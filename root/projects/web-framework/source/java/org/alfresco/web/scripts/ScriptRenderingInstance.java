@@ -64,7 +64,7 @@ public final class ScriptRenderingInstance extends ScriptBase
     {
         if (this.properties == null)
         {
-            this.properties = new ScriptableMap<String, Serializable>(
+            this.properties = new ScriptableLinkedHashMap<String, Serializable>(
                     this.rendererContext.getObject().getProperties());
         }
         

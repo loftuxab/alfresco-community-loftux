@@ -26,6 +26,7 @@ package org.alfresco.web.site;
 
 import java.io.Serializable;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
@@ -120,6 +121,14 @@ public interface RequestContext extends Serializable
      * @return An iterator of String keys
      */
     public Iterator<String> keys();
+    
+    /**
+     * Returns the underlying map of the custom key/values pairs
+     * stored on this RequestContext instance. Use with caution!
+     * 
+     * @return the underlying map of custom key/value pairs.
+     */
+    public Map<String, Serializable> map();
 
     /**
      * Sets the currently executing uri.

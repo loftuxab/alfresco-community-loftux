@@ -24,9 +24,6 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.Serializable;
-import java.util.Iterator;
-
 import org.alfresco.connector.User;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
@@ -50,6 +47,7 @@ public final class ScriptRequestContext extends ScriptBase
     protected ScriptModelObject scriptThemeObject = null;
     protected ScriptUser scriptUser = null;
     
+    
     /**
      * Constructs a new ScriptRequestContext object.
      * 
@@ -67,16 +65,7 @@ public final class ScriptRequestContext extends ScriptBase
     {
         if (this.properties == null)
         {
-            this.properties = new ScriptableMap<String, Serializable>();
-            
-            // copy in any custom values that have been applied to the RequestContext
-            Iterator<String> it = context.keys();
-            while (it.hasNext())
-            {
-                String key = it.next();
-                Serializable value = (Serializable)context.getValue(key);
-                properties.put(key, value);
-            }
+            this.properties = new ScriptableWrappedMap(context.map());
         }
         
         return this.properties;
@@ -85,7 +74,6 @@ public final class ScriptRequestContext extends ScriptBase
     
     // --------------------------------------------------------------
     // JavaScript Properties
-    //
     
     public ScriptContentObject getContent()
     {

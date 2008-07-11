@@ -228,8 +228,7 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
         {
             // retrieve script model value
             Object value = entry.getValue();
-            Object templateValue = getContainer().getScriptProcessor().unwrapValue(
-                    value);
+            Object templateValue = getContainer().getScriptProcessor().unwrapValue(value);
             templateModel.put(entry.getKey(), templateValue);
         }
     }

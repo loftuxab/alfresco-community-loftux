@@ -702,7 +702,7 @@ public final class ScriptSiteData extends ScriptBase
         {
             Map<String, TemplateInstance> templatesMap = page.getTemplates(context);
             
-            ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>(templatesMap.size());
+            ScriptableMap<String, Serializable> map = new ScriptableLinkedHashMap<String, Serializable>(templatesMap.size());
             Iterator it = templatesMap.keySet().iterator();
             while (it.hasNext())
             {

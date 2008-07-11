@@ -52,7 +52,8 @@ public final class ScriptHelper implements Serializable
     public static ScriptableMap toScriptableMap(RequestContext context,
             ModelObject[] modelObjects)
     {
-        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>(modelObjects.length);
+        ScriptableMap<String, Serializable> map =
+            new ScriptableLinkedHashMap<String, Serializable>(modelObjects.length);
         
         for (int i = 0; i < modelObjects.length; i++)
         {
@@ -75,7 +76,7 @@ public final class ScriptHelper implements Serializable
     public static ScriptableMap toScriptableMap(RequestContext context,
             Map<String, ModelObject> objects)
     {
-        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>(objects.size());
+        ScriptableMap<String, Serializable> map = new ScriptableLinkedHashMap<String, Serializable>(objects.size());
         
         // convert to map of script model objects
         Iterator it = objects.keySet().iterator();
@@ -100,7 +101,7 @@ public final class ScriptHelper implements Serializable
      */
     public static ScriptableMap toScriptableMap(Map<String, Serializable> map)
     {
-        return new ScriptableMap<String, Serializable>(map);
+        return new ScriptableLinkedHashMap<String, Serializable>(map);
     }
 
     /**
