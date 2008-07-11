@@ -4,8 +4,4 @@
    <region-id>filter</region-id>
    <source-id>wiki</source-id>
    <url>/components/wiki/filter</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>
