@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+	<title>Alfresco Forge</title>  
+	<url>/components/extranet/alfresco-forge</url>
+	
+	<!-- Binding --> 
+	<scope>page</scope>
+	<region-id>body</region-id>
+	<source-id>resources</source-id>
+  
+</component>

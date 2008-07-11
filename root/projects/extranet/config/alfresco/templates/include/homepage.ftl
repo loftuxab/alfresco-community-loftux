@@ -15,139 +15,27 @@
 	<div class="yui-b">
 	
 		<@region id="enterprise-welcome" scope="global"/>
-					
-		<h2>Enterprise News</h2>
-		<@region id="networknews" scope="global"/>
-
-		<h2>Product News</h2>
-		<ul>
-			<li><a href="#">Alfresco 3.0 Wiki Pages to help get you up-to-speed on our next major release</a> (15 May)</li>
-			<li><a href="#">Alfresco 2.2.0 Enterprise Now Available</a> (18 Apr)</li>
-			<li><a href="#">Alfresco Community 2.9B Labs release available for download</a> (9 Dec 2007)</li>
-		</ul>
-		<h2>Activity Feed</h2>
-		<ul>
-			<li><a href="#">Mike F added 'DM Roadway' 9 AM today.</a></li>
-			<li><a href="#">Dave C added 'New API Handbook' 6 AM, 12 May</a></li>
-			<li><a href="#">John N updated 'Roadmap' 2 PM, 10 May</a></li>
-		</ul>
-		<h2>Additional Enterprise Resources</h2>
-		<ul>
-			<li><a href="#">Source Code</a></li>
-			<li><a href="#">Roadmap</a></li>
-			<li><a href="#">Training</a></li>
-		</ul>
-		<div class="rightalign">
-			<a href="#"><img src="images/add.gif" alt="" /></a>
-		</div>
+		<br/>
+		<@region id="enterprise-product-updates" scope="global"/>
+		<br/>		
+		<@region id="enterprise-product-news" scope="global"/>
+		
 	</div>
 </div>
 
 <!-- narrow column -->
 <div class="yui-b">
 
-	<h3>Enterprise Product Updates</h3>
-	<div class="roundbox gradient">
-	
-		<!-- Show JIRA stuff -->
-		<table width="100%">
-			<tr>
-				<td colspan="2"><b><u>June 23</u></b></td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>User usages - add tests + fixes</td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>Activity Service - add site/user feed RSS templates ...</td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>Merged FTP Path Parsing Fix From HEAD</td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>Fix issue in web-framework where components bindings were cached per template instance - should only be cached per request.</td>
-			</tr>
+	<@region id="networknews" scope="global"/>
+	<br/>
+	<@region id="alfresco-communities" scope="global"/>
+	<br/>
+	<@region id="alfresco-events" scope="global"/>
+	<br/>
+	<@region id="alfresco-top-contributors" scope="global"/>
+	<br/>
+	<@region id="alfresco-popular-extensions" scope="global"/>
 
-			<tr>
-				<td colspan="2"><br/></td>
-			</tr>
-			
-			<tr>
-				<td colspan="2"><b><u>June 22</u></b></td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>Initial version of the agenda view of the calendar.</td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>Refactored RemoteStore client, Improvements and fixes to web-framework.</td>
-			</tr>
-			<tr>
-				<td><img src="/extranet/components/extranet/downloads/opts_16.gif"></td>
-				<td>ACT-759: Workflow - nested forks issue</td>
-			</tr>
-
-		</table>
-		
-	</div>
-	<h3>Other Alfresco Communities</h3>
-	<div class="box">
-		<img src="images/facebook.gif" alt="" />
-		<div class="txt">
-			<a href="#">Join our Facebook Community</a>
-		</div>
-	</div>
-	<h3>Related Events &amp; Webinars</h3>
-	<div class="box">
-		<img src="images/img1.gif" alt="" />
-		<div class="txt">
-			<a href="#">JavaOne Conference</a><br />
-			6-9 May 2008<br />
-			San Francisco, CA
-		</div>
-	</div>
-	<div class="box">
-		<img src="images/img2.gif" alt="" />
-		<div class="txt">
-			<a href="#">Alfresco iPhone Integration Webinar</a><br />
-			3 April 2008<br />
-			12pm EDT
-		</div>
-	</div>
-	<h3>Top Forum Members</h3>
-	<div class="box">
-		<img src="images/photo1.jpg" alt="" />
-		<div class="txt">
-			<a href="#">Nancy Garrity</a>
-		</div>
-	</div>
-	<div class="box">
-		<img src="images/photo2.jpg" alt="" />
-		<div class="txt">
-			<a href="#">Ian Howells</a>
-		</div>
-	</div>
-	<div class="box">
-		<img src="images/photo3.jpg" alt="" />
-		<div class="txt">
-			<a href="#">David Sadowski</a>
-		</div>
-	</div>
-	<h3>Popular Extensions</h3>
-	<div class="box">
-		<img src="images/img3.gif" alt="" />
-		<div class="txt">
-			<ul>
-				<li><a href="#">Email User Password</a></li>
-				<li><a href="#">Alfresco Rights Viewer</a></li>
-				<li><a href="#">Google Mashup</a></li>
-			</ul>
-		</div>
-	</div>
 </div>
 
 </#macro>
