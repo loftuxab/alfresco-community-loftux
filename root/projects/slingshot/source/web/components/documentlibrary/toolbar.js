@@ -278,7 +278,7 @@
          {
             siteId: this.options.siteId,
             containerId: this.options.containerId,
-            path: this.currentPath,
+            uploadDirectory: this.currentPath,
             filter: [],
             mode: this.fileUpload.MODE_MULTI_UPLOAD,
             onFileUploadComplete:

@@ -224,7 +224,9 @@
       {
          siteId: null,
          containerId: null,
-         path: null,
+         uploadDirectory: null,
+         updateNodeRef: null,
+         updateFilename: null,
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
          onFileUploadComplete: null,
@@ -305,12 +307,20 @@
       titleText: null,
 
       /**
-       * HTMLElement of type span that displays help text for multiple selection.
+       * HTMLElement of type span that displays help text for multi uploads.
        *
-       * @property multiSelectText
+       * @property multiUploadTip
        * @type HTMLElement
        */
-      multiSelectText:null,
+      multiUploadTip:null,
+
+      /**
+       * HTMLElement of type span that displays help text for single updates.
+       *
+       * @property singleUpdateTip
+       * @type HTMLElement
+       */
+      singleUpdateTip:null,
 
       /**
        * HTMLElement of type span that displays the total upload status
@@ -319,6 +329,22 @@
        * @type HTMLElement
        */
       statusText: null,
+
+      /**
+       * HTMLElement of type radio button for major or minor version 
+       *
+       * @property description
+       * @type HTMLElement
+       */
+      minorVersion: null,
+
+      /**
+       * HTMLElement of type textarea for version comment
+       *
+       * @property description
+       * @type HTMLElement
+       */
+      description: null,
 
       /**
        * HTMLElement of type div that displays the version input form.
@@ -383,16 +409,18 @@
        * @param config {object} describes how the upload dialog should be displayed
        * The config object is in the form of:
        * {
-       *    siteId: {string},       // site to upload file(s) to
-       *    containerId: {string},  // container to upload file(s) to (i.e. a doclib id)
-       *    path: {string},         // path inside the component to upload file(s) to
-       *    mode: {int},            // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
-       *    filter: {array},        // limits what kind of files the user can select in the OS file selector
+       *    siteId: {string},        // site to upload file(s) to
+       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
+       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
+       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
+       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
+       *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
+       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
        *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: false        // If true and in mode MODE_XXX_UPLOAD it tells
-       *                            // the backend to overwrite a file with the existing name
-       *                            // If false and in mode MODE_XXX_UPLOAD it tells
-       *                            // the backend to append a number to the filename to avoid an overwrite 
+       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to overwrite a file with the existing name
+       *                             // If false and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to append a number to the filename to avoid an overwrite
        * }
        */
       show: function FU_show(config)
@@ -402,13 +430,13 @@
 
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
-         if (this.showConfig.path === undefined)
+         if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
          {
-             throw new Error("A path must be provided");
+             throw new Error("An updateNodeRef OR uploadDirectory must be provided");
          }
-         else if (this.showConfig.path.length === 0)
+         if (this.showConfig.uploadDirectory !== null && this.showConfig.uploadDirectory.length === 0)
          {
-            this.showConfig.path = "/";
+            this.showConfig.uploadDirectory = "/";
          }
          // Check if the uploader has been shoed before
          if (this.panel)
@@ -481,8 +509,13 @@
 
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.titleText = Dom.get(this.id + "-title-span");
-         this.multiSelectText = Dom.get(this.id + "-multiSelect-span");
+         this.multiUploadTip = Dom.get(this.id + "-multiUploadTip-span");
+         this.singleUpdateTip = Dom.get(this.id + "-singleUpdateTip-span");
          this.statusText = Dom.get(this.id + "-status-span");
+         this.description = YAHOO.util.Dom.get(this.id + "-description-textarea");
+
+         // Save reference to version radio so we can reset and get its value later
+         this.minorVersion = YAHOO.util.Dom.get(this.id + "-minorVersion-radioButton");
 
          // Save a reference to browseButton so wa can change it later
          this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
@@ -863,6 +896,7 @@
                this.widgets.uploadButton.set("label", Alfresco.util.message("button.uploading", this.name));
                this.widgets.uploadButton.set("disabled", true);
                this.widgets.browseButton.set("disabled", true);
+               this._updateStatus();
             }
             // And start uploading from the queue
             this._uploadFromQueue(2);
@@ -897,6 +931,11 @@
 
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
+
+            var tip = Alfresco.util.message("label.singleUpdateTip", this.name);
+            tip = YAHOO.lang.substitute(tip, {"0": this.showConfig.updateFilename});
+            this.singleUpdateTip["innerHTML"] = tip;
+
             // Display the version input form
             Dom.removeClass(this.versionSection, "hidden");
          }
@@ -908,16 +947,37 @@
 
          if (this.showConfig.mode === this.MODE_MULTI_UPLOAD)
          {
+            // Show the upload status label, only interesting for multiple files
+            Dom.removeClass(this.statusText, "hidden");
+
             // Show the help label for how to select multiple files
-            Dom.removeClass(this.multiSelectText, "hidden");
+            Dom.removeClass(this.multiUploadTip, "hidden");
+
+            // Hide the help label for other modes
+            Dom.addClass(this.singleUpdateTip, "hidden");
 
             // Make the file list long
             this.dataTable.set("height", "204px");
          }
          else
          {
+            // Hide the upload status label, only interesting for multiple files
+            Dom.addClass(this.statusText, "hidden");
+
             // Hide the help label for how to select multiple files
-            Dom.addClass(this.multiSelectText, "hidden");
+            Dom.addClass(this.multiUploadTip, "hidden");
+
+            // Show the help label for single updates
+            if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+            {
+               // Show the help label for single updates
+               Dom.removeClass(this.singleUpdateTip, "hidden");
+            }
+            else
+            {
+               // Hide the help label for single updates
+               Dom.addClass(this.singleUpdateTip, "hidden");
+            }
 
             // Make the file list short
             this.dataTable.set("height", "40px");
@@ -1099,6 +1159,8 @@
          this.noOfSuccessfulUploads = 0;
          this.noOfUnrenderedRows = 0;
          this.statusText["innerHTML"] = "&nbsp;";
+         this.description.value = "";
+         this.minorVersion.checked = true;
          this.widgets.uploadButton.set("label", Alfresco.util.message("button.upload", this.name));
          this.widgets.uploadButton.set("disabled", true);
          this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
@@ -1223,24 +1285,23 @@
                fileInfo.state = this.STATE_UPLOADING;
 
                // The contentType that the file should be uploaded as.
-               var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
                var attributes = {
-                  path: this.showConfig.path,
                   siteId: this.showConfig.siteId,
-                  containerId: this.showConfig.containerId,
-                  contentType: contentType
+                  containerId: this.showConfig.containerId
                }
                if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
-               {
-                  var majorVersion = YAHOO.util.Dom.get(this.id + "-majorVersion-radioButton").checked;
-                  attributes.majorVersion = majorVersion;
-                  var description = YAHOO.util.Dom.get(this.id + "-description-textarea").value;
-                  attributes.description = description;
+               {         
+                  attributes.updateNodeRef = this.showConfig.updateNodeRef;
+                  attributes.majorVersion = !this.minorVersion.checked;
+                  attributes.description = this.description.value;
                }
                else
                {
-                  attributes.overwrite = this.showConfig.overwrite;                  
+                  attributes.uploadDirectory = this.showConfig.uploadDirectory;
+                  var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
+                  attributes.contentType = contentType;
+                  attributes.overwrite = this.showConfig.overwrite;
                }
                this.uploader.upload(flashId, url, "POST", attributes, "filedata");
                startedUploads++;

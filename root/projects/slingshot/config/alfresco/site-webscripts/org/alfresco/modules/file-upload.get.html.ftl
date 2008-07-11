@@ -5,7 +5,8 @@
    <div class="bd">
       <p>
          <input id="${args.htmlid}-browse-button" type="button" value="${msg("button.browse")}" />
-         <span id="${args.htmlid}-multiSelect-span">${msg("label.browseTip")}</span>
+         <span id="${args.htmlid}-multiUploadTip-span">${msg("label.multiUploadTip")}</span>
+         <span id="${args.htmlid}-singleUpdateTip-span">${msg("label.singleUpdateTip")}</span>
       </p>
       <p>
          <span id="${args.htmlid}-status-span"></span>

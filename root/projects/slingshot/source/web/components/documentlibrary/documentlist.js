@@ -1019,6 +1019,7 @@
       onActionUploadNewVersion: function DL_onActionUploadNewVersion(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
+         var nodeRef = record.getData("nodeRef");
          var fileName = record.getData("actualName");
 
          if (this.fileUpload === null)
@@ -1035,7 +1036,8 @@
          {
             siteId: this.options.siteId,
             containerId: this.options.containerId,
-            path: this.currentPath + fileName,
+            updateNodeRef: nodeRef,
+            updateFilename: record.getData("displayName"),
             filter: [{description: description, extensions: extensions}],
             mode: this.fileUpload.MODE_SINGLE_UPDATE,
             onFileUploadComplete:
