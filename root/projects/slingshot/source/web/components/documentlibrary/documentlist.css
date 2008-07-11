@@ -203,7 +203,8 @@
    padding: 1px 0px;
 }
 
-.doclist a.action-link
+.doclist a.action-link,
+.doclist a.simple-link
 {
    background-position: 2px 50%;
    background-repeat: no-repeat;
@@ -253,7 +254,7 @@
 
 /* Actions: Icons */
 
-.doclist .onActionDeleteAsset a
+.doclist .onActionDelete a
 {
    background-image: url(images/delete.gif);
 }

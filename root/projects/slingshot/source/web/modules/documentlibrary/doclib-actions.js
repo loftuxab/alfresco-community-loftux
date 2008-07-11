@@ -121,9 +121,17 @@
        * @param action.success.event.name {string} Bubbling event to fire on success
        * @param action.success.event.obj {object} Bubbling event success parameter object
        * @param action.success.message {string} Timed message to display on success
+       * @param action.success.callback.fn {object} Callback function to call on success.
+       * <pre>function(data, obj) where data is an object literal containing config, json, serverResponse</pre>
+       * @param action.success.callback.scope {object} Success callback function scope
+       * @param action.success.callback.obj {object} Success callback function object passed to callback
        * @param action.failure.event.name {string} Bubbling event to fire on failure
        * @param action.failure.event.obj {object} Bubbling event failure parameter object
        * @param action.failure.message {string} Timed message to display on failure
+       * @param action.failure.callback.fn {object} Callback function to call on failure.
+       * <pre>function(data, obj) where data is an object literal containing config, json, serverResponse</pre>
+       * @param action.failure.callback.scope {object} Failure callback function scope
+       * @param action.failure.callback.obj {object} Failure callback function object passed to callback
        * @param action.webscript.name {string} data webscript URL name
        * @param action.webscript.method {string} HTTP method to call the data webscript on
        * @param action.params.siteId {string} current site
@@ -145,9 +153,23 @@
          var fnCallback = function DLA_genericAction_callback(data, obj)
          {
             // Check for notification event
-            if (obj && obj.event && obj.event.name)
+            if (obj)
             {
-               YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
+               // Event specified?
+               if (obj.event && obj.event.name)
+               {
+                  YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
+               }
+               // Callback function specified?
+               if (obj.callback && obj.callback.fn)
+               {
+                  obj.callback.fn.call((typeof obj.callback.scope == "object" ? obj.callback.scope : this),
+                  {
+                     config: data.config,
+                     json: data.json,
+                     serverResponse: data.serverResponse
+                  }, obj.callback.obj);
+               }
             }
          }
          
@@ -193,72 +215,7 @@
          });
 
          return this._runAction(config, obj);
-      },
-   
-      
-      /**
-       * ACTION: Delete file.
-       * Deletes a file from the component container, given filepath
-       *
-       * @method deleteFile
-       * @param site {string} current site
-       * @param containerId {string} component container
-       * @param path {string} path where file is located
-       * @param file {string} file to be deleted
-       * @param obj {object} optional additional request configuration
-       * @return {boolean} false: module not ready
-       */
-      deleteFile: function DLA_deleteFile(site, containerId, path, file, obj)
-      {
-         var filePath =  path + "/" + file;
-         
-         var config = YAHOO.lang.merge(this.defaultConfig,
-         {
-            url: this.defaultConfig.url + "file/site/" + site + "/" + containerId + filePath,
-            method: Alfresco.util.Ajax.DELETE,
-            responseContentType: Alfresco.util.Ajax.JSON,
-            object:
-            {
-               filePath: filePath,
-               fileName: file
-            }
-         });
-
-         return this._runAction(config, obj);
-      },
-      
-      /**
-       * ACTION: Checkout file.
-       * Checks out a working copy file from the component container, given filepath
-       *
-       * @method editFileOffline
-       * @param site {string} current site
-       * @param containerId {string} component container
-       * @param path {string} path where file is located
-       * @param file {string} file to be deleted
-       * @param obj {object} optional additional request configuration
-       * @return {boolean} false: module not ready
-       */
-      editFileOffline: function DLA_editFileOffline(site, containerId, path, file, obj)
-      {
-         var filePath =  path + "/" + file;
-         
-         var config = YAHOO.lang.merge(this.defaultConfig,
-         {
-            url: this.defaultConfig.url + "checkout/site/" + site + "/" + containerId + filePath,
-            method: Alfresco.util.Ajax.POST,
-            responseContentType: Alfresco.util.Ajax.JSON,
-            dataObj: {},
-            object:
-            {
-               filePath: filePath,
-               fileName: file
-            }
-         });
-
-         return this._runAction(config, obj);
       }
-      
    };
 })();
 

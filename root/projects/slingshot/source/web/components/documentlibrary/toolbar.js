@@ -32,6 +32,13 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
+   
+   /**
     * DocListToolbar constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -53,6 +60,7 @@
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
       YAHOO.Bubbling.on("fileSelected", this.onFileSelected, this);
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
    
       return this;
    }
@@ -101,6 +109,17 @@
        * @type string
        */
       currentPath: "",
+
+      /**
+       * Current filter to choose toolbar view and populate description.
+       * 
+       * @property currentFilter
+       * @type string
+       */
+      currentFilter:
+      {
+         filterOwner: ""
+      },
 
       /**
        * FileUpload module instance.
@@ -168,7 +187,7 @@
        */
       onComponentsLoaded: function DLTB_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -179,10 +198,6 @@
        */
       onReady: function DLTB_onReady()
       {
-         var Dom = YAHOO.util.Dom,
-            Event = YAHOO.util.Event,
-            Element = YAHOO.util.Element;
-
          // Reference to self used by inline functions
          var me = this;
          
@@ -202,6 +217,9 @@
          // Folder Up Navigation button
          this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp);
 
+         // DocLib Actions module
+         this.modules.actions = new Alfresco.module.DoclibActions();
+
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -220,6 +238,55 @@
        * @param p_obj {object} Object passed back from addListener method
        */
       onNewFolder: function DLTB_onNewFolder(e, p_obj)
+      {
+         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
+         
+         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/site/{site}/{container}/{path}",
+         {
+            site: this.options.siteId,
+            container: this.options.containerId,
+            path: this.currentPath
+         });
+         
+         if (!this.modules.createFolder)
+         {
+            this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder").setOptions(
+            {
+               width: "30em",
+               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
+               actionUrl: actionUrl,
+               firstFocus: this.id + "-createFolder-name",
+               onSuccess:
+               {
+                  fn: function DLTB_onNewFolder_callback(response)
+                  {
+                     var folder = response.json.results[0];
+                     YAHOO.Bubbling.fire("folderCreated",
+                     {
+                        name: folder.name,
+                        parentPath: folder.parentPath,
+                        nodeRef: folder.nodeRef
+                     });
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this._msg("message.new-folder.success", folder.name)
+                     });
+                  },
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            this.modules.createFolder.setOptions(
+            {
+               actionUrl: actionUrl
+            })
+         }
+         this.modules.createFolder.show();
+      },
+
+      onNewFolder_OLD: function DLTB_onNewFolder_OLD(e, p_obj)
       {
          if (!this.modules.createFolder)
          {
@@ -288,7 +355,7 @@
             }
          }
          this.fileUpload.show(multiUploadConfig);
-         YAHOO.util.Event.preventDefault(e);
+         Event.preventDefault(e);
       },
       
       onFileUploadComplete: function DLTB_onFileUploadComplete(complete)
@@ -375,7 +442,7 @@
          {
             path: newPath
          });
-         YAHOO.util.Event.preventDefault(e);
+         Event.preventDefault(e);
       },
       
 
@@ -418,6 +485,43 @@
          }
       },
       
+      /**
+       * Filter Changed event handler
+       *
+       * @method onFilterChanged
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFilterChanged: function DLTB_onFilterChanged(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.filterId !== null))
+         {
+            if (this.currentFilter.filterId != obj.filterId)
+            {
+               this.currentFilter = obj;
+               var owner = obj.filterOwner.split(".")[1];
+               // Obtain array of DIVs we might want to hide
+               var divs = YAHOO.util.Selector.query('div', Dom.get(this.id + "-headerBar"));
+               divs = divs.concat(YAHOO.util.Selector.query('div', Dom.get(this.id + "-navBar")));
+               var div;
+               for (var i = 0, j = divs.length; i < j; i++)
+               {
+                  div = divs[i];
+                  if (Dom.hasClass(div, owner))
+                  {
+                     Dom.removeClass(div, "hidden");
+                  }
+                  else
+                  {
+                     Dom.addClass(div, "hidden");
+                  }
+               }
+               
+               this._generateDescription();
+            }
+         }
+      },
    
       /**
        * PRIVATE FUNCTIONS
@@ -431,9 +535,6 @@
        */
       _generateBreadcrumb: function DLTB__generateBreadcrumb()
       {
-         var Dom = YAHOO.util.Dom,
-            Element = YAHOO.util.Element;
-         
          var divBC = Dom.get(this.id + "-breadcrumb");
          if (divBC === null)
          {
@@ -471,7 +572,7 @@
                   {
                      path: path
                   });
-                  YAHOO.util.Event.stopEvent(e);
+                  Event.stopEvent(e);
                }, newPath);
                eCrumb.appendChild(eLink);
                eCrumb.appendChild(new Element(document.createElement("span"),
@@ -481,6 +582,39 @@
             }
             eBreadcrumb.appendChild(eCrumb);
          }
+      },
+
+      /**
+       * Generates the HTML mark-up for the description from the currentFilter
+       *
+       * @method _generateDescription
+       * @private
+       */
+      _generateDescription: function DLTB__generateDescription()
+      {
+         var divDesc = Dom.get(this.id + "-description");
+         if (divDesc === null)
+         {
+            return;
+         }
+         divDesc.innerHTML = "";
+         
+         var eDivDesc = new Element(divDesc);
+
+         var eDescMsg = new Element(document.createElement("span"),
+         {
+            innerHTML: this._msg("description." + this.currentFilter.filterId)
+         });
+         eDescMsg.addClass("message");
+
+         var eDescMore = new Element(document.createElement("span"),
+         {
+            innerHTML: this._msg("description." + this.currentFilter.filterId + ".more")
+         });
+         eDescMore.addClass("more");
+         
+         eDescMsg.appendChild(eDescMore);
+         eDivDesc.appendChild(eDescMsg);
       },
 
       /**
