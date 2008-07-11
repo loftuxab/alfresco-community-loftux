@@ -46,26 +46,26 @@
 //]]></script>
 
 <div class="taglibcontainer">
-   <div class="title rel_left"> Tags: </div>
-   <div class="tags rel_left">
+   <label>Tags:</label>
+   <div class="tags">
       <div class="top_taglist tags_box">
          <ul id="${htmlid}-current-tags">
          <#list tags as tag>
             <li id="${htmlid}-onRemoveTag-${tag}">
                <a href="#" class="taglibrary-action">${tag}
-                  <span class="close">
-                     <img src="icon_close.gif" alt="x" />
+                  <span class="close">&nbsp;
+                     <!-- <img src="/modules/taglibrary/images/icon_close.gif" alt="x" /> -->
                   </span>
                </a>
             </li>
          </#list>
          </ul>
       </div>
-      <br clear="all" />
+      <br class="clear" />
       <div class="title">Type Tag(s):</div>
       <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
       <input type="button" id="${htmlid}-add-tag-button" value="Add" />
-      <br />
+      <br class="clear" />
       <div class="bottom_taglist tags_box">
          <a href="#" id="${htmlid}-load-popular-tags-link">Choose from popular tags in this site</a>
          
@@ -73,7 +73,7 @@
          <ul id="${htmlid}-popular-tags">
          </ul>
       </div>
-      <br clear="all" />
+      <br class="clear" />
    </div>
 </div>
 </#macro>
