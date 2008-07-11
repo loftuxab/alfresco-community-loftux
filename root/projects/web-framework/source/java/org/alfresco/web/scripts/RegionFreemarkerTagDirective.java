@@ -92,6 +92,20 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
                tag.setAccess("protected");
            }
         }
+        
+        // Region chrome
+        // Allows region directives to explicitly specify which chrome they want to use
+        TemplateModel chromeValue = (TemplateModel)params.get("chrome");
+        if(chromeValue != null)
+        {
+            if (chromeValue instanceof TemplateScalarModel == false)
+            {
+               throw new TemplateModelException("The 'chrome' parameter to a region directive must be a string.");
+            }
+            String chromeId = ((TemplateScalarModel)chromeValue).getAsString();
+            tag.setChrome(chromeId);
+        }
+        
 
         // copy in body content (if there is any)
         String bodyContentString = null;
