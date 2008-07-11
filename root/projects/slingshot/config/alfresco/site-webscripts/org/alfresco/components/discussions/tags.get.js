@@ -1,21 +1,33 @@
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/callutils.js">
+
+function getContainerTagScopeRequestUrl(site, container)
+{
+    var url = "/api/site/" + site + "/" + container + "/tagscopetags";
+    return url;
+}
+
+function getTags(site, container)
+{
+    var url = getContainerTagScopeRequestUrl(site, container);
+    var data = doGetCall(url);
+    if (data === null)
+    {
+        return null;
+    }
+    return data;
+}
 
 function main()
 {
-    var json = '{ "tags": [ ';
-    json += '  	   { "name": "ECM",';
-    json += '  	   "count": 5 },';
-    json += '  	   { "name": "Alfresco",';
-    json += '  	   "count": 10 },';
-    json += '  	   { "name": "DMS",';
-    json += '  	   "count": 1 } ] }';
+    // gather all required data
+    var site = page.url.templateArgs.site;
+    var container = "discussions";
     
-    var data = eval('(' + json + ')');
-    model.tags = data.tags;
-    
-    /* 
-    Look here for the logic about how to create tag cloud
-    http://www.petefreitag.com/item/396.cfm
-    */
+    var data = getTags(site, container);
+    if (data != null)
+    {
+       model.tags = data.tags;
+    }
 }
 
 main();

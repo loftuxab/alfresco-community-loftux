@@ -117,76 +117,15 @@
          {
             this._registerPostForm();
          }
+
+         // action hooks
+         Alfresco.util.registerDefaultActionHandler(this.id, "blogpost-action-link", "div", this);
          
+         // initialize the mouse over listener
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onPostElementMouseEntered, this.onPostElementMouseExited);
          
-         // only initialize action hooks and roll-over if we have a post
-         // otherwise it's just a create form
-         if (this.options.postId.length > 0)
-         {
-             // Hook action events
-             var me = this;
-             YAHOO.Bubbling.addDefaultAction("action-link-"+this.options.postId, function BlogPostList_filterAction(layer, args)
-             {
-                var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
-                if (owner !== null)
-                {
-                   var action = owner.className;
-                   var target = args[1].target;
-                   if (typeof me[action] == "function")
-                   {
-                      // extract the id from the element
-                      var elemId = owner.id.substring((action + "-").length);
-                      me[action].call(me, elemId);
-                      args[1].stop = true;
-                   }
-                }
-          		 
-                return true;
-             });
-             
-             // initialize the mouse over functionality for the list
-             this.initMouseOverListeners();
-         }
-      },
-      
-      createSimpleEditor: function CreateComment_createSimpleEditor(textareaId)
-      {
-         // instantiate the simple editor we use for the form
-		 var editor = new YAHOO.widget.SimpleEditor(textareaId, {
-		     height: '300px',
-		     width: '538px',
-		     dompath: false, //Turns on the bar at the bottom
-		     animate: false, //Animates the opening, closing and moving of Editor windows
-		     toolbar: {
-		        titlebar: false,
-		        buttons: [
-		            { group: 'textstyle', label: this._msg("comments.form.font"),
-		                buttons: [
-				            { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
-				            { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
-				            { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
-		                    { type: 'separator' },
-		                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-		                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
-		                ]
-		            },
-		            { type: 'separator' },
-				    { group: 'indentlist', label: this._msg("comments.form.lists"),
-				        buttons: [
-				            { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
-				            { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
-				        ]
-				    },
-				    { type: 'separator' },
-				    { group: 'insertitem', label: this._msg("comments.form.link"),
-				        buttons: [
-				            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
-				        ]
-				    }
-		        ]
-		    }
-		 });
-		 return editor;
+         // as the list got already rendered on the server, already attach the listener to the rendered elements
+         Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
       },
 
       /**
@@ -223,7 +162,14 @@
          cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-		 this.editor = this.createSimpleEditor(this.id + '-content')
+		 this.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
+		     height: '300px',
+		     width: '538px',
+		     dompath: false, //Turns on the bar at the bottom
+		     animate: false, //Animates the opening, closing and moving of Editor windows
+		     toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
+		 });
+
 		 this.editor.render();
          
          // create the form that does the validation/submit
@@ -248,7 +194,6 @@
              postForm.ajaxSubmitMethod = "PUT";
          }
          postForm.setSubmitAsJSON(true);
-          
          postForm.doBeforeFormSubmit =
         	{
         	   fn: function(form, obj)
@@ -331,22 +276,22 @@
        * Loads the edit post form and displays it instead of the content
        * The div class should have the same name as the above function (onEditNode)
        */
-      onEditNode: function BlogPostList_onEditNode(id)
+      onEditNode: function BlogPostList_onEditNode(htmlId, ownerId, param)
       {
-         this._loadBlogPostEditPage(id);
+         this._loadBlogPostEditPage(param);
       },
       
       /**
        * Deletes a post.
        * The div class which contain the Delete link should have the same name as the above function (onEditNode)
        */
-      onDeleteNode: function BlogPost_onDelete(elemId)
+      onDeleteNode: function BlogPost_onDelete(htmlId, ownerId, param)
       {
          // make an ajax request to delete the post
          // we can directly go to alfresco for this
          Alfresco.util.Ajax.request(
 		   {
-		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" + this.options.postId,
+		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" + param,
 		      method: "DELETE",
 		      responseContentType : "application/json",
 		      successCallback:
@@ -369,13 +314,13 @@
                     this.options.siteId + "/" + this.options.containerId + "/" + postId + "/publishing";
       },
       
-      onPublishExternal: function Blog_onPublishExternal(id)
+      onPublishExternal: function Blog_onPublishExternal(htmlId, ownerId, param)
       {
          var me = this;
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: me._getPublishingRestUrl(id),
+		      url: me._getPublishingRestUrl(param),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -398,12 +343,12 @@
           this._loadBlogPostViewPage(response.json.item.name);
       },
      
-      onUpdateExternal: function Blog_onUpdateExternal(id)
+      onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, param)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: this._getPublishingRestUrl(id),
+		      url: this._getPublishingRestUrl(param),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -426,12 +371,12 @@
           this._loadBlogPostViewPage(response.json.item.name);
       },    
 
-      onUnpublishExternal: function Blog_onUnpublishExternal(id)
+      onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, param)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: this._getPublishingRestUrl(id),
+		      url: this._getPublishingRestUrl(param),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -473,92 +418,7 @@
             window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postlist";
       },
       
-      
-      // helper functions
-      
-      
-      /**
-       * Updates a div content and makes sure the div is displayed
-       */
-       
-      updateAndShowDiv: function BlogPost_updateAndShowDiv(divId, newHTML)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-          elem.innerHTML = newHTML;
-	      YAHOO.util.Dom.removeClass(elem, "hidden");
-      },
-      
-      showDiv: function BlogPost_updateAndShowDiv(divId)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-	      YAHOO.util.Dom.removeClass(elem, "hidden");
-      },
-      
-      hideDiv: function BlogPost_hideDiv(divId)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-	      YAHOO.util.Dom.addClass(elem, "hidden");          
-      },
-      
       // mouse hover functionality
-      
-      /**
-       * Attaches a listener to all passed elements.
-       */
-      _attachRolloverListener: function(elem, mouseOverEventName, mouseOutEventName)
-      {  
-         var eventElem = elem;
-         
-         var mouseOverHandler = function(e)
-         {
-             // find out whether we actually moved inside the 
-             if (! e) var e = window.event;
-             var relTarg = e.relatedTarget || e.fromElement;
-             while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY') {
-                relTarg = relTarg.parentNode
-             }
-             if (relTarg == eventElem) return;
-             
-             // the mouse entered the element, fire an event to inform about it
-             YAHOO.Bubbling.fire(mouseOverEventName, {event : e, target : eventElem});
-         };
-         
-         var mouseOutHandler = function(e)
-         {
-             // find out whether we actually moved inside the 
-             if (! e) var e = window.event;
-             var relTarg = e.relatedTarget || e.toElement;
-             while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY') {
-                relTarg = relTarg.parentNode
-             }
-             if (relTarg == eventElem) return;
-             
-             // the mouse exited the element, fire an event to inform about it
-             YAHOO.Bubbling.fire(mouseOutEventName, {event : e, target : eventElem});
-         };
-         
-         YAHOO.util.Event.addListener(elem, 'mouseover', mouseOverHandler);
-         YAHOO.util.Event.addListener(elem, 'mouseout', mouseOutHandler);
-      },
-      
-      firstMouseOverInit: true,
-      
-      initMouseOverListeners: function BlogPostList_initMouseOverListeners()
-      {
-         var mouseEnteredBubbleEventName = 'onPostElementMouseEntered';
-         var mouseExitedBubbleEventName = 'onPostElementMouseExited';
-         var divs = YAHOO.util.Dom.getElementsByClassName('post', 'div');
-         for (var x=0; x < divs.length; x++) {
-             this._attachRolloverListener(divs[x], mouseEnteredBubbleEventName, mouseExitedBubbleEventName);
-         }
-         
-         if (this.firstMouseOverInit) {
-            this.firstMouseOverInit = false;
-            // manage mouse hover/exit
-            YAHOO.Bubbling.on(mouseEnteredBubbleEventName, this.onPostElementMouseEntered, this);
-            YAHOO.Bubbling.on(mouseExitedBubbleEventName, this.onPostElementMouseExited, this);
-         }
-      },
       
       /** Called when the mouse enters into a list item. */
       onPostElementMouseEntered: function BlogPostList_onListElementMouseEntered(layer, args)
