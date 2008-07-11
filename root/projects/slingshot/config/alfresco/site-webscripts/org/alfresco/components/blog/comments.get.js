@@ -24,7 +24,7 @@ function main()
    model.post = item;
     
    // fetch the replies
-   var commentsdata = fetchComments(data.item.nodeRef);
+   var commentsdata = fetchComments(item.nodeRef);
    if (status.getCode() != status.STATUS_OK)
    {
       return;

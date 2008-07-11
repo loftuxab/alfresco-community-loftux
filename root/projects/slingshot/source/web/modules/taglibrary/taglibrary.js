@@ -266,7 +266,7 @@
          <li id="${htmlid}-onRemoveTag-${tag}">
         	<a href="#" class="taglibrary-action">${tag}
         		<span class="close">
-        			<img src="icon_close.gif" alt="x" />
+        			<img src="/modules/taglibrary/images/icon_add.gif" alt="x" />
         		</span>
         	</a>
          </li>
@@ -276,7 +276,7 @@
          var elemId = this.id + '-onRemoveTag-' + tagName;
          elem.setAttribute('id', elemId);
          elem.innerHTML = '<a href="#" class="taglibrary-action">' + tagName +
-                          '    <span class="close"><img src="icon_close.gif" alt="x" /></span></a>';
+                          '    <span class="close">&nbsp;</span></a>'; // <img src="/modules/taglibrary/images/icon_add.gif" alt="x" />
          currentTagsElem.appendChild(elem);
 
          // inform interested parties about change
@@ -318,7 +318,7 @@
       _displayPopularTags: function TagLibrary__showPopularTags(tags)
       {
          // remove the popular tags load link
-         YAHOO.util.Dom.setStyle(this.id + "-load-popular-tags-link", "visibility", "hidden");
+         YAHOO.util.Dom.setStyle(this.id + "-load-popular-tags-link", "display", "none");
 
          // add all tags to the ui
          /*
@@ -337,7 +337,7 @@
             var elemId = this.id + "-onAddTag-" + tags[x];
             elem.setAttribute('id', elemId);
             elem.innerHTML = '<a href="#" class="taglibrary-action">' + tags[x] +
-        		'<span class="close"><img src="icon_close.gif" alt="x" /></span></a>';
+        		'<span class="close">&nbsp;</span></a>'; // <img src="icon_close.gif" alt="x" />
             popularTagsElem.appendChild(elem);
          }
       },
