@@ -51,6 +51,11 @@ function getPostsRequestUrlWithParams(site, container, path, filter, tag, fromDa
         url = addParamToUrl(url, "toDate", toDate);
     }
     
+    if (tag != null && tag.length > 0)
+    {
+        url = addParamToUrl(url, "tag", tag);
+    }
+    
     // add the contentFormat
     url = addParamToUrl(url, "contentFormat", "textDigest");
 

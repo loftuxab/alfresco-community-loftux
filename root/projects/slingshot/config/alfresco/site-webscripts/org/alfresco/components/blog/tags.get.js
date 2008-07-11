@@ -1,15 +1,33 @@
-var json = '{ "tags": [ ';
-json += '  	   { "name": "Brand",';
-json += '  	   "count": 3 },';
-json += '  	   { "name": "Compute",';
-json += '  	   "count": 5 },';
-json += '  	   { "name": "Desogm",';
-json += '  	   "count": 6 } ] }';
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/callutils.js">
 
-var data = eval('(' + json + ')');
-model.tags = data.tags;
+function getContainerTagScopeRequestUrl(site, container)
+{
+    var url = "/api/site/" + site + "/" + container + "/tagscopetags";
+    return url;
+}
 
-/* 
-Look here for the logic about how to create tag cloud
-http://www.petefreitag.com/item/396.cfm
-*/
+function getTags(site, container)
+{
+    var url = getContainerTagScopeRequestUrl(site, container);
+    var data = doGetCall(url);
+    if (data === null)
+    {
+        return null;
+    }
+    return data;
+}
+
+function main()
+{
+    // gather all required data
+    var site = page.url.templateArgs.site;
+    var container = "blog";
+    
+    var data = getTags(site, container);
+    if (data != null)
+    {
+       model.tags = data.tags;
+    }
+}
+
+main();

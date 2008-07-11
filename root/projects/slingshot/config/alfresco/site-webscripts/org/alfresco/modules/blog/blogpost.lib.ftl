@@ -6,36 +6,36 @@
   ${page.url.context}
   ${url.context}
 -->
-<#macro blogpostViewHTML post>
-   <div id="${post.name}" class="node post postview">
+<#macro blogpostViewHTML htmlid post>
+<div id="${post.name}" class="node post postview">
    
    <div class="nodeEdit">
       <#if (post.permissions.edit)>
-      <div class="onEditNode" id="onEditNode-${post.name}">
-         <a href="#" class="action-link-${post.name}">${msg("post.action.edit")}</a>
+      <div class="onEditNode" id="${htmlid}-onEditNode-${post.name}">
+         <a href="#" class="blogpost-action-link">${msg("post.action.edit")}</a>
       </div>
       </#if>
         
       <#if (post.permissions.publishExt && ! post.isDraft)>
          <#if post.isPublished>
             <#if post.outOfDate>
-            <div class="onUpdateExternal" id="onUpdateExternal-${post.name}">
-               <a href="#" class="action-link-${post.name}">${msg("post.action.updateexternal")}</a>
+            <div class="onUpdateExternal" id="${htmlid}-onUpdateExternal-${post.name}">
+               <a href="#" class="blogpost-action-link">${msg("post.action.updateexternal")}</a>
             </div>
             </#if>
-            <div class="onUnpublishExternal" id="onUnpublishExternal-${post.name}">
-               <a href="#" class="action-link-${post.name}">${msg("post.action.unpublishexternal")}</a>
+            <div class="onUnpublishExternal" id="${htmlid}-onUnpublishExternal-${post.name}">
+               <a href="#" class="blogpost-action-link">${msg("post.action.unpublishexternal")}</a>
             </div>
          <#else>
-            <div class="onPublishExternal" id="onPublishExternal-${post.name}">
-               <a href="#" class="action-link-${post.name}">${msg("post.action.publishexternal")}</a>
+            <div class="onPublishExternal" id="${htmlid}-onPublishExternal-${post.name}">
+               <a href="#" class="blogpost-action-link">${msg("post.action.publishexternal")}</a>
             </div>
          </#if>
       </#if>
         
       <#if (post.permissions.delete)>
-         <div class="onDeleteNode" id="onDeleteNode-${post.name}">
-            <a href="#" class="action-link">${msg("post.action.delete")}</a>
+         <div class="onDeleteNode" id="${htmlid}-onDeleteNode-${post.name}">
+            <a href="#" class="blogpost-action-link">${msg("post.action.delete")}</a>
          </div>
       </#if>
    </div>
@@ -73,8 +73,8 @@
             </#list>
          </span>
       </#if> 
-     </div>
-  </div>
+   </div>
+</div>
 </#macro>
 
 

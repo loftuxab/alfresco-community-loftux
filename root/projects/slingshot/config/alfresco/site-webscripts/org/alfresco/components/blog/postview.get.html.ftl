@@ -24,6 +24,6 @@
 
 <div id="${args.htmlid}-post">
    <div id="${args.htmlid}-viewDiv">
-      <@blogpostLib.blogpostViewHTML post=item/>
+      <@blogpostLib.blogpostViewHTML htmlid=args.htmlid post=item/>
    </div>
 </div>

@@ -8,7 +8,7 @@ function main()
    var container = "blog";
    var path = "";
    var filter = args["filter"];
-   var tag = "";
+   var tag = args["tag"];
    var fromDate = args["fromDate"];
    var toDate = args["toDate"];
    var paginationData = fetchPaginationDataFromRequest(0, 10);
