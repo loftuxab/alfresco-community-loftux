@@ -37,6 +37,10 @@
             <div class="yui-u first">End date:</div>
             <div class="yui-u"><span id="${args.htmlid}-enddate"><input id="td" type="text" name="dateto" readonly="readonly" value="<#if event.to?exists>${event.to?date("MM/dd/yyy")?string("EEEE, MMMM dd yyyy")}</#if>"/></span><span id="${args.htmlid}-endtime">&nbsp;at&nbsp;<input id="${args.htmlid}-end" name="end" value="${event.end!"13:00"}" type="text" size="10" /></span></div>
          </div>
+         <div class="yui-gd"> 
+            <div class="yui-u first">Tags:</div>
+            <div class="yui-u"><input type="text" id="${args.htmlid}-tags" name="tags" value=""/> space separated</div>
+         </div>
          <div class="bdft">
             <input type="submit" id="${args.htmlid}-ok-button" value="OK" />
             <input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />

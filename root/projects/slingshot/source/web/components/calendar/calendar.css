@@ -196,3 +196,8 @@ div.agenda-item {
 div.cal-event-entry a {
 	text-decoration: none;
 }
+
+/* Override default textfield width for start and end time textfields */
+span.eventTime  input[type="text"] {
+   width: 5em;
+}

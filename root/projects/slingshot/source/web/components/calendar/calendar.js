@@ -56,7 +56,7 @@
        * A reference to the YAHOO calendar component.
        * 
        * @property calendar
-       * @type YAHOO.widget.CalendarGroup
+       * @type YAHOO.widget.Calendar
        */
 		calendar: null,
 
@@ -110,7 +110,7 @@
 		
 		 	// Separate the (initial) rendering of the calendar from the data loading.
 		 	// If for some reason the data fails to load, the calendar will still display.
-			this.calendar = new YAHOO.widget.CalendarGroup("calendar");
+			this.calendar = new YAHOO.widget.Calendar("calendar");
 			// Set localised properties
 			this.calendar.cfg.setProperty("MONTHS_SHORT", eval(Alfresco.util.message("yui.calendar.months_short", this.name)));
 			this.calendar.cfg.setProperty("MONTHS_LONG", eval(Alfresco.util.message("yui.calendar.months_long", this.name)));
