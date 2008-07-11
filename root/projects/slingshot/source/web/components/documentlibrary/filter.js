@@ -92,26 +92,18 @@
             if (owner !== null)
             {
                var Dom = YAHOO.util.Dom;
-               var filter = owner.className;
+               var filterId = owner.className;
                YAHOO.Bubbling.fire("filterChanged",
                {
-                  filterId: filter,
+                  filterId: filterId,
                   filterOwner: me.name
                });
                
                // If a function has been provided which corresponds to the filter name, then call it
-               if (typeof me[filter] == "function")
+               if (typeof me[filterId] == "function")
                {
-                  me[filter].call(me);
+                  me[filterId].call(me);
                }
-               
-               // Update the current selected filter highlight
-               if (me.selectedFilter !== null)
-               {
-                  Dom.removeClass(me.selectedFilter, "selected");
-               }
-               me.selectedFilter = owner.parentNode;
-               Dom.addClass(me.selectedFilter, "selected");
             }
       		 
             return true;
@@ -136,16 +128,24 @@
          if ((obj !== null) && (obj.filterId !== null))
          {
             var Dom = YAHOO.util.Dom;
-            if (this.selectedFilter !== null)
+            if (obj.filterOwner == this.name)
             {
-               if (obj.filterOwner == this.name)
+               // Remove the old highlight, as it might no longer be correct
+               if (this.selectedFilter !== null)
                {
-                  // This component now owns the active filter
-                  Dom.addClass(this.selectedFilter, "selected");
+                  Dom.removeClass(this.selectedFilter, "selected");
                }
-               else
+
+               // Need to find the selectedFilter element, from the current filterId
+               this.selectedFilter = YAHOO.util.Selector.query("." + obj.filterId, this.id + "-body")[0].parentNode;
+               // This component now owns the active filter
+               Dom.addClass(this.selectedFilter, "selected");
+            }
+            else
+            {
+               // Currently filtering by something other than this component
+               if (this.selectedFilter !== null)
                {
-                  // Currently filtering by something other than this component
                   Dom.removeClass(this.selectedFilter, "selected");
                }
             }

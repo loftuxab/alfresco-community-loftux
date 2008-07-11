@@ -422,6 +422,21 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
 }
 
 /**
+ * Returns a URL to the content represented by the passed-in nodeRef
+ *
+ * @method Alfresco.util.contentURL
+ * @param nodeRef {string} Standard Alfresco nodeRef
+ * @param name {string} Filename to download
+ * @param attach {boolean} If true, browser should prompt the user to "Open or Save?", rather than display inline
+ * @return {string} The URL to the content
+ * @static
+ */
+Alfresco.util.contentURL = function(nodeRef, name, attach)
+{
+   return Alfresco.constants.PROXY_URL + "api/node/content/" + nodeRef.replace(":/", "") + "/" + name + (attach ? "?a=true" : "");
+}
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */
@@ -574,7 +589,7 @@ Alfresco.util.ComponentManager = function()
       },
 
       /**
-       * Allows components to find other regsitered components by name, id or both
+       * Allows components to find other registered components by name, id or both
        * e.g. find({name: "Alfresco.DocumentLibrary"})
        * @method find
        * @param p_oParams {object} List of paramters to search by
@@ -602,6 +617,23 @@ Alfresco.util.ComponentManager = function()
             }
          }
          return found;
+      },
+
+      /**
+       * Allows components to find first registered components by name only
+       * e.g. findFirst("Alfresco.DocumentLibrary")
+       * @method findFirst
+       * @param p_sName {string} Name of registered component to search on
+       * @return {object|null} Component found in the search
+       */
+      findFirst: function(p_sName)
+      {
+         var found = Alfresco.util.ComponentManager.find(
+         {
+            name: p_sName
+         });
+         
+         return (typeof found[0] == "object" ? found[0] : null);
       }
    };
 }();

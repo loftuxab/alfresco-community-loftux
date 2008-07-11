@@ -32,6 +32,13 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
+   
+   /**
     * DocumentList constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -248,7 +255,7 @@
        */
       onComponentsLoaded: function DL_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -259,11 +266,6 @@
        */
       onReady: function DL_onReady()
       {
-         var Dom = YAHOO.util.Dom,
-            Event = YAHOO.util.Event,
-            Element = YAHOO.util.Element,
-            History = YAHOO.util.History;
-
          // Reference to self used by inline functions
          var me = this;
          
@@ -276,7 +278,7 @@
          YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       
          // YUI History
-         var bookmarkedPath = History.getBookmarkedState("path") || "";
+         var bookmarkedPath = YAHOO.util.History.getBookmarkedState("path") || "";
          while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath)));
          
          this.currentPath = bookmarkedPath || this.options.initialPath || "";
@@ -286,7 +288,7 @@
          }
 
          // Register History Manager path update callback
-         History.register("path", "", function(newPath)
+         YAHOO.util.History.register("path", "", function(newPath)
          {
             if (this.expectedHistoryEvent)
             {
@@ -307,7 +309,7 @@
          // Initialize the browser history management library
          try
          {
-             History.initialize("yui-history-field", "yui-history-iframe");
+             YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
          }
          catch(e)
          {
@@ -334,14 +336,14 @@
          });
 
          // DataSource definition
-         var uriDoclist = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist?";
+         var uriDoclist = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriDoclist);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "doclist.items",
-             fields: ["index", "nodeRef", "type", "icon32", "displayName", "actualName", "parent", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
+             fields: ["index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
          };
          
          /**
@@ -417,7 +419,7 @@
           */
          renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var name = oRecord.getData("displayName");
+            var name = oRecord.getData("fileName");
             var extn = name.substring(name.lastIndexOf("."));
 
             if (me.options.detailedView)
@@ -431,7 +433,7 @@
                }
                else if (oRecord.getData("type") == "folder")
                {
-                  var newPath = me.currentPath + "/" + oRecord.getData("displayName");
+                  var newPath = me.currentPath + "/" + name;
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
                   elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
                }
@@ -447,7 +449,7 @@
 
                if (oRecord.getData("type") == "folder")
                {
-                  var newPath = me.currentPath + "/" + oRecord.getData("displayName");
+                  var newPath = me.currentPath + "/" + name;
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
                   elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
                }
@@ -472,7 +474,7 @@
             var desc = "";
             if (oRecord.getData("type") == "folder")
             {
-               var newPath = me.currentPath + "/" + oRecord.getData("displayName");
+               var newPath = me.currentPath + "/" + oRecord.getData("fileName");
 
                // TODO: *** Update the onclick to be logically-bound, not via HTML
                desc = '<h3 class="filename"><a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("displayName") + '</b></a></h3>';
@@ -505,8 +507,10 @@
                   desc += '<div class="detail"><span><b>Modified on:</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
                   desc += '<span><b>Modified by:</b> ' + oRecord.getData("modifiedBy") + '</span>';
                   desc += '<span><b>Version:</b> ' + oRecord.getData("version") + '</span></div>';
+                  /* Created On field
                   desc += '<div class="detail"><span><b>Created on:</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   desc += '<span><b>Created by:</b> ' + oRecord.getData("createdBy") + '</span>';
+                  */
                   desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
                   desc += '<div class="detail"><span><b>Comments:</b> 0</span></div>';
                }
@@ -548,7 +552,7 @@
             key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 80
          },
          {
-            key: "name", label: "Description", sortable: false, formatter: renderCellDescription
+            key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
          },
          {
             key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
@@ -591,7 +595,7 @@
             }
             else if (oResponse.results)
             {
-               this.renderLoopSize = oResponse.results.length >> 3;
+               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
@@ -670,7 +674,7 @@
          p_obj.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
 
          YAHOO.Bubbling.fire("doclistRefresh");
-         YAHOO.util.Event.preventDefault(e);
+         Event.preventDefault(e);
       },
       
       /**
@@ -686,7 +690,7 @@
          p_obj.set("label", this._msg(this.options.detailedView ? "button.view.simple" : "button.view.detailed"));
 
          YAHOO.Bubbling.fire("doclistRefresh");
-         YAHOO.util.Event.preventDefault(e);
+         Event.preventDefault(e);
       },
       
       /**
@@ -753,8 +757,6 @@
        */
       onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
-         var Dom = YAHOO.util.Dom;
-         
          // Drop out if More Actions pop-up active
          if (this.showingMoreActions)
          {
@@ -771,12 +773,16 @@
          // Inject the correct action elements into the actionsId element
          if (elActions.firstChild === null)
          {
-            // Retrieve the actionType - currently keyed off folder or file type.
-            // TODO (M): Data webscript to inject action type into data record
-            // TODO (S): Cache the types for each recordId?
-            var actionSet = this.widgets.dataTable.getRecord(target).getData("actionSet");
-
+            // Retrieve the actionSet for this asset
+            var record = this.widgets.dataTable.getRecord(target);
+            var actionSet = record.getData("actionSet");
+            // Now clone the actionSet template node from the DOM
             var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
+            // Token replacement
+            clone.innerHTML = YAHOO.lang.substitute(unescape(clone.innerHTML),
+            {
+               downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true"
+            });
             clone.id = elActions.id + "_a";
             Dom.addClass(clone, this.options.detailedView ? "detailed" : "simple");
             elActions.appendChild(clone);
@@ -798,8 +804,6 @@
        */
       onEventUnhighlightRow: function DL_onEventUnhighlightRow(oArgs)
       {
-         var Dom = YAHOO.util.Dom;
-
          // Drop out if More Actions pop-up active
          if (this.showingMoreActions)
          {
@@ -828,11 +832,11 @@
        * Show more actions pop-up.
        *
        * @method onActionShowMore
+       * @param row {object} DataTable row representing file to be actioned
+       * @param elMore {element} DOM Element of "More Actions" link
        */
       onActionShowMore: function DL_onActionShowMore(row, elMore)
       {
-         var Dom = YAHOO.util.Dom;
-         var Event = YAHOO.util.Event;
          var me = this;
          
          var elMoreActions = Dom.getNextSibling(elMore);
@@ -897,28 +901,29 @@
       /**
        * Delete Asset.
        *
-       * @method onActionDeleteAsset
+       * @method onActionDelete
+       * @param row {object} DataTable row representing file to be actioned
        */
-      onActionDeleteAsset: function DL_onActionDeleteAsset(row)
+      onActionDelete: function DL_onActionDelete(row)
       {
          var me = this;
          var record = this.widgets.dataTable.getRecord(row);
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: "Are you sure you want to delete '" + record.getData("displayName") + "'?",
+            text: "Are you sure you want to delete '" + record.getData("fileName") + "'?",
             buttons: [
             {
                text: "Delete",
-               handler: function DL_onActionDeleteAsset_delete()
+               handler: function DL_onActionDelete_delete()
                {
                   this.hide();
-                  me._onActionDeleteAssetConfirm.call(me, record);
+                  me._onActionDeleteConfirm.call(me, record);
                },
                isDefault: true
             },
             {
                text: "Cancel",
-               handler: function DL_onActionDeleteAsset_cancel()
+               handler: function DL_onActionDelete_cancel()
                {
                   this.hide();
                }
@@ -929,14 +934,16 @@
       /**
        * Delete Asset confirmed.
        *
-       * @method _onActionDeleteAssetConfirm
+       * @method _onActionDeleteConfirm
+       * @param record {object} DataTable record representing file to be actioned
        * @private
        */
-      _onActionDeleteAssetConfirm: function DL__onActionDeleteAssetConfirm(record)
+      _onActionDeleteConfirm: function DL__onActionDeleteConfirm(record)
       {
          var fileType = record.getData("type");
-         var fileName = record.getData("displayName");
-         var filePath = record.getData("parent") + "/" + fileName;
+         var fileName = record.getData("fileName");
+         var filePath = this.currentPath + "/" + fileName;
+         var displayName = record.getData("displayName");
          
          this.modules.actions.genericAction(
          {
@@ -950,11 +957,11 @@
                      path: filePath
                   }
                },
-               message: this._msg("message.delete.success", fileName)
+               message: this._msg("message.delete.success", displayName)
             },
             failure:
             {
-               message: this._msg("message.delete.failure", fileName)
+               message: this._msg("message.delete.failure", displayName)
             },
             webscript:
             {
@@ -975,11 +982,13 @@
        * Edit Offline.
        *
        * @method onActionEditOffline
+       * @param row {object} DataTable row representing file to be actioned
        */
       onActionEditOffline: function DL_onActionEditOffline(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("displayName");
+         var fileName = record.getData("fileName");
+         var displayName = record.getData("displayName");
 
          this.modules.actions.genericAction(
          {
@@ -987,13 +996,25 @@
             {
                event:
                {
-                  name: "doclistRefresh"
+                  name: "filterChanged",
+                  obj:
+                  {
+                     filterId: "editingMe",
+                     filterOwner: "Alfresco.DocListFilter"
+                  }
                },
-               message: this._msg("message.edit-offline.success", fileName)
+               message: this._msg("message.edit-offline.success", displayName),
+               callback:
+               {
+                  fn: function DL_oAEO_success(data)
+                  {
+                     window.location = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
+                  }
+               }
             },
             failure:
             {
-               message: this._msg("message.edit-offline.failure", fileName)
+               message: this._msg("message.edit-offline.failure", displayName)
             },
             webscript:
             {
@@ -1010,34 +1031,33 @@
          });
       },
 
-
       /**
        * Upload new version.
        *
        * @method onActionUploadNewVersion
+       * @param row {object} DataTable row representing file to be actioned
        */
       onActionUploadNewVersion: function DL_onActionUploadNewVersion(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
+         var fileName = record.getData("fileName");
          var nodeRef = record.getData("nodeRef");
-         var fileName = record.getData("actualName");
 
          if (this.fileUpload === null)
          {
-            this.fileUpload = Alfresco.module.getFileUploadInstance(); //new Alfresco.module.FileUpload(this.id + "-fileUpload");
+            /*this.fileUpload = Alfresco.module.getFileUploadInstance(); //new Alfresco.module.FileUpload(this.id + "-fileUpload");*/
+            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
          }
 
          // Show uploader for multiple files
-
-         var description = Alfresco.util.message("label.filterDescription", this.name);
-         description = YAHOO.lang.substitute(description, {"0": record.getData("displayName")});
+         var description = Alfresco.util.message("label.filterDescription", this.name, record.getData("displayName"));
          var extensions = "*" + fileName.substring(fileName.lastIndexOf("."));
          var singleUpdateConfig =
          {
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             updateNodeRef: nodeRef,
-            updateFilename: record.getData("displayName"),
+            updateFilename: fileName,
             filter: [{description: description, extensions: extensions}],
             mode: this.fileUpload.MODE_SINGLE_UPDATE,
             onFileUploadComplete:
@@ -1047,7 +1067,7 @@
             }
          }
          this.fileUpload.show(singleUpdateConfig);
-         YAHOO.util.Event.preventDefault(e);
+         Event.preventDefault(e);
       },
 
       /**
@@ -1057,7 +1077,7 @@
        */
       onNewVersionUploadComplete: function DL_onNewVersionUploadComplete()
       {
-         // Do something after the new version is iuploaded
+         // Do something after the new version is uploaded
       },
 
       /**
@@ -1068,7 +1088,8 @@
       onActionCancelEditing: function DL_onActionCancelEditing(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("displayName");
+         var fileName = record.getData("fileName");
+         var displayName = record.getData("displayName");
          var nodeRef = record.getData("nodeRef");
 
          this.modules.actions.genericAction(
@@ -1079,11 +1100,11 @@
                {
                   name: "doclistRefresh"
                },
-               message: this._msg("message.edit-cancel.success", fileName)
+               message: this._msg("message.edit-cancel.success", displayName)
             },
             failure:
             {
-               message: this._msg("message.edit-cancel.failure", fileName)
+               message: this._msg("message.edit-cancel.failure", displayName)
             },
             webscript:
             {
@@ -1119,9 +1140,12 @@
             // Should be a path in the arguments
             if (obj.path !== null)
             {
-               if (obj.doclistInitialNav)
+               var hashPath = YAHOO.util.History.getBookmarkedState("path");
+               hashPath = (YAHOO.env.ua.gecko) ? decodeURIComponent(hashPath) : hashPath;
+               
+               if ((obj.doclistInitialNav) || (obj.path == hashPath))
                {
-                  // HistoryManager won't fire for the initial navigation event
+                  // HistoryManager won't fire for the initial navigation event, or if the path hasn't changed
                   this._updateDocList.call(this, obj.path);
                }
                else
@@ -1251,10 +1275,15 @@
        */
        _buildDocListParams: function DL__buildDocListParams(path)
        {
-          var params = "path=" + encodeURIComponent(path);
-          params += "&site=" + encodeURIComponent(this.options.siteId);
-          params += this.options.showFolders ? "" : "&type=documents";
-          params += "&filter=" + encodeURIComponent(this.currentFilterId);
+          var params = YAHOO.lang.substitute("{type}/site/{site}/{container}{path}",
+          {
+             type: this.options.showFolders ? "all" : "documents",
+             site: encodeURIComponent(this.options.siteId),
+             container: encodeURIComponent(this.options.containerId),
+             path: encodeURI(path)
+          });
+
+          params += "?filter=" + encodeURIComponent(this.currentFilterId);
           return params;
        }
    };

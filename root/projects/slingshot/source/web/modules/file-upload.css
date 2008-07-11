@@ -181,7 +181,7 @@
 
 /* General styling */
 
-.file-upload
+.yui-panel-container .file-upload
 {
    width: 640px;
 }

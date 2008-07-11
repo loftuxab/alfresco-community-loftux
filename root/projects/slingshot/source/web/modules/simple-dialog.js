@@ -31,6 +31,8 @@
  */
 (function()
 {
+   var Dom = YAHOO.util.Dom;
+   
    Alfresco.module.SimpleDialog = function(htmlId)
    {
       this.name = "Alfresco.module.SimpleDialog";
@@ -223,7 +225,7 @@
        */
       _showDialog: function AmSD__showDialog()
       {
-         var form = YAHOO.util.Dom.get(this.id + "-form");
+         var form = Dom.get(this.id + "-form");
          
          if (this.options.actionUrl !== null)
          {
@@ -233,12 +235,12 @@
          this.dialog.show();
 
          // Fix Firefox caret issue
-         Alfresco.util.firefoxCaretFix(form);
+         Alfresco.util.caretFix(form);
          
          // Set focus if required
          if (this.options.firstFocus !== null)
          {
-            YAHOO.util.Dom.get(this.options.firstFocus).focus();
+            Dom.get(this.options.firstFocus).focus();
          }
       },
       
@@ -255,7 +257,7 @@
          containerDiv.innerHTML = response.serverResponse.responseText;
 
          // The panel is created from the HTML returned in the XHR request, not the container
-         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+         var dialogDiv = Dom.getFirstChild(containerDiv);
 
          // Create and render the YUI dialog
          this.dialog = new YAHOO.widget.Panel(dialogDiv,
@@ -264,7 +266,8 @@
             draggable: false,
             fixedcenter: true,
             close: true,
-            visible: false
+            visible: false,
+            width: this.options.width
          });
          this.dialog.render(document.body);
          
@@ -317,7 +320,7 @@
       },
 
       /**
-       * Successful folder creation event handler
+       * Successful data webscript call event handler
        *
        * @method onSuccess
        * @param response {object} Server response object
@@ -346,7 +349,7 @@
             // Invoke the callback if one was supplied
             if (typeof this.options.onSuccess.fn == "function")
             {
-               this.options.onSuccess.fn.call(this.options.onSuccess.scope, this.options.onSuccess.obj);
+               this.options.onSuccess.fn.call(this.options.onSuccess.scope, response, this.options.onSuccess.obj);
             }
             else
             {

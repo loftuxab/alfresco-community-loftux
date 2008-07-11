@@ -207,7 +207,7 @@
             var nodePath = node.data.path;
 
             // Prepare URI for XHR data request
-            var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode?site=" + encodeURIComponent(me.options.siteId) + "&path=" + encodeURIComponent(nodePath);
+            var uri = me._buildTreeNodeUrl.call(me, nodePath);
 
             // Prepare the XHR callback object
             var callback =
@@ -292,6 +292,8 @@
        */
       onExpandComplete: function DLT_onExpandComplete(oNode)
       {
+         Alfresco.logger.debug("DLT_onExpandComplete");
+
          // Make sure the tree's Dom has been updated
          this.treeview.draw();
          // Redrawing the tree will clear the highlight
@@ -332,6 +334,8 @@
        */
       onNodeClicked: function DLT_onNodeClicked(node)
       {
+         Alfresco.logger.debug("DLT_onNodeClicked");
+
          this._updateSelectedNode(node);
          
          // Fire the filter changed event
@@ -364,6 +368,8 @@
        */
       onPathChanged: function DLT_onPathChanged(layer, args)
       {
+         Alfresco.logger.debug("DLT_onPathChanged");
+
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
@@ -430,6 +436,8 @@
        */
       onFolderRenamed: function DLT_onFolderRenamed(layer, args)
       {
+         Alfresco.logger.debug("DLT_onFolderRenamed");
+
          var obj = args[1];
          if ((obj !== null) && (obj.nodeRef !== null) && (obj.name !== null))
          {
@@ -452,6 +460,8 @@
        */
       onFolderCreated: function DLT_onFolderCreated(layer, args)
       {
+         Alfresco.logger.debug("DLT_onFolderCreated");
+
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
@@ -473,6 +483,8 @@
        */
       onFolderDeleted: function DLT_onFolderDeleted(layer, args)
       {
+         Alfresco.logger.debug("DLT_onFolderDeleted");
+
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
@@ -509,6 +521,8 @@
        */
       onFilterChanged: function DLT_onFilterChanged(layer, args)
       {
+         Alfresco.logger.debug("DLT_onFilterChanged");
+
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
@@ -540,6 +554,8 @@
        */
       _buildTree: function DLT__buildTree()
       {
+         Alfresco.logger.debug("DLT__buildTree");
+
          // Create a new tree
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
          this.treeview = tree;
@@ -574,17 +590,31 @@
        */
       _sortNodeChildren: function DLT__sortNodeChildren(node, onSortComplete)
       {
+         Alfresco.logger.debug("DLT__sortNodeChildren");
+         
+         // Is the node a leaf?
+         if (node.isLeaf)
+         {
+            // Yes, so clearing the leaf flag and redrawing will automatically query the child nodes
+            node.isLeaf = false;
+            this.treeview.draw();
+            this._showHighlight(true);
+            return;
+         }
+         
          // Get the path this node refers to
          var nodePath = node.data.path;
 
          // Prepare URI for XHR data request
-         var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode?site=" + encodeURIComponent(this.options.siteId) + "&path=" + encodeURIComponent(nodePath);
+         var uri = this._buildTreeNodeUrl(nodePath);
 
          // Prepare the XHR callback object
          var callback =
          {
             success: function DLT_sNC_success(oResponse)
             {
+               Alfresco.logger.debug("DLT_sNC_success");
+
                var results = YAHOO.lang.JSON.parse(oResponse.responseText);
 
                if (results.treenode.items)
@@ -660,6 +690,7 @@
             // If the XHR call is not successful, no further processing - tree may not be sorted correctly
             failure: function DLT_sNC_failure(oResponse)
             {
+               Alfresco.logger.debug("DLT_sNC_failure");
             },
 
             // XHR response argument information
@@ -681,6 +712,8 @@
 
       _showHighlight: function DLT__showHighlight(isVisible)
       {
+         Alfresco.logger.debug("DLT__showHighlight");
+
          if (this.selectedNode !== null)
          {
             if (isVisible)
@@ -696,6 +729,8 @@
       
       _updateSelectedNode: function DLT__updateSelectedNode(node)
       {
+         Alfresco.logger.debug("DLT__updateSelectedNode");
+
          if (this.isFilterOwner)
          {
             this._showHighlight(false);
@@ -706,7 +741,26 @@
          {
             this.selectedNode = node;
          }
-      }
+      },
 
+      /**
+       * Build URI parameter string for treenode JSON data webscript
+       *
+       * @method _buildTreeNodeUrl
+       * @param path {string} Path to query
+       */
+       _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
+       {
+          var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/{site}/{container}{path}";
+
+          var url = YAHOO.lang.substitute(uriTemplate,
+          {
+             site: encodeURIComponent(this.options.siteId),
+             container: encodeURIComponent(this.options.containerId),
+             path: encodeURI(path)
+          });
+
+          return url;
+       }
    };
 })();

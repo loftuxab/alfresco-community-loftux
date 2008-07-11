@@ -31,6 +31,10 @@
    border-bottom: 2px solid #f0f3f4;
 }
 
+.toolbar .hidden
+{
+   display: none;
+}
 
 /* Navigation Bar */
 
@@ -47,12 +51,29 @@
 
 .toolbar span.crumb
 {
+   font-size: 116%;
 }
 
 .toolbar span.crumb a
 {
 }
 
+.toolbar .description
+{
+   padding: 0.5em;
+}
+
+.toolbar .description span.message
+{
+   color: #000;
+   font-size: 116%;
+}
+
+.toolbar .description span.more
+{
+   color: #515d6b;
+   margin-left: 0.3em;
+}
 
 /* Buttons */
 

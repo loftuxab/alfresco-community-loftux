@@ -26,7 +26,7 @@ html, body
 body
 {
    font-family: Arial, sans-serif;
-   font-size: 12px;
+   font-size: 81%;
    color: #515D6B;
 }
 
@@ -119,24 +119,24 @@ hr
    color: red;
 }
 
-.yui-skin-default .yui-panel
+.yui-skin-sam .yui-panel
 {
    border-bottom-color: #C4C5C5;
    border-top-color: #C4C5C5;
 }
 
-.yui-skin-default .mask
+.yui-skin-sam .mask
 {
-   opacity:0.15;
+   opacity: 0.5;
 }
 
-.yui-skin-default .yui-panel-container.shadow .underlay {
-   /*visibility:hidden;*/
-   opacity:0.25;
+.yui-skin-sam .yui-panel-container.shadow .underlay
+{
+   opacity: 0.25;
 }
 
-.yui-skin-default .yui-panel .hd,
-.yui-skin-default .yui-panel .bdft
+.yui-skin-sam .yui-panel .hd,
+.yui-skin-sam .yui-panel .bdft
 {
    color: #515D6B;
    background: #E3EBEC;
@@ -146,7 +146,7 @@ hr
    border-right-color: #C4C5C5;
 }
 
-.yui-skin-default .yui-panel .hd
+.yui-skin-sam .yui-panel .hd
 {
    font-size:123.1%;
    font-weight:bold;
@@ -154,14 +154,14 @@ hr
    line-height:35px;
 }
 
-.yui-skin-default .yui-panel .bdft
+.yui-skin-sam .yui-panel .bdft
 {
    font-size:100%;
    border-top: 1px solid #C4C5C5;
 }
 
 
-.yui-skin-default .yui-panel .bd
+.yui-skin-sam .yui-panel .bd
 {
    color: #515D6B;
    background-color: #F9FBFD;
@@ -171,18 +171,18 @@ hr
    text-align: left;
 }
 
-.yui-skin-default .yui-panel .yui-g h2,
-.yui-skin-default .yui-panel .bd div
+.yui-skin-sam .yui-panel .yui-g h2,
+.yui-skin-sam .yui-panel .bd div
 {
    padding: 0.3em;
 }
 
-.yui-skin-default .yui-panel .yui-gd .yui-u.first
+.yui-skin-sam .yui-panel .yui-gd .yui-u.first
 {
    width: 28%;
 }
 
-.yui-skin-default .yui-panel .yui-gd .yui-u
+.yui-skin-sam .yui-panel .yui-gd .yui-u
 {
    width: 60%;
 }
