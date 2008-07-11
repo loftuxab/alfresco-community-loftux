@@ -57,10 +57,27 @@ import org.apache.commons.logging.Log;
  */
 public abstract class AbstractRequestContext implements RequestContext
 {
+    public static final String VALUE_HEAD_TAGS = "headTags";    
+    public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
+    
     /*
      * Increments every time a request ID is required
      */
     protected static int idCounter = 0;
+    
+    protected Map<String, Serializable> map;
+    protected Page currentPage;
+    protected TemplateInstance currentTemplate;
+    protected Content currentObject;
+    protected String currentFormatId;
+    protected IFileSystem fileSystem;
+    protected String storeId;
+    protected User user;
+    protected String id;
+    protected String uri;
+    protected String themeId;
+    protected Model model;
+    
     
     /**
      * Constructs a new Request Context.  In general, you should not
@@ -69,7 +86,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     protected AbstractRequestContext()
     {
-        this.map = new HashMap(16, 1.0f);
+        this.map = new HashMap<String, Serializable>(16, 1.0f);
     }
 
     /**
@@ -206,6 +223,17 @@ public abstract class AbstractRequestContext implements RequestContext
     public Iterator keys()
     {
         return map.keySet().iterator();
+    }
+    
+    /**
+     * Returns the underlying map of the custom key/values pairs
+     * stored on this RequestContext instance. Use with caution!
+     * 
+     * @return the underlying map of custom key/value pairs.
+     */
+    public Map<String, Serializable> map()
+    {
+        return map;
     }
 
     /**
@@ -533,23 +561,4 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         return map.toString();
     }
-
-
-    protected Map<String, Serializable> map;
-    protected Page currentPage;
-    protected TemplateInstance currentTemplate;
-    protected Content currentObject;
-    protected String currentFormatId;
-    protected IFileSystem fileSystem;
-    protected String storeId;
-    protected User user;
-    protected String id;
-    protected String uri;
-    protected String themeId;
-    protected Model model;
-
-    // constants
-    
-    public static final String VALUE_HEAD_TAGS = "headTags";    
-    public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
 }

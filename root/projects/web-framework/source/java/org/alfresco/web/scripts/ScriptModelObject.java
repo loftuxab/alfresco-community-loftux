@@ -83,7 +83,7 @@ public final class ScriptModelObject extends ScriptBase
         if (this.properties == null)
         {
             // construct and add in all of our model object properties
-            this.properties = new ScriptableMap<String, Serializable>(modelObject.getProperties())
+            this.properties = new ScriptableLinkedHashMap<String, Serializable>(modelObject.getProperties())
             {
                 // trap this method so that we can adjust the model object
                 public void put(String name, Scriptable start, Object value)

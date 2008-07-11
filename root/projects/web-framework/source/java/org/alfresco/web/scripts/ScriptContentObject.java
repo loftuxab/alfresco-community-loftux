@@ -81,7 +81,7 @@ public final class ScriptContentObject extends ScriptBase
         {
             if (content.getProperties() != null)
             {
-                this.properties = new ScriptableMap<String, Serializable>(content.getProperties());
+                this.properties = new ScriptableLinkedHashMap<String, Serializable>(content.getProperties());
             }
         }
         

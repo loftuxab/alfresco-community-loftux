@@ -70,7 +70,7 @@ public final class ScriptUser extends ScriptBase
     {
         if (this.properties == null)
         {
-            this.properties = new ScriptableMap<String, Serializable>(user.getProperties());
+            this.properties = new ScriptableLinkedHashMap<String, Serializable>(user.getProperties());
         }
         
         return this.properties;

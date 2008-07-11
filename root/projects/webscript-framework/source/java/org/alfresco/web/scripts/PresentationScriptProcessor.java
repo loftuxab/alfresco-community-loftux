@@ -62,8 +62,10 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
 
     private static final String PATH_CLASSPATH = "classpath:";
 
+    protected ScriptValueConverter valueConverter = new ScriptValueConverter();
     protected SearchPath searchPath;
     protected ScriptLoader scriptLoader;
+
 
     /**
      * @param searchPath
@@ -248,135 +250,12 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         }
     }
 
-    /**
-     * Convert an object from a script wrapper value to a serializable value valid outside
-     * of the Rhino script processor context.
-     * 
-     * This includes converting JavaScript Array objects to Lists of valid objects.
-     * 
-     * @param value     Value to convert from script wrapper object to external object value.
-     * 
-     * @return unwrapped and converted value.
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.ScriptProcessor#unwrapValue(java.lang.Object)
      */
     public Object unwrapValue(Object value)
     {
-        if (value == null)
-        {
-            return null;
-        }
-        else if (value instanceof Wrapper)
-        {
-            // unwrap a Java object from a JavaScript wrapper
-            // recursively call this method to convert the unwrapped value
-            value = unwrapValue(((Wrapper)value).unwrap());
-        }
-        else if (value instanceof ScriptableObject)
-        {
-            // a scriptable object will probably indicate a multi-value property
-            // set using a JavaScript Array object
-            ScriptableObject values = (ScriptableObject)value;
-
-            if (value instanceof IdScriptableObject)
-            {
-                if ("Date".equals(((IdScriptableObject)value).getClassName()))
-                {
-                    value = Context.jsToJava(value, Date.class);
-                }
-                else if (value instanceof NativeArray)
-                {
-                    // convert JavaScript array of values to a List of Serializable objects
-                    Object[] propIds = values.getIds();
-                    if (isArray(propIds) == true)
-                    {                    
-                        List<Object> propValues = new ArrayList<Object>(propIds.length);
-                        for (int i=0; i<propIds.length; i++)
-                        {
-                            // work on each key in turn
-                            Object propId = propIds[i];
-                            
-                            // we are only interested in keys that indicate a list of values
-                            if (propId instanceof Integer)
-                            {
-                                // get the value out for the specified key
-                                Object val = values.get((Integer)propId, values);
-                                // recursively call this method to convert the value
-                                propValues.add(unwrapValue(val));
-                            }
-                        }
-
-                        value = propValues;
-                    }
-                    else
-                    {
-                        Map<String, Object> propValues = new HashMap<String, Object>(propIds.length);
-                        for (Object propId : propIds)
-                        {
-                            if (propId instanceof String)
-                            {
-                                // Get the value and add to the map
-                                Object val = values.get((String)propId, values);
-                                propValues.put((String)propId, unwrapValue(val));
-                            }
-                        }
-                        
-                        value = propValues;
-                    }
-                }
-                else
-                {
-                    // convert JavaScript map to values to a Map of objects
-                    Object[] propIds = values.getIds();
-                    Map<String, Object> propValues = new HashMap<String, Object>(propIds.length);
-                    for (int i=0; i<propIds.length; i++)
-                    {
-                        // work on each key in turn
-                        Object propId = propIds[i];
-
-                        // we are only interested in keys that indicate a list of values
-                        if (propId instanceof String)
-                        {
-                            // get the value out for the specified key
-                            Object val = values.get((String)propId, values);
-                            // recursively call this method to convert the value
-                            propValues.put((String)propId, unwrapValue(val));
-                        }
-                    }
-                    value = propValues;
-                }
-            }
-        }
-        else if (value instanceof Object[])
-        {
-            // convert back a list Object Java values
-            Object[] array = (Object[])value;
-            ArrayList<Object> list = new ArrayList<Object>(array.length);
-            for (int i=0; i<array.length; i++)
-            {
-                list.add(unwrapValue(array[i]));
-            }
-            value = list;
-        }
-        return value;
-    }
-    
-    /**
-     * Look at the id's of a native array and try to determine whether it's actually an Array or a Hashmap
-     * 
-     * @param ids       id's of the native array
-     * @return boolean  true if it's an array, false otherwise (ie it's a map)
-     */
-    private boolean isArray(Object[] ids)
-    {
-        boolean result = true;
-        for (int i=0; i<ids.length; i++)
-        {
-            if (ids[i] instanceof Integer == false)
-            {
-               result = false;
-               break;
-            }
-        }
-        return result;
+        return valueConverter.unwrapValue(value);
     }
 
     /* (non-Javadoc)
