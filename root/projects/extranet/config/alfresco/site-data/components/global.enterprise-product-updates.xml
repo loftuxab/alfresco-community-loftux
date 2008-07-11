@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+	<title>Source Code - Latest Updates</title>
+
+	<url>/components/extranet/enterprise-product-updates</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>enterprise-product-updates</region-id>
+	<source-id>global</source-id>
+	
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-box-chrome</chrome>
+  
+  	<properties>
+  		<endpoint>alfresco</endpoint>
+  		<category>HEAD</category>
+  	</properties>
+  
+</component>
+

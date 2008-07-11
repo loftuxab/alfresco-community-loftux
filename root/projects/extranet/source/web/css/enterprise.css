@@ -36,7 +36,7 @@ a:hover {
 
 /* header */
 #hd {
-	padding: 0 1.538em;
+	padding: 0 0 8px;
 }
 .logo {
 	float: left;
@@ -45,8 +45,8 @@ a:hover {
 }
 .logo2 {
 	float: left;
-	width: 400px;
-	height: 6.461em;
+	width: 500px;
+	height: 72px;
 }
 #top-links {
 	padding: 0.461em 0 1.924em;
@@ -69,7 +69,7 @@ a:hover {
 	padding-left: 0.769em;
 }
 #top-links2 a {
-	color: #060;
+	color: #039;
 	font: 11px/14px 'Trebuchet MS', Arial, sans-serif;
 }
 
@@ -163,9 +163,9 @@ a:hover {
 /* body */
 #bd {
 	border: 1px solid #ccc;
-	padding: 28px 20px;
+	padding: 10px 20px;
 	background: #fff;
-	margin: 2.615em 0 0;
+	margin: 0.615em 0 0;
 }
 .yui-b {
 	font-family: 'Trebuchet MS', Arial, sans-serif;
@@ -191,7 +191,7 @@ a:hover {
 #yui-main h2 {
 	font: bold 1.230em 'Trebuchet MS', Arial, sans-serif;
 	border-bottom: 1px solid #ccc;
-	margin: 1em 0 0;
+	margin: 0 0 0;
 }
 #yui-main ul li {
 	padding-left: 11px;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component> 
+	<title>Network News</title>
 
 	<url>/components/extranet/networknews</url>
 	
@@ -7,6 +8,9 @@
 	<scope>global</scope>
 	<region-id>networknews</region-id>
 	<source-id>global</source-id>
+	
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-box-chrome</chrome>
   
   	<properties>
   		<rss-endpoint>alfresco</rss-endpoint>

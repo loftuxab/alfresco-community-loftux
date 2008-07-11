@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+	<title>Alfresco Communities</title>
+
+	<url>/components/extranet/alfresco-communities</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>alfresco-communities</region-id>
+	<source-id>global</source-id>
+	
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-box-chrome</chrome>
+    
+</component>
+

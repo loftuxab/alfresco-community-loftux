@@ -1,93 +1,72 @@
-<#if displayOption?exists>
+<style type="text/css">
+<!--
+div.networknews
+{
+}
+div.networknews-body
+{
+	font: 12px arial;
+	color: #000000;
+}
+div.networknews-element
+{
+	font: 12px arial;
+	border: 1px black solid;
+}
+img.networknews-image
+{
+	float: left;
+	height: 32px;
+	width: 32px;
+	margin: 6px 6px 6px 6px;
+	border: 1px black solid;
+}
+a.networknews-title
+{
+	font: small-caps bold 14px arial;
+	color: #000000;
+}
+a.networknews-title:link { color: #000000; text-decoration: none; }
+a.networknews-title:visited { color: #000000; text-decoration: none; }
+a.networknews-title:hover { color: #000000; text-decoration: none; }
+a.networknews-title:active { color: #000000; text-decoration: none; }
 
-	<#if displayOption == "fourgrid">
+p.networknews
+{
+	color: #000000;
+}
+-->
+</style>
+<div class="networknews">
+   <div class="networknews-body scrollableList">
+	<#if items?exists && items?size &gt; 0>
 	
-		<#if items?exists>
-
-		<#assign index = 0>
-		
-		<div class="yui-g">
-			<div class="yui-u first">
-				<div class="box">
-				
-					<#if items?size &gt; index>
-						
-						<img src="${items[index].imageurl}" alt="" />
-						<h3>${items[index].title}</h3>
-						${items[index].description}
-						<br/>
-						<a href="${items[index].link}">Read more!</a>
-					
-						<#assign index = index + 1>
-					</#if>
-
-				</div>
-				<div class="box">
-
-					<#if items?size &gt; index>
-						
-						<img src="${items[index].imageurl}" alt="" />
-						<h3>${items[index].title}</h3>
-						${items[index].description}
-						<br/>
-						<a href="${items[index].link}">Read more!</a>
-					
-						<#assign index = index + 1>
-					</#if>
-
-				</div>
-			</div>
-			<div class="yui-u">
-				<div class="box">
-
-					<#if items?size &gt; index>
-						
-						<img src="${items[index].imageurl}" alt="" />
-						<h3>${items[index].title}</h3>
-						${items[index].description}
-						<br/>
-						<a href="${items[index].link}">Read more!</a>
-					
-						<#assign index = index + 1>
-					</#if>
-
-				</div>
-				<div class="box">
-				
-					<#if items?size &gt; index>
-						
-						<img src="${items[index].imageurl}" alt="" />
-						<h3>${items[index].title}</h3>
-						${items[index].description}
-						<br/>
-						<a href="${items[index].link}">Read more!</a>
-					
-						<#assign index = index + 1>
-					</#if>
-
-				</div>
-			</div>
-		</div>
-		
-		</#if>
-	
+		<table>
+		<#list items as i>
+			<#if i.title?ends_with(".jpg")>
+			<#else>
+				<tr>
+					<td valign="middle">
+				<p class="networknews">
+				<img src="${i.imageurl}" alt="" class="networknews-image"/>		
+				<a href="${i.link}" class="networknews-title" target="_blank">${i.title}</a>
+				</p>
+					</td>
+				</tr>
+				<tr>
+					<td>
+			
+				<p class="networknews">
+					${i.description}
+				</p>
+					</td>
+				</tr>
+				<tr><td><br/></td></tr>
+			</#if>
+		</#list>
+		</table>
+	<#else>
+		<em>No news items.</em>
 	</#if>
-<#else>
-
-	<div class="rssfeed">
-	   <div class="title">${title!""}</div>
-	   <div class="body scrollableList">
-		<#if items?exists && items?size &gt; 0>
-			<#list items as i>
-			<p>
-			<h4><a href="${i.link}">${i.title}</a></h4>
-			${i.description}
-			</p>
-			</#list>
-		<#else>
-			<em>No news items.</em>
-		</#if>
-		</div><#-- end of body -->
-	</div><#-- end of dashlet -->
-
-</#if>
+   </div><#-- end of body -->
+</div><#-- end of dashlet -->

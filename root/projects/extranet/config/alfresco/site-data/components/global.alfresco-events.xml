@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+	<title>Alfresco Events</title>
+
+	<url>/components/extranet/alfresco-events</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>alfresco-events</region-id>
+	<source-id>global</source-id>
+	
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-box-chrome</chrome>
+    
+</component>
+

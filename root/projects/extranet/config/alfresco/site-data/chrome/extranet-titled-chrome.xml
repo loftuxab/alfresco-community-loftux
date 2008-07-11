@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chrome>
+	<title>Extranet Titled Component Chrome</title>
+	<renderer>/app/extranet/titled-chrome/chrome.jsp</renderer>
+	<renderer-type>jsp</renderer-type>
+</chrome>

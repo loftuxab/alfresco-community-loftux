@@ -1,3 +1,68 @@
+<style type="text/css">
+<!--
+table.userprofile
+{
+	background-color: white;
+}
+table.userprofile th {
+	padding: 1px 1px 1px 1px;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+}
+table.userprofile td {
+	padding: 4px 4px 4px 4px;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+}
+td.userprofile-label
+{
+	font: bold 12px arial;
+}
+td.userprofile-grayed
+{
+	padding: 4px 4px 4px 4px;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+	color: lightgray;
+}
+-->
+</style>
+
+<table>
+	<tr>
+		<td>
+			<img src="${url.context}/images/extranet/user_32.gif"/>
+		</td>
+		<td>
+			<font size="5">${user.fullName}</font>
+			<br/>
+		</td>
+	</tr>
+</table>
+<@anchor pageType="viewprofile">View my profile</@anchor>
+|
+<@anchor pageType="editprofile">Edit my profile</@anchor>
+|
+<@anchor pageType="viewcredentials">View/Edit my credentials</@anchor>
+
+
+<br/>
+<br/>
+<font size="4">Edit User Credentials</font>
+<br/>
+<br/>
+
+
+
+
+
+
+
+
+
+
+
+
 <#assign endpointImage = "/images/extranet/user_credentials_32.gif">
 
 <#assign cleartextUsername = "">
@@ -8,15 +73,6 @@
 	<#assign cleartextUsername = credentials.properties["cleartextUsername"]>
 	<#assign cleartextPassword = credentials.properties["cleartextPassword"]>	
 </#if>
-
-<p align="center">
-<br/>
-<br/>
-
-
-Editing Credentials '${endpointId}' for '${user.fullName}'
-<br/>
-<br/>
 
 <form action="${url.full}" method="POST">
 
@@ -54,13 +110,3 @@ Editing Credentials '${endpointId}' for '${user.fullName}'
 <input type="submit" value="Save" />
 
 </form>
-
-
-
-<br/>
-<@anchor pageType="editprofile">Edit my profile</@anchor>
-<br/>
-<@anchor pageType="viewcredentials">View my credentials</@anchor>
-<br/>
-<br/>
-</p>

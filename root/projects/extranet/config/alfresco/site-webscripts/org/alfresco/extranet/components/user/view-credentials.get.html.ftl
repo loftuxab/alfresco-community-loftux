@@ -1,9 +1,54 @@
-<p align="center">
-<br/>
-<br/>
+<style type="text/css">
+<!--
+table.userprofile
+{
+	background-color: white;
+}
+table.userprofile th {
+	padding: 1px 1px 1px 1px;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+}
+table.userprofile td {
+	padding: 4px 4px 4px 4px;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+}
+td.userprofile-label
+{
+	font: bold 12px arial;
+}
+td.userprofile-grayed
+{
+	padding: 4px 4px 4px 4px;
+	background-color: white;
+	-moz-border-radius: 0px 0px 0px 0px;
+	color: lightgray;
+}
+-->
+</style>
+
+<table>
+	<tr>
+		<td>
+			<img src="${url.context}/images/extranet/user_32.gif"/>
+		</td>
+		<td>
+			<font size="5">${user.fullName}</font>
+			<br/>
+		</td>
+	</tr>
+</table>
+<@anchor pageType="viewprofile">View my profile</@anchor>
+|
+<@anchor pageType="editprofile">Edit my profile</@anchor>
+|
+<@anchor pageType="viewcredentials">View/Edit my credentials</@anchor>
 
 
-View Credentials for ${user.fullName}
+<br/>
+<br/>
+<font size="4">User Credentials</font>
 <br/>
 <br/>
 
@@ -25,13 +70,6 @@ View Credentials for ${user.fullName}
 	</#if>
 </#list>
 
-<br/>
-<@anchor pageType="editprofile">Edit my profile</@anchor>
-<br/>
-<@anchor pageType="editcredentials">Edit my credentials</@anchor>
-<br/>
-<br/>
-</p>
 
 
 <#macro renderEndpoint endpointId>
@@ -45,11 +83,16 @@ View Credentials for ${user.fullName}
 	</#if>
 	<#assign editCredentialsImage = "/images/extranet/edit_16.gif">
 	<#assign editCredentialsUrl = "?f=default&pt=editcredentials&endpointId=" + endpointId>
+	
+	<#assign tdDisplayClass = "">
+	<#if endpointPersistent == false>
+		<#assign tdDisplayClass = "class='userprofile-grayed'">
+	</#if>
 
-	<table border="0">
+	<table border="0" class="userprofile">
 		<tr>
 			<td><img src="${url.context}${endpointImage}"/></td>
-			<td colspan="2">
+			<td colspan="2" ${tdDisplayClass} >
 				<b>${endpointName}</b>				
 				<#if endpointPersistent == true>
 					<a href="${url.context}${editCredentialsUrl}">
@@ -64,7 +107,7 @@ View Credentials for ${user.fullName}
 		<#if endpointPersistent == false>
 		<tr>
 			<td></td>
-			<td colspan="2">
+			<td colspan="2" ${tdDisplayClass}>
 				These credentials are managed by the application
 			</td>
 		</tr>		
@@ -92,7 +135,7 @@ View Credentials for ${user.fullName}
 
 		<tr>
 			<td></td>
-			<td colspan="2">None defined</td>
+			<td colspan="2" ${tdDisplayClass}>None defined</td>
 		</tr>	
 			
 			</#if>

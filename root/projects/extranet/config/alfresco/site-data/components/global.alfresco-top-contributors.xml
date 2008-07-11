@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+	<title>Alfresco Top Contributors</title>
+
+	<url>/components/extranet/alfresco-top-contributors</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>alfresco-top-contributors</region-id>
+	<source-id>global</source-id>
+	
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-box-chrome</chrome>
+    
+</component>
+
