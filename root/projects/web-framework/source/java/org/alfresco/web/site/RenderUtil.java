@@ -1043,12 +1043,11 @@ public final class RenderUtil
     {
         RendererDescriptor descriptor = null;
 
-        // if the chrome id is empty, see if there is an override
-        // this allows the component to "override" the chrome on a
-        // per-component basis
+        // if the chrome id is empty, see if the component instance intself
+        // the chrome that it would like to use
         if (chromeId == null)
         {
-            chromeId = component.getCustomProperty("chrome");
+            chromeId = component.getChrome();
         }
 
         // see if a default chrome was specified
