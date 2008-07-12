@@ -1,4 +1,4 @@
-<webscript>
+<webscript kind="extranet">
    <shortname>Alfresco Network Enterprise Product Updates</shortname>
    <description>Alfresco Network Enterprise Product Updates</description>
    <url>/components/extranet/enterprise-product-updates</url>

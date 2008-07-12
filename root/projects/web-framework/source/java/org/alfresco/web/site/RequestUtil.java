@@ -32,6 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.site.exception.RequestContextException;
 
 /**
@@ -69,6 +70,38 @@ public class RequestUtil
         
         return _getRequestContext(request, false);
     }
+    
+    /**
+     * Performs the same request context lookup starting from a WebScriptRequest
+     * object.
+     * 
+     * @param req
+     * @return
+     */
+    public static RequestContext getRequestContext(WebScriptRequest req)
+        throws RequestContextException
+    {
+        RequestContext context = null;
+        HttpServletRequest request = null;
+
+        // try to determine the http servlet request        
+        if (req instanceof org.alfresco.web.scripts.servlet.WebScriptServletRequest)
+        {
+            request = ((org.alfresco.web.scripts.servlet.WebScriptServletRequest) req).getHttpServletRequest();
+        }
+        if (req instanceof org.alfresco.web.scripts.LocalWebScriptRequest)
+        {
+            request = ((org.alfresco.web.scripts.LocalWebScriptRequest) req).getHttpServletRequest();
+        }
+        
+        if(request != null)
+        {
+            context = getRequestContext(request);
+        }
+        
+        return context;
+    }
+    
     
     /**
      * Synchronized method that checks to see if a request context already

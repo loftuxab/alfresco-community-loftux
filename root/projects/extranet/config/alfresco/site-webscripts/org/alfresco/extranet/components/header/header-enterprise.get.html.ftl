@@ -8,15 +8,12 @@
 		<li><a href="#">Contact Us</a></li>
 	</ul>
 <#else>
-	<p style="padding: 0.300em 0 0.224em; float:right;font: 12px/14px 'Trebuchet MS', Arial, sans-serif;">
-	You are logged in as 
-	
-	<img src="${url.context}/images/extranet/user_16.gif"/>
-	&nbsp;<b>${user.fullName}</b> ( <b>${user.id}</b> )
-	
-	</p>
-	<br/>
-	
+	<span id="top-user">
+		You are logged in as 	
+		<img src="${url.context}/images/extranet/user_16.gif"/>
+		&nbsp;<b>${user.fullName}</b> ( <b>${user.id}</b> )	
+	</span>
+	<br/><br/>
 	<ul id="top-links2">
 		<li>
 			<img src="${url.context}/images/extranet/logout_16.gif"/>

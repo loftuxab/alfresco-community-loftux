@@ -2,7 +2,7 @@
 
 <component> 
 
-	<title>MediaWiki Component</title>  
+	<title>Wiki Component</title>  
 	<url>/components/extranet/mediawiki</url>
   
 	<!-- Binding -->  

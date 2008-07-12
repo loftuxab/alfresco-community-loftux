@@ -72,6 +72,11 @@ a:hover {
 	color: #039;
 	font: 11px/14px 'Trebuchet MS', Arial, sans-serif;
 }
+#top-user {
+	padding: 0.300em 0 0.224em;
+	float: right;
+	font: 12px/14px 'Trebuchet MS', Arial, sans-serif;
+}
 
 .search {
 	float: right;

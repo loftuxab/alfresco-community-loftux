@@ -1,47 +1,72 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have recieved a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.scripts;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.alfresco.util.Content;
 
 /**
+ * The Class LocalWebScriptRequest.
+ * 
  * @author muzquiano
  */
 public class LocalWebScriptRequest extends WebScriptRequestURLImpl
 {
     private Map<String, String> parameters;
+    private HttpServletRequest request;
 
+    /**
+     * Instantiates a new local web script request.
+     * 
+     * @param runtime the runtime
+     * @param scriptUrl the script url
+     * @param match the match
+     * @param parameters the parameters
+     * @param request the request
+     */
     public LocalWebScriptRequest(Runtime runtime, String scriptUrl,
-            Match match, Map<String, String> parameters)
+            Match match, Map<String, String> parameters, HttpServletRequest request)
     {
         super(runtime, scriptUrl, match);
         this.parameters = parameters;
+        this.request = request;
     }
-
+    
+    /**
+     * Gets the http servlet request.
+     * 
+     * @return the http servlet request
+     */
+    public HttpServletRequest getHttpServletRequest()
+    {
+        return this.request;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -74,31 +99,49 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
                 new String[this.parameters.size()]);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getAgent()
+     */
     public String getAgent()
     {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getServerPath()
+     */
     public String getServerPath()
     {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderNames()
+     */
     public String[] getHeaderNames()
     {
         return new String[] {};
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getHeader(java.lang.String)
+     */
     public String getHeader(String name)
     {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderValues(java.lang.String)
+     */
     public String[] getHeaderValues(String name)
     {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getContent()
+     */
     public Content getContent()
     {
         return null;

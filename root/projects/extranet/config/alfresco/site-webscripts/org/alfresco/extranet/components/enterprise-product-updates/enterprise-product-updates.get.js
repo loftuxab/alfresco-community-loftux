@@ -1,11 +1,13 @@
 // component properties
-var endpoint = instance.properties["endpoint"];
-var category = instance.properties["category"];
+var filterId = instance.properties["filter-id"];
+if(filterId == null)
+{
+	filterId = "10422";
+}
+model.filterId = filterId;
 
-// connect and retrieve json
-var connector = remote.connect("alfresco");
-var str = connector.get("/network/enterprise-product-updates?category="+category);
+var objects = extranet.getCheckIns(filterId, 0, 8);
+model.objects = objects;
 
-var json = eval('(' + str + ')');
-
-model.objects = json.results;
+var totalObjects = extranet.getCheckIns(filterId, 0, 1000);
+model.totalCount = totalObjects.length;

@@ -1,10 +1,16 @@
+<style type="text/css">
+<!--
+#nav-selected {
+	font: 1.153em/2em 'Trebuchet MS', Arial, sans-serif;
+	background: url('../images/spr-nav.gif') no-repeat 0 50%;
+}
+-->
+</style>
 <ul>
-	<li class="first"><a href="#">alfresco.com</a></li>
-	
 	<#list pages as page>
 		<#assign activeTag="">
 		<#if page.id == currentPageId>
-			<#assign activeTag=" class='active' ">
+			<#assign activeTag=" id='nav-selected' ">
 		</#if>
 		
 		<li ${activeTag}>

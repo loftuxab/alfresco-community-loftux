@@ -27,6 +27,7 @@ package org.alfresco.extranet;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.extranet.jira.JIRAService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -137,6 +138,33 @@ public class ExtranetHelper
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         return (CompanyService) context.getBean("extranet.service.company");                
     }
+    
+    /**
+     * Gets the JIRA service.
+     * 
+     * @param request the request
+     * 
+     * @return the JIRA service
+     */
+    public static JIRAService getJIRAService(HttpServletRequest request)
+    {
+        return getJIRAService(request.getSession().getServletContext());
+    }
+    
+    /**
+     * Gets the JIRA service.
+     * 
+     * @param servletContext the servlet context
+     * 
+     * @return the JIRA service
+     */
+    public static JIRAService getJIRAService(ServletContext servletContext)
+    {
+        ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return (JIRAService) context.getBean("extranet.service.jira");                
+    }
+    
+    
     
     // Helper Functions
         

@@ -27,6 +27,9 @@ package org.alfresco.web.scripts;
 import java.io.Writer;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.uri.UriUtils;
 
@@ -86,8 +89,15 @@ public class LocalWebScriptRuntime extends AbstractRuntime
         {
             properties.put(ProcessorModelHelper.PROP_HTMLID, htmlBindingId);
         }
+        
+        // try to determine the http servlet request and bind it in if we can
+        HttpServletRequest request = null;
+        if(context.RequestContext instanceof HttpRequestContext)
+        {
+            request = ((HttpRequestContext)context.RequestContext).getRequest();
+        }
 
-        return new LocalWebScriptRequest(this, scriptUrl, match, properties);
+        return new LocalWebScriptRequest(this, scriptUrl, match, properties, request);
     }
 
     @Override
