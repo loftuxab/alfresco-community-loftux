@@ -154,6 +154,21 @@
 	</bean>
     
     
+	<!--                            -->
+	<!-- Application Service: JIRA -->
+	<!--                            -->		
+	<bean id="extranet.service.jira" class="org.alfresco.extranet.jira.JIRAService">
+		<property name="server" value="http://issues.alfresco.com"/>
+		<property name="username" value="extranet"/>
+		<property name="password" value="(FILL IN)"/>
+	</bean>    
+
+
+
+   <!--  Extranet Declarative Web Script -->
+   <bean id="webscript.extranet" parent="webscript" class="org.alfresco.web.scripts.DeclarativeExtranetWebScript" singleton="false" />
+    
+    
     
     <!--  A few overrides -->
    <bean id="webframework.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
@@ -167,6 +182,9 @@
       <property name="defaultEncoding"><value>UTF-8</value></property>
       <property name="updateDelay"><value>0</value></property>
    </bean>
+   
+   
+   
    
    
    

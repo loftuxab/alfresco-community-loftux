@@ -13,8 +13,7 @@
 	<chrome>extranet-box-chrome</chrome>
   
   	<properties>
-  		<endpoint>alfresco</endpoint>
-  		<category>HEAD</category>
+  		<filter-id>10422</filter-id>
   	</properties>
   
 </component>

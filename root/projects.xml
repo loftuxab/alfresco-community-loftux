@@ -2936,6 +2936,26 @@
    
    <target name="compile-extranet" 
            depends="init">
+
+      <!-- Override the classpath to include our dependencies -->      
+      <path id="classpath.compile">
+         <fileset dir="${dir.project.3rdparty.lib}">
+            <include name="**/*.jar" />
+         </fileset>
+         <fileset dir="${dir.projects}">
+            <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
+         </fileset>
+         <fileset dir="${dir.modules}">
+            <include name="**/${dir.name.lib}/*.jar" />
+         </fileset>
+         <fileset dir="${dir.project.extranet}/dependencies/axis">
+            <include name="*.jar" />
+	 </fileset>
+         <fileset dir="${dir.project.extranet}/dependencies/misc">
+            <include name="*.jar" />
+	 </fileset>
+      </path>
+           
       <compile-java projectdir="${dir.project.extranet}" />
    </target>
    
@@ -2991,6 +3011,10 @@
                   includes="${file.name.jar.webframework}" />
          <fileset dir="${dir.project.extranet.dist}" 
                   includes="${file.name.jar.extranet}" />
+         <fileset dir="${dir.project.extranet}/dependencies/axis" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.extranet}/dependencies/misc" 
+                  includes="*.jar" />
       </copy>
 
       <!-- unzip and add 3rd party javascript library -->
