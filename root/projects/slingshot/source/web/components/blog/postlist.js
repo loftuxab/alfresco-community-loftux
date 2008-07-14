@@ -241,7 +241,7 @@
       {
          // make an ajax request to the repository to delete the post
          var url = Alfresco.util.blog.getBlogPostRestUrl(this.options.siteId, this.options.containerId,
-                                                         this.options.path, param);
+                                                         this.options.path, postId);
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -274,7 +274,7 @@
       {
          // make an ajax request to publish the post
          var url = Alfresco.util.blog.getPublishingRestUrl(this.options.siteId, this.options.containerId,
-                                                           this.options.path, param);
+                                                           this.options.path, postId);
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -310,7 +310,7 @@
       {
          // make an ajax request to publish the post
          var url = Alfresco.util.blog.getPublishingRestUrl(this.options.siteId, this.options.containerId,
-                                                           this.options.path, param);
+                                                           this.options.path, postId);
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -347,7 +347,7 @@
       {
          // make an ajax request to publish the post
          var url = Alfresco.util.blog.getPublishingRestUrl(this.options.siteId, this.options.containerId,
-                                                           this.options.path, param);
+                                                           this.options.path, postId);
          Alfresco.util.Ajax.request(
          {
             url: url,

@@ -173,8 +173,7 @@ Alfresco.util.blog.getBlogPostRestUrl = function(site, container, path, postId)
 
 Alfresco.util.blog.getPublishingRestUrl = function(site, container, path, postId)
 {
-   return Alfresco.constants.PROXY_URI + "blog/post/site/" +
-          this.options.siteId + "/" + this.options.containerId + "/";
+   var url = Alfresco.constants.PROXY_URI + "blog/post/site/" + site + "/" + container + "/";
    if (path != undefined && path.length > 0)
    {
       url += path + "/";
