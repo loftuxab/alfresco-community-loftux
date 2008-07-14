@@ -1,9 +1,13 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.TagComponent("${args.htmlid}");
+   new Alfresco.TagComponent("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!""}",
+      container: "${args.container!""}"
+   });
 //]]></script>
 <div id="${args.htmlid}-body" class="tag tagTitle">
 	<h2>	${msg("header.title")}</h2>
-	<ul class="filterLink">
+	<ul class="filterLink" id="tagFilterLinks">
 	<#if tags?size &gt; 0>
         <#list tags as tag>
             <li class="onTagSelection nav-label" id="${args.htmlid}-onTagSelection-${tag.name}">
