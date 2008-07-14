@@ -121,7 +121,6 @@ public final class ScriptModelObject extends ScriptBase
     
     // --------------------------------------------------------------
     // JavaScript Properties
-    //
     
     public String getId()
     {
@@ -184,15 +183,12 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getStoragePath();
     }
     
-
     
     // --------------------------------------------------------------
     // JavaScript Functions
-    //    
-    
     
     /**
-     * Save.
+     * Persist the object and all modified properties.
      */
     public void save()
     {
