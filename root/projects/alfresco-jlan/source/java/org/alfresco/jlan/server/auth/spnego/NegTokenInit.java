@@ -249,7 +249,7 @@ public class NegTokenInit
             // Get the bit flags
             
             DERBitString derBitStr = (DERBitString) derObj;
-            m_contextFlags = derBitStr.getValue();
+            m_contextFlags = derBitStr.intValue();
           }
         }
         

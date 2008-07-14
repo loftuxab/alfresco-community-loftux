@@ -48,6 +48,7 @@ public class DER {
   public static final int Sequence            = 0x10;
   public static final int NumericString       = 0x12;
   public static final int PrintableString     = 0x13;
+  public static final int GeneralizedTime     = 0x18;
   public static final int GeneralString       = 0x1B;
   public static final int UniversalString     = 0x1C;
 
@@ -113,5 +114,68 @@ public class DER {
    */
   public final static boolean isApplicationSpecific(int typ) {
     return ( typ & Application) != 0 ? true : false;
+  }
+  
+  /**
+   * Return the type as a string
+   * 
+   * @param typ int
+   * @return String
+   */
+  public final static String isTypeString(int typ) {
+	  String typStr = null;
+	  
+	  switch ( typ) {
+		  case Boolean:
+			  typStr = "Boolean";
+			  break;
+		  case Integer:
+			  typStr = "Integer";
+			  break;
+		  case BitString:
+			  typStr = "BitString";
+			  break;
+		  case OctetString:
+			  typStr = "OctetString";
+			  break;
+		  case Null:
+			  typStr = "Null";
+			  break;
+		  case ObjectIdentifier:
+			  typStr = "ObjectIdentifier";
+			  break;
+		  case External:
+			  typStr = "External";
+			  break;
+		  case Enumerated:
+			  typStr = "Enumerated";
+			  break;
+		  case UTF8String:
+			  typStr = "UTF8String";
+			  break;
+		  case Sequence:
+			  typStr = "Sequence";
+			  break;
+		  case NumericString:
+			  typStr = "NumericString";
+			  break;
+		  case PrintableString:
+			  typStr = "PrintableString";
+			  break;
+		  case GeneralizedTime:
+			  typStr = "GeneralizedTime";
+			  break;
+		  case GeneralString:
+			  typStr = "GeneralString";
+			  break;
+		  case UniversalString:
+			  typStr = "UniversalString";
+			  break;
+		  default:
+			  typStr = "UnknownType (" + typ + ")";
+		  	  break;
+	  }
+	  
+	  return typStr;
   }
 }
