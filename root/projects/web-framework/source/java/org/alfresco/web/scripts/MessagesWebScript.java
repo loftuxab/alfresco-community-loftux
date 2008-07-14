@@ -113,7 +113,7 @@ public class MessagesWebScript extends AbstractWebScript
                 writer.write(";\r\n");
                 
                 // community tracking logo
-                writer.write("document.write('<img src=\"http://www.alfresco.com/assets/images/common/alfresco_community_horiz30.gif\" alt=\"*\" style=\"display:none\"/>\');\r\n");
+                writer.write("window.setTimeout(function(){(document.getElementById('alfresco-yuiloader')||document.createElement('div')).innerHTML = '<img src=\"http://www.alfresco.com/assets/images/common/alfresco_community_horiz30.gif\" alt=\"*\" style=\"display:none\"/>\'}, 100);\r\n");
                 
                 // retrieve result from the writer and cache for this locale
                 result = writer.toString();
