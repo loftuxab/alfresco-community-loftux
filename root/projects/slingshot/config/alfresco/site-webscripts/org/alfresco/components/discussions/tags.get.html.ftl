@@ -2,7 +2,7 @@
    new Alfresco.TopicListTags("${args.htmlid}");
 //]]></script>
 <div id="${args.htmlid}-body" class="filter menuTitle">
-	<h2>BROWSE TAGS</h2>
+	<h2>${msg("topiclist.tags.title")}</h2>
     <ul class="filterLink">
         <#list tags as tag>
             <li class="nav-label" id="${args.htmlid}-onTagSelection-${tag.name}">

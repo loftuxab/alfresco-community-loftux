@@ -34,10 +34,6 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.TagLibrary("${htmlid}").setOptions(
    {
-      //siteId: "{page.url.templateArgs.site}",
-      //tags: [
-      //topicId: "{item.name}",
-      //topicRef: "{item.nodeRef}"
    }).setMessages(
       ${messages}
    ).setCurrentTags(
@@ -46,7 +42,7 @@
 //]]></script>
 
 <div class="taglibcontainer">
-   <label>Tags:</label>
+   <label>${msg("taglibrary.tags")}</label>
    <div class="tags">
       <div class="top_taglist tags_box">
          <ul id="${htmlid}-current-tags">
@@ -62,12 +58,12 @@
          </ul>
       </div>
       <br class="clear" />
-      <div class="title">Type Tag(s):</div>
+      <div class="title">${msg("taglibrary.typetag")}</div>
       <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
       <input type="button" id="${htmlid}-add-tag-button" value="Add" />
       <br class="clear" />
       <div class="bottom_taglist tags_box">
-         <a href="#" id="${htmlid}-load-popular-tags-link">Choose from popular tags in this site</a>
+         <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
          
          <#-- Following list contains the popular tags, loaded by AJAX on users request -->
          <ul id="${htmlid}-popular-tags">

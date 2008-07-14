@@ -106,7 +106,7 @@
 <div class="editNodeForm">
    <#if ! isEdit>
    <div class="replyTo">
-      ${msg("replies.action.delete")}: <em>${post.author}</em>
+      ${msg("replies.form.replyTo")}: <em>${post.author}</em>
    </div>
    </#if>
    

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <rss version="2.0">
 	<channel>
-		<title>Alfresco Discussions Topics</title>
+		<title>${msg("topiclistrss.title")}</title>
 		<link>${absurl(url.context)}/service/components/discussions/rss?site=${site}&amp;container=${container}</link>
-		<description>RSS feed of the discussions</description>
+		<description>${msg("topiclistrss.description")}</description>
 		<language>${lang}</language>
 
 		<#if (items?size > 0)>
@@ -16,7 +16,7 @@
 			      </item>
 			</#list>
 		<#else>
-		      <item>No topic content yet</item>
+		      <item>${msg("topiclistrss.nocontent")}</item>
 		</#if>
 	</channel>
 </rss>

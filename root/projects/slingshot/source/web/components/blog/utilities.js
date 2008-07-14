@@ -91,27 +91,27 @@ Alfresco.util.editor.getTextOnlyToolbarConfig = function(msg)
    var toolbar = {
       titlebar: false,
       buttons: [
-         { group: 'textstyle', label: msg("comments.form.font"),
+         { group: 'textstyle', label: msg("yuieditor.toolbar.group.font"),
             buttons: [
-               { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
-               { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
-               { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
+               { type: 'push', label: msg("yuieditor.toolbar.item.bold"), value: 'bold' },
+               { type: 'push', label: msg("yuieditor.toolbar.item.italic"), value: 'italic' },
+               { type: 'push', label: msg("yuieditor.toolbar.item.underline"), value: 'underline' },
                { type: 'separator' },
-               { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-               { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
+               { type: 'color', label: msg("yuieditor.toolbar.item.fontcolor"), value: 'forecolor', disabled: true },
+               { type: 'color', label: msg("yuieditor.toolbar.item.backgroundcolor"), value: 'backcolor', disabled: true }
             ]
          },
          { type: 'separator' },
-         { group: 'indentlist', label: msg("comments.form.lists"),
+         { group: 'indentlist', label: msg("yuieditor.toolbar.group.lists"),
             buttons: [
-               { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
-               { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
+               { type: 'push', label: msg("yuieditor.toolbar.item.createunorderedlist"), value: 'insertunorderedlist' },
+               { type: 'push', label: msg("yuieditor.toolbar.item.createorderedlist"), value: 'insertorderedlist' }
             ]
          },
          { type: 'separator' },
-         { group: 'insertitem', label: msg("comments.form.link"),
+         { group: 'insertitem', label: msg("yuieditor.toolbar.group.link"),
             buttons: [
-              { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
+              { type: 'push', label: msg("yuieditor.toolbar.item.link"), value: 'createlink', disabled: true }
             ]
         }
       ]

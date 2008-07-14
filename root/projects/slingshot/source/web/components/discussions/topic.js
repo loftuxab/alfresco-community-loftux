@@ -183,7 +183,7 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete") + response.json.error});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete", response.json.error)});
          }
       },
 
@@ -208,12 +208,12 @@
                scope: this,
                object : { mode : "edit" }
             },
-            failureMessage: this._msg("topic.msg.failedLoad1"),
+            failureMessage: this._msg("topic.msg.failedloadeditform"),
          });
       },
 
       _onFormLoaded: function(response, object)
-      {
+      {  
          // ignore the loaded statement if the mode is already edit
          if (this.options.mode != "view")
          {
@@ -301,7 +301,7 @@
          // check whether we got an error
          if (response.json.error != undefined)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.error") + response.json.error});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.formsubmiterror", response.json.error)});
             return;
          }
 
@@ -329,7 +329,7 @@
      
       onFormSubmitFailure: function DiscussionsTopic_onFormSubmitFailure(response)
       {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.failedSubmit")});
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.formsubmitfailed")});
       },
      
       onFormCancelButtonClick: function(type, args)

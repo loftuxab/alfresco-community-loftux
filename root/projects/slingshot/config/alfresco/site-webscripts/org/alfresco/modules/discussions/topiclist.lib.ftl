@@ -4,18 +4,18 @@
 <#macro topicListTitle filter="" tag="">
    <#if (filter?length > 0 && filter != "all")>
       <#if filter == "hot">
-         Hot topics
+         ${msg("topiclist.title.hottopics")}
       <#elseif (filter == "new")>
-         New topics
+         ${msg("topiclist.title.newtopics")}
       <#elseif (filter == "mine")>
-         My topics
+         ${msg("topiclist.title.mytopics")}
       <#else>
          Unknown filter!
       </#if>
    <#elseif (tag?length > 0)>
-      Posts with tag ${tag}
+      ${msg("topiclist.title.bytag", tag)}
    <#else>
-      All posts
+      ${msg("topiclist.title.alltopics")}
    </#if>
 </#macro>
 
@@ -36,7 +36,7 @@
          </#switch>
       </#list>
    <#else>
-      <div class="noNode">${msg("topic.noTopic")}</div>
+      <div class="noNode">${msg("topiclist.noTopics")}</div>
    </#if>
 </div>
 </#macro>

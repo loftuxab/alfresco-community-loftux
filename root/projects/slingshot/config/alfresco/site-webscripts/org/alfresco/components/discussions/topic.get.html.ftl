@@ -12,14 +12,6 @@
    );
 //]]></script>
 
-<#--
-<button id="${args.htmlid}-edit-button" name="editButton">Edit</button>
-<button id="${args.htmlid}-delete-button" name="deleteButton">Delete</button>
-
-<br>
-<br>
--->
-
 <div id="discussionsBlogHeader2">
 	<div class="leftDiscussionBlogHeader listTitle">
 		<span class="backLink">
