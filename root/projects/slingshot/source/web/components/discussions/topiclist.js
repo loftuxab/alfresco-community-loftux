@@ -227,7 +227,7 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete") + response.json.error});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete", response.json.error)});
          }
       },
       
@@ -293,7 +293,7 @@
                fn: this._processData,
                scope: this
             },
-            failureMessage: this._msg("topic.msg.failedLoad1")
+            failureMessage: this._msg("topiclist.msg.failedloadingdata")
          });
       },
       
@@ -302,7 +302,7 @@
          // first check whether we got an error back
          if (response.json.error != undefined)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.failedLoadData") + response.json.error});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topiclist.msg.unableloadingdata", response.json.error)});
          }
          else
          {

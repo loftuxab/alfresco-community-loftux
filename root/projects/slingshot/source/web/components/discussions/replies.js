@@ -107,11 +107,10 @@
             var elem = YAHOO.util.Dom.get(indentedID);
             if (YAHOO.util.Dom.hasClass(elem, "hidden")) {
                YAHOO.util.Dom.removeClass(elem, "hidden");
-               owner.innerHTML ="Hide";
-               
+               owner.innerHTML = this._msg("replies.footer.hide");
             } else {
                YAHOO.util.Dom.addClass(elem, "hidden");
-               owner.innerHTML = "Show";
+               owner.innerHTML = this._msg("replies.footer.show");
             }
             return true;
          });
@@ -174,7 +173,7 @@
                scope: this,
                obj: { replyRef : replyRef}
             },
-            failureMessage: this._msg("replies.msg.failedDeleted2")
+            failureMessage: this._msg("replies.msg.failedDelete")
          });
       },
       
@@ -189,7 +188,7 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.failedDeleted1") + response.json.error});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.unableDelete") + response.json.error});
          }
       },
       
@@ -221,7 +220,7 @@
                   postRef : postRef
                }
             },
-            failureMessage: this._msg("replies.msg.failedLoadTopicForm")
+            failureMessage: this._msg("replies.msg.failedloadeditform")
          });
       },
       
@@ -230,14 +229,14 @@
          // ignore the loaded statement if the mode is already edit
          if (! this.isViewMode())
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.editingTwice")});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.wrongmode")});
             return;
          }
 
          // check whether we actually got an error back
          if (response.json.error != undefined)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.failedLoadReplyForm")  + response.json.error});   
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.unableloadeditform", response.json.error)});   
             return;
          }
         
@@ -356,7 +355,7 @@
       
       onFormSubmitFailure: function DiscussionsTopic_onFormSubmitFailure(response)
       {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.failed")});
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.submitfailed")});
       },
       
       onFormCancelButtonClick: function(type, args)
