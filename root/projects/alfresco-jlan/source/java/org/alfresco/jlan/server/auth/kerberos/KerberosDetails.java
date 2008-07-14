@@ -92,6 +92,15 @@ public class KerberosDetails {
   }
 
   /**
+   * Set the response token
+   * 
+   * @param tok byte[]
+   */
+  public final void setResponseToken(byte[] tok) {
+	  m_krbResponse = tok;
+  }
+  
+  /**
    * Parse the source name to return the user name part only
    * 
    * @return String

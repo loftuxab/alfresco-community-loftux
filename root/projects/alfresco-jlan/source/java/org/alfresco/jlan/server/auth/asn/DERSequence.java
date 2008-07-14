@@ -27,6 +27,7 @@ package org.alfresco.jlan.server.auth.asn;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -193,7 +194,15 @@ public class DERSequence extends DERObject {
     if ( totLen > 0)
       buf.packBytes( objBuf);
   }
-  
+
+  /**
+   * Enumerate the list
+   * 
+   * @return Iterator<DERObject>
+   */
+  public final Iterator<DERObject> getObjects() {
+	  return m_list.iterator();
+  }
   /**
    * Return the sequence as a string
    * 

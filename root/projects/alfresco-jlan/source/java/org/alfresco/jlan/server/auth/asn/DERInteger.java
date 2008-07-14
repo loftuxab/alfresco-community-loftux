@@ -63,12 +63,21 @@ public class DERInteger extends DERObject {
   }
   
   /**
-   * Return the integer value
+   * Return the long value
    * 
    * @return long
    */
   public final long getValue() {
     return m_integer;
+  }
+  
+  /**
+   * Return the integer value
+   * 
+   * @return int
+   */
+  public final int intValue() {
+	  return (int) m_integer;
   }
   
   /**
@@ -86,7 +95,14 @@ public class DERInteger extends DERObject {
       // Unpack the length and value
       
       int len = buf.unpackByte();
-      m_integer  = buf.unpackLong( len);
+      m_integer = 0;
+      
+      if ( len == 1)
+    	  m_integer = buf.unpackByte();
+      else if ( len > 1) {
+	      while ( len-- > 0)
+	    	  m_integer = (m_integer << 8) + buf.unpackByte();
+      }
     }
     else
       throw new IOException("Wrong DER type, expected Integer");
@@ -102,9 +118,23 @@ public class DERInteger extends DERObject {
 
     // Pack the type, length and value
     
-    buf.packByte( DER.Enumerated);
-    buf.packLength( 8);
-    buf.packLong( m_integer);
+    buf.packByte( DER.Integer);
+    
+    // Calculate the number of bytes required to pack the integer value
+    
+    int bytLen = 8;
+    
+    while ( bytLen > 0 && (m_integer & ( 0xFFL << ((bytLen - 1) * 8))) == 0)
+    	bytLen--;
+    
+    // Pack the length
+    
+    buf.packLength( bytLen);
+    
+    // Pack the integer bytes
+    
+    while ( bytLen > 0)
+    	buf.packByte(( int) ( m_integer >> ( --bytLen * 8)) & 0xFF);
   }
   
   /**

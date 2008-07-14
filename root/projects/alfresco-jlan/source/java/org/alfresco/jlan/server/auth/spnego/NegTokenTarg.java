@@ -130,6 +130,7 @@ public class NegTokenTarg {
    */
   public void decode(byte[] buf, int off, int len)
     throws IOException {
+	  
     // Create a DER buffer to decode the blob
     
     DERBuffer derBuf = new DERBuffer(buf, off, len);
@@ -149,6 +150,7 @@ public class NegTokenTarg {
       derObj = derSeq.getTaggedObject( 0);
       if ( derObj == null)
         throw new IOException( "Status missing from blob");
+      
       if ( derObj instanceof DEREnumerated == false)
         throw new IOException( "Invalid status object");
       
@@ -218,16 +220,10 @@ public class NegTokenTarg {
   public byte[] encode()
     throws IOException {
 
-    // Create the list of objects to be encoded
-	    
-    List<DERObject> objList = new ArrayList<DERObject>();
-    objList.add( new DEROid( OID.ID_SPNEGO));
-
     // Build the sequence of tagged objects
 	    
     DERSequence derSeq = new DERSequence();
     derSeq.setTagNo( 1);
-    objList.add( derSeq);
 	    
     // Add the result
     
@@ -254,8 +250,7 @@ public class NegTokenTarg {
     // Pack the objects
     
     DERBuffer derBuf = new DERBuffer();
-    
-    derBuf.packApplicationSpecific( objList);
+    derBuf.packObject( derSeq);
     
     // Return the packed negTokenInit blob
     

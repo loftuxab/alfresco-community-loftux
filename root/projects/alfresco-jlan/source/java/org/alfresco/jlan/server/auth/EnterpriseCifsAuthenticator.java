@@ -44,7 +44,9 @@ import javax.security.sasl.RealmCallback;
 
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
+import org.alfresco.jlan.server.auth.kerberos.KerberosApReq;
 import org.alfresco.jlan.server.auth.kerberos.KerberosDetails;
+import org.alfresco.jlan.server.auth.kerberos.KrbAuthContext;
 import org.alfresco.jlan.server.auth.kerberos.SessionSetupPrivilegedAction;
 import org.alfresco.jlan.server.auth.ntlm.NTLM;
 import org.alfresco.jlan.server.auth.ntlm.NTLMMessage;
@@ -63,6 +65,7 @@ import org.alfresco.jlan.server.core.NoPooledMemoryException;
 import org.alfresco.jlan.smb.Capability;
 import org.alfresco.jlan.smb.SMBStatus;
 import org.alfresco.jlan.smb.dcerpc.UUID;
+import org.alfresco.jlan.smb.server.CIFSConfigSection;
 import org.alfresco.jlan.smb.server.SMBSrvException;
 import org.alfresco.jlan.smb.server.SMBSrvPacket;
 import org.alfresco.jlan.smb.server.SMBSrvSession;
@@ -81,7 +84,7 @@ import org.ietf.jgss.Oid;
  * @author gkspencer
  */
 public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements CallbackHandler {
-	
+
 	// Constants
 	//
 	// Default login configuration entry name
@@ -150,6 +153,20 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 
 		super.initialize(config, params);
 
+        // Check if Java API Kerberos debug output should be enabled
+        
+        if ( params.getChild("kerberosDebug") != null) {
+
+        	// Enable Kerberos API debug output
+        	
+        	System.setProperty( "sun.security.jgss.debug", "true");
+        	System.setProperty( "sun.security.krb5.debug", "true");
+        }
+        
+        // Access the CIFS server configuration
+        
+        CIFSConfigSection cifsConfig = (CIFSConfigSection) config.getConfigSection(CIFSConfigSection.SectionName);
+        
 		// Check if Kerberos is enabled, get the Kerberos KDC address
 
 		ConfigElement kdcAddress = params.getChild("KDC");
@@ -222,7 +239,7 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 				StringBuffer cifsAccount = new StringBuffer();
 
 				cifsAccount.append("cifs/");
-				cifsAccount.append(config.getServerName().toLowerCase());
+				cifsAccount.append(cifsConfig.getServerName().toLowerCase());
 				cifsAccount.append("@");
 				cifsAccount.append(m_krbRealm);
 
@@ -253,13 +270,30 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 				throw new InvalidConfigurationException("Failed to login CIFS server service");
 			}
 
+            // DEBUG
+            
+            if ( Debug.EnableDbg && hasDebug()) {
+            	Debug.println("[SMB] Enabling mechTypes :-");
+            	Debug.println("       Kerberos5");
+            	Debug.println("       MS-Kerberos5");
+            }
+            
 			// Create the Oid list for the SPNEGO NegTokenInit, include NTLMSSP for fallback
 
 			Vector<Oid> mechTypes = new Vector<Oid>();
 
 			mechTypes.add(OID.KERBEROS5);
 			mechTypes.add(OID.MSKERBEROS5);
-			mechTypes.add(OID.NTLMSSP);
+			
+            if ( params.getChild("disableNTLM") == null)
+            {
+            	mechTypes.add(OID.NTLMSSP);
+            	
+            	// DEBUG
+            	
+            	if ( Debug.EnableDbg && hasDebug())
+            		Debug.println("       NTLMSSP");
+            }
 
 			// Build the SPNEGO NegTokenInit blob
 
@@ -272,7 +306,7 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 				String mecListMIC = null;
 
 				StringBuffer mic = new StringBuffer();
-				mic.append(config.getServerName().toLowerCase());
+				mic.append(cifsConfig.getServerName().toLowerCase());
 				mic.append("$@");
 				mic.append(m_krbRealm);
 
@@ -495,7 +529,7 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 	 */
 	public void processSessionSetup(SMBSrvSession sess, SMBSrvPacket reqPkt)
 		throws SMBSrvException {
-		
+
 		// Check that the received packet looks like a valid NT session setup andX request
 
 		if ( reqPkt.checkPacketIsValid(12, 0) == false)
@@ -721,10 +755,10 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 
 			// Fill in the rest of the packet header
 
-			respPkt.setParameter(0, 0xFF); 	// No chained response
-			respPkt.setParameter(1, 0); 	// Offset to chained response
+			respPkt.setParameter(0, 0xFF); // No chained response
+			respPkt.setParameter(1, 0); // Offset to chained response
 
-			respPkt.setParameter(2, 0); 	// Action
+			respPkt.setParameter(2, 0); // Action
 			respPkt.setParameter(3, respLen);
 		}
 		else {
@@ -736,15 +770,15 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 			// Build the session setup response SMB
 
 			respPkt.setParameterCount(12);
-			respPkt.setParameter(0, 0xFF); 	// No chained response
-			respPkt.setParameter(1, 0); 	// Offset to chained response
+			respPkt.setParameter(0, 0xFF); // No chained response
+			respPkt.setParameter(1, 0); // Offset to chained response
 
 			respPkt.setParameter(2, SMBSrvSession.DefaultBufferSize);
 			respPkt.setParameter(3, SMBSrvSession.NTMaxMultiplexed);
 			respPkt.setParameter(4, vcNum); // virtual circuit number
 			respPkt.setParameterLong(5, 0); // session key
 			respPkt.setParameter(7, respLen);
-											// security blob length
+			// security blob length
 			respPkt.setParameterLong(8, 0); // reserved
 			respPkt.setParameterLong(10, getServerCapabilities());
 
@@ -1175,94 +1209,207 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 	private final NegTokenTarg doKerberosLogon(SMBSrvSession sess, NegTokenInit negToken, ClientInfo client)
 		throws SMBSrvException {
 
-		// Authenticate the user
+        //  Authenticate the user
+        
+        KerberosDetails krbDetails = null;
+        NegTokenTarg negTokenTarg = null;
+        
+        try
+        {
+        	// Parse the mechToken to get the AP-REQ details
+        	
+        	KerberosApReq krbApReq = new KerberosApReq();
+        	krbApReq.parseMechToken( negToken.getMechtoken());
+        	
+        	if ( Debug.EnableDbg && hasDebug())
+        		Debug.println( "[SMB] Kerberos AP-REQ - " + krbApReq);
+        	
+        	// Check if mutual authentication is required
 
-		KerberosDetails krbDetails = null;
-		NegTokenTarg negTokenTarg = null;
+        	KrbAuthContext krbAuthCtx = null;
+        	
+        	if ( krbApReq.hasMutualAuthentication())
+        	{
+        		// Allocate the Kerberos authentication and parse the AP-REQ
+        		
+        		krbAuthCtx = new KrbAuthContext();
+        		krbAuthCtx.setDebug(hasDebug());
+        		
+        		// DEBUG
+        		
+        		if ( Debug.EnableDbg && hasDebug())
+        			Debug.println("[SMB] Kerberos mutual auth required, parsing AP-REQ");
+        		
+        		try {
+        			
+        			// Parse the AP-REQ
+        			
+        			krbAuthCtx.parseKerberosApReq( m_loginContext.getSubject(), krbApReq);
+        		}
+        		catch ( IOException ex)
+        		{
+        			// Failed to parse AP-REQ
+        			
+        			if ( Debug.EnableDbg && hasDebug())
+        				Debug.println("[SMB] Failed to parse AP-REQ, " + ex.toString());
+        			
+                    // Return a logon failure status
+                    
+                    throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+        		}
+        	}
+        	
+            //  Run the session setup as a privileged action
+            
+            SessionSetupPrivilegedAction sessSetupAction = new SessionSetupPrivilegedAction( m_accountName, negToken.getMechtoken());
+            Object result = Subject.doAs( m_loginContext.getSubject(), sessSetupAction);
+    
+            if ( result != null)
+            {
+                // Access the Kerberos response
+                
+                krbDetails = (KerberosDetails) result;
 
-		try {
+                // Determine the response OID
+                
+                Oid respOid = null;
+                
+                if ( negToken.hasOid( OID.MSKERBEROS5))
+                {
+                	respOid = OID.MSKERBEROS5;
+                	
+                	// DEBUG
+                	
+                	if ( Debug.EnableDbg && hasDebug())
+                		Debug.println("[SMB] Using OID MS Kerberos5 for NegTokenTarg");
+                }
+                else
+                {
+                	respOid = OID.KERBEROS5;
+                	
+                	// DEBUG
+                	
+                	if ( Debug.EnableDbg && hasDebug())
+                		Debug.println("[SMB] Using OID Kerberos5 for NegTokenTarg");
+                }
 
-			// Run the session setup as a privileged action
+                // If mutual authentication is required then we unpack the AP-REP and add in the missing
+                // subkey that the AD client requires
+                
+                if ( krbAuthCtx != null)
+                {
+	                try
+	                {
+	                	// Parse the AP-REP and add the missing subkey, return the updated response blob
+	                	
+	                	byte[] respToken = krbAuthCtx.parseKerberosApRep( krbDetails.getResponseToken());
+	                	krbDetails.setResponseToken(respToken);
+	                	
+	                	// Create the NegtokenTarg
+	                	
+		                negTokenTarg = new NegTokenTarg( SPNEGO.AcceptCompleted, respOid, krbDetails.getResponseToken());
+	                	
+	                	// DEBUG
+	                	
+	                	if ( Debug.EnableDbg && hasDebug())
+	                		Debug.println("[SMB] Created NegTokenTarg using updated AP-REP, added subkey");
+	                }
+	                catch (Exception ex)
+	                {
+	        			if ( Debug.EnableDbg && hasDebug()) {
+	        				Debug.println("[SMB] AP-REP Error:");
+	        				Debug.println( ex);
+	        			}
+	                }
+                }
+                else
+                {
+	                // Create the NegTokenTarg response blob
+	                
+	                negTokenTarg = new NegTokenTarg( SPNEGO.AcceptCompleted, respOid, krbDetails.getResponseToken());
+	                
+	                // DEBUG
+	                
+	                if ( Debug.EnableDbg && hasDebug())
+	                	Debug.println("[SMB] Created NegTokenTarg using standard Krb5 API response");
+                }
+                
+            	// Check if this is a null logon
+            	
+            	String userName = krbDetails.getUserName();
+            	
+            	if ( userName != null)
+            	{
+            		// Check for the machine account name
+            		
+            		if ( userName.endsWith( "$") && userName.equals( userName.toUpperCase()))
+            		{
+            			// Null logon
+            			
+                		client.setLogonType( ClientInfo.LogonNull);
 
-			SessionSetupPrivilegedAction sessSetupAction = new SessionSetupPrivilegedAction(m_accountName, negToken
-					.getMechtoken());
-			Object result = Subject.doAs(m_loginContext.getSubject(), sessSetupAction);
-
-			if ( result != null) {
-
-				// Access the Kerberos response
-
-				krbDetails = (KerberosDetails) result;
-
-				// Create the NegTokenTarg response blob
-
-				negTokenTarg = new NegTokenTarg(SPNEGO.AcceptCompleted, OID.KERBEROS5, krbDetails.getResponseToken());
-
-				// Check if this is a null logon
-
-				String userName = krbDetails.getUserName();
-
-				if ( userName != null) {
-
-					// Check for the machine account name
-
-					if ( userName.endsWith("$") && userName.equals(userName.toUpperCase())) {
-
-						// Null logon
-
-						client.setLogonType(ClientInfo.LogonNull);
-
-						// Debug
-
-						if ( Debug.EnableDbg && hasDebug())
-							Debug.println("[SMB] Machine account logon, " + userName + ", as null logon");
-					}
-					else {
-
-						// Store the full user name in the client information, indicate that this is
-						// not a guest logon
-
-						client.setUserName(krbDetails.getSourceName());
-						client.setGuest(false);
-
-						// Indicate that the session is logged on
-
-						sess.setLoggedOn(true);
-					}
-				}
-				else {
-
-					// Return a logon failure status
-
-					throw new SMBSrvException(SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
-				}
-
-				// Debug
-
-				if ( Debug.EnableInfo && hasDebug())
-					Debug.println("[SMB] Logged on using Kerberos");
-			}
-		}
-		catch (Exception ex) {
-
-			// Log the error
-
-			if ( Debug.EnableError && hasDebug())
-				Debug.println(ex);
-
-			// Return a logon failure status
-
-			throw new SMBSrvException(SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
-		}
-
-		// Check if the response is valid
-
-		if ( negTokenTarg == null)
-			throw new SMBSrvException(SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
-
-		// Return the response SPNEGO blob
-
-		return negTokenTarg;
+                		//  Debug
+                        
+                        if ( Debug.EnableDbg && hasDebug())
+                            Debug.println("[SMB] Machine account logon, " + userName + ", as null logon");
+            		}
+            		else
+            		{
+                        // Store the full user name in the client information, indicate that this is not a guest logon
+                        
+                        client.setUserName( krbDetails.getSourceName());
+                        client.setGuest( false);
+	                        
+                        // Indicate that the session is logged on
+                        
+                        sess.setLoggedOn(true);
+            		}
+            	}
+            	else
+            	{
+            		// Null logon
+            		
+            		client.setLogonType( ClientInfo.LogonNull);
+            	}
+            	
+                // Indicate that the session is logged on
+                
+                sess.setLoggedOn(true);
+                
+                //  Debug
+                
+                if ( Debug.EnableDbg && hasDebug())
+                	Debug.println("[SMB] Logged on using Kerberos, user " + userName);
+            }
+            else
+            {
+            	// Debug
+            	
+            	if ( Debug.EnableDbg && hasDebug())
+            		Debug.println( "[SMB] No SPNEGO response, Kerberos logon failed");
+            	
+                // Return a logon failure status
+                
+                throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the error
+            
+        	if ( Debug.EnableError && hasDebug()) {
+        		Debug.println("[SMB] Kerberos logon error");
+        		Debug.println(ex);
+        	}
+    
+            // Return a logon failure status
+            
+            throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+        }
+    
+        // Return the response SPNEGO blob
+        
+        return negTokenTarg;
 	}
 
 	/**

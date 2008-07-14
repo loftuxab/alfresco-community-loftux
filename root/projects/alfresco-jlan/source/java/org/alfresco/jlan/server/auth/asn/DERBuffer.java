@@ -28,6 +28,7 @@ package org.alfresco.jlan.server.auth.asn;
 import java.io.IOException;
 import java.util.List;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.util.DataPacker;
 
 /**
@@ -42,6 +43,10 @@ public class DERBuffer {
   //  Constants
   
   private static final int DefaultBufferSize  = 256;
+  
+  // Debug enable
+  
+  private static final boolean DebugEnable = false;
   
   //  Data buffer, current position and offset
   
@@ -298,40 +303,64 @@ public class DERBuffer {
     // Create the required object type
     
     DERObject derObj = null;
-    
-    switch ( DER.isType( objTyp)) {
-      case DER.BitString:
-        derObj = new DERBitString();
-        break;
-      case DER.Boolean:
-        derObj = new DERBoolean();
-        break;
-      case DER.Enumerated:
-        derObj = new DEREnumerated();
-        break;
-      case DER.GeneralString:
-        derObj = new DERGeneralString();
-        break;
-      case DER.Integer:
-        derObj = new DERInteger();
-        break;
-      case DER.NumericString:
-        break;
-      case DER.ObjectIdentifier:
-        derObj = new DEROid();
-        break;
-      case DER.OctetString:
-        derObj = new DEROctetString();
-        break;
-      case DER.PrintableString:
-        break;
-      case DER.Sequence:
-        derObj = new DERSequence();
-        break;
-      case DER.UniversalString:
-        break;
-      case DER.UTF8String:
-        break;
+
+    if (( objTyp & DER.Application) != 0) {
+    	
+    	// Create an applicatin sepcific object
+    	
+    	derObj = new DERApplicationSpecific();
+
+    	// DEBUG
+        
+        if ( DebugEnable)
+        	Debug.println("DER unpackObject typ=Applicationspecific objTyp=0x" + Integer.toHexString(objTyp));
+    }
+    else {
+
+    	// DEBUG
+        
+        if ( DebugEnable)
+        	Debug.println("DER unpackObject typ=" + DER.isTypeString( DER.isType( objTyp)) + " objTyp=0x" + Integer.toHexString(objTyp));
+
+        // Create the appropriate object type
+        
+	    switch ( DER.isType( objTyp)) {
+	      case DER.BitString:
+	        derObj = new DERBitString();
+	        break;
+	      case DER.Boolean:
+	        derObj = new DERBoolean();
+	        break;
+	      case DER.Enumerated:
+	        derObj = new DEREnumerated();
+	        break;
+	      case DER.GeneralString:
+	        derObj = new DERGeneralString();
+	        break;
+	      case DER.Integer:
+	        derObj = new DERInteger();
+	        break;
+	      case DER.NumericString:
+	        break;
+	      case DER.ObjectIdentifier:
+	        derObj = new DEROid();
+	        break;
+	      case DER.OctetString:
+	        derObj = new DEROctetString();
+	        break;
+	      case DER.PrintableString:
+	        break;
+	      case DER.Sequence:
+	        derObj = new DERSequence();
+	        break;
+	      case DER.UniversalString:
+	        break;
+	      case DER.UTF8String:
+	        break;
+	      case DER.GeneralizedTime:
+	    	derObj = new DERGeneralizedTime();
+	    	break;
+	    }
     }
     
     // Decode the object, if valid
@@ -386,7 +415,7 @@ public class DERBuffer {
 
     //  Check if there is enough data in the buffer
     
-    if ( m_data.length - m_pos < 8)
+    if ( m_data.length - m_pos < len)
       throw new ArrayIndexOutOfBoundsException("End of data buffer");
       
     //  Unpack the integer value
@@ -584,9 +613,24 @@ public class DERBuffer {
   public final void packApplicationSpecific(DERObject derObj)
     throws IOException {
 
+	// Pack the object
+	  
+	packApplicationSpecific(0, derObj);
+  }
+
+  /**
+   * Pack an application specific object
+   * 
+   * @param tagId int
+   * @param derObj DERObject
+   * @exception IOException
+   */
+  public final void packApplicationSpecific(int tagId, DERObject derObj)
+    throws IOException {
+
     // Pack the header
     
-    packByte( DER.Application + DER.Constructed);
+    packByte( DER.Application + DER.Constructed + (tagId & 0x1F));
     
     // Pack the object to a seperate buffer to get the length
     
@@ -607,10 +651,25 @@ public class DERBuffer {
    */
   public final void packApplicationSpecific(List derList)
     throws IOException {
+	  
+	// Pack the list of objects
+	  
+	packApplicationSpecific( 0, derList);
+  }
+  
+  /**
+   * Pack an application specific list of objects
+   * 
+   * @param tagId int
+   * @param derList List
+   * @exception IOException
+   */
+  public final void packApplicationSpecific(int tagId, List derList)
+    throws IOException {
 
     // Pack the header
     
-    packByte( DER.Application + DER.Constructed);
+    packByte( DER.Application + DER.Constructed + (tagId & 0x1F));
     
     // Pack the objects to a seperate buffer to get the length
 
@@ -642,6 +701,40 @@ public class DERBuffer {
   }
 
   /**
+   * Pack an application specific object
+   *
+   * @param tagId int
+   * @param byts byte[]
+   * @exception IOException
+   */
+  public final void packApplicationSpecific(int tagId, byte[] byts)
+    throws IOException {
+
+    // Pack the header
+    
+    packByte( DER.Application + DER.Constructed + (tagId & 0x1F));
+    
+    // Pack the length and object
+    
+    packLength( byts.length);
+    packBytes( byts, 0, byts.length);
+  }
+
+  /**
+   * Pack an application specific object
+   *
+   * @param byts byte[]
+   * @exception IOException
+   */
+  public final void packApplicationSpecific(byte[] byts)
+    throws IOException {
+
+    // Pack the bytes
+	  
+	packApplicationSpecific( 0, byts);
+  }
+  
+  /**
    * Unpack an application specific object
    * 
    * @return DERObject
@@ -671,6 +764,38 @@ public class DERBuffer {
     // Return the decoded object
     
     return derObj;
+  }
+  
+  /**
+   * Unpack an application specific blob
+   * 
+   * @return byte[]
+   * @exception IOException
+   */
+  public final byte[] unpackApplicationSpecificBytes()
+    throws IOException {
+    
+    // Get the first entry from the stream
+
+    int typ = unpackType();
+    byte[] objByts = null;
+    
+    if ( DER.isApplicationSpecific(typ)) {
+    
+      // Get the object length
+      
+      int len = unpackLength();
+      
+      // Unpack the top level object bytes
+      
+      objByts = unpackBytes( len);
+    }
+    else
+      throw new IOException("Wrong DER type, expected Application or Context");
+    
+    // Return the object bytes
+    
+    return objByts;
   }
   
   /**

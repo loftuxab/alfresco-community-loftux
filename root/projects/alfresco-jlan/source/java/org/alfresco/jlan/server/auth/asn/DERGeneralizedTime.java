@@ -28,47 +28,38 @@ package org.alfresco.jlan.server.auth.asn;
 import java.io.IOException;
 
 /**
- * DER Bit String Class 
+ * DER Generalized Time Class
  *
  * @author gkspencer
  */
-public class DERBitString extends DERObject {
+public class DERGeneralizedTime extends DERObject {
 
-  // Bit flags value
+  // Time value
   
-  private long m_bits;
+  private String m_string;
   
   /**
    * Default constructor
    */
-  public DERBitString() {
+  public DERGeneralizedTime() {
   }
-
+  
   /**
    * Class constructor
    * 
-   * @param bits int
+   * @param str String
    */
-  public DERBitString( long bits) {
-    m_bits = bits;
+  public DERGeneralizedTime(String str) {
+    m_string = str;
   }
 
   /**
-   * Return the value
+   * Return the string value
    * 
-   * @return long
+   * @return String
    */
-  public final long getValue() {
-    return m_bits;
-  }
-
-  /**
-   * Return the value as an integer
-   * 
-   * @return int
-   */
-  public final int intValue() {
-	  return (int) m_bits;
+  public final String getValue() {
+    return m_string;
   }
   
   /**
@@ -82,27 +73,23 @@ public class DERBitString extends DERObject {
 
     // Decode the type
     
-    if ( buf.unpackType() == DER.BitString) {
+    if ( buf.unpackType() == DER.GeneralizedTime) {
       
       // Unpack the length and bytes
       
       int len = buf.unpackLength();
-      int lastBits = buf.unpackByte();
-      
-      m_bits = 0;
-      long curByt = 0L;
-      len --;
-      
-      for ( int idx = (len - 1); idx >= 0; idx--) {
+      if ( len > 0) {
         
-        // Get the value bytes
-
-    	curByt = (long) buf.unpackByte();
-        m_bits += curByt << (idx * 8);
+        // Get the string bytes
+        
+        byte[] byts = buf.unpackBytes( len);
+        m_string = new String( byts);
       }
+      else
+        m_string = null;
     }
     else
-      throw new IOException("Wrong DER type, expected BitString");
+      throw new IOException("Wrong DER type, expected GeneralString");
   }
 
   /**
@@ -116,26 +103,27 @@ public class DERBitString extends DERObject {
 
     // Pack the type, length and bytes
     
-    buf.packByte( DER.BitString);
-    buf.packByte( 0);
+    buf.packByte( DER.GeneralizedTime);
 
-    buf.packLength( 8);
-    for ( int idx = 7; idx >= 0; idx--) {
-    	long bytVal = m_bits >> ( idx * 8); 
-    	buf.packByte((int) ( m_bits & 0xFF));
+    if ( m_string != null) {
+      byte[] byts = m_string.getBytes();
+      buf.packLength( byts.length);
+      buf.packBytes( byts, 0, byts.length);
     }
+    else
+      buf.packLength( 0);
   }
   
   /**
-   * Return the bit string as a string
+   * Return as a string
    * 
    * @return String
    */
   public String toString() {
     StringBuffer str = new StringBuffer();
     
-    str.append("[BitString:0x");
-    str.append( Long.toHexString( m_bits));
+    str.append("[GeneralizedTime:");
+    str.append(m_string);
     str.append("]");
     
     return str.toString();

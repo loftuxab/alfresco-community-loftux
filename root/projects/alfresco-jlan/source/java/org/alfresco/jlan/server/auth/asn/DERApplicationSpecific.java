@@ -28,114 +28,113 @@ package org.alfresco.jlan.server.auth.asn;
 import java.io.IOException;
 
 /**
- * DER Bit String Class 
+ * DER Application Specific Class
  *
  * @author gkspencer
  */
-public class DERBitString extends DERObject {
+public class DERApplicationSpecific extends DERObject {
 
-  // Bit flags value
+  // Application specific blob bytes
   
-  private long m_bits;
+  private byte[] m_bytes;
   
   /**
    * Default constructor
    */
-  public DERBitString() {
-  }
-
-  /**
-   * Class constructor
-   * 
-   * @param bits int
-   */
-  public DERBitString( long bits) {
-    m_bits = bits;
-  }
-
-  /**
-   * Return the value
-   * 
-   * @return long
-   */
-  public final long getValue() {
-    return m_bits;
-  }
-
-  /**
-   * Return the value as an integer
-   * 
-   * @return int
-   */
-  public final int intValue() {
-	  return (int) m_bits;
+  public DERApplicationSpecific() {
   }
   
   /**
-   * Decode the object
+   * Class constructor
    * 
-   * @param buf
-   * @throws IOException
+   * @param byts byte[]
+   */
+  public DERApplicationSpecific( byte[] byts) {
+    m_bytes = byts;
+  }
+  
+  /**
+   * Class constructor
+   *
+   * @param tagId int
+   * @param byts byte[]
+   */
+  public DERApplicationSpecific( int tagId, byte[] byts) {
+	setTagNo( tagId);
+    m_bytes = byts;
+  }
+  
+  /**
+   * Return the bytes
+   * 
+   * @return byte[]
+   */
+  public byte[] getValue() {
+    return m_bytes;
+  }
+
+  /**
+   * DER decode the object
+   * 
+   * @param buf DERBuffer
    */
   public void derDecode(DERBuffer buf)
     throws IOException {
 
     // Decode the type
     
-    if ( buf.unpackType() == DER.BitString) {
+    if (( buf.unpackType() & DER.Application) != 0) {
       
       // Unpack the length and bytes
       
       int len = buf.unpackLength();
-      int lastBits = buf.unpackByte();
-      
-      m_bits = 0;
-      long curByt = 0L;
-      len --;
-      
-      for ( int idx = (len - 1); idx >= 0; idx--) {
+      if ( len > 0) {
         
-        // Get the value bytes
-
-    	curByt = (long) buf.unpackByte();
-        m_bits += curByt << (idx * 8);
+        // Get the string bytes
+        
+        m_bytes = buf.unpackBytes( len);
       }
+      else
+        m_bytes = null;
     }
     else
-      throw new IOException("Wrong DER type, expected BitString");
+      throw new IOException("Wrong DER type, expected ApplicationSpecific");
   }
 
   /**
-   * Encode the object
+   * DER encode the object
    * 
-   * @param buf
-   * @throws IOException
+   * @param buf DERBuffer
    */
   public void derEncode(DERBuffer buf)
     throws IOException {
 
     // Pack the type, length and bytes
-    
-    buf.packByte( DER.BitString);
-    buf.packByte( 0);
 
-    buf.packLength( 8);
-    for ( int idx = 7; idx >= 0; idx--) {
-    	long bytVal = m_bits >> ( idx * 8); 
-    	buf.packByte((int) ( m_bits & 0xFF));
+	int tagNo = 0;
+	if ( isTagged())
+		tagNo = getTagNo();
+	
+    buf.packByte( DER.Application + DER.Constructed + (tagNo & 0xFF));
+
+    if ( m_bytes != null) {
+      buf.packLength( m_bytes.length);
+      buf.packBytes( m_bytes, 0, m_bytes.length);
     }
+    else
+      buf.packLength( 0);
   }
   
   /**
-   * Return the bit string as a string
+   * Return the string details as a string
    * 
    * @return String
    */
   public String toString() {
     StringBuffer str = new StringBuffer();
     
-    str.append("[BitString:0x");
-    str.append( Long.toHexString( m_bits));
+    str.append("[ApplicationSpecific:");
+    str.append(m_bytes != null ? m_bytes.length : 0);
     str.append("]");
     
     return str.toString();
