@@ -5,20 +5,20 @@
    {
       currentLayout:
       {
-         id: "${currentLayout.id}",
+         templateId: "${currentLayout.templateId}",
          noOfColumns: ${currentLayout.noOfColumns},
          description: "${currentLayout.description}",
-         icon: "${url.context}/components/dashboard/images/${currentLayout.id}.png"
+         icon: "${url.context}/components/dashboard/images/${currentLayout.templateId}.png"
       },
       layouts:
       {
 <#list layouts as layout>
-         "${layout.id}":
+         "${layout.templateId}":
          {
-            id: "${layout.id}",
+            templateId: "${layout.templateId}",
             noOfColumns: ${layout.noOfColumns},
             description: "${layout.description}",
-            icon: "${url.context}/components/dashboard/images/${layout.id}.png"
+            icon: "${url.context}/components/dashboard/images/${layout.templateId}.png"
          }<#if (layout_has_next)>,</#if>
 </#list>
       }
@@ -36,7 +36,7 @@
 
       <div>
          <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon"
-              src="${url.context}/components/dashboard/images/${currentLayout.id}.png"/>
+              src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png"/>
          <div id="${args.htmlid}-changeButtonWrapper-div" class="buttons">
             <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}"/>
          </div>
@@ -54,12 +54,12 @@
 
          <ul>
          <#list layouts as layout>
-            <li id="${args.htmlid}-layout-li-${layout.id}" <#if (currentLayout.id == layout.id)>style="display: none;"</#if>>
+            <li id="${args.htmlid}-layout-li-${layout.templateId}" <#if (currentLayout.templateId == layout.templateId)>style="display: none;"</#if>>
                <div class="layoutDescription">${layout.description}</div>               
                <div class="layoutBox">
                   <span>
-                     <img class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.id}.png"/>
-                     <input id="${args.htmlid}-select-button-${layout.id}" type="button" value="${msg("button.select")}"/>
+                     <img class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png"/>
+                     <input id="${args.htmlid}-select-button-${layout.templateId}" type="button" value="${msg("button.select")}"/>
                   </span>
                </div>
             </li>

@@ -119,12 +119,20 @@
       options:
       {
          /**
-          * The current layouts number of column
+          * The current layout
           *
-          * @property noOfColumns
-          * @type {int}
+          * @property currentLayout
+          * @type {object}
           */
-         noOfColumns: -1
+         currentLayout: null,
+
+         /**
+          * The url to the dashboard that is configured
+          *
+          * @property dashboardUrl
+          * @type {string}
+          */
+         dashboardUrl: null
       },
 
       /**
@@ -168,21 +176,30 @@
          }
 
          // Save reference to buttons so we can change label and such later
-         this.widgets.toggleDashletsButton = Alfresco.util.createYUIButton(this, "toggleDashlets-button", this.onToggleDashletsButtonClick);
-         this.widgets.doneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneButtonClick);
+         this.widgets.addDashletsButton = Alfresco.util.createYUIButton(this, "addDashlets-button", this.onAddDashletsButtonClick);
+         this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveButtonClick);
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
          // Save a reference to the shadow that will be used during drag n drop
          this.shadow = Dom.get(this.id + "-dashlet-li-shadow")
 
-         // Make only column 1-n lists drop targets for add
-         // In other words ignore the dashlet column (column 0)
-         for (var i = 1; true ; i++)
+         for (var i = 0; true ; i++)
          {
             var ul = Dom.get(this.id + "-column-ul-" + i);
             if(ul)
             {
-               new YAHOO.util.DDTarget(ul, this.DND_GROUP_ADD_DASHLET);
+               // Make only column 1-n lists drop targets for add since 0 is available dashlets list
+               if(i !== 0)
+               {
+                  new YAHOO.util.DDTarget(ul, this.DND_GROUP_ADD_DASHLET);
+               }
+
+               // Make all dashlets in column draggable
+               var dashlets = Dom.getElementsByClassName("customisableDashlet", "li", ul);
+               for (var j = 0; j < dashlets.length; j++)
+               {
+                  this._createDashlet(dashlets[j]);
+               }
             }
             else
             {
@@ -195,23 +212,6 @@
 
          // ... and create a delete drop target on them
          new YAHOO.util.DDTarget(this.widgets.dashletListEl, this.DND_GROUP_DELETE_DASHLET);
-
-         // Make all dashlets in all columns draggable
-         var noOfColumns = i - 1;
-         for (i = 0; i <= noOfColumns; i++) {
-            for (var j = 1; true; j++)
-            {
-               var li = Dom.get(this.id + "-dashlet-li-" + i + "-" + j)
-               if(li)
-               {
-                  this._createDashlet(li);
-               }
-               else
-               {
-                  break;
-               }
-            }
-         }
 
          YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
          YAHOO.Bubbling.on("onDashboardLayoutsDisplayed", this.onDashboardLayoutsDisplayed, this);
@@ -228,14 +228,14 @@
 
       /**
        * Fired when the number of columns has changed has changed
-       * @method onNoOfColumnsChanged
+       * @method onDashboardLayoutChanged
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
       onDashboardLayoutChanged: function DLT_onDashboardLayoutChanged(layer, args)
       {
          var newLayout = args[1].dashboardLayout;
-         this.options.noOfColumns = newLayout.noOfColumns;
+         this.options.currentLayout = newLayout;
          var wrapper = Dom.get(this.id +"-wrapper-div");
          if(newLayout)
          {
@@ -294,13 +294,13 @@
       },
 
       /**
-       * Fired when the user clicks the Hide / Show dashlet button.
+       * Fired when the user clicks the Add dashlet button.
        * Hides or shows the dashlet list.
        *
-       * @method onToggleDashletsButtonClick
+       * @method onAddDashletsButtonClick
        * @param event {object} an "click" event
        */
-      onToggleDashletsButtonClick: function CD_onToggleDashletsButtonClick(event)
+      onAddDashletsButtonClick: function CD_onAddDashletsButtonClick(event)
       {
          // Hide add dashlets button and fade in available dashlets
          YAHOO.util.Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "none");
@@ -315,6 +315,57 @@
       },
 
       /**
+       * Fired when the user clicks the Save/Done button.
+       * Saves the dashboard config and takes the user back to the dashboard page.
+       *
+       * @method onSaveButtonClick
+       * @param event {object} a "click" event
+       */
+      onSaveButtonClick: function CD_onSaveButtonClick(event)
+      {
+         // Loop through the columns to get the dashlets to save
+         var dashlets = [];
+         for (var i = 1; i <= this.options.currentLayout.noOfColumns; i++)
+         {
+            var ul = Dom.get(this.id + "-column-ul-" + i);
+            var lis = Dom.getElementsByClassName("customisableDashlet", "li", ul);
+            for (var j = 0; j < lis.length; j++)
+            {
+               var li = lis[j];
+               var dashlet = {url: li.getAttribute("dashletUrl"), regionId: "component-" + i + "-" + (j + 1)};
+               var originalRegionId = li.getAttribute("originalRegionId");
+               if(originalRegionId && originalRegionId.length > 0)
+               {
+                  dashlet.originalRegionId = originalRegionId;
+               }
+               dashlets[dashlets.length] = dashlet;
+            }
+         }
+
+         // Prepare save request config
+         var dashboardPage = this.options.dashboardUrl;
+         var templateId = this.options.currentLayout.templateId;
+         var dataObj = {dashboardPage: dashboardPage, templateId: templateId, dashlets: dashlets};
+
+         // Do the request and send the user to the dashboard after wards
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            method: Alfresco.util.Ajax.POST,
+            url: Alfresco.constants.URL_SERVICECONTEXT + "components/dashboard/customise-dashboard",
+            dataObj: dataObj,
+            successCallback: {
+               fn: function()
+               {
+                  // Send the user to the newly configured dashboard
+                  document.location.href = Alfresco.constants.URL_CONTEXT + "page/" + dashboardPage;
+               },
+               scope: this
+            },
+            failureMessage: Alfresco.util.message("message.saveFailure", this.name)
+         });         
+      },
+
+      /**
        * Fired when the user clicks the Cancel button.
        * Takes the user back to the dashboard page without saving anything.
        *
@@ -324,7 +375,7 @@
       onCancelButtonClick: function CD_onCancelButtonClick(event)
       {
          // Send the user to this page again without saveing changes
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/user/" + Alfresco.constants.USERNAME + "/dashboard";
+         document.location.href = Alfresco.constants.URL_CONTEXT + this.options.dashboardUrl;
       },
 
       /**
@@ -458,7 +509,7 @@
                   destColumn = Dom.get(this.id + "-column-ul-" + i);
                   if(destColumn)
                   {
-                     if(i <= this.options.noOfColumns && !this.isColumnFull(destColumn))
+                     if(i <= this.options.currentLayout.noOfColumns && !this.isColumnFull(destColumn))
                      {
                         /**
                          * We have found a visible column with free space, make a copy
@@ -606,6 +657,7 @@
           */
          var copy = document.createElement("li");
          copy.id = srcEl.id + Dom.generateId();
+         copy.setAttribute("dashletUrl", srcEl.getAttribute("dashletUrl"));
          Dom.addClass(copy, "customisableDashlet");
          Dom.addClass(copy, "used");
          copy.innerHTML = srcEl.innerHTML + "";

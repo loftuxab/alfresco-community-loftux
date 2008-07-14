@@ -1,19 +1,91 @@
 
 // Get available components of family/type dashlet 
-var dashlets = sitedata.findWebScripts("dashlet");
-if(!dashlets || dashlets.length === 0)
+var webscripts = sitedata.findWebScripts("dashlet");
+if(!webscripts || webscripts.length === 0)
 {
-   dashlets = [];
+   webscripts = [];
 }
-model.dashlets = dashlets;
+// Transform the webscripts to easy-to-access dashlet items for the template
+var availableDashlets = [];
+for(var i = 0; i < webscripts.length; i++)
+{
+   var webscript = webscripts[i];
+   var uris = webscript.getURIs();
+   if(uris !== null && uris.length > 0 && webscript.shortName !== null)
+   {
+      availableDashlets[i] = {url: uris[0], shortName: webscript.shortName, description: webscript.description};
+   }
+   else
+   {
+      // skip this webscript since it lacks uri or shortName
+   }
+}
 
-// TESTDATA: Number of columns in current layout
-model.noOfColumns = 3;
+var dashboardUrl = "user/" + user.name + "/dashboard";
+var components = sitedata.findComponents("page", null, dashboardUrl, null);
+if(components === undefined || components.length === 0)
+{
+   components = [];
+}
 
-// TESTDATA: The following is test data until proper service exists
-var columns = [];
-columns[0] = [{id: "10", shortName: "My Profile 1", description: "Description..."}, {id: "11", shortName: "My Sites 1", description: "Description..."}, {id: "12", shortName: "My Calendar 1", description: "Description..."}];
-columns[1] = [{id: "13", shortName: "My Profile 2", description: "Description..."}, {id: "14", shortName: "My Sites 2", description: "Description..."}, {id: "15", shortName: "My Calendar 2", description: "Description..."}];
-columns[2] = [{id: "16", shortName: "My Profile 3", description: "Description..."}, {id: "17", shortName: "My Sites 3", description: "Description..."}, {id: "18", shortName: "My Calendar 3", description: "Description..."}];
-columns[3] = [];
+// Transform the webscripts to easy-to-access dashlet items for the template
+var columns = [[], [], [], []];
+for(i = 0; i < components.length; i++)
+{
+   var comp = components[i];
+
+   var regionId = comp.properties["region-id"];
+   var url = comp.properties.url;
+   if(regionId !== null && url !== null)
+   {
+      // Creat dashlet
+      var shortName;
+      var description;
+      for(var j = 0; j < availableDashlets.length; j++)
+      {
+         var d = availableDashlets[j];
+         if(d.url == url)
+         {
+            shortName = d.shortName;
+            description = d.description;
+            break;
+         }
+      }
+      var dashlet = {url: url, shortName: shortName, description: description, originalRegionId: regionId};
+
+      // Place it in correct column and in a temporary row literal
+      if(regionId.match("^component-\\d+-\\d+$"))
+      {
+         var column = parseInt(regionId.substring(regionId.indexOf("-") + 1, regionId.lastIndexOf("-")));
+         var row = parseInt(regionId.substring(regionId.lastIndexOf("-") + 1));
+         columns[column-1][row-1] = dashlet;
+      }
+   }
+   else
+   {
+      // skip this component since it lacks regionId or shortName
+   }
+}
+
+
+function getNoOfColumns(template)
+{
+   var noOfColumns = 0;
+   while(template.properties["gridColumn" + (noOfColumns + 1)] !== null)
+   {
+      noOfColumns++;
+   }
+   return noOfColumns;
+}
+
+// Get current template
+var dashboardPage = "user/" + user.name + "/dashboard";
+var currentTemplate = sitedata.findTemplate(dashboardPage);
+var currentNoOfColumns = getNoOfColumns(currentTemplate);
+var currentLayout = {templateId: currentTemplate.id, noOfColumns: currentNoOfColumns, description: currentTemplate.description};
+
+// Define the model for the template
+model.availableDashlets = availableDashlets;
+model.dashboardUrl = dashboardUrl;
 model.columns = columns;
+model.currentLayout = currentLayout;

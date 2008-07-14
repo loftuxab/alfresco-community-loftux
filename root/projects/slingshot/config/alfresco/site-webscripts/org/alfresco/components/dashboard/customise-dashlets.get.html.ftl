@@ -27,7 +27,13 @@
       ${messages}
    ).setOptions(
    {
-      noOfColumns: ${noOfColumns}
+      currentLayout: {
+         templateId: "${currentLayout.templateId}",
+         noOfColumns: ${currentLayout.noOfColumns},
+         description: "${currentLayout.description}",
+         icon: "${url.context}/components/dashboard/images/${currentLayout.templateId}.png"         
+      },
+      dashboardUrl: "${dashboardUrl}"
    });
    //]]></script>
 
@@ -41,7 +47,7 @@
       <div>
          <div class="text">${msg("label.instructions")}</div>
          <div class="buttons" id="${args.htmlid}-toggleDashletsButtonWrapper-div">
-            <input id="${args.htmlid}-toggleDashlets-button" type="button" value="${msg("button.showDashlets")}" />
+            <input id="${args.htmlid}-addDashlets-button" type="button" value="${msg("button.addDashlets")}" />
          </div>
       </div>
 
@@ -55,10 +61,10 @@
             <h3 class="padded">${msg("section.addDashlets")}</h3>
          </div>
          <ul id="${args.htmlid}-column-ul-0" class="availableList">
-            <#list dashlets as dashlet>
-               <li class="customisableDashlet available" id="${args.htmlid}-dashlet-li-0-${dashlet_index + 1}">
+            <#list availableDashlets as dashlet>
+               <li class="customisableDashlet available" dashletUrl="${dashlet.url}">
                   <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif"></a>
-                  <span dashletId="${dashlet.id}">${dashlet.shortName}</span>
+                  <span >${dashlet.shortName}</span>
                   <div class="draggable" title="${dashlet.description}"></div>
                </li>
             </#list>
@@ -69,16 +75,16 @@
 
    <div class="used">
 
-      <div id="${args.htmlid}-wrapper-div" class="noOfColumns${noOfColumns}">
+      <div id="${args.htmlid}-wrapper-div" class="noOfColumns${currentLayout.noOfColumns}">
 
          <#list columns as column>
-            <div class="column" id="${args.htmlid}-column-div-${column_index + 1}" <#if (column_index >= noOfColumns)>style="display: none;"</#if>>
+            <div class="column" id="${args.htmlid}-column-div-${column_index + 1}" <#if (column_index >= currentLayout.noOfColumns)>style="display: none;"</#if>>
                <h3 class="padded">Column ${column_index + 1}</h3>
                <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
                   <#list column as dashlet>
-                     <li class="customisableDashlet used" id="${args.htmlid}-dashlet-li-${column_index + 1}-${dashlet_index + 1}">
+                     <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
                         <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif"></a>
-                        <span dashletId="${dashlet.id}">${dashlet.shortName}</span>
+                        <span>${dashlet.shortName}</span>
                         <div class="draggable" title="${dashlet.description}"></div>
                      </li>
                   </#list>
@@ -95,7 +101,7 @@
       <hr/>
       <div>
          <div class="buttons">
-            <input id="${args.htmlid}-done-button" type="button" value="${msg("button.done")}" />
+            <input id="${args.htmlid}-save-button" type="button" value="${msg("button.save")}" />
             <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.cancel")}" />
          </div>
       </div>
@@ -106,5 +112,4 @@
       <!-- The shadow dashlet that is used during drag n drop to "make space" for the dragged dashlet -->
       <li class="shadow" id="${args.htmlid}-dashlet-li-shadow"></li>
    </div>
-
 </div>

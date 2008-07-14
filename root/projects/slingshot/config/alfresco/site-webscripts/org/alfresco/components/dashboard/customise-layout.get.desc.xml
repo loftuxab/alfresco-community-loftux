@@ -1,5 +1,5 @@
 <webscript>
-  <shortname>Customise Dashboard Layout</shortname>
-  <description>Customise dashboard layout component</description>
-  <url>/components/dashboard/customise-layout</url>
+   <shortname>Customise Dashboard Layout</shortname>
+   <description>Customise dashboard layout component</description>
+   <url>/components/dashboard/customise-layout</url>
 </webscript>
