@@ -11,7 +11,7 @@ function main()
     var container = "discussions";
     var path = "";
     var filter = page.url.args["filter"];
-    var tag = "";
+    var tag = page.url.args["tag"];
     var paginationData = fetchPaginationDataFromPageRequest(0, 10);
 
     // fetch the data

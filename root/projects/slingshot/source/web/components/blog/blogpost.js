@@ -57,14 +57,21 @@
           */
          mode: ""
       },
-   	
+
+      /** Reference to the Alfresco.forms.Form object if available. */   	
    	  postForm: null,
+      /** Reference to the save button.
+       * This is used by the save&publish actions, as those first adapt
+       * the form state before triggering the submit action of the saveButton.
+       */
    	  saveButton: null,
-   	  /** Manages the tags of the form. */
+
+   	  /** Listens to taglibrary changes. */
    	  tagLibraryListener: null,
    	  
-   	  /** If true, an external publish will be executed once the
-   	   * post has been saved
+   	  /**
+   	   * If true, an external publish will be executed once the
+   	   * post has been saved.
    	   */
    	  performExternalPublish: false,
       
@@ -203,7 +210,6 @@
 					// update the tags set in the form
 					this.tagLibraryListener.updateForm();
         	   },
-        	   //obj: myArbitraryObject,
         	   scope: this
          	}
          
@@ -255,7 +261,7 @@
          else
          {
              // simply show the view page
-             this._loadBlogPostViewPage(response.json.item.name);
+             Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
          }
       },
       
@@ -278,7 +284,7 @@
        */
       onEditNode: function BlogPostList_onEditNode(htmlId, ownerId, param)
       {
-         this._loadBlogPostEditPage(param);
+         Alfresco.util.blog.loadBlogPostEditPage(this.options.siteId, this.options.containerId, param);
       },
       
       /**
@@ -305,7 +311,7 @@
 
       _onDeleted: function BlogPost__onDeleted(response)
       {
-         this._loadBlogPostListPage();
+         Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId);
       },
 
       _getPublishingRestUrl: function Blog__getPublishingRestUrl(postId)
@@ -340,7 +346,7 @@
       _onPublished: function Blog__onPublished(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Published!"});
-          this._loadBlogPostViewPage(response.json.item.name);
+          Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
       },
      
       onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, param)
@@ -368,7 +374,7 @@
       _onUpdated: function Blog__onUpdated(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Updated!"});
-          this._loadBlogPostViewPage(response.json.item.name);
+          Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
       },    
 
       onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, param)
@@ -396,27 +402,9 @@
       _onUnpublished: function BlogPost__onUnpublished(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Unpublished!"});
-          this._loadBlogPostViewPage(response.json.item.name);
-      },
-
-      _loadBlogPostViewPage: function BlogPost_loadPostViewPage(postId)
-      {
-            window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postview" +
-                               "?container=" + this.options.containerId + 
-                               "&postId=" + postId;
+          Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
       },
       
-      _loadBlogPostEditPage: function BlogPost_loadPostViewPage(postId)
-      {
-            window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit" +
-                               "?container=" + this.options.containerId + 
-                               "&postId=" + postId;
-      },
-      
-      _loadBlogPostListPage: function BlogPost__loadBlogPostListPage()
-      {
-            window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postlist";
-      },
       
       // mouse hover functionality
       

@@ -24,12 +24,13 @@
 	          ${msg("header.discussionsRSS")}
 	       </a>
 		</span>
-		
+		<#--
 		<span class="rssLink">
 		   <a href="${url.context}/service/components/discussions/rss/latestposts?site=${page.url.templateArgs.site}">
 	          ${msg("header.topicsAndRepliesRSS")}
 	       </a>
 		</span>
+		-->
 	</div>
 	<div class="rightDiscussionBlogHeader">
 		<span class="toolbarOption detailList"><a href="#" id="detailed-list-view">${msg("header.detailList")}</a></span>

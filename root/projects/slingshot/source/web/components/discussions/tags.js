@@ -1,11 +1,11 @@
 /*
- * Alfresco.DiscussionsTopicListTags
+ * Alfresco.TopicListTags
  */
 (function()
 {
-   Alfresco.DiscussionsTopicListTags = function(htmlId)
+   Alfresco.TopicListTags = function(htmlId)
    {
-      this.name = "Alfresco.DiscussionsTopicListTags";
+      this.name = "Alfresco.TopicListTags";
       this.id = htmlId;
       
       /* Register this component */
@@ -17,38 +17,21 @@
       return this;
    }
    
-   Alfresco.DiscussionsTopicListTags.prototype =
+   Alfresco.TopicListTags.prototype =
    {
-      componentsLoaded: function DiscussionsTopicListTags_componentsLoaded()
+      componentsLoaded: function TopicListTags_componentsLoaded()
       {
          YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
    
-      onReady: function DiscussionsTopicListTags_onReady()
+      onReady: function TopicListTags_onReady()
       {
-         var me = this;
-         
-         YAHOO.Bubbling.addDefaultAction("tag-link", function DLF_filterAction(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "li");
-            if (owner !== null)
-            {
-               var action = owner.className;
-               if (typeof me[action] == "function")
-               {
-                  me[action].call(me, owner);
-               }
-            }
-      		 
-            return true;
-         });
+         Alfresco.util.registerDefaultActionHandler(this.id, "tag-link-li", "li", this);
       },
 
-      onTagSelection: function DiscussionsTopicListTags_showNewTopics(owner)
+      onTagSelection: function TopicListTags_onTagSelection(htmlId, ownerId, param)
       {
-         // extract the tag name from the element id
-         var tagName = owner.id.substring((this.id + "-tag-").length);
-         YAHOO.Bubbling.fire('onSetTopicListParams', {tag : tagName});
+         YAHOO.Bubbling.fire('onSetTopicListParams', {tag : param});
       }
    }
 })();

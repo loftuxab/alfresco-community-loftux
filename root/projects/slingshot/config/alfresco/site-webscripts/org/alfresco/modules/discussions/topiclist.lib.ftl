@@ -1,4 +1,3 @@
-
 <#--
   Renders the title of the list
 -->
@@ -102,7 +101,9 @@
       <span class="nodeFooterBloc">
          <span class="nodeAttrLabel tag">${msg("topic.tags")}:</span>
          <#list topic.tags as tag>
-            <span class="nodeAttrValue"><a href="">${tag}</a></span><#if tag_has_next> , </#if> 
+            <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
+               <a href="" class="tag-link-span">${tag}</a>
+            </span><#if tag_has_next> , </#if> 
          </#list>
       </span>
    </#if> 

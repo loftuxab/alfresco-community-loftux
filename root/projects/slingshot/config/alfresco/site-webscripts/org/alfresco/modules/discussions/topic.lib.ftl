@@ -63,23 +63,15 @@
       <span class="nodeFooterBloc">
          <span class="nodeAttrLabel tag">${msg("topic.tags")}:</span>
          <#list topic.tags as tag>
-            <span class="nodeAttrValue"><a href="">${tag}</a></span><#if tag_has_next> , </#if> 
+            <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
+               <a href="" class="tag-link-span">${tag}</a>
+            </span><#if tag_has_next> , </#if> 
          </#list>
       </span>
       </#if> 
    </div>
 </div>
 </#macro>
-
-<#--
-  Returns a comma-separated string of the elements in the passed array-
-  @param elems an array with the elements to concat
-  @return a comma separated string of the elements in the array
--->
-<#function concatArray elems>
-  <#assign res><#list elems as x>${x}<#if x_has_next>, </#if></#list></#assign>
-  <#return res>
-</#function>
 
 
 <#--

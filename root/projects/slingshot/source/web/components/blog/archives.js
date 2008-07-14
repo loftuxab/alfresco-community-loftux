@@ -27,30 +27,15 @@
    
       onReady: function DiscussionsTopicListTags_onReady()
       {
-         var me = this;
-         
-         YAHOO.Bubbling.addDefaultAction("archive-link", function BlogPostListArchives_filterAction(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "li");
-            if (owner !== null)
-            {
-               var action = owner.id.substring(0, owner.id.indexOf('-'));
-               if (typeof me[action] == "function")
-               {
-                  me[action].call(me, owner);
-               }
-           }
-      		 
-            return true;
-         });
+         // action hooks
+         Alfresco.util.registerDefaultActionHandler(this.id, "archive-link", "li", this);
       },
 
-      onMonthSelection: function DiscussionsTopicListTags_showNewTopics(owner)
+      onMonthSelection: function DiscussionsTopicListTags_showNewTopics(htmlId, ownerId, param)
       {
          // extract the tag name from the element id
-         var yearandmonth = owner.id.substring(("onMonthSelection-").length);
-         var year = parseInt(yearandmonth.substring(0, yearandmonth.indexOf('-')));
-         var month = parseInt(yearandmonth.substring(yearandmonth.indexOf('-') + 1));
+         var year = parseInt(param.substring(0, yearandmonth.indexOf('-')));
+         var month = parseInt(param.substring(yearandmonth.indexOf('-') + 1));
          
          // create the date
          var fromDate = new Date(year, month, 1);

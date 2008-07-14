@@ -129,7 +129,6 @@
        */
       onReady: function DiscussionsTopicList_onReady()
       {
-         // Links - PENDING: this should be done in a more generic way
          YAHOO.util.Event.addListener("simple-list-view", "click",
             function simpleListViewClicked(e) {
                var owner = YAHOO.Bubbling.fire('onSetTopicListParams', {viewmode: 'simple'});
@@ -153,10 +152,12 @@
          Alfresco.util.registerDefaultActionHandler(this.id, "action-link-div", "div", this);
          Alfresco.util.registerDefaultActionHandler(this.id, "action-link-span", "span", this);
 
+         Alfresco.util.registerDefaultActionHandler(this.id, "tag-link-span", "span", this);
+         
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onListElementMouseEntered, this.onListElementMouseExited);
          
-         // as the list got already rendered on the server, already attach the listener to the rendered elements
+         // attach the listener to the already rendered list elements
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
       },
       
@@ -168,7 +169,7 @@
        */
       onViewNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
       {
-         Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, topicId);
+         Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, param);
       },
       
       /**
@@ -176,7 +177,7 @@
        */
       onEditNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
       {
-         Alfresco.util.discussions.loadForumPostEditPage(this.options.siteId, this.options.containerId, this.options.path, topicId);             
+         Alfresco.util.discussions.loadForumPostEditPage(this.options.siteId, this.options.containerId, this.options.path, param);             
       },
       
       /**
@@ -184,12 +185,27 @@
        */
       onDeleteNode: function DiscussionsTopic_onDeleteTopic(htmlId, ownerId, param)
       {
+         this._deleteNode(param);
+      },
+      
+      /**
+       * Handles the click on a tag
+       */
+      onTagSelection: function Discussions_onTagSelected(htmlId, ownerId, param)
+      {
+         YAHOO.Bubbling.fire('onSetTopicListParams', {tag : param});
+      },
+      
+      // Actions functionality
+      
+      _deleteNode: function(topicId)
+      {
          // make an ajax request to delete the topic
-         // we can directly go to alfresco for this
+         var url = Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
+                        this.options.containerId, this.options.path, topicId);
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
-                        this.options.containerId, this.options.path, param),
+            url: url,
             method: "DELETE",
             responseContentType : "application/json",
             successCallback:
@@ -257,9 +273,10 @@
       
       _reloadData: function Discussions__reloadData() 
       {
+         var url = Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topiclist/get-topics";
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topiclist/get-topics",
+            url: url,
             responseContentType : "application/json",
             dataObj:
             {
@@ -329,7 +346,7 @@
       {
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null );
+         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null);
          YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
       
@@ -340,7 +357,7 @@
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
+         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null);
          YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
       
