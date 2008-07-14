@@ -41,11 +41,11 @@ import org.alfresco.web.site.ThemeUtil;
  */
 public final class ScriptRequestContext extends ScriptBase
 {
-    protected ScriptContentObject scriptContentObject = null;
-    protected ScriptModelObject scriptPageObject = null;
-    protected ScriptModelObject scriptTemplateObject = null;
-    protected ScriptModelObject scriptThemeObject = null;
-    protected ScriptUser scriptUser = null;
+    private ScriptContentObject scriptContentObject = null;
+    private ScriptModelObject scriptPageObject = null;
+    private ScriptModelObject scriptTemplateObject = null;
+    private ScriptModelObject scriptThemeObject = null;
+    private ScriptUser scriptUser = null;
     
     
     /**
@@ -77,10 +77,10 @@ public final class ScriptRequestContext extends ScriptBase
     
     public ScriptContentObject getContent()
     {
-        if(scriptContentObject == null)
+        if (scriptContentObject == null)
         {
             Content content = context.getCurrentObject();
-            if(content != null)
+            if (content != null)
             {
                 scriptContentObject = new ScriptContentObject(context, content);
             }
@@ -101,10 +101,10 @@ public final class ScriptRequestContext extends ScriptBase
     
     public ScriptModelObject getPage()
     {
-        if(scriptPageObject == null)
+        if (scriptPageObject == null)
         {
             Page page = context.getPage();
-            if(page != null)
+            if (page != null)
             {
                 scriptPageObject = new ScriptModelObject(getRequestContext(), page);
             }
@@ -115,10 +115,10 @@ public final class ScriptRequestContext extends ScriptBase
     
     public ScriptModelObject getTemplate()
     {
-        if(scriptTemplateObject == null)
+        if (scriptTemplateObject == null)
         {
             TemplateInstance template = context.getTemplate();
-            if(template != null)
+            if (template != null)
             {
                 scriptTemplateObject = new ScriptModelObject(getRequestContext(), template);
             }
@@ -134,10 +134,10 @@ public final class ScriptRequestContext extends ScriptBase
     
     public ScriptModelObject getTheme()
     {
-        if(scriptThemeObject == null)
+        if (scriptThemeObject == null)
         {
             Theme theme = ThemeUtil.getCurrentTheme(context);
-            if(theme != null)
+            if (theme != null)
             {
                 scriptThemeObject = new ScriptModelObject(getRequestContext(), theme);
             }
@@ -148,10 +148,10 @@ public final class ScriptRequestContext extends ScriptBase
     
     public ScriptUser getUser()
     {
-        if(scriptUser == null)
+        if (scriptUser == null)
         {
             User user = context.getUser();
-            if(user != null)
+            if (user != null)
             {
                 scriptUser = new ScriptUser(context, user);
             }

@@ -34,6 +34,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.scripts.SearchPath;
 import org.alfresco.web.scripts.Store;
 import org.alfresco.web.site.Model;
@@ -43,11 +44,40 @@ import org.dom4j.Element;
 
 /**
  * Spring util bean responsible for preset model object generation.
- * 
- * Presets are defined a XML snippets representing the page and component bindings
- * for a given set.
- * 
- * Each preset supports any number of "token" name/value pair replacements. For example
+ * <p>
+ * Presets are defined as XML snippets representing the model objects for a given set.
+ * Each file can contain many presets each referenced by a unique ID. The preset definitions
+ * can be located in any Store and any number of stores can be searched.
+ * <p>
+ * A set of parameterised model objects such as page, template instances and component
+ * bindings can be defined for a preset. The XML for each model object definition is
+ * effectively identical to that used to define the model object within its own file -
+ * but nested within the preset structure as follows:
+ * <pre>
+ * <?xml version='1.0' encoding='UTF-8'?>
+ * <presets>
+ *     <preset id="someid">
+ *         <components>
+ *             ...
+ *         </components>
+ *         <pages>
+ *             ...
+ *         </pages>
+ *         <template-instances>
+ *             ...
+ *         </template-instances>
+ *     </preset>
+ *     <preset id="anotherid">
+ *         ...
+ *     </preset>
+ * </presets>
+ * </pre>
+ * One important difference to standard model object XML is that the ID for an object is
+ * specified as an attribute on the parent element, for instance:
+ * <pre><page id="user/${userid}/dashboard"></pre>
+ * See the file slingshot\config\alfresco\site-data\presets\presets.xml for example usage.
+ * <p>
+ * Each preset supports parameterisation via "token" name/value pair replacements. For example:
  * <pre>
  *     <preset id="site-dashboard">
  *         <components>
@@ -59,7 +89,8 @@ import org.dom4j.Element;
  *             </component>
  *             ...
  * </pre>
- * where the values of "${scope}" and "${siteid}" would be replaced if supplied in token map.
+ * where the values of "${scope}" and "${siteid}" would be replaced if supplied in the token
+ * map during preset construction. See the method constructPreset() below.
  * 
  * @author Kevin Roast
  */
@@ -195,6 +226,17 @@ public class PresetsManager
                             component.setURL(url);
                             component.setChrome(chrome);
                             
+                            // apply arbituary custom properties
+                            if (c.element("properties") != null)
+                            {
+                                for (Element prop : (List<Element>)c.element("properties").elements())
+                                {
+                                    String propName = replace(prop.getName(), tokens);
+                                    String propValue = replace(prop.getTextTrim(), tokens);
+                                    component.setCustomProperty(propName, propValue);
+                                }
+                            }
+                            
                             // persist the object
                             model.saveObject(component);
                         }
@@ -217,7 +259,7 @@ public class PresetsManager
                             // validate mandatory values
                             if (pageId == null || pageId.length() == 0)
                             {
-                                throw new IllegalArgumentException("PageID is a mandatory property for a page preset.");
+                                throw new IllegalArgumentException("ID is a mandatory attribute for a page preset.");
                             }
                             if (template == null || template.length() == 0)
                             {
@@ -232,12 +274,68 @@ public class PresetsManager
                             page.setAuthentication(auth);
                             page.setTemplateId(template);
                             
+                            // apply arbituary custom properties
+                            if (p.element("properties") != null)
+                            {
+                                for (Element prop : (List<Element>)p.element("properties").elements())
+                                {
+                                    String propName = replace(prop.getName(), tokens);
+                                    String propValue = replace(prop.getTextTrim(), tokens);
+                                    page.setCustomProperty(propName, propValue);
+                                }
+                            }
+                            
                             // persist the object
                             model.saveObject(page);
                         }
                     }
                     
-                    // TODO: any template instances in the preset?
+                    // any template instances in the preset?
+                    Element templates = preset.element("template-instances");
+                    if (templates != null)
+                    {
+                        for (Element t : (List<Element>)templates.elements("template-instance"))
+                        {
+                            // apply token replacement to each value as it is retrieved
+                            String templateId = replace(t.attributeValue(TemplateInstance.PROP_ID), tokens);
+                            String title = replace(t.elementTextTrim(TemplateInstance.PROP_TITLE), tokens);
+                            String description = replace(t.elementTextTrim(TemplateInstance.PROP_DESCRIPTION), tokens);
+                            String templateType = replace(t.elementTextTrim(TemplateInstance.PROP_TEMPLATE_TYPE), tokens);
+                            
+                            // TODO: read arbituary custom properties
+                            
+                            // validate mandatory values
+                            if (templateId == null || templateId.length() == 0)
+                            {
+                                throw new IllegalArgumentException("ID is a mandatory attribute for a template-instance preset.");
+                            }
+                            if (templateType == null || templateType.length() == 0)
+                            {
+                                throw new IllegalArgumentException("Template is a mandatory property for a page preset.");
+                            }
+                            
+                            // generate template-instance
+                            TemplateInstance template = model.newTemplate(templateId);
+                            template.setTitle(title);
+                            template.setDescription(description);
+                            template.setTemplateType(templateType);
+                            
+                            // apply arbituary custom properties
+                            if (t.element("properties") != null)
+                            {
+                                for (Element prop : (List<Element>)t.element("properties").elements())
+                                {
+                                    String propName = replace(prop.getName(), tokens);
+                                    String propValue = replace(prop.getTextTrim(), tokens);
+                                    template.setCustomProperty(propName, propValue);
+                                }
+                            }
+                            
+                            // persist the object
+                            model.saveObject(template);
+                        }
+                    }
+                    
                     // TODO: any chrome, associations, types, themes etc. in the preset...
                     
                     // found our preset - no need to process further
