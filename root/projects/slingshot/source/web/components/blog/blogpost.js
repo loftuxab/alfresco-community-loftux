@@ -261,12 +261,12 @@
             if (response.json.item.isPublished)
             {
                // perform an update
-               this.onUpdateExternal(postId);
+               this.onUpdateExternal(null, null, postId);
             }
             else
             {
                // perform a publish
-               this.onPublishExternal(postId);
+               this.onPublishExternal(null, null, postId);
             }
          }
          else
@@ -332,7 +332,7 @@
          }
          else
          {
-            Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId);
+            Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId, this.options, path);
          }
       },
       
@@ -369,7 +369,7 @@
          else
          {
             Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.publishedExternal")});
-            Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
+            Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, this.options.path, response.json.item.name);
          }
       },
      
@@ -406,7 +406,7 @@
          else
          {
             Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.updatedExternal")});
-            Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
+            Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, this.options.path, response.json.item.name);
          }
       },    
 

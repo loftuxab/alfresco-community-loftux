@@ -18,8 +18,7 @@
    <#elseif (tag?length > 0)>
       ${msg("postlist.title.bytag", tag)}
    <#elseif (fromDate?is_date)>
-      ${msg("postlist.title.bymonth", fromDate?datetime?string("MMMM"))}
-      ${fromDate?string}
+      ${msg("postlist.title.bymonth", fromDate?datetime?string("MMMM yyyy"))}
    <#else>
       ${msg("postlist.title.allposts")}
    </#if>

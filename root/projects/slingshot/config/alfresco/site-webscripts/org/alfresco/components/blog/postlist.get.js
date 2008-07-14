@@ -24,6 +24,7 @@ function main()
    model.tag = tag;
    if (fromDate.length > 0)
    {
+      fromDate = parseInt(fromDate);
       model.fromDate = new Date(fromDate);
    }
    else

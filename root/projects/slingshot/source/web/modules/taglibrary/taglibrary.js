@@ -220,7 +220,22 @@
          // get the text of the input field
          var inputField = YAHOO.util.Dom.get(this.id + "-tag-input-field");
          var text = inputField.value;
-         this._addTagImpl(text);
+         
+         // extract all full words and add them as tags
+         // take all full words in the string
+         var tags = [];
+         var tag = null;
+         var regexp = /(\w+)/gi;
+         while ((tag = regexp.exec(text)))
+         {
+            tags.push(tag[1]);
+         }
+         for (var x=0; x < tags.length; x++)
+         {
+            this._addTagImpl(tags[x]);
+         }
+         
+         // finally clear the text field
          inputField.value = "";
       },
 

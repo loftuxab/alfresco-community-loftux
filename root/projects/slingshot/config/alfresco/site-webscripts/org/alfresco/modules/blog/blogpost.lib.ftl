@@ -102,13 +102,6 @@
       <#if editForm>
          <input type="hidden" name="postId" id="${htmlId}-postId" value="${post.name}" />
       </#if>
-      <span id="${htmlId}-tags-inputs">
-         <#if editForm>
-            <#list post.tags as tag>
-               <input type="hidden" name="tags[]" value="${tag}" />
-            </#list>
-         </#if>
-      </span>
                
       <!-- title -->
       <label>${msg("post.form.postTitle")}:</label>
