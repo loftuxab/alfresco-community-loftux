@@ -27,6 +27,7 @@ package org.alfresco.web.site.renderer;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +68,11 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public final class RendererContextHelper
 {
+    /** Pattern to represent valid HTML element ID.
+        Note that we also strip ":" and "." from the ID as although legal characters they can
+        interfere with CSS selectors and cause further issues. */
+    private final static Pattern HTMLID_PATTERN = Pattern.compile("[^a-z^A-Z]?[^a-z^A-Z^0-9^_^-]");
+    
     /**
      * Push.
      * 
@@ -254,7 +260,7 @@ public final class RendererContextHelper
 
         // properties about the html binding id
         String htmlBindingId = page.getId();
-        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, validHtmlId(htmlBindingId));
     }
     
     
@@ -272,7 +278,7 @@ public final class RendererContextHelper
         
         // properties about the html binding id
         String htmlBindingId = template.getId();
-        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, validHtmlId(htmlBindingId));
     }
 
     /**
@@ -289,6 +295,14 @@ public final class RendererContextHelper
         context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SOURCE_ID, component.getSourceId());
         context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SCOPE_ID, component.getScope());
         
-        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, component.getId());
-    }    
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, validHtmlId(component.getId()));
+    }
+    
+    /**
+     * Helper to ensure only valid and acceptable characters are output as HTML element IDs.
+     */
+    private static String validHtmlId(String id)
+    {
+        return HTMLID_PATTERN.matcher(id).replaceAll("_");
+    }
 }
