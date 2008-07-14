@@ -240,8 +240,8 @@
       _deleteNode: function BlogPostList__deleteNode(postId)
       {
          // make an ajax request to the repository to delete the post
-         var url = Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" +
-                   this.options.containerId + "/" + postId;
+         var url = Alfresco.util.blog.getBlogPostRestUrl(this.options.siteId, this.options.containerId,
+                                                         this.options.path, param);
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -258,58 +258,62 @@
 
       _onDeleted: function BlogPost__onDeleted(response)
       {
-         if (response.json.error == undefined)
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableDelete", response.json.error)});
+         }
+         else
          {
             // reload the list
             this._reloadData();
             Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.deleted")});
          }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableDelete") + response.json.error});
-         }
-      },
-      
-      _getPublishingRestUrl: function Blog__getPublishingRestUrl(postId)
-      {
-          return Alfresco.constants.PROXY_URI + "blog/post/site/" +
-                    this.options.siteId + "/" + this.options.containerId + "/" + postId + "/publishing";
       },
       
       _publishExternal: function BlogPostList__publishExternal(postId)
       {
          // make an ajax request to publish the post
+         var url = Alfresco.util.blog.getPublishingRestUrl(this.options.siteId, this.options.containerId,
+                                                           this.options.path, param);
          Alfresco.util.Ajax.request(
-       {
-          url: this._getPublishingRestUrl(param),
-          method: "POST",
-          requestContentType : "application/json",
-          responseContentType : "application/json",
-          dataObj:
-          {
-             action : "publish"
-          },
-          successCallback:
-          {
-             fn: this._onPublished,
-             scope: this
-          },
-          failureMessage: "Unable to publish"
-       });
+         {
+            url: url,
+            method: "POST",
+            requestContentType : "application/json",
+            responseContentType : "application/json",
+            dataObj:
+            {
+               action : "publish"
+            },
+            successCallback:
+            {
+               fn: this._onPublished,
+               scope: this
+            },
+            failureMessage: this._msg("post.msg.failedPublishExternal")
+         });
       },
       
       _onPublished: function Blog__onPublished(response)
       {
-          Alfresco.util.PopupManager.displayMessage({text: "Published!"});
-          location.reload(true);
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unablePublishExternal", response.json.error)});
+         }
+         else
+         {
+            location.reload(true);
+         }
       },
       
       _updateExternal: function BlogPostList(postId)
       {
          // make an ajax request to publish the post
+         var url = Alfresco.util.blog.getPublishingRestUrl(this.options.siteId, this.options.containerId,
+                                                           this.options.path, param);
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingRestUrl(param),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -322,22 +326,31 @@
                fn: this._onUpdated,
                scope: this
             },
-            failureMessage: "Unable to publish"
+            failureMessage: this._msg("post.msg.failedUpdateExternal")
          });
       },
 
       _onUpdated: function Blog__onUpdated(response)
       {
-          Alfresco.util.PopupManager.displayMessage({text: "Updated!"});
-          location.reload(true);
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableUpdateExternal", response.json.error)});
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.updatedExternal")});
+            location.reload(true);
+         }
       },
 
       _unpublishExternal: function BlogPostList__onUnpublishExternal(postId)
       {
          // make an ajax request to publish the post
+         var url = Alfresco.util.blog.getPublishingRestUrl(this.options.siteId, this.options.containerId,
+                                                           this.options.path, param);
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingRestUrl(param),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -350,14 +363,21 @@
                fn: this._onUnpublished,
                scope: this
             },
-            failureMessage: "Unable to unpublish"
+            failureMessage: this._msg("post.msg.failedUnpublishExternal")
          });
       },
       
       _onUnpublished: function Blog__onUnpublished(response)
       {
-         Alfresco.util.PopupManager.displayMessage({text: "Unpublished!"});
-         location.reload(true);
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableUnpublishExternal", response.json.error)});
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unpublishExternal")});
+            location.reload(true);
+         }
       },
 
 
@@ -452,7 +472,7 @@
                fn: this._processData,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedLoad1")
+            failureMessage: this._msg("topiclist.msg.failedloadingdata")
          });
       },
       
@@ -464,7 +484,7 @@
          // first check whether we got an error back
          if (response.json.error != undefined)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedLoadData") + response.json.error});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topiclist.msg.unableloadingdata", response.json.error)});
          }
          else
          {

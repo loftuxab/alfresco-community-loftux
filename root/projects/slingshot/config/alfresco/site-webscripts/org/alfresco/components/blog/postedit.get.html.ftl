@@ -17,10 +17,6 @@
 //]]></script>
 
 <div id="${args.htmlid}-post">
-   <#--
-   <div id="${args.htmlid}-viewDiv">
-   </div>
-   -->
    <div id="${args.htmlid}-formDiv">
      <#if item??>
         <@blogpostLib.blogpostFormHTML htmlId="${args.htmlid}" post=item/>

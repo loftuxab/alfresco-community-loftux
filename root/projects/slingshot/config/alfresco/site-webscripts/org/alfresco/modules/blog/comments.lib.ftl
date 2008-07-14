@@ -21,15 +21,15 @@
    Renders a comment view element, including the encosing div and the div for the edit form
 -->
 <#macro commentHTML htmlid comment item_index>
-    <#assign commentRef=(comment.nodeRef?replace("://", "_"))?replace("/", "_") >
+<#assign commentRef=(comment.nodeRef?replace("://", "_"))?replace("/", "_") >
     
-   <div class="comment ${item_index}<#if ((item_index % 2) == 0)> odd <#else> even </#if>" id="comment-${commentRef}">
-      <@commentHTMLContent htmlid=htmlid comment=comment /> 
-   </div>
+<div class="comment ${item_index}<#if ((item_index % 2) == 0)> odd <#else> even </#if>" id="comment-${commentRef}">
+   <@commentHTMLContent htmlid=htmlid comment=comment /> 
+</div>
 
-   <#-- Edit form will be added here -->
-   <div id="comment-edit-form-${commentRef}" class="hidden">
-   </div>
+<#-- Edit form will be added here -->
+<div id="comment-edit-form-${commentRef}" class="hidden">
+</div>
    
 </#macro>
 

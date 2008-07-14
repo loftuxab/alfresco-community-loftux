@@ -156,6 +156,34 @@ Alfresco.util.blog.loadBlogPostListPage = function(site, container, path)
                       "&path=" + path;
 }
      
+/**
+ * Get the rest api url for a blog post
+ */
+Alfresco.util.blog.getBlogPostRestUrl = function(site, container, path, postId)
+{
+   var url = Alfresco.constants.PROXY_URI + "blog/post/site/" + site + "/" +
+            container + "/";
+   if (path != undefined && path.length > 0)
+   {
+      url += path + "/";
+   }
+   url += postId;
+   return url;
+};
+
+Alfresco.util.blog.getPublishingRestUrl = function(site, container, path, postId)
+{
+   return Alfresco.constants.PROXY_URI + "blog/post/site/" +
+          this.options.siteId + "/" + this.options.containerId + "/";
+   if (path != undefined && path.length > 0)
+   {
+      url += path + "/";
+   }
+   url += postId + "/publishing";
+   return url;
+};
+
+
 
 Alfresco.util.discussions = {};
 

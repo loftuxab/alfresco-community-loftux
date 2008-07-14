@@ -34,8 +34,8 @@
       onMonthSelection: function DiscussionsTopicListTags_showNewTopics(htmlId, ownerId, param)
       {
          // extract the tag name from the element id
-         var year = parseInt(param.substring(0, yearandmonth.indexOf('-')));
-         var month = parseInt(param.substring(yearandmonth.indexOf('-') + 1));
+         var year = parseInt(param.substring(0, param.indexOf('-')));
+         var month = parseInt(param.substring(param.indexOf('-') + 1));
          
          // create the date
          var fromDate = new Date(year, month, 1);

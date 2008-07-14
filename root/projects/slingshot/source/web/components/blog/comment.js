@@ -134,16 +134,23 @@
                scope: this,
                obj: { escapedRef : escapedRef}
             },
-            failureMessage: this._msg("comments.msg.failedDeleted2")
+            failureMessage: this._msg("comments.msg.failedDeleted")
          });
       },
       
       _onDeleted: function BlogComment__onDeleted(response, object)
       {
-          Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.deleted")});
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.unableDeleted", response.json.error)});
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.deleted")});
           
-          // reload the page
-          location.reload(true);
+            // reload the page
+            location.reload(true);
+         }
       },
       
 
@@ -169,9 +176,11 @@
             {
                fn: this._onFormLoaded,
                scope: this,
-               obj : { escapedRef : escapedRef }
+               obj : {
+                  escapedRef : escapedRef
+               }
             },
-            failureMessage: this._msg("comments.msg.failedLoadPostForm")
+            failureMessage: this._msg("comments.msg.failedLoadEditForm")
          });
       },
       
@@ -180,7 +189,7 @@
          // ignore the loaded statement if the mode is already edit
          if (! this.isViewMode())
          {
-             Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.editingTwice")});
+             Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.alreadyEditing")});
              return;
          }
          
@@ -257,18 +266,24 @@
       
       onEditFormSubmitSuccess: function BlogComment_onCreateFormSubmitSuccess(response, object)
       {
-         // fetch the div that contains the data for the post
-         var divId = "comment-" + object.escapedRef;
-         Alfresco.util.dom.updateAndShowDiv(divId, response.json.html);
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.submitErrorReturn", response.json.error)});
+         }
+         else
+         {
+            // fetch the div that contains the data for the post
+            var divId = "comment-" + object.escapedRef;
+            Alfresco.util.dom.updateAndShowDiv(divId, response.json.html);
 
-         this._hideOpenForms();
-                
-         Alfresco.util.PopupManager.displayMessage({text: "Comment updated"});
+            this._hideOpenForms();  
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentUpdated")});
+         }
       },
       
       onEditFormSubmitFailure: function BlogComment_onCreateFormSubmitFailure(response)
       {
-         Alfresco.util.PopupManager.displayMessage({text: "Updating comment failed"});
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.formSubmitFailed")});
       },
       
       
