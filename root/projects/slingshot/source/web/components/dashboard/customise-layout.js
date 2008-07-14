@@ -88,7 +88,7 @@
           * The avaiable layouts
           *
           * @property layouts
-          * @type {object} {"layout.id":{id: "", description: "", icon: ""}}
+          * @type {object} {"layout.id":{templateId: "", description: "", icon: ""}}
           */
          layouts: {}
       },
