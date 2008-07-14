@@ -302,8 +302,6 @@ public class PresetsManager
                             String description = replace(t.elementTextTrim(TemplateInstance.PROP_DESCRIPTION), tokens);
                             String templateType = replace(t.elementTextTrim(TemplateInstance.PROP_TEMPLATE_TYPE), tokens);
                             
-                            // TODO: read arbituary custom properties
-                            
                             // validate mandatory values
                             if (templateId == null || templateId.length() == 0)
                             {
