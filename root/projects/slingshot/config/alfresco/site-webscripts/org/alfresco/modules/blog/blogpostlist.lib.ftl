@@ -5,22 +5,23 @@
 <#macro postListTitle filter="" fromDate="" toDate="" tag="">
    <#if (filter?length > 0 && filter != "all")>
       <#if filter == "new">
-         New posts
+         ${msg("postlist.title.newposts")}
       <#elseif (filter == "mydrafts")>
-         My drafts posts
+         ${msg("postlist.title.mydrafts")}
       <#elseif (filter == "mypublished")>
-         My published posts
+         ${msg("postlist.title.mypublished")}
       <#elseif (filter == "publishedext")>
-         Externally published posts
+         ${msg("postlist.title.publishedext")}
       <#else>
          Unknown filter!
       </#if>
    <#elseif (tag?length > 0)>
-      Posts with tag ${tag}
+      ${msg("postlist.title.bytag", tag)}
    <#elseif (fromDate?is_date)>
-      Posts for month ${fromDate?datetime?string("MMMM")}
+      ${msg("postlist.title.bymonth", fromDate?datetime?string("MMMM"))}
+      ${fromDate?string}
    <#else>
-      All posts
+      ${msg("postlist.title.allposts")}
    </#if>
 </#macro>
 
@@ -64,7 +65,7 @@
       </#switch>
    </#list>
 <#else>
-   <div class="noNode">${msg("post.noPost")}</div>
+   <div class="noNode">${msg("postlist.noPosts")}</div>
 </#if>
 
 <#-- PENDING: find why we have to add this! -->

@@ -90,7 +90,6 @@
          var okButton = new YAHOO.widget.Button(this.id + "-createcomment-ok-button", {type: "submit"});
          
          // instantiate the simple editor we use for the form
-         // instantiate the simple editor we use for the form
          this.editor = new YAHOO.widget.SimpleEditor(this.id + '-createcomment-content', {
             height: '250px',
             width: '538px',
@@ -136,14 +135,22 @@
        */
       onCreateFormSubmitSuccess: function CreateComment_onCreateFormSubmitSuccess(response, object)
       {
-         Alfresco.util.PopupManager.displayMessage({text: "Form submit successful"});
-         location.reload(true);
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.unableCreateComment", response.json.error)});
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentCreated")});
+            location.reload(true);
+         }
+
       },
       
       /** Called when the form submit failed. */
       onCreateFormSubmitFailure: function CreateComment_onCreateFormSubmitFailure(response)
       {
-         Alfresco.util.PopupManager.displayMessage({text: "Creating comment failed"});
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.failedCreateComment")});
       },
 
       /**
