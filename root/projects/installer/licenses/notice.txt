@@ -27,7 +27,9 @@ This product includes software developed by Heng Yuan http://www.cs.ucla.edu/~he
 
 This product also includes software developed by Clinton Begin (http://www.ibatis.com). 
 
-This product includes software developed by ImageMagick Studio LLC (http://www.imagemagick.org)
+This product is distributed with software developed by ImageMagick Studio LLC (http://www.imagemagick.org)
+
+This product is distributed with software developed by Rainer Böhme and Matthias Kramm (http://www.swftools.org)
 
 This product includes software developed by the Spring Framework Project (http://www.springframework.org).
 
