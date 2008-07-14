@@ -6,7 +6,7 @@
 	<h2>BROWSE ARCHIVES</h2>
     <ul class="filterLink">
         <#list items as month>
-            <li class="onMonthSelection nav-label" id="onMonthSelection-${month.year?c}-${month.month?c}">
+            <li class="onMonthSelection nav-label" id="${args.htmlid}-onMonthSelection-${month.year?c}-${month.month?c}">
                 <a  href="" class="archive-link nav-link">${month.beginOfMonth?string("MMMM yyyy")}</a> (${month.postCount?c})
             </li>
         </#list>

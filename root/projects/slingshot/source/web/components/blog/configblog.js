@@ -72,7 +72,12 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+         
+         /**
+          * Container this configuration refers to
+          */
+         containerId: "blog"
       },
        
       /**
@@ -89,7 +94,7 @@
        * @property widgets
        * @type object
        */
-       widgets: {},
+      widgets: {},
 
       /**
        * Set multiple initialization options at once.
@@ -133,8 +138,8 @@
        */
       onReady: function()
       {
-         var configBlogLink = document.getElementById(this.id + "-config-blog-button");
-         YAHOO.util.Event.addListener(configBlogLink, "click", this.onConfigBlogLinkClick, this, true);
+         // listen on onConfigureBlog events
+         YAHOO.Bubbling.on("onConfigureBlog", this.onConfigureBlog, this);
       },
 
       /**
@@ -142,7 +147,7 @@
        * @method onCreateSiteLinkClick
        * @param event {domEvent} DOM event
        */
-      onConfigBlogLinkClick: function(event)
+      onConfigureBlog: function(layer, args)
       {
          this.show();
       },
@@ -168,9 +173,10 @@
              * Load the gui from the server and let the templateLoaded() method
              * handle the rest.
              */
+            var url = Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/config/config-blog";
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/config/config-blog",
+               url: url,
                dataObj:
                {
                   site: this.options.siteId,
@@ -224,7 +230,7 @@
          });
 
          // Configure the forms runtime
-         var configBlogForm = new Alfresco.forms.Form(this.id + "-configBlog-form");
+         var configureBlogForm = new Alfresco.forms.Form(this.id + "-configBlog-form");
 
          // Shortname is mandatory
          //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
@@ -234,21 +240,21 @@
          //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
-         configBlogForm.setShowSubmitStateDynamically(true, false);
-         configBlogForm.setSubmitElements(this.widgets.okButton);
+         configureBlogForm.setShowSubmitStateDynamically(true, false);
+         configureBlogForm.setSubmitElements(this.widgets.okButton);
 
-         // Submit as an ajax submit (not leave the page), in json format
-         configBlogForm.setAJAXSubmit(true,
+         // Submit as an ajax submit
+         configureBlogForm.setAJAXSubmit(true,
          {
             successCallback:
             {
-               fn: this.onConfigBlogSuccess,
+               fn: this.onConfigureBlogSuccess,
                scope: this
             },
             failureMessage: "Unable to update blog configuration"
          });
-         configBlogForm.setSubmitAsJSON(true);
-         configBlogForm.init();
+         configureBlogForm.setSubmitAsJSON(true);
+         configureBlogForm.init();
 
          // Show the panel
          this._showPanel();
@@ -274,7 +280,7 @@
        * @method onConfigBlogSuccess
        * @param response
        */
-      onConfigBlogSuccess: function(response)
+      onConfigureBlogSuccess: function(response)
       {
          // refresh page
          Alfresco.util.PopupManager.displayMessage({text: "Blog configuration updated successfully"});

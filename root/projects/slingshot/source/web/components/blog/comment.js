@@ -1,5 +1,9 @@
 /**
- * Comment component.
+ * BlogComment component.
+ * 
+ * Displays comments of a blog post.
+ * The component does not really refer to the blog and could
+ * be used in other cases as well.
  * 
  * @namespace Alfresco
  * @class Alfresco.BlogComment
@@ -38,28 +42,22 @@
       options:
       {
          /**
-          * Current siteId.
-          * 
-          * @property siteId
-          * @type string
-          */
-         siteId: "",
-         
-         /**
-          * Stores the reference of the post for which this comments component
-          * displays comments.
+          * Stores the reference of the node for which to display the comments.
           */
          nodeRef: ""
       },
       
-      /** Stores the ref of the currently edited comment. */
+      /** root element of the current edit form. */
       editCommentFormElementId : null,
       
+      /** Hidden comment view element, null if no comment edit
+       * form is currently displayed.
+       */
       hiddenViewElementId : null,
       
       /**
        * Set multiple initialization options at once.
-       *
+       * 
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
        */
@@ -95,58 +93,49 @@
        */
       onReady: function BlogComment_onReady()
       { 
-         // Hook action events
-         var me = this;
-         YAHOO.Bubbling.addDefaultAction("action-link-"+this.id, function BlogComment_filterAction(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
-            if (owner !== null)
-            {
-              //  alert(owner.className);
-               var action = owner.className;
-               
-               var target = args[1].target;
-               if (typeof me[action] == "function")
-               {
-                  // fetch the id of the comment,
-                  var saveCommentRef = owner.id.substring((action + "-" + me.id + "-").length);
-                  me[action].call(me, saveCommentRef);
-                  args[1].stop = true;
-               }
-            }
-      		 
-            return true;
-         });         
+         // action hooks
+         Alfresco.util.registerDefaultActionHandler(this.id, "blogcomment-action", "div", this);
+
+         // initialize the mouse over listener
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onCommentElementMouseEntered, this.onCommentElementMouseExited);
          
-         // initialize the mouse over functionality for the list
-         this.initMouseOverListeners();
+         // as the list got already rendered on the server, already attach the listener to the rendered elements
+         Alfresco.util.rollover.registerListenersByClassName(this.id, 'comment', 'div');
       },      
       
       
       // Actions
 
-      onEditComment: function BlogComment_onEditComment(saveCommentRef)
+      onEditComment: function BlogComment_onEditComment(htmlId, ownerId, param)
       {
-         this._loadForm(saveCommentRef);
+         this._loadForm(param);
       },
 
-      onDeleteComment: function BlogComment_onEditComment(saveCommentRef)
+      onDeleteComment: function BlogComment_onEditComment(htmlId, ownerId, param)
       {
-         // make an ajax request to delete the post
-         // we can directly go to alfresco for this
+         this._deleteComment(param);
+      },
+
+
+      // Action implementations
+      
+      _deleteComment: function BlogComment__deleteComment(escapedRef)
+      {
+         // make an ajax request to the repository to delete the post
+         var url = Alfresco.constants.PROXY_URI + "/comment/node/" + Alfresco.util.noderefs.escapedToUrl(escapedRef);
          Alfresco.util.Ajax.request(
-		   {
-		      url: Alfresco.constants.PROXY_URI + "/comment/node/" + this.convertSaveToUrlRef(saveCommentRef),
-		      method: "DELETE",
-		      responseContentType : "application/json",
-		      successCallback:
-		      {
-		         fn: this._onDeleted,
-		         scope: this,
-		         obj: { saveCommentRef : saveCommentRef}
-		      },
-		      failureMessage: this._msg("comments.msg.failedDeleted2")
-		   });
+         {
+            url: url,
+            method: "DELETE",
+            responseContentType : "application/json",
+            successCallback:
+            {
+               fn: this._onDeleted,
+               scope: this,
+               obj: { escapedRef : escapedRef}
+            },
+            failureMessage: this._msg("comments.msg.failedDeleted2")
+         });
       },
       
       _onDeleted: function BlogComment__onDeleted(response, object)
@@ -160,102 +149,62 @@
 
       // Form management
 
-      _loadForm: function BlogComment__loadForm(saveCommentRef)
+      _loadForm: function BlogComment__loadForm(escapedRef)
       {   
-          // make sure no other forms are displayed
-          this._hideOpenForms();
+         // make sure no other forms are displayed
+         this._hideOpenForms();
           
-          // load the form for the post
+         // load the form for the post
+         var url = Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/comments/comment-edit-form";
          Alfresco.util.Ajax.request(
-		   {
-		      url: Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/comments/comment-edit-form",
-		      dataObj:
-		      {
-		         htmlid : this.id,
-		         nodeRef : this.convertSaveToNodeRef(saveCommentRef)
-		      },
-		      responseContentType : "application/json",
-		      successCallback:
-		      {
-		         fn: this._onFormLoaded,
-		         scope: this,
-		         obj : { saveCommentRef : saveCommentRef }
-		      },
-		      failureMessage: this._msg("comments.msg.failedLoadPostForm")
-		   });
+         {
+            url: url,
+            dataObj:
+            {
+               htmlid : this.id,
+               nodeRef : Alfresco.util.noderefs.unescape(escapedRef)
+            },
+            responseContentType : "application/json",
+            successCallback:
+            {
+               fn: this._onFormLoaded,
+               scope: this,
+               obj : { escapedRef : escapedRef }
+            },
+            failureMessage: this._msg("comments.msg.failedLoadPostForm")
+         });
       },
       
       _onFormLoaded: function(response, object)
-	  {
-	     // ignore the loaded statement if the mode is already edit
-	     if (! this.isViewMode())
-	     {
-	         Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.editingTwice")});
-	         return;
-	     }
-	     
-         var formDivId = "comment-edit-form-" + object.saveCommentRef;
-         this.updateAndShowDiv(formDivId, response.json.form);
+      {
+         // ignore the loaded statement if the mode is already edit
+         if (! this.isViewMode())
+         {
+             Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.editingTwice")});
+             return;
+         }
+         
+         var formDivId = "comment-edit-form-" + object.escapedRef;
+         Alfresco.util.dom.updateAndShowDiv(formDivId, response.json.form);
          this.editCommentFormElementId = formDivId;
         
          // hide the view
-         var viewDivId = "comment-" + object.saveCommentRef;
-         this.hideDiv(viewDivId);
+         var viewDivId = "comment-" + object.escapedRef;
+         Alfresco.util.dom.hideDiv(viewDivId);
          this.hiddenViewElementId = viewDivId;
              
          // register the form handling
-         this._registerEditCommentForm(object.saveCommentRef, formDivId);
-	  },
-      
-      
-      createSimpleEditor: function CreateComment_createSimpleEditor(textareaId)
-      {
-         // instantiate the simple editor we use for the form
-		 var editor = new YAHOO.widget.SimpleEditor(textareaId, {
-		     height: '180px',
-		     width: '700px',
-		     dompath: false, //Turns on the bar at the bottom
-		     animate: false, //Animates the opening, closing and moving of Editor windows
-		     toolbar: {
-		        titlebar: false,
-		        buttons: [
-		            { group: 'textstyle', label: this._msg("comments.form.font"),
-		                buttons: [
-				            { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
-				            { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
-				            { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
-		                    { type: 'separator' },
-		                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-		                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
-		                ]
-		            },
-		            { type: 'separator' },
-				    { group: 'indentlist', label: this._msg("comments.form.lists"),
-				        buttons: [
-				            { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
-				            { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
-				        ]
-				    },
-				    { type: 'separator' },
-				    { group: 'insertitem', label: this._msg("comments.form.link"),
-				        buttons: [
-				            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
-				        ]
-				    }
-		        ]
-		    }
-		 });
-		 return editor;
+         this._registerEditCommentForm(object.escapedRef, formDivId);
       },
       
       /**
        * Registers the form with the html (that should be available in the page)
        * as well as the buttons that are part of the form.
        */
-      _registerEditCommentForm: function BlogComment__registerEditCommentForm(saveCommentRef, formDivId)
+      _registerEditCommentForm: function BlogComment__registerEditCommentForm(escapedRef, formDivId)
       {
          // base id for all elements on the form
-         var formBaseId = this.id + "-" + saveCommentRef + "-editform";
+         var formBaseId = this.id + "-" + escapedRef + "-editform";
           
          // register the okButton
          var okButton = new YAHOO.widget.Button(formBaseId + "-ok-button", {type: "submit"});
@@ -265,8 +214,14 @@
          cancelButton.subscribe("click", this.onEditFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.editor = this.createSimpleEditor(formBaseId + '-content');
-		 this.editor.render();
+         this.editor = new YAHOO.widget.SimpleEditor(formBaseId + '-content', {
+             height: '180px',
+             width: '700px',
+             dompath: false, //Turns on the bar at the bottom
+             animate: false, //Animates the opening, closing and moving of Editor windows
+             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
+         });
+         this.editor.render();
          
          // create the form that does the validation/submit
          var commentForm = new Alfresco.forms.Form(formBaseId);
@@ -278,7 +233,7 @@
             {
                fn: this.onEditFormSubmitSuccess,
                scope: this,
-               obj: { saveCommentRef : saveCommentRef }
+               obj: { escapedRef : escapedRef }
             },
             failureCallback:
             {
@@ -287,15 +242,14 @@
             }
          });
          commentForm.setSubmitAsJSON(true);
-          
          commentForm.doBeforeFormSubmit =
          {
-       	   fn: function(form, obj)
-       	   {
-		        //Put the HTML back into the text area
-				this.editor.saveHTML();
-       	   },
-       	   scope: this
+              fn: function(form, obj)
+              {
+                //Put the HTML back into the text area
+                this.editor.saveHTML();
+              },
+              scope: this
          }
          
          commentForm.init();
@@ -304,8 +258,8 @@
       onEditFormSubmitSuccess: function BlogComment_onCreateFormSubmitSuccess(response, object)
       {
          // fetch the div that contains the data for the post
-         var divId = "comment-" + object.saveCommentRef;
-         this.updateAndShowDiv(divId, response.json.html);
+         var divId = "comment-" + object.escapedRef;
+         Alfresco.util.dom.updateAndShowDiv(divId, response.json.html);
 
          this._hideOpenForms();
                 
@@ -323,18 +277,20 @@
           this._hideOpenForms();
       },
       
-      // Misc
-      
+      /**
+       * Makes sure that all forms get removed and if available the hidden content
+       * elements displayed again.
+       */
       _hideOpenForms: function()
       {
           if (this.editCommentFormElementId != null)
           {
-              this.hideAndRemoveDivContent(this.editCommentFormElementId);
+              Alfresco.util.dom.hideAndRemoveDivContent(this.editCommentFormElementId);
               this.editCommentFormElementId = null;
           }
           if (this.hiddenViewElementId != null)
           {
-              this.showDiv(this.hiddenViewElementId);
+              Alfresco.util.dom.showDiv(this.hiddenViewElementId);
               this.hiddenViewElementId = null;
           }
       },
@@ -344,115 +300,10 @@
        */
       isViewMode: function()
       {
-          return this.editCommentFormElement == null;
-      },      
-      
-      getSaveNodeRef: function(nodeRef)
-      {
-          return nodeRef.replace(/\:\/\//, "_").replace(/\//, "_");
+         return this.editCommentFormElement == null;
       },
       
-      convertSaveToNodeRef: function(saveNodeRef)
-      {
-          return saveNodeRef.replace(/_/, "://").replace(/_/, "/");
-      },
-      
-      convertSaveToUrlRef: function(saveNodeRef)
-      {
-          return saveNodeRef.replace(/_/g, "/");
-      },
-      
-      // showing / hiding of divs
-      
-      /**
-       * Updates a div content and makes sure the div is displayed
-       */
-      updateAndShowDiv: function BlogComment_updateAndShowDiv(divId, newHTML)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-          elem.innerHTML = newHTML;
-	      YAHOO.util.Dom.removeClass(elem, "hidden");
-      },
-
-      showDiv: function BlogComment_updateAndShowDiv(divId)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-	      YAHOO.util.Dom.removeClass(elem, "hidden");
-      },
-      
-      hideDiv: function BlogComment_hideDiv(divId)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-	      YAHOO.util.Dom.addClass(elem, "hidden");
-      },
-      
-      hideAndRemoveDivContent: function BlogComment_removeDivContent(divId)
-      {
-          var elem = YAHOO.util.Dom.get(divId);
-	      YAHOO.util.Dom.addClass(elem, "hidden");
-          elem.innerHTML = "";
-      },
-      
-      
-      
-      // Overlay functionality      
-      /**
-       * Attaches a listener to all passed elements.
-       */
-      _attachRolloverListener: function(elem, mouseOverEventName, mouseOutEventName)
-      {  
-         var eventElem = elem;
-         
-         var mouseOverHandler = function(e)
-         {
-             // find out whether we actually moved inside the 
-             if (! e) var e = window.event;
-             var relTarg = e.relatedTarget || e.fromElement;
-             while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY') {
-                relTarg = relTarg.parentNode
-             }
-             if (relTarg == eventElem) return;
-             
-             // the mouse entered the element, fire an event to inform about it
-             YAHOO.Bubbling.fire(mouseOverEventName, {event : e, target : eventElem});
-         };
-         
-         var mouseOutHandler = function(e)
-         {
-             // find out whether we actually moved inside the 
-             if (! e) var e = window.event;
-             var relTarg = e.relatedTarget || e.toElement;
-             while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY') {
-                relTarg = relTarg.parentNode
-             }
-             if (relTarg == eventElem) return;
-             
-             // the mouse exited the element, fire an event to inform about it
-             YAHOO.Bubbling.fire(mouseOutEventName, {event : e, target : eventElem});
-         };
-         
-         YAHOO.util.Event.addListener(elem, 'mouseover', mouseOverHandler);
-         YAHOO.util.Event.addListener(elem, 'mouseout', mouseOutHandler);
-      },
-      
-      firstMouseOverInit: true,
-      
-      initMouseOverListeners: function BlogComment_initMouseOverListeners()
-      {
-         var mouseEnteredBubbleEventName = 'onCommentsElementMouseEntered';
-         var mouseExitedBubbleEventName = 'onCommentsElementMouseExited';
-         var divs = YAHOO.util.Dom.getElementsByClassName('comment', 'div');
-         for (var x=0; x < divs.length; x++) {
-             this._attachRolloverListener(divs[x], mouseEnteredBubbleEventName, mouseExitedBubbleEventName);
-         }
-         
-         if (this.firstMouseOverInit) {
-            this.firstMouseOverInit = false;
-            // manage mouse hover/exit
-            YAHOO.Bubbling.on(mouseEnteredBubbleEventName, this.onCommentElementMouseEntered, this);
-            YAHOO.Bubbling.on(mouseExitedBubbleEventName, this.onCommentElementMouseExited, this);
-         }
-      },
+      // showing / hiding of divs      
       
       /** Called when the mouse enters into a list item. */
       onCommentElementMouseEntered: function BlogComment_onListElementMouseEntered(layer, args)

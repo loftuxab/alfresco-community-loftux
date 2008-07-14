@@ -54,7 +54,7 @@
    
    Alfresco.BlogPostList.prototype =
    {
-   	  /**
+        /**
        * Object container for initialization options
        *
        * @property options
@@ -70,8 +70,12 @@
           */
          siteId: "",
          
+         /**
+          * Id of the container
+          */
          containerId: "blog",
          
+         /** Path to the blog. */
          path: "",
          
          /**
@@ -83,18 +87,37 @@
           * Size of elements to show
           */
          pageSize: 10,
-         
+
+         /**
+          * Used filter. Currently following values are supported:
+          * "", "all", "new", "mydrafts", "mypublished", "publishedext"
+          */         
          filter: "",
          
+         /**
+          * Selected tag
+          * Only takes effect if the filter is "" or "all"
+          */
          tag: "",
          
+         /**
+          * Selected view mode.
+          * Only "simple" and "details" are supported
+          */
          viewmode: "",
          
+         /**
+          * If set, only posts after this date are displayed.
+          * Only takes effect if the filter is "" or "all"
+          */
          fromDate: "",
          
+         /**
+          * If set, only posts before this date are displayed.
+          * Only takes effect if the filter is "" or all
+          */
          toDate: ""
       },
-   	
       
       /**
        * Set multiple initialization options at once.
@@ -133,21 +156,29 @@
        */
       onReady: function BlogPostList_onReady()
       {
-         // Links - PENDING: this should be done in a more generic way
+         // simple view link
          YAHOO.util.Event.addListener("simple-list-view", "click",
             function simpleListViewClicked(e) {
                var owner = YAHOO.Bubbling.fire('onSetBlogPostListParams', {viewmode: 'simple'});
                return true;
             }
          );
+         // detailed view link
          YAHOO.util.Event.addListener("detailed-list-view", "click",
             function detailedListViewClicked(e) {
                var owner = YAHOO.Bubbling.fire('onSetBlogPostListParams', {viewmode: 'details'});
                return true;
             }
-         ); 
+         );
+         // blog configuration
+         YAHOO.util.Event.addListener(this.id + "-config-blog-link", "click",
+            function configBlogButtonClicked(e) {
+               var owner = YAHOO.Bubbling.fire('onConfigureBlog', {});
+               return true;
+            }
+         );
 
-         // used by the filter, tag and view buttons to set options
+         // used by the filter component, tag component and view buttons to set options
          YAHOO.Bubbling.on("onSetBlogPostListParams", this.onSetPostListParams, this);
 
          // catch paginator events
@@ -160,32 +191,13 @@
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onListElementMouseEntered, this.onListElementMouseExited);
          
-         // as the list got already rendered on the server, already attach the listener to the rendered elements
+         // attach a listener to the already rendered list elements
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
       },
       
-      /**
-       * Called when the mouse enters into a list item.
-       */
-      onListElementMouseEntered: function BlogPostList_onListElementMouseEntered(layer, args)
-      {
-         var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
-      },
-      
-      /**
-       * Called whenever the mouse exits a list item.
-       */
-      onListElementMouseExited: function BlogPostList_onListElementMouseExited(layer, args)
-      {
-         var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
-      },
 
+      // Actions
+      
       /**
        * Action handler for the view action
        */
@@ -202,22 +214,46 @@
       /**
        * Deletes a post.
        */
-      onDeleteNode: function BlogPost_onDeletePost(htmlId, ownerId, param)
+      onDeleteNode: function BlogPostList_onDeletePost(htmlId, ownerId, param)
       {
-         // make an ajax request to delete the post
-         // we can directly go to alfresco for this
+         this._deleteNode(param);
+      },
+      
+      onPublishExternal: function Blog_onPublishExternal(htmlId, ownerId, param)
+      {
+         this._publishExternal(param);
+      },
+      
+      onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, param)
+      {
+         this._updateExternal(param);
+      },
+      
+      onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, param)
+      {
+         this._unpublishExternal(param);
+      },
+      
+      
+      // Actions implementation
+      
+      _deleteNode: function BlogPostList__deleteNode(postId)
+      {
+         // make an ajax request to the repository to delete the post
+         var url = Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" +
+                   this.options.containerId + "/" + postId;
          Alfresco.util.Ajax.request(
-		   {
-		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" /* ADD PATH */ + param,
-		      method: "DELETE",
-		      responseContentType : "application/json",
-		      successCallback:
-		      {
-		         fn: this._onDeleted,
-		         scope: this
-		      },
-		      failureMessage: this._msg("post.msg.failedDelete")
-		   });
+         {
+            url: url,
+            method: "DELETE",
+            responseContentType : "application/json",
+            successCallback:
+            {
+               fn: this._onDeleted,
+               scope: this
+            },
+            failureMessage: this._msg("post.msg.failedDelete")
+         });
       },
 
       _onDeleted: function BlogPost__onDeleted(response)
@@ -240,27 +276,26 @@
                     this.options.siteId + "/" + this.options.containerId + "/" + postId + "/publishing";
       },
       
-      onPublishExternal: function Blog_onPublishExternal(htmlId, ownerId, param)
+      _publishExternal: function BlogPostList__publishExternal(postId)
       {
-         var me = this;
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
-		   {
-		      url: me._getPublishingRestUrl(param),
-		      method: "POST",
-		      requestContentType : "application/json",
-		      responseContentType : "application/json",
-		      dataObj:
-		      {
-		         action : "publish"
-		      },
-		      successCallback:
-		      {
-		         fn: this._onPublished,
-		         scope: this
-		      },
-		      failureMessage: "Unable to publish"
-		   });
+       {
+          url: this._getPublishingRestUrl(param),
+          method: "POST",
+          requestContentType : "application/json",
+          responseContentType : "application/json",
+          dataObj:
+          {
+             action : "publish"
+          },
+          successCallback:
+          {
+             fn: this._onPublished,
+             scope: this
+          },
+          failureMessage: "Unable to publish"
+       });
       },
       
       _onPublished: function Blog__onPublished(response)
@@ -268,69 +303,71 @@
           Alfresco.util.PopupManager.displayMessage({text: "Published!"});
           location.reload(true);
       },
-     
-      onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, param)
+      
+      _updateExternal: function BlogPostList(postId)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
-		   {
-		      url: this._getPublishingRestUrl(param),
-		      method: "POST",
-		      requestContentType : "application/json",
-		      responseContentType : "application/json",
-		      dataObj:
-		      {
-		         action : "update"
-		      },
-		      successCallback:
-		      {
-		         fn: this._onUpdated,
-		         scope: this
-		      },
-		      failureMessage: "Unable to publish"
-		   });
+         {
+            url: this._getPublishingRestUrl(param),
+            method: "POST",
+            requestContentType : "application/json",
+            responseContentType : "application/json",
+            dataObj:
+            {
+               action : "update"
+            },
+            successCallback:
+            {
+               fn: this._onUpdated,
+               scope: this
+            },
+            failureMessage: "Unable to publish"
+         });
       },
 
       _onUpdated: function Blog__onUpdated(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Updated!"});
           location.reload(true);
-      },    
+      },
 
-      onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, param)
+      _unpublishExternal: function BlogPostList__onUnpublishExternal(postId)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
-		   {
-		      url: this._getPublishingRestUrl(param),
-		      method: "POST",
-		      requestContentType : "application/json",
-		      responseContentType : "application/json",
-		      dataObj:
-		      {
-		         action : "unpublish"
-		      },
-		      successCallback:
-		      {
-		         fn: this._onUnpublished,
-		         scope: this
-		      },
-		      failureMessage: "Unable to unpublish"
-		   });
+         {
+            url: this._getPublishingRestUrl(param),
+            method: "POST",
+            requestContentType : "application/json",
+            responseContentType : "application/json",
+            dataObj:
+            {
+               action : "unpublish"
+            },
+            successCallback:
+            {
+               fn: this._onUnpublished,
+               scope: this
+            },
+            failureMessage: "Unable to unpublish"
+         });
       },
       
       _onUnpublished: function Blog__onUnpublished(response)
       {
-          Alfresco.util.PopupManager.displayMessage({text: "Unpublished!"});
-          location.reload(true);
+         Alfresco.util.PopupManager.displayMessage({text: "Unpublished!"});
+         location.reload(true);
       },
 
 
-	  /**
-	   * Updates the filter and reloads the page
-	   */ 
-	  onSetPostListParams: function Blog_onPostCategoryChange(layer, args)
-	  {
+      // List update functionality
+
+      /**
+       * Updates the filter and reloads the page
+       */ 
+      onSetPostListParams: function Blog_onPostCategoryChange(layer, args)
+      {
          // check the filter or tag
          if (args[1].filter != undefined)
          {
@@ -374,83 +411,106 @@
              this.options.viewmode = args[1].viewmode;
          }
          
-         // reload the table
+         // reload the list
          this._reloadData();
-	  },
-	  
-	  /**
-	   * Handles paginator events
-	   */
-	  onStartIndexChanged: function BlogPostList_onPageIndexChanged(layer, args)
-	  {
-	     this.options.pageSize = args[1].pageSize;
-	     this.options.startIndex = args[1].startIndex;
-	     this._reloadData();
-	  },
-      
-      _reloadData: function Blog__reloadData() 
+      },
+     
+      /**
+       * Handles paginator events
+       */
+      onStartIndexChanged: function BlogPostList_onPageIndexChanged(layer, args)
       {
-      	Alfresco.util.Ajax.request(
-		   {
-		      url: Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/postlist/get-blogposts",
-		      responseContentType : "application/json",
-		      dataObj:
-		      {
-		         site    : this.options.siteId,
-		         htmlid  : this.id,
-		         startIndex : this.options.startIndex,
-		         pageSize : this.options.pageSize,
-		         filter  : this.options.filter,
-		         tag     : this.options.tag,
-		         viewmode: this.options.viewmode,
-		         fromDate : this.options.fromDate,
-		         toDate : this.options.toDate
-		      },
-		      successCallback:
-		      {
-		         fn: this._processData,
-		         scope: this
-		      },
-		      failureMessage: this._msg("post.msg.failedLoad1")
-		   });
+         this.options.pageSize = args[1].pageSize;
+         this.options.startIndex = args[1].startIndex;
+         this._reloadData();
       },
       
-      _processData: function Blog__processData(response)
-	  {
-	     // first check whether we got an error back
-	     if (response.json.error != undefined)
-	     {
-	        Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedLoadData") + response.json.error});
-	     }
-	     else
-	     {
-	        // update the paginator
-	        var paginatorData = response.json.paginatorData;
-	        this._updatePaginator(paginatorData);
-	        
-	        // update the internal position fields
-	        this.options.startIndex = paginatorData.startIndex;
-	        this.options.pageSize = paginatorData.pageSize;
-	         
-	        // update title
-	        var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
+      /**
+       * Reloads the list using the parameters
+       * stored in the options object
+       */
+      _reloadData: function Blog__reloadData() 
+      {
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/postlist/get-blogposts",
+            responseContentType : "application/json",
+            dataObj:
+            {
+               site    : this.options.siteId,
+               htmlid  : this.id,
+               startIndex : this.options.startIndex,
+               pageSize : this.options.pageSize,
+               filter  : this.options.filter,
+               tag     : this.options.tag,
+               viewmode: this.options.viewmode,
+               fromDate : this.options.fromDate,
+               toDate : this.options.toDate
+            },
+            successCallback:
+            {
+               fn: this._processData,
+               scope: this
+            },
+            failureMessage: this._msg("post.msg.failedLoad1")
+         });
+      },
+      
+      /**
+       * Displays the list data returned by the ajax call
+       */
+      _processData: function BlogPostList__processData(response)
+      {
+         // first check whether we got an error back
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedLoadData") + response.json.error});
+         }
+         else
+         {
+            // update the paginator. we pass the data using a bubble event
+            var paginatorData = response.json.paginatorData;
+            YAHOO.Bubbling.fire('onPagingDataChanged', { data: paginatorData });
+     
+            // update the internal position fields
+            this.options.startIndex = paginatorData.startIndex;
+            this.options.pageSize = paginatorData.pageSize;
+             
+            // update title
+            var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
             elem.innerHTML = response.json.listTitle;
-	         
-	        // update list
-	        var elem = YAHOO.util.Dom.get(this.id + "-postlist");
+            
+            // update list
+            var elem = YAHOO.util.Dom.get(this.id + "-postlist");
             elem.innerHTML = response.json.listHtml;
             
+            // attach the rollover listener to the new elements
             Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
-	     }
-	  },
+         }
+      },
 
-      _updatePaginator: function BlogPostList__updatePaginator(paginatorData)
+      // Mouse over functionality
+
+      /**
+       * Called when the mouse enters into a list item.
+       */
+      onListElementMouseEntered: function BlogPostList_onListElementMouseEntered(layer, args)
       {
-         YAHOO.Bubbling.fire('onPagingDataChanged',
-            {
-               data: paginatorData
-            }
-         );
+         var elem = args[1].target;
+         YAHOO.util.Dom.addClass(elem, 'overNode');
+         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null);
+         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
+      },
+      
+      /**
+       * Called whenever the mouse exits a list item.
+       */
+      onListElementMouseExited: function BlogPostList_onListElementMouseExited(layer, args)
+      {
+         var elem = args[1].target;
+         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null);
+         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
 
       /**

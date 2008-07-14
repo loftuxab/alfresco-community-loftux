@@ -23,6 +23,35 @@
  * http://www.alfresco.com/legal/licensing
  */
 
+/**
+ * Contains utility functions to work with node references on the client side.
+ * Node references can't be used as element id's as they contain invalid characters.
+ * 
+ * These helper function allow converting from/to normal/escaped node references.
+ */
+Alfresco.util.noderefs = {};
+
+/** Escapes a node reference to be usable as element id.
+ * @return a nodeReference where :// has been replaced by _
+ */
+Alfresco.util.noderefs.escape = function(nodeRef)
+{
+   return nodeRef.replace(/\:\/\//, "_").replace(/\//, "_");
+}
+
+     
+Alfresco.util.noderefs.unescape = function(escapedNodeRef)
+{
+   return escapedNodeRef.replace(/_/, "://").replace(/_/, "/");
+}
+     
+Alfresco.util.noderefs.escapedToUrl = function(escapedNodeRef)
+{
+   return escapedNodeRef.replace(/_/g, "/");
+}
+
+
+
 Alfresco.util.dom = {};
 
 /**
@@ -46,6 +75,13 @@ Alfresco.util.dom.hideDiv = function(divId)
    var elem = YAHOO.util.Dom.get(divId);
    YAHOO.util.Dom.addClass(elem, "hidden");          
 };
+
+Alfresco.util.dom.hideAndRemoveDivContent = function(divId)
+{
+   var elem = YAHOO.util.Dom.get(divId);
+   YAHOO.util.Dom.addClass(elem, "hidden");
+   elem.innerHTML = "";
+},
 
 
 Alfresco.util.editor = {};
@@ -132,6 +168,7 @@ Alfresco.util.discussions.loadForumPostViewPage = function(site, container, path
                      "?container=" + container + 
                      "&path=" + path +
                      "&topicId=" + postId;
+                     
 }
 
 /**
@@ -149,11 +186,20 @@ Alfresco.util.discussions.loadForumPostEditPage = function(site, container, path
 /**
  * Redirects to the forum listing page
  */
-Alfresco.util.discussions.loadForumPostListPage = function(site, container, path)
+Alfresco.util.discussions.loadForumPostListPage = function(site, container, path, filter, tag)
 {
-   window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/discussions-topiclist" +
+   var url =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/discussions-topiclist" +
                       "?container=" + container +
                       "&path=" + path;
+   if (filter != null)
+   {
+      url += "&filter=" + filter;
+   }
+   if (tag != null)
+   {
+      url += "&tag=" + tag;
+   }
+   window.location = url;           
 };
 
 /**

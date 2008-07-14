@@ -8,7 +8,7 @@ function main()
    var container = "discussions";
    var path = "";
    var filter = args["filter"];
-   var tag = "";
+   var tag = args["tag"];
    var paginationData = fetchPaginationDataFromRequest(0, 10);
    
    // fetch the data

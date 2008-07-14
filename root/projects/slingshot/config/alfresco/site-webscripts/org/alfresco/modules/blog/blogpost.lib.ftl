@@ -79,17 +79,6 @@
 
 
 <#--
-  Returns a comma-separated string of the elements in the passed array-
-  @param elems an array with the elements to concat
-  @return a comma separated string of the elements in the array
--->
-<#function concatArray elems>
-  <#assign res><#list elems as x>${x}<#if x_has_next>, </#if></#list></#assign>
-  <#return res>
-</#function>
-
-
-<#--
   Renders a form to edit a post.
   
   @param form-id The form id to use

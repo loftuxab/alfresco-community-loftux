@@ -7,12 +7,12 @@
 (function()
 {
    /**
-    * Topic constructor.
-    * 
-    * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.TopicView} The new Topic instance
-    * @constructor
-    */
+   * Topic constructor.
+   * 
+   * @param {String} htmlId The HTML id of the parent element
+   * @return {Alfresco.TopicView} The new Topic instance
+   * @constructor
+   */
    Alfresco.DiscussionsTopic = function(htmlId)
    {
       this.name = "Alfresco.DiscussionsTopic";
@@ -23,7 +23,7 @@
 
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["datasource", "json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
-      
+     
       return this;
    }
    
@@ -44,23 +44,23 @@
           * @type string
           */
          siteId: "",
-         
+       
          containerId: "discussions",
-         
+       
          path: "",
-         
+       
          topicId: "",
-         
+       
          topicRef: "",
-         
+       
          /**
           * define which mode is currently used - could this be a 
           * create, view or edit
           */
          mode: ""
       },
-      
-      
+     
+     
       /**
        * Set multiple initialization options at once.
        *
@@ -72,13 +72,13 @@
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
       },
-      
+     
       setMessages: function DiscussionsTopic_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
       },
-      
+     
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -110,20 +110,16 @@
          {
             this._registerTopicForm();
          }
-         
-         
-         // only initialize action hooks and roll-over if we have a topic
-         // otherwise it's just a create form
-         //if (this.options.topicId.length > 0)
-         //{
-            Alfresco.util.registerDefaultActionHandler(this.id, 'topic-action-link', 'div', this);
-             
-            // initialize the mouse over listener
-            Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onTopicElementMouseEntered, this.onTopicElementMouseExited);
-         
-            // as the list got already rendered on the server, already attach the listener to the rendered elements
-            Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');             
-         //}
+       
+         // default action handler
+         Alfresco.util.registerDefaultActionHandler(this.id, 'topic-action-link', 'div', this);
+         Alfresco.util.registerDefaultActionHandler(this.id, 'tag-link-span', 'span', this);
+          
+         // initialize the mouse over listener
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onTopicElementMouseEntered, this.onTopicElementMouseExited);
+       
+         // as the list got already rendered on the server, already attach the listener to the rendered elements
+         Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');          
       },
 
 
@@ -132,32 +128,33 @@
       /**
        * Called when the add reply button is clicked
        */
-      onAddReply: function DiscussionsTopic_onEdit(htmlId, ownerId, param)
+      onAddReply: function DiscussionsTopic_onAddNode(htmlId, ownerId, param)
       {
          YAHOO.Bubbling.fire('onAddReplyToPost', {parentPostRef : this.options.topicRef});
       },
-      
+     
       /**
        * Loads the edit topic form and displays it instead of the content
        * The div class should have the same name as the above function (onEditNode)
        */
-      onEditNode: function DiscussionsTopic_onEdit(htmlId, ownerId, param)
+      onEditNode: function DiscussionsTopic_onEditNode(htmlId, ownerId, param)
       {
          this._loadForm();
       },
-      
+     
       /**
        * Deletes a topic.
        * The div class which contain the Delete link should have the same name as the above function (onEditNode)
        */
-      onDeleteNode: function DiscussionsTopic_onDeletee(htmlId, ownerId, param)
+      onDeleteNode: function DiscussionsTopic_onDeleteNode(htmlId, ownerId, param)
       {
          // make an ajax request to delete the topic
          // we can directly go to alfresco for this
+         var url = Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
+                  this.options.containerId, this.options.path, param);
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
-                    this.options.containerId, this.options.path, param),
+            url: url,
             method: "DELETE",
             responseContentType : "application/json",
             successCallback:
@@ -168,6 +165,14 @@
             failureMessage: this._msg("topic.msg.failedDelete")
          });
       },
+      
+      onTagSelection: function DiscussionsTopic_onTagSelection(htmlId, ownerId, param)
+      {
+         // redirect to list page, but request the given tag
+         Alfresco.util.discussions.loadForumPostListPage(this.options.siteId, this.options.containerId, this.options.path, null, param);
+      },
+      
+      // Action functionality
 
       _onDeleted: function DiscussionsTopic__onDeleted(response)
       {
@@ -197,7 +202,6 @@
                htmlId : this.id,
                topicId : this.options.topicId
             },
-            //responseContentType : "application/json",
             successCallback:
             {
                fn: this._onFormLoaded,
@@ -211,35 +215,27 @@
       _onFormLoaded: function(response, object)
       {
          // ignore the loaded statement if the mode is already edit
-         if (this.options.mode == "view")
-         {
-            // check whether we actually got an error back
-            /*if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.failedLoad2") + response.json.error});   
-               return;
-            }*/
-        
-            // update the mode
-            this.options.mode = "edit";
-           
-            // hide the view element
-            Alfresco.util.dom.hideDiv(this.id + "-viewDiv");
-           
-            // insert the new html into the document and then load the javascript
-            var html = response.serverResponse.responseText;
-            var javascript = Alfresco.util.ajaxtools.extractScripts(html);
-            html = Alfresco.util.ajaxtools.removeScripts(response.serverResponse.responseText);
-            Alfresco.util.dom.updateAndShowDiv(this.id + "-formDiv", html);
-            Alfresco.util.ajaxtools.loadJSCode(javascript);
-            
-            // register the form handling
-            this._registerTopicForm();
-         }
-         else
+         if (this.options.mode != "view")
          {
             Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unknownMode")});
+            return;
          }
+      
+         // update the mode
+         this.options.mode = "edit";
+         
+         // hide the view element
+         Alfresco.util.dom.hideDiv(this.id + "-viewDiv");
+         
+         // insert the new html into the document and then load the javascript
+         var html = response.serverResponse.responseText;
+         var javascript = Alfresco.util.ajaxtools.extractScripts(html);
+         html = Alfresco.util.ajaxtools.removeScripts(response.serverResponse.responseText);
+         Alfresco.util.dom.updateAndShowDiv(this.id + "-formDiv", html);
+         Alfresco.util.ajaxtools.loadJSCode(javascript);
+         
+         // register the form handling
+         this._registerTopicForm();
       },
 
       /**
@@ -250,14 +246,14 @@
       {
          // register the tag listener
          this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id+"-form", "tags");
-          
+        
          // register the okButton
          var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
-         
+       
          // register the cancel button
          var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
-         
+       
          // instantiate the simple editor we use for the form
          this.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
             height: '300px',
@@ -267,7 +263,7 @@
             toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
          this.editor.render();
-         
+       
          // create the form that does the validation/submit
          var topicForm = new Alfresco.forms.Form(this.id + "-form");
          topicForm.setShowSubmitStateDynamically(true, false);
@@ -299,54 +295,53 @@
          }
          topicForm.init();
       },
-      
+     
       onFormSubmitSuccess: function DiscussionsTopic_onFormSubmitSuccess(response)
       {
          // check whether we got an error
          if (response.json.error != undefined)
          {
             Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.error") + response.json.error});
+            return;
          }
-         else
+
+         // check whether we are in create or edit mode. In case of create we will redirect
+         // to the view page
+         if (this.options.mode == "create")
          {
-            // check whether we are in create or edit mode. In case of create we will redirect
-            // to the view page
-            if (this.options.mode == "create")
-            {
-               Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, response.json.topicId);
-            }
-            else if (this.options.mode == "edit")
-            {
-               // hide the form
-               Alfresco.util.dom.hideDiv(this.id + "-formDiv");
-             
-               // update the viewDiv
-               Alfresco.util.dom.updateAndShowDiv(this.id + "-viewDiv", response.json.topic);
-                
-               // set the mode back to view
-               this.options.mode = "view";
-                
-               // reinit the mouse over listener
-               Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
-            }
+            Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, response.json.topicId);
+         }
+         else if (this.options.mode == "edit")
+         {
+            // hide the form
+            Alfresco.util.dom.hideDiv(this.id + "-formDiv");
+          
+            // update the viewDiv
+            Alfresco.util.dom.updateAndShowDiv(this.id + "-viewDiv", response.json.topic);
+            
+            // set the mode back to view
+            this.options.mode = "view";
+            
+            // reinit the mouse over listener
+            Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
          }
       },
-      
+     
       onFormSubmitFailure: function DiscussionsTopic_onFormSubmitFailure(response)
       {
          Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.failedSubmit")});
       },
-      
+     
       onFormCancelButtonClick: function(type, args)
       {
          if (this.options.mode == "edit")
          {
             // hide the form and show the view div
             Alfresco.util.dom.hideDiv(this.id + "-formDiv");
-         
+       
             // show the view
             Alfresco.util.dom.showDiv(this.id + "-viewDiv");
-            
+         
             this.options.mode = "view";
          }
          else
@@ -354,7 +349,7 @@
             history.go(-1);
          }
       },
-      
+     
       /**
        * Called when the mouse enters into the topic div
        */
@@ -365,7 +360,7 @@
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
          YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
-      
+     
       /**
        * Called whenever the mouse exits the topic div
        */

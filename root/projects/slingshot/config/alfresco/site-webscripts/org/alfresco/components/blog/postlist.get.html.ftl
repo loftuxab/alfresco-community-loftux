@@ -15,7 +15,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.ConfigBlog("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!""}"
+      siteId: "${page.url.templateArgs.site!""}",
+      containerId: "blog",
    }).setMessages(
       ${messages}
    );;
@@ -35,7 +36,7 @@
 		</span>
 		
 		<span class="configLink">
-		   <a id="${args.htmlid}-config-blog-button" href="#">
+		   <a id="${args.htmlid}-config-blog-link" href="#">
 	          ${msg("header.configureBlog")}
 	       </a>
 		</span>

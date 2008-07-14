@@ -90,8 +90,15 @@
          var okButton = new YAHOO.widget.Button(this.id + "-createcomment-ok-button", {type: "submit"});
          
          // instantiate the simple editor we use for the form
-         this.editor = this.createSimpleEditor(this.id + '-createcomment-content');
-		 this.editor.render();
+         // instantiate the simple editor we use for the form
+         this.editor = new YAHOO.widget.SimpleEditor(this.id + '-createcomment-content', {
+            height: '250px',
+            width: '538px',
+            dompath: false, //Turns on the bar at the bottom
+            animate: false, //Animates the opening, closing and moving of Editor windows
+            toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
+         });
+         this.editor.render();
          
          // create the form that does the validation/submit
          var commentForm = new Alfresco.forms.Form(this.id + "-createcomment-form");
@@ -111,76 +118,26 @@
             }
          });
          commentForm.setSubmitAsJSON(true);
-          
          commentForm.doBeforeFormSubmit =
          {
-       	   fn: function(form, obj)
-       	   {
-		        //Put the HTML back into the text area
-				this.editor.saveHTML();
-       	   },
-       	   scope: this
+            fn: function(form, obj)
+            {
+               //Put the HTML back into the text area
+               this.editor.saveHTML();
+            },
+            scope: this
          }
          
          commentForm.init();
-      },
-      
-      /**
-       * Creates a SimpleEditor for the specified id.
-       * 
-       * Note: You still need to call return_val.render() to actually render the editor
-       * 
-       * PENDING: this should be generalized!
-       * 
-       * @return the editor object.
-       */
-      createSimpleEditor: function CreateComment_createSimpleEditor(textareaId)
-      {
-         // instantiate the simple editor we use for the form
-		 var editor = new YAHOO.widget.SimpleEditor(textareaId, {
-		     height: '250px',
-		     width: '538px',
-		     dompath: false, //Turns on the bar at the bottom
-		     animate: false, //Animates the opening, closing and moving of Editor windows
-		     toolbar: {
-		        titlebar: false,
-		        buttons: [
-		            { group: 'textstyle', label: this._msg("comments.form.font"),
-		                buttons: [
-				            { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
-				            { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
-				            { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
-		                    { type: 'separator' },
-		                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-		                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
-		                ]
-		            },
-		            { type: 'separator' },
-				    { group: 'indentlist', label: this._msg("comments.form.lists"),
-				        buttons: [
-				            { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
-				            { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
-				        ]
-				    },
-				    { type: 'separator' },
-				    { group: 'insertitem', label: this._msg("comments.form.link"),
-				        buttons: [
-				            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
-				        ]
-				    }
-		        ]
-		    }
-		 });
-		 return editor;
-      },      
+      },     
       
       /**
        * Called when the form has been successfully submitted.
        */
       onCreateFormSubmitSuccess: function CreateComment_onCreateFormSubmitSuccess(response, object)
       {
-          Alfresco.util.PopupManager.displayMessage({text: "Form submit successful"});
-          location.reload(true);
+         Alfresco.util.PopupManager.displayMessage({text: "Form submit successful"});
+         location.reload(true);
       },
       
       /** Called when the form submit failed. */
@@ -201,6 +158,5 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.CreateComment", Array.prototype.slice.call(arguments).slice(1));
       }
-      
    };
 })();

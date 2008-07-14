@@ -1,9 +1,9 @@
 <#--
    Renders the tag input fields for the form
 
-    @param htmlid (String) the id to use
-    @param tags (array) an array of tags
-    @param tagInputName the name to use for the input field
+   @param htmlid (String) the id to use
+   @param tags (array) an array of tags
+   @param tagInputName the name to use for the input field
 -->
 <#macro renderTagInputs htmlid tags tagInputName>
    <#list tags as tag>
@@ -41,7 +41,7 @@
    }).setMessages(
       ${messages}
    ).setCurrentTags(
-     <@toJSONArray tags />
+      <@toJSONArray tags />
    );
 //]]></script>
 

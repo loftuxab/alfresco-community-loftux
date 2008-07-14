@@ -42,7 +42,12 @@ function getTopicsRequestUrlWithParams(site, container, path, filter, tag, pagin
             url += "/myposts";
         }
     }
-    
+
+    if (tag != null && tag.length > 0)
+    {
+        url = addParamToUrl(url, "tag", tag);
+    }
+        
     // add the contentFormat
     url = addParamToUrl(url, "contentFormat", "textDigest");
 
