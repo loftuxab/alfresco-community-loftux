@@ -113,7 +113,7 @@
       <!-- Render the tag inputs -->
       <@taglibraryLib.renderTagInputs htmlid=htmlid tags=tags tagInputName="tags" />
       <!-- Render the library component -->
-      <@taglibraryLib.renderTagLibrary htmlid=htmlid tags=tags />
+      <@taglibraryLib.renderTagLibrary htmlid=htmlid site=site tags=tags />
       <!-- end tags -->
 
       <div class="nodeFormAction">

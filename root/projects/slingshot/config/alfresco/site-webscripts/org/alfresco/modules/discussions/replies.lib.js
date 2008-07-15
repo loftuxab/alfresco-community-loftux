@@ -41,9 +41,12 @@ function fetchAndAssignReplies(nodeRef, content)
     applyDataToModel(data);
 }
 
-function createAndAssignReply(parentNodeRef, content)
+function createAndAssignReply(site, container, path, parentNodeRef, content)
 {
     var params = {
+        site : site,
+        container : container,
+        path : path,
         content : content
     };
     var paramsJSON = jsonUtils.toJSONString(params);

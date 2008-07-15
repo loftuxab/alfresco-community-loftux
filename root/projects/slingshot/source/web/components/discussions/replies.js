@@ -45,6 +45,10 @@
           */
          siteId: "",
          
+         containerId: "discussions",
+         
+         path: "",
+         
          /**
           * Stores the reference of the topic for which this replies component
           * displays replies.
@@ -207,6 +211,9 @@
             dataObj:
             {
                htmlid : this.id,
+               site: this.options.siteId,
+               container: this.options.containerId,
+               path: this.options.path,
                postRef : Alfresco.util.noderefs.unescape(postRef),
                isEdit : isEditReply
             },

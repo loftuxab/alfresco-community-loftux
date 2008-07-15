@@ -30,6 +30,9 @@ function main()
         return;
     }
     model.replies = repliesdata.items;
+    model.site = site;
+    model.container = container;
+    model.path = path;
 }
 
 main();

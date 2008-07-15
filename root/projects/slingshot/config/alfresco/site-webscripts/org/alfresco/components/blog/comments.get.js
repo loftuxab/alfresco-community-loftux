@@ -10,7 +10,7 @@ function main()
    var postId = getPageUrlParam("postId", null);
    
    // check whether we already loaded the item, load it otherwise
-   var item = context.properties["blog-post-item"];
+   var item = undefined; //context.properties["blog-post-item"];
    if (item == undefined)
    {
       var data = fetchPost(site, container, postId);

@@ -86,10 +86,12 @@
                Can be empty in which case the form will contain no data.
 -->
 <#macro blogpostFormHTML htmlId post="">
+<#assign editForm = post?has_content>
+<#assign isDraft = (! post?has_content) || (post.isDraft)>
+<#assign isPublished = post?has_content && post.isPublished>
+
+<h1><#if editForm>${msg("post.form.title.updatepost")}<#else>${msg("post.form.title.createpost")}</#if></h1>
 <div class="editNodeForm">
-   <#assign editForm = post?has_content>
-   <#assign isDraft = (! post?has_content) || (post.isDraft)>
-   <#assign isPublished = post?has_content && post.isPublished>
    <form id="${htmlId}-form" name="${htmlId}-form" method="POST"
       <#if editForm>
          action="${page.url.context}/proxy/alfresco/blog/post/site/${site}/${container}/${post.name}" 
@@ -122,7 +124,7 @@
       <!-- Render the tag inputs -->
       <@taglibraryLib.renderTagInputs htmlid=htmlId tags=tags tagInputName="tags" />
       <!-- Render the library component -->
-      <@taglibraryLib.renderTagLibrary htmlid=htmlId tags=tags />
+      <@taglibraryLib.renderTagLibrary htmlid=htmlId site=site tags=tags />
       <!-- end tags -->
       
       <div class="nodeFormAction">
