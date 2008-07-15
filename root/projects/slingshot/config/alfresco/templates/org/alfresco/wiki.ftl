@@ -11,6 +11,7 @@
 	<div class="yui-gf">
 		<div class="yui-u first">
 		    <@region id="filter" scope="template" protected=true />
+		    <@region id="tags" scope="template" protected=true />   
    	</div>
 		<div class="yui-u">
 		    <@region id="toolbar" scope="template" protected=true />

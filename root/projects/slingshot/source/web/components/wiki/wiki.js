@@ -70,14 +70,15 @@
 		init: function()
 		{
 			this.tabs = new YAHOO.widget.TabView(this.id + "-wikipage");
-			 
-			// Initialise the editor
-			this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', { 
-				height: '300px', 
-				width: '522px', 
-				dompath: true 
-			}); 
-			this.pageEditor.render();
+			
+			this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
+   		     height: '300px',
+   		     width: '538px',
+   		     dompath: false, //Turns on the bar at the bottom
+   		     animate: false //Animates the opening, closing and moving of Editor windows
+   		 });
+
+   		this.pageEditor.render();
 			
 			var saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveSelect,
 	        {
@@ -148,7 +149,7 @@
 		 */
 		_getAbsolutePath: function()
 		{
-			return Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki?title=";	
+			return Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=";	
 		},
 		
 		/*
