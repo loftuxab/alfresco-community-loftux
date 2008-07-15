@@ -299,7 +299,7 @@ public class DispatcherServlet extends BaseServlet
                                 }
                                 // construct redirection url
                                 String redirectUrl = request.getRequestURI() + 
-                                    (request.getQueryString() != null ? request.getQueryString() : "");
+                                    (request.getQueryString() != null ? ("?" + request.getQueryString()) : "");
                                 
                                 // set redirect url for use on login page template
                                 context.setValue(ALF_REDIRECT_URL, redirectUrl);
