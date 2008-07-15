@@ -64,3 +64,17 @@
 {
    padding-left: 40px;
 }
+
+/* 3 column layout styling */
+
+.yui-gb.grid .column1,
+.yui-gb.grid .column3
+{
+   width:24%;
+}
+
+.yui-gb.grid .column2
+{
+   width:48%;
+}
+

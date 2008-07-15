@@ -121,8 +121,7 @@ hr
 
 .yui-skin-default .yui-panel
 {
-   border-bottom-color: #C4C5C5;
-   border-top-color: #C4C5C5;
+   border-bottom:medium none;
 }
 
 .yui-skin-default .mask
@@ -186,6 +185,74 @@ hr
 {
    width: 60%;
 }
+
+/* Style the default message  */
+
+.yui-skin-default #message
+{
+   border: medium none;
+}
+
+.yui-skin-default #message .bd
+{
+   background-color:black;
+   color:white;
+   font-weight:bold;
+   opacity:0.65;
+   padding:2em;
+}
+
+/* Style the default prompt */
+
+.yui-skin-default #prompt
+{
+   border-top: 1px solid #C4C5C5;
+   border-bottom: 1px solid #C4C5C5;
+   background-color: #E3EBEC;
+}
+
+.yui-skin-default #prompt_mask
+{
+   opacity: 0;
+}
+
+.yui-skin-default #prompt .hd
+{
+   border-bottom:medium none;
+
+}
+
+/*
+IE SPECIFIC
+.yui-skin-default #prompt .hd,
+.yui-skin-default #prompt .bd,
+.yui-skin-default #prompt .fd
+{
+   border:medium none;
+}
+*/
+
+.yui-skin-default #prompt .bd
+{
+   padding:1em;
+   background-color:#E3EBEC;
+}
+
+.yui-skin-default #prompt .ft .button-group
+{
+   display:block;
+   padding-top:0.5em;
+   text-align:center;
+}
+
+.yui-skin-default #prompt .ft
+{
+   border-left: 1px solid #C4C5C5;
+   border-right: 1px solid #C4C5C5;
+   background-color:#E3EBEC;
+}
+
+
 
 /* Page title and navigation styles */
 
