@@ -21,15 +21,19 @@
 <div id="${args.htmlid}-body" class="doclist">
    <div id="${args.htmlid}-doclistBar" class="yui-g doclist-bar">
       <div class="yui-u first">
-         <div class="inline">
+         <div class="inline file-select">
             <button id="${args.htmlid}-fileSelect-button" name="doclist-fileSelect-button">${msg("menu.select")}</button>
-            <select id="${args.htmlid}-fileSelect-menu" name="doclist-fileSelect-menu">
-                <option value="all">${msg("menu.select.all")}</option>
-                <option value="none">${msg("menu.select.none")}</option>
-                <option value="invert">${msg("menu.select.invert")}</option>
-                <option value="folders">${msg("menu.select.folders")}</option>
-                <option value="documents">${msg("menu.select.documents")}</option>
-            </select>
+            <div id="${args.htmlid}-fileSelect-menu" class="yuimenu">
+               <div class="bd">
+                  <ul>
+                     <li><span><span class="selectDocuments">${msg("menu.select.documents")}</span></span></li>
+                     <li><span><span class="selectFolders">${msg("menu.select.folders")}</span></span></li>
+                     <li><span><span class="selectAll">${msg("menu.select.all")}</span></span></li>
+                     <li><span><span class="selectInvert">${msg("menu.select.invert")}</span></span></li>
+                     <li><span><span class="selectNone">${msg("menu.select.none")}</span></span></li>
+                  </ul>
+               </div>
+            </div>
          </div>
       </div>
       <div class="yui-u align-right">

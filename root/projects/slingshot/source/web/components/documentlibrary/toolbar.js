@@ -59,7 +59,6 @@
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
-      YAHOO.Bubbling.on("fileSelected", this.onFileSelected, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    
@@ -220,6 +219,9 @@
 
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
+         
+         // Reference to Document List component
+         this.modules.docList = Alfresco.util.ComponentManager.findFirst("Alfresco.DocumentList");
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -334,6 +336,12 @@
          Event.preventDefault(e);
       },
       
+      /**
+       * File Upload complete event handler
+       *
+       * @method onFileUploadComplete
+       * @param complete {object} Object literal containing details of successful and failed uploads
+       */
       onFileUploadComplete: function DLTB_onFileUploadComplete(complete)
       {
          var config =
@@ -400,9 +408,41 @@
         */
       onSelectedItems: function DLTB_onSelectedItems(sType, aArgs, p_obj)
       {
-         var domEvent = aArgs[0]
+         var domEvent = aArgs[0];
          var eventTarget = aArgs[1];
+         
+         // Get the function related to the clicked item
+         var fn = Alfresco.util.findEventClass(eventTarget);
+         if (fn && (typeof this[fn] == "function"))
+         {
+            this[fn].call(this);
+         }
+         Event.preventDefault(domEvent);
       },
+      
+      onActionCopyTo: function DLTB_onActionCopyTo()
+      {
+         var files = this.modules.docList.getSelectedFiles();
+         alert("Would perform copyTo on " + files.length + " files.");
+      },
+
+      onActionMoveTo: function DLTB_onActionMoveTo()
+      {
+         var files = this.modules.docList.getSelectedFiles();
+         alert("Would perform moveTo on " + files.length + " files.");
+      },
+
+      onActionDelete: function DLTB_onActionDelete()
+      {
+         var files = this.modules.docList.getSelectedFiles();
+         alert("Would perform delete on " + files.length + " files.");
+      },
+
+      onActionDeselectAll: function DLTB_onActionDeselectAll()
+      {
+         this.modules.docList.selectFiles("selectNone");
+      },
+
 
       /**
        * Folder Up Navigate button click handler
@@ -447,22 +487,6 @@
       },
 
       /**
-       * File(s) Selected event handler
-       *
-       * @method onFileSelected
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onFileSelected: function DLTB_onFileSelected(layer, args)
-      {
-         var obj = args[1];
-         if (obj !== null)
-         {
-            // TODO: Files Selected
-         }
-      },
-      
-      /**
        * Filter Changed event handler
        *
        * @method onFilterChanged
@@ -479,19 +503,18 @@
                this.currentFilter = obj;
                var owner = obj.filterOwner.split(".")[1];
                // Obtain array of DIVs we might want to hide
-               var divs = YAHOO.util.Selector.query('div', Dom.get(this.id + "-headerBar"));
-               divs = divs.concat(YAHOO.util.Selector.query('div', Dom.get(this.id + "-navBar")));
+               var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id + "-body"));
                var div;
                for (var i = 0, j = divs.length; i < j; i++)
                {
                   div = divs[i];
                   if (Dom.hasClass(div, owner))
                   {
-                     Dom.removeClass(div, "hidden");
+                     Dom.removeClass(div, "toolbar-hidden");
                   }
                   else
                   {
-                     Dom.addClass(div, "hidden");
+                     Dom.addClass(div, "toolbar-hidden");
                   }
                }
                

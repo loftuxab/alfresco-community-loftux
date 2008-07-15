@@ -17,11 +17,16 @@
    padding: 0.5em;
 }
 
-.toolbar .header-bar div,
-.toolbar .nav-bar div
+.toolbar div.hideable
 {
    float: left;
 }
+
+.toolbar .toolbar-hidden
+{
+   display: none;
+}
+
 
 /* Header Bar */
 
@@ -31,10 +36,37 @@
    border-bottom: 2px solid #f0f3f4;
 }
 
-.toolbar .hidden
+.toolbar .selected-items .yuimenuitemlabel span
 {
-   display: none;
+   background-position: 2px 50%;
+   background-repeat: no-repeat;
+   cursor: pointer;
+   display: block;
+   margin-left: -4px;
+   min-height: 16px;
+   padding: 2px 0px 1px 20px;
 }
+
+.toolbar .onActionCopyTo
+{
+   background-image: url(images/copy-to.gif);
+}
+
+.toolbar .onActionMoveTo
+{
+   background-image: url(images/move-to.gif);
+}
+
+.toolbar .onActionDelete
+{
+   background-image: url(images/delete.gif);
+}
+
+.toolbar .onActionDeselectAll
+{
+   background-image: url(images/select-none.gif);
+}
+
 
 /* Navigation Bar */
 

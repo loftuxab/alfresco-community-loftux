@@ -252,6 +252,35 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
 }
 
 /**
+ * Find an event target's class name, ignoring YUI classes.
+ *
+ * @method Alfresco.util.findEventClass
+ * @param p_eventTarget {object} Event target from Event class
+ * @param p_tagName {string} Optional tag if 'span' needs to be overridden
+ * @return {string|null} Class name or null
+ * @static
+ */
+Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
+{
+   var src = p_eventTarget.element;
+   var tagName = (p_tagName || "span").toLowerCase();
+
+   // Walk down until specified tag found and not a yui class
+   while ((src !== null) && ((src.tagName.toLowerCase() != tagName) || (src.className.indexOf("yui") == 0)))
+   {
+      src = src.firstChild;
+   }
+
+   // Found the target element?
+   if (src === null)
+   {
+      return null;
+   }
+
+   return src.className;
+}
+
+/**
  * Add a component's messages to the central message store.
  *
  * @method Alfresco.util.addMessages
