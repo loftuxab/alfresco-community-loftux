@@ -54,12 +54,6 @@
 		        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_space.xml</prop>
 		      	</props>     
 		      	
-		      	<props>
-        			<prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
-        			<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_data_dictionary.xml</prop>
-      			</props>    	        	
-		      	
-	    	</list>
 	    </property>
 	</bean>
 	
