@@ -677,7 +677,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      }
                      formData[name].push(value);
                   }
-                  else
+                  else if (!(element.type === "checkbox" && !element.checked))
                   {
                      formData[name] = value;
                   }
