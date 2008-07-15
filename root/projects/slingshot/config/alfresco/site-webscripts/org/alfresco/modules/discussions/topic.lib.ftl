@@ -42,9 +42,13 @@
          <span class="spacer"> | </span>
          <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><a href=""> ${topic.author}</a></span>      
          <br />
-         <span class="nodeAttrLabel">${msg("topic.info.lastReplyBy")}:</span> <span class="nodeAttrValue">${topic.lastReplyBy!""}</span>
-         <span class="spacer"> | </span>
-         <span class="nodeAttrLabel">${msg("topic.info.lastReplyOn")}:</span> <span class="nodeAttrValue"><#if topic.lastReplyOn??>${topic.lastReplyOn?datetime?string.medium_short}</#if></span>
+         <#if (topic.totalReplyCount > 0)>
+            <span class="nodeAttrLabel">${msg("topic.info.lastReplyBy")}:</span> <span class="nodeAttrValue">${topic.lastReplyBy!""}</span>
+            <span class="spacer"> | </span>
+            <span class="nodeAttrLabel">${msg("topic.info.lastReplyOn")}:</span> <span class="nodeAttrValue"><#if topic.lastReplyOn??>${topic.lastReplyOn?datetime?string.medium_short}</#if></span>
+         <#else>
+            <span class="nodeAttrLabel">${msg("topic.footer.replies")}:</span> <span class="nodeAttrValue">${msg("topic.info.noReplies")}</span>
+         </#if>
       </div>
       
       <div class="userLink"><a href="">${topic.author}</a> ${msg("topic.said")}:</div>

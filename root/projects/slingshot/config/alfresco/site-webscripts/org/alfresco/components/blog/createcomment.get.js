@@ -3,6 +3,8 @@
 
 function main()
 {
+   model.showComponent = false;
+      
    // gather all required data
    var site = page.url.templateArgs.site;
    var container = getTemplateParam("container", "blog");
@@ -21,10 +23,17 @@ function main()
       context.properties["blog-post-item"] = data.item;
       item = data.item;
    }
+   
+   // don't show the component if this is a draft post
+   if (item.isDraft)
+   {
+      return;
+   }
     
    // the nodeRef is all that the component actually needs.
    // Could therefore be generalized
    model.nodeRef = item.nodeRef;
+   model.showComponent = true;
 }
 
 main();

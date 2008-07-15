@@ -49,8 +49,10 @@
          <@blogpostlistLib.renderPostStatus post=post/>
       </div>
       <div class="published">
-         <span class="nodeAttrLabel">${msg("post.info.publishedOn")}:</span> <span class="nodeAttrValue">${post.modifiedOn?datetime?string.medium_short}</span>
-         <span class="spacer"> | </span>
+         <#if (! post.isDraft)>
+            <span class="nodeAttrLabel">${msg("post.info.publishedOn")}:</span> <span class="nodeAttrValue">${post.releasedOn?datetime?string.medium_short}</span>
+            <span class="spacer"> | </span>
+         </#if>
          <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><a href=""> ${post.author}</a></span>
       </div>
       
@@ -59,13 +61,17 @@
    <br clear="all" />
    
    <div class="nodeFooter">
-      <span class="nodeFooterBloc">
-         <span class="nodeAttrLabel replyTo">${msg("post.footer.comments")}:</span><span class="nodeAttrValue"> (${post.commentCount})</span>
-      </span> 
+      <#if (! post.isDraft)>
+         <span class="nodeFooterBloc">
+            <span class="nodeAttrLabel replyTo">${msg("post.footer.comments")}:</span><span class="nodeAttrValue"> (${post.commentCount})</span>
+         </span>
+      </#if>
+      
+      <#if ((post.tags?size > 0) && (! post.isDraft))>
+      <span class="spacer"> | </span>
+      </#if>
       
       <#if (post.tags?size > 0)>
-      <span class="spacer"> | </span>
-      
          <span class="nodeFooterBloc">
             <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
             <#list post.tags as tag>

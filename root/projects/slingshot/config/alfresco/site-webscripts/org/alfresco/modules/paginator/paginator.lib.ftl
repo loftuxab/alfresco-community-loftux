@@ -36,7 +36,7 @@
 	Paginator renderer for the forum
 --> 
 <#macro renderPaginatorContent htmlid pdata>
-    ${msg("paginator.totaltopics", pdata.total)}
+    ${msg("paginator.totalitems", pdata.total)}
 	|
 	${msg("paginator.showingpageof", pdata.currPage, pdata.numPages)}
 	|

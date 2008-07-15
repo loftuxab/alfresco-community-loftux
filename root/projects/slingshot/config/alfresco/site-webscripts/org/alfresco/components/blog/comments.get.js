@@ -3,6 +3,8 @@
 
 function main()
 {
+   model.showComponent = false;
+   
    // gather all required data
    var site = page.url.templateArgs.site;
    var container = getTemplateParam("container", "blog");
@@ -10,7 +12,7 @@ function main()
    var postId = getPageUrlParam("postId", null);
    
    // check whether we already loaded the item, load it otherwise
-   var item = undefined; //context.properties["blog-post-item"];
+   var item = context.properties["blog-post-item"];
    if (item == undefined)
    {
       var data = fetchPost(site, container, postId);
@@ -22,7 +24,13 @@ function main()
       item = data.item;
    }
    model.post = item;
-    
+   
+   // don't allow adding comments to a draft post
+   if (model.post.isDraft)
+   {
+      return;
+   }
+   
    // fetch the replies
    var commentsdata = fetchComments(item.nodeRef);
    if (status.getCode() != status.STATUS_OK)
@@ -30,6 +38,7 @@ function main()
       return;
    }
    model.comments = commentsdata.items;
+   model.showComponent = true;
 }
 
 main();

@@ -6,7 +6,7 @@ function convertTopicJSONData(topic)
     topic["createdOn"] = created;
     
     // modified
-    if(topic["modifiedOn"] != undefined)
+    /*if(topic["modifiedOn"] != undefined)
     {
         var modified = new Date(topic["modifiedOn"]);
         topic["modifiedOn"] = created;
@@ -22,7 +22,7 @@ function convertTopicJSONData(topic)
     else
     {
         topic["isUpdated"] = false;
-    }
+    }*/
     
     // last reply
     if(topic["lastReplyOn"] != undefined)

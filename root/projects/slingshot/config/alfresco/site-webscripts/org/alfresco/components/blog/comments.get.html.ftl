@@ -1,3 +1,4 @@
+<#if showComponent>
 <#import "/org/alfresco/modules/blog/comments.lib.ftl" as commentsLib/>
 <#assign postRef=(post.nodeRef?replace("://", "_"))?replace("/", "_")>
 
@@ -12,3 +13,4 @@
 //]]></script>
 
 <@commentsLib.commentsHTML htmlid=args.htmlid comments=comments/>
+</#if>

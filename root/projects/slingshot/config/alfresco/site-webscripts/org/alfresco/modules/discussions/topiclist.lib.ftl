@@ -81,7 +81,7 @@
             <span class="spacer"> | </span>
             <span class="nodeAttrLabel">${msg("topic.info.lastReplyOn")}:</span> <span class="nodeAttrValue"><#if topic.lastReplyOn??>${topic.lastReplyOn?datetime?string.medium_short}</#if></span>    
          <#else>
-            <span class="nodeAttrValue">${msg("topic.info.noReplies")}</span>
+            <span class="nodeAttrLabel">${msg("topic.footer.replies")}:</span> <span class="nodeAttrValue">${msg("topic.info.noReplies")}</span>
          </#if>
       </div>
       
