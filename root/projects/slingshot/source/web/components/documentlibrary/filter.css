@@ -13,6 +13,15 @@
    background-color: #d2e5f2;
 }
 
+.filter a.disabled,
+.filter a.disabled:active,
+.filter a.disabled:hover,
+.filter a.disabled:visited
+{
+   color: #a6a6a6;
+   cursor: not-allowed;
+}
+
 .filter a:hover
 {
    text-decoration: none;

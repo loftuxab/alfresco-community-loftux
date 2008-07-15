@@ -433,7 +433,7 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
  */
 Alfresco.util.contentURL = function(nodeRef, name, attach)
 {
-   return Alfresco.constants.PROXY_URL + "api/node/content/" + nodeRef.replace(":/", "") + "/" + name + (attach ? "?a=true" : "");
+   return Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRef.replace(":/", "") + "/" + name + (attach ? "?a=true" : "");
 }
 
 /**
@@ -1385,7 +1385,8 @@ Alfresco.util.Anim = function()
        *    callback: null,      // A function that will get called after the fade
        *    scope: this,         // The scope the callback function will get called in
        */
-      fadeAttributes: {
+      fadeAttributes:
+      {
          adjustDisplay: true,
          callback: null,
          scope: this
@@ -1495,6 +1496,95 @@ Alfresco.util.Anim = function()
                // Call custom callback
                fn.call(scope ? scope : this);
             }
+         }
+      },
+      
+      /**
+       * Default attributes for a pulse call.
+       *
+       * @property pulseAttributes
+       * @type {object} An object literal containing:
+       *    callback: {object} Function definition for callback on complete. {fn, scope, obj}
+       *    inColor: {string} Optional colour for the pulse (default is #ffff80)
+       *    outColor: {string} Optional colour to fade back to (default is original element backgroundColor)
+       *    inDuration: {int} Optional time for "in" animation (default 0.2s)
+       *    outDuration: {int} Optional time for "out" animation (default 1.2s)
+       *    clearOnComplete: {boolean} Set to clear the backgroundColor style on pulse complete (default true)
+       */
+      pulseAttributes:
+      {
+         callback: null,
+         inColor: "#ffff80",
+         inDuration: 0.2,
+         outDuration: 1.2,
+         clearOnComplete: true
+      },
+      /**
+       * Pulses the background colo(u)r of an HTMLELement
+       *
+       * @method pulse
+       * @param el {HTMLElement|string} element to fade out
+       * @param attributes {object} Object literal containing optional custom values
+       */
+      pulse: function A_pulse(p_el, p_attributes)
+      {
+         // Shortcut return if animation library not loaded
+         if (!YAHOO.util.ColorAnim)
+         {
+            return;
+         }
+         
+         var el = YAHOO.util.Dom.get(p_el);
+         if (el)
+         {
+            // Set outColor to existing backgroundColor
+            var attr = YAHOO.lang.merge(this.pulseAttributes,
+            {
+               outColor: YAHOO.util.Dom.getStyle(el, "backgroundColor")
+            });
+            if (typeof p_attributes == "object")
+            {
+               attr = YAHOO.lang.merge(attr, p_attributes);
+            }
+
+            // The "in" animation class
+            var animIn = new YAHOO.util.ColorAnim(el,
+            {
+               backgroundColor:
+               {
+                  to: attr.inColor
+               }
+            }, attr.inDuration);
+
+            // The "out" animation class
+            var animOut = new YAHOO.util.ColorAnim(el,
+            {
+               backgroundColor:
+               {
+                  to: attr.outColor
+               }
+            }, attr.outDuration);
+            
+            // onComplete functions
+            animIn.onComplete.subscribe(function A_aI_onComplete()
+            {
+               animOut.animate();
+            });
+            
+            animOut.onComplete.subscribe(function A_aO_onComplete()
+            {
+               if (attr.clearOnComplete)
+               {
+                  YAHOO.util.Dom.setStyle(el, "backgroundColor", "");
+               }
+               if (attr.callback && (typeof attr.callback.fn == "function"))
+               {
+                  attr.callback.fn.call(attr.callback.scope || this, attr.callback.obj);
+               }
+            });
+            
+            // Kick off the pulse animation
+            animIn.animate();
          }
       }
 

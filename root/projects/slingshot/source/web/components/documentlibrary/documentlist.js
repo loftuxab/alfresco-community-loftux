@@ -56,6 +56,16 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
       
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
+      YAHOO.Bubbling.on("doclistRefresh", this.onDoclistRefresh, this);
+      YAHOO.Bubbling.on("highlightFile", this.onHighlightFile, this);
+      YAHOO.Bubbling.on("fileDeleted", this.onDoclistRefresh, this);
+      YAHOO.Bubbling.on("folderCreated", this.onDoclistRefresh, this);
+      YAHOO.Bubbling.on("folderDeleted", this.onDoclistRefresh, this);
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+   
       return this;
    }
    
@@ -125,7 +135,15 @@
           * @type int
           * @default 500
           */
-         actionsPopupTimeout: 500
+         actionsPopupTimeout: 500,
+
+         /**
+          * FileName to highlight on initial DataTable render.
+          * 
+          * @property highlightFile
+          * @type string
+          */
+         highlightFile: null
       },
       
       /**
@@ -269,14 +287,6 @@
          // Reference to self used by inline functions
          var me = this;
          
-         // Decoupled event listeners
-         YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
-         YAHOO.Bubbling.on("doclistRefresh", this.onDoclistRefresh, this);
-         YAHOO.Bubbling.on("fileDeleted", this.onDoclistRefresh, this);
-         YAHOO.Bubbling.on("folderCreated", this.onDoclistRefresh, this);
-         YAHOO.Bubbling.on("folderDeleted", this.onDoclistRefresh, this);
-         YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
-      
          // YUI History
          var bookmarkedPath = YAHOO.util.History.getBookmarkedState("path") || "";
          while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath)));
@@ -564,7 +574,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 50,
+            renderLoopSize: 32,
             initialLoad: false
          });
          
@@ -606,6 +616,34 @@
          { 
             var id = parseInt(e.target.value, 10); 
             this.checked[id] = e.target.checked;
+         }, this, true);
+         
+         // Rendering complete event handler
+         this.widgets.dataTable.subscribe("initEvent", function()
+         {
+            if (this.options.highlightFile)
+            {
+               var recordSet = this.widgets.dataTable.getRecordSet();
+               var recordFound = null;
+               for (var i = 0, j = recordSet.getLength(); i < j; i++)
+               {
+                  if (recordSet.getRecord(i).getData("fileName") == this.options.highlightFile)
+                  {
+                     recordFound = recordSet.getRecord(i);
+                     break;
+                  }
+               }
+               if (recordFound !== null)
+               {
+                  // Found it
+                  this.options.highlightFile = null;
+                  // Scroll the records into view and highlight it
+                  var el = this.widgets.dataTable.getTrEl(recordFound);
+                  var yPos = Dom.getY(el);
+                  window.scrollTo(0, yPos);
+                  Alfresco.util.Anim.pulse(el);
+               }
+            }
          }, this, true);
          
          // Enable row highlighting
@@ -843,7 +881,7 @@
          Dom.removeClass(elMoreActions, "hidden");
          me.showingMoreActions = true;
          
-         // Mouse over handler - clear any registered hide timer
+         // Mouse over handler
          var onMouseOver = function DLSM_onMouseOver(e, obj)
          {
             // Clear any existing hide timer
@@ -854,7 +892,7 @@
             }
          }
          
-         // Mouse out handler - register hide timer
+         // Mouse out handler
          var onMouseOut = function DLSM_onMouseOut(e, obj)
          {
             var elTarget = Event.getTarget(e);
@@ -1202,6 +1240,39 @@
          }
       },
 
+      /**
+       * Highlight file event handler
+       * Used when a component (including the DocList itself on loading) wants to scroll to and hightlight a file
+       *
+       * @method onHighlightFile
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (filename to be highlighted)
+       */
+      onHighlightFile: function DL_onHighlightFile(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.fileName !== null))
+         {
+            var recordSet = this.widgets.dataSource.getrecordSet();
+            //var record = 
+         }
+      },
+
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function DL_onDeactivateAllControls(layer, args)
+      {
+         for (widget in this.widgets)
+         {
+            this.widgets[widget].set("disabled", true);
+         }
+      },
+
    
       /**
        * PRIVATE FUNCTIONS
@@ -1256,6 +1327,24 @@
             {
                // Our session has likely timed-out, so refresh to offer the login page
                window.location.reload();
+            }
+            else
+            {
+               try
+               {
+                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
+                  if (oResponse.status == 404)
+                  {
+                     // Site or container not found - deactivate controls
+                     YAHOO.Bubbling.fire("deactivateAllControls");
+                  }
+               }
+               catch(e)
+               {
+                  this._setDefaultDataTableErrors();
+               }
             }
          }
          

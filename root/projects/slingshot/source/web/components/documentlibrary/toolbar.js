@@ -61,6 +61,7 @@
       YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
       YAHOO.Bubbling.on("fileSelected", this.onFileSelected, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    
       return this;
    }
@@ -248,6 +249,16 @@
             path: this.currentPath
          });
          
+         var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
+         {
+            // Validation
+            // Name: mandatory value
+            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.mandatory, null, "keyup");
+            // Name: valid filename
+            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
+            p_form.setShowSubmitStateDynamically(true, false);
+         }
+         
          if (!this.modules.createFolder)
          {
             this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder").setOptions(
@@ -255,6 +266,11 @@
                width: "30em",
                templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
                actionUrl: actionUrl,
+               doSetupFormsValidation:
+               {
+                  fn: doSetupFormsValidation,
+                  scope: this
+               },
                firstFocus: this.id + "-createFolder-name",
                onSuccess:
                {
@@ -281,46 +297,6 @@
             this.modules.createFolder.setOptions(
             {
                actionUrl: actionUrl
-            })
-         }
-         this.modules.createFolder.show();
-      },
-
-      onNewFolder_OLD: function DLTB_onNewFolder_OLD(e, p_obj)
-      {
-         if (!this.modules.createFolder)
-         {
-            this.modules.createFolder = new Alfresco.module.CreateFolder(this.id + "-createFolder").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               parentPath: this.currentPath,
-               onSuccess:
-               {
-                  fn: function DLTB_onNewFolder_callback(folder)
-                  {
-                     YAHOO.Bubbling.fire("folderCreated",
-                     {
-                        name: folder.name,
-                        parentPath: folder.parentPath,
-                        nodeRef: folder.nodeRef
-                     });
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: this._msg("message.new-folder.success", folder.name)
-                     });
-                  },
-                  scope: this
-               }
-            });
-         }
-         else
-         {
-            this.modules.createFolder.setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               parentPath: this.currentPath
             })
          }
          this.modules.createFolder.show();
@@ -366,9 +342,9 @@
             url: Alfresco.constants.PROXY_URI + "slingshot/doclib/activity",
             dataObj:
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               browseURL: location.pathname + location.hash
+               site: this.options.siteId,
+               container: this.options.containerId,
+               browseURL: location.pathname + (location.hash || "")
             },
             successCallback: null,
             successMessage: null,
@@ -387,7 +363,8 @@
                {
                   config.dataObj.type = "file-added";
                   config.dataObj.fileName = complete.successful[i].fileName;
-                  config.dataObj.contentURL = Alfresco.constants.PROXY_URL + "api/node/content/" + complete.successful[i].nodeRef.replace(":/", "");
+                  config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + complete.successful[i].nodeRef.replace(":/", "");
+                  config.dataObj.browseURL = location.pathname + "?file=" + config.dataObj.fileName + (location.hash || "");
                   try
                   {
                      Alfresco.util.Ajax.jsonRequest(config);
@@ -522,6 +499,22 @@
             }
          }
       },
+
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function DLTB_onDeactivateAllControls(layer, args)
+      {
+         for (widget in this.widgets)
+         {
+            this.widgets[widget].set("disabled", true)
+         }
+      },
+
    
       /**
        * PRIVATE FUNCTIONS

@@ -32,6 +32,13 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
+   
+   /**
     * DocListFilter constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -51,6 +58,7 @@
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
 
       return this;
    }
@@ -66,6 +74,15 @@
       selectedFilter: null,
 
       /**
+       * Selected filter.
+       * 
+       * @property controlsDeactivated
+       * @type {boolean}
+       * @default false
+       */
+      controlsDeactivated: false,
+
+      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -73,7 +90,7 @@
        */
       onComponentsLoaded: function DLF_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -89,9 +106,8 @@
          YAHOO.Bubbling.addDefaultAction("filter-link", function DLF_filterAction(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
-            if (owner !== null)
+            if ((owner !== null) && !me.controlsDeactivated)
             {
-               var Dom = YAHOO.util.Dom;
                var filterId = owner.className;
                YAHOO.Bubbling.fire("filterChanged",
                {
@@ -127,7 +143,6 @@
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
-            var Dom = YAHOO.util.Dom;
             if (obj.filterOwner == this.name)
             {
                // Remove the old highlight, as it might no longer be correct
@@ -150,6 +165,24 @@
                }
             }
          }
+      },
+      
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function DLF_onDeactivateAllControls(layer, args)
+      {
+         this.controlsDeactivated = true;
+         var filters = YAHOO.util.Selector.query("a.filter-link", this.id + "-body");
+         for (var i = 0, j = filters.length; i < j; i++)
+         {
+            Dom.addClass(filters[i], "disabled");
+         }
       }
+      
    };
 })();
