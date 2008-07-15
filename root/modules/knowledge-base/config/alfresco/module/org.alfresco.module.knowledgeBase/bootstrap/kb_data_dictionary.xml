@@ -2,9 +2,9 @@
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0">
   <view:metadata>
     <view:exportBy>admin</view:exportBy>
-    <view:exportDate>2008-07-08T12:13:28.025Z</view:exportDate>
-    <view:exporterVersion>2.1.0 (109)</view:exporterVersion>
-    <view:exportOf>/app:company_home/app:dictionary/cm:Knowledge_x0020_Base_x0020_Templates</view:exportOf>
+    <view:exportDate>2007-07-19T12:00:11.350+01:00</view:exportDate>
+    <view:exporterVersion>2.1.0 (R2-dev @build-number@)</view:exporterVersion>
+    <view:exportOf>/app:company_home/app:data_dictionary</view:exportOf>
   </view:metadata>
   <cm:folder xmlns:act="http://www.alfresco.org/model/action/1.0" 
   			 xmlns:app="http://www.alfresco.org/model/application/1.0" 
@@ -40,13 +40,7 @@
     <view:properties>
       <app:icon>space-icon-default</app:icon>
       <cm:description>Knowledge Base Templates</cm:description>
-      <sys:node-uuid>7c2a9ff2-4ce6-11dd-847d-9de922461451</sys:node-uuid>
-      <sys:node-dbid>473</sys:node-dbid>
       <cm:title>Knowledge Base Templates</cm:title>
-      <cm:created>2008-07-08T12:07:50.065Z</cm:created>
-      <cm:modifier>admin</cm:modifier>
-      <cm:modified>2008-07-08T12:07:50.079Z</cm:modified>
-      <cm:creator>admin</cm:creator>
       <sys:store-protocol>workspace</sys:store-protocol>
       <cm:name>Knowledge Base Templates</cm:name>
       <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -62,13 +56,7 @@
           <view:properties>
             <app:icon>space-icon-default</app:icon>
             <cm:description>Templates for Knowledge Base</cm:description>
-            <sys:node-uuid>87ac06b3-4ce6-11dd-847d-9de922461451</sys:node-uuid>
-            <sys:node-dbid>474</sys:node-dbid>
             <cm:title>Templates</cm:title>
-            <cm:created>2008-07-08T12:08:09.398Z</cm:created>
-            <cm:modifier>admin</cm:modifier>
-            <cm:modified>2008-07-08T12:08:50.103Z</cm:modified>
-            <cm:creator>admin</cm:creator>
             <sys:store-protocol>workspace</sys:store-protocol>
             <cm:name>Templates</cm:name>
             <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -86,15 +74,9 @@
                 <view:properties>
                   <app:editInline>true</app:editInline>
                   <cm:description></cm:description>
-                  <sys:node-uuid>f94b8dae-4ce6-11dd-847d-9de922461451</sys:node-uuid>
-                  <sys:node-dbid>478</sys:node-dbid>
                   <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/template/search_articles.ftl|mimetype=text/plain|size=6967|encoding=UTF-8|locale=en_GB_</cm:content>
                   <cm:title>search_articles.ftl</cm:title>
                   <cm:author></cm:author>
-                  <cm:created>2008-07-08T12:11:19.981Z</cm:created>
-                  <cm:modifier>admin</cm:modifier>
-                  <cm:modified>2008-07-08T12:11:21.670Z</cm:modified>
-                  <cm:creator>admin</cm:creator>
                   <sys:store-protocol>workspace</sys:store-protocol>
                   <cm:name>search_articles.ftl</cm:name>
                   <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -112,15 +94,9 @@
                 <view:properties>
                   <app:editInline>true</app:editInline>
                   <cm:description></cm:description>
-                  <sys:node-uuid>fef6d04f-4ce6-11dd-847d-9de922461451</sys:node-uuid>
-                  <sys:node-dbid>479</sys:node-dbid>
                   <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/template/search_results.ftl|mimetype=text/plain|size=9511|encoding=UTF-8|locale=en_GB_</cm:content>
                   <cm:title>search_results.ftl</cm:title>
                   <cm:author></cm:author>
-                  <cm:created>2008-07-08T12:11:29.493Z</cm:created>
-                  <cm:modifier>admin</cm:modifier>
-                  <cm:modified>2008-07-08T12:11:31.261Z</cm:modified>
-                  <cm:creator>admin</cm:creator>
                   <sys:store-protocol>workspace</sys:store-protocol>
                   <cm:name>search_results.ftl</cm:name>
                   <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -139,13 +115,7 @@
           <view:properties>
             <app:icon>space-icon-default</app:icon>
             <cm:description>Scripts for Knowledge Base</cm:description>
-            <sys:node-uuid>954c087f-4ce6-11dd-847d-9de922461451</sys:node-uuid>
-            <sys:node-dbid>475</sys:node-dbid>
             <cm:title>Scripts</cm:title>
-            <cm:created>2008-07-08T12:08:32.249Z</cm:created>
-            <cm:modifier>admin</cm:modifier>
-            <cm:modified>2008-07-08T12:08:32.255Z</cm:modified>
-            <cm:creator>admin</cm:creator>
             <sys:store-protocol>workspace</sys:store-protocol>
             <cm:name>Scripts</cm:name>
             <sys:store-identifier>SpacesStore</sys:store-identifier>
@@ -161,15 +131,9 @@
                 </view:aspects>
                 <view:properties>
                   <cm:description></cm:description>
-                  <sys:node-uuid>28f16d47-4ce7-11dd-847d-9de922461451</sys:node-uuid>
-                  <sys:node-dbid>481</sys:node-dbid>
                   <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/script/search_scripts.js|mimetype=application/x-javascript|size=9545|encoding=UTF-8|locale=en_GB_</cm:content>
                   <cm:title>search_scripts.js</cm:title>
                   <cm:author></cm:author>
-                  <cm:created>2008-07-08T12:12:39.917Z</cm:created>
-                  <cm:modifier>admin</cm:modifier>
-                  <cm:modified>2008-07-08T12:12:41.514Z</cm:modified>
-                  <cm:creator>admin</cm:creator>
                   <sys:store-protocol>workspace</sys:store-protocol>
                   <cm:name>search_scripts.js</cm:name>
                   <sys:store-identifier>SpacesStore</sys:store-identifier>
