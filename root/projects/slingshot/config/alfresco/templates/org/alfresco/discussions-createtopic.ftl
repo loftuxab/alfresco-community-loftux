@@ -10,7 +10,6 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <h1>Create new topic</h1>	
       <@region id="createtopic" scope="template" protected=true />
    </div>
 </@>

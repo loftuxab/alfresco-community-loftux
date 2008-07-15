@@ -118,6 +118,9 @@
             action="${url.serviceContext}/modules/discussions/replies/create-reply"
          </#if>
       >
+         <input type="hidden" name="site" value="${site}" />
+         <input type="hidden" name="container" value="${container}" />
+         <input type="hidden" name="path" value="${path}" />
          <input type="hidden" name="postRef" value="${post.nodeRef}" />
          <input type="hidden" name="htmlid" value="${htmlid}" />
          <textarea id="${htmlid}-replyContent" rows="8" cols="80" name="content"><#if isEdit>${post.content}</#if></textarea>

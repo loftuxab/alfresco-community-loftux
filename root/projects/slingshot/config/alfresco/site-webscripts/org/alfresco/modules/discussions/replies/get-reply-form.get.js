@@ -11,6 +11,9 @@ function main()
     // assign additional model data
     model.htmlid = args["htmlid"];
     model.isEdit = (args["isEdit"] != undefined) ? (args["isEdit"] == "true") : false;
+    model.site = args["site"];
+    model.container = args["container"];
+    model.path = args["path"];
 }
 
 main();

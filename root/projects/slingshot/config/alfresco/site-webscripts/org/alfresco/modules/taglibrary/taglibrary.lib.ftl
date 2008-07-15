@@ -30,10 +30,11 @@
    @param htmlid the html id to use for the component
    @param tags the current tags to display
 -->
-<#macro renderTagLibrary htmlid tags>
+<#macro renderTagLibrary htmlid tags site>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.TagLibrary("${htmlid}").setOptions(
    {
+      siteId : "${site}"
    }).setMessages(
       ${messages}
    ).setCurrentTags(

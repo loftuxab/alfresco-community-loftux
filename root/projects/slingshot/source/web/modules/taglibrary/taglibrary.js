@@ -63,7 +63,12 @@
            * @type string
            * @default ""
            */
-          siteId: ""
+          siteId: "",
+          
+          /**
+           * Maximum number of tags popular tags displayed
+           */
+          topN: 10,
        },
 
       
@@ -208,8 +213,65 @@
        */
       onPopularTagsLinkClicked: function TagLibrary_onPopularTagsLinkClicked(e, obj)
       {
-         this._displayPopularTags(["ECM", "Alfresco", "Slingshot", "YUI", "WCM"]);
+         // load the popular tags through an ajax call
+         // make an ajax request to delete the topic
+         var url = Alfresco.constants.PROXY_URI + "api/site/" + this.options.siteId +
+                   "/tagscopetags?topN=" + this.options.topN;
+         Alfresco.util.Ajax.request(
+         {
+            url: url,
+            method: "GET",
+            responseContentType : "application/json",
+            successCallback:
+            {
+               fn: this._onPopularTagsLoaded,
+               scope: this
+            },
+            failureMessage: this._msg("taglibrary.msg.failedLoadTags")
+         });
          YAHOO.util.Event.stopEvent(e);
+      },
+      
+      _onPopularTagsLoaded: function TagLibrary__onPopularTagsLoaded(response)
+      {
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("taglibrary.msg.unableLoadTags", response.json.error)});
+         }
+         else
+         {
+            this._displayPopularTags(response.json.tags);
+         }
+      },
+      
+      /**
+       * Update the UI with the popular tags loaded via AJAX.
+       */
+      _displayPopularTags: function TagLibrary__showPopularTags(tags)
+      {
+         // remove the popular tags load link
+         YAHOO.util.Dom.setStyle(this.id + "-load-popular-tags-link", "display", "none");
+
+         // add all tags to the ui
+         /*
+         <li id="${htmlid}-onAddTag-Car">
+        	<a href="#" class="taglibrary-action">Car
+        		<span class="close">
+        			<img src="icon_close.gif" alt="x" />
+         		</span>
+        	</a>
+         </li>
+         */
+         var popularTagsElem = YAHOO.util.Dom.get(this.id + "-popular-tags");
+         for (var x=0; x < tags.length; x++)
+         {
+            var elem = document.createElement('li');
+            var elemId = this.id + "-onAddTag-" + tags[x].name;
+            elem.setAttribute('id', elemId);
+            elem.innerHTML = '<a href="#" class="taglibrary-action">' + tags[x].name +
+        		'<span class="close">&nbsp;</span></a>'; // <img src="icon_close.gif" alt="x" />
+            popularTagsElem.appendChild(elem);
+         }
       },
 
       /**
@@ -238,11 +300,6 @@
          // finally clear the text field
          inputField.value = "";
       },
-
-
-      /**
-       * PRIVATE FUNCTIONS
-       */
        
       /**
        * Fires a tags changed event.
@@ -325,36 +382,6 @@
          
          // inform interested parties about change
          this._fireTagsChangedEvent();
-      },
-
-      /**
-       * Update the UI with the popular tags loaded via AJAX.
-       */
-      _displayPopularTags: function TagLibrary__showPopularTags(tags)
-      {
-         // remove the popular tags load link
-         YAHOO.util.Dom.setStyle(this.id + "-load-popular-tags-link", "display", "none");
-
-         // add all tags to the ui
-         /*
-         <li id="${htmlid}-onAddTag-Car">
-        	<a href="#" class="taglibrary-action">Car
-        		<span class="close">
-        			<img src="icon_close.gif" alt="x" />
-         		</span>
-        	</a>
-         </li>
-         */
-         var popularTagsElem = YAHOO.util.Dom.get(this.id + "-popular-tags");
-         for (var x=0; x < tags.length; x++)
-         {
-            var elem = document.createElement('li');
-            var elemId = this.id + "-onAddTag-" + tags[x];
-            elem.setAttribute('id', elemId);
-            elem.innerHTML = '<a href="#" class="taglibrary-action">' + tags[x] +
-        		'<span class="close">&nbsp;</span></a>'; // <img src="icon_close.gif" alt="x" />
-            popularTagsElem.appendChild(elem);
-         }
       },
 
       /**

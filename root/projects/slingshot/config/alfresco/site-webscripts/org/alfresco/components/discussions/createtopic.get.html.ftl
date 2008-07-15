@@ -10,6 +10,7 @@
 
 <#import "/org/alfresco/modules/discussions/topic.lib.ftl" as topicLib/>
 
+<h1>${msg("createtopic.title")}</h1>	
 <div id="${args.htmlid}-topic">
    <div id="${args.htmlid}-viewDiv">
    </div>

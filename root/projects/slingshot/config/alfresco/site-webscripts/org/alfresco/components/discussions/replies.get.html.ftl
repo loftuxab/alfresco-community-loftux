@@ -5,6 +5,8 @@
    new Alfresco.DiscussionsReplies("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site}",
+      containerId: "${container}",
+      path: "${path}",
       topicRef: "${topicRef}"
    }).setMessages(
       ${messages}

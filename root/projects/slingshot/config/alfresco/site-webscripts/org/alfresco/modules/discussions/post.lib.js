@@ -39,9 +39,12 @@ function fetchAndAssignPost(nodeRef)
     applyDataToModel(data);
 }
 
-function updateAndAssignPost(parentNodeRef, content)
+function updateAndAssignPost(site, container, path, parentNodeRef, content)
 {
     var params = {
+        site : site,
+        container : container,
+        path : path,
         content : content
     };
     var paramsJSON = jsonUtils.toJSONString(params);

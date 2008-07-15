@@ -10,7 +10,6 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <h1>Create new post</h1>
       <@region id="postedit" scope="template" protected=true />
    </div>
 </@>
