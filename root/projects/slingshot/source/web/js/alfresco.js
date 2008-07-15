@@ -1281,6 +1281,7 @@ Alfresco.util.Ajax = function()
                */
                Alfresco.util.PopupManager.displayPrompt(
                {
+                  title: Alfresco.util.message("message.failure", this.name),
                   text: config.failureMessage
                });
             }
@@ -1300,7 +1301,7 @@ Alfresco.util.Ajax = function()
             {
                Alfresco.util.PopupManager.displayPrompt(
                {
-                  title: "Failure",
+                  title: Alfresco.util.message("message.failure", this.name),
                   text: serverResponse.statusText
                });
             }
@@ -1308,6 +1309,7 @@ Alfresco.util.Ajax = function()
             {
                Alfresco.util.PopupManager.displayPrompt(
                {
+                  title: Alfresco.util.message("message.failure", this.name),
                   text: "Error sending data to server."
                });
             }

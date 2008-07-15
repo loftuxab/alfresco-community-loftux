@@ -365,7 +365,17 @@
                },
                scope: this
             },
-            failureMessage: Alfresco.util.message("message.saveFailure", this.name)
+            failureMessage: Alfresco.util.message("message.saveFailure", this.name),
+            failureCallback: {
+               fn: function()
+               {
+                  // Enable the buttons again
+                  this.widgets.saveButton.set("disabled", false);
+                  this.widgets.cancelButton.set("disabled", false);
+
+               },
+               scope: this
+            }
          });         
       },
 
