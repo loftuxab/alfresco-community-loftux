@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.util.Content;
+import org.alfresco.web.config.ServerProperties;
 
 /**
  * The Class LocalWebScriptRequest.
@@ -39,6 +40,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
 {
     private Map<String, String> parameters;
     private HttpServletRequest request;
+    private ServerProperties serverProperties;
 
     /**
      * Instantiates a new local web script request.
@@ -50,10 +52,11 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      * @param request the request
      */
     public LocalWebScriptRequest(Runtime runtime, String scriptUrl,
-            Match match, Map<String, String> parameters, HttpServletRequest request)
+            Match match, Map<String, String> parameters, ServerProperties serverProps, HttpServletRequest request)
     {
         super(runtime, scriptUrl, match);
         this.parameters = parameters;
+        this.serverProperties = serverProps;
         this.request = request;
     }
     
@@ -112,7 +115,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String getServerPath()
     {
-        return null;
+        return getServerScheme() + "://" + getServerName() + ":" + getServerPort();
     }
 
     /* (non-Javadoc)
@@ -145,5 +148,62 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
     public Content getContent()
     {
         return null;
+    }
+    
+    /**
+     * Get Server Scheme
+     * 
+     * @return  server scheme
+     */
+    private String getServerScheme()
+    {
+        String scheme = null;
+        if (serverProperties != null)
+        {
+            scheme = serverProperties.getScheme();
+        }
+        if (scheme == null)
+        {
+            scheme = request.getScheme();
+        }
+        return scheme;
+    }
+
+    /**
+     * Get Server Name
+     * 
+     * @return  server name
+     */
+    private String getServerName()
+    {
+        String name = null;
+        if (serverProperties != null)
+        {
+            name = serverProperties.getHostName();
+        }
+        if (name == null)
+        {
+            name = request.getServerName();
+        }
+        return name;
+    }
+
+    /**
+     * Get Server Port
+     * 
+     * @return  server name
+     */
+    private int getServerPort()
+    {
+        Integer port = null;
+        if (serverProperties != null)
+        {
+            port = serverProperties.getPort();
+        }
+        if (port == null)
+        {
+            port = request.getServerPort();
+        }
+        return port;
     }
 }

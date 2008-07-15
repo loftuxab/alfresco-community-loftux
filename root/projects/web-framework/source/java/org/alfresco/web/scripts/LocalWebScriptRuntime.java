@@ -29,25 +29,30 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.uri.UriUtils;
 
 /**
+ * WebScript Runtime for rendering as Web Framework components.
+ * 
  * @author kevinr
  * @author muzquiano
  */
 public class LocalWebScriptRuntime extends AbstractRuntime
 {
+    private ServerProperties serverProperties;
     private LocalWebScriptContext context;
     private Writer out;
 
     public LocalWebScriptRuntime(
-            Writer out, RuntimeContainer container, LocalWebScriptContext context) 
+            Writer out, RuntimeContainer container, ServerProperties serverProps, LocalWebScriptContext context) 
     {
         super(container);
         
         this.out = out;
+        this.serverProperties = serverProps;
         this.context = context;
     }
 
@@ -97,7 +102,7 @@ public class LocalWebScriptRuntime extends AbstractRuntime
             request = ((HttpRequestContext)context.RequestContext).getRequest();
         }
 
-        return new LocalWebScriptRequest(this, scriptUrl, match, properties, request);
+        return new LocalWebScriptRequest(this, scriptUrl, match, properties, serverProperties, request);
     }
 
     @Override

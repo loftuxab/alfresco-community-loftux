@@ -34,10 +34,14 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.config.Config;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.StringBuilderWriter;
+import org.alfresco.web.config.ServerConfigElement;
+import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.framework.model.Component;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.AbstractRenderer;
@@ -74,8 +78,12 @@ public class WebScriptRenderer extends AbstractRenderer
     private TemplateProcessor templateProcessor;
     private LocalWebScriptRuntimeContainer webScriptContainer;
     private Registry registry;
+    private ServerProperties serverProperties;
     
     
+    /**
+     * One time initialisation
+     */
     public void init(RendererContext rendererContext)
     {
         // Get the application context and relevant context objects
@@ -98,6 +106,10 @@ public class WebScriptRenderer extends AbstractRenderer
         {
             throw new AlfrescoRuntimeException("Unable to find web script container: " + containerId); 
         }
+        
+        // Setup the external access URL server properties - i.e. external hostname for absolute URLs
+        Config config = FrameworkHelper.getConfigService().getConfig("Server");
+        serverProperties = (ServerConfigElement)config.getConfigElement(ServerConfigElement.CONFIG_ELEMENT_ID);
     }
     
     /* (non-Javadoc)
@@ -241,7 +253,7 @@ public class WebScriptRenderer extends AbstractRenderer
             // This bundles the container, the context and the encoding
             LocalWebScriptRuntime runtime = new LocalWebScriptRuntime(
                     new BufferedWriter(rendererContext.getResponse().getWriter(), 4096),
-                    webScriptContainer, webScriptContext);
+                    webScriptContainer, serverProperties, webScriptContext);
             
             /**
              * Bind the RequestContext to the Web Script Container using a
