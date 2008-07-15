@@ -11,6 +11,15 @@
    background: none;
 }
 
+.treeview .ygtverror,
+.treeview .ygtverror:link,
+.treeview .ygtverror:visited,
+.treeview .ygtverror:hover
+{
+   background: red;
+   color: white;
+}
+
 .treeview .selected
 {
    background-color: #d2e5f2;

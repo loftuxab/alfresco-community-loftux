@@ -12,7 +12,8 @@
       {
          filterId: "path",
          filterOwner: "Alfresco.DocListTree"
-      }
+      },
+      highlightFile: "${page.url.args["file"]!""}"
    }).setMessages(
       ${messages}
    );
@@ -32,9 +33,9 @@
          </div>
       </div>
       <div class="yui-u align-right">
-         <span><a href="#" id="${args.htmlid}-showFolders-button"></a></span>
+         <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button"></button>
          <span class="separator">|</span>
-         <span><a href="#" id="${args.htmlid}-detailedView-button"></a></span>
+         <button id="${args.htmlid}-detailedView-button" name="doclist-detailedView-button"></button>
       </div>
    </div>
 

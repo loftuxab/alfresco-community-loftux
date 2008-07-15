@@ -17,9 +17,10 @@ if (result && re.test(result))
 	var entry;
 	for each (entry in feed.entry)
 	{
-		model.entries.push({
+		model.entries.push(
+		{
 			"title" : entry.title.toString(),
-			"summary" : entry.summary.toString()
+			"summary" : entry.summary.toString().replace(/(target=)/g, "rel=")
 		});
 	}
 }

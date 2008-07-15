@@ -25,6 +25,8 @@
          </div>
       </div>
    </div>
+   <p>&nbsp;</p>
+   <p>&nbsp;</p>
 </@>
 
 <@template.footer>

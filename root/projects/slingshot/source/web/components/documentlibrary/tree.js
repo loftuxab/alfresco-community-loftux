@@ -32,6 +32,13 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
+
+   /**
     * DocumentList TreeView constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -182,7 +189,7 @@
       onComponentsLoaded: function DLT_onComponentsLoaded()
       {
          // Register the onReady callback when the component parent element has been loaded
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -251,7 +258,29 @@
                      // Our session has likely timed-out, so refresh to offer the login page
                      window.location.reload();
                   }
+                  else
+                  {
+                     try
+                     {
+                        var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                        
+                        // Get the "Documents" node
+                        var rootNode = this.treeview.getRoot();
+                        var docNode = rootNode.children[0];
+                        docNode.isLoading = false;
+                        docNode.isLeaf = true;
+                        docNode.label = response.message;
+                        docNode.labelStyle = "ygtverror";
+                        rootNode.refresh();
+                     }
+                     catch(e)
+                     {
+                     }
+                  }
                },
+               
+               // Callback function scope
+               scope: me,
 
                // XHR response argument information
                argument:
@@ -718,11 +747,11 @@
          {
             if (isVisible)
             {
-               YAHOO.util.Dom.addClass(this.selectedNode.getEl(), "selected");
+               Dom.addClass(this.selectedNode.getEl(), "selected");
             }
             else
             {
-               YAHOO.util.Dom.removeClass(this.selectedNode.getEl(), "selected");
+               Dom.removeClass(this.selectedNode.getEl(), "selected");
             }
          }
       },
