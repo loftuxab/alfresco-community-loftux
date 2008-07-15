@@ -20,6 +20,7 @@
 
 
 /* Popup Messages */
+
 #message .bd
 {
    background-color: #ffff80;
@@ -40,11 +41,51 @@
    text-align: center;
 }
 
-/* Buttons */
+/* Doclist bar Buttons */
+
 .doclist div.inline
 {
    display: inline;
 }
+
+/* Doclist bar Select menu */
+
+.doclist .file-select .yuimenuitemlabel span
+{
+   background-position: 2px 50%;
+   background-repeat: no-repeat;
+   cursor: pointer;
+   display: block;
+   margin-left: -4px;
+   min-height: 16px;
+   padding: 2px 0px 1px 20px;
+}
+
+.doclist .file-select .selectAll
+{
+   background-image: url(images/select-all.gif);
+}
+
+.doclist .file-select .selectNone
+{
+   background-image: url(images/select-none.gif);
+}
+
+.doclist .file-select .selectInvert
+{
+   background-image: url(images/select-invert.gif);
+}
+
+.doclist .file-select .selectFolders
+{
+   background-image: url(images/select-folders.gif);
+}
+
+.doclist .file-select .selectDocuments
+{
+   background-image: url(images/select-documents.gif);
+}
+
 
 
 /* Data Table */

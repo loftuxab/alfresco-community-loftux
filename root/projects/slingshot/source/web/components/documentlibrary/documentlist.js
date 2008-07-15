@@ -195,12 +195,12 @@
       actions: {},
 
       /**
-       * Array of selected states for visible files.
+       * Objectliteral of selected states for visible files (indexed by nodeRef).
        * 
        * @property selectedFiles
-       * @type array
+       * @type object
        */
-      selectedFiles: [],
+      selectedFiles: {},
 
       /**
        * Whether "More Actions" pop-up is currently visible.
@@ -553,7 +553,7 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "index", label: "Select", sortable: false, formatter: renderCellSelected, width: 16
+            key: "nodeRef", label: "Select", sortable: false, formatter: renderCellSelected, width: 16
          },
          {
             key: "status", label: "Status", sortable: false, formatter: renderCellStatus, width: 16
@@ -614,8 +614,8 @@
          // File checked handler
          this.widgets.dataTable.subscribe("checkboxClickEvent", function(e)
          { 
-            var id = parseInt(e.target.value, 10); 
-            this.checked[id] = e.target.checked;
+            var id = e.target.value; 
+            this.selectedFiles[id] = e.target.checked;
          }, this, true);
          
          // Rendering complete event handler
@@ -692,6 +692,94 @@
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
+
+      /**
+       * Public function to get array of selected files
+       *
+       * @method getSelectedFiles
+       * @return {Array} Currently selected files
+       */
+      getSelectedFiles: function DL_getSelectedFiles()
+      {
+         var files = [];
+         var recordSet = this.widgets.dataTable.getRecordSet();
+         var record;
+         
+         for (var i = 0, j = recordSet.getLength(); i < j; i++)
+         {
+            record = recordSet.getRecord(i);
+            if (this.selectedFiles[record.getData("nodeRef")])
+            {
+               files.push(record._oData);
+            }
+         }
+         
+         return files;
+      },
+      
+      /**
+       * Public function to select files by specified groups
+       *
+       * @method selectFiles
+       * @param p_selectType {string} Can be one of the following:
+       * <pre>
+       * selectAll - all documents and folders
+       * selectNone - deselect all
+       * selectInvert - invert selection
+       * selectDocuments - select all documents
+       * selectFolders - select all folders
+       * </pre>
+       */
+      selectFiles: function DL_selectFiles(p_selectType)
+      {
+         var recordSet = this.widgets.dataTable.getRecordSet();
+         var record;
+         var checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl());
+         var len = checks.length; 
+
+         switch (p_selectType)
+         {
+            case "selectAll":
+               for (var i = 0; i < len; i++)
+               {
+                  record = recordSet.getRecord(i);
+                  this.selectedFiles[record.getData("nodeRef")] = checks[i].checked = true;
+               }
+               break;
+            
+            case "selectNone":
+               for (var i = 0; i < len; i++)
+               {
+                  record = recordSet.getRecord(i);
+                  this.selectedFiles[record.getData("nodeRef")] = checks[i].checked = false;
+               }
+               break;
+
+            case "selectInvert":
+               for (var i = 0; i < len; i++)
+               {
+                  record = recordSet.getRecord(i);
+                  this.selectedFiles[record.getData("nodeRef")] = checks[i].checked = !checks[i].checked;
+               }
+               break;
+
+            case "selectDocuments":
+               for (var i = 0; i < len; i++)
+               {
+                  record = recordSet.getRecord(i);
+                  this.selectedFiles[record.getData("nodeRef")] = checks[i].checked = record.getData("type") == "document";
+               }
+               break;
+
+            case "selectFolders":
+               for (var i = 0; i < len; i++)
+               {
+                  record = recordSet.getRecord(i);
+                  this.selectedFiles[record.getData("nodeRef")] = checks[i].checked = record.getData("type") == "folder";
+               }
+               break;
+         }
+      },
       
 
       /**
@@ -744,46 +832,12 @@
          var domEvent = aArgs[0]
          var eventTarget = aArgs[1];
 
-         var checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl());
-         var len = checks.length; 
+         // Get the className of the clicked item
+         var action = Alfresco.util.findEventClass(eventTarget);
 
-         switch (eventTarget.value)
-         {
-            case "all":
-               for (var i = 0; i < len; ++i)
-               {
-                  this.selectedFiles[i] = checks[i].checked = true;
-               }
-               break;
-            
-            case "none":
-               for (var i = 0; i < len; ++i)
-               {
-                  this.selectedFiles[i] = checks[i].checked = false;
-               }
-               break;
+         this.selectFiles(action);
 
-            case "invert":
-               for (var i = 0; i < len; ++i)
-               {
-                  this.selectedFiles[i] = checks[i].checked = !checks[i].checked;
-               }
-               break;
-
-            case "documents":
-               for (var i = 0; i < len; ++i)
-               {
-                  this.selectedFiles[i] = checks[i].checked = this.widgets.dataTable.getRecord(i).getData("type") == "document";
-               }
-               break;
-
-            case "folders":
-               for (var i = 0; i < len; ++i)
-               {
-                  this.selectedFiles[i] = checks[i].checked = this.widgets.dataTable.getRecord(i).getData("type") == "folder";
-               }
-               break;
-         }
+         Event.preventDefault(domEvent);
       },
 
       /**
