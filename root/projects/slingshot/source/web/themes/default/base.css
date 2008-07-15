@@ -195,11 +195,9 @@ hr
 
 .yui-skin-default #message .bd
 {
-   background-color:black;
-   color:white;
-   font-weight:bold;
-   opacity:0.65;
    padding:2em;
+   background-color:#808080;
+   color:white;
 }
 
 /* Style the default prompt */
@@ -219,7 +217,6 @@ hr
 .yui-skin-default #prompt .hd
 {
    border-bottom:medium none;
-
 }
 
 /*
