@@ -323,6 +323,10 @@
        */
       onSaveButtonClick: function CD_onSaveButtonClick(event)
       {
+         // Disable buttons to avoid double submits or cancel during post
+         this.widgets.saveButton.set("disabled", true);
+         this.widgets.cancelButton.set("disabled", true);
+
          // Loop through the columns to get the dashlets to save
          var dashlets = [];
          for (var i = 1; i <= this.options.currentLayout.noOfColumns; i++)
@@ -374,8 +378,12 @@
        */
       onCancelButtonClick: function CD_onCancelButtonClick(event)
       {
+         // Disable buttons to avoid double submits or cancel during post
+         this.widgets.saveButton.set("disabled", true);
+         this.widgets.cancelButton.set("disabled", true);
+         
          // Send the user to this page again without saveing changes
-         document.location.href = Alfresco.constants.URL_CONTEXT + this.options.dashboardUrl;
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/" + this.options.dashboardUrl;
       },
 
       /**

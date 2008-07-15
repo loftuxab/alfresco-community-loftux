@@ -7,9 +7,9 @@
 </#macro>
 
 <#macro _normalGrid columns class bindPrefix>
-   <div class="${class}">
+   <div class="${class} grid">
       <#list columns as column>
-         <div class="yui-u<#if column_index == 0> first</#if>">
+         <div class="yui-u<#if column_index == 0> first</#if> column${column_index + 1}">
             <#list 1..column.components as component>
                <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="page" protected=true/>
             </#list>
@@ -19,12 +19,12 @@
 </#macro>
 
 <#macro _nestedGrid columns class bindPrefix>
-   <div class="${class}">
+   <div class="${class} grid">
       <#list columns as column>
          <#if (column_index % 2 == 0)>
-            <div class="yui-g<#if column_index == 0> first</#if>">
+            <div class="yui-g<#if column_index == 0> first</#if> column${column_index + 1}">
          </#if>
-         <div class="yui-u<#if column_index%2 == 0> first</#if>">
+         <div class="yui-u<#if column_index%2 == 0> first</#if> column${column_index + 1}">
             <#list 1..column.components as component>
                <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="page" protected=true/>
             </#list>
