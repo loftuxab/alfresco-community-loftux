@@ -29,7 +29,7 @@ for(var oi = 0; oi < oldComponents.length; oi++)
       for(var ni = 0; ni < newDashlets.length; ni++)
       {
          var newDashlet = newDashlets[ni];
-         if(newDashlet.regionId == regionId)
+         if(newDashlet.originalRegionId == regionId)
          {
             existingDashlet = newDashlet;
             break;
@@ -65,7 +65,7 @@ for(var ni = 0; ni < newDashlets.length; ni++)
          }
          if (existingDashlet != null)
          {
-            // Its an old component that has been moved, use object from the list so we don't loose the properties
+            // Its an old component that has been moved, use object from the list so we don't loose the properties            
             sitedata.bindComponent(existingDashlet, "page", newDashlet.regionId, dashboardPage);
          }
       }

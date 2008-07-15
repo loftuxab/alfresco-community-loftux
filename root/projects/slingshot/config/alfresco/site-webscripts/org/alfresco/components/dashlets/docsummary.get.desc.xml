@@ -1,6 +1,6 @@
 <webscript>
    <shortname>Docsummary</shortname>
    <description>Document summary component</description>
-   <family>dashlet</family>
+   <family>site-dashlet</family>
    <url>/components/dashlets/docsummary</url>
 </webscript>

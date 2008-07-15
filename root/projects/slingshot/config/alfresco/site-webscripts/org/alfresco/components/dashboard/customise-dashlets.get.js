@@ -1,10 +1,17 @@
 
-// Get available components of family/type dashlet 
-var webscripts = sitedata.findWebScripts("dashlet");
-if(!webscripts || webscripts.length === 0)
+// Get available components of family/type dashlet
+var webscripts = sitedata.findWebScripts("user-dashlet");
+if(!webscripts)
 {
    webscripts = [];
 }
+var tmp = sitedata.findWebScripts("dashlet");
+if(tmp || tmp.length > 0)
+{
+   webscripts = webscripts.concat(tmp);
+}
+
+
 // Transform the webscripts to easy-to-access dashlet items for the template
 var availableDashlets = [];
 for(var i = 0; i < webscripts.length; i++)
