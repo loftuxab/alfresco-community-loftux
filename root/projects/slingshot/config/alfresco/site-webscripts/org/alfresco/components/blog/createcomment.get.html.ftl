@@ -1,3 +1,4 @@
+<#if showComponent>
 <#import "/org/alfresco/modules/blog/comments.lib.ftl" as commentsLib/>
 
 <script type="text/javascript">//<![CDATA[
@@ -25,3 +26,4 @@
 		</form>
 	</div>
 </div>
+</#if>

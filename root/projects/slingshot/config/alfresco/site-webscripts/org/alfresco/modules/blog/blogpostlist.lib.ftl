@@ -118,8 +118,10 @@
          <@renderPostStatus post=post/>
       </span>
       <div class="published">
-         <span class="nodeAttrLabel">${msg("post.info.createdOn")}:</span> <span class="nodeAttrValue"> ${post.createdOn?datetime?string.medium_short}</span>
-         <span class="spacer"> | </span>
+         <#if (! post.isDraft)>
+            <span class="nodeAttrLabel">${msg("post.info.publishedOn")}:</span> <span class="nodeAttrValue"> ${post.releasedOn?datetime?string.medium_short}</span>
+            <span class="spacer"> | </span>
+         </#if>
          <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><a href=""> ${post.author}</a></span>
       </div>
       
@@ -188,6 +190,7 @@
          <a href="blog-postview?postId=${post.name}">
             ${post.title}
          </a>
+         <@renderPostStatus post=post/>
       </div>
    </div>
   
