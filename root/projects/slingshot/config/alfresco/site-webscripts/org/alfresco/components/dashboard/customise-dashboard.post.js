@@ -66,7 +66,15 @@ for(var ni = 0; ni < newDashlets.length; ni++)
          if (existingDashlet != null)
          {
             // Its an old component that has been moved, use object from the list so we don't loose the properties            
-            sitedata.bindComponent(existingDashlet, "page", newDashlet.regionId, dashboardPage);
+            //sitedata.bindComponent(existingDashlet, "page", newDashlet.regionId, dashboardPage);
+            var comp = sitedata.newComponent("page", newDashlet.regionId, dashboardPage);
+            for(var propertyKey in existingDashlet.properties)
+            {
+               comp.properties[propertyKey] = existingDashlet.properties[propertyKey];
+            }
+            comp.properties["region-id"] = newDashlet.regionId;
+            comp.properties.url = newDashlet.url;
+            comp.save();
          }
       }
    }
