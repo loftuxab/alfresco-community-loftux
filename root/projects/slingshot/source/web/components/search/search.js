@@ -96,7 +96,7 @@
           * @type int
           * @default 100
           */
-         maxResults: 100,
+         maxResults: 5,
          
          /**
           * Search term to use for
@@ -104,15 +104,17 @@
           * @type string
           * @default ""
           */
-         searchTerm : ""
+         initialSearchTerm : "",
+         
          
          /**
-          * Current tag used for the search
+          * States whether all sites should be searched.
+          * This field only has an effect if siteId != ""
           * 
           * @property searchTag
           * @type string
           */
-         //searchTag: "",
+         initialSearchAll: true
       },
 
       /**
@@ -131,6 +133,26 @@
        */
       modules: {},
 
+      /**
+       * Search term used for the search.
+       */
+      searchTerm: "",
+
+      /**
+       * Whether the search was over all sites or just the current one
+       */
+      searchAll: true,
+      
+      /**
+       * Number of search results.
+       */
+      resultsCount: 0,
+      
+      /**
+       * True if there are more results than the ones listed in the table.
+       */
+      hasMoreResults: false,
+      
       /**
        * Set multiple initialization options at once.
        *
@@ -187,7 +209,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "viewUrl", "detailsUrl", "containerUrl"]
+             fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "viewUrl", "detailsUrl", "containerUrl", "site", "container", "tags"]
          };
          
          /**
@@ -235,15 +257,19 @@
             
             var desc = "";
             // title/link to view page
-            desc = '<h3 class="itemname"><a target="_blank" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("viewUrl") + '">' + oRecord.getData("displayName") + '</a></h3>';
-            // link to details page
+            desc = '<h3 class="itemname"><a target="_blank" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("detailsUrl") + '">' + oRecord.getData("displayName") + '</a></h3>';
+            // link to the site
             desc += '<div class="detail">';
-            desc += '   <a href="' + Alfresco.constants.PROXY_URI + oRecord.getData("detailsUrl") + '">Details page</a>';
+            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + oRecord.getData("site") + '/dashboard">' + oRecord.getData("site") + '</a>';
             desc += '</div>';
-            desc += '<div class="detail">';
-            desc += '   <a href="' + Alfresco.constants.PROXY_URI + oRecord.getData("containerUrl") + '">Container page</a>';
-            desc += '</div>'
-            desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
+            desc += '<div class="details">';
+            desc += '   Tags: ';
+            var tags = oRecord.getData("tags");
+            for (var x=0; x < tags.length; x++)
+            {
+                desc += '<span id="' + this.id + '-searchByTag-' + tags[x] + '"><a class="search-tag">' + tags[x] + '</a></span>';
+            }
+            desc += '</div>';
             elCell.innerHTML = desc;
          };
 
@@ -256,8 +282,12 @@
             key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
          }];
 
-         // Temporary "empty datatable" message
-         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.loading");
+         // show initial message
+         this._setDefaultDataTableErrors();
+         if (this.options.initialSearchTerm.length < 1)
+         {
+            YAHOO.widget.DataTable.MSG_EMPTY = "No search performed yet";
+         }
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
@@ -265,9 +295,6 @@
             renderLoopSize: 32,
             initialLoad: false
          });
-         
-         // Custom error messages
-         this._setDefaultDataTableErrors();
          
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function Search_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -286,31 +313,40 @@
             }
             else if (oResponse.results)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
+               // update the results count, update hasMoreResults.
+               me.hasMoreResults = (oResponse.results.length > me.options.maxResults);
+               if (me.hasMoreResults)
+               {
+                  oResponse.results = oResponse.results.slice(0, me.options.maxResults);
+               }
+               me.resultsCount = oResponse.results.length;
+               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
          
          // Enable row highlighting
-         this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
-         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
+         //this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
+         //this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
          
-         // Fire pathChanged event for first-time population
-         /*YAHOO.Bubbling.fire("pathChanged",
+         // load the initial results
+         // if we got an initial search term, start a search
+         //if (this.options.initialSearchTerm.length > 0)
+         //{  
+         YAHOO.Bubbling.fire("onSearch",
          {
-            doclistInitialNav: true,
-            path: this.currentPath
-         });*/
-         
-         // Set the default view filter to be "path" and the owner to be "Alfresco.DocListTree"
-         /*var filterObj = YAHOO.lang.merge(
-         {
-            filterId: "path",
-            filterOwner: "Alfresco.DocListTree"
-         }, this.options.initialFilter);
+            searchTerm: this.options.initialSearchTerm,
+            searchAll: this.options.initialSearchAll
+         });
+         //}
 
-         YAHOO.Bubbling.fire("filterChanged", filterObj);*/
+         // Hook action events
+         Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
+
+         // tell the header that the search component exists on this page and thus no
+         // refresh is required
+         YAHOO.Bubbling.fire("searchComponentExists", {});
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -318,29 +354,201 @@
 
 
       /**
-       * YUI WIDGET EVENT HANDLERS
+       * DEFAULT ACTION EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
 
-
-      // TEMPORARY
-      searchButtonClick: function Search_searchButtonClick(e, p_obj)
+      searchByTag: function Search_searchTag(param)
       {
-         // fetch the search text field
-         var textElem = Dom.get(this.id + "-search-text");
-         var text = textElem.value;
-          
          // send a search bubble event to load the list
          YAHOO.Bubbling.fire("onSearch",
          {
-            searchTerm : text,
-            maxResults : this.options.maxResults,
-            site : this.options.siteId,
-            container : this.options.containerId
+            searchTerm : param
          });
-         Event.preventDefault(e);
+      },
+      
+
+      /**
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
+       */
+
+      /**
+       * Path Changed event handler
+       *
+       * @method onSearch
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onSearch: function Search_onSearch(layer, args)
+      {
+         var obj = args[1];
+         if (obj !== null)
+         {
+            var searchTerm = (obj["searchTerm"] !== undefined) ? obj["searchTerm"] : "";
+            var searchAllSites = (obj["searchAll"] !== undefined) ? parseBoolean(obj["searchAll"]) : true;
+            
+            this._performSearch(searchTerm, searchAllSites);
+         }
       },
 
+      
+      /**
+       * Resets the YUI DataTable errors to our custom messages
+       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
+       *
+       * @method _setDefaultDataTableErrors
+       */
+      _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors()
+      {
+         var msg = Alfresco.util.message;
+         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.Search");
+         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.Search");
+      },
+      
+      /**
+       * Updates document list by calling data webscript with current site and path
+       *
+       * @method _updateDocList
+       * @param path {string} Path to navigate to
+       */
+      _performSearch: function Search__performSearch(searchTerm, searchAll)
+      {
+         // Reset the custom error messages
+         this._setDefaultDataTableErrors();
+         
+         // Display loading message
+         YAHOO.widget.DataTable.MSG_EMPTY = "Searching term '" + searchTerm + "'"; // this._msg("message.loading");
+         //this.widgets.dataTable.render();
+         
+         // empty results table
+         this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+         
+         function successHandler(sRequest, oResponse, oPayload)
+         {
+            this.searchTerm = searchTerm;
+            this.searchAll = searchAll;
+            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            // update the result info
+            this._updateResultsInfo();
+            this._updateSearchAllLinks();
+         }
+         
+         function failureHandler(sRequest, oResponse)
+         {
+            if (oResponse.status == 401)
+            {
+               // Our session has likely timed-out, so refresh to offer the login page
+               window.location.reload();
+            }
+            else
+            {
+               try
+               {
+                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
+               }
+               catch(e)
+               {
+                  this._setDefaultDataTableErrors();
+               }
+            }
+         }
+         
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm),
+         {
+               success: successHandler,
+               failure: failureHandler,
+               scope: this
+         });
+      },
+      
+      _updateResultsInfo: function Search__updateSearchResultsInfo()
+      {
+         // update the search results field
+         var searchFor = '<b>' + this.searchTerm + '</b>';
+         var searchIn = '<b>' + (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", this.options.siteId)) + '</b>';
+         var resultsCount = '<b>' + this.resultsCount + '</b>';
+         if (this.hasMoreResults)
+         {
+            resultsCount = this._msg("search.info.morethan", resultsCount);
+         }
+         var html = this._msg("search.info.resultinfo", searchFor, searchIn, resultsCount);
+         if (this.hasMoreResults)
+         {
+            html += " " + this._msg("search.info.onlyshowing", this.resultsCount);
+         }
+         
+         var elems = YAHOO.util.Dom.getElementsByClassName(this.id + "-search-result-info");
+         for (x in elems)
+         {
+            elems[x].innerHTML = html;
+         }
+      },
+      
+      _updateSearchAllLinks: function Search__updateSearchAllLinks()
+      {
+         // only proceed if there's a site to switch to
+         if (this.options.siteId == "")
+         {
+            return;
+         }
+         
+         // update the search results field
+         if (this.searchAll)
+         {
+            text = this._msg("search.searchall");
+         }
+         else
+         {
+            text = this._msg("search.searchsiteonly", this.options.siteId);
+         }
+         
+         var elems = YAHOO.util.Dom.getElementsByClassName(this.id + "-search-all-switch");
+         for (x in elems)
+         {
+            elems[x].innerHTML = html;
+         }
+      },
+
+      /**
+       * Build URI parameter string for doclist JSON data webscript
+       *
+       * @method _buildDocListParams
+       * @param path {string} Path to query
+       */
+      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm)
+      {
+         var site = searchAll ? "" : this.options.siteId;
+         var container = searchAll ? "" : this.options.containerId;
+         var params = YAHOO.lang.substitute("site={site}&container={container}&term={term}&maxResults={maxResults}",
+         {
+            site: encodeURIComponent(site),
+            container: encodeURIComponent(container),
+            term : encodeURIComponent(searchTerm),
+            maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
+         });
+
+         return params;
+      },
+      
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function Search__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.Search", Array.prototype.slice.call(arguments).slice(1));
+      },
+      
+      // TEMPORARY
+      
+      // row highlighting
 
       /**
        * Custom event handler to highlight row.
@@ -367,129 +575,72 @@
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
       },
-
-
-      /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
-       * Disconnected event handlers for inter-component event notification
-       */
-
-      /**
-       * Path Changed event handler
-       *
-       * @method onSearch
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onSearch: function Search_onSearch(layer, args)
-      {
-         var obj = args[1];
-         if (obj !== null)
-         {
-            var site = (obj["site"] !== undefined) ? obj["site"] : "";
-            var container = (obj["container"] !== undefined) ? obj["container"] : "";
-            var searchTerm = (obj["searchTerm"] !== undefined) ? obj["searchTerm"] : "";
-            
-            this._performSearch(site, container, searchTerm);
-         }
-      },
-   
-      /**
-       * PRIVATE FUNCTIONS
-       */
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Search__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.Search", Array.prototype.slice.call(arguments).slice(1));
-      },
       
-      /**
-       * Resets the YUI DataTable errors to our custom messages
-       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
-       *
-       * @method _setDefaultDataTableErrors
-       */
-      _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors()
+      searchButtonClick: function Search_searchButtonClick(e, p_obj)
       {
-         var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.Search");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.Search");
-      },
-      
-      /**
-       * Updates document list by calling data webscript with current site and path
-       *
-       * @method _updateDocList
-       * @param path {string} Path to navigate to
-       */
-      _performSearch: function Search__updateDocList(site, container, searchTerm)
-      {
-         // Reset the custom error messages
-         this._setDefaultDataTableErrors();
-         
-         function successHandler(sRequest, oResponse, oPayload)
+         // fetch the search text field
+         var textElem = Dom.get(this.id + "-search-text");
+         var text = textElem.value;
+          
+         // send a search bubble event to load the list
+         YAHOO.Bubbling.fire("onSearch",
          {
-            this.options.searchTerm = searchTerm;
-            this.options.siteId = site;
-            this.options.containerId = container;
-            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-         }
-         
-         function failureHandler(sRequest, oResponse)
-         {
-            if (oResponse.status == 401)
-            {
-               // Our session has likely timed-out, so refresh to offer the login page
-               window.location.reload();
-            }
-            else
-            {
-               try
-               {
-                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
-                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
-               }
-               catch(e)
-               {
-                  this._setDefaultDataTableErrors();
-               }
-            }
-         }
-         
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(site, container, searchTerm),
-         {
-               success: successHandler,
-               failure: failureHandler,
-               scope: this
+            searchTerm : text,
+            maxResults : this.options.maxResults,
+            site : this.options.siteId,
+            container : this.options.containerId
          });
-      },
-
-      /**
-       * Build URI parameter string for doclist JSON data webscript
-       *
-       * @method _buildDocListParams
-       * @param path {string} Path to query
-       */
-      _buildSearchParams: function Search__buildSearchParams(site, container, searchTerm)
-      {
-         var params = YAHOO.lang.substitute("site={site}&container={container}&term={term}&maxResults={maxResults}",
-         {
-            site: encodeURIComponent(site),
-            container: encodeURIComponent(container),
-            term : encodeURIComponent(searchTerm),
-            maxResults : this.options.maxResults
-         });
-
-         return params;
+         Event.preventDefault(e);
       }
+      
    };
 })();
+
+
+/**
+ * Register a default action handler for a set of elements described by a common class name.
+ * The common enclosing tag should hold an id of the form ${htmlid}-methodToCall-param.
+ * 
+ * @param htmlId the id of the component
+ * @param className the classname that is common to all to be handled elements
+ * @param ownerTagName the enclosing element's tag name. This element needs to have
+ *        an id of type {htmlid}-methodToCall[-param], the param is optional.
+ * @param handlerObject the object that handles the actions. Upon action, the methodToCall of this
+ *        object is called, passing in the param as specified in the ownerTagName's id.
+ */
+Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
+{         
+   // Hook the tag events
+   YAHOO.Bubbling.addDefaultAction(className,
+      function genericDefaultAction(layer, args)
+      {
+         var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
+         if (owner !== null)
+         {
+            // check that the html id matches, abort otherwise
+            var tmp = owner.id;
+            if (tmp.indexOf(htmlId) != 0)
+            {
+               return true;
+            }
+            var tmp = tmp.substring(htmlId.length + 1);
+            var parts = tmp.split('-');
+            if (parts.length < 1)
+            {
+               // stop here
+               return true;
+            }
+            // the first entry is the handler method to call
+            var action = parts[0];
+            if (typeof handlerObject[action] == "function")
+            {
+               // extract the param part of the id
+               var param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
+               handlerObject[action].call(handlerObject, param);
+               args[1].stop = true;
+            }
+         }
+         return true;
+      }
+   );
+}
