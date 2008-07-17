@@ -29,7 +29,7 @@
       </condition>
       <property file      = "${alfresco.user.override.properties.file}" />
 
-      <property file="${basedir}/projects/repository/config/alfresco/version.properties" />
+<!--      <property file="${basedir}/projects/repository/config/alfresco/version.properties" /> -->
       <property file="${basedir}/build.properties" />
       <property file="${basedir}/shared.properties" />
 
