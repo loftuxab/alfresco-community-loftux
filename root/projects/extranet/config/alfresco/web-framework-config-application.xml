@@ -62,19 +62,6 @@
 
 			<!-- Overwrite the endpoints with Alfresco Extranet endpoints -->
 			<endpoint>
-				<id>alfresco-system</id>
-				<name>Alfresco - System access</name>
-				<description>System account access to Alfresco</description>
-				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
-				<identity>declared</identity>
-				<username>admin</username>
-				<password>admin</password>
-				<unsecure>true</unsecure>
-				<persistent>false</persistent>
-			</endpoint>
-			
-			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - user access</name>
 				<description>Access to Alfresco Repository WebScripts</description>

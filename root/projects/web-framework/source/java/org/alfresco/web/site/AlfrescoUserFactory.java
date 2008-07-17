@@ -32,6 +32,7 @@ import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.User;
+import org.alfresco.web.scripts.Status;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +50,6 @@ public class AlfrescoUserFactory extends UserFactory
     private static Log logger = LogFactory.getLog(AlfrescoUserFactory.class);
 
     public static final String ALFRESCO_ENDPOINT_ID = "alfresco";
-    public static final String ALFRESCO_SYSTEM_ENDPOINT_ID = "alfresco-system";
 
 
     /* (non-Javadoc)
@@ -65,7 +65,7 @@ public class AlfrescoUserFactory extends UserFactory
             Credentials credentials = vault.newCredentials(ALFRESCO_ENDPOINT_ID);
             credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
             credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
-
+            
             // build a connector whose connector session is bound to the current session
             AuthenticatingConnector connector = (AuthenticatingConnector)
                 FrameworkHelper.getConnector(request.getSession(), username, ALFRESCO_ENDPOINT_ID);
@@ -77,9 +77,9 @@ public class AlfrescoUserFactory extends UserFactory
             // an invalid ticket or perhaps a connectivity issue
             // at any rate, we cannot authenticate
             if(logger.isDebugEnabled())
-                logger.debug("Exception on initializeUser", ex);
+                logger.debug("Exception in AlfrescoUserFactory.authenticate()", ex);
         }
-
+        
         return authenticated;
     }
 
@@ -92,22 +92,25 @@ public class AlfrescoUserFactory extends UserFactory
         User user = null;
         try
         {
-            // build a connector whose connector session is bound to the current session
-            Connector connector = FrameworkHelper.getConnector(request.getSession(), userId, ALFRESCO_SYSTEM_ENDPOINT_ID);
+            // get a connector whose connector session is bound to the current session
+            Connector connector = FrameworkHelper.getConnector(
+                    request.getSession(), userId, ALFRESCO_ENDPOINT_ID);
             
-            // call the authentication ticket provider
+            // build the REST URL to retrieve user details
             String uri = "/webframework/content/metadata?user=" + userId;
-
+            
+            // invoke and check for OK response
             Response response = connector.call(uri);
-
-            String responseString = response.getResponse();
-
-            // Load the user from the JSON parser
-            JSONObject jsonObject = new JSONObject(responseString);
-
-            JSONObject properties = jsonObject.getJSONObject("properties");
-
-            user = new User(userId);
+            if (Status.STATUS_OK != response.getStatus().getCode())
+            {
+                throw new UserFactoryException("Unable to create user - failed to retrieve user metadata: " + 
+                        response.getStatus().getMessage(), (Exception)response.getStatus().getException());
+            }
+            
+            // Load the user properties via the JSON parser
+            JSONObject properties = new JSONObject(response.getResponse()).getJSONObject("properties");
+            
+            user = new AlfrescoUser(userId);
             user.setFirstName(properties.getString("{http://www.alfresco.org/model/content/1.0}firstName"));
             user.setLastName(properties.getString("{http://www.alfresco.org/model/content/1.0}lastName"));
             if (properties.has("{http://www.alfresco.org/model/content/1.0}jobtitle"))
@@ -126,8 +129,51 @@ public class AlfrescoUserFactory extends UserFactory
             {
                 user.setEmail(properties.getString("{http://www.alfresco.org/model/content/1.0}email"));
             }
-
-            // TODO: apply other user properties
+            // TODO: get BIO - note child content property on cm:person!
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}telephone"))
+            {
+                user.setTelephone(properties.getString("{http://www.alfresco.org/model/content/1.0}telephone"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}mobile"))
+            {
+                user.setMobilePhone(properties.getString("{http://www.alfresco.org/model/content/1.0}mobile"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}skype"))
+            {
+                user.setSkype(properties.getString("{http://www.alfresco.org/model/content/1.0}skype"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}instantmsg"))
+            {
+                user.setInstantMsg(properties.getString("{http://www.alfresco.org/model/content/1.0}instantmsg"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companyaddress1"))
+            {
+                user.setCompanyAddress1(properties.getString("{http://www.alfresco.org/model/content/1.0}companyaddress1"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companyaddress2"))
+            {
+                user.setCompanyAddress2(properties.getString("{http://www.alfresco.org/model/content/1.0}companyaddress2"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companyaddress3"))
+            {
+                user.setCompanyAddress3(properties.getString("{http://www.alfresco.org/model/content/1.0}companyaddress3"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companypostcode"))
+            {
+                user.setCompanyPostcode(properties.getString("{http://www.alfresco.org/model/content/1.0}companypostcode"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companytelephone"))
+            {
+                user.setCompanyTelephone(properties.getString("{http://www.alfresco.org/model/content/1.0}companytelephone"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companyfax"))
+            {
+                user.setCompanyFax(properties.getString("{http://www.alfresco.org/model/content/1.0}companyfax"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}companyemail"))
+            {
+                user.setCompanyEmail(properties.getString("{http://www.alfresco.org/model/content/1.0}companyemail"));
+            }
         }
         catch (Exception ex)
         {

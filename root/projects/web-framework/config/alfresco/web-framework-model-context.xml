@@ -6,7 +6,7 @@
    <!-- Abstract Store Instances -->
    <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
       <property name="endpoint">
-         <value>alfresco-system</value>
+         <value>alfresco</value>
       </property>
       <property name="api">
          <value>/remotestore</value>

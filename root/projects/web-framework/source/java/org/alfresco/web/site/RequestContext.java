@@ -338,7 +338,7 @@ public interface RequestContext extends Serializable
      * @param model
      */
     public void setModel(Model model);
-        
+    
     public static final String VALUE_HEAD_TAGS = "headTags";
     public static final String VALUE_CREDENTIAL_VAULT = "credential_vault";
     public static final String VALUE_IDENTITY_VAULT = "identity_vault";

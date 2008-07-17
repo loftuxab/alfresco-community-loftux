@@ -29,8 +29,13 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author muzquiano
  */
-public class HttpRequestContext extends AbstractRequestContext
+public class HttpRequestContext extends ThreadLocalRequestContext
 {
+    /**
+     * Construction
+     * 
+     * @param request   The HttpServletRequest this context is related too
+     */
     public HttpRequestContext(HttpServletRequest request)
     {
         this.request = request;

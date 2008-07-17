@@ -48,6 +48,7 @@
 			</authenticator>
 
 			<!-- Endpoints -->
+			<!-- Example of a 'declared' identity endpoint configuration
 			<endpoint>
 				<id>alfresco-system</id>
 				<name>Alfresco - System access</name>
@@ -58,12 +59,21 @@
 				<username>admin</username>
 				<password>admin</password>
 				<unsecure>true</unsecure>
+			</endpoint> -->
+
+			<endpoint>
+				<id>alfresco-noauth</id>
+				<name>Alfresco - unauthenticated access</name>
+				<description>Access to Alfresco Repository WebScripts that do not require authentication</description>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://localhost:8080/alfresco/s</endpoint-url>
+				<identity>none</identity>
 			</endpoint>
 
 			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - user access</name>
-				<description>Access to Alfresco Repository WebScripts</description>
+				<description>Access to Alfresco Repository WebScripts that require user authentication</description>
 				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://localhost:8080/alfresco/s</endpoint-url>
 				<identity>user</identity>

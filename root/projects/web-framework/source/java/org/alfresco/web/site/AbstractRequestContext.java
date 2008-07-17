@@ -88,7 +88,7 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         this.map = new HashMap<String, Serializable>(16, 1.0f);
     }
-
+    
     /**
      * Each request context instance is stamped with a unique id - generally only used for debugging
      * 

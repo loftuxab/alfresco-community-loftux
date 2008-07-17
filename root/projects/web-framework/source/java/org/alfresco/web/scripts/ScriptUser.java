@@ -30,8 +30,8 @@ import org.alfresco.connector.User;
 import org.alfresco.web.site.RequestContext;
 
 /**
- * Read-only root-scoped script object describing the user of the site who 
- * is currently executing current rendering process.
+ * Read-only root-scoped script object wrapping the current user for
+ * the current thread of execution.
  * 
  * The following is equivalent:
  * 
@@ -40,10 +40,11 @@ import org.alfresco.web.site.RequestContext;
  * var city = user.properties["city"];
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public final class ScriptUser extends ScriptBase
 {
-    protected User user;
+    private final User user;
     
     /**
      * Instantiates a new ScriptUser object which wraps a given request
@@ -77,86 +78,6 @@ public final class ScriptUser extends ScriptBase
     }
     
     /**
-     * Gets the name.
-     * 
-     * @return the name
-     */
-    public String getName()
-    {
-        return this.user.getName();
-    }
-    
-    /**
-     * Gets the full name.
-     * 
-     * @return the full name
-     */
-    public String getFullName()
-    {
-        return this.user.getFullName();
-    }
-
-    /**
-     * Gets the address1.
-     * 
-     * @return the address1
-     */
-    public String getAddress1()
-    {
-        return this.user.getAddress1();
-    }
-
-    /**
-     * Gets the address2.
-     * 
-     * @return the address2
-     */
-    public String getAddress2()
-    {
-        return this.user.getAddress2();
-    }
-
-    /**
-     * Gets the city.
-     * 
-     * @return the city
-     */
-    public String getCity()
-    {
-        return this.user.getCity();
-    }
-
-    /**
-     * Gets the country.
-     * 
-     * @return the country
-     */
-    public String getCountry()
-    {
-        return this.user.getCountry();
-    }
-
-    /**
-     * Gets the first name.
-     * 
-     * @return the first name
-     */
-    public String getFirstName()
-    {
-        return this.user.getFirstName();
-    }
-
-    /**
-     * Gets the home phone.
-     * 
-     * @return the home phone
-     */
-    public String getHomePhone()
-    {
-        return this.user.getHomePhone();
-    }
-
-    /**
      * Gets the id.
      * 
      * @return the id
@@ -165,75 +86,216 @@ public final class ScriptUser extends ScriptBase
     {
         return this.user.getId();
     }
-
+    
     /**
-     * Gets the last name.
+     * Gets the name (generally this is the username - i.e. same as id)
      * 
-     * @return the last name
+     * @return the name
      */
+    public String getName()
+    {
+        return this.user.getName();
+    }
+    
+    public String getFullName()
+    {
+        return this.user.getFullName();
+    }
+    
+    public String getFirstName()
+    {
+        return this.user.getFirstName();
+    }
+    
+    public void setFirstName(String value)
+    {
+        this.user.setFirstName(value);
+    }
+    
     public String getLastName()
     {
         return this.user.getLastName();
     }
+    
+    public void setLastName(String value)
+    {
+        this.user.setLastName(value);
+    }
 
-    /**
-     * Gets the middle name.
-     * 
-     * @return the middle name
-     */
     public String getMiddleName()
     {
         return this.user.getMiddleName();
     }
-
-    /**
-     * Gets the mobile phone.
-     * 
-     * @return the mobile phone
-     */
+    
+    public void setMiddleName(String value)
+    {
+        this.user.setMiddleName(value);
+    }
+    
+    public String getEmail()
+    {
+        return this.user.getEmail();
+    }
+    
+    public void setEmail(String value)
+    {
+        this.user.setEmail(value);
+    }
+    
+    public String getOrganization()
+    {
+        return this.user.getOrganization();
+    }
+    
+    public void setOrganization(String value)
+    {
+        this.user.setEmail(value);
+    }
+    
+    public String getJobTitle()
+    {
+        return this.user.getJobTitle();
+    }
+    
+    public void setJobTitle(String value)
+    {
+        this.user.setJobTitle(value);
+    }
+    
+    public String getLocation()
+    {
+        return this.user.getLocation();
+    }
+    
+    public void setLocation(String value)
+    {
+        this.user.setLocation(value);
+    }
+    
+    public String getBiography()
+    {
+        return this.user.getBiography();
+    }
+    
+    public void setBiography(String value)
+    {
+        this.user.setBiography(value);
+    }
+    
+    public String getTelephone()
+    {
+        return this.user.getTelephone();
+    }
+    
+    public void setTelephone(String value)
+    {
+        this.user.setTelephone(value);
+    }
+    
     public String getMobilePhone()
     {
         return this.user.getMobilePhone();
     }
-
-    /**
-     * Gets the state.
-     * 
-     * @return the state
-     */
-    public String getState()
+    
+    public void setMobilePhone(String value)
     {
-        return this.user.getState();
+        this.user.setMobilePhone(value);
+    }
+    
+    public String getSkype()
+    {
+        return this.user.getSkype();
+    }
+    
+    public void setSkype(String value)
+    {
+        this.user.setSkype(value);
+    }
+    
+    public String getInstantMsg()
+    {
+        return this.user.getInstantMsg();
+    }
+    
+    public void setInstantMsg(String value)
+    {
+        this.user.setInstantMsg(value);
+    }
+    
+    public String getCompanyPostcode()
+    {
+        return this.user.getCompanyPostcode();
+    }
+    
+    public void setCompanyPostcode(String value)
+    {
+        this.user.setCompanyPostcode(value);
+    }
+    
+    public String getCompanyTelephone()
+    {
+        return this.user.getCompanyTelephone();
+    }
+    
+    public void setCompanyTelephone(String value)
+    {
+        this.user.setCompanyTelephone(value);
+    }
+    
+    public String getCompanyFax()
+    {
+        return this.user.getCompanyFax();
+    }
+    
+    public void setCompanyFax(String value)
+    {
+        this.user.setCompanyFax(value);
+    }
+    
+    public String getCompanyEmail()
+    {
+        return this.user.getCompanyEmail();
+    }
+    
+    public void setCompanyEmail(String value)
+    {
+        this.user.setCompanyEmail(value);
+    }
+    
+    public String getCompanyAddress1()
+    {
+        return this.user.getCompanyAddress1();
+    }
+    
+    public void setCompanyAddress1(String value)
+    {
+        this.user.setCompanyAddress1(value);
     }
 
-    /**
-     * Gets the work phone.
-     * 
-     * @return the work phone
-     */
-    public String getWorkPhone()
+    public String getCompanyAddress2()
     {
-        return this.user.getWorkPhone();
+        return this.user.getCompanyAddress2();
     }
-
-    /**
-     * Gets the zip code.
-     * 
-     * @return the zip code
-     */
-    public String getZipCode()
+    
+    public void setCompanyAddress2(String value)
     {
-        return this.user.getZipCode();
+        this.user.setCompanyAddress2(value);
     }
-
-    /**
-     * Gets the email.
-     * 
-     * @return the email
-     */
-    public String getEmail()
+    
+    public String getCompanyAddress3()
     {
-        return this.user.getEmail();
+        return this.user.getCompanyAddress3();
+    }
+    
+    public void setCompanyAddress3(String value)
+    {
+        this.user.setCompanyAddress3(value);
+    }
+    
+    
+    public void save()
+    {
+        this.user.save();
     }
     
     /* (non-Javadoc)
