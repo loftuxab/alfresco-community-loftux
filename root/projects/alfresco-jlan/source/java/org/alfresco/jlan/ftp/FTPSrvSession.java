@@ -2046,6 +2046,10 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				// Create a new file
 
 				netFile = disk.createFile(this, tree, params);
+				
+				// Commit any transaction before starting the data transfer
+				
+				endTransaction();
 			}
 
 			// Notify change listeners that a new file has been created
