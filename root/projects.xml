@@ -2994,6 +2994,17 @@
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
          <fileset dir="${dir.project.extranet.config}" excludes="**/extension/**" />
       </copy>
+      
+      <!-- Additional development mode support -->
+      <echo>${dir.project.extranet}/dev/extranet.properties</echo>
+      <copy file="${dir.project.extranet}/dev/extranet.properties" 
+	    tofile="${dir.project.extranet.assemble}/WEB-INF/classes/alfresco/extranet.properties"
+	    failonerror="false" 
+	    overwrite="true" />
+      <copy file="${dir.project.extranet}/dev/web-framework-config-custom.xml" 
+	    tofile="${dir.project.extranet.assemble}/WEB-INF/classes/alfresco/extension/web-framework-config-custom.xml"
+	    failonerror="false" 
+	    overwrite="true" />
 
       <!-- add all JAR to WEB-INF/lib -->
       <copy todir="${dir.project.extranet.assemble}/WEB-INF/lib">

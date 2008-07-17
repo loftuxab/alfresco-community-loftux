@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<model name="network:contentModel"
+	xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+	<description>Network Content Model</description>
+	<author>Uzquiano</author>
+	<version>1.0</version>
+
+	<!-- Imports are required to allow references to definitions in other models -->
+	<imports>
+		<!-- Import Alfresco Dictionary Definitions -->
+		<import uri="http://www.alfresco.org/model/dictionary/1.0"
+			prefix="d" />
+		<!-- Import Alfresco Content Domain Model Definitions -->
+		<import uri="http://www.alfresco.org/model/content/1.0"
+			prefix="cm" />
+	</imports>
+
+	<namespaces>
+		<namespace uri="http://www.alfresco.org/model/network/1.0"
+			prefix="network" />
+	</namespaces>
+	
+	<constraints>
+        <constraint name="network:newsItemTypeValues" type="LIST">
+            <parameter name="allowedValues">
+                <list>
+                    <value>community</value>
+                    <value>support</value>
+                    <value>product</value>
+                    <value>general</value>
+                </list>
+            </parameter>
+        </constraint>	
+	</constraints>
+
+	<types>
+
+		<type name="network:newsItem">
+			<title>Network News Item</title>
+			<parent>cm:content</parent>
+			<properties>
+				<property name="network:newsItemHeadline">
+					<title>Headline</title>
+					<type>d:text</type>
+				</property>
+				<property name="network:newsItemTeaser">
+					<title>Teaser</title>
+					<type>d:text</type>
+				</property>
+				<property name="network:newsItemType">
+					<title>News Item Type</title>
+					<type>d:text</type>
+					<multiple>true</multiple>
+                    <constraints>
+                        <constraint ref="network:newsItemTypeValues" />
+                    </constraints>					
+				</property>
+				<property name="network:newsItemRelatedLinks">
+					<title>Related Links</title>
+					<type>d:text</type>
+					<multiple>true</multiple>
+				</property>
+				<property name="network:newsItemReadMore">
+					<title>Read More Text</title>
+					<type>d:text</type>
+				</property>
+			</properties>
+			<associations>
+				<association name="network:newsItemTeaserImage">
+					<title>Teaser Image</title>
+					<source>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</source>
+					<target>
+						<class>cm:content</class>
+						<mandatory>false</mandatory>
+						<many>false</many>
+					</target>
+				</association>
+				<association name="network:newsItemRelatedMedia">
+					<title>Related Media</title>
+					<source>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</source>
+					<target>
+						<class>cm:content</class>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</target>
+				</association>
+			</associations>
+	         <mandatory-aspects>
+	            <aspect>cm:effectivity</aspect>
+	         </mandatory-aspects>
+		</type>
+
+		<type name="network:libraryAsset">
+			<title>Library Asset</title>
+			<parent>cm:content</parent>
+			<properties>
+				<property name="network:libraryAssetHeadline">
+					<title>Headline</title>
+					<type>d:text</type>
+				</property>
+				<property name="network:libraryAssetTeaser">
+					<title>Teaser</title>
+					<type>d:text</type>
+				</property>
+				<property name="network:libraryAssetLongDescription">
+					<title>Long Description</title>
+					<type>d:text</type>
+				</property>
+				<property name="network:libraryAssetVersionID">
+					<title>Version Identifier</title>
+					<type>d:text</type>
+				</property>
+				<property name="network:libraryAssetRelatedLinks">
+					<title>Related Links</title>
+					<type>d:text</type>
+					<multiple>true</multiple>
+				</property>
+				<property name="network:libraryAssetPreviewURL">
+					<title>Preview URL</title>
+					<type>d:text</type>
+				</property>				
+				<property name="network:libraryAssetAuthorDetails">
+					<title>Contact Information - Author</title>
+					<type>d:text</type>
+				</property>				
+				<property name="network:libraryAssetDownloadRef">
+					<title>Download Reference</title>
+					<type>d:text</type>
+				</property>				
+				<property name="network:libraryAssetDocumentationRef">
+					<title>Documentation Reference</title>
+					<type>d:text</type>
+				</property>				
+				<property name="network:libraryAssetInstallationType">
+					<title>Installation Type</title>
+					<type>d:text</type>
+				</property>				
+			</properties>
+			<associations>
+				<association name="network:libraryAssetTeaserImage">
+					<title>Teaser Image</title>
+					<source>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</source>
+					<target>
+						<class>cm:content</class>
+						<mandatory>false</mandatory>
+						<many>false</many>
+					</target>
+				</association>
+				<association name="network:libraryAssetPreviews">
+					<title>Previews</title>
+					<source>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</source>
+					<target>
+						<class>cm:content</class>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</target>
+				</association>
+				<association name="network:libraryAssetCategories">
+					<title>Categories</title>
+					<source>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</source>
+					<target>
+						<class>cm:content</class>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</target>
+				</association>
+			</associations>
+	         <mandatory-aspects>
+	            <aspect>cm:effectivity</aspect>
+	         </mandatory-aspects>
+		</type>
+
+	</types>
+
+</model>

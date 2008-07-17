@@ -33,6 +33,8 @@ tr.notifications-rowB {
 	</tr>
 	
 <#assign count = 0>
+<#if objects?exists>
+
 <#list objects as object>
 
 	<#assign bgClass = "notifications-rowA">
@@ -59,6 +61,8 @@ tr.notifications-rowB {
 	<#assign count = count + 1>
 
 </#list>
+
+</#if>
 
 </table>
 
