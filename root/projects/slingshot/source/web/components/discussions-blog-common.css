@@ -40,17 +40,6 @@ ol li {
   list-style-type: decimal; 
 }
 
-/***********
- * GENERAL *
-************/
-.hidden {
-  display: none;
-}
-.spacer {
-  margin: 0 7px;
-  color: #ccc;
-  font-size: 116%;
-}
 
 /************
  * LEFT NAV *
@@ -362,4 +351,16 @@ html>body .node, .reply, .comment {
 }
 .editNodeForm .nodeFormAction {
   margin: 25px 0 10px 115px;
+}
+
+/***********
+ * GENERAL *
+************/
+.hidden {
+  display: none;
+}
+.spacer {
+  margin: 0 7px;
+  color: #ccc;
+  font-size: 116%;
 }
