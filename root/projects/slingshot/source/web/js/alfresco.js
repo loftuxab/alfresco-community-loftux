@@ -1211,9 +1211,10 @@ Alfresco.util.Ajax = function()
          var callback = config.successCallback;
          if (callback && typeof callback.fn == "function")
          {
+            var contentType = serverResponse.getResponseHeader["Content-Type"] || config.responseContentType;
             // User provided a custom successHandler
             var json = null;
-            if (config.responseContentType === "application/json")
+            if (/^\s*application\/json/.test(contentType))
             {
                // Decode the response since it should be json
                json = Alfresco.util.parseJSON(serverResponse.responseText);
