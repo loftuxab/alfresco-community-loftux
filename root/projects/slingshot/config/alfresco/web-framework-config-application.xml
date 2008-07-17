@@ -191,4 +191,15 @@
       </uri-templates>
    </config>
 
+   <config evaluator="string-compare" condition="SitePages" replace="true">
+      <pages>
+         <page id="user-profile">user-profile</page>
+         <page id="calendar">calendar</page>
+         <page id="wiki">wiki</page>
+         <page id="documentlibrary">documentlibrary</page>
+         <page id="discussions-topiclist">discussions-topiclist</page>
+         <page id="blog-postlist">blog-postlist</page>
+      </pages>
+   </config>
+
 </alfresco-config>
