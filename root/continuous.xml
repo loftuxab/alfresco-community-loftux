@@ -299,8 +299,6 @@
          <zipfileset dir="${dir.project.installer.extras}" 
                      prefix="extras"
                      excludes="**/*.sh" />
-         <zipfileset dir="${dir.project.installer.alfdata}"
-                     prefix="alf_data" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
          <zipfileset dir="${dir.project.jlan}/jni"
@@ -342,8 +340,6 @@
          <tarfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.bat" />
-         <tarfileset dir="${dir.project.installer.alfdata}"
-                     prefix="alf_data" />
          <tarfileset dir="${dir.project.installer.binlin}"
                      prefix="bin" />
          <tarfileset dir="${dir.continuous.dist}"
@@ -449,8 +445,6 @@
          <zipfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.sh" />
-         <zipfileset dir="${dir.project.installer.alfdata}"
-                     prefix="alf_data" />
          <zipfileset dir="${dir.project.installer}"
                      includes="licenses/**,
                                README_war.txt" />
@@ -479,8 +473,6 @@
          <tarfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.bat" />
-         <tarfileset dir="${dir.project.installer.alfdata}"
-                     prefix="alf_data" />
          <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**,
                                README_war.txt" />
