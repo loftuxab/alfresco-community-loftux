@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Search</title>
+   <description>Search view</description>
+   <template-instance>search</template-instance>
+   <authentication>user</authentication>
+</page>

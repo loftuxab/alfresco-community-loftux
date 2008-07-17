@@ -17,7 +17,7 @@
 	border: 2px solid #5A7380;
 }
 .commentsListTitle {
-	font-size: 11pt;
+	font-size: 116%;
 	background:transparent url(../images/tag.png) no-repeat scroll 20px 50%;
 	padding: 20px 0pt 20px 40px;
 }
@@ -31,7 +31,7 @@
 #discussionsBlogHeader1 .configLink {
 	font-family: Arial, sans-serif;
 	font-weight: normal;
-	font-size: 11pt;
+	font-size: 116%;
 	color: #333333;
 	background: transparent url(../images/star.png) no-repeat scroll 3px 5px;
 	padding-left: 19px;
@@ -49,7 +49,7 @@
 }
 
 .commentFormTitle {
-	font-size: 11pt;
+	font-size: 116%;
 	margin-bottom: 15px;
 }
 
