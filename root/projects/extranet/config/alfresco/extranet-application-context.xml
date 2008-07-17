@@ -3,10 +3,19 @@
 
 <beans>
 
+	<!-- Extranet Environment Configurator -->
+	<bean id="extranet.environment.configurator" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    	<property name="location">
+			<value>/WEB-INF/classes/alfresco/extranet.properties</value>
+		</property>
+	</bean>
+
+	
+
 	<!-- Extranet Application Properties -->
 	<bean id="application.properties" class="org.alfresco.extranet.ApplicationProperties">
-		<property name="hostPort" value="http://localhost:8280/" />
-		<property name="webapp" value="extranet" />
+		<property name="hostPort" value="${application.hostPort}" />
+		<property name="webapp" value="${application.webapp}" />
 	</bean>
 
 	<!--               -->
@@ -52,10 +61,10 @@
 		</constructor-arg>
 	</bean>
 	<bean id="extranet.service.webhelpdesk.jdbc.datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://127.0.0.1/extranet" />
-		<property name="username" value="root" />
-		<property name="password" value="admin" />
+		<property name="driverClassName" value="${webhelpdesk.db.driverClassName}" />
+		<property name="url" value="${webhelpdesk.db.url}" />
+		<property name="username" value="${webhelpdesk.db.username}" />
+		<property name="password" value="${webhelpdesk.db.password}" />
 	</bean>	
 	
 	
@@ -95,10 +104,10 @@
 		</constructor-arg>
 	</bean>
 	<bean id="extranet.service.database.jdbc.datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://127.0.0.1/extranet" />
-		<property name="username" value="root" />
-		<property name="password" value="admin" />
+		<property name="driverClassName" value="${application.db.driverClassName}" />
+		<property name="url" value="${application.db.url}" />
+		<property name="username" value="${application.db.username}" />
+		<property name="password" value="${application.db.password}" />
 	</bean>	
 
 	
@@ -124,10 +133,10 @@
         <property name="ldapTemplate" ref="extranet.service.ldap.template" />
     </bean>
 	<bean id="extranet.service.ldap.contextsource" class="org.springframework.ldap.core.support.LdapContextSource">
-		<property name="url" value="ldap://localhost:10389" />
-		<property name="base" value="dc=example,dc=com" />
-		<property name="userDn" value="cn=Manager" />
-		<property name="password" value="secret" />
+		<property name="url" value="${application.ldap.url}" />
+		<property name="base" value="${application.ldap.base}" />
+		<property name="userDn" value="${application.ldap.userDn}" />
+		<property name="password" value="${application.ldap.password}" />
     </bean>
     <bean id="extranet.service.ldap.template" class="org.springframework.ldap.core.LdapTemplate">
         <constructor-arg ref="extranet.service.ldap.contextsource" />
@@ -140,12 +149,12 @@
 	<!--                            -->		
 	<bean id="extranet.service.mail" class="org.alfresco.extranet.mail.MailService">
 		<property name="mailSender" ref="extranet.service.mail.sender"/>
-		<property name="adminEmailAddress" value="network@alfresco.com"/>
+		<property name="adminEmailAddress" value="${application.email.address}"/>
 	</bean>    
 	<bean id="extranet.service.mail.sender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="host" value="zimbra.alfresco.com"/>
-		<property name="username" value="network"/>
-		<property name="password" value="(FILL IN)"/>
+		<property name="host" value="${application.email.host}"/>
+		<property name="username" value="${application.email.username}"/>
+		<property name="password" value="${application.email.password}"/>
 		<property name="javaMailProperties">
 			<props>
 				<prop key="mail.smtp.auth">true</prop>
@@ -158,9 +167,9 @@
 	<!-- Application Service: JIRA -->
 	<!--                            -->		
 	<bean id="extranet.service.jira" class="org.alfresco.extranet.jira.JIRAService">
-		<property name="server" value="http://issues.alfresco.com"/>
-		<property name="username" value="extranet"/>
-		<property name="password" value="(FILL IN)"/>
+		<property name="server" value="${jira.server}"/>
+		<property name="username" value="${jira.username}"/>
+		<property name="password" value="${jira.password}"/>
 	</bean>    
 
 

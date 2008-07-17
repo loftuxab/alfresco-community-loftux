@@ -66,10 +66,10 @@
 				<name>Alfresco - System access</name>
 				<description>System account access to Alfresco</description>
 				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://hosted13.alfresco.com/alfresco/service</endpoint-url>
+				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
 				<identity>declared</identity>
-				<username>extranet</username>
-				<password>(FILL IN)</password>
+				<username>admin</username>
+				<password>admin</password>
 				<unsecure>true</unsecure>
 				<persistent>false</persistent>
 			</endpoint>
@@ -79,7 +79,7 @@
 				<name>Alfresco - user access</name>
 				<description>Access to Alfresco Repository WebScripts</description>
 				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://hosted13.alfresco.com/alfresco/service</endpoint-url>
+				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
 				<identity>user</identity>
 				<persistent>false</persistent>				
 			</endpoint>
@@ -129,7 +129,7 @@
 				<name>support.alfresco.com</name>
 				<description>support.alfresco.com</description>
 				<connector-id>webhelpdesk</connector-id>
-				<endpoint-url>http://support.alfresco.com</endpoint-url>
+				<endpoint-url>http://support.test.alfresco.com</endpoint-url>
 				<identity>user</identity>
 				<persistent>true</persistent>				
 			</endpoint>
