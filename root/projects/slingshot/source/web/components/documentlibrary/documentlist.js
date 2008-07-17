@@ -1137,12 +1137,12 @@
 
          if (this.fileUpload === null)
          {
-            /*this.fileUpload = Alfresco.module.getFileUploadInstance(); //new Alfresco.module.FileUpload(this.id + "-fileUpload");*/
-            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
+            this.fileUpload = Alfresco.module.getFileUploadInstance();
+            // this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
          }
 
          // Show uploader for multiple files
-         var description = Alfresco.util.message("label.filterDescription", this.name, record.getData("displayName"));
+         var description = this._msg("label.filter-description", record.getData("displayName"));
          var extensions = "*" + fileName.substring(fileName.lastIndexOf("."));
          var singleUpdateConfig =
          {
@@ -1150,11 +1150,15 @@
             containerId: this.options.containerId,
             updateNodeRef: nodeRef,
             updateFilename: fileName,
-            filter: [{description: description, extensions: extensions}],
+            filter: [
+            {
+               description: description,
+               extensions: extensions
+            }],
             mode: this.fileUpload.MODE_SINGLE_UPDATE,
             onFileUploadComplete:
             {
-               fn: this.onFileUploadComplete,
+               fn: this.onNewVersionUploadComplete,
                scope: this
             }
          }
@@ -1166,8 +1170,9 @@
        * Called from the uploader component after a the new version has been uploaded.
        *
        * @method onNewVersionUploadComplete
+       * @param complete {object} Object literal containing details of successful and failed uploads
        */
-      onNewVersionUploadComplete: function DL_onNewVersionUploadComplete()
+      onNewVersionUploadComplete: function DL_onNewVersionUploadComplete(complete)
       {
          // Do something after the new version is uploaded
       },

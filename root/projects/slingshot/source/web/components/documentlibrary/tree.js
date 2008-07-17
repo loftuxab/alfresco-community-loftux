@@ -515,14 +515,24 @@
          Alfresco.logger.debug("DLT_onFolderDeleted");
 
          var obj = args[1];
-         if ((obj !== null) && (obj.path !== null))
+         if (obj !== null)
          {
-            // ensure path starts with leading slash if not the root node
-            if ((obj.path != "") && (obj.path.substring(0, 1) != "/"))
+            var node = null;
+            
+            if (obj.path)
             {
-               obj.path = "/" + obj.path;
+               // ensure path starts with leading slash if not the root node
+               if ((obj.path != "") && (obj.path.substring(0, 1) != "/"))
+               {
+                  obj.path = "/" + obj.path;
+               }
+               node = this.treeview.getNodeByProperty("path", obj.path);
             }
-            var node = this.treeview.getNodeByProperty("path", obj.path);
+            else if (obj.nodeRef)
+            {
+               node = this.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
+            }
+            
             if (node !== null)
             {
                var parentNode = node.parent;

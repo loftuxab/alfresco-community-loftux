@@ -420,22 +420,139 @@
          Event.preventDefault(domEvent);
       },
       
+      /**
+       * Copy Multiple Assets.
+       *
+       * @method onActionCopyTo
+       * @private
+       */
       onActionCopyTo: function DLTB_onActionCopyTo()
       {
          var files = this.modules.docList.getSelectedFiles();
          alert("Would perform copyTo on " + files.length + " files.");
       },
 
+      /**
+       * Move Multiple Assets.
+       *
+       * @method onActionMoveTo
+       * @private
+       */
       onActionMoveTo: function DLTB_onActionMoveTo()
       {
          var files = this.modules.docList.getSelectedFiles();
          alert("Would perform moveTo on " + files.length + " files.");
       },
 
+      /**
+       * Delete Multiple Assets.
+       *
+       * @method onActionDelete
+       * @private
+       */
       onActionDelete: function DLTB_onActionDelete()
       {
+         var me = this;
          var files = this.modules.docList.getSelectedFiles();
-         alert("Would perform delete on " + files.length + " files.");
+         
+         var fileNames = [];
+         for (var i = 0, j = files.length; i < j; i++)
+         {
+            fileNames.push("<span class=\"" + files[i].type + "\">" + files[i].displayName + "</span>");
+         }
+         
+         var confirmMsg = this._msg("message.confirm.multiple-delete", files.length);
+         confirmMsg += "<div class=\"toolbar-file-list\">" + fileNames.join("") + "</div>";
+
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: confirmMsg,
+            modal: true,
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function DLTB_onActionDelete_delete()
+               {
+                  this.hide();
+                  me._onActionDeleteConfirm.call(me, files);
+               },
+               isDefault: true
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function DLTB_onActionDelete_cancel()
+               {
+                  this.hide();
+               }
+            }]
+         });
+      },
+
+      /**
+       * Delete Multiple Assets confirmed.
+       *
+       * @method _onActionDeleteConfirm
+       * @param files {array} Array containing files to be deleted
+       * @private
+       */
+      _onActionDeleteConfirm: function DLTB__onActionDeleteConfirm(files)
+      {
+         var multipleFiles = [];
+         for (var i = 0, j = files.length; i < j; i++)
+         {
+            multipleFiles.push(files[i].nodeRef);
+         }
+         
+         // Success callback function
+         var fnSuccess = function DLTB__oADC_success(data, files)
+         {
+            var result;
+            for (var i = 0, j = data.json.totalResults; i < j; i++)
+            {
+               result = data.json.results[i];
+               
+               if (result.success)
+               {
+                  // TODO: Show a confirmation pop-up
+                  // TODO: Roll-up single events?
+                  YAHOO.Bubbling.fire(result.type == "folder" ? "folderDeleted" : "fileDeleted",
+                  {
+                     nodeRef: result.nodeRef
+                  });
+               }
+            }
+         }
+         
+         // Construct the data object for the genericAction call
+         this.modules.actions.genericAction(
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: fnSuccess,
+                  scope: this,
+                  obj: files
+               }
+            },
+            failure:
+            {
+               message: this._msg("message.multiple-delete.failure")
+            },
+            webscript:
+            {
+               name: "files",
+               method: Alfresco.util.Ajax.DELETE
+            },
+            config:
+            {
+               requestContentType: Alfresco.util.Ajax.JSON,
+               dataObj:
+               {
+                  nodeRefs: multipleFiles
+               }
+            }
+         });
       },
 
       onActionDeselectAll: function DLTB_onActionDeselectAll()

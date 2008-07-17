@@ -37,11 +37,3 @@
    </div>
 
 </div>
-
-<!--
-   <select id="${args.htmlid}-selectedItems-menu" name="doclist-selectedItems-menu">
-       <option value="onActionCopyTo">${msg("menu.selected-items.copy")}</option>
-       <option value="onActionMoveTo">${msg("menu.selected-items.move")}</option>
-       <option value="onActionDelete">${msg("menu.selected-items.delete")}</option>
-   </select>
--->
