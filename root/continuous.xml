@@ -67,9 +67,11 @@
                     distribute-sample-extensions,
                     distribute-docs,
                     revert-changes" />
-
+                    
    <target name="set-build-number"
            depends="init, set-build-devbox-number, set-revision-number">
+      <property file="${dir.project.repository.config}/alfresco/version.properties" />
+      <property file="distribute.properties" />
    </target>
 
    <target name="set-build-devbox-number"
