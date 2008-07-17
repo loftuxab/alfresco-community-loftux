@@ -24,10 +24,6 @@
  */
 package org.alfresco.extranet.mail;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -35,6 +31,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.alfresco.extranet.ApplicationProperties;
 import org.alfresco.extranet.database.DatabaseInvitedUser;
+import org.alfresco.tools.URLUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -53,6 +50,8 @@ public class MailService implements ApplicationContextAware
     protected JavaMailSender mailSender;
     public String adminEmailAddress;
     
+    public String inviteUserEmailTemplateUrl;
+    
     /**
      * Sets the mail sender.
      * 
@@ -61,6 +60,16 @@ public class MailService implements ApplicationContextAware
     public void setMailSender(JavaMailSender mailSender) 
     {
         this.mailSender = mailSender;
+    }
+    
+    /**
+     * Sets the invite user email template url.
+     * 
+     * @param inviteUserEmailTemplateUrl the new invite user email template url
+     */
+    public void setInviteUserEmailTemplateUrl(String inviteUserEmailTemplateUrl)
+    {
+        this.inviteUserEmailTemplateUrl = inviteUserEmailTemplateUrl;
     }
     
     /**
@@ -88,16 +97,16 @@ public class MailService implements ApplicationContextAware
      */
     public void inviteUser(DatabaseInvitedUser invitedUser)
     {
-        inviteUser(invitedUser, "/templates/invite_user.html");
+        inviteUser(invitedUser, inviteUserEmailTemplateUrl);
     }
     
     /**
      * Invite user.
      * 
      * @param invitedUser the invited user
-     * @param bodyFilePath the body file path
+     * @param bodyUri the uri from which to load the body
      */
-    public void inviteUser(final DatabaseInvitedUser invitedUser, String bodyFilePath)
+    public void inviteUser(final DatabaseInvitedUser invitedUser, String bodyUri)
     {
         // pull out application properties
         ApplicationProperties props = (ApplicationProperties) this.applicationContext.getBean("application.properties");
@@ -109,10 +118,12 @@ public class MailService implements ApplicationContextAware
         final StringBuffer buffer = new StringBuffer();
         try
         {
-            File f = new File(bodyFilePath);
-            InputStream input = new FileInputStream(f);
-            String bodyString = org.alfresco.tools.DataUtil.copyToString(input, true);
-            buffer.append(bodyString);
+            // load the email from the url connection
+            String bodyString = URLUtil.get(bodyUri);
+            if(bodyString != null)
+            {
+                buffer.append(bodyString);
+            }
         }
         catch(Exception ex)
         {
@@ -154,7 +165,7 @@ public class MailService implements ApplicationContextAware
         catch (MailException ex)
         {
             //log it and go on
-            System.err.println(ex.getMessage());            
+            ex.printStackTrace();
         }
     }
     

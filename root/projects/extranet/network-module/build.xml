@@ -1,0 +1,81 @@
+<project name="alfnetwork" default="package-module">
+
+	<property environment="env" />
+
+	<property name="module.id" value="alfnetwork"/>
+	<property name="module.title" value="Alfresco Network Module"/>
+	
+	<property name="project.dir" value="."/>
+	<property name="config.dir" value="${project.dir}/config"/>
+	<property name="build.dir" value="${project.dir}/build"/>
+	<property name="src.web.dir" value="${project.dir}/source/web" />	
+	<property name="src.java.dir" value="${project.dir}/source/java" />	
+	<property name="package.file.jar" value="${build.dir}/${module.id}.jar" />
+	<property name="package.file.amp" value="${build.dir}/${module.id}.amp" />
+	<property name="property.dir" value="config/alfresco/module/${module.id}" />
+	
+	<property name="alfresco.war" value="/alfresco/2.2/tomcat/webapps/alfresco.war" />
+	<property name="alf22root" value="../../../../../branches/v2.2/root"/>
+
+	<path id="class.path">
+		<dirset dir="${build.dir}" />
+		<fileset dir="${alf22root}/projects/3rd-party/lib/" includes="**/*.jar"/>
+		<fileset dir="${alf22root}" includes="*/build/dist/*.jar"/>
+		<pathelement path="${alf22root}/projects/core/build/classes" />
+		<pathelement path="${alf22root}/projects/repository/build/classes" />
+		<pathelement path="${alf22root}/projects/web-client/build/classes" />
+		<pathelement path="${alf22root}/projects/webscript-framework/build/classes" />
+	</path>
+	
+	<target name="clean">
+		<delete>
+			<fileset dir="${build.dir}" includes="**/*"/>
+  		</delete>
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.dir}/classes" />
+		<javac classpathref="class.path" srcdir="${src.java.dir}" destdir="${build.dir}/classes" debug="true"/>
+		<copy todir="${build.dir}/classes">
+			<fileset dir="${src.java.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.ftl"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>		
+	</target>
+   
+	<target name="package-jar" depends="compile">
+		<delete file="${package.file.jar}" />  
+		<jar destfile="${package.file.jar}">
+			<fileset dir="${build.dir}/classes" excludes="*.zip"/>
+		</jar>
+	</target>
+	
+	<target name="package-module" depends="package-jar" description="Packages the extension">
+		<echo>Packaging ${module.title} AMP file</echo>
+		<zip destfile="${package.file.amp}" update="true">
+			<zipfileset file="${property.dir}/module.properties"/>
+			<zipfileset file="${property.dir}/file-mapping.properties"/>
+			<zipfileset file="${package.file.jar}" prefix="lib"/>
+   	     		<zipfileset dir="${config.dir}" prefix="config">
+	   	     		<exclude name="**/module.properties"/>
+	   	     		<exclude name="**/file-mapping.properties"/>	   	     		
+			</zipfileset>
+   	     		<zipfileset dir="${src.web.dir}" prefix="web"/>			
+   		</zip>
+	</target>
+	
+	
+	<target name="package-extension" depends="package-jar"/>
+
+	<target name="update-war" depends="package-module" description="Update the WAR file.  Set -Dwar.file=..." >
+		<echo>Installing Demo Scripts into WAR</echo>
+		<java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool">
+			<classpath refid="class.path" />
+			<arg line="install ${package.file.amp} ${alfresco.war} -force -verbose"/>
+		</java>
+	</target>
+
+</project>

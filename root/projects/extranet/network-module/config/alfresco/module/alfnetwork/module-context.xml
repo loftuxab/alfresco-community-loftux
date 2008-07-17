@@ -26,11 +26,14 @@
 	</bean>  
 	
    <!--  Alfresco LDAP Synchronization Web Script -->
+   <!--
+   	For 2.9 and 3.0
    <bean id="webscript.org.alfresco.network.ldapsync.ldapsync.get" class="org.alfresco.module.alfnetwork.LDAPSyncWebScript" parent="webscript" depends-on="repositoryHelper">
       <property name="repository" ref="repositoryHelper" />
       <property name="serviceRegistry" ref="ServiceRegistry" />
    </bean>
-	
-    
+   -->
+   <!-- For 2.2 -->
+   <bean id="webscript.org.alfresco.network.ldapsync.ldapsync.get" class="org.alfresco.module.alfnetwork.LDAPSyncWebScript" parent="webscript"/>
     
 </beans>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="source/java"/>
+	<classpathentry kind="src" path="network-module/source/java"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/3rd Party"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
@@ -8,5 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
 	<classpathentry kind="lib" path="dependencies/misc/jira-soap-0.3.jar"/>
 	<classpathentry kind="lib" path="dependencies/misc/spring-ldap-1.2.1.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Remote API"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
