@@ -26,6 +26,7 @@ package org.alfresco.web.site.renderer;
 
 import java.util.HashMap;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.ComponentType;
 import org.alfresco.web.framework.model.TemplateInstance;
@@ -118,6 +119,10 @@ public final class RendererFactory
          * a renderer for that component type
          */
         ComponentType componentType = component.getComponentType(context);
+        if (componentType == null)
+        {
+            throw new AlfrescoRuntimeException("No URL set and component type not found for component definition.");
+        }
         return newRenderer(context, componentType);
     }
 

@@ -59,13 +59,25 @@ public class RemoteStore implements Store
     private String endpoint;
 
     private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();
-
+    private ThreadLocal<Connector> connector = new ThreadLocal<Connector>();
+    
+    
     /**
      * Binds this instance to the given repository store id for the current thread
      */
     public void bindRepositoryStoreId(String repositoryStoreId)
     {
         this.repositoryStoreId.set(repositoryStoreId);
+    }
+    
+    /**
+     * Binds this instance to the given Connector instance for the current thread
+     * 
+     * @param connector     Connector to bind for the current thread
+     */
+    public void bindConnector(Connector connector)
+    {
+        this.connector.set(connector);
     }
 
     /**
@@ -74,6 +86,7 @@ public class RemoteStore implements Store
     public void unbind()
     {
         this.repositoryStoreId.remove();
+        this.connector.remove();
     }
 
     /**
@@ -111,6 +124,14 @@ public class RemoteStore implements Store
     public void setEndpoint(String endpoint)
     {
         this.endpoint = endpoint;
+    }
+    
+    /**
+     * @return the endpoint ID being used when calling the remote API
+     */
+    public String getEndpoint()
+    {
+        return this.endpoint;
     }
 
     /**
@@ -363,7 +384,7 @@ public class RemoteStore implements Store
     {
         try
         {
-            Connector con = this.connectorService.getConnector(this.endpoint);
+            Connector con = getConnector();
             return con.call(uri, null, in);
         }
         catch (RemoteConfigException re)
@@ -376,7 +397,7 @@ public class RemoteStore implements Store
     {
         try
         {
-            Connector con = this.connectorService.getConnector(this.endpoint);
+            Connector con = getConnector();
             return con.call(uri);
         }
         catch (RemoteConfigException re)
@@ -389,7 +410,7 @@ public class RemoteStore implements Store
     {
         try
         {
-            Connector con = this.connectorService.getConnector(this.endpoint);
+            Connector con = getConnector();
             ConnectorContext context = new ConnectorContext(HttpMethod.DELETE, null, null);
             return con.call(uri, context);
         }
@@ -397,5 +418,24 @@ public class RemoteStore implements Store
         {
             throw new AlfrescoRuntimeException("Unable to find config for remote store.", re);
         }
+    }
+
+    /**
+     * Get the Connector to use to access the endpoint. If a connector has be bound to the
+     * current thread then use it, else retrieve a transient connector instance from the
+     * ConnectorService.
+     * 
+     * @return Connector
+     * 
+     * @throws RemoteConfigException
+     */
+    private Connector getConnector() throws RemoteConfigException
+    {
+        Connector con = connector.get();
+        if (con == null)
+        {
+            con = this.connectorService.getConnector(this.endpoint);
+        }
+        return con; 
     }
 }
