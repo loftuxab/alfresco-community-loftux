@@ -49,7 +49,7 @@ ol li {
 .spacer {
   margin: 0 7px;
   color: #ccc;
-  font-size: 11pt;
+  font-size: 116%;
 }
 
 /************
@@ -58,7 +58,7 @@ ol li {
 .nav-label {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 10pt;
+  font-size: 100%;
   color: #999999;
   line-height: 170%;
 }
@@ -73,7 +73,7 @@ ol li {
 #discussionsBlogHeader1 .createNodeLink {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 11pt;
+  font-size: 116%;
   color: #333333;
   background: transparent url(images/createtopic.png) no-repeat scroll 3px 3px;
   padding: 0 5px 0 19px;
@@ -82,7 +82,7 @@ ol li {
 #discussionsBlogHeader1 .rssLink {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 11pt;
+  font-size: 116%;
   color: #333333;
   background: transparent url(images/rss.png) no-repeat scroll 3px 5px;
   padding-left: 19px;
@@ -92,12 +92,12 @@ ol li {
   border-right: 1px solid #c6c6c6;
 } 
 . detailList, .simpleList {
-  font-size: 10pt;
+  font-size: 100%;
 }
 #discussionsBlogHeader2 .backLink {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 11pt;
+  font-size: 116%;
   color: #333333;
   background: transparent url(images/back.png) no-repeat scroll 3px 3px;
   padding: 0 5px 0 19px;
@@ -105,13 +105,13 @@ ol li {
 #discussionsBlogHeader2 .toolbarOption {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 10pt;
+  font-size: 100%;
   color: #333333;
 }
 #discussionsBlogHeader2 .listTitle {
   font-family: Helvetica, Trebuchet, sans-serif;
   font-weight: normal;
-  font-size: 12pt;
+  font-size: 123.1%;
   color: #333333;
 }
 
@@ -205,7 +205,7 @@ html>body .node, .reply, .comment {
 .node .nodeTitle a {
   font-family: Helvetica, Trebuchet, sans-serif;
   font-weight: normal;
-  font-size: 13pt;
+  font-size: 131%;
   line-height: 130%;
   color: #2b6eb5;
 }
@@ -213,7 +213,7 @@ html>body .node, .reply, .comment {
 .node .nodeStatus {
   font-family: Trebuchet, sans-serif;
   font-weight: normal;
-  font-size: 13pt;
+  font-size: 131%;
   line-height: 130%;
   color: #669966;
 }
@@ -221,14 +221,14 @@ html>body .node, .reply, .comment {
 .nodeAttrLabel {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 10pt;
+  font-size: 100%;
   line-height: 130%;
   color: #606060;
 }
 .nodeAttrValue {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 10pt;
+  font-size: 100%;
   line-height: 130%;
   color: #333333;
 }
@@ -238,7 +238,7 @@ html>body .node, .reply, .comment {
 .node .userLink {
   font-family: Arial, sans-serif;
   font-weight: bold;
-  font-size: 10pt;
+  font-size: 100%;
   line-height: 150%;
   color: #999999;
 }
@@ -249,7 +249,7 @@ html>body .node, .reply, .comment {
   padding-right: 40px;
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 10pt;
+  font-size: 100%;
   line-height: 150%;
   margin-right: 140px;
   
@@ -295,7 +295,7 @@ html>body .node, .reply, .comment {
 .nodeEdit .action-link {
   font-family: Arial, sans-serif;
   font-weight: normal;
-  font-size: 9pt;
+  font-size: 93%;
   line-height: 150%;
   color: #2B6EB5;
 }
