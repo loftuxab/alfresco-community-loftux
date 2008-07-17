@@ -104,7 +104,20 @@
          
          if (config.method == Alfresco.util.Ajax.DELETE)
          {
-            Alfresco.util.Ajax.request(config);
+            if (config.dataObj !== null)
+            {
+               // Change this request into a POST with the alf_method override
+               config.method = Alfresco.util.Ajax.POST;
+               if (config.url.indexOf("alf_method") < 1)
+               {
+                  config.url += (config.url.indexOf("?") < 0 ? "?" : "&") + "alf_method=delete";
+               }
+               Alfresco.util.Ajax.jsonRequest(config);
+            }
+            else
+            {
+               Alfresco.util.Ajax.request(config);
+            }
          }
          else
          {
@@ -134,21 +147,24 @@
        * @param action.failure.callback.obj {object} Failure callback function object passed to callback
        * @param action.webscript.name {string} data webscript URL name
        * @param action.webscript.method {string} HTTP method to call the data webscript on
+       * @param action.webscript.queryString {string} Optional queryString to append to the webscript URL
        * @param action.params.siteId {string} current site
        * @param action.params.containerId {string} component container
        * @param action.params.path {string} path where file is located
        * @param action.params.file {string} file to be deleted
        * @param action.params.nodeRef {string} noderef instead of site, container, path, file
-       * @param obj {object} optional additional request configuration
+       * @param action.config {object} optional additional request configuration overrides
        * @return {boolean} false: module not ready
        */
-      genericAction: function DLA_genericAction(action, obj)
+      genericAction: function DLA_genericAction(action)
       {
          var filePath = null;
          var success = action.success;
          var failure = action.failure;
          var webscript = action.webscript;
          var params = action.params;
+         var overrideConfig = action.config;
+         var configObj = null;
 
          var fnCallback = function DLA_genericAction_callback(data, obj)
          {
@@ -173,17 +189,39 @@
             }
          }
          
-         var url = this.defaultConfig.url + webscript.name + "/";
-         if (params.nodeRef)
+         var url = this.defaultConfig.url + webscript.name;
+         if (params)
          {
-            url += "node/" + params.nodeRef.replace(":/", "");
+            url +=  "/";
+            if (params.nodeRef)
+            {
+               url += "node/" + params.nodeRef.replace(":/", "");
+            }
+            else
+            {
+               filePath = params.path;
+               if (params.file)
+               {
+                  filePath += "/" + params.file;
+               }
+               url += "site/" + params.siteId + "/" + params.containerId + filePath;
+            }
+            
+            configObj =
+            {
+               nodeRef: params.nodeRef,
+               siteId: params.siteId,
+               containerId: params.containerId,
+               path: params.path,
+               file: params.file,
+               filePath: filePath
+            }
          }
-         else
+         if (webscript.queryString)
          {
-            filePath = params.path + "/" + params.file;
-            url += "site/" + params.siteId + "/" + params.containerId + filePath;
+            url += "?" + webscript.queryString;
          }
-         
+                  
          var config = YAHOO.lang.merge(this.defaultConfig,
          {
             successCallback:
@@ -203,18 +241,10 @@
             url: url,
             method: webscript.method,
             responseContentType: Alfresco.util.Ajax.JSON,
-            object:
-            {
-               nodeRef: params.nodeRef,
-               siteId: params.siteId,
-               containerId: params.containerId,
-               path: params.path,
-               file: params.file,
-               filePath: filePath
-            }
+            object: configObj
          });
 
-         return this._runAction(config, obj);
+         return this._runAction(config, overrideConfig);
       }
    };
 })();

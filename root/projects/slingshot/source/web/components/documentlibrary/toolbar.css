@@ -107,7 +107,8 @@
    margin-left: 0.3em;
 }
 
-/* Buttons */
+
+/* Navigation Bar Buttons */
 
 .toolbar .new-folder button
 {
@@ -125,4 +126,31 @@
 {
    padding-left: 2.5em; 
    background: url(images/folder-up.png) no-repeat 10% 50%;
+}
+
+
+/* Messages */
+.toolbar-file-list
+{
+   max-height: 20em;
+   overflow-y: auto;
+}
+
+.toolbar-file-list span
+{
+   background-position: 1px 0px;
+   background-repeat: no-repeat;
+   display: block;
+   min-height: 18px;
+   padding-left: 20px;
+}
+
+.toolbar-file-list span.folder
+{
+   background-image: url(images/toolbar-folder.gif);
+}
+
+.toolbar-file-list span.document
+{
+   background-image: url(images/toolbar-document.gif);
 }

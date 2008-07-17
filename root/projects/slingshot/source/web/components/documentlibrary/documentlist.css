@@ -19,14 +19,6 @@
 }
 
 
-/* Popup Messages */
-
-#message .bd
-{
-   background-color: #ffff80;
-}
-
-
 /* Doclist bar */
 
 .doclist .doclist-bar
@@ -247,7 +239,7 @@
 .doclist a.action-link,
 .doclist a.simple-link
 {
-   background-position: 2px 50%;
+   background-position: 1px 0px;
    background-repeat: no-repeat;
    display: block;
    min-height: 16px;
@@ -280,7 +272,8 @@
 {
    float: left;
 }
-.doclist div.simple a.action-link span
+.doclist div.simple a.action-link span,
+.doclist div.simple a.simple-link span
 {
    display: none;
 }
@@ -288,7 +281,8 @@
 {
    float: none;
 }
-.doclist div.simple div.more-actions a.action-link span
+.doclist div.simple div.more-actions a.action-link span,
+.doclist div.simple div.more-actions a.simple-link span
 {
    display: block;
 }
