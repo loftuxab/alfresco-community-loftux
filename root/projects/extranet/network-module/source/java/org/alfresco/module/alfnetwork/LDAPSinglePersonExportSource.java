@@ -48,6 +48,7 @@ public class LDAPSinglePersonExportSource extends LDAPPersonExportSource
     public void setUserId(String userId)
     {
         String newSearchBase = "cn=" + userId + "," + originalSearchBase;
+        System.out.println("New search base: " + newSearchBase);
         setSearchBase(newSearchBase);
     }
  

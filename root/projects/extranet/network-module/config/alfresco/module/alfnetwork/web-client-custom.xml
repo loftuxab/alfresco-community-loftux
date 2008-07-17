@@ -14,16 +14,19 @@
       <property-sheet>
          <separator name="sep1" display-label="Main Properties" component-generator="HeaderSeparatorGenerator" />         
          <show-property name="network:newsItemHeadline" display-label="Headline" />        
-         <show-property name="network:newsItemTeaser" display-label="Teaser" />
+         <show-property name="network:newsItemTeaser" display-label="Teaser" component-generator="MultilingualTextAreaGenerator" />
          <show-property name="network:newsItemType" display-label="Type" />
          
          <separator name="sep2" display-label="Related Elements" component-generator="HeaderSeparatorGenerator" />
          <show-property name="network:newsItemRelatedLinks" display-label="Related Links" />
          <show-association name="network:newsItemRelatedMedia" display-label="Related Media"/>
          
-         <separator name="sep2" display-label="Formatting" component-generator="HeaderSeparatorGenerator" />
+         <separator name="sep3" display-label="Formatting" component-generator="HeaderSeparatorGenerator" />
          <show-property name="network:newsItemReadMore" display-label="Read More Link Text" />
          <show-association name="network:newsItemTeaserImage" display-label="Teaser Image"/>
+         
+		 <separator name="sep4" display-label="Categories" component-generator="HeaderSeparatorGenerator" />
+		 <show-association name="network:newsItemCategories" display-label="Categories" />         
          
       </property-sheet>
    </config>
@@ -33,8 +36,8 @@
       <property-sheet>
          <separator name="sep1" display-label="Main Properties" component-generator="HeaderSeparatorGenerator" />         
          <show-property name="network:libraryAssetHeadline" display-label="Headline" />        
-         <show-property name="network:libraryAssetTeaser" display-label="Teaser" />
-         <show-property name="network:libraryAssetLongDescription" display-label="Long Description" />
+         <show-property name="network:libraryAssetTeaser" display-label="Teaser" component-generator="MultilingualTextAreaGenerator" />
+         <show-property name="network:libraryAssetLongDescription" display-label="Long Description" component-generator="MultilingualTextAreaGenerator" />
          <show-property name="network:libraryAssetVersionID" display-label="Version ID" />
          
          <separator name="sep2" display-label="Preview and Related" component-generator="HeaderSeparatorGenerator" />
@@ -44,10 +47,10 @@
          
          <separator name="sep3" display-label="Formatting and Author" component-generator="HeaderSeparatorGenerator" />
          <show-association name="network:libraryAssetTeaserImage" display-label="Teaser Image"/>
-         <show-property name="network:libraryAssetAuthorDetails" display-label="Author Details" />
+         <show-property name="network:libraryAssetAuthorDetails" display-label="Author Details" component-generator="MultilingualTextAreaGenerator" />
 
 		 <separator name="sep4" display-label="Categories" component-generator="HeaderSeparatorGenerator" />
-         <show-property name="network:libraryAssetCategories" display-label="Categories" />
+		 <show-association name="network:libraryAssetCategories" display-label="Categories" />
 
 		 <separator name="sep5" display-label="Internal Properties" component-generator="HeaderSeparatorGenerator" />
          <show-property name="network:libraryAssetDownloadRef" display-label="Download Ref" />
