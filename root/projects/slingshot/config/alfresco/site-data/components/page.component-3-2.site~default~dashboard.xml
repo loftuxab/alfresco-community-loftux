@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+  <scope>page</scope>  
+  <region-id>component-3-2</region-id>  
+  <source-id>site/default/dashboard</source-id>  
+  <url>/components/dashlets/wiki</url>  
+</component>
