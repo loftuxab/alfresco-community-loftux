@@ -1,18 +1,38 @@
-.search .results table{
-	width: 100%;
+.search {
+	margin: 0 -10px;
 }
 
-.search .results table thead{
+.search .yui-dt-bd table{
+	width: 100%;
+	border: none;
+}
+
+.search .yui-dt-bd table thead{
 	display: none;
 }
 
+#template_search_search-results {
+  position: relative;
+  height:auto !important;
+  min-height:99%;
+  height:99%;
+}
+
 .search .resultbar {
-	background-color: #d7e0e7;
 	padding: 8px 10px;
-	height: 27px;   
+	background-color:#E3EAEC;
+	border-bottom:2px solid #F0F3F4;
+	border-top:2px solid #F0F3F4;
+}
+
+.search .resultbar.gobottom {	
+	width: 99%;
+	position: absolute;	
+	bottom: 2.4em;
 }
 
 #template_title_search div.float-right {
+	margin-top: 4px;
 	float: right;
 }
 

@@ -96,7 +96,7 @@
           * @type int
           * @default 100
           */
-         maxResults: 5,
+         maxResults: 100,
          
          /**
           * Search term to use for
@@ -209,7 +209,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "viewUrl", "detailsUrl", "containerUrl", "site", "container", "tags"]
+             fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "downloadUrl", "browseUrl", "site", "container", "tags"]
          };
          
          // setup of the datatable.
@@ -258,7 +258,7 @@
             var name = oRecord.getData("name");
             var extn = name.substring(name.lastIndexOf("."));
 
-            oColumn.width = 80;
+            oColumn.width = 40;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
               
             // Render the cell
@@ -278,20 +278,34 @@
          renderCellDescription = function Search_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // we currently render all results the same way
-            
+            var site = oRecord.getData("site");
+            var url = "";
+            if (oRecord.getData("downloadUrl") != undefined)
+            {
+               // Download urls always go to the repository, use the proxy context therefore
+               url = Alfresco.constants.PROXY_URI + oRecord.getData("downloadUrl");
+            }
+            else if (oRecord.getData("browseUrl") != undefined)
+            {
+               // browse urls always go to a page. We assume that the url contains the page name and all
+               // parameters. What we have to add is the absolute path and the site param
+               // PENDING: could we somehow make use of Alfresco.constants.URI_TEMPLATES and pass
+               //          the pageid and param list separately?
+               url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + oRecord.getData("browseUrl");
+           }
             var desc = "";
             // title/link to view page
-            desc = '<h3 class="itemname"><a target="_blank" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("detailsUrl") + '">' + oRecord.getData("displayName") + '</a></h3>';
+            desc = '<h3 class="itemname"><a href="' + url + '">' + oRecord.getData("displayName") + '</a></h3>';
             // link to the site
             desc += '<div class="detail">';
-            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + oRecord.getData("site") + '/dashboard">' + oRecord.getData("site") + '</a>';
+            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + '/dashboard">' + site.title + '</a>';
             desc += '</div>';
             desc += '<div class="details">';
             desc += '   Tags: ';
             var tags = oRecord.getData("tags");
             for (var x=0; x < tags.length; x++)
             {
-                desc += '<span id="' + this.id + '-searchByTag-' + tags[x] + '"><a class="search-tag">' + tags[x] + '</a></span>';
+                desc += '<span id="' + me.id + '-searchByTag-' + tags[x] + '"><a class="search-tag">' + tags[x] + '</a> </span>';
             }
             desc += '</div>';
             elCell.innerHTML = desc;
@@ -300,7 +314,7 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 80
+            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 40
          },
          {
             key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
@@ -563,7 +577,7 @@
       _msg: function Search__msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.Search", Array.prototype.slice.call(arguments).slice(1));
-      },
+      }
 
    };
 })();
