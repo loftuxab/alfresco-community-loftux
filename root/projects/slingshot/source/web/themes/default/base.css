@@ -209,11 +209,6 @@ hr
    background-color: #E3EBEC;
 }
 
-.yui-skin-default #prompt_mask
-{
-   opacity: 0;
-}
-
 .yui-skin-default #prompt .hd
 {
    border-bottom:medium none;

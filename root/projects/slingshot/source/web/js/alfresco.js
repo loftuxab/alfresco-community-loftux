@@ -733,8 +733,12 @@ Alfresco.util.PopupManager = function()
          {
             visible: false,
             close: false,
-            draggable:false,
-            effect:{effect: c.effect, duration: c.effectDuration},
+            draggable: false,
+            effect:
+            {
+               effect: c.effect,
+               duration: c.effectDuration
+            },
             modal: c.modal,
             zIndex: this.zIndex++
          });
@@ -752,7 +756,7 @@ Alfresco.util.PopupManager = function()
          {
             popup: message,
             displayTime: (c.displayTime * 1000)
-        }, true);
+         }, true);
          message.show();
       },
 
@@ -767,7 +771,7 @@ Alfresco.util.PopupManager = function()
       {         
          YAHOO.lang.later(this.displayTime, this, function()
          {
-            this.popup.hide();
+            this.popup.destroy();
          });
       },
 
@@ -792,7 +796,7 @@ Alfresco.util.PopupManager = function()
             text: null, // To early to localize at this time, do it when called instead
             handler: function()
             {
-               this.hide();
+               this.destroy();
             },
             isDefault: true
          }]
@@ -838,7 +842,7 @@ Alfresco.util.PopupManager = function()
             throw new Error("Property text in userConfig must be set");
          }
 
-         // Create the SImpleDialog that will display the text
+         // Create the SimpleDialog that will display the text
          var prompt = new YAHOO.widget.SimpleDialog("prompt",
          {
             visible: false,
