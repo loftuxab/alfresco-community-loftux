@@ -204,11 +204,11 @@
          /**
           * Dynamically loads TreeView nodes.
           * This MUST be inline in order to have access to the Alfresco.DocListTree class.
-          * @method loadNodeData
+          * @method fnLoadNodeData
           * @param node {object} Parent node
           * @param fnLoadComplete {function} Expanding node's callback function
           */
-         this.fnLoadNodeData = function DLT_loadNodeData(node, fnLoadComplete)
+         this.fnLoadNodeData = function DLT_oR_fnLoadNodeData(node, fnLoadComplete)
          {
             // Get the path this node refers to
             var nodePath = node.data.path;
@@ -326,7 +326,10 @@
          // Make sure the tree's Dom has been updated
          this.treeview.draw();
          // Redrawing the tree will clear the highlight
-         this._showHighlight(true);
+         if (this.isFilterOwner)
+         {
+            this._showHighlight(true);
+         }
          
          if (this.pathsToExpand.length > 0)
          {

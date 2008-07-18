@@ -58,11 +58,11 @@
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
-      YAHOO.Bubbling.on("doclistRefresh", this.onDoclistRefresh, this);
+      YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("highlightFile", this.onHighlightFile, this);
-      YAHOO.Bubbling.on("fileDeleted", this.onDoclistRefresh, this);
-      YAHOO.Bubbling.on("folderCreated", this.onDoclistRefresh, this);
-      YAHOO.Bubbling.on("folderDeleted", this.onDoclistRefresh, this);
+      YAHOO.Bubbling.on("fileDeleted", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("folderDeleted", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    
@@ -323,11 +323,11 @@
          }
          catch(e)
          {
-             /*
-              * The only exception that gets thrown here is when the browser is
-              * not supported (Opera, or not A-grade)
-              */
-            Alfresco.logger.debug("DocList_onReady: Couldn't initialize HistoryManager.", e.toString());
+            /*
+             * The only exception that gets thrown here is when the browser is
+             * not supported (Opera, or not A-grade)
+             */
+            Alfresco.logger.debug("Alfresco.DocumentList: Couldn't initialize HistoryManager.", e.toString());
          }
          
          // Hide/Show Folders button
@@ -346,15 +346,48 @@
          });
 
          // DataSource definition
-         var uriDoclist = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriDoclist);
+         var uriDocList = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriDocList);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "doclist.items",
-             fields: ["index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
+             fields:[
+               "index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "title", "description",
+               "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"
+            ]
          };
+         
+         /**
+          * Custom field generator functions
+          */
+
+         /**
+          * Generate "pathChanged" event onClick mark-up
+          *
+          * @method generatePathOnClick
+          * @param path {string} New path to navigate to
+          * @return {string} Mark-up for use in onClick attribute
+          */
+         var generatePathOnClick = function DL_generatePathOnClick(path)
+         {
+            return "YAHOO.Bubbling.fire('pathChanged', {path: '" + path.replace(/[']/g, "\\'") + "'}); return false;";
+         }
+         
+         /**
+          * Generate URL to thumbnail image
+          *
+          * @method generateThumbnailUrl
+          * @param path {YAHOO.widget.Record} File record
+          * @return {string} URL to thumbnail
+          */
+         var generateThumbnailUrl = function DL_generateThumbnailUrl(record)
+         {
+            var url = Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "");
+            url += "/content/thumbnails/doclib?qc=true&ph=true";
+            return url;
+         }
          
          /**
           * DataTable Cell Renderers
@@ -372,12 +405,12 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellSelected = function DL_renderCellSelected(elCell, oRecord, oColumn, oData)
+         var renderCellSelected = function DL_renderCellSelected(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             elCell.innerHTML = '<input type="checkbox" name="fileChecked" value="'+ oData + '"' + (me.selectedFiles[oData] ? ' checked="checked">' : '>');
-         },
+         }
           
          /**
           * Status custom datacell formatter
@@ -388,7 +421,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellStatus = function DL_renderCellStatus(elCell, oRecord, oColumn, oData)
+         var renderCellStatus = function DL_renderCellStatus(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
@@ -416,7 +449,7 @@
             {
                elCell.innerHTML = '';
             }
-         },
+         }
           
          /**
           * Thumbnail custom datacell formatter
@@ -427,29 +460,23 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
+         var renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
             var name = oRecord.getData("fileName");
             var extn = name.substring(name.lastIndexOf("."));
 
             if (me.options.detailedView)
             {
-               oColumn.width = 80;
+               oColumn.width = 100;
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-               if (".docx.xlsx.pptx".indexOf(extn) != -1)
+               if (oRecord.getData("type") == "folder")
                {
-                  elCell.innerHTML = '<span class="demo-thumbnail"></span>';
-               }
-               else if (oRecord.getData("type") == "folder")
-               {
-                  var newPath = me.currentPath + "/" + name;
-                  // TODO: *** Update the onclick to be logically-bound, not via HTML
-                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
+                  elCell.innerHTML = '<a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + name) + '"><span class="folder"></span></a>';
                }
                else
                {
-                  elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
+                  elCell.innerHTML = '<span class="thumbnail"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></span>';
                }
             }
             else
@@ -459,16 +486,14 @@
 
                if (oRecord.getData("type") == "folder")
                {
-                  var newPath = me.currentPath + "/" + name;
-                  // TODO: *** Update the onclick to be logically-bound, not via HTML
-                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
+                  elCell.innerHTML = '<a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + name) + '"><span class="folder-small"></span></a>';
                }
                else
                {
                   elCell.innerHTML = '<span class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
                }
             }
-         };
+         }
 
          /**
           * Description/detail custom datacell formatter
@@ -479,23 +504,21 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellDescription = function DL_renderCellDescription(elCell, oRecord, oColumn, oData)
+         var renderCellDescription = function DL_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             var desc = "";
             if (oRecord.getData("type") == "folder")
             {
-               var newPath = me.currentPath + "/" + oRecord.getData("fileName");
-
-               // TODO: *** Update the onclick to be logically-bound, not via HTML
-               desc = '<h3 class="filename"><a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("displayName") + '</b></a></h3>';
+               desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + oRecord.getData("fileName")) + '">';
+               desc += '<b>' + oRecord.getData("displayName") + '</b></a></h3>';
 
                if (me.options.detailedView)
                {
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
-                  desc += '<div class="detail"><span><b>Created on:</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
+                  desc += '<div class="detail"><span><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   if (oRecord.getData("description").length > 0)
                   {
-                     desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
+                     desc += '<div class="detail"><span><b>' + me._msg("details.description") + '</b> ' + oRecord.getData("description") + '</span></div>';
                   }
                   else
                   {
@@ -505,7 +528,7 @@
                }
                else
                {
-                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</div>';
+                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("createdOn"), "dd mmmm yyyy") + '</div>';
                }
             }
             else
@@ -514,15 +537,15 @@
                if (me.options.detailedView)
                {
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
-                  desc += '<div class="detail"><span><b>Modified on:</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span><b>Modified by:</b> ' + oRecord.getData("modifiedBy") + '</span>';
-                  desc += '<span><b>Version:</b> ' + oRecord.getData("version") + '</span></div>';
+                  desc += '<div class="detail"><span><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                  desc += '<span><b>' + me._msg("details.modified-by") + '</b> ' + oRecord.getData("modifiedBy") + '</span>';
+                  desc += '<span><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span></div>';
                   /* Created On field
-                  desc += '<div class="detail"><span><b>Created on:</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
-                  desc += '<span><b>Created by:</b> ' + oRecord.getData("createdBy") + '</span>';
+                  desc += '<div class="detail"><span><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
+                  desc += '<span><b>' + me._msg("details.created-by") + '</b> ' + oRecord.getData("createdBy") + '</span>';
                   */
-                  desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
-                  desc += '<div class="detail"><span><b>Comments:</b> 0</span></div>';
+                  desc += '<div class="detail"><span><b>' + me._msg("details.description") + '</b> ' + oRecord.getData("description") + '</span></div>';
+                  desc += '<div class="detail"><span><b>' + me._msg("details.comments") + '</b> 0</span></div>';
                }
                else
                {
@@ -530,7 +553,7 @@
                }
             }
             elCell.innerHTML = desc;
-         };
+         }
 
          /**
           * Actions custom datacell formatter
@@ -541,13 +564,13 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellActions = function DL_renderCellActions(elCell, oRecord, oColumn, oData)
+         var renderCellActions = function DL_renderCellActions(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "border-left", "3px solid #fff");
 
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
-         };
+         }
 
 
          // DataTable column defintions
@@ -559,7 +582,7 @@
             key: "status", label: "Status", sortable: false, formatter: renderCellStatus, width: 16
          },
          {
-            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 80
+            key: "thumbnail", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 100
          },
          {
             key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
@@ -616,6 +639,7 @@
          { 
             var id = e.target.value; 
             this.selectedFiles[id] = e.target.checked;
+            YAHOO.Bubbling.fire("selectedFilesChanged");
          }, this, true);
          
          // Rendering complete event handler
@@ -779,6 +803,8 @@
                }
                break;
          }
+         
+         YAHOO.Bubbling.fire("selectedFilesChanged");
       },
       
 
@@ -1002,22 +1028,22 @@
          var record = this.widgets.dataTable.getRecord(row);
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: "Are you sure you want to delete '" + record.getData("fileName") + "'?",
+            text: this._msg("message.confirm.delete", record.getData("fileName")),
             buttons: [
             {
-               text: "Delete",
+               text: this._msg("button.delete"),
                handler: function DL_onActionDelete_delete()
                {
-                  this.hide();
+                  this.destroy();
                   me._onActionDeleteConfirm.call(me, record);
                },
                isDefault: true
             },
             {
-               text: "Cancel",
+               text: this._msg("button.cancel"),
                handler: function DL_onActionDelete_cancel()
                {
-                  this.hide();
+                  this.destroy();
                }
             }]
          });
@@ -1268,11 +1294,11 @@
       /**
        * DocList Refresh Required event handler
        *
-       * @method onDoclistRefresh
+       * @method onDocListRefresh
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onDoclistRefresh: function DL_onDoclistRefresh(layer, args)
+      onDocListRefresh: function DL_onDocListRefresh(layer, args)
       {
          this._updateDocList.call(this, this.currentPath);
       },

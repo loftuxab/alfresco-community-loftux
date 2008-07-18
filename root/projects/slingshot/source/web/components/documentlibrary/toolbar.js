@@ -61,6 +61,7 @@
       YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("selectedFilesChanged", this.onSelectedFilesChanged, this);
    
       return this;
    }
@@ -211,11 +212,15 @@
          this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
          {
             type: "menu", 
-            menu: "selectedItems-menu"
+            menu: "selectedItems-menu",
+            disabled: true
          });
 
          // Folder Up Navigation button
-         this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp);
+         this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp,
+         {
+            disabled: true
+         });
 
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
@@ -428,6 +433,11 @@
        */
       onActionCopyTo: function DLTB_onActionCopyTo()
       {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+         
          var files = this.modules.docList.getSelectedFiles();
          alert("Would perform copyTo on " + files.length + " files.");
       },
@@ -440,6 +450,11 @@
        */
       onActionMoveTo: function DLTB_onActionMoveTo()
       {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
          var files = this.modules.docList.getSelectedFiles();
          alert("Would perform moveTo on " + files.length + " files.");
       },
@@ -452,6 +467,11 @@
        */
       onActionDelete: function DLTB_onActionDelete()
       {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
          var me = this;
          var files = this.modules.docList.getSelectedFiles();
          
@@ -461,11 +481,13 @@
             fileNames.push("<span class=\"" + files[i].type + "\">" + files[i].displayName + "</span>");
          }
          
+         var confirmTitle = this._msg("title.confirm.multiple-delete");
          var confirmMsg = this._msg("message.confirm.multiple-delete", files.length);
          confirmMsg += "<div class=\"toolbar-file-list\">" + fileNames.join("") + "</div>";
 
          Alfresco.util.PopupManager.displayPrompt(
          {
+            title: confirmTitle,
             text: confirmMsg,
             modal: true,
             buttons: [
@@ -473,7 +495,7 @@
                text: this._msg("button.delete"),
                handler: function DLTB_onActionDelete_delete()
                {
-                  this.hide();
+                  this.destroy();
                   me._onActionDeleteConfirm.call(me, files);
                },
                isDefault: true
@@ -482,7 +504,7 @@
                text: this._msg("button.cancel"),
                handler: function DLTB_onActionDelete_cancel()
                {
-                  this.hide();
+                  this.destroy();
                }
             }]
          });
@@ -557,7 +579,10 @@
 
       onActionDeselectAll: function DLTB_onActionDeselectAll()
       {
-         this.modules.docList.selectFiles("selectNone");
+         if (this.modules.docList)
+         {
+            this.modules.docList.selectFiles("selectNone");
+         }
       },
 
 
@@ -600,6 +625,10 @@
             // Should be a path in the arguments
             this.currentPath = obj.path;
             this._generateBreadcrumb();
+            
+            // Enable/disable the Folder Up button
+            var paths = this.currentPath.split("/");
+            this.widgets["folderUp"].set("disabled", paths.length < 2);
          }
       },
 
@@ -655,6 +684,22 @@
          }
       },
 
+      /**
+       * Selected Files Changed event handler.
+       * Determines whether to enable or disable the multi-file action drop-down
+       *
+       * @method onSelectedFilesChanged
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onSelectedFilesChanged: function DLTB_onSelectedFilesChanged(layer, args)
+      {
+         if (this.modules.docList)
+         {
+            var files = this.modules.docList.getSelectedFiles();
+            this.widgets["selectedItems"].set("disabled", (files.length == 0))
+         }
+      },
    
       /**
        * PRIVATE FUNCTIONS
