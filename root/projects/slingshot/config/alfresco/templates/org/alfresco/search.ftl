@@ -11,11 +11,7 @@
    <div id="bd">
       <div class="yui-t1">
          <div id="yui-main">
-            <div class="yui-b">
-               <@region id="search" scope="template" protected=true />
-            </div>
-         </div>
-         <div class="yui-b">
+            <@region id="search" scope="template" protected=true />
          </div>
       </div>
    </div>

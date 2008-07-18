@@ -212,6 +212,30 @@
              fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "viewUrl", "detailsUrl", "containerUrl", "site", "container", "tags"]
          };
          
+         // setup of the datatable.
+         this._setupDataTable();
+         
+         // trigger the initial search
+         YAHOO.Bubbling.fire("onSearch",
+         {
+            searchTerm: this.options.initialSearchTerm,
+            searchAll: (this.options.initialSearchAll == 'true')
+         });
+
+         // Hook action events
+         Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
+         Alfresco.util.registerDefaultActionHandler(this.id, "search-scope-toggle", "a", this);
+
+         // tell the header that the search component exists on this page and thus no
+         // refresh is required
+         YAHOO.Bubbling.fire("searchComponentExists", {});
+
+         // Finally show the component body here to prevent UI artifacts on YUI button decoration
+         Dom.setStyle(this.id + "-body", "visibility", "visible");
+      },
+      
+      _setupDataTable: function Search_setupDataTable()
+      {
          /**
           * DataTable Cell Renderers
           *
@@ -325,31 +349,6 @@
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
-         
-         // Enable row highlighting
-         //this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
-         //this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
-         
-         // load the initial results
-         // if we got an initial search term, start a search
-         //if (this.options.initialSearchTerm.length > 0)
-         //{  
-         YAHOO.Bubbling.fire("onSearch",
-         {
-            searchTerm: this.options.initialSearchTerm,
-            searchAll: this.options.initialSearchAll
-         });
-         //}
-
-         // Hook action events
-         Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
-
-         // tell the header that the search component exists on this page and thus no
-         // refresh is required
-         YAHOO.Bubbling.fire("searchComponentExists", {});
-
-         // Finally show the component body here to prevent UI artifacts on YUI button decoration
-         Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
 
 
@@ -367,6 +366,18 @@
          });
       },
       
+      /**
+       * Triggered by the search all/site only link
+       */
+      toggleSearchScope: function Search_switchSearchScope()
+      {
+         var searchAll = ! this.searchAll;
+         // send a search bubble event to load the list
+         YAHOO.Bubbling.fire("onSearch",
+         {
+            searchAll : searchAll
+         });
+      },
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
@@ -385,10 +396,17 @@
          var obj = args[1];
          if (obj !== null)
          {
-            var searchTerm = (obj["searchTerm"] !== undefined) ? obj["searchTerm"] : "";
-            var searchAllSites = (obj["searchAll"] !== undefined) ? parseBoolean(obj["searchAll"]) : true;
-            
-            this._performSearch(searchTerm, searchAllSites);
+            var searchTerm = this.searchTerm;
+            if (obj["searchTerm"] !== undefined)
+            {
+               searchTerm = obj["searchTerm"];
+            }
+            var searchAll= this.searchAll;
+            if (obj["searchAll"] !== undefined)
+            {
+               searchAll = obj["searchAll"];
+            }
+            this._performSearch(searchTerm, searchAll);
          }
       },
 
@@ -468,7 +486,7 @@
       {
          // update the search results field
          var searchFor = '<b>' + this.searchTerm + '</b>';
-         var searchIn = '<b>' + (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", this.options.siteId)) + '</b>';
+         var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + this.options.siteId + '</b>'));
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
          {
@@ -480,7 +498,7 @@
             html += " " + this._msg("search.info.onlyshowing", this.resultsCount);
          }
          
-         var elems = YAHOO.util.Dom.getElementsByClassName(this.id + "-search-result-info");
+         var elems = YAHOO.util.Dom.getElementsByClassName("search-result-info");
          for (x in elems)
          {
             elems[x].innerHTML = html;
@@ -496,19 +514,20 @@
          }
          
          // update the search results field
+         var text = "";
          if (this.searchAll)
-         {
-            text = this._msg("search.searchall");
-         }
-         else
          {
             text = this._msg("search.searchsiteonly", this.options.siteId);
          }
+         else
+         {
+            text = this._msg("search.searchall");
+         }
          
-         var elems = YAHOO.util.Dom.getElementsByClassName(this.id + "-search-all-switch");
+         var elems = YAHOO.util.Dom.getElementsByClassName("search-scope-toggle");
          for (x in elems)
          {
-            elems[x].innerHTML = html;
+            elems[x].innerHTML = text;
          }
       },
 
@@ -545,54 +564,7 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.Search", Array.prototype.slice.call(arguments).slice(1));
       },
-      
-      // TEMPORARY
-      
-      // row highlighting
 
-      /**
-       * Custom event handler to highlight row.
-       *
-       * @method onEventHighlightRow
-       * @param oArgs.event {HTMLEvent} Event object.
-       * @param oArgs.target {HTMLElement} Target element.
-       */
-      onEventHighlightRow: function Search_onEventHighlightRow(oArgs)
-      {         
-         // Call through to get the row highlighted by YUI
-         this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
-      },
-
-      /**
-       * Custom event handler to unhighlight row.
-       *
-       * @method onEventUnhighlightRow
-       * @param oArgs.event {HTMLEvent} Event object.
-       * @param oArgs.target {HTMLElement} Target element.
-       */
-      onEventUnhighlightRow: function Search_onEventUnhighlightRow(oArgs)
-      {
-         // Call through to get the row unhighlighted by YUI
-         this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
-      },
-      
-      searchButtonClick: function Search_searchButtonClick(e, p_obj)
-      {
-         // fetch the search text field
-         var textElem = Dom.get(this.id + "-search-text");
-         var text = textElem.value;
-          
-         // send a search bubble event to load the list
-         YAHOO.Bubbling.fire("onSearch",
-         {
-            searchTerm : text,
-            maxResults : this.options.maxResults,
-            site : this.options.siteId,
-            container : this.options.containerId
-         });
-         Event.preventDefault(e);
-      }
-      
    };
 })();
 
