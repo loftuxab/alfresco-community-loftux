@@ -19,7 +19,7 @@
 }
 
 
-/* Doclist bar */
+/* DocList bar */
 
 .doclist .doclist-bar
 {
@@ -33,14 +33,14 @@
    text-align: center;
 }
 
-/* Doclist bar Buttons */
+/* DocList bar Buttons */
 
 .doclist div.inline
 {
    display: inline;
 }
 
-/* Doclist bar Select menu */
+/* DocList bar Select menu */
 
 .doclist .file-select .yuimenuitemlabel span
 {
@@ -147,16 +147,13 @@
 
 /* Cell Renderers */
 
-.doclist .documents .demo-thumbnail
+.doclist .documents .thumbnail
 {
-   background: url(images/demo-thumbnail.jpg) no-repeat;
-   border: 1px solid #e0e0e0;
    display: block;
-   height: 100px;
-   width: 77px;
+   min-height: 100px;
 }
 
-.doclist .documents .demo-folder
+.doclist .documents .folder
 {
    background: url(images/demo-folder.png) no-repeat;
    display: block;
@@ -164,32 +161,12 @@
    height: 32px;
    width: 32px;
 }
-.doclist .documents .demo-folder-small
+.doclist .documents .folder-small
 {
    background: url(images/demo-folder.png) no-repeat;
    display: block;
    height: 32px;
    width: 32px;
-}
-
-.doclist .documents .demo-other
-{
-   background: url(images/demo-other.jpg) no-repeat;
-   border: 1px solid #e0e0e0;
-   display: block;
-   height: 100px;
-   width: 77px;
-}
-.doclist .documents .demo-other-small
-{
-   display: block;
-   height: 32px;
-   width: 32px;
-}
-
-.doclist .documents .demo-other img
-{
-   margin: 30px 0 0 20px;
 }
 
 .doclist .documents h3.filename

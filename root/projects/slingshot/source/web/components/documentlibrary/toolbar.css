@@ -132,7 +132,7 @@
 /* Messages */
 .toolbar-file-list
 {
-   max-height: 20em;
+   max-height: 15em;
    overflow-y: auto;
 }
 
