@@ -1,12 +1,11 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.Header("${args.htmlid}").setOptions({
       siteId: "${page.url.templateArgs.site!""}"
-   
    });
 //]]></script>
 <div class="header">
    <div class="logo">
-      <img src="${url.context}${args.logo}" alt="Company Logo"/>
+      <img src="${url.context}/themes/${theme}/images/app-logo.png" alt="Alfresco Share" />
    </div>
    <div class="personal-menu">
       <span class="menu-item"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>

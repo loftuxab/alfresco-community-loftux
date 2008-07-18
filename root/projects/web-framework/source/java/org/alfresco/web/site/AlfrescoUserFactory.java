@@ -129,7 +129,10 @@ public class AlfrescoUserFactory extends UserFactory
             {
                 user.setEmail(properties.getString("{http://www.alfresco.org/model/content/1.0}email"));
             }
-            // TODO: get BIO - note child content property on cm:person!
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}persondescription"))
+            {
+                user.setBiography(properties.getString("{http://www.alfresco.org/model/content/1.0}persondescription"));
+            }
             if (properties.has("{http://www.alfresco.org/model/content/1.0}telephone"))
             {
                 user.setTelephone(properties.getString("{http://www.alfresco.org/model/content/1.0}telephone"));

@@ -4,7 +4,4 @@
    <region-id>header</region-id>
    <source-id>global</source-id>
    <url>/components/header</url>
-   <properties>
-      <logo>/images/logo/AlfrescoLogo32.png</logo>
-   </properties>
 </component>

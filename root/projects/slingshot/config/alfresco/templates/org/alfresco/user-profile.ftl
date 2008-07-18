@@ -1,6 +1,5 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />      
 </@>
 
 <@template.body>
@@ -10,9 +9,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="site-content">
-      <@region id="user-profile-dashlet" scope="template" />
-      </div>
+      <@region id="user-profile" scope="template" />
    </div>
 </@>
 

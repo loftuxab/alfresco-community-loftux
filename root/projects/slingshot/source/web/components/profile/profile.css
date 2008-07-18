@@ -1,0 +1,80 @@
+.profile
+{
+   visibility: hidden;
+}
+
+.profile .separator
+{
+   padding: 0.4em;
+}
+
+.profile .header-bar
+{
+   height: 1.1em;
+   width: 50em;
+   padding: 0.5em;
+   margin-top: 0.8em;
+   background-color: #e3eaec;
+   border-bottom: 2px solid #f0f3f4;
+   font-weight: bold;
+   font-size: 123.1%;
+}
+
+.profile .row
+{
+   padding: 0.5em;
+}
+
+.profile .drow
+{
+   height: 2em;
+   padding: 0.5em;
+   width: 50em;
+}
+
+.profile .photo
+{
+   padding: 0.5em;
+   float: left;
+}
+
+.profile .photobtn
+{
+   padding-left: 7em;
+   padding-top: 2em;
+   height: 4em;
+}
+
+.profile .label
+{
+   display: block;
+   float: left;
+   padding-right: 0.8em;
+   padding-top: 0.3em;
+   width: 8em;
+   text-align: right;
+   font-weight: bold;
+}
+
+.profile textarea
+{
+   width: 40.8em;
+}
+
+.profile .check
+{
+   font-weight: bold;
+   line-height: 1.7em;
+}
+
+.profile .buttons
+{
+   padding-bottom: 1em;
+   padding-top: 0.5em;
+   text-align: center;
+}
+
+.profile .hidden
+{
+   display: none;
+}
