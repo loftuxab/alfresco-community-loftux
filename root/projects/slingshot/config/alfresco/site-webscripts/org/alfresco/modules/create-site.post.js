@@ -7,10 +7,19 @@ var scriptRemoteConnector = remote.connect("alfresco");
 var repoResponse = scriptRemoteConnector.post("/api/sites", clientRequest, "application/json");
 var repoJSON = eval('(' + repoResponse + ')');
 
-// Create the site in the webtier
-var tokens = new Array();
-tokens["siteid"] = repoJSON.shortName;
-sitedata.newPreset(clientJSON.sitePreset, tokens);
+// Check if we got a positive result
+if(repoJSON.shortName)
+{
+   // Yes we did, now create the site in the webtier
+   var tokens = new Array();
+   tokens["siteid"] = repoJSON.shortName;
+   sitedata.newPreset(clientJSON.sitePreset, tokens);
 
-// Prepare the response
-model.result = repoResponse;
+   model.success = true;   
+}
+else
+{
+   // Something is wrong, indicate it in the response
+   model.success = false;
+}
+

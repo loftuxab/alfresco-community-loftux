@@ -1,5 +1,0 @@
-<webscript>
-  <shortname>User Dashboard Navigation</shortname>
-  <description>Navigation component used in the users dashboard</description>
-  <url>/components/navigation/user-dashboard-navigation</url>
-</webscript>

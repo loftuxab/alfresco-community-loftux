@@ -331,6 +331,12 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
       throw new Error("Missing or invalid argument: messageId");
    }
    
+   var globalMsg = Alfresco.messages.global[p_messageId];
+   if (typeof globalMsg == "string")
+   {
+      msg = globalMsg;
+   }
+
    if ((typeof p_messageScope == "string") && (typeof Alfresco.messages.scope[p_messageScope] == "object"))
    {
       var scopeMsg = Alfresco.messages.scope[p_messageScope][p_messageId];
@@ -340,12 +346,7 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
       }
    }
    
-   var globalMsg = Alfresco.messages.global[p_messageId];
-   if (typeof globalMsg == "string")
-   {
-      msg = globalMsg;
-   }
-   
+
    // Search/replace tokens
    var tokens;
    if ((arguments.length == 3) && (typeof arguments[2] == "object"))

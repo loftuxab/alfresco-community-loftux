@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <title>Collboration Site Dashboard</title>
+   <title>Collaboration Site Dashboard</title>
    <description>Collaboration site's dashboard page</description>
    <template-instance>dashboard-3-columns</template-instance>
    <authentication>user</authentication>

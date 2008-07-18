@@ -50,10 +50,13 @@
       </components>
       <pages>
          <page id="site/${siteid}/dashboard">
-            <title>Collboration Site Dashboard</title>
+            <title>Collaboration Site Dashboard</title>
             <description>Collaboration site's dashboard page</description>
             <template-instance>dashboard-3-columns</template-instance>
             <authentication>user</authentication>
+            <properties>
+               <sitePages>[{"pageId":"documentlibrary"}, {"pageId":"calendar"}]</sitePages>
+            </properties>
          </page>
       </pages>
    </preset>
@@ -66,13 +69,6 @@
             <region-id>title</region-id>
             <source-id>user/${userid}/dashboard</source-id>
             <url>/components/title/user-dashboard-title</url>
-         </component>
-         <!-- navigation -->
-         <component>
-            <scope>page</scope>
-            <region-id>navigation</region-id>
-            <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/navigation/user-dashboard-navigation</url>
          </component>
          <!-- dashboard components -->
          <component>
