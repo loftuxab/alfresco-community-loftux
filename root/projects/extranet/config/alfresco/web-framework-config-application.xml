@@ -62,6 +62,18 @@
 
 			<!-- Overwrite the endpoints with Alfresco Extranet endpoints -->
 			<endpoint>
+				<id>alfresco-system</id>
+				<name>Alfresco - System access</name>
+				<description>System account access to Alfresco</description>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://hosted13.alfresco.com/alfresco/service</endpoint-url>
+				<identity>declared</identity>
+				<username>extranet</username>
+				<password>(FILL IN)</password>
+				<unsecure>true</unsecure>
+				<persistent>false</persistent>
+			</endpoint>			
+			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - user access</name>
 				<description>Access to Alfresco Repository WebScripts</description>
@@ -163,6 +175,16 @@
 		</remote>
 				
 	</config>
+	
+	<!-- allow for remote invocation of components via a special url -->
+	<config evaluator="string-compare" condition="UriTemplate">
+		<uri-mappings>
+			<uri-mapping>
+				<uri-template>/c/{componentId}</uri-template>
+				<url-entry>/component?componentId={componentId}</url-entry>
+			</uri-mapping>
+		</uri-mappings>
+	</config>	
 
 </alfresco-config>
 

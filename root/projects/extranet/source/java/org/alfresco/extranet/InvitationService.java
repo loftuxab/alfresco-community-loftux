@@ -28,13 +28,17 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.Response;
 import org.alfresco.extranet.database.DatabaseInvitedUser;
 import org.alfresco.extranet.database.DatabaseService;
 import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.extranet.ldap.LDAPService;
+import org.alfresco.extranet.ldap.LDAPUser;
 import org.alfresco.extranet.mail.MailService;
 import org.alfresco.extranet.webhelpdesk.WebHelpdeskService;
 import org.alfresco.tools.ObjectGUID;
+import org.alfresco.web.site.FrameworkHelper;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -52,6 +56,7 @@ public class InvitationService
     protected LDAPService ldapService;
     protected MailService mailService;
     protected WebHelpdeskService webHelpdeskService;
+    protected String alfrescoHostPort;
     
     public static int DEFAULT_INVITATION_LENGTH = 7; // a week
     
@@ -104,6 +109,16 @@ public class InvitationService
     }
     
     /**
+     * Sets the alfresco host port.
+     * 
+     * @param alfrescoHostPort the new alfresco host port
+     */
+    public void setAlfrescoHostPort(String alfrescoHostPort)
+    {
+        this.alfrescoHostPort = alfrescoHostPort;
+    }
+    
+    /**
      * Instantiates a new invitation service impl.
      */
     public InvitationService()
@@ -129,7 +144,7 @@ public class InvitationService
      * 
      * @throws Exception the exception
      */
-    public void processInvitedUser(String userId)
+    public void processInvitedUser(String userId, String password)
         throws Exception
     {
         DatabaseInvitedUser invitedUser = this.databaseService.getInvitedUser(userId);
@@ -144,8 +159,28 @@ public class InvitationService
             // create the db user
             DatabaseUser dbUser = this.databaseService.startProcessInvitedUser(invitedUser);
             
-            // create the ldap user (this is what partners will now use)
-            //LDAPUser ldapUser = this.ldapService.createUser(dbUser);
+            // map the db user into an lpda user
+            LDAPUser ldapUser = mapToLDAPUser(dbUser, password);
+            
+            // create the ldap user 
+            System.out.println("Creating LDAP User: " + ldapUser.getEntityId());
+            ldapUser = this.ldapService.createUser(ldapUser);
+            if(ldapUser != null)
+            {
+                // sync the ldap user into alfresco
+                // this calls over to a web script to pull in the ldap user
+                Connector connector = FrameworkHelper.getConnector("alfresco-system");                
+                String uri = "/network/ldapsync?command=user&id=" + ldapUser.getEntityId();
+                Response r = connector.call(uri);
+                if(r.getStatus().getCode() != 200)
+                {
+                    System.out.println("Sync command for user: " + dbUser.getEntityId() + " failed with code: " + r.getStatus().getCode());
+                    if(r.getStatus().getException() != null)
+                    {
+                        r.getStatus().getException().printStackTrace();
+                    }
+                }
+            }
             
             // if it has a legacy alfresco partners entry...
             // do additional touch up on partners
@@ -162,7 +197,8 @@ public class InvitationService
             {
                 String whdUserId = invitedUser.getWebHelpdeskUserId();
                 
-                // TODO
+                // TODO: query for the WHD user with this id
+                // and update the WHD user properties
             }
             
             // if we're processing an enterprise invitation
@@ -184,6 +220,31 @@ public class InvitationService
             // finally, mark the user as having been invited            
             this.databaseService.endProcessInvitedUser(invitedUser);            
         }
+    }
+    
+    /**
+     * Map a db user to an ldap user.
+     * 
+     * @param dbUser the db user
+     * 
+     * @return the lDAP user
+     */
+    public LDAPUser mapToLDAPUser(DatabaseUser dbUser, String password)
+    {
+        // create the ldap user
+        LDAPUser user = new LDAPUser(dbUser.getUserId());
+        
+        // copy in properties
+        user.setDescription(dbUser.getDescription());
+        user.setEmail(dbUser.getEmail());
+        user.setFirstName(dbUser.getFirstName());
+        user.setMiddleName(dbUser.getMiddleName());
+        user.setLastName(dbUser.getLastName());
+        
+        // set password
+        user.setPassword(password);
+        
+        return user;        
     }
 
     /**

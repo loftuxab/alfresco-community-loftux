@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Network News Item Retrieval</shortname>
+  <description>Network News Item Retrieval</description>
+  <url>/network/news/item/retrieval</url>
+  <format default="html">argument</format>
+  <authentication>none</authentication>
+  <transaction>required</transaction>
+</webscript>

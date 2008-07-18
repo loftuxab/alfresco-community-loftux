@@ -33,14 +33,35 @@ import org.alfresco.extranet.AbstractUser;
  */
 public class LDAPUser extends AbstractUser
 {
+    private String password;
     
     /**
-     * Instantiates a new lDAP user.
+     * Instantiates a new LDAP user.
      * 
      * @param userId the user id
      */
     public LDAPUser(String userId)
     {
         super(userId);
+    }
+    
+    /**
+     * Sets the password.
+     * 
+     * @param password the new password
+     */
+    public void setPassword(String password)
+    {
+        this.password = password;
+    }
+    
+    /**
+     * Gets the password.
+     * 
+     * @return the password
+     */
+    public String getPassword()
+    {
+        return this.password;
     }
 }

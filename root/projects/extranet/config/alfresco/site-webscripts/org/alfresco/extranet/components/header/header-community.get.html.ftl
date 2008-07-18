@@ -13,7 +13,7 @@
 		</li>
 		<li>
 			<img src="${url.context}/images/extranet/contact_us_16.gif"/>
-			<a href="#">Contact Us</a>
+			<a href="mailto:support@alfresco.com">Contact Us</a>
 		</li>
 	</ul>
 <#else>
@@ -37,7 +37,7 @@
 		</li>
 		<li>
 			<img src="${url.context}/images/extranet/contact_us_16.gif"/>
-			<a href="#">Contact Us</a>
+			<a href="mailto:support@alfresco.com">Contact Us</a>
 		</li>
 	</ul>
 	<br/>

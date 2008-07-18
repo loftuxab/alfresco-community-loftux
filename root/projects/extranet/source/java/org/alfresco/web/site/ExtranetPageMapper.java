@@ -26,15 +26,14 @@ package org.alfresco.web.site;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.alfresco.connector.User;
 import org.alfresco.extranet.ExtranetHelper;
 import org.alfresco.extranet.database.DatabaseGroup;
-import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.web.site.exception.PageMapperException;
 
 /**
@@ -46,11 +45,11 @@ public class ExtranetPageMapper extends DefaultPageMapper
     {
         super();
     }
-    
+       
     /* (non-Javadoc)
      * @see org.alfresco.web.site.AbstractPageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
      */
-    public void execute(RequestContext context, ServletRequest request)
+    public synchronized void execute(RequestContext context, ServletRequest request)
         throws PageMapperException
     {
         super.execute(context, request);
@@ -64,22 +63,36 @@ public class ExtranetPageMapper extends DefaultPageMapper
             {
                 // non-guest user
                 
-                // get the user's groups
-                List groupsList = ExtranetHelper.getGroupService((HttpServletRequest)request).getGroupsForUser(userId);
+                // get the user's groups from the session if possible
+                HttpSession session = ((HttpServletRequest)request).getSession();
+                HashMap groupsMap = (HashMap) session.getAttribute("user_groups_map");
                 
-                // build a map
-                HashMap groupsMap = new HashMap<String, String>();
-                for(int i = 0; i < groupsList.size(); i++)
+                // if not found, load the user's groups
+                if(groupsMap == null)
                 {
-                    DatabaseGroup dbGroup = (DatabaseGroup) groupsList.get(i);
-                    if(dbGroup != null)
-                    {
-                        groupsMap.put(dbGroup.getEntityId(), dbGroup.getName());
-                    }
-                } 
+                    // get the user's groups
+                    List groupsList = ExtranetHelper.getGroupService((HttpServletRequest)request).getGroupsForUser(userId);
                 
-                // store the groups onto the request context
-                context.setValue("groups", groupsMap);
+                    // build a map
+                    groupsMap = new HashMap<String, String>();
+                    for(int i = 0; i < groupsList.size(); i++)
+                    {
+                        DatabaseGroup dbGroup = (DatabaseGroup) groupsList.get(i);
+                        if(dbGroup != null)
+                        {
+                            groupsMap.put(dbGroup.getEntityId(), dbGroup.getName());
+                        }
+                    }
+                    
+                    // set the user's groups onto the session
+                    session.setAttribute("user_groups_map", groupsMap);
+                }
+
+                // store the groups onto the request context                
+                if(groupsMap != null)
+                {
+                    context.setValue("groups", groupsMap);
+                }
                 
                 if(groupsMap.get("enterprise") != null)
                 {

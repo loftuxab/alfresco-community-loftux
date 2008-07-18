@@ -2,7 +2,7 @@
 <component> 
 	<title>Product News</title>
 
-	<url>/components/extranet/enterprise-product-news</url>
+	<url>/components/extranet/networknews</url>
 	
 	<!-- Binding --> 
 	<scope>global</scope>
@@ -11,6 +11,13 @@
 	
 	<!-- Pick which chrome to use -->
 	<chrome>extranet-titled-chrome</chrome>
-    
+  
+  	<properties>
+  		<endpoint>alfresco</endpoint>
+  		<itemType>product</itemType>
+  		<presentation>bullets</presentation>
+  		<maxcount>3</maxcount>  		
+  	</properties>
+  
 </component>
 

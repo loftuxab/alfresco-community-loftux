@@ -89,27 +89,25 @@ public class LDAPService implements ApplicationContextAware
     /**
      * Creates the user.
      * 
-     * @param dbUser the db user
+     * @param ldapUser the LDAPUser
      * 
      * @return the lDAP user
      */
-    public LDAPUser createUser(DatabaseUser dbUser)
+    public LDAPUser createUser(LDAPUser ldapUser)
     {
-        // create the ldap user
-        LDAPUser user = new LDAPUser(dbUser.getUserId());
-        
-        // copy in properties
-        user.setDescription(dbUser.getDescription());
-        user.setEmail(dbUser.getEmail());
-        user.setFirstName(dbUser.getFirstName());
-        user.setMiddleName(dbUser.getMiddleName());
-        user.setLastName(dbUser.getLastName());
-        
-        // insert user
-        user = userBean.insert(user);
-        
-        // return the user
-        return user;        
+        return userBean.insert(ldapUser);
+    }
+    
+    /**
+     * Update user.
+     * 
+     * @param ldapUser the ldap user
+     * 
+     * @return true, if successful
+     */
+    public boolean updateUser(LDAPUser ldapUser)
+    {
+        return userBean.update(ldapUser);
     }
     
     

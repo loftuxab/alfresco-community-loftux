@@ -35,6 +35,11 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RequestDispatchException;
 
 /**
+ * Responsible for dispatching a single component.
+ * 
+ * Constructs the request context as per usual construction pattern
+ * so as to provide context during component execution.
+ * 
  * @author muzquiano
  */
 public class ComponentDispatcherServlet extends DispatcherServlet
