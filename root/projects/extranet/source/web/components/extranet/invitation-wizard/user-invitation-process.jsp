@@ -38,7 +38,7 @@
 		if(user == null)
 		{
 			// process the invited user
-			invitationService.processInvitedUser(userId);
+			invitationService.processInvitedUser(userId, password);
 		}
 	}	
 %>

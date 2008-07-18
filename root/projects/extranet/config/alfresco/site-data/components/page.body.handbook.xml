@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component> 
 
-	<url>/components/extranet/iframeinclude</url>
+	<url>/components/include/iframe</url>
 	
 	<!-- Binding --> 
 	<scope>page</scope>
@@ -9,9 +9,10 @@
 	<source-id>handbook</source-id>
 
   	<properties>
-  		<content-path>/Network/Support/Handbook/handbook.pdf</content-path>
+  		<path>/api/path/content/workspace/SpacesStore/Company%20Home/Network/Support/Handbook/handbook.pdf</path>
   		<endpoint>alfresco</endpoint>
   		<height>800px</height>
+  		<width>100%</width>
   	</properties>
 
 </component>

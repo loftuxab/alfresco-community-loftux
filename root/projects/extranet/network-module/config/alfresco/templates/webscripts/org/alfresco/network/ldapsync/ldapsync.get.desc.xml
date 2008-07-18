@@ -2,6 +2,6 @@
   <shortname>Synchronizes users and groups from the configured LDAP store</shortname>
   <description>Synchronizes users and groups from the configured LDAP store</description>
   <url>/network/ldapsync</url>
-  <authentication>admin</authentication>
+  <authentication>user</authentication>
   <format default="html">argument</format>
 </webscript>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<title>Contributing to the Community</title>
+
+	<url>/components/extranet/htmlinclude</url>
+	
+	<!-- Binding --> 
+	<scope>page</scope>
+	<region-id>body</region-id>
+	<source-id>contribute</source-id>
+
+  	<properties>
+  		<endpoint>alfresco-network</endpoint>
+  		<content-path>/Network/Community/contribute.html</content-path>
+  	</properties>
+  
+</component>
+

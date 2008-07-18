@@ -1,7 +1,7 @@
 <webscript>
-  <shortname>Alfresco Network News</shortname>
-  <description>Alfresco Network News</description>
-  <url>/network/news</url>
+  <shortname>Library Retrieval</shortname>
+  <description>Library Retrieval</description>
+  <url>/network/library/retrieval</url>
   <format default="html">argument</format>
   <authentication>user</authentication>
   <transaction>required</transaction>

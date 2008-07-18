@@ -26,6 +26,7 @@
 		<property name="ldapService" ref="extranet.service.ldap" />
 		<property name="databaseService" ref="extranet.service.database" />
 		<property name="mailService" ref="extranet.service.mail" />
+		<property name="alfrescoHostPort" value="${alfresco.hostPort}" />
 	</bean>
 	<bean id="extranet.service.user" class="org.alfresco.extranet.UserService">
 		<property name="webHelpdeskService" ref="extranet.service.webhelpdesk" />
@@ -135,7 +136,7 @@
 	<bean id="extranet.service.ldap.contextsource" class="org.springframework.ldap.core.support.LdapContextSource">
 		<property name="url" value="${application.ldap.url}" />
 		<property name="base" value="${application.ldap.base}" />
-		<property name="userDn" value="${application.ldap.userDn}" />
+		<property name="userName" value="${application.ldap.userName}" />
 		<property name="password" value="${application.ldap.password}" />
     </bean>
     <bean id="extranet.service.ldap.template" class="org.springframework.ldap.core.LdapTemplate">

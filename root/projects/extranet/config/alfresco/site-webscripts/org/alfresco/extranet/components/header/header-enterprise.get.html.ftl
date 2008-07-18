@@ -5,7 +5,7 @@
 	<ul id="top-links">
 		<li><a href="?pt=login">Sign In</a></li>
 		<li><a href="?pt=register">Register</a></li>
-		<li><a href="#">Contact Us</a></li>
+		<li><a href="mailto:support@alfresco.com">Contact Us</a></li>
 	</ul>
 <#else>
 	<span id="top-user">
@@ -25,7 +25,7 @@
 		</li>
 		<li>
 			<img src="${url.context}/images/extranet/contact_us_16.gif"/>
-			<a href="#">Contact Us</a>
+			<a href="mailto:support@alfresco.com">Contact Us</a>
 		</li>
 	</ul>
 	<br/>

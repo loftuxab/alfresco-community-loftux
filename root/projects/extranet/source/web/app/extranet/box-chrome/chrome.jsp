@@ -34,22 +34,10 @@
 	color: #014a67;
 	font-weight: bold;
 	padding: 3px;
-	padding-left: 10px;
+	padding-left: 5px;
 	background-image: url(<%=servletPath%>/app/extranet/box-chrome/header_bg.gif);
 	background-repeat: repeat-x;
 	background-position: bottom;
-	border-bottom: 0px;
-}
-
-#chrome-extranet-alert-header-<%=htmlBindingId%> {
-	color: #ffffff;
-	font-weight: bold;
-	padding: 3px;
-	padding-left: 34px;
-	background-color: #b54545;
-	background-image: url(<%=servletPath%>/app/extranet/box-chrome/alert_header_bg.png);
-	background-repeat: no-repeat;
-	background-position: left top;
 	border-bottom: 0px;
 }
 -->
@@ -62,7 +50,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td id="chrome-extranet-content-<%=htmlBindingId%>" style="padding: 10px;" align="left" valign="top">
+		<td id="chrome-extranet-content-<%=htmlBindingId%>" style="padding: 5px;" align="left" valign="top">
 			
 			<alf:component-include/>
 			

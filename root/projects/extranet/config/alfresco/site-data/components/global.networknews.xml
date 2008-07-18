@@ -13,9 +13,10 @@
 	<chrome>extranet-box-chrome</chrome>
   
   	<properties>
-  		<rss-endpoint>alfresco</rss-endpoint>
-  		<rss-uri>/webframework/applytemplate/rss.xml?templatePath=/Data%20Dictionary/Presentation%20Templates/AlfrescoNetwork_RSS.ftl&amp;docPath=/Network/Support/News</rss-uri>
-  		<display-option>fourgrid</display-option>
+  		<endpoint>alfresco</endpoint>
+  		<itemType>support</itemType>
+  		<presentation>list</presentation>
+  		<maxcount>4</maxcount>  		
   	</properties>
   
 </component>

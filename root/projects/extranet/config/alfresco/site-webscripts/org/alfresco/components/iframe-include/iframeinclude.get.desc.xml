@@ -1,5 +1,5 @@
 <webscript>
    <shortname>IFRAME Include Component</shortname>
    <description>Pulls in content from an endpoint and uri and displays in an IFRAME</description>
-   <url>/components/extranet/iframeinclude</url>
+   <url>/components/include/iframe</url>
 </webscript>
