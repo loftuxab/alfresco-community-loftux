@@ -10,8 +10,8 @@
    );
 //]]></script>
 
-<#macro resultbar uniqueid>
-   <div class="resultbar">
+<#macro resultbar uniqueid cssclass>
+   <div class="${cssclass}">
       <span class="search-result-info">
       </span>
       
@@ -33,11 +33,11 @@
 </#macro>
 
 <div id="${args.htmlid}-body" class="search">
-
-   <@resultbar uniqueid="first" />
-
-   <#-- this div contains the search results -->
-   <div id="${args.htmlid}-results" class="results"></div>
-
-   <@resultbar uniqueid="second" />
+	<@resultbar uniqueid="first" cssclass="resultbar" />
+	
+	<#-- this div contains the search results -->
+	<div id="${args.htmlid}-results" class="results"></div>
+	<#--
+   <@resultbar uniqueid="second" cssclass="resultbar gobottom" />
+   -->
 </div>
