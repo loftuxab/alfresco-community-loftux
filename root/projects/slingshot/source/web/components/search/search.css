@@ -1,3 +1,26 @@
-search .documents table{
+.search .results table{
 	width: 100%;
+}
+
+.search .results table thead{
+	display: none;
+}
+
+.search .resultbar {
+	background-color: #d7e0e7;
+	padding: 8px 10px;
+	height: 27px;   
+}
+
+#template_title_search div.float-right {
+	float: right;
+}
+
+#template_title_search div.float-left {
+	float: left;
+}
+
+#template_title_search .back-icon {
+	padding-left: 22px;
+	background: url(images/back.gif) no-repeat center left;
 }

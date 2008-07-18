@@ -115,11 +115,10 @@
             {
                url += "site/" + this.options.siteId + "/";
             }
-            url += "search?searchTerm=" + searchTerm;
+            url += "search?t=" + searchTerm;
             if (this.options.siteId.length > 0)
             {
-               url += "&searchAll=" + searchAll;
-               url += "&site=" + this.options.siteId;
+               url += "&a=" + searchAll;
             }
             window.location =  url;
          }

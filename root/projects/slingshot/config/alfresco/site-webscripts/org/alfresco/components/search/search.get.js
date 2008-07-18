@@ -1,4 +1,10 @@
-model.siteId = (args["site"] != undefined) ? args["site"] : "";
-model.containerId = (args["container"] != undefined) ? args["container"] : "";
-model.searchTerm = (args["searchTerm"] != undefined) ? args["searchTerm"] : "";
-model.searchAll = (args["searchAll"] != undefined) ? parseBoolean(args["searchAll"]) : true;
+model.siteId = (page.url.templateArgs["site"] != undefined) ? page.url.templateArgs["site"] : "";
+model.searchTerm = (page.url.args["t"] != undefined) ? page.url.args["t"] : "";
+if (page.url.args["a"] != undefined)
+{
+   model.searchAll = (page.url.args["a"] != "false"); // we want to default to true
+}
+else
+{
+   model.searchAll = true;
+}
