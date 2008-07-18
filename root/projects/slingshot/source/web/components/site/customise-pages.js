@@ -69,22 +69,6 @@
       widgets: {
 
          /**
-          * Remove buttons for each page
-          *
-          * @property removeButtons
-          * @type object Contains other objects of type {pageId: YAHOO.util.Button}
-          */
-         infoButtons: {},
-
-         /**
-          * Remove buttons for each page
-          *
-          * @property removeButtons
-          * @type object Contains other objects of type {pageId: YAHOO.util.Button}
-          */
-         removeButtons: {},
-
-         /**
           * Select buttons for each page
           *
           * @property selectButtons
@@ -104,10 +88,18 @@
       {
 
          /**
+          * The id for the site who's pages are configured
+          *
+          * @property siteId
+          * @type {string} The siteId
+          */
+         siteId: null,
+
+         /**
           * The avaiable layouts
           *
           * @property layouts
-          * @type {object} {"page.pageId":{pageId: "", title: "", description: "", originallyInUse: boolean}}
+          * @type {object} {"page.pageId":{pageId: "", title: "", description: ""}}
           */
          pages: {}
       },
@@ -152,12 +144,13 @@
             return;
          }
 
-         // Save reference to buttons so we can change label and such later
+         // Save reference to elements so we can hide and show later
          this.widgets.addPagesDiv = Dom.get(this.id + "-addPages-div");
          this.widgets.pagesDiv = Dom.get(this.id + "-pages-div");
+
+         // Create references to control buttons and listen to events
          var closeAddPagesLink = document.getElementById(this.id + "-closeAddPages-link");
          YAHOO.util.Event.addListener(closeAddPagesLink, "click", this.onCloseAddPagesLinkClick, this, true);
-
          this.widgets.addPagesButton = Alfresco.util.createYUIButton(this, "addPages-button", this.onAddPagesButtonClick);
          this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveButtonClick);
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -166,10 +159,15 @@
          this.widgets.selectButtons = [];
          for (var pageId in this.options.pages)
          {
-            this.widgets.infoButtons[pageId] = Alfresco.util.createYUIButton(this, "info-button-" + pageId, this.onInfoButtonClick);            
-            this.widgets.removeButtons[pageId] = Alfresco.util.createYUIButton(this, "remove-button-" + pageId, this.onRemoveButtonClick);
+            // Save a reference to each remove image button and listen for click event
+            var removeLink = document.getElementById(this.id + "-remove-link-" + pageId);
+            YAHOO.util.Event.addListener(removeLink, "click", this.onRemoveButtonClick, this, true);
+
+            // Save references and listen to clicks on each select button
             this.widgets.selectButtons[pageId] = Alfresco.util.createYUIButton(this, "select-button-" + pageId, this.onSelectButtonClick);
          }
+
+         // Show or hide empty div labels
          this._adjustEmptyMessages();
       },
 
@@ -186,30 +184,15 @@
          var buttonId = button.get("id");
          var selectedPageId = buttonId.substring((this.id + "-select-button-").length);
 
-         //Dom.setStyle(this.id + "-currentPage-li-" + selectedPageId, "display", "");
+         // Hide the selected page from the available pages list and add it last to the current pages list
          Dom.setStyle(this.id + "-page-li-" + selectedPageId, "display", "none");
          var page = Dom.get(this.id + "-currentPage-li-" + selectedPageId);
          var container = page.parentNode;
          container.appendChild(page);
          Alfresco.util.Anim.fadeIn(page);
 
+         // Show or hide empty div labels
          this._adjustEmptyMessages();
-      },
-
-      /**
-       * Fired when the user clicks one of the info buttons for a page.
-       * Removes the selected page from the current pages.
-       *
-       * @method onInfoButtonClick
-       * @param event {object} an "click" event
-       */
-      onInfoButtonClick: function CP_onInfoButtonClick(event, button)
-      {
-         // Find out what layout that is chosen by looking at the clicked button's id
-         var buttonId = button.get("id");
-         var selectedLayoutId = buttonId.substring((this.id + "-info-button-").length);
-
-         alert("info:" + selectedLayoutId);
       },
 
       /**
@@ -235,7 +218,7 @@
        */
       onCloseAddPagesLinkClick: function CP_onCloseAddPagesLinkClick(event)
       {
-         // Show add dashlets button and hide available dashlets
+         // Show add pages button and hide available pages
          YAHOO.util.Dom.setStyle(this.widgets.addPagesDiv, "display", "");
          YAHOO.util.Dom.setStyle(this.widgets.pagesDiv, "display", "none");
       },
@@ -247,51 +230,122 @@
        * @method onRemoveButtonClick
        * @param event {object} an "click" event
        */
-      onRemoveButtonClick: function CP_onRemoveButtonClick(event, button)
+      onRemoveButtonClick: function CP_onRemoveButtonClick(event)
       {
          // Find out what layout that is chosen by looking at the clicked button's id
-         var buttonId = button.get("id");
-         var selectedPageId = buttonId.substring((this.id + "-remove-button-").length);
+         var buttonId = event.currentTarget.getAttribute("id");
+         var selectedPageId = buttonId.substring((this.id + "-remove-link-").length);
 
+         // Remove the page from the current pages list and add it last to the available pages list
          Dom.setStyle(this.id + "-currentPage-li-" + selectedPageId, "display", "none")
-         //Dom.setStyle(this.id + "-page-li-" + selectedPageId, "display", "")
          var page = Dom.get(this.id + "-page-li-" + selectedPageId);
          var container = page.parentNode;
          container.appendChild(page);
          Alfresco.util.Anim.fadeIn(page);
 
-
-         //Alfresco.util.Anim.fadeIn(this.id + "-page-li-" + selectedPageId);
+         // Show or hide empty div labels
          this._adjustEmptyMessages();
       },
 
-      /*
+
+      /**
+       * Fired when the user clicks the Save/Done button.
+       * Saves the dashboard config and takes the user back to the dashboard page.
+       *
+       * @method onSaveButtonClick
+       * @param event {object} a "click" event
+       */
+      onSaveButtonClick: function CD_onSaveButtonClick(event)
+      {
+         // Disable buttons to avoid double submits or cancel during post
+         this.widgets.saveButton.set("disabled", true);
+         this.widgets.cancelButton.set("disabled", true);
+
+         // Loop through the columns to get the pages to save
+         var pages = [];
+         var children = Dom.getChildrenBy(Dom.get(this.id + "-currentPages-ul"), this._isRealPage);
+         for (var i = 0; i < children.length; i++)
+         {
+            // FInd the page id by extracting part of its Dom id
+            var li = children[i];
+            var pageId = li.id.substring((this.id + "-currentPage-li-").length);
+
+            // Create a page object to send to the server
+            var page = {pageId: pageId};
+            pages[pages.length] = page;
+         }
+
+         // Prepare the root object to send to the server
+         var siteId = this.options.siteId;
+         var dataObj = {siteId: siteId, pages: pages};
+
+         // Do the request and send the user to the dashboard after wards
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            method: Alfresco.util.Ajax.POST,
+            url: Alfresco.constants.URL_SERVICECONTEXT + "components/site/customise-pages",
+            dataObj: dataObj,
+            successCallback: {
+               fn: function()
+               {
+                  // Send the user to the newly configured dashboard
+                  document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + siteId + "/dashboard";
+               },
+               scope: this
+            },
+            failureMessage: Alfresco.util.message("message.saveFailure", this.name),
+            failureCallback: {
+               fn: function()
+               {
+                  // Enable the buttons again
+                  this.widgets.saveButton.set("disabled", false);
+                  this.widgets.cancelButton.set("disabled", false);
+               },
+               scope: this
+            }
+         });
+      },
+
+      /**
        * Fired when the user clicks cancel layout button.
-       * Hides the layout list.
+       * Takes the user to the sites dashboard
        *
        * @method onCancelButtonClick
        * @param event {object} an "click" event
        */
       onCancelButtonClick: function CP_onCancelButtonClick(event)
       {
-         alert("cancel");
+         // Take the user back to the sites dashboard
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/dashboard";
       },
 
+      /**
+       * If the current page list or the avialable page list is empty a div
+       * with a simple label should be displayed to tell the user of this.
+       * This method checks both of the list.
+       *
+       * @method _adjustEmptyMessages
+       * @private
+       */
       _adjustEmptyMessages: function CP_adjustEmptyMessages()
       {
          this._adjustEmptyMessage(Dom.get(this.id + "-pages-empty-li"));
          this._adjustEmptyMessage(Dom.get(this.id + "-currentPages-empty-li"));
       },
 
+      /**
+       * Takes a div element with an "empty" label and looks if its parent
+       * ul node contains any li that represent pages.
+       * If it doesnt it displays li/the empty div label.
+       *
+       * @method _adjustEmptyMessage
+       * @param li an HTMLElement of type li
+       * @private
+       */
       _adjustEmptyMessage: function CP_adjustEmptyMessage(li)
       {
          var parentUl = li.parentNode;
-         var children = Dom.getChildrenBy(parentUl, function (el)
-         {
-            return el.tagName.toLowerCase() == ("li") &&
-                   !Dom.hasClass(el, "empty") &&
-                   Dom.getStyle(el, "display") != "none";
-         });
+         var children = Dom.getChildrenBy(parentUl, this._isRealPage);
          if(children.length > 0)
          {
             Dom.setStyle(li, "display", "none");
@@ -300,6 +354,22 @@
          {
             Dom.setStyle(li, "display", "");
          }
+      },
+
+
+      /**
+       * Tests if the li elemenet supplied represents a page.
+       *
+       * @method _isRealPage
+       * @param el an HTMLElement of type li
+       * @return true if el represents a page 
+       * @private
+       */
+      _isRealPage: function (el)
+      {
+         return el.tagName.toLowerCase() == ("li") &&
+                !Dom.hasClass(el, "empty") &&
+                Dom.getStyle(el, "display") != "none";
       }
 
    }

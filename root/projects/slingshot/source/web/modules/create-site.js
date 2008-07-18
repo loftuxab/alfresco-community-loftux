@@ -73,6 +73,20 @@
        */
        widgets: {},
 
+
+      /**
+       * Set messages for this module.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.module.CreateSite} returns 'this' for method chaining
+       */
+      setMessages: function FU_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -121,6 +135,7 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
+               execScripts: true,
                failureMessage: "Could not load create site template"
             });
          }
@@ -183,8 +198,9 @@
             successCallback:
             {
                fn: this.onCreateSiteSuccess,
-               scope: this
-            }
+               scope: this               
+            },
+            failureMessage: Alfresco.util.message("message.failure", this.name)
          });
          createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();
@@ -215,16 +231,14 @@
        */
       onCreateSiteSuccess: function(response)
       {
-         if (response.json === undefined || response.json.shortName === undefined || response.json.shortName.length == 0)
+         if (response.json !== undefined && response.json.success)
          {
-            // We have got a positive status code from the server,
-            // but the response doesn't look as it should.
-            Alfresco.util.PopupManager.displayMessage({text: "Received a success message with missing variables (shortname)"});
+            // The site has been successfully created, redirect the user to it.
+            document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + response.config.dataObj.shortName + "/dashboard";
          }
          else
          {
-            // The site has been successfully created, redirect the user to it.
-            document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + response.json.shortName + "/dashboard";
+            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
          }
       },
 

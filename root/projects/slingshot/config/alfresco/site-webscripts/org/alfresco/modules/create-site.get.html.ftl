@@ -38,3 +38,7 @@
       </form>
    </div>
 </div>
+
+<script type="text/javascript">//<![CDATA[
+Alfresco.util.addMessages(${messages}, "Alfresco.module.CreateSite");
+//]]></script>

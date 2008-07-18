@@ -3,13 +3,14 @@
    <script type="text/javascript">//<![CDATA[
    new Alfresco.CustomisePages("${args.htmlid}").setOptions(
    {
+      siteId: "${siteId}",
       pages:{
       <#list pages as page>
          "${page.pageId}":{
             pageId: "${page.pageId}",
             title: "${page.title}",
             description: "${page.description}",
-            originallyInUse: ${page.originallyInUse?string}
+            used: ${page.used?string}
          }<#if (page_has_next)>,</#if>
       </#list>
       }
@@ -21,19 +22,23 @@
       <h2>${msg("section.currentPages")}</h2>
       <hr/>
       <div>
-         <ul>
-            <li id="${args.htmlid}-currentPages-empty-li" class="empty" class="display: none;">
+         <ul id="${args.htmlid}-currentPages-ul">
+            <li id="${args.htmlid}-currentPages-empty-li" class="empty" style="display: none;">
                 ${msg("label.noPagesSelected")}
             </li>
             <#list pages as page>
-            <li id="${args.htmlid}-currentPage-li-${page.pageId}" <#if (page.originallyInUse)>style="display: none;"</#if>>
+            <li id="${args.htmlid}-currentPage-li-${page.pageId}" <#if (!page.used)>style="display: none;"</#if>>
                <div class="pageTitle"><h4>${page.title}</h4></div>
                <div class="pageIcon">
-                  <img src="${url.context}/components/dashboard/images/dashboard-1-column.png"/>
+                  <img src="${url.context}/components/site/images/page-icon-placeholder.png"/>
                </div>
                <div class="pageActions">
-                  <input id="${args.htmlid}-info-button-${page.pageId}" type="button" value="${msg("button.info")}"/>
-                  <input id="${args.htmlid}-remove-button-${page.pageId}" type="button" value="${msg("button.remove")}"/>
+                  <img src="${url.context}/components/site/images/i-icon-placeholder.png"
+                       title="${page.description}"/>
+                  <a id="${args.htmlid}-remove-link-${page.pageId}" href="javascript: var nothing;">
+                     <img src="${url.context}/components/site/images/remove-icon-placeholder.png"
+                          title="${msg("button.remove")}"/>
+                  </a>
                </div>
             </li>
             </#list>
@@ -56,13 +61,13 @@
       </div>
       <div>
          <ul>
-            <li id="${args.htmlid}-pages-empty-li" class="empty" class="display: none;">
+            <li id="${args.htmlid}-pages-empty-li" class="empty" style="display: none;">
                 ${msg("label.noPagesLeft")}
             </li>
             <#list pages as page>
-               <li id="${args.htmlid}-page-li-${page.pageId}" <#if (!page.originallyInUse)>style="display: none;"</#if>>
+               <li id="${args.htmlid}-page-li-${page.pageId}" <#if (page.used)>style="display: none;"</#if>>
                <div class="pageIcon">
-                  <img src="${url.context}/components/dashboard/images/dashboard-1-column.png"/>                  
+                  <img src="${url.context}/components/site/images/page-icon-placeholder.png"/>                  
                </div>
                <div class="pageActions">
                   <input id="${args.htmlid}-select-button-${page.pageId}" type="button" value="${msg("button.select")}"/>

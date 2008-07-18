@@ -1,0 +1,6 @@
+<webscript>
+   <shortname>Save Customise Site Pages</shortname>
+   <description>Saves the the user selected pages from the Customise site pages component</description>
+   <format default="json"/>
+   <url>/components/site/customise-pages</url>
+</webscript>
