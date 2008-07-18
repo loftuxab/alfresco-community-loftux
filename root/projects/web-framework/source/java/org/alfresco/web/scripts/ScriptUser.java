@@ -35,9 +35,9 @@ import org.alfresco.web.site.RequestContext;
  * 
  * The following is equivalent:
  * 
- * var city = user.city;
- * var city = user.properties.city;
- * var city = user.properties["city"];
+ * var organization = user.organization;
+ * var organization = user.properties.organization;
+ * var organization = user.properties["organization"];
  * 
  * @author muzquiano
  * @author kevinr

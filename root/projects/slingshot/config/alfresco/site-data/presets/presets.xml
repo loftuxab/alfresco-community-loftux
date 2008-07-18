@@ -88,7 +88,7 @@
          <page id="user/${userid}/dashboard">
             <title>User Dashboard</title>
             <description>Users dashboard page</description>
-            <template-instance>dashboard-3-columns</template-instance>
+            <template-instance>dashboard-2-columns-wide-right</template-instance>
             <authentication>user</authentication>
          </page>
       </pages>
