@@ -137,6 +137,7 @@ function askidsearch(){
 	document.getElementById('askid').value='';
 	if(askid!=''){
 		var url="/alfresco/service/kb/advancedsearchresults?askid="+askid+"&maxresults="+maxresults;
+		makeRequest(url);
 		askid='';
 	}
 	else {

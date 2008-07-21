@@ -54,6 +54,7 @@
 		        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_space.xml</prop>
 		      	</props>     
 		      	
+		     </list> 	
 	    </property>
 	</bean>
 	
