@@ -36,6 +36,7 @@ import org.alfresco.web.scripts.Status;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -89,7 +90,7 @@ public class AlfrescoUserFactory extends UserFactory
     public User loadUser(RequestContext context, HttpServletRequest request, String userId)
         throws UserFactoryException
     {
-        User user = null;
+        AlfrescoUser user = null;
         try
         {
             // get a connector whose connector session is bound to the current session
@@ -108,7 +109,8 @@ public class AlfrescoUserFactory extends UserFactory
             }
             
             // Load the user properties via the JSON parser
-            JSONObject properties = new JSONObject(response.getResponse()).getJSONObject("properties");
+            JSONObject json = new JSONObject(response.getResponse());
+            JSONObject properties = json.getJSONObject("properties");
             
             user = new AlfrescoUser(userId);
             user.setFirstName(properties.getString("{http://www.alfresco.org/model/content/1.0}firstName"));
@@ -176,6 +178,16 @@ public class AlfrescoUserFactory extends UserFactory
             if (properties.has("{http://www.alfresco.org/model/content/1.0}companyemail"))
             {
                 user.setCompanyEmail(properties.getString("{http://www.alfresco.org/model/content/1.0}companyemail"));
+            }
+            
+            if (json.has("associations"))
+            {
+                JSONObject assocs = json.getJSONObject("associations");
+                JSONArray array = assocs.getJSONArray("{http://www.alfresco.org/model/content/1.0}avatar");
+                if (array.length() != 0)
+                {
+                    user.setAvatarRef(array.getString(0));
+                }
             }
         }
         catch (Exception ex)

@@ -155,10 +155,22 @@
          this.widgets.save = Alfresco.util.createYUIButton(this, "button-save", this.onSave);
          this.widgets.cancel = Alfresco.util.createYUIButton(this, "button-cancel", this.onCancel);
          
-         // Finally show the component body here to prevent UI artifacts on YUI button decoration
-         Dom.setStyle(this.id + "-body", "visibility", "visible");
+         // Finally show the main component body here to prevent UI artifacts on YUI button decoration
+         Dom.setStyle(this.id + "-readview", "display", "block");
       },
       
+      /**
+       * Edit Profile link click handler
+       * 
+       * @method onEditProfile
+       */
+      onEditProfile: function UP_onEditProfile()
+      {
+         Dom.setStyle(this.id + "-readview", "display", "none");
+         //Dom.setStyle(this.id + "-editview", "visibility", "visible"); 
+         Dom.setStyle(this.id + "-editview", "display", "block");   
+      },
+
 
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -234,7 +246,8 @@
        */
       onCancel: function UP_onCancel(e, p_obj)
       {
-         
+         Dom.setStyle(this.id + "-editview", "display", "none"); 
+         Dom.setStyle(this.id + "-readview", "display", "block");
       }
    };
 })();

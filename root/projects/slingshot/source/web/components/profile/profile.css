@@ -1,6 +1,5 @@
 .profile
 {
-   visibility: hidden;
 }
 
 .profile .separator
@@ -11,18 +10,17 @@
 .profile .header-bar
 {
    height: 1.1em;
-   width: 50em;
-   padding: 0.5em;
+   padding: 0.4em;
    margin-top: 0.8em;
    background-color: #e3eaec;
    border-bottom: 2px solid #f0f3f4;
    font-weight: bold;
-   font-size: 123.1%;
+   font-size: 116%;
 }
 
 .profile .row
 {
-   padding: 0.5em;
+   padding: 0.333em;
 }
 
 .profile .drow
@@ -56,6 +54,39 @@
    font-weight: bold;
 }
 
+.profile .namelabel
+{
+   margin-left: 96px;
+   font-size: 123.1%;
+   line-height: 1.7em;
+}
+
+.profile .fieldlabel
+{
+   margin-left: 96px;
+   line-height: 1.5em;
+}
+
+.profile .fieldlabelright
+{
+   display: block;
+   float: left;
+   padding-right: 0.8em;
+   width: 8em;
+   margin-left: 64px;
+   text-align: right;
+}
+
+.profile .fieldvalue
+{
+   padding-left: 1.5em;
+}
+
+.profile p
+{
+   line-height: 1.5em;
+}
+
 .profile textarea
 {
    width: 40.8em;
@@ -77,4 +108,17 @@
 .profile .hidden
 {
    display: none;
+}
+
+.profile .editcolumn
+{
+   float: right;
+   width: 120px;
+   text-align: center;
+   padding-top: 8px;
+}
+
+.profile .viewcolumn
+{
+   margin-right: 120px;
 }
