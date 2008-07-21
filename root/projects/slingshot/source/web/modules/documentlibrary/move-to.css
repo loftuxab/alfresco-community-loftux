@@ -1,0 +1,33 @@
+.move-to .treeview
+{
+   height: 20em;
+   overflow-y: auto;
+   padding: 0.5em;
+}
+
+.move-to .ygtvitem
+{
+   background-color: #ffffff;
+}
+
+.move-to .ygtvlabel,
+.move-to .ygtvlabel:link,
+.move-to .ygtvlabel:visited,
+.move-to .ygtvlabel:hover
+{
+   background: none;
+}
+
+.move-to .ygtverror,
+.move-to .ygtverror:link,
+.move-to .ygtverror:visited,
+.move-to .ygtverror:hover
+{
+   background: red;
+   color: white;
+}
+
+.move-to .selected
+{
+   background-color: #d2e5f2;
+}

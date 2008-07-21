@@ -331,6 +331,7 @@
             uploadDirectory: this.currentPath,
             filter: [],
             mode: this.fileUpload.MODE_MULTI_UPLOAD,
+            thumbnail: "doclib",
             onFileUploadComplete:
             {
                fn: this.onFileUploadComplete,
@@ -455,8 +456,51 @@
             return;
          }
 
+         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
          var files = this.modules.docList.getSelectedFiles();
-         alert("Would perform moveTo on " + files.length + " files.");
+         
+         if (!this.modules.moveTo)
+         {
+            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               files: files,
+               width: "40em",
+               onSuccess:
+               {
+                  fn: function DLTB_onActionsMoveTo_success(data)
+                  {
+                     var result;
+                     for (var i = 0, j = data.json.totalResults; i < j; i++)
+                     {
+                        result = data.json.results[i];
+
+                        if (result.success)
+                        {
+                           // TODO: Fire the movedTo event
+                        }
+                     }
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this._msg("message.move-to.success")
+                     });
+                  },
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            this.modules.moveTo.setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath
+            })
+         }
+         this.modules.moveTo.showDialog();
       },
 
       /**

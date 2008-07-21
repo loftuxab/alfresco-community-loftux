@@ -172,7 +172,9 @@ hr
 }
 
 .yui-skin-sam .yui-panel .yui-g h2,
-.yui-skin-sam .yui-panel .bd div
+.yui-skin-sam .yui-panel .bd div.yui-gd,
+.yui-skin-sam .yui-panel .bd div.yui-u,
+.yui-skin-sam .yui-panel .bd div.bdft
 {
    padding: 0.3em;
 }

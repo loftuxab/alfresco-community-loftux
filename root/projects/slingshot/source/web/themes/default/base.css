@@ -171,7 +171,9 @@ hr
 }
 
 .yui-skin-default .yui-panel .yui-g h2,
-.yui-skin-default .yui-panel .bd div
+.yui-skin-default .yui-panel .bd div.yui-gd,
+.yui-skin-default .yui-panel .bd div.yui-u,
+.yui-skin-default .yui-panel .bd div.bdft
 {
    padding: 0.3em;
 }
