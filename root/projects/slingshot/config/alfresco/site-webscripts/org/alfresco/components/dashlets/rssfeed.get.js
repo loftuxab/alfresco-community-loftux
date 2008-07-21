@@ -1,17 +1,17 @@
-var conf = new XML(config.script);
-// We just grab the first one for now
-var url = conf.feed[0];
-
-var connectStr = url.split("://");
-var type = connectStr[0];
-var uri = connectStr[1];
-
-if (type === "http")
+var uri = args.feedurl;
+if (!uri)
 {
-	uri = "http://" + uri;
+   // Use the default
+   var conf = new XML(config.script);
+   uri = conf.feed[0];
 }
 
-var connector = remote.connect(type);
+var connector = remote.connect("http");
+var re = /^http:\/\//;
+if (!re.test(uri))
+{
+   uri = "http://" + uri;
+}
 var result = connector.call(uri);
 
 if (result !== null)
