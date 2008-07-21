@@ -175,7 +175,7 @@
        * @param obj {object} Object literal specifying a set of messages
        * @return {Alfresco.DocListTree} returns 'this' for method chaining
        */
-      setMessages: function DL_setMessages(obj)
+      setMessages: function DLT_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;

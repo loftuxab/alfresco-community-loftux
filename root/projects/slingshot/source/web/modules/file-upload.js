@@ -68,7 +68,7 @@
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
 
       var instance = Alfresco.util.ComponentManager.find({id: this.id});
-      if(instance !== undefined && instance.length > 0)
+      if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.FileUpload already exists.");
       }
@@ -230,7 +230,8 @@
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
          onFileUploadComplete: null,
-         overwrite: false
+         overwrite: false,
+         thumbnail: null
       },
 
       /**
@@ -312,7 +313,7 @@
        * @property multiUploadTip
        * @type HTMLElement
        */
-      multiUploadTip:null,
+      multiUploadTip: null,
 
       /**
        * HTMLElement of type span that displays help text for single updates.
@@ -320,7 +321,7 @@
        * @property singleUpdateTip
        * @type HTMLElement
        */
-      singleUpdateTip:null,
+      singleUpdateTip: null,
 
       /**
        * HTMLElement of type span that displays the total upload status
@@ -1290,7 +1291,7 @@
                   siteId: this.showConfig.siteId,
                   containerId: this.showConfig.containerId
                }
-               if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+               if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
                {         
                   attributes.updateNodeRef = this.showConfig.updateNodeRef;
                   attributes.majorVersion = !this.minorVersion.checked;
@@ -1302,6 +1303,10 @@
                   var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                   attributes.contentType = contentType;
                   attributes.overwrite = this.showConfig.overwrite;
+                  if (this.showConfig.thumbnail)
+                  {
+                     attributes.thumbnail = this.showConfig.thumbnail;
+                  }
                }
                this.uploader.upload(flashId, url, "POST", attributes, "filedata");
                startedUploads++;
@@ -1355,7 +1360,7 @@ Alfresco.module.getFileUploadInstance = function()
 {
    var instanceId = "alfresco-upload-instance";
    var instance = Alfresco.util.ComponentManager.find({id: instanceId});
-   if(instance !== undefined && instance.length > 0)
+   if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];
    }

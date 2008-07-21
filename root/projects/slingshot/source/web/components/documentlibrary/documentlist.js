@@ -60,6 +60,7 @@
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("highlightFile", this.onHighlightFile, this);
+      YAHOO.Bubbling.on("fileMoved", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("fileDeleted", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("folderDeleted", this.onDocListRefresh, this);
@@ -1207,6 +1208,7 @@
        * Cancel editing.
        *
        * @method onActionCancelEditing
+       * @param row {object} DataTable row representing file to be actioned
        */
       onActionCancelEditing: function DL_onActionCancelEditing(row)
       {
@@ -1240,7 +1242,61 @@
             }
          });
       },
+      
+      /**
+       * Move single document or folder.
+       *
+       * @method onActionMoveTo
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionMoveTo: function DL_onActionMoveTo(row)
+      {
+         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
+         var file = this.widgets.dataTable.getRecord(row)._oData;
+         
+         if (!this.modules.moveTo)
+         {
+            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               files: file,
+               width: "40em",
+               onSuccess:
+               {
+                  fn: function DL_onActionsMoveTo_success(data)
+                  {
+                     var result;
+                     for (var i = 0, j = data.json.totalResults; i < j; i++)
+                     {
+                        result = data.json.results[i];
 
+                        if (result.success)
+                        {
+                           // TODO: Fire the movedTo event
+                        }
+                     }
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this._msg("message.move-to.success")
+                     });
+                  },
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            this.modules.moveTo.setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath
+            })
+         }
+         this.modules.moveTo.showDialog();
+      },
 
 
       /**

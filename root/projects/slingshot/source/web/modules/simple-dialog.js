@@ -155,7 +155,33 @@
              fn: null,
              obj: null,
              scope: window
-          }
+          },
+          
+          /**
+           * Object literal representing function to intercept form before submit.
+           *   fn: function, // The handler to call when the event fires.
+           *   obj: object, // An object to pass back to the handler.
+           *   scope: object // The object to use for the scope of the handler.
+           *
+           * @property doBeforeFormSubmit
+           * @type object
+           * @default null
+           */
+          doBeforeFormSubmit:
+          {
+             fn: null,
+             obj: null,
+             scope: window
+          },
+          
+          /**
+           * Width for the dialog
+           *
+           * @property: width
+           * @type: integer
+           * @default: 30em
+           */
+          width: "30em"
        },
 
       /**
@@ -298,6 +324,13 @@
          if (typeof doSetupFormsValidation.fn == "function")
          {
             doSetupFormsValidation.fn.call(doSetupFormsValidation.scope || this, form, doSetupFormsValidation.obj);
+         }
+         
+         // Custom forms before-submit interest registered?
+         var doBeforeFormSubmit = this.options.doBeforeFormSubmit;
+         if (typeof doBeforeFormSubmit.fn == "function")
+         {
+            form.doBeforeFormSubmit = doBeforeFormSubmit;
          }
 
          // Initialise the form
