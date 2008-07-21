@@ -36,7 +36,7 @@ proc CreateWindow.3E64C4C8-6089-4EAD-953A-6F62CBA77C81 {wizard id} {
 
     grid columnconfigure $base.clientarea 0 -weight 1
     
-    ttk::radiobutton $base.clientarea.hsql -text "HSQLDB - Uses built-in Java database" -value "hsql" -variable ::info(ALF_DB)
+    ttk::radiobutton $base.clientarea.hsql -text "Derby - Uses built-in Java database" -value "derby" -variable ::info(ALF_DB)
     grid $base.clientarea.hsql -row 0 -column 0 -sticky nw -padx 20 -pady 2
 
     ttk::radiobutton $base.clientarea.mysql -text "MySQL - Requires MySQL to be already installed and running" -value "mysql" -variable ::info(ALF_DB)
