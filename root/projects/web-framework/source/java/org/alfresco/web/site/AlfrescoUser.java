@@ -36,6 +36,8 @@ import org.alfresco.connector.User;
  */
 public class AlfrescoUser extends User
 {
+    public static String PROP_AVATARREF = "avatar";
+    
     /**
      * Instantiates a new user.
      * 
@@ -56,6 +58,23 @@ public class AlfrescoUser extends User
     {
         super(id, isAdmin);
     }
+    
+    /**
+     * @return the avatarRef
+     */
+    public String getAvatarRef()
+    {
+        return getStringProperty(PROP_AVATARREF);
+    }
+
+    /**
+     * @param avatarRef the avatarRef to set
+     */
+    public void setAvatarRef(String avatarRef)
+    {
+        setProperty(PROP_AVATARREF, avatarRef);
+    }
+
 
     /**
      * @see org.alfresco.connector.User#save()
