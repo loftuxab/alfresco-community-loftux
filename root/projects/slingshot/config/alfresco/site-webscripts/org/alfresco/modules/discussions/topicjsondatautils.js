@@ -5,25 +5,6 @@ function convertTopicJSONData(topic)
     var created = new Date(topic["createdOn"])
     topic["createdOn"] = created;
     
-    // modified
-    /*if(topic["modifiedOn"] != undefined)
-    {
-        var modified = new Date(topic["modifiedOn"]);
-        topic["modifiedOn"] = created;
-        if ((modified.getTime() - created.getTime()) > 60000) // 60*1000 = 1 minute
-        {
-            topic["isUpdated"] = true;
-        }
-        else
-        {
-            topic["isUpdated"] = false;
-        }
-    }
-    else
-    {
-        topic["isUpdated"] = false;
-    }*/
-    
     // last reply
     if(topic["lastReplyOn"] != undefined)
     {

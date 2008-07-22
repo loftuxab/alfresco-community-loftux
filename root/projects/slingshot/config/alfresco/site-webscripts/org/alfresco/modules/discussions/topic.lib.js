@@ -3,7 +3,7 @@
 
 function getTopicRequestUrl(site, container, path, topicId)
 {
-    var url = "/forum/post/site/" + site + "/" + container;
+    var url = "/api/forum/post/site/" + site + "/" + container;
     url = addUrlPathElement(url, path);
     url = addUrlPathElement(url, topicId);
     return url;

@@ -8,13 +8,12 @@
  */
 function nodeRefToUrl(nodeRef)
 {
-    // PENDING: what is the best way to clean this up?
     return nodeRef.replace(/%3A/gi, ":").replace(/%2F/gi, "/").replace(/\:\/\//,"/");
 }
 
 function getPostRequestUrl(nodeRef)
 {
-    return "/forum/post/node/" + nodeRefToUrl(nodeRef);    
+    return "/api/forum/post/node/" + nodeRefToUrl(nodeRef);    
 }
 
 function fetchPost(nodeRef)

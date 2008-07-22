@@ -15,7 +15,7 @@
 	</div>
 	<div class="editComment">
 		<form id="${htmlid}-createcomment-form" name="${htmlid}-createcomment-form" method="POST"
-            action="${page.url.context}/proxy/alfresco/node/${nodeRef?replace('://','/')}/comments" 
+            action="${page.url.context}/proxy/alfresco/api/node/${nodeRef?replace('://','/')}/comments" 
 		>
 			<input type="hidden" name="nodeRef" value="${nodeRef}" />
 			<input type="hidden" name="htmlid" value="${htmlid}" />

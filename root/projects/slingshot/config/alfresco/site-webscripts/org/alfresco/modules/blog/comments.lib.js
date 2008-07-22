@@ -11,7 +11,7 @@ function nodeRefToUrl(nodeRef)
 
 function getCommentsRequestUrl(nodeRef)
 {
-    return "/node/" + nodeRefToUrl(nodeRef) + "/comments";
+    return "/api/node/" + nodeRefToUrl(nodeRef) + "/comments";
 }
 
 function fetchComments(nodeRef)
@@ -41,7 +41,7 @@ function fetchAndAssignComments(nodeRef, content)
 
 function getCommentRequestUrl(nodeRef)
 {
-    return "/comment/node/" + nodeRefToUrl(nodeRef);
+    return "/api/comment/node/" + nodeRefToUrl(nodeRef);
 }
 
 

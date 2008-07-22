@@ -122,7 +122,7 @@
       _deleteComment: function BlogComment__deleteComment(escapedRef)
       {
          // make an ajax request to the repository to delete the post
-         var url = Alfresco.constants.PROXY_URI + "/comment/node/" + Alfresco.util.noderefs.escapedToUrl(escapedRef);
+         var url = Alfresco.constants.PROXY_URI + "/api/comment/node/" + Alfresco.util.noderefs.escapedToUrl(escapedRef);
          Alfresco.util.Ajax.request(
          {
             url: url,

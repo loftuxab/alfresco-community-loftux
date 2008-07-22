@@ -3,7 +3,7 @@
 
 function getPostRequestUrl(site, container, postId)
 {
-    var url = "/blog/post/site/" + site + "/" + container + "/" + postId;
+    var url = "/api/blog/post/site/" + site + "/" + container + "/" + postId;
     return url;
 }
 

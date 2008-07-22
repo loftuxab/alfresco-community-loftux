@@ -104,9 +104,9 @@
 <div class="editNodeForm">
    <form id="${htmlId}-form" name="${htmlId}-form" method="POST"
       <#if editForm>
-         action="${page.url.context}/proxy/alfresco/blog/post/site/${site}/${container}/${post.name}" 
+         action="${page.url.context}/proxy/alfresco/api/blog/post/site/${site}/${container}/${post.name}" 
       <#else>
-         action="${page.url.context}/proxy/alfresco/blog/site/${site}/${container}/posts" 
+         action="${page.url.context}/proxy/alfresco/api/blog/site/${site}/${container}/posts" 
       </#if>
    >
       <input type="hidden" name="site" id="${htmlId}-site" value="${site}" />

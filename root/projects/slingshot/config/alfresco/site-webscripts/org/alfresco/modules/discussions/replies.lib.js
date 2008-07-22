@@ -3,13 +3,12 @@
 
 function nodeRefToUrl(nodeRef)
 {
-    // PENDING: use another method to decode the url
     return nodeRef.replace(/%3A/gi, ":").replace(/%2F/gi, "/").replace(/\:\/\//,"/");
 }
 
 function getRepliesRequestUrl(nodeRef)
 {
-    return "/forum/post/node/" + nodeRefToUrl(nodeRef) + "/replies";
+    return "/api/forum/post/node/" + nodeRefToUrl(nodeRef) + "/replies";
 }
 
 function getRepliesRequestUrlIncludingLevels(nodeRef, levels)
