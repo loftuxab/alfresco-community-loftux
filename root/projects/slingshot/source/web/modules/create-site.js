@@ -33,7 +33,6 @@
  */
 (function()
 {
-
    /**
     * CreateSite constructor.
     *
@@ -199,8 +198,7 @@
             {
                fn: this.onCreateSiteSuccess,
                scope: this               
-            },
-            failureMessage: Alfresco.util.message("message.failure", this.name)
+            }
          });
          createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();

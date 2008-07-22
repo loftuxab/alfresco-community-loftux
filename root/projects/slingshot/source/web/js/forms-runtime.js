@@ -664,6 +664,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             {
                var element = form.elements[i];
                var name = element.name;
+               if (name == undefined || name == "")
+               {
+                  name = element.id;
+               }
                var value = element.value;
                if (name)
                {

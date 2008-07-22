@@ -82,7 +82,8 @@ public class AlfrescoUser extends User
     @Override
     public void save()
     {
-        // TODO: persist user!
-        
+        // TODO: which fields should be saved? all or calculate diff?
+        // TODO: repo REST script to persist props
+        String test = "test";
     }
 }
