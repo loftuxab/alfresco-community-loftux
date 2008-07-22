@@ -152,8 +152,32 @@
          
          // Buttons
          this.widgets.upload = Alfresco.util.createYUIButton(this, "button-upload", this.onUpload);
-         this.widgets.save = Alfresco.util.createYUIButton(this, "button-save", this.onSave);
+         this.widgets.save = Alfresco.util.createYUIButton(this, "button-save", null,
+            {
+               type: "submit"
+            });
          this.widgets.cancel = Alfresco.util.createYUIButton(this, "button-cancel", this.onCancel);
+         
+         // Form definition
+         var form = new Alfresco.forms.Form(this.id + "-form");
+         form.setSubmitElements(this.widgets.save);
+         form.setShowSubmitStateDynamically(true);
+         form.setSubmitAsJSON(true);
+         form.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+               fn: this.onSuccess,
+               scope: this
+            }
+         });
+         
+         // Form field validation
+         form.addValidation(this.id + "-input-firstName", Alfresco.forms.validation.mandatory, null, "keyup");
+         form.addValidation(this.id + "-input-lastName", Alfresco.forms.validation.mandatory, null, "keyup");
+         
+         // Initialise the form
+         form.init();
          
          // Finally show the main component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-readview", "display", "block");
@@ -226,15 +250,22 @@
       },
       
       /**
-       * Save Changes button click handler
+       * Save Changes form submit success handler
        *
-       * @method onSave
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
+       * @method onSuccess
+       * @param response {object} Server response object
        */
-      onSave: function UP_onSave(e, p_obj)
+      onSuccess: function UP_onSuccess(response)
       {
-         
+         if (response)
+         {
+            // succesfully updated details - refresh the page with the new user details
+            location.reload(true);
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this)});
+         }
       },
       
       /**

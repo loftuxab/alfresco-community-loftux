@@ -24,8 +24,6 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.Serializable;
-
 import org.alfresco.connector.User;
 import org.alfresco.web.site.RequestContext;
 
@@ -71,7 +69,7 @@ public final class ScriptUser extends ScriptBase
     {
         if (this.properties == null)
         {
-            this.properties = new ScriptableLinkedHashMap<String, Serializable>(user.getProperties());
+            this.properties = new ScriptableWrappedMap(user.getProperties());
         }
         
         return this.properties;
