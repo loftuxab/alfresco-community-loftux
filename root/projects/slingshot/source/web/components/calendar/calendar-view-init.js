@@ -149,20 +149,20 @@
                 tab.on("click", this.onTabSelected, this, true);
             }
 
-            /* Initialise buttons and handlers */
-            Alfresco.util.createYUIButton(this, "next-button", this.onNextNav, { type: "push" });
-            Alfresco.util.createYUIButton(this, "prev-button", this.onPrevNav, { type: "push" });
-            Alfresco.util.createYUIButton(this, "current-button", this.onTodayNav, { type: "push" });
-
+            /* Listen for any navigation events */
+            YAHOO.Bubbling.on("onNextNav", this.onNextNav, this);
+            YAHOO.Bubbling.on("onPrevNav", this.onPrevNav, this);
+            YAHOO.Bubbling.on("onTodayNav", this.onTodayNav, this);
+            
             /* Load the data */
             this._loadData();
 
             // Decoupled event listeners
             YAHOO.Bubbling.on("onEventSaved", this.onEventSaved, this);
-			// Listen for when an event has been deleted as view will need refreshing.
-			YAHOO.Bubbling.on("eventDeleted", this.onEventDelete, this);
-			// Listen for when an event has been updated
-			YAHOO.Bubbling.on("eventUpdated", this.onEventUpdate, this);
+			   // Listen for when an event has been deleted as view will need refreshing.
+			   YAHOO.Bubbling.on("eventDeleted", this.onEventDelete, this);
+			   // Listen for when an event has been updated
+			   YAHOO.Bubbling.on("eventUpdated", this.onEventUpdate, this);
         },
 
 		/**
@@ -178,7 +178,7 @@
 		 * @method onNextNav
 		 * @param e {object} DomEvent
 		 */
-		onNextNav: function(e)
+		onNextNav: function(e, args)
 		{
 			var DateMath = YAHOO.widget.DateMath;
 			var fields = [DateMath.DAY, DateMath.WEEK, DateMath.MONTH, null];
@@ -199,7 +199,7 @@
 		 * @method onPrevNav
 		 * @param e {object} DomEvent
 		 */
-		onPrevNav: function(e)
+		onPrevNav: function(e, args)
 		{
 			var DateMath = YAHOO.widget.DateMath;
 			var fields = [DateMath.DAY, DateMath.WEEK, DateMath.MONTH, null];
@@ -218,7 +218,7 @@
 		 * @method onTodayNav
 		 * @param e {object} DomEvent
 		 */
-		onTodayNav: function(e)
+		onTodayNav: function(e, args)
 		{
 			this.currentDate = new Date();
 			this._refreshCurrentView();

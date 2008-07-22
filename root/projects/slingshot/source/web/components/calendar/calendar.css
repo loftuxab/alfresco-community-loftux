@@ -197,6 +197,15 @@ div.cal-event-entry a {
 	text-decoration: none;
 }
 
+div.calendar-currentMonth {
+   text-align: center;
+}
+
+.calendar-bar .align-right
+{
+   text-align: right;
+}
+
 /* Override default textfield width for start and end time textfields */
 span.eventTime  input[type="text"] {
    width: 5em;
