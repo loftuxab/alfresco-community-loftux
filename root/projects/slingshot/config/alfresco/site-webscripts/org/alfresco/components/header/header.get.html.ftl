@@ -1,8 +1,15 @@
+<#assign searchTypeLabel><#if page.url.templateArgs.site??>Search ${page.url.templateArgs.site} site<#else>Search all sites</#if></#assign>
+<#assign siteActive><#if page.url.templateArgs.site??>true<#else>false</#if></#assign>
+
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.Header("${args.htmlid}").setOptions({
-      siteId: "${page.url.templateArgs.site!""}"
-   });
+   var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions({
+      siteId: "${page.url.templateArgs.site!""}",
+      searchType: "${page.url.templateArgs.site!'all'}" // default search type
+   }).setMessages(
+      ${messages}
+   );
 //]]></script>
+
 <div class="header">
    <div class="logo">
       <img src="${url.context}/themes/${theme}/images/app-logo.png" alt="Alfresco Share" />
@@ -13,21 +20,32 @@
       <span class="menu-item"><a href="#">${msg("link.sites")}</a></span>
       <span class="menu-item"><a href="#">${msg("link.users")}</a></span>
    </div>
-   <div class="util-menu">
+   
+   <div class="util-menu" id="${args.htmlid}-searchcontainer">
       <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
+      
       <span class="menu-item">
-         <#-- Check whether we got a site -->
-         <select name="${args.htmlid}-searchtype" id="${args.htmlid}-searchtype" <#if ! page.url.templateArgs.site??>disabled="true"</#if>>
-            <#if page.url.templateArgs.site??>
-            <option value="site">Search this site</option>
-            </#if>
-            <option value="all">Search all sites</option>
-         </select>
+         <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />     
+          <span id="${args.htmlid}-search-sbutton" class="menu-item search-icon">&nbsp;</span>
+          <span id="${args.htmlid}-search-tbutton" class="menu-item search-site-icon">&nbsp;</span>
       </span>
-      <span class="menu-item">
-         <input type="text" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />
-      </span>
+
       <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")}</a></span>
    </div>
+
+	<div id="${args.htmlid}-searchtogglemenu" class="searchtoggle">
+	<div class="bd">
+		<ul>
+			<li class="searchtoggleitem">
+				<a class="searchtoggleitemlabel<#if siteActive == 'false'> disabled</#if>" 
+					href="<#if siteActive == 'false'>#<#else>javascript:thisHeader.doToggleSearchType('site')</#if>">${msg("header.search.searchsite", page.url.templateArgs.site!"")}
+				</a>
+			</li>
+			<li class="searchtoggleitem"><a class="searchtoggleitemlabel" href="javascript:thisHeader.doToggleSearchType('all')">${msg("header.search.searchall")}</a></li>
+		</ul>            
+	</div>
+	</div>	
+
 </div>
+
 <div class="clear"></div>
