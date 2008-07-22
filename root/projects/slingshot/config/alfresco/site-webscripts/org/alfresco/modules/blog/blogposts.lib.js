@@ -5,7 +5,7 @@
 
 function getPostsRequestUrl(site, container, path)
 {
-    var url = "/blog/site/" + site + "/" + container;
+    var url = "/api/blog/site/" + site + "/" + container;
     url = addUrlPathElement(url, path);
     url += "/posts";
     return url;

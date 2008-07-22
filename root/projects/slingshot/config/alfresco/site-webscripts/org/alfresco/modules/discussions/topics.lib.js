@@ -8,10 +8,10 @@
  */
 function getTopicsRequestUrl(site, container, path)
 {
-    var url = "/forum/site/" + site + "/" + container;
-    url = addUrlPathElement(url, path);
-    url += "/posts";
-    return url;
+   var url = "/api/forum/site/" + site + "/" + container;
+   url = addUrlPathElement(url, path);
+   url += "/posts";
+   return url;
 }
 
 /**
@@ -20,41 +20,41 @@ function getTopicsRequestUrl(site, container, path)
  */
 function getTopicsRequestUrlWithParams(site, container, path, filter, tag, paginationData)
 {
-    var url = getTopicsRequestUrl(site, container, path);
+   var url = getTopicsRequestUrl(site, container, path);
 
-    // check whether we got a filter or not
-    if (filter != undefined)
-    {
-        if (filter == "all")
-        {
-            // the default returns all
-        }
-        else if (filter == "new")
-        {
-            url += "/new";
-        }
-        else if (filter == "hot")
-        {
-            url += "/hot";
-        }
-        else if (filter == "mine")
-        {
-            url += "/myposts";
-        }
-    }
+   // check whether we got a filter or not
+   if (filter != undefined)
+   {
+      if (filter == "all")
+      {
+         // the default returns all
+      }
+      else if (filter == "new")
+      {
+         url += "/new";
+      }
+      else if (filter == "hot")
+      {
+         url += "/hot";
+      }
+      else if (filter == "mine")
+      {
+         url += "/myposts";
+      }
+   }
 
-    if (tag != null && tag.length > 0)
-    {
-        url = addParamToUrl(url, "tag", tag);
-    }
+   if (tag != null && tag.length > 0)
+   {
+      url = addParamToUrl(url, "tag", tag);
+   }
         
-    // add the contentFormat
-    url = addParamToUrl(url, "contentFormat", "textDigest");
+   // add the contentFormat
+   url = addParamToUrl(url, "contentFormat", "textDigest");
 
-    // pagination
-    url = addPaginationParamsToUrl(url, paginationData);
+   // pagination
+   url = addPaginationParamsToUrl(url, paginationData);
     
-    return url;
+   return url;
 }
 
 /**
@@ -62,72 +62,72 @@ function getTopicsRequestUrlWithParams(site, container, path, filter, tag, pagin
  */
 function fetchTopics(site, container, path, filter, tag, paginationData)
 {
-    var callback = function fetchTopicsCallback(paginationData)
-    {
-        var url = getTopicsRequestUrlWithParams(site, container, path, filter, tag, paginationData);
-        return doGetCall(url);
-    }
-    var data = fetchValidPaginatedData(callback, paginationData);
-    if (data === null)
-    {
-        return null;
-    }
-    convertTopicsJSONData(data);
-    return data;
+   var callback = function fetchTopicsCallback(paginationData)
+   {
+      var url = getTopicsRequestUrlWithParams(site, container, path, filter, tag, paginationData);
+      return doGetCall(url);
+   }
+   var data = fetchValidPaginatedData(callback, paginationData);
+   if (data === null)
+   {
+      return null;
+   }
+   convertTopicsJSONData(data);
+   return data;
 }
 
 /** Fetches topics and assigns them to the model. */
 function fetchAndAssignTopics(site, container, path, filter, tag, paginationData)
 {
-    var data = fetchTopics(site, container, path, filter, tag, paginationData);
-    if (data == null) return;
+   var data = fetchTopics(site, container, path, filter, tag, paginationData);
+   if (data == null) return;
     
-    applyDataToModel(data);
-    model.pdata = getPaginatorRenderingData(data);    
+   applyDataToModel(data);
+   model.pdata = getPaginatorRenderingData(data);    
 }
 
 
 function createAndAssignTopic(site, container, path, title, content, tags)
 {
-    // fetch the information required to create the topic
-    var params = {
-        title : title,
-        content : content,
-        tags : tags
-    };
-    var jsonParams = jsonUtils.toJSONString(params);
-    var url  = getTopicsRequestUrl(site, container, path);
+   // fetch the information required to create the topic
+   var params = {
+      title : title,
+      content : content,
+      tags : tags
+   };
+   var jsonParams = jsonUtils.toJSONString(params);
+   var url  = getTopicsRequestUrl(site, container, path);
     
-    // Create topic and assign returned data
-    var data = doPostCall(url, jsonParams);
-    if (data === null)
-    {
-        return;
-    }
-    convertTopicJSONData(data.item);
-    applyDataToModel(data);   
+   // Create topic and assign returned data
+   var data = doPostCall(url, jsonParams);
+   if (data === null)
+   {
+      return;
+   }
+   convertTopicJSONData(data.item);
+   applyDataToModel(data);   
 }
 
 function getListTitle(filter, tag)
 {
-    if (filter == null || filter == "all")
-    {
-        return "All topics";
-    }
-    else if (filter == "hot")
-    {
-        return "Hot topics";
-    }
-    else if (filter == "new")
-    {
-        return "New topics";
-    }
-    else if (tag != null && tag.length > 0)
-    {
-        return "Topics with tag " + tag;
-    }
-    else
-    {
-        return "Topics"
-    }
+   if (filter == null || filter == "all")
+   {
+      return "All topics";
+   }
+   else if (filter == "hot")
+   {
+      return "Hot topics";
+   }
+   else if (filter == "new")
+   {
+      return "New topics";
+   }
+   else if (tag != null && tag.length > 0)
+   {
+      return "Topics with tag " + tag;
+   }
+   else
+   {
+      return "Topics"
+   }
 }

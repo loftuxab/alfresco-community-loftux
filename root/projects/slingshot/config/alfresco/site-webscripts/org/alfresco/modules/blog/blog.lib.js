@@ -2,7 +2,7 @@
 
 function getBlogRequestUrl(site, container)
 {
-    var url = "/blog/site/" + site + "/" + container;
+    var url = "/api/blog/site/" + site + "/" + container;
     return url;
 }
 

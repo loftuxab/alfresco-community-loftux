@@ -165,7 +165,7 @@
       _deleteReply: function DiscussionsReplies__deleteReply(replyRef)
       {
          // make an ajax request to delete the topic
-         var url = Alfresco.constants.PROXY_URI + "forum/post/node/" + Alfresco.util.noderefs.escapedToUrl(replyRef);
+         var url = Alfresco.constants.PROXY_URI + "api/forum/post/node/" + Alfresco.util.noderefs.escapedToUrl(replyRef);
          Alfresco.util.Ajax.request(
          {
             url: url,

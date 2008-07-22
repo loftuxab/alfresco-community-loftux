@@ -161,7 +161,7 @@ Alfresco.util.blog.loadBlogPostListPage = function(site, container, path)
  */
 Alfresco.util.blog.getBlogPostRestUrl = function(site, container, path, postId)
 {
-   var url = Alfresco.constants.PROXY_URI + "blog/post/site/" + site + "/" +
+   var url = Alfresco.constants.PROXY_URI + "api/blog/post/site/" + site + "/" +
             container + "/";
    if (path != undefined && path.length > 0)
    {
@@ -173,7 +173,7 @@ Alfresco.util.blog.getBlogPostRestUrl = function(site, container, path, postId)
 
 Alfresco.util.blog.getPublishingRestUrl = function(site, container, path, postId)
 {
-   var url = Alfresco.constants.PROXY_URI + "blog/post/site/" + site + "/" + container + "/";
+   var url = Alfresco.constants.PROXY_URI + "api/blog/post/site/" + site + "/" + container + "/";
    if (path != undefined && path.length > 0)
    {
       url += path + "/";
@@ -234,7 +234,7 @@ Alfresco.util.discussions.loadForumPostListPage = function(site, container, path
  */
 Alfresco.util.discussions.getTopicRestUrl = function(site, container, path, topicId)
 {
-   var url = Alfresco.constants.PROXY_URI + "forum/post/site/" + site + "/" +
+   var url = Alfresco.constants.PROXY_URI + "api/forum/post/site/" + site + "/" +
             container + "/";
    if (path != undefined && path.length > 0)
    {
