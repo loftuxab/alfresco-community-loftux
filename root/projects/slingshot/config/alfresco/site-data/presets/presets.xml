@@ -47,6 +47,12 @@
             <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/site-profile</url>
          </component>
+         <component>
+            <scope>page</scope>
+            <region-id>component-3-2</region-id>
+            <source-id>site/${siteid}/dashboard</source-id>
+            <url>/components/dashlets/wiki</url>
+         </component>   
       </components>
       <pages>
          <page id="site/${siteid}/dashboard">
