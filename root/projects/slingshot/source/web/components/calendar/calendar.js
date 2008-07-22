@@ -106,7 +106,7 @@
 			var Dom = YAHOO.util.Dom;
 		
 			/* Add Event Button */
-         var aeButton = Alfresco.util.createYUIButton(this, "addEvent-button", this.onButtonClick);
+         var aeButton = Alfresco.util.createYUIButton(this, "thisMonth-button", this.onButtonClick);
 		
 		 	// Separate the (initial) rendering of the calendar from the data loading.
 		 	// If for some reason the data fails to load, the calendar will still display.
@@ -199,12 +199,9 @@
 	 	 */
 		onButtonClick: function(e, oValue)
 		{
-			if (this.eventDialog === null)
-			{
-				this.eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-			}
-			this.eventDialog.setSiteId(this.siteId);
-			this.eventDialog.show();
+		   var today = new Date();
+		   this.calendar.cfg.setProperty("pagedate", today.getMonth()+1+"/"+today.getFullYear());
+		   this.calendar.render();
 		}
    };
 })();

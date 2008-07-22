@@ -9,8 +9,6 @@
 <div id="${args.htmlid}-body">
    <div id="calendar"></div>
    <div>
-      <div id="${args.htmlid}-viewButtons" class="doclist-viewButtons"><a href="#" id="${args.htmlid}-addEvent-button">${msg("button.add-event")}</a></div>
-      </div>
-      <div id="${args.htmlid}-addEvent"></div>
+      <div id="${args.htmlid}-viewButtons" class="calendar-currentMonth"><a href="#" id="${args.htmlid}-thisMonth-button">${msg("button.this-month")}</a></div>
    </div>
 </div>

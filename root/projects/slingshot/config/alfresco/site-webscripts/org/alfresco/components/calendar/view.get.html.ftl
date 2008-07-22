@@ -11,9 +11,6 @@
 
 <div id="${args.htmlid}">
 <div id="eventInfoPanel"></div>
-<div style="text-align:right;">
-	<a href="#" id="${args.htmlid}-prev-button">${msg("button.previous")}</a><a href="#" id="${args.htmlid}-next-button">${msg("button.next")}</a><a href="#" id="${args.htmlid}-current-button">${msg("button.today")}</a> 
-</div>
 <div id="calendar-view" class="yui-navset">
 <ul class="yui-nav">
   <li><a href="#day"><em>${msg("label.day")}</em></a></li>

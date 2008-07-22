@@ -14,12 +14,13 @@
         <div class="yui-t1" id="divCalendarWrapper">
            <div id="yui-main">
               <div class="yui-b" id="divCalendarEvents">
+               <@region id="toolbar" scope="template" protected=true />
                 <@region id="view" scope="template" protected=true />
               </div>
            </div>
            <div class="yui-b" id="divCalendarFilters">
-              <@region id="tags" scope="template" protected=true />
-              <@region id="calendar" scope="template" protected=true />
+               <@region id="calendar" scope="template" protected=true />
+               <@region id="tags" scope="template" protected=true />
            </div>
         </div>
    </div>
