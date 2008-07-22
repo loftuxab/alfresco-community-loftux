@@ -1,3 +1,5 @@
+<#import "/org/alfresco/modules/discussions/user.lib.ftl" as userLib/>
+
 <#--
    Macros to render comments and the comment form
 -->
@@ -55,12 +57,12 @@
 </div>
   
 <div class="authorPicture">
-   <img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="photo" />
+   <@userLib.renderAvatarImage user=comment.author />
 </div>
   
 <div class="nodeContent">
    <div class="userLink">
-      <a href="">${comment.author}</a> ${msg("comments.said")}:
+      <@userLib.renderUserLink user=comment.author /> ${msg("comments.said")}:
       <#if comment.isUpdated><span class="nodeStatus">(${msg("comments.updated")})</span></#if>
    </div>
 

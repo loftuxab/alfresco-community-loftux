@@ -1,3 +1,5 @@
+<#import "/org/alfresco/modules/discussions/user.lib.ftl" as userLib/>
+
 <#--
   Renders a post.
   
@@ -53,7 +55,7 @@
             <span class="nodeAttrLabel">${msg("post.info.publishedOn")}:</span> <span class="nodeAttrValue">${post.releasedOn?datetime?string.medium_short}</span>
             <span class="spacer"> | </span>
          </#if>
-         <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><a href=""> ${post.author}</a></span>
+         <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=post.author /></span>
       </div>
       
       <div class="content">${post.content}</div>
@@ -61,6 +63,7 @@
    <br clear="all" />
    
    <div class="nodeFooter">
+   <#--
       <#if (! post.isDraft)>
          <span class="nodeFooterBloc">
             <span class="nodeAttrLabel replyTo">${msg("post.footer.comments")}:</span><span class="nodeAttrValue"> (${post.commentCount})</span>
@@ -70,6 +73,7 @@
       <#if ((post.tags?size > 0) && (! post.isDraft))>
       <span class="spacer"> | </span>
       </#if>
+   -->
       
       <#if (post.tags?size > 0)>
          <span class="nodeFooterBloc">
