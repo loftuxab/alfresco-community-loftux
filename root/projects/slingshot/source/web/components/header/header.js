@@ -38,7 +38,8 @@
           * @type string
           * @default null
           */
-         siteId: ""
+         siteId: "",
+         searchType: ""
       },
       
       /**
@@ -52,14 +53,34 @@
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
       },
-       
+      
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.Search} returns 'this' for method chaining
+       */
+      setMessages: function Search_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+      
       componentsLoaded: function()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);           
       },
       
       onReady: function Header_onReady()
       {
+         YAHOO.util.Event.addListener(this.id+"-searchtext", "focus", this.focusSearchText, null, this);
+         YAHOO.util.Event.addListener(this.id+"-searchtext", "blur", this.blurSearchText, null, this);
+         
+
+         
+         this.defaultSearchText();
+         
          // register the "enter" event on the search text field
          //var zinput = document.getElementById(this.id + "-searchtext");
          var zinput = YAHOO.util.Dom.get(this.id + "-searchtext");
@@ -78,6 +99,51 @@
             }, 
             "keydown" 
          ).enable();
+
+
+		YAHOO.util.Event.onContentReady(me.id+"-searchtogglemenu", function () {
+			var oMenu = new YAHOO.widget.Menu(me.id+"-searchtogglemenu");
+			oMenu.render();
+			oMenu.owner = me;
+			oMenu.subscribe("show", oMenu.focus);
+			
+			YAHOO.util.Event.addListener(me.id+"-search-tbutton", "click", me.openToggleSearchMenu, null, oMenu);
+		});
+      },
+      
+      focusSearchText: function () {
+		if(YAHOO.util.Dom.hasClass(this.id + "-searchtext", "gray")) {
+			YAHOO.util.Dom.get(this.id + "-searchtext").value = "";
+			YAHOO.util.Dom.removeClass(this.id + "-searchtext", "gray");
+		}
+		else {
+			YAHOO.util.Dom.get(this.id + "-searchtext").select();
+		}
+      },
+      
+      blurSearchText: function () {
+		var searchVal = YAHOO.util.Dom.get(this.id + "-searchtext").value;
+		if(searchVal.length == 0) {
+			this.defaultSearchText();
+		}
+      }, 
+      
+      defaultSearchText: function() {
+			YAHOO.util.Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
+			YAHOO.util.Dom.addClass(this.id + "-searchtext", "gray");
+      },
+      
+      openToggleSearchMenu: function() {
+      	this.show();
+      	var coord = YAHOO.util.Dom.getXY(this.owner.id+"-search-tbutton");
+      	coord[0] -= (YAHOO.util.Dom.get(this.owner.id+"-searchtogglemenu").offsetWidth - YAHOO.util.Dom.get(this.owner.id+"-search-tbutton").offsetWidth);
+      	coord[1] += YAHOO.util.Dom.get(this.owner.id+"-search-tbutton").offsetHeight;
+	    YAHOO.util.Dom.setXY(this.id, coord);       	
+      },
+      
+      doToggleSearchType: function(newVal) {
+      	this.options.searchType = newVal;
+      	this.defaultSearchText();
       },
       
       /**
@@ -95,7 +161,7 @@
       doSearch: function()
       {
          var searchTerm = YAHOO.util.Dom.get(this.id + "-searchtext").value;
-         var searchAll = ! (YAHOO.util.Dom.get(this.id + "-searchtype").value == "site");
+         var searchAll =  (this.options.searchType == "all");
 
          if (this.searchExists)
          {
@@ -122,6 +188,31 @@
             }
             window.location =  url;
          }
-      }
+      },
+
+	  _getToggleLabel: function(type)
+      {
+         if (type == 'all')
+         {
+            return this._msg("header.search.searchall");
+         }
+         else
+         {
+            return this._msg("header.search.searchsite", this.options.siteTitle);
+         }
+      },
+      
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function Search__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+      }      
    };
 })();

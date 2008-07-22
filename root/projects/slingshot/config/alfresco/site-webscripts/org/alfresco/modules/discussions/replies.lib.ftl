@@ -1,6 +1,9 @@
+<#import "/org/alfresco/modules/discussions/user.lib.ftl" as userLib/>
+
 <#--
    Macros to render replies and the reply form
 -->
+
 
 <#--
    Renders a list of replies
@@ -64,12 +67,12 @@
 </div>
   
 <div class="authorPicture">
-   <img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="photo" />
+   <@userLib.renderAvatarImage user=reply.author />
 </div>
 
 <div class="nodeContent">
    <div class="userLink">
-      <a href="">${reply.author}</a> ${msg("replies.said")}:
+      <@userLib.renderUserLink user=reply.author /> ${msg("replies.said")}:
       <#if reply.isUpdated><span class="nodeStatus">(${msg("replies.updated")})</span></#if>
    </div>
 
@@ -106,7 +109,7 @@
 <div class="editNodeForm">
    <#if ! isEdit>
    <div class="replyTo">
-      ${msg("replies.form.replyTo")}: <em>${post.author}</em>
+      ${msg("replies.form.replyTo")}: <em><@userLib.renderUserName user=post.author /></em>
    </div>
    </#if>
    

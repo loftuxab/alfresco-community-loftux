@@ -1,3 +1,21 @@
+<#import "/org/alfresco/modules/discussions/user.lib.ftl" as userLib/>
+
+<#--
+   User related rendering macros.
+   A user object is expected of following form:
+   
+   {
+      "username" : "name of the user",
+      "firstName" : "first name",
+      "lastName" : "last name",
+      "avatarRef" : node reference of the avatar image
+   }
+   
+   firstName, lastName and avatarRef can be missing, in which case
+   the macros will do a fallback to defaults
+-->
+
+
 <#--
   Renders the title of the list
 -->
@@ -74,10 +92,10 @@
       <div class="published">
          <span class="nodeAttrLabel">${msg("topic.info.createdOn")}:</span> <span class="nodeAttrValue"> ${topic.createdOn?datetime?string.medium_short}</span>
          <span class="spacer"> | </span>
-         <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><a href=""> ${topic.author}</a></span>   
+         <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=topic.author /></a></span>
          <br />
-         <#if (topic.totalReplyCount > 0)>
-            <span class="nodeAttrLabel">${msg("topic.info.lastReplyBy")}:</span> <span class="nodeAttrValue"> ${topic.lastReplyBy!""}</span>
+         <#if topic.lastReplyBy??>
+            <span class="nodeAttrLabel">${msg("topic.info.lastReplyBy")}:</span> <span class="nodeAttrValue"><@userLib.renderUserLink user=topic.lastReplyBy /></span>
             <span class="spacer"> | </span>
             <span class="nodeAttrLabel">${msg("topic.info.lastReplyOn")}:</span> <span class="nodeAttrValue"><#if topic.lastReplyOn??>${topic.lastReplyOn?datetime?string.medium_short}</#if></span>    
          <#else>
@@ -85,7 +103,7 @@
          </#if>
       </div>
       
-      <div class="userLink"><a href="">${topic.author}</a> ${msg("topic.said")}:</div>
+      <div class="userLink"><@userLib.renderUserLink user=topic.author /></a> ${msg("topic.said")}:</div>
       <div class="content">${topic.content}</div>
    </div>
    <br clear="all" />
