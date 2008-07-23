@@ -102,5 +102,6 @@
 	<classpathentry kind="lib" path="lib/jgroups/jgroups-2.6.2.jar" sourcepath="src/jgroups-2.6.2.src.zip"/>
 	<classpathentry kind="lib" path="lib/jsr107cache-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/derby.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
