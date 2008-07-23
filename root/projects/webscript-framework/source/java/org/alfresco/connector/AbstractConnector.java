@@ -73,9 +73,7 @@ public abstract class AbstractConnector implements Connector
         return call(uri, null);
     }
     
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see org.alfresco.connector.Connector#setCredentials(org.alfresco.connector.Credentials)
      */
     public void setCredentials(Credentials credentials)
@@ -107,14 +105,12 @@ public abstract class AbstractConnector implements Connector
         return this.endpoint;
     }    
 
-    
     /* (non-Javadoc)
      * @see org.alfresco.connector.Connector#setConnectorSession(org.alfresco.connector.ConnectorSession)
      */
     public void setConnectorSession(ConnectorSession connectorSession)
     {
         this.connectorSession = connectorSession;
-        
     }
     
     /* (non-Javadoc)
@@ -123,5 +119,14 @@ public abstract class AbstractConnector implements Connector
     public ConnectorSession getConnectorSession()
     {
         return this.connectorSession;
-    }    
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return this.endpoint + (credentials != null ? (" - " + credentials.toString()) : "");
+    }
 }

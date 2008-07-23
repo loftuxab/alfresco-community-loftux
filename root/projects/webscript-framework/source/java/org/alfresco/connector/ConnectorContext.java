@@ -70,11 +70,24 @@ public final class ConnectorContext
     {
         this(null, parameters, headers);
     }
+    
+    /**
+     * Instantiates a new connector context.
+     * 
+     * @param method the HTTP method
+     */
+    public ConnectorContext(HttpMethod method)
+    {
+        if (method != null)
+        {
+            this.method = method;
+        }
+    }
 
     /**
      * Instantiates a new connector context.
      * 
-     * @param method the method
+     * @param method the HTTP method
      * @param parameters the parameters
      * @param headers the headers
      */

@@ -14,48 +14,48 @@
       </div>
       <div class="viewcolumn">
          <div class="header-bar">${msg("label.info")}</div>
-         <div class="row" style="height:7em">
+         <div class="photorow">
             <div class="photo">
-               <img src="${url.context}<#if user.properties.avatar?exists>/proxy/alfresco/api/node/content/${user.properties.avatar?replace('://','/')}/avatar.jpg<#else>/components/images/no-photo.png</#if>" width="64" height="64" alt="" />
+               <img src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/content/${user.properties.avatar?replace('://','/')}/avatar.jpg<#else>/components/images/no-photo.png</#if>" width="64" height="64" alt="" />
             </div>
             <div class="namelabel">${user.firstName!""} ${user.lastName!""}</div>
-            <#if user.jobTitle?exists><div class="fieldlabel">${user.jobTitle?html}</div></#if>
-            <#if user.organization?exists><div class="fieldlabel">${user.organization?html}</div></#if>
-            <#if user.location?exists><div class="fieldlabel">${user.location?html}</div></#if>
+            <#if user.jobTitle?? && user.jobTitle?length!=0><div class="fieldlabel">${user.jobTitle?html}</div></#if>
+            <#if user.organization?? && user.organization?length!=0><div class="fieldlabel">${user.organization?html}</div></#if>
+            <#if user.location?? && user.location?length!=0><div class="fieldlabel">${user.location?html}</div></#if>
          </div>
-         <#if user.biography?exists>
-         <div class="row" style="padding-left:100px">
+         <#if user.biography?? && user.biography?length!=0>
+         <div class="biorow">
             <hr/>
             <div>${user.biography?html}</div>
          </div>
          </#if>
          
          <div class="header-bar">${msg("label.contact")}:</div>
-         <#if user.email?exists>
+         <#if user.email?? && user.email?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.email")}:</span>
             <span class="fieldvalue">${user.email?html}</span>
          </div>
          </#if>
-         <#if user.telephone?exists>
+         <#if user.telephone?? && user.telephone?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.telephone")}:</span>
             <span class="fieldvalue">${user.telephone?html}</span>
          </div>
          </#if>
-         <#if user.mobilePhone?exists>
+         <#if user.mobilePhone?? && user.mobilePhone?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.mobile")}:</span>
             <span class="fieldvalue">${user.mobilePhone?html}</span>
          </div>
          </#if>
-         <#if user.skype?exists>
+         <#if user.skype?? && user.skype?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.skype")}:</span>
             <span class="fieldvalue">${user.skype?html}</span>
          </div>
          </#if>
-         <#if user.instantMsg?exists>
+         <#if user.instantMsg?? && user.instantMsg?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.im")}:</span>
             <span class="fieldvalue">${user.instantMsg?html}</span>
@@ -63,20 +63,22 @@
          </#if>
          
          <div class="header-bar">${msg("label.companyinfo")}</div>
-         <#if user.organization?exists>
+         <#if user.organization?? && user.organization?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.name")}:</span>
             <span class="fieldvalue">${user.organization?html}</span>
          </div>
          </#if>
-         <#if user.companyAddress1?exists || user.companyAddress2?exists ||
-              user.companyAddress3?exists || user.companyPostcode?exists>
+         <#if (user.companyAddress1?? && user.companyAddress1?length!=0) ||
+              (user.companyAddress2?? && user.companyAddress2?length!=0) ||
+              (user.companyAddress3?? && user.companyAddress3?length!=0) ||
+              (user.companyPostcode?? && user.companyPostcode?length!=0)>
          <div class="row">
             <span class="fieldlabelright">${msg("label.address")}:</span>
-            <span class="fieldvalue"><#if user.companyAddress1?exists>${user.companyAddress1?html}</#if>
-               <#if user.companyAddress2?exists><p>${user.companyAddress2?html}</p></#if>
-               <#if user.companyAddress3?exists><p>${user.companyAddress3?html}</p></#if>
-               <#if user.companyPostcode?exists><p>${user.companyPostcode?html}</p></#if>
+            <span class="fieldvalue"><#if user.companyAddress1?? && user.companyAddress1?length!=0>${user.companyAddress1?html}</#if>
+               <#if user.companyAddress2?? && user.companyAddress2?length!=0><p>${user.companyAddress2?html}</p></#if>
+               <#if user.companyAddress3?? && user.companyAddress3?length!=0><p>${user.companyAddress3?html}</p></#if>
+               <#if user.companyPostcode?? && user.companyPostcode?length!=0><p>${user.companyPostcode?html}</p></#if>
             </span>
          </div>
          </#if>
@@ -86,19 +88,19 @@
             <span class="fieldvalue"></span>
          </div>
          -->
-         <#if user.companyTelephone?exists>
+         <#if user.companyTelephone?? && user.companyTelephone?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.telephone")}:</span>
             <span class="fieldvalue">${user.companyTelephone?html}</span>
          </div>
          </#if>
-         <#if user.companyFax?exists>
+         <#if user.companyFax?? && user.companyFax?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.fax")}:</span>
             <span class="fieldvalue">${user.companyFax?html}</span>
          </div>
          </#if>
-         <#if user.companyemail?exists>
+         <#if user.companyemail?? && user.companyemail?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.email")}:</span>
             <span class="fieldvalue">${user.companyemail?html}</span>
@@ -112,32 +114,32 @@
       
       <div class="header-bar">${msg("label.info")}</div>
       <div class="drow">
-         <div style="float:left">
+         <div class="leftcolumn">
             <span class="label">${msg("label.firstname")}:</span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-firstName" value="${user.firstName!""}" /></span>
          </div>
-         <div style="float:right">
+         <div class="rightcolumn">
             <span class="label">${msg("label.lastname")}:</span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-lastName" value="${user.lastName!""}" /></span>
          </div>
       </div>
       <div class="drow">
-         <div style="float:left">
+         <div class="leftcolumn">
             <span class="label">${msg("label.title")}:</span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-jobtitle" value="${user.jobTitle!""}" /></span>
          </div>
-         <div style="float:right">
+         <div class="rightcolumn">
             <span class="label">${msg("label.location")}:</span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-location" value="${user.location!""}" /></span>
          </div>
       </div>
       <!--
       <div class="drow">
-         <div style="float:left">
+         <div class="leftcolumn">
             <span class="label">${msg("label.timezone")}:</span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-timezone" /></span>
          </div>
-         <div style="float:right">
+         <div class="rightcolumn">
          </div>
       </div>
       -->
@@ -148,7 +150,9 @@
       
       <div class="header-bar">${msg("label.photo")}:</div>
       <div class="row">
-         <div class="photo"><img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="" /></div>
+         <div class="photo">
+            <img src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/content/${user.properties.avatar?replace('://','/')}/avatar.jpg<#else>/components/images/no-photo.png</#if>" width="64" height="64" alt="" />
+         </div>
          <div class="photobtn"><button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button></div>
       </div>
       
