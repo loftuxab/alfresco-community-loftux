@@ -12,7 +12,8 @@ function main()
     fetchAndAssignTopic(site, container, path, topicId)
     
     // assign additional model data
-    model.site = page.url.templateArgs.site;
+    model.site = site;
+    model.container = container;
     model.editMode = ((page.url.args["edit"] != undefined) && (page.url.args["edit"] == "true"));
 }
 

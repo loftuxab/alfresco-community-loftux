@@ -9,9 +9,10 @@ function main()
     var site = "" + json.get("site");
     var container = "" + json.get("container");
     var path = "" + json.get("path");
+    var browseTopicUrl = "" + json.get("browseTopicUrl");
     
     // create reply
-    createAndAssignReply(site, container, path, postRef, content);
+    createAndAssignReply(site, container, path, postRef, content, browseTopicUrl);
     
     // set additional template data
     model.htmlid = json.get("htmlid");

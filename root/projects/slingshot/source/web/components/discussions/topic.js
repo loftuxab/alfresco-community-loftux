@@ -152,6 +152,8 @@
          // we can directly go to alfresco for this
          var url = Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
                   this.options.containerId, this.options.path, param);
+         url += "?site=" + this.options.siteId;
+         url += "&container=" + this.options.containerId;
          Alfresco.util.Ajax.request(
          {
             url: url,

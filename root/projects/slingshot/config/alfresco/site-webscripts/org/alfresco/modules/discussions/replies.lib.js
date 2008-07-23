@@ -40,13 +40,14 @@ function fetchAndAssignReplies(nodeRef, content)
     applyDataToModel(data);
 }
 
-function createAndAssignReply(site, container, path, parentNodeRef, content)
+function createAndAssignReply(site, container, path, parentNodeRef, content, browseTopicUrl)
 {
     var params = {
         site : site,
         container : container,
         path : path,
-        content : content
+        content : content,
+        browseTopicUrl : browseTopicUrl
     };
     var paramsJSON = jsonUtils.toJSONString(params);
     var url = getRepliesRequestUrl(parentNodeRef);

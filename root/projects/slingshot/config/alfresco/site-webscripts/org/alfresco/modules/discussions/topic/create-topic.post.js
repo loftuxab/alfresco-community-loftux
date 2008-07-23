@@ -9,6 +9,7 @@ function main()
    var title = "" + json.get("title");
    var content = "" + json.get("content");
    var htmlid = "" + json.get("htmlid");
+   var browseTopicUrl = "" + json.get("browseTopicUrl");
    var tags = [];
    if (json.has("tags"))
    {
@@ -20,7 +21,7 @@ function main()
    }
     
    // Create topic and assign returned data
-   createAndAssignTopic(site, container, path, title, content, tags);
+   createAndAssignTopic(site, container, path, title, content, tags, browseTopicUrl);
     
    // set additional template data
    model.site = site;

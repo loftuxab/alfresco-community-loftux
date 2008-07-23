@@ -38,13 +38,14 @@ function fetchAndAssignPost(nodeRef)
     applyDataToModel(data);
 }
 
-function updateAndAssignPost(site, container, path, parentNodeRef, content)
+function updateAndAssignPost(site, container, path, parentNodeRef, content, browseTopicUrl)
 {
     var params = {
         site : site,
         container : container,
         path : path,
-        content : content
+        content : content,
+        browseTopicUrl : browseTopicUrl
     };
     var paramsJSON = jsonUtils.toJSONString(params);
     var url = getPostRequestUrl(parentNodeRef);

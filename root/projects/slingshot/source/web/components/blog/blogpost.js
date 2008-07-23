@@ -310,6 +310,8 @@
          // make an ajax request to delete the post
          var url = Alfresco.util.blog.getBlogPostRestUrl(this.options.siteId, this.options.containerId,
                                                          this.options.path, param);
+         url += "?site=" + this.options.siteId;
+         url += "&container=" + this.options.containerId;
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -332,7 +334,7 @@
          }
          else
          {
-            Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId, this.options, path);
+            Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId, this.options.path);
          }
       },
       

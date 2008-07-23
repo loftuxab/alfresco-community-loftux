@@ -3,12 +3,13 @@
 function main()
 {
    var site = "" + json.get("site");
-   var container = "discussions";
+   var container = "" + json.get("container");
    var path = "";
    var topicId = "" + json.get("topicId");
    var title = "" + json.get("title");
    var content =  "" + json.get("content");
    var htmlid = "" + json.get("htmlid");
+   var browseTopicUrl = "" + json.get("browseTopicUrl");
    var tags = [];
    if (json.has("tags"))
    {
@@ -20,10 +21,11 @@ function main()
    }
     
    // update topic and assign returned data
-   updateAndAssignTopic(site, container, path, topicId, title, content, tags);
+   updateAndAssignTopic(site, container, path, topicId, title, content, tags, browseTopicUrl);
     
    // set additional model data
-   model.site = json.get("site");
+   model.site = site;
+   model.container = container;
    model.htmlid = htmlid;
 }
 

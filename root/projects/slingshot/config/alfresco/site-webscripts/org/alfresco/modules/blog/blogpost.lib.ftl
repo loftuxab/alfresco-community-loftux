@@ -110,6 +110,8 @@
       </#if>
    >
       <input type="hidden" name="site" id="${htmlId}-site" value="${site}" />
+      <input type="hidden" name="container" value="${container}" />
+      <input type="hidden" name="browsePostUrl" value="${page.url.context}/page/site/${site}/blog-postview?container=${container}&postId={post.name}" />
       <input type="hidden" name="draft" id="${htmlId}-draft" value="<#if isDraft>true<#else>false</#if>">
       <#if editForm>
          <input type="hidden" name="postId" id="${htmlId}-postId" value="${post.name}" />
