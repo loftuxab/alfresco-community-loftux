@@ -16,8 +16,13 @@
 		<!-- HEADER end -->
 		
 		<!-- BODY  -->
-		<div id="bd">		
-			<@region id="body" scope="page"/>
+		<div id="bd">	
+		
+			<div id="yui-main">
+		
+				<@region id="body" scope="page"/>
+			
+			</div>
 		</div>
 		<!-- BODY end -->
 				

@@ -24,6 +24,8 @@
  */
 package org.alfresco.extranet.database;
 
+import java.util.Date;
+
 import org.alfresco.extranet.AbstractUser;
 
 /**
@@ -32,6 +34,9 @@ import org.alfresco.extranet.AbstractUser;
 public class DatabaseUser extends AbstractUser
 {
     protected int id;
+    protected Date subscriptionStart;
+    protected Date subscriptionEnd;
+    protected String level;
     
     /**
      * Instantiates a new extranet user.
@@ -64,5 +69,35 @@ public class DatabaseUser extends AbstractUser
     public int getId()
     {
         return this.id;
+    }
+    
+    public String getLevel()
+    {
+        return this.level;
+    }
+    
+    public void setLevel(String level)
+    {
+        this.level = level;
+    }
+    
+    public Date getSubscriptionStart()
+    {
+        return this.subscriptionStart;
+    }
+
+    public void setSubscriptionStart(Date subscriptionStart)
+    {
+        this.subscriptionStart = subscriptionStart;
+    }
+    
+    public Date getSubscriptionEnd()
+    {
+        return this.subscriptionEnd;
+    }
+    
+    public void setSubscriptionEnd(Date subscriptionEnd)
+    {
+        this.subscriptionEnd = subscriptionEnd;
     }
 }

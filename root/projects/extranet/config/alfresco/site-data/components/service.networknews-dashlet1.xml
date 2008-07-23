@@ -2,16 +2,11 @@
 
 <component> 
 
-	<title>Alfresco Network News</title>
-
 	<url>/components/network/news/clientdashlet1</url>
 	
 	<!-- Binding --> 
 	<scope>service</scope>
 	<region-id>networknews-dashlet1</region-id>
 	<source-id>service</source-id>
-	
-	<!-- Pick which chrome to use -->
-	<chrome>extranet-box-chrome</chrome>	
-  
+
 </component>

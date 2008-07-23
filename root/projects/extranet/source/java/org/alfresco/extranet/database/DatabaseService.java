@@ -24,6 +24,7 @@
  */
 package org.alfresco.extranet.database;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -129,13 +130,13 @@ public class DatabaseService implements ApplicationContextAware
         return user;
     } 
     
-    public synchronized DatabaseUser startProcessInvitedUser(DatabaseInvitedUser invitedUser)
+    public synchronized DatabaseUser startProcessInvitedUser(DatabaseInvitedUser invitedUser, String userId)
     {
         DatabaseUser user = userBean.get(invitedUser.getUserId());
         if(user == null)
         {
             // create the database user
-            user = new DatabaseUser(invitedUser.getUserId());
+            user = new DatabaseUser(userId);
         
             // copy in properties
             user.setDescription(invitedUser.getDescription());
@@ -143,6 +144,10 @@ public class DatabaseService implements ApplicationContextAware
             user.setFirstName(invitedUser.getFirstName());
             user.setMiddleName(invitedUser.getMiddleName());
             user.setLastName(invitedUser.getLastName());
+            
+            // copy in dates
+            user.setSubscriptionStart(invitedUser.getSubscriptionStart());
+            user.setSubscriptionEnd(invitedUser.getSubscriptionEnd());
             
             // insert user
             user = userBean.insert(user);
@@ -317,5 +322,7 @@ public class DatabaseService implements ApplicationContextAware
     {
         return this.companyBean.delete(company);
     }
+    
+    public static SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     
 }

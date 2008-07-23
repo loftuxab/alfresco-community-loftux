@@ -25,7 +25,7 @@
 
 		<!-- BODY  -->
 		<div id="bd">		
-			<@region id="content-details" scope="global"/>
+			<@region id="body" scope="page"/>
 		</div>
 		<!-- BODY end -->
 		

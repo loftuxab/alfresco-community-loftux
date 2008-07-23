@@ -70,8 +70,10 @@ public class XMLCredentialVault extends PersistentCredentialVault
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#load()
      */
-    public void load()
+    public boolean load()
     {
+        boolean success = false;
+        
         File file = new File(getLocation() + "/" + this.id + ".xml");
         if(file.exists())
         {
@@ -94,6 +96,9 @@ public class XMLCredentialVault extends PersistentCredentialVault
                     
                     // deserialize
                     deserialize(xml);
+                    
+                    // mark that the load was successful
+                    success = true;
                 }
                 finally 
                 {
@@ -113,13 +118,17 @@ public class XMLCredentialVault extends PersistentCredentialVault
                 logger.debug("Not found: " + file.getAbsolutePath());
             }
         }
+        
+        return success;
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#save()
      */
-    public void save()
+    public boolean save()
     {
+        boolean success = false;
+        
         String xml = serialize();
         
         File file = new File(getLocation() + "/" + this.id + ".xml");
@@ -133,6 +142,9 @@ public class XMLCredentialVault extends PersistentCredentialVault
         {
             fw = new FileWriter(file, true);
             fw.write(xml);
+            
+            // mark that the save was successful
+            success = true;
         }
         catch(Exception ex)
         {
@@ -145,6 +157,8 @@ public class XMLCredentialVault extends PersistentCredentialVault
                 try { fw.close(); } catch(Exception ex) { }
             }
         }
+        
+        return success;
     }
     
     /**

@@ -25,7 +25,6 @@
 package org.alfresco.extranet.database;
 
 import java.sql.Types;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -59,10 +58,25 @@ public class DatabaseInvitedUserBean
 	public DatabaseInvitedUser insert(DatabaseInvitedUser user) 
 	{
 	    // build sql statement
-		String sql = "insert into invited_user (user_id, email, company_id, hash, completed, whd_user_id, alfresco_user_id, description, first_name, middle_name, last_name, expiration_date, group_ids, invitation_type) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+		String sql = "insert into invited_user (user_id, email, company_id, hash, completed, whd_user_id, alfresco_user_id, description, first_name, middle_name, last_name, expiration_date, group_ids, invitation_type, subscription_start, subscription_end) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
-		// build the sql expiration date
-		java.sql.Date sqlExpirationDate = new java.sql.Date(user.getExpirationDate().getTime());
+        // date formats
+        String sqlExpirationDate = null;
+        if(user.getExpirationDate() != null)
+        {
+            sqlExpirationDate = DatabaseService.SQL_DATE_FORMAT.format(user.getExpirationDate());
+        }
+        String sqlSubscriptionStartDate = null;
+        if(user.getSubscriptionStart() != null)
+        {
+            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionStart());
+        }
+        String sqlSubscriptionEndDate = null;
+        if(user.getSubscriptionEnd() != null)
+        {
+            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionEnd());
+        }
+				
 		
 		// date format
 		//SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
@@ -83,9 +97,11 @@ public class DatabaseInvitedUserBean
 		        user.getLastName(),
 		        sqlExpirationDate,
 		        user.getGroupIds(),
-		        user.getInvitationType()
+		        user.getInvitationType(),
+		        sqlSubscriptionStartDate,
+		        sqlSubscriptionEndDate
 		};
-		int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR };
+		int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE };
 		
 		// execute the update
 		jdbcTemplate.update(sql, args, types);
@@ -104,11 +120,24 @@ public class DatabaseInvitedUserBean
 	public boolean update(DatabaseInvitedUser user) 
 	{
 	    // build sql statement
-	    String sql = "update invited_user set user_id=?, email=?, company_id=?, hash=?, completed=?, whd_user_id=?, alfresco_user_id=?, description=?, first_name=?, middle_name=?, last_name=?, expiration_date=?, group_ids=?, invitation_type=? where id = ?";
+	    String sql = "update invited_user set user_id=?, email=?, company_id=?, hash=?, completed=?, whd_user_id=?, alfresco_user_id=?, description=?, first_name=?, middle_name=?, last_name=?, expiration_date=?, group_ids=?, invitation_type=?, subscription_start=?, subscription_end=? where id = ?";
 	    
-        // date format
-        SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
-        String sqlExpirationDate = SQL_DATE_FORMAT.format(user.getExpirationDate());
+        // date formats
+        String sqlExpirationDate = null;
+        if(user.getExpirationDate() != null)
+        {
+            sqlExpirationDate = DatabaseService.SQL_DATE_FORMAT.format(user.getExpirationDate());
+        }
+        String sqlSubscriptionStartDate = null;
+        if(user.getSubscriptionStart() != null)
+        {
+            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionStart());
+        }
+        String sqlSubscriptionEndDate = null;
+        if(user.getSubscriptionEnd() != null)
+        {
+            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionEnd());
+        }
 	    
         // arguments and types
         Object args []= new Object[] {
@@ -126,9 +155,11 @@ public class DatabaseInvitedUserBean
                 sqlExpirationDate,
                 user.getGroupIds(),
                 user.getInvitationType(),
+                sqlSubscriptionStartDate,
+                sqlSubscriptionEndDate,
                 user.getId()
         };
-        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.INTEGER };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE, Types.INTEGER };
 	    
         // execute the update
 		int x = jdbcTemplate.update(sql, args, types);

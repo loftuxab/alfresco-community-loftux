@@ -13,6 +13,7 @@
 	<chrome>extranet-titled-chrome</chrome>
   
   	<properties>
+  		<!--  zzz  -->
   		<endpoint>alfresco</endpoint>
   		<itemType>product</itemType>
   		<presentation>bullets</presentation>

@@ -152,6 +152,7 @@
 		<property name="mailSender" ref="extranet.service.mail.sender"/>
 		<property name="adminEmailAddress" value="${application.email.address}"/>
 		<property name="inviteUserEmailTemplateUrl" value="${application.email.inviteUserEmailTemplateUrl}"/>
+		<property name="resetPasswordEmailTemplateUrl" value="${application.email.resetPasswordEmailTemplateUrl}"/>
 	</bean>    
 	<bean id="extranet.service.mail.sender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="${application.email.host}"/>

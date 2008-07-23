@@ -167,7 +167,6 @@ public class LDAPUserBean
      */
     public boolean delete(DatabaseUser user)
     {
-        //DistinguishedName dn = new DistinguishedName("dc=public,dc=people,dc=ds,dc=alfresco,dc=com");
         DistinguishedName dn = new DistinguishedName("dc=public,dc=people");
         dn.add("cn", user.getUserId());
         ldapTemplate.unbind(dn);
@@ -182,8 +181,9 @@ public class LDAPUserBean
      */
     public List list() 
     {
-        //return ldapTemplate.search("dc=public,dc=people,dc=ds,dc=alfresco,dc=com", "(objectclass=inetOrgPerson)", new LDAPUserMapper());
-        return ldapTemplate.search("dc=public,dc=people", "(objectclass=inetOrgPerson)", new LDAPUserMapper());
+        String dnString = "dc=public,dc=people";
+
+        return ldapTemplate.search(dnString, "(objectclass=inetOrgPerson)", new LDAPUserMapper());
     }
     
     /**
@@ -195,19 +195,10 @@ public class LDAPUserBean
      */
     public LDAPUser get(String userId) 
     {
-        //DistinguishedName dn = new DistinguishedName("dc=public,dc=people,dc=ds,dc=alfresco,dc=com");
         DistinguishedName dn = new DistinguishedName("dc=public,dc=people");        
         dn.add("cn", userId);
 
-        LDAPUser user = null;
-        
-        List list = ldapTemplate.search(dn, null, new LDAPUserMapper());
-        if(list != null && list.size() > 0)
-        {
-            user = (LDAPUser) list.get(0);
-        }
-        
-        return user;
+        return (LDAPUser) ldapTemplate.lookup(dn, new LDAPUserMapper());
     }   
     
 

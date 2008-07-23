@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<url>/components/extranet/viewer/content</url>
+	
+	<!-- Binding --> 
+	<scope>page</scope>
+	<region-id>body</region-id>
+	<source-id>view-content</source-id>
+
+</component>

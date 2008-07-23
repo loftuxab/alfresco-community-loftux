@@ -50,8 +50,10 @@ public class AlfrescoCredentialVault extends SecureXMLCredentialVault
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#load()
      */
-    public void load()
+    public boolean load()
     {
+        boolean success = false;
+        
         ApplicationContext applicationContext = FrameworkHelper.getApplicationContext();
         ConnectorService connectorService = (ConnectorService) applicationContext.getBean("connector.service");
         Connector connector = null;
@@ -65,20 +67,27 @@ public class AlfrescoCredentialVault extends SecureXMLCredentialVault
                 String xml = response.getResponse();
                 
                 // deserialize
-                deserialize(xml);                
+                deserialize(xml);
+                
+                // mark that the load succeeded
+                success = true;
             }
         }
         catch(RemoteConfigException rce)
         {
             rce.printStackTrace();
         }
+        
+        return success;
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#save()
      */
-    public void save()
+    public boolean save()
     {
+        boolean success = false;
+        
         // build the xml
         String xml = serialize();
 
@@ -105,11 +114,16 @@ public class AlfrescoCredentialVault extends SecureXMLCredentialVault
             {
                 throw new Exception("Unable to save vault, code: " + response.getStatus().getCode() + ", response: " + response.getResponse());
             }
+            
+            // mark that the save succeeded
+            success = true;
         }
         catch(Exception ex)
         {
             ex.printStackTrace();
         }
+        
+        return success;
     }
             
     /* (non-Javadoc)

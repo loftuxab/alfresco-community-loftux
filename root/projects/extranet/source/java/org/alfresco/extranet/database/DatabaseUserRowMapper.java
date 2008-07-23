@@ -50,6 +50,7 @@ public class DatabaseUserRowMapper implements RowMapper
 	    String lastName = rs.getString("last_name");
 	    String email = rs.getString("email");
 	    String description = rs.getString("description");
+	    String level = rs.getString("level");
 	    
 	    DatabaseUser user = new DatabaseUser(id, userId);
 	    user.setFirstName(firstName);
@@ -57,7 +58,26 @@ public class DatabaseUserRowMapper implements RowMapper
 	    user.setLastName(lastName);
 	    user.setEmail(email);
 	    user.setDescription(description);
-
+	    user.setLevel(level);
+	    
+	    // subscription start
+        java.sql.Date subscriptionStartDate = rs.getDate("subscription_start");
+        if(subscriptionStartDate != null)
+        {
+            long subscriptionStartTime = subscriptionStartDate.getTime();
+            java.util.Date _subscriptionStartDate = new java.util.Date(subscriptionStartTime);
+            user.setSubscriptionStart(_subscriptionStartDate);
+        }
+        
+        // subscription end
+        java.sql.Date subscriptionEndDate = rs.getDate("subscription_end");
+        if(subscriptionEndDate != null)
+        {
+            long subscriptionEndTime = subscriptionEndDate.getTime();
+            java.util.Date _subscriptionEndDate = new java.util.Date(subscriptionEndTime);
+            user.setSubscriptionEnd(_subscriptionEndDate);
+        }
+        
 		return user;
 	}
 

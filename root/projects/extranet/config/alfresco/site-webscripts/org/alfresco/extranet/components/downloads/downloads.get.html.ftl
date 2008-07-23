@@ -123,6 +123,49 @@
 				</tr>
 			</table>
 		</div>
+
+		<br/>
+		
+		<div id="releaseDocsDownloadsDiv" style="display: none;">
+
+			<table>
+				<tr>
+					<td width="48px" align="center" valign="center">
+						<img src="/extranet/components/extranet/downloads/docs_32.gif">
+					</td>
+					<td valign="top">
+						What would you like to see?
+					</td>
+				</tr>
+				<tr>
+					<td></td>					
+					<td>
+						<div id="releaseDocsDownloadsControl">
+
+							<table>
+								<tr>
+									<td>
+										<input name="releaseDocsDownloads" type="radio" value="download" onclick="pickDocsDownloads(this.value);" />
+									</td>
+									<td>
+										<B>Downloads</B>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<input name="releaseDocsDownloads" type="radio" value="documentation" onclick="pickDocsDownloads(this.value);" />
+									</td>
+									<td>
+										<B>Documentation</B>
+									</td>
+								</tr>
+							</table>				
+						</div>	
+					</td>
+				</tr>
+			</table>
+		</div>
+		
 	</td>
 	<td width="50%" nowrap valign="top">
 		<div id="fileListingDiv">

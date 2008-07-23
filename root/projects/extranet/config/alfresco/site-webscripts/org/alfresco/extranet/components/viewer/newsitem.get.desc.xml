@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>News Item Viewer</shortname>
+   <description>News Item Viewer</description>
+   <url>/components/extranet/viewer/newsitem</url>
+</webscript>

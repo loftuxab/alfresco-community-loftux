@@ -58,7 +58,19 @@ public class DatabaseUserBean
 	public DatabaseUser insert(DatabaseUser user) 
 	{
 	    // build sql statement
-		String sql = "insert into user (user_id, first_name, middle_name, last_name, email, description) values (?,?,?,?,?,?)";
+		String sql = "insert into user (user_id, first_name, middle_name, last_name, email, description, subscription_start, subscription_end, level) values (?,?,?,?,?,?,?,?,?)";
+		
+        // date formats
+        String sqlSubscriptionStartDate = null;
+        if(user.getSubscriptionStart() != null)
+        {
+            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionStart());
+        }
+        String sqlSubscriptionEndDate = null;
+        if(user.getSubscriptionEnd() != null)
+        {
+            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionEnd());
+        }
 		
 		// arguments and types
 		Object args []= new Object[] {
@@ -67,9 +79,12 @@ public class DatabaseUserBean
 		        user.getMiddleName(),
 		        user.getLastName(),
 		        user.getEmail(),
-		        user.getDescription()
+		        user.getDescription(),
+		        sqlSubscriptionStartDate,
+		        sqlSubscriptionEndDate,
+		        user.getLevel()
 		};
-		int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
+		int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE, Types.VARCHAR};
 		
 		// execute the update
 		jdbcTemplate.update(sql, args, types);
@@ -88,7 +103,19 @@ public class DatabaseUserBean
 	public boolean update(DatabaseUser user) 
 	{
 	    // build sql statement
-	    String sql = "update user set user_id=?, first_name=?, middle_name=?, last_name=?, email=?, description=? where id = ?";
+	    String sql = "update user set user_id=?, first_name=?, middle_name=?, last_name=?, email=?, description=?, subscription_start=?, subscription_end=?, level=? where id = ?";
+	    
+        // date formats
+        String sqlSubscriptionStartDate = null;
+        if(user.getSubscriptionStart() != null)
+        {
+            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionStart());
+        }
+        String sqlSubscriptionEndDate = null;
+        if(user.getSubscriptionEnd() != null)
+        {
+            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionEnd());
+        }
 	    
         // arguments and types
         Object args []= new Object[] {
@@ -98,9 +125,12 @@ public class DatabaseUserBean
                 user.getLastName(),
                 user.getEmail(),
                 user.getDescription(),
+                sqlSubscriptionStartDate,
+                sqlSubscriptionEndDate,
+                user.getLevel(),
                 user.getId()
         };
-        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE, Types.VARCHAR, Types.INTEGER };
 	    
         // execute the update
 		int x = jdbcTemplate.update(sql, args, types);

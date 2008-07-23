@@ -11,10 +11,10 @@
 }
 .linkthru a {
 	font-weight: bold;	
-	color: #blue;
+	color: #5ba1d0;
 }
 .header2 {
-	background-color: #6699FF;
+	background-color: #5ba1d0;
 	color: #FFFFFF;
 	height: 14px;
 	padding: 2px 2px 2px 2px;
@@ -28,22 +28,18 @@
 
 
 
-.news-item {
-	float: left;
+.news-item-thumbnail {
+	vertical-align: top;
+}
+.news-item-headline {
+	padding: 1px 0 1px 0;
+	margin: 0 0 0 0;
+	vertical-align: top;
 	font-family: Verdana;
 	font-size: 10px;
-	vertical-align: top;
 }
-.news-item p {
-	float: right;
-	font-size: 10px;	
-	padding: 0px;
-	margin: 0px;
-	border: 1px black solid;
-	vertical-align: top;
-}
-.news-item a {
-	color:#6699CC;
+.news-item-headline a {
+	color:#5ba1d0;
 	font-weight: none;
 	font-size: 11px;
 	text-decoration: none;
@@ -52,34 +48,31 @@
 
 
 
-.thumbnail {
-	float: left;
-	margin: 0px 0px 0px 0px;
-	padding: 0px 0px 0px 0px;
-	border: 0px 0px 0px 0px;
+.plugin-thumbnail {
 	vertical-align: top;
 }
 
-.plugin {
-	float: right;
+.plugin-headline {
 	padding: 0 0 0 0;
-	width: 280px;
+	margin: 0 0 0 0;
+	vertical-align: top;
 	font-family: Verdana;
 	font-size: 10px;	
 }
 
-.plugin a {
-	color:#6699CC;
-	font-weight: none;
+.plugin-headline a {
+	color:#5ba1d0;
+	font-weight: bold;
 	font-size: 11px;
 	text-decoration: none;
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
 }
 
-.plugin p {
+.plugin-headline p {
 	font-size: 10px;	
-	padding: 0px;
-	margin: 0px;
-	border: 0px;
+	padding: 4px 0 4px 0;
+	margin: 0 0 0 0;
 }
 
 body
@@ -88,6 +81,7 @@ body
 	margin: 0px 0px 0px 0px;
 	border: 0px 0px 0px 0px;
 }
+
 -->
 </style>
 
@@ -104,11 +98,11 @@ body
 <!-- news item 1 -->
 <table width="100%">
 <tr>
-<td class="news-item">
+<td class="news-item-thumbnail">
 	<img src="${url.context}/images/extranet/info_16.gif" width="16" height="16" />
 </td>
-<td class="news-item">
-	<a href="http://network.alfresco.com/extranet/linktoviewer">
+<td class="news-item-headline">
+	<a href="#">
   	Alfresco benchmark exceeds 100 million objects at record pace!
 </td>
 </tr>
@@ -117,15 +111,29 @@ body
 <!-- news item 2 -->
 <table width="100%">
 <tr>
-<td class="news-item">
+<td class="news-item-thumbnail">
 	<img src="${url.context}/images/extranet/edit_16.gif" width="16" height="16" />
 </td>
-<td class="news-item">
-	<a href="http://network.alfresco.com/extranet/linktoviewer">
+<td class="news-item-headline">
+	<a href="#">
   	Alfresco 2.2.3 Service Pack Released!
 </td>
 </tr>
 </table>
+
+<!-- news item 3 -->
+<table width="100%">
+<tr>
+<td class="news-item-thumbnail">
+	<img src="${url.context}/images/extranet/info_16.gif" width="16" height="16" />
+</td>
+<td class="news-item-headline">
+	<a href="#">
+  	Learn about Web Studio 3.0 development tracks!
+</td>
+</tr>
+</table>
+
 
 
 <!-- plugins section header -->
@@ -140,14 +148,14 @@ body
 <!-- plugin 1 -->
 <table width="100%">
 <tr>
-<td class="thumbnail">
+<td class="plugin-thumbnail">
 	<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
 </td>
-<td class="plugin">
-  	<a href="http://network.alfresco.com/extranet/s/a/bdad7967-52df-11dd-8057-a3ee59756d04/org_alfresco_zimbra.zip">
+<td class="plugin-headline">
+  	<a href="#">
   		Expense Report Manager
   	</a>
-  	<p style="padding-top: 6px">
+  	<p>
   		AJAX and jBPM workflow powered application for managing expense reports
   	</p>
 </td>
@@ -156,14 +164,14 @@ body
 <!-- plugin 2 -->
 <table width="100%">
 <tr>
-<td class="thumbnail">
+<td class="plugin-thumbnail">
 	<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
 </td>
-<td class="plugin">
-  	<a href="http://network.alfresco.com/extranet/s/a/bdad7967-52df-11dd-8057-a3ee59756d04/org_alfresco_zimbra.zip">
+<td class="plugin-headline">
+  	<a href="#">
   		Zimlets for Alfresco
   	</a>
-  	<p style="padding-top: 6px">
+  	<p>
   		Zimbra email integration for Alfresco 2.2
   	</p>
 </td>
@@ -172,27 +180,38 @@ body
 <!-- plugin 3 -->
 <table width="100%">
 <tr>
-<td class="thumbnail">
+<td class="plugin-thumbnail">
 	<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
 </td>
-<td class="plugin">
-  	<a href="http://network.alfresco.com/extranet/s/a/bdad7967-52df-11dd-8057-a3ee59756d04/org_alfresco_zimbra.zip">
+<td class="plugin-headline">
+  	<a href="#">
   		Java-backed Web Scripts Sample Package
   	</a>
-  	<p style="padding-top: 6px">
+  	<p>
   		Examples for designing your own Java-backed web scripts!
   	</p>
 </td>
 </table>
 
-<!-- linkthru footer -->
-<table width="100%" style="margin-top: 10px;">
+<!-- join alfresco network header -->
+<table width="100%" style="margin-top: 4px;">
+<tr>
+<td class="header2">
+	Join Alfresco Network
+</td>
+</tr>
+</table>
+
+
+<!-- linkthru -->
+<table width="100%">
 <tr>
 <td class="linkthru">
-	Find more 
-	<a href="http://network.alfresco.com?ref=30b1labs">add-ons</a>
-	and
-	<a href="http://network.alfresco.com?ref=30b1labs">extensions</a>!
+	Interested in finding out about Alfresco add-ons and extensions?
+	<br/>
+	<br/>Join
+	<a href="http://network.alfresco.com?ref=30b1labs" target="_blank">Alfresco Network</a>
+	today!
 </td>
 </tr>
 </table>

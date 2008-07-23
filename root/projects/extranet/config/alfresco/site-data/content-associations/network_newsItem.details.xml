@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<content-association>
+  <source-id>{http://www.alfresco.org/model/network/1.0}newsItem</source-id>
+  <dest-id>view-newsitem</dest-id>
+  <assoc-type>page</assoc-type>
+</content-association>

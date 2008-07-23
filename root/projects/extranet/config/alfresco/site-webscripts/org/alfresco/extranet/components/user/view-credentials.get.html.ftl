@@ -83,6 +83,8 @@ td.userprofile-grayed
 	</#if>
 	<#assign editCredentialsImage = "/images/extranet/edit_16.gif">
 	<#assign editCredentialsUrl = "?f=default&pt=editcredentials&endpointId=" + endpointId>
+	<#assign removeCredentialsImage = "/images/extranet/del_16.gif">
+	<#assign removeCredentialsUrl = "?f=default&pt=viewcredentials&command=remove&endpointId=" + endpointId>
 	
 	<#assign tdDisplayClass = "">
 	<#if endpointPersistent == false>
@@ -97,6 +99,9 @@ td.userprofile-grayed
 				<#if endpointPersistent == true>
 					<a href="${url.context}${editCredentialsUrl}">
 					<img src="${url.context}${editCredentialsImage}"/>
+					</a>
+					<a href="${url.context}${removeCredentialsUrl}">
+					<img src="${url.context}${removeCredentialsImage}"/>
 					</a>
 				</#if>
 				<br/>				

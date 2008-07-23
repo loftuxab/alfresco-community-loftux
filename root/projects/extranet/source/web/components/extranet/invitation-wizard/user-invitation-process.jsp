@@ -20,6 +20,7 @@
 	DatabaseInvitedUser invitedUser = invitationService.getInvitedUserFromHash(hash);
 		
 	// properties
+	String invitedUserId = request.getParameter("invitedUserId");
 	String userId = request.getParameter("userId");
 	String password = request.getParameter("password");
 	String firstName = request.getParameter("firstName");
@@ -38,7 +39,19 @@
 		if(user == null)
 		{
 			// process the invited user
-			invitationService.processInvitedUser(userId, password);
+			invitationService.processInvitedUser(invitedUserId, userId, password);
+			
+			// load the user
+			DatabaseUser dbUser = (DatabaseUser) userService.getUser(userId);
+			
+			// populate user
+			dbUser.setFirstName(firstName);
+			dbUser.setLastName(lastName);
+			dbUser.setEmail(email);
+			
+			// save the user
+			// TODO: This needs to push to all systems
+			userService.update(dbUser);
 		}
 	}	
 %>
@@ -49,7 +62,7 @@
    <body>
       <h2>Welcome to Alfresco Network!</h2>
       <p>
-      	  Congratulations!  Your account has been created.
+      	  Congratulations!  Your account '<b><%=userId%></b>' has been created.
       	  <br/>
       	  <br/>
       	  <a href="/extranet">Proceed to Alfresco Network</a>

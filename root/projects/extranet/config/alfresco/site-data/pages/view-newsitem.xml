@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <title>News Item Details</title>
+  <template-instance>view-content</template-instance>
+  <authentication>none</authentication>  
+</page>

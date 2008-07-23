@@ -6,7 +6,7 @@ model.filterPlatform = args["filterPlatform"];
 
 
 // create the connector
-var connector = remote.connect("alfresco-network");
+var connector = remote.connect("alfresco");
 
 
 // get the values for release class

@@ -24,6 +24,9 @@
  */
 package org.alfresco.extranet.mail;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -31,6 +34,7 @@ import javax.mail.internet.MimeMessage;
 
 import org.alfresco.extranet.ApplicationProperties;
 import org.alfresco.extranet.database.DatabaseInvitedUser;
+import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.tools.URLUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -51,6 +55,7 @@ public class MailService implements ApplicationContextAware
     public String adminEmailAddress;
     
     public String inviteUserEmailTemplateUrl;
+    public String resetPasswordEmailTemplateUrl;
     
     /**
      * Sets the mail sender.
@@ -70,6 +75,16 @@ public class MailService implements ApplicationContextAware
     public void setInviteUserEmailTemplateUrl(String inviteUserEmailTemplateUrl)
     {
         this.inviteUserEmailTemplateUrl = inviteUserEmailTemplateUrl;
+    }
+    
+    /**
+     * Sets the reset user email template url
+     * 
+     * @param resetPasswordEmailTemplateUrl
+     */
+    public void setResetPasswordEmailTemplateUrl(String resetPasswordEmailTemplateUrl)
+    {
+        this.resetPasswordEmailTemplateUrl = resetPasswordEmailTemplateUrl;
     }
     
     /**
@@ -150,6 +165,11 @@ public class MailService implements ApplicationContextAware
                 body = fullReplace(body, "${user.hash}", invitedUser.getHash());
                 body = fullReplace(body, "${user.userId}", invitedUser.getUserId());
                 body = fullReplace(body, "${user.whdUserId}", invitedUser.getWebHelpdeskUserId());
+                
+                // dates
+                body = fullReplace(body, "${user.expirationDate}", formatDate(invitedUser.getExpirationDate()));
+                
+                // webapp
                 body = fullReplace(body, "${webapp.url}", webappUrl);
                 
                 // set email text
@@ -193,4 +213,105 @@ public class MailService implements ApplicationContextAware
         
         return body;
     }
+    
+    public static String formatDate(Date date)
+    {
+        String formattedDate = "Unknown";
+        
+        if(date != null)
+        {
+            formattedDate = SimpleDateFormat.getInstance().format(date);
+        }
+        
+        return formattedDate;
+    }
+    
+    /**
+     * Resets the user password
+     * 
+     * @param user the user
+     */
+    public void resetUserPassword(DatabaseUser user, String newPassword)
+    {
+        resetUserPassword(user, newPassword, resetPasswordEmailTemplateUrl);
+    }
+    
+    /**
+     * Resets the user password
+     * 
+     * @param invitedUser the invited user
+     * @param bodyUri the uri from which to load the body
+     */
+    public void resetUserPassword(final DatabaseUser user, final String newPassword, String bodyUri)
+    {
+        // pull out application properties
+        ApplicationProperties props = (ApplicationProperties) this.applicationContext.getBean("application.properties");
+        final String hostPort = props.getHostPort();
+        final String webapp = props.getWebapp();
+        final String webappUrl = hostPort + webapp;
+        
+        // build the email body
+        final StringBuffer buffer = new StringBuffer();
+        try
+        {
+            // load the email from the url connection
+            String bodyString = URLUtil.get(bodyUri);
+            if(bodyString != null)
+            {
+                buffer.append(bodyString);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        // preparator
+        MimeMessagePreparator preparator = new MimeMessagePreparator() 
+        {
+            public void prepare(MimeMessage mimeMessage) 
+                throws MessagingException 
+            {
+                mimeMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
+                mimeMessage.setFrom(new InternetAddress(adminEmailAddress));
+                mimeMessage.setSubject("Your login information for Alfresco Network");
+                
+                // do variable substitution
+                String body = buffer.toString();
+                body = fullReplace(body, "${user.firstName}", user.getFirstName());
+                body = fullReplace(body, "${user.middleName}", user.getMiddleName());
+                body = fullReplace(body, "${user.lastName}", user.getLastName());
+                body = fullReplace(body, "${user.email}", user.getEmail());
+                body = fullReplace(body, "${user.userId}", user.getUserId());
+                body = fullReplace(body, "${user.id}", user.getUserId());
+                body = fullReplace(body, "${user.description}", user.getDescription());
+                body = fullReplace(body, "${user.level}", user.getLevel());
+                                
+                // dates
+                body = fullReplace(body, "${user.subscriptionStart}", formatDate(user.getSubscriptionStart()));
+                body = fullReplace(body, "${user.subscriptionEnd}", formatDate(user.getSubscriptionEnd()));
+                
+                // webapp
+                body = fullReplace(body, "${webapp.url}", webappUrl);
+                
+                // password
+                body = fullReplace(body, "${password}", newPassword);
+                
+                // set email text
+                mimeMessage.setText(body);
+            }
+        };
+        
+        // send the mail
+        try
+        {
+            mailSender.send(preparator);
+        }
+        catch (MailException ex)
+        {
+            //log it and go on
+            ex.printStackTrace();
+        }
+    }
+    
 }

@@ -29,8 +29,10 @@ import java.util.List;
 import org.alfresco.extranet.database.DatabaseService;
 import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.extranet.ldap.LDAPService;
+import org.alfresco.extranet.ldap.LDAPUser;
 import org.alfresco.extranet.mail.MailService;
 import org.alfresco.extranet.webhelpdesk.WebHelpdeskService;
+import org.alfresco.tools.ObjectGUID;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -128,6 +130,29 @@ public class UserService implements ApplicationContextAware, EntityService
     {
         return this.databaseService.getUserByEmail(email);
     } 
+    
+    /**
+     * Resets the user password for a user and then send an email
+     * to notify them of the password reset
+     * 
+     * @param userId
+     */
+    public void resetUserPassword(String userId)
+    {
+        // generate a user password
+        String newPassword = (new ObjectGUID()).toString();
+
+        // get the LDAP user, update and save
+        LDAPUser ldapUser = this.ldapService.getUser(userId);;
+        ldapUser.setPassword(newPassword);
+        this.ldapService.updateUser(ldapUser);
+        
+        // load the database user
+        DatabaseUser dbUser = this.databaseService.getUser(userId);
+        
+        // send an email
+        this.mailService.resetUserPassword(dbUser, newPassword);
+    }
 
     
     ///////////////////////////////////////////////////////////////////

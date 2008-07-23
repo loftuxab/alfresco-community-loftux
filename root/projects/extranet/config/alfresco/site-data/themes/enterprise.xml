@@ -34,6 +34,10 @@
 			<id>register</id>
 			<page-instance-id>extranet-register</page-instance-id>
 		</page-type>
+		<page-type>
+			<id>lostpassword</id>
+			<page-instance-id>extranet-lostpassword</page-instance-id>
+		</page-type>
 	</page-types>
 	<defaults>
 		<component>

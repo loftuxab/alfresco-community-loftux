@@ -11,6 +11,12 @@
 	
 	<!-- Pick which chrome to use -->
 	<chrome>extranet-box-chrome</chrome>
+	
+  	<properties>
+  		<!--  zzz  -->
+  		<endpoint>alfresco</endpoint>
+  		<content-path>/Network/Community/Dashlets/alfresco_communities.html?guest=true</content-path>
+  	</properties>	
     
 </component>
 

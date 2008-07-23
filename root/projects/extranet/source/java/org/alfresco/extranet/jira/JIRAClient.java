@@ -38,7 +38,8 @@ public class JIRAClient
 		try
 		{
 			String serverURL=server;
-			String endPoint="/rpc/soap/jirasoapservice-v2";
+			//String endPoint="/rpc/soap/jirasoapservice-v2";
+			String endPoint="/jira/rpc/soap/jirasoapservice-v2";
 			fJiraSoapServiceGetter.setJirasoapserviceV2EndpointAddress(serverURL+endPoint);
 			fJiraSoapServiceGetter.setMaintainSession(true);
 			fJiraSoapService = fJiraSoapServiceGetter.getJirasoapserviceV2();
