@@ -1,4 +1,4 @@
-/* Header Component */
+   /* Header Component */
 .header
 {
    padding-top: 0.5em;
@@ -7,16 +7,15 @@
 .header span.menu-item
 {
     vertical-align: middle;
-    padding: 8px 10px 0px;
-    margin: 0px;
-    text-valign: middle;
+    padding: 0px 6px 0px;
     white-space: nowrap;
 }
 
 .header div.logo
 {
     float: left;
-    margin: 0px 0px 0px 10px;
+    padding-top: 1px;
+    padding-bottom: 2px;
 }
 
 .header div.personal-menu
