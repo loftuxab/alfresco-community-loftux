@@ -1,7 +1,9 @@
 // Call the repo for the sites profile
 var profile =
 {
-   description: "[Not found]"
+   title: "",
+   shortName: "",   
+   description: ""
 }
 
 var json = remote.call("/api/sites/" + page.url.templateArgs.site);
@@ -9,7 +11,7 @@ if (json.status == 200)
 {
    // Create javascript object from the repo response
    var obj = eval('(' + json + ')');
-   if (obj && obj.description)
+   if (obj)
    {
       profile = obj;
    }

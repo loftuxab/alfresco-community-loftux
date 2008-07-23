@@ -191,6 +191,15 @@
          container.appendChild(page);
          Alfresco.util.Anim.fadeIn(page);
 
+         /**
+          * todo: To handle multiple instances of the same page:
+          * - In html.ftl: Don't create unused pages in the currentPages div (now they are created but hidden)
+          * - Create a hidden "used page template"-div in html.ftl
+          * - In onComponentLoaded store a reference to the template in widgets
+          * - Do a widgets.templateDiv.clone(true) and populate the template by using the selected Page's values from options.pages
+          * - Insert the page in the end of the list like before  
+          */
+
          // Show or hide empty div labels
          this._adjustEmptyMessages();
       },
