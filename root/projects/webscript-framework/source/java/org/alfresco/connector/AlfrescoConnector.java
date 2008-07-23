@@ -39,6 +39,7 @@ import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
  */
 public class AlfrescoConnector extends HttpConnector
 {
+    private static final String UNAUTHENTICATED_MODE_GUEST = "guest";
     private static final String PARAM_TICKETNAME_ALF_TICKET = "alf_ticket";
 
     /**
@@ -82,6 +83,17 @@ public class AlfrescoConnector extends HttpConnector
         {
             remoteClient.setTicket(alfTicket);
             remoteClient.setTicketName(PARAM_TICKETNAME_ALF_TICKET);
+        }
+        else
+        {
+            // otherwise, if we don't have an alfresco ticket
+            // we can slip into "guest mode"
+            String unauthenticatedMode = this.descriptor.getUnauthenticatedMode();
+            if(UNAUTHENTICATED_MODE_GUEST.equalsIgnoreCase(unauthenticatedMode))
+            {
+                remoteClient.setTicketName("guest");
+                remoteClient.setTicket("true");
+            }
         }
     }
 }

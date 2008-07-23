@@ -81,11 +81,15 @@ public interface CredentialVault
     
     /**
      * Tells the Credential Vault to load state from persisted store
+     * 
+     * @return whether the credential vault successfully loaded
      */
-    public void load();
+    public boolean load();
 
     /**
      * Tells the Credential Vault to write state to persisted store
+     * 
+     * @return whether the credential vault successfully saved
      */
-    public void save();
+    public boolean save();
 }

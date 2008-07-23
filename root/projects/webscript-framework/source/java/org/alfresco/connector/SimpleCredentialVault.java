@@ -116,15 +116,17 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#load()
      */
-    public void load()
+    public boolean load()
     {
+        return true;
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#save()
      */
-    public void save()
+    public boolean save()
     {
+        return true;
     }
 
     /* (non-Javadoc)

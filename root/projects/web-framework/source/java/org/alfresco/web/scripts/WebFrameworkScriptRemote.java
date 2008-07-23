@@ -249,6 +249,16 @@ public class WebFrameworkScriptRemote
         return description;
     }    
 
+    /**
+     * Returns whether the endpoint is persistent.
+     * 
+     * A persistent endpoint can have its authentication credentials
+     * written into a credential vault
+     * 
+     * @param id the id
+     * 
+     * @return true, if is endpoint persistent
+     */
     public boolean isEndpointPersistent(String id)
     {
         boolean persistent = false;
@@ -264,5 +274,30 @@ public class WebFrameworkScriptRemote
         }
 
         return persistent;
-    }        
+    }
+    
+    /**
+     * Returns the configured URL for the given endpoint
+     * 
+     * @param id the id
+     * 
+     * @return the endpoint url
+     */
+    public String getEndpointURL(String id)
+    {
+        String url = null;
+        
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        if (remoteConfig != null)
+        {
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if (descriptor != null)
+            {
+                url = descriptor.getEndpointUrl();
+            }
+        }
+
+        return url;
+    }
+    
 }

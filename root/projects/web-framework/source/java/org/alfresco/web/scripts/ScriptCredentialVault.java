@@ -99,7 +99,7 @@ public final class ScriptCredentialVault extends ScriptBase
      */
     public boolean hasCredentials(String endpointId)
     {
-        return this.properties.containsKey(endpointId);
+        return getProperties().containsKey(endpointId);
     }
     
     /**
@@ -111,7 +111,7 @@ public final class ScriptCredentialVault extends ScriptBase
      */
     public ScriptCredentials newCredentials(String endpointId)
     {
-        ScriptCredentials scriptCredentials = (ScriptCredentials) this.properties.get(endpointId);
+        ScriptCredentials scriptCredentials = (ScriptCredentials) getProperties().get(endpointId);
         if(scriptCredentials == null)
         {
             Credentials creds = this.vault.newCredentials(endpointId);
@@ -119,7 +119,7 @@ public final class ScriptCredentialVault extends ScriptBase
             
             // update our properties map
             scriptCredentials = new ScriptCredentials(this.context, this.vault, creds);
-            this.properties.put(endpointId, scriptCredentials);
+            getProperties().put(endpointId, scriptCredentials);
         }
         
         return scriptCredentials;
@@ -137,7 +137,7 @@ public final class ScriptCredentialVault extends ScriptBase
         this.vault.save();
         
         // remove from our map
-        this.properties.remove(endpointId);
+        getProperties().remove(endpointId);
     }
     
     /**
@@ -153,13 +153,13 @@ public final class ScriptCredentialVault extends ScriptBase
         }
         
         // now walk through our properties and place them back into the vault
-        Iterator it = this.properties.keySet().iterator();
+        Iterator it = getProperties().keySet().iterator();
         while(it.hasNext())
         {
             String endpointId = (String) it.next();
 
             // get the script credentials
-            ScriptCredentials scriptCredentials = (ScriptCredentials) this.properties.get(endpointId);
+            ScriptCredentials scriptCredentials = (ScriptCredentials) getProperties().get(endpointId);
             
             // create a new actual credentials onto which we will map
             Credentials creds = this.vault.newCredentials(endpointId);
