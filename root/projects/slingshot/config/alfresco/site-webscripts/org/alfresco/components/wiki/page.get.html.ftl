@@ -2,7 +2,7 @@
 	new Alfresco.Wiki("${args.htmlid}").setSiteId(
 		"${page.url.templateArgs.site}"
 	).setPageTitle(
-		"${page.url.args["title"]}"
+		"${page.url.args["title"]!""}"
 	);
 //]]></script>
 <div id="${args.htmlid}-wikipage" style="visibility: hidden;" class="yui-navset"> 
@@ -24,7 +24,7 @@
 			<#if result?exists>${result.pagetext}</#if>
 			</textarea>
 			<div>
-	            <input type="submit" id="${args.htmlid}-save-button" value="Save" />
+	         <input type="submit" id="${args.htmlid}-save-button" value="Save" />
 				<input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
 	        </div>
 			</div> 
@@ -35,7 +35,7 @@
 			<th>Version</th><th>Date</th><th>Author</th>
 			</tr>
 			<#list result.versionhistory as version>
-			<tr><td>${version.version}</td><td>${version.date}</td><td>${version.author}</td></tr>
+			<tr><td>${version.version}</td><td>${version.date}</td><td>${version.author}</td><td>(<a href="#" id="${version.versionId}" class="view-link">view</a>)</td></tr>
 			</#list>
 			</table>
 			</#if>

@@ -4,7 +4,7 @@
 (function()
 {
 	Alfresco.WikiToolbar = function(containerId)
-   {
+   {encodeURIComponentComponent
 	   this.name = "Alfresco.WikiToolbar";
       this.id = containerId;
 
@@ -142,7 +142,7 @@
 	   onConfirm: function(e)
 	   {
 	      var params = {
-	         "context": Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + this.title
+	         "context": Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(this.title)
 	      };
 	      
 	      Alfresco.util.Ajax.request(
@@ -221,7 +221,7 @@
 	         {
 	            title = title.replace(/\s+/g, "_");
 	            // Change the location bar
-   	         window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + title;
+   	         window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(title);
 	         } 
 	      } 
 	   },
@@ -266,7 +266,7 @@
 			Alfresco.util.Ajax.request(
 			{
 				method: Alfresco.util.Ajax.POST,
-		      url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.siteId + "/" + this.title,
+		      url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.siteId + "/" + encodeURIComponent(this.title),
 				requestContentType: Alfresco.util.Ajax.JSON,
 				dataObj: data,
 				successCallback:
@@ -295,7 +295,7 @@
             if (!YAHOO.lang.isUndefined(response.name))
             {
                // Change the location bar
-         	   window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + response.name;
+         	   window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
             } 
             else
             {

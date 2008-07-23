@@ -1,16 +1,17 @@
-if (!page.url.args.title)
+var title = page.url.args.title;
+if (title)
 {
-	status.redirect = true;
-  	status.code = 301;
-  	status.location = page.url.service + "?title=Main_Page";
-}
-else
-{
-   var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki?title=" + page.url.args.title;
+   var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title;
   	var result = remote.call("/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + page.url.args.title + "?context=" + escape(context));
 
   	if (result)
   	{
 		model.result = eval('(' + result + ')');
   	}
+}
+else
+{
+	status.redirect = true;
+  	status.code = 301;
+  	status.location = page.url.service + "?title=Main_Page";   
 }
