@@ -10,6 +10,10 @@ function main()
     
     // assign additional model data
     model.htmlid = args["htmlid"];
+    model.site = args["site"];
+    model.container = args["container"];
+    model.itemName = args["itemName"];
+    model.itemTitle = args["itemTitle"];
 }
 
 main();

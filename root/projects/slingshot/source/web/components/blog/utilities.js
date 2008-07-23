@@ -129,7 +129,12 @@ Alfresco.util.blog = {};
  */
 Alfresco.util.blog.loadBlogPostViewPage = function(site, container, path, postId)
 {
-   window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/blog-postview" +
+   window.location =  Alfresco.util.blog.blogPostViewPageUrl(site, container, path, postId);
+}
+
+Alfresco.util.blog.blogPostViewPageUrl = function(site, container, path, postId)
+{
+   return Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/blog-postview" +
                       "?container=" + container + 
                       "&path=" + path +
                       "&postId=" + postId;
