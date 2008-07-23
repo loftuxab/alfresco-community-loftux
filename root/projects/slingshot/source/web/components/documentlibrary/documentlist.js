@@ -389,7 +389,24 @@
             url += "/content/thumbnails/doclib?qc=true&ph=true";
             return url;
          }
-         
+
+         /**
+          * Generate URL to thumbnail image
+          *
+          * @method generateDocumentPreviewOnClick
+          * @param path {YAHOO.widget.Record} File record
+          * @return {string} a click handler to open the document preview component for the document
+          */
+         var generateDocumentPreviewOnClick = function DL_generateDocumentPreviewOnClick(record)
+         {
+            var nodeRef = record.getData("nodeRef");
+            var fileName = record.getData("fileName");
+            var icon32 = Alfresco.constants.URL_CONTEXT + record.getData("icon32");
+            var onClickHandler = "Alfresco.module.getDocumentPreviewInstance().show({nodeRef: '" + nodeRef + "', fileName: '" + fileName + "', icon32: '" + icon32 + "'});";
+            return onClickHandler;
+         }
+
+
          /**
           * DataTable Cell Renderers
           *
@@ -477,7 +494,7 @@
                }
                else
                {
-                  elCell.innerHTML = '<span class="thumbnail"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></span>';
+                  elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="thumbnail"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></span>';
                }
             }
             else
@@ -491,7 +508,7 @@
                }
                else
                {
-                  elCell.innerHTML = '<span class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
+                  elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
                }
             }
          }
