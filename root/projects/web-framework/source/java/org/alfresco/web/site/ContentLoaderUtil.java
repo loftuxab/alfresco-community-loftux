@@ -109,6 +109,9 @@ public class ContentLoaderUtil
 					}
 				}
 			}
+			
+			// iterate through loop
+			i++;
 		}
 		
 		return content;

@@ -187,6 +187,7 @@ public class ConnectorService implements ApplicationListener
      * 
      * @param endpointId the endpoint id
      * @param userContext the user context
+     * @param session the http session
      * 
      * @return the connector
      * 
@@ -281,7 +282,11 @@ public class ConnectorService implements ApplicationListener
                     // store credentials in vault if we persisting against a user session
                     if (session != null)
                     {
-                        getCredentialVault(session, username).store(credentials);
+                        CredentialVault vault = getCredentialVault(session, username);
+                        if(vault != null)
+                        {
+                            vault.store(credentials);
+                        }
                     }
                 }
                 connector.setCredentials(credentials);
@@ -431,7 +436,7 @@ public class ConnectorService implements ApplicationListener
      * @param userId the user id
      * @param vaultId the vault id
      * 
-     * @return the credential vault
+     * @return the credential vault (null if unable to load or if guest)
      * 
      * @throws RemoteConfigException the remote config exception
      */
@@ -448,10 +453,12 @@ public class ConnectorService implements ApplicationListener
         }
         
         // session binding key
-        String cacheKey = PREFIX_VAULT_SESSION + vaultId;
+        String cacheKey = PREFIX_VAULT_SESSION + userId + "_" + vaultId;
         
-        // grab the vault
+        // pull the credential vault from session
         CredentialVault vault = (CredentialVault)session.getAttribute(cacheKey);
+        
+        // if no vault, build a new one
         if (vault == null)
         {
             // load the vault descriptor
@@ -462,16 +469,17 @@ public class ConnectorService implements ApplicationListener
                         "Unable to find credential vault definition for id: " + vaultId);
             }
             
-            // build the vault - it should always succeed
+            // build the vault instance - it should always succeed
             vault = buildCredentialVault(userId, descriptor);
             if (vault == null)
             {
                 throw new RemoteConfigException("Unable to instantiate configured class: " + descriptor.getImplementationClass());
             }
             
-            // place into cache and tell the vault to load (from persisted state - if any)
+            // load the vault
             vault.load();
             
+            // place onto session
             session.setAttribute(cacheKey, vault);
         }
         

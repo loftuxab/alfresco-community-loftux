@@ -239,6 +239,7 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         private static final String DESCRIPTION = "description";
         private static final String NAME = "name";
         private static final String AUTHENTICATOR_ID = "authenticator-id";
+        private static final String UNAUTHENTICATED_MODE = "unauthenticated-mode";
 
         /**
          * Instantiates a new remote connector descriptor.
@@ -269,6 +270,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         {
             return getStringProperty(AUTHENTICATOR_ID);
         }	    
+        
+        public String getUnauthenticatedMode()
+        {
+            return getStringProperty(UNAUTHENTICATED_MODE);
+        }
     }
 
     /**
