@@ -34,6 +34,10 @@ function main()
    // Could therefore be generalized
    model.nodeRef = item.nodeRef;
    model.showComponent = true;
+   model.site = site;
+   model.container = container;
+   model.itemTitle = item.title;
+   model.itemName = item.name;
 }
 
 main();

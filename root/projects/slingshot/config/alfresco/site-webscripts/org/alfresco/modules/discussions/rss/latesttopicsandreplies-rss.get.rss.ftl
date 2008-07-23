@@ -12,7 +12,11 @@
 			         <title><#if postdata.isRootPost>New topic:<#else>Reply to topic:</#if> ${postdata.topicTitle?html}</title>
 			         <link>${absurl(url.context)}/page/site/${site}/discussions-topicview?container=${container}&amp;topicId=${postdata.topicName}</link>
 			         <description>${postdata.content?html}</description>
-			         <pubDate>${postdata.createdOn?datetime?string("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")}</pubDate>
+                     <#-- make sure we use en_US for date rendering -->
+                     <#assign currentLocale=locale />
+                     <#setting locale="en_US" />
+                     <pubDate>${postdata.createdOn?datetime?string("EEE, dd MMM yyyy HH:mm:ss Z")}</pubDate>
+                     <#setting locale=currentLocale />
 			      </item>
 			</#list>
 		<#else>

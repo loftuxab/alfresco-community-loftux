@@ -13,7 +13,11 @@
                <link>${absurl(url.context)}/page/site/${site}/blog-postview?container=${container}&amp;postId=${post.name}</link>
                <description>${post.content?html}</description>
                <#if (! post.isDraft)>
-                  <pubDate>${post.releasedOn?datetime?string("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")}</pubDate>
+                  <#-- make sure we use en_US for date rendering -->
+                  <#assign currentLocale=locale />
+                  <#setting locale="en_US" />
+                  <pubDate>${post.releasedOn?datetime?string("EEE, dd MMM yyyy HH:mm:ss Z")}</pubDate>
+                  <#setting locale=currentLocale />
                </#if>
             </item>
          </#list>

@@ -41,10 +41,14 @@
        */
       options:
       {
+         siteId: "",
+         containerId: "",
          /**
           * Stores the reference of the node for which to display the comments.
           */
-         nodeRef: ""
+         nodeRef: "",
+         itemTitle: "",
+         itemName: ""
       },
       
       /** root element of the current edit form. */
@@ -123,6 +127,11 @@
       {
          // make an ajax request to the repository to delete the post
          var url = Alfresco.constants.PROXY_URI + "/api/comment/node/" + Alfresco.util.noderefs.escapedToUrl(escapedRef);
+         // add params for the activity entry
+         url += "?site=" + this.options.siteId;
+         url += "&container=" + this.options.containerId;
+         url += "&itemTitle=" + encodeURIComponent(this.options.itemTitle);
+         url += "&browseItemUrl=" + encodeURIComponent(Alfresco.util.blog.blogPostViewPageUrl(this.options.siteId, this.options.containerId, "", this.options.itemName))
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -163,6 +172,10 @@
           
          // load the form for the post
          var url = Alfresco.constants.URL_SERVICECONTEXT + "modules/blog/comments/comment-edit-form";
+         url += "?site=" + this.options.siteId;
+         url += "&container=" + this.options.containerId;
+         url += "&itemTitle=" + this.options.itemTitle;
+         url += "&itemName=" + this.options.itemName;
          Alfresco.util.Ajax.request(
          {
             url: url,

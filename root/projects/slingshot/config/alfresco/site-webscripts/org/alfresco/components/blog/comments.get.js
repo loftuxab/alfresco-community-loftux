@@ -39,6 +39,10 @@ function main()
    }
    model.comments = commentsdata.items;
    model.showComponent = true;
+   model.site = site;
+   model.container = container;
+   model.itemTitle = item.title;
+   model.itemName = item.name;
 }
 
 main();

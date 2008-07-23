@@ -5,7 +5,10 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.BlogComment("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site}",
+      siteId: "${site}",
+      containerId: "${container}",
+      itemTitle: "${post.title}",
+      itemName: "${post.name}",
       topicRef: "${post.nodeRef}"
    }).setMessages(
       ${messages}

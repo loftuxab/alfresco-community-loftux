@@ -67,10 +67,14 @@ function fetchAndAssignComment(nodeRef)
     applyDataToModel(data);
 }
 
-function updateAndAssignComment(nodeRef, content)
+function updateAndAssignComment(nodeRef, content, site, container, itemTitle, browseItemUrl)
 {
     var params = {
-        content : content
+        content : content,
+        site : site,
+        container : container,
+        itemTitle : itemTitle,
+        browseItemUrl : browseItemUrl
     };
     var paramsJSON = jsonUtils.toJSONString(params);
     var url = getCommentRequestUrl(nodeRef);

@@ -92,6 +92,11 @@
       >
          <input type="hidden" name="nodeRef" value="${comment.nodeRef}" />
          <input type="hidden" name="htmlid" value="${htmlid}" />
+         <input type="hidden" name="site" value="${site}" />
+         <input type="hidden" name="container" value="${container}" />
+         <input type="hidden" name="itemTitle" value="${itemTitle}" />
+         <input type="hidden" name="browseItemUrl" value="${url.context}/page/site/${site}/blog-postview?postId=${itemName}" />
+         
          <textarea id="${htmlid}-${commentRef}-editform-content" rows="8" cols="80" name="content">${comment.content}</textarea>
          <div class="commentFormAction">
             <input type="submit" id="${htmlid}-${commentRef}-editform-ok-button"  value='${msg("editcomment.form.updateComment")}' />

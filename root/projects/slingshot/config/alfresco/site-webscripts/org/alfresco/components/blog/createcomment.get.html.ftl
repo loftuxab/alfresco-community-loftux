@@ -19,6 +19,11 @@
 		>
 			<input type="hidden" name="nodeRef" value="${nodeRef}" />
 			<input type="hidden" name="htmlid" value="${htmlid}" />
+            <input type="hidden" name="site" value="${site}" />
+            <input type="hidden" name="container" value="${container}" />
+            <input type="hidden" name="itemTitle" value="${itemTitle}" />
+            <input type="hidden" name="browseItemUrl" value="${page.url.context}/page/site/${site}/blog-postview?postId=${itemName}" />
+            
 			<textarea id="${htmlid}-createcomment-content" rows="8" cols="80" name="content"></textarea>
 			<div class="commentFormAction">
 				<input type="submit" id="${htmlid}-createcomment-ok-button" value="${msg('comments.form.postComment')}" />
