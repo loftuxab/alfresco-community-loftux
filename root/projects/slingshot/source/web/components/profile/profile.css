@@ -18,6 +18,16 @@
    font-size: 116%;
 }
 
+.profile .leftcolumn
+{
+   float: left;
+}
+
+.profile .rightcolumn
+{
+   float: right;
+}
+
 .profile .row
 {
    padding: 0.333em;
@@ -28,6 +38,18 @@
    height: 2em;
    padding: 0.5em;
    width: 50em;
+}
+
+.profile .photorow
+{
+   padding: 0.333em;
+   height: 7em;
+}
+
+.profile .biorow
+{
+   padding: 0.333em;
+   padding-left: 100px;
 }
 
 .profile .photo
@@ -80,13 +102,15 @@
 
 .profile .fieldvalue
 {
+   display: block;
+   min-height: 1.2em;
    padding-left: 1.5em;
 }
 
 .profile p
 {
    line-height: 1.5em;
-   margin-left: 14.8em;
+   margin-left: 12em;
    padding: 0px;
 }
 

@@ -282,11 +282,7 @@ public class ConnectorService implements ApplicationListener
                     // store credentials in vault if we persisting against a user session
                     if (session != null)
                     {
-                        CredentialVault vault = getCredentialVault(session, username);
-                        if(vault != null)
-                        {
-                            vault.store(credentials);
-                        }
+                        getCredentialVault(session, username).store(credentials);
                     }
                 }
                 connector.setCredentials(credentials);
@@ -436,7 +432,7 @@ public class ConnectorService implements ApplicationListener
      * @param userId the user id
      * @param vaultId the vault id
      * 
-     * @return the credential vault (null if unable to load or if guest)
+     * @return the credential vault
      * 
      * @throws RemoteConfigException the remote config exception
      */

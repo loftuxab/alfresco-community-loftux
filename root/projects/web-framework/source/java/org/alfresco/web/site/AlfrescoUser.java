@@ -24,10 +24,9 @@
  */
 package org.alfresco.web.site;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
 import org.alfresco.connector.User;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
  * User object extended to provide persistence back to an Alfresco repo.
@@ -60,7 +59,7 @@ public class AlfrescoUser extends User
     }
     
     /**
-     * @return the avatarRef
+     * @return  the avatarRef
      */
     public String getAvatarRef()
     {
@@ -82,8 +81,13 @@ public class AlfrescoUser extends User
     @Override
     public void save()
     {
-        // TODO: which fields should be saved? all or calculate diff?
-        // TODO: repo REST script to persist props
-        String test = "test";
+        try
+        {
+            ((AlfrescoUserFactory)FrameworkHelper.getUserFactory()).saveUser(this);
+        }
+        catch (UserFactoryException err)
+        {
+            throw new AlfrescoRuntimeException("Unable to save user details: " + err.getMessage(), err);
+        }
     }
 }

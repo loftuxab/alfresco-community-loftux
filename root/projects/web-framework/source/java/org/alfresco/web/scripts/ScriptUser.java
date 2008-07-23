@@ -290,11 +290,14 @@ public final class ScriptUser extends ScriptBase
         this.user.setCompanyAddress3(value);
     }
     
-    
+    /**
+     * Persist user changes
+     */
     public void save()
     {
         this.user.save();
     }
+    
     
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
