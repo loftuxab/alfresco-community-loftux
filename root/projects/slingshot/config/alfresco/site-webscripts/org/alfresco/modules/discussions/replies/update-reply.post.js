@@ -7,9 +7,10 @@ function main()
     var site = "" + json.get("site");
     var container = "" + json.get("container");
     var path = "" + json.get("path");
+    var browseTopicUrl = "" + json.get("browseTopicUrl");
     
     // update the post and assign returned data
-    updateAndAssignPost(site, container, path, postRef, content);
+    updateAndAssignPost(site, container, path, postRef, content, browseTopicUrl);
     
     // set additional model data
     model.htmlid = json.get("htmlid");

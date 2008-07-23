@@ -123,6 +123,7 @@
       >
          <input type="hidden" name="site" value="${site}" />
          <input type="hidden" name="container" value="${container}" />
+         <input type="hidden" name="browseTopicUrl" value="${url.context}/page/site/${site}/discussions-topicview?container=${container}&topicId={post.name}" />
          <input type="hidden" name="path" value="${path}" />
          <input type="hidden" name="postRef" value="${post.nodeRef}" />
          <input type="hidden" name="htmlid" value="${htmlid}" />

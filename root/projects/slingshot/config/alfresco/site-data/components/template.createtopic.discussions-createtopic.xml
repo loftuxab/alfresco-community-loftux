@@ -5,6 +5,6 @@
    <source-id>discussions-createtopic</source-id>
    <url>/components/discussions/createtopic</url>
    <properties>
-      <container>blog</container>
+      <container>discussions</container>
    </properties>
 </component>

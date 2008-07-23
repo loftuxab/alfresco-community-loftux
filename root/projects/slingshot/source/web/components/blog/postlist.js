@@ -242,6 +242,8 @@
          // make an ajax request to the repository to delete the post
          var url = Alfresco.util.blog.getBlogPostRestUrl(this.options.siteId, this.options.containerId,
                                                          this.options.path, postId);
+         url += "?site=" + this.options.siteId;
+         url += "&container=" + this.options.containerId;
          Alfresco.util.Ajax.request(
          {
             url: url,

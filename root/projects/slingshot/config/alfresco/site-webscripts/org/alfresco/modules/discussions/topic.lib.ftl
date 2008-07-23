@@ -115,6 +115,8 @@
       </#if>
    >
       <input type="hidden" name="site" value="${site}">
+      <input type="hidden" name="container" value="${container}" />
+      <input type="hidden" name="browseTopicUrl" value="${url.context}/page/site/${site}/discussions-topicview?container=${container}&topicId={post.name}" />
       <input type="hidden" name="htmlid" value="${htmlid}">
       <#if topic?has_content>
          <input type="hidden" name="topicId" value="${topic.name}" >

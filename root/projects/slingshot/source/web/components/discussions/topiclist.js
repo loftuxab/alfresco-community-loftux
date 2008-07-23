@@ -203,6 +203,8 @@
          // make an ajax request to delete the topic
          var url = Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
                         this.options.containerId, this.options.path, topicId);
+         url += "?site=" + this.options.siteId;
+         url += "&container=" + this.options.containerId;
          Alfresco.util.Ajax.request(
          {
             url: url,
