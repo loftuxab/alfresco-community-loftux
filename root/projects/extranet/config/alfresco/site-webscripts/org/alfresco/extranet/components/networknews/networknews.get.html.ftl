@@ -54,8 +54,8 @@
 				<tr>
 					<td valign="middle">
 						<p class="networknews">
-							<img src="${url.context}/proxy/alfresco/api/node/content/workspace/SpacesStore/${i.teaserImage.id}" alt="" class="networknews-image"/>
-							<a href="${url.context}/proxy/alfresco/api/node/content/workspace/SpacesStore/${i.id}" class="networknews-title" target="_blank">${i.headline}</a>
+							<img src="${url.context}/proxy/alfresco-noauth/api/node/content/workspace/SpacesStore/${i.teaserImage.id}" alt="" class="networknews-image"/>
+							<a href="<@link object='${i.nodeRef}'/>" class="networknews-title" target="_blank">${i.headline}</a>
 						</p>
 					</td>
 				</tr>
@@ -67,7 +67,7 @@
 						</p>
 
 						<p class="readMore">
-						<a href="${url.context}/proxy/alfresco/api/node/content/workspace/SpacesStore/${i.id}" class="networknews-title" target="_blank">
+						<a href="<@link object='${i.nodeRef}'/>" class="networknews-title" target="_blank">
 						${i.readMore}
 						</a>
 						</p>
@@ -93,7 +93,7 @@
 	 <#if i_index < maxcount>
 
 		<li>
-			<a href="${url.context}/proxy/alfresco/api/node/content/workspace/SpacesStore/${i.id}" target="_blank">
+			<a href="<@link object='${i.nodeRef}'/>" target="_blank">
 				${i.headline}
 			</a>
 			(${i.modified})
@@ -104,4 +104,39 @@
 	
 	</ul>
 
+</#if>
+<#if presentation="grid22">
+
+	<div class="yui-g">
+
+		<div class="yui-u first">
+		<#list items as item>
+		
+			<#if item_index < maxcount>
+
+				<#if ((item_index + 1) % 2) == 0>
+					</div>
+					<div class="yui-u">
+				</#if>
+
+				<div class="box">
+					<img src="${url.context}/proxy/alfresco-noauth/api/node/content/workspace/SpacesStore/${item.teaserImage.id}" alt="" />
+					<h3><a href="<@link object='${item.nodeRef}'/>" class="networknews-title" target="_blank">${item.headline}</a></h3>
+					${item.teaser}
+					<a href="<@link object='${item.nodeRef}'/>" class="networknews-title" target="_blank">
+					${item.readMore}
+					</a>
+				</div>
+
+				<#if item_index == maxcount>
+					<#break>
+				</#if> 
+			
+			</#if>
+
+		</#list>
+		</div>
+
+	</div>
+	
 </#if>

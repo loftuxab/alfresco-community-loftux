@@ -11,7 +11,8 @@
 	<source-id>contribute</source-id>
 
   	<properties>
-  		<endpoint>alfresco-network</endpoint>
+  		<!--  zzz  -->
+  		<endpoint>alfresco</endpoint>
   		<content-path>/Network/Community/contribute.html</content-path>
   	</properties>
   

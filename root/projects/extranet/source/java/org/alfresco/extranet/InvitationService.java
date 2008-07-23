@@ -37,6 +37,7 @@ import org.alfresco.extranet.ldap.LDAPService;
 import org.alfresco.extranet.ldap.LDAPUser;
 import org.alfresco.extranet.mail.MailService;
 import org.alfresco.extranet.webhelpdesk.WebHelpdeskService;
+import org.alfresco.extranet.webhelpdesk.WebHelpdeskUser;
 import org.alfresco.tools.ObjectGUID;
 import org.alfresco.web.site.FrameworkHelper;
 import org.springframework.beans.BeansException;
@@ -144,10 +145,10 @@ public class InvitationService
      * 
      * @throws Exception the exception
      */
-    public void processInvitedUser(String userId, String password)
+    public void processInvitedUser(String invitedUserId, String userId, String password)
         throws Exception
     {
-        DatabaseInvitedUser invitedUser = this.databaseService.getInvitedUser(userId);
+        DatabaseInvitedUser invitedUser = this.databaseService.getInvitedUser(invitedUserId);
         if(invitedUser != null)
         {
             // check to make sure they haven't already been processed already
@@ -157,7 +158,7 @@ public class InvitationService
             }
             
             // create the db user
-            DatabaseUser dbUser = this.databaseService.startProcessInvitedUser(invitedUser);
+            DatabaseUser dbUser = this.databaseService.startProcessInvitedUser(invitedUser, userId);
             
             // map the db user into an lpda user
             LDAPUser ldapUser = mapToLDAPUser(dbUser, password);
@@ -181,25 +182,13 @@ public class InvitationService
                     }
                 }
             }
+
+////////////////////////////////////////////////////////////////////////
+// Set up groups
+////////////////////////////////////////////////////////////////////////
             
-            // if it has a legacy alfresco partners entry...
-            // do additional touch up on partners
-            // move folders, who knows...
-            if(invitedUser.getAlfrescoUserId() != null && invitedUser.getAlfrescoUserId().trim().length() > 0)
-            {
-                String alfrescoUserId = invitedUser.getAlfrescoUserId();
-                
-                // TODO
-            }
-            
-            // if it has an whd entry, do additional touch up on whd
-            if(invitedUser.getWebHelpdeskUserId() != null && invitedUser.getWebHelpdeskUserId().trim().length() > 0)
-            {
-                String whdUserId = invitedUser.getWebHelpdeskUserId();
-                
-                // TODO: query for the WHD user with this id
-                // and update the WHD user properties
-            }
+            // add all users to the community group
+            this.databaseService.addUserToGroup(userId, "community");
             
             // if we're processing an enterprise invitation
             if("enterprise".equals(invitedUser.getInvitationType()))
@@ -214,9 +203,74 @@ public class InvitationService
                 this.databaseService.addUserToGroup(userId, "registered");                
             }
             
-            // add all users to the community group
-            this.databaseService.addUserToGroup(userId, "community");
 
+////////////////////////////////////////////////////////////////////////
+// Synchronize Partners
+////////////////////////////////////////////////////////////////////////
+            if(invitedUser.getAlfrescoUserId() != null && invitedUser.getAlfrescoUserId().trim().length() > 0)
+            {
+                String alfrescoUserId = invitedUser.getAlfrescoUserId();
+                
+                // TODO
+                // Nothing at this time
+            }
+
+            
+////////////////////////////////////////////////////////////////////////
+// Synchronize ACT
+////////////////////////////////////////////////////////////////////////
+            if(invitedUser.getWebHelpdeskUserId() != null && invitedUser.getWebHelpdeskUserId().trim().length() > 0)
+            {
+                String whdUserId = invitedUser.getWebHelpdeskUserId();
+                
+                // migrate the old ACT user id to the new ACT user id
+                // this will also set the LDAP flag
+                boolean migrate = this.webHelpdeskService.migrateUser(whdUserId, dbUser.getUserId());
+                if(migrate)
+                {
+                    // migration completed
+                    // load the user
+                    WebHelpdeskUser whdUser = this.webHelpdeskService.getUser(dbUser.getUserId());
+                    if(whdUser != null)
+                    {
+                        // map properties in
+                        mapToWebHelpdeskUser(whdUser, dbUser);
+                        
+                        // save the user
+                        boolean update = this.webHelpdeskService.updateUser(whdUser);
+                        if(!update)
+                        {
+                            System.out.println("Update of user: " + whdUser + " failed");
+                        }
+                        
+                        // TODO: This ought to sync from LDAP
+                        // WHD doesn't do real time auth?
+                        // This is a temporary way to alleviate the issue
+                        // Write the password directly into WHD tables
+                        this.webHelpdeskService.updatePassword(whdUser, ldapUser.getPassword());
+                    }
+                    else
+                    {
+                        System.out.println("Unable to find migrated whd user: " + dbUser.getUserId());
+                    }
+                }
+                else
+                {
+                    System.out.println("Migration of whd user: " + whdUserId + " to new id: " + dbUser.getUserId() + " failed"); 
+                }
+                
+                // TODO: query for the WHD user with this id
+                // and update the WHD user properties
+            }
+            
+
+            
+            
+            
+            
+            
+            
+            
             // finally, mark the user as having been invited            
             this.databaseService.endProcessInvitedUser(invitedUser);            
         }
@@ -246,6 +300,23 @@ public class InvitationService
         
         return user;        
     }
+    
+    public WebHelpdeskUser mapToWebHelpdeskUser(WebHelpdeskUser user, DatabaseUser dbUser)
+    {
+        if(user == null)
+        {
+            user = new WebHelpdeskUser(dbUser.getUserId());
+        }
+        
+        // copy in properties
+        user.setDescription(dbUser.getDescription());
+        user.setEmail(dbUser.getEmail());
+        user.setFirstName(dbUser.getFirstName());
+        user.setMiddleName(dbUser.getMiddleName());
+        user.setLastName(dbUser.getLastName());
+                
+        return user;
+    }
 
     /**
      * Invite user.
@@ -260,9 +331,9 @@ public class InvitationService
      * 
      * @return the database invited user
      */
-    public DatabaseInvitedUser inviteUser(String userId, String firstName, String lastName, String email, String whdUserId, String alfrescoUserId, String invitationType)
+    public DatabaseInvitedUser inviteUser(String userId, String firstName, String lastName, String email, String whdUserId, String alfrescoUserId, String invitationType, Date subscriptionStartDate, Date subscriptionEndDate)
     {
-        return inviteUser(userId, firstName, null, lastName, email, whdUserId, alfrescoUserId, DEFAULT_INVITATION_LENGTH, invitationType);        
+        return inviteUser(userId, firstName, null, lastName, email, whdUserId, alfrescoUserId, DEFAULT_INVITATION_LENGTH, invitationType, subscriptionStartDate, subscriptionEndDate);        
     }
     
     /**
@@ -277,10 +348,12 @@ public class InvitationService
      * @param alfrescoUserId the alfresco user id
      * @param lengthOfInvitation the length of invitation
      * @param invitationType the type of the invitation
+     * @param subscriptionStartDate date when subscription starts
+     * @param subscriptionEndDate date when subscription ends
      * 
      * @return the database invited user
      */
-    public DatabaseInvitedUser inviteUser(String userId, String firstName, String middleName, String lastName, String email, String whdUserId, String alfrescoUserId, int lengthOfInvitation, String invitationType)
+    public DatabaseInvitedUser inviteUser(String userId, String firstName, String middleName, String lastName, String email, String whdUserId, String alfrescoUserId, int lengthOfInvitation, String invitationType, Date subscriptionStartDate, Date subscriptionEndDate)
     {
         // clean up data
         userId = userId.trim();
@@ -327,6 +400,16 @@ public class InvitationService
         {
             invitationType = invitationType.trim();
             user.setInvitationType(invitationType);
+        }
+        
+        if(subscriptionStartDate != null)
+        {
+            user.setSubscriptionStart(subscriptionStartDate);            
+        }
+        
+        if(subscriptionEndDate != null)
+        {
+            user.setSubscriptionEnd(subscriptionEndDate);
         }
         
         // generate a hash

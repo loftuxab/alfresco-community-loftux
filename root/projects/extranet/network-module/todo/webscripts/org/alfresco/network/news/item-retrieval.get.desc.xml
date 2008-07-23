@@ -3,6 +3,6 @@
   <description>Network News Item Retrieval</description>
   <url>/network/news/item/retrieval</url>
   <format default="html">argument</format>
-  <authentication>none</authentication>
+  <authentication>guest</authentication>
   <transaction>required</transaction>
 </webscript>

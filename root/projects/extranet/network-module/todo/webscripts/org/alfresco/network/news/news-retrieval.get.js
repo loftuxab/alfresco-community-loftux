@@ -99,7 +99,8 @@ for(var i = 0; i < children.length; i++)
 	{
 		var item = { };
 		item["title"] = child.name;
-		item["nodeRef"] = child.nodeRef;
+		//item["nodeRef"] = child.nodeRef;
+		item["nodeRef"] = child.nodeRef.storeRef.protocol + "://" + child.nodeRef.storeRef.identifier + "/" + child.nodeRef.id;
 		item["id"] = child.id;
 		item["author"] = child.properties["{http://www.alfresco.org/model/content/1.0}author"];
 		item["creator"] = child.properties["{http://www.alfresco.org/model/content/1.0}creator"];		

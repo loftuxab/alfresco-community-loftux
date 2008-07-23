@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+	<title>Community News</title>
+
+	<url>/components/extranet/networknews</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>community-news</region-id>
+	<source-id>global</source-id>
+	
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-titled-chrome</chrome>
+  
+  	<properties>
+  		<!--  zzz  -->
+  		<endpoint>alfresco</endpoint>
+  		<itemType>community</itemType>
+  		<presentation>grid22</presentation>
+  		<maxcount>4</maxcount>  		
+  	</properties>
+  
+</component>
+

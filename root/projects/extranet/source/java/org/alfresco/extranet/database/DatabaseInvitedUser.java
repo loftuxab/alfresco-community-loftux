@@ -51,6 +51,9 @@ public class DatabaseInvitedUser
     public String groupIds;
     public String invitationType;
     
+    protected Date subscriptionStart;
+    protected Date subscriptionEnd;
+    
     /**
      * Instantiates a new database invited user.
      * 
@@ -352,4 +355,45 @@ public class DatabaseInvitedUser
     {
         this.invitationType = invitationType;
     }
+    
+    /**
+     * Gets the subscription start.
+     * 
+     * @return the subscription start
+     */
+    public Date getSubscriptionStart()
+    {
+        return this.subscriptionStart;
+    }
+
+    /**
+     * Sets the subscription start.
+     * 
+     * @param subscriptionStart the new subscription start
+     */
+    public void setSubscriptionStart(Date subscriptionStart)
+    {
+        this.subscriptionStart = subscriptionStart;
+    }
+    
+    /**
+     * Gets the subscription end.
+     * 
+     * @return the subscription end
+     */
+    public Date getSubscriptionEnd()
+    {
+        return this.subscriptionEnd;
+    }
+    
+    /**
+     * Sets the subscription end.
+     * 
+     * @param subscriptionEnd the new subscription end
+     */
+    public void setSubscriptionEnd(Date subscriptionEnd)
+    {
+        this.subscriptionEnd = subscriptionEnd;
+    }
+    
 }

@@ -24,6 +24,9 @@
  */
 package org.alfresco.extranet.webhelpdesk;
 
+import java.sql.Types;
+import java.util.List;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -62,5 +65,158 @@ public class WebHelpdeskService implements ApplicationContextAware
      */
     public WebHelpdeskService()
     {
-    }    
+    }  
+
+    /**
+     * Migrates a single user from their old whd id to a new one
+     * 
+     * @param formerUserId
+     * @param newUserId
+     * @return
+     */
+    public boolean migrateUser(String formerUserId, String newUserId)
+    {
+        int ldapConnectionId = getDefaultLdapConnectionId();
+        
+        return migrateUser(formerUserId, newUserId, ldapConnectionId, false);
+    }
+    
+    /**
+     * Migrates a single user from their old whd id to a new one
+     * This should only be called once during the invitation process
+     * 
+     * @param formerUserId
+     * @param newUserId
+     * @return
+     */
+    public boolean migrateUser(String formerUserId, String newUserId, int ldapConnectionId, boolean force)
+    {
+        boolean success = false;
+        
+        // get the existing user if available
+        WebHelpdeskUser formerUser = getUser(formerUserId);
+        if(formerUser != null)
+        {
+            // check to make sure that the new user doesn't exist
+            WebHelpdeskUser checkUser = getUser(newUserId);
+            if(checkUser == null || force)
+            {
+                if(force)
+                {
+                    System.out.println("Unable to migrate user: " + formerUserId + " to id: " + newUserId + " because the user with id: " + newUserId + " already exists");
+                    System.out.println("Forcing migration anyway");
+                    
+                    deleteUser(formerUserId);
+                }
+
+                String sql = "update CLIENT set USER_NAME=?, LDAP_CONNECTION_ID=? where USER_NAME = ?";
+                
+                // arguments and types
+                Object args []= new Object[] { newUserId, ldapConnectionId, formerUserId };
+                int types[] = new int[] { Types.VARCHAR, Types.INTEGER, Types.VARCHAR };
+                
+                // execute the update
+                int x = jdbcTemplate.update(sql, args, types);
+                success = (x > 0);
+            }
+            else
+            {
+                // we can't proceed as there is already a user there with this id
+                System.out.println("Unable to migrate user: " + formerUserId + " to id: " + newUserId + " because the user with id: " + newUserId + " already exists");
+            }
+        }
+        else
+        {
+            // there is no former user
+            // do not handle this case yet
+        }
+        
+        return success;
+    }
+        
+    /**
+     * Updates a web helpdesk user
+     * 
+     * @param formerUserId
+     * @param user
+     * @return
+     */
+    public boolean updateUser(WebHelpdeskUser user)
+    {
+        String sql = "update CLIENT set USER_NAME=?, FIRST_NAME=?, LAST_NAME=?, EMAIL=?, NOTES=?, LDAP_CONNECTION_ID=? where USER_NAME = ?";
+        
+        // arguments and types
+        Object args []= new Object[] { user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getDescription(), user.getLdapConnectionId(), user.getUserId() };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR };
+        
+        // execute the update
+        int x = jdbcTemplate.update(sql, args, types);
+        return (x > 0);
+    }
+    
+    /**
+     * Update password.
+     * 
+     * @param user the user
+     * @param password the password
+     * 
+     * @return true, if successful
+     */
+    public boolean updatePassword(WebHelpdeskUser user, String password)
+    {
+        String sql = "update CLIENT set PASSWORD=? where USER_NAME = ?";
+        
+        // arguments and types
+        Object args []= new Object[] { password, user.getUserId() };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR };
+        
+        // execute the update
+        int x = jdbcTemplate.update(sql, args, types);
+        return (x > 0);        
+    }
+    
+    
+    /**
+     * Gets a Web Helpdesk user
+     * 
+     * @param userName the USER_NAME field on the whd CLIENT table
+     * 
+     * @return the user object
+     */
+    public WebHelpdeskUser getUser(String userName) 
+    {
+        // build the sql statement
+        String sql = "select * from CLIENT where USER_NAME='" + userName + "'";
+        
+        // run the query
+        List list = jdbcTemplate.query(sql, new WebHelpdeskUserRowMapper());
+        if(list == null || list.size() == 0)
+        {
+            return null;
+        }
+        return (WebHelpdeskUser) list.get(0);        
+    } 
+    
+    public boolean deleteUser(String userName)
+    {
+        // build sql statemnet
+        String sql = "delete from CLIENT where USER_NAME=?";
+        
+        // arguments and types
+        Object params[] = new Object[] { userName };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        int x = jdbcTemplate.update(sql, params, types);
+        return (x > 0);
+    }
+    
+    public int getDefaultLdapConnectionId()
+    {
+        // build the sql statement
+        String sql = "select ID from LDAP_CONNECTION where DELETED=0";
+        
+        // run the query
+        return jdbcTemplate.queryForInt(sql);
+    }
 }

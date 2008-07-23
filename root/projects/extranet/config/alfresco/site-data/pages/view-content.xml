@@ -2,7 +2,6 @@
 
 <page>
   <title>Content Details</title>
-  <page-type>viewcontentdetails</page-type>
-  <template-instance>viewcontentdetails</template-instance>
+  <template-instance>view-content</template-instance>
   <authentication>none</authentication>  
 </page>

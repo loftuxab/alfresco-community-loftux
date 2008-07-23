@@ -48,9 +48,8 @@ if(itemType != null && itemType.length > 0)
 }
 
 // call the endpoint
-var connector = remote.connect(endpoint);
+var connector = remote.connect("alfresco");
 var json = connector.call(uri);
+
 var obj = eval('(' + json + ')');
 model.items = obj.results;
-
-

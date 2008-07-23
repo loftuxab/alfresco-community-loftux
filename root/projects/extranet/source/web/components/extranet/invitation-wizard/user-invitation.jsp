@@ -20,102 +20,101 @@
 	DatabaseInvitedUser invitedUser = invitationService.getInvitedUserFromHash(hash);
 	
 	// message
-	String message = (String) request.getAttribute("user-invitation-message");
-	
-	/*
-	http://localhost:8280/extranet/?p=invitation-wizard&hash=58cc3b7fca
-	*/	
+	String message = (String) request.getAttribute("user-invitation-message");	
 %>
-<html>
-   <head>
-   	<title>Welcome to Alfresco Network, <%=invitedUser.getFirstName()%> <%=invitedUser.getLastName()%>!</title>
-   </head>
-   <body>
-      <h2>Welcome to Alfresco Network!</h2>
-      <p>
-      	You have been invited to be a part of the Alfresco Enterprise Network community.
-      	
-      	<br/>
-      	<br/>
-      	Please verify the following invitation data.
-      	<br/>
-      	If you need to make any corrections, please do so.
-      	<br/>
-      	When you are done, click "Check" below to go to the next step
-      	<br/>
-      	<%
-      		if(message != null)
-      		{
-      			out.println("<font color='red'><b>");
-      			out.println(message);
-      			out.println("</b></font>");
-      		}
-	%>      		
-      	
-   	<form method="POST" action="/extranet/">
+<h5>Welcome to Alfresco Network!</h5>
+<p>
+You have been invited to be a part of the Alfresco Enterprise Network community.
 
-		<table>
-			<tr>
-				<td colspan="2"><b>Account Details</b></td>
-			</tr>
-			<tr>
-				<td>User ID</td>
-				<td>
-					<input name="userId" type="text" value="<%=invitedUser.getUserId()%>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>Password</td>
-				<td>
-					<input name="password" type="password" value=""/>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2"><br/></td>
-			</tr>
-			<tr>
-				<td colspan="2"><b>User Details</b></td>
-			</tr>			
-			<tr>
-				<td>First Name</td>
-				<td>
-					<input name="firstName" type="text" value="<%=invitedUser.getFirstName()%>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>Last Name</td>
-				<td>
-					<input name="lastName" type="text" value="<%=invitedUser.getLastName()%>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>Email</td>
-				<td>
-					<input name="email" type="text" value="<%=invitedUser.getEmail()%>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>Web Helpdesk User ID</td>
-				<td>
-					<input name="whdUserId" type="text" value="<%=invitedUser.getWebHelpdeskUserId()%>"/>
-				</td>
-			</tr>
-			<tr>
-				<td>Alfresco User ID</td>
-				<td>
-					<input name="alfrescoUserId" type="text" value="<%=invitedUser.getAlfrescoUserId()%>"/>
-				</td>
-			</tr>
-		</table>
-		
-		<input type="hidden" name="p" value="invitation-wizard"/>
-		<input type="hidden" name="dispatchTo" value="user-invitation-confirm.jsp"/>
-		<input type="hidden" name="hash" value="<%=hash%>"/>
-		<br/>
-		<input type="submit" value="Check and Verify Settings"/>
-	</form>
+<br/>
+<br/>
+Please verify the following invitation data.
+<br/>
+If you need to make any corrections, please do so.
+<br/>
+<br/>
+When you are done, click "Check" below to go to the next step
+<br/>
+<br/>
+<%
+	if(message != null)
+	{
+		out.println("<font color='red'><b>");
+		out.println(message);
+		out.println("</b></font>");
+	}
+%>      		
 
-      	
-      </p>      	
-   </body>
-</html>
+<form method="POST" action="/extranet/">
+
+	<table>
+		<tr>
+			<td colspan="2"><b>Account Details</b></td>
+		</tr>
+		<tr>
+			<td>User ID</td>
+			<td>
+				<input name="userId" type="text" value="<%=invitedUser.getUserId()%>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Password</td>
+			<td>
+				<input name="password" type="password" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td>Password (verify)</td>
+			<td>
+				<input name="passwordVerify" type="password" value=""/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><br/></td>
+		</tr>
+		<tr>
+			<td colspan="2"><b>User Details</b></td>
+		</tr>			
+		<tr>
+			<td>First Name</td>
+			<td>
+				<input name="firstName" type="text" value="<%=invitedUser.getFirstName()%>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Last Name</td>
+			<td>
+				<input name="lastName" type="text" value="<%=invitedUser.getLastName()%>"/>
+			</td>
+		</tr>
+		<tr>
+			<td>Email</td>
+			<td>
+				<input name="email" type="text" value="<%=invitedUser.getEmail()%>"/>
+			</td>
+		</tr>
+		<tr>
+			<td><i>Web Helpdesk User</i></td>
+			<td>
+				<input name="whdUserId" type="text" value="<%=invitedUser.getWebHelpdeskUserId()%>" disabled />
+			</td>
+		</tr>
+		<tr>
+			<td><i>Partners User</i></td>
+			<td>
+				<input name="alfrescoUserId" type="text" value="<%=invitedUser.getAlfrescoUserId()%>" disabled />
+			</td>
+		</tr>
+	</table>
+	
+	<input name="invitedUserId" type="hidden" value="<%=invitedUser.getUserId()%>"/>
+
+	<input type="hidden" name="p" value="invitation-wizard"/>
+	<input type="hidden" name="dispatchTo" value="user-invitation-confirm.jsp"/>
+	<input type="hidden" name="hash" value="<%=hash%>"/>
+	<br/>
+	<input type="submit" value="Check and Verify Settings"/>
+</form>
+
+
+</p>   

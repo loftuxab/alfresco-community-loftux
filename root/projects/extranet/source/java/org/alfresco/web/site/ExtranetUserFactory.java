@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.User;
@@ -41,6 +43,75 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ExtranetUserFactory extends AlfrescoUserFactory
 {
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
+     */
+    public boolean authenticate(HttpServletRequest request, String username, String password)
+    {
+        boolean authenticated = false;
+
+        // check to see if we have this user in our db
+        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
+        if(appContext != null)
+        {
+            // get the user service
+            UserService userService = (UserService) appContext.getBean("extranet.service.user");
+            if(userService != null)
+            {
+                DatabaseUser dbUser = userService.getUser(username);
+                if(dbUser != null)
+                {
+                    boolean checkSubscription = true;
+                    boolean subscriber = false;
+                    
+                    // if they are admin user, let them in
+                    if("admin".equalsIgnoreCase(dbUser.getLevel()))
+                    {
+                        checkSubscription = false;
+                    }
+                    
+                    if(checkSubscription)
+                    {
+                        long now = new Date().getTime();
+                        
+                        if(dbUser.getSubscriptionStart() != null && dbUser.getSubscriptionEnd() != null)
+                        {
+                            long t1 = dbUser.getSubscriptionStart().getTime();
+                            long t2 = dbUser.getSubscriptionEnd().getTime();
+                            
+                            System.out.println("user: " + dbUser.getUserId() + " - t1: " + t1);
+                            System.out.println("user: " + dbUser.getUserId() + " - now: " + now);
+                            System.out.println("user: " + dbUser.getUserId() + " - t2: " + t2);
+                            
+                            subscriber = ((t1 < now) && (now < t2));
+                        }
+                        else
+                        {
+                            System.out.println("subscription start: " + dbUser.getSubscriptionStart() + " and end: " + dbUser.getSubscriptionEnd() + " so skipping");
+                        }
+                        
+                        System.out.println("user: " + dbUser.getUserId() + " - subscriber: " + subscriber);                        
+                    }
+                    else
+                    {
+                        subscriber = true;
+                    }
+                    
+                    if(subscriber)
+                    {
+                        authenticated = super.authenticate(request, username, password);
+                    }
+                }
+                else
+                {
+                    System.out.println("User: " + username + " does not exist in application database");
+                }
+            }
+        }
+        
+        return authenticated;
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
      */
@@ -61,11 +132,17 @@ public class ExtranetUserFactory extends AlfrescoUserFactory
                 DatabaseUser databaseUser = userService.getUser(userId);
                 if(databaseUser != null)
                 {
-                    user = new User(userId);
+                    boolean isAdmin = ("admin".equalsIgnoreCase(databaseUser.getLevel())); 
+                    user = new User(userId, isAdmin);
+
                     user.setFirstName(databaseUser.getFirstName());
                     user.setLastName(databaseUser.getLastName());
                     user.setMiddleName(databaseUser.getMiddleName());
                     user.setEmail(databaseUser.getEmail());
+                    
+                    user.setProperty("subscription_start", databaseUser.getSubscriptionStart());
+                    user.setProperty("subscription_end", databaseUser.getSubscriptionEnd());
+                    user.setProperty("level", databaseUser.getLevel());
                 }
             }
         }

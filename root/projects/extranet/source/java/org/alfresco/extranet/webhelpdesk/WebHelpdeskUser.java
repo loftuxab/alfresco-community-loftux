@@ -33,9 +33,21 @@ import org.alfresco.extranet.AbstractUser;
  */
 public class WebHelpdeskUser extends AbstractUser
 {
+    protected int id;
+    protected int ldapConnectionId;
     
     /**
      * Instantiates a new web helpdesk user.
+     * 
+     * @param userId the user id
+     */
+    public WebHelpdeskUser(int id, String userId)
+    {
+        super(userId);
+    }
+    
+    /**
+     * Instantiates a new database user.
      * 
      * @param userId the user id
      */
@@ -43,4 +55,24 @@ public class WebHelpdeskUser extends AbstractUser
     {
         super(userId);
     }
+    
+    /**
+     * Gets the id.
+     * 
+     * @return the id
+     */
+    public int getId()
+    {
+        return this.id;
+    }
+    
+    public void setLdapConnectionId(int ldapConnectionId)
+    {
+        this.ldapConnectionId = ldapConnectionId;
+    }
+    
+    public int getLdapConnectionId()
+    {
+        return this.ldapConnectionId;
+    }    
 }

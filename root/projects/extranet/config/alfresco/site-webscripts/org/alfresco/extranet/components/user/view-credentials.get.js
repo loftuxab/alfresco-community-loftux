@@ -30,3 +30,16 @@ for(var i = 0; i < endpointIds.length; i++)
 	endpointPersistence[endpointId] = remote.isEndpointPersistent(endpointId);
 }
 model.endpointPersistence = endpointPersistence;
+
+
+// process commands
+var command = context.properties["command"];
+if(command == "remove")
+{
+	var epId = context.properties["endpointId"];
+	if(epId != null)
+	{
+		vault.removeCredentials(epId);
+		vault.save();
+	}
+}

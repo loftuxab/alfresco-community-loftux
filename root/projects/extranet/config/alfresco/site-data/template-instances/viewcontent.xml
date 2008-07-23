@@ -2,6 +2,6 @@
 
 <template-instance>
 
-  <template-type>viewcontentdetails</template-type>
-
+  <template-type>register</template-type>
+  
 </template-instance>

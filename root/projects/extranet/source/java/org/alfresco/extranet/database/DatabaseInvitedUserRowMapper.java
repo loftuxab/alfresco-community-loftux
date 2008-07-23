@@ -58,10 +58,7 @@ public class DatabaseInvitedUserRowMapper implements RowMapper
 	    boolean completed = rs.getBoolean("completed");
 	    String whdUserId = rs.getString("whd_user_id");
 	    String alfrescoUserId = rs.getString("alfresco_user_id");
-	    
-	    // expiration
-	    java.sql.Date expirationSqlDate = rs.getDate("expiration_date");
-	    
+	    	    
 	    // group ids
 	    String groupIds = rs.getString("group_ids");
 	    
@@ -83,11 +80,37 @@ public class DatabaseInvitedUserRowMapper implements RowMapper
 	    user.setWebHelpdeskUserId(whdUserId);
 	    user.setAlfrescoUserId(alfrescoUserId);
 	    
-	    // apply invitation expiration date
-	    long expirationTime = expirationSqlDate.getTime();
-	    java.util.Date expirationDate = new java.util.Date(expirationTime);
-	    user.setExpirationDate(expirationDate);
 	    
+	    
+	    // apply invitation expiration date
+        java.sql.Date expirationSqlDate = rs.getDate("expiration_date");
+	    if(expirationSqlDate != null)
+	    {
+    	    long expirationTime = expirationSqlDate.getTime();
+    	    java.util.Date expirationDate = new java.util.Date(expirationTime);
+    	    user.setExpirationDate(expirationDate);
+	    }
+	    
+        // subscription start date
+        java.sql.Date subscriptionStartDate = rs.getDate("subscription_start");
+        if(subscriptionStartDate != null)
+        {
+            long subscriptionStartTime = subscriptionStartDate.getTime();
+            java.util.Date _subscriptionStartDate = new java.util.Date(subscriptionStartTime);
+            user.setSubscriptionStart(_subscriptionStartDate);
+        }
+        
+        // subscription end date
+        java.sql.Date subscriptionEndDate = rs.getDate("subscription_end");
+        if(subscriptionEndDate != null)
+        {
+            long subscriptionEndTime = subscriptionEndDate.getTime();
+            java.util.Date _subscriptionEndDate = new java.util.Date(subscriptionEndTime);
+            user.setSubscriptionEnd(_subscriptionEndDate);
+        }
+	    
+	    
+        
 	    // apply group ids and invitation type
 	    user.setGroupIds(groupIds);
 	    user.setInvitationType(invitationType);

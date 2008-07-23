@@ -24,7 +24,6 @@
  */
 package org.alfresco.extranet.ldap;
 
-import org.alfresco.extranet.database.DatabaseUser;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -108,6 +107,17 @@ public class LDAPService implements ApplicationContextAware
     public boolean updateUser(LDAPUser ldapUser)
     {
         return userBean.update(ldapUser);
+    }
+    
+    /**
+     * Returns the user
+     * 
+     * @param userId
+     * @return
+     */
+    public LDAPUser getUser(String userId)
+    {
+        return userBean.get(userId);
     }
     
     

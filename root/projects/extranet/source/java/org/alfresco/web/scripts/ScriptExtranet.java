@@ -28,6 +28,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 
 import org.alfresco.extranet.ExtranetHelper;
+import org.alfresco.extranet.UserService;
+import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.extranet.jira.JIRAClient;
 import org.alfresco.extranet.jira.JIRAService;
 import org.alfresco.web.framework.cache.BasicCache;
@@ -112,6 +114,41 @@ public final class ScriptExtranet extends ScriptBase
         }
         
         return array;
+    }
+    
+    /**
+     * Resets the user's password and sends an email
+     * 
+     * @param userIdentity Either the user's id or their email address
+     * @return true if successful
+     */
+    public boolean resetUserPassword(String userIdentity)
+    {
+        boolean reset = false;
+        
+        UserService userService = ExtranetHelper.getUserService(((HttpRequestContext)context).getRequest());
+        
+        DatabaseUser user = null;
+        try
+        {
+            user = userService.getUser(userIdentity);
+        }
+        catch(Exception ex) { }
+        if(user == null)
+        {
+            try
+            {
+                user = userService.getUserByEmail(userIdentity);
+            }
+            catch(Exception ex) { }
+        }
+        if(user != null)
+        {
+            userService.resetUserPassword(user.getUserId());
+            reset = true;
+        }
+        
+        return reset;
     }
     
 }

@@ -20,8 +20,10 @@
 	DatabaseInvitedUser invitedUser = invitationService.getInvitedUserFromHash(hash);
 		
 	// properties
+	String invitedUserId = request.getParameter("invitedUserId");
 	String userId = request.getParameter("userId");
 	String password = request.getParameter("password");
+	String passwordVerify = request.getParameter("passwordVerify");
 	String firstName = request.getParameter("firstName");
 	String lastName = request.getParameter("lastName");
 	String email = request.getParameter("email");
@@ -46,19 +48,40 @@
 			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
 			return;
 		}
+		
+		// check to see if null password
+		if(password == null || password.length() == 0)
+		{
+			// redirect to user-invitation with a message
+			request.setAttribute("user-invitation-message", "An empty password was provided.  Please provide a valid password");
+			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
+			return;
+		}
+		if(passwordVerify == null || passwordVerify.length() == 0)
+		{
+			// redirect to user-invitation with a message
+			request.setAttribute("user-invitation-message", "An empty password was provided.  Please provide a valid password");
+			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
+			return;
+		}
+		
+		// check to see if passwords match
+		if(!password.equals(passwordVerify))
+		{
+			// redirect to user-invitation with a message
+			request.setAttribute("user-invitation-message", "The passwords provided did not match.  Please re-enter your password and verify that it is correct.");
+			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
+			return;		
+		}
 	}	
 %>
-<html>
-   <head>
-   	<title>Welcome to Alfresco Network, <%=invitedUser.getFirstName()%> <%=invitedUser.getLastName()%>!</title>
-   </head>
-   <body>
-      <h2>Welcome to Alfresco Network!</h2>
+
+
+      <h5>Let's create your account...</h5>
       <p>
-      	
       	Congratulations!  Your account is ready to be created.
       	<br/>
-      	Just click 'Create' below
+      	To authorize the creation of your account, just click "Create my account" below!
       	<br/>
       	<br/>
       	
@@ -106,18 +129,20 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Web Helpdesk User ID</td>
+				<td>Web Helpdesk User</td>
 				<td>
-					<%=whdUserId%>
+					<%=((whdUserId!=null)?whdUserId:"N/A")%>
 				</td>
 			</tr>
 			<tr>
-				<td>Alfresco User ID</td>
+				<td>Alfresco User</td>
 				<td>
-					<%=alfrescoUserId%>
+					<%=((alfrescoUserId!=null)?alfrescoUserId:"N/A")%>
 				</td>
 			</tr>
 		</table>
+		
+		<input type="hidden" name="invitedUserId" value="<%=invitedUserId%>"/>
 		
 		<input type="hidden" name="userId" value="<%=userId%>"/>
 		<input type="hidden" name="password" value="<%=password%>"/>
@@ -138,5 +163,3 @@
 
       	
       </p>      	
-   </body>
-</html>
