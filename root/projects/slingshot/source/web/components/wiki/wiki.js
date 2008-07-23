@@ -4,17 +4,17 @@
 (function()
 {
 	Alfresco.Wiki = function(containerId)
-   	{
-		this.name = "Alfresco.Wiki";
-      	this.id = containerId;
+   {
+	   this.name = "Alfresco.Wiki";
+      this.id = containerId;
 
-      	/* Load YUI Components */
-      	Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
+      /* Load YUI Components */
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
 
 		this.parser = new Alfresco.WikiParser();
 
-      	return this;
-   	};
+      return this;
+   };
 
 	Alfresco.Wiki.prototype =
 	{
@@ -71,6 +71,19 @@
 		{
 			this.tabs = new YAHOO.widget.TabView(this.id + "-wikipage");
 			
+			var me = this;
+			
+			YAHOO.Bubbling.addDefaultAction('view-link', function(layer, args)
+         {
+            var link = args[1].target;
+            if (link)
+            {
+               var id = link.id;
+               me._displayVersion(id);      
+            }
+            return true;
+         });
+			
 			this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
    		     height: '300px',
    		     width: '538px',
@@ -81,9 +94,9 @@
    		this.pageEditor.render();
 			
 			var saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveSelect,
-	        {
+	      {
 	        	type: "push"
-	        });
+	      });
 	
 			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelSelect,
 			{
@@ -100,6 +113,46 @@
 			
 			var Dom = YAHOO.util.Dom;
 			Dom.get(this.id + "-wikipage").style.visibility = "visible";
+		},
+		
+		_displayVersion: function(id)
+		{
+         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
+         {
+            site: this.siteId,
+            title: this.pageTitle,
+            version: id
+         });
+		   
+		   Alfresco.util.Ajax.request(
+			{
+				method: Alfresco.util.Ajax.GET,
+		      url: actionUrl,
+				successCallback:
+				{
+					fn: this.onVersionInfo,
+					scope: this
+				},
+		      failureMessage: "Could not retrieve version information"
+		   });
+		   
+		},
+		
+		onVersionInfo: function(e)
+		{
+		   var panel = new YAHOO.widget.Panel("versionPanel", 
+		   { 
+		      width:"320px", 
+		      visible:false, 
+		      draggable:true, 
+		      close:true, 
+		      fixedcenter:true
+		   });
+		   
+		   panel.setHeader("Version Info");
+		   panel.setBody(this.parser.parse(e.serverResponse.responseText));
+		   panel.render(document.body);
+		   panel.show();
 		},
 		
 		/*
