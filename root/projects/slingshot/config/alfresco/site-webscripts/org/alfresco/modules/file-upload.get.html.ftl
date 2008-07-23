@@ -12,8 +12,8 @@
          <span id="${args.htmlid}-status-span"></span>
       </p>
       <#-- Increase width and height and remove display:none to see flash debug info -->
-      <div id="${args.htmlid}-flashuploader-div" style="width:0px;height:0px; padding: 0;">
-         ${msg("label.noFlash")}
+      <div id="${args.htmlid}-flashuploader-div">
+         <p>${msg("label.noFlash")}</p>
       </div>
 
       <div id="${args.htmlid}-filelist-table" class="fileUpload-filelist-table"></div>

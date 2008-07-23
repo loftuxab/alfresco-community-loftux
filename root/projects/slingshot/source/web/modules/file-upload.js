@@ -230,7 +230,7 @@
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
          onFileUploadComplete: null,
-         overwrite: false,
+         overwrite: true,
          thumbnail: null
       },
 
@@ -418,10 +418,11 @@
        *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},         // limits what kind of files the user can select in the OS file selector
        *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to overwrite a file with the existing name
+       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to overwrite a versionable file with the existing name
        *                             // If false and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to append a number to the filename to avoid an overwrite
+       *                             // the backend to append a number to the versionable filename to avoid
+       *                             // an overwrite and a new version
        * }
        */
       show: function FU_show(config)
@@ -532,6 +533,7 @@
 
          // Create and save a reference to the uploader so we can call it later
          this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
+         this.uploader.subscribe("contentReady", this.onContentReady, this, true);
          this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
          this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
          this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
@@ -539,7 +541,16 @@
          this.uploader.subscribe("uploadCancel",this.onUploadCancel, this, true);
          this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
          this.uploader.subscribe("uploadError",this.onUploadError, this, true);
+      },
 
+      /**
+       * Fired by the YUIAdapter when the uploader.swf has loaded.
+       *
+       * @method onContentReady
+       * @param event {object} an YUIAdapter "onContentReady" event
+       */
+      onContentReady: function onContentReady(event)
+      {
          // Show the uploader panel
          this._showPanel();
       },
@@ -984,6 +995,15 @@
             this.dataTable.set("height", "40px");
          }
 
+         // Check if flash player existed or if the no flash message is displayed
+         var uploaderDiv = Dom.get(this.id + "-flashuploader-div");
+         var p = Dom.getFirstChild(uploaderDiv);
+         if(p && p.tagName.toLowerCase() != "p")
+         {
+            // The p tag (with the no flash error message is gone)
+            // Flash is installed, make sure the flash movie isn't visible
+            Dom.setStyle(uploaderDiv, "height", "0px");
+         }
       },
 
       /**

@@ -3,14 +3,15 @@ var json = remote.call("/api/sites/" + page.url.templateArgs.site);
 
 var profile =
 {
-   title: "[Not Found]"
+   title: "",
+   shortName: ""
 };
 
 if (json.status == 200)
 {
    // Create javascript objects from the repo response
    var obj = eval('(' + json + ')');
-   if (obj && obj.title)
+   if (obj)
    {
       profile = obj;
    }

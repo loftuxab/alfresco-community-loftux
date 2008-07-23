@@ -33,6 +33,9 @@
  */
 (function()
 {
+   
+   var Dom = YAHOO.util.Dom;
+   
    /**
     * CreateSite constructor.
     *
@@ -203,8 +206,26 @@
          createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();
 
+         this.widgets.isPublicCheckbox = Dom.get(this.id + "-isPublic-checkbox");
+         YAHOO.util.Event.addListener(this.widgets.isPublicCheckbox, "change", this.onIsPublicChange, this, true);
+         this.widgets.isPublic = Dom.get(this.id + "-isPublic");
+
          // Show the panel
          this._showPanel();
+      },
+
+
+
+      /**
+       * Called when user clicks on the isPublic checkbox.
+       *
+       * @method onCancelButtonClick
+       * @param type
+       * @param args
+       */
+      onIsPublicChange: function(type, args)
+      {
+        this.widgets.isPublic.value = this.widgets.isPublicCheckbox.checked ? "true" : "false";
       },
 
       /**

@@ -521,8 +521,25 @@ Alfresco.util.YUILoaderHelper = function()
                   rollup: 3
                },
                onSuccess: Alfresco.util.YUILoaderHelper.onLoaderComplete,
+               onFailure: function(event)
+               {
+                  alert("load failed:" + event);
+               },
                scope: this
             });
+            // Add Alfresco YUI components to YUI loader -->
+
+            // SWFPlayer
+            yuiLoader.addModule(
+            {
+               name: "swfplayer",
+               type: "js",
+               path: "swfplayer/swfplayer.js", //can use a path instead, extending base path
+               varName: "SWFPlayer",
+               requires: ['uploader'] // The FlashAdapter class is located in uploader.js
+            });
+
+
          }
          
          if (p_aComponents.length > 0)
@@ -608,6 +625,7 @@ Alfresco.util.ComponentManager = function()
    var components = [];
    
    return {
+      
       /**
        * Main entrypoint for components wishing to register themselves with the ComponentManager
        * @method register
@@ -1812,3 +1830,4 @@ Alfresco.thirdparty.dateFormat = function()
     */
    return dateFormat.apply(this, arguments);
 }
+

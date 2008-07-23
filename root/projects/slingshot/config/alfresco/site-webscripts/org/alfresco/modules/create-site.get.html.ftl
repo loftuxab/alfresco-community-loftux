@@ -31,9 +31,13 @@
                </select>
             </div>
          </div>
+         <div class="yui-gd">
+            <div class="yui-u first">${msg("label.isPublic")}</div>
+            <div class="yui-u"><input id="${args.htmlid}-isPublic-checkbox" type="checkbox" checked tabindex="5"/> ${msg("text.isPublic")}</div>
+         </div>
          <div class="bdft">
-            <input type="submit" id="${args.htmlid}-ok-button" value="${msg("button.ok")}" tabindex="5"/>
-            <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" tabindex="6"/>
+            <input type="submit" id="${args.htmlid}-ok-button" value="${msg("button.ok")}" tabindex="6"/>
+            <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" tabindex="7"/>
          </div>
       </form>
    </div>
