@@ -13,7 +13,7 @@
    
    <div class="nodeEdit">
       <#if (post.permissions.edit)>
-      <div class="onEditNode" id="${htmlid}-onEditNode-${post.name}">
+      <div class="onEditBlogPost" id="${htmlid}-onEditNode-${post.name}">
          <a href="#" class="blogpost-action-link">${msg("post.action.edit")}</a>
       </div>
       </#if>
@@ -36,7 +36,7 @@
       </#if>
         
       <#if (post.permissions.delete)>
-         <div class="onDeleteNode" id="${htmlid}-onDeleteNode-${post.name}">
+         <div class="onDeleteBlogPost" id="${htmlid}-onDeleteNode-${post.name}">
             <a href="#" class="blogpost-action-link">${msg("post.action.delete")}</a>
          </div>
       </#if>
