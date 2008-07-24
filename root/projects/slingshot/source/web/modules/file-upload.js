@@ -175,7 +175,6 @@
        */
       noOfFailedUploads: 0,
 
-
       /**
        * Remembers what files that how been added to the file list since
        * the show method was called.
@@ -185,31 +184,31 @@
        */
       addedFiles: {},
 
-       /**
-        * Shows uploader in single upload mode.
-        *
-        * @property MODE_SINGLE_UPLOAD
-        * @static
-        * @type int
-        */
+      /**
+       * Shows uploader in single upload mode.
+       *
+       * @property MODE_SINGLE_UPLOAD
+       * @static
+       * @type int
+       */
       MODE_SINGLE_UPLOAD: 1,
 
       /**
-        * Shows uploader in single update mode.
-        *
-        * @property MODE_SINGLE_UPDATE
-        * @static
-        * @type int
-        */
+       * Shows uploader in single update mode.
+       *
+       * @property MODE_SINGLE_UPDATE
+       * @static
+       * @type int
+       */
       MODE_SINGLE_UPDATE: 2,
 
       /**
-        * Shows uploader in multi upload mode.
-        *
-        * @property MODE_MULTI_UPLOAD
-        * @static
-        * @type int
-        */
+       * Shows uploader in multi upload mode.
+       *
+       * @property MODE_MULTI_UPLOAD
+       * @static
+       * @type int
+       */
       MODE_MULTI_UPLOAD: 3,
       
       /**
@@ -231,7 +230,9 @@
          filter: [],
          onFileUploadComplete: null,
          overwrite: true,
-         thumbnail: null
+         thumbnail: null,
+         uploadURL: null,
+         username: null
       },
 
       /**
@@ -242,7 +243,6 @@
        * @type object
        */
       showConfig: {},
-
 
       /**
        * Since is YAHOO.widget.DataTable.MSG_EMPTY is global and can't be set
@@ -279,7 +279,7 @@
        * @property widgets
        * @type object
        */
-       widgets: {},
+      widgets: {},
 
       /**
        * YUI class that controls the .swf to open the browser dialog window
@@ -1292,6 +1292,17 @@
        */
       _uploadFromQueue: function FU__uploadFromQueue(noOfUploadsToStart)
       {
+         // generate upload POST url
+         var url;
+         if (this.showConfig.uploadURL == null)
+         {
+            url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+         }
+         else
+         {
+            url = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL + "?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+         }
+         
          // Find files to upload
          var startedUploads = 0;
          var length = this.dataTable.getRecordSet().getLength();
@@ -1304,12 +1315,11 @@
             {
                // Upload has NOT been started for this file, start it now
                fileInfo.state = this.STATE_UPLOADING;
-
-               // The contentType that the file should be uploaded as.
-               var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+               
                var attributes = {
                   siteId: this.showConfig.siteId,
-                  containerId: this.showConfig.containerId
+                  containerId: this.showConfig.containerId,
+                  username: this.showConfig.username
                }
                if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
                {         

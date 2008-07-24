@@ -54,7 +54,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
       
       return this;
    }
@@ -191,7 +191,6 @@
       onEditProfile: function UP_onEditProfile()
       {
          Dom.setStyle(this.id + "-readview", "display", "none");
-         //Dom.setStyle(this.id + "-editview", "visibility", "visible"); 
          Dom.setStyle(this.id + "-editview", "display", "block");   
       },
 
@@ -215,14 +214,11 @@
             this.fileUpload = Alfresco.module.getFileUploadInstance();
          }
          
-         // Show uploader for single file select
-         // TODO: need to allow for upload dir noderef - i.e. not site related
+         // Show uploader for single file select - override the upload URL to use avatar upload service
          var uploadConfig =
          {
-            siteId: "none",
-            containerId: "none",
-            uploadDirectory: "none",
-            filter: [],
+            uploadURL: "slingshot/profile/uploadavatar",
+            username: this.options.userId,
             mode: this.fileUpload.MODE_SINGLE_UPLOAD,
             onFileUploadComplete:
             {
@@ -245,7 +241,18 @@
          var success = complete.successful.length;
          if (success > 0)
          {
+            var noderef = complete.successful[0].nodeRef;
             
+            // replace avatar image URL with the updated one
+            var photos = Dom.getElementsByClassName("photoimg", "img");
+            for (i in photos)
+            {
+               photos[i].src = Alfresco.constants.PROXY_URI + "api/node/" + noderef.replace("://", "/") +
+                               "/content/thumbnails/avatar?fc=true";
+            }
+            
+            // update the hidden input field with the new photo noderef
+            Dom.get(this.id + "-photoref").value = noderef;
          }
       },
       
