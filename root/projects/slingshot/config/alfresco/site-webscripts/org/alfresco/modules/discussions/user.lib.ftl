@@ -16,7 +16,12 @@
 
 
 <#macro renderAvatarImage user>
-<img src="${url.context}<#if user.avatarRef??>/proxy/alfresco/api/node/content/${user.avatarRef?replace('://','/')}/avatar.jpg<#else>/components/images/no-photo.png</#if>" width="64" height="64" alt="" />
+   <#if user.avatarRef??>
+      <#assign avatarUrl>${url.context}/proxy/alfresco/api/node/${user.avatarRef?replace('://','/')}/content/thumbnails/avatar?qc=true&ph=true</#assign>
+   <#else>
+      <#assign avatarUrl="${url.context}/components/images/no-photo.png" />
+   </#if>
+   <img src="${avatarUrl}" alt="${user.username}-avatar-image" />
 </#macro>
 
 
