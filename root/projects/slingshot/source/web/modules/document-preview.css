@@ -1,6 +1,6 @@
 .document-preview
 {
-   width: 500px;
+   width: 800px;
 }
 
 .document-preview .hd img
@@ -18,8 +18,7 @@
 .yui-skin-default .document-preview.yui-panel .bd .preview-document-swf
 {
    /*padding: 1em;*/
-   height:500px;
-   width:480px;
+   width:790px;
 }
 
 .document-preview .jumpToPage

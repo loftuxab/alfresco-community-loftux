@@ -230,7 +230,7 @@
          filter: [],
          onFileUploadComplete: null,
          overwrite: true,
-         thumbnail: null,
+         thumbnails: null,
          uploadURL: null,
          username: null
       },
@@ -1333,9 +1333,9 @@
                   var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                   attributes.contentType = contentType;
                   attributes.overwrite = this.showConfig.overwrite;
-                  if (this.showConfig.thumbnail)
+                  if (this.showConfig.thumbnails)
                   {
-                     attributes.thumbnail = this.showConfig.thumbnail;
+                     attributes.thumbnails = this.showConfig.thumbnails;
                   }
                }
                this.uploader.upload(flashId, url, "POST", attributes, "filedata");

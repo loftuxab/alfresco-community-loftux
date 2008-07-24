@@ -331,7 +331,7 @@
             uploadDirectory: this.currentPath,
             filter: [],
             mode: this.fileUpload.MODE_MULTI_UPLOAD,
-            thumbnail: "doclib",
+            thumbnails: "doclib",
             onFileUploadComplete:
             {
                fn: this.onFileUploadComplete,

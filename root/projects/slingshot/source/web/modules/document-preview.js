@@ -212,8 +212,8 @@
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;         
 
-         var panelWidth = document.width > 1000 ? 1000 : document.width - 20;
-         var panelHeight = document.height - 100;
+         //var panelWidth = document.width > 1000 ? 1000 : document.width - 20;
+         var panelHeight = document.height - 40;
 
          // Create the panel from the HTML returned in the server reponse
          var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
@@ -223,8 +223,7 @@
             draggable: false,
             fixedcenter: true,
             visible: false,
-            width: panelWidth,
-            height: panelHeight
+            height: panelHeight + "px"
          });
 
          /**
@@ -246,6 +245,10 @@
          YAHOO.util.Event.addListener(this.widgets.jumpToPageTextField, "change", this.onJumpToPageTextFieldChange, this, true);
 
          this.widgets.currentFrameSpan = Dom.get(this.id + "-currentFrame-span");
+
+         // Maximize the height of the swf div
+         var swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
+         Dom.setStyle(swfPlayerDiv, "height", panelHeight - 80 + "px"); 
 
          // Create and save a reference to the swfPlayer so we can call it later
          this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#5C5C5C"});
@@ -399,8 +402,17 @@
          var store = nodeRef.substring(nodeRef.indexOf("://") + 3, nodeRef.lastIndexOf("/"));
          var ref = nodeRef.substring(nodeRef.lastIndexOf("/") + 1);
          var url = Alfresco.constants.PROXY_URI + "api/node/" + space + "/" + store + "/" + ref + "/content/thumbnails/webpreview"
-         url += "?qc=true&alf_ticket=" + Alfresco.constants.ALF_TICKET;
-
+         url += "?fc=true&alf_ticket=" + Alfresco.constants.ALF_TICKET;
+         /*
+         var forceCreateUrl = Alfresco.constants.PROXY_URI + "api/node/" + space + "/" + store + "/" + ref + "/content/thumbnails"
+         forceCreateUrl += "?as=false&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
+         var forceCreate = {
+            url: forceCreateUrl,
+            method: "POST",
+            contentType: "application/json",
+            data: '{"thumbnailName":"webpreview"}'
+         };
+         */
          this.swfPlayer.load(url);
       },
 
