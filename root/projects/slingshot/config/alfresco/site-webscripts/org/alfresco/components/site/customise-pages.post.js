@@ -18,5 +18,6 @@ var newPagesString = jsonUtils.toJSONString(newPages) + "";
 
 var p = sitedata.getPage("site/" + siteId + "/dashboard");
 p.properties.sitePages = newPagesString;
+p.save();
 
 model.success = true;
