@@ -16,7 +16,7 @@
          <div class="header-bar">${msg("label.info")}</div>
          <div class="photorow">
             <div class="photo">
-               <img src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/content/${user.properties.avatar?replace('://','/')}/avatar.jpg<#else>/components/images/no-photo.png</#if>" width="64" height="64" alt="" />
+               <img src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?qc=false&ph=false<#else>/components/images/no-photo.png</#if>" alt="" />
             </div>
             <div class="namelabel">${user.firstName!""} ${user.lastName!""}</div>
             <#if user.jobTitle?? && user.jobTitle?length!=0><div class="fieldlabel">${user.jobTitle?html}</div></#if>
