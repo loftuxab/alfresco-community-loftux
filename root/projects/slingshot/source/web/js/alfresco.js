@@ -735,7 +735,7 @@ Alfresco.util.PopupManager = function()
        *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when shpwing and hiding the message,
        *                                            // default is YAHOO.widget.ContainerEffect.FADE
        *    effectDuration: {int},  // time in seconds that the effect should be played, default is 0.5
-       *    displayTime: {int},     // time in seconds that the message will be displayed, default 1.5
+       *    displayTime: {int},     // time in seconds that the message will be displayed, default 2.5
        *    modal: {true}           // if the message should modal (the background overlayed with a gray transparent layer), default is false
        * }
        */
@@ -771,12 +771,18 @@ Alfresco.util.PopupManager = function()
           */
          message.render(document.body);
          message.center();
-         message.subscribe("show", this._delayPopupHide,
+         // Need to schedule a fade-out?
+         if (c.displayTime > 0)
          {
-            popup: message,
-            displayTime: (c.displayTime * 1000)
-         }, true);
+            message.subscribe("show", this._delayPopupHide,
+            {
+               popup: message,
+               displayTime: (c.displayTime * 1000)
+            }, true);
+         }
          message.show();
+         
+         return message;
       },
 
       /**
@@ -974,7 +980,7 @@ Alfresco.util.Ajax = function()
          requestContentType: null,    // Set to JSON if json should be used
          responseContentType: null,    // Set to JSON if json should be used
          successCallback: null,// Object literal representing callback upon successful operation
-         successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
+         successMessage: null, // Will be displayed by Alfresco.util.PopupManager.displayMessage if no success handler is provided
          failureCallback: null,// Object literal representing callback upon failed operation
          failureMessage: null,  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
          execScripts: false,    // Whether embedded <script> tags will be executed within the successful response
@@ -1044,7 +1050,7 @@ Alfresco.util.Ajax = function()
        *    requestContentType: {string},  // Set to JSON if json should be used
        *    responseContentType: {string}, // Set to JSON if json should be used
        *    successCallback: {object},     // Callback for successful request, should have the following form: {fn: successHandler, scope: scopeForSuccessHandler}
-       *    successMessage: {string},      // Will be displayed using Alfresco.util.displayMessage if successCallback isn't provided
+       *    successMessage: {string},      // Will be displayed using Alfresco.util.PopupManager.displayMessage if successCallback isn't provided
        *    failureCallback: {object},     // Callback for failed request, should have the following form: {fn: failureHandler, scope: scopeForFailureHandler}
        *    failureMessage: {string},      // Will be displayed by Alfresco.util.displayPrompt if no failureCallback isn't provided
        *    execScripts: {boolean},        // Whether embedded <script> tags will be executed within the successful response

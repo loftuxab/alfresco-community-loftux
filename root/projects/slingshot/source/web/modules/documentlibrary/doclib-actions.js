@@ -158,7 +158,7 @@
        */
       genericAction: function DLA_genericAction(action)
       {
-         var filePath = null;
+         var path = null;
          var success = action.success;
          var failure = action.failure;
          var webscript = action.webscript;
@@ -193,19 +193,23 @@
          if (params)
          {
             url +=  "/";
+            // Using nodeRef-based or site, container?
             if (params.nodeRef)
             {
                url += "node/" + params.nodeRef.replace(":/", "");
             }
             else
             {
-               filePath = params.path;
-               if (params.file)
-               {
-                  filePath += "/" + params.file;
-               }
-               url += "site/" + params.siteId + "/" + params.containerId + filePath;
+               url += "site/" + params.siteId + "/" + params.containerId;
             }
+
+            // Add path and file if supplied
+            path = params.path;
+            if (params.file)
+            {
+               path += "/" + params.file;
+            }
+            url += path;
             
             configObj =
             {
@@ -214,7 +218,7 @@
                containerId: params.containerId,
                path: params.path,
                file: params.file,
-               filePath: filePath
+               path: path
             }
          }
          if (webscript.queryString)

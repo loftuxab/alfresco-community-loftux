@@ -373,11 +373,13 @@
             if (success < this.options.groupUploadsAt)
             {
                // Below cutoff for grouping Activities into one
+               var file;
                for (var i = 0; i < success; i++)
                {
+                  file = complete.successful[i];
                   config.dataObj.type = "file-added";
-                  config.dataObj.fileName = complete.successful[i].fileName;
-                  config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + complete.successful[i].nodeRef.replace(":/", "") + "/" + encodeURIComponent(complete.successful[i].fileName);
+                  config.dataObj.fileName = file.fileName;
+                  config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + file.nodeRef.replace(":/", "") + "/" + encodeURIComponent(file.fileName);
                   config.dataObj.browseURL = location.pathname + "?file=" + config.dataObj.fileName + (location.hash || "");
                   try
                   {
@@ -438,9 +440,29 @@
          {
             return;
          }
-         
+
+         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
          var files = this.modules.docList.getSelectedFiles();
-         alert("Would perform copyTo on " + files.length + " files.");
+         
+         if (!this.modules.copyTo)
+         {
+            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               files: files
+            });
+         }
+         else
+         {
+            this.modules.copyTo.setOptions(
+            {
+               path: this.currentPath,
+               files: files
+            })
+         }
+         this.modules.copyTo.showDialog();
       },
 
       /**
@@ -467,37 +489,15 @@
                containerId: this.options.containerId,
                path: this.currentPath,
                files: files,
-               width: "40em",
-               onSuccess:
-               {
-                  fn: function DLTB_onActionsMoveTo_success(data)
-                  {
-                     var result;
-                     for (var i = 0, j = data.json.totalResults; i < j; i++)
-                     {
-                        result = data.json.results[i];
-
-                        if (result.success)
-                        {
-                           // TODO: Fire the movedTo event
-                        }
-                     }
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: this._msg("message.move-to.success")
-                     });
-                  },
-                  scope: this
-               }
+               width: "40em"
             });
          }
          else
          {
             this.modules.moveTo.setOptions(
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath
+               path: this.currentPath,
+               files: files
             })
          }
          this.modules.moveTo.showDialog();
@@ -573,6 +573,17 @@
          var fnSuccess = function DLTB__oADC_success(data, files)
          {
             var result;
+
+            // Did the operation succeed?
+            if (!data.json.overallSuccess)
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this._msg("message.multiple-delete.failure")
+               });
+               return;
+            }
+
             for (var i = 0, j = data.json.totalResults; i < j; i++)
             {
                result = data.json.results[i];
@@ -669,6 +680,7 @@
             // Should be a path in the arguments
             this.currentPath = obj.path;
             this._generateBreadcrumb();
+            this._generateRSSFeedUrl();
             
             // Enable/disable the Folder Up button
             var paths = this.currentPath.split("/");
@@ -709,6 +721,7 @@
                }
                
                this._generateDescription();
+               this._generateRSSFeedUrl();
             }
          }
       },
@@ -838,6 +851,25 @@
          eDescMsg.appendChild(eDescMore);
          eDivDesc.appendChild(eDescMsg);
       },
+      
+      /**
+       * Generates the HTML mark-up for the RSS feed link
+       *
+       * @method _generateRSSFeedUrl
+       * @private
+       */
+      _generateRSSFeedUrl: function DLTB__generateRSSFeedUrl()
+      {
+         var divFeed = Dom.get(this.id + "-rssFeed");
+         if (!divFeed || !this.modules.docList)
+         {
+            return;
+         }
+         
+         var url = this.modules.docList.getRSSFeedUrl();
+         divFeed.innerHTML = '<a href="' + url + '">' + this._msg("link.rss-feed") + '</a>';
+      },
+      
 
       /**
        * Gets a custom message

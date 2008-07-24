@@ -23,6 +23,8 @@
 
 .doclist .doclist-bar
 {
+   background-color: #f8f8f8;
+   border-bottom: 1px dashed #c0c0c0;
    margin: 0 -10px;
    padding: 0.5em;
 }
@@ -110,6 +112,7 @@
 .doclist tr.yui-dt-even.yui-dt-highlighted
 {
    background-color: #d2e5f2;
+   cursor: auto;
 }
 
 .doclist .documents.yui-dt td
@@ -149,6 +152,7 @@
 
 .doclist .documents .thumbnail
 {
+   cursor: pointer;
    display: block;
    min-height: 100px;
 }
@@ -172,6 +176,15 @@
 .doclist .documents h3.filename
 {
    float: left;
+}
+.doclist .documents a
+{
+   color: #2B6EB5;
+}
+.doclist .documents a:active,
+.doclist .documents a:hover
+{
+   text-decoration: underline;
 }
 
 .doclist .documents .rename-file
@@ -218,6 +231,7 @@
 {
    background-position: 1px 0px;
    background-repeat: no-repeat;
+   color: #000;
    display: block;
    min-height: 16px;
    padding-left: 24px;
@@ -230,9 +244,11 @@
    min-height: 16px;
 }
 
+.doclist .action-set a:active,
 .doclist .action-set a:hover
 {
    background-color: #fff;
+   text-decoration: none;
 }
 
 .doclist div.more-actions
@@ -265,6 +281,11 @@
 }
 
 /* Actions: Icons */
+
+.doclist .onActionDetails a
+{
+   background-image: url(images/details.gif);
+}
 
 .doclist .onActionDelete a
 {

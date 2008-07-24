@@ -76,18 +76,28 @@
    border-bottom: 2px solid #c7ccce;
 }
 
-.toolbar .breadcrumb
+.toolbar .breadcrumb,
+.toolbar .rss-feed
 {
    padding: 0.5em;
 }
 
-.toolbar span.crumb
+.toolbar span.crumb,
+.toolbar .rss-feed a
 {
    font-size: 116%;
 }
 
-.toolbar span.crumb a
+.toolbar .rss-feed
 {
+   float: right;
+}
+
+.toolbar .rss-feed a
+{
+   background-image: url(images/rss-feed.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
 }
 
 .toolbar .description
@@ -108,7 +118,7 @@
 }
 
 
-/* Navigation Bar Buttons */
+/* Header- and Navigation-Bar Buttons */
 
 .toolbar .new-folder button
 {

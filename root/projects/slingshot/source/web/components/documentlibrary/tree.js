@@ -59,8 +59,10 @@
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("folderRenamed", this.onFolderRenamed, this);
+      YAHOO.Bubbling.on("folderCopied", this.onFolderCopied, this);
       YAHOO.Bubbling.on("folderCreated", this.onFolderCreated, this);
       YAHOO.Bubbling.on("folderDeleted", this.onFolderDeleted, this);
+      YAHOO.Bubbling.on("folderMoved", this.onFolderMoved, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
 
       return this;
@@ -91,6 +93,14 @@
          containerId: "documentLibrary"
       },
       
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets: {},
+
       /**
        * Flag set after TreeView instantiated.
        * 
@@ -130,14 +140,6 @@
        * @type boolean
        */
       isFilterOwner: false,
-
-      /**
-       * The YUI TreeView widget.
-       * 
-       * @property treeview
-       * @type object
-       */
-      treeview: null,
 
       /**
        * Paths we have to expand as a result of a deep navigation event.
@@ -265,7 +267,7 @@
                         var response = YAHOO.lang.JSON.parse(oResponse.responseText);
                         
                         // Get the "Documents" node
-                        var rootNode = this.treeview.getRoot();
+                        var rootNode = this.widgets.treeview.getRoot();
                         var docNode = rootNode.children[0];
                         docNode.isLoading = false;
                         docNode.isLeaf = true;
@@ -324,7 +326,7 @@
          Alfresco.logger.debug("DLT_onExpandComplete");
 
          // Make sure the tree's Dom has been updated
-         this.treeview.draw();
+         this.widgets.treeview.draw();
          // Redrawing the tree will clear the highlight
          if (this.isFilterOwner)
          {
@@ -333,7 +335,7 @@
          
          if (this.pathsToExpand.length > 0)
          {
-            var node = this.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
+            var node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
             if (node !== null)
             {
                if (node.data.path == this.currentPath)
@@ -420,7 +422,7 @@
             this.currentPath = obj.path;
             
             // Search the tree to see if this path's node is expanded
-            var node = this.treeview.getNodeByProperty("path", obj.path);
+            var node = this.widgets.treeview.getNodeByProperty("path", obj.path);
             if (node !== null)
             {
                // Node found
@@ -452,7 +454,7 @@
             }
             
             // Kick off the expansion process by expanding the root node
-            node = this.treeview.getNodeByProperty("path", "");
+            node = this.widgets.treeview.getNodeByProperty("path", "");
             if (node !== null)
             {
                node.expand();
@@ -473,12 +475,60 @@
          var obj = args[1];
          if ((obj !== null) && (obj.nodeRef !== null) && (obj.name !== null))
          {
-            var node = this.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
+            var node = this.widgets.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
             if (node !== null)
             {
                // Node found, so rename it
                node.label = obj.name;
-               this.treeview.draw();
+               this.widgets.treeview.draw();
+               this._showHighlight(true);
+            }
+         }
+      },
+
+      /**
+       * Fired when a folder has been copied
+       *
+       * Event data contains:
+       *    nodeRef - the nodeRef of the newly copied object
+       *    destination - new parent path
+       * @method onFolderCopied
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onFolderCopied: function DLT_onFolderCopied(layer, args)
+      {
+         Alfresco.logger.debug("DLT_onFolderCopied");
+
+         var destPath;
+         var obj = args[1];
+         if (obj !== null)
+         {
+            if (obj.nodeRef && obj.destination)
+            {
+               destPath = obj.destination;
+               
+               // ensure path starts with leading slash if not the root node
+               if ((destPath != "") && (destPath.substring(0, 1) != "/"))
+               {
+                  destPath = "/" + destPath;
+               }
+               
+               // Do we have the parent of the node's copy loaded?
+               var nodeDest = this.widgets.treeview.getNodeByProperty("path", destPath);
+               if (nodeDest)
+               {
+                  if (nodeDest.expanded)
+                  {
+                     this._sortNodeChildren(nodeDest);
+                  }
+                  else
+                  {
+                     nodeDest.isLeaf = false;
+                  }
+               }
+               
+               this.widgets.treeview.draw();
                this._showHighlight(true);
             }
          }
@@ -502,7 +552,7 @@
             {
                obj.parentPath = "/" + obj.parentPath;
             }
-            var parentNode = this.treeview.getNodeByProperty("path", obj.parentPath);
+            var parentNode = this.widgets.treeview.getNodeByProperty("path", obj.parentPath);
             this._sortNodeChildren(parentNode);
          }
       },
@@ -529,18 +579,18 @@
                {
                   obj.path = "/" + obj.path;
                }
-               node = this.treeview.getNodeByProperty("path", obj.path);
+               node = this.widgets.treeview.getNodeByProperty("path", obj.path);
             }
             else if (obj.nodeRef)
             {
-               node = this.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
+               node = this.widgets.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
             }
             
             if (node !== null)
             {
                var parentNode = node.parent;
                // Node found, so delete it
-               this.treeview.removeNode(node);
+               this.widgets.treeview.removeNode(node);
                // Have all the parent child nodes been removed now?
                if (parentNode != null)
                {
@@ -549,8 +599,73 @@
                      parentNode.isLeaf = true;
                   }
                }
-               this.treeview.draw();
+               this.widgets.treeview.draw();
                this._showHighlight(true);
+            }
+         }
+      },
+
+      /**
+       * Fired when a folder has been moved
+       *
+       * Event data contains:
+       *    nodeRef - the nodeRef of the moved object
+       *    destination - new parent path
+       * @method onFolderMoved
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onFolderMoved: function DLT_onFolderMoved(layer, args)
+      {
+         Alfresco.logger.debug("DLT_onFolderMoved");
+
+         var obj = args[1];
+         if (obj !== null)
+         {
+            if (obj.nodeRef && obj.destination)
+            {
+               var nodeSrc = null;
+               var dest = obj.destination;
+
+               // ensure path starts with leading slash if not the root node
+               if ((dest != "") && (dest.substring(0, 1) != "/"))
+               {
+                  dest = "/" + dest;
+               }
+               
+               // we should be able to find the original node
+               nodeSrc = this.widgets.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
+            
+               if (nodeSrc !== null)
+               {
+                  var parentNode = nodeSrc.parent;
+                  // Node found, so delete it
+                  this.widgets.treeview.removeNode(nodeSrc, true);
+                  // Have all the parent child nodes been removed now?
+                  if (parentNode != null)
+                  {
+                     if (!parentNode.hasChildren())
+                     {
+                        parentNode.isLeaf = true;
+                     }
+                  }
+                  // Do we have the node's new parent loaded?
+                  var nodeDest = this.widgets.treeview.getNodeByProperty("path", dest);
+                  if (nodeDest)
+                  {
+                     if (nodeDest.expanded)
+                     {
+                        this._sortNodeChildren(nodeDest);
+                     }
+                     else
+                     {
+                        nodeDest.isLeaf = false;
+                     }
+                  }
+                  
+                  this.widgets.treeview.draw();
+                  this._showHighlight(true);
+               }
             }
          }
       },
@@ -600,7 +715,7 @@
 
          // Create a new tree
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
-         this.treeview = tree;
+         this.widgets.treeview = tree;
 
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
@@ -639,7 +754,7 @@
          {
             // Yes, so clearing the leaf flag and redrawing will automatically query the child nodes
             node.isLeaf = false;
-            this.treeview.draw();
+            this.widgets.treeview.draw();
             this._showHighlight(true);
             return;
          }
@@ -717,7 +832,7 @@
                   }
                   
                   // Update the tree
-                  this.treeview.draw();
+                  this.widgets.treeview.draw();
                   this._showHighlight(true);
                   
                   // Execute the onSortComplete callback
