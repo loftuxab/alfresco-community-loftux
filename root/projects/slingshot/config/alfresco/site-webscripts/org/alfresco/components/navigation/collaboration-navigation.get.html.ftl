@@ -4,4 +4,6 @@
    <span class="navigation-separator">|</span>
    <span class="navigation-item"><a href="${url.context}/page/site/${page.url.templateArgs.site!""}/${p.pageId}">${p.title}</a></span>
 </#list>
+<span class="navigation-separator">|</span>
+<span class="navigation-item"><a href="${url.context}/page/site/${page.url.templateArgs.site!""}/invite">${msg("link.members")}</a></span>
 </div>
