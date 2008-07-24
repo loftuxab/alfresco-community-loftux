@@ -402,6 +402,10 @@
        */
       _showDialog: function DLCT__showDialog()
       {
+         // Enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+
          // Dialog title
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
