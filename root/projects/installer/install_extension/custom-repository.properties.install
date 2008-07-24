@@ -11,9 +11,9 @@ dir.indexes=@@ALF_INDEXES@@
 #
 # Sample database connection properties
 #
-db.name=@@ALF_DBNAME@@
-db.username=@@ALF_DB_USERNAME@@
-db.password=@@ALF_DB_PASSWORD@@
+db.name=@@DB_NAME@@
+db.username=@@DB_USER@@
+db.password=@@DB_USERPWD@@
 #db.pool.initial=10
 #db.pool.max=100
 
@@ -29,22 +29,22 @@ db.password=@@ALF_DB_PASSWORD@@
 # Derby connection
 #
 #derby#db.driver=org.apache.derby.jdbc.EmbeddedDriver
-#derby#db.url=jdbc:derby:/srv/alfresco/alf_data/derby_data/alfresco;create=true
+#derby#db.url=jdbc:derby:@@ALF_DATA@@/derby_data/alfresco;create=true
 
 #
 # HSQL connection
 #
 #hsql#db.driver=org.hsqldb.jdbcDriver
-#hsql#db.url=jdbc:hsqldb:file:alf_data/hsql_data/alfresco;ifexists=true;shutdown=true;
+#hsql#db.url=jdbc:hsqldb:file:@@ALF_DATA/hsql_data/alfresco;ifexists=true;shutdown=true;
 
 #
 # MySQL connection (This is default and requires mysql-connector-java-5.0.3-bin.jar, which ships with the Alfresco server)
 #
 #mysql#db.driver=org.gjt.mm.mysql.Driver
-#mysql#db.url=jdbc:mysql://localhost/@@ALF_DBNAME@@
+#mysql#db.url=jdbc:mysql://@@DBHOST@@:@@DBPORT@@/@@ALF_DBNAME@@
 
 #
 # PostgreSQL connection (requires postgresql-8.2-504.jdbc3.jar or equivalent)
 #
 #postgresql#db.driver=org.postgresql.Driver
-#postgresql#db.url=jdbc:postgresql://localhost:5432/@@ALF_DBNAME@@
+#postgresql#db.url=jdbc:postgresql://@@DBHOST@@:@@DBPORT@@/@@ALF_DBNAME@@

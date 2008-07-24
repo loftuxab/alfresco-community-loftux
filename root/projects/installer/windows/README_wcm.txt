@@ -17,7 +17,6 @@ Installing WCM Bootstrap
 Once unzipped, the wcm-bootstrap-context.xml file needs to be moved to
 the Alfresco extension directory:
 - for Tomcat, this is usually tomcat/shared/classes/alfresco/extension
-- for JBoss, this is usually jboss/server/default/conf/alfresco/extension
 
 Restart the Alfresco server for the bootstrap to take effect.  You will 
 see information about the success of the bootstrap in the logs.

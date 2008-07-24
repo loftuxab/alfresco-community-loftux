@@ -5,14 +5,10 @@ rem ---------------------------------------------------------------------------
 
 rem set Alfresco home (includes trailing \  e.g. c:\alfresco\)
 set ALF_HOME=%~dp0
-set ALF_HOME_URI=%ALF_HOME:\=/%
-
 set CATALINA_HOME=%ALF_HOME%tomcat
 
 rem Set any default JVM options
-set JAVA_OPTS=-Xms128m -Xmx512m -Xss96k -server
-rem The following options are only required for Sun JVMs prior to 1.5 update 8
-set JAVA_OPTS=%JAVA_OPTS% -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeIndexes -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeDeletions
+set JAVA_OPTS=-Xms128m -Xmx512m -Xss96k -XX:MaxPermSize=128m -server
 
 rem --- If SetPaths.bat already exists - assume set by hand and use as is
 set PATH=%ALF_HOME%bin;%PATH%
@@ -45,11 +41,6 @@ rem Start Virtualization if available
 rem ---------------------------------
 rem if exist "~dp0virtual_start.bat" call "~dp0virtual_start.bat" 
 
-rem ---------------------------------------
-rem Start OpenOffice for transformations
-rem ---------------------------------------
-rem if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///%ALF_HOME_URI%oouser" -nologo -headless -nofirststartwizard
-
 goto nostop
 :nostart
 
@@ -63,7 +54,5 @@ echo Shutting down Tomcat...
 call "%CATALINA_HOME%\bin\shutdown.bat" 
 
 rem if exist "virtual_start.bat" call virtual_stop.bat 
-
-rem if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
 :nostop

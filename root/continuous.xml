@@ -56,14 +56,14 @@
                     incremental, 
                     distribute-mmt,
                     distribute-bm-remote,
+                    distribute-amps,
                     distribute-tomcat,
                     distribute-war, 
-                    distribute-wcm, 
+                    distribute-wcm,
                     distribute-sdk, 
                     distribute-webserviceclient,
                     distribute-extensions-office2003,
                     distribute-deployment,
-                    distribute-amps,
                     distribute-sample-extensions,
                     distribute-docs,
                     revert-changes" />
@@ -190,8 +190,7 @@
    <target name="distribute-wcm" 
            description="Creates the distibution files for WCM"
            depends="distribute-wcm-windows, 
-                    distribute-wcm-linux,
-                    distribute-wcm-installers" />
+                    distribute-wcm-linux" />
 
    <target name="distribute-wcm-windows" 
            depends="assemble-virtual">
@@ -234,22 +233,6 @@
       </tar>
    </target>
 
-   <target name="distribute-wcm-installers"
-           depends="assemble-virtual">
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/wcm-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.wcm}"' />
-      </exec>
-      <move todir="${dir.continuous.dist}" failonerror="no">
-         <fileset dir="${dir.project.installer.builder}/wcm-installer/output">
-            <include name="**/*"/>
-         </fileset>
-      </move>
-
-   </target>
-
    <target name="assemble-virtual"
            depends="init">
       <mkdir dir="${dir.continuous.dist}" />
@@ -271,8 +254,7 @@
 
    <target name="distribute-tomcat" 
            description="Creates the distibution files for Tomcat"
-           depends="distribute-config,
-                    distribute-tomcat-windows,
+           depends="distribute-tomcat-windows,
                     distribute-tomcat-linux,
                     distribute-tomcat-installers" />
 
@@ -290,8 +272,6 @@
                                apply_amps.bat,
                                README_mysql.txt,
                                README.txt" />
-         <zipfileset dir="${dir.project.installer.builder}/configwizard"
-                     includes="output/*.exe" />
          <zipfileset dir="${dir.project.installer}/install_extension"
                      prefix="install_extension" />
          <zipfileset dir="${dir.project.installer}"
@@ -301,6 +281,9 @@
                      excludes="**/*.sh" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
+         <zipfileset dir="${dir.project.3rdparty.distro}"
+                     prefix="bin"
+                     includes="imconvert.exe,pdf2swf.exe" />
          <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
          <zipfileset dir="${dir.continuous.dist}"
@@ -352,29 +335,25 @@
    </target>
 
    <target name="distribute-tomcat-installers"
-           depends="assemble-virtual, distribute-config">
+           depends="init, assemble-virtual">
       <delete quiet="yes"
               includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/core-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.core}"'/>
+              dir="${dir.project.installer.builder}/quick-installer/output" />
+      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer127.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
+      </exec>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer127.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
+      </exec>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer127.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
       <move todir="${dir.continuous.dist}" failonerror="no">
-         <fileset dir="${dir.project.installer.builder}/core-installer/output">
+         <fileset dir="${dir.project.installer.builder}/quick-installer/output">
             <include name="**/*"/>
          </fileset>
       </move>
    </target>
-
-   <target name="distribute-config" depends="init">
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/configwizard/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.config}"'/>
-      </exec>
-   </target>
-
    <target name="assemble-tomcat"
            depends="init">
       <mkdir dir="${dir.continuous.dist}" />
@@ -388,6 +367,7 @@
       <delete dir="${dir.continuous.assemble.tomcat}/webapps/servlets-examples" />
       <delete dir="${dir.continuous.assemble.tomcat}/webapps/tomcat-docs" />
       <delete dir="${dir.continuous.assemble.tomcat}/webapps/webdav" />
+      <delete dir="${dir.continuous.assemble.tomcat}/webapps/ROOT" />
 
       <!-- make sure the context is set for no serialization -->
       <copy todir="${dir.continuous.assemble.tomcat}/conf" 
@@ -402,16 +382,18 @@
       <!-- place latest Xalan jars to ensure they are used -->
       <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed"
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
-      <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed" 
+      <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed"
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
 
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.continuous.assemble.tomcat}/webapps">
          <fileset dir="${dir.project.webclient.dist}" 
                   includes="${file.name.war.webclient}" />
-         <fileset dir="${dir.project.slingshot.dist}" 
+         <fileset dir="${dir.project.slingshot.dist}"
                   includes="${file.name.war.slingshot}" />
       </copy>
+      <copy todir="${dir.continuous.assemble.tomcat}/webapps"
+            file="${file.name.war.root}" />
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
          <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
@@ -496,20 +478,6 @@
                                ${file.name.jar.serializer}"
                      prefix="endorsed" />
       </tar>
-
-      <!-- Installer -->
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/upgrade-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.war}"' />
-      </exec>
-      <move todir="${dir.continuous.dist}" failonerror="false">
-         <fileset dir="${dir.project.installer.builder}/upgrade-installer/output">
-            <include name="**/*"/>
-         </fileset>
-      </move>
-
    </target>
 
    <target name="distribute-war-installers"
@@ -521,7 +489,7 @@
    <!-- ** Web Service Client targets ** -->
    <!-- ******************************** -->
 
-   <target name="distribute-webserviceclient" 
+   <target name="distribute-webserviceclient"
            description="Creates the web service client distribution file for all platforms"
            depends="init">
       <mkdir dir="${dir.continuous.dist}" />
@@ -630,7 +598,7 @@
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/deploy-installer/output" />
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.deploy}"'/>
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.deploy}"'/>
       </exec>
       <move todir="${dir.continuous.dist}" failonerror="false">
          <fileset dir="${dir.project.installer.builder}/deploy-installer/output">
@@ -724,7 +692,7 @@
                   includes="org/alfresco/repo/module/tool/default-file-mapping.properties" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/repo/module/**/*.class" />
-         <fileset dir="${dir.project.repository.classes}" 
+         <fileset dir="${dir.project.repository.classes}"
                   includes="org/alfresco/service/cmr/module/**/*.class" />
       </copy>
       <!-- copy in a manifest file -->
@@ -1026,7 +994,7 @@
       <!-- Package configuration as a .jar -->
       <!-- TODO: configuration should ideally live in each of the above .jars -->
       <mkdir dir="${dir.continuous.assemble.sdk}/config" />
-      <copy todir="${dir.continuous.assemble.sdk}/config" 
+      <copy todir="${dir.continuous.assemble.sdk}/config"
             includeEmptyDirs="false">
          <fileset dir="${dir.project.repository.config}" 
                   excludes="**/extension/*,**/desktop/*" />
