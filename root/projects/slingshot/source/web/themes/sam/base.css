@@ -127,12 +127,12 @@ hr
 
 .yui-skin-sam .mask
 {
-   opacity: 0.5;
+   opacity: 0.25;
 }
 
 .yui-skin-sam .yui-panel-container.shadow .underlay
 {
-   opacity: 0.25;
+   opacity: 0.125;
 }
 
 .yui-skin-sam .yui-panel .hd,

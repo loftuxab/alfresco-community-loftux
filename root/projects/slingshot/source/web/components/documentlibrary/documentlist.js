@@ -446,7 +446,7 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            elCell.innerHTML = '<input type="checkbox" name="fileChecked" value="'+ oData + '"' + (me.selectedFiles[oData] ? ' checked="checked">' : '>');
+            elCell.innerHTML = '<input id="checkbox-' + oRecord.getId() + '" type="checkbox" name="fileChecked" value="'+ oData + '"' + (me.selectedFiles[oData] ? ' checked="checked">' : '>');
          }
           
          /**
@@ -694,26 +694,10 @@
          {
             if (this.options.highlightFile)
             {
-               var recordSet = this.widgets.dataTable.getRecordSet();
-               var recordFound = null;
-               for (var i = 0, j = recordSet.getLength(); i < j; i++)
+               YAHOO.Bubbling.fire("highlightFile",
                {
-                  if (recordSet.getRecord(i).getData("fileName") == this.options.highlightFile)
-                  {
-                     recordFound = recordSet.getRecord(i);
-                     break;
-                  }
-               }
-               if (recordFound !== null)
-               {
-                  // Found it
-                  this.options.highlightFile = null;
-                  // Scroll the records into view and highlight it
-                  var el = this.widgets.dataTable.getTrEl(recordFound);
-                  var yPos = Dom.getY(el);
-                  window.scrollTo(0, yPos);
-                  Alfresco.util.Anim.pulse(el);
-               }
+                  fileName: this.options.highlightFile
+               });
             }
          }, this, true);
          
@@ -1532,8 +1516,28 @@
          var obj = args[1];
          if ((obj !== null) && (obj.fileName !== null))
          {
-            var recordSet = this.widgets.dataSource.getrecordSet();
-            //var record = 
+            var recordSet = this.widgets.dataTable.getRecordSet();
+            var recordFound = null;
+            for (var i = 0, j = recordSet.getLength(); i < j; i++)
+            {
+               if (recordSet.getRecord(i).getData("fileName") == obj.fileName)
+               {
+                  recordFound = recordSet.getRecord(i);
+                  break;
+               }
+            }
+            if (recordFound !== null)
+            {
+               // Scroll the record into view and highlight it
+               var el = this.widgets.dataTable.getTrEl(recordFound);
+               var yPos = Dom.getY(el);
+               window.scrollTo(0, yPos);
+               Alfresco.util.Anim.pulse(el);
+               this.options.highlightFile = null;
+
+               // Select the file
+               Dom.get("checkbox-" + recordFound.getId()).checked = true;
+            }
          }
       },
 
