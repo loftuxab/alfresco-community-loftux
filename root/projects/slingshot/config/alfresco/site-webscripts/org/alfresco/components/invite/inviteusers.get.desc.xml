@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Invite users list</shortname>
+  <description>Invite users list</description>
+  <url>/components/invite/inviteusers</url>
+</webscript>
