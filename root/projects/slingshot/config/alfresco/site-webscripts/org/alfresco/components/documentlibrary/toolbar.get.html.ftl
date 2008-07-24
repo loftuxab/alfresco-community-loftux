@@ -27,6 +27,7 @@
             </div>
          </div>
       </div>
+      <div id="${args.htmlid}-rssFeed" class="rss-feed"></div>
    </div>
 
    <div id="${args.htmlid}-navBar" class="nav-bar">

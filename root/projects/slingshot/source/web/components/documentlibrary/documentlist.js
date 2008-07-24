@@ -60,10 +60,13 @@
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("highlightFile", this.onHighlightFile, this);
-      YAHOO.Bubbling.on("fileMoved", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("fileCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("fileDeleted", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("fileMoved", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("folderCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("folderDeleted", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("folderMoved", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    
@@ -353,10 +356,11 @@
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
-             resultsList: "doclist.items",
-             fields:[
-               "index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "title", "description",
-               "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"
+            resultsList: "doclist.items",
+            fields:
+            [
+               "index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
+               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "contentUrl", "actionSet"
             ]
          };
          
@@ -391,6 +395,22 @@
          }
 
          /**
+          * Generate URL to user profile page
+          *
+          * @method generateUserProfileUrl
+          * @param userName {string} Username
+          * @return {string} URL to profile page
+          */
+         var generateUserProfileUrl = function DL_generateUserProfileUrl(userName)
+         {
+            return Alfresco.util.uriTemplate("userpage",
+            {
+               userid: userName,
+               pageid: "profile"
+            });
+         }
+         
+         /**
           * Generate URL to thumbnail image
           *
           * @method generateDocumentPreviewOnClick
@@ -400,10 +420,9 @@
          var generateDocumentPreviewOnClick = function DL_generateDocumentPreviewOnClick(record)
          {
             var nodeRef = record.getData("nodeRef");
-            var fileName = record.getData("fileName");
+            var fileName = record.getData("fileName").replace(/[']/g, "\\'");
             var icon32 = Alfresco.constants.URL_CONTEXT + record.getData("icon32");
-            var onClickHandler = "Alfresco.module.getDocumentPreviewInstance().show({nodeRef: '" + nodeRef + "', fileName: '" + fileName + "', icon32: '" + icon32 + "'});";
-            return onClickHandler;
+            return "Alfresco.module.getDocumentPreviewInstance().show({nodeRef: '" + nodeRef + "', fileName: '" + fileName + "', icon32: '" + icon32 + "'});";
          }
 
 
@@ -527,12 +546,17 @@
             var desc = "";
             if (oRecord.getData("type") == "folder")
             {
+               /**
+                * Folder type
+                */
                desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + oRecord.getData("fileName")) + '">';
                desc += '<b>' + oRecord.getData("displayName") + '</b></a></h3>';
 
                if (me.options.detailedView)
                {
+                  /* Inline Rename
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
+                  */
                   desc += '<div class="detail"><span><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   if (oRecord.getData("description").length > 0)
                   {
@@ -551,12 +575,17 @@
             }
             else
             {
+               /**
+                * Document type
+                */
                desc = '<h3 class="filename"><a target="content" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("contentUrl") + '">' + oRecord.getData("displayName") + '</a></h3>';
                if (me.options.detailedView)
                {
+                  /* Inline Rename
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
+                  */
                   desc += '<div class="detail"><span><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span><b>' + me._msg("details.modified-by") + '</b> ' + oRecord.getData("modifiedBy") + '</span>';
+                  desc += '<span><b>' + me._msg("details.modified-by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
                   desc += '<span><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span></div>';
                   /* Created On field
                   desc += '<div class="detail"><span><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
@@ -734,6 +763,12 @@
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
+      
+      /**
+       * Public functions
+       *
+       * Functions designed to be called form external sources
+       */
 
       /**
        * Public function to get array of selected files
@@ -823,6 +858,19 @@
          }
          
          YAHOO.Bubbling.fire("selectedFilesChanged");
+      },
+
+      /**
+       * Public function to get URL to RSS feed for current view
+       *
+       * @method getRSSFeedUrl
+       * @return {string} URL to RSS feed for current document list view
+       */
+      getRSSFeedUrl: function DL_getRSSFeedUrl()
+      {
+         var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
+         url += this._buildDocListRSSParams(this.currentPath);
+         return url;
       },
       
 
@@ -1034,6 +1082,69 @@
          Event.on(elMoreActions, "mouseout", onMouseOut, elMoreActions);
       },
       
+      /**
+       * Asset details.
+       *
+       * @method onActionDetails
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionDetails: function DL_onActionDetails(row)
+      {
+         /**
+          * TODO
+          */
+         return;
+         
+         var me = this;
+         var record = this.widgets.dataTable.getRecord(row);
+
+         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/metadata/node/{nodeRef}",
+         {
+            nodeRef: record.getData("nodeRef").replace(":/", "")
+         });
+         
+         var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
+         {
+            // Validation
+            // Name: mandatory value
+            p_form.addValidation(this.id + "-details-name", Alfresco.forms.validation.mandatory, null, "keyup");
+            // Name: valid filename
+            p_form.addValidation(this.id + "-details-name", Alfresco.forms.validation.nodeName, null, "keyup");
+            p_form.setShowSubmitStateDynamically(true, false);
+         }
+         
+         if (!this.modules.details)
+         {
+            this.modules.details = new Alfresco.module.SimpleDialog(this.id + "-details").setOptions(
+            {
+               width: "30em",
+               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/details",
+               actionUrl: actionUrl,
+               doSetupFormsValidation:
+               {
+                  fn: doSetupFormsValidation,
+                  scope: this
+               },
+               firstFocus: this.id + "-details-name",
+               onSuccess:
+               {
+                  fn: function DLTB_onActionDetails_callback(response)
+                  {
+                  },
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            this.modules.details.setOptions(
+            {
+               actionUrl: actionUrl
+            })
+         }
+         this.modules.details.show();
+      },
+
       /**
        * Delete Asset.
        *
@@ -1261,6 +1372,38 @@
       },
       
       /**
+       * Copy single document or folder.
+       *
+       * @method onActionCopyTo
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionCopyTo: function DL_onActionCopyTo(row)
+      {
+         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
+         var file = this.widgets.dataTable.getRecord(row)._oData;
+         
+         if (!this.modules.copyTo)
+         {
+            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               files: file
+            });
+         }
+         else
+         {
+            this.modules.copyTo.setOptions(
+            {
+               path: this.currentPath,
+               files: file
+            })
+         }
+         this.modules.copyTo.showDialog();
+      },
+
+      /**
        * Move single document or folder.
        *
        * @method onActionMoveTo
@@ -1279,37 +1422,15 @@
                containerId: this.options.containerId,
                path: this.currentPath,
                files: file,
-               width: "40em",
-               onSuccess:
-               {
-                  fn: function DL_onActionsMoveTo_success(data)
-                  {
-                     var result;
-                     for (var i = 0, j = data.json.totalResults; i < j; i++)
-                     {
-                        result = data.json.results[i];
-
-                        if (result.success)
-                        {
-                           // TODO: Fire the movedTo event
-                        }
-                     }
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: this._msg("message.move-to.success")
-                     });
-                  },
-                  scope: this
-               }
+               width: "40em"
             });
          }
          else
          {
             this.modules.moveTo.setOptions(
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath
+               path: this.currentPath,
+               files: file
             })
          }
          this.modules.moveTo.showDialog();
@@ -1484,7 +1605,7 @@
             if (oResponse.status == 401)
             {
                // Our session has likely timed-out, so refresh to offer the login page
-               window.location.reload();
+               window.location.reload(true);
             }
             else
             {
@@ -1532,6 +1653,19 @@
 
           params += "?filter=" + encodeURIComponent(this.currentFilterId);
           return params;
-       }
+       },
+       
+       /**
+        * Build URI parameter string for doclist RSS data webscript
+        *
+        * @method _buildDocListRSSParams
+        * @param path {string} Path to query
+        */
+        _buildDocListRSSParams: function DL__buildDocListRSSParams(path)
+        {
+           var params = this._buildDocListParams(path);
+           params += "&format=rss";
+           return params;
+        }
    };
 })();

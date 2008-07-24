@@ -1,0 +1,165 @@
+.copy-to .hd .light
+{
+   font-weight: normal;
+}
+
+.copy-to .wrapper
+{
+   padding-top: 0.5em;
+}
+
+.copy-to h3
+{
+   padding-left: 0.5em;
+}
+
+.copy-to .bdft
+{
+   clear: both;
+}
+
+/* Columns */
+
+.copy-to .mode,
+.copy-to .site,
+.copy-to .container,
+.copy-to .path
+{
+   float: left;
+   height: 23em;
+}
+
+.copy-to .repository-mode .site,
+.copy-to .repository-mode .container
+{
+   display: none;
+}
+
+.copy-to .repository-mode .treeview
+{
+   width: 48em;
+}
+
+
+/* Mode Select */
+
+.copy-to .mode span
+{
+   clear: left;
+   float: left;
+}
+
+.copy-to .mode span.yui-button
+{
+   margin: 0.5em 0.5em 0px;
+}
+
+.copy-to .mode span.default
+{
+   background-position: 0pt -1400px;
+   border-color: #304369;
+}
+
+.copy-to .mode span.default button
+{
+   color: #fff;
+}
+
+.copy-to .mode button
+{
+   height: 4em;
+   width: 10em;
+}
+
+
+/* Site and container pickers */
+
+/* Ensure site-picker.width + container-picker.width + treeview.width = 46em */
+.copy-to .site-picker
+{
+   border: 1px solid #e0e0e0;
+   float: left;
+   height: 20em;
+   margin: 0.5em 0.5em 0px;
+   overflow-y: auto;
+   width: 14em;
+}
+
+.copy-to .container-picker
+{
+   border: 1px solid #e0e0e0;
+   float: left;
+   height: 20em;
+   margin: 0.5em 0.5em 0px;
+   overflow-y: auto;
+   width: 14em;
+}
+
+.copy-to .site-picker a,
+.copy-to .container-picker a
+{
+   display: block;
+}
+.copy-to .site-picker .odd a,
+.copy-to .container-picker .odd a
+{
+   background-color: #edf5ff;
+}
+.copy-to .site-picker .even a,
+.copy-to .container-picker .even a
+{
+   background-color: #fff;
+}
+.copy-to .site-picker a:active,
+.copy-to .site-picker a:hover,
+.copy-to .container-picker a:active,
+.copy-to .container-picker a:hover
+{
+   background-color: #d2e5f2;
+   text-decoration: none;
+}
+
+.copy-to .site-picker a.selected,
+.copy-to .container-picker a.selected
+{
+   background-color: #d2e5f2;
+}
+
+
+/* Tree view */
+
+.copy-to .treeview
+{
+   border: 1px solid #e0e0e0;
+   height: 20em;
+   margin: 0.5em 0.5em 0px;
+   overflow-y: auto;
+   width: 18em;
+}
+
+.copy-to .ygtvitem
+{
+   background-color: #ffffff;
+}
+
+.copy-to .ygtvlabel,
+.copy-to .ygtvlabel:link,
+.copy-to .ygtvlabel:visited,
+.copy-to .ygtvlabel:hover
+{
+   background: none;
+}
+
+.copy-to .ygtverror,
+.copy-to .ygtverror:link,
+.copy-to .ygtverror:visited,
+.copy-to .ygtverror:hover
+{
+   background: red;
+   color: white;
+}
+
+.copy-to .selected
+{
+   background-color: #d2e5f2;
+}

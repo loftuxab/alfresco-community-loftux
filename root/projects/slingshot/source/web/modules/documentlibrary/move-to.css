@@ -1,3 +1,8 @@
+.move-to .hd .light
+{
+   font-weight: normal;
+}
+
 .move-to .treeview
 {
    height: 20em;
