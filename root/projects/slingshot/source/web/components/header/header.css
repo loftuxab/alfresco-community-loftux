@@ -44,18 +44,51 @@
 	color: #ddd;
 }
 
+.header .search-container{
+   display: inline;
+   padding-right: 16px;  /* leave space for the select site icon */
+   position: relative;
+}
+
+/*
 .header .search-icon {
-	cursor: pointer;
-	background: url(../images/search.gif) no-repeat center right;
-	position: relative;
-	right: 35px;	
+ background: url(../images/search.gif) no-repeat left bottom;
+   cursor: pointer;
+   padding-left: 20px;
+   right: 35px; 
+   position:relative;
 }
 
 .header .search-site-icon {
-	position: relative;
-	background: url(../images/select_arrow.gif) no-repeat center center;
-	right: 35px;	
+   position: relative;
+   background: url(../images/select_arrow.gif) no-repeat center center;
+   padding-left: 12px;
+   right: 25px; 
 }
+*/
+
+.header .search-icon {
+   background: url(../images/search.gif) no-repeat left bottom;
+   cursor: pointer;
+   position: absolute;
+   padding-left: 12px;
+   padding-top: 2px;
+   right: 24px;
+}
+
+.header .search-site-icon {
+   background: url(../images/select_arrow.gif) no-repeat left bottom;
+   cursor: pointer;
+   position: absolute;
+   padding-left: 12px;
+   padding-top: 4px;
+   right: 0px;
+}
+
+/* IE6 fix */
+* html .header .search-icon {position: fixed;}
+* html .header .search-site-icon {position: fixed;}
+/* */ 
 
 .header .searchtoggleitemlabel.disabled {
 	color: #ccc;

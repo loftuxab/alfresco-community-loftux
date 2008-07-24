@@ -2,7 +2,7 @@
    <div class="hd">${msg("header.configBlog")}</div>
    <div class="bd">
       <form id="${args.htmlid}-configBlog-form"
-            action="${url.context}/proxy/alfresco/blog/site/${site}/${container}?alf_method=PUT"
+            action="${url.context}/proxy/alfresco/api/blog/site/${site}/${container}?alf_method=PUT"
             method="POST">
             
          <div class="yui-g">

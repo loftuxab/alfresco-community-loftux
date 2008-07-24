@@ -24,7 +24,7 @@
 
 <div id="discussionsBlogHeader1">
 	<div class="leftDiscussionBlogHeader">
-		<span class="createNodeLink">
+		<span class="createBlogPostLink">
 		   <a href="${url.context}/page/site/${page.url.templateArgs.site}/blog-postedit">
 		      ${msg("header.createPost")}
 		   </a>

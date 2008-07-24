@@ -377,7 +377,7 @@
                {
                   config.dataObj.type = "file-added";
                   config.dataObj.fileName = complete.successful[i].fileName;
-                  config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + complete.successful[i].nodeRef.replace(":/", "");
+                  config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + complete.successful[i].nodeRef.replace(":/", "") + "/" + encodeURIComponent(complete.successful[i].fileName);
                   config.dataObj.browseURL = location.pathname + "?file=" + config.dataObj.fileName + (location.hash || "");
                   try
                   {

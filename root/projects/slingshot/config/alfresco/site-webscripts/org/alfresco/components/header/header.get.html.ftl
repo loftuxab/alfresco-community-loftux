@@ -25,9 +25,11 @@
       <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
       
       <span class="menu-item">
-         <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />     
-          <span id="${args.htmlid}-search-sbutton" class="menu-item search-icon">&nbsp;</span>
-          <span id="${args.htmlid}-search-tbutton" class="menu-item search-site-icon">&nbsp;</span>
+         <div class="search-container">
+            <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />
+            <span id="${args.htmlid}-search-sbutton" class="search-icon">&nbsp;</span>
+            <span id="${args.htmlid}-search-tbutton" class="search-site-icon">&nbsp;</span>
+         </div>
       </span>
 
       <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")}</a></span>
