@@ -42,13 +42,13 @@ proc CreateWindow.3D88EE52-1868-4E40-8C75-4A27EF566021 {wizard id} {
     ttk::label $base.clientarea.label2 -text "Root Password:" -justify right
     grid $base.clientarea.label2 -row 1 -column 0 -sticky e
 
-    ttk::entry $base.clientarea.entry2 -textvariable ::info(DBROOTPASS) -show "*"
+    ttk::entry $base.clientarea.entry2 -textvariable ::info(DB_ROOTPASS) -show "*"
     grid $base.clientarea.entry2 -row 1 -column 1 -sticky e
 
     ttk::label $base.clientarea.label3 -text "Server:" -justify right
     grid $base.clientarea.label3 -row 2 -column 0 -sticky e
 
-    ttk::entry $base.clientarea.entry3 -textvariable ::info(DBHOST)
+    ttk::entry $base.clientarea.entry3 -textvariable ::info(DB_HOST)
     grid $base.clientarea.entry3 -row 2 -column 1 -sticky e
 
     ttk::label $base.clientarea.label4 -text "Port:" -justify right
@@ -60,7 +60,7 @@ proc CreateWindow.3D88EE52-1868-4E40-8C75-4A27EF566021 {wizard id} {
     ttk::label $base.clientarea.label6 -text "Database name:" -justify right
     grid $base.clientarea.label6 -row 4 -column 0 -sticky e
 
-    ttk::entry $base.clientarea.entry5 -textvariable ::info(DBNAME)
+    ttk::entry $base.clientarea.entry5 -textvariable ::info(DB_NAME)
     grid $base.clientarea.entry5 -row 4 -column 1 -sticky e
 
     Label $base.message -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text4]
