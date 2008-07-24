@@ -1,3 +1,4 @@
+<#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RssFeed("${args.htmlid}").setGUID(
       "${instance.object.id}"
@@ -10,11 +11,8 @@
    </div>
    <div class="body scrollableList" id="${args.htmlid}-scrollableList">
 	<#if items?exists && items?size &gt; 0>
-		<#list items as i>
-		<p>
-		<h4><a href="${i.link}">${i.title}</a></h4>
-		${i.description}
-		</p>
+		<#list items as item>
+         <@feedLib.renderItem item=item />
 		</#list>
 	<#else>
 		<em>No news items.</em>

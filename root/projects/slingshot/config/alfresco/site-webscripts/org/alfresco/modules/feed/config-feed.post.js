@@ -28,15 +28,38 @@ if (result !== null)
 		var rss = new XML(rssXml); 
 		model.title = rss.channel.title.toString();
 		model.items = [];
+		
+		var media = new Namespace("http://search.yahoo.com/mrss/");
+      var mediaRe = /([^\/]+)$/;
 
-		var item;
+		var item, obj;
 		for each (item in rss.channel..item)
 		{
-			model.items.push({
-				"title" : item.title.toString(),
-				"description" : item.description.toString(),
-				"link" : item.link.toString()
-			});
+		   obj = {
+		      "title": item.title.toString(),
+		      "description": item.description.toString(),
+		      "link": item.link.toString()
+		   };
+		   
+		   var attachment = item.media::content;
+		   if (attachment)
+		   {
+		      var contenturl = attachment.@url.toString();
+		      if (contenturl.length > 0)
+		      {
+		         var filename = mediaRe.exec(contenturl)[0];
+      		   // Use the file extension to figure out what type it is for now
+      		   var ext = filename.split(".");
+      		   
+   		      obj["attachment"] = {
+   		         "url": contenturl,
+   		         "name": filename,
+   		         "type": (ext[1] ? ext[1] : "_default")
+   		      }
+		      }
+		   }
+		   
+		   model.items.push(obj);
 		}
 	}	
 }
