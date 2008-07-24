@@ -16,7 +16,7 @@
          <div class="header-bar">${msg("label.info")}</div>
          <div class="photorow">
             <div class="photo">
-               <img src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?qc=false&ph=false<#else>/components/images/no-photo.png</#if>" alt="" />
+               <img class="photoimg" src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-photo.png</#if>" alt="" />
             </div>
             <div class="namelabel">${user.firstName!""} ${user.lastName!""}</div>
             <#if user.jobTitle?? && user.jobTitle?length!=0><div class="fieldlabel">${user.jobTitle?html}</div></#if>
@@ -151,7 +151,8 @@
       <div class="header-bar">${msg("label.photo")}:</div>
       <div class="row">
          <div class="photo">
-            <img src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/content/${user.properties.avatar?replace('://','/')}/avatar.jpg<#else>/components/images/no-photo.png</#if>" width="64" height="64" alt="" />
+            <img class="photoimg" src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-photo.png</#if>" alt="" />
+            <input type="hidden" id="${args.htmlid}-photoref" value="" />
          </div>
          <div class="photobtn"><button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button></div>
       </div>
