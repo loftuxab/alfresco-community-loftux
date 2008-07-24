@@ -83,6 +83,14 @@
             }
             return true;
          });
+         
+         this.tabs.on('activeTabChange', function(e) {
+            var newTab = e.newValue;
+            if (newTab === me.tabs.get('tabs')[1])
+            {
+               me.pageEditor.show();
+            }
+         });
 			
 			this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
    		     height: '300px',
