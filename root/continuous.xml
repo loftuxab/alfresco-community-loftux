@@ -392,8 +392,6 @@
          <fileset dir="${dir.project.slingshot.dist}"
                   includes="${file.name.war.slingshot}" />
       </copy>
-      <copy todir="${dir.continuous.assemble.tomcat}/webapps"
-            file="${file.name.war.root}" />
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
          <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
