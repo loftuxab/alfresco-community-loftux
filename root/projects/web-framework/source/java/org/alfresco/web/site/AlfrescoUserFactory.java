@@ -113,17 +113,25 @@ public class AlfrescoUserFactory extends UserFactory
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
+     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, java.lang.String)
      */
-    public User loadUser(RequestContext context, HttpServletRequest request, String userId)
+    public User loadUser(RequestContext context, String userId)
         throws UserFactoryException
     {
         AlfrescoUser user = null;
         try
         {
+            // ensure we bind the connector to the current user name - if this is the first load
+            // of a user we will use the userId as passed into the method 
+            String currentUserId = context.getUserId();
+            if (currentUserId == null)
+            {
+                currentUserId = userId;
+            }
+            
             // get a connector whose connector session is bound to the current session
             Connector connector = FrameworkHelper.getConnector(
-                    request.getSession(), userId, ALFRESCO_ENDPOINT_ID);
+                    ((HttpRequestContext)context).getRequest().getSession(), currentUserId, ALFRESCO_ENDPOINT_ID);
             
             // build the REST URL to retrieve user details
             String uri = "/webframework/content/metadata?user=" + userId;
@@ -237,6 +245,12 @@ public class AlfrescoUserFactory extends UserFactory
      */
     public void saveUser(AlfrescoUser user) throws UserFactoryException
     {
+        HttpRequestContext context = (HttpRequestContext)ThreadLocalRequestContext.getRequestContext();
+        if (!context.getUserId().equals(user.getId()))
+        {
+            throw new UserFactoryException("Unable to persist user with different Id that current Id.");
+        }
+        
         StringBuilderWriter buf = new StringBuilderWriter(512);
         JSONWriter writer = new JSONWriter(buf);
         
@@ -275,8 +289,6 @@ public class AlfrescoUserFactory extends UserFactory
             writer.endValue();
             
             writer.endObject();
-            
-            HttpRequestContext context = (HttpRequestContext)ThreadLocalRequestContext.getRequestContext();
             
             Connector conn = FrameworkHelper.getConnector(context, ALFRESCO_ENDPOINT_ID);
             ConnectorContext c = new ConnectorContext(HttpMethod.POST);

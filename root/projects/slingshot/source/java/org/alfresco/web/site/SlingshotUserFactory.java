@@ -55,10 +55,10 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
 	 * is done automatically by the UserFactory class.  Thus, the
 	 * User object faulting should only occur once.
 	 */
-    public User loadUser(RequestContext context, HttpServletRequest request, String userId)
+    public User loadUser(RequestContext context, String userId)
         throws UserFactoryException
     {
-    	User user = super.loadUser(context, request, userId);
+    	User user = super.loadUser(context, userId);
         
         return user;
     }

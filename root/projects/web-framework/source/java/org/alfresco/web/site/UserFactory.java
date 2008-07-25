@@ -46,8 +46,7 @@ public abstract class UserFactory
     protected String id;
     
     
-    protected User getGuestUser(RequestContext context,
-            HttpServletRequest request) throws UserFactoryException
+    protected User getGuestUser(RequestContext context) throws UserFactoryException
     {
         if (this.guestUser == null)
         {
@@ -73,8 +72,8 @@ public abstract class UserFactory
             if (user == null)
             {
                 // load the user from whatever store...
-                user = loadUser(context, request, userId);
-    
+                user = loadUser(context, userId);
+                
                 // if we got the user, set onto session
                 if (user != null)
                 {
@@ -92,24 +91,39 @@ public abstract class UserFactory
         // return the guest user
         if (user == null)
         {
-            user = getGuestUser(context, request);
+            user = getGuestUser(context);
         }
         
         return user;
     }
-
-    public abstract User loadUser(
-            RequestContext context, HttpServletRequest request, String user_id)
+    
+    /**
+     * Load the user from a store
+     * 
+     * @param context
+     * @param userId
+     * @return
+     * @throws UserFactoryException
+     */
+    public abstract User loadUser(RequestContext context, String userId)
         throws UserFactoryException;
-
-    public abstract boolean authenticate(
-            HttpServletRequest request, String username, String password);
+    
+    /**
+     * Authentication the user given the supplied username/password
+     * 
+     * @param request
+     * @param username
+     * @param password
+     * 
+     * @return success/failure
+     */
+    public abstract boolean authenticate(HttpServletRequest request, String username, String password);
     
     public void setId(String id)
     {
         this.id = id;
     }
-
+    
     public String getId()
     {
         return this.id;
