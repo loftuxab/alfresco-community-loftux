@@ -18,7 +18,7 @@
       <form accept-charset="UTF-8" method="post" action="${url.context}/login">
          <fieldset>
             <div style="padding-top:96px">
-               <span>Username:</span>
+               <span>User name:</span>
             </div>
             <div style="padding-top:4px">
                <input type="text" id="username" name="username" maxlength="256" style="width:200px"/>

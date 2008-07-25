@@ -25,7 +25,10 @@
 package org.alfresco.web.scripts;
 
 import org.alfresco.connector.User;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.ThreadLocalRequestContext;
+import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
  * Read-only root-scoped script object wrapping the current user for
@@ -296,6 +299,28 @@ public final class ScriptUser extends ScriptBase
     public void save()
     {
         this.user.save();
+    }
+    
+    /**
+     * Retrieve a user object with populated details for the given user Id
+     * 
+     * @param userId
+     * 
+     * @return ScriptUser
+     */
+    public ScriptUser getUser(String userId)
+    {
+        try
+        {
+            RequestContext context = ThreadLocalRequestContext.getRequestContext();
+            User user = FrameworkHelper.getUserFactory().loadUser(context, userId);
+            return new ScriptUser(context, user);
+        }
+        catch (UserFactoryException err)
+        {
+            // unable to load user details - so cannot return a user to the caller
+            return null;
+        }
     }
     
     

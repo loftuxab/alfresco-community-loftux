@@ -31,7 +31,7 @@
    {  username, firstName, lastName, avatarRef  }
 -->
 <#macro renderUserLink user>
-   <a href="${url.context}/page/user/${user.username}/user-profile"><@renderUserName user=user /></a>
+   <a href="${url.context}/page/user/${user.username}/profile"><@renderUserName user=user /></a>
 </#macro>
 
 <#--

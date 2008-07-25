@@ -905,7 +905,6 @@
             if (length > 0)
             {
                this.state = this.STATE_UPLOADING;
-               this.widgets.uploadButton.set("label", Alfresco.util.message("button.uploading", this.name));
                this.widgets.uploadButton.set("disabled", true);
                this.widgets.browseButton.set("disabled", true);
                this._updateStatus();

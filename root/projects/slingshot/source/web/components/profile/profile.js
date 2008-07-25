@@ -75,7 +75,15 @@
           * @property userId
           * @type string
           */
-         userId: ""
+         userId: "",
+         
+         /**
+          * Id of the profile to display
+          * 
+          * @property profileId
+          * @type string
+          */
+         profileId: ""
       },
 
       /**
@@ -150,35 +158,39 @@
          // Reference to self used by inline functions
          var me = this;
          
-         // Buttons
-         this.widgets.upload = Alfresco.util.createYUIButton(this, "button-upload", this.onUpload);
-         this.widgets.edit = Alfresco.util.createYUIButton(this, "button-edit", this.onEditProfile);
-         this.widgets.save = Alfresco.util.createYUIButton(this, "button-save", null,
-            {
-               type: "submit"
-            });
-         this.widgets.cancel = Alfresco.util.createYUIButton(this, "button-cancel", this.onCancel);
-         
-         // Form definition
-         var form = new Alfresco.forms.Form(this.id + "-form");
-         form.setSubmitElements(this.widgets.save);
-         form.setShowSubmitStateDynamically(true);
-         form.setSubmitAsJSON(true);
-         form.setAJAXSubmit(true,
+         // Allow edit if we are displaying this users profile
+         if (this.options.profileId == this.options.userId)
          {
-            successCallback:
+            // Buttons
+            this.widgets.upload = Alfresco.util.createYUIButton(this, "button-upload", this.onUpload);
+            this.widgets.edit = Alfresco.util.createYUIButton(this, "button-edit", this.onEditProfile);
+            this.widgets.save = Alfresco.util.createYUIButton(this, "button-save", null,
+               {
+                  type: "submit"
+               });
+            this.widgets.cancel = Alfresco.util.createYUIButton(this, "button-cancel", this.onCancel);
+            
+            // Form definition
+            var form = new Alfresco.forms.Form(this.id + "-form");
+            form.setSubmitElements(this.widgets.save);
+            form.setShowSubmitStateDynamically(true);
+            form.setSubmitAsJSON(true);
+            form.setAJAXSubmit(true,
             {
-               fn: this.onSuccess,
-               scope: this
-            }
-         });
-         
-         // Form field validation
-         form.addValidation(this.id + "-input-firstName", Alfresco.forms.validation.mandatory, null, "keyup");
-         form.addValidation(this.id + "-input-lastName", Alfresco.forms.validation.mandatory, null, "keyup");
-         
-         // Initialise the form
-         form.init();
+               successCallback:
+               {
+                  fn: this.onSuccess,
+                  scope: this
+               }
+            });
+            
+            // Form field validation
+            form.addValidation(this.id + "-input-firstName", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(this.id + "-input-lastName", Alfresco.forms.validation.mandatory, null, "keyup");
+            
+            // Initialise the form
+            form.init();
+         }
          
          // Finally show the main component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-readview", "display", "block");
