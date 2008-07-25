@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>site-finder</region-id>
+   <source-id>site-finder</source-id>
+   <url>/components/site-finder</url>
+</component>

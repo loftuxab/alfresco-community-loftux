@@ -17,8 +17,7 @@
    <div class="personal-menu">
       <span class="menu-item"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>
       <span class="menu-item"><a href="${url.context}/page/user-profile">${msg("link.myProfile")}</a></span>
-      <span class="menu-item"><a href="#">${msg("link.sites")}</a></span>
-      <span class="menu-item"><a href="#">${msg("link.users")}</a></span>
+      <span class="menu-item"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
    </div>
    
    <div class="util-menu" id="${args.htmlid}-searchcontainer">
