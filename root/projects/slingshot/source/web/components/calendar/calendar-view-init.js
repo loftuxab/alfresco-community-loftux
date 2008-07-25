@@ -483,6 +483,7 @@
 
 		onEventClick: function(e, obj)
 		{
+		   // TODO: look at caching this
 			var panel = new Alfresco.EventInfo(this.id + "-eventInfo");
 			panel.setSiteId(this.siteId);
 			panel.show(obj); // event object

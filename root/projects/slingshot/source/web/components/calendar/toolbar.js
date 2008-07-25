@@ -102,12 +102,10 @@
 	 	 */	   
 	   onButtonClick: function(e)
 	   {
-	      if (!this.eventDialog)
-			{
-				this.eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-			}
-			this.eventDialog.setSiteId(this.siteId);
-			this.eventDialog.show();
+	      // TODO: look at caching this
+			var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
+			eventDialog.setSiteId(this.siteId);
+			eventDialog.show();
 	   }
 	  
    };

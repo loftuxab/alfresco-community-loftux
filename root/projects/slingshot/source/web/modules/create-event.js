@@ -131,7 +131,6 @@
 		 */
        templateLoaded: function(response)
        {
-
           // Inject the template from the XHR request into a new DIV element
           var containerDiv = document.createElement("div");
           containerDiv.innerHTML = response.serverResponse.responseText;
@@ -324,7 +323,7 @@
 		
 		onEventUpdated: function(e)
 		{
-			this.panel.hide();
+			this.panel.destroy();
 			// Fire off "eventUpdated" event
 			YAHOO.Bubbling.fire('eventUpdated');
 		},
@@ -397,7 +396,7 @@
 		 */
 		onCancelButtonClick: function(e, obj)
 		{
-		     this.panel.hide();
+		     this.panel.destroy();
 		},
 
 		/**
@@ -410,7 +409,7 @@
 		 */
 	  	onCreateEventSuccess: function(e)
 	  	{
-			this.panel.hide();
+			this.panel.destroy();
 
 			var result = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
 			if (result.event)
