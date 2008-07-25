@@ -30,14 +30,14 @@
  * @class Alfresco.InvitationList
  */
 (function()
-{
+{  
    /**
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
-   
+    
    /**
     * InvitationList constructor.
     * 
@@ -57,7 +57,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
-      //YAHOO.Bubbling.on("onAddInvite", this.onAddInvite, this);
+      YAHOO.Bubbling.on("onAddInvite", this.onAddInvite, this);
    
       return this;
    }
@@ -88,34 +88,13 @@
        * @type object
        */
       widgets: {},
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: {},
-
-      /**
-       * InvitationList term used for the InvitationList.
-       */
-      InvitationListTerm: "",
-
-      /**
-       * Whether the InvitationList was over all sites or just the current one
-       */
-      InvitationListAll: true,
       
-      /**
-       * Number of InvitationList results.
-       */
-      resultsCount: 0,
+      listWidgets: [],
       
-      /**
-       * True if there are more results than the ones listed in the table.
+      /** Auto-incremented unique id for each element added to the
+       * tabel.
        */
-      hasMoreResults: false,
+      uniqueRecordId : 1,
       
       /**
        * Set multiple initialization options at once.
@@ -151,7 +130,7 @@
        */
       onComponentsLoaded: function InvitationList_onComponentsLoaded()
       {
-         //Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -161,41 +140,39 @@
        * @method onReady
        */
       onReady: function InvitationList_onReady()
-      {  
-         // Temporary InvitationList button
-         this.widgets.InvitationListButton = Alfresco.util.createYUIButton(this, "InvitationList-button", this.InvitationListButtonClick);
-
-         // DataSource definition
-         var uriInvitationListResults = Alfresco.constants.PROXY_URI + "slingshot/InvitationList?";
-         this.widgets.dataSource = new YAHOO.util.DataSource(uriInvitationListResults);
-         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
-         this.widgets.dataSource.responseSchema =
+      {
+         // button to invite all people in the list 
+         this.widgets.inviteButton = Alfresco.util.createYUIButton(this, "invite-button", this.inviteButtonClick);
+         
+         // File Select menu button
+         this.widgets.allRolesSelect = Alfresco.util.createYUIButton(this, "selectallroles-button", this.onSelectAllRoles,
          {
-             resultsList: "items",
-             fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "downloadUrl", "browseUrl", "site", "container", "tags"]
+            type: "menu", 
+            menu: "selectallroles-menu"
+         });
+         
+         // setup the datasource
+         // fields of data are available in the RecordSet 
+         this.widgets.dataSource = new YAHOO.util.DataSource( [ { id: this.uniqueRecordId++, firstName: "Michael", lastName : "Ruflin", email : "mruflin@optaros.com"} ] ); 
+         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
+         this.widgets.dataSource.responseSchema = { 
+            fields: ['id', 'firstName', 'lastName', 'email']
          };
          
-         // setup of the datatable.
+         // setup of the datatable
          this._setupDataTable();
-         
-         // trigger the initial InvitationList
-         YAHOO.Bubbling.fire("onInvitationList",
-         {
-            InvitationListTerm: this.options.initialInvitationListTerm,
-            InvitationListAll: (this.options.initialInvitationListAll == 'true')
-         });
 
          // Hook action events
-         Alfresco.util.registerDefaultActionHandler(this.id, "InvitationList-tag", "span", this);
-         Alfresco.util.registerDefaultActionHandler(this.id, "InvitationList-scope-toggle", "a", this);
+         //Alfresco.util.registerDefaultActionHandler(this.id, "InvitationList-tag", "span", this);
+         //Alfresco.util.registerDefaultActionHandler(this.id, "InvitationList-scope-toggle", "a", this);
 
-         // tell the header that the InvitationList component exists on this page and thus no
-         // refresh is required
-         YAHOO.Bubbling.fire("InvitationListComponentExists", {});
+         this._enableDisableInviteButton();
+
+         // Hook action events
+         Alfresco.util.registerDefaultActionHandler(this.id, "remove-item-button", "span", this);
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
-         Dom.setStyle(this.id + "-body", "visibility", "visible");
+         //Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
       
       _setupDataTable: function InvitationList_setupDataTable()
@@ -207,28 +184,6 @@
           * These MUST be inline in order to have access to the Alfresco.InvitationList class (via the "me" variable).
           */
          var me = this;
-          
-         /**
-          * Thumbnail custom datacell formatter
-          *
-          * @method renderCellThumbnail
-          * @param elCell {object}
-          * @param oRecord {object}
-          * @param oColumn {object}
-          * @param oData {object|string}
-          */
-         renderCellThumbnail = function InvitationList_renderCellThumbnail(elCell, oRecord, oColumn, oData)
-         {
-            var name = oRecord.getData("name");
-            var extn = name.substring(name.lastIndexOf("."));
-
-            oColumn.width = 40;
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-              
-            // Render the cell
-            // TODO: this should use the correct icon
-            elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
-         };
 
          /**
           * Description/detail custom datacell formatter
@@ -242,106 +197,98 @@
          renderCellDescription = function InvitationList_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // we currently render all results the same way
-            var site = oRecord.getData("site");
-            var url = "";
-            if (oRecord.getData("downloadUrl") != undefined)
-            {
-               // Download urls always go to the repository, use the proxy context therefore
-               url = Alfresco.constants.PROXY_URI + oRecord.getData("downloadUrl");
-            }
-            else if (oRecord.getData("browseUrl") != undefined)
-            {
-               // browse urls always go to a page. We assume that the url contains the page name and all
-               // parameters. What we have to add is the absolute path and the site param
-               // PENDING: could we somehow make use of Alfresco.constants.URI_TEMPLATES and pass
-               //          the pageid and param list separately?
-               url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + oRecord.getData("browseUrl");
-           }
+            var name = oRecord.getData("firstName") + oRecord.getData("lastName")
+            var email = oRecord.getData("email");
             var desc = "";
-            // title/link to view page
-            desc = '<h3 class="itemname"><a href="' + url + '">' + oRecord.getData("displayName") + '</a></h3>';
-            // link to the site
+            desc = '<h3 class="itemname">' + name + '</a></h3>';
             desc += '<div class="detail">';
-            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + '/dashboard">' + site.title + '</a>';
-            desc += '</div>';
-            desc += '<div class="details">';
-            desc += '   Tags: ';
-            var tags = oRecord.getData("tags");
-            for (var x=0; x < tags.length; x++)
-            {
-                desc += '<span id="' + me.id + '-InvitationListByTag-' + tags[x] + '"><a class="InvitationList-tag">' + tags[x] + '</a> </span>';
-            }
+            desc += email;
             desc += '</div>';
             elCell.innerHTML = desc;
+         };
+
+         renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
+         {
+            var id = oRecord.getData('id');
+            var desc =
+               '<div id="' + me.id + '-roleselector-' + id + '"></div>' +
+               '<span class="removeInvitee" id="'+me.id+'-removeInvitee">' +
+               '  <a href="#" class="remove-item-button">remove</a>' +
+               '</span>';
+            elCell.innerHTML = desc;
+            
+            // define the role dropdown menu and the event listeners
+            var rolesMenu = [
+               {
+                  text: "Site Consumer", value: "consumer", onclick: {
+                     fn: me.onRoleSelect, obj: { record: oRecord, role: "consumer" }, scope: me
+                  },
+               },
+               {
+                  text: "Site Collaborator", value: "collaborator", onclick: {
+                     fn: me.onRoleSelect, obj: { record: oRecord, role: "collaborator" }, scope: me
+                  },
+               },
+               {
+                  text: "Site Manager", value: "manager", onclick: {
+                     fn: me.onRoleSelect, obj: { record: oRecord, role: "manager" }, scope: me
+                  },
+               }
+            ];
+
+            // create button
+            var button = new YAHOO.widget.Button(
+               {
+                   type: "menu",
+                   label: me.getRoleLabel(oRecord),
+                   name: me.id + "-roleselectorbutton-" + id,
+                   menu: rolesMenu,
+                   container: me.id + '-roleselector-' + id
+               }
+            );
+            me.listWidgets[id] = { button: button };
          };
 
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 40
+            key: "user", label: "User", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 100
          }];
 
-         // show initial message
-         this._setDefaultDataTableErrors();
-         if (this.options.initialInvitationListTerm.length < 1)
-         {
-            YAHOO.widget.DataTable.MSG_EMPTY = "No InvitationList performed yet";
-         }
-
          // DataTable definition
-         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
+         YAHOO.widget.DataTable.MSG_EMPTY = "First add users to this list";  //msg("message.empty", "Alfresco.InvitationList");
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-inviteelist", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
-            initialLoad: false
+            scrollable:true,
+            renderLoopSize: 32
+            //initialLoad: false
          });
-         
-         // Override abstract function within DataTable to set custom error message
-         this.widgets.dataTable.doBeforeLoadData = function InvitationList_doBeforeLoadData(sRequest, oResponse, oPayload)
-         {
-            if (oResponse.error)
-            {
-               try
-               {
-                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
-               }
-               catch(e)
-               {
-                  me._setDefaultDataTableErrors();
-               }
-            }
-            else if (oResponse.results)
-            {
-               // update the results count, update hasMoreResults.
-               me.hasMoreResults = (oResponse.results.length > me.options.maxResults);
-               if (me.hasMoreResults)
-               {
-                  oResponse.results = oResponse.results.slice(0, me.options.maxResults);
-               }
-               me.resultsCount = oResponse.results.length;
-               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
-            }
-            // Must return true to have the "Loading..." message replaced by the error message
-            return true;
-         }
       },
 
 
-      /**
-       * DEFAULT ACTION EVENT HANDLERS
-       * Handlers for standard events fired from YUI widgets, e.g. "click"
-       */
-
-      InvitationListByTag: function InvitationList_InvitationListTag(param)
+      getRoleLabel: function(record)
       {
-         // send a InvitationList bubble event to load the list
-         YAHOO.Bubbling.fire("onInvitationList",
+         var roleName = "";
+         if (record.getData("role") != undefined)
          {
-            InvitationListTerm : param
-         });
+            roleName = record.getData("role");
+         }
+         switch(roleName)
+         {
+            case "":
+               return "Select Role...";
+            case "consumer":
+               return "Site Consumer";
+            case "collaborator":
+               return "Site Collaborator";
+            case "manager":
+               return "Site Manager";
+            default:
+               return "<unknown role>";
+         }
       },
       
       /**
@@ -356,38 +303,173 @@
             InvitationListAll : InvitationListAll
          });
       },
-
+      
       /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
-       * Disconnected event handlers for inter-component event notification
-       */
-
-      /**
-       * Path Changed event handler
-       *
-       * @method onInvitationList
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onInvitationList: function InvitationList_onInvitationList(layer, args)
+       * BubbleEvent:
+       * Called by the other components to add invitees to the list of invites
+       */ 
+      onAddInvite: function Invitationlist_onAddInvite(layer, args)
       {
-         var obj = args[1];
-         if (obj !== null)
-         {
-            var InvitationListTerm = this.InvitationListTerm;
-            if (obj["InvitationListTerm"] !== undefined)
-            {
-               InvitationListTerm = obj["InvitationListTerm"];
-            }
-            var InvitationListAll= this.InvitationListAll;
-            if (obj["InvitationListAll"] !== undefined)
-            {
-               InvitationListAll = obj["InvitationListAll"];
-            }
-            this._performInvitationList(InvitationListTerm, InvitationListAll);
-         }
+         // PENDING: copy the data, and don't directly insert it!
+         var data = args[1];
+         data.id = this.uniqueRecordId++;
+         this.widgets.dataTable.addRow(data);
+         this._enableDisableInviteButton();
       },
+      
+      /**
+       * DefaultActionListener:
+       * Called when the user clicks on the "remove invitee" button
+       */
+      removeInvitee: function InvitationList_removeInvitee(owner, param)
+      {
+         // find the correct row
+         var recordId = this.widgets.dataTable.getRecordIndex(owner);
+         this.widgets.dataTable.deleteRow(recordId);
+         this._enableDisableInviteButton();
+      },
+      
+      /**
+       * Select all roles dropdown
+       */
+      onSelectAllRoles: function DL_onFileSelect(sType, aArgs, p_obj)
+      {
+         var value = aArgs[1].value;
+         if (value == "")
+         {
+            return;
+         }
+         
+         this._setAllRolesImpl(value);
+         this._enableDisableInviteButton();
+         var eventTarget = aArgs[1];
+         Event.preventDefault(domEvent);
+      },
+      
+      /**
+       * Called when the user select a role in the role dropdown
+       * @parma p_obj: object containing record and role to set
+       */
+      onRoleSelect: function InvitationList_onRoleSelect(sType, aArgs, p_obj)
+      {
+         // set the role for the passed record
+         var x = 10; // PENDING: why does the first access to p_obj fail?!?
+         var role = p_obj.role;
+         var record = p_obj.record;
+         this._setRoleForRecord(record, role);
+         
+         // update the invite button
+         this._enableDisableInviteButton();
+         
+         var eventTarget = aArgs[1];
+         Event.preventDefault(domEvent);
+      },
+      
+      _setAllRolesImpl: function(roleName)
+      {
+         var recordSet = this.widgets.dataTable.getRecordSet();
+         for (var x=0; x < recordSet.getLength(); x++)
+         {
+            var record = recordSet.getRecord(x);
+            this._setRoleForRecord(record, roleName);
+         }
+         
+         // update the invite button
+         this._enableDisableInviteButton();
+      },
+      
+      /**
+       * Sets the role for a given record
+       */
+      _setRoleForRecord: function(record, role)
+      {
+         // set the new role
+         record.setData('role', role);
+          
+         // update the button
+         this.listWidgets[record.getData('id')].button.set('label', this.getRoleLabel(record));   
+      },
+      
+      /**
+       * Returns whether all invitees have their role set correctly
+       */
+      _checkAllRolesSet: function InvitationList__checkRolesSet()
+      {
+         var recordSet = this.widgets.dataTable.getRecordSet();
+         for (var x=0; x < recordSet.getLength(); x++)
+         {
+            var record = recordSet.getRecord(x);
+            if (record.getData("role") == undefined)
+            {
+               return false;
+            }
+         }
+         return true;
+      },
+      
+      _enableDisableInviteButton: function InvitationList__enableDisableInviteButton()
+      {
+         var enable = this.widgets.dataTable.getRecordSet().getLength() > 0 &&
+                      this._checkAllRolesSet();
+         this.widgets.inviteButton.set("disabled", ! enable);
+      },
+      
+      /**
+       * Initiates the invite process
+       */
+      inviteButtonClick: function InvitationList_inviteButtonClick(e, p_obj)
+      {
+         // sanity check - the invite button shouldn't be clickable in this case
+         var recordSet = this.widgets.dataTable.getRecordSet();
+         if (recordSet.getLength() < 0 || ! this._checkAllRolesSet())
+         {
+            this._enableDisableInviteButton();
+            return;
+         }
+         
+         // We have to do a backend call for each invited person
+         var config =
+         {
+            method: "GET",
+            url: Alfresco.constants.PROXY_URI + "api/invite/start",
+            dataObj:
+            {
+               inviteeFirstName: "",
+               inviteeLastName: "",
+               inviteeEmail: "",
+               siteShortName : this.options.siteId
+            },
+            successCallback: null,
+            successMessage: null,
+            failureCallback: null,
+            failureMessage: null,
+            object: null
+         };
 
+         // Invite each person
+         var succeeded = [];
+         var failed = [];
+         for (var i = 0; i < recordSet.getLength(); i++)
+         {
+            var record = recordSet.getRecord(i);
+            config.dataObj.inviteeFirstName = record.getData('firstName');
+            config.dataObj.inviteeLastName = record.getData('lastName');
+            config.dataObj.inviteeEmail = record.getData('email');
+            try
+            {
+               Alfresco.util.Ajax.request(config);
+            }
+            catch (e)
+            {
+            }
+         }
+         
+         // PENDING: only remove the ones that succeeded
+         this.widgets.dataTable.deleteRows(0, recordSet.getLength());
+         
+         // inform the user
+         Alfresco.util.PopupManager.displayMessage({text: "Invites sent out"});
+      },
       
       /**
        * Resets the YUI DataTable errors to our custom messages
@@ -401,135 +483,7 @@
          YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.InvitationList");
          YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.InvitationList");
       },
-      
-      /**
-       * Updates document list by calling data webscript with current site and path
-       *
-       * @method _updateDocList
-       * @param path {string} Path to navigate to
-       */
-      _performInvitationList: function InvitationList__performInvitationList(InvitationListTerm, InvitationListAll)
-      {
-         // Reset the custom error messages
-         this._setDefaultDataTableErrors();
-         
-         // Display loading message
-         YAHOO.widget.DataTable.MSG_EMPTY = "InvitationListing term '" + InvitationListTerm + "'"; // this._msg("message.loading");
-         //this.widgets.dataTable.render();
-         
-         // empty results table
-         this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
-         
-         function successHandler(sRequest, oResponse, oPayload)
-         {
-            this.InvitationListTerm = InvitationListTerm;
-            this.InvitationListAll = InvitationListAll;
-            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-            // update the result info
-            this._updateResultsInfo();
-            this._updateInvitationListAllLinks();
-         }
-         
-         function failureHandler(sRequest, oResponse)
-         {
-            if (oResponse.status == 401)
-            {
-               // Our session has likely timed-out, so refresh to offer the login page
-               window.location.reload();
-            }
-            else
-            {
-               try
-               {
-                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
-                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
-               }
-               catch(e)
-               {
-                  this._setDefaultDataTableErrors();
-               }
-            }
-         }
-         
-         this.widgets.dataSource.sendRequest(this._buildInvitationListParams(InvitationListAll, InvitationListTerm),
-         {
-               success: successHandler,
-               failure: failureHandler,
-               scope: this
-         });
-      },
-      
-      _updateResultsInfo: function InvitationList__updateInvitationListResultsInfo()
-      {
-         // update the InvitationList results field
-         var InvitationListFor = '<b>' + this.InvitationListTerm + '</b>';
-         var InvitationListIn = (this.InvitationListAll ? this._msg("InvitationList.info.inallsites") : this._msg("InvitationList.info.insite", '<b>' + this.options.siteId + '</b>'));
-         var resultsCount = '<b>' + this.resultsCount + '</b>';
-         if (this.hasMoreResults)
-         {
-            resultsCount = this._msg("InvitationList.info.morethan", resultsCount);
-         }
-         var html = this._msg("InvitationList.info.resultinfo", InvitationListFor, InvitationListIn, resultsCount);
-         if (this.hasMoreResults)
-         {
-            html += " " + this._msg("InvitationList.info.onlyshowing", this.resultsCount);
-         }
-         
-         var elems = YAHOO.util.Dom.getElementsByClassName("InvitationList-result-info");
-         for (x in elems)
-         {
-            elems[x].innerHTML = html;
-         }
-      },
-      
-      _updateInvitationListAllLinks: function InvitationList__updateInvitationListAllLinks()
-      {
-         // only proceed if there's a site to switch to
-         if (this.options.siteId == "")
-         {
-            return;
-         }
-         
-         // update the InvitationList results field
-         var text = "";
-         if (this.InvitationListAll)
-         {
-            text = this._msg("InvitationList.InvitationListsiteonly", this.options.siteId);
-         }
-         else
-         {
-            text = this._msg("InvitationList.InvitationListall");
-         }
-         
-         var elems = YAHOO.util.Dom.getElementsByClassName("InvitationList-scope-toggle");
-         for (x in elems)
-         {
-            elems[x].innerHTML = text;
-         }
-      },
 
-      /**
-       * Build URI parameter string for doclist JSON data webscript
-       *
-       * @method _buildDocListParams
-       * @param path {string} Path to query
-       */
-      _buildInvitationListParams: function InvitationList__buildInvitationListParams(InvitationListAll, InvitationListTerm)
-      {
-         var site = InvitationListAll ? "" : this.options.siteId;
-         var container = InvitationListAll ? "" : this.options.containerId;
-         var params = YAHOO.lang.substitute("site={site}&container={container}&term={term}&maxResults={maxResults}",
-         {
-            site: encodeURIComponent(site),
-            container: encodeURIComponent(container),
-            term : encodeURIComponent(InvitationListTerm),
-            maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
-         });
-
-         return params;
-      },
-      
       /**
        * Gets a custom message
        *
@@ -548,21 +502,20 @@
 
 
 /**
- * Register a default action handler for a set of elements described by a common class name.
- * The common enclosing tag should hold an id of the form ${htmlid}-methodToCall-param.
- * 
- * @param htmlId the id of the component
- * @param className the classname that is common to all to be handled elements
- * @param ownerTagName the enclosing element's tag name. This element needs to have
- *        an id of type {htmlid}-methodToCall[-param], the param is optional.
- * @param handlerObject the object that handles the actions. Upon action, the methodToCall of this
- *        object is called, passing in the param as specified in the ownerTagName's id.
+ * Register a default action handler for a given set
+ * of elements described by their class name.
+ * @parma handlerObject object that is used as for the method calls
+ * @param className The elements to which the action should be added to
+ * @param ownerTagName the owner tag name to search for. This has to be a
+ *        parent element of the default action element. The id of this element is used
+ *        to call the correct method. Id's should follow the form htmlid-actionname[-param]
+ *        Actions methods should have the form f(htmlid, ownerId, param)
  */
 Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
 {         
    // Hook the tag events
    YAHOO.Bubbling.addDefaultAction(className,
-      function genericDefaultAction(layer, args)
+      function TagLibrary_genericDefaultAction(layer, args)
       {
          var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
          if (owner !== null)
@@ -586,7 +539,7 @@ Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTa
             {
                // extract the param part of the id
                var param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
-               handlerObject[action].call(handlerObject, param);
+               handlerObject[action].call(handlerObject, owner, param);
                args[1].stop = true;
             }
          }

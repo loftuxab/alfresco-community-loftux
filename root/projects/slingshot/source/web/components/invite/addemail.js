@@ -156,7 +156,7 @@
             emailElem.value = "";
             
             // PENDING: debug
-            Alfresco.util.PopupManager.displayMessage({text: "User added to invitee: f=" +firstName + ", l=" + lastName + ", e=" + email});
+//            Alfresco.util.PopupManager.displayMessage({text: "User added to invitee: f=" +firstName + ", l=" + lastName + ", e=" + email});
          }
       },
             
