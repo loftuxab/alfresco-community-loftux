@@ -4,7 +4,7 @@
 (function()
 {
 	Alfresco.WikiToolbar = function(containerId)
-   {encodeURIComponentComponent
+   {
 	   this.name = "Alfresco.WikiToolbar";
       this.id = containerId;
 
