@@ -40,7 +40,7 @@ for(var i = 0; i < usedPages.length; i++)
 for (i = 0; i < availablePages.size(); i++)
 {
    // Get page id from config file
-   var pageId = availablePages.get(i).value;
+   var pageId = availablePages.get(i).attributes["id"];
    var used = false;
    for (var j = 0; j < usedPages.length; j++)
    {

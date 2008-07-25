@@ -193,11 +193,11 @@
 
    <config evaluator="string-compare" condition="SitePages" replace="true">
       <pages>
-         <page>calendar</page>
-         <page>wiki</page>
-         <page>documentlibrary</page>
-         <page>discussions-topiclist</page>
-         <page>blog-postlist</page>
+         <page id="calendar">calendar</page>
+         <page id="wiki-page">wiki-page?title=Main_Page</page>
+         <page id="documentlibrary">documentlibrary</page>
+         <page id="discussions-topiclist">discussions-topiclist</page>
+         <page id="blog-postlist">blog-postlist</page>
       </pages>
    </config>
 

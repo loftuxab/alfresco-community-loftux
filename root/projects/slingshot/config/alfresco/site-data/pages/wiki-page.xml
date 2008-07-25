@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <title>Wiki Page</title>
+   <title>Wiki</title>
    <description>Displays a wiki page</description>
    <template-instance>wiki-page</template-instance>
    <authentication>user</authentication>
