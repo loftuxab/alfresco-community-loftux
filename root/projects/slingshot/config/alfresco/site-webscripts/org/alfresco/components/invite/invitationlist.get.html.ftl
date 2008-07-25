@@ -11,15 +11,17 @@
 
    <div id="${args.htmlid}-invitationBar" class="yui-g invitelist-bar">
       Search role, then click invite
-      <select>
-        <option>Site Consumer</option>
-        <option>Site Collaboratior</option>
-        <option>Site Manager</option>
+      
+      <input type="button" id="${args.htmlid}-selectallroles-button" value="Select all roles to...">
+      <select id="${args.htmlid}-selectallroles-menu""> 
+<!--         <option value="">Select all roles to...</option>  --> 
+         <option value="consumer">Site Consumer</option> 
+         <option value="collaborator">Site Coordinator</option> 
+         <option value="manager">Site Manager</option>                 
       </select>
    </div>
 
    <div id="${args.htmlid}-inviteelist" class="inviteelist">
-   List of added users
    </div>
-   <input type="button" value="Invite" />
+   <input type="button" value="Invite" id="${args.htmlid}-invite-button" />
 </div>
