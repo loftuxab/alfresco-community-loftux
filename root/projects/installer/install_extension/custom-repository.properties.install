@@ -41,10 +41,10 @@ db.password=@@DB_USERPWD@@
 # MySQL connection (This is default and requires mysql-connector-java-5.0.3-bin.jar, which ships with the Alfresco server)
 #
 #mysql#db.driver=org.gjt.mm.mysql.Driver
-#mysql#db.url=jdbc:mysql://@@DBHOST@@:@@DBPORT@@/@@ALF_DBNAME@@
+#mysql#db.url=jdbc:mysql://@@DB_HOST@@:@@DB_PORT@@/@@DB_NAME@@
 
 #
 # PostgreSQL connection (requires postgresql-8.2-504.jdbc3.jar or equivalent)
 #
 #postgresql#db.driver=org.postgresql.Driver
-#postgresql#db.url=jdbc:postgresql://@@DBHOST@@:@@DBPORT@@/@@ALF_DBNAME@@
+#postgresql#db.url=jdbc:postgresql://@@DB_HOST@@:@@DB_PORT@@/@@DB_NAME@@
