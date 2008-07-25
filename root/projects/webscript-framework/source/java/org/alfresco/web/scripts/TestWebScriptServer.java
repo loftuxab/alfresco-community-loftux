@@ -37,6 +37,9 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigService;
+import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.alfresco.web.scripts.servlet.WebScriptServletRuntime;
@@ -61,6 +64,7 @@ public class TestWebScriptServer implements ApplicationContextAware
     protected ApplicationContext applicationContext;
     
     // dependencies
+    protected ConfigService configService;
     protected RuntimeContainer container;
     protected ServletAuthenticatorFactory authenticatorFactory;
     
@@ -82,6 +86,14 @@ public class TestWebScriptServer implements ApplicationContextAware
     /** I18N Messages */
     protected MessageSource m_messages;    
     
+    
+    /**
+     * @param configService
+     */
+    public void setConfigService(ConfigService configService)
+    {
+        this.configService = configService;
+    }
     
     /**
      * Sets the Web Script Runtime Context
@@ -124,6 +136,22 @@ public class TestWebScriptServer implements ApplicationContextAware
     {
         this.applicationContext = applicationContext;
     }
+
+    /**
+     * Gets the server properties
+     * 
+     * @return  server properties
+     * @throws Exception
+     */
+	public ServerProperties getServerProperties()
+	{
+		if (serverProperties == null)
+		{
+			Config config = configService.getConfig("Server");
+			serverProperties = (ServerConfigElement)config.getConfigElement(ServerConfigElement.CONFIG_ELEMENT_ID);
+		}
+		return serverProperties;
+	}
     
     /**
      * Gets the application context
@@ -191,7 +219,7 @@ public class TestWebScriptServer implements ApplicationContextAware
     {
         MockHttpServletRequest req = createRequest(method, uri);
         MockHttpServletResponse res = new MockHttpServletResponse();
-        AbstractRuntime runtime = new WebScriptServletRuntime(container, null, req, res, serverProperties);
+        AbstractRuntime runtime = new WebScriptServletRuntime(container, null, req, res, getServerProperties());
         runtime.executeScript();
         return res;
     }
@@ -252,7 +280,7 @@ public class TestWebScriptServer implements ApplicationContextAware
         }
         
         MockHttpServletResponse res = new MockHttpServletResponse();
-        AbstractRuntime runtime = new WebScriptServletRuntime(container, authenticatorFactory, req, res, serverProperties);
+        AbstractRuntime runtime = new WebScriptServletRuntime(container, authenticatorFactory, req, res, getServerProperties());
         runtime.executeScript();
         return res;
     }    
@@ -523,4 +551,5 @@ public class TestWebScriptServer implements ApplicationContextAware
         
         return req;
     }
+
 }
