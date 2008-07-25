@@ -211,10 +211,11 @@
          {
             var id = oRecord.getData('id');
             var desc =
-               '<div id="' + me.id + '-roleselector-' + id + '"></div>' +
-               '<span class="removeInvitee" id="'+me.id+'-removeInvitee">' +
-               '  <a href="#" class="remove-item-button">remove</a>' +
-               '</span>';
+               '<span  class="roleselect" id="' + me.id + '-roleselector-' + id + '"></span>' +
+               '<span id="'+me.id+'-removeInvitee">' +
+               '  <a href="#" class="remove-item-button"><span class="removeIcon">&nbsp;</span></a>' +
+               '</span>' +
+              '';// '<span class="remove-item-button" id="'+me.id+'-removeInvitee"><span class="removeIcon">&nbsp;</span></span>';
             elCell.innerHTML = desc;
             
             // define the role dropdown menu and the event listeners
@@ -255,7 +256,7 @@
             key: "user", label: "User", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 100
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 150
          }];
 
          // DataTable definition
