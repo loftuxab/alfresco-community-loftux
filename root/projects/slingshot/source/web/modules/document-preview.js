@@ -206,6 +206,7 @@
        */
       onTemplateLoaded: function DP_onTemplateLoaded(response)
       {
+
          var Dom = YAHOO.util.Dom;
 
          // Inject the template from the XHR request into a new DIV element
@@ -213,7 +214,7 @@
          containerDiv.innerHTML = response.serverResponse.responseText;         
 
          //var panelWidth = document.width > 1000 ? 1000 : document.width - 20;
-         var panelHeight = document.height - 40;
+         var panelHeight = Dom.getViewportHeight() - 40;
 
          // Create the panel from the HTML returned in the server reponse
          var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
@@ -225,6 +226,7 @@
             visible: false,
             height: panelHeight + "px"
          });
+
 
          /**
           * Render the server reponse so the contents get inserted in the Dom.
@@ -248,27 +250,20 @@
 
          // Maximize the height of the swf div
          var swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
-         Dom.setStyle(swfPlayerDiv, "height", panelHeight - 80 + "px"); 
+         Dom.setStyle(swfPlayerDiv, "height", panelHeight - 80 + "px");
 
          // Create and save a reference to the swfPlayer so we can call it later
          this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#5C5C5C"});
-         this.swfPlayer.subscribe("contentReady", this.onContentReady, this, true);
          this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
          this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
          this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
-      },
 
-      /**
-       * Fired by the YUIAdapter when the swfplayer.swf has loaded.
-       *
-       * @method onContentReady
-       * @param event {object} an YUIAdapater "onContentReady" event
-       */
-      onContentReady: function onContentReady(event)
-      {
-         // Show the preview panel
+         // The contentReady event can't be used since it crashes FF2 on Mac
+         //this.swfPlayer.subscribe("contentReady", this.onContentReady, this, true);
+
+         // Show panel and handle if flash is loaded later
          this._showPanel();
-      },
+      },      
 
       /**
        * Fired by the SWFPlayer when the swf for the nodeRef failed to load.
@@ -278,9 +273,16 @@
        */
       onLoadedSwfError: function onLoadedSwfError(event)
       {
-         alert("Error");
          this.widgets.previousButton.set("disabled", true);
          this.widgets.nextButton.set("disabled", true);
+         this.panel.hide();
+
+         var message = "Error";
+         if(event.code)
+         {
+            message = Alfresco.util.message(event.code, this.name);
+         }
+         Alfresco.util.PopupManager.displayMessage({text: message});
       },
 
       /**
@@ -291,7 +293,7 @@
        */
       onLoadedSwfReady: function onLoadedSwfReady(event)
       {
-         this._handleSuccessFulLoadedSwfEvent(event);
+         this._handleSuccessFullLoadedSwfEvent(event);
       },
 
       /**
@@ -302,16 +304,16 @@
        */
       onLoadedSwfOnFrame: function DP_onLoadedSwfOnFrame(event)
       {
-         this._handleSuccessFulLoadedSwfEvent(event);
+         this._handleSuccessFullLoadedSwfEvent(event);
       },
 
       /**
        * Updates the gui to match that state of the loaded swf.
        *
-       * @method _handleSuccessFulLoadedSwfEvent
+       * @method _handleSuccessFullLoadedSwfEvent
        * @param event {object} an SWFPlayer "swfLoadedEnterFrame" or "swfLoadedReady" event
        */
-      _handleSuccessFulLoadedSwfEvent: function DP__handleSuccessFulLoadedSwfEvent(event)
+      _handleSuccessFullLoadedSwfEvent: function DP__handleSuccessFullLoadedSwfEvent(event)
       {
          // Update our local model of the loaded swf
          this.loadedSwf = {
@@ -387,33 +389,50 @@
        */
       _applyConfig: function DP__applyConfig()
       {
-         var Dom = YAHOO.util.Dom;
-
-         // Set the panel title
+         // Set the panel title and image
          this.widgets.titleText["innerHTML"] = this.showConfig.fileName;
          this.widgets.titleImg.src = this.showConfig.icon32;
 
+         // Display the current frame status
          var message = Alfresco.util.message("label.currentFrame", this.name);
          message = YAHOO.lang.substitute(message, {"0": "0", "1": "0"});
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
-         var nodeRef = this.showConfig.nodeRef;
-         var space = nodeRef.substring(0, nodeRef.indexOf(":"));
-         var store = nodeRef.substring(nodeRef.indexOf("://") + 3, nodeRef.lastIndexOf("/"));
-         var ref = nodeRef.substring(nodeRef.lastIndexOf("/") + 1);
-         var url = Alfresco.constants.PROXY_URI + "api/node/" + space + "/" + store + "/" + ref + "/content/thumbnails/webpreview"
-         url += "?fc=true&alf_ticket=" + Alfresco.constants.ALF_TICKET;
-         /*
-         var forceCreateUrl = Alfresco.constants.PROXY_URI + "api/node/" + space + "/" + store + "/" + ref + "/content/thumbnails"
-         forceCreateUrl += "?as=false&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
-         var forceCreate = {
-            url: forceCreateUrl,
-            method: "POST",
-            contentType: "application/json",
-            data: '{"thumbnailName":"webpreview"}'
-         };
-         */
-         this.swfPlayer.load(url);
+         // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
+         var nodeRef = this.showConfig.nodeRef.replace(":/", "");
+         var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRef + "/content/thumbnails/webpreview"
+         url += "?fc=true&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
+
+         // Call the load function but wait a bit to make safari work
+         YAHOO.lang.later(250, this, this._load, [url, 0], false);
+      },
+
+      /**
+       * Do repeated checks until floash movie is loaded by invoking init(),
+       * after its considered loaded, call method load.
+       *
+       * @method _load
+       * @private
+       */
+      _load: function DP_load(url, attempt)
+      {
+         // Set to true if swfplayer should display debug text inside itself
+         var debug = false;
+         if(this.swfPlayer.init(debug))
+         {
+            // The flash movie has loaded, its ok to call a method on it
+            this.swfPlayer.load(url);
+         }
+         else if(attempt < 7)
+         {
+            // The flash movie wasn't loaded, try againg in 0.5 sec
+            YAHOO.lang.later(500, this, this._load, [url, attempt++], false);
+         }
+         else
+         {
+            // Give up something is probably wrong
+            Alfresco.util.PopupManager.displayMessage({text: "Flash move doesn't seem to load"});
+         }
       },
 
       /**

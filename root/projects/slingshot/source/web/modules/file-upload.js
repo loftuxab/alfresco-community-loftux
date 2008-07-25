@@ -447,8 +447,6 @@
          }
          else
          {
-            /* TODO: Probably place the loading of i18n messages here (or in the constructor) */            
-
             // If it hasn't load the gui (template) from the server
             Alfresco.util.Ajax.request(
             {
@@ -461,7 +459,6 @@
                failureMessage: "Could not load file upload template",
                execScripts: true
             });
-            
          }
       },
 
@@ -533,7 +530,6 @@
 
          // Create and save a reference to the uploader so we can call it later
          this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
-         this.uploader.subscribe("contentReady", this.onContentReady, this, true);
          this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
          this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
          this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
@@ -541,17 +537,11 @@
          this.uploader.subscribe("uploadCancel",this.onUploadCancel, this, true);
          this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
          this.uploader.subscribe("uploadError",this.onUploadError, this, true);
-      },
 
-      /**
-       * Fired by the YUIAdapter when the uploader.swf has loaded.
-       *
-       * @method onContentReady
-       * @param event {object} an YUIAdapter "onContentReady" event
-       */
-      onContentReady: function onContentReady(event)
-      {
-         // Show the uploader panel
+         // The contentReady event can't be used since it crashes FF2 on Mac
+         //this.uploader.subscribe("contentReady", this.onContentReady, this, true);
+
+         // Show panel and handle if flash is loaded later 
          this._showPanel();
       },
 
@@ -764,7 +754,36 @@
 
          // Tell the flash movie to display the OS's file selector dialog
          var multiSelect = this.showConfig.mode === this.MODE_MULTI_UPLOAD;
-         this.uploader.browse(multiSelect, this.showConfig.filter);
+         this._browse(multiSelect, this.showConfig.filter, 0);
+      },
+
+      /**
+       * Do repeated checks if the browse method was successfyully invoked
+       *
+       * @method _browse
+       * @private
+       */
+      _browse: function FU__browse(multiSelect, filter, attempt)
+      {
+         try
+         {
+            // Try and call browse
+            this.uploader.browse(multiSelect, filter);
+         }
+         catch(e)
+         {
+            // The swf movie wasn't loaded, try seven times
+            if(attempt < 7)
+            {
+               // Try again after 0.5 sec
+               YAHOO.lang.later(500, this, this._browse, [multiSelect, filter, attempt++], false);
+            }
+            else
+            {
+               // Give up
+               Alfresco.util.PopupManager.displayMessage({text: "Flash move doesn't seem to load"});
+            }
+         }
       },
 
       /**
@@ -997,11 +1016,10 @@
          // Check if flash player existed or if the no flash message is displayed
          var uploaderDiv = Dom.get(this.id + "-flashuploader-div");
          var p = Dom.getFirstChild(uploaderDiv);
-         if(p && p.tagName.toLowerCase() != "p")
+         if(p && p.tagName.toLowerCase() == "p")
          {
-            // The p tag (with the no flash error message is gone)
-            // Flash is installed, make sure the flash movie isn't visible
-            Dom.setStyle(uploaderDiv, "height", "0px");
+            // Flash isn't installed, make sure the flash no flash error message is displayed
+            Dom.setStyle(uploaderDiv, "height", "30px");
          }
       },
 
