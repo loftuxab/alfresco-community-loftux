@@ -18,6 +18,8 @@
    	   </div>
    	</div>   
    	<div class="yui-b">
+   	   <@region id="filter" scope="template" protected=true />
+   		<@region id="tags" scope="template" protected=true />
    	</div>
  	</div>
 	</div>
