@@ -422,6 +422,8 @@
 					end: result.event.end,
 					uri: result.event.uri
 				});
+				// Refresh the tag component
+				YAHOO.Bubbling.fire('onTagRefresh');
 			}
 	  	}
    };
