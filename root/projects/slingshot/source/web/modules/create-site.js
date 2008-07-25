@@ -193,6 +193,14 @@
          // The ok button is the submit button, and it should be enabled when the form is ready
          createSiteForm.setShowSubmitStateDynamically(true, false);
          createSiteForm.setSubmitElements(this.widgets.okButton);
+         createSiteForm.doBeforeFormSubmit = {
+            fn: function(){
+               this.widgets.okButton.set("disabled", true);
+               this.widgets.cancelButton.set("disabled", true);
+            },
+            obj: null,
+            scope: this
+         }
 
          // Submit as an ajax submit (not leave the page), in json format
          createSiteForm.setAJAXSubmit(true,

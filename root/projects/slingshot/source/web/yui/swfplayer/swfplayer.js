@@ -55,12 +55,28 @@ YAHOO.widget.Uploader.SWFURL = "assets/SWFPlayer.swf";
 YAHOO.extend(YAHOO.widget.SWFPlayer, YAHOO.widget.FlashAdapter,
 {
    /**
+    * Tests if the swfplayer is loaded.
+    */
+   init: function(debug)
+   {
+      try
+      {
+         this._swf.init(debug);
+         return true;
+      }
+      catch(e)
+      {
+         return false;
+      }
+   },
+
+   /**
     * Loads the swf that the SWFPlayer should play/control.
     *
     * @param swfUrl {string} the url to the swf that should be played.
     */
    load: function(swfUrl)
-   {                              
+   {      
       this._swf.load(swfUrl);
    },
 

@@ -12,7 +12,7 @@
          <span id="${args.htmlid}-status-span"></span>
       </p>
       <#-- Increase width and height and remove display:none to see flash debug info -->
-      <div id="${args.htmlid}-flashuploader-div">
+      <div id="${args.htmlid}-flashuploader-div" style="height: 0px;">
          <p>${msg("label.noFlash")}</p>
       </div>
 
