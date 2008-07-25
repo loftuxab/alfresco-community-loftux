@@ -152,6 +152,7 @@
          
          // Buttons
          this.widgets.upload = Alfresco.util.createYUIButton(this, "button-upload", this.onUpload);
+         this.widgets.edit = Alfresco.util.createYUIButton(this, "button-edit", this.onEditProfile);
          this.widgets.save = Alfresco.util.createYUIButton(this, "button-save", null,
             {
                type: "submit"
@@ -184,11 +185,13 @@
       },
       
       /**
-       * Edit Profile link click handler
+       * Edit Profile button click handler
        * 
        * @method onEditProfile
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
        */
-      onEditProfile: function UP_onEditProfile()
+      onEditProfile: function UP_onEditProfile(e, p_obj)
       {
          Dom.setStyle(this.id + "-readview", "display", "none");
          Dom.setStyle(this.id + "-editview", "display", "block");   
@@ -251,8 +254,16 @@
                                "/content/thumbnails/avatar?fc=true";
             }
             
-            // update the hidden input field with the new photo noderef
-            Dom.get(this.id + "-photoref").value = noderef;
+            // call to update the user object - photo changes take effect immediately!
+            var json = {};
+            json[this.id + "-photoref"] = noderef;
+            var config =
+            {
+               method: "POST",
+               url: Dom.get(this.id + "-form").attributes.action.nodeValue,
+               dataObj: json
+            };
+            Alfresco.util.Ajax.jsonRequest(config);
          }
       },
       

@@ -10,10 +10,11 @@
 <div id="${args.htmlid}-body" class="profile">
    <div id="${args.htmlid}-readview" class="hidden">
       <div class="editcolumn">
-         <a href="#" onclick="javascript:userProfile.onEditProfile();">${msg("label.editprofile")}</a>
+         <div class="btn-edit"><button id="${args.htmlid}-button-edit" name="edit">${msg("button.editprofile")}</button></div>
       </div>
       <div class="viewcolumn">
-         <div class="header-bar">${msg("label.info")}</div>
+         <div class="title">${msg("label.myprofile")}</div>
+         <div class="header-bar">${msg("label.about")}</div>
          <div class="photorow">
             <div class="photo">
                <img class="photoimg" src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-photo.png</#if>" alt="" />
@@ -30,7 +31,7 @@
          </div>
          </#if>
          
-         <div class="header-bar">${msg("label.contact")}:</div>
+         <div class="header-bar">${msg("label.contactinfo")}</div>
          <#if user.email?? && user.email?length!=0>
          <div class="row">
             <span class="fieldlabelright">${msg("label.email")}:</span>
@@ -112,7 +113,7 @@
    <div id="${args.htmlid}-editview" class="hidden">
       <form id="${htmlid}-form" name="${htmlid}-form" action="${url.serviceContext}/components/profile/userprofile" method="POST">
       
-      <div class="header-bar">${msg("label.info")}</div>
+      <div class="header-bar">${msg("label.about")}</div>
       <div class="drow">
          <div class="leftcolumn">
             <span class="label">${msg("label.firstname")}:</span>
@@ -148,16 +149,19 @@
          <span class="input"><textarea id="${args.htmlid}-input-bio" name="${args.htmlid}-text-biography" rows="5" cols="60">${user.biography!""}</textarea></span>
       </div>
       
-      <div class="header-bar">${msg("label.photo")}:</div>
-      <div class="row">
+      <div class="header-bar">${msg("label.photo")}</div>
+      <div class="photorow">
          <div class="photo">
             <img class="photoimg" src="${url.context}<#if user.properties.avatar??>/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-photo.png</#if>" alt="" />
-            <input type="hidden" id="${args.htmlid}-photoref" value="" />
          </div>
-         <div class="photobtn"><button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button></div>
+         <div class="photobtn">
+            <button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button>
+            <div class="phototxt">${msg("label.photoimagesize")}</div>
+            <div class="phototxt">${msg("label.photonote")}</div>
+         </div>
       </div>
       
-      <div class="header-bar">${msg("label.contact")}:</div>
+      <div class="header-bar">${msg("label.contactinfo")}</div>
       <div class="row">
          <span class="label">${msg("label.telephone")}:</span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-telephone" value="${user.telephone!""}" /></span>
