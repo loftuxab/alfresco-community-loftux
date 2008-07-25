@@ -1,6 +1,6 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
-  <link rel="stylesheet" type="text/css" href="${url.context}/templates/invite/invite.css" />
+   <link rel="stylesheet" type="text/css" href="${url.context}/templates/invite/invite.css" />
 </@>
 
 <@template.body>
@@ -9,22 +9,33 @@
       <@region id="title" scope="template" protected=true />
       <@region id="navigation" scope="template" protected=true />
    </div>
+   
    <div id="bd">
-      <div class="yui-t1" id="divInviteWrapper">
-         <div id="yui-main">
-            <div class="yui-b" id="divInviationList">
-               <@region id="invitationlist" scope="template" protected=true />
-            </div>
-         </div>
-         <div class="yui-b" id="divInviteCompoments">
-            <@region id="inviteusers" scope="template" protected=true />
-            <br />
-            <br />
-            <@region id="addemail" scope="template" protected=true />
-         </div>
-      </div>
-   </div>
+   
+		<!-- start component code -->
+		<div class="yui-g grid">
 
+			<div class="yui-u first column1">
+					<div class="yui-b" id="byAlfrescoUsers">
+					   <@region id="inviteusers" scope="template" protected=true />
+					</div>
+
+					<div class="yui-b" id="byEmail">
+					   <@region id="addemail" scope="template" protected=true />
+					</div>
+			</div>
+
+			<div class="yui-u column2">
+					<div class="yui-b" id="invitationList">
+						<@region id="invitationlist" scope="template" protected=true />
+					</div>
+			</div>
+
+		</div>
+		<!-- end component code -->
+	</div>
+	
+    <br />
 </@>
 
 <@template.footer>

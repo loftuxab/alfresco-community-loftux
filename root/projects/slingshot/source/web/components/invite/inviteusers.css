@@ -1,0 +1,79 @@
+.invitelist * {
+	color: #000;
+}
+.invitelist {
+	border: 1px solid #bababa;
+}
+
+.invitelist .users {
+	padding: 4px;
+	position: relative;
+}
+
+.invitelist .users .user {
+	height: 75px;
+	padding-left: 75px;     
+	padding-right: 83px;     
+	
+	border-bottom: 1px solid #e4e5e5;
+	padding-top: 3px;
+	padding-bottom: 3px;	
+}
+
+.invitelist .users .user div.photo,
+.invitelist .users .user div.badd,
+.invitelist .users .user div.details {
+	position: relative;
+	float: left;
+}
+
+.invitelist .users .user .details {
+	width: 100%;
+}
+
+.invitelist .users .user .details .uname{
+	font-weight: bold;
+}
+
+.invitelist .users .user .photo {
+	width: 70px;           
+	right: 70px;            
+	margin-left: -140px;
+	left: 70px;
+}
+
+.invitelist .users .user .badd {
+	width: 50px;            
+	margin-right: -100%;
+}
+
+.invitelist .users .user .details span {
+	display: block;
+}
+
+.invitelistwrapper .title {
+	color: #009300;
+	font-weight: bold;
+	padding: 6px;
+	padding-left: 24px;
+	background: transparent url(images/pholder.gif) no-repeat 3px center;
+}
+
+.invitelist .invitelist-bar {
+	padding: 6px;
+	border-bottom: 1px dotted #bababa;
+	background-color: #dee8ed;
+}
+
+
+.invitelist .invitelist-bar div {
+	display: inline;
+	padding-right: 10px;
+}
+
+.invitelist .users {
+	height: 400px;
+	overflow-y: auto;
+	padding: 4px;
+	background-color: #f6f9fc;
+}
