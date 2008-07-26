@@ -83,9 +83,17 @@
           * 
           * @property showPrivateSites
           * @type boolean
-          * @default true
+          * @default false
           */
-         showPrivateSites: true
+         showPrivateSites: false,
+         
+         /**
+          * The userid of the current user
+          * 
+          * @property currentUser
+          * @type string
+          */
+         currentUser: ""
       },
 
       /**
@@ -95,6 +103,14 @@
        * @type object
        */
       widgets: {},
+      
+      /**
+       * List of Join/Leave buttons
+       * 
+       * @property buttons
+       * @type array
+       */
+      buttons: [],
 
       /**
        * Object container for storing module instances.
@@ -156,7 +172,7 @@
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
-   
+      
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -166,6 +182,19 @@
       onReady: function SiteFinder_onReady()
       {  
          var me = this;
+         
+         // build a list of sites the current user is a member of
+         var config = {
+            method: "GET",
+            url: Alfresco.constants.PROXY_URI + "api/people/" + this.options.currentUser + "/sites",
+            successCallback: 
+            { 
+               fn: this._processMembership, 
+               scope: this 
+            },
+            failureMessage: "Failed to retrieve site membership information for current user"
+         };
+         Alfresco.util.Ajax.request(config);
          
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "api/sites?";
@@ -185,24 +214,32 @@
             {
                var items = [];
                
-               // filter the results and add the appropriate label for a button for each site
-               
-               for (var x = 0; x < oFullResponse.length; x++)
+               // determine list of sites to show
+               if (me.searchTerm.length == 0 && me.showPrivateSites)
                {
-                  var siteData = oFullResponse[x];
-                  var shortName = siteData.shortName;
-                  var title = siteData.title;
-                  
-                  // Determine if site matches search term
-                  if (me.searchTerm.length == 0 || 
-                      shortName.indexOf(me.searchTerm) != -1 ||
-                      title.indexOf(me.searchTerm) != -1)
+                  // if no search term and private sites are to be shown
+                  // just pass response through
+                  items = oFullResponse;
+               }
+               else
+               {
+                  for (var x = 0; x < oFullResponse.length; x++)
                   {
-                     // TODO: Determine if user is already a member of the site
-                     siteData.button = "Join";
-                  
-                     // add site to list
-                     items.push(siteData);
+                     var siteData = oFullResponse[x];
+                     var shortName = siteData.shortName;
+                     var title = siteData.title;
+                     var isPublic = siteData.isPublic;
+                     
+                     // TODO: Filter out private sites if necessary
+                     // TODO: lower case everything so case won't matter
+                     
+                     // Determine if site matches search term
+                     if (shortName.indexOf(me.searchTerm) != -1 ||
+                         title.indexOf(me.searchTerm) != -1)
+                     {
+                        // add site to list
+                        items.push(siteData);
+                     }
                   }
                }
                
@@ -220,9 +257,27 @@
          
          // setup the button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
+         this.widgets.searchButton.set("disabled", true);
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
+      },
+      
+      _processMembership: function SiteFinder__processMembership(response)
+      {
+         if (response.json.error === undefined)
+         {
+            var sites = response.json;
+            for (var x = 0; x < sites.length; x++)
+            {
+               var site = sites[x];
+               
+               this.memberOfSites[site.shortName] = true;
+            }
+            
+            // enable the search button
+            this.widgets.searchButton.set("disabled", false);
+         }
       },
       
       _setupDataTable: function SiteFinder_setupDataTable()
@@ -246,15 +301,14 @@
           */
          renderCellThumbnail = function SiteFinder_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
+            var shortName = oRecord.getData("shortName");
+            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";
             var siteName = oRecord.getData("title");
 
-            //oColumn.width = 32;
-            //Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-              
             // Render the icon
-            elCell.innerHTML = '<img src="' + Alfresco.constants.URL_CONTEXT + 
-               '/components/site-finder/images/site_large.gif' + '" alt="' + siteName + '" title="' + 
-               siteName + '" />';
+            elCell.innerHTML = '<a href="' + url + '"><img src="' + 
+               Alfresco.constants.URL_CONTEXT + '/components/site-finder/images/site_large.gif' + 
+               '" alt="' + siteName + '" title="' + siteName + '" /></a>';
          };
 
          /**
@@ -281,6 +335,47 @@
             
             elCell.innerHTML = details;
          };
+         
+         /**
+          * Actions custom datacell formatter
+          *
+          * @method renderCellActions
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
+         {
+            var isPublic = true; //oRecord.getData("isPublic");
+            if (isPublic)
+            {
+               var shortName = oRecord.getData("shortName");
+               var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
+               elCell.innerHTML = action;
+               
+               // create button
+               var button = new YAHOO.widget.Button(
+               {
+                   container: me.id + '-button-' + shortName,
+               });
+               
+               // if the user is already a member of the site show leave button
+               // otherwise show join button
+               if (shortName in me.memberOfSites)
+               {
+                  button.set("label", "Leave");
+                  button.set("onclick", { fn: me.doLeave, obj: shortName, scope: me});
+               }
+               else
+               {
+                  button.set("label", "Join");
+                  button.set("onclick", { fn: me.doJoin, obj: shortName, scope: me});
+               }
+               
+               me.buttons[shortName] = { button: button };
+            }
+         };
 
          // DataTable column defintions
          var columnDefinitions = [
@@ -291,7 +386,7 @@
             key: "title", label: "Title", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "button", label: "Action", formatter:YAHOO.widget.DataTable.formatButton
+            key: "description", label: "Description", formatter: renderCellActions
          }
          ];
 
@@ -302,13 +397,6 @@
          {
             renderLoopSize: 32,
             initialLoad: false
-         });
-         
-         // subscribe to the buttons
-         this.widgets.dataTable.subscribe("buttonClickEvent", function(oArgs)
-         { 
-            //var oRecord = this.getRecord(oArgs.target); 
-            //alert(YAHOO.lang.dump(oRecord.getData()));
          });
          
          // Override abstract function within DataTable to set custom error message
@@ -344,13 +432,71 @@
       doSearch: function SiteFinder_doSearch()
       {
          this.searchTerm = document.getElementById(this.id + "-term").value;
-         
-         // TODO: get list of sites the current user is a member of
-         // /api/people/{userid}/sites
-         
          this._performSearch(this.searchTerm);
       },
-
+      
+      /**
+       * Join event handler
+       * 
+       * @method doJoin
+       * @param event {object} The event object
+       * @param site {string} The shortName of the site to join
+       */
+      doJoin: function SiteFinder_doJoin(event, site)
+      {
+         var user = this.options.currentUser;
+         
+         // make ajax call to site service to join user
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            method: "PUT",
+            dataObj:
+            {
+               role: "SiteConsumer",
+               person:
+               {
+                  userName: user,
+                  url: "/alfresco/service/api/people/" + user
+               },
+               url: "/alfresco/service/api/sites/" + site + "/memberships/" + user
+            },
+            successCallback:
+            {
+               fn: this._joinSuccess,
+               obj: site,
+               scope: this
+            },
+            failureMessage: "Failed to join user " + user + " to site " + site
+         });
+      },
+      
+      _joinSuccess: function SiteFinder__joinSuccess(response, site)
+      {
+         // add site to site membership list
+         this.memberOfSites[site] = true;
+         
+         // show popup message to confirm
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: "Successfully added user " + this.options.currentUser + " to site " + site
+         });
+         
+         // redo the search again to get updated info
+         this.doSearch();
+      },
+      
+      /**
+       * Leave event handler
+       * 
+       * @method doLeave
+       * @param event {object} The event object
+       * @param site {string} The shortName of the site to leave
+       */
+      doLeave: function SiteFinder_doLeave(event, site)
+      {
+         alert("user " + this.options.currentUser + " can not leave site " + site + " as this feature is not yet implemented!");
+      },
       
       /**
        * Resets the YUI DataTable errors to our custom messages
@@ -427,9 +573,8 @@
        */
       _buildSearchParams: function SiteFinder__buildSearchParams(searchTerm)
       {
-         var params = YAHOO.lang.substitute("nf={term}&maxResults={maxResults}",
+         var params = YAHOO.lang.substitute("size={maxResults}",
          {
-            term : encodeURIComponent(searchTerm),
             maxResults : this.options.maxResults
          });
 

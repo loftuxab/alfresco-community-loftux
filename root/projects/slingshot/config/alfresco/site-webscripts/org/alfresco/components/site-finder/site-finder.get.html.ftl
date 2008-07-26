@@ -1,7 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.SiteFinder("${args.htmlid}").setOptions(
    {
-      showPrivateSites: false
+      showPrivateSites: true,
+      currentUser: "${user.id}"
    }).setMessages(
       ${messages}
    );
