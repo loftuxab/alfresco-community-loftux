@@ -23,11 +23,12 @@
 {
    padding: 0px;
    float: left;
+   width: 75%;
 }
 
 .site-finder .search-controls .search-term input
 {
-   width: 800px;
+   width: 98%;
    margin: 3px 4px 0px 4px;
 }
 
