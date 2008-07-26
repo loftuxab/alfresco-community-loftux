@@ -192,7 +192,7 @@
                fn: this._processMembership, 
                scope: this 
             },
-            failureMessage: "Failed to retrieve site membership information for current user"
+            failureMessage: Alfresco.util.message("site-finder.no-membership-detail", "Alfresco.SiteFinder")
          };
          Alfresco.util.Ajax.request(config);
          
@@ -230,15 +230,17 @@
                      var title = siteData.title;
                      var isPublic = siteData.isPublic;
                      
-                     // TODO: Filter out private sites if necessary
-                     // TODO: lower case everything so case won't matter
-                     
-                     // Determine if site matches search term
-                     if (shortName.indexOf(me.searchTerm) != -1 ||
-                         title.indexOf(me.searchTerm) != -1)
+                     // Filter out private sites if necessary
+                     if (me.options.showPrivateSites ||
+                         (!me.options.showPrivateSites && isPublic))
                      {
-                        // add site to list
-                        items.push(siteData);
+                        // Determine if site matches search term
+                        if (shortName.toLowerCase().indexOf(me.searchTerm.toLowerCase()) != -1 ||
+                            title.toLowerCase().indexOf(me.searchTerm.toLowerCase()) != -1)
+                        {
+                           // add site to list
+                           items.push(siteData);
+                        }
                      }
                   }
                }
@@ -258,6 +260,20 @@
          // setup the button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
          this.widgets.searchButton.set("disabled", true);
+         
+         // register the "enter" event on the search text field
+         var searchIinput = Dom.get(this.id + "-term");
+         new YAHOO.util.KeyListener(searchIinput, { keys:13 }, 
+         {
+            fn: function() 
+            {
+               me.doSearch()
+            },
+            scope:this,
+            correctScope:true
+         }, 
+         "keydown" 
+         ).enable();
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -390,7 +406,7 @@
          }
          ];
 
-         YAHOO.widget.DataTable.MSG_EMPTY = "Enter search term to find sites.";
+         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-finder.enter-search-term", "Alfresco.SiteFinder");
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
@@ -416,10 +432,15 @@
             }
             else if (oResponse.results)
             {
+               if (oResponse.results.length == 0)
+               {
+                  YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' + 
+                     Alfresco.util.message("message.empty", "Alfresco.SiteFinder") + '</span>';
+               }
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
             
-            // Must return true to have the "Loading..." message replaced by the error message
+            // Must return true to have the "Searching..." message replaced by the error message
             return true;
          }
       },
@@ -467,7 +488,7 @@
                obj: site,
                scope: this
             },
-            failureMessage: "Failed to join user " + user + " to site " + site
+            failureMessage: Alfresco.util.message("site-finder.join-failure", "Alfresco.SiteFinder", this.options.currentUser, site)
          });
       },
       
@@ -486,7 +507,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: "Successfully added user " + this.options.currentUser + " to site " + site
+            text: Alfresco.util.message("site-finder.join-success", "Alfresco.SiteFinder", this.options.currentUser, site)
          });
          
          // redo the search again to get updated info
@@ -515,7 +536,7 @@
                obj: site,
                scope: this
             },
-            failureMessage: "Failed to remove user " + user + " from site " + site
+            failureMessage: Alfresco.util.message("site-finder.leave-failure", "Alfresco.SiteFinder", this.options.currentUser, site)
          });
       },
       
@@ -534,7 +555,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: "Successfully removed user " + this.options.currentUser + " from site " + site
+            text: Alfresco.util.message("site-finder.leave-success", "Alfresco.SiteFinder", this.options.currentUser, site)
          });
          
          // redo the search again to get updated info
@@ -566,8 +587,7 @@
          this._setDefaultDataTableErrors();
          
          // Display loading message
-         //YAHOO.widget.DataTable.MSG_EMPTY = "Searching term '" + searchTerm + "'...";
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
+         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-finder.searching", "Alfresco.SiteFinder");
          
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
