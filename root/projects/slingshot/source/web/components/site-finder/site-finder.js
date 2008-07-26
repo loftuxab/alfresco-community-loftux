@@ -347,7 +347,7 @@
           */
          renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {
-            var isPublic = true; //oRecord.getData("isPublic");
+            var isPublic = oRecord.getData("isPublic");
             if (isPublic)
             {
                var shortName = oRecord.getData("shortName");
@@ -471,6 +471,13 @@
          });
       },
       
+      /**
+       * Callback handler used when a user is successfully added to a site
+       * 
+       * @method _joinSuccess
+       * @param response {object}
+       * @param siteData {object}
+       */
       _joinSuccess: function SiteFinder__joinSuccess(response, site)
       {
          // add site to site membership list
@@ -495,7 +502,43 @@
        */
       doLeave: function SiteFinder_doLeave(event, site)
       {
-         alert("user " + this.options.currentUser + " can not leave site " + site + " as this feature is not yet implemented!");
+         var user = this.options.currentUser;
+         
+         // make ajax call to site service to join user
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            method: "DELETE",
+            successCallback:
+            {
+               fn: this._leaveSuccess,
+               obj: site,
+               scope: this
+            },
+            failureMessage: "Failed to remove user " + user + " from site " + site
+         });
+      },
+      
+      /**
+       * Callback handler used when a user is successfully removed from a site
+       * 
+       * @method _leaveSuccess
+       * @param response {object}
+       * @param siteData {object}
+       */
+      _leaveSuccess: function SiteFinder__leaveSuccess(response, site)
+      {
+         // remove site from site membership list
+         delete this.memberOfSites[site];
+         
+         // show popup message to confirm
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: "Successfully removed user " + this.options.currentUser + " from site " + site
+         });
+         
+         // redo the search again to get updated info
+         this.doSearch();
       },
       
       /**
