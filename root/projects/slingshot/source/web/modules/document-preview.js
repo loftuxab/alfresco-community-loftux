@@ -420,13 +420,20 @@
          var debug = false;
          if(this.swfPlayer.init(debug))
          {
-            // The flash movie has loaded, its ok to call a method on it
-            this.swfPlayer.load(url);
+            try
+            {
+               // The flash movie has loaded, its ok to call a method on it
+               this.swfPlayer.load(url);
+            }
+            catch(e)
+            {
+               YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
+            }
          }
          else if(attempt < 7)
          {
             // The flash movie wasn't loaded, try againg in 0.5 sec
-            YAHOO.lang.later(500, this, this._load, [url, attempt++], false);
+            YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
          }
          else
          {

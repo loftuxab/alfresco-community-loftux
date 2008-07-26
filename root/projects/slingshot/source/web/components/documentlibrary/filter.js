@@ -74,7 +74,7 @@
       selectedFilter: null,
 
       /**
-       * Selected filter.
+       * Flag to indicate whether all controls are deactivated or not.
        * 
        * @property controlsDeactivated
        * @type {boolean}

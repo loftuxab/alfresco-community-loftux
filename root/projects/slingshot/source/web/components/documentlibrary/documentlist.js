@@ -63,12 +63,15 @@
       YAHOO.Bubbling.on("fileCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("fileDeleted", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("fileMoved", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("fileRenamed", this.onFileRenamed, this);
       YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("folderCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("folderDeleted", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("folderRenamed", this.onFileRenamed, this);
       YAHOO.Bubbling.on("folderMoved", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this);
    
       return this;
    }
@@ -159,12 +162,17 @@
       currentPath: "",
 
       /**
-       * Current filterId to filter document list.
+       * Current filter to filter document list.
        * 
-       * @property currentFilterId
-       * @type string
+       * @property currentFilter
+       * @type object
        */
-      currentFilterId: "",
+      currentFilter:
+      {
+         filterId: "",
+         filterOwner: "",
+         filterData: ""
+      },
 
       /**
        * FileUpload module instance.
@@ -199,7 +207,7 @@
       actions: {},
 
       /**
-       * Objectliteral of selected states for visible files (indexed by nodeRef).
+       * Object literal of selected states for visible files (indexed by nodeRef).
        * 
        * @property selectedFiles
        * @type object
@@ -244,11 +252,23 @@
       deferUnhighlightRow: null,
 
       /**
+       * Object literal used to generate unique tag ids
+       * 
+       * @property tagId
+       * @type object
+       */
+      tagId:
+      {
+         id: 0,
+         tags: {}
+      },
+
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
        */
       setOptions: function DL_setOptions(obj)
       {
@@ -261,7 +281,7 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
        */
       setMessages: function DL_setMessages(obj)
       {
@@ -360,7 +380,7 @@
             fields:
             [
                "index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
-               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "contentUrl", "actionSet"
+               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "contentUrl", "actionSet", "tags"
             ]
          };
          
@@ -411,10 +431,10 @@
          }
          
          /**
-          * Generate URL to thumbnail image
+          * Generate Show Preview onClick mark-up
           *
           * @method generateDocumentPreviewOnClick
-          * @param path {YAHOO.widget.Record} File record
+          * @param record {YAHOO.widget.Record} File record
           * @return {string} a click handler to open the document preview component for the document
           */
          var generateDocumentPreviewOnClick = function DL_generateDocumentPreviewOnClick(record)
@@ -422,7 +442,31 @@
             var nodeRef = record.getData("nodeRef");
             var fileName = record.getData("fileName").replace(/[']/g, "\\'");
             var icon32 = Alfresco.constants.URL_CONTEXT + record.getData("icon32");
-            return "Alfresco.module.getDocumentPreviewInstance().show({nodeRef: '" + nodeRef + "', fileName: '" + fileName + "', icon32: '" + icon32 + "'});";
+            return "Alfresco.module.getDocumentPreviewInstance().show({nodeRef: '" + nodeRef + "', fileName: '" + fileName + "', icon32: '" + icon32 + "'}); return false;";
+         }
+
+         /**
+          * Generate ID alias for tag, suitable for DOM ID attribute
+          *
+          * @method generateTagId
+          * @param scope {object} DocumentLibrary instance
+          * @param tagName {string} Tag name
+          * @return {string} A unique DOM-safe ID for the tag
+          */
+         var generateTagId = function DL_generateTagId(scope, tagName)
+         {
+            var id = 0;
+            var tagId = scope.tagId;
+            if (tagName in tagId.tags)
+            {
+                id = tagId.tags[tagName];
+            }
+            else
+            {
+               tagId.id++;
+               id = tagId.tags[tagName] = tagId.id;
+            }
+            return scope.id + "-tagId-" + id;
          }
 
 
@@ -557,10 +601,10 @@
                   /* Inline Rename
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
                   */
-                  desc += '<div class="detail"><span><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
+                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   if (oRecord.getData("description").length > 0)
                   {
-                     desc += '<div class="detail"><span><b>' + me._msg("details.description") + '</b> ' + oRecord.getData("description") + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + oRecord.getData("description") + '</span></div>';
                   }
                   else
                   {
@@ -578,21 +622,40 @@
                /**
                 * Document type
                 */
-               desc = '<h3 class="filename"><a target="content" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("contentUrl") + '">' + oRecord.getData("displayName") + '</a></h3>';
+               desc = '<h3 class="filename"><a href="#" onclick="' + generateDocumentPreviewOnClick(oRecord) + '">' + oRecord.getData("displayName") + '</a></h3>';
                if (me.options.detailedView)
                {
                   /* Inline Rename
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
                   */
-                  desc += '<div class="detail"><span><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span><b>' + me._msg("details.modified-by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
-                  desc += '<span><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span></div>';
+                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                  desc += '<span class="item"><b>' + me._msg("details.modified-by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
+                  desc += '<span class="item"><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span></div>';
                   /* Created On field
                   desc += '<div class="detail"><span><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   desc += '<span><b>' + me._msg("details.created-by") + '</b> ' + oRecord.getData("createdBy") + '</span>';
                   */
-                  desc += '<div class="detail"><span><b>' + me._msg("details.description") + '</b> ' + oRecord.getData("description") + '</span></div>';
-                  desc += '<div class="detail"><span><b>' + me._msg("details.comments") + '</b> 0</span></div>';
+                  var description = oRecord.getData("description");
+                  if (description == "")
+                  {
+                     description = me._msg("details.description.none");
+                  }
+                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + description + '</span></div>';
+                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.comments") + '</b> 0</span></div>';
+                  /* Tags */
+                  var tags = oRecord.getData("tags");
+                  desc += '<div class="detail"><span><b>' + me._msg("details.tags") + '</b> ';
+                  if (tags.length > 0)
+                  {
+                     for (var i = 0, j = tags.length; i < j; i++)
+                     {
+                        desc += '<span id="' + generateTagId(me, tags[i]) + '" class="tag"><a href="#" class="tag-link" title="' + tags[i] + '"><span>' + tags[i] + '</span></a></span>';
+                     }
+                  }
+                  else
+                  {
+                     desc += me._msg("details.tags.none");
+                  }
                }
                else
                {
@@ -722,7 +785,7 @@
          YAHOO.Bubbling.fire("filterChanged", filterObj);
 
          // Hook action events
-         var fnActionHandler = function DL_filterAction(layer, args)
+         var fnActionHandler = function DL_fnActionHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
@@ -740,6 +803,33 @@
          }
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          YAHOO.Bubbling.addDefaultAction("show-more", fnActionHandler);
+
+         // Hook tag clicks
+         var fnTagHandler = function DL_fnTagHandler(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
+            if (owner !== null)
+            {
+               var tagId = owner.id;
+               tagId = tagId.substring(tagId.lastIndexOf("-") + 1);
+               for (tag in me.tagId.tags)
+               {
+                  if (me.tagId.tags[tag] == tagId)
+                  {
+                     //me.onTagSelected.call(me, tag, owner);
+                     YAHOO.Bubbling.fire("onTagSelected",
+                     {
+                        tagname: tag
+                     });
+                     break;
+                  }
+               }
+               args[1].stop = true;
+            }
+      		 
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("tag-link", fnTagHandler);
          
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
@@ -771,7 +861,7 @@
             record = recordSet.getRecord(i);
             if (this.selectedFiles[record.getData("nodeRef")])
             {
-               files.push(record._oData);
+               files.push(record.getData());
             }
          }
          
@@ -996,6 +1086,22 @@
        * Disconnected event handlers for action event notification
        */
 
+       /**
+        * Tag selected handler (document details)
+        *
+        * @method onTagSelected
+        * @param tagId {string} Tag name.
+        * @param target {HTMLElement} Target element clicked.
+        */
+       onTagSelected: function DL_onTagSelected(layer, args)
+       {
+          var obj = args[1];
+          if (obj && (obj.tagname !== null))
+          {
+             alert(obj.tagname);
+          }
+       },
+
       /**
        * Show more actions pop-up.
        *
@@ -1074,59 +1180,15 @@
        */
       onActionDetails: function DL_onActionDetails(row)
       {
-         /**
-          * TODO
-          */
-         return;
-         
-         var me = this;
-         var record = this.widgets.dataTable.getRecord(row);
-
-         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/metadata/node/{nodeRef}",
-         {
-            nodeRef: record.getData("nodeRef").replace(":/", "")
-         });
-         
-         var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
-         {
-            // Validation
-            // Name: mandatory value
-            p_form.addValidation(this.id + "-details-name", Alfresco.forms.validation.mandatory, null, "keyup");
-            // Name: valid filename
-            p_form.addValidation(this.id + "-details-name", Alfresco.forms.validation.nodeName, null, "keyup");
-            p_form.setShowSubmitStateDynamically(true, false);
-         }
-         
          if (!this.modules.details)
          {
-            this.modules.details = new Alfresco.module.SimpleDialog(this.id + "-details").setOptions(
-            {
-               width: "30em",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/details",
-               actionUrl: actionUrl,
-               doSetupFormsValidation:
-               {
-                  fn: doSetupFormsValidation,
-                  scope: this
-               },
-               firstFocus: this.id + "-details-name",
-               onSuccess:
-               {
-                  fn: function DLTB_onActionDetails_callback(response)
-                  {
-                  },
-                  scope: this
-               }
-            });
+            this.modules.details = new Alfresco.module.DoclibDetails(this.id + "-details");
          }
-         else
+
+         this.modules.details.setOptions(
          {
-            this.modules.details.setOptions(
-            {
-               actionUrl: actionUrl
-            })
-         }
-         this.modules.details.show();
+            file: this.widgets.dataTable.getRecord(row).getData()
+         }).showDialog();
       },
 
       /**
@@ -1363,8 +1425,7 @@
        */
       onActionCopyTo: function DL_onActionCopyTo(row)
       {
-         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
-         var file = this.widgets.dataTable.getRecord(row)._oData;
+         var file = this.widgets.dataTable.getRecord(row).getData();
          
          if (!this.modules.copyTo)
          {
@@ -1395,8 +1456,7 @@
        */
       onActionMoveTo: function DL_onActionMoveTo(row)
       {
-         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
-         var file = this.widgets.dataTable.getRecord(row)._oData;
+         var file = this.widgets.dataTable.getRecord(row).getData();
          
          if (!this.modules.moveTo)
          {
@@ -1470,6 +1530,28 @@
       },
       
       /**
+       * File or folder renamed event handler
+       *
+       * @method onFileRenamed
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFileRenamed: function DL_onFileRenamed(layer, args)
+      {
+         var obj = args[1];
+         if (obj && (obj.file !== null))
+         {
+            var recordFound = this._findRecordByParameter(obj.file.nodeRef, "nodeRef");
+            if (recordFound != null)
+            {
+               this.widgets.dataTable.updateRow(recordFound, obj.file);
+               var el = this.widgets.dataTable.getTrEl(recordFound);
+               Alfresco.util.Anim.pulse(el);
+            }
+         }
+      },
+
+      /**
        * DocList Refresh Required event handler
        *
        * @method onDocListRefresh
@@ -1494,7 +1576,12 @@
          if ((obj !== null) && (obj.filterId !== null))
          {
             // Should be a filterId in the arguments
-            this.currentFilterId = obj.filterId;
+            this.currentFilter =
+            {
+               filterId: obj.filterId,
+               filterOwner: obj.filterOwner,
+               filterData: obj.filterData
+            };
             // Ignore if it's the path, as we'll update on the pathChanged event
             if (obj.filterId != "path")
             {
@@ -1516,16 +1603,7 @@
          var obj = args[1];
          if ((obj !== null) && (obj.fileName !== null))
          {
-            var recordSet = this.widgets.dataTable.getRecordSet();
-            var recordFound = null;
-            for (var i = 0, j = recordSet.getLength(); i < j; i++)
-            {
-               if (recordSet.getRecord(i).getData("fileName") == obj.fileName)
-               {
-                  recordFound = recordSet.getRecord(i);
-                  break;
-               }
-            }
+            var recordFound = this._findRecordByParameter(obj.fileName, "fileName");
             if (recordFound !== null)
             {
                // Scroll the record into view and highlight it
@@ -1655,7 +1733,7 @@
              path: encodeURI(path)
           });
 
-          params += "?filter=" + encodeURIComponent(this.currentFilterId);
+          params += "?filter=" + encodeURIComponent(this.currentFilter.filterId) + "&filterData=" + encodeURIComponent(this.currentFilter.filterData);
           return params;
        },
        
@@ -1665,11 +1743,31 @@
         * @method _buildDocListRSSParams
         * @param path {string} Path to query
         */
-        _buildDocListRSSParams: function DL__buildDocListRSSParams(path)
+      _buildDocListRSSParams: function DL__buildDocListRSSParams(path)
+      {
+        var params = this._buildDocListParams(path);
+        params += "&format=rss";
+        return params;
+      },
+
+      /**
+       * Searches the current recordSet for a record with the given parameter value
+       *
+       * @method _findRecordByParameter
+       * @param p_value {string} Value to find
+       * @param p_parameter {string} Parameter to look for the value in
+       */
+      _findRecordByParameter: function DL__findRecordByParameter(p_value, p_parameter)
+      {
+        var recordSet = this.widgets.dataTable.getRecordSet();
+        for (var i = 0, j = recordSet.getLength(); i < j; i++)
         {
-           var params = this._buildDocListParams(path);
-           params += "&format=rss";
-           return params;
+           if (recordSet.getRecord(i).getData(p_parameter) == p_value)
+           {
+              return recordSet.getRecord(i);
+           }
         }
+        return null;
+      }
    };
 })();

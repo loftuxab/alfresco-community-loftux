@@ -473,13 +473,13 @@
          Alfresco.logger.debug("DLT_onFolderRenamed");
 
          var obj = args[1];
-         if ((obj !== null) && (obj.nodeRef !== null) && (obj.name !== null))
+         if (obj && (obj.file !== null))
          {
-            var node = this.widgets.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
+            var node = this.widgets.treeview.getNodeByProperty("nodeRef", obj.file.nodeRef);
             if (node !== null)
             {
                // Node found, so rename it
-               node.label = obj.name;
+               node.label = obj.file.displayName;
                this.widgets.treeview.draw();
                this._showHighlight(true);
             }

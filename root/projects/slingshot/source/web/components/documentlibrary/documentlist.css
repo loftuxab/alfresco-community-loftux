@@ -203,9 +203,27 @@
    clear: left;
 }
 
-.doclist .documents .detail span
+.doclist .documents .detail span.item
 {
    padding-right: 2em;
+}
+
+
+/* Tags */
+
+.doclist .documents .detail span.tag
+{
+   padding-right: 0.5em;
+}
+
+.doclist .documents .detail a.tag-link
+{
+   
+}
+
+.doclist .documents .detail a.tag-link span
+{
+   
 }
 
 

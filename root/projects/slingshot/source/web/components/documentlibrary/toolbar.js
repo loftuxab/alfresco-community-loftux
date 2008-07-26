@@ -119,7 +119,9 @@
        */
       currentFilter:
       {
-         filterOwner: ""
+         filterId: "",
+         filterOwner: "",
+         filterData: ""
       },
 
       /**
@@ -159,7 +161,7 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.DocListToolbar} returns 'this' for method chaining
        */
       setOptions: function DLTB_setOptions(obj)
       {
@@ -172,7 +174,7 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.DocListToolbar} returns 'this' for method chaining
        */
       setMessages: function DLTB_setMessages(obj)
       {
@@ -700,9 +702,15 @@
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
-            if (this.currentFilter.filterId != obj.filterId)
-            {
-               this.currentFilter = obj;
+            /*if (this.currentFilter.filterId != obj.filterId)
+            {*/
+               this.currentFilter = 
+               {
+                  filterId: obj.filterId,
+                  filterOwner: obj.filterOwner,
+                  filterData: obj.filterData
+               }
+               
                var owner = obj.filterOwner.split(".")[1];
                // Obtain array of DIVs we might want to hide
                var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id + "-body"));
@@ -722,7 +730,7 @@
                
                this._generateDescription();
                this._generateRSSFeedUrl();
-            }
+            /*}*/
          }
       },
 
@@ -838,13 +846,13 @@
 
          var eDescMsg = new Element(document.createElement("span"),
          {
-            innerHTML: this._msg("description." + this.currentFilter.filterId)
+            innerHTML: this._msg("description." + this.currentFilter.filterId, this.currentFilter.filterData)
          });
          eDescMsg.addClass("message");
 
          var eDescMore = new Element(document.createElement("span"),
          {
-            innerHTML: this._msg("description." + this.currentFilter.filterId + ".more")
+            innerHTML: this._msg("description." + this.currentFilter.filterId + ".more", this.currentFilter.filterData)
          });
          eDescMore.addClass("more");
          

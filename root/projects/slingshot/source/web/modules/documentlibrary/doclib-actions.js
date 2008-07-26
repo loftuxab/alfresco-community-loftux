@@ -61,7 +61,7 @@
       defaultConfig:
       {
          method: "POST",
-         url: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/",
+         urlStem: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/",
          dataObj: null,
          successCallback: null,
          successMessage: null,
@@ -145,6 +145,8 @@
        * <pre>function(data, obj) where data is an object literal containing config, json, serverResponse</pre>
        * @param action.failure.callback.scope {object} Failure callback function scope
        * @param action.failure.callback.obj {object} Failure callback function object passed to callback
+       * @param action.webscript.stem {string} optional webscript URL stem
+       * <pre>default: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/"</pre>
        * @param action.webscript.name {string} data webscript URL name
        * @param action.webscript.method {string} HTTP method to call the data webscript on
        * @param action.webscript.queryString {string} Optional queryString to append to the webscript URL
@@ -189,7 +191,16 @@
             }
          }
          
-         var url = this.defaultConfig.url + webscript.name;
+         var url;
+         if (webscript.stem)
+         {
+            url = webscript.stem + webscript.name;
+         }
+         else
+         {
+            url = this.defaultConfig.urlStem + webscript.name;
+         }
+         
          if (params)
          {
             url +=  "/";

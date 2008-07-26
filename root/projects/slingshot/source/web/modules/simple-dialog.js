@@ -237,7 +237,8 @@
                   scope: this
                },
                failureMessage: "Could not load dialog template from '" + this.options.templateUrl + "'.",
-               scope: this
+               scope: this,
+               execScripts: true
             });
          }
          return this;
@@ -284,6 +285,10 @@
 
          // The panel is created from the HTML returned in the XHR request, not the container
          var dialogDiv = Dom.getFirstChild(containerDiv);
+         while (dialogDiv && dialogDiv.tagName.toLowerCase() != "div")
+         {
+            dialogDiv = Dom.getNextSibling(dialogDiv);
+         }
 
          // Create and render the YUI dialog
          this.dialog = new YAHOO.widget.Panel(dialogDiv,
