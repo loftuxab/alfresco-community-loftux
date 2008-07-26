@@ -664,6 +664,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             {
                var element = form.elements[i];
                var name = element.name;
+               if (name == "-")
+               {
+                  continue;
+               }
                if (name == undefined || name == "")
                {
                   name = element.id;
@@ -680,6 +684,23 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                         formData[name] = new Array();
                      }
                      formData[name].push(value);
+                  }
+                  // check whether the input element is an object literal value
+                  else if (name.indexOf(".") > 0)
+                  {
+                     var names = name.split(".");
+                     var obj = formData;
+                     var index;
+                     for (var j = 0, k = names.length - 1; j < k; j++)
+                     {
+                        index = names[j];
+                        if (obj[index] === undefined)
+                        {
+                           obj[index] = {};
+                        }
+                        obj = obj[index];
+                     }
+                     obj[names[j]] = value;
                   }
                   else if (!(element.type === "checkbox" && !element.checked))
                   {
