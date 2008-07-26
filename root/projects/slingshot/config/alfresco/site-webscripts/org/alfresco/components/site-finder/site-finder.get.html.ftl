@@ -10,12 +10,12 @@
 
 <div id="${args.htmlid}-body" class="site-finder">
 	
-	<div class="heading">${msg("site-finder.search")}</div>
+	<div class="heading">${msg("site-finder.heading")}</div>
 	
 	<div class="search-controls">
 	   <div>
 	   <div class="search-term"><input id ="${args.htmlid}-term" type="text" /></div>
-	   <div class="search-button"><input id="${args.htmlid}-button" type="button" value="Search" /></div>
+	   <div class="search-button"><input id="${args.htmlid}-button" type="button" value="${msg("site-finder.search-button")}" /></div>
 	   </div>
 	</div>
 	
