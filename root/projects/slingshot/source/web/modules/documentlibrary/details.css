@@ -1,0 +1,16 @@
+.details select,
+.details input[type="text"],
+.details textarea
+{
+   width: 26em;
+}
+
+.details .yui-gd .yui-u.first
+{
+   width: 18% !important;
+}
+
+.details .yui-gd .yui-u
+{
+   width: 70% !important;
+}

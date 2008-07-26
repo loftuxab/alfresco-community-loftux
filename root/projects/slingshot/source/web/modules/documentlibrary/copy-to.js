@@ -199,7 +199,7 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.module.DoclibCopyTo} returns 'this' for method chaining
        */
       setOptions: function DLCT_setOptions(obj)
       {
@@ -212,7 +212,7 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.module.DoclibCopyTo} returns 'this' for method chaining
        */
       setMessages: function DLCT_setMessages(obj)
       {

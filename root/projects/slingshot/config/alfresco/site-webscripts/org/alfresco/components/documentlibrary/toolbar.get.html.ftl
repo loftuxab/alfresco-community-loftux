@@ -13,7 +13,7 @@
       <div class="separator hideable DocListTree">|</div>
       <div class="file-upload hideable DocListTree"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
       <div class="separator hideable DocListTree">|</div>
-      <div class="selected-items hideable DocListTree DocListFilter">
+      <div class="selected-items hideable DocListTree DocListFilter DocListTags">
          <button id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
          <div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
             <div class="bd">
@@ -34,7 +34,7 @@
       <div class="folder-up hideable DocListTree"><button id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
       <div class="separator hideable DocListTree">|</div>
       <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable DocListTree"></div>
-      <div id="${args.htmlid}-description" class="description hideable DocListFilter"></div>
+      <div id="${args.htmlid}-description" class="description hideable DocListFilter DocListTags"></div>
    </div>
 
 </div>

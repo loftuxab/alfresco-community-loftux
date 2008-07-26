@@ -146,7 +146,7 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.module.DoclibMoveTo} returns 'this' for method chaining
        */
       setOptions: function DLMT_setOptions(obj)
       {
@@ -159,7 +159,7 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.module.DoclibMoveTo} returns 'this' for method chaining
        */
       setMessages: function DLMT_setMessages(obj)
       {
@@ -184,23 +184,30 @@
        */
       showDialog: function DLMT_showDialog()
       {
-         // Load the UI template from the server
-         Alfresco.util.Ajax.request(
+         if (!this.containerDiv)
          {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/move-to",
-            dataObj:
+            // Load the UI template from the server
+            Alfresco.util.Ajax.request(
             {
-               htmlid: this.id
-            },
-            successCallback:
-            {
-               fn: this.onTemplateLoaded,
-               scope: this
-            },
-            failureMessage: "Could not load Document Library Move-To template",
-            execScripts: true
-         });
-
+               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/move-to",
+               dataObj:
+               {
+                  htmlid: this.id
+               },
+               successCallback:
+               {
+                  fn: this.onTemplateLoaded,
+                  scope: this
+               },
+               failureMessage: "Could not load Document Library Move-To template",
+               execScripts: true
+            });
+         }
+         else
+         {
+            // Show the dialog
+            this._showDialog();
+         }
       },
 
       /**
@@ -215,12 +222,12 @@
          var me = this;
          
          // Inject the template from the XHR request into a new DIV element
-         var containerDiv = document.createElement("div");
-         containerDiv.setAttribute("style", "display:none");
-         containerDiv.innerHTML = response.serverResponse.responseText;
+         this.containerDiv = document.createElement("div");
+         this.containerDiv.setAttribute("style", "display:none");
+         this.containerDiv.innerHTML = response.serverResponse.responseText;
 
          // The panel is created from the HTML returned in the XHR request, not the container
-         var dialogDiv = Dom.getFirstChild(containerDiv);
+         var dialogDiv = Dom.getFirstChild(this.containerDiv);
          
          // Create and render the YUI dialog
          this.widgets.dialog = new YAHOO.widget.Panel(dialogDiv,
@@ -234,18 +241,6 @@
          });
          this.widgets.dialog.render(document.body);
          
-         // Dialog title
-         var titleDiv = Dom.get(this.id + "-title");
-         if (YAHOO.lang.isArray(this.options.files))
-         {
-            titleDiv.innerHTML = this._msg("title.multi", this.options.files.length)
-         }
-         else
-         {
-            var fileSpan = '<span class="light">' + this.options.files.displayName + '</span>';
-            titleDiv.innerHTML = this._msg("title.single", fileSpan)
-         }
-
          // OK button
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", this.onOK);
 
@@ -340,6 +335,28 @@
             YAHOO.util.Connect.asyncRequest("GET", uri, callback);
          };
          
+         // Show the dialog
+         this._showDialog();
+      },
+
+      /**
+       * Internal show dialog function
+       * @method _showDialog
+       */
+      _showDialog: function DLMT__showDialog()
+      {
+         // Dialog title
+         var titleDiv = Dom.get(this.id + "-title");
+         if (YAHOO.lang.isArray(this.options.files))
+         {
+            titleDiv.innerHTML = this._msg("title.multi", this.options.files.length)
+         }
+         else
+         {
+            var fileSpan = '<span class="light">' + this.options.files.displayName + '</span>';
+            titleDiv.innerHTML = this._msg("title.single", fileSpan)
+         }
+
          // Build the TreeView widget
          this._buildTree();
          
@@ -352,7 +369,7 @@
             this.pathChanged(this.options.path);
          }
       },
-
+      
       /**
        * YUI WIDGET EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
@@ -457,7 +474,7 @@
             }
          });
          
-         this.widgets.dialog.destroy();
+         this.widgets.dialog.hide();
       },
 
       /**
@@ -469,7 +486,7 @@
        */
       onCancel: function DLMT_onCancel(e, p_obj)
       {
-         this.widgets.dialog.destroy();
+         this.widgets.dialog.hide();
       },
 
       /**

@@ -63,12 +63,10 @@
 
       <div id="${args.htmlid}-actionSet-locked" class="action-set">
          <div class="onActionDownload"><a href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download")}"><span>${msg("actions.document.download")}</span></a></div>
-         <div class="onActionRequestUnlock"><a href="#" class="action-link" title="[Request Unlock]"><span>[Request Unlock]</span></a></div>
       </div>
 
       <div id="${args.htmlid}-actionSet-lockOwner" class="action-set">
          <div class="onActionDownload"><a href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download-original")}"><span>${msg("actions.document.download-original")}</span></a></div>
-         <div class="onActionUnlock"><a href="#" class="action-link" title="[Unlock]"><span>[Unlock]</span></a></div>
       </div>
 
       <div id="${args.htmlid}-actionSet-workingCopyOwner" class="action-set">
@@ -80,7 +78,10 @@
       <div id="${args.htmlid}-actionSet-folder" class="action-set">
          <div class="onActionCopyTo"><a href="#" class="action-link" title="${msg("actions.folder.copy-to")}"><span>${msg("actions.folder.copy-to")}</span></a></div>
          <div class="onActionMoveTo"><a href="#" class="action-link" title="${msg("actions.folder.move-to")}"><span>${msg("actions.folder.move-to")}</span></a></div>
-         <div class="onActionDelete"><a href="#" class="action-link" title="${msg("actions.folder.delete")}"><span>${msg("actions.folder.delete")}</span></a></div>
+         <div class="onActionDetails"><a href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
+         <div class="more-actions hidden">
+            <div class="onActionDelete"><a href="#" class="action-link" title="${msg("actions.folder.delete")}"><span>${msg("actions.folder.delete")}</span></a></div>
+         </div>
       </div>
    </div>
 
