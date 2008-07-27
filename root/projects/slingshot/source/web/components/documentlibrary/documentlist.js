@@ -71,8 +71,8 @@
       YAHOO.Bubbling.on("folderMoved", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("documentPreviewFailure", this.onDocumentPreviewFailure, this);
       YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this);
-   
       return this;
    }
    
@@ -442,7 +442,12 @@
             var nodeRef = record.getData("nodeRef");
             var fileName = record.getData("fileName").replace(/[']/g, "\\'");
             var icon32 = Alfresco.constants.URL_CONTEXT + record.getData("icon32");
-            return "Alfresco.module.getDocumentPreviewInstance().show({nodeRef: '" + nodeRef + "', fileName: '" + fileName + "', icon32: '" + icon32 + "'}); return false;";
+            return "Alfresco.module.getDocumentPreviewInstance().show({" +
+                   "nodeRef: '" + nodeRef + "', " +
+                   "fileName: '" + fileName + "', " +
+                   "icon32: '" + icon32 + "', " +
+                   "failureUrl: '" + Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "'" + 
+                   "});  return false;";
          }
 
          /**
@@ -1634,7 +1639,23 @@
          }
       },
 
-   
+
+      /**
+       * Document preview failed event handler
+       *
+       * @method onDocumentPreviewFailure
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDocumentPreviewFailure: function DL_onDocumentPreviewFailure(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.failureUrl !== null))
+         {
+            document.location.href = obj.failureUrl;
+         }
+      },
+
       /**
        * PRIVATE FUNCTIONS
        */
