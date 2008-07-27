@@ -86,7 +86,7 @@
          nodeRef: "",
          fileName : "",
          icon32: "",
-         buttons: [{id: "previous"}, {id: "next"}]
+         failureUrl: null
       },
 
       /**
@@ -273,16 +273,27 @@
        */
       onLoadedSwfError: function onLoadedSwfError(event)
       {
+         // Disable buttons and hide panel
          this.widgets.previousButton.set("disabled", true);
          this.widgets.nextButton.set("disabled", true);
          this.panel.hide();
 
+         // Inform the user about the failure
          var message = "Error";
          if(event.code)
          {
             message = Alfresco.util.message(event.code, this.name);
          }
          Alfresco.util.PopupManager.displayMessage({text: message});
+
+         // Tell other components that the preview failed
+         YAHOO.Bubbling.fire("documentPreviewFailure",
+         {
+            error: event.code,
+            nodeRef: this.showConfig.nodeRef,
+            failureUrl: this.showConfig.failureUrl
+         })
+
       },
 
       /**

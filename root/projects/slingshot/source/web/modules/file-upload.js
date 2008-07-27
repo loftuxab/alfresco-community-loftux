@@ -776,7 +776,7 @@
             if(attempt < 7)
             {
                // Try again after 0.5 sec
-               YAHOO.lang.later(500, this, this._browse, [multiSelect, filter, attempt++], false);
+               YAHOO.lang.later(500, this, this._browse, [multiSelect, filter, ++attempt], false);
             }
             else
             {
