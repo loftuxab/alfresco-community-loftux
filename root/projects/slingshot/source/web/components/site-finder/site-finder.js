@@ -274,7 +274,7 @@
          }, 
          "keydown" 
          ).enable();
-
+         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -373,7 +373,7 @@
                // create button
                var button = new YAHOO.widget.Button(
                {
-                   container: me.id + '-button-' + shortName,
+                   container: me.id + '-button-' + shortName
                });
                
                // if the user is already a member of the site show leave button
@@ -406,7 +406,8 @@
          }
          ];
 
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-finder.enter-search-term", "Alfresco.SiteFinder");
+         YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' +
+            Alfresco.util.message("site-finder.enter-search-term", "Alfresco.SiteFinder") + '</span>';
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
@@ -452,7 +453,7 @@
        */
       doSearch: function SiteFinder_doSearch()
       {
-         this.searchTerm = document.getElementById(this.id + "-term").value;
+         this.searchTerm = Dom.get(this.id + "-term").value;
          this._performSearch(this.searchTerm);
       },
       
