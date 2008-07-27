@@ -1,13 +1,11 @@
-<#--
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.InviteUserList("${args.htmlid}").setOptions(
+   new Alfresco.InviteUsers("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
--->
 
 <div id="${args.htmlid}-body" class="invitelistwrapper">
    <div class="title">Search Alfreso users</div>
@@ -16,11 +14,12 @@
 	   
 	   <div id="${args.htmlid}-invitelistBar" class="invitelist-bar">
 		  <div class="label">Search</div>
-		  <div class="sinput"><input type="text" class="sinput" name="${args.htmlid}-inviteuserlist-search" value=""/></div>
-		  <div class="bsub"><input type="button" value="search" /></div>
+		  <div class="sinput"><input type="text" class="sinput" id="${args.htmlid}-search-text" value=""/></div>
+		  <div class="bsub"><input type="button" value="search" id="${args.htmlid}-search-button" /></div>
 	   </div>
 
-	   <div id="${args.htmlid}-users" class="users">
+	   <div id="${args.htmlid}-userslist" class="userslist">
+		<#--
 			<div class="user">
 				<div class="photo">here goes the photo</div>
 				<div class="details">
@@ -40,7 +39,8 @@
 					<span class="uExpertise">Expertise: AJAX, Java</span>
 				</div>
 				<div class="badd"><input type="button" value="Add &gt;&gt;" /></div>
-			</div>   		
+			</div> 
+       -->
 	   </div>
    </div>
 </div>

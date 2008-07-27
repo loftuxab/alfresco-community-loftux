@@ -16,7 +16,7 @@
 
 <div id="${args.htmlid}-body" class="invitationlist">
 
-   <div id="${args.htmlid}-invitationBar" class="invitelist-bar">Search role, then click invite
+   <div id="${args.htmlid}-invitationBar" class="invitelist-bar">Select role, then click <b>invite</b>
       <input type="button" id="${args.htmlid}-selectallroles-button" value="select all roles to...">
       <select id="${args.htmlid}-selectallroles-menu"> 
          <option value="consumer">Site Consumer</option> 
