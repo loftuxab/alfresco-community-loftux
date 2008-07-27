@@ -153,7 +153,7 @@
          
          // setup the datasource
          // fields of data are available in the RecordSet 
-         this.widgets.dataSource = new YAHOO.util.DataSource( [ { id: this.uniqueRecordId++, firstName: "Michael", lastName : "Ruflin", email : "mruflin@optaros.com"} ] ); 
+         this.widgets.dataSource = new YAHOO.util.DataSource( [ ] ); 
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
          this.widgets.dataSource.responseSchema = { 
             fields: ['id', 'firstName', 'lastName', 'email']
@@ -208,7 +208,10 @@
          };
 
          renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
-         {
+         {  
+            oColumn.width = 160;
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            
             var id = oRecord.getData('id');
             var desc =
                '<span  class="roleselect" id="' + me.id + '-roleselector-' + id + '"></span>' +
@@ -223,19 +226,20 @@
                {
                   text: "Site Consumer", value: "consumer", onclick: {
                      fn: me.onRoleSelect, obj: { record: oRecord, role: "consumer" }, scope: me
-                  },
+                  }
                },
                {
                   text: "Site Collaborator", value: "collaborator", onclick: {
                      fn: me.onRoleSelect, obj: { record: oRecord, role: "collaborator" }, scope: me
-                  },
+                  }
                },
                {
                   text: "Site Manager", value: "manager", onclick: {
                      fn: me.onRoleSelect, obj: { record: oRecord, role: "manager" }, scope: me
-                  },
+                  }
                }
             ];
+            var elem = YAHOO.util.Dom.get("")
 
             // create button
             var button = new YAHOO.widget.Button(
@@ -256,16 +260,14 @@
             key: "user", label: "User", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 150
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
          }];
 
          // DataTable definition
-         YAHOO.widget.DataTable.MSG_EMPTY = "First add users to this list";  //msg("message.empty", "Alfresco.InvitationList");
+         YAHOO.widget.DataTable.MSG_EMPTY = ""; // "First add users to this list";  //msg("message.empty", "Alfresco.InvitationList");
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-inviteelist", columnDefinitions, this.widgets.dataSource,
          {
-            scrollable:true,
             renderLoopSize: 32
-            //initialLoad: false
          });
       },
 
@@ -292,6 +294,25 @@
          }
       },
       
+      getRoleName: function(record)
+      {
+         var roleName = "";
+         if (record.getData("role") != undefined)
+         {
+            roleName = record.getData("role");
+         }
+         switch(roleName)
+         {
+            case "collaborator":
+               return "SiteCollaborator";
+            case "manager":
+               return "SiteManager";
+            case "consumer":
+            default:
+               return "SiteConsumer";
+         }
+      },
+      
       /**
        * Triggered by the InvitationList all/site only link
        */
@@ -310,11 +331,15 @@
        * Called by the other components to add invitees to the list of invites
        */ 
       onAddInvite: function Invitationlist_onAddInvite(layer, args)
-      {
-         // PENDING: copy the data, and don't directly insert it!
+      {   
          var data = args[1];
-         data.id = this.uniqueRecordId++;
-         this.widgets.dataTable.addRow(data);
+         var inviteData = {};
+         inviteData.id = this.uniqueRecordId++;
+         inviteData.userName = data.userName;
+         inviteData.firstName = data.firstName;
+         inviteData.lastName = data.lastName;
+         inviteData.email = data.email;
+         this.widgets.dataTable.addRow(inviteData);
          this._enableDisableInviteButton();
       },
       
@@ -354,6 +379,7 @@
       onRoleSelect: function InvitationList_onRoleSelect(sType, aArgs, p_obj)
       {
          // set the role for the passed record
+         var selectedRole = p_obj.role;
          var x = 10; // PENDING: why does the first access to p_obj fail?!?
          var role = p_obj.role;
          var record = p_obj.record;
@@ -427,62 +453,148 @@
             this._enableDisableInviteButton();
             return;
          }
+
+         Alfresco.util.PopupManager.displayMessage({text: "Please wait..."});
+         
+         // copy over all records
+         var recs = [];
+         for (var i=0; i < recordSet.getLength(); i++)
+         {
+            recs.push(recordSet.getRecord(i));
+         }
+         var inviteData = {
+             recs: recs,
+             size : recs.length,
+             index: 0,
+             successes: [],
+             failures: []
+         };
+         
+         this._processInviteData(inviteData);
+      },
+      
+      _processInviteData: function(inviteData)
+      {   
+         // check if we are already done
+         if (inviteData.index >= inviteData.size)
+         {  
+            this._finalizeInvites(inviteData);
+            return;
+         }
+         
+         // check the current entry to see what we have to do
+         var recs = inviteData.recs;
+         var currentRecord = recs[inviteData.index];
+         if (currentRecord.getData('userName') != undefined)
+         {
+            // set got a username, a simply join will be enough
+            this._doJoinExistingUser(inviteData);
+         }
+         else
+         {
+            this._doInviteNewUser(inviteData);
+         }
+      },
+      
+      _finalizeInvites: function(inviteData)
+      {  
+         // remove the entries that were successful
+         for (var x=inviteData.successes.length - 1; x >= 0; x--)
+         {
+            this.widgets.dataTable.deleteRow(inviteData.successes[x]);
+         }
+         
+         // inform the user
+         var message = this._msg("{0} invites sent out. {1} failures.", inviteData.successes.length, inviteData.failures.length);
+         Alfresco.util.PopupManager.displayMessage({text: message });
+      },
+      
+      _doInviteNewUser: function(inviteData)
+      {
+         // fetch the record to process
+         var record = inviteData.recs[inviteData.index];
+         var firstName = record.getData('firstName');
+         var lastName = record.getData('lastName');
+         var email = record.getData('email');
          
          // We have to do a backend call for each invited person
-         var config =
+         Alfresco.util.Ajax.request(
          {
             method: "GET",
             url: Alfresco.constants.PROXY_URI + "api/invite/start",
             dataObj:
             {
-               inviteeFirstName: "",
-               inviteeLastName: "",
-               inviteeEmail: "",
+               inviteeFirstName: firstName,
+               inviteeLastName: lastName,
+               inviteeEmail: email,
                siteShortName : this.options.siteId
             },
-            successCallback: null,
-            successMessage: null,
-            failureCallback: null,
-            failureMessage: null,
-            object: null
-         };
-
-         // Invite each person
-         var succeeded = [];
-         var failed = [];
-         for (var i = 0; i < recordSet.getLength(); i++)
-         {
-            var record = recordSet.getRecord(i);
-            config.dataObj.inviteeFirstName = record.getData('firstName');
-            config.dataObj.inviteeLastName = record.getData('lastName');
-            config.dataObj.inviteeEmail = record.getData('email');
-            try
+            successCallback:
             {
-               Alfresco.util.Ajax.request(config);
-            }
-            catch (e)
+               fn: this._successCallback,
+               obj: inviteData,
+               scope: this
+            },
+            failureCallback:
             {
+               fn: this._failureCallback,
+               obj: inviteData,
+               scope: this
             }
-         }
-         
-         // PENDING: only remove the ones that succeeded
-         this.widgets.dataTable.deleteRows(0, recordSet.getLength());
-         
-         // inform the user
-         Alfresco.util.PopupManager.displayMessage({text: "Invites sent out"});
+         });
       },
       
-      /**
-       * Resets the YUI DataTable errors to our custom messages
-       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
-       *
-       * @method _setDefaultDataTableErrors
-       */
-      _setDefaultDataTableErrors: function InvitationList__setDefaultDataTableErrors()
+      _doJoinExistingUser: function(inviteData)
       {
-         var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.InvitationList");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.InvitationList");
+         // fetch the record to process
+         var record = inviteData.recs[inviteData.index];
+         
+         var user = record.getData('userName');
+         var role = this.getRoleName(record);
+         var site = this.options.siteId;
+         
+         // make ajax call to site service to join user
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            method: "PUT",
+            dataObj:
+            {
+               role: role,
+               person:
+               {
+                  userName: user,
+                  url: "/alfresco/service/api/people/" + user
+               },
+               url: "/alfresco/service/api/sites/" + site + "/memberships/" + user
+            },
+            successCallback:
+            {
+               fn: this._successCallback,
+               obj: inviteData,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: inviteData,
+               scope: this
+            }
+         });
+      },
+      
+      _successCallback: function(response, inviteData)
+      {
+         inviteData.successes.push(inviteData.index);
+         inviteData.index++;
+         this._processInviteData(inviteData);
+      },
+      
+      _failureCallback: function(response, inviteData)
+      {
+         inviteData.failures.push(inviteData.index);
+         inviteData.index++;
+         this._processInviteData(inviteData);
       },
 
       /**

@@ -9,7 +9,7 @@
 //]]></script>
 
 <div id="${args.htmlid}-body" class="inviteusersbyemail">
-	<div class="title">... or type email address</div>
+	<div class="title">... or add new user</div>
 	<div class="body">		
 		<div class="user">
 			<div class="labels">

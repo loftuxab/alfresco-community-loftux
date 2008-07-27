@@ -9,11 +9,31 @@
 .invitationlist .inviteelist {
 	height: 380px;
 	overflow-y: auto;
-	padding: 4px;
+	/*padding: 4px;*/
 	background-color: #f6fef5;
 }
 
-table {width: 100%}
+.invitationlist .inviteelist table {width: 100%; border: none;}
+.invitationlist .inviteelist table thead {display: none;}
+.invitationlist .inviteelist table td {border: none; }
+/*.invitationlist .inviteelist table tr {background-color: transparent;}*/
+.invitationlist .inviteelist table .yui-dt-empty { background-color: transparent; }
+
+/**
+ * If an element with "position: relative;" is used inside
+ * another element with "overflow: scroll;" IE takes the inner element "out of
+ * the flow" which makes statically positioned on the screen ignoring to be
+ * hidden and following the scrollbar.
+ *
+ * In this component, position relative is used for the progress bars, but
+ * a YUI button is also used which causes the same problem.
+ *
+ * If the outer element also has "position: relative;" it works though.
+ */
+/*.invitationlist .inviteelist table .yui-dt-bd
+{
+   position:relative;
+}*/
 
 .invitationlist .inviteelist .user {
 	height: 55px;
@@ -75,7 +95,7 @@ table {width: 100%}
 .invitationlistwrapper .title {
 	color: #009300;
 	font-weight: bold;
-	padding: 6px;
+	padding: 10px 0px 10px 5px;
 }
 
 .invitationlist .invitelist-bar {

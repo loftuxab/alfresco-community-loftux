@@ -134,30 +134,27 @@
          var lastName = lastNameElem.value;
          var emailElem = YAHOO.util.Dom.get(this.id + "-email");
          var email = emailElem.value;
+         
+         // check whether we got enough information to proceed
          if (firstName.length < 1 || lastName.length < 1 || email.length < 1)
          {
-            // TODO: better filter and better handling!
-            alert("All fields need to be filled out!");
+            Alfresco.util.PopupManager.displayMessage({text: "All fields need to be filled out!" });
+            return;
          }
-         else
+         
+         // send a onAddInvite bubble event to add the new address to the
+         // invitee list
+         YAHOO.Bubbling.fire("onAddInvite",
          {
-            // send a onAddInvite bubble event to add the new address to the
-            // invitee list
-            YAHOO.Bubbling.fire("onAddInvite",
-            {
-               firstName : firstName,
-               lastName : lastName,
-               email : email
-            });
+            firstName : firstName,
+            lastName : lastName,
+            email : email
+         });
             
-            // clear the values
-            firstNameElem.value = "";
-            lastNameElem.value = "";
-            emailElem.value = "";
-            
-            // PENDING: debug
-//            Alfresco.util.PopupManager.displayMessage({text: "User added to invitee: f=" +firstName + ", l=" + lastName + ", e=" + email});
-         }
+         // clear the values
+         firstNameElem.value = "";
+         lastNameElem.value = "";
+         emailElem.value = "";
       },
             
       /**
