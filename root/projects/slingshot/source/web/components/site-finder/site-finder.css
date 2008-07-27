@@ -60,7 +60,7 @@
 
 .site-finder .yui-dt-first
 {
-   width: 40px;
+   width: 70px;
 }
 
 .site-finder .yui-dt-last
@@ -75,8 +75,7 @@
 
 .site-finder h3
 {
-   margin-top: 6px;
-   margin-bottom: 2px;
+   margin-bottom: 4px;
 }
 
 .site-finder h3 a
