@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Network News Retrieval</shortname>
-  <description>Network News Retrieval</description>
-  <url>/network/news/retrieval</url>
-  <format default="html">argument</format>
-  <authentication>guest</authentication>
-  <transaction>required</transaction>
-</webscript>

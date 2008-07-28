@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Release Management - Tagging</shortname>
-  <description>Release Management - Tagging</description>
-  <url>/releasemgmt-tag</url>
-  <format default="html">argument</format>
-  <authentication>admin</authentication>
-  <transaction>required</transaction>
-</webscript>
