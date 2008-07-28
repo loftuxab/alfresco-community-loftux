@@ -56,7 +56,6 @@
    <#else>
       <div class="noNode">${msg("topiclist.noTopics")}</div>
    </#if>
-</div>
 </#macro>
 
 <#--
@@ -92,7 +91,7 @@
       <div class="published">
          <span class="nodeAttrLabel">${msg("topic.info.createdOn")}:</span> <span class="nodeAttrValue"> ${topic.createdOn?datetime?string.medium_short}</span>
          <span class="spacer"> | </span>
-         <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=topic.author /></a></span>
+         <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=topic.author /></span>
          <br />
          <#if topic.lastReplyBy??>
             <span class="nodeAttrLabel">${msg("topic.info.lastReplyBy")}:</span> <span class="nodeAttrValue"><@userLib.renderUserLink user=topic.lastReplyBy /></span>
@@ -103,10 +102,9 @@
          </#if>
       </div>
       
-      <div class="userLink"><@userLib.renderUserLink user=topic.author /></a> ${msg("topic.said")}:</div>
+      <div class="userLink"><@userLib.renderUserLink user=topic.author /> ${msg("topic.said")}:</div>
       <div class="content">${topic.content}</div>
    </div>
-   <br clear="all" />
 </div>
   
 <div class="nodeFooter">
@@ -120,7 +118,7 @@
          <span class="nodeAttrLabel tag">${msg("topic.tags")}:</span>
          <#list topic.tags as tag>
             <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-               <a href="" class="tag-link-span">${tag}</a>
+               <a href="#" class="tag-link-span">${tag}</a>
             </span><#if tag_has_next> , </#if> 
          </#list>
       </span>
@@ -158,6 +156,5 @@
          </a>
       </div>
    </div>
-   <br clear="all" />
 </div>
 </#macro>

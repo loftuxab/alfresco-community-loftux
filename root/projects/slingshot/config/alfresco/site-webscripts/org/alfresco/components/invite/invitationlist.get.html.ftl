@@ -8,16 +8,16 @@
    );
 //]]></script>
 
-<div id="${args.htmlid}-body" class="invitationlistwrapper">
+<div id="${args.htmlid}-invitationlistwrapper" class="invitationlistwrapper">
 
 <div class="title">Invitation List</div>
    
 
 
-<div id="${args.htmlid}-body" class="invitationlist">
+<div id="${args.htmlid}-invitationlist" class="invitationlist">
 
    <div id="${args.htmlid}-invitationBar" class="invitelist-bar">Select role, then click <b>invite</b>
-      <input type="button" id="${args.htmlid}-selectallroles-button" value="select all roles to...">
+      <input type="button" id="${args.htmlid}-selectallroles-button" value="select all roles to..." />
       <select id="${args.htmlid}-selectallroles-menu"> 
          <option value="consumer">Site Consumer</option> 
          <option value="collaborator">Site Coordinator</option> 
@@ -30,7 +30,7 @@
    
    <div id="${args.htmlid}-role-column-template" style="display:none">
 
-         <button class="role-selector-button" value="" />
+         <button class="role-selector-button" value="">Role</button>
          
    </div>
 

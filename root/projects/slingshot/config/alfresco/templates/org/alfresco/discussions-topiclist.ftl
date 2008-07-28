@@ -16,10 +16,10 @@
             <div class="yui-b" id="divTopicListTopics">
                <@region id="topiclist" scope="template" protected=true />
             </div>
-	         <div class="yui-b" id="divTopicListFilters">
-	            <@region id="filters" scope="template" protected=true />
-	            <@region id="tags" scope="template" protected=true />
-	         </div>
+         </div>
+         <div class="yui-b" id="divTopicListFilters">
+            <@region id="filters" scope="template" protected=true />
+            <@region id="tags" scope="template" protected=true />
          </div>
       </div>
    </div>

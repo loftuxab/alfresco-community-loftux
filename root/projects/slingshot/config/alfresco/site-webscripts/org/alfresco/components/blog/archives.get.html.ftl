@@ -7,7 +7,7 @@
     <ul class="filterLink">
         <#list items as month>
             <li class="onMonthSelection nav-label" id="${args.htmlid}-onMonthSelection-${month.year?c}-${month.month?c}">
-                <a  href="" class="archive-link nav-link">${month.beginOfMonth?string("MMMM yyyy")}</a> (${month.postCount?c})
+                <a  href="#" class="archive-link nav-link">${month.beginOfMonth?string("MMMM yyyy")}</a> (${month.postCount?c})
             </li>
         </#list>
 	</ul>

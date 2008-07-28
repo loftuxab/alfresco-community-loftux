@@ -60,7 +60,6 @@
       
       <div class="content">${post.content}</div>
    </div>
-   <br clear="all" />
    
    <div class="nodeFooter">
    <#--
@@ -80,7 +79,7 @@
             <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
             <#list post.tags as tag>
             <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-               <a href="" class="tag-link-span">${tag}</a>
+               <a href="#" class="tag-link-span">${tag}</a>
             </span><#if tag_has_next> , </#if> 
             </#list>
          </span>
@@ -104,43 +103,44 @@
 
 <h1><#if editForm>${msg("post.form.title.updatepost")}<#else>${msg("post.form.title.createpost")}</#if></h1>
 <div class="editNodeForm">
-   <form id="${htmlId}-form" name="${htmlId}-form" method="POST"
+   <form id="${htmlId}-form" method="post"
       <#if editForm>
          action="${page.url.context}/proxy/alfresco/api/blog/post/site/${site}/${container}/${post.name}" 
       <#else>
          action="${page.url.context}/proxy/alfresco/api/blog/site/${site}/${container}/posts" 
       </#if>
    >
-      <input type="hidden" name="site" id="${htmlId}-site" value="${site}" />
-      <input type="hidden" name="container" value="${container}" />
-      <input type="hidden" name="browsePostUrl" value="${page.url.context}/page/site/${site}/blog-postview?container=${container}&postId={post.name}" />
-      <input type="hidden" name="draft" id="${htmlId}-draft" value="<#if isDraft>true<#else>false</#if>">
-      <#if editForm>
-         <input type="hidden" name="postId" id="${htmlId}-postId" value="${post.name}" />
-      </#if>
+      <div>
+         <input type="hidden" name="site" id="${htmlId}-site" value="${site}" />
+         <input type="hidden" name="container" value="${container}" />
+         <input type="hidden" name="browsePostUrl" value="${page.url.context}/page/site/${site}/blog-postview?container=${container}&amp;postId={post.name}" />
+         <input type="hidden" name="draft" id="${htmlId}-draft" value="<#if isDraft>true<#else>false</#if>" />
+         <#if editForm>
+            <input type="hidden" name="postId" id="${htmlId}-postId" value="${post.name}" />
+         </#if>
                
-      <!-- title -->
-      <label>${msg("post.form.postTitle")}:</label>
-      <input type="text" value="<#if editForm>${post.title!''}</#if>"
-         name="title" id="${htmlId}-title" size="80" />
+         <!-- title -->
+         <label>${msg("post.form.postTitle")}:</label>
+         <input type="text" value="<#if editForm>${post.title!''}</#if>"
+            name="title" id="${htmlId}-title" size="80" />
 
-      <!-- content -->
-      <label>${msg("post.form.postText")}:</label>
-      <textarea rows="8" cols="80" name="content" id="${htmlId}-content"><#if editForm>${post.content!''}</#if></textarea> 
+         <!-- content -->
+         <label>${msg("post.form.postText")}:</label>
+         <textarea rows="8" cols="80" name="content" id="${htmlId}-content"><#if editForm>${post.content!''}</#if></textarea> 
       
-      <!-- tags -->
-      <#if editForm>
-         <#assign tags=post.tags />
-      <#else>
-         <#assign tags=[] />
-      </#if>
-      <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-      <!-- Render the tag inputs -->
-      <@taglibraryLib.renderTagInputs htmlid=htmlId tags=tags tagInputName="tags" />
-      <!-- Render the library component -->
-      <@taglibraryLib.renderTagLibrary htmlid=htmlId site=site tags=tags />
-      <!-- end tags -->
-      
+         <!-- tags -->
+         <#if editForm>
+            <#assign tags=post.tags />
+         <#else>
+            <#assign tags=[] />
+         </#if>
+         <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+         <!-- Render the tag inputs -->
+         <@taglibraryLib.renderTagInputs htmlid=htmlId tags=tags tagInputName="tags" />
+         <!-- Render the library component -->
+         <@taglibraryLib.renderTagLibrary htmlid=htmlId site=site tags=tags />
+         <!-- end tags -->
+      </div>
       <div class="nodeFormAction">
          <input type="submit" id="${htmlId}-save-button" value="<#if editForm>${msg('post.form.update')}<#else>${msg('post.form.saveAsDraft')}</#if>" />         
          <#if isDraft>

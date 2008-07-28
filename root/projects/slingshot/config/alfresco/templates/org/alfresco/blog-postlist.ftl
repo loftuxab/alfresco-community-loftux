@@ -16,12 +16,12 @@
             <div class="yui-b" id="divPostListPosts">
                <@region id="postlist" scope="template" protected=true />
             </div>
+         </div>
 	         <div class="yui-b" id="divPostListFilters">
 	            <@region id="filters" scope="template" protected=true />
 	   			<@region id="archives" scope="template" protected=true />
-	            <@region id="tags" scope="template" protected=true />         
+	            <@region id="tags" scope="template" protected=true />
 	         </div>
-         </div>
       </div>
    </div>
 </@>

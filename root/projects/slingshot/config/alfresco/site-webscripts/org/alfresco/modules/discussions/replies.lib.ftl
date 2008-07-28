@@ -78,9 +78,6 @@
 
    <div class="content">${reply.content}</div>
 </div>
-
-<br clear="all" />
-
 <div class="topicFooter">
    <span class="nodeFooterBloc">
       <span class="nodeAttrLabel replyTo">${msg("replies.footer.replies")}:</span><span class="nodeAttrValue">
