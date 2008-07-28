@@ -68,8 +68,6 @@
    <div class="noNode">${msg("postlist.noPosts")}</div>
 </#if>
 
-<#-- PENDING: find why we have to add this! -->
-</div>
 </#macro>
 
 
@@ -140,7 +138,7 @@
       <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
       <#list post.tags as tag>
       <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-         <a href="" class="tag-link-span">${tag}</a>
+         <a href="#" class="tag-link-span">${tag}</a>
       </span><#if tag_has_next> , </#if> 
       </#list>
    </span>

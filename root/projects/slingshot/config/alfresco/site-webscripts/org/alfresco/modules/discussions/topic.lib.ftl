@@ -60,7 +60,7 @@
       <div class="published">
          <span class="nodeAttrLabel">${msg("topic.info.createdOn")}:</span> <span class="nodeAttrValue"> ${topic.createdOn?datetime?string.medium_short}</span>
          <span class="spacer"> | </span>
-         <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=topic.author /></a></span>      
+         <span class="nodeAttrLabel">${msg("topic.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=topic.author /></span>      
          <br />
          <#if topic.lastReplyBy??>
             <span class="nodeAttrLabel">${msg("topic.info.lastReplyBy")}:</span> <span class="nodeAttrValue"><@userLib.renderUserLink user=topic.lastReplyBy /></span>
@@ -73,9 +73,7 @@
       
       <div class="userLink"><@userLib.renderUserLink user=topic.author /> ${msg("topic.said")}:</div>
       <div class="content">${topic.content}</div>
-   </div>    
-
-   <br clear="all" />
+   </div>
    <div class="nodeFooter">
       <span class="nodeFooterBloc">
          <span class="nodeAttrLabel replyTo">${msg("topic.footer.replies")}:</span><span class="nodeAttrValue"> (${topic.replyCount})</span>
@@ -88,7 +86,7 @@
          <span class="nodeAttrLabel tag">${msg("topic.tags")}:</span>
          <#list topic.tags as tag>
             <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-               <a href="" class="tag-link-span">${tag}</a>
+               <a href="#" class="tag-link-span">${tag}</a>
             </span><#if tag_has_next> , </#if> 
          </#list>
       </span>
@@ -107,41 +105,42 @@
 -->
 <#macro topicFormHTML htmlid topic="">
 <div class="editNodeForm">
-   <form id="${htmlid}-form" name="${htmlid}-form" method="POST"
+   <form id="${htmlid}-form" method="post"
       <#if topic?has_content>
          action="${url.serviceContext}/modules/discussions/topic/update-topic"
       <#else>
          action="${url.serviceContext}/modules/discussions/topic/create-topic"
       </#if>
    >
-      <input type="hidden" name="site" value="${site}">
-      <input type="hidden" name="container" value="${container}" />
-      <input type="hidden" name="browseTopicUrl" value="${url.context}/page/site/${site}/discussions-topicview?container=${container}&topicId={post.name}" />
-      <input type="hidden" name="htmlid" value="${htmlid}">
-      <#if topic?has_content>
-         <input type="hidden" name="topicId" value="${topic.name}" >
-      </#if>
-       
-      <label>${msg("topic.form.topicTitle")}:</label>
-      <input type="text" value="<#if topic?has_content && topic.title?has_content>${topic.title}</#if>"
-             name="title" id="${htmlid}-title" size="80" />
-      <label>${msg("topic.form.topicText")}:</label>
-      <textarea rows="8" cols="80" name="content" id="${htmlid}-content"
-         ><#if topic?has_content && topic.content?has_content>${topic.content}</#if></textarea> 
-         
-      <!-- tags -->
-      <#if topic?has_content>
-         <#assign tags=topic.tags />
-      <#else>
-         <#assign tags=[] />
-      </#if>
-      <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-      <!-- Render the tag inputs -->
-      <@taglibraryLib.renderTagInputs htmlid=htmlid tags=tags tagInputName="tags" />
-      <!-- Render the library component -->
-      <@taglibraryLib.renderTagLibrary htmlid=htmlid site=site tags=tags />
-      <!-- end tags -->
+      <div>
+         <input type="hidden" name="site" value="${site}" />
+         <input type="hidden" name="container" value="${container}" />
+         <input type="hidden" name="browseTopicUrl" value="${url.context}/page/site/${site}/discussions-topicview?container=${container}&amp;topicId={post.name}" />
+         <input type="hidden" name="htmlid" value="${htmlid}" />
+         <#if topic?has_content>
+            <input type="hidden" name="topicId" value="${topic.name}" />
+         </#if>
 
+         <label>${msg("topic.form.topicTitle")}:</label>
+         <input type="text" value="<#if topic?has_content && topic.title?has_content>${topic.title}</#if>"
+                name="title" id="${htmlid}-title" size="80" />
+         <label>${msg("topic.form.topicText")}:</label>
+         <textarea rows="8" cols="80" name="content" id="${htmlid}-content"
+            ><#if topic?has_content && topic.content?has_content>${topic.content}</#if></textarea> 
+         
+         <!-- tags -->
+         <#if topic?has_content>
+            <#assign tags=topic.tags />
+         <#else>
+            <#assign tags=[] />
+         </#if>
+         <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+         <!-- Render the tag inputs -->
+         <@taglibraryLib.renderTagInputs htmlid=htmlid tags=tags tagInputName="tags" />
+         <!-- Render the library component -->
+         <@taglibraryLib.renderTagLibrary htmlid=htmlid site=site tags=tags />
+         <!-- end tags -->
+      </div>
       <div class="nodeFormAction">
          <input type="submit" id="${htmlid}-ok-button" value="<#if topic?has_content>${msg('topic.form.save')}<#else>${msg('topic.form.create')}</#if>" />
          <input type="reset" id="${htmlid}-cancel-button" value="${msg('topic.form.cancel')}" />

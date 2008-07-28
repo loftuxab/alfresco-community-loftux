@@ -6,7 +6,7 @@
     <ul class="filterLink">
         <#list tags as tag>
             <li class="nav-label" id="${args.htmlid}-onTagSelection-${tag.name}">
-                <a  href="" class="tag-link-li nav-link">${tag.name}</a> (${tag.count})
+                <a  href="#" class="tag-link-li nav-link">${tag.name}</a> (${tag.count})
             </li>
         </#list>
 	</ul>

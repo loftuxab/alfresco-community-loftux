@@ -178,6 +178,7 @@
             width: '538px',
             dompath: false, //Turns on the bar at the bottom
             animate: false, //Animates the opening, closing and moving of Editor windows
+            markup: "xhtml",
             toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
 
