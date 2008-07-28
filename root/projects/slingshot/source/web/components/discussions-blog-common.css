@@ -97,7 +97,7 @@ ol li {
   font-weight: normal;
   font-size: 116%;
   color: #333333;
-  background: transparent url(images/back.png) no-repeat scroll 3px 3px;
+  background: transparent url(images/back-arrow.png) no-repeat scroll 3px 3px;
   padding: 0 5px 0 19px;
 }
 #discussionsBlogHeader2 .toolbarOption {

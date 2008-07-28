@@ -96,6 +96,8 @@
        */
       uniqueRecordId : 1,
       
+      actionsColumnTemplate : null,
+      
       /**
        * Set multiple initialization options at once.
        *
@@ -140,7 +142,7 @@
        * @method onReady
        */
       onReady: function InvitationList_onReady()
-      {
+      {   
          // button to invite all people in the list 
          this.widgets.inviteButton = Alfresco.util.createYUIButton(this, "invite-button", this.inviteButtonClick);
          
@@ -162,17 +164,11 @@
          // setup of the datatable
          this._setupDataTable();
 
-         // Hook action events
-         //Alfresco.util.registerDefaultActionHandler(this.id, "InvitationList-tag", "span", this);
-         //Alfresco.util.registerDefaultActionHandler(this.id, "InvitationList-scope-toggle", "a", this);
-
          this._enableDisableInviteButton();
 
          // Hook action events
-         Alfresco.util.registerDefaultActionHandler(this.id, "remove-item-button", "span", this);
-
-         // Finally show the component body here to prevent UI artifacts on YUI button decoration
-         //Dom.setStyle(this.id + "-body", "visibility", "visible");
+         // TODO: cleanup
+         Alfresco.util.myRegisterDefaultActionHandler(this.id, "remove-item-button", "span", this);
       },
       
       _setupDataTable: function InvitationList_setupDataTable()
@@ -207,20 +203,23 @@
             elCell.innerHTML = desc;
          };
 
-         renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
+         renderCellRole = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {  
-            oColumn.width = 160;
+            oColumn.width = 130;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            // cell where to add the element
+            var cell = new YAHOO.util.Element(elCell);
             
             var id = oRecord.getData('id');
-            var desc =
-               '<span  class="roleselect" id="' + me.id + '-roleselector-' + id + '"></span>' +
-               '<span id="'+me.id+'-removeInvitee">' +
-               '  <a href="#" class="remove-item-button"><span class="removeIcon">&nbsp;</span></a>' +
-               '</span>' +
-              '';// '<span class="remove-item-button" id="'+me.id+'-removeInvitee"><span class="removeIcon">&nbsp;</span></span>';
-            elCell.innerHTML = desc;
+            var buttonId = me.id + '-roleselector-' + id;
             
+            // create a clone of the template
+            var actionsColumnTemplate = Dom.get(me.id + '-role-column-template');
+            var templateInstance = actionsColumnTemplate.cloneNode(true);
+            templateInstance.setAttribute("id", "actionsDiv" + id);
+            Dom.setStyle(templateInstance, "display", "");
+
             // define the role dropdown menu and the event listeners
             var rolesMenu = [
                {
@@ -239,19 +238,32 @@
                   }
                }
             ];
-            var elem = YAHOO.util.Dom.get("")
 
-            // create button
-            var button = new YAHOO.widget.Button(
-               {
-                   type: "menu",
-                   label: me.getRoleLabel(oRecord),
-                   name: me.id + "-roleselectorbutton-" + id,
-                   menu: rolesMenu,
-                   container: me.id + '-roleselector-' + id
-               }
-            );
+            // Insert the templateInstance to the column.
+            cell.appendChild (templateInstance);
+
+            // Create a yui button for the role selector.
+            var fButton = Dom.getElementsByClassName("role-selector-button", "button", templateInstance);
+            var button = new YAHOO.widget.Button(fButton[0],
+            {
+               type: "menu",
+               name: buttonId,
+               label: me.getRoleLabel(oRecord),
+               menu: rolesMenu
+            });
             me.listWidgets[id] = { button: button };
+         };
+
+         renderCellRemoveButton = function InvitationList_renderCellRemoveButton(elCell, oRecord, oColumn, oData)
+         {  
+            oColumn.width = 20;
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            var desc =
+               '<span id="'+me.id+'-removeInvitee">' +
+               '  <a href="#" class="remove-item-button"><span class="removeIcon">&nbsp;</span></a>' +
+               '</span>';
+            elCell.innerHTML = desc;
          };
 
          // DataTable column defintions
@@ -260,7 +272,10 @@
             key: "user", label: "User", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
+            key: "role", label: "Role", sortable: false, formatter: renderCellRole, width: 130
+         },
+         {
+            key: "remove", label: "Remove", sortable: false, formatter: renderCellRemoveButton, width: 20
          }];
 
          // DataTable definition
@@ -351,6 +366,10 @@
       {
          // find the correct row
          var recordId = this.widgets.dataTable.getRecordIndex(owner);
+         
+         // remove the element, but first set the empty message (which is static,
+         // thus shared by this table and the one to find users
+         YAHOO.widget.DataTable.MSG_EMPTY = "";
          this.widgets.dataTable.deleteRow(recordId);
          this._enableDisableInviteButton();
       },
@@ -624,7 +643,7 @@
  *        to call the correct method. Id's should follow the form htmlid-actionname[-param]
  *        Actions methods should have the form f(htmlid, ownerId, param)
  */
-Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
+Alfresco.util.myRegisterDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
 {         
    // Hook the tag events
    YAHOO.Bubbling.addDefaultAction(className,
