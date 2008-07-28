@@ -31,6 +31,11 @@ package org.alfresco.extranet;
  */
 public abstract class AbstractCompany extends AbstractEntity
 {
+    public static final String PROP_OID = "oid";
+    public static final String PROP_DESCRIPTION = "description";
+    public static final String PROP_NAME = "name";
+    public static final String PROP_COMPANY_ID = "companyId";
+    
     public static String ENTITY_TYPE = "company";
     
     /**
@@ -42,6 +47,8 @@ public abstract class AbstractCompany extends AbstractEntity
     {
         setCompanyId(companyId);        
     }
+    
+    
 
     /* (non-Javadoc)
      * @see org.alfresco.extranet.AbstractEntity#getEntityType()
@@ -56,9 +63,9 @@ public abstract class AbstractCompany extends AbstractEntity
      * 
      * @return the property names
      */
-    public static String[] getPropertyNames()
+    public String[] getPropertyNames()
     {
-        return new String[] { "companyId", "name", "description", "oid" }; 
+        return new String[] { PROP_COMPANY_ID, PROP_NAME, PROP_DESCRIPTION, PROP_OID }; 
     }
     
     /* (non-Javadoc)
@@ -76,7 +83,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public String getCompanyId()
     {
-        return getStringProperty("companyId");
+        return getStringProperty(PROP_COMPANY_ID);
     }
     
     /**
@@ -86,7 +93,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public void setCompanyId(String companyId)
     {
-        setProperty("companyId", companyId);
+        setProperty(PROP_COMPANY_ID, companyId);
     }
     
     /**
@@ -96,7 +103,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public String getName()
     {
-        return getStringProperty("name");
+        return getStringProperty(PROP_NAME);
     }
     
     /**
@@ -106,7 +113,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public void setName(String name)
     {
-        setProperty("name", name);
+        setProperty(PROP_NAME, name);
     }
         
     /**
@@ -116,7 +123,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public String getDescription()
     {
-        return getStringProperty("description");
+        return getStringProperty(PROP_DESCRIPTION);
     }
     
     /**
@@ -126,7 +133,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public void setDescription(String description)
     {
-        setProperty("description", description);
+        setProperty(PROP_DESCRIPTION, description);
     }
     
     /**
@@ -136,7 +143,7 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public String getOid()
     {
-        return getStringProperty("oid");
+        return getStringProperty(PROP_OID);
     }
     
     /**
@@ -146,6 +153,6 @@ public abstract class AbstractCompany extends AbstractEntity
      */
     public void setOid(String oid)
     {
-        setProperty("oid", oid);
+        setProperty(PROP_OID, oid);
     }
 }

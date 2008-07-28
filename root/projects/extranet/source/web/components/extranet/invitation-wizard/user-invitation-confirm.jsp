@@ -12,6 +12,7 @@
 	// get services
 	InvitationService invitationService = ExtranetHelper.getInvitationService(request);
 	UserService userService = ExtranetHelper.getUserService(request);
+	SyncService syncService = ExtranetHelper.getSyncService(request);
 	
 	// get the invitation hash
 	String hash = (String) request.getParameter("hash");
@@ -40,8 +41,9 @@
 	}
 	else
 	{
-		DatabaseUser user = userService.getUser(userId);
-		if(user != null)
+		// check to see if this user id is available
+		boolean available = syncService.isUserIdAvailable(userId);
+		if(!available)
 		{
 			// redirect to user-invitation with a message
 			request.setAttribute("user-invitation-message", "The user id '" + userId + "' is already in use");

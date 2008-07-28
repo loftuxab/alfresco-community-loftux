@@ -28,13 +28,7 @@
 
 	<@region id="networknews" scope="global"/>
 	<br/>
-	<@region id="alfresco-communities" scope="global"/>
-	<br/>
 	<@region id="alfresco-events" scope="global"/>
-	<br/>
-	<@region id="alfresco-top-contributors" scope="global"/>
-	<br/>
-	<@region id="alfresco-popular-extensions" scope="global"/>
 
 </div>
 

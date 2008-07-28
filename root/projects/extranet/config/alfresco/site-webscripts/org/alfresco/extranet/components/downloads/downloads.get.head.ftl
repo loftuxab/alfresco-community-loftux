@@ -1,6 +1,6 @@
 <script type="text/javascript">
 
-	var host = "http://hosted13.alfresco.com/alfresco";
+	var host = "http://netrepo.alfresco.com/alfresco";
 	
 	var productClass = null;   
 	var version = null;
@@ -47,7 +47,7 @@
 			fileListingDiv.innerHTML = ajaxHtml;
 
 			var first = true;
-			var queryString = "{\"path\":\"/Releases\", \"categories\":[";
+			var queryString = "{\"path\":\"/Network/Releases/Published\", \"categories\":[";
 			if(version != null)
 			{
 				if(!first) { queryString += ","; };

@@ -26,6 +26,7 @@ package org.alfresco.extranet;
 
 import java.util.List;
 
+import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.extranet.database.DatabaseService;
 import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.extranet.ldap.LDAPService;
@@ -48,6 +49,7 @@ public class UserService implements ApplicationContextAware, EntityService
     protected DatabaseService databaseService;
     protected LDAPService ldapService;
     protected MailService mailService;
+    protected SyncService syncService;
     protected WebHelpdeskService webHelpdeskService;
     
     public static int DEFAULT_INVITATION_LENGTH = 7; // a week
@@ -101,6 +103,16 @@ public class UserService implements ApplicationContextAware, EntityService
     }
     
     /**
+     * Sets the sync service.
+     * 
+     * @param syncService the new sync service
+     */
+    public void setSyncService(SyncService syncService)
+    {
+        this.syncService = syncService;
+    }    
+    
+    /**
      * Instantiates a new user service impl.
      */
     public UserService()
@@ -152,6 +164,111 @@ public class UserService implements ApplicationContextAware, EntityService
         
         // send an email
         this.mailService.resetUserPassword(dbUser, newPassword);
+    }
+    
+    /**
+     * Bulk sets user properties onto an existing user object
+     * 
+     * @param userId
+     * @param newUser
+     * @return
+     */
+    public synchronized boolean setUserProperties(String userId, DatabaseUser newUser)
+    {
+        boolean success = false;
+        
+        // load the user
+        DatabaseUser dbUser = this.databaseService.getUser(userId);
+        if(dbUser != null)
+        {
+            newUser.copyPropertiesInto(dbUser);
+            
+            // don't allow the user id to get renamed
+            // TODO: At some point in the future, change this
+            dbUser.setUserId(userId);
+            
+            // update the user
+            this.databaseService.updateUser(dbUser);
+            
+            // sync to ldap
+            LDAPUser ldapUser = this.ldapService.getUser(userId);
+            if(ldapUser != null)
+            {
+                // update ldap user
+                LDAPUser mappedLdapUser = ConversionUtil.toLDAPUser(newUser, ldapUser.getPassword());
+                mappedLdapUser.copyPropertiesInto(ldapUser);
+                this.ldapService.updateUser(ldapUser);
+                
+                // sync to alfresco
+                try
+                {
+                    this.syncService.syncAlfresco(ldapUser);
+                }
+                catch(RemoteConfigException rce)
+                {
+                    rce.printStackTrace();
+                }
+                
+                // sync web helpdesk
+                this.syncWebHelpdeskUser(userId, userId);
+            }
+            
+            // flag success
+            success = true;
+        }
+        
+        return success;
+    }
+    
+    public boolean syncWebHelpdeskUser(String userId, String whdUserId)
+    {
+        boolean success = false;
+        
+        DatabaseUser dbUser = this.databaseService.getUser(userId);
+        if(dbUser != null)
+        {
+            LDAPUser ldapUser = this.ldapService.getUser(userId);
+            if(ldapUser != null)
+            {
+                success = syncService.syncWebHelpdesk(dbUser, whdUserId, ldapUser.getPassword());
+            }
+        }
+        
+        return success;
+    }
+    
+    public boolean changePassword(String userId, String originalPassword, String newPassword1, String newPassword2)
+        throws Exception
+    {
+        boolean success = false;
+        
+        LDAPUser ldapUser = this.ldapService.getUser(userId);
+        if(ldapUser != null)
+        {
+            String currentPassword = ldapUser.getPassword();
+            if(currentPassword != null && currentPassword.equalsIgnoreCase(originalPassword))
+            {
+                if(newPassword1 != null && newPassword1.equalsIgnoreCase(newPassword2))
+                {
+                    ldapUser.setPassword(newPassword1);
+                    success = this.ldapService.updateUser(ldapUser);                    
+                }
+                else
+                {
+                    throw new Exception("The new passwords did not match.");
+                }
+            }
+            else
+            {
+                throw new Exception("The current password is incorrect.");
+            }
+        }
+        else
+        {
+            throw new Exception("The user with ID '" + userId + "' was not found.");
+        }
+        
+        return success;        
     }
 
     

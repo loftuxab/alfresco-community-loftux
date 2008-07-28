@@ -94,7 +94,18 @@ public class LDAPService implements ApplicationContextAware
      */
     public LDAPUser createUser(LDAPUser ldapUser)
     {
-        return userBean.insert(ldapUser);
+        LDAPUser user = null;
+        
+        try
+        {
+            user = userBean.insert(ldapUser);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        return user;
     }
     
     /**
@@ -106,7 +117,18 @@ public class LDAPService implements ApplicationContextAware
      */
     public boolean updateUser(LDAPUser ldapUser)
     {
-        return userBean.update(ldapUser);
+        boolean success = false;
+
+        try
+        {
+            success = userBean.update(ldapUser);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        return success;
     }
     
     /**
@@ -117,7 +139,18 @@ public class LDAPService implements ApplicationContextAware
      */
     public LDAPUser getUser(String userId)
     {
-        return userBean.get(userId);
+        LDAPUser user = null;
+        
+        try
+        {
+            user = userBean.get(userId);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        return user;
     }
     
     

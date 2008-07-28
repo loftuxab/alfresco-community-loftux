@@ -51,30 +51,30 @@ public class DatabaseInvitedUserBean
 	/**
 	 * Insert.
 	 * 
-	 * @param user the user
+	 * @param invitedUser the user
 	 * 
 	 * @return the database invited user
 	 */
-	public DatabaseInvitedUser insert(DatabaseInvitedUser user) 
+	public DatabaseInvitedUser insert(DatabaseInvitedUser invitedUser) 
 	{
 	    // build sql statement
 		String sql = "insert into invited_user (user_id, email, company_id, hash, completed, whd_user_id, alfresco_user_id, description, first_name, middle_name, last_name, expiration_date, group_ids, invitation_type, subscription_start, subscription_end) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 		
         // date formats
         String sqlExpirationDate = null;
-        if(user.getExpirationDate() != null)
+        if(invitedUser.getExpirationDate() != null)
         {
-            sqlExpirationDate = DatabaseService.SQL_DATE_FORMAT.format(user.getExpirationDate());
+            sqlExpirationDate = DatabaseService.SQL_DATE_FORMAT.format(invitedUser.getExpirationDate());
         }
         String sqlSubscriptionStartDate = null;
-        if(user.getSubscriptionStart() != null)
+        if(invitedUser.getSubscriptionStart() != null)
         {
-            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionStart());
+            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(invitedUser.getSubscriptionStart());
         }
         String sqlSubscriptionEndDate = null;
-        if(user.getSubscriptionEnd() != null)
+        if(invitedUser.getSubscriptionEnd() != null)
         {
-            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionEnd());
+            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(invitedUser.getSubscriptionEnd());
         }
 				
 		
@@ -84,20 +84,20 @@ public class DatabaseInvitedUserBean
 	    
 		// arguments and types
 		Object args []= new Object[] {
-		        user.getUserId(),
-		        user.getEmail(),
-		        user.getCompanyId(),
-		        user.getHash(),
-		        user.isCompleted(),
-		        user.getWebHelpdeskUserId(),
-		        user.getAlfrescoUserId(),
-		        user.getDescription(),
-		        user.getFirstName(),
-		        user.getMiddleName(),
-		        user.getLastName(),
+		        invitedUser.getUserId(),
+		        invitedUser.getEmail(),
+		        invitedUser.getCompanyId(),
+		        invitedUser.getHash(),
+		        invitedUser.isCompleted(),
+		        invitedUser.getWebHelpdeskUserId(),
+		        invitedUser.getAlfrescoUserId(),
+		        invitedUser.getDescription(),
+		        invitedUser.getFirstName(),
+		        invitedUser.getMiddleName(),
+		        invitedUser.getLastName(),
 		        sqlExpirationDate,
-		        user.getGroupIds(),
-		        user.getInvitationType(),
+		        invitedUser.getGroupIds(),
+		        invitedUser.getInvitationType(),
 		        sqlSubscriptionStartDate,
 		        sqlSubscriptionEndDate
 		};
@@ -107,57 +107,57 @@ public class DatabaseInvitedUserBean
 		jdbcTemplate.update(sql, args, types);
 		
         // return the user
-        return get(user.getUserId());
+        return get(invitedUser.getUserId());
 	}
 
 	/**
 	 * Update.
 	 * 
-	 * @param user the user
+	 * @param invitedUser the user
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean update(DatabaseInvitedUser user) 
+	public boolean update(DatabaseInvitedUser invitedUser) 
 	{
 	    // build sql statement
 	    String sql = "update invited_user set user_id=?, email=?, company_id=?, hash=?, completed=?, whd_user_id=?, alfresco_user_id=?, description=?, first_name=?, middle_name=?, last_name=?, expiration_date=?, group_ids=?, invitation_type=?, subscription_start=?, subscription_end=? where id = ?";
 	    
         // date formats
         String sqlExpirationDate = null;
-        if(user.getExpirationDate() != null)
+        if(invitedUser.getExpirationDate() != null)
         {
-            sqlExpirationDate = DatabaseService.SQL_DATE_FORMAT.format(user.getExpirationDate());
+            sqlExpirationDate = DatabaseService.SQL_DATE_FORMAT.format(invitedUser.getExpirationDate());
         }
         String sqlSubscriptionStartDate = null;
-        if(user.getSubscriptionStart() != null)
+        if(invitedUser.getSubscriptionStart() != null)
         {
-            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionStart());
+            sqlSubscriptionStartDate = DatabaseService.SQL_DATE_FORMAT.format(invitedUser.getSubscriptionStart());
         }
         String sqlSubscriptionEndDate = null;
-        if(user.getSubscriptionEnd() != null)
+        if(invitedUser.getSubscriptionEnd() != null)
         {
-            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(user.getSubscriptionEnd());
+            sqlSubscriptionEndDate = DatabaseService.SQL_DATE_FORMAT.format(invitedUser.getSubscriptionEnd());
         }
 	    
         // arguments and types
         Object args []= new Object[] {
-                user.getUserId(),
-                user.getEmail(),
-                user.getCompanyId(),
-                user.getHash(),
-                user.isCompleted(),
-                user.getWebHelpdeskUserId(),
-                user.getAlfrescoUserId(),
-                user.getDescription(),
-                user.getFirstName(),
-                user.getMiddleName(),
-                user.getLastName(),
+                invitedUser.getUserId(),
+                invitedUser.getEmail(),
+                invitedUser.getCompanyId(),
+                invitedUser.getHash(),
+                invitedUser.isCompleted(),
+                invitedUser.getWebHelpdeskUserId(),
+                invitedUser.getAlfrescoUserId(),
+                invitedUser.getDescription(),
+                invitedUser.getFirstName(),
+                invitedUser.getMiddleName(),
+                invitedUser.getLastName(),
                 sqlExpirationDate,
-                user.getGroupIds(),
-                user.getInvitationType(),
+                invitedUser.getGroupIds(),
+                invitedUser.getInvitationType(),
                 sqlSubscriptionStartDate,
                 sqlSubscriptionEndDate,
-                user.getId()
+                invitedUser.getId()
         };
         int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.BOOLEAN, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.VARCHAR, Types.VARCHAR, Types.DATE, Types.DATE, Types.INTEGER };
 	    
@@ -169,17 +169,17 @@ public class DatabaseInvitedUserBean
 	/**
 	 * Delete.
 	 * 
-	 * @param user the user
+	 * @param invitedUser the user
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean delete(DatabaseInvitedUser user)
+	public boolean delete(DatabaseInvitedUser invitedUser)
 	{
 	    // build sql statemnet
 		String sql = "delete from invited_user where user_id=?";
 		
 		// arguments and types
-		Object params[] = new Object[] { user.getUserId() };
+		Object params[] = new Object[] { invitedUser.getUserId() };
 		int types[] = new int [] {Types.VARCHAR};
 		
 		// execute the update
@@ -201,14 +201,14 @@ public class DatabaseInvitedUserBean
     /**
      * Gets the.
      * 
-     * @param userId the user id
+     * @param invitedUserId the user id
      * 
      * @return the database invited user
      */
-    public DatabaseInvitedUser get(String userId) 
+    public DatabaseInvitedUser get(String invitedUserId) 
     {
         // build the sql statement
-        String sql = "select * from invited_user where user_id='" + userId + "'";
+        String sql = "select * from invited_user where user_id='" + invitedUserId + "'";
         
         // run the query
         List list = jdbcTemplate.query(sql, new DatabaseInvitedUserRowMapper());

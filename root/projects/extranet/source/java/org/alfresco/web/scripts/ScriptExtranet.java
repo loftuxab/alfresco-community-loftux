@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -151,4 +151,46 @@ public final class ScriptExtranet extends ScriptBase
         return reset;
     }
     
+    /**
+     * Update user.
+     * 
+     * @param userId the user id
+     * @param newUserId the new user id
+     * @param email the email
+     * @param firstName the first name
+     * @param lastName the last name
+     * 
+     * @return true, if successful
+     */
+    public boolean setUserProperties(String originalUserId, String newUserId, String email, String firstName, String lastName)
+        throws Exception
+    {
+        UserService userService = ExtranetHelper.getUserService(((HttpRequestContext)context).getRequest());
+        
+        // load the original user
+        DatabaseUser user = userService.getUser(originalUserId);
+
+        // set our new properties
+        user.setEmail(email);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        
+        return userService.setUserProperties(originalUserId, user); 
+    }
+    
+    public boolean syncWebHelpdeskUser(String userId, String whdUserId)
+        throws Exception
+    {
+        UserService userService = ExtranetHelper.getUserService(((HttpRequestContext)context).getRequest());
+        
+        return userService.syncWebHelpdeskUser(userId, whdUserId);
+    }    
+    
+    public boolean changePassword(String userId, String originalPassword, String newPassword1, String newPassword2)
+        throws Exception
+    {
+        UserService userService = ExtranetHelper.getUserService(((HttpRequestContext)context).getRequest());
+        
+        return userService.changePassword(userId, originalPassword, newPassword1, newPassword2);        
+    }
 }

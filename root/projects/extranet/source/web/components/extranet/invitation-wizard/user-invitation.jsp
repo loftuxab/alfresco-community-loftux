@@ -96,13 +96,13 @@ When you are done, click "Check" below to go to the next step
 		<tr>
 			<td><i>Web Helpdesk User</i></td>
 			<td>
-				<input name="whdUserId" type="text" value="<%=invitedUser.getWebHelpdeskUserId()%>" disabled />
+				<input name="whdUserId" type="text" value="<%=(invitedUser.getWebHelpdeskUserId() != null ? invitedUser.getWebHelpdeskUserId() : "")%>" disabled />
 			</td>
 		</tr>
 		<tr>
 			<td><i>Partners User</i></td>
 			<td>
-				<input name="alfrescoUserId" type="text" value="<%=invitedUser.getAlfrescoUserId()%>" disabled />
+				<input name="alfrescoUserId" type="text" value="<%=(invitedUser.getAlfrescoUserId() != null ? invitedUser.getAlfrescoUserId() : "")%>" disabled />
 			</td>
 		</tr>
 	</table>

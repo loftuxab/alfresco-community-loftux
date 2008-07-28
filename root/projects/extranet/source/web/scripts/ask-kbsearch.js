@@ -126,12 +126,12 @@
 	 		 var link = dataArray[i].getElementsByTagName('link');
 			 var originallink = dataArray[i].getElementsByTagName('originallink');
 			 var icon = dataArray[i].getElementsByTagName('icon');
-			 var url = 'http://hosted13.alfresco.com';
+			 var url = 'http://netrepo.alfresco.com';
 			
 			
 			 // Changed by Uzi:  Build a link that proxies through the endpoint servlet
 			 //swfHyperLink = link[0].attributes.getNamedItem("href").nodeValue;
-			 //swfHyperLink = 'http://hosted13.alfresco.com' + explodeDomainName(swfHyperLink);
+			 //swfHyperLink = 'http://netrepo.alfresco.com' + explodeDomainName(swfHyperLink);
 			 swfHyperLink = link[0].attributes.getNamedItem("href").nodeValue;
 			 var y = swfHyperLink.indexOf("/d/a");
 			 if(y > -1)
@@ -141,7 +141,7 @@
 			 
 			 // Changed by Uzi:  Build a link that proxies through the endpoint servlet			 
 			//pdfHyperLink = originallink[0].attributes.getNamedItem("href").nodeValue;
-			//pdfHyperLink = 'http://hosted13.alfresco.com' + explodeDomainName(pdfHyperLink);
+			//pdfHyperLink = 'http://netrepo.alfresco.com' + explodeDomainName(pdfHyperLink);
 			pdfHyperLink = originallink[0].attributes.getNamedItem("href").nodeValue;
 			var x = pdfHyperLink.indexOf("/d/a");
 			if(x > -1)
@@ -150,10 +150,10 @@
 			}
 
 
-			//http://hosted13.alfresco.com/alfresco/service/api/path/content/workspace/SpacesStore/Company%20Home/Alfresco/AlfrescoPhonelist.pdf
+			//http://netrepo.alfresco.com/alfresco/service/api/path/content/workspace/SpacesStore/Company%20Home/Alfresco/AlfrescoPhonelist.pdf
 
 			iconLink = icon[0].firstChild.data;
-			iconLink = 'http://hosted13.alfresco.com' + explodeDomainName(iconLink)
+			iconLink = 'http://netrepo.alfresco.com' + explodeDomainName(iconLink)
 
 			strObj[i] = swfHyperLink;
 			insertData += "<tr><td><a id=\""+ i +"\" href=\"#void\" onclick=\"setSelectedVar("+i+");YAHOO.com.alfresco.dialog6.show();\"><img src=\"images/preview.gif\" style=\"border-width:0px;vertical-align:middle;\"></img></a>&nbsp;"

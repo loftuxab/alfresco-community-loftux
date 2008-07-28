@@ -7,11 +7,13 @@
 	if(dispatchTo == null)
 	{
 %>
+<a href="?p=admin-tools&dispatchTo=admin-entities">Entities</a>
+<br/>
 <a href="?p=admin-tools&dispatchTo=admin-bulk-invite-user">Bulk Invite User</a>
 <br/>
 <a href="?p=admin-tools&dispatchTo=admin-invite-user">Invite User</a>
 <br/>
-<a href="?p=admin-tools&dispatchTo=admin-entities">Entities</a>
+<a href="?p=admin-tools&dispatchTo=admin-show-invited-users">Show Invited Users</a>
 <br/>
 <%
 		return;

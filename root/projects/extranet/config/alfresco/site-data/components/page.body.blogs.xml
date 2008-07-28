@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component> 
 
-	<url>/components/extranet/rssfeed</url>
+	<url>/components/extranet/blogs</url>
 	
 	<!-- Binding --> 
 	<scope>page</scope>
 	<region-id>body</region-id>
 	<source-id>blogs</source-id>
-  
-  	<properties>
-  		<rss-endpoint>blogs.alfresco.com</rss-endpoint>
-  		<rss-uri>/rss20.xml</rss-uri>
-  	</properties>
+    	
 </component>

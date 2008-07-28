@@ -129,32 +129,6 @@ public class DatabaseService implements ApplicationContextAware
         }
         return user;
     } 
-    
-    public synchronized DatabaseUser startProcessInvitedUser(DatabaseInvitedUser invitedUser, String userId)
-    {
-        DatabaseUser user = userBean.get(invitedUser.getUserId());
-        if(user == null)
-        {
-            // create the database user
-            user = new DatabaseUser(userId);
-        
-            // copy in properties
-            user.setDescription(invitedUser.getDescription());
-            user.setEmail(invitedUser.getEmail());
-            user.setFirstName(invitedUser.getFirstName());
-            user.setMiddleName(invitedUser.getMiddleName());
-            user.setLastName(invitedUser.getLastName());
-            
-            // copy in dates
-            user.setSubscriptionStart(invitedUser.getSubscriptionStart());
-            user.setSubscriptionEnd(invitedUser.getSubscriptionEnd());
-            
-            // insert user
-            user = userBean.insert(user);
-        }
-        
-        return user;
-    }
 
     public synchronized void endProcessInvitedUser(DatabaseInvitedUser invitedUser)
     {
@@ -177,6 +151,16 @@ public class DatabaseService implements ApplicationContextAware
         }
         return user;
     }    
+    
+    public boolean removeInvitedUser(DatabaseInvitedUser invitedUser)
+    {
+        return this.invitedUserBean.delete(invitedUser);
+    }
+    
+    public synchronized List getAllInvitedUsers()
+    {
+        return this.invitedUserBean.list();
+    }
     
     
     ///////////////////////////////////////////////////////////////////////

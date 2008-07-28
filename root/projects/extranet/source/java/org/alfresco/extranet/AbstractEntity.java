@@ -78,13 +78,22 @@ public abstract class AbstractEntity implements Entity
      * 
      * @return the property names
      */
-    public static String[] getPropertyNames()
-    {
-        return new String[] { };
-    }
+    public abstract String[] getPropertyNames();
     
     /* (non-Javadoc)
      * @see org.alfresco.extranet.Entity#getEntityId()
      */
     public abstract String getEntityId();
+    
+    public void copyPropertiesInto(Entity entity)
+    {
+        String[] propertyNames = getPropertyNames();
+        for(int i = 0; i < propertyNames.length; i++)
+        {
+            String propertyName = (String) propertyNames[i];
+            Object propertyValue = getProperty(propertyName);
+            
+            entity.setProperty(propertyName, propertyValue);
+        }
+    }
 }

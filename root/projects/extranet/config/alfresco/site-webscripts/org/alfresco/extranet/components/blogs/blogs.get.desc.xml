@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Alfresco Blogs Component</shortname>
+  <description>Alfresco Blogs Component</description>
+  <url>/components/extranet/blogs</url>
+</webscript>

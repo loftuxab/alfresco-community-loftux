@@ -26,6 +26,11 @@
 	
 	?json={"path":"/Releases","categories":[{"path":"/categories/General/Releases/ReleaseVersion/2.2"}]}
 	
+	
+	http://localhost:8280/extranet/proxy/alfresco/webframework/query?json=
+		{%22path%22:%22/Network/Releases/Published%22,
+		%20%22categories%22:[{%20%22path%22%20:%20%22/categories/General/Releases/ReleaseVersion/2.2%22%20},{%20%22path%22%20:%20%22/categories/General/Releases/ReleasePlatform/Windows%22%20},{%20%22path%22%20:%20%22/categories/General/Releases/ReleaseFamily/enterprise%22%20},{%20%22path%22%20:%20%22/categories/General/Releases/ReleaseClass/Enterprise%20Content%20Management%22%20},{%20%22path%22%20:%20%22/categories/General/Releases/ReleaseAssetType/documentation%22%20}]}
+	
 */
 
 function collectFiles(file, array)
@@ -36,9 +41,12 @@ function collectFiles(file, array)
 	}
 	else
 	{
-		for(var i = 0; i < file.children.length; i++)
+		if(file.children != null)
 		{
-			collectFiles(file.children[i], array);
+			for(var i = 0; i < file.children.length; i++)
+			{
+				collectFiles(file.children[i], array);
+			}
 		}
 	}
 }
@@ -60,25 +68,31 @@ function filterCategories(rootPath, requiredCategories)
 		// create a map of this file's categories
 		var fileCatMap = { };
 		var fileCategories = file.properties["{http://www.alfresco.org/model/content/1.0}categories"];
-		for(var z = 0; z < fileCategories.length; z++)
+		if(fileCategories != null)
 		{
-			var catPath = fileCategories[z].displayPath + "/" + fileCategories[z].name;
-			fileCatMap[catPath] = fileCategories[z];
+			for(var z = 0; z < fileCategories.length; z++)
+			{
+				var catPath = fileCategories[z].displayPath + "/" + fileCategories[z].name;
+				fileCatMap[catPath] = fileCategories[z];
+			}
 		}
 		
 		var keep = true;
 		
 		// walk over the categories we are required to have to have
-		for(var z = 0; z < requiredCategories.length; z++)
+		if(requiredCategories != null)
 		{
-			var catPath = requiredCategories[z].path;
-			//catPath = "/categories/General" + catPath;
-			
-			// make sure that this file has that category
-			var requiredCategory = fileCatMap[catPath];
-			if(requiredCategory == null)
+			for(var z = 0; z < requiredCategories.length; z++)
 			{
-				keep = false;
+				var catPath = requiredCategories[z].path;
+				//catPath = "/categories/General" + catPath;
+				
+				// make sure that this file has that category
+				var requiredCategory = fileCatMap[catPath];
+				if(requiredCategory == null)
+				{
+					keep = false;
+				}
 			}
 		}
 		

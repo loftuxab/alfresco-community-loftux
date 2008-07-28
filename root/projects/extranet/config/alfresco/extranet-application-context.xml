@@ -26,9 +26,17 @@
 		<property name="ldapService" ref="extranet.service.ldap" />
 		<property name="databaseService" ref="extranet.service.database" />
 		<property name="mailService" ref="extranet.service.mail" />
+		<property name="syncService" ref="extranet.service.sync" />
 		<property name="alfrescoHostPort" value="${alfresco.hostPort}" />
 	</bean>
 	<bean id="extranet.service.user" class="org.alfresco.extranet.UserService">
+		<property name="webHelpdeskService" ref="extranet.service.webhelpdesk" />
+		<property name="ldapService" ref="extranet.service.ldap" />
+		<property name="databaseService" ref="extranet.service.database" />
+		<property name="mailService" ref="extranet.service.mail" />
+		<property name="syncService" ref="extranet.service.sync" />
+	</bean>
+	<bean id="extranet.service.sync" class="org.alfresco.extranet.SyncService">
 		<property name="webHelpdeskService" ref="extranet.service.webhelpdesk" />
 		<property name="ldapService" ref="extranet.service.ldap" />
 		<property name="databaseService" ref="extranet.service.database" />
@@ -39,12 +47,14 @@
 		<property name="ldapService" ref="extranet.service.ldap" />
 		<property name="databaseService" ref="extranet.service.database" />
 		<property name="mailService" ref="extranet.service.mail" />
+		<property name="syncService" ref="extranet.service.sync" />
 	</bean>
 	<bean id="extranet.service.company" class="org.alfresco.extranet.CompanyService">
 		<property name="webHelpdeskService" ref="extranet.service.webhelpdesk" />
 		<property name="ldapService" ref="extranet.service.ldap" />
 		<property name="databaseService" ref="extranet.service.database" />
 		<property name="mailService" ref="extranet.service.mail" />
+		<property name="syncService" ref="extranet.service.sync" />
 	</bean>
 
 

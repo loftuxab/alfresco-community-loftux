@@ -133,7 +133,27 @@ public class WebHelpdeskService implements ApplicationContextAware
         
         return success;
     }
+
+    /**
+     * Inserts a web helpdesk user
+     * 
+     * @param formerUserId
+     * @param user
+     * @return
+     */
+    public boolean insertUser(WebHelpdeskUser whdUser)
+    {
+        String sql = "insert into CLIENT (USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, NOTES, LDAP_CONNECTION_ID) values (?,?,?,?,?,?)";
         
+        // arguments and types
+        Object args []= new Object[] { whdUser.getUserId(), whdUser.getFirstName(), whdUser.getLastName(), whdUser.getEmail(), whdUser.getDescription(), whdUser.getLdapConnectionId() };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER };
+        
+        // execute the update
+        int x = jdbcTemplate.update(sql, args, types);
+        return (x > 0);
+    }
+    
     /**
      * Updates a web helpdesk user
      * 
