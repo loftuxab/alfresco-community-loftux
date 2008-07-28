@@ -9,6 +9,9 @@
 	<h2>${msg("header.title")}</h2>
 	<ul class="filterLink" id="tagFilterLinks">
 	<#if tags?size &gt; 0>
+	   <li class="onTagSelection nav-label" id="${args.htmlid}-onTagSelection-alltags">
+	      <a href="#" class="tag-link nav-link">${msg("label.all-tags")}</a>
+	   </li>   
       <#list tags as tag>
       <li class="onTagSelection nav-label" id="${args.htmlid}-onTagSelection-${tag.name}">
          <a href="#" class="tag-link nav-link">${tag.name}</a> (${tag.count})
