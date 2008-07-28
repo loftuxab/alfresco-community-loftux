@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Alfresco Network - Enterprise Product Updates</shortname>
-  <description>Alfresco Network - Enterprise Product Updates</description>
-  <url>/network/enterprise-product-updates</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Library Retrieval</shortname>
-  <description>Library Retrieval</description>
-  <url>/network/library/retrieval</url>
-  <format default="html">argument</format>
-  <authentication>guest</authentication>
-  <transaction>required</transaction>
-</webscript>

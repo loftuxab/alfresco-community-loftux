@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Credential Vault Service</shortname>
-  <description>Credential Vault Service</description>
-  <url>/extranet/credentialvault</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
