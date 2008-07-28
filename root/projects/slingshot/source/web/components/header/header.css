@@ -1,4 +1,4 @@
-   /* Header Component */
+/* Header Component */
 .header
 {
    padding-top: 0.5em;
@@ -14,60 +14,40 @@
 .header div.logo
 {
     float: left;
-    padding-top: 1px;
-    padding-bottom: 2px;
+    padding: 5px 0px 5px 2px;
 }
 
 .header div.personal-menu
 {
     float: left;
-    margin: 5px 0px 0px 10px;
-}
-
-.header div.collaboration-menu
-{
-    text-align: center;
-    margin: 5px 0px 0px 0px;
+    margin: 9px 0px 0px 10px;
 }
 
 .header div.util-menu
 {
-    margin: 5px 10px 0px 0px;
     float: right;
+    margin: 7px 10px 0px 0px;
 }
 
-.header .search-tinput {
+.header .search-tinput
+{
 	color: default;
 }
 
-.header .search-tinput.gray {
+.header .search-tinput.gray
+{
 	color: #ddd;
 }
 
-.header .search-container{
+.header .search-container
+{
    display: inline;
    padding-right: 16px;  /* leave space for the select site icon */
    position: relative;
 }
 
-/*
-.header .search-icon {
- background: url(../images/search.gif) no-repeat left bottom;
-   cursor: pointer;
-   padding-left: 20px;
-   right: 35px; 
-   position:relative;
-}
-
-.header .search-site-icon {
-   position: relative;
-   background: url(../images/select_arrow.gif) no-repeat center center;
-   padding-left: 12px;
-   right: 25px; 
-}
-*/
-
-.header .search-icon {
+.header .search-icon
+{
    background: url(../images/search.gif) no-repeat left bottom;
    cursor: pointer;
    position: absolute;
@@ -76,7 +56,8 @@
    right: 24px;
 }
 
-.header .search-site-icon {
+.header .search-site-icon
+{
    background: url(../images/select_arrow.gif) no-repeat left bottom;
    cursor: pointer;
    position: absolute;
@@ -88,20 +69,22 @@
 /* IE6 fix */
 * html .header .search-icon {position: fixed;}
 * html .header .search-site-icon {position: fixed;}
-/* */ 
+/* */
 
-.header .searchtoggleitemlabel.disabled {
+.header .searchtoggleitemlabel.disabled
+{
 	color: #ccc;
 	cursor: default;
 }
 
-.header .searchtoggle {
+.header .searchtoggle
+{
 	visibility: hidden;
 	position: relative;
 }
 
-
-.header div.toggle-search {
+.header div.toggle-search
+{
 	min-width: 250px;
 	display: inline;
 	border: 1px solid #C5D6E2;
@@ -111,14 +94,16 @@
 	background: url(../images/search.gif) no-repeat center right;
 }
 
-.header .searchtoggle .bd {    
+.header .searchtoggle .bd
+{    
 	zoom: normal;
 	border: 1px thin #84B4D5;
 	background-color: #EBEFF1;
 	padding: 4px;
 }
 
-.header .bd .searchtoggle .searchtoggleitemlabel {
+.header .bd .searchtoggle .searchtoggleitemlabel
+{
 	color: #fff;
 	cursor:pointer;
 	padding: 4px;
@@ -126,11 +111,13 @@
 	padding-left: 10px;		
 }
 
-.header .bd .searchtoggle .searchtoggleitemlabel.disabled:hover {
+.header .bd .searchtoggle .searchtoggleitemlabel.disabled:hover
+{
 	color: #eee;
 	cursor: default;
 }
 
-.header .bd .searchtoggle .searchtoggleitemlabel.disabled .searchtoggleitem.selected {
+.header .bd .searchtoggle .searchtoggleitemlabel.disabled .searchtoggleitem.selected
+{
 	background-color: transparent;
 }
