@@ -210,7 +210,7 @@
                scope: this,
                object : { mode : "edit" }
             },
-            failureMessage: this._msg("topic.msg.failedloadeditform"),
+            failureMessage: this._msg("topic.msg.failedloadeditform")
          });
       },
 

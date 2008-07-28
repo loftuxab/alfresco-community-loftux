@@ -114,6 +114,6 @@
             elem.setAttribute('type', 'hidden');
             formElem.appendChild(elem);
          }
-      },
+      }
    };     
 })();

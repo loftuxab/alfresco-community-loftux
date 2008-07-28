@@ -16,7 +16,7 @@
    new Alfresco.ConfigBlog("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "blog",
+      containerId: "blog"
    }).setMessages(
       ${messages}
    );;
