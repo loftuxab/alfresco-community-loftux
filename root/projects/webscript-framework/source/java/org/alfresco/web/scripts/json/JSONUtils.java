@@ -263,4 +263,15 @@ public class JSONUtils
             json.value(value);
         }
     }    
+    
+    /**
+     * Encodes a JSON string value
+     * 
+     * @param value     value to encode
+     * @return String   encoded value
+     */
+    public String encodeJSONString(String value)
+    {
+        return JSONWriter.encodeJSONString(value);
+    }
 }

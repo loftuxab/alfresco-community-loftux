@@ -242,6 +242,9 @@ public abstract class AbstractWebScript implements WebScript
         params.put("headersM", createHeadersM(req));
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
+        
+        // add the json utilities
+        params.put("jsonUtils", new JSONUtils());
 
         // populate model with template methods
         params.put("absurl", new AbsoluteUrlMethod(req.getServerPath()));
