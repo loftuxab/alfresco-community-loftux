@@ -37,6 +37,8 @@ td.userprofile-label
 <@anchor pageType="editprofile">Edit my profile</@anchor>
 |
 <@anchor pageType="viewcredentials">View/Edit my credentials</@anchor>
+|
+<@anchor pageType="changepassword">Change my password</@anchor>
 
 
 <br/>
@@ -44,12 +46,15 @@ td.userprofile-label
 <font size="4">User Profile</font>
 <br/>
 <br/>
+
+<form action="${url.full}" method="POST">
+
 <table class="userprofile">
 	<tr>
 		<td>*</td>
 		<td class="userprofile-label">User Name</td>
 		<td>
-			<input name="username" type="text" value="${user.id}"/>
+			<input name="username" type="text" value="${user.id}" disabled/>
 		</td>
 	</tr>
 	<tr>
@@ -76,5 +81,8 @@ td.userprofile-label
 </table>
 
 <br/>
+<input name="username" value="${user.id}" type="hidden"/>
+<input type="hidden" name="originalUsername" value="${user.id}"/>
 <input type="submit" value="Save this Profile"/>
 
+</form>

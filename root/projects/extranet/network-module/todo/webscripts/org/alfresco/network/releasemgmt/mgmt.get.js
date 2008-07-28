@@ -1,3 +1,44 @@
+<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/ReleaseManagement/releases-include.js">
+
+function getArg(argName)
+{
+	var value = args[argName];
+	if("" == value)
+	{
+		value = null;
+	}
+	return value;
+}
+
+//
+// incoming args
+//
+var display = getArg("display");
+if(display == null)
+{
+	display = "incoming";
+}
+model.display = display;
+var displayPath = getArg("displayPath");
+model.displayPath = displayPath;
+var pushVersion = getArg("pushVersion");
+model.pushVersion = pushVersion;
+var pushPlatform = getArg("pushPlatform");
+model.pushPlatform = pushPlatform;
+var pushFamily = getArg("pushFamily");
+model.pushFamily = pushFamily;
+var pushAssetType = getArg("pushAssetType");
+model.pushAssetType = pushAssetType;
+var pushDescriptor = getArg("pushDescriptor");
+model.pushDescriptor = pushDescriptor;
+var pushClass = getArg("pushClass");
+model.pushClass = pushClass;
+
+
+
+//
+// query for content and filter
+//
 var platformContent = { };
 model.platformContent = platformContent;
 var descriptorContent = { };
@@ -9,12 +50,75 @@ model.typeContent = typeContent;
 var classContent = { };
 model.classContent = classContent;
 
+
+
+// walk all content in this folder and sort it into version categories
+var categorizedContent = { };
+var topFolder = model.releasesFolder;
+if(display != null)
+{
+	if("all" == display)
+	{
+	}
+	else if("incoming" == display)
+	{
+		topFolder = model.releasesFolder.childByNamePath("Incoming");
+	}
+	else if("path" == display)
+	{
+		topFolder = model.publishedFolder.childByNamePath(displayPath);
+	}
+	
+}
+sortVersions(topFolder, categorizedContent);
+
+// set into model
+model.contents = categorizedContent;
+
+
+
+
+
+
+// root 
+function passesFilter(file)
+{
+	var valid = true;
+
+	if(model.pushVersion != null && valid)
+	{
+		valid = hasVersion(file, model.pushVersion);
+	}
+	if(model.pushPlatform != null && valid)
+	{
+		valid = hasPlatform(file, model.pushPlatform);
+	}
+	if(model.pushFamily != null && valid)
+	{
+		valid = hasFamily(file, model.pushFamily);
+	}
+	if(model.pushAssetType != null && valid)
+	{
+		valid = hasAssetType(file, model.pushAssetType);
+	}
+	if(model.pushDescriptor != null && valid)
+	{
+		valid = hasDescriptor(file, model.pushDescriptor);
+	}
+	if(model.pushClass != null && valid)
+	{
+		valid = hasProductClass(file, model.pushClass);
+	}
+	
+	return valid;
+}
+
 function sortVersions(file, bucket)
 {
-	if(file.isDocument)
+	if(file.isDocument && passesFilter(file))
 	{
 		var sorted = false;
-		
+
 		var categories = file.properties["{http://www.alfresco.org/model/content/1.0}categories"];
 		if(categories != null)
 		{
@@ -53,7 +157,7 @@ function sortVersions(file, bucket)
 				}
 			}
 		}
-		
+
 		if(!sorted)
 		{
 			var files = bucket["unknown"];
@@ -67,95 +171,12 @@ function sortVersions(file, bucket)
 	}
 	else
 	{
-		for(var i = 0; i < file.children.length; i++)
+		if(file.children != null)
 		{
-			sortVersions(file.children[i], bucket);
+			for(var i = 0; i < file.children.length; i++)
+			{
+				sortVersions(file.children[i], bucket);
+			}
 		}
 	}
 }
-
-
-// get the "Releases" folder
-var categorizedContent = { };
-var releasesFolder = companyhome.childByNamePath("Releases");
-
-// walk all content in this folder and sort it into version categories
-sortVersions(releasesFolder, categorizedContent);
-
-// set into model
-model.contents = categorizedContent;
-
-
-
-
-// gather root categories
-var rootCategories = classification.getRootCategories("cm:generalclassifiable");
-
-// find the releases root category
-var rootCategory = null;
-for(var i = 0; i < rootCategories.length; i++)
-{
-	if(rootCategories[i].name == "Releases")
-		rootCategory = rootCategories[i];
-}
-model.rootCategory = rootCategory;
-
-
-// build a map of the versions
-var versions = new Array();
-var versionsCategory = rootCategory.childByNamePath("ReleaseVersion");
-for(var i = 0; i < versionsCategory.children.length; i++)
-{
-	versions[versions.length] = versionsCategory.children[i];
-}
-model.versions = versions;
-
-
-// build a map of the platforms
-var platforms = new Array();
-var platformsCategory = rootCategory.childByNamePath("ReleasePlatform");
-for(var i = 0; i < platformsCategory.children.length; i++)
-{
-	platforms[platforms.length] = platformsCategory.children[i];
-}
-model.platforms = platforms;
-
-
-// build a map of the descriptors
-var descriptors = new Array();
-var descriptorsCategory = rootCategory.childByNamePath("ReleaseFileDescriptor");
-for(var i = 0; i < descriptorsCategory.children.length; i++)
-{
-	descriptors[descriptors.length] = descriptorsCategory.children[i];
-}
-model.descriptors = descriptors;
-
-
-// build a map of the families
-var families = new Array();
-var familiesCategory = rootCategory.childByNamePath("ReleaseFamily");
-for(var i = 0; i < familiesCategory.children.length; i++)
-{
-	families[families.length] = familiesCategory.children[i];
-}
-model.families = families;
-
-
-// build a map of the asset types
-var assetTypes = new Array();
-var assetTypesCategory = rootCategory.childByNamePath("ReleaseAssetType");
-for(var i = 0; i < assetTypesCategory.children.length; i++)
-{
-	assetTypes[assetTypes.length] = assetTypesCategory.children[i];
-}
-model.assetTypes = assetTypes;
-
-
-// build a map of the product class
-var productClasses = new Array();
-var productClassCategory = rootCategory.childByNamePath("ReleaseClass");
-for(var i = 0; i < productClassCategory.children.length; i++)
-{
-	productClasses[productClasses.length] = productClassCategory.children[i];
-}
-model.productClasses = productClasses;

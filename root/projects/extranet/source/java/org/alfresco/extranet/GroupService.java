@@ -46,6 +46,7 @@ public class GroupService implements ApplicationContextAware, EntityService
     protected DatabaseService databaseService;
     protected LDAPService ldapService;
     protected MailService mailService;
+    protected SyncService syncService;
     protected WebHelpdeskService webHelpdeskService;
     
     public static int DEFAULT_INVITATION_LENGTH = 7; // a week
@@ -97,6 +98,16 @@ public class GroupService implements ApplicationContextAware, EntityService
     {
         this.mailService = mailService;
     }
+    
+    /**
+     * Sets the sync service.
+     * 
+     * @param syncService the new sync service
+     */
+    public void setSyncService(SyncService syncService)
+    {
+        this.syncService = syncService;
+    }    
     
     /**
      * Instantiates a new group service impl.

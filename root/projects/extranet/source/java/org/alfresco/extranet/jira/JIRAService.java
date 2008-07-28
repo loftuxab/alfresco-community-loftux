@@ -38,7 +38,7 @@ public class JIRAService implements ApplicationContextAware
     protected String username;
     protected String password;
     
-    protected JIRAClient client;
+    //protected JIRAClient client;
     
     /* (non-Javadoc)
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
@@ -65,6 +65,7 @@ public class JIRAService implements ApplicationContextAware
     
     public synchronized JIRAClient getClient()
     {
+        /*
         if(client == null)
         {
             try
@@ -77,6 +78,20 @@ public class JIRAService implements ApplicationContextAware
             }
         }
         
-        return client;        
+        return client;
+        */
+        
+        JIRAClient client = null;
+        
+        try
+        {
+            client = new JIRAClient(server, username, password);
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        return client;
     }
 }

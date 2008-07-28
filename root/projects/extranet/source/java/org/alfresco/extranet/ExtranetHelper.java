@@ -28,6 +28,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.extranet.jira.JIRAService;
+import org.alfresco.extranet.ldap.LDAPCompany;
+import org.alfresco.extranet.ldap.LDAPGroup;
+import org.alfresco.extranet.ldap.LDAPUser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -164,6 +167,32 @@ public class ExtranetHelper
         return (JIRAService) context.getBean("extranet.service.jira");                
     }
     
+    /**
+     * Gets the sync service.
+     * 
+     * @param request the request
+     * 
+     * @return the sync service
+     */
+    public static SyncService getSyncService(HttpServletRequest request)
+    {
+        return getSyncService(request.getSession().getServletContext());        
+    }
+    
+    /**
+     * Gets the sync service.
+     * 
+     * @param servletContext the servlet context
+     * 
+     * @return the sync service
+     */
+    public static SyncService getSyncService(ServletContext servletContext)
+    {
+        ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return (SyncService) context.getBean("extranet.service.sync");
+    }
+    
+    
     
     
     // Helper Functions
@@ -199,17 +228,19 @@ public class ExtranetHelper
     {
         String[] propertyNames = null;
         
+        // TODO: This needs to be rethought
+        
         if("company".equals(entityType))
         {
-            propertyNames = AbstractCompany.getPropertyNames();
+            propertyNames = new LDAPCompany("dummy").getPropertyNames();
         }
         else if("user".equals(entityType))
         {
-            propertyNames = AbstractUser.getPropertyNames();
+            propertyNames = new LDAPUser("dummy").getPropertyNames();
         }
         else if("group".equals(entityType))
         {
-            propertyNames = AbstractGroup.getPropertyNames();
+            propertyNames = new LDAPGroup("dummy").getPropertyNames();
         }        
         
         return propertyNames;

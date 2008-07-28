@@ -1,86 +1,168 @@
 <html>
   <head>
-  	<link rel="stylesheet" href="/alfresco/css/main.css" type="text/css">
+	<style type="text/css">
+	<!--
+	body
+	{
+		font: 10px arial;
+	}
+	
+	input,textarea,select
+	{
+	   font-family: Tahoma, Arial, Helvetica, sans-serif;
+	   font-size: 10px;
+	}
+	
+	table
+	{
+		background-color: white;
+	}
+	th {
+		font: 10px arial;
+		padding: 1px 1px 1px 1px;
+		background-color: white;
+		-moz-border-radius: 0px 0px 0px 0px;
+	}
+	td {
+		font: 10px arial;
+		background-color: white;
+		-moz-border-radius: 0px 0px 0px 0px;
+	}
+	td.label
+	{
+		font: bold 12px arial;
+	}
+	td.grayed
+	{
+		font: 10px arial;
+		padding: 4px 4px 4px 4px;
+		background-color: white;
+		-moz-border-radius: 0px 0px 0px 0px;
+		color: lightgray;
+	}
+	-->
+	</style>
   </head>
   <body>
   
-  <form method="POST" action="/alfresco/service/releasemgmt">
+  <h1>Browse</h1>
+
+  <form method="GET" action="/alfresco/service/releasemgmt">
   
   <!-- tools -->
-  Version:
-  <select name="pushVersion">
-  	<option value="" checked></option>
-  <#list versions as version>
-  	<option value="${version.nodeRef}">${version.name}</option>
-  </#list>
-  </select>
+  <table>
+  <tr>
+  	<td align="left" valign="top" nowrap>
+  		<input type="radio" name="display" value="incoming" <#if display == 'incoming'>checked</#if>>Show incoming files
+  		<br/>
+  		<input type="radio" name="display" value="all" <#if display == 'all'>checked</#if>>Show all files
+  		<br/>
+  		<input type="radio" name="display" value="path" <#if display == 'path'>checked</#if>>Specific path:
+  		<br/>
+  		<input type="text" name="displayPath" size="40" value="<#if displayPath?exists>${displayPath}</#if>"/>
+  	</td>
+  	<td align="left" valign="top">
+  		<B>Version</B>
+  		<br/>
+		<select name="pushVersion">
+			<option value="" checked></option>
+			<#list versions as version>
+				<option value="${version.name}" <#if pushVersion?exists && version.name == pushVersion>selected</#if> >
+					${version.name}
+				</option>
+			</#list>
+		</select>
+	</td>
+	<td align="left" valign="top">
+		<B>Platform</B>
+		<br/>
+		<select name="pushPlatform" multiple size=4>
+			<option value="" checked></option>
+			<#list platforms as platform>
+				<option value="${platform.name}" <#if pushPlatform?exists && platform.name == pushPlatform>selected</#if> >
+					${platform.name}
+				</option>
+			</#list>
+		</select>
+	</td>
+	<td align="left" valign="top">
+		<B>Family</B>
+		<br/>
+		<select name="pushFamily">
+			<option value="" checked></option>
+			<#list families as family>
+				<option value="${family.name}" <#if pushFamily?exists && family.name == pushFamily>selected</#if> >
+					${family.name}
+				</option>
+			</#list>
+		</select>
+	</td>
+	<td align="left" valign="top">
+		<B>Asset Type</B>
+		<br/>
+		<select name="pushAssetType">
+			<option value="" checked></option>
+			<#list assetTypes as assetType>
+				<option value="${assetType.name}" <#if pushAssetType?exists && assetType.name == pushAssetType>selected</#if> >
+					${assetType.name}
+				</option>
+			</#list>
+		</select>
+	</td>
+	<td align="left" valign="top">
+		<B>Descriptors</B>
+		<br/>
+		<select name="pushDescriptor">
+			<option value="" checked></option>
+			<#list descriptors as descriptor>
+				<option value="${descriptor.name}" <#if pushDescriptor?exists && descriptor.name == pushDescriptor>selected</#if> >
+					${descriptor.name}
+				</option>
+			</#list>
+		</select>
+	</td>
+	<td align="left" valign="top">
+		<B>Product</B>
+		<br/>
+		<select name="pushClass" multiple size=4>
+			<option value="" checked></option>
+			<#list productClasses as productClass>
+				<option value="${productClass.name}" <#if pushClass?exists && productClass.name == pushClass>selected</#if> >
+					${productClass.name}
+				</option>
+			</#list>
+		</select>
+	</td>
+	<td align="left" valign="top">
+
+		<input type="submit" value="Apply Filter"/>
+	</td>
+	
+  </tr>
+  </table>
+
   
-  Platform:
-  <select name="pushPlatform" multiple>
-  	<option value="" checked></option>
-  <#list platforms as platform>
-  	<option value="${platform.nodeRef}">${platform.name}</option>
-  </#list>
-  </select>
-
-  Family:
-  <select name="pushFamily">
-  	<option value="" checked></option>
-  <#list families as family>
-  	<option value="${family.nodeRef}">${family.name}</option>
-  </#list>
-  </select>
-
-  Asset Type:
-  <select name="pushAssetType">
-  	<option value="" checked></option>
-  <#list assetTypes as assetType>
-  	<option value="${assetType.nodeRef}">${assetType.name}</option>
-  </#list>
-  </select>
-
-  Descriptors:
-  <select name="pushDescriptor">
-  	<option value="" checked></option>
-  <#list descriptors as descriptor>
-  	<option value="${descriptor.nodeRef}">${descriptor.name}</option>
-  </#list>
-  </select>
-
-  Product:
-  <select name="pushClass" multiple>
-  	<option value="" checked></option>
-  <#list productClasses as productClass>
-  	<option value="${productClass.nodeRef}">${productClass.name}</option>
-  </#list>
-  </select>
   
-  <input type="submit" value="SET"/>
   
   <hr/>
 
 	<table border="0" width="100%">
 		<tr>
-			<td>Version</td>
-			<td></td>
-			<td>File</td>
-			
-			<td>Platform</td>
-			<td>Descriptor</td>
-			<td>Family</td>
-			<td>Type</td>
-			<td>Product Class</td>
+			<td class="label">Version</td>
+			<td class="label"></td>
+			<td class="label" width="100%">Files</td>
 		</tr>
 				
 <#list versions as version>
 
 	<#assign versionId = version.name>
-
+	
+	<#if contents[versionId]?exists && contents[versionId]?size &gt; 0>
+	
 		<tr>
-			<td colspan="8" align="center"><font size="3"><B>${versionId}</B></font></td>
+			<td colspan="3" align="center"><font size="3"><B>${versionId}</B></font></td>
 		</tr>
 	
-	<#if contents[versionId]?exists>
 		<#list contents[versionId] as file>
 
 			<#assign platform = "">
@@ -104,15 +186,12 @@
 				<#assign productClass = classContent[file.nodeRef]>
 			</#if>
 			
+			<#assign filePath = file.displayPath + "/" + file.name>
+			
 			<tr>
 				<td></td>
 				<td><input type="checkbox" name="selectedFiles" value="${file.nodeRef}" /></td>
-				<td>${file.name}</td>
-				<td>${platform}</td>
-				<td>${descriptor}</td>
-				<td>${family}</td>
-				<td>${assetType}</td>
-				<td>${productClass}</td>
+				<td width="100%">${filePath}</td>
 			</tr>
 
 		</#list>
@@ -123,26 +202,32 @@
 
 
 <!-- show the unknowns -->
+	
+	<#if contents["unknown"]?exists && contents["unknown"]?size &gt; 0>
 
 		<tr>
-			<td colspan="8" align="center"><font size="3"><B>Unknown</B></font></td>
+			<td colspan="3" align="center"><font size="3"><B>Unknown</B></font></td>
 		</tr>
-	
-	<#if contents["unknown"]?exists>
+
 		<#list contents["unknown"] as file>
 
+			<#assign filePath = file.displayPath + "/" + file.name>
 			<tr>
 				<td></td>
 				<td>
 					<input type="checkbox" name="selectedFiles" value="${file.nodeRef}" />
 				</td>
-				<td>${file.name}</td>
-				<td colspan="5"></td>
+				<td width="10)%">${filePath}</td>
 			</tr>
 
 		</#list>
 	</#if>
   
+  
+  	<br/>
+  	<br/>
+  	
+  	<input type="button" name="classify" id="classify" value="Tag these files" onClick="this.form.action = '/alfresco/service/releasemgmt-tag'; this.form.submit();"/>
   </form>
   
   </body>

@@ -33,10 +33,14 @@ import org.alfresco.extranet.AbstractUser;
  */
 public class DatabaseUser extends AbstractUser
 {
+    public static final String PROP_LEVEL = "level";
+    public static final String PROP_SUBSCRIPTION_START = "subscriptionStart";
+    public static final String PROP_SUBSCRIPTION_END = "subscriptionEnd";
+    
     protected int id;
-    protected Date subscriptionStart;
-    protected Date subscriptionEnd;
-    protected String level;
+    //protected Date subscriptionStart;
+    //protected Date subscriptionEnd;
+    //protected String level;
     
     /**
      * Instantiates a new extranet user.
@@ -62,6 +66,17 @@ public class DatabaseUser extends AbstractUser
     }
     
     /**
+     * Gets the property names.
+     * 
+     * @return the property names
+     */
+    public String[] getPropertyNames()
+    {
+        return new String[] { PROP_USER_ID, PROP_FIRST_NAME, PROP_MIDDLE_NAME, PROP_LAST_NAME, PROP_EMAIL, PROP_DESCRIPTION, PROP_LEVEL, PROP_SUBSCRIPTION_START, PROP_SUBSCRIPTION_END}; 
+    }    
+    
+    
+    /**
      * Gets the id.
      * 
      * @return the id
@@ -73,31 +88,31 @@ public class DatabaseUser extends AbstractUser
     
     public String getLevel()
     {
-        return this.level;
+        return getStringProperty(PROP_LEVEL);
     }
     
     public void setLevel(String level)
     {
-        this.level = level;
+        setProperty(PROP_LEVEL, level);
     }
     
     public Date getSubscriptionStart()
     {
-        return this.subscriptionStart;
+        return (Date) getProperty(PROP_SUBSCRIPTION_START);
     }
 
     public void setSubscriptionStart(Date subscriptionStart)
     {
-        this.subscriptionStart = subscriptionStart;
+        setProperty(PROP_SUBSCRIPTION_START, subscriptionStart);
     }
     
     public Date getSubscriptionEnd()
     {
-        return this.subscriptionEnd;
+        return (Date) getProperty(PROP_SUBSCRIPTION_END);
     }
     
     public void setSubscriptionEnd(Date subscriptionEnd)
     {
-        this.subscriptionEnd = subscriptionEnd;
+        setProperty(PROP_SUBSCRIPTION_END, subscriptionEnd);
     }
 }

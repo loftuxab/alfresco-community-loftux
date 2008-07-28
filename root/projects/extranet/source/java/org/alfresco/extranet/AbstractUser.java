@@ -31,6 +31,13 @@ package org.alfresco.extranet;
  */
 public abstract class AbstractUser extends AbstractEntity
 {
+    public static final String PROP_DESCRIPTION = "description";
+    public static final String PROP_EMAIL = "email";
+    public static final String PROP_LAST_NAME = "lastName";
+    public static final String PROP_MIDDLE_NAME = "middleName";
+    public static final String PROP_FIRST_NAME = "firstName";
+    public static final String PROP_USER_ID = "userId";
+    
     public static String ENTITY_TYPE = "user";
     
     /**
@@ -56,9 +63,9 @@ public abstract class AbstractUser extends AbstractEntity
      * 
      * @return the property names
      */
-    public static String[] getPropertyNames()
+    public String[] getPropertyNames()
     {
-        return new String[] { "userId", "firstName", "middleName", "lastName", "email", "description" }; 
+        return new String[] { PROP_USER_ID, PROP_FIRST_NAME, PROP_MIDDLE_NAME, PROP_LAST_NAME, PROP_EMAIL, PROP_DESCRIPTION }; 
     }    
     
     /* (non-Javadoc)
@@ -76,7 +83,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public String getUserId()
     {
-        return getStringProperty("userId");
+        return getStringProperty(PROP_USER_ID);
     }
     
     /**
@@ -86,7 +93,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public void setUserId(String userId)
     {
-        setProperty("userId", userId);
+        setProperty(PROP_USER_ID, userId);
     }
     
     /**
@@ -96,7 +103,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public String getFirstName()
     {
-        return getStringProperty("firstName");        
+        return getStringProperty(PROP_FIRST_NAME);        
     }
     
     /**
@@ -106,7 +113,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public void setFirstName(String firstName)
     {
-        setProperty("firstName", firstName);
+        setProperty(PROP_FIRST_NAME, firstName);
     }
     
     /**
@@ -116,7 +123,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public String getMiddleName()
     {
-        return getStringProperty("middleName");        
+        return getStringProperty(PROP_MIDDLE_NAME);        
     }
     
     /**
@@ -126,7 +133,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public void setMiddleName(String middleName)
     {
-        setProperty("middleName", middleName);
+        setProperty(PROP_MIDDLE_NAME, middleName);
     }
     
     /**
@@ -136,7 +143,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public String getLastName()
     {
-        return getStringProperty("lastName");
+        return getStringProperty(PROP_LAST_NAME);
     }
     
     /**
@@ -146,7 +153,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public void setLastName(String lastName)
     {
-        setProperty("lastName", lastName);
+        setProperty(PROP_LAST_NAME, lastName);
     }
     
     /**
@@ -156,7 +163,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public String getEmail()
     {
-        return getStringProperty("email");
+        return getStringProperty(PROP_EMAIL);
     }
     
     /**
@@ -166,7 +173,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public void setEmail(String email)
     {
-        setProperty("email", email);
+        setProperty(PROP_EMAIL, email);
     }
     
     /**
@@ -176,7 +183,7 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public String getDescription()
     {
-        return getStringProperty("description");
+        return getStringProperty(PROP_DESCRIPTION);
     }
     
     /**
@@ -186,6 +193,6 @@ public abstract class AbstractUser extends AbstractEntity
      */
     public void setDescription(String description)
     {
-        setProperty("description", description);
+        setProperty(PROP_DESCRIPTION, description);
     }
 }

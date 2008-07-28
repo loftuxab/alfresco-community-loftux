@@ -31,6 +31,11 @@ package org.alfresco.extranet;
  */
 public abstract class AbstractGroup extends AbstractEntity
 {
+    public static final String PROP_GROUP_TYPE = "groupType";
+    public static final String PROP_DESCRIPTION = "description";
+    public static final String PROP_NAME = "name";
+    public static final String PROP_GROUP_ID = "groupId";
+    
     public static String ENTITY_TYPE = "group";
     
     /**
@@ -56,9 +61,9 @@ public abstract class AbstractGroup extends AbstractEntity
      * 
      * @return the property names
      */
-    public static String[] getPropertyNames()
+    public String[] getPropertyNames()
     {
-        return new String[] { "groupId", "name", "description", "groupType" }; 
+        return new String[] { PROP_GROUP_ID, PROP_NAME, PROP_DESCRIPTION, PROP_GROUP_TYPE }; 
     }    
     
     /* (non-Javadoc)
@@ -76,7 +81,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public String getGroupId()
     {
-        return getStringProperty("groupId");
+        return getStringProperty(PROP_GROUP_ID);
     }
     
     /**
@@ -86,7 +91,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public void setGroupId(String groupId)
     {
-        setProperty("groupId", groupId);
+        setProperty(PROP_GROUP_ID, groupId);
     }
     
     /**
@@ -96,7 +101,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public String getName()
     {
-        return getStringProperty("name");
+        return getStringProperty(PROP_NAME);
     }
     
     /**
@@ -106,7 +111,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public void setName(String name)
     {
-        setProperty("name", name);
+        setProperty(PROP_NAME, name);
     }
         
     /**
@@ -116,7 +121,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public String getDescription()
     {
-        return getStringProperty("description");
+        return getStringProperty(PROP_DESCRIPTION);
     }
     
     /**
@@ -126,7 +131,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public void setDescription(String description)
     {
-        setProperty("description", description);
+        setProperty(PROP_DESCRIPTION, description);
     }
     
     /**
@@ -136,7 +141,7 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public String getGroupType()
     {
-        return getStringProperty("groupType");
+        return getStringProperty(PROP_GROUP_TYPE);
     }
     
     /**
@@ -146,6 +151,6 @@ public abstract class AbstractGroup extends AbstractEntity
      */
     public void setGroupType(String groupType)
     {
-        setProperty("groupType", groupType);
+        setProperty(PROP_GROUP_TYPE, groupType);
     }
 }

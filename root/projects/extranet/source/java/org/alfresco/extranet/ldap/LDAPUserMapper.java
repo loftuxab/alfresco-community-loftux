@@ -74,6 +74,15 @@ public class LDAPUserMapper implements AttributesMapper
             {
                 user.setDescription((String)description.get());
             }
+
+            Attribute userPassword = attributes.get("userPassword");
+            if(userPassword != null)
+            {
+                byte[] array = (byte[]) userPassword.get();
+                String pw = new String(array);
+                user.setPassword(pw);
+            }
+            
         }
         
         return user;

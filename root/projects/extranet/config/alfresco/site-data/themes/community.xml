@@ -38,6 +38,10 @@
 			<id>lostpassword</id>
 			<page-instance-id>extranet-lostpassword</page-instance-id>
 		</page-type>
+		<page-type>
+			<id>changepassword</id>
+			<page-instance-id>extranet-changepassword</page-instance-id>
+		</page-type>		
 	</page-types>
 	<defaults>
 		<component>

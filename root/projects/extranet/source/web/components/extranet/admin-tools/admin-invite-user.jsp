@@ -10,6 +10,17 @@
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" autoFlush="true"%>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
+<%!
+	public String nullAssert(String value)
+	{
+	    if(value != null && value.length() == 0)
+	    {
+	        value = null;
+	    }
+	    
+	    return value;
+	}
+%>
 <%
 	// get services
 	InvitationService invitationService = ExtranetHelper.getInvitationService(request);
@@ -19,29 +30,33 @@
 	if("inviteUser".equals(command))
 	{
 		String userId = request.getParameter("userId");
-		String firstName = request.getParameter("firstName");
-		String lastName = request.getParameter("lastName");
-		String email = request.getParameter("email");
-		String whdUserId = request.getParameter("whdUserId");
-		String alfrescoUserId = request.getParameter("alfrescoUserId");
+		String firstName = nullAssert(request.getParameter("firstName"));
+		String lastName = nullAssert(request.getParameter("lastName"));
+		String email = nullAssert(request.getParameter("email"));
+		String whdUserId = nullAssert(request.getParameter("whdUserId"));
+		String alfrescoUserId = nullAssert(request.getParameter("alfrescoUserId"));
 		
-		String subscriptionStart = request.getParameter("subscriptionStart");
-		String subscriptionEnd = request.getParameter("subscriptionEnd");
+		String subscriptionStart = nullAssert(request.getParameter("subscriptionStart"));
+		String subscriptionEnd = nullAssert(request.getParameter("subscriptionEnd"));
 		
 		// we only handle enterprise invitation types for the moment
-		String invitationType = request.getParameter("invitationType");
+		String invitationType = nullAssert(request.getParameter("invitationType"));
 		if("enterprise".equals(invitationType))
 		{
 			// build date objects
 			Date subscriptionStartDate = null;
 			if(subscriptionStart != null)
 			{
-				subscriptionStartDate = SimpleDateFormat.getDateInstance(DateFormat.SHORT).parse(subscriptionStart);
+				subscriptionStartDate = SimpleDateFormat.getDateInstance(DateFormat.SHORT, Locale.US).parse(subscriptionStart);
+				System.out.println("Original Start Date: " + subscriptionStart);
+				System.out.println("New Start Date: " + subscriptionStartDate);
 			}
 			Date subscriptionEndDate = null;
 			if(subscriptionEnd != null)
 			{
-				subscriptionEndDate = SimpleDateFormat.getDateInstance(DateFormat.SHORT).parse(subscriptionEnd);
+				subscriptionEndDate = SimpleDateFormat.getDateInstance(DateFormat.SHORT, Locale.US).parse(subscriptionEnd);
+				System.out.println("Original End Date: " + subscriptionEnd);
+				System.out.println("New End Date: " + subscriptionEndDate);
 			}
 			
 			// invite the user
@@ -130,6 +145,7 @@ window.open(Ink,"calendar","height=250,width=250,scrollbars=no")
 				<td>
 					<input type="text" name="subscriptionStart" id="subscriptionStart" value=""/>
 					<img src="/extranet/components/extranet/datepicker/calendaricon.gif" height="17" width="17" border="0" onClick="popUpCalendar(this, document.getElementById('subscriptionStart'), 'm/dd/yyyy', 0, 0)"/>
+					&nbsp;(m/dd/yyyy)
 				</td>
 			</tr>
 			<tr>
@@ -137,6 +153,7 @@ window.open(Ink,"calendar","height=250,width=250,scrollbars=no")
 				<td>
 					<input type="text" name="subscriptionEnd" id="subscriptionEnd" value=""/>
 					<img src="/extranet/components/extranet/datepicker/calendaricon.gif" height="17" width="17" border="0" onClick="popUpCalendar(this, document.getElementById('subscriptionEnd'), 'm/dd/yyyy', 0, 0)"/>
+					&nbsp;(m/dd/yyyy)
 				</td>
 			</tr>
 		</table>

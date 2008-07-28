@@ -71,4 +71,11 @@ public interface Entity
      * @return
      */
     public abstract String getEntityType();
+    
+    /**
+     * Copies properties out of this entity and into another
+     * 
+     * @param t
+     */
+    public void copyPropertiesInto(Entity entity);
 }

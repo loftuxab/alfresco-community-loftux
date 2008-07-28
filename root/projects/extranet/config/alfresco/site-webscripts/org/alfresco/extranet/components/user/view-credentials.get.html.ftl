@@ -44,6 +44,8 @@ td.userprofile-grayed
 <@anchor pageType="editprofile">Edit my profile</@anchor>
 |
 <@anchor pageType="viewcredentials">View/Edit my credentials</@anchor>
+|
+<@anchor pageType="changepassword">Change my password</@anchor>
 
 
 <br/>

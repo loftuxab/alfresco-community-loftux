@@ -97,6 +97,16 @@ public class DatabaseInvitedUser
     }
     
     /**
+     * Sets the user id.
+     * 
+     * @param userId the new user id
+     */
+    public void setUserId(String userId)
+    {
+        this.userId = userId;
+    }
+    
+    /**
      * Gets the email.
      * 
      * @return the email
