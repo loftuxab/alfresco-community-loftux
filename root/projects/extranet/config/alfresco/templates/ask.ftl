@@ -7,17 +7,19 @@
 	<@global.header/>
 	${head}
 
+<link rel="stylesheet" type="text/css" href="yui/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="yui/datatable/assets/skins/sam/datatable.css" />
 <script type="text/javascript" src="yui/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="yui/dragdrop/dragdrop-min.js"></script>
-<script type="text/javascript" src="yui/container/container-min.js"></script>
-<script type="text/javascript" src="scripts/swfobject.js"></script>
-	
-<script type="text/javascript" src="scripts/ask-kbsearch.js"></script>
-<link rel="stylesheet" type="text/css" href="yui/container/assets/container.css" />
-<link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+<script type="text/javascript" src="yui/connection/connection-min.js"></script>
 
-   
-	
+<script type="text/javascript" src="yui/json/json-min.js"></script>
+<script type="text/javascript" src="yui/element/element-beta-min.js"></script>
+<script type="text/javascript" src="yui/datasource/datasource-beta-min.js"></script>
+<script type="text/javascript" src="yui/datatable/datatable-beta-min.js"></script>
+<script type="text/javascript" src="scripts/kbadvancedsearch.js"></script>
+<script type="text/javascript" src="yui/button/button-min.js"></script>
+
+
 <style type="text/css">
 	.mask 
 	{
@@ -26,6 +28,21 @@
 		filter: alpha(opacity=80);
 		background-color:#2f2f2f;
 	}
+	#paginated {
+        text-align: center;
+    }
+    #paginated table {
+        margin-left:auto; margin-right:auto;
+    }
+    #paginated .yui-pg-container a {
+        color: #00d;
+    }
+    #paginated .yui-pg-pages a {
+        text-decoration: underline;
+    }
+    #paginated, #paginated .yui-dt-loading {
+        text-align: center; background-color: transparent;
+    }
 </style>
 
 </head>
@@ -48,7 +65,7 @@
 
 
 		<!-- BODY -->
-		<div id="bd">
+		<div id="bd" class="yui-skin-sam">
 		
 			<@region id="search" scope="page"/>
 			
