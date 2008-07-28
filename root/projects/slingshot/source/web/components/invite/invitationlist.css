@@ -74,7 +74,7 @@
 }
 
 .invitationlist .inviteelist .removeIcon {
-	background: transparent url(images/remove-user.gif) no-repeat center center;
+	background: transparent url(images/remove-icon-16.gif) no-repeat center center;
 	padding: 6px;
 }
 
@@ -84,7 +84,7 @@
 
 .invitationlistwrapper {
 	padding-left: 50px;
-	background: transparent url(images/add-arrow.gif) no-repeat left 15%;
+	background: transparent url(images/green-arrow.png) no-repeat left 15%;
 }
 
 .invitationlistwrapper .sinvite {
