@@ -154,11 +154,20 @@ Alfresco.util.blog.loadBlogPostEditPage = function(site, container, path, postId
 /**
  * Redirects to the blog listing page
  */
-Alfresco.util.blog.loadBlogPostListPage = function(site, container, path)
+Alfresco.util.blog.loadBlogPostListPage = function(site, container, path, filter, tag)
 {
-   window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/blog-postlist" +
-                      "?container=" + container +
-                      "&path=" + path;
+   var url = Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/blog-postlist" +
+               "?container=" + container +
+               "&path=" + path;
+   if (filter != null)
+   {
+      url += "&filter=" + filter;
+   }
+   if (tag != null)
+   {
+      url += "&tag=" + tag;
+   }
+   window.location = url;
 }
      
 /**

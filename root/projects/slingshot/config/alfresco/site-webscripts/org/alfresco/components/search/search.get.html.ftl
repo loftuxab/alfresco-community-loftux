@@ -3,7 +3,7 @@
    {
       siteId: "${siteId}",
       containerId: "",
-      initialSearchTerm: "${searchTerm}",
+      initialSearchTerm: "${searchTerm?html}",
       initialSearchAll: "${searchAll?string}"
    }).setMessages(
       ${messages}
