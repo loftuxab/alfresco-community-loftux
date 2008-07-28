@@ -159,18 +159,22 @@
 		 	   YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
 		 	}
 
+         var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
+         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
+         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "keyup");
+         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
+
+         // OK Button
+         var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
+         {
+            type: "submit"
+         });
+         
+         eventForm.setShowSubmitStateDynamically(true);
+         eventForm.setSubmitElements(okButton);
+
 			if (!this.eventURI) // Create
 			{
-				// OK Button
-				var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
-	         {
-	            type: "submit"
-	         });
-	
-				var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
-				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-	         eventForm.setShowSubmitStateDynamically(true);
-		   	eventForm.setSubmitElements(okButton);
 				eventForm.setAJAXSubmit(true,
 				{
 					successCallback:
@@ -179,8 +183,6 @@
 						scope: this
 					}
 				});
-			   eventForm.setSubmitAsJSON(true);
-	       	eventForm.init();
 	
 				// Initialise the start and end dates to today
 				var today = new Date();
@@ -194,11 +196,20 @@
 				Dom.get("to").value = ansiDate;
 			}
 			else  // Event Edit
-			{
-				var okButton = Alfresco.util.createYUIButton(this, "ok-button", this.onOKSelect,
-	         {
-	            type: "push"
-	         });
+			{   
+            var form = document.getElementById(this.id + "-addEvent-form");
+            // Reset the "action" attribute
+            form.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + this.eventURI;
+            
+            eventForm.ajaxSubmitMethod = Alfresco.util.Ajax.PUT;
+            eventForm.setAJAXSubmit(true,
+            {
+	            successCallback:
+	            {
+		            fn: this.onEventUpdated,
+		            scope: this
+	            }
+            });        
 	         
 	         // Is this an all day event?
 	         var startTime = Dom.get(this.id + "-start");
@@ -211,6 +222,9 @@
 	            this._displayTimeFields(false);
 	         }
 			}
+			
+			eventForm.setSubmitAsJSON(true);
+			eventForm.init();
 			
 			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
@@ -276,49 +290,6 @@
 		       elem.style.display = (display ? "inline" : "none");
 		     }
 		  } 
-		},
-		
-		onOKSelect: function(e)
-		{
-			if (this.eventURI)
-			{
-				// TODO: this exists in the forms runtime, currently private
-				var form = document.getElementById(this.id + "-addEvent-form");
-				if (form)
-		      {
-		         var formData = {};
-		         var length = form.elements.length;
-		         for (var i = 0; i < length; i++)
-		         {
-		            var element = form.elements[i];
-		            var name = element.name;
-		            var value = element.value;
-		            var type = element.type;
-		            if (name)
-		            {
-		               if (!(type === "checkbox" && !element.checked)) 
-		               {
-		                  formData[name] = value;
-		               }
-		            }
-		         }
-		
-					// Submit PUT request 
-					Alfresco.util.Ajax.request(
-					{
-						method: Alfresco.util.Ajax.PUT,
-				      url: Alfresco.constants.PROXY_URI + this.eventURI,
-						requestContentType: Alfresco.util.Ajax.JSON,
-						dataObj: formData,
-						successCallback:
-						{
-							fn: this.onEventUpdated,
-							scope: this
-						},
-				      failureMessage: "Update event failed"
-				   });
-		      	}
-			}
 		},
 		
 		onEventUpdated: function(e)
