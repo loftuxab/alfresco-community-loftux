@@ -68,7 +68,7 @@
           /**
            * Maximum number of tags popular tags displayed
            */
-          topN: 10,
+          topN: 10
        },
 
       
