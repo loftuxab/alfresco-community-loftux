@@ -478,10 +478,8 @@
                role: "SiteConsumer",
                person:
                {
-                  userName: user,
-                  url: "/alfresco/service/api/people/" + user
-               },
-               url: "/alfresco/service/api/sites/" + site + "/memberships/" + user
+                  userName: user
+               }
             },
             successCallback:
             {
