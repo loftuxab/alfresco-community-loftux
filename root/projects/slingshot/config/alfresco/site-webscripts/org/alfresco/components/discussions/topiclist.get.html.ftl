@@ -14,7 +14,7 @@
 
 <div id="discussionsBlogHeader1">
 	<div class="leftDiscussionBlogHeader">
-		<span class="createNodeLink">
+		<span class="createTopicLink">
 		   <a href="${url.context}/page/site/${page.url.templateArgs.site}/discussions-createtopic">
 		      ${msg("header.createTopic")}
 		   </a>
