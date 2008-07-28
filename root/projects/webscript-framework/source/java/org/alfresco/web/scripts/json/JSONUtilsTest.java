@@ -140,10 +140,10 @@ public class JSONUtilsTest extends TestCase
         assertEquals(10, nativeObj.get("int", nativeObj));
         assertEquals(3.142, nativeObj.get("number", nativeObj));
         subObjResult = (NativeObject)nativeObj.get("comp1", nativeObj);
-        assertEquals("tad-ahhhh", subObjResult.get("sunValue", subObjResult)); 
-        
-        
+        assertEquals("tad-ahhhh", subObjResult.get("sunValue", subObjResult));         
     }
+    
+    
     
     private Object executeScript(String script, Map<String, Object> model, boolean secure)
     {
