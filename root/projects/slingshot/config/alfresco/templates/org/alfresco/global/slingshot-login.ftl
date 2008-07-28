@@ -38,7 +38,7 @@
                </span>
             </div>
             <input type="hidden" id="success" name="success" value="${successUrl}"/>
-            <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${link?html}"/>
+            <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${url.servletContext}${link?html}&error=true"/>
          </fieldset>
       </form>
    </div>
@@ -60,6 +60,14 @@
       YAHOO.util.Dom.get("success").value += window.location.hash;
       YAHOO.util.Dom.get("username").focus();
    });
+   
+   <#if url.args["error"]??>
+   Alfresco.util.PopupManager.displayPrompt(
+      {
+         title: "Failed to Login",
+         text: "The remote server may be unavailable or your authentication details have not been recognised."
+      });
+   </#if>
    //]]></script>
 </@>
 </body>
