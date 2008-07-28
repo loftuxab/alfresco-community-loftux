@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template-type>
-	<id>freemarker</id>
 	<title>Freemarker Template Type</title>
 	<description>A reusable Freemarker Template Type</description>
 	<renderer-type>freemarker</renderer-type>

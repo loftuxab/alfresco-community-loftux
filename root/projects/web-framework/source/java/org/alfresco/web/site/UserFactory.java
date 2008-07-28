@@ -57,11 +57,45 @@ public abstract class UserFactory
         }
         return this.guestUser;
     }
-
+    
+    /**
+     * Loads a user from the remote user store and store it into the session.
+     * 
+     * @param context
+     * @param request
+     * @return
+     * @throws UserFactoryException
+     */
     public User faultUser(RequestContext context, HttpServletRequest request)
         throws UserFactoryException
     {
+        return faultUser(context, request, false);
+    }
+       
+
+    /**
+     * Loads a user from the remote user store and stores it into the session.
+     * 
+     * If the force flag is set, the current in-session user
+     * object will be purged, forcing the user object to reload.
+     * 
+     * @param context
+     * @param request
+     * @param force
+     * @return
+     * @throws UserFactoryException
+     */
+    public User faultUser(RequestContext context, HttpServletRequest request, boolean force)
+        throws UserFactoryException
+    {
         User user = null;
+        
+        // do we want to force a user fault?
+        if(force)
+        {
+            // remove the user object from session
+            request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+        }
         
         // check whether there is a "USER_ID" marker in the session
         String userId = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_ID);
