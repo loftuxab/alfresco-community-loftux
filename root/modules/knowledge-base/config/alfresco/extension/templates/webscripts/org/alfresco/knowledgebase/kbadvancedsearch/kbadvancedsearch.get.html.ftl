@@ -48,17 +48,6 @@ function setVisibility(){
 	send();
 }
 
-function askIDSearch(e)	{
-	var keycode;
-	if (window.event) keycode = window.event.keyCode;
-	else if (e) keycode = e.which;
-		if (keycode == 13) {
-			askidsearch('');
-			return false;
-		}
-	return true;
-}
-
 function categorydisplay() {
 	vista = (document.getElementById("categorydisplay").style.display == 'none') ? 'block' : 'none';
 	document.getElementById("categorydisplay").style.display = vista;
@@ -236,13 +225,13 @@ function reset(){
 </script>
 <#-- Form for collecting search criteria -->
 <h3>Alfresco Knowledge Base Search</h3> 
-<form id="searcharticles" name="searcharticles" method="get" action="javascript:sndReq('');">	
+<form id="searcharticles" name="searcharticles" method="get" action="javascript:send('');">	
 
 <table width="100%" border="0">
 	<tr valign="top">
 		<td align="left" valign="middle"><img valign="top" width="32" height="32" src="/alfresco/images/logo/AlfrescoLogo32.png"/></td>
 		<td align="left" valign="top">
-			<input type="text" id="searchText" name="searchText" value=""/>
+			<input type="text" id="searchText" name="searchText" value="" onKeyPress="{if (event.keyCode==13) textsearch();}"/>
 			<input type="button"  value="Search" onclick="javascript:textsearch();"/>
 			<input onclick="javascript:resetSearchArticles();" type="button" value="Reset"/>
 			| Show <SELECT id="maxresults" NAME="maxresults" onchange="javascript:setMaxresults('');">
@@ -254,7 +243,7 @@ function reset(){
 				    </select> Items
 	    </td>
 	    <td valign="top" align="right"><td>ASK ID:
-	    <input  type="text" name="askid" id="askid"/><input type="button" value="Search" onclick="javascript:askidsearch();">
+	    <input  type="text" name="askid" id="askid" onKeyPress="{if (event.keyCode==13) askidsearch();}"/><input type="button" value="Search" onclick="javascript:askidsearch();">
 	    </tr>
 </table>
 <table border="0" valign="top">
