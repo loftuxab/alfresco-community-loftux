@@ -187,6 +187,7 @@
          // Hook action events
          Alfresco.util.registerDefaultActionHandler(this.id, "action-link-div", "div", this);
          Alfresco.util.registerDefaultActionHandler(this.id, "action-link-span", "span", this);
+         Alfresco.util.registerDefaultActionHandler(this.id, "tag-link-span", "span", this);
          
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onListElementMouseEntered, this.onListElementMouseExited);
@@ -209,6 +210,14 @@
       onEditNode: function BlogPostList_onEditNode(htmlId, ownerId, param)
       {
          Alfresco.util.blog.loadBlogPostEditPage(this.options.siteId, this.options.containerId, this.options.path, param);
+      },
+      
+      /**
+       * Handles the click on a tag
+       */
+      onTagSelection: function Discussions_onTagSelected(htmlId, ownerId, param)
+      {
+         YAHOO.Bubbling.fire('onSetBlogPostListParams', {tag : param});
       },
       
       /**

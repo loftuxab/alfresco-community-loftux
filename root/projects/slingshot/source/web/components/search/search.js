@@ -351,6 +351,9 @@
             }
             else if (oResponse.results)
             {
+               // clear the empty error message
+               YAHOO.widget.DataTable.MSG_EMPTY = "";
+               
                // update the results count, update hasMoreResults.
                me.hasMoreResults = (oResponse.results.length > me.options.maxResults);
                if (me.hasMoreResults)

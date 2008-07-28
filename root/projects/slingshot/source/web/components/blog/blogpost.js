@@ -130,6 +130,7 @@
 
          // action hooks
          Alfresco.util.registerDefaultActionHandler(this.id, "blogpost-action-link", "div", this);
+         Alfresco.util.registerDefaultActionHandler(this.id, 'tag-link-span', 'span', this);
          
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onPostElementMouseEntered, this.onPostElementMouseExited);
@@ -292,6 +293,12 @@
       
       // Actions
       
+      onTagSelection: function BlogPostList_onTagSelection(htmlId, ownerId, param)
+      {
+         // redirect to list page, but request the given tag
+         Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId, this.options.path, null, param);
+      },
+      
       /**
        * Loads the edit post form and displays it instead of the content
        * The div class should have the same name as the above function (onEditNode)
@@ -334,7 +341,7 @@
          }
          else
          {
-            Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId, this.options.path);
+            Alfresco.util.blog.loadBlogPostListPage(this.options.siteId, this.options.containerId, this.options.path, null, null);
          }
       },
       
