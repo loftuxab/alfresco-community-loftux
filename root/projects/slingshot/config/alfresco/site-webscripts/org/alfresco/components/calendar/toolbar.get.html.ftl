@@ -5,8 +5,8 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar calendar-toolbar">
    <div class="yui-g calendar-bar">
-       <div id="${args.htmlid}-viewButtons" class="yui-u first">
-         <button id="${args.htmlid}-addEvent-button">${msg("button.add-event")}</button>
+       <div id="${args.htmlid}-viewButtons" class="yui-u first addEvent">
+         <button id="${args.htmlid}-addEvent-button" name="addEvent">${msg("button.add-event")}</button>
        </div>
        <div class="yui-u align-right">
           <button id="${args.htmlid}-prev-button">${msg("button.previous")}</button>
