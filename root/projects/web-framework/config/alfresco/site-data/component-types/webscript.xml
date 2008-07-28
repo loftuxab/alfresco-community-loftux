@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-type>
-	<id>webscript</id>
-	<title>Webscript Component Type</title>
-	<description>A component type that invokes the webscript engine</description>
+	<title>Web Script Component Type</title>
+	<description>Local web script runtime component type</description>
 	<renderer-type>webscript</renderer-type>
 </component-type>

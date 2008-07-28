@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.framework.ModelObject;
@@ -39,7 +41,9 @@ import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.FrameworkHelper;
+import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.exception.UserFactoryException;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -904,6 +908,24 @@ public final class ScriptSiteData extends ScriptBase
     {
         AuthenticationUtil.logout(getRequestContext());
     }
+    
+    /**
+     * Reloads the current user into session
+
+     */
+    public void reloadUser()
+    {
+        HttpServletRequest request = ((HttpRequestContext)context).getRequest();
+        try
+        {
+            FrameworkHelper.getUserFactory().faultUser(context, request, true);
+        }
+        catch(UserFactoryException ufe)
+        {
+            FrameworkHelper.getLogger().warn("Unable to reload current user into session");
+        }
+    }
+    
     
     // also still in progress
     
