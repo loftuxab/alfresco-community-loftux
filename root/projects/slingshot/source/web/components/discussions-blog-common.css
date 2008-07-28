@@ -59,12 +59,12 @@ ol li {
 /**********
  * HEADER *
 ***********/
-#discussionsBlogHeader1 .createNodeLink {
+#discussionsBlogHeader1 .createTopicLink {
   font-family: Arial, sans-serif;
   font-weight: normal;
   font-size: 116%;
   color: #333333;
-  background: transparent url(images/createtopic.png) no-repeat scroll 3px 3px;
+  background: transparent url(images/create-discussion-16.png) no-repeat scroll 3px 3px;
   padding: 0 5px 0 19px;
   border-right: 1px solid #c6c6c6;
 }
@@ -264,7 +264,7 @@ html>body .node, .reply, .comment {
 }
 
 .replyTo {
-  background:transparent url(images/replyto.png) no-repeat scroll 0px 50%;
+  background:transparent url(images/reply-to-discussion-16.png) no-repeat scroll 0px 50%;
   padding-left: 15px;
 }
 
@@ -299,17 +299,17 @@ html>body .node, .reply, .comment {
 }
 
 .nodeEdit .onViewNode {
-  background: url(images/replyto.png) no-repeat scroll 2px 5px;
+  background: url(images/view-discussion-16.png) no-repeat scroll 2px 5px;
   padding-left: 20px;
 }
 .nodeEdit .onAddReply {
-  background: url(images/replyto.png) no-repeat scroll 2px 5px;
+  background: url(images/reply-to-discussion-16.png) no-repeat scroll 2px 5px;
   padding-left: 20px;
 }
 .nodeEdit .onEditNode,
 .nodeEdit .onEditReply,
 .nodeEdit .onEditComment {
-  background:url(images/edit.png) no-repeat scroll 2px 5px;
+  background:url(images/edit-discussion-16.png) no-repeat scroll 2px 5px;
   padding-left: 20px;
 }
 .nodeEdit .onEditBlogPost {
@@ -319,7 +319,7 @@ html>body .node, .reply, .comment {
 .nodeEdit .onDeleteNode,
 .nodeEdit .onDeleteReply,
 .nodeEdit .onDeleteComment {
-  background: url('images/delete.png') no-repeat scroll 2px 5px;
+  background: url('images/delete-discussion-16.png') no-repeat scroll 2px 5px;
   padding-left: 20px;
 }
 .nodeEdit .onDeleteBlogPost {
