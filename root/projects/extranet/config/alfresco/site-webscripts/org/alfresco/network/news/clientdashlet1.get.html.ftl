@@ -95,46 +95,29 @@ body
 </tr>
 </table>
 
-<!-- news item 1 -->
-<table width="100%">
-<tr>
-<td class="news-item-thumbnail">
-	<img src="${url.context}/images/extranet/info_16.gif" width="16" height="16" />
-</td>
-<td class="news-item-headline">
-	<a href="#">
-  	Alfresco benchmark exceeds 100 million objects at record pace!
-</td>
-</tr>
-</table>
+<#assign newsCount = 0>
+<#list newsItems as newsItem>
 
-<!-- news item 2 -->
-<table width="100%">
-<tr>
-<td class="news-item-thumbnail">
-	<img src="${url.context}/images/extranet/edit_16.gif" width="16" height="16" />
-</td>
-<td class="news-item-headline">
-	<a href="#">
-  	Alfresco 2.2.3 Service Pack Released!
-</td>
-</tr>
-</table>
+	<#if newsCount < maxNewsCount>
+	
+		<table width="100%">
+		<tr>
+		<td class="news-item-thumbnail">
+			<img src="${url.context}/images/extranet/info_16.gif" width="16" height="16" />
+		</td>
+		<td class="news-item-headline" width="100%">
+			<a href="http://network.alfresco.com/extranet/?f=default&o=${newsItem.nodeRef}">
+			${newsItem.headline}
+			</a>
+		</td>
+		</tr>
+		</table>
+	
+	</#if>
+	
+	<#assign newsCount = newsCount + 1>
 
-<!-- news item 3 -->
-<table width="100%">
-<tr>
-<td class="news-item-thumbnail">
-	<img src="${url.context}/images/extranet/info_16.gif" width="16" height="16" />
-</td>
-<td class="news-item-headline">
-	<a href="#">
-  	Learn about Web Studio 3.0 development tracks!
-</td>
-</tr>
-</table>
-
-
+</#list>
 
 <!-- plugins section header -->
 <table width="100%" style="margin-top: 4px;">
@@ -145,53 +128,24 @@ body
 </tr>
 </table>
 
-<!-- plugin 1 -->
-<table width="100%">
-<tr>
-<td class="plugin-thumbnail">
-	<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
-</td>
-<td class="plugin-headline">
-  	<a href="#">
-  		Expense Report Manager
-  	</a>
-  	<p>
-  		AJAX and jBPM workflow powered application for managing expense reports
-  	</p>
-</td>
-</table>
+<#list assets as asset>
 
-<!-- plugin 2 -->
-<table width="100%">
-<tr>
-<td class="plugin-thumbnail">
-	<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
-</td>
-<td class="plugin-headline">
-  	<a href="#">
-  		Zimlets for Alfresco
-  	</a>
-  	<p>
-  		Zimbra email integration for Alfresco 2.2
-  	</p>
-</td>
-</table>
+	<table width="100%">
+	<tr>
+	<td class="plugin-thumbnail">
+		<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
+	</td>
+	<td class="plugin-headline" width="100%">
+		<a href="http://network.alfresco.com/extranet/?f=default&o=${asset.nodeRef}">
+			${asset.title}
+		</a>
+		<p>
+			${asset.headline}
+		</p>
+	</td>
+	</table>
 
-<!-- plugin 3 -->
-<table width="100%">
-<tr>
-<td class="plugin-thumbnail">
-	<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
-</td>
-<td class="plugin-headline">
-  	<a href="#">
-  		Java-backed Web Scripts Sample Package
-  	</a>
-  	<p>
-  		Examples for designing your own Java-backed web scripts!
-  	</p>
-</td>
-</table>
+</#list>
 
 <!-- join alfresco network header -->
 <table width="100%" style="margin-top: 4px;">
