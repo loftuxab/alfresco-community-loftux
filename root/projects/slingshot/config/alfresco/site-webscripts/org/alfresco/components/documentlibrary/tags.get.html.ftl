@@ -7,5 +7,5 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="tags doclib-filter">
 	<h2>${msg("header.title")}</h2>
-	<ul class="filterLink" id="${args.htmlid}-tags"></ul>
+	<ul class="filterLink" id="${args.htmlid}-tags"><li>&nbsp;</li></ul>
 </div>

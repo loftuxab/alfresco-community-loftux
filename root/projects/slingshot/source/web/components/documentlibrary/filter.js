@@ -37,6 +37,11 @@
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
    
    /**
     * DocListFilter constructor.
@@ -112,7 +117,8 @@
                YAHOO.Bubbling.fire("filterChanged",
                {
                   filterId: filterId,
-                  filterOwner: me.name
+                  filterOwner: me.name,
+                  filterData: ""
                });
                
                // If a function has been provided which corresponds to the filter name, then call it

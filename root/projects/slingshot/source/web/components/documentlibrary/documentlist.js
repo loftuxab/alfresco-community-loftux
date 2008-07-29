@@ -37,6 +37,11 @@
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
    
    /**
     * DocumentList constructor.
@@ -97,10 +102,10 @@
          /**
           * Flag indicating whether the list shows a detailed view or a simple one.
           * 
-          * @property detailedView
+          * @property simpleView
           * @type boolean
           */
-         detailedView: true,
+         simpleView: false,
 
          /**
           * Current siteId.
@@ -169,7 +174,7 @@
        */
       currentFilter:
       {
-         filterId: "",
+         filterId: "path",
          filterOwner: "",
          filterData: ""
       },
@@ -355,12 +360,18 @@
          }
          
          // Hide/Show Folders button
-         Dom.get(this.id + "-showFolders-button").innerHTML = this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show");
-         this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
+         this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders,
+         {
+            type: "checkbox",
+            checked: this.options.showFolders
+         });
 
          // Detailed/Simple List button
-         Dom.get(this.id + "-detailedView-button").innerHTML = this._msg(this.options.detailedView ? "button.view.simple" : "button.view.detailed");
-         this.widgets.detailedView =  Alfresco.util.createYUIButton(this, "detailedView-button", this.onDetailedView);
+         this.widgets.simpleView =  Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
+         {
+            type: "checkbox",
+            checked: this.options.simpleView
+         });
 
          // File Select menu button
          this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "fileSelect-button", this.onFileSelect,
@@ -379,7 +390,7 @@
             resultsList: "doclist.items",
             fields:
             [
-               "index", "nodeRef", "type", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
+               "index", "nodeRef", "type", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "contentUrl", "actionSet", "tags"
             ]
          };
@@ -529,7 +540,7 @@
             }
             if (lockType != "")
             {
-               elCell.innerHTML = '<span class="locked-by"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '.gif" alt="' + lockType + '" /></span>'
+               elCell.innerHTML = '<span class="locked-by"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/status-' + lockType + '-16.png" alt="' + lockType + '" /></span>'
             }
             else
             {
@@ -551,21 +562,7 @@
             var name = oRecord.getData("fileName");
             var extn = name.substring(name.lastIndexOf("."));
 
-            if (me.options.detailedView)
-            {
-               oColumn.width = 100;
-               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
-               if (oRecord.getData("type") == "folder")
-               {
-                  elCell.innerHTML = '<a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + name) + '"><span class="folder"></span></a>';
-               }
-               else
-               {
-                  elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="thumbnail"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></span>';
-               }
-            }
-            else
+            if (me.options.simpleView)
             {
                oColumn.width = 40;
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -577,6 +574,20 @@
                else
                {
                   elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
+               }
+            }
+            else
+            {
+               oColumn.width = 100;
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+               if (oRecord.getData("type") == "folder")
+               {
+                  elCell.innerHTML = '<a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + name) + '"><span class="folder"></span></a>';
+               }
+               else
+               {
+                  elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="thumbnail"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></span>';
                }
             }
          }
@@ -599,9 +610,13 @@
                 * Folder type
                 */
                desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + oRecord.getData("fileName")) + '">';
-               desc += '<b>' + oRecord.getData("displayName") + '</b></a></h3>';
+               desc += '<b>' + $html(oRecord.getData("displayName")) + '</b></a></h3>';
 
-               if (me.options.detailedView)
+               if (me.options.simpleView)
+               {
+                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("createdOn"), "dd mmmm yyyy") + '</div>';
+               }
+               else
                {
                   /* Inline Rename
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
@@ -609,7 +624,7 @@
                   desc += '<div class="detail"><span class="item"><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   if (oRecord.getData("description").length > 0)
                   {
-                     desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + oRecord.getData("description") + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(oRecord.getData("description")) + '</span></div>';
                   }
                   else
                   {
@@ -617,18 +632,18 @@
                   }
                   desc += '<div class="detail">&nbsp;</div>';
                }
-               else
-               {
-                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("createdOn"), "dd mmmm yyyy") + '</div>';
-               }
             }
             else
             {
                /**
                 * Document type
                 */
-               desc = '<h3 class="filename"><a href="#" onclick="' + generateDocumentPreviewOnClick(oRecord) + '">' + oRecord.getData("displayName") + '</a></h3>';
-               if (me.options.detailedView)
+               desc = '<h3 class="filename"><a href="#" onclick="' + generateDocumentPreviewOnClick(oRecord) + '">' + $html(oRecord.getData("displayName")) + '</a></h3>';
+               if (me.options.simpleView)
+               {
+                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</div>';
+               }
+               else
                {
                   /* Inline Rename
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
@@ -645,7 +660,7 @@
                   {
                      description = me._msg("details.description.none");
                   }
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + description + '</span></div>';
+                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span></div>';
                   desc += '<div class="detail"><span class="item"><b>' + me._msg("details.comments") + '</b> 0</span></div>';
                   /* Tags */
                   var tags = oRecord.getData("tags");
@@ -654,17 +669,13 @@
                   {
                      for (var i = 0, j = tags.length; i < j; i++)
                      {
-                        desc += '<span id="' + generateTagId(me, tags[i]) + '" class="tag"><a href="#" class="tag-link" title="' + tags[i] + '"><span>' + tags[i] + '</span></a></span>';
+                        desc += '<span id="' + generateTagId(me, tags[i]) + '" class="tag"><a href="#" class="tag-link" title="' + tags[i] + '"><span>' + $html(tags[i]) + '</span></a></span>';
                      }
                   }
                   else
                   {
                      desc += me._msg("details.tags.none");
                   }
-               }
-               else
-               {
-                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</div>';
                }
             }
             elCell.innerHTML = desc;
@@ -784,7 +795,8 @@
          var filterObj = YAHOO.lang.merge(
          {
             filterId: "path",
-            filterOwner: "Alfresco.DocListTree"
+            filterOwner: "Alfresco.DocListTree",
+            filterData: this.currentPath
          }, this.options.initialFilter);
 
          YAHOO.Bubbling.fire("filterChanged", filterObj);
@@ -968,7 +980,7 @@
       onShowFolders: function DL_onShowFolders(e, p_obj)
       {
          this.options.showFolders = !this.options.showFolders;
-         p_obj.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
+         p_obj.set("checked", this.options.showFolders);
 
          YAHOO.Bubbling.fire("doclistRefresh");
          Event.preventDefault(e);
@@ -977,14 +989,14 @@
       /**
        * Show/Hide detailed list button click handler
        *
-       * @method onDetailedView
+       * @method onSimpleView
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onDetailedView: function DL_onDetailedView(e, p_obj)
+      onSimpleView: function DL_onSimpleView(e, p_obj)
       {
-         this.options.detailedView = !this.options.detailedView;
-         p_obj.set("label", this._msg(this.options.detailedView ? "button.view.simple" : "button.view.detailed"));
+         this.options.simpleView = !this.options.simpleView;
+         p_obj.set("checked", this.options.simpleView);
 
          YAHOO.Bubbling.fire("doclistRefresh");
          Event.preventDefault(e);
@@ -1047,7 +1059,7 @@
                downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true"
             });
             clone.id = elActions.id + "_a";
-            Dom.addClass(clone, this.options.detailedView ? "detailed" : "simple");
+            Dom.addClass(clone, this.options.simpleView ? "simple" : "detailed");
             elActions.appendChild(clone);
          }
          // Show the actions
@@ -1744,26 +1756,30 @@
        * @method _buildDocListParams
        * @param path {string} Path to query
        */
-       _buildDocListParams: function DL__buildDocListParams(path)
-       {
-          var params = YAHOO.lang.substitute("{type}/site/{site}/{container}{path}",
-          {
-             type: this.options.showFolders ? "all" : "documents",
-             site: encodeURIComponent(this.options.siteId),
-             container: encodeURIComponent(this.options.containerId),
-             path: encodeURI(path)
-          });
+      _buildDocListParams: function DL__buildDocListParams(path)
+      {
+         var params = YAHOO.lang.substitute("{type}/site/{site}/{container}{path}",
+         {
+            type: this.options.showFolders ? "all" : "documents",
+            site: encodeURIComponent(this.options.siteId),
+            container: encodeURIComponent(this.options.containerId),
+            path: encodeURI(path)
+         });
 
-          params += "?filter=" + encodeURIComponent(this.currentFilter.filterId) + "&filterData=" + encodeURIComponent(this.currentFilter.filterData);
-          return params;
-       },
+         params += "?filter=" + encodeURIComponent(this.currentFilter.filterId);
+         if (this.currentFilter.filterData)
+         {
+            params += "&filterData=" + encodeURIComponent(this.currentFilter.filterData);             
+         }
+         return params;
+      },
        
-       /**
-        * Build URI parameter string for doclist RSS data webscript
-        *
-        * @method _buildDocListRSSParams
-        * @param path {string} Path to query
-        */
+      /**
+       * Build URI parameter string for doclist RSS data webscript
+       *
+       * @method _buildDocListRSSParams
+       * @param path {string} Path to query
+       */
       _buildDocListRSSParams: function DL__buildDocListRSSParams(path)
       {
         var params = this._buildDocListParams(path);

@@ -255,7 +255,7 @@
             url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/all/node/" + this.options.file.nodeRef.replace(":/", "") + "?filter=node",
             successCallback:
             {
-               fn: this.onMetadata,
+               fn: this.onMetadataSuccess,
                scope: this
             },
             failureCallback:
@@ -270,10 +270,10 @@
       /**
        * Metadata refresh success handler
        *
-       * @method onSuccess
+       * @method onMetadataSuccess
        * @param response {object} Server response object
        */
-      onMetadata: function DLD_onMetadata(response)
+      onMetadataSuccess: function DLD_onMetadataSuccess(response)
       {
          var file = response.json.doclist.items[0];
 
@@ -284,7 +284,7 @@
          });
 
          // Fire "tagRefresh" event
-         YAHOO.Bubbling.fire("onTagRefresh");
+         YAHOO.Bubbling.fire("tagRefresh");
 
          // Display success message
          Alfresco.util.PopupManager.displayMessage(
@@ -366,6 +366,11 @@
          Dom.get(this.id + "-title").value = file.title ? file.title : "";
          Dom.get(this.id + "-description").value = file.description ? file.description : "";
          Dom.get(this.id + "-tags").value = file.tags.join(" ");
+         var option = YAHOO.util.Selector.query("option[value=\"" + file.mimetype + "\"]", this.id + "-mimetype")[0];
+         if (option)
+         {
+            Dom.get(this.id + "-mimetype").selectedIndex = option.index;
+         }
 
          // Initialise the form
          this.modules.form.init();

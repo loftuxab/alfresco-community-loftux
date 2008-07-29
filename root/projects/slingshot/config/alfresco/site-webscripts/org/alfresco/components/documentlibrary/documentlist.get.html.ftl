@@ -37,9 +37,9 @@
          </div>
       </div>
       <div class="yui-u align-right">
-         <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button"></button>
+         <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button">${msg("button.folders.show")}</button>
          <span class="separator">|</span>
-         <button id="${args.htmlid}-detailedView-button" name="doclist-detailedView-button"></button>
+         <button id="${args.htmlid}-simpleView-button" name="doclist-simpleView-button">${msg("button.view.simple")}</button>
       </div>
    </div>
 
