@@ -39,8 +39,6 @@ import org.alfresco.jlan.server.filesys.SearchContext;
 import org.alfresco.jlan.server.filesys.TooManyConnectionsException;
 import org.alfresco.jlan.server.filesys.TreeConnection;
 
-
-
 /**
  * Virtual Circuit Class
  * 
@@ -85,7 +83,7 @@ public class VirtualCircuit {
   
   // Active tree connections
   
-  private Hashtable m_connections;
+  private Hashtable<Integer, TreeConnection> m_connections;
   private int m_treeId;
   
   // List of active searches
@@ -97,6 +95,10 @@ public class VirtualCircuit {
   
   private SrvTransactBuffer m_transact;
 
+  // Flag to indicate if the virtual circuit is logged on/off
+  
+  private boolean m_loggedOn;
+  
   /**
    * Class constructor
    * 
@@ -148,7 +150,7 @@ public class VirtualCircuit {
     //  Check if the connection array has been allocated
 
     if (m_connections == null)
-      m_connections = new Hashtable(DefaultConnections);
+      m_connections = new Hashtable<Integer, TreeConnection>(DefaultConnections);
 
     //  Allocate an id for the tree connection
     
@@ -199,7 +201,7 @@ public class VirtualCircuit {
 
     //  Get the required tree connection details
 
-    return (TreeConnection) m_connections.get(new Integer(treeId));
+    return m_connections.get(new Integer(treeId));
   }
 
   /**
@@ -222,7 +224,7 @@ public class VirtualCircuit {
       //  Get the connection
       
       Integer key = new Integer(treeId);
-      TreeConnection tree = ( TreeConnection) m_connections.get(key);
+      TreeConnection tree = m_connections.get(key);
       
       //  Close the connection, release resources
 
@@ -433,13 +435,13 @@ public class VirtualCircuit {
 
         //  Close all active tree connections
 
-        Enumeration enm = m_connections.elements();
+        Enumeration<TreeConnection> enm = m_connections.elements();
             
         while ( enm.hasMoreElements()) {
               
           //  Get the current tree connection
               
-          TreeConnection tree = (TreeConnection) enm.nextElement();
+          TreeConnection tree = enm.nextElement();
           DeviceInterface devIface = tree.getInterface();
 
           //  Check if there are open files on the share
@@ -486,6 +488,24 @@ public class VirtualCircuit {
         m_connections.clear();
       }
     }
+  }
+
+  /**
+   * Check if the virtual circuit has a valid user logged on
+   * 
+   * @return boolean
+   */
+  public final boolean isLoggedOn() {
+	  return m_loggedOn;
+  }
+  
+  /**
+   * Set the logged on status for the virtual circuit
+   * 
+   * @param loggedOn boolean
+   */
+  public final void setLoggedOn(boolean loggedOn) {
+	  m_loggedOn = loggedOn;
   }
   
   /**

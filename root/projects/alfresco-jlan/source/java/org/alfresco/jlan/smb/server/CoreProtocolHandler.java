@@ -3194,6 +3194,20 @@ class CoreProtocolHandler extends ProtocolHandler {
 
 		vc.removeConnection(treeId, m_sess);
 
+		// Check if this is the last tree connection on the virtual circuit and the virtual circuit is logged off
+		
+		if ( vc.getConnectionCount() == 0 && vc.isLoggedOn() == false) {
+			
+			// Remove the virtual circuit
+			
+			m_sess.removeVirtualCircuit( vc.getUID());
+			
+			// Debug
+
+			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_TREE))
+				m_sess.debugPrintln("  Removed virtual circuit " + vc);
+		}
+			
 		// Build the tree disconnect response
 
 		smbPkt.setParameterCount(0);

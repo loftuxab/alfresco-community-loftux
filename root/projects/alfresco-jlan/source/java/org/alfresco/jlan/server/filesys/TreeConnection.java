@@ -78,7 +78,7 @@ public class TreeConnection {
    * @param sess SrvSession
    * @return int
    */
-  public final int addFile(NetworkFile file, SrvSession sess)
+  public synchronized final int addFile(NetworkFile file, SrvSession sess)
     throws TooManyFilesException {
 
     //  Check if the file array has been allocated
