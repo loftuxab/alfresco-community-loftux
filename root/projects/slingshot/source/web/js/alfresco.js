@@ -196,6 +196,44 @@ Alfresco.util.formatDate = function(date)
 }
 
 /**
+ * Decodes an HTML-encoded string
+ * Replaces &lt; &gt; and &amp; entities with their character equivalents
+ *
+ * @method Alfresco.util.decodeHTML
+ * @param html {string} The string containing HTML entities
+ * @return {string} Decoded string
+ * @static
+ */
+Alfresco.util.decodeHTML = function(html)
+{
+   return html.split("&lt;").join("<").split("&gt;").join(">").split("&amp;").join("&");
+}
+
+/**
+ * Encodes a potentially unsafe string with HTML entities
+ * Replaces <pre><, >, &</pre> characters with their entity equivalents.
+ * Based on the equivalent encodeHTML and unencodeHTML functions in Prototype.
+ *
+ * @method Alfresco.util.encodeHTML
+ * @param text {string} The string to be encoded
+ * @return {string} Safe HTML string
+ * @static
+ */
+Alfresco.util.encodeHTML = function(text)
+{
+   if ((YAHOO.env.ua.ie > 0) || (YAHOO.env.ua.webkit > 0))
+   {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+   }
+   var me = arguments.callee;
+   me.text.data = text;
+   return me.div.innerHTML;
+}
+Alfresco.util.encodeHTML.div = document.createElement("div");
+Alfresco.util.encodeHTML.text = document.createTextNode("");
+Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
+
+/**
  * Wrapper to create a YUI Button with common attributes.
  * All supplied object parameters are passed to the button constructor
  * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});
@@ -693,6 +731,11 @@ Alfresco.util.ComponentManager = function()
  */
 Alfresco.util.PopupManager = function()
 {
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+   
    return {
 
       /**
@@ -763,7 +806,7 @@ Alfresco.util.PopupManager = function()
          });
 
          // Set the message that should be displayed
-         message.setBody(c.text);
+         message.setBody($html(c.text));
 
          /**
           * Add it to the dom, center it, schedule the fade out of the message
@@ -881,11 +924,11 @@ Alfresco.util.PopupManager = function()
          // Show the title if it exists
          if (c.title)
          {
-            prompt.setHeader(c.title);
+            prompt.setHeader($html(c.title));
          }
 
          // Show the actual text taht should be prompted for the user
-         prompt.setBody(c.text);
+         prompt.setBody($html(c.text));
 
          // Show the title if it exists
          if (c.icon)
@@ -1092,15 +1135,15 @@ Alfresco.util.Ajax = function()
          }
          else
          {
-            // Normal URL parameters
-            if (c.method.toUpperCase() === this.GET)
+            if (c.dataObj)
             {
-               // Encode the dataObj and put it in the url
-               c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
-            }
-            else
-            {
-               if (c.dataObj)
+               // Normal URL parameters
+               if (c.method.toUpperCase() === this.GET)
+               {
+                  // Encode the dataObj and put it in the url
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
+               }
+               else
                {
                   // Enccode the dataObj and put it in the body
                   c.dataStr = this._toParamString(c.dataObj);
@@ -1325,7 +1368,11 @@ Alfresco.util.Ajax = function()
             if (config.responseContentType == "application/json")
             {
                var json = Alfresco.util.parseJSON(serverResponse.responseText);
-               Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  title: json.status.name,
+                  text: json.message
+               });
             }
             else if (serverResponse.statusText)
             {
