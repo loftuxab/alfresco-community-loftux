@@ -150,11 +150,23 @@
 
 /* Cell Renderers */
 
+.doclist .documents .icon32
+{
+   cursor: pointer;
+   display: block;
+   min-height: 32px;
+}
+
 .doclist .documents .thumbnail
 {
    cursor: pointer;
    display: block;
    min-height: 100px;
+}
+
+.doclist .documents a.preview-link
+{
+   cursor: pointer;
 }
 
 .doclist .documents .folder
@@ -167,7 +179,7 @@
 }
 .doclist .documents .folder-small
 {
-   background: url(images/demo-folder.png) no-repeat;
+   background: url(images/folder-32.png) no-repeat;
    display: block;
    height: 32px;
    width: 32px;

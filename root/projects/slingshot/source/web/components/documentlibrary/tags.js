@@ -94,7 +94,16 @@
           * @type string
           * @default "documentLibrary"
           */
-         containerId: "documentLibrary"
+         containerId: "documentLibrary",
+
+         /**
+          * Number of tags to show
+          *
+          * @property numTags
+          * @type int
+          * @default 15
+          */
+         numTags: 15
       },
 
       /**
@@ -236,7 +245,7 @@
       onTagRefresh: function DLTg_onRefresh(layer, args)
       {
          var timestamp = new Date().getTime();
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/site/{site}/{container}/tagscopetags?d=" + timestamp,
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/site/{site}/{container}/tagscopetags?d=" + timestamp + "&topN=" + this.options.numTags,
          {
             site: this.options.siteId,
             container: this.options.containerId

@@ -54,7 +54,7 @@
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/swfplayer/assets/SWFPlayer.swf";
 
       var instance = Alfresco.util.ComponentManager.find({id: this.id});
-      if(instance !== undefined && instance.length > 0)
+      if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.DocumentPreview already exists.");
       }
@@ -165,12 +165,18 @@
        */
       show: function DP_show(config)
       {
-         // Merge the supplied config with default config and check mandatory properties
-         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
-         if (this.showConfig.nodeRef === undefined)
+         // nodeRef is mandatory
+         if (config.nodeRef === undefined)
          {
              throw new Error("A nodeRef must be provided");
          }
+
+         // Build the failureUrl
+         config.failureUrl = Alfresco.constants.PROXY_URI + "api/node/content/" + config.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.fileName);
+
+         // Merge the supplied config with default config and check mandatory properties
+         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
+
          // Check if the uploader has been shoed before
          if (this.panel)
          {
@@ -280,11 +286,14 @@
 
          // Inform the user about the failure
          var message = "Error";
-         if(event.code)
+         if (event.code)
          {
             message = Alfresco.util.message(event.code, this.name);
          }
-         Alfresco.util.PopupManager.displayMessage({text: message});
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: message
+         });
 
          // Tell other components that the preview failed
          YAHOO.Bubbling.fire("documentPreviewFailure",
@@ -292,7 +301,7 @@
             error: event.code,
             nodeRef: this.showConfig.nodeRef,
             failureUrl: this.showConfig.failureUrl
-         })
+         });
 
       },
 
@@ -327,14 +336,19 @@
       _handleSuccessFullLoadedSwfEvent: function DP__handleSuccessFullLoadedSwfEvent(event)
       {
          // Update our local model of the loaded swf
-         this.loadedSwf = {
+         this.loadedSwf =
+         {
             currentFrame: parseInt(event.currentFrame),
             totalFrames: parseInt(event.totalFrames)
          };
 
          // Update label
          var message = Alfresco.util.message("label.currentFrame", this.name);
-         message = YAHOO.lang.substitute(message, {"0": event.currentFrame, "1": event.totalFrames});
+         message = YAHOO.lang.substitute(message,
+         {
+            "0": event.currentFrame,
+            "1": event.totalFrames
+         });
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
          // Enable buttons to navigate in the loaded swf
@@ -354,11 +368,18 @@
       onJumpToPageTextFieldChange: function DP_onJumpToPageTextFieldChange(event)
       {
          var newFrame = parseInt(event.target.value);
-         if(newFrame > this.loadedSwf.totalFrames)
+         if (newFrame > this.loadedSwf.totalFrames)
          {
             var message = Alfresco.util.message("message.invalidFrame", this.name);
-            message = YAHOO.lang.substitute(message, {"0": "1", "1": this.loadedSwf.totalFrames});
-            Alfresco.util.PopupManager.displayMessage({text: message});
+            message = YAHOO.lang.substitute(message,
+            {
+               "0": "1",
+               "1": this.loadedSwf.totalFrames
+            });
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: message
+            });
          }
          else
          {
@@ -402,7 +423,7 @@
       {
          // Set the panel title and image
          this.widgets.titleText["innerHTML"] = this.showConfig.fileName;
-         this.widgets.titleImg.src = this.showConfig.icon32;
+         this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.showConfig.icon32.substring(1);
 
          // Display the current frame status
          var message = Alfresco.util.message("label.currentFrame", this.name);
@@ -429,7 +450,7 @@
       {
          // Set to true if swfplayer should display debug text inside itself
          var debug = false;
-         if(this.swfPlayer.init(debug))
+         if (this.swfPlayer.init(debug))
          {
             try
             {
@@ -441,7 +462,7 @@
                YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
             }
          }
-         else if(attempt < 7)
+         else if (attempt < 7)
          {
             // The flash movie wasn't loaded, try againg in 0.5 sec
             YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
@@ -449,7 +470,10 @@
          else
          {
             // Give up something is probably wrong
-            Alfresco.util.PopupManager.displayMessage({text: "Flash move doesn't seem to load"});
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: "Flash movie doesn't seem to load"
+            });
          }
       },
 
@@ -481,7 +505,7 @@ Alfresco.module.getDocumentPreviewInstance = function()
 {
    var instanceId = "alfresco-documentPreview-instance";
    var instance = Alfresco.util.ComponentManager.find({id: instanceId});
-   if(instance !== undefined && instance.length > 0)
+   if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];
    }

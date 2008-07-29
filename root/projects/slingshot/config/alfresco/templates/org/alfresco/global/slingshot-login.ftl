@@ -38,7 +38,7 @@
                </span>
             </div>
             <input type="hidden" id="success" name="success" value="${successUrl}"/>
-            <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${url.servletContext}${link?html}&error=true"/>
+            <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${url.servletContext}${link?html}&amp;error=true"/>
          </fieldset>
       </form>
    </div>
