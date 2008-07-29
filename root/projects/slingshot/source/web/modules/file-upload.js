@@ -781,7 +781,7 @@
             else
             {
                // Give up
-               Alfresco.util.PopupManager.displayMessage({text: "Flash move doesn't seem to load"});
+               Alfresco.util.PopupManager.displayMessage({text: "Flash movie doesn't seem to load"});
             }
          }
       },

@@ -36,6 +36,11 @@
    border-bottom: 2px solid #f0f3f4;
 }
 
+.toolbar .selected-items li
+{
+   width: auto;
+}
+
 .toolbar .selected-items .yuimenuitemlabel span
 {
    background-position: 2px 50%;
@@ -45,6 +50,11 @@
    margin-left: -4px;
    min-height: 16px;
    padding: 2px 0px 1px 20px;
+}
+
+.toolbar .selected-items hr.yuimenuitemlabel
+{
+   padding: 0px;
 }
 
 .toolbar .onActionCopyTo
@@ -82,8 +92,7 @@
    padding: 0.5em;
 }
 
-.toolbar span.crumb,
-.toolbar .rss-feed a
+.toolbar span.crumb
 {
    font-size: 116%;
 }

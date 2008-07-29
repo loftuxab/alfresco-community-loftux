@@ -155,7 +155,21 @@
           * @property highlightFile
           * @type string
           */
-         highlightFile: null
+         highlightFile: null,
+         
+         /**
+          * Valid .swf preview mimetypes
+          *
+          * @property previewMimetypes
+          * @type object
+          */
+         previewMimetypes:
+         {
+            "application/pdf": true,
+            "application/vnd.excel": true,
+            "application/vnd.powerpoint": true,
+            "application/msword": true
+         }
       },
       
       /**
@@ -442,26 +456,6 @@
          }
          
          /**
-          * Generate Show Preview onClick mark-up
-          *
-          * @method generateDocumentPreviewOnClick
-          * @param record {YAHOO.widget.Record} File record
-          * @return {string} a click handler to open the document preview component for the document
-          */
-         var generateDocumentPreviewOnClick = function DL_generateDocumentPreviewOnClick(record)
-         {
-            var nodeRef = record.getData("nodeRef");
-            var fileName = record.getData("fileName").replace(/[']/g, "\\'");
-            var icon32 = Alfresco.constants.URL_CONTEXT + record.getData("icon32");
-            return "Alfresco.module.getDocumentPreviewInstance().show({" +
-                   "nodeRef: '" + nodeRef + "', " +
-                   "fileName: '" + fileName + "', " +
-                   "icon32: '" + icon32 + "', " +
-                   "failureUrl: '" + Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "'" + 
-                   "});  return false;";
-         }
-
-         /**
           * Generate ID alias for tag, suitable for DOM ID attribute
           *
           * @method generateTagId
@@ -564,6 +558,9 @@
 
             if (me.options.simpleView)
             {
+               /**
+                * Simple View
+                */
                oColumn.width = 40;
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
@@ -573,11 +570,14 @@
                }
                else
                {
-                  elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
+                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="icon32"><a href="#" class="preview-link"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></a></span>';
                }
             }
             else
             {
+               /**
+                * Detailed View
+                */
                oColumn.width = 100;
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
@@ -587,7 +587,7 @@
                }
                else
                {
-                  elCell.innerHTML = '<span onclick="' + generateDocumentPreviewOnClick(oRecord) + '" class="thumbnail"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></span>';
+                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="thumbnail"><a href="#" class="preview-link"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></a></span>';
                }
             }
          }
@@ -638,7 +638,7 @@
                /**
                 * Document type
                 */
-               desc = '<h3 class="filename"><a href="#" onclick="' + generateDocumentPreviewOnClick(oRecord) + '">' + $html(oRecord.getData("displayName")) + '</a></h3>';
+               desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="#" class="preview-link">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
                if (me.options.simpleView)
                {
                   desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</div>';
@@ -661,7 +661,9 @@
                      description = me._msg("details.description.none");
                   }
                   desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span></div>';
+                  /* Comments field
                   desc += '<div class="detail"><span class="item"><b>' + me._msg("details.comments") + '</b> 0</span></div>';
+                  */
                   /* Tags */
                   var tags = oRecord.getData("tags");
                   desc += '<div class="detail"><span><b>' + me._msg("details.tags") + '</b> ';
@@ -847,6 +849,41 @@
             return true;
          }
          YAHOO.Bubbling.addDefaultAction("tag-link", fnTagHandler);
+
+         // Hook preview clicks
+         var fnPreviewHandler = function DL_fnPreviewHandler(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
+            if (owner !== null)
+            {
+               var fileId = owner.id;
+               fileId = fileId.substring(fileId.lastIndexOf("yui-rec"));
+               var record = me.widgets.dataTable.getRecord(fileId);
+               // Show the preview, or just the content?
+               if (record.getData("mimetype") in (me.options.previewMimetypes))
+               {
+                  Alfresco.module.getDocumentPreviewInstance().show(
+                  {
+                      nodeRef: record.getData("nodeRef"),
+                      fileName: record.getData("fileName"),
+                      icon32: record.getData("icon32")
+                   });
+               }
+               else
+               {
+                  YAHOO.Bubbling.fire("documentPreviewFailure",
+                  {
+                     error: 0,
+                     nodeRef: record.getData("nodeRef"),
+                     failureUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl")
+                  });
+               }
+               args[1].stop = true;
+            }
+      		 
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("preview-link", fnPreviewHandler);
          
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
@@ -1664,7 +1701,7 @@
          var obj = args[1];
          if ((obj !== null) && (obj.failureUrl !== null))
          {
-            document.location.href = obj.failureUrl;
+            window.open(obj.failureUrl, "_blank");
          }
       },
 

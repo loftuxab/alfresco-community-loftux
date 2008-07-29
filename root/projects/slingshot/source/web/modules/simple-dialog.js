@@ -181,7 +181,16 @@
            * @type: integer
            * @default: 30em
            */
-          width: "30em"
+          width: "30em",
+          
+          /**
+           * Clear the form before showing it?
+           *
+           * @property: clearForm
+           * @type: boolean
+           * @default: false
+           */
+          clearForm: false
        },
 
       /**
@@ -257,6 +266,16 @@
          if (this.options.actionUrl !== null)
          {
             form.attributes.action.nodeValue = this.options.actionUrl;
+         }
+         
+         if (this.options.clearForm)
+         {
+            var inputs = YAHOO.util.Selector.query("input", form);
+            inputs = inputs.concat(YAHOO.util.Selector.query("textarea", form));
+            for (var i = 0, j = inputs.length; i < j; i++)
+            {
+               inputs[i].value = "";
+            }
          }
 
          this.dialog.show();
