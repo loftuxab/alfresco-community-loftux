@@ -91,8 +91,9 @@
 }
 
 .invitelist .userslist {
-	height: 400px;
-	overflow-y: auto;
-	/*padding: 4px;*/
-	background-color: #f6f9fc;
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative !important;
+    background-color: #f6f9fc;
 }

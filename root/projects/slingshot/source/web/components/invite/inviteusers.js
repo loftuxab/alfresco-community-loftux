@@ -132,7 +132,7 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.searchButtonClick);
 
          // DataSource definition  
-         var peopleSearchUrl = Alfresco.constants.PROXY_URI + "api/people?"; // ?filter={filterQuery?}
+         var peopleSearchUrl = Alfresco.constants.PROXY_URI + "api/people?";
          this.widgets.dataSource = new YAHOO.util.DataSource(peopleSearchUrl);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
@@ -336,7 +336,7 @@
           
          if (searchTerm.length < 3)
          {
-            Alfresco.util.PopupManager.displayMessage({text: "Enter at least 3 characters to search for" });
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("inviteusers.mintextlength") });
             return;
          }
          
