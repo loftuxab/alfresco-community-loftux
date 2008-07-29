@@ -8,8 +8,8 @@
   },  
   
   <#-- Exception details -->
-  "message" : "${status.message?j_string!""}",  
-  "exception" : "<#if status.exception?exists>${status.exception.class.name?j_string}<#if status.exception.message?exists> - ${status.exception.message?j_string}</#if></#if>",
+  "message" : "${jsonUtils.encodeJSONString(status.message)}",  
+  "exception" : "<#if status.exception?exists>${jsonUtils.encodeJSONString(status.exception.class.name)}<#if status.exception.message?exists> - ${status.exception.message?j_string}</#if></#if>",
   
   <#-- Exception call stack --> 
   "callstack" : 
@@ -29,12 +29,12 @@
       <@recursestack exception=exception.cause/>
    </#if>
    <#if exception.cause?exists == false>
-      ,"${exception?j_string}"
+      ,"${jsonUtils.encodeJSONString(exception)}"
       <#list exception.stackTrace as element>
-      ,"${element?j_string}"
+      ,"${jsonUtils.encodeJSONString(element)}"
       </#list>  
    <#else>
-      ,"${exception?j_string}"
-      ,"${exception.stackTrace[0]?j_string}"
+      ,"${jsonUtils.encodeJSONString(exception)}"
+      ,"${jsonUtils.encodeJSONString(exception.stackTrace[0])}"
    </#if>
 </#macro>
