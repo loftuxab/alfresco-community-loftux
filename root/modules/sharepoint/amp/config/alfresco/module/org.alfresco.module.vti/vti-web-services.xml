@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd ">
+
+    <bean id="endpoints_mapping" class="org.springframework.ws.soap.server.endpoint.mapping.SoapActionEndpointMapping">
+        <property name="mappings">
+            <props>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/WebUrlFromPageUrl">webUrlFromPageUrlEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/GetDwsMetaData">getDwsMetaDataEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/GetVersions">getVersionsEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/RestoreVersion">restoreVersionEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/DeleteVersion">deleteVersionEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/GetDwsData">getDwsDataEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/CreateDws">createDwsEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/DeleteAllVersions">deleteAllVersionsEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/directory/GetUserLoginFromEmail">getUserLoginFromEmailEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/directory/AddUserCollectionToRole">addUserCollectionToRoleEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/CreateFolder">createFolderEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteFolder">deleteFolderEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteDws">deleteDwsEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/RenameDws">renameDwsEndpoint</prop>
+                <prop key="http://schemas.microsoft.com/sharepoint/soap/dws/RemoveDwsUser">removeDwsUserEndpoint</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="webUrlFromPageUrlEndpoint" class="org.alfresco.module.vti.endpoints.webs.WebUrlFromPageUrlEndpoint">
+        <constructor-arg ref="vtiHandler" />
+        <property name="name">
+            <value>WebUrlFromPageUrl</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="getDwsMetaDataEndpoint" class="org.alfresco.module.vti.endpoints.dws.GetDwsMetaDataEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>GetDwsMetaData</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="getDwsDataEndpoint" class="org.alfresco.module.vti.endpoints.dws.GetDwsDataEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>GetDwsData</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="createDwsEndpoint" class="org.alfresco.module.vti.endpoints.dws.CreateDwsEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>CreateDws</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="getVersionsEndpoint" class="org.alfresco.module.vti.endpoints.versions.GetVersionsEndpoint">
+        <constructor-arg ref="versionsServiceHandler" />
+        <property name="name">
+            <value>GetVersions</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="restoreVersionEndpoint" class="org.alfresco.module.vti.endpoints.versions.RestoreVersionEndpoint">
+        <constructor-arg ref="versionsServiceHandler" />
+        <property name="name">
+            <value>RestoreVersion</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="deleteVersionEndpoint" class="org.alfresco.module.vti.endpoints.versions.DeleteVersionEndpoint">
+        <constructor-arg ref="versionsServiceHandler" />
+        <property name="name">
+            <value>DeleteVersion</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="deleteAllVersionsEndpoint" class="org.alfresco.module.vti.endpoints.versions.DeleteAllVersionsEndpoint">
+        <constructor-arg ref="versionsServiceHandler" />
+        <property name="name">
+            <value>DeleteAllVersions</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="getUserLoginFromEmailEndpoint" class="org.alfresco.module.vti.endpoints.usergroup.GetUserLoginFromEmailEndpoint">
+        <constructor-arg ref="userGroupServiceHandler" />
+        <property name="name">
+            <value>GetUserLoginFromEmail</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/directory/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="addUserCollectionToRoleEndpoint" class="org.alfresco.module.vti.endpoints.usergroup.AddUserCollectionToRoleEndpoint">
+        <constructor-arg ref="userGroupServiceHandler" />
+        <property name="name">
+            <value>AddUserCollectionToRole</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/directory/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="createFolderEndpoint" class="org.alfresco.module.vti.endpoints.dws.CreateFolderEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>CreateFolder</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="deleteFolderEndpoint" class="org.alfresco.module.vti.endpoints.dws.DeleteFolderEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>DeleteFolder</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="deleteDwsEndpoint" class="org.alfresco.module.vti.endpoints.dws.DeleteDwsEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>DeleteDws</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="renameDwsEndpoint" class="org.alfresco.module.vti.endpoints.dws.RenameDwsEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>RenameDws</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="removeDwsUserEndpoint" class="org.alfresco.module.vti.endpoints.dws.RemoveDwsUserEndpoint">
+        <constructor-arg ref="dwsServiceHandler" />
+        <property name="name">
+            <value>RenameDwsUser</value>
+        </property>
+        <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+        <property name="sessionManager" ref="vtiSessionManager" />
+    </bean>
+
+    <bean id="errorCodeExceptionResolver" class="org.alfresco.module.vti.endpoints.ErrorCodeExceptionMappingResolver">
+        <property name="order">
+            <value>1</value>
+        </property>
+    </bean>
+
+    <bean id="exceptionResolver" class="org.alfresco.module.vti.endpoints.VtiSoapFaultMappingResolver">
+        <property name="order">
+            <value>2</value>
+        </property>
+        <property name="defaultFault" value="SERVER"></property>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="java.lang.Exception">SERVER,Internal server error.</prop>
+            </props>
+        </property>
+    </bean>
+
+</beans>

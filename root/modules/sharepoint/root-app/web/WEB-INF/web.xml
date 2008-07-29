@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE web-app PUBLIC
+  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+   <display-name>Alfresco Vti Root Proxy</display-name>
+   <description>Alfresco Vti Root Proxy</description>
+   
+   <servlet>
+      <servlet-name>VtiRootProxyServlet</servlet-name>
+      <servlet-class>org.alfresco.proxy.ProxyServlet</servlet-class>
+      <init-param>
+         <param-name>alfresco-context-name</param-name>
+         <param-value>/alfresco</param-value>
+      </init-param>
+      <init-param>
+         <param-name>alfresco-appcontext-attribute</param-name>
+         <param-value>org.springframework.web.context.WebApplicationContext.ROOT</param-value>
+      </init-param>
+      <init-param>
+         <param-name>receiver-bean-name</param-name>
+         <param-value>vtiServletContainer</param-value>
+      </init-param>
+      <init-param>
+         <param-name>context-receiver-bean-name</param-name>
+         <param-value>vtiContextServletContainer</param-value>
+      </init-param>      
+      <init-param>
+         <param-name>target-http-method</param-name>
+         <param-value>service</param-value>
+      </init-param>
+      <init-param>
+         <param-name>target-alfresco-context-method</param-name>
+         <param-value>setContext</param-value>
+      </init-param>
+      
+      <load-on-startup>5</load-on-startup>
+   </servlet>
+   
+   <servlet-mapping>
+      <servlet-name>VtiRootProxyServlet</servlet-name>
+      <url-pattern>/*</url-pattern>
+   </servlet-mapping>
+       
+</web-app>
