@@ -1358,7 +1358,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
-			m_sess.debugPrintln("File close [" + smbPkt.getTreeId() + "] fid=" + fid);
+			m_sess.debugPrintln("File close [" + smbPkt.getTreeId() + "] fid=" + fid + ", fileId=" + netFile.getFileId());
 
 		// Close the file
 
@@ -2096,9 +2096,9 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_NEGOTIATE))
 			Debug.println("[SMB] Logoff vc=" + vc);
 
-		// Close the virtual circuit
+		// Mark the virtual circuit as logged off
 
-		m_sess.removeVirtualCircuit(uid);
+		vc.setLoggedOn( false);
 
 		// Return a success status SMB
 
@@ -5576,7 +5576,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			// Add the file to the list of open files for this tree connection
 
 			fid = conn.addFile(netFile, getSession());
-
+			
+			// DEBUG
+			
+			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
+				m_sess.debugPrintln("  [" + treeId + "] name=" + fileName + " fid=" + fid + ", fileId=" + netFile.getFileId());
 		}
 		catch (TooManyFilesException ex) {
 
