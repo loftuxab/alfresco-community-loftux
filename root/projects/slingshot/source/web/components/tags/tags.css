@@ -13,5 +13,6 @@
 
 .tag li
 {
+   overflow: hidden;
    padding: 2px 0;
 }

@@ -16,8 +16,11 @@
    <div id="${args.htmlid}-createpanel">
       <div class="hd">${msg("panel.create.title")}</div>
       <div class="bd">
-         <input type="text" id="${args.htmlid}-title" name="title" value="" size="30"/>
-         <button id="${args.htmlid}-save-button">${msg("button.save")}</button>
+         <form id="${args.htmlid}-addPageForm" method="GET" action="${url.context}/page/site/${page.url.templateArgs["site"]}/wiki-page">
+         <input type="hidden" id="${args.htmlid}-title" name="title"/>
+         <input type="text" id="${args.htmlid}-pagetitle" name="pagetitle" value="" size="30"/>
+         <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}"/>
+         </form>
       </div>
       <div class="ft">${msg("panel.create.footer")}</div>
    </div>

@@ -75,10 +75,30 @@
    	   this.panel = new YAHOO.widget.Panel(this.id + "-createpanel", { width:"320px", visible:false, constraintoviewport:true } );
 	      this.panel.render();
 	      
-	      var saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveClick,
+	      var saveButton = Alfresco.util.createYUIButton(this, "save-button", null,
 	      {
-	      	type: "push"
+	      	type: "submit"
 	      });
+	      
+	      var pageForm = new Alfresco.forms.Form(this.id + "-addPageForm");
+         pageForm.addValidation(this.id + "-pagetitle", Alfresco.forms.validation.mandatory, null, "blur");
+         pageForm.addValidation(this.id + "-pagetitle", Alfresco.forms.validation.nodeName, null, "keyup");
+	      pageForm.setShowSubmitStateDynamically(true);
+	      pageForm.setSubmitElements(saveButton);
+	      pageForm.setSubmitAsJSON(false);
+	      pageForm.doBeforeFormSubmit.fn = function(form, obj)
+	      {
+	         var elem = YAHOO.util.Dom.get(this.id + "-pagetitle");
+	         if (elem)
+	         {
+	            // Fix for Firefox 2.x
+	            var title = YAHOO.util.Dom.get(this.id + "-title");
+               title.value = elem.value.replace(/\s+/g, "_");
+               elem.disabled = true;
+	         }
+	      };
+	      pageForm.doBeforeFormSubmit.scope = this;
+	      pageForm.init();
 	      
 	      // Create button
 	      var createButton = Alfresco.util.createYUIButton(this, "create-button", this.onCreateClick,
