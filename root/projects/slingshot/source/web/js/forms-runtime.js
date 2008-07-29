@@ -174,8 +174,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          var form = document.getElementById(this.formId);
          if (form != null)
          {
-            // add the event to the form and make the scope of the handler this form.
-            YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
+            if (form.getAttribute("forms-runtime") != "listening")
+            {
+               // add the event to the form and make the scope of the handler this form.
+               YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
+               form.setAttribute("forms-runtime", "listening");
+            }
             
             // determine if the AJAX and JSON submission should be enabled
             if (form.enctype && form.enctype === "application/json")
