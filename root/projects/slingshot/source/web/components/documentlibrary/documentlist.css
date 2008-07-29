@@ -111,7 +111,7 @@
 .doclist tr.yui-dt-odd.yui-dt-highlighted,
 .doclist tr.yui-dt-even.yui-dt-highlighted
 {
-   background-color: #d2e5f2;
+   background-color: #e8f6ff;
    cursor: auto;
 }
 
@@ -283,11 +283,11 @@
 
 .doclist div.more-actions
 {
-   background-color: #d2e5f2;
+   background-color: #e8f6ff;
    border: 1px solid #808080;
    clear: left;
    position: absolute;
-   width: 160px;
+   width: 140px;
 }
 
 /* Actions: Simple view */
