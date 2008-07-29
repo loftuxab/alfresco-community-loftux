@@ -1,0 +1,150 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="vtiContextServletContainer" class="org.alfresco.module.vti.httpconnector.VtiServletContainer">
+		<!-- SERVLETS -->
+		<constructor-arg>
+			<list>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_inf.html"/>
+					<property name="servlet" ref="vtiInfServlet"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/*"/>
+					<property name="servlet" ref="vtiBinServlet"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/history/*"/>
+					<property name="servlet" ref="vtiDownloadContent"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/resources/*"/>
+					<property name="servlet" ref="vtiResourceServlet"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="*.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/webs.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/dws.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/versions.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/usergroup.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+			</list>
+		</constructor-arg>
+		<!-- FILTERS -->
+		<constructor-arg>
+			<list>
+				<bean class="org.alfresco.module.vti.httpconnector.FilterPattern">
+					<property name="pattern" value="/*"/>
+					<property name="filter" ref="vtiFilter"/>
+				</bean>
+			</list>
+		</constructor-arg>        
+    </bean>
+    
+    <bean id="vtiServletContainer" class="org.alfresco.module.vti.httpconnector.VtiServletContainer">
+		<!-- SERVLETS -->
+		<constructor-arg>
+			<list>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_inf.html"/>
+					<property name="servlet" ref="vtiInfServlet"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/*"/>
+					<property name="servlet" ref="vtiBinServlet"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="*.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="/_vti_bin/webs.asmx"/>
+					<property name="servlet" ref="soap"/>
+				</bean>
+			</list>
+		</constructor-arg>
+		<!-- FILTERS -->
+		<constructor-arg>
+			<list>
+				<bean class="org.alfresco.module.vti.httpconnector.FilterPattern">
+					<property name="pattern" value="/*"/>
+					<property name="filter" ref="vtiFilter"/>
+				</bean>
+			</list>
+		</constructor-arg>		        
+    </bean>
+    
+    <bean id="vtiAccessChecker" class="org.alfresco.module.vti.VtiAccessChecker">
+        <property name="acceptRules">
+        	<map>
+                <entry key="User-Agent"><value>(FrontPage)|(Microsoft Data Access Internet Publishing Provider Protocol Discovery)</value></entry>
+            </map>
+        </property>
+    </bean>   
+    
+    <bean id="vtiSessionManager" class="org.alfresco.module.vti.httpconnector.VtiSessionManager">
+        <property name="sessionGuidLength" value="25"/>
+        <property name="sessionsInspectTime" value="1800000"/>
+        <property name="timeToLeave" value="1800000"/>
+    </bean>
+    
+    <bean id="vtiFilter" class="org.alfresco.module.vti.VtiFilter">
+    	<property name="authService" ref="vtiAuthService"/>
+    	<property name="accessChecker" ref="vtiAccessChecker"/>
+    	<property name="vtiHandler" ref="vtiHandler"/>    	
+    	<property name="sessionManager" ref="vtiSessionManager"/>
+    </bean>
+    
+    <bean id="vtiInfServlet" class="org.alfresco.module.vti.VtiInfServlet">
+	</bean>
+	
+	<bean id="vtiBinServlet" class="org.alfresco.module.vti.VtiBinServlet">
+		<property name="nameToVtiMethod">
+        	<map>
+        		<entry key="server_version_method"> <ref bean="server_version_method"/> </entry>
+        		<entry key="open_service_method"> <ref bean="open_service_method"/> </entry>
+        		<entry key="url_to_web_url_method"> <ref bean="url_to_web_url_method"/> </entry>
+        		<entry key="FileOpen_dialog"> <ref bean="FileOpen_dialog"/> </entry>
+				<entry key="FileSave_dialog"> <ref bean="FileSave_dialog"/> </entry>    
+				<entry key="SaveForm_dialog"> <ref bean="SaveForm_dialog"/> </entry>
+				<entry key="list_documents_method"> <ref bean="list_documents_method"/> </entry>
+				<entry key="getDocsMetaInfo_method"> <ref bean="getDocsMetaInfo_method"/> </entry>
+				<entry key="get_document_method"> <ref bean="get_document_method"/> </entry>
+				<entry key="checkout_document_method"> <ref bean="checkout_document_method"/> </entry>
+    			<entry key="uncheckout_document_method"> <ref bean="uncheckout_document_method"/> </entry>
+    			<entry key="remove_documents_method"> <ref bean="remove_documents_method"/> </entry>
+    			<entry key="put_document_method"> <ref bean="put_document_method"/> </entry>
+    			<entry key="create_url-directories_method"> <ref bean="create_url-directories_method"/> </entry>
+    			<entry key="create_url-directory_method"> <ref bean="create_url-directory_method"/> </entry>
+    			<entry key="move_document_method"> <ref bean="move_document_method"/> </entry>
+				<entry key="checkin_document_method"> <ref bean="checkin_document_method"/> </entry>
+            </map>
+        </property>
+	</bean>
+	
+	<bean id="vtiDownloadContent" class="org.alfresco.module.vti.VtiDownloadContentServlet">
+	</bean>
+	
+	<bean id="vtiResourceServlet" class="org.alfresco.module.vti.VtiResourceServlet">
+	</bean>
+	
+	<bean id="soap" class="org.springframework.ws.transport.http.MessageDispatcherServlet">
+		<property name="contextConfigLocation" value="WEB-INF/classes/alfresco/module/org.alfresco.module.vti/vti-web-services.xml"/>
+	</bean>    
+    
+</beans>

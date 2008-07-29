@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- Parent bean for beans derived from abstractVtiMethod -->
+    <bean id="abstractVtiMethod" abstract="true" class="org.alfresco.module.vti.method.AbstractVtiMethod">
+        <property name="vtiHandler">
+            <ref bean="vtiHandler"/>
+        </property>
+    </bean>
+
+    <bean id="server_version_method" class="org.alfresco.module.vti.method.ServerVersionMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="open_service_method" class="org.alfresco.module.vti.method.OpenServiceMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="url_to_web_url_method" class="org.alfresco.module.vti.method.UrlToWebUrlMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="FileOpen_dialog" class="org.alfresco.module.vti.method.FileOpenDialog" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="FileSave_dialog" class="org.alfresco.module.vti.method.FileOpenDialog" parent="abstractVtiMethod">
+    </bean>
+    
+    <bean id="SaveForm_dialog" class="org.alfresco.module.vti.method.SaveFormDialog" parent="abstractVtiMethod">
+    </bean>    
+
+    <bean id="list_documents_method" class="org.alfresco.module.vti.method.ListDocumentsMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="getDocsMetaInfo_method" class="org.alfresco.module.vti.method.GetDocsMetaInfoMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="get_document_method" class="org.alfresco.module.vti.method.GetDocumentMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="checkout_document_method" class="org.alfresco.module.vti.method.CheckoutDocumentMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="uncheckout_document_method" class="org.alfresco.module.vti.method.UncheckoutDocumentMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="remove_documents_method" class="org.alfresco.module.vti.method.RemoveDocumentsMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="put_document_method" class="org.alfresco.module.vti.method.PutDocumentMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="create_url-directories_method" class="org.alfresco.module.vti.method.CreateUrlDirectories" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="create_url-directory_method" class="org.alfresco.module.vti.method.CreateUrlDirectory" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="move_document_method" class="org.alfresco.module.vti.method.MoveDocumentMethod" parent="abstractVtiMethod">
+    </bean>
+
+    <bean id="checkin_document_method" class="org.alfresco.module.vti.method.CheckinDocumentMethod" parent="abstractVtiMethod">
+    </bean>	
+	
+</beans>
