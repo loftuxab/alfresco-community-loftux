@@ -37,6 +37,11 @@
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
    
    /**
     * DocListToolbar constructor.
@@ -305,7 +310,8 @@
          {
             this.modules.createFolder.setOptions(
             {
-               actionUrl: actionUrl
+               actionUrl: actionUrl,
+               clearForm: true
             })
          }
          this.modules.createFolder.show();
@@ -702,15 +708,8 @@
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
-            /*if (this.currentFilter.filterId != obj.filterId)
-            {*/
-               this.currentFilter = 
-               {
-                  filterId: obj.filterId,
-                  filterOwner: obj.filterOwner,
-                  filterData: obj.filterData
-               }
-               
+            if (this.currentFilter.filterOwner != obj.filterOwner)
+            {
                var owner = obj.filterOwner.split(".")[1];
                // Obtain array of DIVs we might want to hide
                var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id + "-body"));
@@ -727,10 +726,17 @@
                      Dom.addClass(div, "toolbar-hidden");
                   }
                }
-               
-               this._generateDescription();
-               this._generateRSSFeedUrl();
-            /*}*/
+            }
+            
+            this.currentFilter = 
+            {
+               filterId: obj.filterId,
+               filterOwner: obj.filterOwner,
+               filterData: obj.filterData
+            }
+            
+            this._generateDescription();
+            this._generateRSSFeedUrl();
          }
       },
 

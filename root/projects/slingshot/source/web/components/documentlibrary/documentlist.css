@@ -159,11 +159,11 @@
 
 .doclist .documents .folder
 {
-   background: url(images/demo-folder.png) no-repeat;
+   background: url(images/folder-closed-48.png) no-repeat;
    display: block;
    margin-left: 24px;
-   height: 32px;
-   width: 32px;
+   height: 48px;
+   width: 48px;
 }
 .doclist .documents .folder-small
 {
@@ -302,22 +302,22 @@
 
 .doclist .onActionDetails a
 {
-   background-image: url(images/details.gif);
+   background-image: url(images/details-16.png);
 }
 
 .doclist .onActionDelete a
 {
-   background-image: url(images/delete.gif);
+   background-image: url(images/remove-16.png);
 }
 
 .doclist .onActionDownload a
 {
-   background-image: url(images/download.gif);
+   background-image: url(images/download-16.png);
 }
 
 .doclist .onActionEditOffline a
 {
-   background-image: url(images/checkout.gif);
+   background-image: url(images/edit-16.png);
 }
 
 .doclist .onActionCancelEditing a
@@ -327,12 +327,12 @@
 
 .doclist .onActionCopyTo a
 {
-   background-image: url(images/copy-to.gif);
+   background-image: url(images/copy-16.png);
 }
 
 .doclist .onActionMoveTo a
 {
-   background-image: url(images/move-to.gif);
+   background-image: url(images/move-to-16.png);
 }
 
 .doclist .onActionRequestUnlock a
@@ -347,7 +347,7 @@
 
 .doclist .onActionUploadNewVersion a
 {
-   background-image: url(images/upload-new-version.gif);
+   background-image: url(images/upload-new-version-16.png);
 }
 
 

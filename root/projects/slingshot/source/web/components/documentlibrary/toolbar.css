@@ -49,17 +49,17 @@
 
 .toolbar .onActionCopyTo
 {
-   background-image: url(images/copy-to.gif);
+   background-image: url(images/copy-16.png);
 }
 
 .toolbar .onActionMoveTo
 {
-   background-image: url(images/move-to.gif);
+   background-image: url(images/move-to-16.png);
 }
 
 .toolbar .onActionDelete
 {
-   background-image: url(images/delete.gif);
+   background-image: url(images/remove-16.png);
 }
 
 .toolbar .onActionDeselectAll
@@ -95,7 +95,7 @@
 
 .toolbar .rss-feed a
 {
-   background-image: url(images/rss-feed.png);
+   background-image: url(images/feed-icon-16.png);
    background-repeat: no-repeat;
    padding-left: 20px;
 }
@@ -123,13 +123,13 @@
 .toolbar .new-folder button
 {
    padding-left: 2.5em; 
-   background: url(images/new-folder.png) no-repeat 10% 50%;
+   background: url(images/foldernew-16.png) no-repeat 10% 50%;
 }
 
 .toolbar .file-upload button
 {
    padding-left: 2.5em; 
-   background: url(images/file-upload.png) no-repeat 10% 50%;
+   background: url(images/upload-16.png) no-repeat 10% 50%;
 }
 
 .toolbar .folder-up button

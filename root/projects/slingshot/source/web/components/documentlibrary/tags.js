@@ -39,6 +39,11 @@
       Element = YAHOO.util.Element;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * DocumentList Tags constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -59,7 +64,7 @@
       // Decoupled event listeners
       YAHOO.Bubbling.on("tagRefresh", this.onTagRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
-//      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
    }
@@ -159,7 +164,7 @@
          YAHOO.Bubbling.addDefaultAction('tag-link', function(layer, args)
          {
             var link = args[1].target;
-            if (link)
+            if (link && !me.controlsDeactivated)
             {
                var tagName = link.firstChild.nodeValue;
                YAHOO.Bubbling.fire("filterChanged",
@@ -173,7 +178,10 @@
          });
          
          // Kick-off tag population
-         YAHOO.Bubbling.fire("tagRefresh");
+         if (this.options.siteId && this.options.containerId)
+         {
+            YAHOO.Bubbling.fire("tagRefresh");
+         }
       },
       
 
@@ -240,20 +248,24 @@
 				url: url,
 				successCallback:
 				{
-					fn: this.onTagsLoaded,
+					fn: this.onTagRefresh_success,
 					scope: this
 				},
-				failureMessage: this._msg("message.refresh.failure")
+				failureCallback:
+				{
+					fn: this.onTagRefresh_success,
+					scope: this
+				}
 			});
       },
       
       /**
        * Event handler for when the tag data loads successfully.
        *
-       * @method onTagsLoaded
+       * @method onTagRefresh_success
        * @param response {object} Server response object
        */ 
-      onTagsLoaded: function DLTg_onTagsLoaded(response)
+      onTagRefresh_success: function DLTg_onTagRefresh_success(response)
       {
          if (response && !YAHOO.lang.isUndefined(response.json.tags))
          {
@@ -269,6 +281,24 @@
          }
       },
       
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function DLTg_onDeactivateAllControls(layer, args)
+      {
+         this.controlsDeactivated = true;
+         var controls = YAHOO.util.Selector.query("a.tag-link", this.id + "-body");
+         for (var i = 0, j = controls.length; i < j; i++)
+         {
+            Dom.addClass(controls[i], "disabled");
+         }
+      },
+
+
       /**
        * PRIVATE FUNCTIONS
        */
@@ -295,7 +325,7 @@
       _generateTagMarkup: function DLTg__generateTagMarkup(tag)
       {
          var html = '<li id="' + this._generateTagId(tag.name) + '"><span class="onTagSelection nav-label">';
-         html += '<a href="#" class="tag-link nav-link">' + tag.name + '</a> (' + tag.count + ')';
+         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a> (' + tag.count + ')';
          html += '</span></li>';
          return html;
       },

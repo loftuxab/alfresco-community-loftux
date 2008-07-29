@@ -116,7 +116,13 @@ hr
 
 .error
 {
-   color: red;
+   background: white !important;
+   color: red !important;
+}
+.error-alt
+{
+   background-color: red !important;
+   color: white !important;
 }
 
 .yui-skin-default .yui-panel

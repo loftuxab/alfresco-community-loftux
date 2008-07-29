@@ -39,6 +39,11 @@
       Element = YAHOO.util.Element;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * DocumentList TreeView constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -58,11 +63,11 @@
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
-      YAHOO.Bubbling.on("folderRenamed", this.onFolderRenamed, this);
       YAHOO.Bubbling.on("folderCopied", this.onFolderCopied, this);
       YAHOO.Bubbling.on("folderCreated", this.onFolderCreated, this);
       YAHOO.Bubbling.on("folderDeleted", this.onFolderDeleted, this);
       YAHOO.Bubbling.on("folderMoved", this.onFolderMoved, this);
+      YAHOO.Bubbling.on("folderRenamed", this.onFolderRenamed, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
 
       return this;
@@ -376,7 +381,8 @@
          YAHOO.Bubbling.fire("filterChanged",
          {
             filterId: "path",
-            filterOwner: this.name
+            filterOwner: this.name,
+            filterdata: node.data.path
          });
          // Fire the path changed event
          YAHOO.Bubbling.fire("pathChanged",
