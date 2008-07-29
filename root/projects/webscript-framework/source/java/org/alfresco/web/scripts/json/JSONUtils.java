@@ -270,8 +270,15 @@ public class JSONUtils
      * @param value     value to encode
      * @return String   encoded value
      */
-    public String encodeJSONString(String value)
+    public Object encodeJSONString(Object value)
     {
-        return JSONWriter.encodeJSONString(value);
+        if (value instanceof String)
+        {
+            return JSONWriter.encodeJSONString((String)value);
+        }
+        else
+        {
+            return value;
+        }
     }
 }
