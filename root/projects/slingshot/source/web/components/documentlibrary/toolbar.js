@@ -875,13 +875,27 @@
       _generateRSSFeedUrl: function DLTB__generateRSSFeedUrl()
       {
          var divFeed = Dom.get(this.id + "-rssFeed");
-         if (!divFeed || !this.modules.docList)
+         if (divFeed && this.modules.docList)
          {
-            return;
+            var params = YAHOO.lang.substitute("{type}/site/{site}/{container}{path}",
+            {
+               type: this.modules.docList.options.showFolders ? "all" : "documents",
+               site: encodeURIComponent(this.options.siteId),
+               container: encodeURIComponent(this.options.containerId),
+               path: encodeURI(this.currentPath)
+            });
+
+            params += "?filter=" + encodeURIComponent(this.currentFilter.filterId);
+            if (this.currentFilter.filterData)
+            {
+               params += "&filterData=" + encodeURIComponent(this.currentFilter.filterData);             
+            }
+            params += "&format=rss";
+            
+            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/" + params;
+            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("link.rss-feed") + '</a>';
          }
          
-         var url = this.modules.docList.getRSSFeedUrl();
-         divFeed.innerHTML = '<a href="' + url + '">' + this._msg("link.rss-feed") + '</a>';
       },
       
 

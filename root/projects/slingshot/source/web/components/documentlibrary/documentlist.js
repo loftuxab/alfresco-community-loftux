@@ -716,7 +716,7 @@
             key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 140
          }];
 
          // Temporary "empty datatable" message
@@ -988,19 +988,6 @@
          YAHOO.Bubbling.fire("selectedFilesChanged");
       },
 
-      /**
-       * Public function to get URL to RSS feed for current view
-       *
-       * @method getRSSFeedUrl
-       * @return {string} URL to RSS feed for current document list view
-       */
-      getRSSFeedUrl: function DL_getRSSFeedUrl()
-      {
-         var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
-         url += this._buildDocListRSSParams(this.currentPath);
-         return url;
-      },
-      
 
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -1811,19 +1798,6 @@
          return params;
       },
        
-      /**
-       * Build URI parameter string for doclist RSS data webscript
-       *
-       * @method _buildDocListRSSParams
-       * @param path {string} Path to query
-       */
-      _buildDocListRSSParams: function DL__buildDocListRSSParams(path)
-      {
-        var params = this._buildDocListParams(path);
-        params += "&format=rss";
-        return params;
-      },
-
       /**
        * Searches the current recordSet for a record with the given parameter value
        *
