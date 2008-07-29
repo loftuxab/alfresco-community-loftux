@@ -179,6 +179,27 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                // add the event to the form and make the scope of the handler this form.
                YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
                form.setAttribute("forms-runtime", "listening");
+               form.setAttribute("onsubmit", "return false;");
+               
+               var me = this;
+               
+               var fnStopEvent = function(id, keyEvent)
+               {
+                  var event = keyEvent[1];
+                  var target = event.target;
+                  if (target.tagName.toLowerCase() == "input")
+                  {
+                     me._submitInvoked(event);
+                     form.attributes.action.nodeValue = "";
+                  }
+               }
+               
+               var keyListener = new YAHOO.util.KeyListener(form,
+               {
+                  keys: YAHOO.util.KeyListener.KEY.ENTER
+               },
+               fnStopEvent, "keydown");
+               keyListener.enable();
             }
             
             // determine if the AJAX and JSON submission should be enabled
