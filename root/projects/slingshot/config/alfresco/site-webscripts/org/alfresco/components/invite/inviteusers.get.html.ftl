@@ -8,39 +8,23 @@
 //]]></script>
 
 <div id="${args.htmlid}-body" class="invitelistwrapper">
-   <div class="title">Search Alfreso users</div>
+   <div class="title">${msg("inviteusers.title")}</div>
    
    <div class="invitelist">
-	   
-	   <div id="${args.htmlid}-invitelistBar" class="invitelist-bar">
-		  <div class="label">Search</div>
-		  <div class="sinput"><input type="text" class="sinput" id="${args.htmlid}-search-text" value=""/></div>
-		  <div class="bsub"><input type="button" value="search" id="${args.htmlid}-search-button" /></div>
-	   </div>
+      
+      <div id="${args.htmlid}-invitelistBar" class="invitelist-bar">
+         <div class="label">${msg("inviteusers.search.label")}</div>
+         <div class="sinput"><input type="text" class="sinput" id="${args.htmlid}-search-text" value=""/></div>
+         <div class="bsub">
+            <span id="${args.htmlid}-search-button" class="yui-button"> 
+               <span class="first-child"> 
+                  <button type="button">${msg("inviteusers.search.button")}</button> 
+               </span> 
+            </span>
+         </div>
+      </div>
 
-	   <div id="${args.htmlid}-userslist" class="userslist">
-		<#--
-			<div class="user">
-				<div class="photo">here goes the photo</div>
-				<div class="details">
-					<span class="uname">Jim Smith</span>
-					<span class="utitle">Title: Senior Developer</span>
-					<span class="ucompany">Company: dotcom</span>
-					<span class="uExpertise">Expertise: AJAX, Java</span>
-				</div>
-				<div class="badd"><input type="button" value="Add &gt;&gt;" /></div>
-			</div>
-			<div class="user">
-				<div class="photo">here goes the photo</div>
-				<div class="details">
-					<span class="uname">Jim Smith</span>
-					<span class="utitle">Title: Senior Developer</span>
-					<span class="ucompany">Company: dotcom</span>
-					<span class="uExpertise">Expertise: AJAX, Java</span>
-				</div>
-				<div class="badd"><input type="button" value="Add &gt;&gt;" /></div>
-			</div> 
-       -->
-	   </div>
+      <div id="${args.htmlid}-userslist" class="userslist">
+      </div>
    </div>
 </div>

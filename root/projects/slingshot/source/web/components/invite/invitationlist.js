@@ -169,6 +169,10 @@
          // Hook action events
          // TODO: cleanup
          Alfresco.util.myRegisterDefaultActionHandler(this.id, "remove-item-button", "span", this);
+         
+         // show the component now, this avoids painting issues of the dropdown button
+         Dom.setStyle(this.id + "-invitationBar", "visibility", "visible");
+         
       },
       
       _setupDataTable: function InvitationList_setupDataTable()
@@ -223,17 +227,17 @@
             // define the role dropdown menu and the event listeners
             var rolesMenu = [
                {
-                  text: "Site Consumer", value: "consumer", onclick: {
+                  text: me._msg("role.siteconsumer"), value: "consumer", onclick: {
                      fn: me.onRoleSelect, obj: { record: oRecord, role: "consumer" }, scope: me
                   }
                },
                {
-                  text: "Site Collaborator", value: "collaborator", onclick: {
+                  text: me._msg("role.sitecollaborator"), value: "collaborator", onclick: {
                      fn: me.onRoleSelect, obj: { record: oRecord, role: "collaborator" }, scope: me
                   }
                },
                {
-                  text: "Site Manager", value: "manager", onclick: {
+                  text: me._msg("role.sitemanager"), value: "manager", onclick: {
                      fn: me.onRoleSelect, obj: { record: oRecord, role: "manager" }, scope: me
                   }
                }
@@ -256,7 +260,7 @@
 
          renderCellRemoveButton = function InvitationList_renderCellRemoveButton(elCell, oRecord, oColumn, oData)
          {  
-            oColumn.width = 20;
+            oColumn.width = 30;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             var desc =
@@ -275,7 +279,7 @@
             key: "role", label: "Role", sortable: false, formatter: renderCellRole, width: 130
          },
          {
-            key: "remove", label: "Remove", sortable: false, formatter: renderCellRemoveButton, width: 20
+            key: "remove", label: "Remove", sortable: false, formatter: renderCellRemoveButton, width: 30
          }];
 
          // DataTable definition
@@ -297,18 +301,21 @@
          switch(roleName)
          {
             case "":
-               return "Select Role...";
+               return this._msg("invitationlist.selectrole");
             case "consumer":
-               return "Site Consumer";
+               return this._msg("role.siteconsumer");
             case "collaborator":
-               return "Site Collaborator";
+               return this._msg("role.sitecollaborator");
             case "manager":
-               return "Site Manager";
+               return this._msg("role.sitemanager");
             default:
                return "<unknown role>";
          }
       },
       
+      /**
+       * Returns the role name as expected by the rest API.
+       */
       getRoleName: function(record)
       {
          var roleName = "";
@@ -473,7 +480,7 @@
             return;
          }
 
-         Alfresco.util.PopupManager.displayMessage({text: "Please wait..."});
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("invitationlist.pleasewait")});
          
          // copy over all records
          var recs = [];
@@ -524,7 +531,7 @@
          }
          
          // inform the user
-         var message = this._msg("{0} invites sent out. {1} failures.", inviteData.successes.length, inviteData.failures.length);
+         var message = this._msg(this._msg("invitationlist.inviteresult"), inviteData.successes.length, inviteData.failures.length);
          Alfresco.util.PopupManager.displayMessage({text: message });
       },
       
