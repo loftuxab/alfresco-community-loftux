@@ -3291,12 +3291,18 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 		// Check for the file structure argument
 
-		if ( req.hasArgument() && req.getArgument().equalsIgnoreCase("F"))
+		if ( req.hasArgument() && req.getArgument().equalsIgnoreCase("F")) {
+			
+			// Return a success status
+		
 			sendFTPResponse(200, "OK");
+		}
+		else {
 
-		// Return an error response
-
-		sendFTPResponse(504, "Obsolete");
+			// Return an error response
+	
+			sendFTPResponse(504, "Obsolete");
+		}
 	}
 
 	/**
@@ -3310,12 +3316,18 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 		// Check for the stream transfer mode argument
 
-		if ( req.hasArgument() && req.getArgument().equalsIgnoreCase("S"))
+		if ( req.hasArgument() && req.getArgument().equalsIgnoreCase("S")) {
+			
+			// Return a success status
+		
 			sendFTPResponse(200, "OK");
+		}
+		else {
 
-		// Return an error response
-
-		sendFTPResponse(504, "Obsolete");
+			// Return an error response
+	
+			sendFTPResponse(504, "Obsolete");
+		}
 	}
 
 	/**
