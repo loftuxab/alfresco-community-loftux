@@ -16,7 +16,7 @@
 
 <div id="${args.htmlid}-invitationlist" class="invitationlist">
 
-   <div id="${args.htmlid}-invitationBar" class="invitelist-bar">${msg("invitationlist.selectalldescription")} <b>${msg("invitationlist.invite")}</b>
+   <div id="${args.htmlid}-invitationBar" class="invitelist-bar">
       <input type="button" id="${args.htmlid}-selectallroles-button" value="${msg("invitationlist.selectallroles")}" />
       <select id="${args.htmlid}-selectallroles-menu">
          <option value="consumer">${msg("role.siteconsumer")}</option>
