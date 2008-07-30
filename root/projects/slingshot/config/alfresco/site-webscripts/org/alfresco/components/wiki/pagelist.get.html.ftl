@@ -22,7 +22,7 @@
 			<span class="spacer"> | </span>
 			<span class="attrLabel">Modified on:</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>
-   <div class="pageCopy">${p.text}</div>
+   <div class="pageCopy">${p.text!"&nbsp;"}</div>
    </div><#-- End of wikipage -->
 </#list>
 <#else>
