@@ -292,7 +292,7 @@
             text: this._msg("message.details.success")
          });
          
-         this.widgets.dialog.hide();
+         this._hideDialog();
       },
 
       /**
@@ -312,7 +312,7 @@
          // Fire doclistRefresh event
          YAHOO.Bubbling.fire("doclistRefresh");
          
-         this.widgets.dialog.hide();
+         this._hideDialog();
       },
       
 
@@ -330,7 +330,7 @@
        */
       onCancel: function DLD_onCancel(e, p_obj)
       {
-         this.widgets.dialog.hide();
+         this._hideDialog();
       },
 
 
@@ -380,9 +380,28 @@
 
          // Fix Firefox caret issue
          Alfresco.util.caretFix(this.id + "-form");
+
+         // We're in a popup, so need the tabbing fix
+         this.modules.form.applyTabFix();
          
          // Set focus to fileName input
          Dom.get(this.id + "-name").focus();
+      },
+
+      /**
+       * Hide the dialog, removing the caret-fix patch
+       *
+       * @method _hideDialog
+       * @private
+       */
+      _hideDialog: function DLD__hideDialog()
+      {
+         // Grab the form element
+         var formElement = Dom.get(this.id + "-form");
+
+         // Undo Firefox caret issue
+         Alfresco.util.undoCaretFix(formElement);
+         this.widgets.dialog.hide();
       },
 
       /**

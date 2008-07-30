@@ -212,6 +212,8 @@
             }
          });
          createSiteForm.setSubmitAsJSON(true);
+         // We're in a popup, so need the tabbing fix
+         createSiteForm.applyTabFix();
          createSiteForm.init();
 
          this.widgets.isPublicCheckbox = Dom.get(this.id + "-isPublic-checkbox");

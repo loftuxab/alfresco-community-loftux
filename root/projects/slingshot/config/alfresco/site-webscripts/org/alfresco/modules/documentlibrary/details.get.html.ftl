@@ -20,20 +20,20 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-name">${msg("label.name")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-name" type="text" name="properties.name" />&nbsp;*</div>
+            <div class="yui-u"><input id="${args.htmlid}-name" type="text" name="properties.name" tabindex="1" />&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-title">${msg("label.title")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="properties.title" /></div>
+            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="properties.title" tabindex="2" /></div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
-            <div class="yui-u"><textarea id="${args.htmlid}-description" name="properties.description" rows="3" cols="20"></textarea></div>
+            <div class="yui-u"><textarea id="${args.htmlid}-description" name="properties.description" rows="3" cols="20" tabindex="3"></textarea></div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-mimetype">${msg("label.mimetype")}:</label></div>
             <div class="yui-u">
-               <select id="${args.htmlid}-mimetype" name="mimetype">
+               <select id="${args.htmlid}-mimetype" name="mimetype" tabindex="4">
                   <option value="application/pdf">Adobe PDF Document</option>
                   <option value="audio/x-aiff">AIFF Audio</option>
                   <option value="application/acp">Alfresco Content Package</option>
@@ -140,11 +140,11 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-tags">${msg("label.tags")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-tags" type="text" name="tags" /><br />${msg("label.tags.hint")}</div>
+            <div class="yui-u"><input id="${args.htmlid}-tags" type="text" name="tags" tabindex="5" /><br />${msg("label.tags.hint")}</div>
          </div>
          <div class="bdft">
-            <input type="submit" id="${args.htmlid}-ok" value="${msg("button.ok")}" />
-            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" />
+            <input type="submit" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="6" />
+            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="7" />
          </div>
       </form>
    </div>
