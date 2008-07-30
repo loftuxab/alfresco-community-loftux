@@ -4,9 +4,4 @@
    <region-id>column2</region-id>
    <source-id>dashboard-2column</source-id>
    <url>/test/alfwebtest03</url>
-   <chrome>
-      <frame>div</frame>      <!-- none | div (default) | iframe -->
-      <theme>default</theme>  <!-- optional theme styling for the outer frame -->
-   </chrome>
-   <properties></properties>
 </component>
