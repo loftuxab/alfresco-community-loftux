@@ -179,7 +179,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                // add the event to the form and make the scope of the handler this form.
                YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
                form.setAttribute("forms-runtime", "listening");
-               form.setAttribute("onsubmit", "return false;");
+               if (this.ajaxSubmit)
+               {
+                  form.setAttribute("onsubmit", "return false;");
+               }
                
                var me = this;
                
