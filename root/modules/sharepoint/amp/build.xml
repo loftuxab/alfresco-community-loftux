@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+
+<project name="Vti-Module" default="amp" basedir=".">
+   
+   <property environment="env" />
+   <property name="src" value="${basedir}/source/java" />	
+   <property name="build.dir" value="${basedir}/build" />
+   <property name="lib.dir" value="${basedir}/lib" />
+   <property name="config" value="${basedir}/config" />		
+   <property name="amp.file" value="vti-module.amp" />	
+   <property name="jar.file" value="alfresco-vti.jar" />
+   <property name="tomcat.home" value="${env.TOMCAT_HOME}" />
+   
+   <path id="class.path">
+      <fileset dir="../../../projects/3rd-party/lib">
+         <include name="**/*.jar" />
+      </fileset>
+      <fileset dir="../../../projects">
+         <include name="**/build/dist/*.jar" />
+      </fileset>
+      <fileset dir="${lib.dir}" includes="**/*.jar" />
+   </path>
+   
+   <target name="clean">				
+      <delete dir="${build.dir}/dist" />
+      <delete dir="${build.dir}/classes" />
+      <delete dir="${build.dir}/lib" />
+      <mkdir dir="${build.dir}/classes" />		
+      <mkdir dir="${build.dir}/dist" />
+      <mkdir dir="${build.dir}/lib" />
+   </target>
+   
+   <target name="compile" depends="clean">	
+      <javac classpathref="class.path" srcdir="${src}" destdir="${build.dir}/classes" debug="true" />
+   </target>
+   
+   <target name="jar" depends="compile">
+      <jar destfile="${build.dir}/lib/${jar.file}" encoding="UTF-8">
+         <fileset dir="${build.dir}/classes" includes="**/*.class" />
+      </jar>
+   </target>
+   
+   <target name="amp" depends="jar">
+      <zip destfile="${build.dir}/dist/${amp.file}" encoding="UTF-8">
+         <fileset dir="${basedir}" includes="lib/*.jar" />
+         <fileset dir="${build.dir}" includes="lib/*.jar" />
+         <fileset dir="${basedir}" includes="config/**/*.*" excludes="config/**/*.properties" />
+         <fileset dir="${basedir}/source" includes="web/**/*.*" />
+         <fileset dir="${config}/alfresco/module/org.alfresco.module.vti" includes="*.properties" />
+      </zip>
+   </target>
+
+   <target name="deploy" depends="amp" >
+      <java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool">
+         <classpath refid="class.path" />
+         <arg line="install ${build.dir}/dist/${amp.file} ${tomcat.home}/webapps/alfresco.war -force -verbose" />
+      </java>
+   </target>
+
+</project>

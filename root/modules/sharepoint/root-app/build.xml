@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<project name="Vti-Root" default="war" basedir=".">
+
+   <property environment="env" />
+   <property name="src" value="${basedir}/source/java" />	
+   <property name="build.dir" value="${basedir}/build" />
+   <property name="web.dir" value="${basedir}/web" />
+   <property name="webinf.dir" value="${basedir}/web/WEB-INF" />
+   <property name="jar.file" value="vti-proxy.jar"/>
+   <property name="war.file" value="ROOT.war" />
+   <property name="tomcat.home" value="${env.TOMCAT_HOME}" />
+   <property name="tomcat.app.home" value="${env.APP_TOMCAT_HOME}" />
+   
+   <path id="class.path">
+      <fileset dir="${tomcat.home}/common/lib" includes="**/*.jar" />
+   </path>
+   
+   <target name="clean">
+      <delete dir="${build.dir}/classes" />
+      <delete dir="${build.dir}/dist" />
+      <delete dir="${build.dir}/lib" />
+      <mkdir dir="${build.dir}/classes" />
+      <mkdir dir="${build.dir}/dist" />	
+      <mkdir dir="${build.dir}/lib" />
+   </target>
+   
+   <target name="compile" depends="clean">
+      <javac classpathref="class.path" srcdir="${src}" destdir="${build.dir}/classes" debug="true" />
+   </target>
+   
+   <target name="jar" depends="compile">
+      <jar destfile="${build.dir}/lib/${jar.file}" encoding="UTF-8">
+         <fileset dir="${build.dir}/classes" includes="**/*.class" />
+      </jar>
+   </target>
+   
+   <target name="war" depends="jar">
+      <jar basedir="${build.dir}/classes" destfile="${build.dir}/lib/vti-proxy.jar" />
+      <war warfile="${build.dir}/dist/ROOT.war" webxml="${webinf.dir}/web.xml">
+         <fileset dir="${web.dir}" excludes="WEB-INF/**" />
+         <lib dir="${build.dir}/lib" includes="*.jar" />
+      </war>
+   </target>
+
+   <target name="deploy" depends="war">
+      <delete dir="${tomcat.home}/webapps/ROOT" failonerror="yes" />
+      <copy file="${build.dir}/dist/${war.file}" todir="${tomcat.home}/webapps" />
+   </target>
+   
+   <target name="undeploy">
+      <delete dir="${tomcat.home}/webapps/ROOT" failonerror="yes" />
+      <delete file="${tomcat.home}/webapps/${war.file}" />
+      <copy todir="${tomcat.home}/webapps/ROOT">
+         <fileset dir="${tomcat.app.home}/webapps/ROOT" />
+      </copy>
+   </target>
+
+</project>
