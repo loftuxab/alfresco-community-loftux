@@ -540,7 +540,8 @@
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: confirmTitle,
-            text: confirmMsg,
+            text: Alfresco.util.decodeHTML(confirmMsg),
+            noEscape: true,
             modal: true,
             buttons: [
             {
