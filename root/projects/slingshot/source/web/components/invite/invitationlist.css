@@ -94,9 +94,10 @@
 }
 
 .invitationlistwrapper .title {
+	background: transparent url(images/step-two.png) no-repeat 3px center;
 	color: #009300;
 	font-weight: bold;
-	padding: 10px 0px 10px 5px;
+	padding: 10px 0px 10px 34px;
 }
 
 .invitationlist .invitelist-bar {
