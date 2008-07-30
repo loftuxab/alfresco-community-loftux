@@ -137,6 +137,16 @@
       memberOfSites: {},
       
       /**
+       * Flag to determine whether membership details have been
+       * retrieved yet, until they have join/leave buttons can
+       * not be shown
+       * 
+       * @property membershipsRetrieved
+       * @type boolean
+       */
+      membershipsRetrieved: false,
+      
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -259,7 +269,6 @@
          
          // setup the button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
-         this.widgets.searchButton.set("disabled", true);
          
          // register the "enter" event on the search text field
          var searchIinput = Dom.get(this.id + "-term");
@@ -291,8 +300,8 @@
                this.memberOfSites[site.shortName] = true;
             }
             
-            // enable the search button
-            this.widgets.searchButton.set("disabled", false);
+            // indicate that membership details have been received
+            this.membershipsRetrieved = true;
          }
       },
       
@@ -363,33 +372,41 @@
           */
          renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {
-            var isPublic = oRecord.getData("isPublic");
-            if (isPublic)
+            if (me.membershipsRetrieved)
             {
-               var shortName = oRecord.getData("shortName");
-               var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
-               elCell.innerHTML = action;
-               
-               // create button
-               var button = new YAHOO.widget.Button(
+               var isPublic = oRecord.getData("isPublic");
+               if (isPublic)
                {
-                   container: me.id + '-button-' + shortName
-               });
-               
-               // if the user is already a member of the site show leave button
-               // otherwise show join button
-               if (shortName in me.memberOfSites)
-               {
-                  button.set("label", "Leave");
-                  button.set("onclick", { fn: me.doLeave, obj: shortName, scope: me});
+                  var shortName = oRecord.getData("shortName");
+                  var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
+                  elCell.innerHTML = action;
+                  
+                  // create button
+                  var button = new YAHOO.widget.Button(
+                  {
+                      container: me.id + '-button-' + shortName
+                  });
+                  
+                  // if the user is already a member of the site show leave button
+                  // otherwise show join button
+                  if (shortName in me.memberOfSites)
+                  {
+                     button.set("label", "Leave");
+                     button.set("onclick", { fn: me.doLeave, obj: shortName, scope: me});
+                  }
+                  else
+                  {
+                     button.set("label", "Join");
+                     button.set("onclick", { fn: me.doJoin, obj: shortName, scope: me});
+                  }
+                  
+                  me.buttons[shortName] = { button: button };
                }
-               else
-               {
-                  button.set("label", "Join");
-                  button.set("onclick", { fn: me.doJoin, obj: shortName, scope: me});
-               }
-               
-               me.buttons[shortName] = { button: button };
+            }
+            else
+            {
+               // output padding div so layout is not messed up due to missing buttons
+               elCell.innerHTML = '<div></div>';
             }
          };
 
