@@ -61,7 +61,7 @@
          </div>
          <div id="${args.htmlid}-center-div" class="fileupload-center-div">
             <span class="fileupload-progressSuccess-span">&nbsp;</span>
-            <img src="${url.context}/images/filetypes32/_default.gif" class="fileupload-docImage-img"/>
+            <img src="${url.context}/images/generic-file-32.png" class="fileupload-docImage-img"/>
             <span class="fileupload-progressInfo-span"></span>
          </div>
          <div id="${args.htmlid}-right-div" class="fileupload-right-div">

@@ -49,12 +49,13 @@
    display: block;
    margin-left: -4px;
    min-height: 16px;
-   padding: 2px 0px 1px 20px;
+   padding: 2px 0px 1px 24px;
 }
 
 .toolbar .selected-items hr.yuimenuitemlabel
 {
    padding: 0px;
+   width: 132px;
 }
 
 .toolbar .onActionCopyTo
@@ -74,7 +75,7 @@
 
 .toolbar .onActionDeselectAll
 {
-   background-image: url(images/select-none.gif);
+   background-image: url(images/select-none-16.png);
 }
 
 
@@ -132,7 +133,7 @@
 .toolbar .new-folder button
 {
    padding-left: 2.5em; 
-   background: url(images/foldernew-16.png) no-repeat 10% 50%;
+   background: url(images/folder-new-16.png) no-repeat 10% 50%;
 }
 
 .toolbar .file-upload button
@@ -144,7 +145,7 @@
 .toolbar .folder-up button
 {
    padding-left: 2.5em; 
-   background: url(images/folder-up.png) no-repeat 10% 50%;
+   background: url(images/up-arrow-16.png) no-repeat 10% 50%;
 }
 
 
@@ -166,10 +167,10 @@
 
 .toolbar-file-list span.folder
 {
-   background-image: url(images/toolbar-folder.gif);
+   background-image: url(images/folder-open-16.png);
 }
 
 .toolbar-file-list span.document
 {
-   background-image: url(images/toolbar-document.gif);
+   background-image: url(images/generic-16.png);
 }
