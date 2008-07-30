@@ -26,8 +26,6 @@
 package org.alfresco.jlan.server.auth.spnego;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.alfresco.jlan.server.auth.asn.DERBuffer;
 import org.alfresco.jlan.server.auth.asn.DEREnumerated;
@@ -50,7 +48,7 @@ public class NegTokenTarg {
 
   // Result code
 
-  private int m_result;
+  private int m_result = -1;
 
   // Supported mechanism
 
@@ -86,7 +84,6 @@ public class NegTokenTarg {
    * @return int
    */
   public final int getResult() {
-
     return m_result;
   }
 
@@ -96,7 +93,6 @@ public class NegTokenTarg {
    * @return Oid
    */
   public final Oid getSupportedMech() {
-
     return m_supportedMech;
   }
 
@@ -106,7 +102,6 @@ public class NegTokenTarg {
    * @return boolean
    */
   public final boolean hasResponseToken() {
-
     return m_responseToken != null ? true : false;
   }
 
@@ -116,7 +111,6 @@ public class NegTokenTarg {
    * @return byte[]
    */
   public final byte[] getResponseToken() {
-
     return m_responseToken;
   }
 
@@ -137,7 +131,7 @@ public class NegTokenTarg {
     
     // Get the first object from the blob
     
-    DERObject derObj = derBuf.unpackApplicationSpecific();
+    DERObject derObj = derBuf.unpackObject();
     
     if ( derObj instanceof DERSequence) {
       
@@ -148,14 +142,14 @@ public class NegTokenTarg {
       // Get the status
       
       derObj = derSeq.getTaggedObject( 0);
-      if ( derObj == null)
-        throw new IOException( "Status missing from blob");
+      if ( derObj != null) {
       
-      if ( derObj instanceof DEREnumerated == false)
-        throw new IOException( "Invalid status object");
-      
-      DEREnumerated derEnum = (DEREnumerated) derObj;
-      m_result = derEnum.getValue();
+	      if ( derObj instanceof DEREnumerated == false)
+	        throw new IOException( "Invalid status object");
+	      
+	      DEREnumerated derEnum = (DEREnumerated) derObj;
+	      m_result = derEnum.getValue();
+      }
       
       // Get the supportedMech (optional)
       
