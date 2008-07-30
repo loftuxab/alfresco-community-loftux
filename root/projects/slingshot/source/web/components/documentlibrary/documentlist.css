@@ -52,32 +52,32 @@
    display: block;
    margin-left: -4px;
    min-height: 16px;
-   padding: 2px 0px 1px 20px;
+   padding: 2px 0px 1px 24px;
 }
 
 .doclist .file-select .selectAll
 {
-   background-image: url(images/select-all.gif);
+   background-image: url(images/select-all-16.png);
 }
 
 .doclist .file-select .selectNone
 {
-   background-image: url(images/select-none.gif);
+   background-image: url(images/select-none-16.png);
 }
 
 .doclist .file-select .selectInvert
 {
-   background-image: url(images/select-invert.gif);
+   background-image: url(images/select-invert-16.png);
 }
 
 .doclist .file-select .selectFolders
 {
-   background-image: url(images/select-folders.gif);
+   background-image: url(images/select-folders-16.png);
 }
 
 .doclist .file-select .selectDocuments
 {
-   background-image: url(images/select-documents.gif);
+   background-image: url(images/select-documents-16.png);
 }
 
 
@@ -179,7 +179,7 @@
 }
 .doclist .documents .folder-small
 {
-   background: url(images/folder-32.png) no-repeat;
+   background: url(images/folder-closed-32.png) no-repeat;
    display: block;
    height: 32px;
    width: 32px;
@@ -220,8 +220,21 @@
    padding-right: 2em;
 }
 
+.doclist .documents .detail span.item-simple
+{
+   padding-right: 0.5em;
+}
+
 
 /* Tags */
+
+.doclist .documents .detail span.tag-item
+{
+   background-image: url(images/tag-16.png);
+   background-position: 1px 0px;
+   background-repeat: no-repeat;
+   padding-left: 18px;
+}
 
 .doclist .documents .detail span.tag
 {
@@ -334,7 +347,7 @@
 
 .doclist .onActionCancelEditing a
 {
-   background-image: url(images/cancel-editing.gif);
+   background-image: url(images/cancel-editing-16.png);
 }
 
 .doclist .onActionCopyTo a
@@ -349,12 +362,12 @@
 
 .doclist .onActionRequestUnlock a
 {
-   background-image: url(images/request-unlock.gif);
+   background-image: url(images/request-unlock-16.png);
 }
 
 .doclist .onActionUnlock a
 {
-   background-image: url(images/unlock.gif);
+   background-image: url(images/unlock-16.png);
 }
 
 .doclist .onActionUploadNewVersion a

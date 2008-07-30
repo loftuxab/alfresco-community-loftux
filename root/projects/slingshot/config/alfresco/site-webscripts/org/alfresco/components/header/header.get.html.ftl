@@ -15,9 +15,9 @@
       <img src="${url.context}/themes/${theme}/images/app-logo.png" alt="Alfresco Share" />
    </div>
    <div class="personal-menu">
-      <span class="menu-item"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>
-      <span class="menu-item"><a href="${url.context}/page/user-profile">${msg("link.myProfile")}</a></span>
-      <span class="menu-item"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
+      <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>
+      <span class="menu-item-icon my-profile"><a href="${url.context}/page/user-profile">${msg("link.myProfile")}</a></span>
+      <span class="menu-item-icon sites"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
    </div>
    
    <div class="util-menu" id="${args.htmlid}-searchcontainer">
@@ -26,7 +26,7 @@
       <span class="menu-item">
          <span class="search-container">
             <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />
-            <span id="${args.htmlid}-search-sbutton" class="search-icon">&nbsp;</span>
+            <!-- ><span id="${args.htmlid}-search-sbutton" class="search-icon">&nbsp;</span> -->
             <span id="${args.htmlid}-search-tbutton" class="search-site-icon">&nbsp;</span>
          </span>
       </span>

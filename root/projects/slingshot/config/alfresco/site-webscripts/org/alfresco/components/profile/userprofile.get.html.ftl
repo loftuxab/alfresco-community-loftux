@@ -21,7 +21,7 @@
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photorow">
             <div class="photo">
-               <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-photo.png</#if>" alt="" />
+               <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
             </div>
             <div class="namelabel">${profile.firstName!""} ${profile.lastName!""}</div>
             <#if profile.jobTitle?? && profile.jobTitle?length!=0><div class="fieldlabel">${profile.jobTitle?html}</div></#if>
@@ -157,7 +157,7 @@
       <div class="header-bar">${msg("label.photo")}</div>
       <div class="photorow">
          <div class="photo">
-            <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-photo.png</#if>" alt="" />
+            <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
          </div>
          <div class="photobtn">
             <button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button>

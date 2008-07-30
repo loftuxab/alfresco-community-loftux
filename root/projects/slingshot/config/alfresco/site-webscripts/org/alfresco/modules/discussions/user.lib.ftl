@@ -19,7 +19,7 @@
    <#if user.avatarRef??>
       <#assign avatarUrl>${url.context}/proxy/alfresco/api/node/${user.avatarRef?replace('://','/')}/content/thumbnails/avatar?qc=true&amp;ph=true</#assign>
    <#else>
-      <#assign avatarUrl="${url.context}/components/images/no-photo.png" />
+      <#assign avatarUrl="${url.context}/components/images/no-user-photo-64.png" />
    </#if>
    <img src="${avatarUrl}" alt="${user.username}-avatar-image" />
 </#macro>

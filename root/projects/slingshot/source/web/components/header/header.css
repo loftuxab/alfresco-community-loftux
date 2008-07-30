@@ -4,11 +4,32 @@
    padding-top: 0.5em;
 }
 
-.header span.menu-item
+.header span.menu-item,
+.header span.menu-item-icon
 {
-    vertical-align: middle;
-    padding: 0px 6px 0px;
-    white-space: nowrap;
+   padding: 0px 6px 0px;
+   vertical-align: middle;
+   white-space: nowrap;
+}
+.header span.menu-item-icon a
+{
+   background-repeat: no-repeat;
+   padding: 1px 0px 1px 20px;
+}
+
+.header span.my-dashboard a
+{
+   background-image: url(../images/my-dashboard-16.png);
+}
+
+.header span.my-profile a
+{
+   background-image: url(../images/my-profile-16.png);
+}
+
+.header span.sites a
+{
+   background-image: url(../images/site-16.png);
 }
 
 .header div.logo
@@ -20,7 +41,7 @@
 .header div.personal-menu
 {
     float: left;
-    margin: 9px 0px 0px 10px;
+    margin: 10px 0px 0px 2em;
 }
 
 .header div.util-menu
@@ -31,11 +52,16 @@
 
 .header .search-tinput
 {
+	background-image: url(../images/search-16.png);
+   background-position: 2px 50%;
+	background-repeat: no-repeat;
 	color: default;
+	padding-left: 20px;
 }
 
 .header .search-tinput.gray
 {
+	background-image: url(../images/search-16-gray.png);
 	color: #ddd;
 }
 
