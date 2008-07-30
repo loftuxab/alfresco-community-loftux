@@ -160,7 +160,7 @@
        */
       genericAction: function DLA_genericAction(action)
       {
-         var path = null;
+         var path = "";
          var success = action.success;
          var failure = action.failure;
          var webscript = action.webscript;
@@ -215,7 +215,10 @@
             }
 
             // Add path and file if supplied
-            path = params.path;
+            if (params.path)
+            {
+               path = params.path;
+            }
             if (params.file)
             {
                path += "/" + params.file;
