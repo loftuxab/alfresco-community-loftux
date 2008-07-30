@@ -127,9 +127,10 @@
 		 */
 		_renderEvent: function(event)
 		{
-			var html = "<table><tr><td>";
-			html += '<span class="eventTitle">' + event.title + '</span>';
-			html += 'From: ' + event.start;
+			var html = "<table class='cal-events-dashlet'><tr class='cal-event'><td class='cal-icon'><img src='" + Alfresco.constants.URL_CONTEXT + "/components/calendar/images/calendar-16.png'/></td><td>";
+			html += '<div class="cal-header"><a href="' + Alfresco.constants.URL_CONTEXT + event.url + '">' + event.title + '</a></div>';
+			html += '<div>' + event.when + '  (' + event.start + ' - ' + event.end + ')</div>';
+			html += '<div>In: <a href="' + Alfresco.constants.URL_CONTEXT + 'page/site/' + event.site + '/dashboard">' + event.site + '</a></div>';
 			html += "</td></tr></table>";
 			
 			return html;
