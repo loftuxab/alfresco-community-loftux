@@ -10,6 +10,16 @@ if (json.status == 200)
    if (obj)
    {
       memberships = obj;
+      var userObj, member;
+      for (var i = 0, j = memberships.length; i < j; i++)
+      {
+         member = memberships[i];
+         userObj = user.getUser(member.person.userName);
+         if (userObj != null)
+         {
+            member.avatar = userObj.properties.avatar;
+         }
+      }
    }
 }
 

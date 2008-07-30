@@ -55,12 +55,20 @@
    border-bottom: 1px solid #e9e9e9;
 }
 
-.dashlet .detail-list-item .icon
+.dashlet .detail-list-item .icon,
+.dashlet .detail-list-item .avatar
 {
    float: left;
 }
 
-.dashlet .detail-list-item .details
+.dashlet .detail-list-item .avatar img
+{
+   height: 32px;
+   width: 32px;
+}
+
+.dashlet .detail-list-item .details,
+.dashlet .detail-list-item .person
 {
    padding-left: 40px;
 }
