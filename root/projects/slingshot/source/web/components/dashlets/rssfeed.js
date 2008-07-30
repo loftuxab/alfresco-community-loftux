@@ -12,6 +12,8 @@
       this.name = "Alfresco.RssFeed";
       this.id = htmlId;
       
+      this.configDialog = null;
+     
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
       
@@ -22,22 +24,12 @@
    }
 
   	Alfresco.RssFeed.prototype =
-  	{
-  	   guid: null,
-  	   
+  	{  
   	   setGUID: function(guid)
   	   {
   	      this.guid = guid;
   	      return this;
   	   },
-  	   
-	   /**
-		 * Allows the user to configure the feed for the dashlet.
-		 *
-		 * @property configDialog
-	    * @type DOM node
-		 */
-		configDialog: null,
 		
 		/**
 		 * Fired by YUILoaderHelper when required component script files have
