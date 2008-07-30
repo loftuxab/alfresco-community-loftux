@@ -1,54 +1,32 @@
+.inviteusersbyemail  {
+ margin-top: 15px;
+ background-color: #f6f9fc;
+ border: 1px dashed #bababa;
+}
+
 .inviteusersbyemail * {
-	color: #000;
-}
-.inviteusersbyemail .body .user {
-	height: 95px;
-	padding-left: 105px;     
-	padding-right: 83px;     
-}
-
-.inviteusersbyemail .body div.labels,
-.inviteusersbyemail .body div.badd,
-.inviteusersbyemail .body div.inputs {
-	position: relative;
-	float: left;
-}
-
-.inviteusersbyemail .body .inputs {
-	width: 100%;
-}
-
-.inviteusersbyemail .body .labels {
-	width: 100px;           
-	right: 100px;            
-	margin-left: -200px;
-	left: 100px;
-}
-
-.inviteusersbyemail .body .badd {
-	width: 90px;            
-	margin-right: -100%;
-}
-
-.inviteusersbyemail .body .labels span,
-.inviteusersbyemail .body .inputs span {
-	display: block;
-	line-height: 20px;
-	padding: 2px;
+ color: #000;
 }
 
 .inviteusersbyemail .title {
-	color: #009300;
-	font-weight: bold;
-	padding-top: 12px;
-	padding-left: 34px;
-	padding-bottom: 12px;
-	background: transparent url(images/step-two.png) no-repeat 3px center;
+ color: #009300;
+ font-weight: bold;
+ padding-top: 12px;
+ padding-left: 34px;
+ padding-bottom: 12px;
+ background: transparent url(images/step-two.png) no-repeat 3px center;
 }
 
-.inviteusersbyemail  {
-	margin-top: 15px;
-	background-color: #f6f9fc;
-	border: 1px dashed #bababa;
+.inviteusersbyemail .byemailbody .byemailuser {
+ width: 100%;
+ padding: 4px;
 }
 
+.inviteusersbyemail .byemailbody .byemailuser td {
+ white-space:nowrap;
+ padding: 4px;
+}
+
+.inviteusersbyemail .byemailbody .byemailuser .elabel {padding-left: 15px;}
+.inviteusersbyemail .byemailbody .byemailuser .einput {width: 99%;}
+.inviteusersbyemail .byemailbody .byemailuser .byemailadd {vertical-align: top; padding-right: 25px; }
