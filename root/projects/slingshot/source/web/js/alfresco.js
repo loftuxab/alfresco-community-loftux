@@ -426,6 +426,31 @@ Alfresco.util.caretFix = function(p_formElement)
 }
 
 /**
+ * Removed the fixes for the hidden caret problem in Firefox 2.x.
+ * Should be called before hiding a form for re-use.
+ *
+ * @method Alfresco.util.undoCaretFix
+ * @param p_formElement {element|string} Form element to undo fixes within
+ * @static
+ */
+Alfresco.util.undoCaretFix = function(p_formElement)
+{
+   if (YAHOO.env.ua.gecko == 1.8)
+   {
+      if (typeof p_formElement == "string")
+      {
+         p_formElement = YAHOO.util.Dom.get(p_formElement);
+      }
+      var nodes = YAHOO.util.Selector.query(".caret-fix", p_formElement);
+      for (var x = 0; x < nodes.length; x++)
+      {
+         var elem = nodes[x];
+         YAHOO.util.Dom.removeClass(elem, "caret-fix");
+      }
+   }
+}
+
+/**
  * Parses a string to a json object and returns it.
  * If str contains invalid json code that is displayed using displayPrompt().
  *
@@ -761,7 +786,8 @@ Alfresco.util.PopupManager = function()
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
          displayTime: 2.5,
-         modal: false
+         modal: false,
+         noEscape: false
       },
 
       /**
@@ -806,7 +832,7 @@ Alfresco.util.PopupManager = function()
          });
 
          // Set the message that should be displayed
-         message.setBody($html(c.text));
+         message.setBody(c.noEscape ? c.text : $html(c.text));
 
          /**
           * Add it to the dom, center it, schedule the fade out of the message
@@ -859,6 +885,7 @@ Alfresco.util.PopupManager = function()
          effectDuration: 0.5,
          modal: true,
          close: false,
+         noEscape: false,
          buttons: [
          {
             text: null, // To early to localize at this time, do it when called instead
@@ -928,7 +955,7 @@ Alfresco.util.PopupManager = function()
          }
 
          // Show the actual text taht should be prompted for the user
-         prompt.setBody($html(c.text));
+         prompt.setBody(c.noEscape ? c.text : $html(c.text));
 
          // Show the title if it exists
          if (c.icon)
