@@ -12,7 +12,7 @@
                <div class="detail-list-item">
                   <div>
                      <div class="icon">
-                        <img src="${url.context}${doc.icon32}" alt="${doc.name?html}" />
+                        <img src="${url.context}/components/images/generic-file-32.png" alt="${doc.name?html}" />
                      </div>
                      <div class="details">
                         <h4><a rel="content" href="${url.context}/proxy/alfresco${doc.contentUrl}/${doc.name?url}">${doc.name?html}</a></h4>

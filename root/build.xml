@@ -565,18 +565,6 @@
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.slingshot.yui}"
              dest="${dir.deploy.tomcat.application.slingshot}" />
-
-       <!-- *** TEMPORARY: COPY WEB-CLIENT FILETYPE IMAGES -->
-       <copy todir="${dir.deploy.tomcat.application.slingshot}">
-          <fileset dir="${dir.project.webclient.src.web}"> 
-             <include name="**/images/filetypes32/*.gif" />
-             <include name="**/images/icons/close_panel.gif" />
-             <include name="**/images/icons/project-icon-*.gif" />
-             <include name="**/images/icons/space-icon-*.gif" />
-             <include name="**/images/icons/trashcan_large.gif" />
-             <exclude name="**/images/icons/*16.gif" />
-          </fileset>
-       </copy>
    </target>
    
    <target name="deploy-dynamicwebsite-tomcat" depends="init" 
