@@ -8,13 +8,13 @@
 <#list pageList.pages as p>
    <div class="wikipage">
    <div class="actionPanel">
-      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&action=edit">Edit</a></div>
+      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit">Edit</a></div>
       <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}">Details</a></div>
       <div class="deletePage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}">Delete</a></div>
    </div>
    <div class="pageTitle"><a class="pageTitle" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}">${p.title}</a></div>
    <div class="publishedDetails">
-         <span class="attrLabel">Created by:</span> <span class="attrValue"><a href="">${p.createdBy}</a></span>
+         <span class="attrLabel">Created by:</span> <span class="attrValue"><a href="#">${p.createdBy}</a></span>
    		<span class="spacer"> | </span>
 			<span class="attrLabel">Created on:</span> <span class="attrValue">${p.createdOn}</span>
 			<span class="spacer"> | </span>
