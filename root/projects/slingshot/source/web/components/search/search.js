@@ -258,12 +258,22 @@
             var name = oRecord.getData("name");
             var extn = name.substring(name.lastIndexOf("."));
 
-            oColumn.width = 40;
+            oColumn.width = 100;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-              
+            
+            var url = me._getBrowseUrlForRecord(oRecord);
+            var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/generic-result.png'; //  oRecord.getData("icon32").substring(1);
+            
+            // use the preview image for the document library
+            if (oRecord.getData("type") == "file")
+            {
+               imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
+               imageUrl += "/content/thumbnails/doclib?qc=true&ph=true";
+            }
+            
             // Render the cell
             // TODO: this should use the correct icon
-            elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
+            elCell.innerHTML = '<span class="demo-other"><a href="' + url + '" target="_blank"><img src="' + imageUrl + '" alt="' + extn + '" /></a></span>';
          };
 
          /**
@@ -279,26 +289,13 @@
          {
             // we currently render all results the same way
             var site = oRecord.getData("site");
-            var url = "";
-            if (oRecord.getData("downloadUrl") != undefined)
-            {
-               // Download urls always go to the repository, use the proxy context therefore
-               url = Alfresco.constants.PROXY_URI + oRecord.getData("downloadUrl");
-            }
-            else if (oRecord.getData("browseUrl") != undefined)
-            {
-               // browse urls always go to a page. We assume that the url contains the page name and all
-               // parameters. What we have to add is the absolute path and the site param
-               // PENDING: could we somehow make use of Alfresco.constants.URI_TEMPLATES and pass
-               //          the pageid and param list separately?
-               url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + oRecord.getData("browseUrl");
-           }
+            var url = me._getBrowseUrlForRecord(oRecord);
             var desc = "";
             // title/link to view page
-            desc = '<h3 class="itemname"><a href="' + url + '">' + oRecord.getData("displayName") + '</a></h3>';
+            desc = '<h3 class="itemname"><a target="_blank" href="' + url + '">' + oRecord.getData("displayName") + '</a></h3>';
             // link to the site
             desc += '<div class="detail">';
-            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + '/dashboard">' + site.title + '</a>';
+            desc += '   In Site: <a  target="_blank" href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + '/dashboard">' + site.title + '</a>';
             desc += '</div>';
             desc += '<div class="details">';
             desc += '   Tags: ';
@@ -314,7 +311,7 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 40
+            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 100
          },
          {
             key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
@@ -368,6 +365,25 @@
          }
       },
 
+      _getBrowseUrlForRecord: function (oRecord)
+      {
+         var url = "#";
+         if (oRecord.getData("downloadUrl") != undefined)
+         {
+            // Download urls always go to the repository, use the proxy context therefore
+            url = Alfresco.constants.PROXY_URI + oRecord.getData("downloadUrl");
+         }
+         else if (oRecord.getData("browseUrl") != undefined)
+         {
+            // browse urls always go to a page. We assume that the url contains the page name and all
+            // parameters. What we have to add is the absolute path and the site param
+            // PENDING: could we somehow make use of Alfresco.constants.URI_TEMPLATES and pass
+            //          the pageid and param list separately?
+            var site = oRecord.getData("site");
+            url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + oRecord.getData("browseUrl");
+         }
+         return url;
+      },
 
       /**
        * DEFAULT ACTION EVENT HANDLERS
