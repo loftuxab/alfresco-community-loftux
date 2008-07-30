@@ -210,7 +210,7 @@ public class RemoteStore implements Store
             }
             catch (NumberFormatException ne)
             {
-                throw new IOException("Failed to process lastModified response: " + ne.getMessage(), ne);
+                throw new IOException("Failed to process lastModified response: " + ne.getMessage());
             }
         }
         else
