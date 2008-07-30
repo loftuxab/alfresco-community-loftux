@@ -26,7 +26,17 @@ if (json.status == 200)
    var obj = eval('(' + json + ')');
    if (obj)
    {
-      sitemanagers = obj;
+      // the REST API doesn't yet filter per role, we have to do it here
+      var managers = [];
+      for (var x=0; x < obj.length; x++)
+      {
+         if (obj[x].role == "SiteManager")
+         {
+            managers.push(obj[x]);
+         }
+      }
+       
+      sitemanagers = managers;
    }
 }
 
