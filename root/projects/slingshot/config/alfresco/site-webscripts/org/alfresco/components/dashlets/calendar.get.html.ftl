@@ -5,6 +5,7 @@
 <div class="dashlet">
    <div class="title">Calendar</div>
    <div class="body scrollableList">
-      <div id="calendar"></div>
+      <#-- Events go here -->
+      <div id="${args.htmlid}-eventsContainer"></div>
    </div>
 </div>

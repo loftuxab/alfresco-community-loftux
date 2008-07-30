@@ -53,8 +53,8 @@
 		 	* Separate the (initial) rendering of the calendar from the data loading.
 		 	* If for some reason the data fails to load, the calendar will still display.
 		 	*/
-			var cal = new YAHOO.widget.Calendar("calendar");
-			cal.render();
+			//var cal = new YAHOO.widget.Calendar("calendar");
+			//cal.render();
 		
 			var uriEvents = Alfresco.constants.PROXY_URI + "calendar/eventList?site=" + this.siteId;
 		
@@ -62,7 +62,7 @@
 			{
 				success: this.onSuccess,
 				failure: this.onFailure,
-				argument: [cal],
+				//argument: [cal],
 				scope: this
 			};
 		
@@ -78,38 +78,51 @@
 		 */
 		onSuccess: function(o)
 		{
-			try {
+		   var html = "";
+		   try 
+		   {
 				var eventList = YAHOO.lang.JSON.parse(o.responseText); 
-				var eventDates = [];
-			
-				var key; /* The key is the date of the event */
-				for (key in eventList)
-				{
-					eventDates.push(key);
-				}
-			
-				if (eventDates.length > 0)
-				{
-					var cal = o.argument[0];
-					var selected = eventDates.join(",");
-					var site = this.siteId;
-					
-					cal.addRenderer(selected, function(workingDate, cell) {
-						var date = new Date(workingDate);
-						var dateStr = date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate();
-						cell.innerHTML = '<a href="calendar?date=' + dateStr + '">' + this.buildDayLabel(workingDate) + "</a>"; 
-						YAHOO.util.Dom.addClass(cell, "highlight1"); 
-						return YAHOO.widget.Calendar.STOP_RENDER; 
-					});
 				
-					cal.cfg.setProperty("selected", selected);
-					cal.render();
-				}
-			}
-			catch(e) {
-			   // Nothing to do
-				//alert("Failed to parse webscript response: " + e);
-			}
+				for (var key in eventList)
+   			{
+   				if (eventList.hasOwnProperty(key)) {
+   					var dateParts = key.split("/");
+   					var date = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
+   					html += this._dayRenderer(date, eventList);
+   				}
+   			}
+         } 
+         catch (e)
+         {
+            // Do nothing
+            html = "Could not load calendar data";
+         }
+         
+         var div = document.getElementById(this.id + "-eventsContainer");
+         div.innerHTML = html;
+		},
+		
+		_dayRenderer: function(date, eventData)
+		{
+		   var thedate = Alfresco.util.formatDate(date, "m/d/yyyy");
+   		var events = eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
+   		var html = "";
+   		if (events && events.length > 0)
+   		{
+   			var title = Alfresco.util.formatDate(date, "mediumDate");
+   			html += '<div class="agenda-item">'
+   			html += '<div class="dayheader">' + title + '</div>';
+   			html += '<table class="daytable">'
+   			for (var i=0; i < events.length; i++)
+   			{
+   				var event = events[i];
+   				html += '<tr><td class="timelabel">' + event.start + '</td><td><a href="';
+   				var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/calendar?date=" + thedate;
+   				html += url + '">' + event.name + '</a></td></tr>';
+   			}
+   			html += '</table></div>';
+   		}
+   		return html;   
 		},
 	
 		/**
