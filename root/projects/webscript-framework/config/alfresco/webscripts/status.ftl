@@ -38,7 +38,8 @@
    <#if exception.cause?exists>
       <@recursestack exception=exception.cause/>
    </#if>
-   <tr><td><b>Exception:</b></td><td>${exception.class.name}<#if exception.message?exists> - ${exception.message}</#if></td></tr>
+   <#if exception.message?? && exception.message?is_string>
+   <tr><td><b>Exception:</b></td><td>${exception.class.name} - ${exception.message}</td></tr>
    <tr><td></td><td>&nbsp;</td></tr>
    <#if exception.cause?exists == false>
       <#list exception.stackTrace as element>
@@ -48,4 +49,5 @@
       <tr><td></td><td>${exception.stackTrace[0]}</td></tr>
    </#if>
    <tr><td></td><td>&nbsp;</td></tr>
+   </#if>
 </#macro>
