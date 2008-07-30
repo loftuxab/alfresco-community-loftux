@@ -7,7 +7,7 @@
          <p><span class="label">${msg("label.siteAdmin")}</span> ${sitemanager.person.firstName} ${sitemanager.person.lastName}</p>
       </#if>
       <p><span class="label">${msg("label.visibility")}</span>&nbsp;
-      <#if profile.isPublic>
+      <#if profile.isPublic?? && profile.isPublic>
          ${msg("text.public")}
       <#else>
          ${msg("text.private")}
