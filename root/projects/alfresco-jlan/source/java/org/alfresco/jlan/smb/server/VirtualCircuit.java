@@ -108,6 +108,8 @@ public class VirtualCircuit {
   public VirtualCircuit( int vcNum, ClientInfo cInfo) {
     m_vcNum = vcNum;
     m_clientInfo = cInfo;
+    
+    m_loggedOn = true;
   }
   
   /**
