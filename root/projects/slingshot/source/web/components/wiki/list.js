@@ -8,6 +8,9 @@
 	   this.name = "Alfresco.WikiList";
       this.id = containerId;
 
+      this.$parser = new Alfresco.WikiParser();
+      this.$parser.URL = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=";
+         
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
       return this;
@@ -47,6 +50,16 @@
        init: function()
        {
           this._initMouseOverListeners();
+          
+          // Render any mediawiki markup
+          // TODO: look at doing this on the server
+          var divs = YAHOO.util.Dom.getElementsByClassName('pageCopy', 'div');
+          var div;
+          for (var i=0; i < divs.length; i++)
+          {
+             div = divs[i];
+             div.innerHTML = this.$parser.parse(div.innerHTML);
+          }
        },
        
        _initMouseOverListeners: function()
