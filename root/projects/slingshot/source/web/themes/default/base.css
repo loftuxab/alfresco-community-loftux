@@ -296,7 +296,9 @@ div.site-navigation
    padding: 8px 0;
 }
 
-span.navigation-separator, span.navigation-item
+span.navigation-separator,
+span.navigation-item,
+span.navigation-item-alt
 {
    color: #9fc6e1;
    vertical-align: middle;
@@ -304,26 +306,29 @@ span.navigation-separator, span.navigation-item
    text-valign: middle;
 }
 
-span.navigation-item
+span.navigation-item,
+span.navigation-item-alt
 {
    padding: 0px 0px 0px 10px;
-   white-space: nowrap;
 }
 
-span.navigation-item a
-{
-   color: white;
-}
-
+span.navigation-item a,
 span.navigation-item a:hover,
 span.navigation-item a:visited   
 {
    color: white;
 }
 
+span.navigation-item-alt a,
+span.navigation-item-alt a:hover,
+span.navigation-item-alt a:visited   
+{
+   color: #e8ff96;
+}
+
 span.navigation-separator
 {
-   padding: 0px 10px;
+   padding: 0px 0px 0px 10px;
    text-align: center;
 }
 
