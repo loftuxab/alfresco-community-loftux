@@ -112,13 +112,17 @@ public class ExtranetUserFactory extends AlfrescoUserFactory
         return authenticated;
     }
     
+    
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
+     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, java.lang.String)
      */
-    public User loadUser(RequestContext context, HttpServletRequest request, String userId)
+    public User loadUser(RequestContext context, String userId)
         throws UserFactoryException
     {
         User user = null;
+        
+        // get the http servlet request
+        HttpServletRequest request = ((HttpRequestContext)context).getRequest();
         
         // get the Spring application context
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());

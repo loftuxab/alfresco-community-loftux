@@ -1,5 +1,5 @@
 <div class="wrap">
-	<a href="${url.context}"><img src="${path}/logo.gif" class="logo" alt=""/></a>
+	<a href="${url.context}"><img src="${path}/logo.gif" class="logo" title="Alfresco Network - Community Beta"/></a>
 
 <#if user.id == "guest">	
 	<ul id="top-links">
@@ -15,7 +15,8 @@
 			<img src="${url.context}/images/extranet/contact_us_16.gif"/>
 			<a href="mailto:support@alfresco.com">Contact Us</a>
 		</li>
-	</ul>
+	</ul>	
+	
 <#else>
 	<p style="padding: 0.300em 0 0.224em; float:right;font: 12px/14px 'Trebuchet MS', Arial, sans-serif;">
 	You are logged in as 
@@ -40,19 +41,12 @@
 			<a href="mailto:support@alfresco.com">Contact Us</a>
 		</li>
 	</ul>
+
 	<br/>
 	<br/>
+	<br/>
+	<p><i><font color="gray" size="2">Beta</font></i></p>
+
 </#if>
 
-	<!--
-	<form action="#" class="search">
-		Search
-		<select>
-			<option>alfresco.com</option>
-		</select>
-		for
-		<input type="text" class="text" />
-		<input type="submit" class="button" value="Go" />
-	</form>
-	-->
 </div>

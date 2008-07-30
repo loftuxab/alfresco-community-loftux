@@ -3,5 +3,5 @@
 <page>
   <title>Support Handbook</title>
   <template-instance>application</template-instance>
-  <authentication>none</authentication>  
+  <authentication>user</authentication>  
 </page>

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <component> 
 
-	<title>JIRA</title>  
-	<url>/components/extranet/jira</url>
-	
+	<url>/components/extranet/logout</url>
+
 	<!-- Binding --> 
-	<scope>page</scope>
+	<scope>global</scope>
 	<region-id>body</region-id>
-	<source-id>jira</source-id>
+	<source-id>global</source-id>
   
 </component>

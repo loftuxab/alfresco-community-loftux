@@ -3,5 +3,5 @@
 <page>
   <title>ASK</title>
   <template-instance>ask</template-instance>
-  <authentication>none</authentication>  
+  <authentication>user</authentication>  
 </page>

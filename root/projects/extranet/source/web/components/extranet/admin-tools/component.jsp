@@ -1,4 +1,13 @@
 <%
+	// safety check
+	org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
+	if(user == null || !user.isAdmin())
+	{
+		out.println("Access denied");
+		return;
+	}
+%>
+<%
 	// base path
 	String path = "/components/extranet/admin-tools/";
 	

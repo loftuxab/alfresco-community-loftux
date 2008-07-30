@@ -39,15 +39,7 @@
 <!-- wide column -->
 <div id="yui-main">
 	<div class="yui-b">
-	
-		<!-- Guided Section -->
-		<ol class="path">
-			<li><a href="#">Download</a></li>
-			<li><a href="#">Install</a></li>
-			<li><a href="#">Make it Your Own</a></li>
-			<li class="last"><a href="#">Participate</a></li>
-		</ol>
-		
+			
 		<!-- Community Welcome -->
 		<h1>Welcome to the Alfresco Community!</h1>
 		<p class="bigger">Whether you are looking to use Alfresco out-of-the-box or you are a hard-core programmer planning to develop a custom content management application, you've come to the right place. Visit the <a href="#">Alfresco Discovery Center</a> to get information about what you can do with Alfresco or if you're ready to get started, click on one of the links below.</p>
@@ -55,36 +47,9 @@
 		<!-- Community News -->
 		<@region id="community-news" scope="global"/>
 		
-		<!--
-		<h2>Community News</h2>
-		<div class="yui-g">
-		
-			<div id="doclist">
-			    <@region id="community-news" scope="global"/>
-			</div>
-		
-		</div>
-		-->
-		
+		<!-- Product News -->
 		<@region id="enterprise-product-news" scope="global"/>
 
-		<h2>Activity Feed</h2>
-		<ul>
-			<li><a href="#">Mike F added 'DM Roadway' 9 AM today.</a></li>
-			<li><a href="#">Dave C added 'New API Handbook' 6 AM, 12 May</a></li>
-			<li><a href="#">John N updated 'Roadmap' 2 PM, 10 May</a></li>
-		</ul>
-
-		<h2>Additional Community Resources</h2>
-		<ul>
-			<li><a href="#">Source Code</a></li>
-			<li><a href="#">Roadmap</a></li>
-			<li><a href="#">Training</a></li>
-		</ul>
-
-		<div class="rightalign">
-			<a href="#"><img src="images/add.gif" alt="" /></a>
-		</div>
 	</div>
 </div>
 

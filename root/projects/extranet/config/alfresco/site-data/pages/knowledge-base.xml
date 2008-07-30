@@ -3,5 +3,5 @@
 <page>
   <title>Knowledge Base</title>
   <template-instance>knowledge-base</template-instance>
-  <authentication>none</authentication>  
+  <authentication>user</authentication>  
 </page>

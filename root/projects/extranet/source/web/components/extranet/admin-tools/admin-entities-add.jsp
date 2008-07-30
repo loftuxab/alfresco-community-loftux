@@ -10,6 +10,15 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
+	// safety check
+	org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
+	if(user == null || !user.isAdmin())
+	{
+		out.println("Access denied");
+		return;
+	}
+%>
+<%
 	// select the entity type
 	String entityType = request.getParameter("entity_type");
 	

@@ -7,6 +7,10 @@
 -->
 </style>
 <ul>
+		<li class="first">
+			<a href="/extranet/">Home</a>
+		</li>
+
 	<#list pages as page>
 		<#assign activeTag="">
 		<#if page.id == currentPageId>

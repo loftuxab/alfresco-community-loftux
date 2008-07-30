@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component> 
 
-	<url>/components/extranet/logout</url>
+	<url>/components/extranet/login</url>
 
 	<!-- Binding --> 
-	<scope>page</scope>
+	<scope>global</scope>
 	<region-id>body</region-id>
-	<source-id>extranet-logout</source-id>
+	<source-id>global</source-id>
   
 </component>

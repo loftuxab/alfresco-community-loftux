@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <component> 
 
-	<url>/components/extranet/viewer/content</url>
+	<title>Issues</title>  
+	<url>/components/extranet/jira</url>
 	
 	<!-- Binding --> 
 	<scope>page</scope>
 	<region-id>body</region-id>
-	<source-id>view-content</source-id>
-
+	<source-id>issues</source-id>
+  
 </component>
