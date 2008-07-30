@@ -204,7 +204,14 @@ public class RemoteStore implements Store
         Response res = callGet(buildEncodeCall("lastmodified", documentPath));
         if (Status.STATUS_OK == res.getStatus().getCode())
         {
-            return Long.parseLong(res.getResponse());
+            try
+            {
+                return Long.parseLong(res.getResponse());
+            }
+            catch (NumberFormatException ne)
+            {
+                throw new IOException("Failed to process lastModified response: " + ne.getMessage(), ne);
+            }
         }
         else
         {
