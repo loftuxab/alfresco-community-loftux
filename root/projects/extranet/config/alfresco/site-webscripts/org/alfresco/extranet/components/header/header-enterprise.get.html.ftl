@@ -28,19 +28,7 @@
 			<a href="mailto:support@alfresco.com">Contact Us</a>
 		</li>
 	</ul>
-	<br/>
-	<br/>
+
 </#if>
 
-	<!--
-	<form action="#" class="search">
-		Search
-		<select>
-			<option>alfresco.com</option>
-		</select>
-		for
-		<input type="text" class="text" />
-		<input type="submit" class="button" value="Go" />
-	</form>
-	-->
 </div>

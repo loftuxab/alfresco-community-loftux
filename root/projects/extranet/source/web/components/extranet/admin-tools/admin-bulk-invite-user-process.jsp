@@ -11,6 +11,15 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
+	// safety check
+	org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
+	if(user == null || !user.isAdmin())
+	{
+		out.println("Access denied");
+		return;
+	}
+%>
+<%
 	// get services
 	InvitationService invitationService = ExtranetHelper.getInvitationService(request);
 	UserService userService = ExtranetHelper.getUserService(request);

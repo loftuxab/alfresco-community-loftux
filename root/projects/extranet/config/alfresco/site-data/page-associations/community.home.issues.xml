@@ -3,6 +3,11 @@
 <page-association>
   <title>Issues</title>
   <source-id>home</source-id>
-  <dest-id>jira</dest-id>
-  <assoc-type>community-registered</assoc-type>
+  <dest-id>issues</dest-id>
+  <assoc-type>community</assoc-type>
+  
+  <properties>
+  	<sort-order>4</sort-order>
+  </properties>
+  
 </page-association>

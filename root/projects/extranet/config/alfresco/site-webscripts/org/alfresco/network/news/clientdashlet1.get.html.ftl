@@ -130,6 +130,14 @@ body
 
 <#list assets as asset>
 
+	<#assign title = asset.headline>
+	<#if !title?exists || title == "">
+		<#assign title = asset.title>
+		<#if !title?exists || title == "">
+			<#assign title = assist.name>
+		</#if>
+	</#if>
+
 	<table width="100%">
 	<tr>
 	<td class="plugin-thumbnail">
@@ -137,10 +145,10 @@ body
 	</td>
 	<td class="plugin-headline" width="100%">
 		<a target="_blank" href="http://network.alfresco.com/extranet/?f=default&o=${asset.nodeRef}">
-			${asset.title}
+			${title}
 		</a>
 		<p>
-			${asset.headline}
+			${asset.description}
 		</p>
 	</td>
 	</table>
@@ -169,4 +177,3 @@ body
 </td>
 </tr>
 </table>
-

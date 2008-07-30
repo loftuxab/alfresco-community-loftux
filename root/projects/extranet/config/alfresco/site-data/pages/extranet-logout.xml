@@ -3,6 +3,6 @@
 <page>
   <title>Extranet Logout Page</title>
   <page-type>logout</page-type>
-  <template-instance>usermanagement</template-instance>
+  <template-instance>extranet-logout</template-instance>
   <authentication>none</authentication>  
 </page>
