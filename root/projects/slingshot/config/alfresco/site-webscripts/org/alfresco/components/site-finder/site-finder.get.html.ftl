@@ -13,10 +13,8 @@
 	<div class="heading">${msg("site-finder.heading")}</div>
 	
 	<div class="search-controls">
-	   <div>
-	   <div class="search-term"><input id ="${args.htmlid}-term" type="text" /></div>
-	   <div class="search-button"><input id="${args.htmlid}-button" type="button" value="${msg("site-finder.search-button")}" /></div>
-	   </div>
+	   <input id="${args.htmlid}-term" type="text" class="search-term" />
+	   <input id="${args.htmlid}-button" type="button" value="${msg("site-finder.search-button")}" />
 	</div>
 	
 	<#-- this div contains the site search results -->
