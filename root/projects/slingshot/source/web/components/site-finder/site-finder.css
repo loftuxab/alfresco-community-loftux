@@ -19,22 +19,11 @@
    background-color: #aebccc;
 }
 
-.site-finder .search-term
+.site-finder .search-controls .search-term
 {
-   padding: 0px;
-   float: left;
+   vertical-align: text-bottom;
+   height: 18px;
    width: 75%;
-}
-
-.site-finder .search-controls .search-term input
-{
-   width: 98%;
-   margin: 3px 4px 0px 4px;
-}
-
-.site-finder .search-button
-{
-   padding: 0px;
 }
 
 .site-finder .yui-dt-bd
