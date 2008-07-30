@@ -139,6 +139,19 @@
       currentPath: "",
 
       /**
+       * Currently active filter
+       * 
+       * @property currentFilter
+       * @type object
+       */
+       currentFilter:
+       {
+          filterId: "path",
+          filterOwner: "",
+          filterData: ""
+       },
+
+      /**
        * Tracks if this component is the active filter owner.
        * 
        * @property isFilterOwner
@@ -358,7 +371,8 @@
                null,
                {
                   filterId: this.initialFilter.filterId,
-                  filterOwner: this.initialFilter.filterOwner
+                  filterOwner: this.initialFilter.filterOwner,
+                  filterData: this.initialFilter.filterData
                }
             ]);
             this.initialFilter = null;
@@ -427,6 +441,17 @@
             
             this.currentPath = obj.path;
             
+            // check we're the current filter owner
+            if (this.currentFilter.filterOwner != this.name)
+            {
+               YAHOO.Bubbling.fire("filterChanged",
+               {
+                  filterOwner: this.name,
+                  filterId: "path",
+                  filterdata: this.currentPath
+               });
+            }
+
             // Search the tree to see if this path's node is expanded
             var node = this.widgets.treeview.getNodeByProperty("path", obj.path);
             if (node !== null)
@@ -695,10 +720,19 @@
                this.initialFilter =
                {
                   filterId: obj.filterId,
-                  filterOwner: obj.filterOwner
+                  filterOwner: obj.filterOwner,
+                  filterData: obj.filterData
                };
                return;
             }
+            
+            // Should be a filterId in the arguments
+            this.currentFilter =
+            {
+               filterId: obj.filterId,
+               filterOwner: obj.filterOwner,
+               filterData: obj.filterData
+            };
 
             this.isFilterOwner = (obj.filterOwner == this.name);
             this._showHighlight(this.isFilterOwner);
