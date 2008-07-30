@@ -55,7 +55,7 @@ br.clear {
 	white-space: nowrap;
 	padding: 7px;
 	padding-left: 22px;
-	background: URL('images/icon_tag.gif') no-repeat 4px 6px;
+	background: URL('images/tag-16.png') no-repeat 4px 6px;
 }
 .tags_box li a .close {
 	visibility: hidden;
@@ -72,7 +72,7 @@ br.clear {
 	border-color: #FE3;
 	color: #FFF;
 	white-space: nowrap;
-	background: #939292 URL('images/icon_tag.gif') no-repeat 4px 6px;
+	background: #939292 URL('images/tag-16.png') no-repeat 4px 6px;
 }
 .tags_box li a:hover .close {
 	visibility: visible;

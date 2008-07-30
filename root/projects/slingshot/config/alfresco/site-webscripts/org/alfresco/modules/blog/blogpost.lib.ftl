@@ -55,14 +55,27 @@
             <span class="nodeAttrLabel">${msg("post.info.publishedOn")}:</span> <span class="nodeAttrValue">${post.releasedOn?datetime?string.medium_short}</span>
             <span class="spacer"> | </span>
          </#if>
-         <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=post.author /></span>
+ 
+         <span class="nodeAttrLabel">${msg("post.info.author")}:</span>
+         <span class="nodeAttrValue"><@userLib.renderUserLink user=post.author /></span>
+      
+         <#if (post.tags?size > 0)>
+            <span class="spacer"> | </span>
+            <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
+            <#list post.tags as tag>
+            <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
+               <a href="#" class="tag-link-span">${tag}</a>
+            </span><#if tag_has_next>, </#if> 
+            </#list>
+         </#if>
       </div>
       
       <div class="content">${post.content}</div>
    </div>
    
-   <div class="nodeFooter">
    <#--
+   <div class="nodeFooter">
+   <#- -
       <#if (! post.isDraft)>
          <span class="nodeFooterBloc">
             <span class="nodeAttrLabel replyTo">${msg("post.footer.comments")}:</span><span class="nodeAttrValue"> (${post.commentCount})</span>
@@ -72,8 +85,8 @@
       <#if ((post.tags?size > 0) && (! post.isDraft))>
       <span class="spacer"> | </span>
       </#if>
-   -->
-      
+   - ->
+
       <#if (post.tags?size > 0)>
          <span class="nodeFooterBloc">
             <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
@@ -85,6 +98,7 @@
          </span>
       </#if> 
    </div>
+   -->
 </div>
 </#macro>
 
