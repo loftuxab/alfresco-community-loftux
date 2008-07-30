@@ -18,6 +18,7 @@
 .filter li
 {
    padding: 2px 0;
+   list-style-type: none;
 }
 
 
@@ -65,7 +66,7 @@ ol li {
   font-size: 116%;
   color: #333333;
   background: transparent url(images/create-discussion-16.png) no-repeat scroll 3px 3px;
-  padding: 0 5px 0 19px;
+  padding: 0 5px 0 20px;
   border-right: 1px solid #c6c6c6;
 }
 #discussionsBlogHeader1 .createBlogPostLink {
@@ -74,7 +75,7 @@ ol li {
   font-size: 116%;
   color: #333333;
   background: transparent url(images/new-blog-16.png) no-repeat scroll 3px 1px;
-  padding: 0 5px 0 19px;
+  padding: 0 5px 0 20px;
   border-right: 1px solid #c6c6c6;
 }
 #discussionsBlogHeader1 .rssLink {
@@ -83,7 +84,7 @@ ol li {
   font-size: 116%;
   color: #333333;
   background: transparent url(images/feed-icon-16.png) no-repeat scroll 3px 1px;
-  padding-left: 19px;
+  padding-left: 20px;
 }
 #discussionsBlogHeader1 .detailList {
   padding-right: 5px;
@@ -153,7 +154,7 @@ ol li {
 }
 .node .authorPicture, .reply .authorPicture, .comment .authorPicture {
   text-align: center;
-  margin-right: 20px;
+  margin-right: 10px;
   width: 100px;
   position: relative;
   float: left;
@@ -164,8 +165,12 @@ ol li {
   border: none;
   margin-top: 5px;
 }
-.topicview .nodeContent, .comment .nodeContent {
-  margin-left: 120px;
+.topicview .nodeContent, .comment .nodeContent, .reply .nodeContent {
+  margin-left: 110px;
+}
+
+.topicview .nodeFooter, .comment .commentFooter, .reply .nodeFooter {
+  margin-left: 110px;
 }
 
 
@@ -250,8 +255,8 @@ html>body .node, .reply, .comment {
   font-size: 100%;
   line-height: 150%;
   margin-right: 140px;
-  
 }
+
 .nodeFooter {
   background-color: #f8f8f8;
   border-top: 1px dashed #c6c6c6;
@@ -259,13 +264,13 @@ html>body .node, .reply, .comment {
   padding: 1px;
 }
 .nodeFooter .tag {
-  background:transparent url(images/tag.png) no-repeat scroll 0px 50%;
-  padding-left: 15px;
+  background:transparent url(images/tag-16.png) no-repeat scroll 0px 50%;
+  padding-left: 18px;
 }
 
 .replyTo {
   background:transparent url(images/reply-to-discussion-16.png) no-repeat scroll 0px 50%;
-  padding-left: 15px;
+  padding-left: 20px;
 }
 
 
@@ -346,7 +351,7 @@ html>body .node, .reply, .comment {
   margin: 4px;
   border: thin solid #000;
   padding: 4px;
-  background-color: #fff9ab;
+  background-color: #FAFAFA;
 }
 .editNodeForm label {
   width: 100px;

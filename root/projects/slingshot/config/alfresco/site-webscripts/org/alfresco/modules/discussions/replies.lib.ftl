@@ -78,7 +78,7 @@
 
    <div class="content">${reply.content}</div>
 </div>
-<div class="topicFooter">
+<div class="nodeFooter">
    <span class="nodeFooterBloc">
       <span class="nodeAttrLabel replyTo">${msg("replies.footer.replies")}:</span><span class="nodeAttrValue">
         (<#if reply.children??>${reply.children?size}<#else>0</#if>)

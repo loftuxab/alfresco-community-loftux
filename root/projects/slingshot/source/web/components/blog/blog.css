@@ -18,7 +18,7 @@
 }
 .commentsListTitle {
 	font-size: 116%;
-	background:transparent url(../images/tag.png) no-repeat scroll 20px 50%;
+	background:transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
 	padding: 20px 0pt 20px 40px;
 }
 .comment.even {
@@ -34,7 +34,7 @@
 	font-size: 116%;
 	color: #333333;
 	background: transparent url(../images/configure-blog-16.png) no-repeat scroll 3px 1px;
-	padding-left: 19px;
+	padding-left: 20px;
     border-left: 1px solid #c6c6c6;
 }
 
