@@ -106,7 +106,7 @@ body
 			<img src="${url.context}/images/extranet/info_16.gif" width="16" height="16" />
 		</td>
 		<td class="news-item-headline" width="100%">
-			<a href="http://network.alfresco.com/extranet/?f=default&o=${newsItem.nodeRef}">
+			<a target="_blank" href="http://network.alfresco.com/extranet/?f=default&o=${newsItem.nodeRef}">
 			${newsItem.headline}
 			</a>
 		</td>
@@ -136,7 +136,7 @@ body
 		<img src="${url.context}/images/library/down18px.png" width="18" height="18" />
 	</td>
 	<td class="plugin-headline" width="100%">
-		<a href="http://network.alfresco.com/extranet/?f=default&o=${asset.nodeRef}">
+		<a target="_blank" href="http://network.alfresco.com/extranet/?f=default&o=${asset.nodeRef}">
 			${asset.title}
 		</a>
 		<p>
@@ -164,7 +164,7 @@ body
 	Interested in finding out about Alfresco add-ons and extensions?
 	<br/>
 	<br/>Join
-	<a href="http://network.alfresco.com?ref=30b1labs" target="_blank">Alfresco Network</a>
+	<a target="_blank" href="http://network.alfresco.com?ref=30b1labs">Alfresco Network</a>
 	today!
 </td>
 </tr>
