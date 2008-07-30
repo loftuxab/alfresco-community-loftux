@@ -107,7 +107,8 @@
 				}
 			}
 			catch(e) {
-				alert("Failed to parse webscript response: " + e);
+			   // Nothing to do
+				//alert("Failed to parse webscript response: " + e);
 			}
 		},
 	
@@ -121,7 +122,7 @@
 		onFailure: function(o)
 		{
 			/* Failed */
-			alert("Failed to load calendar data.");
+			//alert("Failed to load calendar data.");
 		}	
    
 	};

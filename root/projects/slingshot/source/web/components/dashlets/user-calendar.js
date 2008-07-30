@@ -59,8 +59,24 @@
 					fn: this.onEventsLoaded,
 					scope: this
 				},
-				failureMessage: "Couldn't load event data"
+				failureCallback: 
+				{
+				   fn: this.onLoadFailed,
+				   scope: this
+				}
 			});
+		},
+
+		/**
+		 * Event handler that gets fired when the event data 
+	    * fails to load.
+		 *
+		 * @method onLoadFailed
+		 * @param e {object} DomEvent
+		 */		
+		onLoadFailed: function(e)
+		{
+		   this.container.innerHTML = "No calendars configured";
 		},
 		
 		/**
@@ -73,25 +89,32 @@
 		onEventsLoaded: function(e)
 		{
 			// Display the event data
-			var eventData = null;
+			var eventData;
 			try 
 			{
 				eventData = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
 			}
 			catch (e)
 			{
-				alert(e.toString());
+				eventData = null;
 			}
 			
 			if (eventData)
 			{
 				var events = eventData.events;
 				var len = events.length;
-				var event;
-				for (var i=0; i < len; i++)
+				if (len > 0)
 				{
-					event = events[i];
-					this.container.innerHTML+= this._renderEvent(event);
+				   var event;
+   				for (var i=0; i < len; i++)
+   				{
+   					event = events[i];
+   					this.container.innerHTML+= this._renderEvent(event);
+   				}   
+				}
+				else
+				{
+				   this.container.innerHTML = "No upcoming events";
 				}
 			}
 		},
@@ -104,7 +127,7 @@
 		 */
 		_renderEvent: function(event)
 		{
-			var html = "<table><tr><td>"
+			var html = "<table><tr><td>";
 			html += '<span class="eventTitle">' + event.title + '</span>';
 			html += 'From: ' + event.start;
 			html += "</td></tr></table>";
