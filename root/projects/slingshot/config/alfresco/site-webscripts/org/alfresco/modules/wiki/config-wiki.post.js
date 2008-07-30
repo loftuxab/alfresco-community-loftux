@@ -1,22 +1,35 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/callutils.js">
 
-var wikipage = String(json.get("wikipage"));
-var siteId = String(json.get("siteId"));
-
-var c = sitedata.getComponent(url.templateArgs.componentId);
-c.properties["wikipage"] = wikipage;
-c.save();
-
-var uri = "/slingshot/wiki/page/" + siteId + "/" + wikipage + "?format=mediawiki";
-
-var connector = remote.connect("alfresco");
-var result = connector.get(uri);
-if (result.status == status.STATUS_OK)
+if (!json.isNull("wikipage"))
 {
-   model.pagecontent = result.response;
+   var wikipage = String(json.get("wikipage"));   
+   model.pagecontent = getPageText(wikipage);
 }
 else
 {
-   model.pagecontent = "Error";
+   model.pagecontent = "No page is configured";
 }
+
+function getPageText(wikipage)
+{
+   var c = sitedata.getComponent(url.templateArgs.componentId);
+   c.properties["wikipage"] = wikipage;
+   c.save();
+
+   var siteId = String(json.get("siteId"));
+   var uri = "/slingshot/wiki/page/" + siteId + "/" + wikipage + "?format=mediawiki";
+
+   var connector = remote.connect("alfresco");
+   var result = connector.get(uri);
+   if (result.status == status.STATUS_OK)
+   {
+      return result.response;
+   }
+   else
+   {
+      return "";
+   }   
+}
+
+
 
