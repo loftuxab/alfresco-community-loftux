@@ -224,6 +224,8 @@
 			}
 			
 			eventForm.setSubmitAsJSON(true);
+         // We're in a popup, so need the tabbing fix
+         eventForm.applyTabFix();
 			eventForm.init();
 			
 			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -248,6 +250,10 @@
 
 			// Display the panel
 			this.panel.show();
+
+         // Set intial focus
+         YAHOO.util.Dom.get(this.id + "-title").focus();
+         console.log(YAHOO.util.Dom.get(this.id + "-title"));
 		},
 		
 		/**

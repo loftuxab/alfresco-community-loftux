@@ -58,6 +58,14 @@
       dialog: null,
 
       /**
+       * Form instance.
+       * 
+       * @property form
+       * @type Alfresco.forms.Form
+       */
+      form: null,
+
+      /**
        * Object container for storing YUI widget instances.
        * 
        * @property widgets
@@ -87,6 +95,15 @@
            * @default null
            */
           actionUrl: null,
+
+          /**
+           * ID of form element to receive focus on show
+           *
+           * @property firstFocus
+           * @type string
+           * @default null
+           */
+          firstFocus: null,
 
           /**
            * Object literal representing callback upon successful operation.
@@ -256,7 +273,7 @@
       /**
        * Show the dialog and set focus to the first text field
        *
-       * @method showDialog
+       * @method _showDialog
        * @private
        */
       _showDialog: function AmSD__showDialog()
@@ -283,11 +300,28 @@
          // Fix Firefox caret issue
          Alfresco.util.caretFix(form);
          
+         // We're in a popup, so need the tabbing fix
+         this.form.applyTabFix();
+
          // Set focus if required
          if (this.options.firstFocus !== null)
          {
             Dom.get(this.options.firstFocus).focus();
          }
+      },
+      
+      /**
+       * Hide the dialog, removing the caret-fix patch
+       *
+       * @method _hideDialog
+       * @private
+       */
+      _hideDialog: function AmSD__hideDialog()
+      {
+         var form = Dom.get(this.id + "-form");
+         // Undo Firefox caret issue
+         Alfresco.util.undoCaretFix(form);
+         this.dialog.hide();
       },
       
       /**
@@ -331,9 +365,9 @@
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
 
          // Form definition
-         var form = new Alfresco.forms.Form(this.id + "-form");
-         form.setSubmitElements(this.widgets.okButton);
-         form.setAJAXSubmit(true,
+         this.form = new Alfresco.forms.Form(this.id + "-form");
+         this.form.setSubmitElements(this.widgets.okButton);
+         this.form.setAJAXSubmit(true,
          {
             successCallback:
             {
@@ -341,24 +375,24 @@
                scope: this
             }
          });
-         form.setSubmitAsJSON(true);
+         this.form.setSubmitAsJSON(true);
 
          // Custom forms validation setup interest registered?
          var doSetupFormsValidation = this.options.doSetupFormsValidation;
          if (typeof doSetupFormsValidation.fn == "function")
          {
-            doSetupFormsValidation.fn.call(doSetupFormsValidation.scope || this, form, doSetupFormsValidation.obj);
+            doSetupFormsValidation.fn.call(doSetupFormsValidation.scope || this, this.form, doSetupFormsValidation.obj);
          }
          
          // Custom forms before-submit interest registered?
          var doBeforeFormSubmit = this.options.doBeforeFormSubmit;
          if (typeof doBeforeFormSubmit.fn == "function")
          {
-            form.doBeforeFormSubmit = doBeforeFormSubmit;
+            this.form.doBeforeFormSubmit = doBeforeFormSubmit;
          }
 
          // Initialise the form
-         form.init();
+         this.form.init();
 
          this._showDialog();
       },
@@ -372,7 +406,7 @@
        */
       onCancel: function AmSD_onCancel(e, p_obj)
       {
-        this.dialog.hide();
+         this._hideDialog();
       },
 
       /**
@@ -383,7 +417,7 @@
        */
       onSuccess: function AmSD_onSuccess(response)
       {
-         this.dialog.hide();
+         this._hideDialog();
 
          if (!response)
          {

@@ -183,6 +183,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                
                var me = this;
                
+               /**
+                * Prevent the Enter key from causing a double form submission
+                */
                var fnStopEvent = function(id, keyEvent)
                {
                   var event = keyEvent[1];
@@ -194,12 +197,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   }
                }
                
-               var keyListener = new YAHOO.util.KeyListener(form,
+               var enterListener = new YAHOO.util.KeyListener(form,
                {
                   keys: YAHOO.util.KeyListener.KEY.ENTER
                },
                fnStopEvent, "keydown");
-               keyListener.enable();
+               enterListener.enable();
             }
             
             // determine if the AJAX and JSON submission should be enabled
@@ -498,6 +501,42 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          }
          
          return label;
+      },
+      
+      /**
+       * Applies a Key Listener to input fields to ensure tabbing only targets elements
+       * that specifically set a "tabindex" attribute.
+       * This has only been seen as an issue with the Firefox web browser, so shouldn't be applied otherwise.
+       *
+       * @method applyTabFix
+       */
+      applyTabFix: function()
+      {
+         if (YAHOO.env.ua.gecko > 0)
+         {
+            /**
+             * Ensure the Tab key only focusses relevant fields
+             */
+            var form = YAHOO.util.Dom.get(this.formId);
+            
+            var fnTabFix = function(id, keyEvent)
+            {
+               var event = keyEvent[1];
+               var target = event.target;
+               if (!target.hasAttribute("tabindex"))
+               {
+                  YAHOO.util.Event.stopEvent(event);
+                  YAHOO.util.Selector.query("[tabindex]", form)[0].focus();
+               }
+            }
+            
+            var tabListener = new YAHOO.util.KeyListener(form,
+            {
+               keys: YAHOO.util.KeyListener.KEY.TAB
+            },
+            fnTabFix, "keyup");
+            tabListener.enable();
+         }
       },
       
       /**
