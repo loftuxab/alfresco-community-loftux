@@ -186,7 +186,7 @@
          // Shortname is mandatory
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
          // and can NOT contain whitespace characters
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "keyup");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[0-9a-zA-Zs]+$/}, "keyup");
          // and should be valid file name
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
 
