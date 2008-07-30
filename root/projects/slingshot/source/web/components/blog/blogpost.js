@@ -283,7 +283,7 @@
       
       onFormSubmitFailure: function BlogPost_onFormSubmitFailure(response)
       {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.formsubmitfailed")});
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedFormSubmit")});
       },
       
       onFormCancelButtonClick: function(type, args)

@@ -28,6 +28,10 @@ function main()
     {
        model.tags = data.tags;
     }
+    else
+    {
+       model.tags = [];
+    }
 }
 
 main();

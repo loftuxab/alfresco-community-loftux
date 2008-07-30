@@ -197,7 +197,7 @@
          renderCellDescription = function InvitationList_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // we currently render all results the same way
-            var name = oRecord.getData("firstName") + oRecord.getData("lastName")
+            var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName")
             var email = oRecord.getData("email");
             var desc = "";
             desc = '<h3 class="itemname">' + name + '</a></h3>';
@@ -582,7 +582,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.jsonRequest(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
             method: "PUT",
             dataObj:
             {
@@ -590,9 +590,9 @@
                person:
                {
                   userName: user,
-                  url: "/alfresco/service/api/people/" + user
+                  url: "/alfresco/service/api/people/" + encodeURIComponent(user)
                },
-               url: "/alfresco/service/api/sites/" + site + "/memberships/" + user
+               url: "/alfresco/service/api/sites/" + site + "/memberships/" + encodeURIComponent(user)
             },
             successCallback:
             {
