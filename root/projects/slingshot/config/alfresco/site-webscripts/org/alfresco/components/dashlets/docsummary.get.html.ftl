@@ -8,6 +8,7 @@
             <span>${msg("label.noItems")}</span>
          <#else>
             <#list docs.items as doc>
+               <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser}/profile">${doc.modifiedBy}</a></#assign>
                <div class="detail-list-item">
                   <div>
                      <div class="icon">
@@ -15,7 +16,9 @@
                      </div>
                      <div class="details">
                         <h4><a rel="content" href="${url.context}/proxy/alfresco${doc.contentUrl}/${doc.name?url}">${doc.name?html}</a></h4>
-                        <div>${msg("text.docDetails", doc.modifiedBy, doc.modifiedOn)?html}</div>
+                        <div>
+                           ${msg("text.modified-by", modifiedBy)} ${msg("text.modified-on", doc.modifiedOn)}
+                        </div>
                      </div>
                   </div>
                </div>
