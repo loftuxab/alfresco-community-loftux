@@ -49,9 +49,9 @@
    </target>
    
    <target name="undeploy">
-      <delete dir="${tomcat.home}/webapps/ROOT" failonerror="yes" />
+      <delete dir="${tomcat.home}/webapps/ROOT" />
       <delete file="${tomcat.home}/webapps/${war.file}" />
-      <copy todir="${tomcat.home}/webapps/ROOT">
+      <copy todir="${tomcat.home}/webapps/ROOT" failonerror="no">
          <fileset dir="${tomcat.app.home}/webapps/ROOT" />
       </copy>
    </target>
