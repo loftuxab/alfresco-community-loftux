@@ -27,7 +27,6 @@ package org.alfresco.web.site.renderer;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Stack;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,11 +67,6 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public final class RendererContextHelper
 {
-    /** Pattern to represent valid HTML element ID.
-        Note that we also strip ":" and "." from the ID as although legal characters they can
-        interfere with CSS selectors and cause further issues. */
-    private final static Pattern HTMLID_PATTERN = Pattern.compile("[^a-z^A-Z]?[^a-z^A-Z^0-9^_^-]");
-    
     /**
      * Push.
      * 
@@ -257,10 +251,6 @@ public final class RendererContextHelper
         // properties about the page
         context.put(WebFrameworkConstants.RENDER_DATA_PAGE_ID, page.getId());
         context.put(WebFrameworkConstants.RENDER_DATA_PAGE_TYPE_ID, page.getPageTypeId());
-
-        // properties about the html binding id
-        String htmlBindingId = page.getId();
-        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, validHtmlId(htmlBindingId));
     }
     
     
@@ -275,10 +265,6 @@ public final class RendererContextHelper
         // properties about the template
         context.put(WebFrameworkConstants.RENDER_DATA_TEMPLATE_ID, template.getId());
         context.put(WebFrameworkConstants.RENDER_DATA_TEMPLATE_TYPE_ID, template.getTemplateType());
-        
-        // properties about the html binding id
-        String htmlBindingId = template.getId();
-        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, validHtmlId(htmlBindingId));
     }
 
     /**
@@ -298,11 +284,81 @@ public final class RendererContextHelper
         context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, validHtmlId(component.getId()));
     }
     
+    
+    /**
+     * Mask for hex encoding
+     */
+    private static final int MASK = (1 << 4) - 1;
+
+    /**
+     * Digits used string encoding
+     */
+    private static final char[] DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    
     /**
      * Helper to ensure only valid and acceptable characters are output as HTML element IDs.
      */
     private static String validHtmlId(String id)
     {
-        return HTMLID_PATTERN.matcher(id).replaceAll("_");
+        int len = id.length();
+        StringBuilder buf = new StringBuilder(len + (len>>1) + 8);
+        for (int i = 0; i<len; i++)
+        {
+            char c = id.charAt(i);
+            int ci = (int)c;
+            if (i == 0)
+            {
+                if ((ci >= 65 && ci <= 90) ||   // A-Z
+                    (ci >= 97 && ci <= 122))    // a-z
+                {
+                    buf.append(c);
+                }
+                else
+                {
+                    encodef(c, buf);
+                }
+            }
+            else
+            {
+                if ((ci >= 65 && ci <= 90) ||   // A-Z
+                    (ci >= 97 && ci <= 122) ||  // a-z
+                    (ci >= 48 && ci <= 57) ||   // 0-9
+                    ci == 45 || ci == 95)       // - and _
+                {
+                    buf.append(c);
+                }
+                else
+                {
+                    encode(c, buf);
+                }
+            }
+        }
+        return buf.toString();
+    }
+    
+    private static void encode(char c, StringBuilder builder)
+    {
+        char[] buf = new char[] { '_', 'x', '0', '0', '0', '0', '_' };
+        int charPos = 6;
+        do
+        {
+            buf[--charPos] = DIGITS[c & MASK];
+            c >>>= 4;
+        }
+        while (c != 0);
+        builder.append(buf);
+    }
+    
+    private static void encodef(char c, StringBuilder builder)
+    {
+        char[] buf = new char[] { 'x', '0', '0', '0', '0', '_' };
+        int charPos = 5;
+        do
+        {
+            buf[--charPos] = DIGITS[c & MASK];
+            c >>>= 4;
+        }
+        while (c != 0);
+        builder.append(buf);
     }
 }
