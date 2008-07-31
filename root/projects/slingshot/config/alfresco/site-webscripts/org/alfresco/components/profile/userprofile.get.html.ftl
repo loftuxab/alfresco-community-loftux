@@ -80,10 +80,10 @@
               (profile.companyPostcode?? && profile.companyPostcode?length!=0)>
          <div class="row">
             <span class="fieldlabelright">${msg("label.address")}:</span>
-            <span class="fieldvalue"><#if profile.companyAddress1?? && profile.companyAddress1?length!=0>${profile.companyAddress1?html}</#if>
-               <#if profile.companyAddress2?? && profile.companyAddress2?length!=0><p>${profile.companyAddress2?html}</p></#if>
-               <#if profile.companyAddress3?? && profile.companyAddress3?length!=0><p>${profile.companyAddress3?html}</p></#if>
-               <#if profile.companyPostcode?? && profile.companyPostcode?length!=0><p>${profile.companyPostcode?html}</p></#if>
+            <span class="fieldvalue"><#if profile.companyAddress1?? && profile.companyAddress1?length!=0>${profile.companyAddress1?html}<br /></#if>
+               <#if profile.companyAddress2?? && profile.companyAddress2?length!=0>${profile.companyAddress2?html}<br /></#if>
+               <#if profile.companyAddress3?? && profile.companyAddress3?length!=0>${profile.companyAddress3?html}<br /></#if>
+               <#if profile.companyPostcode?? && profile.companyPostcode?length!=0>${profile.companyPostcode?html}</#if>
             </span>
          </div>
          </#if>
@@ -116,7 +116,7 @@
    
    <#if editable>
    <div id="${args.htmlid}-editview" class="hidden">
-      <form id="${htmlid}-form" name="${htmlid}-form" action="${url.serviceContext}/components/profile/userprofile" method="POST">
+      <form id="${htmlid}-form" action="${url.serviceContext}/components/profile/userprofile" method="post">
       
       <div class="header-bar">${msg("label.about")}</div>
       <div class="drow">

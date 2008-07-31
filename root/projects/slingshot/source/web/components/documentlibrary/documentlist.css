@@ -231,9 +231,9 @@
 .doclist .documents .detail span.tag-item
 {
    background-image: url(images/tag-16.png);
-   background-position: 1px 0px;
+   background-position: -3px 0px;
    background-repeat: no-repeat;
-   padding-left: 18px;
+   padding-left: 14px;
 }
 
 .doclist .documents .detail span.tag
