@@ -1159,6 +1159,7 @@ Alfresco.util.Ajax = function()
                   c.dataStr = "{}";
                }
             }
+            
          }
          else
          {
@@ -1168,12 +1169,12 @@ Alfresco.util.Ajax = function()
                if (c.method.toUpperCase() === this.GET)
                {
                   // Encode the dataObj and put it in the url
-                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj, false);
                }
                else
                {
                   // Enccode the dataObj and put it in the body
-                  c.dataStr = this._toParamString(c.dataObj);
+                  c.dataStr = this._toParamString(c.dataObj, true);
                }
             }
          }
@@ -1227,9 +1228,10 @@ Alfresco.util.Ajax = function()
        *
        * @method request
        * @param obj
+       * @param encode	indicates whether the parameter values should be encoded or not
        * @private
        */
-      _toParamString: function(obj)
+      _toParamString: function(obj, encode)
       {
          var params = "";
          var first = true;
@@ -1243,8 +1245,16 @@ Alfresco.util.Ajax = function()
             {
                params += "&";
             }
+            
             // Make sure no user input destroys the url 
-            params += encodeURIComponent(attr) + "=" + encodeURIComponent(obj[attr]);
+            if (encode === true)
+            {
+               params += encodeURIComponent(attr) + "=" + encodeURIComponent(obj[attr]);
+            }
+            else
+            {
+               params += attr + "=" + obj[attr];
+            }
          }
          return params;
       },
