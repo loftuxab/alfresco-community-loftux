@@ -11,6 +11,8 @@
    </div>
    
    <div id="bd">
+
+	   <@region id="membersbar" scope="template" protected=true />
    
 		<!-- start component code -->
 		<div class="yui-g grid">
