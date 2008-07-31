@@ -239,6 +239,10 @@
    <target name="build-sharepoint" depends="clean-sharepoint, incremental-webclient-tomcat">
       <ant dir="${dir.modules}/sharepoint/amp" target="deploy" />
       <ant dir="${dir.modules}/sharepoint/root-app" target="deploy" />
+      <copy file="${dir.modules}/sharepoint/amp/build/dist/vti-module.amp"
+            todir="${dir.projects}/installer" />
+      <copy file="${dir.modules}/sharepoint/root-app/build/dist/ROOT.war"
+            todir="${dir.projects}/installer" />
    </target>
    
    <target name="generate-docs" 
