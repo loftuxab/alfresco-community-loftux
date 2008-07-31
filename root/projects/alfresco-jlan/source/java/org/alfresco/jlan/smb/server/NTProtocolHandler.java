@@ -2100,6 +2100,20 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		vc.setLoggedOn( false);
 
+		// Check if there are no tree connections on this virtual circuit
+		
+		if ( vc.getConnectionCount() == 0) {
+			
+			// Remove the virtual circuit
+			
+			m_sess.removeVirtualCircuit( vc.getUID());
+			
+			// Debug
+
+			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_NEGOTIATE))
+				m_sess.debugPrintln("  Removed virtual circuit " + vc);
+		}
+			
 		// Return a success status SMB
 
 		m_sess.sendSuccessResponseSMB( smbPkt);
