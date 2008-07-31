@@ -10,12 +10,15 @@ var homePage = sitedata.rootPage;
 if(alfCommunity)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "community");
-	pageAssociations.sort(pageAssociationSort);
-	for(var i = 0; i < pageAssociations.length; i++)
+	if(pageAssociations != null)
 	{
-		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getPage(destId);		
-		model.pages[model.pages.length] = page;
+		pageAssociations.sort(pageAssociationSort);
+		for(var i = 0; i < pageAssociations.length; i++)
+		{
+			var destId = pageAssociations[i].properties["dest-id"];
+			var page = sitedata.getPage(destId);		
+			model.pages[model.pages.length] = page;
+		}
 	}
 }
 
@@ -23,12 +26,15 @@ if(alfCommunity)
 if(alfRegistered)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "community-registered");
-	pageAssociations.sort(pageAssociationSort);
-	for(var i = 0; i < pageAssociations.length; i++)
+	if(pageAssociations != null)
 	{
-		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getPage(destId);
-		model.pages[model.pages.length] = page;
+		pageAssociations.sort(pageAssociationSort);
+		for(var i = 0; i < pageAssociations.length; i++)
+		{
+			var destId = pageAssociations[i].properties["dest-id"];
+			var page = sitedata.getPage(destId);
+			model.pages[model.pages.length] = page;
+		}
 	}
 }
 
@@ -36,12 +42,15 @@ if(alfRegistered)
 if(alfEnterprise)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "enterprise");
-	pageAssociations.sort(pageAssociationSort);
-	for(var i = 0; i < pageAssociations.length; i++)
+	if(pageAssociations != null)
 	{
-		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getPage(destId);
-		model.pages[model.pages.length] = page;
+		pageAssociations.sort(pageAssociationSort);
+		for(var i = 0; i < pageAssociations.length; i++)
+		{
+			var destId = pageAssociations[i].properties["dest-id"];
+			var page = sitedata.getPage(destId);
+			model.pages[model.pages.length] = page;
+		}
 	}
 }
 
@@ -49,12 +58,15 @@ if(alfEnterprise)
 if(!alfEnterprise)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "final");
-	pageAssociations.sort(pageAssociationSort);
-	for(var i = 0; i < pageAssociations.length; i++)
+	if(pageAssociations != null)
 	{
-		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getPage(destId);
-		model.pages[model.pages.length] = page;
+		pageAssociations.sort(pageAssociationSort);
+		for(var i = 0; i < pageAssociations.length; i++)
+		{
+			var destId = pageAssociations[i].properties["dest-id"];
+			var page = sitedata.getPage(destId);
+			model.pages[model.pages.length] = page;
+		}
 	}
 }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<title>Most Recent Activities</title>
+
+	<url>/components/extranet/htmlinclude</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>activity-tracking</region-id>
+	<source-id>global</source-id>
+
+	<!-- Pick which chrome to use -->
+	<chrome>extranet-titled-chrome</chrome>
+
+  	<properties>
+  		<endpoint>alfresco</endpoint>
+  		<content-path>/Network/Community/Dashlets/activity-tracking.html</content-path>
+  	</properties>
+  
+</component>
+

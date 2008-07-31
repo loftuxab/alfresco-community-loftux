@@ -4,5 +4,10 @@
   <title>Resources</title>
   <source-id>home</source-id>
   <dest-id>resources</dest-id>
-  <assoc-type>community-registered</assoc-type>
+  <assoc-type>community</assoc-type>
+  
+  <properties>
+  	<sort-order>5</sort-order>
+  </properties>
+  
 </page-association>

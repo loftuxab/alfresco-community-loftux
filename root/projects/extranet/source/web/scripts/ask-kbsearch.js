@@ -1,5 +1,5 @@
 	//Javascript for ask search
-	
+
 	//Global variables	
 	var strObj = new Array;
 	var selectedVar = '';
