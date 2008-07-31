@@ -539,7 +539,9 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
         // if document isn't checked out then throw exception
         if (VtiDocumentHepler.isCheckedout(documentStatus) == false)
         {
-            throw VtiException.create(VtiError.V_DOC_NOT_CHECKED_OUT);
+            DocMetaInfo docMetaInfo = new DocMetaInfo(false);
+            docMetaInfo.setPath(documentName);
+            return docMetaInfo;
         }
 
         // if document is checked out, but user isn't owner, then throw exception
