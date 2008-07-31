@@ -74,6 +74,15 @@
                      div.innerHTML = txt;
                   },
                   scope: this
+               },
+               doSetupFormsValidation:
+               {
+                  fn: function RssFeed_doSetupForm_callback(form)
+                  {
+                     form.addValidation(this.configDialog.id + "-url", Alfresco.forms.validation.mandatory, null, "keyup");
+                     form.setShowSubmitStateDynamically(true, false);
+                  },
+                  scope: this
                }
             });
          }
