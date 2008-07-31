@@ -3,5 +3,5 @@
 <page>
   <title>Resources</title>
   <template-instance>application</template-instance>
-  <authentication>user</authentication>  
+  <authentication>none</authentication>  
 </page>

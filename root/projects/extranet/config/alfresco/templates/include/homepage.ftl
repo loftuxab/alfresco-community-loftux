@@ -39,16 +39,18 @@
 <!-- wide column -->
 <div id="yui-main">
 	<div class="yui-b">
-			
-		<!-- Community Welcome -->
-		<h1>Welcome to the Alfresco Community!</h1>
-		<p class="bigger">Whether you are looking to use Alfresco out-of-the-box or you are a hard-core programmer planning to develop a custom content management application, you've come to the right place. Visit the <a href="#">Alfresco Discovery Center</a> to get information about what you can do with Alfresco or if you're ready to get started, click on one of the links below.</p>
 		
+		<!-- Community Welcome -->
+		<@region id="community-welcome" scope="global"/>
+				
 		<!-- Community News -->
 		<@region id="community-news" scope="global"/>
 		
 		<!-- Product News -->
 		<@region id="enterprise-product-news" scope="global"/>
+
+		<!-- Activity Tracking -->
+		<@region id="activity-tracking" scope="global"/>
 
 	</div>
 </div>
@@ -83,11 +85,10 @@
 				<div class="inner3">
 					<div class="inner4">
 						<div class="txt-box">
-							Community Stats
-							<ul>
-								<li>&gt; 1.3 million downloads</li>
-								<li>&gt; 50,000 registered members</li>
-							</ul>
+						
+							<!-- Community Welcome -->
+							<@region id="community-stats" scope="global"/>
+
 						</div>
 					</div>
 				</div>

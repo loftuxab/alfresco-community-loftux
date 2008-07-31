@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<title>Welcome to the Alfresco Community Site (Beta)</title>
+
+	<url>/components/extranet/htmlinclude</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>community-welcome</region-id>
+	<source-id>global</source-id>
+
+  	<!-- Pick which chrome to use -->
+  	<chrome>extranet-titled-chrome</chrome>
+
+  	<properties>
+  		<endpoint>alfresco</endpoint>
+  		<content-path>/Network/Community/Dashlets/welcome.html</content-path>
+  	</properties>
+  
+</component>
+

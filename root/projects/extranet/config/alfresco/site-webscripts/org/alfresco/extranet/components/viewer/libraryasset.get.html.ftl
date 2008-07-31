@@ -26,6 +26,7 @@ td.asset-property
 -->
 </style>
 
+<#assign assetId = "/Network/10/AssetLib/" + obj.name>
 
 <#assign teaserImageUrl = "/extranet/images">
 <#assign teaserImage = obj.associations["{http://www.alfresco.org/model/network/1.0}libraryAssetTeaserImage"]>
@@ -40,7 +41,7 @@ td.asset-property
 <table class="asset">
 <tr>
 	<td class="asset">
-		<a href="${teaserImageUrl}" target="_blank">
+		<a href="${teaserImageUrl}" target="_blank" onClick="javascript: pageTracker._trackPageview('${assetId}/teaserImage'">
 			<img src='${teaserImageUrl}' width="240px" height="180px" />
 		</a>
 	</td>
@@ -129,7 +130,7 @@ td.asset-property
 	<#if previewUrl?exists>
 
 		<p>
-			A <a href='${previewUrl}'>Live Preview of this application</a> is available.
+			A <a target="_blank" href='${previewUrl}' onClick="javascript: pageTracker._trackPageview('${assetId}/livePreview'">Live Preview of this application</a> is available.
 		</p>
 	</#if>
 	
@@ -142,7 +143,9 @@ td.asset-property
 				<#if firstPreview == false>,&nbsp;</#if>
 			
 				<#assign downloadUrl = "/extranet/proxy/alfresco/api/path/content/workspace/SpacesStore" + preview.displayPath + "/" + preview.name>
-				<a target="_blank" href="${downloadUrl}">${preview.name}</a>
+				<a target="_blank" href="${downloadUrl}" onClick="javascript: pageTracker._trackPageview('${assetId}/preview/${preview.name}'">
+					${preview.name}
+				</a>
 				
 				<#assign firstPreview = false>
 			</#list>
@@ -162,9 +165,9 @@ td.asset-property
 
 <h2>Downloads and Documentation</h2>
 <p>
-	<a href='${downloadUrl}'>Download the plugin</a>
+	<a target="_blank" href='${downloadUrl}' onClick="javascript: pageTracker._trackPageview('${assetId}/download/${obj.properties["{http://www.alfresco.org/model/network/1.0}libraryAssetDownloadRef"]}'">Download the plugin</a>
 	<br/>
-	<a href='${documentationUrl}'>Download the documentation</a>
+	<a target="_blank" href='${documentationUrl}' onClick="javascript: pageTracker._trackPageview('${assetId}/documentation/${obj.properties["{http://www.alfresco.org/model/network/1.0}libraryAssetDocumentationRef"]}'">Download the documentation</a>
 	<br/>
 </p>
 <br/>
@@ -186,7 +189,7 @@ td.asset-property
 				<img src="${file.icon32}"/>
 			</td>
 			<td width="100%">
-				<a href="${downloadUrl}">
+				<a target="_blank" href="${downloadUrl}"  onClick="javascript: pageTracker._trackPageview('${assetId}/file/${file.name}'">
 					${file.name}
 				</a>
 			</td>

@@ -44,7 +44,10 @@
 
    <servlet>
       <servlet-name>proxyServlet</servlet-name>
+      <!-- 
       <servlet-class>org.alfresco.web.scripts.servlet.EndPointProxyServlet</servlet-class>
+      -->
+      <servlet-class>org.alfresco.web.scripts.servlet.EndPointProxyServletEx</servlet-class>
    </servlet>
    
    <servlet>
