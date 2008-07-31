@@ -345,6 +345,10 @@
        */
       _showDialog: function DLMT__showDialog()
       {
+         // Enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+
          // Dialog title
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
@@ -401,13 +405,16 @@
          }
          
          // Success callback function
-         var fnSuccess = function DLMT__onOK_success(data, files)
+         var fnSuccess = function DLMT__onOK_success(p_data)
          {
             var result;
-            var successCount = 0;
+            var successCount = p_data.json.successCount;
+            var failureCount = p_data.json.failureCount;
             
+            this.widgets.dialog.hide();
+
             // Did the operation succeed?
-            if (!data.json.overallSuccess)
+            if (!p_data.json.overallSuccess)
             {
                Alfresco.util.PopupManager.displayMessage(
                {
@@ -416,15 +423,22 @@
                return;
             }
             
+            YAHOO.Bubbling.fire("filesMoved",
+            {
+               destination: this.currentPath,
+               successCount: successCount,
+               failureCount: failureCount
+            });
+            
             for (var i = 0, j = data.json.totalResults; i < j; i++)
             {
-               result = data.json.results[i];
+               result = p_data.json.results[i];
                
                if (result.success)
                {
-                  successCount++;
                   YAHOO.Bubbling.fire(result.type == "folder" ? "folderMoved" : "fileMoved",
                   {
+                     multiple: true,
                      nodeRef: result.nodeRef,
                      destination: this.currentPath
                   });
@@ -437,6 +451,17 @@
             });
          }
          
+         // Failure callback function
+         var fnFailure = function DLMT__onOK_failure(p_data)
+         {
+            this.widgets.dialog.hide();
+
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.move-to.failure")
+            });
+         }
+
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
          {
@@ -445,18 +470,25 @@
                callback:
                {
                   fn: fnSuccess,
-                  scope: this,
-                  obj: files
+                  scope: this
                }
             },
             failure:
             {
-               message: this._msg("message.move-to.failure")
+               callback:
+               {
+                  fn: fnFailure,
+                  scope: this
+               }
             },
             webscript:
             {
                name: "move-to",
                method: Alfresco.util.Ajax.POST
+            },
+            wait:
+            {
+               message: this._msg("message.please-wait")
             },
             params:
             {
@@ -473,8 +505,9 @@
                }
             }
          });
-         
-         this.widgets.dialog.hide();
+
+         this.widgets.okButton.set("disabled", true);
+         this.widgets.cancelButton.set("disabled", true);
       },
 
       /**

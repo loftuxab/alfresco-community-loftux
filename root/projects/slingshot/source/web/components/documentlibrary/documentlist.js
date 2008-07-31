@@ -61,23 +61,31 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
       
-      // Decoupled event listeners
-      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
-      YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("highlightFile", this.onHighlightFile, this);
-      YAHOO.Bubbling.on("fileCopied", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("fileDeleted", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("fileMoved", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("fileRenamed", this.onFileRenamed, this);
-      YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("folderCopied", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("folderDeleted", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("folderRenamed", this.onFileRenamed, this);
-      YAHOO.Bubbling.on("folderMoved", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      /**
+       * Decoupled event listeners
+       */
+      // Specific event handlers
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("documentPreviewFailure", this.onDocumentPreviewFailure, this);
+      YAHOO.Bubbling.on("fileRenamed", this.onFileRenamed, this);
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("folderRenamed", this.onFileRenamed, this);
+      YAHOO.Bubbling.on("highlightFile", this.onHighlightFile, this);
+      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
+      // File actions which may be part of a multi-file action set
+      YAHOO.Bubbling.on("fileCopied", this.onFileAction, this);
+      YAHOO.Bubbling.on("fileDeleted", this.onFileAction, this);
+      YAHOO.Bubbling.on("fileMoved", this.onFileAction, this);
+      YAHOO.Bubbling.on("folderCopied", this.onFileAction, this);
+      YAHOO.Bubbling.on("folderDeleted", this.onFileAction, this);
+      YAHOO.Bubbling.on("folderMoved", this.onFileAction, this);
+      // Multi-file actions
+      YAHOO.Bubbling.on("filesCopied", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("filesDeleted", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("filesMoved", this.onDocListRefresh, this);
       return this;
    }
    
@@ -1599,6 +1607,25 @@
          }
       },
       
+      /**
+       * Generic file action event handler
+       *
+       * @method onFileAction
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFileAction: function DL_onFileAction(layer, args)
+      {
+         var obj = args[1];
+         if (obj)
+         {
+            if (!obj.multiple)
+            {
+               this._updateDocList.call(this, this.currentPath);
+            }
+         }
+      },
+
       /**
        * File or folder renamed event handler
        *

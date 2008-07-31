@@ -155,6 +155,7 @@
        * @param action.params.path {string} path where file is located
        * @param action.params.file {string} file to be deleted
        * @param action.params.nodeRef {string} noderef instead of site, container, path, file
+       * @param action.wait.message {string} if set, show a Please wait-style message during the operation
        * @param action.config {object} optional additional request configuration overrides
        * @return {boolean} false: module not ready
        */
@@ -166,6 +167,7 @@
          var webscript = action.webscript;
          var params = action.params;
          var overrideConfig = action.config;
+         var wait = action.wait;
          var configObj = null;
 
          var fnCallback = function DLA_genericAction_callback(data, obj)
@@ -177,6 +179,11 @@
                if (obj.event && obj.event.name)
                {
                   YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
+               }
+               // Please wait pop-up active?
+               if (obj.popup)
+               {
+                  obj.popup.destroy();
                }
                // Callback function specified?
                if (obj.callback && obj.callback.fn)
@@ -191,6 +198,22 @@
             }
          }
          
+         // Please Wait... message pop-up?
+         if (wait && wait.message)
+         {
+            if (typeof success != "object")
+            {
+               success = {};
+            }
+            
+            success.popup = Alfresco.util.PopupManager.displayMessage(
+            {
+               modal: true,
+               displayTime: 0,
+               text: wait.message
+            });
+         }
+
          var url;
          if (webscript.stem)
          {
