@@ -366,10 +366,20 @@
          Dom.get(this.id + "-title").value = file.title ? file.title : "";
          Dom.get(this.id + "-description").value = file.description ? file.description : "";
          Dom.get(this.id + "-tags").value = file.tags.join(" ");
-         var option = YAHOO.util.Selector.query("option[value=\"" + file.mimetype + "\"]", this.id + "-mimetype")[0];
-         if (option)
+         if (file.type == "document")
          {
-            Dom.get(this.id + "-mimetype").selectedIndex = option.index;
+            var option = YAHOO.util.Selector.query("option[value=\"" + file.mimetype + "\"]", this.id + "-mimetype")[0];
+            if (option)
+            {
+               Dom.get(this.id + "-mimetype").selectedIndex = option.index;
+               Dom.get(this.id + "-mimetype").name = "mimetype";
+            }
+            Dom.removeClass(this.id + "-mimetype-field", "hidden");
+         }
+         else
+         {
+            Dom.addClass(this.id + "-mimetype-field", "hidden");
+            Dom.get(this.id + "-mimetype").name = "-";
          }
 
          // Initialise the form
