@@ -316,20 +316,29 @@ span.navigation-item-alt
 span.navigation-item a,
 span.navigation-item a:visited   
 {
-   color: white;
+   color: #fff;
+   padding: 3px 4px;
 }
 
 span.navigation-item a.active-page,
 span.navigation-item a:hover
 {
-   color: black;
+   background-color: #d4e9f7;
+   color: #000;
 }
 
 span.navigation-item-alt a,
-span.navigation-item-alt a:hover,
 span.navigation-item-alt a:visited   
 {
    color: #e8ff96;
+   padding: 3px 4px;
+}
+
+span.navigation-item-alt a.active-page,
+span.navigation-item-alt a:hover
+{
+   background-color: #c5e8a5;
+   color: #000;
 }
 
 span.navigation-separator
