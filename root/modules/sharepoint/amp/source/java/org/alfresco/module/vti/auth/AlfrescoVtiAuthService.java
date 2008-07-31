@@ -43,7 +43,14 @@ public class AlfrescoVtiAuthService implements VtiAuthService
 
     public void authenticate(String userName, char[] password) throws VtiAuthException
     {
-        authenticationService.authenticate(userName, password);
+        try
+        {
+            authenticationService.authenticate(userName, password);
+        }
+        catch (Throwable th)
+        {
+            throw new VtiAuthException(th);
+        }
     }
 
     public void validate(String ticket) throws VtiAuthException
