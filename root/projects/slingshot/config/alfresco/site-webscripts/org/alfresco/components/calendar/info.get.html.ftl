@@ -21,7 +21,9 @@
             <div class="yui-gd">
                <div class="yui-u first">${msg("label.tags")}:</div>
                <div class="yui-u">
-               <#list result.tags as tag>${tag}<#if tag_has_next>&nbsp;</#if></#list>
+               <#if result.tags??>
+                  <#list result.tags as tag>${tag}<#if tag_has_next>&nbsp;</#if></#list>
+               </#if>
                </div>
             </div>
 			<div class="yui-g">
