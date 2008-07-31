@@ -1,0 +1,26 @@
+.members-bar
+{
+   background-color: #e9edef;
+   border-bottom: 2px solid #c7ccce;
+   clear: both;
+   height: 1em;
+   margin: 0 -10px;
+   padding: 10px 0px;
+}
+
+.members-bar .separator,
+.members-bar .member-link
+{
+   padding-left: 10px;
+}
+
+.members-bar .member-link a.activePage,
+.members-bar .member-link a:hover
+{
+	color: #009300;
+}
+
+.members-bar div
+{
+   float: left;
+}
