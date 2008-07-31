@@ -10,7 +10,6 @@
    <property name="jar.file" value="vti-proxy.jar"/>
    <property name="war.file" value="ROOT.war" />
    <property name="tomcat.home" value="${env.TOMCAT_HOME}" />
-   <property name="tomcat.app.home" value="${env.APP_TOMCAT_HOME}" />
    
    <path id="class.path">
       <fileset dir="${tomcat.home}/common/lib" includes="**/*.jar" />
@@ -44,16 +43,15 @@
    </target>
 
    <target name="deploy" depends="war">
+      <delete file="${tomcat.home}/conf/Catalina/localhost/ROOT.xml" quiet="true" />
       <delete dir="${tomcat.home}/webapps/ROOT" failonerror="yes" />
       <copy file="${build.dir}/dist/${war.file}" todir="${tomcat.home}/webapps" />
    </target>
    
    <target name="undeploy">
-      <delete dir="${tomcat.home}/webapps/ROOT" />
-      <delete file="${tomcat.home}/webapps/${war.file}" />
-      <copy todir="${tomcat.home}/webapps/ROOT" failonerror="no">
-         <fileset dir="${tomcat.app.home}/webapps/ROOT" />
-      </copy>
+      <delete dir="${tomcat.home}/webapps/ROOT" quiet="true" />
+      <delete file="${tomcat.home}/webapps/${war.file}" quiet="true" />
+      <delete file="${tomcat.home}/conf/Catalina/localhost/ROOT.xml" quiet="true" />
    </target>
 
 </project>

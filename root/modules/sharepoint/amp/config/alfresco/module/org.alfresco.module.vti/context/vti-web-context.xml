@@ -92,7 +92,7 @@
     <bean id="vtiAccessChecker" class="org.alfresco.module.vti.VtiAccessChecker">
         <property name="acceptRules">
         	<map>
-                <entry key="User-Agent"><value>(FrontPage)|(Microsoft Data Access Internet Publishing Provider Protocol Discovery)</value></entry>
+                <entry key="User-Agent"><value>(FrontPage)|(Microsoft Data Access Internet Publishing Provider Protocol Discovery)|(Microsoft Office)</value></entry>
             </map>
         </property>
     </bean>   
