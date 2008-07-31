@@ -9,6 +9,11 @@
    width: 26.5em;
 }
 
+.details .hidden
+{
+   display: none;
+}
+
 .details .yui-gd .yui-u.first
 {
    width: 18% !important;
