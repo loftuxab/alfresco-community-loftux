@@ -558,13 +558,12 @@
          }
          
          // Success callback function
-         var fnSuccess = function DLCT__onOK_success(p_data, p_popup)
+         var fnSuccess = function DLCT__onOK_success(p_data)
          {
             var result;
-            var successCount = 0;
+            var successCount = p_data.json.successCount;
+            var failureCount = p_data.json.failureCount;
 
-            // Lose the pop-up and dialog
-            p_popup.destroy();
             this.widgets.dialog.hide();
 
             // Did the operation succeed?
@@ -576,6 +575,13 @@
                });
                return;
             }
+
+            YAHOO.Bubbling.fire("filesCopied",
+            {
+               destination: this.currentPath,
+               successCount: successCount,
+               failureCount: failureCount
+            });
             
             for (var i = 0, j = p_data.json.totalResults; i < j; i++)
             {
@@ -583,9 +589,9 @@
                
                if (result.success)
                {
-                  successCount++;
                   YAHOO.Bubbling.fire(result.type == "folder" ? "folderCopied" : "fileCopied",
                   {
+                     multiple: true,
                      nodeRef: result.nodeRef,
                      destination: this.currentPath
                   });
@@ -599,10 +605,8 @@
          }
 
          // Failure callback function
-         var fnFailure = function DLCT__onOK_failure(p_data, p_popup)
+         var fnFailure = function DLCT__onOK_failure(p_data)
          {
-            // Lose the pop-up and dialog
-            p_popup.destroy();
             this.widgets.dialog.hide();
 
             Alfresco.util.PopupManager.displayMessage(
@@ -631,14 +635,6 @@
             }
          }
          
-         // Please Wait... message pop-up
-         var popup = Alfresco.util.PopupManager.displayMessage(
-         {
-            modal: true,
-            displayTime: 0,
-            text: this._msg("message.please-wait")
-         })
-
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
          {
@@ -647,8 +643,7 @@
                callback:
                {
                   fn: fnSuccess,
-                  scope: this,
-                  obj: popup
+                  scope: this
                }
             },
             failure:
@@ -656,14 +651,17 @@
                callback:
                {
                   fn: fnFailure,
-                  scope: this,
-                  obj: popup
+                  scope: this
                }
             },
             webscript:
             {
                name: "copy-to",
                method: Alfresco.util.Ajax.POST
+            },
+            wait:
+            {
+               message: this._msg("message.please-wait")
             },
             params: params,
             config:

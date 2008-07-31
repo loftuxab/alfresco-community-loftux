@@ -533,8 +533,8 @@
             fileNames.push("<span class=\"" + files[i].type + "\">" + files[i].displayName + "</span>");
          }
          
-         var confirmTitle = this._msg("title.confirm.multiple-delete");
-         var confirmMsg = this._msg("message.confirm.multiple-delete", files.length);
+         var confirmTitle = this._msg("title.multiple-delete.confirm");
+         var confirmMsg = this._msg("message.multiple-delete.confirm", files.length);
          confirmMsg += "<div class=\"toolbar-file-list\">" + fileNames.join("") + "</div>";
 
          Alfresco.util.PopupManager.displayPrompt(
@@ -582,6 +582,7 @@
          var fnSuccess = function DLTB__oADC_success(data, files)
          {
             var result;
+            var successCount = 0;
 
             // Did the operation succeed?
             if (!data.json.overallSuccess)
@@ -593,20 +594,26 @@
                return;
             }
 
+            YAHOO.Bubbling.fire("filesDeleted");
+
             for (var i = 0, j = data.json.totalResults; i < j; i++)
             {
                result = data.json.results[i];
                
                if (result.success)
                {
-                  // TODO: Show a confirmation pop-up
-                  // TODO: Roll-up single events?
                   YAHOO.Bubbling.fire(result.type == "folder" ? "folderDeleted" : "fileDeleted",
                   {
+                     multiple: true,
                      nodeRef: result.nodeRef
                   });
                }
             }
+
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.multiple-delete.success", successCount)
+            });
          }
          
          // Construct the data object for the genericAction call
@@ -629,6 +636,10 @@
             {
                name: "files",
                method: Alfresco.util.Ajax.DELETE
+            },
+            wait:
+            {
+               message: this._msg("message.multiple-delete.please-wait")
             },
             config:
             {
