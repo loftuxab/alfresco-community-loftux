@@ -314,10 +314,15 @@ span.navigation-item-alt
 }
 
 span.navigation-item a,
-span.navigation-item a:hover,
 span.navigation-item a:visited   
 {
    color: white;
+}
+
+span.navigation-item a.active-page,
+span.navigation-item a:hover
+{
+   color: black;
 }
 
 span.navigation-item-alt a,
