@@ -161,7 +161,6 @@
 
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "keyup");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
 
          // OK Button
