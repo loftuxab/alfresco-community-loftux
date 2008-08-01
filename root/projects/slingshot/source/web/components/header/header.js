@@ -84,63 +84,69 @@
          //var zinput = document.getElementById(this.id + "-searchtext");
          var zinput = YAHOO.util.Dom.get(this.id + "-searchtext");
          var me = this;
-         new YAHOO.util.KeyListener(
-            zinput, 
-            {
-               keys:13
-            }, 
-            {
-               fn: function() {
-                  me.doSearch()
-               },
-               scope:this,
-               correctScope:true
-            }, 
-            "keydown" 
-         ).enable();
+         new YAHOO.util.KeyListener(zinput, 
+         {
+            keys:13
+         }, 
+         {
+            fn: function() {
+               me.doSearch()
+            },
+            scope:this,
+            correctScope:true
+         }, 
+         "keydown").enable();
 
-
-		YAHOO.util.Event.onContentReady(me.id+"-searchtogglemenu", function () {
-			var oMenu = new YAHOO.widget.Menu(me.id+"-searchtogglemenu");
-			oMenu.render();
-			oMenu.owner = me;
-			oMenu.subscribe("show", oMenu.focus);
+   		YAHOO.util.Event.onContentReady(me.id+"-searchtogglemenu", function ()
+   		{
+   			var oMenu = new YAHOO.widget.Menu(me.id+"-searchtogglemenu");
+   			oMenu.render();
+   			oMenu.owner = me;
+   			oMenu.subscribe("show", oMenu.focus);
 			
-			YAHOO.util.Event.addListener(me.id+"-search-tbutton", "click", me.openToggleSearchMenu, null, oMenu);
-		});
+   			YAHOO.util.Event.addListener(me.id+"-search-tbutton", "click", me.openToggleSearchMenu, null, oMenu);
+   		});
       },
       
-      focusSearchText: function () {
-		if(YAHOO.util.Dom.hasClass(this.id + "-searchtext", "gray")) {
-			YAHOO.util.Dom.get(this.id + "-searchtext").value = "";
-			YAHOO.util.Dom.removeClass(this.id + "-searchtext", "gray");
-		}
-		else {
-			YAHOO.util.Dom.get(this.id + "-searchtext").select();
-		}
+      focusSearchText: function ()
+      {
+   		if (YAHOO.util.Dom.hasClass(this.id + "-searchtext", "gray"))
+   		{
+   			YAHOO.util.Dom.get(this.id + "-searchtext").value = "";
+   			YAHOO.util.Dom.removeClass(this.id + "-searchtext", "gray");
+   		}
+   		else
+   		{
+   			YAHOO.util.Dom.get(this.id + "-searchtext").select();
+   		}
       },
       
-      blurSearchText: function () {
-		var searchVal = YAHOO.util.Dom.get(this.id + "-searchtext").value;
-		if(searchVal.length == 0) {
-			this.defaultSearchText();
-		}
+      blurSearchText: function ()
+      {
+   		var searchVal = YAHOO.util.Dom.get(this.id + "-searchtext").value;
+   		if (searchVal.length == 0)
+   		{
+   			this.defaultSearchText();
+   		}
       }, 
       
-      defaultSearchText: function() {
+      defaultSearchText: function()
+      {
 			YAHOO.util.Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
 			YAHOO.util.Dom.addClass(this.id + "-searchtext", "gray");
       },
       
-      openToggleSearchMenu: function() {
+      openToggleSearchMenu: function()
+      {
       	this.show();
       	var coord = YAHOO.util.Dom.getXY(this.owner.id+"-search-tbutton");
       	coord[0] -= (YAHOO.util.Dom.get(this.owner.id+"-searchtogglemenu").offsetWidth - YAHOO.util.Dom.get(this.owner.id+"-search-tbutton").offsetWidth);
       	coord[1] += YAHOO.util.Dom.get(this.owner.id+"-search-tbutton").offsetHeight;
-	    YAHOO.util.Dom.setXY(this.id, coord);       	
+	      YAHOO.util.Dom.setXY(this.id, coord);       	
       },
       
-      doToggleSearchType: function(newVal) {
+      doToggleSearchType: function(newVal)
+      {
       	this.options.searchType = newVal;
       	this.defaultSearchText();
       },

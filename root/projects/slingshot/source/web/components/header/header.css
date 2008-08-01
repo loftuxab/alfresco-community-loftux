@@ -1,18 +1,45 @@
 /* Header Component */
 .header
 {
-   padding-top: 0.5em;
+   padding-top: 0px;
 }
 
-.header span.menu-item,
+.header .logo-wrapper
+{
+   background-color: #fff;
+   border-right: 1px dashed #c0c0c0;
+   float: left;
+   padding-right: 8px;
+}
+
+.header .menu-wrapper
+{
+   background-color: #e9edef;
+   margin-right: -10px;
+   height: 19px;
+   padding: 12px 0px 8px;
+}
+
+.header span.menu-item-separator
+{
+   padding: 0.5em;
+}
+
+.header span.menu-item
+{
+   padding: 0px 0.25em;
+   vertical-align: middle;
+}
+
 .header span.menu-item-icon
 {
-   padding: 0px 6px 0px;
+   padding: 0px 1em;
    vertical-align: middle;
-   white-space: nowrap;
 }
+
 .header span.menu-item-icon a
 {
+   background-position: 0px 50%;
    background-repeat: no-repeat;
    padding: 1px 0px 1px 20px;
 }
@@ -41,13 +68,13 @@
 .header div.personal-menu
 {
     float: left;
-    margin: 10px 0px 0px 2em;
+    margin: 2px 0px 0px 2em;
 }
 
 .header div.util-menu
 {
     float: right;
-    margin: 7px 10px 0px 0px;
+    margin: 0px 10px 0px 0px;
 }
 
 .header .search-tinput
@@ -65,13 +92,6 @@
 	color: #ddd;
 }
 
-.header .search-container
-{
-   display: inline;
-   padding-right: 16px;  /* leave space for the select site icon */
-   position: relative;
-}
-
 .header .search-icon
 {
    background: url(../images/search.gif) no-repeat left bottom;
@@ -84,12 +104,15 @@
 
 .header .search-site-icon
 {
-   background: url(../images/select_arrow.gif) no-repeat left bottom;
+   background-image: url(../images/select_arrow.gif);
+   background-position: left bottom;
+   background-repeat: no-repeat;
    cursor: pointer;
-   position: absolute;
+   left: -2px;
    padding-left: 12px;
    padding-top: 4px;
-   right: 0px;
+   position: relative;
+   top: 2px;
 }
 
 /* IE6 fix */
