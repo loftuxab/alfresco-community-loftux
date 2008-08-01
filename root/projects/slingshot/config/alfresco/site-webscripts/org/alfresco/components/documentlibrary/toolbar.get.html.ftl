@@ -6,7 +6,7 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar doclib-toolbar">
+<div id="${args.htmlid}-body" class="toolbar">
 
    <div id="${args.htmlid}-headerBar" class="header-bar">
       <div class="new-folder hideable DocListTree"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>

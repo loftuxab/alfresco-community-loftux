@@ -1,5 +1,9 @@
 /* CSS Overrides for Microsoft Internet Explorer v7 */
 
+
+/**
+ * Global site header
+ */
 .header div.util-menu
 {
     margin-top: -2px;
@@ -8,4 +12,16 @@
 .header .search-site-icon
 {
    top: -2px;
+}
+
+
+/**
+ * Document Library
+ */
+.toolbar .selected-items hr
+{
+   color: #e4e4e4;
+   margin: 0px;
+   text-align: center;
+   width: 10em;
 }
