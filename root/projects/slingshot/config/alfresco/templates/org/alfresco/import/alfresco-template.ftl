@@ -66,6 +66,10 @@ ${head}
 
 <!-- Template Assets -->
 <#nested>
+
+<!-- MSIE CSS fix overrides -->
+   <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie6.css" /><![endif]-->
+   <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie7.css" /><![endif]-->
 </head>
 </#macro>
 

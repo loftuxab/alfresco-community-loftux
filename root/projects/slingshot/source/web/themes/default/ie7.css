@@ -1,0 +1,11 @@
+/* CSS Overrides for Microsoft Internet Explorer v7 */
+
+.header div.util-menu
+{
+    margin-top: -2px;
+}
+
+.header .search-site-icon
+{
+   top: -2px;
+}
