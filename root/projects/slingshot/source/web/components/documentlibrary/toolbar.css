@@ -1,5 +1,6 @@
 .toolbar
 {
+   margin: 0px -10px;
    visibility: hidden;
 }
 
@@ -12,8 +13,7 @@
 .toolbar .nav-bar
 {
    clear: both;
-   height: 2em;
-   margin: 0 -10px;
+   min-height: 2em;
    padding: 0.5em;
 }
 
@@ -52,10 +52,9 @@
    padding: 2px 0px 1px 24px;
 }
 
-.toolbar .selected-items hr.yuimenuitemlabel
+.toolbar .selected-items hr
 {
    padding: 0px;
-   width: 132px;
 }
 
 .toolbar .onActionCopyTo
