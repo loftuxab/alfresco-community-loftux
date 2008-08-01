@@ -165,7 +165,7 @@ div.dayEvent {
 
 /** Styling for the agenda view **/
 div.dayheader {
-	width: 100%;
+	width: auto;
 	border-bottom: 1px solid #000;
 	font-family: Arial;
 	font-size: 16px;
@@ -174,7 +174,7 @@ div.dayheader {
 }
 
 table.daytable {
-	width: 100%;
+	width: auto;
 }
 
 table.daytable td.timelabel {
