@@ -8,14 +8,28 @@
 <div id="${args.htmlid}-wikipage" style="visibility: hidden;" class="yui-navset"> 
       <h1>${page.url.args["title"]?replace("_", " ")}</h1>
 	    <ul class="yui-nav"> 
-	    <#if page.url.args["action"]?exists && page.url.args["action"] == "edit">
-	      <li><a href="#page"><em>${msg("tab.view")}</em></a></li> 
-	      <li class="selected"><a href="#edit"><em>${msg("tab.edit")}</em></a></li>
-	    <#else>
-	      <li class="selected"><a href="#page"><em>${msg("tab.view")}</em></a></li> 
-	      <li><a href="#edit"><em>${msg("tab.edit")}</em></a></li>
-	    </#if>
-			<li><a href="#history"><em>${msg("tab.details")}</em></a></li>
+	    <#assign action = page.url.args["action"]!"view">   
+	    <#assign tabs =
+	    [
+	      { 
+	         "id": "#page",
+	         "label": msg("tab.view"),
+	         "action": "view"
+	      },
+	      {
+	         "id": "#edit",
+	         "label": msg("tab.edit"),
+	         "action": "edit"
+	      },
+	      {
+	         "id": "#history",
+	         "label": msg("tab.details"),
+	         "action": "details"
+	      }
+	    ]>     
+	    <#list tabs as tab>
+	      <li <#if tab.action == action>class="selected"</#if>><a href="${tab.id}"><em>${tab.label}</em></a></li> 
+	    </#list>
 	    </ul>             
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 	        <div id="#page"><#if result?exists>${result.pagetext}</#if></div> 
