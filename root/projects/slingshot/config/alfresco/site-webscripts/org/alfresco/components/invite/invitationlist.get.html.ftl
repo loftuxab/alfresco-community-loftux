@@ -1,4 +1,3 @@
-
 <script type="text/javascript">//<![CDATA[
    new Alfresco.InvitationList("${args.htmlid}").setOptions(
    {
@@ -11,8 +10,6 @@
 <div id="${args.htmlid}-invitationlistwrapper" class="invitationlistwrapper">
 
 <div class="title">${msg("invitationlist.title")}</div>
-   
-
 
 <div id="${args.htmlid}-invitationlist" class="invitationlist">
 
@@ -29,9 +26,7 @@
    </div>
    
    <div id="${args.htmlid}-role-column-template" style="display:none">
-
          <button class="role-selector-button" value="">${msg("role")}</button>
-         
    </div>
 
 </div>
@@ -39,4 +34,3 @@
    <input type="button" value="${msg("invitationlist.invite")}"  id="${args.htmlid}-invite-button" />
 </div>
 </div>
-
