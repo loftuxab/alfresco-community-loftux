@@ -39,6 +39,7 @@ public class DescriptionImpl implements Description
 {
     private Store store;
     private String scriptPath;
+    private Path scriptPackage;
     private String descPath;
     private String id;
     private String kind;
@@ -90,6 +91,24 @@ public class DescriptionImpl implements Description
     public String getScriptPath()
     {
         return scriptPath;
+    }
+
+    /**
+     * Sets the Package  (path version of getScriptPath)
+     * 
+     * @param package
+     */
+    public void setPackage(Path scriptPackage)
+    {
+        this.scriptPackage = scriptPackage;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getPackage()
+     */
+    public Path getPackage()
+    {
+        return scriptPackage;
     }
 
     /**

@@ -1,29 +1,26 @@
-Back to [[HTTP API]].
-
-
-'''NOTE: This document describes features to be found in Alfresco v2.1 onwards.'''
+Back to [[Alfresco Labs 3]].
 
 
 = Introduction =
 
-Welcome to the reference documentation for the Alfresco [[HTTP API]].
+Welcome to the reference documentation for the Alfresco Repository <#if description??>${description} </#if>[[RESTful API]] - ${server.edition} v${server.version}.
 
-This document was generated from the Alfresco Server URL
+This document was generated on ${date?datetime} via the Alfresco Repository URI...
 
- GET <nowiki>http://</nowiki><host>:<port>${url.service}
+ <nowiki>http://</nowiki><host>:<port>${url.full?html}
 
-on ${date?datetime} using Alfresco v${server.version}.
+'''NOTE: This document is under construction and the APIs are subject to change while still in Labs Beta.'''
 
 
 = Web Script Reference =
 
-This section provides technical information for all ${webscripts?size} [[Web Scripts]], organized by Web Script Package. 
+This section provides reference information for each [[Web Scripts|Web Script]], organized by Web Script Package. 
 
 Documentation for each Web Script includes:
 
 * Short Name
 * Description
-* Available URL templates
+* Available URI templates
 * Default [[Web Scripts Framework#HTTP Response Formats|response format]]
 * How to specify an alternative response
 * Authentication requirements
@@ -56,9 +53,10 @@ Definition:
 </#list>
 </#if>
 <#list package.children as childpath>
-
   <@recursepackage package=childpath/>
 </#list>
 </#macro>
     
 <@recursepackage package=rootpackage/>
+
+[[Category:3.0]]

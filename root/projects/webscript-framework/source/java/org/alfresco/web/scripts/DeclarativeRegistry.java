@@ -313,7 +313,8 @@ public class DeclarativeRegistry
                     }
     
                     // build path indexes to web script
-                    registerPackage(serviceImpl);
+                    Path scriptPath = registerPackage(serviceImpl);
+                    serviceDesc.setPackage(scriptPath);
                     registerURIs(serviceImpl);
                 }
                 catch(WebScriptException e)
@@ -347,7 +348,7 @@ public class DeclarativeRegistry
      * 
      * @param script
      */
-    private void registerPackage(WebScript script)
+    private Path registerPackage(WebScript script)
     {
         Description desc = script.getDescription();
         PathImpl path = packageByPath.get("/");
@@ -363,6 +364,7 @@ public class DeclarativeRegistry
             path = subpath;
         }
         path.addScript(script);
+        return path;
     }
     
     /**

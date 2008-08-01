@@ -110,6 +110,12 @@ public interface Description
     public String getScriptPath();
     
     /**
+     * Gets the package  (Path version of getScriptPath)
+     * 
+     */
+    public Path getPackage();
+    
+    /**
      * Gets the path of the description xml document for this web script
      * 
      * @return  document location (path)
