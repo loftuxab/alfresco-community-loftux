@@ -1,1 +1,54 @@
 /* CSS Overrides for Microsoft Internet Explorer v6 */
+
+/**
+ * Global site header
+ */
+.header .logo-wrapper
+{
+   margin-bottom: -1px;
+   margin-right: -3px;
+   padding-bottom: 4px;
+}
+
+.header div.util-menu
+{
+   margin-top: -1px;
+}
+
+.header .search-site-icon
+{
+   margin-left: -4px;
+}
+
+
+/**
+ * Page title and navigation
+ */
+.page-title
+{
+   padding-bottom: 2em;
+}
+
+.page-title div.title
+{
+   margin-top: -4px;
+}
+
+
+/**
+ * Members / invite pages
+ */
+.members-bar
+{
+   height: 1em;
+}
+
+
+/**
+ * Document Library
+ */
+.toolbar .header-bar,
+.toolbar .nav-bar
+{
+   padding-bottom: 2em;
+}

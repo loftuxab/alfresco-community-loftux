@@ -258,12 +258,13 @@ IE SPECIFIC
 
 .page-title
 {
-   color: white;
    background-color: #5497c4;
-   margin: 0px -10px 0px -10px;
+   clear: left;
+   color: white;
+   line-height: 2em;
+   margin: 0px -10px;
+   min-height: 2em;
    padding: 8px 10px;
-   min-height:2em;
-   line-height:2em;
 }
 
 .page-title a:visited,
@@ -289,9 +290,10 @@ IE SPECIFIC
 
 div.site-navigation
 {
-   color: white;
    background-color: #5ba1d0;
    border-top: 1px dotted #84b4d5;
+   clear: left;
+   color: white;
    margin: 0 -10px 1px;
    min-height: 1em;
    padding: 10px 0;
@@ -304,13 +306,12 @@ span.navigation-item-alt
    color: #9fc6e1;
    vertical-align: middle;
    margin: 0px;
-   text-valign: middle;
 }
 
 span.navigation-item,
 span.navigation-item-alt
 {
-   padding: 0px 0px 0px 10px;
+   padding: 0px 0px 0px 6px;
 }
 
 span.navigation-item a,
@@ -321,6 +322,7 @@ span.navigation-item a:visited
 }
 
 span.navigation-item a.active-page,
+span.navigation-item a.active-page:visited,
 span.navigation-item a:hover
 {
    background-color: #d4e9f7;
@@ -335,6 +337,7 @@ span.navigation-item-alt a:visited
 }
 
 span.navigation-item-alt a.active-page,
+span.navigation-item-alt a.active-page:visited,
 span.navigation-item-alt a:hover
 {
    background-color: #c5e8a5;
