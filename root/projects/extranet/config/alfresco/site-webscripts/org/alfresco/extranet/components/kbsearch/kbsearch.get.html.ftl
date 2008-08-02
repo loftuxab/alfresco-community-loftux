@@ -18,7 +18,6 @@
 		<option value="workspace://SpacesStore/kb:version-2-0-1">2.2</option>
 		</select>
 	</td>
-			
 	<td valign="top">&nbsp;| Type&nbsp;</td><td valign="top">
 		<select name="article_type" id="article_type" onchange="javascript:setArticletype('');">
 		<option value="workspace://SpacesStore/kb:type-any">Any</option>
@@ -27,11 +26,7 @@
 		<option value="workspace://SpacesStore/kb:type-white-paper">White Paper</option>
 		</select>
 	</td>
-
 </tr>
 <tr></td></tr>
 </table>
-
 </div>
- 
-   
