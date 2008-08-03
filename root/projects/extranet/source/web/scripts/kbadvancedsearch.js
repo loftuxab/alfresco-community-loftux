@@ -6,7 +6,7 @@ function init() {
 		this.cancel();
 	}
 	YAHOO.com.alfresco.dialog =
-	new YAHOO.widget.Dialog("preview",
+	new YAHOO.widget.Dialog("lightbox_display",
 	{ width : "550px",
 	fixedcenter : false,
 	visible : false,
@@ -28,7 +28,7 @@ function init() {
 		o.setBody('');
 	};
 	YAHOO.com.alfresco.dialog.hideEvent.subscribe(ondialogHide, YAHOO.com.alfresco.dialog);
-	YAHOO.util.Dom.setStyle(['preview'], 'display', 'block');
+	YAHOO.util.Dom.setStyle(['lightbox_display'], 'display', 'block');
 };
 YAHOO.util.Event.addListener(window, "load", init);
 
@@ -115,12 +115,12 @@ function textsearch()
 		    var x = oRecord.getData("originallink").indexOf("/d/a");
 		    if(x > -1)
 		    {
-		        dataLink = '/alfresco/service/api/node/content' + oRecord.getData("originallink").substring(x+4);
+		        dataLink = '/extranet/proxy/alfresco/api/node/content' + oRecord.getData("originallink").substring(x+4);
 		    }
 		    var y = oRecord.getData("swflink").indexOf("/d/a");
 		    if(y > -1)
 		    {
-		       swfLink = oRecord.getData("swflink");
+		       swfLink = '/extranet/proxy/alfresco/api/node/content' + oRecord.getData("swflink").substring(x+4);
 		    }	
 		    strObj[oRecord.getData("id")] = swfLink;
 		    elCell.innerHTML = "<a href=\"#void\" onclick=\"setSelectedVar(" + oRecord.getData("id") +");YAHOO.com.alfresco.dialog.show();\"><img src=\"images/preview.gif\" style=\"border-width:0px;vertical-align:middle;\"></img></a>&nbsp;<a href=\"" + dataLink + "\">" + sData + "&nbsp;<img src=\""+oRecord.getData("icon")+"\" alt=\"download\" style=\"border-width:0px;vertical-align:right;\"></img></a>";
@@ -139,7 +139,7 @@ function textsearch()
 		    {key:"tags", label:"Tags",sortable:true}
 		];
 		
-		var url = "/alfresco/service/kb/advancedsearchresults.json?searchText="+document.getElementById('searchText').value+"&article_type="+document.getElementById('article_type').value+"&alfresco_version="+alfresco_version+"&";
+		var url = "/extranet/proxy/alfresco/kb/advancedsearchresults.json?searchText="+document.getElementById('searchText').value+"&article_type="+document.getElementById('article_type').value+"&alfresco_version="+alfresco_version+"&";
 
 
 		this.myDataSource = new YAHOO.util.DataSource(url);
