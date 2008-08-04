@@ -26,7 +26,7 @@
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
          <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
          <span class="menu-item-separator">|</span>
-         <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")}</a></span>
+         <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")} (${user.name})</a></span>
          <span class="menu-item-separator">|</span>
          <span class="menu-item">
             <span class="search-container">
