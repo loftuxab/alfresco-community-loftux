@@ -18,6 +18,8 @@
 
 	Alfresco.Wiki.prototype =
 	{
+	   
+	   selectedTags: [],
 		/**
 		 * An instance of a Wiki parser for this page.
 		 * 
@@ -92,25 +94,7 @@
             }
          });
 			
-			this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
-   		     height: '300px',
-   		     width: '538px',
-   		     dompath: false, //Turns on the bar at the bottom
-   		     animate: false, //Animates the opening, closing and moving of Editor windows
-   		     markup: "xhtml"
-   		 });
-
-   		this.pageEditor.render();
-			
-			var saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveSelect,
-	      {
-	        	type: "push"
-	      });
-	
-			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelSelect,
-			{
-				type: "push"
-			});
+		   this._setupEditForm();
 			
 			var pageText = document.getElementById("#page"); // Content area
 			if (pageText)
@@ -122,6 +106,78 @@
 			
 			var Dom = YAHOO.util.Dom;
 			Dom.get(this.id + "-wikipage").style.visibility = "visible";
+		},
+		
+		_setupEditForm: function()
+		{
+         this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
+      	   height: '300px',
+      		width: '538px',
+      		dompath: false, //Turns on the bar at the bottom
+      		animate: false, //Animates the opening, closing and moving of Editor windows
+      	   markup: "xhtml"
+      	});
+
+      	this.pageEditor.render();
+
+         var saveButtonId = this.id + "-save-button";
+         var saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
+
+   		var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelSelect,
+   		{
+   			type: "push"
+   		});		   
+   		
+         // create the form that does the validation/submit
+         var form = new Alfresco.forms.Form(this.id + "-form");
+         form.setShowSubmitStateDynamically(true, false);
+         form.setSubmitElements(saveButton);
+         form.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+               fn: this.onPageUpdated,
+               scope: this
+            },
+            failureMessage: "Page update failed"
+         });
+       
+         form.setSubmitAsJSON(true);
+         form.ajaxSubmitMethod = Alfresco.util.Ajax.PUT;
+         form.doBeforeFormSubmit =
+         {
+            fn: function(form, obj)
+            {
+               // Put the HTML back into the text area
+               this.pageEditor.saveHTML();
+               // update the tags set in the form
+               if (this.selectedTags.length > 0)
+               {
+                  var elem = document.createElement('input');
+                  elem.setAttribute('name', "tags");
+                  elem.setAttribute('value', this.selectedTags.join(" "));
+                  elem.setAttribute('type', 'hidden');
+                  var formElem = YAHOO.util.Dom.get(this.id + "-form");
+                  formElem.appendChild(elem);
+               }
+               // Avoid submitting the input field used for entering tags
+               var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+               if (tagInputElem)
+               {
+                  tagInputElem.disabled = true;
+               }
+            },
+            scope: this
+         }
+         
+         form.init();   		
+   		
+   		YAHOO.Bubbling.on("onTagLibraryTagsChanged", this.onTagLibraryTagsChanged, this);
+		},
+		
+		onTagLibraryTagsChanged: function(layer, args)
+		{
+		   this.selectedTags = args[1].tags;
 		},
 		
 		_displayVersion: function(id)
@@ -162,46 +218,6 @@
 		   panel.setBody(this.parser.parse(e.serverResponse.responseText));
 		   panel.render(document.body);
 		   panel.show();
-		},
-		
-		/*
-		 * This method gets fired when the user saves
-		 * a page they are editing. Fires off of a request to 
-		 * the repo to update the page content.
-		 *
-		 * @method onSaveSelect
-		 * @param e {object} Event fired
-		 */
-		onSaveSelect: function(e)
-		{
-			var data = {};
-		
-			this.pageEditor.saveHTML();
-			
-			var html = this.pageEditor.get('element').value; 
-			if (html)
-			{
-				data["pagecontent"] = html;
-			}
-			
-			var URI = "/slingshot/wiki/page/" + this.siteId + "/" + this.pageTitle;
-			// Add the page context
-			URI += "?context=" + encodeURIComponent(this._getAbsolutePath() + this.pageTitle);
-			
-			// Submit PUT request 
-			Alfresco.util.Ajax.request(
-			{
-				method: Alfresco.util.Ajax.PUT,
-		      	url: Alfresco.constants.PROXY_URI + URI,
-				requestContentType: Alfresco.util.Ajax.JSON,
-				dataObj: data,
-				successCallback:
-				{
-					fn: this.onPageUpdated,
-					scope: this
-				},
-		      	failureMessage: "Page update failed"
-		   });
 		},
 		
 		/**
