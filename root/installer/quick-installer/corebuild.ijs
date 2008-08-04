@@ -7,4 +7,8 @@
 ##
 
 ## Activate the OpenOffice location dialog that is disabled in the default project.
+::BuilderAPI::ModifyObject -object "OpenOffice File" -active No
+::BuilderAPI::ModifyObject -object "OpenOffice" -active No
+::BuilderAPI::ModifyObject -object "Java File" -active No
+::BuilderAPI::ModifyObject -object "Java" -active No
 ::BuilderAPI::ModifyObject -object "OOLocation" -active Yes

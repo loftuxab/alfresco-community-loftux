@@ -9,3 +9,5 @@
 ## Activate the OOo file group that are disabled in the default project.
 ::BuilderAPI::ModifyObject -object "OpenOffice File" -active Yes
 ::BuilderAPI::ModifyObject -object "OpenOffice" -active Yes
+::BuilderAPI::ModifyObject -object "Java File" -active No
+::BuilderAPI::ModifyObject -object "Java" -active No
