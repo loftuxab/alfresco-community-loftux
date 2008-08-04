@@ -572,11 +572,12 @@ public class RemoteClient extends AbstractClient
             for (String key : headers.keySet())
             {
                 // NOTE: Tomcat does not appear to be obeying the servlet spec here.
-                //       If you setHeader() it is supposed to clear existing values - i.e. not add
-                //       additional values to existing headers - but for Server and Transfer-Encoding if
-                //       you set them, you get two values in the response...
-                // it's strange, but in addition the key can be null...!
-                if (key != null && key.equals("Server") == false && key.equals("Transfer-Encoding") == false)
+                //       If you call setHeader() the spec says it will "clear existing values" - i.e. not
+                //       add additional values to existing headers - but for Server and Transfer-Encoding
+                //       if we set them, then two values are received in the response...
+                // In addition handle the fact that the key can be null.
+                if (key != null &&
+                    !key.equalsIgnoreCase("Server") && !key.equalsIgnoreCase("Transfer-Encoding"))
                 {
                     if (res != null)
                     {

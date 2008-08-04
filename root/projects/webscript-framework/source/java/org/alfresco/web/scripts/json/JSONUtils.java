@@ -38,6 +38,7 @@ import org.mozilla.javascript.NativeObject;
 
 /**
  * Collection of JSON Utility methods.
+ * This class is immutable.
  * 
  * @author Roy Wetherall
  */

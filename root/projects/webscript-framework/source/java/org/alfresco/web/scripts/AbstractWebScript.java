@@ -73,6 +73,10 @@ public abstract class AbstractWebScript implements WebScript
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
     private ReentrantReadWriteLock statusTemplateLock = new ReentrantReadWriteLock(); 
     
+    // Reusable utility classes
+    private static final JSONUtils JSON_UTILS = new JSONUtils();
+    private static final ScriptableUtils SCRIPTABLE_UTILS = new ScriptableUtils();
+    
     //
     // Initialisation
     //
@@ -191,7 +195,10 @@ public abstract class AbstractWebScript implements WebScript
         params.put("url", new URLModel(req));
         
         // add the json utilities
-        params.put("jsonUtils", new JSONUtils());
+        params.put("jsonUtils", JSON_UTILS);
+        
+        // add the script utilities
+        params.put("scriptUtils", SCRIPTABLE_UTILS);
         
         // add remote object
         if (this.container instanceof PresentationContainer)
