@@ -5,26 +5,32 @@ function init() {
 	var handleCancel = function(o){
 		this.cancel();
 	}
-	YAHOO.com.alfresco.dialog =
-	new YAHOO.widget.Dialog("lightbox_display",
-	{ width : "550px",
-	fixedcenter : false,
-	visible : false,
-	close: true,
-	draggable: true,
-	modal: true,
-	y: 25,
-	constraintoviewport : false});
-	YAHOO.util.Event.addListener('closeImg', 'click', function(o){YAHOO.com.alfresco.dialog.hide()});
+	YAHOO.com.alfresco.dialog = new YAHOO.widget.Dialog("lightbox_display",
+		{ 
+			width : "550px",
+			fixedcenter : false,
+			visible : false,
+			close: true,
+			draggable: true,
+			modal: true,
+			y: 25,
+			constraintoviewport : false
+		}
+	);
+	
+	YAHOO.util.Event.addListener('closeImg', 'click', function(o){YAHOO.com.alfresco.dialog.hide()});	
 	YAHOO.com.alfresco.dialog.render();
-	var ondialogShow = function(e, args, o){
+
+	var ondialogShow = function(e, args, o)
+	{
 		o.body.id = 'videoCon';
 		//flash embed script, more information: http://blog.deconcept.com/swfobject/#download
 		var so = new SWFObject(strObj[selectedVar], "sotester", "500", "690", "9", "#000000");
 		so.write("videoCon");
 	};
 	YAHOO.com.alfresco.dialog.showEvent.subscribe(ondialogShow, YAHOO.com.alfresco.dialog);
-	var ondialogHide = function(e, args, o){
+	var ondialogHide = function(e, args, o)
+	{
 		o.setBody('');
 	};
 	YAHOO.com.alfresco.dialog.hideEvent.subscribe(ondialogHide, YAHOO.com.alfresco.dialog);
@@ -123,25 +129,26 @@ function textsearch()
 		       swfLink = '/extranet/proxy/alfresco/api/node/content' + oRecord.getData("swflink").substring(x+4);
 		    }	
 		    strObj[oRecord.getData("id")] = swfLink;
-		    elCell.innerHTML = "<a href=\"#void\" onclick=\"setSelectedVar(" + oRecord.getData("id") +");YAHOO.com.alfresco.dialog.show();\"><img src=\"images/preview.gif\" style=\"border-width:0px;vertical-align:middle;\"></img></a>&nbsp;<a href=\"" + dataLink + "\">" + sData + "&nbsp;<img src=\""+oRecord.getData("icon")+"\" alt=\"download\" style=\"border-width:0px;vertical-align:right;\"></img></a>";
+		    //elCell.innerHTML = "<a href=\"#void\" onclick=\"setSelectedVar(" + oRecord.getData("id") +");YAHOO.com.alfresco.dialog.show();\"><img src=\"images/preview.gif\" style=\"border-width:0px;vertical-align:middle;\"></img></a>&nbsp;<a href=\"" + dataLink + "\">" + sData + "&nbsp;<img src=\""+oRecord.getData("icon")+"\" alt=\"download\" style=\"border-width:0px;vertical-align:right;\"></img></a>";
+		    elCell.innerHTML = "<a href=\"#void\" onclick=\"setSelectedVar(" + oRecord.getData("id") +");YAHOO.com.alfresco.dialog.show();\"><img src=\"images/preview.gif\" style=\"border-width:0px;vertical-align:middle;\"></img></a>&nbsp;<a href=\"" + dataLink + "\">" + sData + "&nbsp;<img src=\"proxy/alfresco-webapp"+oRecord.getData("icon")+"\" alt=\"download\" style=\"border-width:0px;vertical-align:right;\"></img></a>";
 		};
 		
 		
 		var myColumnDefs = [
-		    {key:"id", label:"S.No",sortable:true},
-		    {key:"title", label:"Title",sortable:true, formatter:this.formatUrl},
-		    {key:"description", label:"Description",sortable:true},
-		    {key:"authorname", label:"Creator",sortable:true},
-		    {key:"modifier", label:"Modified",sortable:true},
-		    {key:"type", label:"Type",sortable:true},
-		    {key:"updated", label:"updated",sortable:true},
-		    {key:"version", label:"Version",sortable:true},
-		    {key:"tags", label:"Tags",sortable:true}
+		    { key:"id", label:"S.No", sortable:true },
+		    { key:"title", label:"Title", sortable:true, formatter:this.formatUrl },
+		    { key:"description", label:"Description", sortable:true },
+		    { key:"authorname", label:"Creator", sortable:true },
+		    { key:"modifier", label:"Modified", sortable:true },
+		    { key:"type", label:"Type", sortable:true },
+		    { key:"updated", label:"updated", sortable:true },
+		    { key:"version", label:"Version", sortable:true },
+		    { key:"tags", label:"Tags", sortable:true }
 		];
 		
-		var url = "/extranet/proxy/alfresco/kb/advancedsearchresults.json?searchText="+document.getElementById('searchText').value+"&article_type="+document.getElementById('article_type').value+"&alfresco_version="+alfresco_version+"&";
-
-
+		//var url = "/extranet/proxy/alfresco/kb/advancedsearchresults.json?searchText="+document.getElementById('searchText').value+"&article_type="+document.getElementById('article_type').value+"&alfresco_version="+alfresco_version+"&";
+		var url = "/extranet/proxy/alfresco/kb2/advancedsearchresults?searchText="+document.getElementById('searchText').value+"&article_type="+document.getElementById('article_type').value+"&alfresco_version="+alfresco_version+"&";
+		
 		this.myDataSource = new YAHOO.util.DataSource(url);
 		this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
 		this.myDataSource.responseSchema = {
@@ -161,7 +168,6 @@ function textsearch()
 		};
 
 		this.myDataTable = new YAHOO.widget.DataTable("paginated", myColumnDefs, this.myDataSource, oConfigs);
-				
 	    };
 	});
 }

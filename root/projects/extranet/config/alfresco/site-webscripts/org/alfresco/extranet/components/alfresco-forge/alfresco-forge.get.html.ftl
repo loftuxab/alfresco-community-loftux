@@ -13,12 +13,12 @@ To get started now, we recommend the following:
 	<li>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<img src="/extranet/images/extranet/login_16.gif">
-		Join the <a href="http://www.alfresco.com/community/register/?source=network.alfresco.com">Alfresco Content Community</a>!
+		Join the <a target="_blank" href="http://www.alfresco.com/community/register/?source=network.alfresco.com">Alfresco Content Community</a>!
 	</li>
 	<li>
 		&nbsp;&nbsp;&nbsp;&nbsp;
 		<img src="/extranet/images/extranet/login_16.gif">
-		Visit the <a href="http://forge.alfresco.com">Alfresco Forge</a>!
+		Visit the <a target="_blank" href="http://forge.alfresco.com">Alfresco Forge</a>!
 	</li>
 </ul>
 <br/>
