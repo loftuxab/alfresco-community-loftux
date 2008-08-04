@@ -24,23 +24,15 @@
  */
 package org.alfresco.web.site;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.AuthenticatingConnector;
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
-import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.User;
-import org.alfresco.connector.exception.RemoteConfigException;
-import org.alfresco.util.StringBuilderWriter;
 import org.alfresco.web.scripts.Status;
-import org.alfresco.web.scripts.json.JSONWriter;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,7 +42,15 @@ import org.json.JSONObject;
 /**
  * This factory loads users from Alfresco, fetching their properties
  * and so forth.  The data source is assumed to be a JSON provider.
- *
+ * 
+ * By implementing this class, User derived objects are available to
+ * all downstream components and templates.  These components and
+ * templates can then consult the user profile as they execute.
+ * 
+ * The user is stored on the request context and can be fetched
+ * using context.getUser(). The user is also available in the root
+ * of the a script component context as 'user'. 
+ * 
  * @author muzquiano
  * @author kevinr
  */
@@ -58,26 +58,26 @@ public class AlfrescoUserFactory extends UserFactory
 {
     private static Log logger = LogFactory.getLog(AlfrescoUserFactory.class);
     
-    private static final String CM_AVATAR = "{http://www.alfresco.org/model/content/1.0}avatar";
-    private static final String CM_COMPANYEMAIL = "{http://www.alfresco.org/model/content/1.0}companyemail";
-    private static final String CM_COMPANYFAX = "{http://www.alfresco.org/model/content/1.0}companyfax";
-    private static final String CM_COMPANYTELEPHONE = "{http://www.alfresco.org/model/content/1.0}companytelephone";
-    private static final String CM_COMPANYPOSTCODE = "{http://www.alfresco.org/model/content/1.0}companypostcode";
-    private static final String CM_COMPANYADDRESS3 = "{http://www.alfresco.org/model/content/1.0}companyaddress3";
-    private static final String CM_COMPANYADDRESS2 = "{http://www.alfresco.org/model/content/1.0}companyaddress2";
-    private static final String CM_COMPANYADDRESS1 = "{http://www.alfresco.org/model/content/1.0}companyaddress1";
-    private static final String CM_INSTANTMSG = "{http://www.alfresco.org/model/content/1.0}instantmsg";
-    private static final String CM_SKYPE = "{http://www.alfresco.org/model/content/1.0}skype";
-    private static final String CM_MOBILE = "{http://www.alfresco.org/model/content/1.0}mobile";
-    private static final String CM_TELEPHONE = "{http://www.alfresco.org/model/content/1.0}telephone";
-    private static final String CM_PERSONDESCRIPTION = "{http://www.alfresco.org/model/content/1.0}persondescription";
-    private static final String CM_EMAIL = "{http://www.alfresco.org/model/content/1.0}email";
-    private static final String CM_LOCATION = "{http://www.alfresco.org/model/content/1.0}location";
-    private static final String CM_ORGANIZATION = "{http://www.alfresco.org/model/content/1.0}organization";
-    private static final String CM_JOBTITLE = "{http://www.alfresco.org/model/content/1.0}jobtitle";
-    private static final String CM_LASTNAME = "{http://www.alfresco.org/model/content/1.0}lastName";
-    private static final String CM_FIRSTNAME = "{http://www.alfresco.org/model/content/1.0}firstName";
-
+    public static final String CM_AVATAR = "{http://www.alfresco.org/model/content/1.0}avatar";
+    public static final String CM_COMPANYEMAIL = "{http://www.alfresco.org/model/content/1.0}companyemail";
+    public static final String CM_COMPANYFAX = "{http://www.alfresco.org/model/content/1.0}companyfax";
+    public static final String CM_COMPANYTELEPHONE = "{http://www.alfresco.org/model/content/1.0}companytelephone";
+    public static final String CM_COMPANYPOSTCODE = "{http://www.alfresco.org/model/content/1.0}companypostcode";
+    public static final String CM_COMPANYADDRESS3 = "{http://www.alfresco.org/model/content/1.0}companyaddress3";
+    public static final String CM_COMPANYADDRESS2 = "{http://www.alfresco.org/model/content/1.0}companyaddress2";
+    public static final String CM_COMPANYADDRESS1 = "{http://www.alfresco.org/model/content/1.0}companyaddress1";
+    public static final String CM_INSTANTMSG = "{http://www.alfresco.org/model/content/1.0}instantmsg";
+    public static final String CM_SKYPE = "{http://www.alfresco.org/model/content/1.0}skype";
+    public static final String CM_MOBILE = "{http://www.alfresco.org/model/content/1.0}mobile";
+    public static final String CM_TELEPHONE = "{http://www.alfresco.org/model/content/1.0}telephone";
+    public static final String CM_PERSONDESCRIPTION = "{http://www.alfresco.org/model/content/1.0}persondescription";
+    public static final String CM_EMAIL = "{http://www.alfresco.org/model/content/1.0}email";
+    public static final String CM_LOCATION = "{http://www.alfresco.org/model/content/1.0}location";
+    public static final String CM_ORGANIZATION = "{http://www.alfresco.org/model/content/1.0}organization";
+    public static final String CM_JOBTITLE = "{http://www.alfresco.org/model/content/1.0}jobtitle";
+    public static final String CM_LASTNAME = "{http://www.alfresco.org/model/content/1.0}lastName";
+    public static final String CM_FIRSTNAME = "{http://www.alfresco.org/model/content/1.0}firstName";
+    
     public static final String ALFRESCO_ENDPOINT_ID = "alfresco";
 
 
@@ -149,7 +149,7 @@ public class AlfrescoUserFactory extends UserFactory
             JSONObject properties = json.getJSONObject("properties");
             
             // Construct the Alfresco User object based on the cm:person properties
-            user = new AlfrescoUser(userId);
+            user = constructUser(userId);
             user.setFirstName(properties.getString(CM_FIRSTNAME));
             user.setLastName(properties.getString(CM_LASTNAME));
             if (properties.has(CM_JOBTITLE))
@@ -235,78 +235,14 @@ public class AlfrescoUserFactory extends UserFactory
 
         return user;
     }
-    
+
     /**
-     * Persist the user back to the Alfresco repository
+     * @param userId
      * 
-     * @param user  to persist
-     * 
-     * @throws IOException
+     * @return the AlfrescoUser object
      */
-    public void saveUser(AlfrescoUser user) throws UserFactoryException
+    protected AlfrescoUser constructUser(String userId)
     {
-        HttpRequestContext context = (HttpRequestContext)ThreadLocalRequestContext.getRequestContext();
-        if (!context.getUserId().equals(user.getId()))
-        {
-            throw new UserFactoryException("Unable to persist user with different Id that current Id.");
-        }
-        
-        StringBuilderWriter buf = new StringBuilderWriter(512);
-        JSONWriter writer = new JSONWriter(buf);
-        
-        try
-        {
-            writer.startObject();
-            
-            writer.writeValue("username", user.getId());
-            
-            writer.startValue("properties");
-            writer.startObject();
-            writer.writeValue(CM_FIRSTNAME, user.getFirstName());
-            writer.writeValue(CM_LASTNAME, user.getLastName());
-            writer.writeValue(CM_JOBTITLE, user.getJobTitle());
-            writer.writeValue(CM_ORGANIZATION, user.getOrganization());
-            writer.writeValue(CM_LOCATION, user.getLocation());
-            writer.writeValue(CM_EMAIL, user.getEmail());
-            writer.writeValue(CM_TELEPHONE, user.getTelephone());
-            writer.writeValue(CM_MOBILE, user.getMobilePhone());
-            writer.writeValue(CM_SKYPE, user.getSkype());
-            writer.writeValue(CM_INSTANTMSG, user.getInstantMsg());
-            writer.writeValue(CM_COMPANYADDRESS1, user.getCompanyAddress1());
-            writer.writeValue(CM_COMPANYADDRESS2, user.getCompanyAddress2());
-            writer.writeValue(CM_COMPANYADDRESS3, user.getCompanyAddress3());
-            writer.writeValue(CM_COMPANYPOSTCODE, user.getCompanyPostcode());
-            writer.writeValue(CM_COMPANYFAX, user.getCompanyFax());
-            writer.writeValue(CM_COMPANYEMAIL, user.getCompanyEmail());
-            writer.writeValue(CM_COMPANYTELEPHONE, user.getCompanyTelephone());
-            writer.endObject();
-            writer.endValue();
-            
-            writer.startValue("content");
-            writer.startObject();
-            writer.writeValue(CM_PERSONDESCRIPTION, user.getBiography());
-            writer.endObject();
-            writer.endValue();
-            
-            writer.endObject();
-            
-            Connector conn = FrameworkHelper.getConnector(context, ALFRESCO_ENDPOINT_ID);
-            ConnectorContext c = new ConnectorContext(HttpMethod.POST);
-            c.setContentType("application/json");
-            Response res = conn.call("/slingshot/profile/userprofile", c,
-                    new ByteArrayInputStream(buf.toString().getBytes()));
-            if (Status.STATUS_OK != res.getStatus().getCode())
-            {
-                throw new UserFactoryException("Remote error during User save: " + res.getStatus().getMessage());
-            }
-        }
-        catch (IOException ioErr)
-        {
-            throw new UserFactoryException("IO error during User save: " + ioErr.getMessage(), ioErr);
-        }
-        catch (RemoteConfigException err)
-        {
-            throw new UserFactoryException("Configuration error during User save: " + err.getMessage(), err);
-        }
+        return new AlfrescoUser(userId);
     }
 }

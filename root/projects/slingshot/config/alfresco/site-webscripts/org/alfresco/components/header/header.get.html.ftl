@@ -19,10 +19,10 @@
    <div class="menu-wrapper">
       <div class="personal-menu">
          <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>
-         <span class="menu-item-icon my-profile"><a href="${url.context}/page/user-profile">${msg("link.myProfile")}</a></span>
+         <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name}/profile">${msg("link.myProfile")}</a></span>
          <span class="menu-item-icon sites"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
       </div>
-   
+
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
          <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
          <span class="menu-item-separator">|</span>

@@ -24,23 +24,22 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.connector.User;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
- * User object extended to add avatar reference property.
+ * User object extended to provide persistence back to an Alfresco repo.
  * 
  * @author Kevin Roast
  */
-public class AlfrescoUser extends User
+public class SlingshotUser extends AlfrescoUser
 {
-    public static String PROP_AVATARREF = "avatar";
-    
     /**
      * Instantiates a new user.
      * 
      * @param id the id
      */
-    public AlfrescoUser(String id)
+    public SlingshotUser(String id)
     {
         super(id);
     }
@@ -51,24 +50,24 @@ public class AlfrescoUser extends User
      * @param id the id
      * @param isAdmin the is admin
      */
-    public AlfrescoUser(String id, boolean isAdmin)
+    public SlingshotUser(String id, boolean isAdmin)
     {
         super(id, isAdmin);
     }
     
     /**
-     * @return  the avatarRef
+     * @see org.alfresco.connector.User#save()
      */
-    public String getAvatarRef()
+    @Override
+    public void save()
     {
-        return getStringProperty(PROP_AVATARREF);
-    }
-
-    /**
-     * @param avatarRef the avatarRef to set
-     */
-    public void setAvatarRef(String avatarRef)
-    {
-        setProperty(PROP_AVATARREF, avatarRef);
+        try
+        {
+            ((SlingshotUserFactory)FrameworkHelper.getUserFactory()).saveUser(this);
+        }
+        catch (UserFactoryException err)
+        {
+            throw new AlfrescoRuntimeException("Unable to save user details: " + err.getMessage(), err);
+        }
     }
 }
