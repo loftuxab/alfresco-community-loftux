@@ -24,42 +24,107 @@
  */
 package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-import org.alfresco.connector.User;
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorContext;
+import org.alfresco.connector.HttpMethod;
+import org.alfresco.connector.Response;
+import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.util.StringBuilderWriter;
+import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.json.JSONWriter;
 import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
- * This factory is responsible for loading user objects from a user
- * repository and making them available to the framework.
+ * Slingshot User Factory makes use of the slingshot REST API to persist
+ * modified user details back to the repo.  
  * 
- * By implementing this class, User derived objects are available to
- * all downstream components and templates.  These components and
- * templates can then consult the user profile as they execute.
- * 
- * The user is stored on the request context and can be fetched
- * using context.getUser()
- * 
- * Within Slingshot, this factory takes a user id and then calls over
- * to Alfresco to load the user object.
- * 
- * @author muzquiano
+ * @author kevinr
  */
 public class SlingshotUserFactory extends AlfrescoUserFactory
 {
-	/**
-	 * This method should call to Alfresco, JSON the data
-	 * for the user object and construct the Slingshot user.
-	 * 
-	 * The returned User object is then placed onto the session.  This
-	 * is done automatically by the UserFactory class.  Thus, the
-	 * User object faulting should only occur once.
-	 */
-    public User loadUser(RequestContext context, String userId)
-        throws UserFactoryException
+    /**
+     * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String)
+     */
+    @Override
+    protected AlfrescoUser constructUser(String userId)
     {
-    	User user = super.loadUser(context, userId);
+        return new SlingshotUser(userId);
+    }
+
+    /**
+     * Persist the user back to the Alfresco repository
+     * 
+     * @param user  to persist
+     * 
+     * @throws IOException
+     */
+    public void saveUser(AlfrescoUser user) throws UserFactoryException
+    {
+        HttpRequestContext context = (HttpRequestContext)ThreadLocalRequestContext.getRequestContext();
+        if (!context.getUserId().equals(user.getId()))
+        {
+            throw new UserFactoryException("Unable to persist user with different Id that current Id.");
+        }
         
-        return user;
+        StringBuilderWriter buf = new StringBuilderWriter(512);
+        JSONWriter writer = new JSONWriter(buf);
+        
+        try
+        {
+            writer.startObject();
+            
+            writer.writeValue("username", user.getId());
+            
+            writer.startValue("properties");
+            writer.startObject();
+            writer.writeValue(CM_FIRSTNAME, user.getFirstName());
+            writer.writeValue(CM_LASTNAME, user.getLastName());
+            writer.writeValue(CM_JOBTITLE, user.getJobTitle());
+            writer.writeValue(CM_ORGANIZATION, user.getOrganization());
+            writer.writeValue(CM_LOCATION, user.getLocation());
+            writer.writeValue(CM_EMAIL, user.getEmail());
+            writer.writeValue(CM_TELEPHONE, user.getTelephone());
+            writer.writeValue(CM_MOBILE, user.getMobilePhone());
+            writer.writeValue(CM_SKYPE, user.getSkype());
+            writer.writeValue(CM_INSTANTMSG, user.getInstantMsg());
+            writer.writeValue(CM_COMPANYADDRESS1, user.getCompanyAddress1());
+            writer.writeValue(CM_COMPANYADDRESS2, user.getCompanyAddress2());
+            writer.writeValue(CM_COMPANYADDRESS3, user.getCompanyAddress3());
+            writer.writeValue(CM_COMPANYPOSTCODE, user.getCompanyPostcode());
+            writer.writeValue(CM_COMPANYFAX, user.getCompanyFax());
+            writer.writeValue(CM_COMPANYEMAIL, user.getCompanyEmail());
+            writer.writeValue(CM_COMPANYTELEPHONE, user.getCompanyTelephone());
+            writer.endObject();
+            writer.endValue();
+            
+            writer.startValue("content");
+            writer.startObject();
+            writer.writeValue(CM_PERSONDESCRIPTION, user.getBiography());
+            writer.endObject();
+            writer.endValue();
+            
+            writer.endObject();
+            
+            Connector conn = FrameworkHelper.getConnector(context, ALFRESCO_ENDPOINT_ID);
+            ConnectorContext c = new ConnectorContext(HttpMethod.POST);
+            c.setContentType("application/json");
+            Response res = conn.call("/slingshot/profile/userprofile", c,
+                    new ByteArrayInputStream(buf.toString().getBytes()));
+            if (Status.STATUS_OK != res.getStatus().getCode())
+            {
+                throw new UserFactoryException("Remote error during User save: " + res.getStatus().getMessage());
+            }
+        }
+        catch (IOException ioErr)
+        {
+            throw new UserFactoryException("IO error during User save: " + ioErr.getMessage(), ioErr);
+        }
+        catch (RemoteConfigException err)
+        {
+            throw new UserFactoryException("Configuration error during User save: " + err.getMessage(), err);
+        }
     }
 }
