@@ -14,7 +14,7 @@
             </td>
             <#if user.properties.avatar??>
             <td style="width:64px;padding-left:8px" valign="middle">
-               <img src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true" alt="" />
+               <img src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" alt="" />
             </td>
             </#if>
          </tr>

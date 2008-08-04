@@ -211,7 +211,7 @@
             var avatarUrl = Alfresco.constants.URL_CONTEXT + "/components/images/no-photo.png";
             if (oRecord.getData("avatar") != undefined)
             {
-               var avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?qc=true&ph=true";
+               var avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
             }
             oColumn.width = 70;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");

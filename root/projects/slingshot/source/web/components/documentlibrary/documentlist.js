@@ -443,7 +443,7 @@
          var generateThumbnailUrl = function DL_generateThumbnailUrl(record)
          {
             var url = Alfresco.constants.PROXY_URI + "api/node/" + record.getData("nodeRef").replace(":/", "");
-            url += "/content/thumbnails/doclib?qc=true&ph=true";
+            url += "/content/thumbnails/doclib?c=queue&ph=true";
             return url;
          }
 

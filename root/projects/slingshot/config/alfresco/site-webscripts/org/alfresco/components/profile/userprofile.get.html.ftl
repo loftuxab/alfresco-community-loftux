@@ -21,17 +21,17 @@
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photorow">
             <div class="photo">
-               <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
+               <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
             </div>
             <div class="namelabel">${profile.firstName!""} ${profile.lastName!""}</div>
             <#if profile.jobTitle?? && profile.jobTitle?length!=0><div class="fieldlabel">${profile.jobTitle?html}</div></#if>
             <#if profile.organization?? && profile.organization?length!=0><div class="fieldlabel">${profile.organization?html}</div></#if>
             <#if profile.location?? && profile.location?length!=0><div class="fieldlabel">${profile.location?html}</div></#if>
          </div>
-         <#if profile.biography?? && profile.biography?length!=0>
+         <#if biohtml?? && biohtml?length!=0>
          <div class="biorow">
             <hr/>
-            <div>${profile.biography?html}</div>
+            <div>${biohtml}</div>
          </div>
          </#if>
          
@@ -157,7 +157,7 @@
       <div class="header-bar">${msg("label.photo")}</div>
       <div class="photorow">
          <div class="photo">
-            <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?fc=true<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
+            <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
          </div>
          <div class="photobtn">
             <button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button>
