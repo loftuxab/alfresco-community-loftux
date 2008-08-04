@@ -24,7 +24,6 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -182,9 +181,8 @@ public class ScriptValueConverter
             // call the "Date" constructor on the root scope object - passing in the millisecond
             // value from the Java date - this will construct a JavaScript Date with the same value
             Date date = (Date)value;
-            Object val = ScriptRuntime.newObject(
-                    Context.getCurrentContext(), scope, TYPE_DATE, new Object[] {date.getTime()});
-            value = (Serializable)val;
+            value = ScriptRuntime.newObject(
+                        Context.getCurrentContext(), scope, TYPE_DATE, new Object[] {date.getTime()});
         }
         else if (value instanceof Collection)
         {
@@ -197,10 +195,14 @@ public class ScriptValueConverter
                 array[index++] = wrapValue(scope, obj);
             }
             // convert array to a native JavaScript Array
-            value = (Serializable)Context.getCurrentContext().newArray(scope, array);
+            value = Context.getCurrentContext().newArray(scope, array);
+        }
+        else if (value instanceof Map)
+        {
+            value = new NativeMap(scope, (Map)value);
         }
         
-        // simple numbers and strings are wrapped automatically by Rhino
+        // simple numbers, strings and booleans are wrapped automatically by Rhino
         
         return value;
     }

@@ -197,8 +197,8 @@ public abstract class AbstractWebScript implements WebScript
         // add the json utilities
         params.put("jsonUtils", JSON_UTILS);
         
-        // add the script utilities
-        params.put("scriptUtils", SCRIPTABLE_UTILS);
+        // add the string utilities
+        params.put("stringUtils", SCRIPTABLE_UTILS);
         
         // add remote object
         if (this.container instanceof PresentationContainer)
@@ -251,8 +251,11 @@ public abstract class AbstractWebScript implements WebScript
         params.put("url", new URLModel(req));
         
         // add the json utilities
-        params.put("jsonUtils", new JSONUtils());
-
+        params.put("jsonUtils", JSON_UTILS);
+        
+        // add the string utilities
+        params.put("stringUtils", SCRIPTABLE_UTILS);
+        
         // populate model with template methods
         params.put("absurl", new AbsoluteUrlMethod(req.getServerPath()));
         params.put("scripturl", new ScriptUrlMethod(req, res));
