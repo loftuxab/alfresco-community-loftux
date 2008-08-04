@@ -28,29 +28,30 @@
 		 */
 		parser : null,
 		
-		/**
-	     * Sets the current site for this component.
-	     * 
-	     * @property siteId
-	     * @type string
-	     */
-		setSiteId: function(siteId)
-		{
-			this.siteId = siteId;
-			return this;
-		},
-		
-		/**
-		 * Sets the page title of the page.
-		 *
-		 * @property pageTitle
-		 * @type string
-		 */
-		setPageTitle: function(pageTitle)
-		{
-			this.pageTitle = pageTitle;
-			return this;
-		},
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         siteId: "",
+         pageTitle: "",
+         mode: "view" // default is "view" mode
+      },		
+
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       */
+      setOptions: function Wiki_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
 		
 		/**
 		 * Fired by YUILoaderHelper when required component script files have
@@ -71,8 +72,6 @@
 		 */
 		init: function()
 		{
-			this.tabs = new YAHOO.widget.TabView(this.id + "-wikipage");
-			
 			var me = this;
 			
 			YAHOO.Bubbling.addDefaultAction('view-link', function(layer, args)
@@ -85,16 +84,11 @@
             }
             return true;
          });
-         
-         this.tabs.on('activeTabChange', function(e) {
-            var newTab = e.newValue;
-            if (newTab === me.tabs.get('tabs')[1])
-            {
-               me.pageEditor.show();
-            }
-         });
-			
-		   this._setupEditForm();
+       
+			if (this.options.mode === "edit") 
+			{
+			  this._setupEditForm();
+			}
 			
 			var pageText = document.getElementById("#page"); // Content area
 			if (pageText)
@@ -103,13 +97,14 @@
 				// Format any wiki markup
 				pageText.innerHTML = this.parser.parse(pageText.innerHTML);
 			}
-			
-			var Dom = YAHOO.util.Dom;
-			Dom.get(this.id + "-wikipage").style.visibility = "visible";
+		
 		},
 		
 		_setupEditForm: function()
 		{
+		   // register the tag listener
+         this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
+         
          this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
       	   height: '300px',
       		width: '538px',
@@ -150,16 +145,9 @@
             {
                // Put the HTML back into the text area
                this.pageEditor.saveHTML();
-               // update the tags set in the form
-               if (this.selectedTags.length > 0)
-               {
-                  var elem = document.createElement('input');
-                  elem.setAttribute('name', "tags");
-                  elem.setAttribute('value', this.selectedTags.join(" "));
-                  elem.setAttribute('type', 'hidden');
-                  var formElem = YAHOO.util.Dom.get(this.id + "-form");
-                  formElem.appendChild(elem);
-               }
+               // Update the tags set in the form
+               this.tagLibraryListener.updateForm();
+               
                // Avoid submitting the input field used for entering tags
                var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
                if (tagInputElem)
@@ -184,8 +172,8 @@
 		{
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
          {
-            site: this.siteId,
-            title: this.pageTitle,
+            site: this.options.siteId,
+            title: this.options.pageTitle,
             version: id
          });
 		   
@@ -227,7 +215,7 @@
 		 */
 		_getAbsolutePath: function()
 		{
-			return Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=";	
+			return Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";	
 		},
 		
 		/*
@@ -239,7 +227,7 @@
 		 */
 		onCancelSelect: function(e)
 		{
-			this.tabs.set('activeIndex', 0);
+			//this.tabs.set('activeIndex', 0);
 		},
 		
 		/*
@@ -251,19 +239,8 @@
 		 */
 		onPageUpdated: function(e)
 		{
-			// Switch back to page view - update with the new content.
-			var response = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
-			if (response && !YAHOO.lang.isUndefined(response.pagetext))
-			{
-				var tab0 = this.tabs.getTab(0);
-				// TODO: fix me
-				this.parser.URL = this._getAbsolutePath();
-				tab0.set('content', this.parser.parse(response.pagetext));
-				
-				this.pageEditor.get('element').value = response.pageText;
-			}
-			
-			this.tabs.set('activeIndex', 0);
+		   // Display pop-up
+		    Alfresco.util.PopupManager.displayMessage({text: "Page Updated"});
 		}
 			
 	};	
