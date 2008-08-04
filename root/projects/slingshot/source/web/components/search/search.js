@@ -268,7 +268,7 @@
             if (oRecord.getData("type") == "file")
             {
                imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
-               imageUrl += "/content/thumbnails/doclib?qc=true&ph=true";
+               imageUrl += "/content/thumbnails/doclib?c=queue&ph=true";
             }
             
             // Render the cell

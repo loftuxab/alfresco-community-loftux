@@ -263,7 +263,7 @@
             for (i in photos)
             {
                photos[i].src = Alfresco.constants.PROXY_URI + "api/node/" + noderef.replace("://", "/") +
-                               "/content/thumbnails/avatar?fc=true";
+                               "/content/thumbnails/avatar?c=force";
             }
             
             // call to update the user object - photo changes take effect immediately!

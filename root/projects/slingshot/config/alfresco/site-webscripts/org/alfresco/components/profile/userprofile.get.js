@@ -23,3 +23,9 @@ else
    // if no profile specified, must be current user which will allow editing
    model.profile = user;
 }
+
+var bio = model.profile.biography;
+if (bio != null)
+{
+   model.biohtml = scriptUtils.replaceLineBreaks(scriptUtils.stripUnsafeHTML(bio));
+}

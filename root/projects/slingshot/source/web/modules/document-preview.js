@@ -433,7 +433,7 @@
          // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
          var nodeRef = this.showConfig.nodeRef.replace(":/", "");
          var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRef + "/content/thumbnails/webpreview"
-         url += "?fc=true&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
+         url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
 
          // Call the load function but wait a bit to make safari work
          YAHOO.lang.later(250, this, this._load, [url, 0], false);
