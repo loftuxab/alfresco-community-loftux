@@ -103,6 +103,9 @@
 </#if>
 "icon":"${absurl(url.context)}${row.icon16}",
 "tags":"${alftags}"
-},
+}
+
+<#if row_index+1 &lt; resultset?size>,</#if>
+
 </#list>
 ]}	
