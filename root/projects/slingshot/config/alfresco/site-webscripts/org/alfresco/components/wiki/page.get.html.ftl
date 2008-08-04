@@ -34,11 +34,27 @@
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 	        <div id="#page"><#if result?exists>${result.pagetext}</#if></div> 
 	        <div id="#edit">
-               <textarea name="${args.htmlid}-pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result?exists>${result.pagetext}</#if></textarea>
+	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="POST">
+	            <#assign pageContext = page.url.context + "/page/site" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
+	            <input type="hidden" name="context" value="${pageContext?html}/" />
+               <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result?exists>${result.pagetext}</#if></textarea>
+               <!-- tags -->
+               <#if result.tags?? && result.tags?size &gt; 0>
+                  <#assign tags=result.tags />
+               <#else>
+                  <#assign tags=[] />
+               </#if>
+               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+               <!-- Render the tag inputs -->
+               <@taglibraryLib.renderTagInputs htmlid=args.htmlid tags=tags tagInputName="tags" />
+               <!-- Render the library component -->
+               <@taglibraryLib.renderTagLibrary htmlid=args.htmlid site=page.url.templateArgs.site tags=tags />
+               <!-- end tags -->
 			      <div>
 	               <input type="submit" id="${args.htmlid}-save-button" value="Save" />
 				      <input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
 	            </div>
+	            </form>
 			</div> 
 			<div id="#history">
 			   <#if result.versionhistory?exists>
