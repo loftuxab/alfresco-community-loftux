@@ -1704,20 +1704,7 @@
          // Should be a path in the arguments
          if (obj && (obj.path !== null))
          {
-            if (obj.doclistSourcedEvent)
-            {
-               /**
-                * This was as a result of either the user manually changing the address bar, or the initial
-                * event fired after parsing the URL hash on page load.
-                */
-               /*
-               this._updateDocList.call(this,
-               {
-                  path: obj.path
-               });
-               */
-            }
-            else
+            if (!obj.doclistSourcedEvent)
             {
                /**
                 * This event was received as a result of a UI event. We need to tell the History Manager about
@@ -1731,11 +1718,17 @@
                   var currentState = YAHOO.util.History.getCurrentState("path");
                   if (obj.path != currentState)
                   {
-                     YAHOO.util.History.multiNavigate(
+                     var objNav =
                      {
-                        page: "1",
                         path: (YAHOO.env.ua.gecko) ? encodeURIComponent(obj.path) : obj.path
-                     });
+                     }
+                     
+                     if (this.options.usePagination)
+                     {
+                        objNav.page = "1";
+                     }
+                     
+                     YAHOO.util.History.multiNavigate(objNav);
                   }
                }
                catch (e)

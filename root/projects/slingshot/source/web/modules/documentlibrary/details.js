@@ -275,7 +275,7 @@
        */
       onMetadataSuccess: function DLD_onMetadataSuccess(response)
       {
-         var file = response.json.doclist.items[0];
+         var file = response.json.items[0];
 
          // Fire "renamed" event
          YAHOO.Bubbling.fire(file.type == "folder" ? "folderRenamed" : "fileRenamed",
