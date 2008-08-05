@@ -30,6 +30,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.AuthenticationUtil;
+import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.exception.RequestContextException;
+
 /**
  * List for call from the web client to log the user out from the current session.
  * 
@@ -41,7 +45,16 @@ public class LogoutServlet extends BaseServlet
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-    	request.getSession().invalidate();
+        try
+        {
+            AuthenticationUtil.logout(RequestUtil.getRequestContext(request));
+        }
+        catch (RequestContextException err)
+        {
+            throw new ServletException(err);
+        }
+        
+        // redirect to the root of the website
         response.sendRedirect(request.getContextPath());
     }
 }

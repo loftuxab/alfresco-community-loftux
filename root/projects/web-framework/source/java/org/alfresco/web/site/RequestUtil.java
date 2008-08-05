@@ -36,39 +36,44 @@ import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.site.exception.RequestContextException;
 
 /**
+ * Utility class for constructing and binding RequestContext objects.
+ * 
  * @author muzquiano
+ * @author kevinr
  */
 public class RequestUtil
 {
+    private static final String ATTR_REQUEST_CONTEXT = "requestContext";
+    
     /**
-     * A lightweight method for returning the request context that is bound
-     * to the current request.
+     * Returning the request context that is bound to the current request.
      * 
-     * If the request context is found, it is returned.  This is very quick
-     * and pays no performance penalty due to synchronized handling.
+     * If the request context is found, it is returned.
      * 
-     * If the request context is not found, then the method calls into
-     * the protected _getRequestContext which is synchronized and pays the
-     * penalty of constructing the actual request context and binding it to
-     * the request context.
+     * If the request context is not found, then the method constructs a new
+     * request context and binds it to the request.
      * 
-     * Thus, subsequent requests are isolated from this penalty and only the
-     * first player pays the penalty.
+     * @param request   ServletRequest
      * 
-     * @param request
-     * @return
+     * @return RequestContext (never null)
+     * 
      * @throws RequestContextException
      */
     public static RequestContext getRequestContext(ServletRequest request)
         throws RequestContextException
     {
-        RequestContext context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT);
-        if(context != null)
+        RequestContext context;
+        
+        // If the request context already exists on the request, then return it
+        context = (RequestContext)request.getAttribute(ATTR_REQUEST_CONTEXT); 
+        if (context == null)
         {
-            return context;
+            // Create a new request context
+            // This will be bound to the current request by the initRequestContext method.
+            context = FrameworkHelper.initRequestContext(request);
         }
         
-        return _getRequestContext(request, false);
+        return context;
     }
     
     /**
@@ -94,7 +99,7 @@ public class RequestUtil
             request = ((org.alfresco.web.scripts.LocalWebScriptRequest) req).getHttpServletRequest();
         }
         
-        if(request != null)
+        if (request != null)
         {
             context = getRequestContext(request);
         }
@@ -102,40 +107,6 @@ public class RequestUtil
         return context;
     }
     
-    
-    /**
-     * Synchronized method that checks to see if a request context already
-     * exists as bound to the current request.  If not, one is created.
-     * 
-     * @param request
-     * @param forceNew
-     * @return
-     * @throws RequestContextException
-     */
-    protected static synchronized RequestContext _getRequestContext(ServletRequest request, boolean forceNew)
-        throws RequestContextException
-    {
-        /**
-         * If we already have a request context on the request, then we
-         * will simply return that.
-         */
-        RequestContext context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT); 
-        if(context != null)
-        {
-            return context;
-        }
-        
-        /**
-         * Create a new request context
-         * 
-         * This will be bound to the current request by the initRequestContext
-         * method.  Thus, we can just hand it back.
-         */
-        context = FrameworkHelper.initRequestContext(request);
-
-        return context;
-    }
-
     /**
      * Binds the given request context to the given servlet request.
      * 
@@ -253,6 +224,4 @@ public class RequestUtil
             throw new ServletException(ex);
         }
     }
-
-    public static final String ATTR_REQUEST_CONTEXT = "requestContext";
 }

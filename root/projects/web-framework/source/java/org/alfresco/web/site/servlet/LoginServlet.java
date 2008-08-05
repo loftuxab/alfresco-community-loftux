@@ -40,6 +40,7 @@ import org.alfresco.web.site.UserFactory;
  * Responds to Login POSTs to allow the user to authenticate to the web site.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class LoginServlet extends BaseServlet
 {
@@ -59,10 +60,10 @@ public class LoginServlet extends BaseServlet
     	try
     	{
 	    	UserFactory userFactory = FrameworkHelper.getUserFactory();
-
+	    	
             // see if we can authenticate the user
             boolean authenticated = userFactory.authenticate(request, username, password);
-            if(authenticated)
+            if (authenticated)
             {
                 // this will fully reset all connector sessions
                 RequestContext context = RequestUtil.getRequestContext(request);
