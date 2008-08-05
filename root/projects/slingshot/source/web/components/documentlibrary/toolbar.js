@@ -602,6 +602,8 @@
                
                if (result.success)
                {
+                  successCount++;
+                  
                   YAHOO.Bubbling.fire(result.type == "folder" ? "folderDeleted" : "fileDeleted",
                   {
                      multiple: true,
