@@ -83,6 +83,9 @@
                token="@build-number@"
                value="${alf.build.number}"
                summary="yes" />
+      <copy todir="${dir.project.webscriptframework.config}" 
+            file="${dir.project.repository.config}/alfresco/version.properties"
+            overwrite="true"/>
    </target>
 
    <target name="set-revision-number"
@@ -103,6 +106,9 @@
                token="@build-number@"
                value="r${svn.revision}"
                summary="yes" />
+      <copy todir="${dir.project.webscriptframework.config}" 
+            file="${dir.project.repository.config}/alfresco/version.properties"
+            overwrite="true"/>
    </target>
 
    <target name="set-build-number-cc"
@@ -111,6 +117,9 @@
       <replace file="${dir.project.repository.config}/alfresco/version.properties" 
                token="@build-number@" 
                value="${label}" />
+      <copy todir="${dir.project.webscriptframework.config}" 
+            file="${dir.project.repository.config}/alfresco/version.properties"
+            overwrite="true"/>
    </target>
 
    <target name="revert-changes"
