@@ -13,15 +13,16 @@
          filterId: "path",
          filterOwner: "Alfresco.DocListTree"
       },
+      usePagination: ${(args.pagination!false)?string},
       highlightFile: "${page.url.args["file"]!""}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
 <div id="${args.htmlid}-body" class="doclist">
-   <div id="${args.htmlid}-doclistBar" class="yui-g doclist-bar">
+   <div id="${args.htmlid}-doclistBar" class="yui-gc doclist-bar">
       <div class="yui-u first">
-         <div class="inline file-select">
+         <div class="file-select">
             <button id="${args.htmlid}-fileSelect-button" name="doclist-fileSelect-button">${msg("menu.select")}</button>
             <div id="${args.htmlid}-fileSelect-menu" class="yuimenu">
                <div class="bd">
@@ -35,6 +36,7 @@
                </div>
             </div>
          </div>
+         <div id="${args.htmlid}-paginator" class="paginator"></div>
       </div>
       <div class="yui-u align-right">
          <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button">${msg("button.folders.show")}</button>

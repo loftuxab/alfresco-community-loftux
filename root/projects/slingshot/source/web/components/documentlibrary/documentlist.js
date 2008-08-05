@@ -116,6 +116,14 @@
          simpleView: false,
 
          /**
+          * Flag indicating whether pagination is available or not.
+          * 
+          * @property usePagination
+          * @type boolean
+          */
+         usePagination: false,
+
+         /**
           * Current siteId.
           * 
           * @property siteId
@@ -133,12 +141,28 @@
          containerId: "documentLibrary",
 
          /**
-          * Initial path to show on load.
+          * Initial path to show on load (otherwise taken from URL hash).
           * 
           * @property initialPath
           * @type string
           */
          initialPath: "",
+
+         /**
+          * Initial page to show on load (otherwise taken from URL hash).
+          * 
+          * @property initialPage
+          * @type int
+          */
+         initialPage: 1,
+
+         /**
+          * Number of items per page
+          * 
+          * @property pageSize
+          * @type int
+          */
+         pageSize: 50,
 
          /**
           * Initial filter to show on load.
@@ -167,16 +191,37 @@
          
          /**
           * Valid .swf preview mimetypes
-          *
+          * Stored as an object literal for quick "string in object" look-up
           * @property previewMimetypes
           * @type object
           */
          previewMimetypes:
          {
+            // Native PDF
             "application/pdf": true,
+            // Microsoft Office 2003
             "application/vnd.excel": true,
             "application/vnd.powerpoint": true,
-            "application/msword": true
+            "application/msword": true,
+            // OpenOffice.org 2.0
+            "application/vnd.oasis.opendocument.text": true,
+            "application/vnd.oasis.opendocument.text-template": true,
+            "application/vnd.oasis.opendocument.text-web": true,
+            "application/vnd.oasis.opendocument.text-master": true,
+            "application/vnd.oasis.opendocument.graphics": true,
+            "application/vnd.oasis.opendocument.graphics-template": true,
+            "application/vnd.oasis.opendocument.presentation": true,
+            "application/vnd.oasis.opendocument.presentation-template": true,
+            "application/vnd.oasis.opendocument.spreadsheet": true,
+            "application/vnd.oasis.opendocument.spreadsheet-template": true,
+            "application/vnd.oasis.opendocument.chart": true,
+            "application/vnd.oasis.opendocument.formula": true,
+            "application/vnd.oasis.opendocument.image": true,
+            // OpenOffice.org 1.0 / StarOffice 6.0
+            "application/vnd.sun.xml.calc": true,
+            "application/vnd.sun.xml.draw": true,
+            "application/vnd.sun.xml.impress": true,
+            "application/vnd.sun.xml.writer": true
          }
       },
       
@@ -187,6 +232,15 @@
        * @type string
        */
       currentPath: "",
+
+      /**
+       * Current page being browsed.
+       * 
+       * @property currentPage
+       * @type int
+       * @default 1
+       */
+      currentPage: 1,
 
       /**
        * Current filter to filter document list.
@@ -242,15 +296,6 @@
       selectedFiles: {},
 
       /**
-       * Whether "More Actions" pop-up is currently visible.
-       * 
-       * @property showingMoreActions
-       * @type boolean
-       * @default false
-       */
-      showingMoreActions: false,
-
-      /**
        * Flag to indicate this HistoryManager event was expected.
        * An unexpected event means the user has updated the URL hash manually.
        * 
@@ -261,22 +306,31 @@
       expectedHistoryEvent: false,
 
       /**
-       * Deferred highlight row event when showing "More Actions".
+       * Current actions menu being shown
        * 
-       * @property deferHighlightRow
+       * @property currentActionsMenu
        * @type object
        * @default null
        */
-      deferHighlightRow: null,
+      currentActionsMenu: null,
 
       /**
-       * Deferred unhighlight row event when showing "More Actions".
+       * Whether "More Actions" pop-up is currently visible.
        * 
-       * @property deferUnhighlightRow
+       * @property showingMoreActions
+       * @type boolean
+       * @default false
+       */
+      showingMoreActions: false,
+
+      /**
+       * Deferred actions menu element when showing "More Actions" pop-up.
+       * 
+       * @property deferredActionsMenu
        * @type object
        * @default null
        */
-      deferUnhighlightRow: null,
+      deferredActionsMenu: null,
 
       /**
        * Object literal used to generate unique tag ids
@@ -326,10 +380,10 @@
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
-   
+
       /**
        * Fired by YUI when parent element is available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and event listener binding.
+       * Initial History Manager event registration
        *
        * @method onReady
        */
@@ -337,8 +391,10 @@
       {
          // Reference to self used by inline functions
          var me = this;
-         
-         // YUI History
+
+         /**
+          * YUI History - path
+          */
          var bookmarkedPath = YAHOO.util.History.getBookmarkedState("path") || "";
          while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath)));
          
@@ -349,13 +405,17 @@
          }
 
          // Register History Manager path update callback
-         YAHOO.util.History.register("path", "", function(newPath)
+         YAHOO.util.History.register("path", bookmarkedPath, function(newPath)
          {
+            Alfresco.logger.debug("HistoryManager: path changed:" + newPath);
             if (this.expectedHistoryEvent)
             {
                // Clear the flag and update the DocList
                this.expectedHistoryEvent = false;
-               this._updateDocList.call(this, (YAHOO.env.ua.gecko) ? decodeURIComponent(newPath) : newPath);
+               this._updateDocList.call(this,
+               {
+                  path: (YAHOO.env.ua.gecko) ? decodeURIComponent(newPath) : newPath
+               });
             }
             else
             {
@@ -367,20 +427,39 @@
             }
          }, null, this);
 
-         // Initialize the browser history management library
-         try
+
+         /**
+          * YUI History - page
+          */
+         if (this.options.usePagination)
          {
-             YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
+            var bookmarkedPage = YAHOO.util.History.getBookmarkedState("page") || "1";
+            while (bookmarkedPage != (bookmarkedPage = decodeURIComponent(bookmarkedPage)));
+            this.currentPage = parseInt(bookmarkedPage || this.options.initialPage, 10);
+
+            // Register History Manager page update callback
+            YAHOO.util.History.register("page", bookmarkedPage, function(newPage)
+            {
+               Alfresco.logger.debug("HistoryManager: page changed:" + newPage);
+               // Update the DocList
+               this._updateDocList.call(this,
+               {
+                  page: newPage
+               });
+            }, null, this);
+
+            // YUI Paginator definition
+            this.widgets.paginator = new YAHOO.widget.Paginator(
+            {
+               containers: [this.id + "-paginator"],
+               rowsPerPage: this.options.pageSize,
+               initialPage: this.currentPage,
+               template: this._msg("pagination.template"),
+               pageReportTemplate: this._msg("pagination.template.page-report")
+            });
          }
-         catch(e)
-         {
-            /*
-             * The only exception that gets thrown here is when the browser is
-             * not supported (Opera, or not A-grade)
-             */
-            Alfresco.logger.debug("Alfresco.DocumentList: Couldn't initialize HistoryManager.", e.toString());
-         }
-         
+
+
          // Hide/Show Folders button
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders,
          {
@@ -409,13 +488,19 @@
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
-            resultsList: "doclist.items",
+            resultsList: "items",
             fields:
             [
                "index", "nodeRef", "type", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "contentUrl", "actionSet", "tags"
-            ]
+            ],
+            metaFields:
+            {
+               paginationRecordOffset: "startIndex",
+               totalRecords: "totalRecords"
+            }
          };
+         
          
          /**
           * Custom field generator functions
@@ -760,11 +845,22 @@
          // Temporary "empty datatable" message
          YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.loading");
 
+         var handlePagination = function DL_handlePagination(state, dt)
+         {
+            YAHOO.util.History.navigate("page", String(state.page));
+         }
+
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
-            initialLoad: false
+            renderLoopSize: this.options.usePagination ? 4 : 32,
+            //initialLoad: false,
+            initialRequest: this._buildDocListParams(
+            {
+               page: this.currentPage
+            }),
+            paginationEventHandler: handlePagination,
+            paginator: this.widgets.paginator
          });
          
          // Custom error messages
@@ -792,7 +888,7 @@
                   me._setDefaultDataTableErrors();
                }
             }
-            else if (oResponse.results)
+            else if (oResponse.results && !me.options.usePagination)
             {
                this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
@@ -823,13 +919,6 @@
          // Enable row highlighting
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
-         
-         // Fire pathChanged event for first-time population
-         YAHOO.Bubbling.fire("pathChanged",
-         {
-            doclistInitialNav: true,
-            path: this.currentPath
-         });
          
          // Set the default view filter to be "path" and the owner to be "Alfresco.DocListTree"
          var filterObj = YAHOO.lang.merge(
@@ -925,6 +1014,41 @@
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
 
+         // Continue only when History Manager fires its onReady event
+         YAHOO.util.History.onReady(this.onHistoryManagerReady, this, true);
+
+         // Initialize the browser history management library
+         try
+         {
+             YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
+         }
+         catch(e)
+         {
+            /*
+             * The only exception that gets thrown here is when the browser is
+             * not supported (Opera, or not A-grade)
+             */
+            Alfresco.logger.debug("Alfresco.DocumentList: Couldn't initialize HistoryManager.", e.toString());
+            this.onHistoryManagerReady();
+         }
+         
+      },
+   
+      /**
+       * Fired by YUI when History Manager is initialised and available for scripting.
+       * Component initialisation, including instantiation of YUI widgets and event listener binding.
+       *
+       * @method onHistoryManagerReady
+       */
+      onHistoryManagerReady: function DL_onHistoryManagerReady()
+      {
+         // Fire pathChanged event for first-time population
+         YAHOO.Bubbling.fire("pathChanged",
+         {
+            doclistSourcedEvent: true,
+            path: this.currentPath
+         });
+         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -1093,16 +1217,12 @@
        */
       onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
-         // Drop out if More Actions pop-up active
-         if (this.showingMoreActions)
-         {
-            this.deferHighlightRow = oArgs;
-            return;
-         }
-         
+         // Call through to get the row highlighted by YUI
+         this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
+
          var target = oArgs.target;
          // elRename is the element id of the rename file link
-         var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
+         // var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
          // elActions is the element id of the active table cell where we'll inject the actual links
          var elActions = Dom.get(this.id + "-actions-" + target.yuiRecordId);
 
@@ -1123,12 +1243,18 @@
             Dom.addClass(clone, this.options.simpleView ? "simple" : "detailed");
             elActions.appendChild(clone);
          }
-         // Show the actions
-         Dom.removeClass(elRename, "hidden");
-         Dom.removeClass(elActions, "hidden");
          
-         // Call through to get the row highlighted by YUI
-         this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
+         if (this.showingMoreActions)
+         {
+            this.deferredActionsMenu = elActions;
+         }
+         else
+         {
+            this.currentActionsMenu = elActions;
+            // Show the actions
+            // Dom.removeClass(elRename, "hidden");
+            Dom.removeClass(elActions, "hidden");
+         }
       },
 
       /**
@@ -1140,45 +1266,26 @@
        */
       onEventUnhighlightRow: function DL_onEventUnhighlightRow(oArgs)
       {
-         // Drop out if More Actions pop-up active
-         if (this.showingMoreActions)
-         {
-            this.deferUnhighlightRow = oArgs;
-            return;
-         }
-         
-         var target = oArgs.target;
-         var renameId = this.id + "-rename-" + target.yuiRecordId;
-         var actionsId = this.id + "-actions-" + target.yuiRecordId;
-
-         // Just hide the action links
-         Dom.addClass(renameId, "hidden");
-         Dom.addClass(actionsId, "hidden");
-         
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
+
+         var target = oArgs.target;
+         // var renameId = this.id + "-rename-" + target.yuiRecordId;
+         var elActions = Dom.get(this.id + "-actions-" + target.yuiRecordId);
+
+         if (!this.showingMoreActions)
+         {
+            // Just hide the action links, rather than removing them from the DOM
+            // Dom.addClass(renameId, "hidden");
+            Dom.addClass(elActions, "hidden");
+         }
       },
+
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR ACTIONS
        * Disconnected event handlers for action event notification
        */
-
-       /**
-        * Tag selected handler (document details)
-        *
-        * @method onTagSelected
-        * @param tagId {string} Tag name.
-        * @param target {HTMLElement} Target element clicked.
-        */
-       onTagSelected: function DL_onTagSelected(layer, args)
-       {
-          var obj = args[1];
-          if (obj && (obj.tagName !== null))
-          {
-             alert(obj.tagName);
-          }
-       },
 
       /**
        * Show more actions pop-up.
@@ -1191,9 +1298,35 @@
       {
          var me = this;
          
+         // Get the pop-up div, sibling of the "More Actions" link
          var elMoreActions = Dom.getNextSibling(elMore);
          Dom.removeClass(elMoreActions, "hidden");
-         me.showingMoreActions = true;
+         me.showingMoreActions = elMoreActions;
+         
+         // Hide pop-up timer function
+         var fnHidePopup = function DL_oASM_fnHidePopup()
+         {
+            // Need to rely on the "elMoreActions" enclosed variable, as MSIE doesn't support
+            // parameter passing for timer functions.
+            Event.removeListener(elMoreActions, "mouseover");
+            Event.removeListener(elMoreActions, "mouseout");
+            Dom.addClass(elMoreActions, "hidden");
+            me.showingMoreActions = false;
+            if (me.deferredActionsMenu !== null)
+            {
+               Dom.addClass(me.currentActionsMenu, "hidden");
+               me.currentActionsMenu = me.deferredActionsMenu;
+               me.deferredActionsMenu = null;
+               Dom.removeClass(me.currentActionsMenu, "hidden");
+            }
+         }
+
+         // Initial after-click hide timer - 5x the mouseOut timer delay
+         if (elMoreActions.hideTimerId)
+         {
+            clearTimeout(elMoreActions.hideTimerId);
+         }
+         elMoreActions.hideTimerId = setTimeout(fnHidePopup, me.options.actionsPopupTimeout * 5);
          
          // Mouse over handler
          var onMouseOver = function DLSM_onMouseOver(e, obj)
@@ -1201,8 +1334,8 @@
             // Clear any existing hide timer
             if (obj.hideTimerId)
             {
-               clearTimeout(elMoreActions.hideTimerId);
-               elMoreActions.hideTimerId = null;
+               clearTimeout(obj.hideTimerId);
+               obj.hideTimerId = null;
             }
          }
          
@@ -1220,29 +1353,7 @@
                {
                   clearTimeout(obj.hideTimerId);
                }
-               obj.hideTimerId = setTimeout(function()
-               {
-                  Event.removeListener(obj, "mouseover");
-                  Event.removeListener(obj, "mouseout");
-                  Dom.addClass(obj, "hidden");
-                  me.showingMoreActions = false;
-                  // Did we defer highlight or unhighlight events?
-                  var high = me.deferHighlightRow;
-                  var unhigh = me.deferUnhighlightRow;
-                  if (unhigh)
-                  {
-                     if (!high || (high && high.target != unhigh.target))
-                     {
-                        me.onEventUnhighlightRow.call(me, unhigh);
-                     }
-                     me.deferUnhighlightRow = null;
-                  }
-                  if (high)
-                  {
-                     me.onEventHighlightRow.call(me, high);
-                     me.deferHighlightRow = null;
-                  }
-               }, me.options.actionsPopupTimeout);
+               obj.hideTimerId = setTimeout(fnHidePopup, me.options.actionsPopupTimeout);
             }
          }
          
@@ -1250,6 +1361,22 @@
          Event.on(elMoreActions, "mouseout", onMouseOut, elMoreActions);
       },
       
+      /**
+       * Tag selected handler (document details)
+       *
+       * @method onTagSelected
+       * @param tagId {string} Tag name.
+       * @param target {HTMLElement} Target element clicked.
+       */
+      onTagSelected: function DL_onTagSelected(layer, args)
+      {
+         var obj = args[1];
+         if (obj && (obj.tagName !== null))
+         {
+            alert(obj.tagName);
+         }
+      },
+
       /**
        * Asset details.
        *
@@ -1574,34 +1701,50 @@
       onPathChanged: function DL_onPathChanged(layer, args)
       {
          var obj = args[1];
-         if (obj !== null)
+         // Should be a path in the arguments
+         if (obj && (obj.path !== null))
          {
-            // Should be a path in the arguments
-            if (obj.path !== null)
+            if (obj.doclistSourcedEvent)
             {
-               var hashPath = YAHOO.util.History.getBookmarkedState("path");
-               hashPath = (YAHOO.env.ua.gecko) ? decodeURIComponent(hashPath) : hashPath;
-               
-               if ((obj.doclistInitialNav) || (obj.path == hashPath))
+               /**
+                * This was as a result of either the user manually changing the address bar, or the initial
+                * event fired after parsing the URL hash on page load.
+                */
+               /*
+               this._updateDocList.call(this,
                {
-                  // HistoryManager won't fire for the initial navigation event, or if the path hasn't changed
-                  this._updateDocList.call(this, obj.path);
-               }
-               else
+                  path: obj.path
+               });
+               */
+            }
+            else
+            {
+               /**
+                * This event was received as a result of a UI event. We need to tell the History Manager about
+                * it and perform the actual navigation in that callback.
+                */
+               try
                {
-                  try
-                  {
-                     // Flag to indicate we're expecting the HistoryManager's event
-                     this.expectedHistoryEvent = true;
+                  // Flag to indicate we're expecting the HistoryManager's event
+                  this.expectedHistoryEvent = true;
 
-                     // Update History Manager with new path. It will callback to update the doclist
-                     YAHOO.util.History.navigate("path", (YAHOO.env.ua.gecko) ? encodeURIComponent(obj.path) : obj.path);
-                  }
-                  catch (e)
+                  var currentState = YAHOO.util.History.getCurrentState("path");
+                  if (obj.path != currentState)
                   {
-                     // Fallback for non-supported browsers, or hidden iframe loading delay
-                     this._updateDocList.call(this, obj.path);
+                     YAHOO.util.History.multiNavigate(
+                     {
+                        page: "1",
+                        path: (YAHOO.env.ua.gecko) ? encodeURIComponent(obj.path) : obj.path
+                     });
                   }
+               }
+               catch (e)
+               {
+                  // Fallback for non-supported browsers, or hidden iframe loading delay
+                  this._updateDocList.call(this,
+                  {
+                     path: obj.path
+                  });
                }
             }
          }
@@ -1621,7 +1764,7 @@
          {
             if (!obj.multiple)
             {
-               this._updateDocList.call(this, this.currentPath);
+               this._updateDocList.call(this);
             }
          }
       },
@@ -1657,7 +1800,7 @@
        */
       onDocListRefresh: function DL_onDocListRefresh(layer, args)
       {
-         this._updateDocList.call(this, this.currentPath);
+         this._updateDocList.call(this);
       },
 
       /**
@@ -1682,7 +1825,7 @@
             // Ignore if it's the path, as we'll update on the pathChanged event
             if (obj.filterId != "path")
             {
-               this._updateDocList.call(this, this.currentPath);
+               this._updateDocList.call(this);
             }
          }
       },
@@ -1782,20 +1925,23 @@
        * Updates document list by calling data webscript with current site and path
        *
        * @method _updateDocList
-       * @param path {string} Path to navigate to
+       * @param p_obj.path {string} Optional path to navigate to (defaults to this.currentPath)
+       * @param p_obj.page {string} Optional page to navigate to (defaults to this.widgets.paginator.get("page"))
        */
-      _updateDocList: function DL__updateDocList(path)
+      _updateDocList: function DL__updateDocList(p_obj)
       {
+         var successPath = (p_obj && p_obj.path) ? p_obj.path : this.currentPath;
+
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
          
-         function successHandler(sRequest, oResponse, oPayload)
+         var successHandler = function DL__uDL_successHandler(sRequest, oResponse, oPayload)
          {
-            this.currentPath = path;
+            this.currentPath = successPath;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
-         function failureHandler(sRequest, oResponse)
+         var failureHandler = function DL__uDL_failureHandler(sRequest, oResponse)
          {
             if (oResponse.status == 401)
             {
@@ -1822,11 +1968,11 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildDocListParams(path),
+         this.widgets.dataSource.sendRequest(this._buildDocListParams(p_obj || {}),
          {
-               success: successHandler,
-               failure: failureHandler,
-               scope: this
+            success: successHandler,
+            failure: failureHandler,
+            scope: this
          });
       },
 
@@ -1834,22 +1980,59 @@
        * Build URI parameter string for doclist JSON data webscript
        *
        * @method _buildDocListParams
-       * @param path {string} Path to query
+       * @param p_obj.page {string} Page number
+       * @param p_obj.pageSize {string} Number of items per page
+       * @param p_obj.path {string} Path to query
+       * @param p_obj.type {string} Filetype to filter: "all", "documents", "folders"
+       * @param p_obj.site {string} Current site
+       * @param p_obj.container {string} Current container
+       * @param p_obj.filter {string} Current filter
        */
-      _buildDocListParams: function DL__buildDocListParams(path)
+      _buildDocListParams: function DL__buildDocListParams(p_obj)
       {
+         // Essential defaults
+         var obj = 
+         {
+            path: this.currentPath,
+            type: this.options.showFolders ? "all" : "documents",
+            site: this.options.siteId,
+            container: this.options.containerId,
+            filter: this.currentFilter
+         };
+         
+         // Pagination in use?
+         if (this.options.usePagination)
+         {
+            obj.page = this.widgets.paginator.get("page") || "1";
+            obj.pageSize = this.widgets.paginator.get("rowsPerPage");
+         }
+
+         // Passed-in overrides
+         if (typeof p_obj == "object")
+         {
+            obj = YAHOO.lang.merge(obj, p_obj);
+         }
+
+         // Build the URI stem
          var params = YAHOO.lang.substitute("{type}/site/{site}/{container}{path}",
          {
-            type: this.options.showFolders ? "all" : "documents",
-            site: encodeURIComponent(this.options.siteId),
-            container: encodeURIComponent(this.options.containerId),
-            path: encodeURI(path)
+            type: encodeURIComponent(obj.type),
+            site: encodeURIComponent(obj.site),
+            container: encodeURIComponent(obj.container),
+            path: encodeURI(obj.path)
          });
 
-         params += "?filter=" + encodeURIComponent(this.currentFilter.filterId);
-         if (this.currentFilter.filterData)
+         // Filter parameters
+         params += "?filter=" + encodeURIComponent(obj.filter.filterId);
+         if (obj.filter.filterData)
          {
-            params += "&filterData=" + encodeURIComponent(this.currentFilter.filterData);             
+            params += "&filterData=" + encodeURIComponent(obj.filter.filterData);             
+         }
+         
+         // Paging parameters
+         if (this.options.usePagination)
+         {
+            params += "&size=" + obj.pageSize  + "&pos=" + obj.page;
          }
          return params;
       },

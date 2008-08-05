@@ -326,11 +326,11 @@
                {
                   var results = eval("(" + oResponse.responseText + ")");
 
-                  if (results.treenode.items)
+                  if (results.items)
                   {
-                     for (var i = 0, j = results.treenode.items.length; i < j; i++)
+                     for (var i = 0, j = results.items.length; i < j; i++)
                      {
-                        var item = results.treenode.items[i];
+                        var item = results.items[i];
                         var tempNode = new YAHOO.widget.TextNode(
                         {
                            label: item.name,

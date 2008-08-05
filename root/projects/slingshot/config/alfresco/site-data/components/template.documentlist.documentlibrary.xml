@@ -6,5 +6,6 @@
    <url>/components/documentlibrary/documentlist</url>
    <properties>
       <container>documentLibrary</container>
+      <pagination>false</pagination>
    </properties>
 </component>

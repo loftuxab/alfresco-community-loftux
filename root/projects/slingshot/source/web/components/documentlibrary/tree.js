@@ -243,11 +243,11 @@
                {
                   var results = eval("(" + oResponse.responseText + ")");
 
-                  if (results.treenode.items)
+                  if (results.items)
                   {
-                     for (var i = 0, j = results.treenode.items.length; i < j; i++)
+                     for (var i = 0, j = results.items.length; i < j; i++)
                      {
-                        var item = results.treenode.items[i];
+                        var item = results.items[i];
                         var tempNode = new YAHOO.widget.TextNode(
                         {
                            label: item.name,
@@ -341,8 +341,6 @@
        */
       onExpandComplete: function DLT_onExpandComplete(oNode)
       {
-         Alfresco.logger.debug("DLT_onExpandComplete");
-
          // Make sure the tree's Dom has been updated
          this.widgets.treeview.draw();
          // Redrawing the tree will clear the highlight
@@ -387,8 +385,6 @@
        */
       onNodeClicked: function DLT_onNodeClicked(node)
       {
-         Alfresco.logger.debug("DLT_onNodeClicked");
-
          this._updateSelectedNode(node);
          
          // Fire the filter changed event
@@ -422,8 +418,6 @@
        */
       onPathChanged: function DLT_onPathChanged(layer, args)
       {
-         Alfresco.logger.debug("DLT_onPathChanged");
-
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
@@ -501,8 +495,6 @@
        */
       onFolderRenamed: function DLT_onFolderRenamed(layer, args)
       {
-         Alfresco.logger.debug("DLT_onFolderRenamed");
-
          var obj = args[1];
          if (obj && (obj.file !== null))
          {
@@ -529,8 +521,6 @@
        */
       onFolderCopied: function DLT_onFolderCopied(layer, args)
       {
-         Alfresco.logger.debug("DLT_onFolderCopied");
-
          var destPath;
          var obj = args[1];
          if (obj !== null)
@@ -573,8 +563,6 @@
        */
       onFolderCreated: function DLT_onFolderCreated(layer, args)
       {
-         Alfresco.logger.debug("DLT_onFolderCreated");
-
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
@@ -596,8 +584,6 @@
        */
       onFolderDeleted: function DLT_onFolderDeleted(layer, args)
       {
-         Alfresco.logger.debug("DLT_onFolderDeleted");
-
          var obj = args[1];
          if (obj !== null)
          {
@@ -648,8 +634,6 @@
        */
       onFolderMoved: function DLT_onFolderMoved(layer, args)
       {
-         Alfresco.logger.debug("DLT_onFolderMoved");
-
          var obj = args[1];
          if (obj !== null)
          {
@@ -709,8 +693,6 @@
        */
       onFilterChanged: function DLT_onFilterChanged(layer, args)
       {
-         Alfresco.logger.debug("DLT_onFilterChanged");
-
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
@@ -751,8 +733,6 @@
        */
       _buildTree: function DLT__buildTree()
       {
-         Alfresco.logger.debug("DLT__buildTree");
-
          // Create a new tree
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
          this.widgets.treeview = tree;
@@ -787,8 +767,6 @@
        */
       _sortNodeChildren: function DLT__sortNodeChildren(node, onSortComplete)
       {
-         Alfresco.logger.debug("DLT__sortNodeChildren");
-         
          // Is the node a leaf?
          if (node.isLeaf)
          {
@@ -810,14 +788,12 @@
          {
             success: function DLT_sNC_success(oResponse)
             {
-               Alfresco.logger.debug("DLT_sNC_success");
-
                var results = YAHOO.lang.JSON.parse(oResponse.responseText);
 
-               if (results.treenode.items)
+               if (results.items)
                {
                   var kids = oResponse.argument.node.children;
-                  var items = results.treenode.items;
+                  var items = results.items;
                   for (var i = 0, j = items.length; i < j; i++)
                   {
                      if ((kids.length <= i) || (kids[i].data.nodeRef != items[i].nodeRef))
@@ -909,8 +885,6 @@
 
       _showHighlight: function DLT__showHighlight(isVisible)
       {
-         Alfresco.logger.debug("DLT__showHighlight");
-
          if (this.selectedNode !== null)
          {
             if (isVisible)
@@ -926,8 +900,6 @@
       
       _updateSelectedNode: function DLT__updateSelectedNode(node)
       {
-         Alfresco.logger.debug("DLT__updateSelectedNode");
-
          if (this.isFilterOwner)
          {
             this._showHighlight(false);
