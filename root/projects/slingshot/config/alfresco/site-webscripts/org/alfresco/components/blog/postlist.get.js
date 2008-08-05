@@ -4,15 +4,25 @@
 
 function main()
 {
-   // gather all required data
+   // template arguments
    var site = page.url.templateArgs.site;
-   var container = getTemplateParam("container", "blog");
-   var path = getTemplateParam("path", "");
-   var filter = getPageUrlParam("filter", "");
-   var tag = getPageUrlParam("tag", "");
-   var fromDate = getPageUrlParam("fromDate", "");
-   var toDate = getPageUrlParam("toDate", "");
+   
+   // template properties
+   var container = template.properties["container"] != undefined ? template.properties["container"] : "blog";
+   var path = template.properties["path"] != undefined ? template.properties["path"] : "";
+   
+   // url arguments
+   var filter = page.url.args["filter"] != undefined ? page.url.args["filter"] : "";
+   var fromDate = page.url.args["fromDate"] != undefined ? page.url.args["fromDate"] : "";
+   var toDate = page.url.args["toDate"] != undefined ? page.url.args["toDate"] : "";
+   var tag = page.url.args["tag"] != undefined ? page.url.args["tag"] : "";
    var paginationData = fetchPaginationDataFromPageRequest(0, 10);
+
+   // new posts should be the default filter
+   if (filter == "" && fromDate == "" && toDate == "" && tag == "")
+   {
+      filter = "new";
+   }
 
    // fetch the data
    fetchAndAssignBlogPosts(site, container, path, filter, tag, fromDate, toDate, paginationData);
@@ -26,6 +36,7 @@ function main()
    {
       fromDate = parseInt(fromDate);
       model.fromDate = new Date(fromDate);
+      model.fromDateInt = fromDate;
    }
    else
    {

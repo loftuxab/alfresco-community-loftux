@@ -76,7 +76,7 @@
       <#if reply.isUpdated><span class="nodeStatus">(${msg("replies.updated")})</span></#if>
    </div>
 
-   <div class="content">${reply.content}</div>
+   <div class="content yuieditor">${reply.content}</div>
 </div>
 <div class="nodeFooter">
    <span class="nodeFooterBloc">
@@ -124,7 +124,7 @@
          <input type="hidden" name="path" value="${path}" />
          <input type="hidden" name="postRef" value="${post.nodeRef}" />
          <input type="hidden" name="htmlid" value="${htmlid}" />
-         <textarea id="${htmlid}-replyContent" rows="8" cols="80" name="content"><#if isEdit>${post.content}</#if></textarea>
+         <textarea id="${htmlid}-replyContent" rows="8" cols="80" name="content" class="yuieditor"><#if isEdit>${post.content?html}</#if></textarea>
          <div class="nodeFormAction">
             <input type="submit" id="${htmlid}-${postRef}-ok-button"  value='<#if isEdit>${msg("replies.form.updateReply")}<#else>${msg("replies.form.postReply")}</#if>' />
             <input type="reset"  id="${htmlid}-${postRef}-cancel-button"  value="${msg('replies.form.cancel')}" />

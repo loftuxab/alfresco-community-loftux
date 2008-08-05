@@ -325,8 +325,9 @@
             // set the mode back to view
             this.options.mode = "view";
             
-            // reinit the mouse over listener
+            // reinit the mouse over and actions listeners
             Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
+            Alfresco.util.registerDefaultActionHandler(this.id, 'topic-action-link', 'div', this);
          }
       },
      

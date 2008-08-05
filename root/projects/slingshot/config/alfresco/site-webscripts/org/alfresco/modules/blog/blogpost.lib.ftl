@@ -45,7 +45,7 @@
    <div class="nodeContent">
       <div class="nodeTitle">
          <a href="blog-postview?postId=${post.name}">
-            ${post.title}
+            ${post.title?html}
          </a>
          <#import "/org/alfresco/modules/blog/blogpostlist.lib.ftl" as blogpostlistLib/>
          <@blogpostlistLib.renderPostStatus post=post/>
@@ -64,41 +64,14 @@
             <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
             <#list post.tags as tag>
             <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-               <a href="#" class="tag-link-span">${tag}</a>
+               <a href="#" class="tag-link-span">${tag?html}</a>
             </span><#if tag_has_next>, </#if> 
             </#list>
          </#if>
       </div>
       
-      <div class="content">${post.content}</div>
+      <div class="content yuieditor">${post.content}</div>
    </div>
-   
-   <#--
-   <div class="nodeFooter">
-   <#- -
-      <#if (! post.isDraft)>
-         <span class="nodeFooterBloc">
-            <span class="nodeAttrLabel replyTo">${msg("post.footer.comments")}:</span><span class="nodeAttrValue"> (${post.commentCount})</span>
-         </span>
-      </#if>
-      
-      <#if ((post.tags?size > 0) && (! post.isDraft))>
-      <span class="spacer"> | </span>
-      </#if>
-   - ->
-
-      <#if (post.tags?size > 0)>
-         <span class="nodeFooterBloc">
-            <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
-            <#list post.tags as tag>
-            <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-               <a href="#" class="tag-link-span">${tag}</a>
-            </span><#if tag_has_next> , </#if> 
-            </#list>
-         </span>
-      </#if> 
-   </div>
-   -->
 </div>
 </#macro>
 
@@ -135,12 +108,12 @@
                
          <!-- title -->
          <label>${msg("post.form.postTitle")}:</label>
-         <input type="text" value="<#if editForm>${post.title!''}</#if>"
+         <input type="text" value="<#if editForm>${(post.title!'')?html}</#if>"
             name="title" id="${htmlId}-title" size="80" />
 
          <!-- content -->
          <label>${msg("post.form.postText")}:</label>
-         <textarea rows="8" cols="80" name="content" id="${htmlId}-content"><#if editForm>${post.content!''}</#if></textarea> 
+         <textarea rows="8" cols="80" name="content" id="${htmlId}-content" class="yuieditor"><#if editForm>${(post.content!'')?html}</#if></textarea> 
       
          <!-- tags -->
          <#if editForm>

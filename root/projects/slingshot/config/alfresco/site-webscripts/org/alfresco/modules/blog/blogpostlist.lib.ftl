@@ -17,7 +17,7 @@
          Unknown filter!
       </#if>
    <#elseif (tag?length > 0)>
-      ${msg("postlist.title.bytag", tag)}
+      ${msg("postlist.title.bytag", tag?html)}
    <#elseif (fromDate?is_date)>
       ${msg("postlist.title.bymonth", fromDate?datetime?string("MMMM yyyy"))}
    <#else>
@@ -112,7 +112,7 @@
    <div class="nodeContent">
       <span class="nodeTitle">
          <a href="blog-postview?postId=${post.name}">
-            ${post.title}
+            ${post.title?html}
          </a>
          <@renderPostStatus post=post/>
       </span>
@@ -124,7 +124,7 @@
          <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=post.author /></span>
       </div>
       
-      <div class="content">${post.content}</div>
+      <div class="content yuieditor">${post.content}</div>
    </div>
 </div>
 <div class="nodeFooter">
@@ -138,7 +138,7 @@
       <span class="nodeAttrLabel tag">${msg("post.tags")}:</span>
       <#list post.tags as tag>
       <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-         <a href="#" class="tag-link-span">${tag}</a>
+         <a href="#" class="tag-link-span">${tag?html}</a>
       </span><#if tag_has_next> , </#if> 
       </#list>
    </span>
@@ -189,7 +189,7 @@
    <div class="nodeContent">
       <div class="nodeTitle">
          <a href="blog-postview?postId=${post.name}">
-            ${post.title}
+            ${post.title?html}
          </a>
          <@renderPostStatus post=post/>
       </div>

@@ -7,7 +7,7 @@
       containerId: "${container}",
       <#if item??>
       mode: "edit",
-      postId: "${item.name}"
+      postId: "${item.name?html?j_string}"
       <#else>
       mode: "create"
       </#if>

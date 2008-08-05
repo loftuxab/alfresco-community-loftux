@@ -273,7 +273,7 @@
             
             // Render the cell
             // TODO: this should use the correct icon
-            elCell.innerHTML = '<span class="demo-other"><a href="' + url + '" target="_blank"><img src="' + imageUrl + '" alt="' + extn + '" /></a></span>';
+            elCell.innerHTML = '<span class="demo-other"><a href="' + encodeURI(url) + '" target="_blank"><img src="' + imageUrl + '" alt="' + extn + '" /></a></span>';
          };
 
          /**
@@ -292,17 +292,17 @@
             var url = me._getBrowseUrlForRecord(oRecord);
             var desc = "";
             // title/link to view page
-            desc = '<h3 class="itemname"><a target="_blank" href="' + url + '">' + oRecord.getData("displayName") + '</a></h3>';
+            desc = '<h3 class="itemname"><a target="_blank" href="' + encodeURI(url) + '">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
             // link to the site
             desc += '<div class="detail">';
-            desc += '   In Site: <a  target="_blank" href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + '/dashboard">' + site.title + '</a>';
+            desc += '   In Site: <a  target="_blank" href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
             desc += '</div>';
             desc += '<div class="details">';
             desc += '   Tags: ';
             var tags = oRecord.getData("tags");
             for (var x=0; x < tags.length; x++)
             {
-                desc += '<span id="' + me.id + '-searchByTag-' + tags[x] + '"><a class="search-tag">' + tags[x] + '</a> </span>';
+                desc += '<span id="' + me.id + '-searchByTag-' + Alfresco.util.encodeHTML(tags[x]) + '"><a class="search-tag">' + Alfresco.util.encodeHTML(tags[x]) + '</a> </span>';
             }
             desc += '</div>';
             elCell.innerHTML = desc;
@@ -321,7 +321,7 @@
          this._setDefaultDataTableErrors();
          if (this.options.initialSearchTerm.length < 1)
          {
-            YAHOO.widget.DataTable.MSG_EMPTY = "No search performed yet";
+            YAHOO.widget.DataTable.MSG_EMPTY = "";
          }
 
          // DataTable definition
@@ -518,7 +518,7 @@
       _updateResultsInfo: function Search__updateSearchResultsInfo()
       {
          // update the search results field
-         var searchFor = '<b>' + this.searchTerm + '</b>';
+         var searchFor = '<b>' + Alfresco.util.encodeHTML(this.searchTerm) + '</b>';
          var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + this.options.siteId + '</b>'));
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)

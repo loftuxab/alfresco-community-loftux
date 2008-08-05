@@ -54,13 +54,13 @@
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first caret-fix"><label for="${args.htmlid}-username">${msg("label.username")}:</label></div>
+            <div class="yui-u first caret-fix"><label for="${args.htmlid}-username">${msg("label.username?html")}:</label></div>
             <div class="yui-u">
                <input id="${args.htmlid}-id" type="text" name="username" tabindex="11" value="${item.username}" />
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first caret-fix"><label for="${args.htmlid}-password">${msg("label.password")}:</label></div>
+            <div class="yui-u first caret-fix"><label for="${args.htmlid}-password">${msg("label.password?html")}:</label></div>
             <div class="yui-u caret-fix">
                <input id="${args.htmlid}-password" type="password" name="password" tabindex="13" value="${item.password}" />
             </div>

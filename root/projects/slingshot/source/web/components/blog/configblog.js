@@ -232,13 +232,6 @@
          // Configure the forms runtime
          var configureBlogForm = new Alfresco.forms.Form(this.id + "-configBlog-form");
 
-         // Shortname is mandatory
-         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
-         // and can NOT contain whitespace characters
-         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "keyup");
-         // and should be valid file name
-         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
-
          // The ok button is the submit button, and it should be enabled when the form is ready
          configureBlogForm.setShowSubmitStateDynamically(true, false);
          configureBlogForm.setSubmitElements(this.widgets.okButton);

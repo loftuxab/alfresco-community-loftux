@@ -6,47 +6,38 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       startIndex: "${pdata.startIndex}",
-      pageSize: "${pdata.pageSize}"
+      pageSize: "${pdata.pageSize}",
+      filter: "${filter?html?j_string}",
+      tag: "${tag?html?j_string}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
-<div id="discussionsBlogHeader1">
-	<div class="leftDiscussionBlogHeader">
-		<span class="createTopicLink">
-		   <a href="${url.context}/page/site/${page.url.templateArgs.site}/discussions-createtopic">
-		      ${msg("header.createTopic")}
-		   </a>
-		</span>
-		<span class="rssLink">
-		   <a href="${url.context}/service/components/discussions/rss?site=${page.url.templateArgs.site}">
-	          ${msg("header.discussionsRSS")}
-	       </a>
-		</span>
-		<#--
-		<span class="rssLink">
-		   <a href="${url.context}/service/components/discussions/rss/latestposts?site=${page.url.templateArgs.site}">
-	          ${msg("header.topicsAndRepliesRSS")}
-	       </a>
-		</span>
-		-->
-	</div>
-	<div class="rightDiscussionBlogHeader">
-		<span class="toolbarOption detailList"><a href="#" id="detailed-list-view">${msg("header.detailList")}</a></span>
-		<span class="toolbarOption simpleList"><a href="#" id="simple-list-view">${msg("header.simpleList")}</a></span>
-	</div>
-</div>
+<div class="topiclist-header">
+   <div id="${args.htmlid}-topiclistBar" class="yui-g toolbar">
+      <div class="yui-u first">
+         <div class="createTopic hideable"><button id="${args.htmlid}-createTopic-button" name="postlist-createTopic-button">${msg("header.createTopic")}</button></div>
+         <div class="separator hideable">|</div>
+         <div id="${args.htmlid}-rssFeed" class="rss-feed hideable">
+            <a href="${url.context}/service/components/discussions/rss?site=${page.url.templateArgs.site}">
+	           ${msg("header.discussionsRSS")}
+            </a>
+         </div>
+      </div>
+      <div class="yui-u align-right">
+         <button id="${args.htmlid}-simpleView-button" name="topiclist-simpleView-button">${msg("header.simpleList")}</button>
+      </div>
+   </div>
 
-<div id="discussionsBlogHeader2">
-	<div id="${args.htmlid}-listtitle" class="leftDiscussionBlogHeader listTitle">
-			<@topiclistLib.topicListTitle filter=filter tag=tag />
-	</div>
-	
-	<div class="rightDiscussionBlogHeader">
-		<@paginatorLib.renderPaginatorModule htmlid=args.htmlid pdata=pdata />
-	</div>
-	
+   <div class="topiclist-infobar">
+      <div id="${args.htmlid}-listtitle" class="leftDiscussionBlogHeader listTitle">
+         <@topiclistLib.topicListTitle filter=filter tag=tag />
+      </div>
+      <div class="align-right paginator">
+         <@paginatorLib.renderPaginatorModule htmlid=args.htmlid pdata=pdata />
+      </div>
+   </div>
 </div>
 
 <div id="${args.htmlid}-topiclist">

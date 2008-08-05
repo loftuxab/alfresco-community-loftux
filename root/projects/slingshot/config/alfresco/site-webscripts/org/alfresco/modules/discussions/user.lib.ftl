@@ -39,8 +39,8 @@
 -->
 <#macro renderUserName user>
    <#if ((user.firstName?? && user.firstName?length > 0) || (user.lastName?? && user.lastName?length > 0))>
-      ${user.firstName!''} ${user.lastName!''}
+      ${(user.firstName!'')?html} ${(user.lastName!'')?html}
    <#else>
-      ${user.username}
+      ${user.username?html}
    </#if>
 </#macro>

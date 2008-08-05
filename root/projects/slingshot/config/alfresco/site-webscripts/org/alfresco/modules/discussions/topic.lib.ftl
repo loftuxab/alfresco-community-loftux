@@ -1,21 +1,6 @@
 <#import "/org/alfresco/modules/discussions/user.lib.ftl" as userLib/>
 
 <#--
-   User related rendering macros.
-   A user object is expected of following form:
-   
-   {
-      "username" : "name of the user",
-      "firstName" : "first name",
-      "lastName" : "last name",
-      "avatarRef" : node reference of the avatar image
-   }
-   
-   firstName, lastName and avatarRef can be missing, in which case
-   the macros will do a fallback to defaults
--->
-
-<#--
   Renders a topic.
   
   @param topic The topic data to render.
@@ -53,7 +38,7 @@
    <div class="nodeContent">
       <div class="nodeTitle">
          <a href="discussions-topicview?topicId=${topic.name}">
-            ${topic.title}
+            ${topic.title?html}
          </a>
          <#if topic.isUpdated><span class="nodeStatus">(${msg("topic.updated")})</span></#if>
       </div>
@@ -72,7 +57,7 @@
       </div>
       
       <div class="userLink"><@userLib.renderUserLink user=topic.author /> ${msg("topic.said")}:</div>
-      <div class="content">${topic.content}</div>
+      <div class="content yuieditor">${topic.content}</div>
    </div>
    <div class="nodeFooter">
       <span class="nodeFooterBloc">
@@ -86,7 +71,7 @@
          <span class="nodeAttrLabel tag">${msg("topic.tags")}:</span>
          <#list topic.tags as tag>
             <span class="nodeAttrValue" id="${htmlid}-onTagSelection-${tag}">
-               <a href="#" class="tag-link-span">${tag}</a>
+               <a href="#" class="tag-link-span">${tag?html}</a>
             </span><#if tag_has_next> , </#if> 
          </#list>
       </span>
@@ -122,11 +107,11 @@
          </#if>
 
          <label>${msg("topic.form.topicTitle")}:</label>
-         <input type="text" value="<#if topic?has_content && topic.title?has_content>${topic.title}</#if>"
+         <input type="text" value="<#if topic?has_content && topic.title?has_content>${topic.title?html}</#if>"
                 name="title" id="${htmlid}-title" size="80" />
          <label>${msg("topic.form.topicText")}:</label>
-         <textarea rows="8" cols="80" name="content" id="${htmlid}-content"
-            ><#if topic?has_content && topic.content?has_content>${topic.content}</#if></textarea> 
+         <textarea rows="8" cols="80" name="content" id="${htmlid}-content" class="yuieditor"
+            ><#if topic?has_content && topic.content?has_content>${topic.content?html}</#if></textarea> 
          
          <!-- tags -->
          <#if topic?has_content>

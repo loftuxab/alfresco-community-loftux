@@ -66,7 +66,7 @@
       <#if comment.isUpdated><span class="nodeStatus">(${msg("comments.updated")})</span></#if>
    </div>
 
-   <div class="content">${comment.content}</div>
+   <div class="content yuieditor">${comment.content}</div>
 </div>
 
 <div class="commentFooter">
@@ -94,10 +94,10 @@
          <input type="hidden" name="htmlid" value="${htmlid}" />
          <input type="hidden" name="site" value="${site}" />
          <input type="hidden" name="container" value="${container}" />
-         <input type="hidden" name="itemTitle" value="${itemTitle}" />
+         <input type="hidden" name="itemTitle" value="${itemTitle?html}" />
          <input type="hidden" name="browseItemUrl" value="${url.context}/page/site/${site}/blog-postview?postId=${itemName}" />
          
-         <textarea id="${htmlid}-${commentRef}-editform-content" rows="8" cols="80" name="content">${comment.content}</textarea>
+         <textarea id="${htmlid}-${commentRef}-editform-content" rows="8" cols="80" name="content">${comment.content?html}</textarea>
          <div class="commentFormAction">
             <input type="submit" id="${htmlid}-${commentRef}-editform-ok-button"  value='${msg("editcomment.form.updateComment")}' />
             <input type="reset"  id="${htmlid}-${commentRef}-editform-cancel-button"  value="${msg('editcomment.form.cancel')}" />

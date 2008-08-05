@@ -49,6 +49,10 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "dom", "event", "history"], this.onComponentsLoaded, this);
       
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("onSetTopicListParams", this.onSetTopicListParams, this);
+      YAHOO.Bubbling.on("onStartIndexChanged", this.onStartIndexChanged, this);
+      
       return this;
    }
    
@@ -88,9 +92,12 @@
          
          tag: "",
          
-         viewmode: ""
+         viewmode: "",
+         
+         simpleView: false
       },
       
+      widgets: {},
       
       /**
        * Set multiple initialization options at once.
@@ -129,24 +136,17 @@
        */
       onReady: function DiscussionsTopicList_onReady()
       {
-         YAHOO.util.Event.addListener("simple-list-view", "click",
-            function simpleListViewClicked(e) {
-               var owner = YAHOO.Bubbling.fire('onSetTopicListParams', {viewmode: 'simple'});
-               return true;
-            }
-         );
-         YAHOO.util.Event.addListener("detailed-list-view", "click",
-            function detailedListViewClicked(e) {
-               var owner = YAHOO.Bubbling.fire('onSetTopicListParams', {viewmode: 'details'});
-               return true;
-            }
-         );
-       
-         // used by the filter, tag and view buttons to set options
-         YAHOO.Bubbling.on("onSetTopicListParams", this.onSetTopicListParams, this);
-         
-         // catch paginator events
-         YAHOO.Bubbling.on("onStartIndexChanged", this.onStartIndexChanged, this);
+         // Create new post button
+         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic,
+         {
+         });
+
+         // Simple view button
+         this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
+         {
+            type: "checkbox",
+            checked: this.options.simpleView
+         });
          
          // Hook action events
          Alfresco.util.registerDefaultActionHandler(this.id, "action-link-div", "div", this);
@@ -159,10 +159,25 @@
          
          // attach the listener to the already rendered list elements
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
+         
+         // tell the filters in what state the list initially loaded
+         YAHOO.Bubbling.fire('topicListParamsChanged', {
+            filter: this.options.filter,
+            tag: this.options.tag
+         });
       },
       
       
       // Action handlers
+
+      /**
+       * Action handler for the create topic button
+       */
+      onCreateTopic: function DiscussionsTopicList_onCreateTopic(e, p_obj)
+      {
+         Alfresco.util.blog.loadForumPostCreatePage(this.options.siteId, this.options.containerId, this.options.path);
+         Event.preventDefault(e);
+      },
 
       /**
        * Action handler for the view action
@@ -191,9 +206,30 @@
       /**
        * Handles the click on a tag
        */
-      onTagSelection: function Discussions_onTagSelected(htmlId, ownerId, param)
+      onTagSelection: function DiscussionsTopicList_onTagSelected(htmlId, ownerId, param)
       {
          YAHOO.Bubbling.fire('onSetTopicListParams', {tag : param});
+      },
+      
+      onSimpleView: function DiscussionsTopicList_onSimpleView(e, p_obj)
+      {
+         this.options.simpleView = !this.options.simpleView;
+         p_obj.set("checked", this.options.simpleView);
+
+         // PENDING: cleanup
+         if (this.options.simpleView)
+         {
+            this.options.viewmode = "simple";
+         }
+         else
+         {
+            this.options.viewmode = "details";
+         }
+         
+         YAHOO.Bubbling.fire('onSetTopicListParams', { "viewmode" : this.options.viewmode });
+         
+         //YAHOO.Bubbling.fire("doclistRefresh");
+         Event.preventDefault(e);
       },
       
       // Actions functionality
@@ -312,13 +348,19 @@
             var paginatorData = response.json.paginatorData;
             this._updatePaginator(paginatorData);
            
+            // update the filters
+            YAHOO.Bubbling.fire('topicListParamsChanged', {
+			   filter: this.options.filter,
+			   tag: this.options.tag
+			});
+           
             // update the internal position fields
             this.options.startIndex = paginatorData.startIndex;
             this.options.pageSize = paginatorData.pageSize;
             
             // update title
             var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
-            elem.innerHTML = response.json.listTitle;
+            elem.innerHTML = Alfresco.util.encodeHTML(response.json.listTitle);
             
             // update list
             var elem = YAHOO.util.Dom.get(this.id + "-topiclist");
