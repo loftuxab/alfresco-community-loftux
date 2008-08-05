@@ -113,7 +113,7 @@
          }, this, true);
          
          // Initial size
-         this.widgets.horizResize.resize(null, null, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
       },
    
       /**
