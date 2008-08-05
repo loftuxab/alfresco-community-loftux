@@ -36,12 +36,27 @@
    text-align: center;
 }
 
-/* DocList bar Buttons */
 
-.doclist div.inline
+/* DocList bar Buttons and Paginator */
+
+.doclist .doclist-bar .file-select
 {
-   display: inline;
+   float: left;
+   width: 15%;
 }
+
+.doclist .doclist-bar .paginator
+{
+   float: left;
+   text-align: center;
+   width: 80%;
+}
+
+.doclist .doclist-bar .yui-pg-current
+{
+   margin-right: 0;
+}
+
 
 /* DocList bar Select menu */
 
