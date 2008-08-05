@@ -140,11 +140,10 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         // at the WebScriptServlet.  If that is done, then a request context
         // is not created until this point.
         // In this case, we do not have a RendererContext instance.
-        //
         boolean handleBinding = false;
         
         RendererContext rendererContext = getRendererContext();
-        if(rendererContext == null)
+        if (rendererContext == null)
         {
             try
             {
@@ -165,28 +164,34 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
                     }
                 }
             }
-            catch(RequestContextException rce)
+            catch (RequestContextException rce)
             {
-                logger.debug("Unable to retrieve the RequestContext instance from the current request");
-                logger.debug(rce);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Unable to retrieve the RequestContext instance from the current request");
+                    logger.debug(rce);
+                }
             }
         }
         
         // manually handle binding?
-        if(handleBinding)
+        if (handleBinding)
         {
             bindRendererContext(rendererContext);
         }
         
-        // call through
-        super.executeScript(scriptReq, scriptRes, auth);
-
-        // manually handle binding?
-        if(handleBinding)
+        try
         {
-            unbindRendererContext();
+            // call through
+            super.executeScript(scriptReq, scriptRes, auth);
         }
-        
+        finally
+        {
+            // manually handle binding?
+            if (handleBinding)
+            {
+                unbindRendererContext();
+            }
+        }
     }
-    
 }

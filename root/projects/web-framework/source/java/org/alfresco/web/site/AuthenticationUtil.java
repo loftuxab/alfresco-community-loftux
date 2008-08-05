@@ -33,31 +33,25 @@ public class AuthenticationUtil
 {
 	public static void logout(RequestContext context)
 	{
-		if(context instanceof HttpRequestContext)
+		if (context instanceof HttpRequestContext)
 		{
 			HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-		
-            // remove their connector sessions
-            FrameworkHelper.removeConnectorSessions(context);
-            
-            // remove the user object from session
-	    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
-	    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_OBJECT);
-            
-            // reset theme
-            ThemeUtil.clearTheme(context, request);
+			
+            // invalidate the web session - will remove all session bound objects
+            // such as connector sessions, theme settings etc.
+			request.getSession().invalidate();
 		}
 	}
 
     public static void login(RequestContext context, String userId)
     {
-        if(context instanceof HttpRequestContext)
+        if (context instanceof HttpRequestContext)
         {
             HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-
+            
             // check whether there is already a user logged in
             String currentUserId = (String) request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
-            if(currentUserId != null)
+            if (currentUserId != null)
             {
                 // log out the current user
                 logout(context);
