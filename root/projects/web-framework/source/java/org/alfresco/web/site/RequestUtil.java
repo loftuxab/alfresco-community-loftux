@@ -43,7 +43,7 @@ import org.alfresco.web.site.exception.RequestContextException;
  */
 public class RequestUtil
 {
-    private static final String ATTR_REQUEST_CONTEXT = "requestContext";
+    public static final String ATTR_REQUEST_CONTEXT = "requestContext";
     
     /**
      * Returning the request context that is bound to the current request.
