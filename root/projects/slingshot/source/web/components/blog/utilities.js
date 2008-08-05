@@ -140,6 +140,13 @@ Alfresco.util.blog.blogPostViewPageUrl = function(site, container, path, postId)
                       "&postId=" + postId;
 }
 
+Alfresco.util.blog.loadBlogPostCreatePage = function(site, container, path)
+{
+   window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/blog-postedit" +
+                      "?container=" + container +
+                      "&path=" + path;
+}
+
 /**
  * Redirects to the blog edit page
  */
@@ -210,6 +217,13 @@ Alfresco.util.discussions.loadForumPostViewPage = function(site, container, path
                      "&path=" + path +
                      "&topicId=" + postId;
                      
+}
+
+Alfresco.util.blog.loadForumPostCreatePage = function(site, container, path)
+{
+   window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/discussions-createtopic" +
+                      "?container=" + container +
+                      "&path=" + path;
 }
 
 /**

@@ -355,6 +355,7 @@
             // fetch the div that contains the data for the post
             var divId = "reply-" + object.replyRef;
             Alfresco.util.dom.updateAndShowDiv(divId, response.json.reply);
+            Alfresco.util.registerDefaultActionHandler(this.id, 'reply-action-link', 'div', this);
             this._hideOpenForms();
                 
             Alfresco.util.PopupManager.displayMessage({text: this._msg("replies.msg.updated")});

@@ -158,8 +158,8 @@
                   for (var x = 0; x < oFullResponse.people.length; x++)
                   {
                      var personData = oFullResponse.people[x];
-                     var firstName = personData.firstName.toLowerCase();
-                     var lastName = personData.lastName.toLowerCase();
+                     var firstName = (personData.firstName != null) ? personData.firstName.toLowerCase() : "";
+                     var lastName = (personData.lastName != null) ? personData.lastName.toLowerCase() : "";
                      
                      // Determine if person matches search term
                      if (firstName.indexOf(lowerCaseTerm) != -1 ||
@@ -208,7 +208,7 @@
           */
          renderCellThumbnail = function InviteUsers_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var avatarUrl = Alfresco.constants.URL_CONTEXT + "/components/images/no-photo.png";
+            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
             if (oRecord.getData("avatar") != undefined)
             {
                var avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
@@ -243,9 +243,9 @@
 
             var title = (oRecord.getData("title") != undefined) ? oRecord.getData("title") : "";
             var company = (oRecord.getData("company") != undefined) ? oRecord.getData("company") : "";
-            desc = '<h3 class="itemname">' + name + '</a></h3>';
-            desc += '<div class="detail">' + title + '</div>';
-            desc += '<div class="detail">' + company + '</div>';
+            desc = '<h3 class="itemname">' + Alfresco.util.encodeHTML(name) + '</a></h3>';
+            desc += '<div class="detail">' + Alfresco.util.encodeHTML(title) + '</div>';
+            desc += '<div class="detail">' + Alfresco.util.encodeHTML(company) + '</div>';
             elCell.innerHTML = desc;
          };
          
@@ -271,7 +271,7 @@
             var button = new YAHOO.widget.Button(
                {
                    type: "button",
-                   label: "Add >>",
+                   label: me._msg("inviteusers.add") + " >>",
                    name: me.id + "-adduserbutton-" + id,
                    container: me.id + '-adduser-' + id,
                    onclick: { fn: me.addUserToInvites, obj: oRecord, scope: me }
@@ -333,7 +333,7 @@
          // fetch the firstname, lastname nad email
          var searchTermElem = YAHOO.util.Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
-          
+         searchTerm = Alfresco.util.encodeHTML(searchTerm);
          if (searchTerm.length < 3)
          {
             Alfresco.util.PopupManager.displayMessage({text: this._msg("inviteusers.mintextlength") });
@@ -368,8 +368,7 @@
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
          
-         // Display loading message
-         //YAHOO.widget.DataTable.MSG_EMPTY = "Searching term '" + searchTerm + "'"; // this._msg("message.loading");
+         // Don't display any message
          YAHOO.widget.DataTable.MSG_EMPTY = "";
          
          // empty results table

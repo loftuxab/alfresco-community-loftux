@@ -20,8 +20,8 @@
 			<input type="hidden" name="htmlid" value="${htmlid}" />
             <input type="hidden" name="site" value="${site}" />
             <input type="hidden" name="container" value="${container}" />
-            <input type="hidden" name="itemTitle" value="${itemTitle}" />
-            <input type="hidden" name="browseItemUrl" value="${page.url.context}/page/site/${site}/blog-postview?postId=${itemName}" />
+            <input type="hidden" name="itemTitle" value="${itemTitle?html}" />
+            <input type="hidden" name="browseItemUrl" value="${page.url.context}/page/site/${site}/blog-postview?postId=${itemName?html}" />
             
 			<textarea id="${htmlid}-createcomment-content" rows="8" cols="80" name="content"></textarea>
 			</div>

@@ -9,35 +9,23 @@
    padding-left: 1em;
 }
 
-.filter ul
-{
-   margin-left: 20px;
-   padding: 0.5em 0 1em;
-}
-
-.filter li
-{
-   padding: 2px 0;
-   list-style-type: none;
-}
-
 
 /*******************
  * WYSIWYG CONTENT *
 ********************/
-strong {
+.yuieditor strong {
   font-weight: bold;
 }
-em {
+.yuieditor em {
   font-style: italic; 
 }
-ul, ol {
+.yuieditor ul, .yuieditor ol {
   padding-left: 40px;
 }
-ul li {
+.yuieditor ul li {
   list-style-type: disc; 
 }
-ol li {
+.yuieditor ol li {
   list-style-type: decimal; 
 }
 
@@ -45,6 +33,28 @@ ol li {
 /************
  * LEFT NAV *
 *************/
+
+.filter ul
+{
+   padding: 0.5em 0 1em;
+}
+
+.filter li
+{
+   padding: 4px 0px 3px 20px;
+}
+
+.filter li.selected
+{
+   background-color: #d2e5f2;
+}
+
+.filter a:hover
+{
+   text-decoration: none;
+}
+
+/*
 .nav-label {
   font-family: Arial, sans-serif;
   font-weight: normal;
@@ -54,7 +64,7 @@ ol li {
 }
 .nav-label a {
   color: #333333;
-}
+}*/
 
 
 /**********

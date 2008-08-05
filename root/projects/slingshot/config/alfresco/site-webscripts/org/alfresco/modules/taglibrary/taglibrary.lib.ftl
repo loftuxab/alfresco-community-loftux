@@ -7,7 +7,7 @@
 -->
 <#macro renderTagInputs htmlid tags tagInputName>
    <#list tags as tag>
-      <input type="hidden" name="${tagInputName}[]" value="${tag}" />
+      <input type="hidden" name="${tagInputName}[]" value="${tag?html}" />
    </#list>
 </#macro>
 
@@ -19,7 +19,7 @@
 -->
 <#macro toJSONArray arr>
 [
-   <#list arr as x>"${x?j_string}"<#if x_has_next>, </#if></#list>
+   <#list arr as x>"${x?html?j_string}"<#if x_has_next>, </#if></#list>
 ]
 </#macro>
 
@@ -48,8 +48,8 @@
       <div class="top_taglist tags_box">
          <ul id="${htmlid}-current-tags">
          <#list tags as tag>
-            <li id="${htmlid}-onRemoveTag-${tag}">
-               <a href="#" class="taglibrary-action">${tag}
+            <li id="${htmlid}-onRemoveTag-${tag?html}">
+               <a href="#" class="taglibrary-action">${tag?html}
                   <span class="close">&nbsp;
                      <!-- <img src="/modules/taglibrary/images/icon_close.gif" alt="x" /> -->
                   </span>

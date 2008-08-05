@@ -49,6 +49,10 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "dom", "event", "history"], this.onComponentsLoaded, this);
       
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("onSetBlogPostListParams", this.onSetPostListParams, this);
+      YAHOO.Bubbling.on("onStartIndexChanged", this.onStartIndexChanged, this);
+      
       return this;
    }
    
@@ -116,8 +120,12 @@
           * If set, only posts before this date are displayed.
           * Only takes effect if the filter is "" or all
           */
-         toDate: ""
+         toDate: "",
+         
+         simpleView: false,
       },
+      
+      widgets : {},
       
       /**
        * Set multiple initialization options at once.
@@ -156,33 +164,22 @@
        */
       onReady: function BlogPostList_onReady()
       {
-         // simple view link
-         YAHOO.util.Event.addListener("simple-list-view", "click",
-            function simpleListViewClicked(e) {
-               var owner = YAHOO.Bubbling.fire('onSetBlogPostListParams', {viewmode: 'simple'});
-               return true;
-            }
-         );
-         // detailed view link
-         YAHOO.util.Event.addListener("detailed-list-view", "click",
-            function detailedListViewClicked(e) {
-               var owner = YAHOO.Bubbling.fire('onSetBlogPostListParams', {viewmode: 'details'});
-               return true;
-            }
-         );
-         // blog configuration
-         YAHOO.util.Event.addListener(this.id + "-config-blog-link", "click",
-            function configBlogButtonClicked(e) {
-               var owner = YAHOO.Bubbling.fire('onConfigureBlog', {});
-               return true;
-            }
-         );
+         // Create new post button
+         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createPost-button", this.onCreatePost,
+         {
+         });
 
-         // used by the filter component, tag component and view buttons to set options
-         YAHOO.Bubbling.on("onSetBlogPostListParams", this.onSetPostListParams, this);
+         // configure blog button
+         this.widgets.configureBlog =  Alfresco.util.createYUIButton(this, "configureBlog-button", this.onConfigureBlog,
+         {
+         });
 
-         // catch paginator events
-         YAHOO.Bubbling.on("onStartIndexChanged", this.onStartIndexChanged, this);
+         // Simple view button
+         this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
+         {
+            type: "checkbox",
+            checked: this.options.simpleView
+         });
          
          // Hook action events
          Alfresco.util.registerDefaultActionHandler(this.id, "action-link-div", "div", this);
@@ -194,10 +191,54 @@
          
          // attach a listener to the already rendered list elements
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
+         
+         // update the filters with the state the list got loaded in
+         YAHOO.Bubbling.fire('postListParamsChanged', {
+            filter: this.options.filter,
+            fromDate: this.options.fromDate,
+            toDate: this.options.toDate,
+            tag: this.options.tag
+         });
       },
       
 
       // Actions
+      
+      /**
+       * Action handler for the create post button
+       */
+      onCreatePost: function BlogPostList_onCreatePost(e, p_obj)
+      {
+         Alfresco.util.blog.loadBlogPostCreatePage(this.options.siteId, this.options.containerId, this.options.path);
+         Event.preventDefault(e);
+      },
+      
+      onConfigureBlog: function BlogPostList_onSimpleView(e, p_obj)
+      {
+         YAHOO.Bubbling.fire('onConfigureBlog', {});
+         Event.preventDefault(e);
+      },      
+      
+      onSimpleView: function BlogPostList_onSimpleView(e, p_obj)
+      {
+         this.options.simpleView = !this.options.simpleView;
+         p_obj.set("checked", this.options.simpleView);
+
+         // PENDING: cleanup
+         if (this.options.simpleView)
+         {
+            this.options.viewmode = "simple";
+         }
+         else
+         {
+            this.options.viewmode = "details";
+         }
+         
+         YAHOO.Bubbling.fire('onSetBlogPostListParams', { "viewmode" : this.options.viewmode });
+         
+         //YAHOO.Bubbling.fire("doclistRefresh");
+         Event.preventDefault(e);
+      },
       
       /**
        * Action handler for the view action
@@ -503,13 +544,21 @@
             var paginatorData = response.json.paginatorData;
             YAHOO.Bubbling.fire('onPagingDataChanged', { data: paginatorData });
      
+            // update the filters
+            YAHOO.Bubbling.fire('postListParamsChanged', {
+			   filter: this.options.filter,
+			   fromDate: this.options.fromDate,
+			   toDate: this.options.toDate,
+			   tag: this.options.tag
+			});
+                        
             // update the internal position fields
             this.options.startIndex = paginatorData.startIndex;
             this.options.pageSize = paginatorData.pageSize;
              
             // update title
             var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
-            elem.innerHTML = response.json.listTitle;
+            elem.innerHTML = Alfresco.util.encodeHTML(response.json.listTitle);
             
             // update list
             var elem = YAHOO.util.Dom.get(this.id + "-postlist");

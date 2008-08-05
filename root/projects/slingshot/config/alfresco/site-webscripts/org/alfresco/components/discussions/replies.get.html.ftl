@@ -12,6 +12,5 @@
       ${messages}
    );
 //]]></script>
- 
 
 <@repliesLib.repliesHTML htmlid=args.htmlid parentPostRef=topicRef replies=replies/>

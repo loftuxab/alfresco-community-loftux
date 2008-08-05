@@ -20,11 +20,6 @@
       <span>
       (
       <a href="#" id="${args.htmlid}-toggleSearchScope-${uniqueid}" class="search-scope-toggle">
-         <#if searchAll>
-         Search site only
-         <#else>
-         Search All Sites
-         </#if>
       </a>
       )
       </span>
@@ -37,7 +32,4 @@
 	
 	<#-- this div contains the search results -->
 	<div id="${args.htmlid}-results" class="results"></div>
-	<#--
-   <@resultbar uniqueid="second" cssclass="resultbar gobottom" />
-   -->
 </div>

@@ -200,9 +200,9 @@
             var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName")
             var email = oRecord.getData("email");
             var desc = "";
-            desc = '<h3 class="itemname">' + name + '</a></h3>';
+            desc = '<h3 class="itemname">' + Alfresco.util.encodeHTML(name) + '</a></h3>';
             desc += '<div class="detail">';
-            desc += email;
+            desc += Alfresco.util.encodeHTML(email);
             desc += '</div>';
             elCell.innerHTML = desc;
          };

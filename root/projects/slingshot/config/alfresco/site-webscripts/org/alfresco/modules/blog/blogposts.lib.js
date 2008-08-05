@@ -57,7 +57,7 @@ function getPostsRequestUrlWithParams(site, container, path, filter, tag, fromDa
     }
     
     // add the contentFormat
-    url = addParamToUrl(url, "contentFormat", "textDigest");
+    url = addParamToUrl(url, "contentLength", "512");
 
     // pagination
     url = addPaginationParamsToUrl(url, paginationData);

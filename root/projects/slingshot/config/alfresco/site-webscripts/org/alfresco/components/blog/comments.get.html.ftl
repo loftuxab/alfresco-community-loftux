@@ -7,8 +7,8 @@
    {
       siteId: "${site}",
       containerId: "${container}",
-      itemTitle: "${post.title}",
-      itemName: "${post.name}",
+      itemTitle: "${post.title?html?j_string}",
+      itemName: "${post.name?html?j_string}",
       topicRef: "${post.nodeRef}"
    }).setMessages(
       ${messages}
