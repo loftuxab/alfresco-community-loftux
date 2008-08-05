@@ -1,8 +1,8 @@
 <#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RssFeed("${args.htmlid}").setGUID(
+   new Alfresco.RssFeed("${args.htmlid}").setComponentId(
       "${instance.object.id}"
-   );
+   ).setFeedURL("${uri}");
 //]]></script>
 <div class="dashlet">
    <div class="title">${title!""}</div>
