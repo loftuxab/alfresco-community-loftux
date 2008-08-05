@@ -29,14 +29,14 @@ import java.io.Serializable;
 import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
- * Class to encapsulate a version number string.
+ * Immutable class to encapsulate a version number string.
  * 
  * A valid version number string can be made up of any number of numberical parts 
  * all delimited by '.'.
  * 
  * @author Roy Wetherall
  */
-public class VersionNumber implements Comparable<VersionNumber>, Serializable
+public final class VersionNumber implements Comparable<VersionNumber>, Serializable
 {
     private static final long serialVersionUID = -1570247769786810251L;
 
@@ -49,7 +49,7 @@ public class VersionNumber implements Comparable<VersionNumber>, Serializable
     private static final String DELIMITER = "\\.";
     
     /** Version parts */
-    private int[] parts;
+    private final int[] parts;
 
     /**
      * Constructror, expects a valid version string.
@@ -92,10 +92,8 @@ public class VersionNumber implements Comparable<VersionNumber>, Serializable
      */
     public int[] getParts()
     {
-        return this.parts;
+        return this.parts.clone();
     }
-    
-    
     
     /**
      * Compares the passed version to this.  Determines whether they are equal, greater or less than this version.

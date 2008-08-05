@@ -25,6 +25,11 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -34,9 +39,11 @@ import java.io.IOException;
  */
 public class PresentationContainer extends AbstractRuntimeContainer
 {
+    private static final Log logger = LogFactory.getLog(PresentationContainer.class);
+    
 	/* (non-Javadoc)
 	 * @see org.alfresco.web.scripts.RuntimeContainer#executeScript(org.alfresco.web.scripts.WebScriptRequest,
-    *      org.alfresco.web.scripts.WebScriptResponse, org.alfresco.web.scripts.Authenticator)
+     *      org.alfresco.web.scripts.WebScriptResponse, org.alfresco.web.scripts.Authenticator)
 	 */
     public void executeScript(WebScriptRequest scriptReq, WebScriptResponse scriptRes, Authenticator auth)
         throws IOException
@@ -51,18 +58,38 @@ public class PresentationContainer extends AbstractRuntimeContainer
      */
     public ServerModel getDescription()
     {
-        return new PresentationServerModel();
+        Properties props = null;
+        URL url = this.getClass().getClassLoader().getResource("version.properties");
+        if (url != null)
+        {
+            try
+            {
+                props = new Properties();
+                props.load(url.openStream());
+            }
+            catch (IOException err)
+            {
+                logger.warn("Failed to load version properties: " + err.getMessage(), err);
+            }
+        }
+        return new PresentationServerModel(props);
     }
     
     /**
      * Presentation Tier Model
      *
-     * TODO: Implement when versioning meta-data is applied to all .jars
-	  *
      * @author davidc
      */
     private class PresentationServerModel implements ServerModel
     {
+        private Properties props = null;
+        private String version = null;
+        
+        public PresentationServerModel(Properties props)
+        {
+            this.props = props;
+        }
+        
         public String getContainerName()
         {
             return getName();
@@ -70,42 +97,95 @@ public class PresentationContainer extends AbstractRuntimeContainer
 
         public String getEdition()
         {
-            return UNKNOWN;
+            return (props != null ? props.getProperty("version.edition") : UNKNOWN);
         }
 
         public int getSchema()
         {
-            return -1;
+            return (props != null ? Integer.parseInt(props.getProperty("version.schema")) : -1);
         }
 
         public String getVersion()
         {
-            return UNKNOWN;
+            if (this.version == null)
+            {
+                if (props != null)
+                {
+                    StringBuilder version = new StringBuilder(getVersionMajor());
+                    version.append(".");
+                    version.append(getVersionMinor());
+                    version.append(".");
+                    version.append(getVersionRevision());
+                    
+                    String label = getVersionLabel();
+                    String build = getVersionBuild();
+                    
+                    boolean hasLabel = (label != null && label.length() > 0);
+                    boolean hasBuild = (build != null && build.length() > 0);
+                    
+                    // add opening bracket if either a label or build number is present
+                    if (hasLabel || hasBuild)
+                    {
+                       version.append(" (");
+                    }
+                    
+                    // add label if present
+                    if (hasLabel)
+                    {
+                       version.append(label);
+                    }
+                    
+                    // add build number is present
+                    if (hasBuild)
+                    {
+                       // if there is also a label we need a separating space
+                       if (hasLabel)
+                       {
+                          version.append(" ");
+                       }
+                       
+                       version.append(build);
+                    }
+                    
+                    // add closing bracket if either a label or build number is present
+                    if (hasLabel || hasBuild)
+                    {
+                       version.append(")");
+                    }
+                    
+                    this.version = version.toString();
+                }
+                else
+                {
+                    this.version = UNKNOWN;
+                }
+            }
+            return this.version;
         }
 
         public String getVersionBuild()
         {
-            return UNKNOWN;
+            return (props != null ? props.getProperty("version.build") : UNKNOWN);
         }
 
         public String getVersionLabel()
         {
-            return UNKNOWN;
+            return (props != null ? props.getProperty("version.label") : UNKNOWN);
         }
 
         public String getVersionMajor()
         {
-            return UNKNOWN;
+            return (props != null ? props.getProperty("version.major") : UNKNOWN);
         }
 
         public String getVersionMinor()
         {
-            return UNKNOWN;
+            return (props != null ? props.getProperty("version.minor") : UNKNOWN);
         }
 
         public String getVersionRevision()
         {
-            return UNKNOWN;
+            return (props != null ? props.getProperty("version.revision") : UNKNOWN);
         }
         
         private final static String UNKNOWN = "<unknown>"; 
