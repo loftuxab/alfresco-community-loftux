@@ -25,9 +25,15 @@
 
   	Alfresco.RssFeed.prototype =
   	{  
-  	   setGUID: function(guid)
+  	   setComponentId: function(componentId)
   	   {
-  	      this.guid = guid;
+  	      this.componentId = componentId;
+  	      return this;
+  	   },
+  	   
+  	   setFeedURL: function(feedURL)
+  	   {
+  	      this.feedURL = feedURL;
   	      return this;
   	   },
 		
@@ -56,7 +62,7 @@
 		
 		onConfigFeedClick: function(e)
 		{
-		   var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config/" + encodeURIComponent(this.guid);
+		   var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config/" + encodeURIComponent(this.componentId);
          
 		   if (!this.configDialog)
          {
@@ -81,6 +87,12 @@
                   {
                      form.addValidation(this.configDialog.id + "-url", Alfresco.forms.validation.mandatory, null, "keyup");
                      form.setShowSubmitStateDynamically(true, false);
+                     
+                     var elem = YAHOO.util.Dom.get(this.configDialog.id + "-url");
+                     if (elem)
+                     {
+                        elem.value = this.feedURL;
+                     }
                   },
                   scope: this
                }

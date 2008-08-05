@@ -1,8 +1,13 @@
 <#macro renderItem item>
-<h4><a href="${item.link}">${item.title}</a></h4>
-<div>${item.description}</div>
-<#if item.attachment??>
-<div><img src="${url.context}/images/components/generic-file-32.png"/><a href="${item.attachment.url}">${item.attachment.name}</a></div>
+<div class="headline">
+<#if item.image??>
+<img align="left" src="${item.image}" alt="" style="padding-right:10px"/>
 </#if>
-<br />
+<h4><a href="${item.link}">${item.title}</a></h4>
+<p>${item.description}</p>
+<#if item.attachment??>
+<div><img src="${url.context}/images/filetypes32/${item.attachment.type}.gif"/><a href="${item.attachment.url}">${item.attachment.name}</a></div>
+</#if>
+<br clear="all"/>
+</div>
 </#macro>
