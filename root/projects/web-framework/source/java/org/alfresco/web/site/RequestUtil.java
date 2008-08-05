@@ -43,6 +43,7 @@ import org.alfresco.web.site.exception.RequestContextException;
  */
 public class RequestUtil
 {
+    // NOTE: this is public as it is accessed by the site root JSP page
     public static final String ATTR_REQUEST_CONTEXT = "requestContext";
     
     /**
