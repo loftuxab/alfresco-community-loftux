@@ -356,10 +356,7 @@
          this.dialog.render(document.body);
          
          // OK button
-         this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", null,
-         {
-            type: "submit"
-         });
+         this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", this.onSubmit);
 
          // Cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
@@ -395,6 +392,18 @@
          this.form.init();
 
          this._showDialog();
+      },
+
+      /**
+       * Submit button event handler
+       *
+       * @method onSubmit
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onSubmit: function AmSD_onSubmit(e, p_obj)
+      {
+         Dom.get(this.id + "-form").submit();
       },
 
       /**

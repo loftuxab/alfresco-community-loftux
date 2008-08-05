@@ -8,7 +8,7 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first">${msg("label.name")}</div>
-            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" tabindex="1"/></div>
+            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" tabindex="1"/>&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-shortName">${msg("label.shortName")}</label></div>
@@ -37,7 +37,7 @@
          </div>
          <div class="bdft">
             <input type="submit" id="${args.htmlid}-ok-button" value="${msg("button.ok")}" tabindex="6"/>
-            <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" tabindex="7"/>
+            <input type="button" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" tabindex="7"/>
          </div>
       </form>
    </div>

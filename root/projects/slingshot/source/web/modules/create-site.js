@@ -183,6 +183,9 @@
          // Configure the forms runtime
          var createSiteForm = new Alfresco.forms.Form(this.id + "-form");
 
+         // Title is mandatory
+         createSiteForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+
          // Shortname is mandatory
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
          // and can NOT contain whitespace characters

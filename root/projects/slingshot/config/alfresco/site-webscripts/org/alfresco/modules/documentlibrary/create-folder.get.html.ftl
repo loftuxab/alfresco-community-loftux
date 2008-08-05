@@ -18,7 +18,7 @@
             <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3" cols="20" tabindex="3" ></textarea></div>
          </div>
          <div class="bdft">
-            <input type="submit" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="4" />
+            <input type="button" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="4" />
             <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="5" />
          </div>
       </form>
