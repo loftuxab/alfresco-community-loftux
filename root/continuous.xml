@@ -981,6 +981,8 @@
             file="${dir.project.deployment.dist}/${file.name.jar.deployment}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.webclient.dist}/${file.name.jar.webclient}" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
+            file="${dir.project.webscriptframework.dist}/${file.name.jar.webscriptframework}" />
 
       <!-- Deployment Libraries -->
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/deployment"/>
