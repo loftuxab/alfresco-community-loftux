@@ -147,7 +147,9 @@ public class LDAPService implements ApplicationContextAware
         }
         catch(Exception ex)
         {
-            ex.printStackTrace();
+            // No big deal if we throw here, just means that we didn't
+            // find the user, so return null
+            //ex.printStackTrace();
         }
         
         return user;

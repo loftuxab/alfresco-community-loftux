@@ -50,7 +50,7 @@
 		
 		// we only handle enterprise invitation types for the moment
 		String invitationType = nullAssert(request.getParameter("invitationType"));
-		if("enterprise".equals(invitationType))
+		if("enterprise".equals(invitationType) || "employee".equals(invitationType))
 		{
 			// build date objects
 			Date subscriptionStartDate = null;

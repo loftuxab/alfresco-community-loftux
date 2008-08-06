@@ -46,7 +46,16 @@
 		if(!available)
 		{
 			// redirect to user-invitation with a message
-			request.setAttribute("user-invitation-message", "The user id '" + userId + "' is already in use");
+			request.setAttribute("user-invitation-message", "The user id '" + userId + "' is already in use.  Please choose a new user id.");
+			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
+			return;
+		}
+		
+		// check to see if this user id is an email address
+		if(userId.indexOf("@") > -1)
+		{
+			// redirect to user-invitation with a message
+			request.setAttribute("user-invitation-message", "Please select a user name that is not an email address.");
 			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
 			return;
 		}
@@ -66,6 +75,16 @@
 			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
 			return;
 		}
+		
+		// see if the password is long enough
+		if(password.length() < 6)
+		{
+			// redirect to user-invitation with a message
+			request.setAttribute("user-invitation-message", "Your password must contain at least six characters.");
+			request.getRequestDispatcher("/components/extranet/invitation-wizard/user-invitation.jsp").include(request, response);
+			return;
+		}
+		
 		
 		// check to see if passwords match
 		if(!password.equals(passwordVerify))

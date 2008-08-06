@@ -391,6 +391,18 @@ public class InvitationService
                     this.databaseService.addUserToGroup(userId, "customers");                
                 }
                 
+                // if we're processing an employee invitation
+                if("employee".equals(invitedUser.getInvitationType()))
+                {
+                    // just give them everything
+                    
+                    // add the user to the "enterprise" group
+                    this.databaseService.addUserToGroup(userId, "enterprise");
+                    
+                    // add the user to the "customers" group
+                    this.databaseService.addUserToGroup(userId, "customers");                                    
+                }
+                
                 // TODO: Create and add users to company groups
 
                 
@@ -452,6 +464,11 @@ public class InvitationService
     public DatabaseInvitedUser getInvitedUserFromHash(String hash)
     {
         return this.databaseService.getInvitedUserFromHash(hash);
+    }
+    
+    public void updateInvitedUser(DatabaseInvitedUser invitedUser)
+    {
+        this.databaseService.updateInvitedUser(invitedUser);
     }
     
 

@@ -27,9 +27,6 @@ package org.alfresco.extranet.mail;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import org.alfresco.extranet.ApplicationProperties;
@@ -39,9 +36,8 @@ import org.alfresco.tools.URLUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.mail.javamail.MimeMessageHelper;
 
 /**
  * The Class MailService.
@@ -145,6 +141,81 @@ public class MailService implements ApplicationContextAware
             ex.printStackTrace();
         }
         
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        
+        try
+        {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+            helper.setTo(invitedUser.getEmail());
+            helper.setFrom(adminEmailAddress);
+            helper.setSubject("An invitation to Alfresco Network");
+    
+            // do variable substitution
+            String body = buffer.toString();
+            body = fullReplace(body, "${user.firstName}", invitedUser.getFirstName());
+            body = fullReplace(body, "${user.middleName}", invitedUser.getMiddleName());
+            body = fullReplace(body, "${user.lastName}", invitedUser.getLastName());
+            body = fullReplace(body, "${user.companyId}", invitedUser.getCompanyId());
+            body = fullReplace(body, "${user.expirationDate}", invitedUser.getExpirationDate().toString());
+            body = fullReplace(body, "${user.hash}", invitedUser.getHash());
+            body = fullReplace(body, "${user.userId}", invitedUser.getUserId());
+            body = fullReplace(body, "${user.whdUserId}", invitedUser.getWebHelpdeskUserId());
+            
+            // dates
+            body = fullReplace(body, "${user.expirationDate}", formatDate(invitedUser.getExpirationDate()));
+            body = fullReplace(body, "${user.subscriptionStart}", formatDate(invitedUser.getSubscriptionStart()));
+            body = fullReplace(body, "${user.subscriptionEnd}", formatDate(invitedUser.getSubscriptionEnd()));
+            
+            // webapp
+            body = fullReplace(body, "${webapp.url}", webappUrl);
+    
+            // set
+            helper.setText(body, true);
+            
+            // send
+            System.out.println("Sending invite email to: " + invitedUser.getEmail());
+            mailSender.send(mimeMessage);
+        }
+        catch(Exception ex)
+        {
+            System.out.println(" -> ERROR SENDING EMAIL");
+            ex.printStackTrace();
+        }
+        System.out.println("Success!");        
+    }
+
+    /**
+     * Invite user
+     * This is the original method, saved for posterity
+     * 
+     * @param invitedUser the invited user
+     * @param bodyUri the uri from which to load the body
+     */
+    /*
+    private void inviteUser2(final DatabaseInvitedUser invitedUser, String bodyUri)
+    {
+        // pull out application properties
+        ApplicationProperties props = (ApplicationProperties) this.applicationContext.getBean("application.properties");
+        final String hostPort = props.getHostPort();
+        final String webapp = props.getWebapp();
+        final String webappUrl = hostPort + webapp;
+        
+        // build the email body
+        final StringBuffer buffer = new StringBuffer();
+        try
+        {
+            // load the email from the url connection
+            String bodyString = URLUtil.get(bodyUri);
+            if(bodyString != null)
+            {
+                buffer.append(bodyString);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
         // preparator
         MimeMessagePreparator preparator = new MimeMessagePreparator() 
         {
@@ -175,7 +246,7 @@ public class MailService implements ApplicationContextAware
                 // set email text
                 mimeMessage.setText(body);
             }
-        };
+        };       
         
         // send the mail
         try
@@ -188,6 +259,7 @@ public class MailService implements ApplicationContextAware
             ex.printStackTrace();
         }
     }
+    */
     
     /**
      * Full replace.
@@ -266,6 +338,80 @@ public class MailService implements ApplicationContextAware
             ex.printStackTrace();
         }
         
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        
+        try
+        {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+            helper.setTo(user.getEmail());
+            helper.setFrom(adminEmailAddress);
+            helper.setSubject("Your login information for Alfresco Network");
+    
+            // do variable substitution
+            String body = buffer.toString();
+            body = fullReplace(body, "${user.firstName}", user.getFirstName());
+            body = fullReplace(body, "${user.middleName}", user.getMiddleName());
+            body = fullReplace(body, "${user.lastName}", user.getLastName());
+            body = fullReplace(body, "${user.email}", user.getEmail());
+            body = fullReplace(body, "${user.userId}", user.getUserId());
+            body = fullReplace(body, "${user.id}", user.getUserId());
+            body = fullReplace(body, "${user.description}", user.getDescription());
+            body = fullReplace(body, "${user.level}", user.getLevel());
+                            
+            // dates
+            body = fullReplace(body, "${user.subscriptionStart}", formatDate(user.getSubscriptionStart()));
+            body = fullReplace(body, "${user.subscriptionEnd}", formatDate(user.getSubscriptionEnd()));
+            
+            // webapp
+            body = fullReplace(body, "${webapp.url}", webappUrl);
+            
+            // password
+            body = fullReplace(body, "${password}", newPassword);
+    
+            // set
+            helper.setText(body, true);
+            
+            // send
+            System.out.println("Sending reset password email to: " + user.getEmail());
+            mailSender.send(mimeMessage);
+        }
+        catch(Exception ex)
+        {
+            System.out.println(" -> ERROR SENDING EMAIL");
+            ex.printStackTrace();
+        }
+        System.out.println("Success!");        
+    }
+
+    
+    
+    
+    /*
+    // original method
+    public void resetUserPassword(final DatabaseUser user, final String newPassword, String bodyUri)
+    {
+        // pull out application properties
+        ApplicationProperties props = (ApplicationProperties) this.applicationContext.getBean("application.properties");
+        final String hostPort = props.getHostPort();
+        final String webapp = props.getWebapp();
+        final String webappUrl = hostPort + webapp;
+        
+        // build the email body
+        final StringBuffer buffer = new StringBuffer();
+        try
+        {
+            // load the email from the url connection
+            String bodyString = URLUtil.get(bodyUri);
+            if(bodyString != null)
+            {
+                buffer.append(bodyString);
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        
         // preparator
         MimeMessagePreparator preparator = new MimeMessagePreparator() 
         {
@@ -313,5 +459,6 @@ public class MailService implements ApplicationContextAware
             ex.printStackTrace();
         }
     }
+    */
     
 }

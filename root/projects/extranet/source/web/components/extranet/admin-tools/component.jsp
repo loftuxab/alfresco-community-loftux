@@ -18,9 +18,11 @@
 %>
 <a href="?p=admin-tools&dispatchTo=admin-entities">Entities</a>
 <br/>
-<a href="?p=admin-tools&dispatchTo=admin-bulk-invite-user">Bulk Invite User</a>
+<a href="?p=admin-tools&dispatchTo=admin-bulk-invite-user">Bulk Invite User From File</a>
 <br/>
 <a href="?p=admin-tools&dispatchTo=admin-invite-user">Invite User</a>
+<br/>
+<a href="?p=admin-tools&dispatchTo=admin-act-invite-users">Invite ACT Users</a>
 <br/>
 <a href="?p=admin-tools&dispatchTo=admin-show-invited-users">Show Invited Users</a>
 <br/>
