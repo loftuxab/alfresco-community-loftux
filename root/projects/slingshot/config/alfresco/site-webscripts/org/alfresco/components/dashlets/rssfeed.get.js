@@ -5,7 +5,7 @@ if (!uri)
 {
    // Use the default
    var conf = new XML(config.script);
-   uri = conf.feed[0];
+   uri = conf.feed[0].toString();
 }
 
 var connector = remote.connect("http");
