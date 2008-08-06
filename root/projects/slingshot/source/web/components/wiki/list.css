@@ -2,6 +2,7 @@
 {
    margin: 0.5em;
    border: 1px solid white;
+   padding: 8px;
 }
 
 .wikipage .pageTitle
@@ -19,6 +20,8 @@
    font-weight: normal;
    font-size: 11pt;
    line-height: 150%;
+   padding-top: 10px;
+   padding-bottom: 10px;
 }
 
 .spacer {
@@ -48,8 +51,8 @@
 }
 
 .wikiPageSelected {
-/*   background-color: #FFFFCC; */
-   border: 1px solid black; 
+   background-color: #FFFFCC; 
+   border: 2px solid black; 
 }
 
 .actionPanel {
@@ -79,4 +82,13 @@
 {
    background-image: url(../images/details-16.png);
 }
+
+.tagDetails
+{
+   padding-left: 2.5em; 
+   background: url(../images/tag.png) no-repeat 10% 50%;
+   font-family: arial;
+   color: #000000;
+}
+
 
