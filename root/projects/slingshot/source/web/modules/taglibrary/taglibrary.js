@@ -147,6 +147,25 @@
          // load link for popular tags
          YAHOO.util.Event.addListener(this.id + "-load-popular-tags-link", "click", this.onPopularTagsLinkClicked, this, true);
          
+         // register the "enter" event on the tag text field to add the tag (otherwise
+         // the form gets submitted
+         var zinput = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+         var me = this;
+         new YAHOO.util.KeyListener(zinput, 
+         {
+            keys:13
+         }, 
+         {
+            fn: function(eventName, event, obj) {
+               me.onAddTagButtonClick();
+               YAHOO.util.Event.stopEvent(event[1]);
+               return false;
+            },
+            scope:this,
+            correctScope:true
+         }, 
+         "keypress").enable();
+         
          // button to add tag to list
          var addTagButton = new YAHOO.widget.Button(this.id + "-add-tag-button", {type: "button"});
          addTagButton.subscribe("click", this.onAddTagButtonClick, this, true);
@@ -255,7 +274,8 @@
          // add all tags to the ui
          /*
          <li id="${htmlid}-onAddTag-Car">
-        	<a href="#" class="taglibrary-action">Car
+        	<a href="#" class="taglibrary-action">
+        	    <span>Car</span>
         		<span class="close">
         			<img src="icon_close.gif" alt="x" />
          		</span>
@@ -268,8 +288,8 @@
             var elem = document.createElement('li');
             var elemId = this.id + "-onAddTag-" + tags[x].name;
             elem.setAttribute('id', elemId);
-            elem.innerHTML = '<a href="#" class="taglibrary-action">' + tags[x].name +
-        		'<span class="close">&nbsp;</span></a>'; // <img src="icon_close.gif" alt="x" />
+            elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tags[x].name +
+        		' </span> <span class="add">&nbsp;</span> </a>'; // <img src="icon_close.gif" alt="x" />
             popularTagsElem.appendChild(elem);
          }
       },
@@ -336,7 +356,7 @@
          // add the tag to the UI
          /*
          <li id="${htmlid}-onRemoveTag-${tag}">
-        	<a href="#" class="taglibrary-action">${tag}
+        	<a href="#" class="taglibrary-action"><span>${tag}</span>
         		<span class="close">
         			<img src="/modules/taglibrary/images/icon_add.gif" alt="x" />
         		</span>
@@ -347,8 +367,8 @@
          var elem = document.createElement('li');
          var elemId = this.id + '-onRemoveTag-' + tagName;
          elem.setAttribute('id', elemId);
-         elem.innerHTML = '<a href="#" class="taglibrary-action">' + tagName +
-                          '    <span class="close">&nbsp;</span></a>'; // <img src="/modules/taglibrary/images/icon_add.gif" alt="x" />
+         elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tagName +
+                          ' </span> <span class="remove">&nbsp;</span> </a>'; // <img src="/modules/taglibrary/images/icon_add.gif" alt="x" />
          currentTagsElem.appendChild(elem);
 
          // inform interested parties about change

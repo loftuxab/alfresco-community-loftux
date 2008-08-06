@@ -13,7 +13,7 @@
    <div class="byemailbody">  
       <table class="byemailuser">
          <tr>
-            <td class="elabel">${msg("addemail.firstname")}:</td>
+            <td class="elabel"><label for="${args.htmlid}-firstname">${msg("addemail.firstname")}:</label></td>
             <td class="einput"><input type="text" id="${args.htmlid}-firstname" /></td>
             <td class="byemailadd" colspan="3">
                <span id="${args.htmlid}-add-email-button" class="yui-button"> 
@@ -24,11 +24,11 @@
             </td>
          </tr>
          <tr>
-            <td class="elabel">${msg("addemail.lastname")}:</td>
+            <td class="elabel"><label for="${args.htmlid}-lastname">${msg("addemail.lastname")}:</label></td>
             <td class="einput"><input type="text" id="${args.htmlid}-lastname" /></td>
          </tr>
          <tr>
-            <td class="elabel">${msg("addemail.email")}:</td>
+            <td class="elabel"><label for="${args.htmlid}-email">${msg("addemail.email")}:</label></td>
             <td class="einput"><input type="text" id="${args.htmlid}-email" /></td>
          </tr>
       </table>

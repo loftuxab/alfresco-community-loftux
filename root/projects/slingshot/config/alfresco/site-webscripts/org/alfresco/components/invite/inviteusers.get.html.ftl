@@ -13,8 +13,8 @@
    <div class="invitelist">
       
       <div id="${args.htmlid}-invitelistBar" class="invitelist-bar">
-         <div class="label">${msg("inviteusers.search.label")}</div>
-         <div class="sinput"><input type="text" class="sinput" id="${args.htmlid}-search-text" value=""/></div>
+         <div class="label"><label for="${args.htmlid}-search-text">${msg("inviteusers.search.label")}</label></div>
+         <div class="sinput"><input type="text" class="sinput" id="${args.htmlid}-search-text" value="" /></div>
          <div class="bsub">
             <span id="${args.htmlid}-search-button" class="yui-button"> 
                <span class="first-child"> 

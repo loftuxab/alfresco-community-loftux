@@ -122,7 +122,7 @@
           */
          toDate: "",
          
-         simpleView: false,
+         simpleView: false
       },
       
       widgets : {},

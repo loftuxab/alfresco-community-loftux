@@ -1,37 +1,22 @@
-br.clear {
+.taglibrary br.clear {
 	clear: both;	
 }
 
-.taglibcontainer {
-	margin-top: 50px;
+.taglibrary .rel_left {
+	position: relative;
+	float: left;
 }
-.taglibcontainer .rel_left {
-	position: relative; float: left;
-}
-.taglibcontainer .title {
-	width: 70px;
-	padding-top: 7px;
+.taglibrary .title {
+	padding-top: 5px;
 	font-weight: bold;
 }
 
-.taglibcontainer .tags {
-	width: 538px;
-	margin-left: 114px;
+.taglibrary input {
+   margin-top: 2px;
 }
 
-.tags .title {
-	width: auto;
-	white-space: nowrap;
-	padding-top: 20px;
-	padding-bottom: 10px;
-}
-
-.tags input {
-	border: 1px solid #000;
-	height: 18px;
-	margin-top: 1px;
-	margin-right: 5px;
-	padding: 1px;
+.taglibrary yui-button {
+	margin-top: 0px;
 }
 
 .bottom_taglist {
@@ -43,28 +28,23 @@ br.clear {
 }
 
 .tags_box li {
-	padding: 7px;
-	padding-left: 0px;
 	position: relative;
 	float: left;
-	list-style-type: none;
+	padding: 7px 3px 7px 0px;
+	margin-bottom: 10px;
 }
 
 .tags_box li a {
 	text-decoration: none;
 	white-space: nowrap;
-	padding: 7px;
-	padding-left: 22px;
-	background: URL('images/tag-16.png') no-repeat 4px 6px;
+	padding: 5px 0px 5px 18px;
+	background: URL('images/tag-16.png') no-repeat 0px 4px;
 }
-.tags_box li a .close {
+.tags_box li a .add, .tags_box li a .remove {
 	visibility: hidden;
-	padding-right: 22px;
+	padding: 1px 2px 1px 18px;
 }
-.tags_box li a .close img {
-	vertical-align: bottom;
-	vertical-align: middle;
-}
+
 .tags_box li a:link { color: #448; }
 .tags_box li a:visited { color: #667; }
 
@@ -72,9 +52,17 @@ br.clear {
 	border-color: #FE3;
 	color: #FFF;
 	white-space: nowrap;
-	background: #939292 URL('images/tag-16.png') no-repeat 4px 6px;
+	padding: 5px 0px 5px 18px;
+	background: #939292 URL('images/tag-16.png') no-repeat 0px 4px;
 }
-.tags_box li a:hover .close {
+
+.tags_box li a:hover .remove {
 	visibility: visible;
-	background: #939292 URL('images/icon_close.gif') no-repeat top right;
+	background: #939292 URL('images/remove-tag-18.png') no-repeat 0px 0px;
 }
+
+.tags_box li a:hover .add {
+	visibility: visible;
+	background: #939292 URL('images/add-tag-18.png') no-repeat 0px 0px;
+}
+
