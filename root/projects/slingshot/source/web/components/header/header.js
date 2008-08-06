@@ -74,9 +74,9 @@
       
       onReady: function Header_onReady()
       {
-         YAHOO.util.Event.addListener(this.id+"-searchtext", "focus", this.focusSearchText, null, this);
-         YAHOO.util.Event.addListener(this.id+"-searchtext", "blur", this.blurSearchText, null, this);
-         YAHOO.util.Event.addListener(this.id+"-search-sbutton", "click", this.doSearch, null, this);
+         YAHOO.util.Event.addListener(this.id + "-searchtext", "focus", this.focusSearchText, null, this);
+         YAHOO.util.Event.addListener(this.id + "-searchtext", "blur", this.blurSearchText, null, this);
+         YAHOO.util.Event.addListener(this.id + "-search-sbutton", "click", this.doSearch, null, this);
          
          this.defaultSearchText();
          
@@ -86,69 +86,65 @@
          var me = this;
          new YAHOO.util.KeyListener(zinput, 
          {
-            keys:13
+            keys: 13
          }, 
          {
-            fn: function() {
-               me.doSearch()
-            },
-            scope:this,
-            correctScope:true
+            fn: me.doSearch,
+            scope: this,
+            correctScope: true
          }, 
          "keydown").enable();
 
-   		YAHOO.util.Event.onContentReady(me.id+"-searchtogglemenu", function ()
-   		{
-   			var oMenu = new YAHOO.widget.Menu(me.id+"-searchtogglemenu");
-   			oMenu.render();
-   			oMenu.owner = me;
-   			oMenu.subscribe("show", oMenu.focus);
-			
-   			YAHOO.util.Event.addListener(me.id+"-search-tbutton", "click", me.openToggleSearchMenu, null, oMenu);
-   		});
+         var oMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu");
+         oMenu.render();
+         oMenu.owner = this;
+         oMenu.subscribe("show", oMenu.focus);
+
+         YAHOO.util.Event.addListener(this.id + "-search-tbutton", "click", this.openToggleSearchMenu, null, oMenu);
+         YAHOO.util.Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
       },
       
       focusSearchText: function ()
       {
-   		if (YAHOO.util.Dom.hasClass(this.id + "-searchtext", "gray"))
-   		{
-   			YAHOO.util.Dom.get(this.id + "-searchtext").value = "";
-   			YAHOO.util.Dom.removeClass(this.id + "-searchtext", "gray");
-   		}
-   		else
-   		{
-   			YAHOO.util.Dom.get(this.id + "-searchtext").select();
-   		}
+         if (YAHOO.util.Dom.hasClass(this.id + "-searchtext", "gray"))
+         {
+            YAHOO.util.Dom.get(this.id + "-searchtext").value = "";
+            YAHOO.util.Dom.removeClass(this.id + "-searchtext", "gray");
+         }
+         else
+         {
+            YAHOO.util.Dom.get(this.id + "-searchtext").select();
+         }
       },
       
       blurSearchText: function ()
       {
-   		var searchVal = YAHOO.util.Dom.get(this.id + "-searchtext").value;
-   		if (searchVal.length == 0)
-   		{
-   			this.defaultSearchText();
-   		}
+         var searchVal = YAHOO.util.Dom.get(this.id + "-searchtext").value;
+         if (searchVal.length == 0)
+         {
+            this.defaultSearchText();
+         }
       }, 
       
       defaultSearchText: function()
       {
-			YAHOO.util.Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
-			YAHOO.util.Dom.addClass(this.id + "-searchtext", "gray");
+         YAHOO.util.Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
+         YAHOO.util.Dom.addClass(this.id + "-searchtext", "gray");
       },
       
       openToggleSearchMenu: function()
       {
-      	this.show();
-      	var coord = YAHOO.util.Dom.getXY(this.owner.id+"-search-tbutton");
-      	coord[0] -= (YAHOO.util.Dom.get(this.owner.id+"-searchtogglemenu").offsetWidth - YAHOO.util.Dom.get(this.owner.id+"-search-tbutton").offsetWidth);
-      	coord[1] += YAHOO.util.Dom.get(this.owner.id+"-search-tbutton").offsetHeight;
-	      YAHOO.util.Dom.setXY(this.id, coord);       	
+         this.show();
+         var coord = YAHOO.util.Dom.getXY(this.owner.id + "-search-tbutton");
+         coord[0] -= (YAHOO.util.Dom.get(this.owner.id + "-searchtogglemenu").offsetWidth - YAHOO.util.Dom.get(this.owner.id + "-search-tbutton").offsetWidth);
+         coord[1] += YAHOO.util.Dom.get(this.owner.id + "-search-tbutton").offsetHeight;
+         YAHOO.util.Dom.setXY(this.id, coord);       	
       },
       
       doToggleSearchType: function(newVal)
       {
-      	this.options.searchType = newVal;
-      	this.defaultSearchText();
+         this.options.searchType = newVal;
+         this.defaultSearchText();
       },
       
       /**

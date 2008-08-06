@@ -126,6 +126,11 @@
 	cursor: default;
 }
 
+.header .hidden
+{
+   display: none;
+}
+
 .header .searchtoggle
 {
 	visibility: hidden;
@@ -154,7 +159,7 @@
 .header .bd .searchtoggle .searchtoggleitemlabel
 {
 	color: #fff;
-	cursor:pointer;
+	cursor: pointer;
 	padding: 4px;
 	padding-right: 10px;	
 	padding-left: 10px;		
