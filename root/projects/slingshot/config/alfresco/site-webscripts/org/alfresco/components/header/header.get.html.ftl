@@ -38,18 +38,16 @@
       </div>
    </div>
 
-	<div id="${args.htmlid}-searchtogglemenu" class="searchtoggle">
-	<div class="bd">
-		<ul>
-			<li class="searchtoggleitem">
-				<a class="searchtoggleitemlabel<#if siteActive == 'false'> disabled</#if>" 
-					href="<#if siteActive == 'false'>#<#else>javascript:thisHeader.doToggleSearchType('site')</#if>">${msg("header.search.searchsite", page.url.templateArgs.site!"")}
-				</a>
-			</li>
-			<li class="searchtoggleitem"><a class="searchtoggleitemlabel" href="javascript:thisHeader.doToggleSearchType('all')">${msg("header.search.searchall")}</a></li>
-		</ul>            
-	</div>
-	</div>	
+   <div id="${args.htmlid}-searchtogglemenu" class="searchtoggle hidden">
+      <div class="bd">
+         <ul>
+            <li class="searchtoggleitem">
+               <a class="searchtoggleitemlabel<#if siteActive == 'false'> disabled</#if>" href="<#if siteActive == 'false'>#<#else>javascript:thisHeader.doToggleSearchType('site')</#if>">${msg("header.search.searchsite", page.url.templateArgs.site!"")}</a>
+            </li>
+            <li class="searchtoggleitem"><a class="searchtoggleitemlabel" href="javascript:thisHeader.doToggleSearchType('all')">${msg("header.search.searchall")}</a></li>
+         </ul>            
+      </div>
+   </div>	
 
 </div>
 
