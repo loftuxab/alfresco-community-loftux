@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 /**
  * The Class SyncService
@@ -159,7 +160,7 @@ public class SyncService
             
                 // map db user into whd user instance
                 whdUser = ConversionUtil.toWebHelpdeskUser(dbUser, whdUser);
-                
+                                                
                 // update the whd user instance
                 this.webHelpdeskService.updateUser(whdUser);
                 
@@ -187,12 +188,15 @@ public class SyncService
             System.out.println("Skipping creation of web helpdesk user - not implemented");
         }
         
+        /*
+         * TODO: Remove this as we no longer push passwords into ACT
         if(success)
         {
             // push password into web helpdesk
             debug(" -> pushing password");
             this.webHelpdeskService.updatePassword(whdUser, password);
         }
+        */
         
         return success;
     }
@@ -253,11 +257,17 @@ public class SyncService
             whdUser = this.webHelpdeskService.getUser(whdUserId);
         }
         
+        // whd tech user
+        SqlRowSet whdTechUserRowSet = this.webHelpdeskService.getTech(whdUserId);
+        boolean techUserExists = whdTechUserRowSet.next();
+        
+        debug("Checking for user_name availability for: " + userId);
         debug("isUserIdAvailable.dbUser = " + dbUser);
         debug("isUserIdAvailable.ldapUser = " + ldapUser);
         debug("isUserIdAvailable.whdUser = " + whdUser);
+        debug("techUserExists = " + techUserExists);
         
-        return ((dbUser == null) && (ldapUser == null) && (whdUser == null));
+        return ((dbUser == null) && (ldapUser == null) && (whdUser == null) && (!techUserExists));
     }
     
     /**

@@ -96,19 +96,24 @@ When you are done, click "Check" below to go to the next step
 		<tr>
 			<td><i>Web Helpdesk User</i></td>
 			<td>
-				<input name="whdUserId" type="text" value="<%=(invitedUser.getWebHelpdeskUserId() != null ? invitedUser.getWebHelpdeskUserId() : "")%>" disabled />
+				<input type="text" value="<%=(invitedUser.getWebHelpdeskUserId() != null ? invitedUser.getWebHelpdeskUserId() : "")%>" disabled />
 			</td>
 		</tr>
 		<tr>
-			<td><i>Partners User</i></td>
+			<td><i>Alfresco User</i></td>
 			<td>
-				<input name="alfrescoUserId" type="text" value="<%=(invitedUser.getAlfrescoUserId() != null ? invitedUser.getAlfrescoUserId() : "")%>" disabled />
+				<input type="text" value="<%=(invitedUser.getAlfrescoUserId() != null ? invitedUser.getAlfrescoUserId() : "")%>" disabled />
 			</td>
 		</tr>
 	</table>
 	
 	<input name="invitedUserId" type="hidden" value="<%=invitedUser.getUserId()%>"/>
 
+	<!--  Sync Properties  -->
+	<input type="hidden" name="whdUserId" value="<%=(invitedUser.getWebHelpdeskUserId() != null ? invitedUser.getWebHelpdeskUserId() : "")%>" />
+	<input type="hidden" name="alfrescoUserId" value="<%=(invitedUser.getAlfrescoUserId() != null ? invitedUser.getAlfrescoUserId() : "")%>" />
+	
+	<!--  Dispatch Properties  -->
 	<input type="hidden" name="p" value="invitation-wizard"/>
 	<input type="hidden" name="dispatchTo" value="user-invitation-confirm.jsp"/>
 	<input type="hidden" name="hash" value="<%=hash%>"/>

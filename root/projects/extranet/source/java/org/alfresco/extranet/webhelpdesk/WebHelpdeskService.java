@@ -110,11 +110,17 @@ public class WebHelpdeskService implements ApplicationContextAware
                     deleteUser(formerUserId);
                 }
 
-                String sql = "update CLIENT set USER_NAME=?, LDAP_CONNECTION_ID=? where USER_NAME = ?";
+                String sql = "update CLIENT set USER_NAME=?, LDAP_CONNECTION_ID=?, RDN=?, BASE_DN=? where USER_NAME = ?";
                 
                 // arguments and types
-                Object args []= new Object[] { newUserId, ldapConnectionId, formerUserId };
-                int types[] = new int[] { Types.VARCHAR, Types.INTEGER, Types.VARCHAR };
+                String rdn = getRdn(newUserId);
+                String baseDn = getBaseDn(newUserId);
+                
+                System.out.println(" -> migrating rdn to: " + rdn);
+                System.out.println(" -> migrating base_dn to: " + baseDn);
+                
+                Object args []= new Object[] { newUserId, ldapConnectionId, rdn, baseDn, formerUserId };
+                int types[] = new int[] { Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
                 
                 // execute the update
                 int x = jdbcTemplate.update(sql, args, types);
@@ -144,11 +150,11 @@ public class WebHelpdeskService implements ApplicationContextAware
      */
     public boolean insertUser(WebHelpdeskUser whdUser)
     {
-        String sql = "insert into CLIENT (USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, NOTES, LDAP_CONNECTION_ID) values (?,?,?,?,?,?)";
+        String sql = "insert into CLIENT (USER_NAME, FIRST_NAME, LAST_NAME, EMAIL, NOTES, LDAP_CONNECTION_ID, RDN, BASE_DN) values (?,?,?,?,?,?,?,?)";
         
         // arguments and types
-        Object args []= new Object[] { whdUser.getUserId(), whdUser.getFirstName(), whdUser.getLastName(), whdUser.getEmail(), whdUser.getDescription(), whdUser.getLdapConnectionId() };
-        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER };
+        Object args []= new Object[] { whdUser.getUserId(), whdUser.getFirstName(), whdUser.getLastName(), whdUser.getEmail(), whdUser.getDescription(), whdUser.getLdapConnectionId(), whdUser.getRdn(), whdUser.getBaseDn() };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR };
         
         // execute the update
         int x = jdbcTemplate.update(sql, args, types);
@@ -164,11 +170,11 @@ public class WebHelpdeskService implements ApplicationContextAware
      */
     public boolean updateUser(WebHelpdeskUser user)
     {
-        String sql = "update CLIENT set USER_NAME=?, FIRST_NAME=?, LAST_NAME=?, EMAIL=?, NOTES=?, LDAP_CONNECTION_ID=? where USER_NAME = ?";
+        String sql = "update CLIENT set USER_NAME=?, FIRST_NAME=?, LAST_NAME=?, EMAIL=?, NOTES=?, LDAP_CONNECTION_ID=?, RDN=?, BASE_DN=? where USER_NAME = ?";
         
         // arguments and types
-        Object args []= new Object[] { user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getDescription(), user.getLdapConnectionId(), user.getUserId() };
-        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR };
+        Object args []= new Object[] { user.getUserId(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getDescription(), user.getLdapConnectionId(), user.getUserId(), user.getRdn(), user.getBaseDn() };
+        int types[] = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
         
         // execute the update
         int x = jdbcTemplate.update(sql, args, types);
@@ -183,6 +189,7 @@ public class WebHelpdeskService implements ApplicationContextAware
      * 
      * @return true, if successful
      */
+    /*
     public boolean updatePassword(WebHelpdeskUser user, String password)
     {
         String sql = "update CLIENT set PASSWORD=? where USER_NAME = ?";
@@ -195,6 +202,7 @@ public class WebHelpdeskService implements ApplicationContextAware
         int x = jdbcTemplate.update(sql, args, types);
         return (x > 0);        
     }
+    */
     
     
     /**
@@ -217,6 +225,20 @@ public class WebHelpdeskService implements ApplicationContextAware
         }
         return (WebHelpdeskUser) list.get(0);        
     } 
+
+    /**
+     * Returns a user from the tech table
+     * 
+     * @param userName
+     * @return
+     */
+    public SqlRowSet getTech(String userName) 
+    {
+        // build the sql statement
+        String sql = "select * from TECH where USER_NAME='" + userName + "'";
+        
+        return jdbcTemplate.queryForRowSet(sql);
+    } 
     
     public boolean deleteUser(String userName)
     {
@@ -235,7 +257,7 @@ public class WebHelpdeskService implements ApplicationContextAware
     public int getDefaultLdapConnectionId()
     {
         // build the sql statement
-        String sql = "select ID from LDAP_CONNECTION where DELETED=0";
+        String sql = "select ID from LDAP_CONNECTION where FRIENDLY_NAME = 'network'";
         
         // run the query
         return jdbcTemplate.queryForInt(sql);
@@ -252,4 +274,14 @@ public class WebHelpdeskService implements ApplicationContextAware
         return rowSet;
     }
     
+    public String getRdn(String userId)
+    {
+        return "uid=" + userId;
+    }
+    
+    public String getBaseDn(String userId)
+    {
+        return "network.alfresco.com:dc=public,dc=people,dc=ds,dc=alfresco,dc=com";
+    }
+
 }

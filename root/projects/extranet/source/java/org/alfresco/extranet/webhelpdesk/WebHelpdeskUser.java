@@ -35,6 +35,8 @@ public class WebHelpdeskUser extends AbstractUser
 {
     protected int id;
     protected int ldapConnectionId;
+    protected String rdn;
+    protected String baseDn;
     
     /**
      * Instantiates a new web helpdesk user.
@@ -75,4 +77,24 @@ public class WebHelpdeskUser extends AbstractUser
     {
         return this.ldapConnectionId;
     }    
+    
+    public String getRdn()
+    {
+        return this.rdn;
+    }
+    
+    public void setRdn(String rdn)
+    {
+        this.rdn = rdn;
+    }
+    
+    public String getBaseDn()
+    {
+        return this.baseDn;
+    }
+    
+    public void setBaseDn(String baseDn)
+    {
+        this.baseDn = baseDn;
+    }
 }
