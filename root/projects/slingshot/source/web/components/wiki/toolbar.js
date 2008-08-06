@@ -146,10 +146,28 @@
 	      this.renamePanel = new YAHOO.widget.Panel(this.id + "-renamepanel", { width:"320px", visible:false, constraintoviewport:true } );
 	      this.renamePanel.render();
 	      
-	      var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", this.onRenameSaveClick,
+	      var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,
 	      {
-	      	type: "push"
+	      	type: "submit"
 	      });
+	      
+	      var renameForm = new Alfresco.forms.Form(this.id + "-renamePageForm");
+         renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.mandatory, null, "blur");
+         renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.nodeName, null, "keyup");
+	      renameForm.setShowSubmitStateDynamically(true);
+	      renameForm.setSubmitElements(renameSaveButton);
+	      renameForm.ajaxSubmitMethod = Alfresco.util.Ajax.POST;
+	      renameForm.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+	            fn: this.onPageRenamed,
+	            scope: this
+            },
+            failureMessage: "Page rename failed"
+         });        
+	      renameForm.setSubmitAsJSON(true);
+	      renameForm.init();
 	   },
 	   
 	   /**

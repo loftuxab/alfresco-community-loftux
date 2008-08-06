@@ -29,8 +29,10 @@
    <div id="${args.htmlid}-renamepanel">
         <div class="hd">${msg("panel.rename.title")}</div>
         <div class="bd">
-           <input type="text" id="${args.htmlid}-newname" name="name" value="" size="30"/>
-           <button id="${args.htmlid}-rename-save-button">${msg("button.save")}</button>
+         <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${page.url.args["title"]!""}">
+           <input type="text" id="${args.htmlid}-renameTo" name="name" value="" size="30"/>
+           <input type="submit" id="${args.htmlid}-rename-save-button" value="${msg("button.save")}" />
+        </form>
         </div>
         <div class="ft">${msg("panel.rename.footer")}</div>
      </div>   
