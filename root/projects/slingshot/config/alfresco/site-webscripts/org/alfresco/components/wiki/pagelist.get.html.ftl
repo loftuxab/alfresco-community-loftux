@@ -19,10 +19,15 @@
 			<span class="attrLabel">Created on:</span> <span class="attrValue">${p.createdOn}</span>
 			<span class="spacer"> | </span>
 			<span class="attrLabel">Modified by:</span> <span class="attrValue"><a href="#">${p.modifiedBy}</a></span>
-			<span class="spacer"> | </span>
+			<span class="spacer"> | </span><br/>
 			<span class="attrLabel">Modified on:</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>
    <div class="pageCopy">${p.text!"&nbsp;"}</div>
+   <#-- Display tags, if any -->
+   <div class="pageTags">
+      <span class="tagDetails">Tags:</span>
+      <#if p.tags??><#list p.tags as tag><span>${tag}</span><#if tag_has_next>,&nbsp;</#if></#list></#if>
+   </div>
    </div><#-- End of wikipage -->
 </#list>
 <#else>
