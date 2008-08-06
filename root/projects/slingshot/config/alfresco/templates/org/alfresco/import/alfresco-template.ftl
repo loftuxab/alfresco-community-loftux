@@ -9,7 +9,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-   <title>Alfresco &raquo; ${page.title}</title>
+   <title>Alfresco Share &raquo; ${page.title}</title>
 
 <!-- Site-wide YUI Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
