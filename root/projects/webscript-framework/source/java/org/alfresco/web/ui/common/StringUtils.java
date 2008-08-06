@@ -219,13 +219,27 @@ public class StringUtils
 
     /**
      * Strip unsafe HTML tags from a string - only leaves most basic formatting tags
-     * and encodes or strips the remaining characters.
+     * and encodes the remaining characters.
      * 
      * @param s HTML string to strip tags from
      * 
      * @return safe string
      */
     public static String stripUnsafeHTMLTags(String s)
+    {
+        return stripUnsafeHTMLTags(s, true);
+    }
+    
+    /**
+     * Strip unsafe HTML tags from a string - only leaves most basic formatting tags
+     * and optionally encodes or strips the remaining characters.
+     * 
+     * @param s         HTML string to strip tags from
+     * @param encode    if true then encode remaining html data
+     * 
+     * @return safe string
+     */
+    public static String stripUnsafeHTMLTags(String s, boolean encode)
     {
         s = s.replace("onclick", "$");
         s = s.replace("onmouseover", "$");
@@ -283,20 +297,23 @@ public class StringUtils
                 }
             }
             String enc = null;
-            switch (chars[i])
+            if (encode)
             {
-                case '"': enc = "&quot;"; break;
-                case '&': enc = "&amp;"; break;
-                case '<': enc = "&lt;"; break;
-                case '>': enc = "&gt;"; break;
-
-                default:
-                    if (((int)chars[i]) >= 0x80)
-                    {
-                        //encode all non basic latin characters
-                        enc = "&#" + ((int)chars[i]) + ";";
-                    }
-                break;
+                switch (chars[i])
+                {
+                    case '"': enc = "&quot;"; break;
+                    case '&': enc = "&amp;"; break;
+                    case '<': enc = "&lt;"; break;
+                    case '>': enc = "&gt;"; break;
+    
+                    default:
+                        if (((int)chars[i]) >= 0x80)
+                        {
+                            //encode all non basic latin characters
+                            enc = "&#" + ((int)chars[i]) + ";";
+                        }
+                    break;
+                }
             }
             buf.append(enc == null ? chars[i] : enc);
         }

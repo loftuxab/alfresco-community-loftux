@@ -36,7 +36,7 @@ public class ScriptableUtils
 {
     public String stripUnsafeHTML(String s)
     {
-        return StringUtils.stripUnsafeHTMLTags(s);
+        return StringUtils.stripUnsafeHTMLTags(s, false);
     }
     
     public String replaceLineBreaks(String s)
