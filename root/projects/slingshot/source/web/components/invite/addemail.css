@@ -1,8 +1,8 @@
 .inviteusersbyemail
 {
-   margin-top: 15px;
    background-color: #f6f9fc;
-   border: 1px dashed #bababa;
+   border: 1px solid #c0c0c0;
+   margin-top: 15px;
 }
 
 .inviteusersbyemail *
@@ -14,21 +14,23 @@
 {
    color: #009300;
    font-weight: bold;
-   padding-top: 12px;
-   padding-left: 8px;
-   padding-bottom: 12px;
+   padding: 12px 0px 12px 8px;
+}
+
+.inviteusersbyemail .byemailbody
+{
+   padding: 0.5em 0.5em 1em;
 }
 
 .inviteusersbyemail .byemailbody .byemailuser
 {
    width: 100%;
-   padding: 4px;
 }
 
 .inviteusersbyemail .byemailbody .byemailuser td
 {
-   white-space: nowrap;
    padding: 4px;
+   white-space: nowrap;
 }
 
 .inviteusersbyemail .byemailbody .byemailuser .elabel
@@ -43,6 +45,6 @@
 
 .inviteusersbyemail .byemailbody .byemailuser .byemailadd
 {
+   padding-right: 3px;
    vertical-align: top;
-   padding-right: 25px;
 }

@@ -16,11 +16,7 @@
             <td class="elabel"><label for="${args.htmlid}-firstname">${msg("addemail.firstname")}:</label></td>
             <td class="einput"><input type="text" id="${args.htmlid}-firstname" /></td>
             <td class="byemailadd" colspan="3">
-               <span id="${args.htmlid}-add-email-button" class="yui-button"> 
-                  <span class="first-child"> 
-                     <button type="button">${msg("addemail.add")} &gt;&gt;</button> 
-                  </span>
-               </span>
+               <button id="${args.htmlid}-add-email-button">${msg("addemail.add")} &gt;&gt;</button> 
             </td>
          </tr>
          <tr>

@@ -24,10 +24,10 @@
  */
  
 /**
- * InviteUsers component.
+ * PeopleFinder component.
  * 
  * @namespace Alfresco
- * @class Alfresco.InviteUsers
+ * @class Alfresco.PeopleFinder
  */
 (function()
 {
@@ -39,27 +39,37 @@
       Element = YAHOO.util.Element;
    
    /**
-    * InviteUsers constructor.
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
+    * PeopleFinder constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.InviteUsers} The new InviteUsers instance
+    * @return {Alfresco.PeopleFinder} The new PeopleFinder instance
     * @constructor
     */
-   Alfresco.InviteUsers = function(htmlId)
+   Alfresco.PeopleFinder = function(htmlId)
    {
-      this.name = "Alfresco.InviteUsers";
+      this.name = "Alfresco.PeopleFinder";
       this.id = htmlId;
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
    
+      /**
+       * Decoupled event listeners
+       */
+      YAHOO.Bubbling.on("personDeselected", this.onPersonDeselected, this);
+
       return this;
    }
    
-   Alfresco.InviteUsers.prototype =
+   Alfresco.PeopleFinder.prototype =
    {
       /**
        * Object container for initialization options
@@ -69,6 +79,13 @@
        */
       options:
       {
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: ""
       },
 
       /**
@@ -79,8 +96,20 @@
        */
       widgets: {},
       
-      listWidgets: [],
+      /**
+       * Object container for storing YUI button instances, indexed by username.
+       * 
+       * @property userSelectButtons
+       * @type object
+       */
+      userSelectButtons: {},
       
+      /**
+       * Current search term, obtained from form input field.
+       * 
+       * @property searchTerm
+       * @type string
+       */
       searchTerm: "",
       
       /**
@@ -88,9 +117,9 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.InviteUsers} returns 'this' for method chaining
+       * @return {Alfresco.PeopleFinder} returns 'this' for method chaining
        */
-      setOptions: function InviteUsers_setOptions(obj)
+      setOptions: function PeopleFinder_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -101,9 +130,9 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.InviteUsers} returns 'this' for method chaining
+       * @return {Alfresco.PeopleFinder} returns 'this' for method chaining
        */
-      setMessages: function InviteUsers_setMessages(obj)
+      setMessages: function PeopleFinder_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -115,7 +144,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function InviteUsers_onComponentsLoaded()
+      onComponentsLoaded: function PeopleFinder_onComponentsLoaded()
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -126,10 +155,12 @@
        *
        * @method onReady
        */
-      onReady: function InviteUsers_onReady()
+      onReady: function PeopleFinder_onReady()
       {  
-         // search button
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.searchButtonClick);
+         var me = this;
+
+         // Search button
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
 
          // DataSource definition  
          var peopleSearchUrl = Alfresco.constants.PROXY_URI + "api/people?";
@@ -141,8 +172,8 @@
              resultsList: "people",
              fields: ["url", "userName", "avatar", "title", "firstName", "lastName", "organisation", "jobtitle", "email"]
          };
-         var me = this;
-         this.widgets.dataSource.doBeforeParseData = function InviteUsers_doBeforeParseData(oRequest , oFullResponse)
+
+         this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
          {
             var updatedResponse = oFullResponse;
                
@@ -150,29 +181,30 @@
             {
                var items = [];
                
-               // determine list of sites to show
+               // Determine list of sites to show
                if (me.searchTerm.length > 0)
                {
-                  // filter the results for the search term
+                  // Filter the results for the search term
                   var lowerCaseTerm = me.searchTerm.toLowerCase();
-                  for (var x = 0; x < oFullResponse.people.length; x++)
+                  var personData, firstName, lastName;
+                  for (var i = 0, j = oFullResponse.people.length; i < j; i++)
                   {
-                     var personData = oFullResponse.people[x];
-                     var firstName = (personData.firstName != null) ? personData.firstName.toLowerCase() : "";
-                     var lastName = (personData.lastName != null) ? personData.lastName.toLowerCase() : "";
+                     personData = oFullResponse.people[i];
+                     firstName = (personData.firstName !== null) ? personData.firstName.toLowerCase() : "";
+                     lastName = (personData.lastName !== null) ? personData.lastName.toLowerCase() : "";
                      
                      // Determine if person matches search term
-                     if (firstName.indexOf(lowerCaseTerm) != -1 ||
-                         lastName.indexOf(lowerCaseTerm) != -1)
+                     if ((firstName.indexOf(lowerCaseTerm) != -1) || (lastName.indexOf(lowerCaseTerm) != -1))
                      {
-                        // add site to list
+                        // Add site to list
                         items.push(personData);
                      }
                   }
                }
                
                // we need to wrap the array inside a JSON object so the DataTable is happy
-               updatedResponse = {
+               updatedResponse =
+               {
                   "people": items
                };
             }
@@ -180,44 +212,72 @@
             return updatedResponse;
          }
          
-         // setup of the datatable.
+         // Setup the DataTable
          this._setupDataTable();
 
-         // Finally show the component body here to prevent UI artifacts on YUI button decoration
-         Dom.setStyle(this.id + "-body", "visibility", "visible");
+         // Set initial focus
+         var searchText = Dom.get(this.id + "-search-text");
+         searchText.focus();
+
+         /*
+          * Enter key listener function needs to be enclosed due to having "window" scope
+          *
+          * @method: onKeyEnter
+          * @param id
+          * @param keyEvent {object} The key event details
+          */
+         var onKeyEnter = function PeopleFinder_onKeyEnter(id, keyEvent)
+         {
+            me.onSearchClick.call(me, keyEvent, null);
+         }
+
+         // Enter key listener
+         var enterListener = new YAHOO.util.KeyListener(searchText,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         }, onKeyEnter, "keydown");
+         enterListener.enable();
+
+         // Show button here to prevent UI artifacts on YUI button decoration
+         Dom.setStyle(this.id + "-search-button", "visibility", "visible");
       },
       
-      _setupDataTable: function InviteUsers_setupDataTable()
+      /**
+       * Setup the YUI DataTable with custom renderers.
+       *
+       * @method _setupDataTable
+       * @private
+       */
+      _setupDataTable: function PeopleFinder__setupDataTable()
       {
          /**
           * DataTable Cell Renderers
           *
           * Each cell has a custom renderer defined as a custom function. See YUI documentation for details.
-          * These MUST be inline in order to have access to the Alfresco.InviteUsers class (via the "me" variable).
+          * These MUST be inline in order to have access to the Alfresco.PeopleFinder class (via the "me" variable).
           */
          var me = this;
           
          /**
-          * Thumbnail custom datacell formatter
+          * User avatar custom datacell formatter
           *
-          * @method renderCellThumbnail
+          * @method renderCellAvatar
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellThumbnail = function InviteUsers_renderCellThumbnail(elCell, oRecord, oColumn, oData)
+         var renderCellAvatar = function PeopleFinder_renderCellAvatar(elCell, oRecord, oColumn, oData)
          {
-            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
-            if (oRecord.getData("avatar") != undefined)
-            {
-               var avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
-            }
-            oColumn.width = 70;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "height", oColumn.width + "px");
 
-            elCell.innerHTML = '<span class="avatar-image"><img src="' + avatarUrl + '" alt="avatar image" /></span>';
+            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+            if (oRecord.getData("avatar") !== undefined)
+            {
+               avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
+            }
+
+            elCell.innerHTML = '<img src="' + avatarUrl + '" alt="avatar" />';
          };
 
          /**
@@ -229,61 +289,64 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellDescription = function InviteUsers_renderCellDescription(elCell, oRecord, oColumn, oData)
+         var renderCellDescription = function PeopleFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            // we currently render all results the same way
+            // Currently rendering all results the same way
             var name = oRecord.getData("userName");
             var firstName = oRecord.getData("firstName");
             var lastName = oRecord.getData("lastName");
-            if (firstName != undefined || lastName != undefined)
+            if ((firstName !== undefined) || (lastName !== undefined))
             {
-               name = (firstName != undefined) ? firstName + " " : "";
-               name += (lastName != undefined) ? lastName : "";
+               name = firstName ? firstName + " " : "";
+               name += lastName ? lastName : "";
             }
 
-            var title = (oRecord.getData("title") != undefined) ? oRecord.getData("title") : "";
-            var company = (oRecord.getData("company") != undefined) ? oRecord.getData("company") : "";
-            desc = '<h3 class="itemname">' + Alfresco.util.encodeHTML(name) + '</a></h3>';
-            desc += '<div class="detail">' + Alfresco.util.encodeHTML(title) + '</div>';
-            desc += '<div class="detail">' + Alfresco.util.encodeHTML(company) + '</div>';
+            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
+            var organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
+            desc = '<h3 class="itemname">' + $html(name) + '</a></h3>';
+            desc += '<div class="detail">' + $html(title) + '</div>';
+            desc += '<div class="detail">' + $html(organisation) + '</div>';
             elCell.innerHTML = desc;
          };
          
          /**
           * Add button datacell formatter
           *
-          * @method renderCellThumbnail
+          * @method renderCellAvatar
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellAddButton = function InviteUsers_renderCellAddButton(elCell, oRecord, oColumn, oData)
+         var renderCellAddButton = function PeopleFinder_renderCellAddButton(elCell, oRecord, oColumn, oData)
          {
-            oColumn.width = 80;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             
-            var id = oRecord.getData('userName');
-            var desc = '<span class="addduser" id="' + me.id + '-adduser-' + id + '"></span>';
+            var id = oRecord.getData("userName");
+            var desc = '<span id="' + me.id + '-select-' + id + '"></span>';
             elCell.innerHTML = desc;
 
             // create button
             var button = new YAHOO.widget.Button(
+            {
+               type: "button",
+               label: me._msg("button.add") + " >>",
+               name: me.id + "-selectbutton-" + id,
+               container: me.id + '-select-' + id,
+               onclick:
                {
-                   type: "button",
-                   label: me._msg("inviteusers.add") + " >>",
-                   name: me.id + "-adduserbutton-" + id,
-                   container: me.id + '-adduser-' + id,
-                   onclick: { fn: me.addUserToInvites, obj: oRecord, scope: me }
+                  fn: me.onPersonSelect,
+                  obj: oRecord,
+                  scope: me
                }
-            );
-            me.listWidgets[id] = { button: button };
+            });
+            me.userSelectButtons[id] = button;
          };
 
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 70
+            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: 70
          },
          {
             key: "person", label: "Description", sortable: false, formatter: renderCellDescription
@@ -294,55 +357,96 @@
 
          // DataTable definition
          YAHOO.widget.DataTable.MSG_EMPTY = "";
-         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-userslist", columnDefinitions, this.widgets.dataSource,
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
+            renderLoopSize: 8,
             initialLoad: false
          });
       },
 
+
       /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
-       * Disconnected event handlers for inter-component event notification
+       * YUI WIDGET EVENT HANDLERS
+       * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
 
-      addUserToInvites: function InviteUsers_addUserToInvites(event, p_obj)
+      /**
+       * Select person button click handler
+       *
+       * @method onPersonSelect
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onPersonSelect: function PeopleFinder_onPersonSelect(event, p_obj)
       {
-         // send a onAddInvite bubble event
-         YAHOO.Bubbling.fire("onAddInvite",
+         var userName = p_obj.getData("userName");
+         
+         // Fire the personSelected bubble event
+         YAHOO.Bubbling.fire("personSelected",
          {
-            userName: p_obj.getData('userName'),
-            firstName : p_obj.getData('firstName'),
-            lastName : p_obj.getData('lastName'),
-            email : p_obj.getData('email')
+            userName: userName,
+            firstName: p_obj.getData("firstName"),
+            lastName: p_obj.getData("lastName"),
+            email: p_obj.getData("email")
          });
          
-         // disable the add button
-         this.listWidgets[p_obj.getData('userName')].button.set('disabled', true);
+         // Disable the add button
+         this.userSelectButtons[userName].set("disabled", true);
       },
 
       /**
-       * Path Changed event handler
+       * Search button click event handler
        *
-       * @method onInviteUsers
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
+       * @method onSearchClick
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
        */
-      searchButtonClick: function InviteUsers_searchButtonClick(e, p_obj)
+      onSearchClick: function PeopleFinder_onSearchClick(e, p_obj)
       {
          // fetch the firstname, lastname nad email
-         var searchTermElem = YAHOO.util.Dom.get(this.id + "-search-text");
+         var searchTermElem = Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
-         searchTerm = Alfresco.util.encodeHTML(searchTerm);
+         searchTerm = $html(searchTerm);
          if (searchTerm.length < 3)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("inviteusers.mintextlength") });
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.minimum-length")
+            });
             return;
          }
          
          this._performSearch(searchTerm);
       },
 
+
+      /**
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
+       */
+
+      /**
+       * Person Deselected event handler
+       *
+       * @method onPersonDeselected
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onPersonDeselected: function DL_onPersonDeselected(layer, args)
+      {
+         var obj = args[1];
+         // Should be person details in the arguments
+         if (obj && (obj.userName !== null))
+         {
+            // Re-enable the add button
+            this.userSelectButtons[obj.userName].set("disabled", false);
+         }
+      },
+
+
+      /**
+       * PRIVATE FUNCTIONS
+       */
       
       /**
        * Resets the YUI DataTable errors to our custom messages
@@ -350,20 +454,20 @@
        *
        * @method _setDefaultDataTableErrors
        */
-      _setDefaultDataTableErrors: function InviteUsers__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function PeopleFinder__setDefaultDataTableErrors()
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.InviteUsers");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.InviteUsers");
+         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.empty");
+         YAHOO.widget.DataTable.MSG_ERROR = this._msg("message.error");
       },
       
       /**
-       * Updates document list by calling data webscript with current site and path
+       * Updates people list by calling data webscript
        *
-       * @method _updateDocList
-       * @param path {string} Path to navigate to
+       * @method _performSearch
+       * @param searchTerm {string} Search term from input field
        */
-      _performSearch: function InviteUsers__performSearch(searchTerm)
+      _performSearch: function PeopleFinder__performSearch(searchTerm)
       {
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
@@ -371,16 +475,16 @@
          // Don't display any message
          YAHOO.widget.DataTable.MSG_EMPTY = "";
          
-         // empty results table
+         // Empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          
-         function successHandler(sRequest, oResponse, oPayload)
+         var successHandler = function PeopleFinder__pS_successHandler(sRequest, oResponse, oPayload)
          {
             this._setDefaultDataTableErrors();
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
-         function failureHandler(sRequest, oResponse)
+         var failureHandler = function PeopleFinder__pS_failureHandler(sRequest, oResponse)
          {
             if (oResponse.status == 401)
             {
@@ -414,17 +518,12 @@
       /**
        * Build URI parameter string for doclist JSON data webscript
        *
-       * @method _buildDocListParams
+       * @method _buildSearchParams
        * @param path {string} Path to query
        */
-      _buildSearchParams: function InviteUsers__buildSearchParams(searchTerm)
+      _buildSearchParams: function PeopleFinder__buildSearchParams(searchTerm)
       {
-         var params = YAHOO.lang.substitute("filter={searchTerm}",
-         {
-            searchTerm : encodeURIComponent(searchTerm)
-         });
-
-         return params;
+         return "filter=" + encodeURIComponent(searchTerm);
       },
       
       /**
@@ -435,59 +534,9 @@
        * @return {string} The custom message
        * @private
        */
-      _msg: function InviteUsers__msg(messageId)
+      _msg: function PeopleFinder__msg(messageId)
       {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.InviteUsers", Array.prototype.slice.call(arguments).slice(1));
+         return Alfresco.util.message.call(this, messageId, "Alfresco.PeopleFinder", Array.prototype.slice.call(arguments).slice(1));
       }
-
    };
 })();
-
-
-/**
- * Register a default action handler for a set of elements described by a common class name.
- * The common enclosing tag should hold an id of the form ${htmlid}-methodToCall-param.
- * 
- * @param htmlId the id of the component
- * @param className the classname that is common to all to be handled elements
- * @param ownerTagName the enclosing element's tag name. This element needs to have
- *        an id of type {htmlid}-methodToCall[-param], the param is optional.
- * @param handlerObject the object that handles the actions. Upon action, the methodToCall of this
- *        object is called, passing in the param as specified in the ownerTagName's id.
- */
-Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
-{         
-   // Hook the tag events
-   YAHOO.Bubbling.addDefaultAction(className,
-      function genericDefaultAction(layer, args)
-      {
-         var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
-         if (owner !== null)
-         {
-            // check that the html id matches, abort otherwise
-            var tmp = owner.id;
-            if (tmp.indexOf(htmlId) != 0)
-            {
-               return true;
-            }
-            var tmp = tmp.substring(htmlId.length + 1);
-            var parts = tmp.split('-');
-            if (parts.length < 1)
-            {
-               // stop here
-               return true;
-            }
-            // the first entry is the handler method to call
-            var action = parts[0];
-            if (typeof handlerObject[action] == "function")
-            {
-               // extract the param part of the id
-               var param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
-               handlerObject[action].call(handlerObject, param);
-               args[1].stop = true;
-            }
-         }
-         return true;
-      }
-   );
-}

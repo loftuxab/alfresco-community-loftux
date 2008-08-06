@@ -1,108 +1,118 @@
-.invitationlist {
+.invitationlist
+{
 	border: 1px solid #bababa;
 }
 
-.invitationlist * {
+.invitationlist
+{
 	color: #000;
 }
 
-.invitationlist .inviteelist {
-	height: 280px;
-	overflow-y: auto;
-    overflow-x: hidden;
-    position: relative !important;
-	background-color: #f6fef5;
+.invitationlist .inviteelist
+{
+   background-color: #f6fef5;
+   height: 280px;
+   overflow-y: auto;
+   overflow-x: hidden;
+   position: relative !important;
 }
 
-.invitationlist .inviteelist table {width: 100%; border: none;}
-.invitationlist .inviteelist table thead {display: none;}
-.invitationlist .inviteelist table td {border: none; }
-/*.invitationlist .inviteelist table tr {background-color: transparent;}*/
-.invitationlist .inviteelist table .yui-dt-empty { background-color: transparent; }
-
-/**
- * If an element with "position: relative;" is used inside
- * another element with "overflow: scroll;" IE takes the inner element "out of
- * the flow" which makes statically positioned on the screen ignoring to be
- * hidden and following the scrollbar.
- *
- * In this component, position relative is used for the progress bars, but
- * a YUI button is also used which causes the same problem.
- *
- * If the outer element also has "position: relative;" it works though.
- */
-/*.invitationlist .inviteelist table .yui-dt-bd
+.invitationlist .inviteelist table
 {
-   position:relative;
-}*/
+   border: none;
+   width: 100%;
+}
+.invitationlist .inviteelist table thead
+{
+   display: none;
+}
+.invitationlist .inviteelist table td
+{
+   border: none;
+}
+.invitationlist .inviteelist table .yui-dt-empty
+{
+   background-color: transparent;
+}
 
-.invitationlist .inviteelist .user {
-	height: 55px;
-	padding-left: 66px;     
-	padding-right: 225px;  
-	
+.invitationlist .inviteelist .user
+{
 	border-bottom: 1px solid #e4e5e5;
-	padding-top: 3px;
-	padding-bottom: 3px;	
+	height: 55px;
+	padding: 3px 225px 3px 66px;
 }
 
 .invitationlist .inviteelist .user div.photo,
 .invitationlist .inviteelist .user div.roleSelection,
-.invitationlist .inviteelist .user div.details {
-	position: relative;
+.invitationlist .inviteelist .user div.details
+{
 	float: left;
+	position: relative;
 }
 
-.invitationlist .inviteelist .user .details {
+.invitationlist .inviteelist .user .details
+{
 	padding-left: 5px;
 	width: 90%;
 }
 
-.invitationlist .inviteelist .user .details .uname{
+.invitationlist .inviteelist .user .details .uname
+{
 	font-weight: bold;
 }
 
-.invitationlist .inviteelist .user .photo {
-	width: 60px;           
-	right: 60px;            
-	margin-left: -120px;
+.invitationlist .inviteelist .user .photo
+{
 	left: 60px;
+	margin-left: -120px;
+	right: 60px;            
+	width: 60px;           
 }
 
-.invitationlist .inviteelist .user .roleSelection {
-	width: 220px;            
+.invitationlist .inviteelist .user .roleSelection
+{
 	margin-right: -100%;
+	width: 220px;            
 }
 
-.invitationlist .inviteelist .removeIcon {
+.invitationlist .inviteelist a.remove-item-button:hover
+{
+   text-decoration: none;
+}
+
+.invitationlist .inviteelist .removeIcon
+{
 	background: transparent url(images/remove-icon-16.png) no-repeat center center;
 	padding: 6px;
 }
 
-.invitationlist .inviteelist .user .details span {
+.invitationlist .inviteelist .user .details span
+{
 	display: block;
 }
 
-.invitationlistwrapper {
-	padding-left: 50px;
+.invitationlistwrapper
+{
 	background: transparent url(images/green-arrow.png) no-repeat left 15%;
+	padding-left: 50px;
 }
 
-.invitationlistwrapper .sinvite {
+.invitationlistwrapper .sinvite
+{
 	padding-top: 5px;
 	text-align: right;
 }
 
-.invitationlistwrapper .title {
-	background: transparent url(images/step-two.png) no-repeat 3px center;
-	color: #009300;
+.invitationlistwrapper .title
+{
 	font-weight: bold;
-	padding: 10px 0px 10px 34px;
+	padding: 0.5em;
 }
 
-.invitationlist .invitelist-bar {
-	padding: 6px;
-	border-bottom: 1px dotted #bababa;
+.invitationlist .invitelist-bar
+{
 	background-color: #f5f5f5;
+	border-bottom: 1px dotted #c0c0c0;
+	padding: 6px;
 	visibility: hidden;
 }

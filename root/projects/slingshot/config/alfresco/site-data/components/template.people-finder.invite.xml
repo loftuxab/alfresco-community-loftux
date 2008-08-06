@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
    <scope>template</scope>
-   <region-id>inviteusers</region-id>
+   <region-id>people-finder</region-id>
    <source-id>invite</source-id>
-   <url>/components/invite/inviteusers</url>
+   <url>/components/people-finder/people-finder</url>
 </component>

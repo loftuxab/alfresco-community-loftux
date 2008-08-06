@@ -1,0 +1,86 @@
+.people-finder
+{
+   color: #000;
+}
+
+.people-finder .finder-wrapper
+{
+	border: 1px solid #c0c0c0;
+}
+
+.people-finder .results table
+{
+   width: 100%;
+   border: none;
+}
+.people-finder .results table thead
+{
+   display: none;
+}
+.people-finder .results table td
+{
+   border: none;
+}
+.people-finder .results table .yui-dt-empty
+{
+   background-color: transparent;
+}
+
+/**
+ * If an element with "position: relative;" is used inside
+ * another element with "overflow: scroll;" IE takes the inner element "out of
+ * the flow" which makes statically positioned on the screen ignoring to be
+ * hidden and following the scrollbar.
+ *
+ * In this component, position relative is used for the progress bars, but
+ * a YUI button is also used which causes the same problem.
+ *
+ * If the outer element also has "position: relative;" it works though.
+ */
+/*.people-finder .results .yui-dt-bd
+{
+   position:relative;
+}*/
+
+.people-finder .title
+{
+	font-weight: bold;
+	padding: 0.5em;
+}
+
+.people-finder .search-bar
+{
+	background-color: #dee8ed;
+	border-bottom: 1px dashed #c0c0c0;
+   min-height: 2em;
+	padding: 0.5em;
+}
+
+.people-finder .search-bar div
+{
+   float: left;
+}
+
+.people-finder .search-label
+{
+   padding: 0.5em 1em 0.5em 0.5em;
+}
+
+.people-finder .search-text
+{
+   padding: 0.3em 1em 0.5em 0.5em;
+}
+
+.people-finder .search-button
+{
+   visibility: hidden;
+}
+
+.people-finder .results
+{
+   background-color: #f6f9fc;
+   height: 300px;
+   overflow-x: hidden;
+   overflow-y: auto;
+   position: relative !important;
+}
