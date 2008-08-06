@@ -9,5 +9,5 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="treeview doclib-filter">
    <h2>${msg("header.library")}</h2>
-   <div id="${args.htmlid}-treeview"></div>
+   <div id="${args.htmlid}-treeview" class="tree"></div>
 </div>

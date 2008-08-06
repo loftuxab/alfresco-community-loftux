@@ -1,3 +1,8 @@
+.treeview .tree
+{
+   padding: 0.5em 0 1em;
+}
+
 .treeview .ygtvitem
 {
    background-color: #ffffff;
