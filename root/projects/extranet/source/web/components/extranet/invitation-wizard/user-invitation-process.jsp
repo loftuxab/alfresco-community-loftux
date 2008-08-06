@@ -40,6 +40,13 @@
 		boolean available = syncService.isUserIdAvailable(userId);
 		if(available)
 		{
+			// update the invited user object
+			DatabaseInvitedUser dUser = invitationService.getInvitedUser(invitedUserId);
+			dUser.setFirstName(firstName);
+			dUser.setLastName(lastName);
+			dUser.setEmail(email);
+			invitationService.updateInvitedUser(dUser);
+			
 			// process the invited user
 			invitationService.processInvitedUser(invitedUserId, userId, password);
 			

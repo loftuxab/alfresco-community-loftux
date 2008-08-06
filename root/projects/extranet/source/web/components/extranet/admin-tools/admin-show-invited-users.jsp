@@ -41,29 +41,29 @@
 	List invitedUsers = invitationService.list();
 	for(int i = 0; i < invitedUsers.size(); i++)
 	{
-		DatabaseInvitedUser user = (DatabaseInvitedUser) invitedUsers.get(i);
-		if(!user.isCompleted())
+		DatabaseInvitedUser dbUser = (DatabaseInvitedUser) invitedUsers.get(i);
+		if(!dbUser.isCompleted())
 		{
 		
 %>
 		<tr>
 			<td>
-				<%=user.getUserId()%>
+				<%=dbUser.getUserId()%>
 			</td>
 			<td>
-				<%=user.getEmail()%>
+				<%=dbUser.getEmail()%>
 			</td>
 			<td>
-				<%=user.getFirstName()%>
+				<%=dbUser.getFirstName()%>
 			</td>
 			<td>
-				<%=user.getLastName()%>
+				<%=dbUser.getLastName()%>
 			</td>
 			<td>
-				<%=user.getHash()%>
+				<%=dbUser.getHash()%>
 			</td>
 			<td>
-				<a href="/extranet/?p=invitation-wizard&hash=<%=user.getHash()%>">Process</a>
+				<a href="/extranet/?p=invitation-wizard&hash=<%=dbUser.getHash()%>">Process</a>
 			</td>
 		</tr>
 <%

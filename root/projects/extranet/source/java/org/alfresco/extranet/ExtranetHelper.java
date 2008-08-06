@@ -31,6 +31,7 @@ import org.alfresco.extranet.jira.JIRAService;
 import org.alfresco.extranet.ldap.LDAPCompany;
 import org.alfresco.extranet.ldap.LDAPGroup;
 import org.alfresco.extranet.ldap.LDAPUser;
+import org.alfresco.extranet.webhelpdesk.WebHelpdeskService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -190,6 +191,32 @@ public class ExtranetHelper
     {
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         return (SyncService) context.getBean("extranet.service.sync");
+    }
+
+    
+    /**
+     * Gets the web helpdesk service
+     * 
+     * @param request the request
+     * 
+     * @return the web helpdesk service
+     */
+    public static WebHelpdeskService getWebHelpdeskService(HttpServletRequest request)
+    {
+        return getWebHelpdeskService(request.getSession().getServletContext());        
+    }
+    
+    /**
+     * Gets the web helpdesk service
+     * 
+     * @param servletContext the servlet context
+     * 
+     * @return the web helpdesk service
+     */
+    public static WebHelpdeskService getWebHelpdeskService(ServletContext servletContext)
+    {
+        ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        return (WebHelpdeskService) context.getBean("extranet.service.webhelpdesk");
     }
     
     

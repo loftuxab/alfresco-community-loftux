@@ -144,7 +144,7 @@ public class SyncService
         WebHelpdeskUser whdUser = this.webHelpdeskService.getUser(whdUserId);
         if(whdUser != null)
         {
-            debug(" -> whd user did not already exist");
+            debug(" -> whd user already exists");
             debug(" -> migrating '" + whdUserId + "' to '" + dbUser.getUserId() + "'");
             
             // migrate the existing whd user id to our user's id
@@ -170,6 +170,7 @@ public class SyncService
         }
         else
         {
+            /*
             debug(" -> no existing whd user, creating new one");
             
             // create a new whd user id
@@ -181,6 +182,9 @@ public class SyncService
             debug(" -> insert was successful");
             
             success = true;
+            */
+            
+            System.out.println("Skipping creation of web helpdesk user - not implemented");
         }
         
         if(success)
@@ -286,4 +290,36 @@ public class SyncService
         
         return success;
     }
+    
+    /**
+     * Calls Alfresco and ensures group membership is set for a single user
+     * 
+     * @param databaseUser
+     * @return
+     */
+    public synchronized boolean syncAlfrescoGroupsForUser(String userId, String userType)
+        throws RemoteConfigException
+    {
+        boolean success = false;
+        
+        Connector connector = FrameworkHelper.getConnector("alfresco-system");                
+        String uri = "/network/login/sync?userId=" + userId + "&userType=" + userType;
+        Response r = connector.call(uri);
+        if(r.getStatus().getCode() == 200)
+        {
+            success = true;
+        }
+        if(r.getStatus().getCode() != 200)
+        {
+            System.out.println("Sync command for user: " + userId + " failed with code: " + r.getStatus().getCode());
+            if(r.getStatus().getException() != null)
+            {
+                r.getStatus().getException().printStackTrace();
+            }
+        }
+        
+        return success;
+        
+    }
+    
 }

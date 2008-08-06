@@ -157,6 +157,11 @@ public class DatabaseService implements ApplicationContextAware
         return this.invitedUserBean.delete(invitedUser);
     }
     
+    public boolean updateInvitedUser(DatabaseInvitedUser invitedUser)
+    {
+        return this.invitedUserBean.update(invitedUser);
+    }
+    
     public synchronized List getAllInvitedUsers()
     {
         return this.invitedUserBean.list();

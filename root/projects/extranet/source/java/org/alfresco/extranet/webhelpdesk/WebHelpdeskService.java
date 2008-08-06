@@ -31,6 +31,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 /**
  * Extranet WebHelpdeskService implementation.
@@ -239,4 +240,16 @@ public class WebHelpdeskService implements ApplicationContextAware
         // run the query
         return jdbcTemplate.queryForInt(sql);
     }
+    
+    /**
+     * Executes an arbitrary query
+     * 
+     * @return the list
+     */
+    public SqlRowSet query(String sql)
+    {
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+        return rowSet;
+    }
+    
 }

@@ -29,6 +29,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.User;
+import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.extranet.SyncService;
 import org.alfresco.extranet.UserService;
 import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.web.site.exception.UserFactoryException;
@@ -149,9 +151,27 @@ public class ExtranetUserFactory extends AlfrescoUserFactory
                     user.setProperty("level", databaseUser.getLevel());
                 }
             }
+            
+            // get the sync service
+            SyncService syncService = (SyncService) appContext.getBean("extranet.service.sync");
+            if(syncService != null)
+            {
+                if(user != null)
+                {
+                    try
+                    {
+                        // sync the alfresco user groups for this user
+                        syncService.syncAlfrescoGroupsForUser(userId, "enterprise");
+                    }
+                    catch(RemoteConfigException rce)
+                    {
+                        // unable to sync groups
+                        FrameworkHelper.getLogger().warn("Unable to sync Alfresco groups for user: " + userId, rce);
+                    }
+                }
+            }
         }
         
         return user;
     }
-    
 }
