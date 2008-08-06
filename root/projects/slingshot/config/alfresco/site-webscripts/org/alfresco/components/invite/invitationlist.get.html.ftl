@@ -14,7 +14,7 @@
 <div id="${args.htmlid}-invitationlist" class="invitationlist">
 
    <div id="${args.htmlid}-invitationBar" class="invitelist-bar">
-      <input type="button" id="${args.htmlid}-selectallroles-button" value="${msg("invitationlist.selectallroles")}" />
+      <button id="${args.htmlid}-selectallroles-button">${msg("invitationlist.selectallroles")}</button>
       <select id="${args.htmlid}-selectallroles-menu">
          <option value="consumer">${msg("role.siteconsumer")}</option>
          <option value="collaborator">${msg("role.sitecollaborator")}</option>
@@ -26,7 +26,7 @@
    </div>
    
    <div id="${args.htmlid}-role-column-template" style="display:none">
-         <button class="role-selector-button" value="">${msg("role")}</button>
+      <button class="role-selector-button" value="">${msg("role")}</button>
    </div>
 
 </div>

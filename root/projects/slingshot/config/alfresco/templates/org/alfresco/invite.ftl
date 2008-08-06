@@ -19,7 +19,7 @@
 
 			<div class="yui-u first column1">
 					<div class="yui-b" id="byAlfrescoUsers">
-					   <@region id="inviteusers" scope="template" protected=true />
+					   <@region id="people-finder" scope="template" protected=true />
 					</div>
 
 					<div class="yui-b" id="byEmail">

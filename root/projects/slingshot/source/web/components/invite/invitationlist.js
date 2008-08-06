@@ -54,10 +54,10 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
-      YAHOO.Bubbling.on("onAddInvite", this.onAddInvite, this);
+      YAHOO.Bubbling.on("personSelected", this.onAddInvite, this);
    
       return this;
    }
@@ -209,7 +209,6 @@
 
          renderCellRole = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {  
-            oColumn.width = 130;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             // cell where to add the element
@@ -260,7 +259,6 @@
 
          renderCellRemoveButton = function InvitationList_renderCellRemoveButton(elCell, oRecord, oColumn, oData)
          {  
-            oColumn.width = 30;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             var desc =
@@ -276,7 +274,7 @@
             key: "user", label: "User", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "role", label: "Role", sortable: false, formatter: renderCellRole, width: 130
+            key: "role", label: "Role", sortable: false, formatter: renderCellRole, width: 140
          },
          {
             key: "remove", label: "Remove", sortable: false, formatter: renderCellRemoveButton, width: 30
@@ -374,8 +372,14 @@
          // find the correct row
          var recordId = this.widgets.dataTable.getRecordIndex(owner);
          
+         // Fire the personDeselected event
+         YAHOO.Bubbling.fire("personDeselected",
+         {
+            userName: this.widgets.dataTable.getRecord(recordId).getData("userName")
+         });
+
          // remove the element, but first set the empty message (which is static,
-         // thus shared by this table and the one to find users
+         // thus shared by this table and the one to find users)
          YAHOO.widget.DataTable.MSG_EMPTY = "";
          this.widgets.dataTable.deleteRow(recordId);
          this._enableDisableInviteButton();
