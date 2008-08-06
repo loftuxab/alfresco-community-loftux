@@ -50,6 +50,8 @@ public class WebHelpdeskUserRowMapper implements RowMapper
 	    String email = rs.getString("EMAIL");
 	    String notes = rs.getString("NOTES");
 	    int ldapConnectionId = rs.getInt("LDAP_CONNECTION_ID");
+	    String rdn = rs.getString("RDN");
+	    String baseDn = rs.getString("BASE_DN");
 	    
 	    WebHelpdeskUser user = new WebHelpdeskUser(id, userName);
 	    user.setFirstName(firstName);
@@ -60,6 +62,8 @@ public class WebHelpdeskUserRowMapper implements RowMapper
 	        user.setDescription(notes);
 	    }
 	    user.setLdapConnectionId(ldapConnectionId);
+	    user.setRdn(rdn);
+	    user.setBaseDn(baseDn);
 
 		return user;
 	}

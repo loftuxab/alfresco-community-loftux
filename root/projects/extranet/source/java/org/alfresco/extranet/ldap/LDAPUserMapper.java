@@ -46,12 +46,13 @@ public class LDAPUserMapper implements AttributesMapper
     {
         LDAPUser user = null;
         
-        String userId = (String) attributes.get("cn").get();
+        //String userId = (String) attributes.get("cn").get();
+        String userId = (String) attributes.get("uid").get();
         if(userId != null)
         {
             user = new LDAPUser(userId);
 
-            String firstName = null; // TODO
+            String firstName = (String) attributes.get("givenName").get();
             if(firstName != null)
             {
                 user.setFirstName(firstName);
@@ -69,6 +70,16 @@ public class LDAPUserMapper implements AttributesMapper
                 user.setLastName(lastName);
             }
             
+            String email = (String) attributes.get("email").get();
+            if(email == null)
+            {
+                email = (String) attributes.get("emailAddress").get();
+            }
+            if(email != null)
+            {
+                user.setEmail(email);
+            }
+            
             Attribute description = attributes.get("description");
             if(description != null)
             {
@@ -82,7 +93,6 @@ public class LDAPUserMapper implements AttributesMapper
                 String pw = new String(array);
                 user.setPassword(pw);
             }
-            
         }
         
         return user;

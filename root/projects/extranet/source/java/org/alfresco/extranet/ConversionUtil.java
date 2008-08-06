@@ -56,7 +56,7 @@ public class ConversionUtil
         whdUser.setFirstName(dbUser.getFirstName());
         whdUser.setMiddleName(dbUser.getMiddleName());
         whdUser.setLastName(dbUser.getLastName());
-                
+                        
         return whdUser;
     }
     

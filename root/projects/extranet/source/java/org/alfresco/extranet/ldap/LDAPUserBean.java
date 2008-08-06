@@ -77,21 +77,35 @@ public class LDAPUserBean
         objectBasicAttribute.add("inetOrgPerson");
         attribs.put(objectBasicAttribute);
         
-        // add other attributes
-        attribs.put("cn", user.getUserId());
+        // figure out the value for cn
+        String cn = user.getUserId();
+        if(user.getFirstName() != null && user.getLastName() != null)
+        {
+            cn = user.getFirstName() + " " + user.getLastName();
+        }
+        
+        // common name
+        attribs.put("cn", cn);
+        
+        // last name
         attribs.put("sn", user.getLastName());
+        
+        // uid
         attribs.put("uid", user.getUserId());
         
+        // description
         if(user.getDescription() != null)
         {
             attribs.put("description", user.getDescription());
         }
         
+        // password
         if(user.getPassword() != null)
         {
             attribs.put("userPassword", user.getPassword());
         }
         
+        // first name
         if(user.getFirstName() != null)
         {
             attribs.put("givenName", user.getFirstName());
@@ -99,9 +113,9 @@ public class LDAPUserBean
         
         
         // define the distinguished name
-        //DistinguishedName dn = new DistinguishedName("dc=public,dc=people,dc=ds,dc=alfresco,dc=com");
         DistinguishedName dn = new DistinguishedName("dc=public,dc=people");
-        dn.add("cn", user.getUserId());
+        //dn.add("cn", user.getUserId());
+        dn.add("uid", user.getUserId());
         
         // bind in
         ldapTemplate.bind(dn, null, attribs);
@@ -127,30 +141,44 @@ public class LDAPUserBean
         objectBasicAttribute.add("inetOrgPerson");
         attribs.put(objectBasicAttribute);
         
-        // add other attributes
-        attribs.put("cn", user.getUserId());
+        // figure out the value for cn
+        String cn = user.getUserId();
+        if(user.getFirstName() != null && user.getLastName() != null)
+        {
+            cn = user.getFirstName() + " " + user.getLastName();
+        }
+
+        // common name
+        attribs.put("cn", cn);
+        
+        // last name
         attribs.put("sn", user.getLastName());
+        
+        // user id
         attribs.put("uid", user.getUserId());
         
+        // description
         if(user.getDescription() != null)
         {
             attribs.put("description", user.getDescription());
         }
         
+        // password
         if(user.getPassword() != null)
         {
             attribs.put("userPassword", user.getPassword());
         }
         
+        // first name
         if(user.getFirstName() != null)
         {
             attribs.put("givenName", user.getFirstName());
         }        
         
         // define the distinguished name
-        //DistinguishedName dn = new DistinguishedName("dc=public,dc=people,dc=ds,dc=alfresco,dc=com");
         DistinguishedName dn = new DistinguishedName("dc=public,dc=people");
-        dn.add("cn", user.getUserId());
+        //dn.add("cn", user.getUserId());
+        dn.add("uid", user.getUserId());
         
         // bind in
         ldapTemplate.rebind(dn, null, attribs);
@@ -168,7 +196,8 @@ public class LDAPUserBean
     public boolean delete(DatabaseUser user)
     {
         DistinguishedName dn = new DistinguishedName("dc=public,dc=people");
-        dn.add("cn", user.getUserId());
+        //dn.add("cn", user.getUserId());
+        dn.add("uid", user.getUserId());
         ldapTemplate.unbind(dn);
         
         return true;
@@ -196,7 +225,8 @@ public class LDAPUserBean
     public LDAPUser get(String userId) 
     {
         DistinguishedName dn = new DistinguishedName("dc=public,dc=people");        
-        dn.add("cn", userId);
+        //dn.add("cn", userId);
+        dn.add("uid", userId);
 
         return (LDAPUser) ldapTemplate.lookup(dn, new LDAPUserMapper());
     }   
