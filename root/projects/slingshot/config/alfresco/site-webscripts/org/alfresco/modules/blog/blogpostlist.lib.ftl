@@ -122,6 +122,11 @@
             <span class="spacer"> | </span>
          </#if>
          <span class="nodeAttrLabel">${msg("post.info.author")}:</span><span class="nodeAttrValue"><@userLib.renderUserLink user=post.author /></span>
+         <#if (post.isPublished && post.postLink?? && post.postLink?length > 0)>
+            <span class="spacer"> | </span>
+            <span class="nodeAttrLabel">${msg("post.info.externalLink")}:</span>
+            <span class="nodeAttrValue"><a target="_blank" href="${post.postLink}">${msg("post.info.clickHere")}</a></span>
+         </#if>
       </div>
       
       <div class="content yuieditor">${post.content}</div>

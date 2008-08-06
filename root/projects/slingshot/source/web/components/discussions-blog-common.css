@@ -374,13 +374,9 @@ html>body .node, .reply, .comment {
   margin-bottom: 15px;
 }
 .editNodeForm .yui-editor-container {
-  margin: 0px 0 0px 114px;
+  margin: 0px 0px 10px 114px;
 }
-.editNodeForm .suggestedTags li {
-  list-style-type: none;
-  float: left;
-  margin-right: 10px;
-}
+
 .editNodeForm .nodeFormAction {
   margin: 25px 0 10px 115px;
 }

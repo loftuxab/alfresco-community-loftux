@@ -42,35 +42,31 @@
    );
 //]]></script>
 
-<div class="taglibcontainer">
-   <label>${msg("taglibrary.tags")}</label>
-   <div class="tags">
-      <div class="top_taglist tags_box">
-         <ul id="${htmlid}-current-tags">
-         <#list tags as tag>
-            <li id="${htmlid}-onRemoveTag-${tag?html}">
-               <a href="#" class="taglibrary-action">${tag?html}
-                  <span class="close">&nbsp;
-                     <!-- <img src="/modules/taglibrary/images/icon_close.gif" alt="x" /> -->
-                  </span>
-               </a>
-            </li>
-         </#list>
-         </ul>
-      </div>
-      <br class="clear" />
-      <div class="title">${msg("taglibrary.typetag")}</div>
-      <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
-      <input type="button" id="${htmlid}-add-tag-button" value="Add" />
-      <br class="clear" />
-      <div class="bottom_taglist tags_box">
-         <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
-         
-         <#-- Following list contains the popular tags, loaded by AJAX on users request -->
-         <ul id="${htmlid}-popular-tags">
-         </ul>
-      </div>
-      <br class="clear" />
+<div class="taglibrary">
+   <div class="top_taglist tags_box">
+      <ul id="${htmlid}-current-tags">
+      <#list tags as tag>
+         <li id="${htmlid}-onRemoveTag-${tag?html}">
+            <a href="#" class="taglibrary-action">
+               <span>${tag?html}</span>
+               <span class="remove" alt="remove tag">&nbsp;</span>
+            </a>
+         </li>
+      </#list>
+      </ul>
    </div>
+   <br class="clear" />
+   <div class="title rel_left">${msg("taglibrary.typetag")}:&nbsp;</div>
+   <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
+   <input type="button" id="${htmlid}-add-tag-button" value="Add" />
+   <br class="clear" />
+   <div class="bottom_taglist tags_box">
+      <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
+       
+      <#-- Following list contains the popular tags, loaded by AJAX on users request -->
+      <ul id="${htmlid}-popular-tags">
+      </ul>
+   </div>
+   <br class="clear" />
 </div>
 </#macro>

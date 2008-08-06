@@ -58,6 +58,12 @@
  
          <span class="nodeAttrLabel">${msg("post.info.author")}:</span>
          <span class="nodeAttrValue"><@userLib.renderUserLink user=post.author /></span>
+
+         <#if (post.isPublished && post.postLink?? && post.postLink?length > 0)>
+            <span class="spacer"> | </span>
+            <span class="nodeAttrLabel">${msg("post.info.externalLink")}:</span>
+            <span class="nodeAttrValue"><a target="_blank" href="${post.postLink}">${msg("post.info.clickHere")}</a></span>
+         </#if>
       
          <#if (post.tags?size > 0)>
             <span class="spacer"> | </span>
@@ -116,6 +122,7 @@
          <textarea rows="8" cols="80" name="content" id="${htmlId}-content" class="yuieditor"><#if editForm>${(post.content!'')?html}</#if></textarea> 
       
          <!-- tags -->
+         <label>${msg("post.tags")}:</label>         
          <#if editForm>
             <#assign tags=post.tags />
          <#else>

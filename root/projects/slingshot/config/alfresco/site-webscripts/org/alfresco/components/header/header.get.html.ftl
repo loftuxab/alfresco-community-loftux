@@ -30,8 +30,8 @@
          <span class="menu-item-separator">|</span>
          <span class="menu-item">
             <span class="search-container">
+               <label for="${args.htmlid}-searchtext" style="display:none">${msg("header.search.inputlabel")}</label>
                <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />
-               <!-- ><span id="${args.htmlid}-search-sbutton" class="search-icon">&nbsp;</span> -->
                <span id="${args.htmlid}-search-tbutton" class="search-site-icon">&nbsp;</span>
             </span>
          </span>

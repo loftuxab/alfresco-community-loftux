@@ -105,26 +105,28 @@
          <#if topic?has_content>
             <input type="hidden" name="topicId" value="${topic.name}" />
          </#if>
-
-         <label>${msg("topic.form.topicTitle")}:</label>
-         <input type="text" value="<#if topic?has_content && topic.title?has_content>${topic.title?html}</#if>"
-                name="title" id="${htmlid}-title" size="80" />
-         <label>${msg("topic.form.topicText")}:</label>
-         <textarea rows="8" cols="80" name="content" id="${htmlid}-content" class="yuieditor"
-            ><#if topic?has_content && topic.content?has_content>${topic.content?html}</#if></textarea> 
-         
-         <!-- tags -->
          <#if topic?has_content>
             <#assign tags=topic.tags />
          <#else>
             <#assign tags=[] />
          </#if>
          <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-         <!-- Render the tag inputs -->
          <@taglibraryLib.renderTagInputs htmlid=htmlid tags=tags tagInputName="tags" />
-         <!-- Render the library component -->
+         
+         <#-- title -->
+         <label>${msg("topic.form.topicTitle")}:</label>
+         <input type="text" value="<#if topic?has_content && topic.title?has_content>${topic.title?html}</#if>"
+                name="title" id="${htmlid}-title" size="80" />
+                
+         <#-- content -->
+         <label>${msg("topic.form.topicText")}:</label>
+         <textarea rows="8" cols="80" name="content" id="${htmlid}-content" class="yuieditor"
+            ><#if topic?has_content && topic.content?has_content>${topic.content?html}</#if></textarea> 
+         
+         <#-- tags -->
+         <label>${msg("topic.tags")}:</label>
          <@taglibraryLib.renderTagLibrary htmlid=htmlid site=site tags=tags />
-         <!-- end tags -->
+
       </div>
       <div class="nodeFormAction">
          <input type="submit" id="${htmlid}-ok-button" value="<#if topic?has_content>${msg('topic.form.save')}<#else>${msg('topic.form.create')}</#if>" />
