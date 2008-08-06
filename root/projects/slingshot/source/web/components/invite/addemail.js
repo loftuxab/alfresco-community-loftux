@@ -48,7 +48,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "button", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["event", "button"], this.onComponentsLoaded, this);
    
       return this;
    }
@@ -142,9 +142,8 @@
             return;
          }
          
-         // send a onAddInvite bubble event to add the new address to the
-         // invitee list
-         YAHOO.Bubbling.fire("onAddInvite",
+         // Fire the personSelected bubble event
+         YAHOO.Bubbling.fire("personSelected",
          {
             firstName : firstName,
             lastName : lastName,

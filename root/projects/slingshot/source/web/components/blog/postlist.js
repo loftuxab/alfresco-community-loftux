@@ -47,7 +47,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "dom", "event", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onSetBlogPostListParams", this.onSetPostListParams, this);

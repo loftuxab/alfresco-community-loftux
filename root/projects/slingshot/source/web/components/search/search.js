@@ -54,7 +54,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onSearch", this.onSearch, this);
