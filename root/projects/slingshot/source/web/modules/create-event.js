@@ -158,11 +158,36 @@
 		 	{
 		 	   YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
 		 	}
-
+         
+         var me = this;
+         
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
-
+         eventForm.addValidation("td", function (field, args, event, form, silent)
+         {      
+            // Check that the end date is after the start date
+            var startDate = new Date(Dom.get("from").value + " " + Dom.get(me.id + "-start").value);
+            var toDate = new Date(Dom.get("to").value + " " + Dom.get(me.id + "-end").value);
+            
+            var after = YAHOO.widget.DateMath.after(toDate, startDate);
+            
+            if (Alfresco.logger.isDebugEnabled())
+            {
+               Alfresco.logger.debug("Current start date: " + Dom.get("from").value + " " + Dom.get(me.id + "-start").value);
+               Alfresco.logger.debug("Current end date: " + Dom.get("to").value + " " + Dom.get(me.id + "-end").value);
+               Alfresco.logger.debug("End date is after start date: " + after);
+            }
+            
+            if (!after && !silent)
+            {
+               form.addError(form.getFieldLabel(field.id) + " cannot be before the start date.", field);
+            }
+            
+            return after;
+            
+         }, null, "focus");
+                          
          // OK Button
          var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
          {
@@ -185,7 +210,7 @@
 	
 				// Initialise the start and end dates to today
 				var today = new Date();
-
+            // Pretty formatting
 				var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
 				Dom.get("fd").value = dateStr;
 				Dom.get("td").value = dateStr;
@@ -333,7 +358,8 @@
 					oCalendarMenu.show();
 				}, 0);
 			});
-
+         var me = this;
+         
 			oCalendar.selectEvent.subscribe(function (type, args) {
 				var date;
 				var Dom = YAHOO.util.Dom;
@@ -348,14 +374,16 @@
 					else
 					{
 						prettyId = "fd";
-					     hiddenId = "from";
+					   hiddenId = "from";
 					}
 
 					date = args[0][0];
 					var selectedDate = new Date(date[0], (date[1]-1), date[2]);
 
-					Dom.get(prettyId).value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
-					Dom.get(hiddenId).value = Alfresco.util.formatDate(selectedDate, "yyyy/mm/d");
+               Dom.get(hiddenId).value = Alfresco.util.formatDate(selectedDate, "yyyy/mm/d");
+               var elem = Dom.get(prettyId);
+					elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
+					elem.focus();			
 				}
 
 				oCalendarMenu.hide();
