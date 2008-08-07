@@ -38,9 +38,10 @@ import org.alfresco.jlan.smb.server.notify.NotifyRequest;
  */
 public class DiskDeviceContext extends DeviceContext {
 	
-	//	Change notification handler
+	//	Change notification handler and flag to indicate if file server should generate notifications
 	
 	private NotifyChangeHandler m_changeHandler;
+	private boolean  m_filesysNotifications = true;
 
 	//	Volume information
 	
@@ -191,10 +192,10 @@ public class DiskDeviceContext extends DeviceContext {
 		
 		super.CloseContext();
 		
-    // Close the change notification handler
+		// Close the change notification handler
     
-    if ( hasChangeHandler())
-      enableChangeHandler( false);
+		if ( hasChangeHandler())
+			enableChangeHandler( false);
 	}
 
 	/**
@@ -213,6 +214,17 @@ public class DiskDeviceContext extends DeviceContext {
 	 */
 	public final NotifyChangeHandler getChangeHandler() {
 		return m_changeHandler;
+	}
+
+	/**
+	 * Determine if file server change notifications are enabled
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasFileServerNotifications() {
+		if ( m_changeHandler == null)
+			return false;
+		return m_filesysNotifications;
 	}
 	
 	/**
@@ -294,6 +306,15 @@ public class DiskDeviceContext extends DeviceContext {
 	 */
 	public final void setDeviceAttributes(int attrib) {
 	  m_deviceAttribs = attrib;
+	}
+
+	/**
+	 * Enable/disable file server change notifications
+	 * 
+	 * @param ena boolean
+	 */
+	public final void setFileServerNotifications(boolean ena) {
+		m_filesysNotifications = ena;
 	}
 	
 	/**

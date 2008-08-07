@@ -34,36 +34,36 @@ public class NotifyChange {
 
 	//	Change notification filter flags
 	
-	public final static int FileName				= 0x0001;
-	public final static int DirectoryName		= 0x0002;
-	public final static int Attributes			= 0x0004;
-	public final static int Size						= 0x0008;
-	public final static int LastWrite				= 0x0010;
-	public final static int LastAccess			= 0x0020;
-	public final static int Creation				= 0x0040;
-	public final static int Security				= 0x0100;
+	public final static int FileName		= 0x0001;
+	public final static int DirectoryName	= 0x0002;
+	public final static int Attributes		= 0x0004;
+	public final static int Size			= 0x0008;
+	public final static int LastWrite		= 0x0010;
+	public final static int LastAccess		= 0x0020;
+	public final static int Creation		= 0x0040;
+	public final static int Security		= 0x0100;
 
 	//	Change notification actions
 	
-	public final static int ActionAdded						= 1;
-	public final static int ActionRemoved					= 2;
-	public final static int ActionModified				= 3;
+	public final static int ActionAdded				= 1;
+	public final static int ActionRemoved			= 2;
+	public final static int ActionModified			= 3;
 	public final static int ActionRenamedOldName	= 4;
 	public final static int ActionRenamedNewName	= 5;
-	public final static int ActionAddedStream			= 6;
+	public final static int ActionAddedStream		= 6;
 	public final static int ActionRemovedStream		= 7;
 	public final static int ActionModifiedStream	= 8;
 	
 	//	Change notification action names
 	
 	private final static String[] _actnNames = {"Added",
-																						  "Removed",
-																						  "Modified",
-																						  "RenamedOldName",
-																						  "RenamedNewName",
-																						  "AddedStream",
-																						  "RemovedStream",
-																						  "ModifiedStream"
+												"Removed",
+												"Modified",
+												"RenamedOldName",
+												"RenamedNewName",
+												"AddedStream",
+												"RemovedStream",
+												"ModifiedStream"
 	};
 																							
 	/**

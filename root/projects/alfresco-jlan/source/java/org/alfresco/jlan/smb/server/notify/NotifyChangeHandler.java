@@ -722,12 +722,12 @@ public class NotifyChangeHandler implements Runnable {
 			ntpkt.resetBytePointerAlign();
 			
 			int pos = ntpkt.getPosition();
-			ntpkt.setNTParameter(1, 0);					//	total data count
+			ntpkt.setNTParameter(1, 0);				//	total data count
 			ntpkt.setNTParameter(3, pos - 4);		//	offset to parameter block
 
-			//	Get the relative file name for the event
+			//	Get the path for the event
 			
-			String relName = FileName.makeRelativePath(req.getWatchPath(), evt.getFileName());
+			String relName = evt.getFileName();
 			if ( relName == null)
 			  relName = evt.getShortFileName();
 			
@@ -738,9 +738,9 @@ public class NotifyChangeHandler implements Runnable {
 			
 			//	Pack the notification structure
 			
-			ntpkt.packInt(0);																//	offset to next structure
-			ntpkt.packInt(evt.getAction());									//	action
-			ntpkt.packInt(relName.length() * 2);						//	file name length
+			ntpkt.packInt(0);						//	offset to next structure
+			ntpkt.packInt(evt.getAction());			//	action
+			ntpkt.packInt(relName.length() * 2);	//	file name length
 			ntpkt.packString(relName, true, false);
 			
 			//	Check if the event is a file/directory rename, if so then add the old file/directory details
@@ -761,9 +761,9 @@ public class NotifyChangeHandler implements Runnable {
 				
 				//	Add the old file/directory name details
 
-				ntpkt.packInt(0);																//	offset to next structure
+				ntpkt.packInt(0);									//	offset to next structure
 				ntpkt.packInt(NotifyChange.ActionRenamedOldName);
-				ntpkt.packInt(relName.length() * 2);						//	file name length
+				ntpkt.packInt(relName.length() * 2);				//	file name length
 				ntpkt.packString(relName, true, false);
 			}
 			
@@ -778,11 +778,11 @@ public class NotifyChangeHandler implements Runnable {
 			ntpkt.setNTParameter(0, prmLen);		//	total parameter block count
 			ntpkt.setNTParameter(2, prmLen);		//	parameter block count for this packet
 			ntpkt.setNTParameter(6, ntpkt.getPosition() - 4);
-																					//	data block offset
+													//	data block offset
 			ntpkt.setByteCount();
 
 			ntpkt.setCommand(PacketType.NTTransact);
-      ntpkt.setLongErrorCode(0);
+			ntpkt.setLongErrorCode(0);
 			
 			ntpkt.setFlags(SMBSrvPacket.FLG_CANONICAL + SMBSrvPacket.FLG_CASELESS);
 			ntpkt.setFlags2(SMBSrvPacket.FLG2_UNICODE + SMBSrvPacket.FLG2_LONGERRORCODE);
@@ -1051,6 +1051,7 @@ public class NotifyChangeHandler implements Runnable {
 		
 		//	DEBUG
 		
-		Debug.println("NotifyChangeHandler thread exit");
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("NotifyChangeHandler thread exit");
 	}
 }

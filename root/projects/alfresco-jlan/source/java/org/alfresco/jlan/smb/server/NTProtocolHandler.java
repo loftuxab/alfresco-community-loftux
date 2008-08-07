@@ -1444,10 +1444,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Check if there are any file/directory change notify requests active
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
-		if ( netFile.getWriteCount() > 0 && diskCtx.hasChangeHandler())
+		if ( netFile.getWriteCount() > 0 && diskCtx.hasFileServerNotifications())
 			diskCtx.getChangeHandler().notifyFileSizeChanged(netFile.getFullName());
 
-		if ( netFile.hasDeleteOnClose() && diskCtx.hasChangeHandler())
+		if ( netFile.hasDeleteOnClose() && diskCtx.hasFileServerNotifications())
 			diskCtx.getChangeHandler().notifyFileChanged(NotifyChange.ActionRemoved, netFile.getFullName());
 	}
 
@@ -2768,7 +2768,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Check if there are any file/directory change notify requests active
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
-		if ( diskCtx.hasChangeHandler())
+		if ( diskCtx.hasFileServerNotifications())
 			diskCtx.getChangeHandler().notifyRename(oldName, newName);
 	}
 
@@ -2911,7 +2911,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Check if there are any file/directory change notify requests active
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
-		if ( diskCtx.hasChangeHandler())
+		if ( diskCtx.hasFileServerNotifications())
 			diskCtx.getChangeHandler().notifyFileChanged(NotifyChange.ActionRemoved, fileName);
 	}
 
@@ -3047,7 +3047,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Check if there are any file/directory change notify requests active
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
-		if ( diskCtx.hasChangeHandler())
+		if ( diskCtx.hasFileServerNotifications())
 			diskCtx.getChangeHandler().notifyDirectoryChanged(NotifyChange.ActionRemoved, dirName);
 	}
 
@@ -4696,7 +4696,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
 
-			if ( diskCtx.hasChangeHandler() && netFile.getFullName() != null) {
+			if ( diskCtx.hasFileServerNotifications() && netFile.getFullName() != null) {
 
 				// Get the change handler
 
@@ -5008,7 +5008,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
 
-			if ( diskCtx.hasChangeHandler() && path != null) {
+			if ( diskCtx.hasFileServerNotifications() && path != null) {
 
 				// Get the change handler
 
@@ -5280,7 +5280,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
 
-		if ( netFile.getWriteCount() % FileSizeChangeRate == 0 && diskCtx.hasChangeHandler() && netFile.getFullName() != null) {
+		if ( netFile.getWriteCount() % FileSizeChangeRate == 0 && diskCtx.hasFileServerNotifications() && netFile.getFullName() != null) {
 
 			// Get the change handler
 
@@ -5758,7 +5758,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Check if there are any file/directory change notify requests active
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
-		if ( diskCtx.hasChangeHandler() && respAction == FileAction.FileCreated) {
+		if ( diskCtx.hasFileServerNotifications() && respAction == FileAction.FileCreated) {
 
 			// Check if a file or directory has been created
 
@@ -6594,7 +6594,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Check if there are any file/directory change notify requests active
 
 		DiskDeviceContext diskCtx = (DiskDeviceContext) conn.getContext();
-		if ( diskCtx.hasChangeHandler() && respAction == FileAction.FileCreated) {
+		if ( diskCtx.hasFileServerNotifications() && respAction == FileAction.FileCreated) {
 
 			// Check if a file or directory has been created
 
@@ -7126,8 +7126,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		}
 
 		// Get the maximum notifications to buffer whilst waiting for the request to be reset after
-		// a notification
-		// has been triggered
+		// a notification has been triggered
 
 		int maxQueue = 0;
 
@@ -7185,8 +7184,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			// Create a change notification request
 
-			req = new NotifyRequest(filter, watchTree, m_sess, dir, mid, ntpkt.getTreeId(), ntpkt.getProcessId(), ntpkt
-					.getUserId(), maxQueue);
+			req = new NotifyRequest(filter, watchTree, m_sess, dir, mid, ntpkt.getTreeId(), ntpkt.getProcessId(), ntpkt.getUserId(), maxQueue);
 
 			// Add the request to the pending notify change lists
 
@@ -7203,8 +7201,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		}
 
 		// NOTE: If the change notification request is accepted then no reply is sent to the client.
-		// A reply will be sent
-		// asynchronously if the change notification is triggered.
+		// A reply will be sent asynchronously if the change notification is triggered.
 	}
 
 	/**
