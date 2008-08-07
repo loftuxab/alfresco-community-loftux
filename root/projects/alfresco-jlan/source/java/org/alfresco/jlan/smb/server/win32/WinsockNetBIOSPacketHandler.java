@@ -152,12 +152,12 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler {
 					
 					// Allocate a larger buffer to hold the full packet
 					
-					SMBSrvPacket pkt2 = getPacketPool().allocatePacket( pkt.getBufferLength() + rxlen2);
+					SMBSrvPacket pkt2 = getPacketPool().allocatePacket( getPacketPool().getLargestSize());
 					
 					// Copy the existing receive data to the new packet
 					
-					rxlen = pkt.getBufferLength() - 4;
-					System.arraycopy(pkt.getBuffer(), 4, pkt2.getBuffer(), 4, rxlen);
+					rxlen = pkt.getBufferLength();
+					System.arraycopy(pkt.getBuffer(), 4, pkt2.getBuffer(), 4, rxlen - 4);
 					
 					// Release the original packet buffer, switch to the new packet
 					
@@ -166,7 +166,7 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler {
 					
 					// Read the remaining data
 					
-					rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen + 4, rxlen2);
+					rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen + 4, pkt.getBufferLength() - rxlen);
 					
 					// Update the total received length
 					
@@ -183,7 +183,7 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler {
 					
 					// Update the total receive length
 					
-					rxlen += rxlen2;
+					rxlen += rxlen2 - 4;
 				}
 			}
 		}

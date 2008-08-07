@@ -1282,7 +1282,10 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Receive
 		if ( wsts != WSAEMSGSIZE)
 			throwWinsockException(jnienv, WSAGetLastError(), "ReceiveSocket");
 		else {
-			sts = ReceiveErrorMask;
+			if ( off > 4)
+				throwWinsockException(jnienv, WSAGetLastError(), "ReceiveSocket");
+			else
+				sts = ReceiveErrorMask;
 		}
 	}
 
