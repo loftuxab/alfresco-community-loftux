@@ -18,13 +18,13 @@
       <form accept-charset="UTF-8" method="post" action="${url.context}/login">
          <fieldset>
             <div style="padding-top:96px">
-               <span>User name:</span>
+               <span id="txt-username"></span>
             </div>
             <div style="padding-top:4px">
                <input type="text" id="username" name="username" maxlength="256" style="width:200px"/>
             </div>
             <div style="padding-top:12px">
-               <span>Password:</span>
+               <span id="txt-password"></span>
             </div>
             <div style="padding-top:4px">
                <input type="password" id="password" name="password" maxlength="256" style="width:200px"/>
@@ -46,6 +46,11 @@
    <script type="text/javascript">//<![CDATA[
    YAHOO.util.Event.onContentReady("alflogin", function()
    {
+      // set I18N labels
+      YAHOO.util.Dom.get("txt-username").innerHTML = Alfresco.util.message("label.username") + ":";
+      YAHOO.util.Dom.get("txt-password").innerHTML = Alfresco.util.message("label.password") + ":";
+      
+      // generate and display main login panel
       var panel = new YAHOO.widget.Overlay(YAHOO.util.Dom.get("alflogin"), 
       {
          modal: false,
