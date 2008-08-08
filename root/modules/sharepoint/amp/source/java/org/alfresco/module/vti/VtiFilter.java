@@ -102,7 +102,7 @@ public class VtiFilter implements Filter
             } 
             else 
             {
-                session = sessionManager.createSession(httpResponse);
+                session = sessionManager.createSession(httpRequest, httpResponse);
             }
         }
                 
@@ -136,9 +136,9 @@ public class VtiFilter implements Filter
         String alfrescoContext = (String)request.getAttribute(VtiServletContainer.VTI_ALFRESCO_CONTEXT);
         //Check resource existence
         String uri = httpRequest.getRequestURI();        
-        if (METHOD_GET.equals(httpMethod) && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.startsWith(alfrescoContext + "/history/a") && !uri.startsWith(alfrescoContext + "/resources"))
+        if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod)) && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.startsWith(alfrescoContext + "/history/a") && !uri.startsWith(alfrescoContext + "/resources"))
         {
-        	   String decodedUrl = URLDecoder.decode(httpRequest.getRequestURI(), "UTF-8");
+               String decodedUrl = URLDecoder.decode(httpRequest.getRequestURI(), "UTF-8");
             // remove '/' character
             if (decodedUrl.length() > alfrescoContext.length())
             {
@@ -261,6 +261,7 @@ public class VtiFilter implements Filter
 
         // Chain other filters
 
+        response.getOutputStream().flush();
         chain.doFilter(request, response);
     }
    

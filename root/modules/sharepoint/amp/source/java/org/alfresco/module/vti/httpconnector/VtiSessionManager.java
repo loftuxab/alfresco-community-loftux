@@ -59,9 +59,10 @@ public class VtiSessionManager extends Thread {
     
     public static final String VTI_SESSION_NAME = "VTISESSION";
     
-    public Map<String, Object> createSession(HttpServletResponse response) {
+    public Map<String, Object> createSession(HttpServletRequest request, HttpServletResponse response) {
         String sessionGuid = createSession();
         setCookieValue(response, VTI_SESSION_NAME, sessionGuid);
+        setCookieValue(request, VTI_SESSION_NAME, sessionGuid);
         return getSession(sessionGuid);
     }
     
@@ -154,6 +155,19 @@ public class VtiSessionManager extends Thread {
         Cookie cookie = new Cookie(name, value);
         cookie.setMaxAge(-1);
         response.addCookie(cookie);
+    }
+    
+    private String setCookieValue(HttpServletRequest request, String name, String value) {
+        Cookie[] cookies = request.getCookies();
+        String result = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (name.equals(cookie.getName())) {
+                    cookie.setValue(value);
+                }
+            }
+        }
+        return result;
     }
 
     public int getSessionGuidLength() {

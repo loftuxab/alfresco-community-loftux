@@ -75,13 +75,10 @@ public class VtiContextFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
         if (sessionManager.getSession(httpRequest) == null) {
             if (!accessChecker.isRequestAcceptableForRoot(httpRequest)) {
                 chain.doFilter(request, response);
                 return;
-            } else {
-                sessionManager.createSession(httpResponse);
             }
         }
         contextContainer.service((HttpServletRequest)request, (HttpServletResponse)response);
