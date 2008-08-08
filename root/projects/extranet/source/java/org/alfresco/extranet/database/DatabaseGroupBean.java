@@ -146,15 +146,19 @@ public class DatabaseGroupBean
      */
     public DatabaseGroup get(String groupId) 
     {
-        // build the sql statement
-        String sql = "select * from app_group where group_id='" + groupId + "'";
+        String sql = "select * from app_group where group_id=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseGroupRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { groupId };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseGroupRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;
         }
+        
         return (DatabaseGroup) list.get(0);        
     }
     
@@ -193,9 +197,15 @@ public class DatabaseGroupBean
     public List listUserIds(String groupId)
     {
         List userList = new ArrayList();
+
+        String sql = "select distinct user_id from group_membership where group_id=?";
         
-        String sql = "select distinct user_id from group_membership where group_id = '" + groupId + "'";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+        // arguments and types
+        Object params[] = new Object[] { groupId };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, params, types);
         while(rowSet.next())
         {
             String userId = rowSet.getString("user_id");
@@ -237,9 +247,15 @@ public class DatabaseGroupBean
     public List getGroupIdsForUser(String userId)
     {
         List groupList = new ArrayList();
+
+        String sql = "select distinct group_id from group_membership where user_id=?";
         
-        String sql = "select distinct group_id from group_membership where user_id = '" + userId + "'";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+        // arguments and types
+        Object params[] = new Object[] { userId };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, params, types);
         while(rowSet.next())
         {
             String groupId = rowSet.getString("group_id").trim();

@@ -19,6 +19,11 @@
 	
 	// determine the user who has been invited
 	DatabaseInvitedUser invitedUser = invitationService.getInvitedUserFromHash(hash);
+	if(invitedUser.isCompleted())
+	{
+	    out.println("Unable to process invited user: completed = " + invitedUser.isCompleted());
+	    return;
+	}
 		
 	// properties
 	String invitedUserId = request.getParameter("invitedUserId");
@@ -74,7 +79,7 @@
       	  Congratulations!  Your account '<b><%=userId%></b>' has been created.
       	  <br/>
       	  <br/>
-      	  <a href="/extranet">Proceed to Alfresco Network</a>
+      	  You must <a href="/extranet/?pt=login">Sign In to Alfresco Network</a> in order to proceed.
       	  <br/>
       </p>      	
    </body>

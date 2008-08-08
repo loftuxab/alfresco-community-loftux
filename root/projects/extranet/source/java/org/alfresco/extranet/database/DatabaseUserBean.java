@@ -178,16 +178,19 @@ public class DatabaseUserBean
      */
     public DatabaseUser get(String userId) 
     {
-        // build the sql statement
-        String sql = "select * from user where user_id='" + userId + "'";
+        String sql = "select * from user where user_id=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseUserRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { userId };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseUserRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;
         }
-        return (DatabaseUser) list.get(0);        
+        return (DatabaseUser) list.get(0);
     }	
 
     /**
@@ -199,11 +202,14 @@ public class DatabaseUserBean
      */
     public DatabaseUser getByEmail(String email) 
     {
-        // build the sql statement
-        String sql = "select * from user where email='" + email + "'";
+        String sql = "select * from user where email=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseUserRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { email };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseUserRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;

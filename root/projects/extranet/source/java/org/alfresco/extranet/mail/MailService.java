@@ -49,6 +49,7 @@ public class MailService implements ApplicationContextAware
     protected ApplicationContext applicationContext;
     protected JavaMailSender mailSender;
     public String adminEmailAddress;
+    public String adminEmailPersonal;
     
     public String inviteUserEmailTemplateUrl;
     public String resetPasswordEmailTemplateUrl;
@@ -91,6 +92,16 @@ public class MailService implements ApplicationContextAware
     public void setAdminEmailAddress(String adminEmailAddress)
     {
         this.adminEmailAddress = adminEmailAddress;
+    }
+    
+    /**
+     * Sets the admin email personal name
+     * 
+     * @param adminEmailPersonal
+     */
+    public void setAdminEmailPersonal(String adminEmailPersonal)
+    {
+        this.adminEmailPersonal = adminEmailPersonal;
     }
     
     /* (non-Javadoc)
@@ -147,7 +158,7 @@ public class MailService implements ApplicationContextAware
         {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
             helper.setTo(invitedUser.getEmail());
-            helper.setFrom(adminEmailAddress);
+            helper.setFrom(adminEmailAddress, adminEmailPersonal);
             helper.setSubject("An invitation to Alfresco Network");
     
             // do variable substitution
@@ -344,7 +355,7 @@ public class MailService implements ApplicationContextAware
         {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
             helper.setTo(user.getEmail());
-            helper.setFrom(adminEmailAddress);
+            helper.setFrom(adminEmailAddress, adminEmailPersonal);
             helper.setSubject("Your login information for Alfresco Network");
     
             // do variable substitution
