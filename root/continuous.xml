@@ -856,8 +856,9 @@
 			<fileset dir="${dir.module.blog.dist}"                 includes="${file.name.amp.blog}" />
 			<fileset dir="${dir.module.avmcompare.dist}"           includes="${file.name.amp.avmcompare}" />
 			<fileset dir="${dir.module.truncatemalformedxml.dist}" includes="${file.name.amp.truncatemalformedxml}" />
-			<fileset dir="${dir.module.fb.doclib.dist}" includes="${file.name.amp.fb.doclib}" />
-			<fileset dir="${dir.module.gg.dist}" includes="${file.name.zip.gg}" />
+			<fileset dir="${dir.module.fb.doclib.dist}"            includes="${file.name.amp.fb.doclib}" />
+			<fileset dir="${dir.module.gg.dist}"                   includes="${file.name.zip.gg}" />
+			<fileset dir="${dir.project.installer}"                includes="vti-module.amp, ROOT.war" />  
 	   </copy>
 	</target>
 	
