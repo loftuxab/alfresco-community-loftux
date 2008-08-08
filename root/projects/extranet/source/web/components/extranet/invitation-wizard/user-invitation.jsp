@@ -22,6 +22,26 @@
 	// message
 	String message = (String) request.getAttribute("user-invitation-message");	
 %>
+<%
+	// check to see if they were already processed
+	if(invitedUser.isCompleted())
+	{
+	    // they already completed, so escape out
+%>
+		<h5>Welcome to Alfresco Network!</h5>
+		<p>
+			You have been invited to be a part of the Alfresco Enterprise Network community.
+			<br/>
+			<br/>
+			This invitation was already accepted and processed.
+			<br/>
+			<br/>
+			If you would like a new invitation, please visit the <a href="/extranet/?pt=register">Registration</a> page.
+		</p>
+<%
+		return;
+	}
+%>
 <h5>Welcome to Alfresco Network!</h5>
 <p>
 You have been invited to be a part of the Alfresco Enterprise Network community.

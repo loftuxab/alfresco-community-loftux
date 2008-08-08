@@ -136,7 +136,7 @@ public class DatabaseCompanyBean
 	}
 	
     /**
-     * Gets the.
+     * Gets the company
      * 
      * @param companyId the company id
      * 
@@ -144,11 +144,14 @@ public class DatabaseCompanyBean
      */
     public DatabaseCompany get(String companyId) 
     {
-        // build the sql statement
-        String sql = "select * from company where company_id='" + companyId + "'";
+        String sql = "select * from company where company_id=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseCompanyRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { companyId };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseCompanyRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;

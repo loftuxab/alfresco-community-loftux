@@ -161,6 +161,7 @@
 	<bean id="extranet.service.mail" class="org.alfresco.extranet.mail.MailService">
 		<property name="mailSender" ref="extranet.service.mail.sender"/>
 		<property name="adminEmailAddress" value="${application.email.address}"/>
+		<property name="adminEmailPersonal" value="${application.email.personal}"/>
 		<property name="inviteUserEmailTemplateUrl" value="${application.email.inviteUserEmailTemplateUrl}"/>
 		<property name="resetPasswordEmailTemplateUrl" value="${application.email.resetPasswordEmailTemplateUrl}"/>
 	</bean>    

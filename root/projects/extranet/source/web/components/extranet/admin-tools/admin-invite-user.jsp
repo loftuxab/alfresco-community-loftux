@@ -142,6 +142,7 @@ window.open(Ink,"calendar","height=250,width=250,scrollbars=no")
 				<td>
 					<select name="invitationType">
 						<option value="enterprise">Supported Enterprise Customer</option>
+						<option value="employee">Alfresco Employee</option>
 						<!--
 							<option value="enterprise_trial">Enterprise Trial</option>
 							<option value="community">Community</option>

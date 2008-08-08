@@ -67,9 +67,9 @@ public class InvitationService
     
     protected static void debug(String value)
     {
-        if(logger.isDebugEnabled())
-            logger.debug(value);
-        else
+//        if(logger.isDebugEnabled())
+  //          logger.debug(value);
+    //    else
             System.out.println(value);
     }
     
@@ -321,14 +321,19 @@ public class InvitationService
                 whdUserId = null;
             }
 
+            debug("InvitationService.sync: Starting");
+            
             // check whether this user id is available
             //boolean available = syncService.isUserIdAvailable(userId, whdUserId);
             boolean available = syncService.isUserIdAvailable(userId);
+            
+            debug("InvitationService.sync: available = " + available);
             
             debug("Check user id (" + userId + "," + whdUserId + ") available: " + available);
             
             if(!available)
             {
+                debug("Not available");
                 throw new UserIDAlreadyExistsException("The user id '" + userId + "' is already taken.");
             }
             
@@ -401,6 +406,9 @@ public class InvitationService
                     
                     // add the user to the "customers" group
                     this.databaseService.addUserToGroup(userId, "customers");                                    
+
+                    // add the user to the "employees" group
+                    this.databaseService.addUserToGroup(userId, "employees");                                                        
                 }
                 
                 // TODO: Create and add users to company groups

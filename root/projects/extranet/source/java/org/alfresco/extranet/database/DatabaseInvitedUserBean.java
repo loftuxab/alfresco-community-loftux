@@ -207,11 +207,14 @@ public class DatabaseInvitedUserBean
      */
     public DatabaseInvitedUser get(String invitedUserId) 
     {
-        // build the sql statement
-        String sql = "select * from invited_user where user_id='" + invitedUserId + "'";
+        String sql = "select * from invited_user where user_id=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseInvitedUserRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { invitedUserId };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseInvitedUserRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;
@@ -228,16 +231,19 @@ public class DatabaseInvitedUserBean
      */
     public DatabaseInvitedUser getFromHash(String hash)
     {
-        // build the sql statement
-        String sql = "select * from invited_user where hash='" + hash + "'";
+        String sql = "select * from invited_user where hash=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseInvitedUserRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { hash };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseInvitedUserRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;
         }
-        return (DatabaseInvitedUser) list.get(0);                
+        return (DatabaseInvitedUser) list.get(0);        
     }
 
     /**
@@ -249,11 +255,14 @@ public class DatabaseInvitedUserBean
      */
     public DatabaseInvitedUser getByEmail(String email) 
     {
-        // build the sql statement
-        String sql = "select * from invited_user where email='" + email + "'";
+        String sql = "select * from invited_user where email=?";
         
-        // run the query
-        List list = jdbcTemplate.query(sql, new DatabaseInvitedUserRowMapper());
+        // arguments and types
+        Object params[] = new Object[] { email };
+        int types[] = new int [] {Types.VARCHAR};
+        
+        // execute the update
+        List list = jdbcTemplate.query(sql, params, types, new DatabaseInvitedUserRowMapper());
         if(list == null || list.size() == 0)
         {
             return null;
