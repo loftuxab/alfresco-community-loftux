@@ -1,8 +1,12 @@
 <#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
+<#assign DISPLAY_ITEMS = 999>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RssFeed("${args.htmlid}").setComponentId(
-      "${instance.object.id}"
-   ).setFeedURL("${uri}");
+   new Alfresco.RssFeed("${args.htmlid}").setConfigOptions(
+   {
+      "componentId": "${instance.object.id}",
+      "feedURL": "${uri}", 
+      "limit": "<#if limit?number != DISPLAY_ITEMS>${limit}<#else>all</#if>"      
+   });
 //]]></script>
 <div class="dashlet">
    <div class="title">${title!""}</div>
@@ -12,7 +16,7 @@
    <div class="body scrollableList" id="${args.htmlid}-scrollableList">
 	<#if items?exists && items?size &gt; 0>
 		<#list items as item>
-         <@feedLib.renderItem item=item />
+		   <#if item_index &lt; limit?number><@feedLib.renderItem item=item /><#else><#break></#if>
 		</#list>
 	<#else>
 		<em>No news items.</em>

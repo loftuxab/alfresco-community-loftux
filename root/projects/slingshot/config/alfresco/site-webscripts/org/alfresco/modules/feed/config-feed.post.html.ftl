@@ -2,7 +2,7 @@
 
 <#if items?exists && items?size &gt; 0>
 	<#list items as item>
-	   <@feedLib.renderItem item=item />
+	   <#if item_index &lt; limit?number><@feedLib.renderItem item=item /><#else><#break></#if>
 	</#list>
 <#else>
 	<em>No news items.</em>

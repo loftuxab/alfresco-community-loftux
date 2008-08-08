@@ -15,4 +15,6 @@ if (!re.test(uri))
    uri = "http://" + uri;
 }
 model.uri = uri;
+model.limit = args.limit || 999;
+
 model.items = getRSSFeed(uri);

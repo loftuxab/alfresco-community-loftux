@@ -1,16 +1,24 @@
 /**
+ * Controls how many items are displayed at any one time in the RSS dashlet.
+ * Defaults to a large number, the theory being is that you aren't going to get 9999 items
+ * in any RSS feed.
+ */
+const DISPLAY_ITEMS = 999;
+/**
  * Takes a URL of an RSS feed and returns an array
  * of items in the feed.
  *
  * @param uri {String} the uri of the RSS feed
  */
-function getRSSFeed(uri)
+function getRSSFeed(uri, limit)
 {
    var re = /^http:\/\//;
    if (!re.test(uri))
    {
       uri = "http://" + uri;
    }
+
+   limit = limit || DISPLAY_ITEMS;
 
    // We only handle "http" connections for the time being
    var connector = remote.connect("http");
@@ -26,7 +34,7 @@ function getRSSFeed(uri)
     	   // Strip out any preceding xml processing instructions or E4X will choke
     		var idx = rssXml.search(re);
     		rssXml = rssXml.substring(idx);
-
+         
     		var rss = new XML(rssXml); 
     		model.title = rss.channel.title.toString();
 
@@ -45,9 +53,14 @@ function getRSSFeed(uri)
             var fileext = /([^\/]+)$/;
          }
 
-    		var item, obj;
+    		var item, obj, count=0;
     		for each (item in rss.channel..item)
     		{
+    		   if (count >= limit)
+    		   {
+    		      break;
+    		   }
+    		   
     		   obj = {
     		      "title": item.title.toString(),
     		      "description": item.description.toString(),
@@ -82,6 +95,7 @@ function getRSSFeed(uri)
             }
     		  
     		   items.push(obj);
+    		   ++count;
     		}
     	}	
     }
