@@ -25,17 +25,30 @@
 
   	Alfresco.RssFeed.prototype =
   	{  
-  	   setComponentId: function(componentId)
-  	   {
-  	      this.componentId = componentId;
-  	      return this;
-  	   },
-  	   
-  	   setFeedURL: function(feedURL)
-  	   {
-  	      this.feedURL = feedURL;
-  	      return this;
-  	   },
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         componentId: "",
+         feedURL: "",
+         limit: "all" // default is view all
+      },  
+      
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       */
+      setConfigOptions: function RssFeed_setConfigOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },      	   
 		
 		/**
 		 * Fired by YUILoaderHelper when required component script files have
@@ -62,7 +75,7 @@
 		
 		onConfigFeedClick: function(e)
 		{
-		   var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config/" + encodeURIComponent(this.componentId);
+		   var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config/" + encodeURIComponent(this.options.componentId);
          
 		   if (!this.configDialog)
          {
@@ -91,7 +104,19 @@
                      var elem = YAHOO.util.Dom.get(this.configDialog.id + "-url");
                      if (elem)
                      {
-                        elem.value = this.feedURL;
+                        elem.value = this.options.feedURL;
+                     }
+                     
+                     var select = YAHOO.util.Dom.get(this.configDialog.id + "-limit");
+                     var option, options = select.options;
+                     for (var i=0; i < options.length; i++)
+                     {
+                        option = options[i];
+                        if (option.value === this.options.limit)
+                        {
+                           option.selected = true;
+                           break;
+                        }
                      }
                   },
                   scope: this
