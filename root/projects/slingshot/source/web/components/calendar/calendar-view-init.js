@@ -331,73 +331,75 @@
             var obj = args[1];
             if (obj)
             {
-            	var events = this.eventData[obj.from];
-               	if (events === undefined)
-               	{
-                	events = [];
-                    this.eventData[obj.from] = events;
-               	}
+               var events = this.eventData[obj.from];
+               if (events === undefined)
+               {
+                  events = [];
+                  this.eventData[obj.from] = events;
+               }
 
-               	events.push({
-                    	"name": obj.name,
+               events.push({
+                  "name": obj.name,
 						"start": obj.start,
 						"end": obj.end,
-						"uri": obj.uri
-               	});
+						"uri": obj.uri,
+						"from": obj.from,
+						"to": obj.to
+               });
 					
-				// Need to re-order on start time
-				events.sort(function(a,b)
-				{
-					var startTimeA = a.start.split(":");
-					var startTimeB = b.start.split(":");
+				   // Need to re-order on start time
+				   events.sort(function(a,b)
+				   {
+					   var startTimeA = a.start.split(":");
+					   var startTimeB = b.start.split(":");
 						
-					if (startTimeA[0] < startTimeB[0] || startTimeA[1] < startTimeB[1])
-					{
-						return 0;
-					}
-					else
-					{
-						return 1;
-					}
-				});
+					   if (startTimeA[0] < startTimeB[0] || startTimeA[1] < startTimeB[1])
+					   {
+						   return 0;
+					   }
+					   else
+					   {
+						   return 1;
+					   }
+				   });
 					
-               	var dateStr = obj.from.split("/");
+               var dateStr = obj.from.split("/");
 
-               	var eventDate = new Date();
-               	eventDate.setYear(dateStr[2]);
-               	eventDate.setMonth((dateStr[0]-1));
-               	eventDate.setDate(dateStr[1]);
+               var eventDate = new Date();
+               eventDate.setYear(dateStr[2]);
+               eventDate.setMonth((dateStr[0]-1));
+               eventDate.setDate(dateStr[1]);
 
- 				var DateMath = YAHOO.widget.DateMath;
-				var dateBegin, dateEnd, f;
-				// For the current view, figure out if it needs updating based on the event that was just created
-				switch (this.activeIndex)
-				{
-					case 0: // day
-						dateBegin = DateMath.getDate(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate());
-						dateEnd = DateMath.add(dateBegin, DateMath.DAY, 1);
-						f = this.refreshDay;
-						break;
-					case 1: // week
-						dateBegin = DateMath.subtract(this.currentDate, DateMath.DAY, this.currentDate.getDay());
-						dateBegin.setHours(0, 0, 0);
-						dateEnd = DateMath.add(dateBegin, DateMath.DAY, 7);
-						f = this.refreshWeek;
-						break;
-					case 2: // month
-						dateBegin = DateMath.findMonthStart(this.currentDate);
-						var monthEnd = DateMath.findMonthEnd(this.currentDate);
-						// This is to catch events that occur on the last day of the current mont
-						dateEnd = DateMath.add(monthEnd, DateMath.DAY, 1);
-						f = this.refreshMonth;
-						break;
-				}
+ 				   var DateMath = YAHOO.widget.DateMath;
+				   var dateBegin, dateEnd, f;
+				   // For the current view, figure out if it needs updating based on the event that was just created
+				   switch (this.activeIndex)
+				   {
+					   case 0: // day
+						   dateBegin = DateMath.getDate(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate());
+						   dateEnd = DateMath.add(dateBegin, DateMath.DAY, 1);
+						   f = this.refreshDay;
+						   break;
+					   case 1: // week
+						   dateBegin = DateMath.subtract(this.currentDate, DateMath.DAY, this.currentDate.getDay());
+						   dateBegin.setHours(0, 0, 0);
+						   dateEnd = DateMath.add(dateBegin, DateMath.DAY, 7);
+						   f = this.refreshWeek;
+						   break;
+					   case 2: // month
+						   dateBegin = DateMath.findMonthStart(this.currentDate);
+						   var monthEnd = DateMath.findMonthEnd(this.currentDate);
+						   // This is to catch events that occur on the last day of the current mont
+						   dateEnd = DateMath.add(monthEnd, DateMath.DAY, 1);
+						   f = this.refreshMonth;
+						   break;
+				   }
 
-				if (DateMath.between(eventDate, dateBegin, dateEnd))
-				{
-					var args = [this.currentDate];
-	               	f.apply(this, args);
-				}
+				   if (DateMath.between(eventDate, dateBegin, dateEnd))
+				   {
+					   var args = [this.currentDate];
+	               f.apply(this, args);
+			      }
             }
         },
 
@@ -471,7 +473,7 @@
                             	var d = document.createElement('div');
                               	Dom.addClass(d, 'cal-event-entry');
                               	d.innerHTML = '<a href="#">' + events[j].name + '</a>';
-								YAHOO.util.Event.addListener(d, 'click', this.onEventClick, events[j], this);
+								         YAHOO.util.Event.addListener(d, 'click', this.onEventClick, events[j], this);
                               	elem.appendChild(d);
                             }
                         }
