@@ -138,7 +138,7 @@
          });
        
          form.setSubmitAsJSON(true);
-         form.ajaxSubmitMethod = Alfresco.util.Ajax.PUT;
+         form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          form.doBeforeFormSubmit =
          {
             fn: function(form, obj)

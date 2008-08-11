@@ -1,14 +1,11 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.BlogPostListArchives("${args.htmlid}");
+   new Alfresco.BlogPostListArchive("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!""}",
+      container: "${args.container!""}"
+   });
 //]]></script>
-
-<div id="archives-body" class="filter postlist-filter">
-	<h2>${msg("archives.title")}</h2>
-    <ul class="filterLink">
-        <#list items as month>
-            <li class="onMonthSelection nav-label" id="${args.htmlid}-selectMonth-${month.year?c}-${month.month?c}">
-                <a  href="#" class="archive-link nav-link">${month.beginOfMonth?string("MMMM yyyy")}</a> (${month.postCount?c})
-            </li>
-        </#list>
-	</ul>
+<div id="${args.htmlid}-body" class="archive blog-filter">
+	<h2>${msg("header.title")}</h2>
+	<ul class="filterLink" id="${args.htmlid}-archive"><li>&nbsp;</li></ul>
 </div>

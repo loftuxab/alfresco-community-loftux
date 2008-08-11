@@ -1,14 +1,13 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.BlogPostListFilters("${args.htmlid}");
+   new Alfresco.BlogPostListFilter("${args.htmlid}");
 //]]></script>
-
-<div id="${args.htmlid}-body" class="filter postlist-filter">
-   <h2>${msg("postlist.filters.title")}</h2>
+<div id="${args.htmlid}-body" class="filter blog-filter">
+   <h2>${msg("header.browseposts")}</h2>
    <ul class="filterLink">
-      <li id="${args.htmlid}-selectFilter-all" class="filter-link"><a href="#" class="filter-link nav-link">${msg("postlist.filters.all")}</a></li>
-      <li id="${args.htmlid}-selectFilter-new" class="filter-link"><a href="#" class="filter-link nav-link">${msg("postlist.filters.new")}</a></li>
-      <li id="${args.htmlid}-selectFilter-mydrafts" class="filter-link"><a href="#" class="filter-link nav-link">${msg("postlist.filters.mydrafts")}</a></li>
-      <li id="${args.htmlid}-selectFilter-mypublished" class="filter-link"><a href="#" class="filter-link nav-link">${msg("postlist.filters.mypublished")}</a></li>
-      <li id="${args.htmlid}-selectFilter-publishedext" class="filter-link"><a href="#" class="filter-link nav-link">${msg("postlist.filters.publishedext")}</a></li>
+      <li><span class="all"><a href="#" onclick="return false;" class="filter-link">${msg("link.all")}</a></span></li>
+      <li><span class="new"><a href="#" onclick="return false;" class="filter-link">${msg("link.new")}</a></span></li>
+      <li><span class="mydrafts"><a href="#" onclick="return false;" class="filter-link">${msg("link.mydrafts")}</a></span></li>
+      <li><span class="mypublished"><a href="#" onclick="return false;" class="filter-link">${msg("link.mypublished")}</a></span></li>
+      <li><span class="publishedext"><a href="#" onclick="return false;" class="filter-link">${msg("link.publishedext")}</a></span></li>
    </ul>
 </div>

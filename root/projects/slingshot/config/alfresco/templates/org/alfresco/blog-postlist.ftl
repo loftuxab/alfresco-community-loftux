@@ -1,6 +1,7 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
-   <link rel="stylesheet" type="text/css" href="${url.context}/templates/discussions/discussions-topiclist.css" />
+<#--   <link rel="stylesheet" type="text/css" href="${url.context}/templates/discussions/discussions-topiclist.css" /> -->
+   <link rel="stylesheet" type="text/css" href="${url.context}/templates/blog/blog-postlist.css" />
    <script type="text/javascript" src="${url.context}/templates/blog/blog-postlist.js"></script>
 </@>
 

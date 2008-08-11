@@ -1,0 +1,252 @@
+/* header */
+
+/*.postlist-header {
+   margin: 0 -10px;	
+}*/
+
+.postlist-header .align-right
+{
+   text-align: right;
+}
+
+.postlist-header div.hideable
+{
+   float: left;
+}
+
+
+/* toolbar */
+
+.postlist-header .toolbar
+{
+   clear: both;
+   height: 2em;
+   padding: 0.5em;
+   background-color: #e3eaec;
+   border-bottom: 2px solid #f0f3f4;
+}
+
+.toolbar .createPost button {
+   padding-left: 2.5em; 
+   background: url(../images/new-blog-16.png) no-repeat 10% 50%;
+}
+
+.toolbar .configureBlog button {
+   padding-left: 2.5em; 
+   background: url(../images/configure-blog-16.png) no-repeat 10% 50%;
+}
+
+.toolbar .rss-feed {
+   padding: 0.5em;
+}
+
+.toolbar .separator {
+   padding: 0.5em;
+}
+
+.toolbar .rss-feed a {
+   background-image : url(../images/feed-icon-16.png);
+   background-repeat : no-repeat;
+   padding-left : 20px;
+}
+
+
+/* infobar */
+
+.postlist-header .postlist-infobar
+{
+  width: auto;
+  height: 30px;
+  background-color: #ebeff1;
+  border-bottom: thin solid #fff;
+  padding-right: 10px;
+}
+
+.postlist-infobar .listTitle {
+  font-family: Helvetica, Trebuchet, sans-serif;
+  font-weight: normal;
+  font-size: 123.1%;
+  color: #333333;
+  padding: 5px;
+}
+
+.postlist-infobar .paginator {
+  text-align: right;
+}
+
+
+/* DataTable css */
+
+/*.blog-postlist {
+   margin: 0 -6px;	
+}*/
+
+.blog-postlist table {
+	width: 100%;
+	border: none !important;
+}
+.blog-postlist table thead {
+	display: none;
+}
+.blog-postlist table td {
+	border: none;
+}
+.blog-postlist table .yui-dt-empty {
+	background-color: transparent;
+}
+.blog-postlist table .yui-dt-liner {
+	padding: 0px;
+}
+
+
+
+/* List elements */
+
+.blog-postlist .post {
+  border: 2px solid transparent;
+  padding: 0.25em;
+}
+
+.nodeEdit {
+  margin: 10px 0 0 15px;
+  visibility: hidden;
+  width: 150px;
+  position: relative;
+  float: right;
+}
+.showEditBlock {
+  visibility: visible;
+}
+.nodeEdit div, .replyEdit div {
+  padding: 2px 19px;
+  margin-bottom: 4px;
+}
+.node.simple .nodeEdit {
+  width: 200px;
+}
+.nodeEdit .action-link {
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 93%;
+  line-height: 150%;
+  color: #2B6EB5;
+}
+
+.nodeEdit .onViewNode {
+  background: url(../images/view-discussion-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onAddReply {
+  background: url(../images/reply-to-discussion-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onEditNode,
+.nodeEdit .onEditReply,
+.nodeEdit .onEditComment {
+  background:url(../images/edit-discussion-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onEditBlogPost {
+  background:url(../images/edit-blog-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onDeleteNode,
+.nodeEdit .onDeleteReply,
+.nodeEdit .onDeleteComment {
+  background: url('../images/delete-discussion-16.png') no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onDeleteBlogPost {
+  background: url('../images/delete-blog-16.png') no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onUpdateExternal {
+  background: url(../images/update-external-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onPublishExternal {
+  background: url(../images/publish-external-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+.nodeEdit .onUnpublishExternal {
+  background: url(../images/unpublish-external-16.png) no-repeat scroll 2px 5px;
+  padding-left: 20px;
+}
+
+
+.overNode {
+  background-color: #fffef5;
+  border: 2px solid #5A7380 !important;
+}
+.node .published {
+  margin: 5px 0 10px 0;
+}
+
+.node .nodeTitle a {
+  font-family: Helvetica, Trebuchet, sans-serif;
+  font-weight: normal;
+  font-size: 131%;
+  line-height: 130%;
+  color: #2b6eb5;
+}
+
+.node .nodeStatus {
+  font-family: Trebuchet, sans-serif;
+  font-weight: normal;
+  font-size: 131%;
+  line-height: 130%;
+  color: #669966;
+}
+
+.nodeAttrLabel {
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 100%;
+  line-height: 130%;
+  color: #606060;
+}
+.nodeAttrValue {
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 100%;
+  line-height: 130%;
+  color: #333333;
+}
+.nodeAttrValue a {
+  color: #2b6eb5;
+}
+.node .userLink {
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 100%;
+  line-height: 150%;
+  color: #999999;
+}
+.node .userLink a {
+  color: #2b6eb5;
+}
+.nodeContent {
+  padding-right: 40px;
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 100%;
+  line-height: 150%;
+  margin-right: 140px;
+}
+
+.nodeFooter {
+  background-color: #f8f8f8;
+  border-top: 1px dashed #c6c6c6;
+  border-bottom: 1px solid #c6c6c6;
+  padding: 1px;
+}
+.nodeFooter .tag {
+  background:transparent url(../images/tag-16.png) no-repeat scroll 0px 50%;
+  padding-left: 18px;
+}
+
+.replyTo {
+  background:transparent url(../images/reply-to-discussion-16.png) no-repeat scroll 0px 50%;
+  padding-left: 20px;
+}
+

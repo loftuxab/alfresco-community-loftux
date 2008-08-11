@@ -137,6 +137,15 @@
          
          // as the list got already rendered on the server, already attach the listener to the rendered elements
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
+         
+         // load the comments list
+         var data = {
+            itemNodeRef: this.options.postRef,
+            itemTitle: "itemTitel",
+            itemName: "itemName"
+         }
+
+         YAHOO.Bubbling.fire("setCommentedNode", data);
       },
 
       /**
@@ -203,7 +212,7 @@
          });
          if (this.options.mode != "create")
          {
-             postForm.ajaxSubmitMethod = "PUT";
+             postForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          }
          postForm.setSubmitAsJSON(true);
          postForm.doBeforeFormSubmit =

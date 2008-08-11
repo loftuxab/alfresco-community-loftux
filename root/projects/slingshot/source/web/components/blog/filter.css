@@ -1,0 +1,28 @@
+.filter ul
+{
+   padding: 0.5em 0 1em;
+}
+
+.filter li
+{
+   padding: 4px 0px 3px 20px;
+}
+
+.filter li.selected
+{
+   background-color: #d2e5f2;
+}
+
+.filter a.disabled,
+.filter a.disabled:active,
+.filter a.disabled:hover,
+.filter a.disabled:visited
+{
+   color: #a6a6a6;
+   cursor: not-allowed;
+}
+
+.filter a:hover
+{
+   text-decoration: none;
+}

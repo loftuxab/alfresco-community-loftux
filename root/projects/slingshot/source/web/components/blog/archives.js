@@ -34,7 +34,7 @@
       onReady: function DiscussionsTopicListTags_onReady()
       {
          // action hooks
-         Alfresco.util.registerDefaultActionHandler(this.id, "archive-link", "li", this);
+         //Alfresco.util.registerDefaultActionHandler(this.id, "archive-link", "li", this);
       },
 
       selectMonth: function DiscussionsTopicListTags_showNewTopics(htmlId, ownerId, param)

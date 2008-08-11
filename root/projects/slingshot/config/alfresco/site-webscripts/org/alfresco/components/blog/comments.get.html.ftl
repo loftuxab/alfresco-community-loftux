@@ -1,19 +1,13 @@
-<#if showComponent>
-<#import "/org/alfresco/modules/blog/comments.lib.ftl" as commentsLib/>
-<#assign postRef=(post.nodeRef?replace("://", "_"))?replace("/", "_")>
 
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.BlogComment("${args.htmlid}").setOptions(
+   new Alfresco.CommentList("${args.htmlid}").setOptions(
    {
-      siteId: "${site}",
-      containerId: "${container}",
-      itemTitle: "${post.title?html?j_string}",
-      itemName: "${post.name?html?j_string}",
-      topicRef: "${post.nodeRef}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
-<@commentsLib.commentsHTML htmlid=args.htmlid comments=comments/>
-</#if>
+<div id="${args.htmlid}-body" class="comment-list" style="display:none;">
+   <div id="${args.htmlid}-title" class="commentsListTitle"></div>
+   <div id="${args.htmlid}-comments"></div>
+</div>

@@ -7,6 +7,11 @@
 (function()
 {
    /**
+   * YUI Library aliases
+   */
+   var Dom = YAHOO.util.Dom
+    
+   /**
     * Comment constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -24,6 +29,9 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["event", "editor"], this.onComponentsLoaded, this);
       
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);      
+      
       return this;
    }
    
@@ -35,9 +43,13 @@
        * @property options
        * @type object
        */
-      options:
-      {
+      options: {
+          itemNodeRef: null,
+          itemTitle: null,
+          itemName: null
       },
+      
+      widgets: {},
       
       /**
        * Set multiple initialization options at once.
@@ -66,18 +78,61 @@
        */
       onComponentsLoaded: function CreateComment_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
-   
+
+
       /**
-       * Fired by YUI when parent element is available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
+       * Called by a bubble event to set the node for which comments should be displayed
        */
-      onReady: function CreateComment_onReady()
-      { 
-         this.registerCreateCommentForm(); 
+      onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemName !== null) && (obj.itemTitle !== null))
+         {
+            this.options.itemNodeRef = obj.itemNodeRef;
+            this.options.itemName = obj.itemName;
+            this.options.itemTitle = obj.itemTitle;
+            this.initializeCreateCommentForm(); 
+         }
+      }, 
+      
+      initializeCreateCommentForm: function CreateComment_initializeCreateCommentForm()
+      {
+         // action url
+         var form = Dom.get(this.id + '-form');         
+         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{nodeRef}/comments",
+         {
+            nodeRef: this.options.itemNodeRef.replace(':/', '')
+         });
+         form.setAttribute("action", actionUrl);
+
+         // nodeRef            
+         var nodeRefElem = Dom.get(this.id + '-nodeRef');
+         nodeRefElem.setAttribute("value", this.options.itemNodeRef);
+         
+         // site
+         var siteElem = Dom.get(this.id + '-site');
+         siteElem.setAttribute("value", this.options.siteId);
+         
+         // container
+         var containerElem = Dom.get(this.id + '-container');
+         containerElem.setAttribute("value", this.options.containerId);
+         
+         // itemTitle
+         var itemTitleElem = Dom.get(this.id + '-itemTitle');
+         itemTitleElem.setAttribute("value", this.options.itemTitle);
+         
+         // browseItemUrl
+         var browseItemUrlElem = Dom.get(this.id + '-browseItemUrl');
+         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postview?postId={itemName}",
+         {
+            site: this.options.siteId,
+            itemName: this.options.itemName
+         });
+         browseItemUrlElem.setAttribute("value", browseUrl);
+         
+         // register the behaviour with the form / display the form
+         this.registerCreateCommentForm();
       },
       
       /**
@@ -87,10 +142,10 @@
       registerCreateCommentForm: function CreateComment_registerCreateCommentForm()
       {
          // register the okButton
-         var okButton = new YAHOO.widget.Button(this.id + "-createcomment-ok-button", {type: "submit"});
+         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
          
          // instantiate the simple editor we use for the form
-         this.editor = new YAHOO.widget.SimpleEditor(this.id + '-createcomment-content', {
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
             height: '250px',
             width: '538px',
             dompath: false, //Turns on the bar at the bottom
@@ -98,13 +153,13 @@
             markup: "xhtml",
             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.editor.render();
+         this.widgets.editor.render();
          
          // create the form that does the validation/submit
-         var commentForm = new Alfresco.forms.Form(this.id + "-createcomment-form");
-         commentForm.setShowSubmitStateDynamically(true, false);
-         commentForm.setSubmitElements(okButton);
-         commentForm.setAJAXSubmit(true,
+         this.widgets.commentForm = new Alfresco.forms.Form(this.id + "-form");
+         this.widgets.commentForm.setShowSubmitStateDynamically(true, false);
+         this.widgets.commentForm.setSubmitElements(this.widgets.okButton);
+         this.widgets.commentForm.setAJAXSubmit(true,
          {
             successCallback:
             {
@@ -117,18 +172,22 @@
                scope: this
             }
          });
-         commentForm.setSubmitAsJSON(true);
-         commentForm.doBeforeFormSubmit =
+         this.widgets.commentForm.setSubmitAsJSON(true);
+         this.widgets.commentForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
                //Put the HTML back into the text area
-               this.editor.saveHTML();
+               this.widgets.editor.saveHTML();
             },
             scope: this
          }
          
-         commentForm.init();
+         this.widgets.commentForm.init();
+         
+         // finally show the form
+         var contanerElem = Dom.get(this.id + '-form-container');
+         Dom.removeClass(contanerElem, 'hidden');
       },     
       
       /**
@@ -143,7 +202,12 @@
          else
          {
             Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentCreated")});
-            location.reload(true);
+
+            // clear the content of the comment editor
+            this.widgets.editor.setEditorHTML('');
+            
+            // reload the comments list
+            YAHOO.Bubbling.fire("refreshComments", {});
          }
 
       },
