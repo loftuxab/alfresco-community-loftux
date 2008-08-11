@@ -9,7 +9,8 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@region id="user-profile" scope="template" />
+      <@region id="toolbar" scope="template" protected=true />
+      <@region id="user-profile" scope="template"  protected=true />
    </div>
 </@>
 

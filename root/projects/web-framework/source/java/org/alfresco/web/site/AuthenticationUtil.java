@@ -24,41 +24,78 @@
  */
 package org.alfresco.web.site;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author muzquiano
+ * @author kevinr
  */
 public class AuthenticationUtil
 {
-	public static void logout(RequestContext context)
-	{
-		if (context instanceof HttpRequestContext)
-		{
-			HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-			
-            // invalidate the web session - will remove all session bound objects
-            // such as connector sessions, theme settings etc.
-			request.getSession().invalidate();
-		}
-	}
+    /** cookie names */
+    private static final String COOKIE_ALFLOGIN = "alfLogin";
 
-    public static void login(RequestContext context, String userId)
+    public static void logout(HttpServletRequest request)
     {
-        if (context instanceof HttpRequestContext)
+        // invalidate the web session - will remove all session bound objects
+        // such as connector sessions, theme settings etc.
+        request.getSession().invalidate();
+    }
+
+    public static void login(HttpServletRequest request, HttpServletResponse response, String userId)
+    {
+        // check whether there is already a user logged in
+        String currentUserId = (String) request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+        if (currentUserId != null)
         {
-            HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-            
-            // check whether there is already a user logged in
-            String currentUserId = (String) request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
-            if (currentUserId != null)
-            {
-                // log out the current user
-                logout(context);
-            }
-            
-            // place user id onto the session
-            request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
+            // log out the current user
+            logout(request);
         }
+
+        // place user id onto the session
+        request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
+        
+        // set login time cookie
+        long timeInSeconds = System.currentTimeMillis() / 1000L;
+        Cookie cookie = getLoginCookie(request);
+        if (cookie == null)
+        {
+            cookie = new Cookie(COOKIE_ALFLOGIN, Long.toString(timeInSeconds));
+        }
+        else
+        {
+            cookie.setValue(Long.toString(timeInSeconds));
+        }
+        cookie.setPath(request.getContextPath());
+        cookie.setMaxAge(60*60*24*7);
+        response.addCookie(cookie);
+    }
+
+    /**
+     * Helper to return the Alfresco cookie. The cookie saves the last login time for a username.
+     * 
+     * @param httpRequest
+     * 
+     * @return Cookie if found or null if not present
+     */
+    public static Cookie getLoginCookie(HttpServletRequest request)
+    {
+        Cookie authCookie = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null)
+        {
+            for (int i=0; i<cookies.length; i++)
+            {
+                if (COOKIE_ALFLOGIN.equals(cookies[i].getName()))
+                {
+                    // found cookie
+                    authCookie = cookies[i];
+                    break;
+                }
+            }
+        }
+        return authCookie;
     }
 }
