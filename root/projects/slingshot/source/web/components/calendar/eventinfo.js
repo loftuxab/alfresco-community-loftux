@@ -174,8 +174,11 @@
 			this.panel.hide();
 			
 			var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-			eventDialog.setSiteId(this.siteId);
-			eventDialog.show("/" + this.event.uri);
+			eventDialog.setOptions({
+			   "siteId": this.siteId,
+			   "eventURI": "/" + this.event.uri
+			});
+			eventDialog.show();
 		},
 		
 		/**
