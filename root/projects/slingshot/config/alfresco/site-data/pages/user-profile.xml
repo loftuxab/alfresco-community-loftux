@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<page>
-   <title>User Profile</title>
-   <description>User profile page</description>
-   <template-instance>user-profile</template-instance>
-   <authentication>user</authentication>
-</page>

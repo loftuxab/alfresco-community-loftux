@@ -903,15 +903,13 @@ public final class ScriptSiteData extends ScriptBase
         return EncodingUtil.decode(input, encoding);
     }    
     
-    // methods that are still in progress
     public void logout()
     {
-        AuthenticationUtil.logout(getRequestContext());
+        AuthenticationUtil.logout(((HttpRequestContext)getRequestContext()).getRequest());
     }
     
     /**
      * Reloads the current user into session
-
      */
     public void reloadUser()
     {
@@ -927,15 +925,12 @@ public final class ScriptSiteData extends ScriptBase
     }
     
     
-    // also still in progress
-    
     // returns the credential vault for the current user
     public ScriptCredentialVault getCredentialVault()
     {
         return new ScriptCredentialVault(getRequestContext());
     }
     
-        
     public ScriptModelObject getChrome(String objectId)
     {
         ModelObject obj = getModel().getChrome(objectId);

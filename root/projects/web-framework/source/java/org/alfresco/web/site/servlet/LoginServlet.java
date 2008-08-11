@@ -47,8 +47,8 @@ public class LoginServlet extends BaseServlet
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
-    protected void service(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
     {
     	String username = (String) request.getParameter("username");
     	String password = (String) request.getParameter("password");
@@ -67,7 +67,7 @@ public class LoginServlet extends BaseServlet
             {
                 // this will fully reset all connector sessions
                 RequestContext context = RequestUtil.getRequestContext(request);
-                AuthenticationUtil.login(context, username);
+                AuthenticationUtil.login(request, response, username);
                 
                 // mark the fact that we succeeded
                 success = true;
