@@ -1,0 +1,29 @@
+.archive ul
+{
+   padding: 0.5em 0 1em;
+}
+
+.archive li
+{
+   padding: 4px 0px 3px 20px;
+}
+
+.archive li.selected
+{
+   background-color: #d2e5f2;
+}
+
+.archive a.disabled,
+.archive a.disabled:active,
+.archive a.disabled:hover,
+.archive a.disabled:visited
+{
+   color: #a6a6a6;
+   cursor: not-allowed;
+}
+
+.archive a:hover
+{
+   text-decoration: none;
+}
+

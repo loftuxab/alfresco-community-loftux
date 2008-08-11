@@ -232,7 +232,7 @@
             // Reset the "action" attribute
             form.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + this.options.eventURI;
             
-            eventForm.ajaxSubmitMethod = Alfresco.util.Ajax.PUT;
+            eventForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
             eventForm.setAJAXSubmit(true,
             {
 	            successCallback:

@@ -1,0 +1,62 @@
+/** Comment list */
+
+.commentFooter {
+	margin-top: 20px;
+}
+
+.comment {
+	border-top: 2px dashed #b1b1b1;
+	border-bottom: 2px solid transparent;
+	border-right: 2px solid transparent;
+	border-left: 2px solid transparent;
+	margin: 0 20px;
+	padding: 10px;
+    display: inline-block;
+}
+
+html>body .comment {
+  display: block;
+}
+
+.comment.overNode {
+	border: 2px solid #5A7380;
+}
+.commentsListTitle {
+	font-size: 116%;
+	background:transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
+	padding: 20px 0pt 20px 40px;
+}
+.comment.even {
+	background-color: #ffffff;
+}
+.comment.odd {
+	background-color: #fcfcf5;
+}
+
+.comment-list .hidden {
+  display: none;
+}
+
+.editCommentForm {
+	margin: 20px;
+	padding: 20px;
+	border-top: 1px solid #b1b1b1;
+	background-color: #fafafa;
+}
+
+/* YUI WYSIWYG editor styles */
+.yuieditor strong {
+  font-weight: bold;
+}
+.yuieditor em {
+  font-style: italic; 
+}
+.yuieditor ul, .yuieditor ol {
+  padding-left: 40px;
+}
+.yuieditor ul li {
+  list-style-type: disc; 
+}
+.yuieditor ol li {
+  list-style-type: decimal; 
+}

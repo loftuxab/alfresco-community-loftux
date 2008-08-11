@@ -210,6 +210,24 @@
          this.currentTags = tags;
          return this;
       },
+      
+      /**
+       * Adds an array of tags to the current tags.
+       * For each tag the html is generated, this function can therefore
+       * be used to set the tags when using the taglibrary as a client-side
+       * only component (no tags generated on the server)
+       *
+       * @method setCurrentTags
+       * @param tags {array} Array containing the tags (by name)
+       */
+      addTags: function TagLibrary_addTags(tags)
+      {  
+         // add each tag to the list, also generating the html
+         for (var x=0; x < tags.length; x++)
+         {
+            this._addTagImpl(tags[x]);
+         }
+      },
 
       /**
        * Triggered by a click on one of the selected tags

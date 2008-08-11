@@ -23,15 +23,11 @@
  * http://www.alfresco.com/legal/licensing
  */
  
-//
-// Note: this is an exact copy of the tags javascript file in the document library !
-//
- 
 /**
- * BlogPostList Tags component.
+ * BlogPostList Archive component.
  * 
  * @namespace Alfresco
- * @class Alfresco.BlogPostListTags
+ * @class Alfresco.BlogPostListArchive
  */
 (function()
 {
@@ -51,12 +47,12 @@
     * Blog Tags constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.BlogPostListTags} The new DoclistTags instance
+    * @return {Alfresco.BlogPostListArchive} The new DoclistTags instance
     * @constructor
     */
-   Alfresco.BlogPostListTags = function(htmlId)
+   Alfresco.BlogPostListArchive = function(htmlId)
    {
-      this.name = "Alfresco.BlogPostListTags";
+      this.name = "Alfresco.BlogPostListArchive";
       this.id = htmlId;
       
       /* Register this component */
@@ -66,14 +62,14 @@
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
-      YAHOO.Bubbling.on("tagRefresh", this.onTagRefresh, this);
+      YAHOO.Bubbling.on("archiveRefresh", this.onArchiveRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
    }
    
-   Alfresco.BlogPostListTags.prototype =
+   Alfresco.BlogPostListArchive.prototype =
    {
       /**
        * Object container for initialization options
@@ -98,16 +94,7 @@
           * @type string
           * @default "blog"
           */
-         containerId: "blog",
-
-         /**
-          * Number of tags to show
-          *
-          * @property numTags
-          * @type int
-          * @default 15
-          */
-         numTags: 15
+         containerId: "blog"
       },
 
       /**
@@ -116,10 +103,10 @@
        * @property tagId
        * @type object
        */
-      tagId:
+      monthId:
       {
          id: 0,
-         tags: {}
+         months: {}
       },
 
       /**
@@ -144,9 +131,9 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.BlogPostListTags} returns 'this' for method chaining
+       * @return {Alfresco.BlogPostListArchive} returns 'this' for method chaining
        */
-       setOptions: function BlogPostListTags_setOptions(obj)
+       setOptions: function BlogPostListArchive_setOptions(obj)
        {
           this.options = YAHOO.lang.merge(this.options, obj);
           return this;
@@ -158,7 +145,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function BlogPostListTags_onComponentsLoaded()
+      onComponentsLoaded: function BlogPostListArchive_onComponentsLoaded()
       {
          YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -170,21 +157,22 @@
        *
        * @method onReady
        */   
-      onReady: function BlogPostListTags_onReady()
+      onReady: function BlogPostListArchive_onReady()
       {
          var me = this;
          
-         YAHOO.Bubbling.addDefaultAction('tag-link', function(layer, args)
+         YAHOO.Bubbling.addDefaultAction('archive-link', function(layer, args)
          {
             var link = args[1].target;
             if (link && !me.controlsDeactivated)
             {
-               var tagName = link.firstChild.nodeValue;
+               var liElem = Dom.getAncestorByTagName(link, 'li');
+               var date = me._getMonthFromId(liElem.id);  
                YAHOO.Bubbling.fire("filterChanged",
                {
-                  filterId: "tag",
+                  filterId: "bymonth",
                   filterOwner: me.name,
-                  filterData: tagName
+                  filterData: { year: date.getFullYear(), month: date.getMonth() }
                });
             }
             return true;
@@ -193,7 +181,7 @@
          // Kick-off tag population
          if (this.options.siteId && this.options.containerId)
          {
-            YAHOO.Bubbling.fire("tagRefresh");
+            YAHOO.Bubbling.fire("archiveRefresh");
          }
       },
       
@@ -209,7 +197,7 @@
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onFilterChanged: function BlogPostListTags_onFilterChanged(layer, args)
+      onFilterChanged: function BlogPostListArchive_onFilterChanged(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
@@ -222,8 +210,10 @@
                   Dom.removeClass(this.selectedFilter, "selected");
                }
 
+               var date = new Date(obj.filterData.year, obj.filterData.month, 1);
                // Need to find the selectedFilter element, from the current filterId
-               this.selectedFilter = Dom.get(this.id + "-tagId-" + this.tagId.tags[obj.filterData]);
+               this.selectedFilter = Dom.get(this._generateIdFromMonth(date));
+               
                // This component now owns the active filter
                Dom.addClass(this.selectedFilter, "selected");
             }
@@ -233,6 +223,7 @@
                if (this.selectedFilter !== null)
                {
                   Dom.removeClass(this.selectedFilter, "selected");
+                  this.selectedFilter = null;
                }
             }
          }
@@ -246,10 +237,10 @@
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onTagRefresh: function BlogPostListTags_onRefresh(layer, args)
+      onArchiveRefresh: function BlogPostListArchive_onArchiveRefresh(layer, args)
       {
          var timestamp = new Date().getTime();
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/site/{site}/{container}/tagscopetags?d=" + timestamp + "&topN=" + this.options.numTags,
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/site/{site}/{container}/postspermonth?d=" + timestamp,
          {
             site: this.options.siteId,
             container: this.options.containerId
@@ -261,12 +252,12 @@
 				url: url,
 				successCallback:
 				{
-					fn: this.onTagRefresh_success,
+					fn: this.onArchiveRefresh_success,
 					scope: this
 				},
 				failureCallback:
 				{
-					fn: this.onTagRefresh_success,
+					fn: this.onArchiveRefresh_success,
 					scope: this
 				}
 			});
@@ -278,19 +269,20 @@
        * @method onTagRefresh_success
        * @param response {object} Server response object
        */ 
-      onTagRefresh_success: function BlogPostListTags_onTagRefresh_success(response)
+      onArchiveRefresh_success: function BlogPostListArchive_onTagRefresh_success(response)
       {
-         if (response && !YAHOO.lang.isUndefined(response.json.tags))
+         if (response && !YAHOO.lang.isUndefined(response.json.items))
          {
             var html = "";
-            var tags = response.json.tags;
-            for (var i = 0, j = tags.length; i < j; i++)
+            var items = response.json.items;
+            for (var i = 0, j = items.length; i < j; i++)
             {
-               html += this._generateTagMarkup(tags[i]);
+               var date = new Date(items[i].year, items[i].month, 1);
+               html += this._generateMonthMarkup(date);
             }
             
-            var eTags = Dom.get(this.id + "-tags");
-            eTags.innerHTML = html;
+            var eMonths = Dom.get(this.id + "-archive");
+            eMonths.innerHTML = html;
          }
       },
       
@@ -301,10 +293,10 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onDeactivateAllControls: function BlogPostListTags_onDeactivateAllControls(layer, args)
+      onDeactivateAllControls: function BlogPostListArchive_onDeactivateAllControls(layer, args)
       {
          this.controlsDeactivated = true;
-         var controls = YAHOO.util.Selector.query("a.tag-link", this.id + "-body");
+         var controls = YAHOO.util.Selector.query("a.archive-link", this.id + "-body");
          for (var i = 0, j = controls.length; i < j; i++)
          {
             Dom.addClass(controls[i], "disabled");
@@ -324,9 +316,9 @@
        * @return {string} The custom message
        * @private
        */
-      _msg: function BlogPostListTags__msg(messageId)
+      _msg: function BlogPostListArchive__msg(messageId)
       {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.BlogPostListTags", Array.prototype.slice.call(arguments).slice(1));
+         return Alfresco.util.message.call(this, messageId, "Alfresco.BlogPostListArchive", Array.prototype.slice.call(arguments).slice(1));
       },
       
       /**
@@ -335,10 +327,11 @@
        * @method _generateTagMarkup
        * @param tag {object} the tag to render
        */
-      _generateTagMarkup: function BlogPostListTags__generateTagMarkup(tag)
+      _generateMonthMarkup: function BlogPostListArchive__generateTagMarkup(date)
       {
-         var html = '<li id="' + this._generateTagId(tag.name) + '"><span class="onTagSelection nav-label">';
-         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a> (' + tag.count + ')';
+         
+         var html = '<li id="' + this._generateIdFromMonth(date) + '"><span class="nav-label">';
+         html += '<a href="#" class="archive-link nav-link">' + Alfresco.util.formatDate(date, "mmmm yyyy") + '</a>';
          html += '</span></li>';
          return html;
       },
@@ -346,24 +339,27 @@
       /**
        * Generate ID alias for tag, suitable for DOM ID attribute
        *
-       * @method generateTagId
+       * @method _generateIdFromMonth
        * @param tagName {string} Tag name
        * @return {string} A unique DOM-safe ID for the tag
        */
-      _generateTagId: function BlogPostListTags__generateTagId(tagName)
+      _generateIdFromMonth: function BlogPostListArchive__generateMonthId(date)
       {
-         var id = 0;
-         var tagId = this.tagId;
-         if (tagName in tagId.tags)
-         {
-             id = tagId.tags[tagName];
-         }
-         else
-         {
-            tagId.id++;
-            id = tagId.tags[tagName] = tagId.id;
-         }
-         return this.id + "-tagId-" + id;
+         return this.id + "-month-" + date.getTime();
+      },
+      
+      /**
+       * Returns the date object that got encoded into the id by _generateIdFromMonth.
+       * @method _getMonthFromId
+       * @param id an id encoded by _generateMonthId
+       * @return a date object
+       */
+      _getMonthFromId: function BlogPostListArchive__getMonthFromId(id)
+      {
+         // get the date millis part
+         var millis = id.substring((this.id + "-month-").length);
+         millis = parseInt(millis);
+         return new Date(millis);
       }
    }
 })();

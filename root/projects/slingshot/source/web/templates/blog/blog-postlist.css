@@ -3,6 +3,11 @@
 }
 .yui-t1 #yui-main {
    margin-left: -50em;
-   margin-top: -15px;
 }
 
+.blog-filter h2
+{
+   background: url(images/expanded.png) no-repeat 0% 50%;
+   margin-top: 1em;
+   padding-left: 1em;
+}

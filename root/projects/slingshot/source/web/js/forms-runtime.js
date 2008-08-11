@@ -380,6 +380,17 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       },
 
       /**
+       * Set the http method to use for the AJAX call.
+       * 
+       * @method setAjaxSubmitMethod
+       * @param ajaxSubmitMethod {string} the http method to use for the AJAX call
+       */
+      setAjaxSubmitMethod: function(ajaxSubmitMethod)
+      {
+         this.ajaxSubmitMethod = ajaxSubmitMethod;
+      },
+      
+      /**
        * Adds validation for a specific field on the form.
        * 
        * @method addValidation
