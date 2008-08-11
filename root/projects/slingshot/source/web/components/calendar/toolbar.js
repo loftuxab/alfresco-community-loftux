@@ -103,8 +103,18 @@
 	   onButtonClick: function(e)
 	   {
 	      // TODO: look at caching this
-			var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-			eventDialog.setSiteId(this.siteId);
+   		var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
+   		var options = {
+   		   "siteId": this.siteId
+   		};
+   			
+	      var obj = Alfresco.util.ComponentManager.findFirst("Alfresco.CalendarView");
+	      if (obj)
+	      {
+	         options["displayDate"] = obj.currentDate;
+	      }
+	     
+	      eventDialog.setOptions(options);
 			eventDialog.show();
 	   }
 	  

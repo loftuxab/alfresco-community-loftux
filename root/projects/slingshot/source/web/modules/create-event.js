@@ -50,26 +50,38 @@
 	    * @type Alfresco.module.AddEvent
 	    */
 		panel: null,
-		
-		/**
-		 * Stores the URI of the event IF an edit is happening 
-		 *
-		 * @property eventURI
-		 * @type String
-		 */
-		eventURI: null,
-		
-		/**
-       * Sets the current site for this component.
-       *
-       * @property siteId
-       * @type string
-       */
-		setSiteId: function(siteId)
-		{
-			this.siteId = siteId;
-		},
+				
+      /**
+        * Object container for initialization options
+        *
+        * @property options
+        * @type object
+        */
+       options:
+       {
+          siteId: "",
+          /**
+    		 * Stores the URI of the event IF an edit is happening 
+    		 *
+    		 * @property eventURI
+    		 * @type String
+    		 */
+          eventURI: null,
+          displayDate: null
+       },		
 
+       /**
+        * Set multiple initialization options at once.
+        *
+        * @method setOptions
+        * @param obj {object} Object literal specifying a set of options
+        */
+       setOptions: function Wiki_setOptions(obj)
+       {
+          this.options = YAHOO.lang.merge(this.options, obj);
+          return this;
+       },
+       
 		/**
 		 * Fired by YUILoaderHelper when required component script files have
 		 * been loaded into the browser.
@@ -92,21 +104,16 @@
 		 *
 		 * @method show
 		 */
-       show: function(uri)
+       show: function()
        {
           var args = {
 				"htmlid": this.id,
-				"site": this.siteId
+				"site": this.options.siteId
 			}
 			
-			if (uri)
+			if (this.options.eventURI)
 			{
-				this.eventURI = uri;
-				args['uri'] = this.eventURI;
-			}
-			else 
-			{
-				this.eventURI = null; // reset
+				args['uri'] = this.options.eventURI;
 			}
 			
 			Alfresco.util.Ajax.request(
@@ -197,7 +204,7 @@
          eventForm.setShowSubmitStateDynamically(true);
          eventForm.setSubmitElements(okButton);
 
-			if (!this.eventURI) // Create
+			if (!this.options.eventURI) // Create
 			{
 				eventForm.setAJAXSubmit(true,
 				{
@@ -207,9 +214,9 @@
 						scope: this
 					}
 				});
-	
+	      
 				// Initialise the start and end dates to today
-				var today = new Date();
+				var today = this.options.displayDate || new Date();
             // Pretty formatting
 				var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
 				Dom.get("fd").value = dateStr;
@@ -223,7 +230,7 @@
 			{   
             var form = document.getElementById(this.id + "-addEvent-form");
             // Reset the "action" attribute
-            form.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + this.eventURI;
+            form.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + this.options.eventURI;
             
             eventForm.ajaxSubmitMethod = Alfresco.util.Ajax.PUT;
             eventForm.setAJAXSubmit(true,
