@@ -6,7 +6,7 @@
 <div id="${args.htmlid}-pagelist" class="yui-navset"> 
 <#if pageList.pages?size &gt; 0>
 <#list pageList.pages as p>
-   <div class="wikipage">
+   <div class="wikipage <#if p.tags??><#list p.tags as t>wp-${t}<#if t_has_next> </#if></#list></#if>">
    <div class="actionPanel">
       <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit">Edit</a></div>
       <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details">Details</a></div>

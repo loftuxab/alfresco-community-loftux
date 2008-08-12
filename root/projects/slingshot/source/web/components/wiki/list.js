@@ -18,6 +18,8 @@
    
    Alfresco.WikiList.prototype = 
    {
+      _selectedTag: "",
+      
       /**
    	  * Sets the current site for this component.
    	  * 
@@ -60,7 +62,44 @@
              div = divs[i];
              div.innerHTML = this.$parser.parse(div.innerHTML);
           }
+          
+          YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this);
        },
+       
+       onTagSelected: function(e, args)
+       {
+          var Dom = YAHOO.util.Dom;
+          var tagname = args[1].tagname;
+          
+          // TODO: do something with the tag name for all tags
+          if (tagname === "All Tags")
+          {
+             var divs = Dom.getElementsByClassName('wikiPageDeselect', 'div');
+             for (var i=0; i < divs.length; i++)
+             {
+                Dom.removeClass(divs[i], 'wikiPageDeselect');
+             }
+          }
+          else if (this._tagSelected !== tagname) 
+          {
+             var div, divs = Dom.getElementsByClassName('wikipage', 'div');
+             for (var x=0; x < divs.length; x++) {
+                div = divs[x];
+             
+                if (Dom.hasClass(div, 'wp-' + this._tagSelected))
+                {
+                   Dom.removeClass(div, 'wikiPageDeselect');
+                }
+             
+                if (!Dom.hasClass(div, 'wp-' + tagname)) 
+                {
+                   Dom.addClass(divs[x], 'wikiPageDeselect');
+                }
+             }
+          
+             this._tagSelected = tagname;
+          }
+       },       
        
        _initMouseOverListeners: function()
        {
