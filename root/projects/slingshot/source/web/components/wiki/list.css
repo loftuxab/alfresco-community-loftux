@@ -55,6 +55,12 @@
    border: 2px solid black; 
 }
 
+.wikiPageDeselect
+{
+   opacity:0.4;
+   filter:alpha(opacity=40);
+}
+
 .actionPanel {
    float: right;
    visibility: hidden;
