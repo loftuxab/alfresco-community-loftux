@@ -14,7 +14,8 @@
             <div class="yui-u">
                <select id="${args.htmlid}-limit" name="limit">
                 <option value="all">All</option>
-               <#list 1..25 as limit><option value="${limit}">${limit}</option></#list>
+                <#assign limits = [5, 10, 15, 20, 25]>
+                <#list limits as limit><option value="${limit}">${limit}</option></#list>
                </select>
             </div>
          </div>   
