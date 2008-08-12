@@ -8,6 +8,6 @@
 <#if item.attachment??>
 <div><img src="${url.context}/images/filetypes32/${item.attachment.type}.gif"/><a href="${item.attachment.url}">${item.attachment.name}</a></div>
 </#if>
-<br clear="all"/>
+<br />
 </div>
 </#macro>
