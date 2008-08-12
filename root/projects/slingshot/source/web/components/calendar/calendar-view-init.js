@@ -811,7 +811,15 @@
 				for (var i=0; i < events.length; i++)
 				{
 					var event = events[i];
-					html += '<tr><td class="timelabel">' + event.start + '</td><td>' + event.name + '</td></tr>';
+				   html += '<tr><td><div class="';
+				   var classes = ["cal-event-entry"];
+				   for (var j=0; j < event.tags.length; j++)
+               {
+                  classes.push("cal-" + event.tags[j]);
+               }
+               html += classes.join(" ");
+               html += '">' + event.start + " " + event.name;
+				   html += '</div></td></tr>';
 				}
 				html += '</table></div>';
 			}
