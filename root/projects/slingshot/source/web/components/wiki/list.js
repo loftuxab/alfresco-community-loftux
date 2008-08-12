@@ -79,14 +79,17 @@
              {
                 Dom.removeClass(divs[i], 'wikiPageDeselect');
              }
+             
+             this._tagSelected = "";
           }
           else if (this._tagSelected !== tagname) 
           {
-             var div, divs = Dom.getElementsByClassName('wikipage', 'div');
+             var divs = Dom.getElementsByClassName('wikipage', 'div');
+             var div;
              for (var x=0; x < divs.length; x++) {
                 div = divs[x];
              
-                if (Dom.hasClass(div, 'wp-' + this._tagSelected))
+                if (Dom.hasClass(div, 'wikiPageDeselect'))
                 {
                    Dom.removeClass(div, 'wikiPageDeselect');
                 }

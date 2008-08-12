@@ -195,7 +195,7 @@
               {
                  div = divs[x];
 
-                 if (Dom.hasClass(div, 'cal-' + this._tagSelected))
+                 if (Dom.hasClass(div, 'eventDeselect'))
                  {
                     Dom.removeClass(div, 'eventDeselect');
                  }
