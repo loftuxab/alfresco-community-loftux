@@ -210,3 +210,10 @@ div.calendar-currentMonth {
 span.eventTime  input[type="text"] {
    width: 5em;
 }
+
+.eventDeselect
+{
+   opacity:0.4;
+   filter:alpha(opacity=40);
+}
+
