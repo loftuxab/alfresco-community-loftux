@@ -163,6 +163,51 @@
 			   YAHOO.Bubbling.on("eventDeleted", this.onEventDelete, this);
 			   // Listen for when an event has been updated
 			   YAHOO.Bubbling.on("eventUpdated", this.onEventUpdate, this);
+			   
+			   YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this);
+        },
+        
+        onTagSelected: function(e, args)
+        {
+           var Dom = YAHOO.util.Dom;
+           var tagname = args[1].tagname;
+
+           var IDS = ["#day", "#week", "#month", "#agenda"];
+           
+           var id = IDS[ this.tabView.get('activeIndex') ];
+           var context = Dom.get(id);
+
+           // TODO: do something with the tag name for all tags
+           if (tagname === "All Tags")
+           {
+              var divs = Dom.getElementsByClassName('eventDeselect', 'div', context);
+              for (var i=0; i < divs.length; i++)
+              {
+                 Dom.removeClass(divs[i], 'eventDeselect');
+              }
+              
+              this._tagSelected = "";
+           }
+           else if (this._tagSelected !== tagname) 
+           {
+              var div, divs = Dom.getElementsByClassName('cal-event-entry', 'div', context);
+              for (var x=0; x < divs.length; x++) 
+              {
+                 div = divs[x];
+
+                 if (Dom.hasClass(div, 'cal-' + this._tagSelected))
+                 {
+                    Dom.removeClass(div, 'eventDeselect');
+                 }
+
+                 if (!Dom.hasClass(div, 'cal-' + tagname)) 
+                 {
+                    Dom.addClass(divs[x], 'eventDeselect');
+                 }
+              }
+
+              this._tagSelected = tagname;
+           }           
         },
 
 		/**
@@ -337,14 +382,15 @@
                   events = [];
                   this.eventData[obj.from] = events;
                }
-
+               
                events.push({
                   "name": obj.name,
 						"start": obj.start,
 						"end": obj.end,
 						"uri": obj.uri,
 						"from": obj.from,
-						"to": obj.to
+						"to": obj.to,
+						"tags": obj.tags
                });
 					
 				   // Need to re-order on start time
@@ -470,11 +516,8 @@
                         {
                             for (var j=0; j < events.length; j++)
                             {
-                            	var d = document.createElement('div');
-                              	Dom.addClass(d, 'cal-event-entry');
-                              	d.innerHTML = '<a href="#">' + events[j].name + '</a>';
-								         YAHOO.util.Event.addListener(d, 'click', this.onEventClick, events[j], this);
-                              	elem.appendChild(d);
+                               var d = this._createEventContainer(events[j]);
+                               elem.appendChild(d);
                             }
                         }
                         ++daynum;
@@ -483,13 +526,13 @@
             }
         },
 
-		onEventClick: function(e, obj)
-		{
-		   // TODO: look at caching this
-			var panel = new Alfresco.EventInfo(this.id + "-eventInfo");
-			panel.setSiteId(this.siteId);
-			panel.show(obj); // event object
-		},
+        onEventClick: function(e, obj)
+		  {
+           // TODO: look at caching this
+			  var panel = new Alfresco.EventInfo(this.id + "-eventInfo");
+			  panel.setSiteId(this.siteId);
+			  panel.show(obj); // event object
+		  },
 
         /**
          * Functions specific to the week view
@@ -504,111 +547,108 @@
          * @param date {Date} JavaScript date object
          * @method  displayPrevMonth
          */
-        refreshWeek: function(date)
-        {
+         refreshWeek: function(date)
+         {
             var DateMath = YAHOO.widget.DateMath;
             var Dom = YAHOO.util.Dom;
 
             var startDate = DateMath.subtract(date, DateMath.DAY, date.getDay());
-			var endDate = DateMath.add(startDate, DateMath.DAY, 6);
+			   var endDate = DateMath.add(startDate, DateMath.DAY, 6);
 			
-			/* Update the week label */
-			var weekLabel = "";
-			if (startDate.getMonth() === endDate.getMonth())
-			{
-				weekLabel = startDate.getDate() + " - " + Alfresco.util.formatDate(endDate, "d mmm yyyy");
-			}
-			else
-			{
-				weekLabel = Alfresco.util.formatDate(startDate, "d mmm yyyy") + " - " + Alfresco.util.formatDate(endDate, "d mmm yyyy");
-			}
+			   /* Update the week label */
+			   var weekLabel = "";
+			   if (startDate.getMonth() === endDate.getMonth())
+			   {
+				   weekLabel = startDate.getDate() + " - " + Alfresco.util.formatDate(endDate, "d mmm yyyy");
+			   }
+			   else
+			   {
+				   weekLabel = Alfresco.util.formatDate(startDate, "d mmm yyyy") + " - " + Alfresco.util.formatDate(endDate, "d mmm yyyy");
+			   }
 			
-			var label = Dom.get(this.id + "-weekLabel");
-	        label.innerHTML = weekLabel;
+			   var label = Dom.get(this.id + "-weekLabel");
+	         label.innerHTML = weekLabel;
 	
-			var colElem;
-			var colDate = startDate;
-			/* Update the column headers */
-			for (var col=0; col < 7; col++)
-			{
-				colElem = Dom.get(this.id + "-weekheader-" + col);
-				if (colElem)
-				{
-					colElem.innerHTML = Alfresco.util.formatDate(colDate, "ddd d/m");
-				}
-				colDate = DateMath.add(colDate, DateMath.DAY, 1);
-			}
+			   var colElem;
+			   var colDate = startDate;
+			   /* Update the column headers */
+			   for (var col=0; col < 7; col++)
+			   {
+				   colElem = Dom.get(this.id + "-weekheader-" + col);
+				   if (colElem)
+				   {
+					   colElem.innerHTML = Alfresco.util.formatDate(colDate, "ddd d/m");
+				   }
+				   colDate = DateMath.add(colDate, DateMath.DAY, 1);
+			   }
 
-			// Clear any previous events
-			var container = document.getElementById("week-view");
-			if (container)
-			{
-				var elems = this._getWeekViewEvents(container, "cal-event-entry");
-				if (elems)
-				{	
-					for (var i=0; i < elems.length; i++)
-					{
-						// FIXME: the node should really be deleted
-						elems[i].innerHTML = "";  
-					}
-				}
-			}
+			   // Clear any previous events
+			   var container = document.getElementById("week-view");
+			   if (container)
+			   {
+				   var elems = this._getWeekViewEvents(container, "cal-event-entry");
+				   if (elems)
+				   {	
+					   for (var i=0; i < elems.length; i++)
+					   {
+						   // FIXME: the node should really be deleted
+						   elems[i].innerHTML = "";  
+					   }
+				   }
+			   }
 
             for (var day=0; day < 7; day++)
             {
-                /* Event data is keyed on m/d/yyyy */
-                var events = this.eventData[ Alfresco.util.formatDate(startDate, "m/d/yyyy") ];
-                if (events)
-                {
-                    for (var i=0; i < events.length; i++)
-                    {
-                        var event = events[i];
-                        var startTime = event.start;
-                        if (startTime)
+               /* Event data is keyed on m/d/yyyy */
+               var events = this.eventData[ Alfresco.util.formatDate(startDate, "m/d/yyyy") ];
+               if (events)
+               {
+                  for (var i=0; i < events.length; i++)
+                  {
+                     var event = events[i];
+                     var startTime = event.start;
+                     if (startTime)
+                     {
+                        var parts = startTime.split(":");
+                        var hours = parseInt(parts[0]);
+                        var minutes = parseInt(parts[1]);
+
+                        // Figure out where the event should be placed
+                        var row = hours * 2 + (minutes > 0 ? 1 : 0);
+                        var col = startDate.getDay();
+                        var id = this.id + "_calendar_cell" + (row*7 + col);
+
+                        var elem = Dom.get(id);
+							   elem.innerHTML = ""; // reset
+                        if (elem)
                         {
-                            var parts = startTime.split(":");
-                            var hours = parseInt(parts[0]);
-                            var minutes = parseInt(parts[1]);
-
-                            // Figure out where the event should be placed
-                            var row = hours * 2 + (minutes > 0 ? 1 : 0);
-                            var col = startDate.getDay();
-                            var id = this.id + "_calendar_cell" + (row*7 + col);
-
-                            var elem = Dom.get(id);
-							elem.innerHTML = ""; // reset
-                            if (elem)
-                            {
-                                var d = document.createElement('div');
-                                Dom.addClass(d, 'cal-event-entry');
-                                d.innerHTML = '<a href="#">' + event.name + '</a>';
-								YAHOO.util.Event.addListener(d, 'click', this.onEventClick, event, this);
-                                elem.appendChild(d);
-                            }
+                           var d = this._createEventContainer(event);
+                           elem.appendChild(d);
                         }
-                    }
+                     }
+                   }
                 }
                 startDate = DateMath.add(startDate, DateMath.DAY, 1);
             }
         },
 
-		_getWeekViewEvents: function(container, className)
-		{
-			var arrElems = container.getElementsByTagName("div");
-			className = className.replace(/\-/g, "\\-");
-			var regExp = new RegExp("(^|\\s)" + className + "(\\s|$)");
-			var returnElems = [];
-			var elem;
-			for (var i=0; i < arrElems.length; i++)
-			{
-				elem = arrElems[i];
-				if (regExp.test(elem.className))
-				{
-					returnElems.push(elem);
-				}
-			}	
-			return returnElems;
-		},
+        _getWeekViewEvents: function(container, className)
+		  {
+           var arrElems = container.getElementsByTagName("div");
+           className = className.replace(/\-/g, "\\-");
+			  var regExp = new RegExp("(^|\\s)" + className + "(\\s|$)");
+			  var returnElems = [];
+			  var elem;
+			  for (var i=0; i < arrElems.length; i++)
+			  {
+              elem = arrElems[i];
+				  if (regExp.test(elem.className))
+				  {
+                 returnElems.push(elem);
+				  }
+			  }	
+			  return returnElems;
+		  },
 
         /**
          * Functions specific to the day view
@@ -624,96 +664,108 @@
          * @param date {Date} JavaScript date object
          * @method  refreshDay
          */
-        refreshDay: function(date)
-        {
+         refreshDay: function(date)
+         {
             var DateMath = YAHOO.widget.DateMath;
             var Dom = YAHOO.util.Dom;
 
-			/* Change the day label */
-	        var label = Dom.get(this.id + "-dayLabel");
-	        label.innerHTML = Alfresco.util.formatDate(date, "dd mmm yyyy");
+			   /* Change the day label */
+	         var label = Dom.get(this.id + "-dayLabel");
+	         label.innerHTML = Alfresco.util.formatDate(date, "dd mmm yyyy");
 
             var WIDTH = 82; // 80px + 1px + 1px
             var HEIGHT = 22;
             var DENOM = 1000 * 60 * 30; // 30 minute slots
 
             var container = Dom.get(this.id + "-dayEventsView");
-			container.innerHTML = ""; // reset
+			   container.innerHTML = ""; // reset
             var events = this.eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
             var total = events.length;
             if (total > 0)
             {
-                var indents = [];
-                // Assumes that events are sorted by start time
-                for (var i=0; i < total; i++)
-                {
-                    var event = events[i];
-                    // TODO: sort this out
-                    var startDate = new Date(date.getTime());
-                    var startTime = event.start.split(":");
-                    startDate.setHours(startTime[0], startTime[1]);
+               var indents = [];
+               // Assumes that events are sorted by start time
+               for (var i=0; i < total; i++)
+               {
+                  var event = events[i];
+                  // TODO: sort this out
+                  var startDate = new Date(date.getTime());
+                  var startTime = event.start.split(":");
+                  startDate.setHours(startTime[0], startTime[1]);
 
-                    var endDate = new Date(date.getTime());
-                    if (!event.end)
-                    {
-                        event.end = "23:00"; // TODO: choose a sensible default
-                    }
-                    var endTime = event.end.split(":");
-                    endDate.setHours(endTime[0], endTime[1]);
+                  var endDate = new Date(date.getTime());
+                  if (!event.end)
+                  {
+                     event.end = "23:00"; // TODO: choose a sensible default
+                  }
+                  var endTime = event.end.split(":");
+                  endDate.setHours(endTime[0], endTime[1]);
 
-                    indents[i] = 0; // initialise
-                    var indent = 0;
-                    // Check the previous events for overlap
-                    for (var j = i-1; j >= 0; j--)
-                    {
-                        /**
-                         * Events are already sorted by start time
-                         */
-                        var e = events[j];
-                        var sDate = new Date(date.getTime());
-                        var sTime = e.start.split(":");
-                        sDate.setHours(sTime[0], sTime[1]);
+                  indents[i] = 0; // initialise
+                  var indent = 0;
+                  // Check the previous events for overlap
+                  for (var j = i-1; j >= 0; j--)
+                  {
+                     /**
+                      * Events are already sorted by start time
+                      */
+                     var e = events[j];
+                     var sDate = new Date(date.getTime());
+                     var sTime = e.start.split(":");
+                     sDate.setHours(sTime[0], sTime[1]);
 
-                        var eDate = new Date(date.getTime());
-                        var eTime = e.end.split(":");
-                        eDate.setHours(eTime[0], eTime[1]);
+                     var eDate = new Date(date.getTime());
+                     var eTime = e.end.split(":");
+                     eDate.setHours(eTime[0], eTime[1]);
                         
-                        // Check to see if the events overlap
-                        if (YAHOO.widget.DateMath.after(eDate, startDate)) 
+                     // Check to see if the events overlap
+                     if (YAHOO.widget.DateMath.after(eDate, startDate)) 
+                     {
+                        if (indent === indents[j]) 
                         {
-                          if (indent === indents[j]) 
-                          {
-                            indent += 1;
-                          }
+                           indent += 1;
                         }
-                    }
-                    // Store the offset for each event
-                    indents[i] = indent;
+                     }
+                   }
+                   // Store the offset for each event
+                   indents[i] = indent;
 
-                    // Now display the event
-                    var div = document.createElement("div");
-                    div.setAttribute("class", "dayEvent cal-event-entry");
-                    div.innerHTML = '<a href="#">' + event.name + '</a>';
-					YAHOO.util.Event.addListener(div, 'click', this.onEventClick, event, this);
-                    // Figure out the height of the div based upon
-                    // the number of half hour slots it occupies
-                    var span = Math.round((endDate.getTime() - startDate.getTime()) / DENOM);
-                    div.style.height = (HEIGHT * span) + "px";
-                    // Set the position
-                    var top = startDate.getHours() * 2 + (startDate.getMinutes() > 0 ? 1 : 0);
-                    div.style.top = (HEIGHT * top) + "px";
-                    div.style.left = (WIDTH * indent) + "px";
+                   // Now display the event
+                   var div = this._createEventContainer(event);
+                   Dom.addClass(div, "dayEvent");
+                   
+                   // Figure out the height of the div based upon
+                   // the number of half hour slots it occupies
+                   var span = Math.round((endDate.getTime() - startDate.getTime()) / DENOM);
+                   div.style.height = (HEIGHT * span) + "px";
+                   // Set the position
+                   var top = startDate.getHours() * 2 + (startDate.getMinutes() > 0 ? 1 : 0);
+                   div.style.top = (HEIGHT * top) + "px";
+                   div.style.left = (WIDTH * indent) + "px";
 
-                    container.appendChild(div);
+                   container.appendChild(div);
                 }
             }
-
+        },
+        
+        _createEventContainer: function(event)
+        {
+           var div = document.createElement("div");
+           var classes = ["cal-event-entry"];
+           for (var i=0; i < event.tags.length; i++)
+           {
+              classes.push("cal-" + event.tags[i]);
+           }
+           div.setAttribute("class", classes.join(" "));
+           div.innerHTML = '<a href="#">' + event.name + '</a>';
+           YAHOO.util.Event.addListener(div, 'click', this.onEventClick, event, this);
+           return div;
         },
 
-		/**
-		 * Methods specific to the agenda view 
-		 * of events.
-		 */
+        /**
+		   * Methods specific to the agenda view 
+		   * of events.
+		   */
 
 		/**
 		 * Updates the agenda view. Currently displays ALL the events for a site.
