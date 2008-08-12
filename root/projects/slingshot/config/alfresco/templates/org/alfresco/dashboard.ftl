@@ -1,6 +1,6 @@
 <#import "import/alfresco-template.ftl" as template />
 <#import "import/alfresco-layout.ftl" as layout />
-<@template.header>
+<@template.header "transitional">
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />
 </@>
 
