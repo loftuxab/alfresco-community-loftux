@@ -171,3 +171,66 @@ function textsearch()
 	    };
 	});
 }
+
+
+//Define the callbacks for the asyncRequest to get KB categories
+var callbacks = {
+	success : function (o) 
+	{
+	        YAHOO.log("RAW JSON DATA: " + o.responseText);
+	
+	        // Process the JSON data returned from the server
+	        var messages = [];
+	        try {
+	            messages = YAHOO.lang.JSON.parse(o.responseText);
+	        }
+	        catch (x) {
+	            alert("JSON Parse failed!");
+	            return;
+	        }
+	
+	        YAHOO.log("PARSED DATA: " + YAHOO.lang.dump(messages));
+	
+	        // The returned data was parsed into an array of objects.
+	        // Add a P element for each received message
+	       for (var i = 0, len = messages['Alfresco Versions'].length; i < len; ++i) 
+	       {
+	            var m = messages['Alfresco Versions'][i];
+	            document.getElementById("alfresco_version").options[i+1] = new Option();
+	            document.getElementById("alfresco_version").options[i+1].text = m.name;
+	            document.getElementById("alfresco_version").options[i+1].value = m.noderef;
+	        }
+	       
+	        for (var i = 0, len = messages['Article Type'].length; i < len; ++i) 
+	 	    { 
+	            var m1 = messages['Article Type'][i];
+	            document.getElementById("article_type").options[i] = new Option();
+	            document.getElementById("article_type").options[i].text = m1.name;
+	            document.getElementById("article_type").options[i].value = m1.noderef;
+	         }
+		
+	},
+
+  failure : function (o) {
+      if (!YAHOO.util.Connect.isCallInProgress(o)) {
+          alert("Async call failed!");
+      }
+  },
+
+  timeout : 3000
+}
+
+//Make the call to the server for JSON data
+YAHOO.util.Connect.asyncRequest('GET',"/extranet/proxy/alfresco/kb/getCategories", callbacks);
+
+//This function ensures that the ajax request for categories is linked even when back button of browser is clicked 
+onload=function()
+{
+	var e=document.getElementById("refreshed");
+	if(e.value=="no") e.value="yes";
+	else
+	{
+		e.value="no";
+		location.reload();
+	}
+}
