@@ -48,10 +48,11 @@
 <#else>
      <#assign askid = args.askid/>
      <#if askid!=''>
-        <#assign query=query+ " +@kb\\:kbId:\"+${askid}+\""/>
+        <#setting number_format="0000">
+        <#assign query=query+ " +@kb\\:kbId:\"+${askid?number}+\""/>
       </#if>
 </#if>
-
+<#setting number_format="number">
 <#if args.article_type?exists>
 	   <#assign article_type = args.article_type/>
 	   <#if article_type!='workspace://SpacesStore/kb:type-any' & article_type!=''>
