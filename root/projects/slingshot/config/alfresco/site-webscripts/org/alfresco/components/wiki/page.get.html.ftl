@@ -67,8 +67,26 @@
 	            </div>
 	            </form>
 			</div> 
-<#elseif action == "details">			
+<#elseif action == "details">	    		
 			<div id="#history">
+			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%">
+			<div class="yui-g" style="background: #CCC;">
+			   <div class="yui-u first"><h2>${result.title!""}</h2></div>
+			   <div class="yui-u align-right">
+			   <select id="${args.htmlid}-selectVersion">
+			   <#list result.versionhistory as version>
+			      <option value="${version.versionId}">${version.version} <#if version_index = 0>(Latest)</#if></option>
+			   </#list>
+			   </select>
+			   </div>
+			</div>
+			<div id="#page">
+			   <#-- PAGE CONTENT GOES HERE -->
+			   <#if result.pagetext??>${result.pagetext}</#if>
+			</div>
+			<div id="${args.htmlid}-pagecontent" style="display:none;"><#if result.pagetext??>${result.pagetext}</#if></div>		
+			</div>
+			 <div style="display:none; margin-bottom: 5px;" id="${args.htmlid}-revertPanel"><button id="${args.htmlid}-revert-button">Revert</button></div>
 			<div class="yui-gb">
 			   <div class="yui-u first">
 			      <div class="columnHeader">Version History</div>
@@ -76,7 +94,7 @@
 			      <#list result.versionhistory as version>
 			      <table class="versionHistory">
 			         <tr><td colspan="2" class="pageTitle">${version.name}</td></tr>
-			         <tr><td class="attributeLabel">Version:</td><td class="attribute">${version.version} (<a href="#" id="${version.versionId}" class="view-link">view</a>)</td></tr>
+			         <tr><td class="attributeLabel">Version:</td><td class="attribute">${version.version}</td></tr>
 			         <tr><td class="attributeLabel">Modifier:</td><td class="attribute">${version.author}</td></tr>
 			         <tr><td class="attributeLabel">Modified on:</td><td class="attribute">${version.date}</td></tr>
 			      </table>

@@ -72,22 +72,13 @@
 		 */
 		init: function()
 		{
-			var me = this;
-			
-			YAHOO.Bubbling.addDefaultAction('view-link', function(layer, args)
-         {
-            var link = args[1].target;
-            if (link)
-            {
-               var id = link.id;
-               me._displayVersion(id);      
-            }
-            return true;
-         });
-       
 			if (this.options.mode === "edit") 
 			{
 			  this._setupEditForm();
+			}
+			else if (this.options.mode === "details")
+			{
+			   this._setupPageDetails();
 			}
 			
 			var pageText = document.getElementById("#page"); // Content area
@@ -98,6 +89,53 @@
 				pageText.innerHTML = this.parser.parse(pageText.innerHTML);
 			}
 		
+		},
+		
+		_setupPageDetails: function()
+		{
+		   // Add 'onchange' handler to dropdown
+		   YAHOO.util.Event.addListener(this.id + "-selectVersion", 'change', this.onSelectChange, null, this);
+		   
+		   var revertButton = Alfresco.util.createYUIButton(this, "revert-button", this.onRevert,
+   		{
+   			type: "push"
+   		});
+   		
+   		// Hide the revert button
+   		var div  = YAHOO.util.Dom.get(this.id + "-revertPanel");
+   		if (div)
+   		{
+   		   div.style.display = "none";
+   		}
+		},
+		
+		onRevert: function(e)
+		{
+		   // Make a PUT request 
+		   var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/page/{site}/{title}",
+         {
+            site: this.options.siteId,
+            title: this.options.pageTitle,
+         });
+		   
+		   var div = YAHOO.util.Dom.get(this.id + "-pagecontent");
+   		var obj = {
+   		   "pagecontent": div.innerHTML
+   	   }
+   		   
+		   Alfresco.util.Ajax.request(
+			{
+				method: Alfresco.util.Ajax.PUT,
+		      url: actionUrl,
+		      dataObj: obj,
+		      requestContentType: Alfresco.util.Ajax.JSON,
+				successCallback:
+				{
+					fn: this.onPageUpdated,
+					scope: this
+				},
+		      failureMessage: "Could not update page"
+		   });
 		},
 		
 		_setupEditForm: function()
@@ -168,8 +206,10 @@
 		   this.selectedTags = args[1].tags;
 		},
 		
-		_displayVersion: function(id)
+		onSelectChange: function(e)
 		{
+		   var select = e.target;
+		   var id = select.options[select.selectedIndex].value; 
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
          {
             site: this.options.siteId,
@@ -189,23 +229,29 @@
 		      failureMessage: "Could not retrieve version information"
 		   });
 		   
+		   // Decide whether to display the revert button or not
+		   var div  = YAHOO.util.Dom.get(this.id + "-revertPanel");
+		   if (select.selectedIndex === 0)
+		   {
+		      div.style.display = "none";
+		   }
+		   else
+		   {
+		      div.style.display = "block";
+		   }
 		},
 		
 		onVersionInfo: function(e)
 		{
-		   var panel = new YAHOO.widget.Panel("versionPanel", 
-		   { 
-		      width:"320px", 
-		      visible:false, 
-		      draggable:true, 
-		      close:true, 
-		      fixedcenter:true
-		   });
+		   var page = YAHOO.util.Dom.get("#page");
+		   page.innerHTML = this.parser.parse(e.serverResponse.responseText);
 		   
-		   panel.setHeader("Version Info");
-		   panel.setBody(this.parser.parse(e.serverResponse.responseText));
-		   panel.render(document.body);
-		   panel.show();
+		   var pagecontent = YAHOO.util.Dom.get(this.id + "-pagecontent");
+		   if (pagecontent)
+		   {
+		      // We store the raw content in this hidden div
+		      pagecontent.innerHTML = e.serverResponse.responseText;
+		   }
 		},
 		
 		/**
@@ -219,7 +265,7 @@
 		},
 		
 		/*
-	   	 * Gets called when the user cancels an edit in progress.
+	    * Gets called when the user cancels an edit in progress.
 		 * Returns the user to the page view of a page.
 		 *
 		 * @method onCancelSelect
@@ -227,20 +273,27 @@
 		 */
 		onCancelSelect: function(e)
 		{
-			//this.tabs.set('activeIndex', 0);
+		   this._redirect();
 		},
 		
 		/*
 		 * Event handler that gets fired when a page is successfully updated.
-		 * This follows the "onSaveSelect" event handler.
+		 * This follows the "onSaveSelect" and "onRevert" event handlers.
 		 * 
 		 * @method onPageUpdated
 		 * @param e {object} Event fired
 		 */
 		onPageUpdated: function(e)
 		{
-		   // Display pop-up
-		    Alfresco.util.PopupManager.displayMessage({text: "Page Updated"});
+		   this._redirect();
+		},
+		
+		_redirect: function()
+		{
+		   // Redirect to the "view" tab
+		   var url = this._getAbsolutePath();
+		   url += this.options.pageTitle;
+		   window.location = url;   
 		}
 			
 	};	
