@@ -12,7 +12,9 @@
         <div class="delete-page"><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
         <div class="separator">|</div>
         <div class="rename-page"><button id="${args.htmlid}-rename-button">${msg("button.rename")}</button></div>
+         
    </div>
+   <div id="${args.htmlid}-rssFeed" class="rss-feed"><a href="${url.context}/proxy/alfresco/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">RSS feed</a></div>
    <div id="${args.htmlid}-createpanel">
       <div class="hd">${msg("panel.create.title")}</div>
       <div class="bd">
