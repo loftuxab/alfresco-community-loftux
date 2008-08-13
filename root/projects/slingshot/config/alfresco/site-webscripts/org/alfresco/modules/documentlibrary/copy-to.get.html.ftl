@@ -5,7 +5,7 @@
          <div class="mode">
             <h3>${msg("header.destination-type")}</h3>
             <div id="${args.htmlid}-modeGroup" class="yui-buttongroup">
-               <input type="radio" id="${args.htmlid}-site" name="site" value="${msg("button.site")}" checked />
+               <input type="radio" id="${args.htmlid}-site" name="site" value="${msg("button.site")}" checked="checked" />
                <input type="radio" id="${args.htmlid}-repository" name="repository" value="${msg("button.repository")}" />
             </div>
          </div>
