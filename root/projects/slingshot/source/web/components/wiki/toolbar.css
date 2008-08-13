@@ -18,6 +18,18 @@
    padding: 0.4em;
 }
 
+.toolbar .rss-feed
+{
+   float: right;
+}
+
+.toolbar .rss-feed a
+{
+   background-image: url(../images/feed-icon-16.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
+}
+
 /* Buttons */
 
 /*
