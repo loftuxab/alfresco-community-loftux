@@ -231,7 +231,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                }
                
                // make sure the submit elements start in the correct state
-               this._updateSubmitElements();
+               this.updateSubmitElements();
             }
             
             if (Alfresco.logger.isDebugEnabled())
@@ -552,6 +552,39 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             tabListener.enable();
          }
       },
+
+      /**
+       * Updates the state of all submit elements.
+       * 
+       * @method updateSubmitElements
+       */
+      updateSubmitElements: function()
+      {
+         if (Alfresco.logger.isDebugEnabled())
+            Alfresco.logger.debug("Determining whether submit elements can be enabled...");
+         
+         // run all validations silently to see if submit elements can be enabled
+         var valid = this._runValidations(true);
+         
+         // make sure all submit elements show correct state
+         for (var x = 0; x < this.submitElements.length; x++)
+         {
+            var currentItem = this.submitElements[x];
+            
+            if (typeof currentItem == "string")
+            {
+               // get the element with the id and set the disabled attribute
+               var elem = document.getElementById(currentItem);
+               elem.disabled = !valid;
+            }
+            else
+            {
+               // TODO: for now if an object is passed presume it's a YUI button
+               currentItem.set("disabled", !valid);
+            }
+         }
+      },
+      
       
       /**
        * Clears any errors displayed by previous validation failures.
@@ -609,7 +642,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          // update submit elements state, if required
          if (this.showSubmitStateDynamically)
          {
-            this._updateSubmitElements();
+            this.updateSubmitElements();
          }
       },
       
@@ -830,39 +863,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          }
          
          return !atLeastOneFailed;
-      },
-      
-      /**
-       * Updates the state of all submit elements.
-       * 
-       * @method _updateSubmitElements
-       * @private
-       */
-      _updateSubmitElements: function()
-      {
-         if (Alfresco.logger.isDebugEnabled())
-            Alfresco.logger.debug("Determining whether submit elements can be enabled...");
-         
-         // run all validations silently to see if submit elements can be enabled
-         var valid = this._runValidations(true);
-         
-         // make sure all submit elements show correct state
-         for (var x = 0; x < this.submitElements.length; x++)
-         {
-            var currentItem = this.submitElements[x];
-            
-            if (typeof currentItem == "string")
-            {
-               // get the element with the id and set the disabled attribute
-               var elem = document.getElementById(currentItem);
-               elem.disabled = !valid;
-            }
-            else
-            {
-               // TODO: for now if an object is passed presume it's a YUI button
-               currentItem.set("disabled", !valid);
-            }
-         }
       },
       
       /**
