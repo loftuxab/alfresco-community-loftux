@@ -30,7 +30,7 @@
                <input type="password" id="password" name="password" maxlength="256" style="width:200px"/>
             </div>
             <div style="padding-top:16px">
-               <input type="submit" value="Login"/>
+               <input type="submit" value="Login" id="btn-login" class="login-button" />
             </div>
             <div style="padding-top:32px">
                <span class="login-copyright">
@@ -46,9 +46,12 @@
    <script type="text/javascript">//<![CDATA[
    YAHOO.util.Event.onContentReady("alflogin", function()
    {
+      var Dom = YAHOO.util.Dom;
+      
       // set I18N labels
-      YAHOO.util.Dom.get("txt-username").innerHTML = Alfresco.util.message("label.username") + ":";
-      YAHOO.util.Dom.get("txt-password").innerHTML = Alfresco.util.message("label.password") + ":";
+      Dom.get("txt-username").innerHTML = Alfresco.util.message("label.username") + ":";
+      Dom.get("txt-password").innerHTML = Alfresco.util.message("label.password") + ":";
+      Dom.get("btn-login").value = Alfresco.util.message("button.login");
       
       // generate and display main login panel
       var panel = new YAHOO.widget.Overlay(YAHOO.util.Dom.get("alflogin"), 
@@ -62,8 +65,8 @@
       });
       panel.render(document.body);
       
-      YAHOO.util.Dom.get("success").value += window.location.hash;
-      YAHOO.util.Dom.get("username").focus();
+      Dom.get("success").value += window.location.hash;
+      Dom.get("username").focus();
    });
    
    <#if url.args["error"]??>
