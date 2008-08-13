@@ -65,8 +65,9 @@ a:visited
 
 h1
 {
+   font-family: Helvetica, Arial, sans-serif;
+   font-size: 146.5%;
    font-weight: normal;
-   font-size: 153.9%;
 }
 
 h2
@@ -135,11 +136,6 @@ hr
    opacity: 0.25;
 }
 
-.yui-skin-default .yui-panel-container.shadow .underlay
-{
-   opacity: 0.125;
-}
-
 .yui-skin-default .yui-panel .hd,
 .yui-skin-default .yui-panel .bdft
 {
@@ -153,15 +149,15 @@ hr
 
 .yui-skin-default .yui-panel .hd
 {
-   font-size:123.1%;
-   font-weight:bold;
+   font-size: 123.1%;
+   font-weight: bold;
    border-bottom: 1px solid #C4C5C5;
-   line-height:35px;
+   line-height: 35px;
 }
 
 .yui-skin-default .yui-panel .bdft
 {
-   font-size:100%;
+   font-size: 100%;
    border-top: 1px solid #C4C5C5;
 }
 
@@ -194,6 +190,7 @@ hr
    width: 60%;
 }
 
+
 /* Style the default message  */
 
 .yui-skin-default #message
@@ -207,6 +204,7 @@ hr
    background-color:#808080;
    color:white;
 }
+
 
 /* Style the default prompt */
 
@@ -222,36 +220,25 @@ hr
    border-bottom:medium none;
 }
 
-/*
-IE SPECIFIC
-.yui-skin-default #prompt .hd,
-.yui-skin-default #prompt .bd,
-.yui-skin-default #prompt .fd
-{
-   border:medium none;
-}
-*/
-
 .yui-skin-default #prompt .bd
 {
-   padding:1em;
-   background-color:#E3EBEC;
+   padding: 1em;
+   background-color: #e3ebec;
 }
 
 .yui-skin-default #prompt .ft .button-group
 {
-   display:block;
-   padding-top:0.5em;
-   text-align:center;
+   display: block;
+   padding-top: 0.5em;
+   text-align: center;
 }
 
 .yui-skin-default #prompt .ft
 {
-   border-left: 1px solid #C4C5C5;
-   border-right: 1px solid #C4C5C5;
-   background-color:#E3EBEC;
+   border-left: 1px solid #c4c5c5;
+   border-right: 1px solid #c4c5c5;
+   background-color: #e3ebec;
 }
-
 
 
 /* Page title and navigation styles */
@@ -259,12 +246,13 @@ IE SPECIFIC
 .page-title
 {
    background-color: #5497c4;
+   border-top: 1px dotted #45637f;
    clear: left;
    color: white;
    line-height: 2em;
    margin: 0px -10px;
    min-height: 2em;
-   padding: 8px 10px;
+   padding: 11px 10px;
 }
 
 .page-title a:visited,
@@ -291,10 +279,11 @@ IE SPECIFIC
 div.site-navigation
 {
    background-color: #5ba1d0;
-   border-top: 1px dotted #84b4d5;
+   border-bottom: 1px solid #4B86ae;
+   border-top: 1px dotted #bbd6e7;
    clear: left;
    color: white;
-   margin: 0 -10px 1px;
+   margin: 0 -10px;
    min-height: 1em;
    padding: 10px 0;
 }

@@ -7,21 +7,22 @@
 .header .logo-wrapper
 {
    background-color: #fff;
-   border-right: 1px dashed #c0c0c0;
+   border-right: 1px dotted #c0c0c0;
    float: left;
    padding-right: 8px;
 }
 
 .header .menu-wrapper
 {
-   background-color: #e9edef;
+   background-color: #f2f2f2;
    margin-right: -10px;
    height: 19px;
-   padding: 12px 0px 8px;
+   padding: 17px 0px 13px;
 }
 
 .header span.menu-item-separator
 {
+   color: #a1a1a1;
    padding: 0.5em;
 }
 
@@ -29,6 +30,12 @@
 {
    padding: 0px 0.25em;
    vertical-align: middle;
+}
+
+.header span.menu-item a,
+.header span.menu-item a:visited
+{
+   color: #333333;
 }
 
 .header span.menu-item-icon
@@ -61,20 +68,27 @@
 
 .header div.logo
 {
-    float: left;
-    padding: 5px 0px 5px 2px;
+   float: left;
+   height: 29px;
+   padding: 13px 3px 7px 0px;
 }
 
 .header div.personal-menu
 {
-    float: left;
-    margin: 2px 0px 0px 2em;
+   float: left;
+   margin: 2px 0px 0px;
+}
+
+.header div.personal-menu a,
+.header div.personal-menu a:visited
+{
+   color: #4c4c4c;
 }
 
 .header div.util-menu
 {
-    float: right;
-    margin: 0px 10px 0px 0px;
+   float: right;
+   margin: 0px 10px 0px 0px;
 }
 
 .header .search-tinput

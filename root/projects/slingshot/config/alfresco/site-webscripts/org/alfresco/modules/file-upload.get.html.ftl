@@ -27,14 +27,14 @@
                ${msg("label.version")}
             </div>
             <div class="yui-u">
-               <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="true"/> ${msg("label.minorVersion")}
+               <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" /> ${msg("label.minorVersion")}
             </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first">&nbsp;
             </div>
             <div class="yui-u">
-               <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion"/> ${msg("label.majorVersion")}
+               <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" /> ${msg("label.majorVersion")}
             </div>
          </div>
          <div class="yui-gd">
