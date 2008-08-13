@@ -34,6 +34,11 @@ input
    visibility: hidden;
 }
 
+.login-button
+{
+   background-color: #f0f0f0;
+}
+
 .login-copyright
 {
    font-family: Arial,Helvetica,sans-serif;
