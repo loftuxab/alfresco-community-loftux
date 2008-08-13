@@ -37,3 +37,15 @@ div.pageTitle {
    font-size: 13pt;
    color: #333333;
 }
+
+.columnHeader
+{
+   font-family: arial;
+   font-size: 13pt;
+}
+
+table.versionHistory
+{
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
