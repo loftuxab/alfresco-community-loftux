@@ -7,7 +7,8 @@
 	<title>${page.title}</title>
 	<@global.header/>
 	${head}
-	
+
+
 <link rel="stylesheet" type="text/css" href="yui/container/assets/container.css" />
 <link rel="stylesheet" type="text/css" href="yui/fonts/fonts-min.css" />
 <link rel="stylesheet" type="text/css" href="yui/datatable/assets/skins/sam/datatable.css" />
@@ -37,7 +38,8 @@
         text-align: center;
     }
     #paginated table {
-        margin-left:auto; margin-right:auto;
+        margin-left:auto; 
+        margin-right:auto;
     }
     #paginated .yui-pg-container a {
         color: #00d;
