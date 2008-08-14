@@ -101,4 +101,43 @@ function getRSSFeed(uri, limit)
     }
     
     return items;
- }
+}
+
+/**
+ * Takes an atom feed and returns an array of entries.
+ *
+ * @param feed {String} represents an Atom feed
+ */
+function parseAtomFeed(feed)
+{
+   if (!feed || feed.length === 0)
+   {
+      return [];
+   }
+   
+   var re = /<\?xml[^\?]*\?>/;
+   if (re.test(feed))
+   {
+      feed = feed.replace(re, ''); // rhino E4X bug 336551
+   }
+   
+   feed = feed.replace(/^\s+/, ''); 
+   
+   default xml namespace = new Namespace("http://www.w3.org/2005/Atom");
+
+   var atom = new XML(feed); 
+
+   var entries = [];
+   
+   var entry;
+   for each (entry in atom.entry)
+   {
+      entries.push(
+   	{
+   		"title" : entry.title.toString(),
+   		"summary" : entry.summary.toString().replace(/(target=)/g, "rel=")
+   	});
+   }
+   
+   return entries;
+}
