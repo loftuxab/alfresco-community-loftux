@@ -92,7 +92,7 @@ div.boxOutline {
 }
 
 #calendarendpicker button, #calendarpicker button {
-	background: url(../../images/icons/project-icon-calendar.gif) center center no-repeat;
+	background: url(images/project-icon-calendar.gif) center center no-repeat;
    text-align: left;
    text-indent: -10em;
    overflow: hidden;
