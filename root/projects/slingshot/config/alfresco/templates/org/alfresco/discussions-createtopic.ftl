@@ -1,6 +1,10 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/discussions/discussions-topiclist.css" />
+   
+   <!-- General Discussion Assets -->
+   <script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></script>
+   <script type="text/javascript" src="${page.url.context}/components/discussions/discussions-common.js"></script>
 </@>
 
 <@template.body>

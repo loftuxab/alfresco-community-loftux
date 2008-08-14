@@ -12,7 +12,7 @@
    var Dom = YAHOO.util.Dom
     
    /**
-    * Comment constructor.
+    * CreateComment constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.CreateComment} The new CreateComment instance
@@ -44,11 +44,47 @@
        * @type object
        */
       options: {
-          itemNodeRef: null,
-          itemTitle: null,
-          itemName: null
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: "",
+         
+         /**
+          * ContainerId representing root container
+          *
+          * @property containerId
+          * @type string
+          * @default "blog"
+          */
+         containerId: "blog",
+         
+         /**
+          * Node reference of the item to comment about
+          */
+         itemNodeRef: null,
+         
+         /**
+          * Title of the item to comment about.
+          * TODO: This is used for activity feed and should not be necessary here
+          */
+         itemTitle: null,
+         
+         /**
+          * Name of the item to comment about.
+          * TODO: This is used for activity feed and should not be necessary here
+          */
+         itemName: null
       },
       
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
       widgets: {},
       
       /**
@@ -63,12 +99,18 @@
          return this;
       },
       
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       */
       setMessages: function CreateComment_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
       },
-       
       
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -79,7 +121,6 @@
       onComponentsLoaded: function CreateComment_onComponentsLoaded()
       {
       },
-
 
       /**
        * Called by a bubble event to set the node for which comments should be displayed
@@ -96,6 +137,9 @@
          }
       }, 
       
+      /**
+       * Initializes the create comment form.
+       */
       initializeCreateCommentForm: function CreateComment_initializeCreateCommentForm()
       {
          // action url
@@ -131,7 +175,7 @@
          });
          browseItemUrlElem.setAttribute("value", browseUrl);
          
-         // register the behaviour with the form / display the form
+         // register the behaviour with the form and display it finally
          this.registerCreateCommentForm();
       },
       
@@ -153,7 +197,7 @@
             markup: "xhtml",
             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.widgets.editor.render();
+         this.widgets.editor._render();
          
          // create the form that does the validation/submit
          this.widgets.commentForm = new Alfresco.forms.Form(this.id + "-form");
@@ -166,11 +210,7 @@
                fn: this.onCreateFormSubmitSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.onCreateFormSubmitFailure,
-               scope: this
-            }
+            failureMessage: this._msg("comments.msg.failedCreateComment")
          });
          this.widgets.commentForm.setSubmitAsJSON(true);
          this.widgets.commentForm.doBeforeFormSubmit =
@@ -182,7 +222,6 @@
             },
             scope: this
          }
-         
          this.widgets.commentForm.init();
          
          // finally show the form
@@ -191,7 +230,7 @@
       },     
       
       /**
-       * Called when the form has been successfully submitted.
+       * Success handler for the form submit ajax request
        */
       onCreateFormSubmitSuccess: function CreateComment_onCreateFormSubmitSuccess(response, object)
       {
@@ -204,18 +243,11 @@
             Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentCreated")});
 
             // clear the content of the comment editor
-            this.widgets.editor.setEditorHTML('');
+            this.widgets.editor.clearEditorDoc();
             
             // reload the comments list
             YAHOO.Bubbling.fire("refreshComments", {});
          }
-
-      },
-      
-      /** Called when the form submit failed. */
-      onCreateFormSubmitFailure: function CreateComment_onCreateFormSubmitFailure(response)
-      {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.failedCreateComment")});
       },
 
       /**

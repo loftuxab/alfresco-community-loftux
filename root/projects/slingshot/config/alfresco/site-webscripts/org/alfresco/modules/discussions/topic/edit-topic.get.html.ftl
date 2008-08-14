@@ -1,15 +1,4 @@
-<script type="text/javascript">//<![CDATA[
-   new Alfresco.CreateTopic("${args.htmlid}").setOptions(
-   {
-      siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${args.container!'discussions'}"
-   }).setMessages(
-      ${messages}
-   );
-//]]></script>
-
-<h1>${msg("createtopic.title")}</h1>
-<div class="createTopicForm hidden" id ="${args.htmlid}-topic-create-div">
+<div class="editNodeForm">
    <form id="${args.htmlid}-form" method="post" action="">
       <div>
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />

@@ -1,6 +1,0 @@
-<webscript>
-  <shortname>create-topic</shortname>
-  <description>Create a topic</description>
-  <url>/modules/discussions/topic/create-topic</url>
-  <format default="json"/>
-</webscript>

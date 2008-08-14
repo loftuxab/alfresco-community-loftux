@@ -88,14 +88,17 @@
 .blog-postlist table thead {
 	display: none;
 }
-.blog-postlist table td {
+/*.blog-postlist table td {
 	border: none;
-}
+}*/
 .blog-postlist table .yui-dt-empty {
 	background-color: transparent;
 }
 .blog-postlist table .yui-dt-liner {
 	padding: 0px;
+}
+.blog-postlist table td {
+	border: none !important;
 }
 
 
@@ -110,7 +113,7 @@
 .nodeEdit {
   margin: 10px 0 0 15px;
   visibility: hidden;
-  width: 150px;
+  width: 180px;
   position: relative;
   float: right;
 }
@@ -121,9 +124,13 @@
   padding: 2px 19px;
   margin-bottom: 4px;
 }
-.node.simple .nodeEdit {
-  width: 200px;
+
+.simple .nodeEdit {
+  width: 300px;
+  text-align: right;
+  margin: 4px;
 }
+
 .nodeEdit .action-link {
   font-family: Arial, sans-serif;
   font-weight: normal;
@@ -132,45 +139,54 @@
   color: #2B6EB5;
 }
 
+
+
 .nodeEdit .onViewNode {
-  background: url(../images/view-discussion-16.png) no-repeat scroll 2px 5px;
+  background: url(../images/view-discussion-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
 }
 .nodeEdit .onAddReply {
-  background: url(../images/reply-to-discussion-16.png) no-repeat scroll 2px 5px;
+  background: url(../images/reply-to-discussion-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
 }
 .nodeEdit .onEditNode,
 .nodeEdit .onEditReply,
 .nodeEdit .onEditComment {
-  background:url(../images/edit-discussion-16.png) no-repeat scroll 2px 5px;
+  background:url(../images/edit-discussion-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 .nodeEdit .onEditBlogPost {
-  background:url(../images/edit-blog-16.png) no-repeat scroll 2px 5px;
+  background:url(../images/edit-blog-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 .nodeEdit .onDeleteNode,
 .nodeEdit .onDeleteReply,
 .nodeEdit .onDeleteComment {
-  background: url('../images/delete-discussion-16.png') no-repeat scroll 2px 5px;
+  background: url('../images/delete-discussion-16.png') no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 .nodeEdit .onDeleteBlogPost {
-  background: url('../images/delete-blog-16.png') no-repeat scroll 2px 5px;
+  background: url('../images/delete-blog-16.png') no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 .nodeEdit .onUpdateExternal {
-  background: url(../images/update-external-16.png) no-repeat scroll 2px 5px;
+  background: url(../images/update-external-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 .nodeEdit .onPublishExternal {
-  background: url(../images/publish-external-16.png) no-repeat scroll 2px 5px;
+  background: url(../images/publish-external-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 .nodeEdit .onUnpublishExternal {
-  background: url(../images/unpublish-external-16.png) no-repeat scroll 2px 5px;
+  background: url(../images/unpublish-external-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
+  margin-right: 10px;
 }
 
 

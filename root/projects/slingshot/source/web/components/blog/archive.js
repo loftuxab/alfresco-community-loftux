@@ -24,7 +24,7 @@
  */
  
 /**
- * BlogPostList Archive component.
+ * BlogPostListArchive component.
  * 
  * @namespace Alfresco
  * @class Alfresco.BlogPostListArchive
@@ -44,7 +44,7 @@
    var $html = Alfresco.util.encodeHTML;
 
    /**
-    * Blog Tags constructor.
+    * BlogPostListArchive constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.BlogPostListArchive} The new DoclistTags instance
@@ -233,7 +233,7 @@
        * Function that gets called when another component fires "tagRefresh"
        * Issues a request to retrieve the latest tag data.
        *
-       * @method onTagRefresh
+       * @method onArchiveRefresh
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
@@ -266,10 +266,10 @@
       /**
        * Event handler for when the tag data loads successfully.
        *
-       * @method onTagRefresh_success
+       * @method onArchiveRefresh_success
        * @param response {object} Server response object
        */ 
-      onArchiveRefresh_success: function BlogPostListArchive_onTagRefresh_success(response)
+      onArchiveRefresh_success: function BlogPostListArchive_onArchiveRefresh_successs(response)
       {
          if (response && !YAHOO.lang.isUndefined(response.json.items))
          {
@@ -322,10 +322,10 @@
       },
       
       /**
-       * Generates the HTML for a tag.
+       * Generates the HTML for a month element.
        *
-       * @method _generateTagMarkup
-       * @param tag {object} the tag to render
+       * @method _generateMonthMarkup
+       * @param date {date} the date to render
        */
       _generateMonthMarkup: function BlogPostListArchive__generateTagMarkup(date)
       {
@@ -337,11 +337,11 @@
       },
 
       /**
-       * Generate ID alias for tag, suitable for DOM ID attribute
+       * Generate ID alias for month, suitable for DOM ID attribute
        *
        * @method _generateIdFromMonth
-       * @param tagName {string} Tag name
-       * @return {string} A unique DOM-safe ID for the tag
+       * @param date {date} Date representing the month
+       * @return {string} A unique DOM-safe ID for the month
        */
       _generateIdFromMonth: function BlogPostListArchive__generateMonthId(date)
       {

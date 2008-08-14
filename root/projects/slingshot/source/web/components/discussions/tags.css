@@ -1,0 +1,28 @@
+.tags ul
+{
+   padding: 0.5em 0 1em;
+}
+
+.tags li
+{
+   padding: 4px 0px 3px 20px;
+}
+
+.tags li.selected
+{
+   background-color: #d2e5f2;
+}
+
+.tags a.disabled,
+.tags a.disabled:active,
+.tags a.disabled:hover,
+.tags a.disabled:visited
+{
+   color: #a6a6a6;
+   cursor: not-allowed;
+}
+
+.tags a:hover
+{
+   text-decoration: none;
+}

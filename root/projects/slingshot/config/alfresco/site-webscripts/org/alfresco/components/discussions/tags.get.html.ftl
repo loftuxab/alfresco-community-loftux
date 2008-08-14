@@ -1,13 +1,11 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.TopicListTags("${args.htmlid}");
+   new Alfresco.TopicListTags("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!""}",
+      container: "${args.container!""}"
+   });
 //]]></script>
-<div id="${args.htmlid}-body" class="filter menuTitle">
-	<h2>${msg("topiclist.tags.title")}</h2>
-    <ul class="filterLink">
-        <#list tags as tag>
-            <li class="filter-link" id="${args.htmlid}-selectTag-${tag.name}">
-                <a  href="#" class="tag-link-li nav-link">${tag.name?html}</a> (${tag.count})
-            </li>
-        </#list>
-	</ul>
+<div id="${args.htmlid}-body" class="tags topiclist-filter">
+	<h2>${msg("header.title")}</h2>
+	<ul class="filterLink" id="${args.htmlid}-tags"><li>&nbsp;</li></ul>
 </div>

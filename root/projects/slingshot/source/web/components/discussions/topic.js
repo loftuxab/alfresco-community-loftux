@@ -1,11 +1,24 @@
 /**
  * Topic component.
+ * Shows and allows to edit a topic.
  * 
  * @namespace Alfresco
  * @class Alfresco.DiscussionsTopic
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+       Event = YAHOO.util.Event,
+       Element = YAHOO.util.Element;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
    /**
    * Topic constructor.
    * 
@@ -24,6 +37,9 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["datasource", "json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
      
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
+           
       return this;
    }
    
@@ -45,22 +61,57 @@
           */
          siteId: "",
        
-         containerId: "discussions",
-       
-         path: "",
-       
-         topicId: "",
-       
-         topicRef: "",
-       
          /**
-          * define which mode is currently used - could this be a 
-          * create, view or edit
+          * Current containerId.
+          * 
+          * @property containerId
+          * @type string
           */
-         mode: ""
+         containerId: "discussions",
+
+         /**
+          * Id of the topic to display.
+          * 
+          * @property topicId
+          * @type string
+          */
+         topicId: ""
+
       },
      
-     
+      /**
+       * Holds the data displayed in this component.
+       */
+      topicData: null,
+      
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets: {},
+      
+      /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       */
+      modules: {},
+      
+      /**
+       * Object literal used to generate unique tag ids
+       * 
+       * @property tagId
+       * @type object
+       */
+      tagId:
+      {
+         id: 0,
+         tags: {}
+      },
+      
       /**
        * Set multiple initialization options at once.
        *
@@ -73,6 +124,12 @@
          return this;
       },
      
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       */
       setMessages: function DiscussionsTopic_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
@@ -90,6 +147,7 @@
          YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
    
+  
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -97,63 +155,237 @@
        * @method onReady
        */
       onReady: function DiscussionsTopic_onReady()
-      { 
-         // don't do anything if we don't have a mode
-         if ((this.options.mode === null) || (this.options.mode == ""))
+      {
+         var me = this;
+         
+         // Hook action events.
+         var fnActionHandlerDiv = function DiscussionsTopic_fnActionHandlerDiv(layer, args)
          {
-            return;
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+            if (owner !== null)
+            {
+               var action = "";
+               action = owner.className;
+               if (typeof me[action] == "function")
+               {
+                  me[action].call(me, me.topicData.name);
+                  args[1].stop = true;
+               }
+            }
+            return true;
          }
-
-         // check whether we are in edit mode, in this case we have to register the
-         // form with the html
-         if ((this.options.mode == "edit") || (this.options.mode == "create"))
-         {
-            this._registerTopicForm();
-         }
-       
-         // default action handler
-         Alfresco.util.registerDefaultActionHandler(this.id, 'topic-action-link', 'div', this);
-         Alfresco.util.registerDefaultActionHandler(this.id, 'tag-link-span', 'span', this);
+         YAHOO.Bubbling.addDefaultAction("topic-action-link-div", fnActionHandlerDiv);
+         
+         // register tag action handler, which will issue tagSelected bubble events.
+         Alfresco.util.tags.registerTagActionHandler(this);
           
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onTopicElementMouseEntered, this.onTopicElementMouseExited);
-       
-         // as the list got already rendered on the server, already attach the listener to the rendered elements
-         Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');          
+          
+         // load the topic data
+         this._loadTopicData();
+      },
+      
+      
+      /**
+       * Loads the topic data and updates the ui.
+       */
+      _loadTopicData: function DiscussionsTopic__loadTopicData()
+      {
+         // ajax request success handler
+         var loadTopicDataSuccess = function DiscussionsTopic__loadTopicData_loadTopicDataSuccess(response)
+         {
+            // set the loaded data
+            var data = response.json.item
+            this.topicData = data;
+            
+            // render the ui
+            this.renderUI();
+            
+            // inform the comment components about the loaded post
+            this._fireTopicDataChangedEvent();
+         };
+         
+         // construct url to call
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         {
+            site : this.options.siteId,
+            container: this.options.containerId,
+            topicId: this.options.topicId
+         });
+         
+         // execute ajax request
+         Alfresco.util.Ajax.request(
+         {
+            url: url,
+            successCallback:
+            {
+               fn: loadTopicDataSuccess,
+               scope: this
+            },
+            failureMessage: this._msg("replies.msg.failedloadeditform")
+         });
       },
 
+      /**
+       * Renders the UI with the data available in the component.
+       */
+      renderUI: function DiscussionsTopic_renderUI()
+      {   
+         // get the container div
+         var viewDiv = Dom.get(this.id + '-topic-view-div');
+         
+         // render the topic and insert the resulting html
+         var html = this.renderTopic(this.topicData);
+         viewDiv.innerHTML = html;
+         
+         // attach the rollover listeners
+         Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
+      },
+      
+      /**
+       * Renders the topic.
+       * 
+       * @param data {object} the data object containing the topic data
+       * @return {string} html representing the data
+       */
+      renderTopic: function DiscussionsTopic_renderTopic(data)
+      {
+         var html = '';
+          
+         html += '<div id="' + this.id + '-topicview" class="node topic topicview">'
+         
+         // actions
+         html += '<div class="nodeEdit">';
+         html += '<div class="onAddReply"><a href="#" class="topic-action-link-div">' + this._msg("topic.action.addReply") + '</a></div>';   
+         if (data.permissions.edit)
+         {
+            html += '<div class="onEditTopic"><a href="#" class="topic-action-link-div">' + this._msg("topic.action.edit") + '</a></div>';
+         }
+         if (data.permissions['delete'])
+         {
+            html += '<div class="onDeleteTopic"><a href="#" class="topic-action-link-div">' + this._msg("topic.action.delete") + '</a></div>';
+         }
+         html += '</div>';
+  
+         // avatar
+         html += '<div class="authorPicture">' + Alfresco.util.people.generateUserAvatarImg(data.author) + '</div>';
 
-      // Action handlers
+         // content
+         html += '<div class="nodeContent">';
+         html += '<div class="nodeTitle"><a href="' + Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, data.name) + '">' + $html(data.title) + '</a> ';
+         if (data.isUpdated)
+         {
+            html += '<span class="nodeStatus">(' + this._msg("topic.updated") + ')</span>';
+         }
+         html += '</div>';
+         
+         html += '<div class="published">';
+         html += '<span class="nodeAttrLabel">' + this._msg("topic.info.createdOn") + ': </span>';
+         html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
+         html += '<span class="spacer"> | </span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("topic.info.author") + ': </span>';
+         html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.author) + '</span>';
+         html += '<br />';
+         if (data.lastReplyBy)
+         {
+            html += '<span class="nodeAttrLabel">' + this._msg("topic.info.lastReplyBy") + ': </span>';
+            html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.lastReplyBy) + '</span>';                  
+            html += '<span class="spacer"> | </span>';
+            html += '<span class="nodeAttrLabel">' + this._msg("topic.info.lastReplyOn") + ': </span>';
+            html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.lastReplyOn) + '</span>';
+         }
+         else
+         {
+            html += '<span class="nodeAttrLabel">' + this._msg("topic.footer.replies") + ': </span>';
+            html += '<span class="nodeAttrValue">' + this._msg("topic.info.noReplies") + '</span>';                  
+         }
+         html += '</div>';
+             
+         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + ' ' + this._msg("topic.said") + ':</div>';
+         html += '<div class="content yuieditor">' + data.content + '</div>';
+         html += '</div>'
+         // end view
+
+         // begin footer
+         html += '<div class="nodeFooter">';
+         html += '<span class="nodeAttrLabel replyTo">' + this._msg("topic.footer.replies") + ': </span>';
+         html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
+         html += '<span class="spacer"> | </span>';
+             
+         html += '<span class="nodeAttrLabel tag">' + this._msg("topic.tags") +': </span>';
+         if (data.tags.length > 0)
+         {
+            for (var x=0; x < data.tags.length; x++)
+            {
+               if (x > 0)
+               {
+                  html += ", ";
+               }
+               html += Alfresco.util.tags.generateTagLink(this, data.tags[x]);
+            }
+         }
+         else
+         {
+            html += '<span class="nodeAttrValue">' + this._msg("topic.noTags") + '</span>';
+         }
+         html += '</div></div></div>';
+          
+         return html;
+      },
 
       /**
-       * Called when the add reply button is clicked
+       * Handler for add reply action link
        */
-      onAddReply: function DiscussionsTopic_onAddNode(htmlId, ownerId, param)
+      onAddReply: function DiscussionsTopic_onAddReply(htmlId, ownerId, param)
       {
-         YAHOO.Bubbling.fire('onAddReplyToPost', {parentPostRef : this.options.topicRef});
+         YAHOO.Bubbling.fire('addReplyToPost',
+         {
+            postRef : this.topicData.nodeRef
+         });
       },
      
       /**
-       * Loads the edit topic form and displays it instead of the content
-       * The div class should have the same name as the above function (onEditNode)
+       * Handler for edit topic action link
        */
-      onEditNode: function DiscussionsTopic_onEditNode(htmlId, ownerId, param)
+      onEditTopic: function DiscussionsTopic_onEditTopic()
       {
-         this._loadForm();
+         this._loadEditForm();
       },
      
       /**
-       * Deletes a topic.
-       * The div class which contain the Delete link should have the same name as the above function (onEditNode)
+       * Handler for delete topic action link
        */
-      onDeleteNode: function DiscussionsTopic_onDeleteNode(htmlId, ownerId, param)
+      onDeleteTopic: function DiscussionsTopic_onDeleteTopic()
       {
-         // make an ajax request to delete the topic
-         // we can directly go to alfresco for this
-         var url = Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
-                  this.options.containerId, this.options.path, param);
-         url += "?site=" + this.options.siteId;
-         url += "&container=" + this.options.containerId;
+         // ajax request success handler
+         var onDeleted = function onDeleted(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.deleted", response.json.error)});
+               var listUrl = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topiclist?container={container}",
+               {
+                  site: this.options.siteId,
+                  container: this.options.containerId
+               });
+               window.location = listUrl;
+            }
+         };
+         
+         // construct the url to call
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         {
+            site : this.options.siteId,
+            container: this.options.containerId,
+            topicId: this.options.topicId
+         });
+         
+         // perform the ajax request to delete the topic
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -161,203 +393,228 @@
             responseContentType : "application/json",
             successCallback:
             {
-               fn: this._onDeleted,
+               fn: onDeleted,
                scope: this
             },
             failureMessage: this._msg("topic.msg.failedDelete")
          });
       },
       
-      onTagSelection: function DiscussionsTopic_onTagSelection(htmlId, ownerId, param)
+      /**
+       * Tag selected handler
+       *
+       * @method onTagSelected
+       * @param tagId {string} Tag name.
+       * @param target {HTMLElement} Target element clicked.
+       */
+      onTagSelected: function DiscussionsTopic_onTagSelected(layer, args)
       {
-         // redirect to list page, but request the given tag
-         Alfresco.util.discussions.loadForumPostListPage(this.options.siteId, this.options.containerId, this.options.path, null, param);
-      },
-      
-      // Action functionality
-
-      _onDeleted: function DiscussionsTopic__onDeleted(response)
-      {
-         if (response.json.error == undefined)
+         var obj = args[1];
+         if (obj && (obj.tagName !== null))
          {
-            // redirect to the list page
-            Alfresco.util.discussions.loadForumPostListPage(this.options.siteId, this.options.containerId, this.options.path);
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete", response.json.error)});
-         }
-      },
-
-
-      // Editing mode
-
-      _loadForm: function DiscussionsTopic__loadForm()
-      {
-         // load the form for the topic
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topic/get-topic-form",
-            dataObj:
+            // construct the topic list url with initial active tag filter
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topiclist" +
+                    "?container={container}&filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
             {
-               site   : this.options.siteId,
-               htmlId : this.id,
-               topicId : this.options.topicId
-            },
-            successCallback:
-            {
-               fn: this._onFormLoaded,
-               scope: this,
-               object : { mode : "edit" }
-            },
-            failureMessage: this._msg("topic.msg.failedloadeditform")
-         });
-      },
+               site: this.options.siteId,
+               container: this.options.containerId,
+               filterId: "tag",
+               filterOwner: "Alfresco.TopicListTags",
+               filterData: obj.tagName
+            });
 
-      _onFormLoaded: function(response, object)
-      {  
-         // ignore the loaded statement if the mode is already edit
-         if (this.options.mode != "view")
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unknownMode")});
-            return;
+            window.location = url;
          }
-      
-         // update the mode
-         this.options.mode = "edit";
-         
-         // hide the view element
-         Alfresco.util.dom.hideDiv(this.id + "-viewDiv");
-         
-         // insert the new html into the document and then load the javascript
-         var html = response.serverResponse.responseText;
-         var javascript = Alfresco.util.ajaxtools.extractScripts(html);
-         html = Alfresco.util.ajaxtools.removeScripts(response.serverResponse.responseText);
-         Alfresco.util.dom.updateAndShowDiv(this.id + "-formDiv", html);
-         Alfresco.util.ajaxtools.loadJSCode(javascript);
-         
-         // register the form handling
-         this._registerTopicForm();
       },
 
       /**
-       * Registers the form with the html (that should be available in the page)
-       * as well as the buttons that are part of the form.
+       * Loads the edit form.
        */
-      _registerTopicForm: function DiscussionsTopic__registerTopicForm()
+      _loadEditForm: function DiscussionsTopic__loadEditForm()
+      {  
+         // Load the UI template from the server
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topic/edit-topic",
+            dataObj:
+            {
+               htmlid: this.id + "-form"
+            },
+            successCallback:
+            {
+               fn: this.onEditFormLoaded,
+               scope: this
+            },
+            failureMessage: "Could not load topic edit form"
+         });
+      },
+
+      /**
+       * Event callback when dialog template has been loaded
+       *
+       * @method onFormLoaded
+       * @param response {object} Server response from load template XHR request
+       */
+      onEditFormLoaded: function DiscussionsTopic_onEditFormLoaded(response)
+      {
+         // id to use for the form
+         var formId = this.id + "-form";
+          
+         // use the already loaded data
+         var data = this.topicData;
+          
+         // find the right divs to insert the html into
+         var viewDiv = Dom.get(this.id + "-topic-view-div");
+         var editDiv = Dom.get(this.id + "-topic-edit-div");
+         
+         // insert the html
+         editDiv.innerHTML = response.serverResponse.responseText;
+         
+         // insert current values into the form
+         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         {
+            site: this.options.siteId,
+            container : this.options.containerId,
+            topicId: this.options.topicId
+         });
+         Dom.get(formId + "-form").setAttribute("action", actionUrl);
+         Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
+         Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
+         Dom.get(formId + "-title").setAttribute("value", data.title);
+         // construct the browseUrl. {post.name} gets replaced on the server
+         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-topicview?container={container}&topicId={post.name}",
+         {
+            site: this.options.siteId,
+            container: this.options.containerId
+         });
+         Dom.get(formId + "-browseTopicUrl").setAttribute("value", browseUrl);
+         Dom.get(formId + "-content").value = data.content;
+         
+         // show the form and hide the view
+         Dom.addClass(viewDiv, "hidden");
+         Dom.removeClass(editDiv, "hidden");
+             
+         // and finally register the form handling
+         this._registerEditTopicForm(data, formId);
+      },
+
+      /**
+       * Registers the form logic
+       */
+      _registerEditTopicForm: function DiscussionsTopic__registerEditTopicForm(data, formId)
       {
          // register the tag listener
-         this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id+"-form", "tags");
-        
+         this.modules.tagLibraryListener = new Alfresco.TagLibraryListener(formId + "-form", "tags");
+         
+         // add the tags that are already set on the post
+         this.modules.tagLibrary = new Alfresco.TagLibrary(formId);
+         this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
+         this.modules.tagLibrary.onReady();
+         if (data.tags.length > 0)
+         {
+            // find the tag library component
+            //var taglibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.TagLibrary");
+            this.modules.tagLibrary.addTags(this.topicData.tags);
+         }
+         
          // register the okButton
-         var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
-       
+         this.widgets.okButton = new YAHOO.widget.Button(formId + "-submit", {type: "submit"});
+         
          // register the cancel button
-         var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
-         cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
-       
+         this.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel", {type: "button"});
+         this.widgets.cancelButton.subscribe("click", this.onEditFormCancelButtonClick, this, true);
+         
          // instantiate the simple editor we use for the form
-         this.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
-            height: '300px',
-            width: '538px',
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content', {
+             height: '180px',
+             width: '700px',
+             dompath: false, //Turns on the bar at the bottom
+             animate: false, //Animates the opening, closing and moving of Editor windows
+             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.editor.render();
-       
+         // render the editor - we use the private function as we want this to happen
+         // prior of displaying the form. Otherwise we get quite ugly ui behavior
+         this.widgets.editor._render();
+         
          // create the form that does the validation/submit
-         var topicForm = new Alfresco.forms.Form(this.id + "-form");
-         topicForm.setShowSubmitStateDynamically(true, false);
-         topicForm.setSubmitElements(okButton);
-         topicForm.setAJAXSubmit(true,
+         var commentForm = new Alfresco.forms.Form(formId + "-form");
+         commentForm.setShowSubmitStateDynamically(true, false);
+         commentForm.setSubmitElements(this.widgets.okButton);
+         commentForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+         commentForm.setAJAXSubmit(true,
          {
             successCallback:
             {
-               fn: this.onFormSubmitSuccess,
+               fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.onFormSubmitFailure,
-               scope: this
-            }
+            failureMessage: this._msg("topic.msg.failedDelete")
          });
-         topicForm.setSubmitAsJSON(true);
-         topicForm.doBeforeFormSubmit =
+         commentForm.setSubmitAsJSON(true);
+         commentForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
                //Put the HTML back into the text area
-               this.editor.saveHTML();
+               this.widgets.editor.saveHTML();
                // update the tags set in the form
-               this.tagLibraryListener.updateForm();
+               this.modules.tagLibraryListener.updateForm();
             },
             scope: this
          }
-         topicForm.init();
+         
+         commentForm.init();
       },
-     
-      onFormSubmitSuccess: function DiscussionsTopic_onFormSubmitSuccess(response)
+      
+      /**
+       * Edit form submit success handler
+       */
+      onEditFormSubmitSuccess: function DiscussionsTopic_onCreateFormSubmitSuccess(response, object)
       {
-         // check whether we got an error
          if (response.json.error != undefined)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.formsubmiterror", response.json.error)});
-            return;
-         }
-
-         // check whether we are in create or edit mode. In case of create we will redirect
-         // to the view page
-         if (this.options.mode == "create")
-         {
-            Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, response.json.topicId);
-         }
-         else if (this.options.mode == "edit")
-         {
-            // hide the form
-            Alfresco.util.dom.hideDiv(this.id + "-formDiv");
-          
-            // update the viewDiv
-            Alfresco.util.dom.updateAndShowDiv(this.id + "-viewDiv", response.json.topic);
-            
-            // set the mode back to view
-            this.options.mode = "view";
-            
-            // reinit the mouse over and actions listeners
-            Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
-            Alfresco.util.registerDefaultActionHandler(this.id, 'topic-action-link', 'div', this);
-         }
-      },
-     
-      onFormSubmitFailure: function DiscussionsTopic_onFormSubmitFailure(response)
-      {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.formsubmitfailed")});
-      },
-     
-      onFormCancelButtonClick: function(type, args)
-      {
-         if (this.options.mode == "edit")
-         {
-            // hide the form and show the view div
-            Alfresco.util.dom.hideDiv(this.id + "-formDiv");
-       
-            // show the view
-            Alfresco.util.dom.showDiv(this.id + "-viewDiv");
-         
-            this.options.mode = "view";
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.submitErrorReturn", response.json.error)});
          }
          else
          {
-            history.go(-1);
+            // the response contains the new data for the comment. Render the comment html
+            // and insert it into the view element
+            this.topicData = response.json.item;
+            this.renderUI();
+            
+            // hide the form and show the ui
+            this._hideEditView();
+
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentUpdated")});
+            
+            // inform the replies object about the update
+            this._fireTopicDataChangedEvent();
          }
       },
-     
+      
+      /**
+       * Edit form cancel button click handler
+       */
+      onEditFormCancelButtonClick: function(type, args)
+      {
+          this._hideEditView();
+      },
+      
+      /**
+       * Hides the form and displays the view
+       */
+      _hideEditView: function()
+      {
+         var editDiv = Dom.get(this.id + "-topic-edit-div");
+         var viewDiv = Dom.get(this.id + "-topic-view-div");
+         Dom.addClass(editDiv, "hidden");
+         Dom.removeClass(viewDiv, "hidden");
+      },
+
       /**
        * Called when the mouse enters into the topic div
        */
-      onTopicElementMouseEntered: function DiscussionsTopicList_onListElementMouseEntered(layer, args)
+      onTopicElementMouseEntered: function DiscussionsTopicList_onTopicElementMouseEntered(layer, args)
       {
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
@@ -368,12 +625,25 @@
       /**
        * Called whenever the mouse exits the topic div
        */
-      onTopicElementMouseExited: function DiscussionsTopicList_onListElementMouseExited(layer, args)
+      onTopicElementMouseExited: function DiscussionsTopicList_onTopicElementMouseExited(layer, args)
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
          YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
+      },
+
+      /**
+       * Fires a topic data changed bubble event
+       */
+      _fireTopicDataChangedEvent: function DiscussionsTopicList__fireTopicDataChangedEvent()
+      {
+         var eventData = {
+            topicRef: this.topicData.nodeRef,
+            topicTitle: this.topicData.title,
+            topicId: this.topicData.name
+         }
+         YAHOO.Bubbling.fire("topicDataChanged", eventData);
       },
 
       /**

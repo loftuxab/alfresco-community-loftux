@@ -1,6 +1,0 @@
-<webscript>
-  <shortname>create-reply</shortname>
-  <description>Create a reply</description>
-  <url>/modules/discussions/replies/create-reply</url>
-  <format default="json"/>
-</webscript>

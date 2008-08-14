@@ -1,6 +1,0 @@
-<webscript>
-  <shortname>Discussions topics</shortname>
-  <description>Discussions: Returns the list of topics</description>
-  <url>/modules/discussions/topiclist/get-topics</url>
-  <format default="json"/>
-</webscript>

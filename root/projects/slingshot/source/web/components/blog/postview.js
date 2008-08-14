@@ -1,5 +1,5 @@
 /**
- * BlogPostViewView component.
+ * BlogPostView component.
  * 
  * Component to view a blog post
  * 
@@ -22,10 +22,10 @@
    var $html = Alfresco.util.encodeHTML;
     
    /**
-    * Post constructor.
+    * BlogPostView constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.PostView} The new Post instance
+    * @return {Alfresco.BlogPostView} The new Post instance
     * @constructor
     */
    Alfresco.BlogPostView = function(htmlId)
@@ -37,8 +37,11 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["datasource", "json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["json", "connection", "event", "button", "menu"], this.onComponentsLoaded, this);
       
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
+
       return this;
    }
    
@@ -60,8 +63,18 @@
           */
          siteId: "",
          
+         /**
+          * ContainerId representing root container
+          *
+          * @property containerId
+          * @type string
+          * @default "blog"
+          */
          containerId: "blog",
          
+         /**
+          * Id of the displayed blog post.
+          */
          postId: ""
       },
       
@@ -93,7 +106,14 @@
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
       },
-      
+
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.BlogPostView} returns 'this' for method chaining
+       */
       setMessages: function BlogPostView_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
@@ -120,11 +140,9 @@
       onReady: function BlogPostView_onReady()
       {
          var me = this;
-          
-         var x = 0;
          
          // Hook action events.
-         var fnActionHandlerDiv = function CommentList_fnActionHandlerDiv(layer, args)
+         var fnActionHandlerDiv = function BlogPostView_fnActionHandlerDiv(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
@@ -133,61 +151,38 @@
                action = owner.className;
                if (typeof me[action] == "function")
                {
-                  var commentElem = Dom.getAncestorByClassName(owner, 'post');
                   me[action].call(me, me.blogPostData.name);
                   args[1].stop = true;
                }
             }
-      		 
             return true;
          }
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-div", fnActionHandlerDiv);
          
          // Hook tag clicks
-         var fnTagHandler = function BlogPostList_fnTagHandler(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
-            if (owner !== null)
-            {
-               var tagId = owner.id;
-               tagId = tagId.substring(tagId.lastIndexOf("-") + 1);
-               for (tag in me.tagId.tags)
-               {
-                  if (me.tagId.tags[tag] == tagId)
-                  {
-                     YAHOO.Bubbling.fire("tagSelected",
-                     {
-                        tagName: tag
-                     });
-                     break;
-                  }
-               }
-               args[1].stop = true;
-            }
-      		 
-            return true;
-         }
-         YAHOO.Bubbling.addDefaultAction("tag-link", fnTagHandler);
+         Alfresco.util.tags.registerTagActionHandler(this);
           
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onPostElementMouseEntered, this.onPostElementMouseExited);
           
-         // load the post data - which in turn will render the UI
+         // load the post data
          this._loadBlogPostData();
       },
-      
       
       /**
        * Loads the comments for the provided nodeRef and refreshes the ui
        */
       _loadBlogPostData: function BlogPostView__loadBlogPostData()
       {
+         // construct the request url
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}",
          {
             site : this.options.siteId,
             container: this.options.containerId,
             postId: this.options.postId
          });
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -196,59 +191,59 @@
                fn: this.loadBlogPostDataSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.loadBlogPostDataFailed,
-               scope: this
-            }
+            failureMessage: this._msg("message.details.failed")
          });
       },
 
-      loadBlogPostDataFailed: function BlogPostView_loadBlogPostDataFailed(response)
+      /**
+       * Success handler for a blog post request. Updates the UI using the blog post data
+       * provided in the response object.
+       * 
+       * @param response {object} the ajax request response
+       */
+      loadBlogPostDataSuccess: function BlogPostView_loadCommentsSuccess(response)
       {
-         // Display success message anyway
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this._msg("message.details.failed")
-         });
-      },
-
-      loadBlogPostDataSuccess: function CommentsList_loadCommentsSuccess(response)
-      {
+         // store the returned data locally
          var data = response.json.item
          this.blogPostData = data;
          
-         var html = this.renderBlogPost(data);
-         
-         // get the container div
+         // get the container div to insert the the post into
          var viewDiv = Dom.get(this.id + '-post-view-div');
+         
+         // render the blog post and insert it into the div
+         var html = this.renderBlogPost(data);
          viewDiv.innerHTML = html;
          
          // attach the rollover listeners
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
          
-         // inform the two comment components about the post
+         // inform interested comment components about the loaded blog post
          var eventData = {
             itemNodeRef: data.nodeRef,
             itemTitle: data.title,
             itemName: data.name
          }
-
          YAHOO.Bubbling.fire("setCommentedNode", eventData);
-      },   
+      },
       
-      renderBlogPost: function(data)
+      /**
+       * Renders the blog post given a blog post data object returned by the server.
+       */
+      renderBlogPost: function BlogPostView_renderBlogPost(data)
       {
-         var html = '';
+         // preformat some values
+         var postViewUrl = Alfresco.util.blog.generateBlogPostViewUrl(this.options.siteId, this.options.containerId, data.name);
+         var statusLabel = Alfresco.util.blog.generatePostStatusLabel(this, data);
+         var authorLink = Alfresco.util.people.generateUserLink(data.author);
           
+         var html = '';
          html += '<div id="' + this.id + '-postview" class="node post postview">'
-         
          html += Alfresco.util.blog.generateBlogPostActions(this, data, 'div');
   
          // content
          html += '<div class="nodeContent">';
-         html += '<div class="nodeTitle"><a href="' + this._generatePostViewUrl(data.name) + '">' + $html(data.title) + '</a> ';
-         html += '<span class="nodeStatus">' + Alfresco.util.blog.generatePostStatusLabel(this, data) + '</span>';
+         html += '<div class="nodeTitle"><a href="' + postViewUrl + '">' + $html(data.title) + '</a> ';
+         html += '<span class="nodeStatus">' + statusLabel + '</span>';
          html += '</div>';
           
          html += '<div class="published">';
@@ -260,13 +255,13 @@
          }
  
          html += '<span class="nodeAttrLabel">' + this._msg("post.info.author") + ':</span>';
-         html += '<span class="nodeAttrValue">' + Alfresco.util.blog.generateUserLink(data.author) + '</span>';
+         html += '<span class="nodeAttrValue">' + authorLink + '</span>';
 
          if (data.isPublished && data.postLink != undefined && data.postLink.length > 0)
          {
             html += '<span class="spacer"> | </span>';
             html += '<span class="nodeAttrLabel">' + this._msg("post.info.externalLink") + ': </span>';
-            html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postList + '">' + this._msg("post.info.clickHere") + '</a></span>';
+            html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + this._msg("post.info.clickHere") + '</a></span>';
          }
          
          html += '<span class="spacer"> | </span>';
@@ -275,9 +270,11 @@
          {
             for (var x=0; x < data.tags.length; x++)
             {
-               html += '<span id="' + this.generateTagId(this, data.tags[x]) + '" class="nodeAttrValue tag">';
-               html += '<a href="#" class="tag-link" title="' + $html(data.tags[x]) + '">';
-               html += '<span>' + $html(data.tags[x]) + '</span></a></span> ';
+               if (x > 0)
+               {
+                  html += ', ';
+               }
+               html += Alfresco.util.tags.generateTagLink(this, data.tags[x]);
             }
          }
          else
@@ -290,47 +287,12 @@
          html += '</div></div>';
          return html;
       },
-      
-      
-      /**
-       * Generate ID alias for tag, suitable for DOM ID attribute
-       *
-       * @method generateTagId
-       * @param scope {object} BlogPostList instance
-       * @param tagName {string} Tag name
-       * @return {string} A unique DOM-safe ID for the tag
-       */
-      generateTagId : function BlogPostList_generateTagId(scope, tagName)
-      {
-         var id = 0;
-         var tagId = scope.tagId;
-         if (tagName in tagId.tags)
-         {
-            id = tagId.tags[tagName];
-         }
-         else
-         {
-            tagId.id++;
-            id = tagId.tags[tagName] = tagId.id;
-         }
-         return scope.id + "-tagId-" + id;
-      },
-      
-      _generatePostViewUrl: function BlogPostList__generatePostViewUrl(postId)
-      {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postview?container={container}&postId={postId}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            postId: postId
-         });
-         return url;
-      },  
+
       
       // Actions
       
       /**
-       * Tag selected handler (document details)
+       * Tag selected handler.
        *
        * @method onTagSelected
        * @param tagId {string} Tag name.
@@ -341,7 +303,7 @@
          var obj = args[1];
          if (obj && (obj.tagName !== null))
          {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}&initialFilterId={filterId}&initialFilterName={filterName}&initialFilterData={filterData}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}&filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
             {
                site: this.options.siteId,
                container: this.options.containerId,
@@ -367,19 +329,46 @@
          });    
          window.location = url;
       },
-      
+
       /**
-       * Deletes a post.
-       * The div class which contain the Delete link should have the same name as the above function (onEditNode)
+       * Blog post deletion implementation
+       * 
+       * @method onDeleteBlogPost
+       * @param postId {string} the id of the blog post to delete
        */
-      onDeleteBlogPost: function BlogPostView_onDelete(postId)
+      onDeleteBlogPost: function BlogPostView_onDeleteBlogPost(postId)
       {
+         // ajax request success handler
+         var me = this;
+         var onDeletedSuccess = function BlogPostList_onDeletedSuccess(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableDelete", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.deleted")});
+
+               // load the blog post list page
+               var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}",
+               {
+                  site: me.options.siteId,
+                  container: me.options.containerId
+               });    
+               window.location = url;
+            }
+         };
+         
+         // get the url to call
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}",
          {
             site: this.options.siteId,
             container: this.options.containerId,
             postId: postId
          });
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -387,46 +376,46 @@
             responseContentType : "application/json",
             successCallback:
             {
-               fn: this._onDeleted,
+               fn: onDeletedSuccess,
                scope: this
             },
             failureMessage: this._msg("post.msg.failedDelete")
          });
       },
-
-      _onDeleted: function BlogPostView__onDeleted(response)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableDelete", response.json.error)});
-         }
-         else
-         {
-            // load the blog post list page
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}",
-            {
-               site: this.options.siteId,
-               container: this.options.containerId
-            });    
-            window.location = url;
-         }
-      },
-      
-      _getPublishingUrl: function BlogPostView__getPublishingUrl(postId)
-      {
-         return YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}/publishing",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            postId: postId
-         });
-      },
-      
+       
+       
+      /**
+       * Publishing of a blog post
+       * 
+       * @method onPublishExternal
+       * @param postId {string} the id of the blog post to publish
+       */
       onPublishExternal: function BlogPostView_onPublishExternal(postId)
       {
+         // ajax call success handler
+         var me = this;
+         var onPublishedSuccess = function BlogPostList_onPublishedSuccess(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unablePublishExternal", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
+
+               // re-render the post
+               this.loadBlogPostDataSuccess(response);
+            }
+         };
+         
+         // get the url to call
+         var url = Alfresco.util.blog.generatePublishingRestURL(this.options.siteId, this.options.containerId, postId);
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingUrl(postId),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -436,33 +425,46 @@
             },
             successCallback:
             {
-               fn: this._onPublished,
+               fn: onPublishedSuccess,
                scope: this
             },
             failureMessage: this._msg("post.msg.failedPublishExternal")
          });
       },
       
-      _onPublished: function BlogPostView__onPublished(response)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unablePublishExternal", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.publishedExternal")});
 
-            // re-render the post
-            this.loadBlogPostDataSuccess(response);
-         }
-      },
-     
+      /**
+       * Updating of an external published blog post implementation
+       * 
+       * @method onUpdateExternal
+       * @param postId {string} the id of the blog post to update
+       */
       onUpdateExternal: function BlogPostView_onUpdateExternal(postId)
       {
+         // ajax request success handler
+         var me = this;
+         var onUpdatedSuccess = function BlogPostList_onUpdatedSuccess(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUpdateExternal", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
+
+               // re-render the post
+               this.loadBlogPostDataSuccess(response);
+            }
+         };
+         
+         // get the url to call
+         var url = Alfresco.util.blog.generatePublishingRestURL(this.options.siteId, this.options.containerId, postId);
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingUrl(postId),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -472,33 +474,46 @@
             },
             successCallback:
             {
-               fn: this._onUpdated,
+               fn: onUpdatedSuccess,
                scope: this
             },
             failureMessage: this._msg("post.msg.failedUpdateExternal")
          });
       },
 
-      _onUpdated: function BlogPostView__onUpdated(response)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableUpdateExternal", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.updatedExternal")});
 
-            // re-render the post
-            this.loadBlogPostDataSuccess(response);
-         }
-      },    
-
+      /**
+       * Unpublishing of an external published blog post implementation
+       * 
+       * @method onUnpublishExternal
+       * @param postId {string} the id of the blog post to update
+       */
       onUnpublishExternal: function BlogPostView_onUnpublishExternal(postId)
       {
+         // ajax request success handler
+         var me = this;
+         var onUnpublishedSuccess = function BlogPostList_onUnpublishedSuccess(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUnpublishExternal", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unpublishExternal")});
+
+               // re-render the post
+               this.loadBlogPostDataSuccess(response);
+            }
+         };
+          
+         // get the url to call
+         var url = Alfresco.util.blog.generatePublishingRestURL(this.options.siteId, this.options.containerId, postId);
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingUrl(postId),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -508,28 +523,13 @@
             },
             successCallback:
             {
-               fn: this._onUnpublished,
+               fn: onUnpublishedSuccess,
                scope: this
             },
             failureMessage: this._msg("post.msg.failedUnpublishExternal")
          });
       },
-      
-      _onUnpublished: function BlogPostView__onUnpublished(response)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableUnpublishExternal", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unpublishExternal")});
-            
-            // re-render the post
-            this.loadBlogPostDataSuccess(response);
-         }
-      },
-      
+
       
       // mouse hover functionality
       

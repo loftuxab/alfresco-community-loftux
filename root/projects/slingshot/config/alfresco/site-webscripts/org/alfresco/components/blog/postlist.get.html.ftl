@@ -6,8 +6,9 @@
       containerId: "${args.container!'blog'}",
       initialFilter:
       {
-         filterId: "new",
-         filterOwner: "Alfresco.BlogPostListFilter"
+         filterId: "${page.url.args.filterId!'new'}",
+         filterOwner: "${page.url.args.filterOwner!'Alfresco.BlogPostListFilter'}",
+         filterData: <#if page.url.args.filterData??>"${page.url.args.filterData}"<#else>null</#if>
       }
    }).setMessages(
       ${messages}
@@ -36,12 +37,10 @@
          </div>
       </div>
       <div class="yui-u align-right">
-         <#-- PAGINATOR -->
          <div id="${args.htmlid}-paginator" class="paginator"></div>
       </div>
    </div>
 </div>
 
 <div id="${args.htmlid}-postlist" class="blog-postlist">
-   <#-- LIST elements -->
 </div>
