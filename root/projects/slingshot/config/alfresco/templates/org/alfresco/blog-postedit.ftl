@@ -1,6 +1,10 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/blog/blog-postlist.css" />
+   
+   <!-- General Blog Assets -->
+   <script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></script>
+   <script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></script>
 </@>
 
 <@template.body>

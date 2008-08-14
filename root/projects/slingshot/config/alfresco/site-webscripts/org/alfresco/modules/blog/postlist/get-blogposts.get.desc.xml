@@ -1,6 +1,0 @@
-<webscript>
-  <shortname>Blog posts</shortname>
-  <description>Blog: Returns a list of posts</description>
-  <url>/modules/blog/postlist/get-blogposts</url>
-  <format default="json"/>
-</webscript>

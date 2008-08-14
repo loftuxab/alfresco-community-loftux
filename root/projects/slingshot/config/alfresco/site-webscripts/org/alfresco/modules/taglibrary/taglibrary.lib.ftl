@@ -70,3 +70,23 @@
    <br class="clear" />
 </div>
 </#macro>
+
+<#macro renderTagLibraryHTML htmlid>
+<div class="taglibrary">
+   <div class="top_taglist tags_box">
+      <ul id="${htmlid}-current-tags">
+      </ul>
+   </div>
+   <br class="clear" />
+   <div class="title rel_left">${msg("taglibrary.typetag")}:&nbsp;</div>
+   <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
+   <input type="button" id="${htmlid}-add-tag-button" value="Add" />
+   <br class="clear" />
+   <div class="bottom_taglist tags_box">
+      <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
+      <ul id="${htmlid}-popular-tags">
+      </ul>
+   </div>
+   <br class="clear" />
+</div>
+</#macro>

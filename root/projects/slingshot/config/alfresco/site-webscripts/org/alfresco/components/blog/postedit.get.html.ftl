@@ -21,7 +21,7 @@
    <h1>${msg("postedit.createpost")}</h1>
 </#if>
 
-<div id="${args.htmlid}-container" class="editNodeForm hidden">
+<div id="${args.htmlid}-container" class="editBlogPostForm hidden">
    <form id="${args.htmlid}-form" method="post" action="">
       <div>
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
@@ -31,11 +31,11 @@
                
          <!-- title -->
          <label>${msg("post.form.postTitle")}:</label>
-         <input type="text" id="${args.htmlid}-title" name="title" size="80" value="" />
+         <input type="text" id="${args.htmlid}-title" name="title" size="180" value="" />
 
          <!-- content -->
          <label>${msg("post.form.postText")}:</label>
-         <textarea rows="8" id="${args.htmlid}-content" name="content" cols="80" class="yuieditor"></textarea> 
+         <textarea rows="8" id="${args.htmlid}-content" name="content" cols="180" class="yuieditor"></textarea> 
       
          <!-- tags -->
          <label>${msg("post.tags")}:</label>

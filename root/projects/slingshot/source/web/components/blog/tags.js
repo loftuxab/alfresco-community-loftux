@@ -48,7 +48,7 @@
    var $html = Alfresco.util.encodeHTML;
 
    /**
-    * Blog Tags constructor.
+    * BlogPostListTags constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.BlogPostListTags} The new DoclistTags instance
@@ -65,7 +65,7 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       
-      // Decoupled event listeners
+      /* Decoupled event listeners */
       YAHOO.Bubbling.on("tagRefresh", this.onTagRefresh, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);

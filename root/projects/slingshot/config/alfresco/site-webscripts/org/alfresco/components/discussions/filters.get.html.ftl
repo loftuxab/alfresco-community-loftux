@@ -1,13 +1,12 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.TopicListFilters("${args.htmlid}");
+   new Alfresco.TopicListFilter("${args.htmlid}");
 //]]></script>
 <div id="${args.htmlid}-body" class="filter topiclist-filter">
-   <h2>${msg("topiclist.filters.title")}</h2>
-   
+   <h2>${msg("header.browsetopics")}</h2>
    <ul class="filterLink">
-      <li id="${args.htmlid}-selectFilter-new" class="nav-label"><a href="#" class="filter-link nav-link">${msg("topiclist.filters.new")}</a></li>
-      <li id="${args.htmlid}-selectFilter-hot" class="nav-label"><a href="#" class="filter-link nav-link">${msg("topiclist.filters.hot")}</a></li>
-      <li id="${args.htmlid}-selectFilter-all" class="nav-label"><a href="#" class="filter-link nav-link">${msg("topiclist.filters.all")}</a></li>
-      <li id="${args.htmlid}-selectFilter-mine" class="nav-label"><a href="#" class="filter-link nav-link">${msg("topiclist.filters.my")}</a></li>
+      <li><span class="new"><a href="#" onclick="return false;" class="filter-link">${msg("link.new")}</a></span></li>
+      <li><span class="hot"><a href="#" onclick="return false;" class="filter-link">${msg("link.hot")}</a></span></li>
+      <li><span class="all"><a href="#" onclick="return false;" class="filter-link">${msg("link.all")}</a></span></li>
+      <li><span class="mine"><a href="#" onclick="return false;" class="filter-link">${msg("link.mine")}</a></span></li>
    </ul>
 </div>

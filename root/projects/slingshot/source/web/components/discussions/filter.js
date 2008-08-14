@@ -24,14 +24,14 @@
  */
  
 //
-// Note: this file is an exact copy of the filter component of the documentlibrary
+// Note: this file is a copy of the filter component of the documentlibrary
 //
  
 /**
- * BlogPostListFilter component.
+ * TopicListFilter component.
  * 
  * @namespace Alfresco
- * @class Alfresco.BlogPostListFilter
+ * @class Alfresco.TopicListFilter
  */
 (function()
 {
@@ -48,15 +48,15 @@
    var $html = Alfresco.util.encodeHTML;
    
    /**
-    * BlogPostListFilter constructor.
+    * TopicListFilter constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.BlogPostListFilter} The new BlogPostListFilter instance
+    * @return {Alfresco.TopicListFilter} The new TopicListFilter instance
     * @constructor
     */
-   Alfresco.BlogPostListFilter = function(htmlId)
+   Alfresco.TopicListFilter = function(htmlId)
    {
-      this.name = "Alfresco.BlogPostListFilter";
+      this.name = "Alfresco.TopicListFilter";
       this.id = htmlId;
       
       /* Register this component */
@@ -72,7 +72,7 @@
       return this;
    }
    
-   Alfresco.BlogPostListFilter.prototype =
+   Alfresco.TopicListFilter.prototype =
    {
       /**
        * Selected filter.
@@ -97,7 +97,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function BlogPostListFilter_onComponentsLoaded()
+      onComponentsLoaded: function TopicListFilter_onComponentsLoaded()
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -108,11 +108,11 @@
        *
        * @method onReady
        */
-      onReady: function BlogPostListFilter_onReady()
+      onReady: function TopicListFilter_onReady()
       {
          var me = this;
          
-         YAHOO.Bubbling.addDefaultAction("filter-link", function BlogPostListFilter_filterAction(layer, args)
+         YAHOO.Bubbling.addDefaultAction("filter-link", function TopicListFilter_filterAction(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
             if ((owner !== null) && !me.controlsDeactivated)
@@ -148,7 +148,7 @@
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onFilterChanged: function BlogPostListFilter_onFilterChanged(layer, args)
+      onFilterChanged: function TopicListFilter_onFilterChanged(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
@@ -184,7 +184,7 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onDeactivateAllControls: function BlogPostListFilter_onDeactivateAllControls(layer, args)
+      onDeactivateAllControls: function TopicListFilter_onDeactivateAllControls(layer, args)
       {
          this.controlsDeactivated = true;
          var filters = YAHOO.util.Selector.query("a.filter-link", this.id + "-body");

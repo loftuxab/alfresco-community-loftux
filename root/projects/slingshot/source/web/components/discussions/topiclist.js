@@ -32,6 +32,19 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+       Event = YAHOO.util.Event,
+       Element = YAHOO.util.Element;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+    
+    
+   /**
     * DiscussionsTopicList constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -47,11 +60,12 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "dom", "datasource", "datatable", "event", "element"], this.onComponentsLoaded, this);
       
-      // Decoupled event listeners
-      YAHOO.Bubbling.on("onSetTopicListParams", this.onSetTopicListParams, this);
-      YAHOO.Bubbling.on("onStartIndexChanged", this.onStartIndexChanged, this);
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("topiclistRefresh", this.onDiscussionsTopicListRefresh, this);
       
       return this;
    }
@@ -74,30 +88,79 @@
           */
          siteId: "",
          
+         /**
+          * Current containerId.
+          * 
+          * @property containerId
+          * @type string
+          */    
          containerId: "discussions",
-         
-         path: "",
-         
+
          /**
-          * Start index of displayed elements
+          * Initially used filter name and id.
           */
-         startIndex: 0,
-         
+         initialFilter: {
+         },
+
          /**
-          * Size of elements to show
+          * Number of items displayed per page
+          * 
+          * @property pageSize
+          * @type int
           */
          pageSize: 10,
+
+         /**
+          * Flag indicating whether the list shows a detailed view or a simple one.
+          * 
+          * @property simpleView
+          * @type boolean
+          */
+         simpleView: false,
          
-         filter: "",
-         
-         tag: "",
-         
-         viewmode: "",
-         
-         simpleView: false
+         /**
+          * Length of preview content loaded for each topic
+          */
+         maxContentLength: 512
       },
       
-      widgets: {},
+      /**
+       * Current filter to filter topic list.
+       * 
+       * @property currentFilter
+       * @type object
+       */
+      currentFilter:
+      {
+      },
+      
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets : {},
+      
+      /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       */
+      modules: {},
+      
+      /**
+       * Object literal used to generate unique tag ids
+       * 
+       * @property tagId
+       * @type object
+       */
+      tagId:
+      {
+         id: 0,
+         tags: {}
+      },
       
       /**
        * Set multiple initialization options at once.
@@ -111,7 +174,14 @@
          return this;
       },
       
-      setMessages: function DiscussionsTopic_setMessages(obj)
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       */
+      setMessages: function DiscussionsTopicList_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -136,6 +206,9 @@
        */
       onReady: function DiscussionsTopicList_onReady()
       {
+         // Reference to self used by inline functions
+         var me = this;
+         
          // Create new post button
          this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic,
          {
@@ -148,99 +221,440 @@
             checked: this.options.simpleView
          });
          
-         // Hook action events
-         Alfresco.util.registerDefaultActionHandler(this.id, "action-link-div", "div", this);
-         Alfresco.util.registerDefaultActionHandler(this.id, "action-link-span", "span", this);
-
-         Alfresco.util.registerDefaultActionHandler(this.id, "tag-link-span", "span", this);
-         
-         // initialize the mouse over listener
-         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onListElementMouseEntered, this.onListElementMouseExited);
-         
-         // attach the listener to the already rendered list elements
-         Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
-         
-         // tell the filters in what state the list initially loaded
-         YAHOO.Bubbling.fire('topicListParamsChanged', {
-            filter: this.options.filter,
-            tag: this.options.tag
+         // YUI Paginator definition
+         this.widgets.paginator = new YAHOO.widget.Paginator(
+         {
+            containers: [this.id + "-paginator"],
+            rowsPerPage: this.options.pageSize,
+            initialPage: 1,
+            template: this._msg("pagination.template"),
+            pageReportTemplate: this._msg("pagination.template.page-report")
          });
+
+         // initialize rss feed link
+         this._generateRSSFeedUrl();
+
+         // Hook action events for details view
+         var fnActionHandlerDiv = function DiscussionsTopicList_fnActionHandlerDiv(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+            if (owner !== null)
+            {
+               var action = owner.className;
+               var target = args[1].target;
+               if (typeof me[action] == "function")
+               {
+                  me[action].call(me, target.offsetParent, owner);
+                  args[1].stop = true;
+               }
+            }
+      		 
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("topic-action-link-div", fnActionHandlerDiv);
+         
+         // Hook action events for simple view
+         var fnActionHandlerSpan = function DiscussionsTopicList_fnActionHandlerSpan(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
+            if (owner !== null)
+            {
+               var action = owner.className;
+               var target = args[1].target;
+               if (typeof me[action] == "function")
+               {
+                  me[action].call(me, target.offsetParent, owner);
+                  args[1].stop = true;
+               }
+            }
+      		 
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("topic-action-link-span", fnActionHandlerSpan);
+         
+         // register tag action handler, which will issue tagSelected bubble events.
+         Alfresco.util.tags.registerTagActionHandler(this);
+
+         // DataSource definition
+         var uriDiscussionsTopicList = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/site/{site}/{container}/posts",
+         {
+            site: this.options.siteId,
+            container: this.options.containerId
+         });
+         this.widgets.dataSource = new YAHOO.util.DataSource(uriDiscussionsTopicList);
+         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+         this.widgets.dataSource.connXhrMode = "queueRequests";
+         this.widgets.dataSource.responseSchema =
+         {
+            resultsList: "items",
+            fields:
+            [ "name", "totalReplyCount", "lastReplyOn", "lastReplyBy", "tags", "url", "repliesUrl",
+              "nodeRef", "title", "createdOn", "modifiedOn", "isUpdated", "updatedOn",
+              "author", "content", "replyCount", "permissions"
+            ],
+            metaFields:
+            {
+               paginationRecordOffset: "startIndex",
+               totalRecords: "total"
+            }
+         };
+         
+         var generateTopicActions = function(me, data, tagName)
+         {
+            var html = '';
+            // begin actions
+            html += '<div class="nodeEdit">';
+            html += '<' + tagName + ' class="onViewTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("topic.action.view") + '</a></' + tagName + '>';   
+            /*if (data.permissions.edit)
+            {
+               html += '<' + tagName + ' class="onEditTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("topic.action.edit") + '</a></' + tagName + '>';
+            }*/
+            if (data.permissions['delete'])
+            {
+               html += '<' + tagName + ' class="onDeleteTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("topic.action.delete") + '</a></' + tagName + '>';
+            }
+            html += '</div>';
+            return html;
+         };        
+         
+         /**
+          * Topic element renderer. We use the data table as a one-column table, this renderer
+          * thus renders the complete element.
+          *
+          * @method renderTopic
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         var renderTopic = function DiscussionsTopicList_renderTopic(elCell, oRecord, oColumn, oData)
+         {
+            // hide the parent temporarily as we first insert the structure and then the content
+            // to avoid problems caused by broken xhtml
+            Dom.addClass(elCell, 'hidden');
+             
+            // precalculate some values
+            var data = oRecord.getData();
+            var topicViewUrl = Alfresco.util.discussions.getTopicViewPage(me.options.siteId, me.options.containerId, data.name);
+            var authorLink = Alfresco.util.people.generateUserLink(data.author);
+            
+            var html = "";
+            
+            // detailed view
+            if (! me.options.simpleView)
+            {
+               html += '<div class="node topic">';
+
+               // actions
+               html += generateTopicActions(me, data, 'div');
+   
+               // begin view
+               html += '<div class="nodeContent">';
+               html += '<span class="nodeTitle"><a href="' + topicViewUrl + '">' + $html(data.title) + '</a> ';
+               if (data.isUpdated)
+               {
+                  html += '<span class="nodeStatus">(' + me._msg("topic.updated") + ')</span>';
+               }
+               html += '</span>';
+               html += '<div class="published">';
+               html += '<span class="nodeAttrLabel">' + me._msg("topic.info.createdOn") + ': </span>';
+               html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
+               html += '<span class="spacer"> | </span>';
+               html += '<span class="nodeAttrLabel">' + me._msg("topic.info.author") + ': </span>';
+               html += '<span class="nodeAttrValue">' + authorLink + '</span>';
+               html += '<br />';
+               if (data.lastReplyBy)
+               {
+                  html += '<span class="nodeAttrLabel">' + me._msg("topic.info.lastReplyBy") + ': </span>';
+                  html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.lastReplyBy) + '</span>';                  
+                  html += '<span class="spacer"> | </span>';
+                  html += '<span class="nodeAttrLabel">' + me._msg("topic.info.lastReplyOn") + ': </span>';
+                  html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.lastReplyOn) + '</span>';
+               }
+               else
+               {
+                  html += '<span class="nodeAttrLabel">' + me._msg("topic.footer.replies") + ': </span>';
+                  html += '<span class="nodeAttrValue">' + me._msg("topic.info.noReplies") + '</span>';                  
+               }
+               html += '</div>';
+               
+               html += '<div class="userLink">' + authorLink + ' ' + me._msg("topic.said") + ':</div>';
+               html += '<div class="content yuieditor"></div>';
+               html += '</div>'
+               // end view
+
+               html += '</div>';
+
+               // begin footer
+               html += '<div class="nodeFooter">';
+               html += '<span class="nodeAttrLabel replyTo">' + me._msg("topic.footer.replies") + ': </span>';
+               html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
+               html += '<span class="spacer"> | </span>';
+               
+               html += '<span class="nodeAttrValue"><a href="' + topicViewUrl + '">' + me._msg("topic.footer.read") + '</a></span>';
+               html += '<span class="spacer"> | </span>';
+               
+               html += '<span class="nodeAttrLabel tag">' + me._msg("topic.tags") +': </span>';
+               if (data.tags.length > 0)
+               {
+                  for (var x=0; x < data.tags.length; x++)
+                  {
+                     if (x > 0)
+                     {
+                        html += ", ";
+                     }
+                     html += Alfresco.util.tags.generateTagLink(me, data.tags[x]);
+                  }
+               }
+               else
+               {
+                  html += '<span class="nodeAttrValue">' + me._msg("topic.noTags") + '</span>';
+               }
+               html += '</div></div>';
+               // end
+            }
+            
+            // simple view
+            else
+            {
+               html += '<div class="node topic simple">';
+               
+               // begin actions
+               html += generateTopicActions(me, data, 'span');
+   
+               // begin view
+               html += '<div class="nodeContent">';
+               html += '<span class="nodeTitle"><a href="' + topicViewUrl + '">' + $html(data.title) + '</a> ';
+               if (data.isUpdated)
+               {
+                  html += '<span class="nodeStatus">(' + me._msg("topic.updated") + ')</span>';
+               }
+               html += '</div>';
+               html += '</div>';
+            }
+             
+            // assign html        
+            elCell.innerHTML = html;
+            
+            // finally add the content. We do this here to avoid a broken page layout, as
+            // data.content isn't valid xhtml.
+            if (! me.options.simpleView)
+            {
+               var contentElem = Dom.getElementsByClassName("content", "div", elCell);
+               if (contentElem.length == 1)
+               {
+                  contentElem[0].innerHTML = data.content
+               }
+            }
+            
+            // now show the element
+            Dom.removeClass(elCell, 'hidden');
+         }
+
+         // DataTable column defintions
+         var columnDefinitions = [
+         {
+            key: "topics", label: "Topics", sortable: false, formatter: renderTopic
+         }];
+
+         // Temporary "empty datatable" message
+         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.loading");
+
+         // called by the paginator on state changes
+         var handlePagination = function DL_handlePagination(state, dt)
+         {
+            //me.currentPage = state.page;
+            me._updateDiscussionsTopicList({ page : state.page });
+         }
+         
+         // DataTable definition
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-topiclist", columnDefinitions, this.widgets.dataSource,
+         {
+            initialLoad: false,
+            paginationEventHandler: handlePagination,
+            paginator: this.widgets.paginator
+         });
+         
+         // Custom error messages
+         this._setDefaultDataTableErrors();
+
+         // Hook tableMsgShowEvent to clear out fixed-pixel width on <table> element (breaks resizer)
+         this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
+         {
+            // NOTE: Scope needs to be DataTable
+            this._elMsgTbody.parentNode.style.width = "";
+         });
+         
+         // Override abstract function within DataTable to set custom error message
+         this.widgets.dataTable.doBeforeLoadData = function DiscussionsTopicList_doBeforeLoadData(sRequest, oResponse, oPayload)
+         {
+            if (oResponse.error)
+            {
+               try
+               {
+                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+               }
+               catch(e)
+               {
+                  me._setDefaultDataTableErrors();
+               }
+            }
+            else if (oResponse.results && !me.options.usePagination)
+            {
+               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
+            }
+            // Must return true to have the "Loading..." message replaced by the error message
+            return true;
+         }
+         
+         // Enable row highlighting
+         this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
+         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
+         
+         // issue a filterChanged bubble event to load the list and to
+         // update the other components on the page
+         var filterObj = YAHOO.lang.merge(
+         {
+            filterId: "new",
+            filterOwner: "Alfresco.DiscussionsTopicListFilter",
+            filterData: null
+         }, this.options.initialFilter);
+         YAHOO.Bubbling.fire("filterChanged", filterObj);
       },
       
-      
-      // Action handlers
-
       /**
-       * Action handler for the create topic button
+       * Generates the HTML mark-up for the RSS feed link
+       *
+       * @method _generateRSSFeedUrl
+       * @private
+       */
+      _generateRSSFeedUrl: function DiscussionsTopicList__generateRSSFeedUrl()
+      {
+         var divFeed = Dom.get(this.id + "-rssFeed");
+         if (divFeed)
+         {
+            var url = Alfresco.constants.URL_CONTEXT + "service/components/discussions/rss?site=" + this.options.siteId;
+            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("header.rssFeed") + '</a>';
+         }
+      },
+      
+      /**
+       * Action handler for the create post button
        */
       onCreateTopic: function DiscussionsTopicList_onCreateTopic(e, p_obj)
       {
-         Alfresco.util.blog.loadForumPostCreatePage(this.options.siteId, this.options.containerId, this.options.path);
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-createtopic?container={container}",
+         {
+            site: this.options.siteId,
+            container: this.options.containerId
+         });
+         window.location = url;
          Event.preventDefault(e);
       },
-
-      /**
-       * Action handler for the view action
-       */
-      onViewNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
-      {
-         Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, param);
-      },
       
       /**
-       * Action handler for the edit action
+       * Action handler for the simple view toggle button
        */
-      onEditNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
-      {
-         Alfresco.util.discussions.loadForumPostEditPage(this.options.siteId, this.options.containerId, this.options.path, param);             
-      },
-      
-      /**
-       * Action handler for the delete action
-       */
-      onDeleteNode: function DiscussionsTopic_onDeleteTopic(htmlId, ownerId, param)
-      {
-         this._deleteNode(param);
-      },
-      
-      /**
-       * Handles the click on a tag
-       */
-      onTagSelection: function DiscussionsTopicList_onTagSelected(htmlId, ownerId, param)
-      {
-         YAHOO.Bubbling.fire('onSetTopicListParams', {tag : param});
-      },
-      
       onSimpleView: function DiscussionsTopicList_onSimpleView(e, p_obj)
       {
          this.options.simpleView = !this.options.simpleView;
          p_obj.set("checked", this.options.simpleView);
 
-         // PENDING: cleanup
-         if (this.options.simpleView)
-         {
-            this.options.viewmode = "simple";
-         }
-         else
-         {
-            this.options.viewmode = "details";
-         }
-         
-         YAHOO.Bubbling.fire('onSetTopicListParams', { "viewmode" : this.options.viewmode });
-         
-         //YAHOO.Bubbling.fire("doclistRefresh");
+         // update the list
+         YAHOO.Bubbling.fire("topiclistRefresh");
          Event.preventDefault(e);
       },
       
-      // Actions functionality
-      
-      _deleteNode: function(topicId)
+      /**
+       * Handler for the view topic action links
+       *
+       * @method onActionDelete
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onViewTopic: function DiscussionsTopicList_onViewTopic(row)
       {
-         // make an ajax request to delete the topic
-         var url = Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
-                        this.options.containerId, this.options.path, topicId);
-         url += "?site=" + this.options.siteId;
-         url += "&container=" + this.options.containerId;
+         var record = this.widgets.dataTable.getRecord(row);
+         window.location = Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, record.getData('name'));
+      },
+
+      /**
+       * Handler for the edit topic action links
+       */
+      onEditTopic: function DiscussionsTopicList_onEditTopic(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row);
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topicview?container={container}&topicId={topicId}",
+         {
+            site: this.options.siteId,
+            container: this.options.containerId,
+            topicId: record.getData('name')
+         });
+         window.location = url;
+      },
+      
+      /**
+       * Tag selected handler (document details)
+       *
+       * @method onTagSelected
+       * @param tagId {string} Tag name.
+       * @param target {HTMLElement} Target element clicked.
+       */
+      onTagSelected: function DiscussionsTopicList_onTagSelected(layer, args)
+      {
+         var obj = args[1];
+         if (obj && (obj.tagName !== null))
+         {
+            var filterObj = {
+               filterId: obj.tagName,
+               filterOwner: "Alfresco.DiscussionsTopicListTags",
+               filterData: null
+            };
+            YAHOO.Bubbling.fire("filterChanged", filterObj);
+         }
+      },
+      
+      /**
+       * Handler for the delete topic action links.
+       */
+      onDeleteTopic: function DiscussionsTopicList_onDeletePost(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row);
+         this._deleteTopic(record.getData('name'));
+      },
+      
+      /**
+       * Delete a topic.
+       * 
+       * @param topicId {string} the id of the topic to delete
+       */
+      _deleteTopic: function DiscussionsTopicList__deleteTopic(topicId)
+      {
+         // ajax request success handler
+         var onDeleted = function DiscussionsTopicList__deleteTopic_onDeleted(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableDelete", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.deleted")});
+               
+               // reload the table
+               this._updateDiscussionsTopicList();
+            }
+         };
+          
+         // construct the url to call
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         {
+            site: this.options.siteId,
+            container: this.options.containerId,
+            topicId: topicId
+         });
+         
+         // execute the request
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -248,164 +662,133 @@
             responseContentType : "application/json",
             successCallback:
             {
-               fn: this._onDeleted,
+               fn: onDeleted,
                scope: this
             },
-            failureMessage: this._msg("topic.msg.failedDelete")
-         });
-      },
-
-      _onDeleted: function DiscussionsTopic__onDeleted(response)
-      {
-         if (response.json.error == undefined)
-         {
-            // reload the list
-            this._reloadData();
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.deleted")});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete", response.json.error)});
-         }
-      },
-      
-      
-      // List event handlers
-      
-      /**
-       * Handles paginator events
-       */
-      onStartIndexChanged: function Discussions_onPageIndexChanged(layer, args)
-      {
-         this.options.pageSize = args[1].pageSize;
-         this.options.startIndex = args[1].startIndex;
-         this._reloadData();
-      },
-
-      /**
-       * Updates the filter and reloads the page
-       */ 
-      onSetTopicListParams: function Discussions_onTopicCategoryChange(layer, args)
-      {
-         // check the filter or tag
-         if (args[1].filter != undefined)
-         {
-            this.options.filter = args[1].filter;
-            this.options.tag = "";
-         }
-         else if (args[1].tag != undefined)
-         {
-            this.options.tag = args[1].tag;
-            this.options.filter = "";
-         }
-         
-         // check the viewmode param
-         if (args[1].viewmode != undefined)
-         {
-             this.options.viewmode = args[1].viewmode;
-         }
-         
-         // reload the table
-         this._reloadData();
-      },
-      
-      _reloadData: function Discussions__reloadData() 
-      {
-         var url = Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topiclist/get-topics";
-         Alfresco.util.Ajax.request(
-         {
-            url: url,
-            responseContentType : "application/json",
-            dataObj:
-            {
-               site    : this.options.siteId,
-               htmlid : this.id,
-               startIndex : this.options.startIndex,
-               pageSize    : this.options.pageSize,
-               filter  : this.options.filter,
-               tag     : this.options.tag,
-               viewmode: this.options.viewmode
-            },
-            successCallback:
-            {
-               fn: this._processData,
-               scope: this
-            },
-            failureMessage: this._msg("topiclist.msg.failedloadingdata")
+            failureMessage: this._msg("post.msg.failedDelete")
          });
       },
       
-      _processData: function Discussions__processData(response)
-      {
-         // first check whether we got an error back
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topiclist.msg.unableloadingdata", response.json.error)});
-         }
-         else
-         {
-            // update the paginator
-            var paginatorData = response.json.paginatorData;
-            this._updatePaginator(paginatorData);
-           
-            // update the filters
-            YAHOO.Bubbling.fire('topicListParamsChanged', {
-			   filter: this.options.filter,
-			   tag: this.options.tag
-			});
-           
-            // update the internal position fields
-            this.options.startIndex = paginatorData.startIndex;
-            this.options.pageSize = paginatorData.pageSize;
-            
-            // update title
-            var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
-            elem.innerHTML = Alfresco.util.encodeHTML(response.json.listTitle);
-            
-            // update list
-            var elem = YAHOO.util.Dom.get(this.id + "-topiclist");
-            elem.innerHTML = response.json.listHtml;
-            
-            // init mouse over events
-            Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
-         }
-      },
-
-      _updatePaginator: function Discussions__updatePaginator(paginatorData)
-      {
-         YAHOO.Bubbling.fire('onPagingDataChanged',
-            {
-               data: paginatorData
-            }
-         );
-      },
-      
-      
-      // Rollover effect
-      
       /**
-       * Called when the mouse enters into a list item.
+       * Custom event handler to highlight row.
+       *
+       * @method onEventHighlightRow
+       * @param oArgs.event {HTMLEvent} Event object.
+       * @param oArgs.target {HTMLElement} Target element.
        */
-      onListElementMouseEntered: function DiscussionsTopicList_onListElementMouseEntered(layer, args)
+      onEventHighlightRow: function DiscussionsTopicList_onEventHighlightRow(oArgs)
       {
-         var elem = args[1].target;
+         var target = oArgs.target;
+         var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null);
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
+         var editBlock = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, target, null);
+         YAHOO.util.Dom.addClass(editBlock, 'showEditBlock');
+      },
+
+      /**
+       * Custom event handler to unhighlight row.
+       *
+       * @method onEventUnhighlightRow
+       * @param oArgs.event {HTMLEvent} Event object.
+       * @param oArgs.target {HTMLElement} Target element.
+       */
+      onEventUnhighlightRow: function DiscussionsTopicList_onEventUnhighlightRow(oArgs)
+      {
+         var target = oArgs.target;
+         var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
+         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         var editBlock = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, target, null);
+         YAHOO.util.Dom.removeClass(editBlock, 'showEditBlock');
       },
       
       /**
-       * Called whenever the mouse exits a list item.
+       * DiscussionsTopicList View Filter changed event handler
+       *
+       * @method onFilterChanged
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (new filterId)
        */
-      onListElementMouseExited: function DiscussionsTopicList_onListElementMouseExited(layer, args)
+      onFilterChanged: function DiscussionsTopicList_onFilterChanged(layer, args)
       {
-         var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, elem, null);
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
+         var obj = args[1];
+         if ((obj !== null) && (obj.filterId !== null))
+         {
+            // Should be a filterId in the arguments
+            this.currentFilter =
+            {
+               filterId: obj.filterId,
+               filterOwner: obj.filterOwner,
+               filterData: obj.filterData
+            };
+            this._updateDiscussionsTopicList({ page: 1 });
+         }
       },
       
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function DiscussionsTopicList_onDeactivateAllControls(layer, args)
+      {
+         for (widget in this.widgets)
+         {
+            this.widgets[widget].set("disabled", true);
+         }
+      },
       
+      /**
+       * Update the list title.
+       */
+      updateListTitle: function DiscussionsTopicList_updateListTitle()
+      {
+         var elem = Dom.get(this.id + '-listtitle');
+         var title = "<unknown filter>";
+
+         var filterOwner = this.currentFilter.filterOwner;
+         var filterId = this.currentFilter.filterId;
+         var filterData = this.currentFilter.filterData;
+         if (filterOwner == "Alfresco.TopicListFilter")
+         {
+            if (filterId == "new")
+            {
+                title = this._msg("topiclist.title.newtopics");
+            }
+            if (filterId == "hot")
+            {
+               title = this._msg("topiclist.title.hottopics");
+            }
+            else if (filterId == "all")
+            {
+               title = this._msg("topiclist.title.alltopics");
+            }
+            else if (filterId == "mine")
+            {
+               title = this._msg("topiclist.title.mytopics");
+            }
+         }
+         else if (filterOwner == "Alfresco.TopicListTags")
+         {
+            title = this._msg("topiclist.title.bytag", $html(filterData));
+         }
+         
+         elem.innerHTML = title;
+      },
+
+      /**
+       * DiscussionsTopicList Refresh Required event handler
+       *
+       * @method onDiscussionsTopicListRefresh
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
+       */
+      onDiscussionsTopicListRefresh: function DiscussionsTopicList_onDiscussionsTopicListRefresh(layer, args)
+      {
+         this._updateDiscussionsTopicList({});
+      },
+
       /**
        * Gets a custom message
        *
@@ -417,7 +800,144 @@
       _msg: function DiscussionsTopicList_msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.DiscussionsTopicList", Array.prototype.slice.call(arguments).slice(1));
-      }
+      },
 
+      /**
+       * Resets the YUI DataTable errors to our custom messages
+       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
+       *
+       * @method _setDefaultDataTableErrors
+       */
+      _setDefaultDataTableErrors: function DiscussionsTopicList__setDefaultDataTableErrors()
+      {
+         var msg = Alfresco.util.message;
+         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.DiscussionsTopicList");
+         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.DiscussionsTopicList");
+      },
+      
+      /**
+       * Updates topic list by calling data webscript with current site and filter information
+       *
+       * @method _updateDiscussionsTopicList
+       */
+      _updateDiscussionsTopicList: function DiscussionsTopicList__updateDiscussionsTopicList(p_obj)
+      {
+         // Reset the custom error messages
+         this._setDefaultDataTableErrors();
+         
+         var successHandler = function DiscussionsTopicList__updateDiscussionsTopicList_successHandler(sRequest, oResponse, oPayload)
+         {
+            //this.currentPath = successPath;
+            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            this.updateListTitle();
+         }
+         
+         var failureHandler = function DiscussionsTopicList__updateDiscussionsTopicList_failureHandler(sRequest, oResponse)
+         {
+            if (oResponse.status == 401)
+            {
+               // Our session has likely timed-out, so refresh to offer the login page
+               window.location.reload(true);
+            }
+            else
+            {
+               try
+               {
+                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
+                  if (oResponse.status == 404)
+                  {
+                     // Site or container not found - deactivate controls
+                     YAHOO.Bubbling.fire("deactivateAllControls");
+                  }
+               }
+               catch(e)
+               {
+                  this._setDefaultDataTableErrors();
+               }
+            }
+         }
+         
+         // get the url to call
+         this.widgets.dataSource.sendRequest(this._buildParams(p_obj || {}),
+         {
+            success: successHandler,
+            failure: failureHandler,
+            scope: this
+         });
+      },
+      
+      /**
+       * Build URI parameter string for doclist JSON data webscript
+       *
+       * @method _buildDocListParams
+       * @param p_obj.page {string} Page number
+       * @param p_obj.pageSize {string} Number of items per page
+       */
+      _buildParams: function DiscussionsTopicList__buildParams(p_obj)
+      {
+         var params = {
+            contentLength: this.options.maxContentLength,
+            tag: null,
+            
+            page: this.widgets.paginator.get("page") || "1",
+            pageSize: this.widgets.paginator.get("rowsPerPage")
+         }
+         
+         // Passed-in overrides
+         if (typeof p_obj == "object")
+         {
+            params = YAHOO.lang.merge(params, p_obj);
+         }
+
+         // check what url to call and with what parameters
+         var filterOwner = this.currentFilter.filterOwner;
+         var filterId = this.currentFilter.filterId;
+         var filterData = this.currentFilter.filterData;       
+         
+         // check whether we got a filter or not
+         var url = "";
+         if (filterOwner == "Alfresco.TopicListFilter")
+         {
+            // latest only
+            if (filterId == "all")
+            {
+                url = "";
+            }
+            if (filterId == "new")
+            {
+                url = "/new";
+            }
+            else if (filterId == "hot")
+            {
+                url = "/hot"
+            }
+            else if (filterId == "mine")
+            {
+                url = "/myposts"
+            }
+         }
+         else if (filterOwner == "Alfresco.TopicListTags")
+         {
+            params.tag = filterData;
+         }
+         
+         // build the url
+         var urlExt = "";
+         for (paramName in params)
+         {
+            if (params[paramName] === null)
+            {
+               continue;
+            }
+            urlExt += "&" + paramName;
+            urlExt += "=";
+            urlExt += encodeURIComponent(params[paramName]);
+         }
+         urlExt += "&startIndex=" + (params.page-1) * params.pageSize;
+
+         return url + "?" + urlExt.substring(1);
+      }
    };
 })();

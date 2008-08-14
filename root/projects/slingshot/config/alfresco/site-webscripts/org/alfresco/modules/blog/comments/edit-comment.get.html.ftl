@@ -4,7 +4,6 @@
    </div>
    <div class="editComment">
       <form id="${args.htmlid}-form" method="POST" action="">
-         <input type="hidden" id="${args.htmlid}-nodeRef" name="nodeRef" value="" />
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
          <input type="hidden" id="${args.htmlid}-container" name="container" value="" />
          <input type="hidden" id="${args.htmlid}-itemTitle" name="itemTitle" value="" />

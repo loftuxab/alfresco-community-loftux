@@ -90,59 +90,38 @@
       {
          YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
-   
-      /**
-       * Register a default action handler for a given set
-       * of elements described by their class name.
-       * @parma handlerObject object that is used as for the method calls
-       * @param className The elements to which the action should be added to
-       * @param ownerTagName the owner tag name to search for. This has to be a
-       *        parent element of the default action element. The id of this element is used
-       *        to call the correct method. Id's should follow the form htmlid-actionname[-param]
-       *        Actions methods should have the form f(htmlid, ownerId, param)
-       */
-      registerDefaultActionHandler: function TagLibrary_registerDefaultActionHandler(handlerObject, htmlId, className, ownerTagName)
-      {         
-         // Hook the tag events
-         YAHOO.Bubbling.addDefaultAction(className, function TagLibrary_genericDefaultAction(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
-            if (owner !== null)
-            {
-               // check that the html id matches, abort otherwise
-               var tmp = owner.id;
-               if (tmp.indexOf(htmlId) != 0)
-               {
-                   return true;
-               }
-               var tmp = tmp.substring(htmlId.length + 1);
-               var parts = tmp.split('-');
-               if (parts.length < 1)
-               {
-                  // stop here
-                  return true;
-               }
-               // the first entry is the handler method to call
-               var action = parts[0];
-               if (typeof handlerObject[action] == "function")
-               {
-                  // extract the param part of the id
-                  var param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
-                  handlerObject[action].call(handlerObject, htmlId, owner.id, param);
-                  args[1].stop = true;
-               }
-            }
-            return true;
-         });
-      },
-   
-   
+
       onReady: function TagLibrary_onReady()
       {
          // register an action handler for all elements with class tag-link.
          // the action to be called is specified in the id of the enclosing li
          // element
-         this.registerDefaultActionHandler(this, this.id, "taglibrary-action", "li");
+         //this.registerDefaultActionHandler(this, this.id, "taglibrary-action", "li");
+         
+         // Hook tag actions
+         var me = this;
+         var fnActionHandlerDiv = function DiscussionsTopic_fnActionHandlerDiv(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "li");
+            if (owner !== null)
+            {
+               var action = "";
+               action = owner.className;
+               if (typeof me[action] == "function")
+               {
+                  // fetch the tag name, which is inside the form id-action-tag
+                  // PENDING: hold this information in the js object and generate
+                  // int id's like for the tag actions
+                  var id = owner.id;
+                  var tagName = id.substring((me.id + '-' + action + '-').length);
+                  me[action].call(me, tagName);
+                  args[1].stop = true;
+               }
+            }
+      		 
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("taglibrary-action", fnActionHandlerDiv);
          
          // load link for popular tags
          YAHOO.util.Event.addListener(this.id + "-load-popular-tags-link", "click", this.onPopularTagsLinkClicked, this, true);
@@ -232,17 +211,17 @@
       /**
        * Triggered by a click on one of the selected tags
        */
-      onRemoveTag: function TagLibrary_onRemoveTag(htmlId, ownerId, param)
+      onRemoveTag: function TagLibrary_onRemoveTag(tagName)
       {
-          this._removeTagImpl(param);
+          this._removeTagImpl(tagName);
       },
       
       /**
        * Triggered by a click onto one of the popular tags.
        */
-      onAddTag: function TagLibrary_onAddTag(htmlId, ownerId, param)
+      onAddTag: function TagLibrary_onAddTag(tagName)
       {
-         this._addTagImpl(param);
+         this._addTagImpl(tagName);
       },
 
       /**
@@ -291,7 +270,7 @@
 
          // add all tags to the ui
          /*
-         <li id="${htmlid}-onAddTag-Car">
+         <li class="onAddTag" id="${htmlid}-onAddTag-Car">
         	<a href="#" class="taglibrary-action">
         	    <span>Car</span>
         		<span class="close">
@@ -306,6 +285,7 @@
             var elem = document.createElement('li');
             var elemId = this.id + "-onAddTag-" + tags[x].name;
             elem.setAttribute('id', elemId);
+            elem.setAttribute('class', 'onAddTag');
             elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tags[x].name +
         		' </span> <span class="add">&nbsp;</span> </a>'; // <img src="icon_close.gif" alt="x" />
             popularTagsElem.appendChild(elem);
@@ -385,6 +365,7 @@
          var elem = document.createElement('li');
          var elemId = this.id + '-onRemoveTag-' + tagName;
          elem.setAttribute('id', elemId);
+         elem.setAttribute('class', 'onRemoveTag');
          elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tagName +
                           ' </span> <span class="remove">&nbsp;</span> </a>'; // <img src="/modules/taglibrary/images/icon_add.gif" alt="x" />
          currentTagsElem.appendChild(elem);

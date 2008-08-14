@@ -1,7 +1,7 @@
 /**
  * BlogPostEdit component.
  * 
- * Component provides blog post creation/edit functionality.s
+ * Component provides blog post creation/edit functionality.
  * 
  * @namespace Alfresco
  * @class Alfresco.BlogPostEdit
@@ -21,10 +21,10 @@
    var $html = Alfresco.util.encodeHTML;
     
    /**
-    * Post constructor.
+    * BlogPostEdit constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.PostView} The new Post instance
+    * @return {Alfresco.BlogPostEdit} The new Post instance
     * @constructor
     */
    Alfresco.BlogPostEdit = function(htmlId)
@@ -36,7 +36,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["datasource", "json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
       
       return this;
    }
@@ -59,6 +59,13 @@
           */
          siteId: "",
          
+         /**
+          * ContainerId representing root container
+          *
+          * @property containerId
+          * @type string
+          * @default "blog"
+          */
          containerId: "blog",
          
          /**
@@ -80,6 +87,12 @@
        */
       widgets : {},
 
+      /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       */
       modules : {},
 
       /**
@@ -88,8 +101,8 @@
       blogPostData: null,
         
       /**
-       * If true, an external publish will be executed once the
-       * post has been saved.
+       * If true, an external publish/update will be executed after the post has been
+       * saved/updated.
        */
       performExternalPublish: false,
       
@@ -98,6 +111,7 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.BlogPostEdit} returns 'this' for method chaining
        */
       setOptions: function BlogPostEdit_setOptions(obj)
       {
@@ -105,6 +119,13 @@
          return this;
       },
       
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.BlogPostEdit} returns 'this' for method chaining
+       */
       setMessages: function BlogPostEdit_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
@@ -132,11 +153,12 @@
       { 
          if (this.options.editMode)
          {
-            // load the blog post data
+            // load the blog post data prior to initializing the form
             this._loadBlogPostData();
          }
          else
          {
+            // directly initialize the form
             this._initializeBlogPostForm();
          }
       },
@@ -146,48 +168,53 @@
        */
       _loadBlogPostData: function BlogPostEdit__loadBlogPostData()
       {
+         // ajax request success handler
+         var me = this;
+         var loadBlogPostDataSuccess = function CommentsList_loadCommentsSuccess(response)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.errorFormLoad", response.json.error)});
+               return;
+            }
+
+            // set the blog data
+            var data = response.json.item
+            me.blogPostData = data;
+            
+            // now initialize the form, which will use the data we just loaded
+            me._initializeBlogPostForm();
+         };
+         
+         // construct the request url
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}",
          {
             site : this.options.siteId,
             container: this.options.containerId,
             postId: this.options.postId
          });
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
             url: url,
+            method: "GET",
+            responseContentType : "application/json",
             successCallback:
             {
-               fn: this.loadBlogPostDataSuccess,
+               fn: loadBlogPostDataSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.loadBlogPostDataFailed,
-               scope: this
-            }
+            failureMessage: this._msg("message.details.failed")
          });
       },
 
-      loadBlogPostDataFailed: function BlogPostView_loadBlogPostDataFailed(response)
-      {
-         // Display success message anyway
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this._msg("message.details.failed")
-         });
-      },
-
-      loadBlogPostDataSuccess: function CommentsList_loadCommentsSuccess(response)
-      {
-         var data = response.json.item
-         this.blogPostData = data;
-         
-         // TODO: make sure to only call this function if data has been loaded successfully
-         this._initializeBlogPostForm();
-      },   
-
+      /**
+       * Initializes the blog post form with create/edit dependent data.
+       */
       _initializeBlogPostForm: function BlogPostEdit__initializeBlogPostForm()
       {
+         // construct the actionUrl, which is different for creating/updating a post
          var actionUrl = '';
          if (this.options.editMode)
          {
@@ -243,18 +270,17 @@
          }
          Dom.get(this.id + '-content').value = content;
          
-         // register the behaviour with the form / display the form
+         // register the behaviour with the form and display the form
          this._registerBlogPostForm();
       },
 
       /**
-       * Registers the form with the htl (that should be available in the page)
-       * as well as the buttons that are part of the form.
+       * Registers the form logic
        */
       _registerBlogPostForm: function BlogPostEdit__registerPostForm()
       {  
          // register the tag listener
-         this.modules.tagLibraryListener = new Alfresco.TagLibraryListener(this.id+"-form", "tags");
+         this.modules.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
          
          // add the tags that are already set on the post
          if (this.options.editMode && this.blogPostData.tags.length > 0)
@@ -264,7 +290,7 @@
             taglibrary.addTags(this.blogPostData.tags);
          }
          
-         // register the Button
+         // create the Button
          var saveButtonLabel = '';
          if (this.options.editMode)
          {
@@ -302,7 +328,7 @@
          this.widgets.publishExternalButton = new YAHOO.widget.Button(this.id + "-publishexternal-button", {type: "button", label: publishExternalButtonLabel });
          this.widgets.publishExternalButton.subscribe("click", this.onFormPublishExternalButtonClick, this, true);         
                   
-         // register the cancel button
+         // cancel button
          this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
@@ -315,8 +341,7 @@
             markup: "xhtml",
             toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-
-         this.widgets.editor.render();
+         this.widgets.editor._render();
          
          // create the form that does the validation/submit
          this.widgets.postForm = new Alfresco.forms.Form(this.id + "-form");
@@ -329,11 +354,7 @@
                fn: this.onFormSubmitSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.onFormSubmitFailure,
-               scope: this
-            }
+            failureMessage: this._msg("post.msg.failedFormSubmit")
          });
          if (this.options.editMode)
          {
@@ -351,7 +372,6 @@
             },
             scope: this
          }
-         
          this.widgets.postForm.init();
          
          // finally display the form
@@ -359,7 +379,10 @@
          Dom.removeClass(containerElem, "hidden");
       },
       
-      onFormPublishButtonClick: function BlogPostEdit_onFormSaveButtonClick(type, args)
+      /**
+       * Publish button click handler
+       */
+      onFormPublishButtonClick: function BlogPostEdit_onFormPublishButtonClick(type, args)
       {
          // make sure we set the draft flag to false
          var draftElem = YAHOO.util.Dom.get(this.id + "-draft");
@@ -369,7 +392,10 @@
          this.widgets.saveButton.fireEvent("click");
       },
       
-      onFormPublishExternalButtonClick: function BlogPostEdit_onFormSaveButtonClick(type, args)
+      /**
+       * Publish external button click handler
+       */
+      onFormPublishExternalButtonClick: function BlogPostEdit_onFormPublishExternalButtonClick(type, args)
       {
          // make sure we set the draft flag to false
          var draftElem = YAHOO.util.Dom.get(this.id + "-draft");
@@ -382,6 +408,18 @@
          this.widgets.saveButton.fireEvent("click");
       },
       
+      /**
+       * Cancel button click handler
+       */
+      onFormCancelButtonClick: function BlogPostEdit_onFormCancelButtonClick(type, args)
+      {
+         // redirect to the page we came from
+         history.go(-1);
+      },
+      
+      /**
+       * Form submit success handler
+       */
       onFormSubmitSuccess: function BlogPostEdit_onFormSubmitSuccess(response)
       {
          if (response.json.error != undefined)
@@ -414,33 +452,34 @@
             this._loadPostViewPage(response.json.item.name);
          }
       },
-      
-      onFormSubmitFailure: function BlogPostEdit_onFormSubmitFailure(response)
+
+      /**
+       * Publishes the blog post to an external blog.
+       */
+      onPublishExternal: function BlogPostEdit_onPublishExternal(postId)
       {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedFormSubmit")});
-      },
-      
-      onFormCancelButtonClick: function(type, args)
-      {
-         // redirect to the page we came from
-         history.go(-1);
-      },
-      
-      _getPublishingUrl: function BlogPostList__getPublishingUrl(postId)
-      {
-         return YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}/publishing",
+         // publish request success handler
+         var me = this;
+         var onPublished = function BlogPostEdit_onPublished(response)
          {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            postId: postId
-         });
-      },
-      
-      onPublishExternal: function Blog_onPublishExternal(postId)
-      {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unablePublishExternal", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.publishedExternal")});
+               me._loadPostViewPage(response.json.item.name);
+            }
+         };
+         
+         // get the url to call
+         var url = Alfresco.util.blog.generatePublishingRestURL(this.options.siteId, this.options.containerId, postId);
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingUrl(postId),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -450,31 +489,40 @@
             },
             successCallback:
             {
-               fn: this._onPublished,
+               fn: onPublished,
                scope: this
             },
             failureMessage: this._msg("post.msg.failedPublishExternal")
          });
       },
       
-      _onPublished: function Blog__onPublished(response)
+      /**
+       * Updates the external published blog post.
+       */
+      onUpdateExternal: function BlogPostEdit_onUpdateExternal(postId)
       {
-         if (response.json.error != undefined)
+         // update request success handler
+         var me = this;
+         var onUpdated = function BlogPostEdit_onUpdated(response)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unablePublishExternal", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.publishedExternal")});
-            this._loadPostViewPage(response.json.item.name);
-         }
-      },
-     
-      onUpdateExternal: function Blog_onUpdateExternal(postId)
-      {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUpdateExternal", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
+               me._loadPostViewPage(response.json.item.name);
+            }
+         };
+         
+         // get the url to call
+         var url = Alfresco.util.blog.generatePublishingRestURL(this.options.siteId, this.options.containerId, postId);
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
-            url: this._getPublishingUrl(postId),
+            url: url,
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -484,26 +532,13 @@
             },
             successCallback:
             {
-               fn: this._onUpdated,
+               fn: onUpdated,
                scope: this
             },
             failureMessage: this._msg("post.msg.failedUpdateExternal")
          });
       },
-
-      _onUpdated: function Blog__onUpdated(response)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableUpdateExternal", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.updatedExternal")});
-            this._loadPostViewPage(response.json.item.name);
-         }
-      },    
-
+      
       
       /**
        * PRIVATE FUNCTIONS
@@ -514,13 +549,7 @@
        */
       _loadPostViewPage: function BlogPostEdit__loadPostViewPage(postId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postview?container={container}&postId={postId}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            postId: postId
-         });
-         window.location = url;
+         window.location = Alfresco.util.blog.generateBlogPostViewUrl(this.options.siteId, this.options.containerId, postId);
       },
 
       /**

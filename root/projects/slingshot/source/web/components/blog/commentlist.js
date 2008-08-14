@@ -17,10 +17,10 @@
        Element = YAHOO.util.Element;
     
    /**
-    * Comment constructor.
+    * CommentList constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.Comment} The new Comment instance
+    * @return {Alfresco.CommentList} The new Comment instance
     * @constructor
     */
    Alfresco.CommentList = function(htmlId)
@@ -50,21 +50,44 @@
        */
       options:
       {
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
          siteId: "",
-         containerId: "",
          
          /**
-          * Information about the node that is commented.
-          * This data needs to be passed in through the setCommetedNode bubble event
+          * ContainerId representing root container
+          *
+          * @property containerId
+          * @type string
+          * @default "blog"
           */
-         itemNodeRef: "",
-         itemTitle: "",
-         itemName: ""
+         containerId: "blog",
+         
+         /**
+          * Node reference of the item to comment about
+          */
+         itemNodeRef: null,
+         
+         /**
+          * Title of the item to comment about.
+          * TODO: This is used for activity feed and should not be necessary here
+          */
+         itemTitle: null,
+         
+         /**
+          * Name of the item to comment about.
+          * TODO: This is used for activity feed and should not be necessary here
+          */
+         itemName: null
       },
       
-      /** Object containing data about the currently edited
+      /**
+       * Object containing data about the currently edited
        * comment.
-       * 
        */
       editData: {
          editDiv : null,
@@ -74,9 +97,8 @@
          widgets : {}
       },
       
-      
       /**
-       * Displayed data.
+       * Comments data
        */
       commentsData: null,
       
@@ -91,13 +113,19 @@
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
       },
-      
+
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       */
       setMessages: function CommentList_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
       },
-       
       
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -119,7 +147,7 @@
       onReady: function CommentList_onReady()
       { 
          var me = this;
-          
+           
          // Hook action events for the comments
          var fnActionHandlerDiv = function CommentList_fnActionHandlerDiv(layer, args)
          {
@@ -161,12 +189,9 @@
          }
       },
     
-    
       /**
-       * Comment list functionality
+       * Forces the comments list to fresh by reloading the data from the server
        */
-     
-    
       refreshComments: function CommentList_onFilterChanged(layer, args)
       {
          if (this.options.itemNodeRef && this.options.itemName && this.options.itemTitle)
@@ -180,11 +205,13 @@
        */
       _loadCommentsList: function CommentList__loadCommentsList()
       {   
-         // request the comment for the node
+         // construct the url to call
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{nodeRef}/comments",
          {
             nodeRef: this.options.itemNodeRef.replace(":/", "")
          });
+         
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -193,24 +220,14 @@
                fn: this.loadCommentsSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.loadCommentsFailed,
-               scope: this
-            }
+            failureMessage: this._msg("message.details.failed")
          });
          
       },
 
-      loadCommentsFailed: function DLD_loadCommentsFailed(response)
-      {
-         // Display success message anyway
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this._msg("message.details.failed")
-         });
-      },
-
+      /**
+       * Load comments ajax request success handler.
+       */
       loadCommentsSuccess: function CommentsList_loadCommentsSuccess(response)
       {
          // make sure any edit data is cleared
@@ -252,17 +269,18 @@
          this.commentsData = comments;
       },
 
-     
       /**
-       * Actions
+       * Edit comment action links handler.
        */
-
       onEditComment: function BlogComment_onEditComment(row)
       {
          var data = this.commentsData[row];
          this._loadForm(row, data);
       },
 
+      /**
+       * Delete comment action links handler.
+       */
       onDeleteComment: function BlogComment_onEditComment(row)
       {
          var data = this.commentsData[row];
@@ -270,12 +288,29 @@
       },
 
 
-      /**
-       *  Action implementations
-       */
+      // Action implementation
       
+      /**
+       * Implementation of the comment deletion action
+       */
       _deleteComment: function BlogComment__deleteComment(row, data)
-      {  
+      {
+         // ajax request success handler
+         var onDeleted = function BlogComment_onDeleted(response, object)
+         {
+            if (response.json.error != undefined)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.unableDeleted", response.json.error)});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.deleted")});
+          
+               // reload the comments list
+               YAHOO.Bubbling.fire("refreshComments", {});
+            }
+         };
+          
          // put together the url displayed in the activity feed
          var browseItemUrl = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postview?container={container}&postId={postId}",
          {
@@ -284,7 +319,7 @@
             postId: this.options.itemName
          });
 
-         // put together the request url to update the comment
+         // put together the request url to delete the comment
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "/api/comment/node/{nodeRef}/?site={site}&container={container}&itemTitle={itemTitle}&browseItemUrl={browseItemUrl}",
          {
             site: this.options.siteId,
@@ -294,6 +329,7 @@
             browseItemurl: browseItemUrl
          });
          
+         // execute ajax request
          Alfresco.util.Ajax.request(
          {
             url: url,
@@ -301,32 +337,19 @@
             responseContentType : "application/json",
             successCallback:
             {
-               fn: this._onDeleted,
+               fn: onDeleted,
                scope: this
             },
             failureMessage: this._msg("comments.msg.failedDeleted")
          });
       },
-      
-      _onDeleted: function BlogComment__onDeleted(response, object)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.unableDeleted", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.deleted")});
-          
-            // reload the comments list
-            YAHOO.Bubbling.fire("refreshComments", {});
-         }
-      },
 
 
       // Form management
 
-      /** Loads and initializes the blog post edit form. */
+      /**
+       * Loads the comment edit form
+       */
       _loadForm: function BlogComment__loadForm(row, data)
       {
          // we always load the template through an ajax request
@@ -346,19 +369,20 @@
                scope: this,
                obj: {formId: formId, row: row, data: data}
             },
-            failureMessage: "Could not load comment edit form",
+            failureMessage: this._msg("comments.msg.failedDeleted"),
             execScripts: true
          });
       },
 
       /**
-       * Event callback when dialog template has been loaded
+       * Event callback when comment form has been loaded
        *
        * @method onFormLoaded
-       * @param response {object} Server response from load template XHR request
+       * @param response {object} Server response from load form XHR request
        */
       onFormLoaded: function BlogComment_onFormLoaded(response, obj)
       {
+         // get the data and formId of the loaded form
          var row = 0;
          row = obj.row;
          var data = obj.data;
@@ -380,7 +404,6 @@
             nodeRef: data.nodeRef.replace(':/', '')
          });
          Dom.get(formId + "-form").setAttribute("action", actionUrl);
-         Dom.get(formId + "-nodeRef").setAttribute("value", data.nodeRef);
          Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
          Dom.get(formId + "-itemTitle").setAttribute("value", this.options.itemTitle);
@@ -396,7 +419,7 @@
          Dom.addClass(viewDiv, "hidden");
          Dom.removeClass(editDiv, "hidden");
 
-         // set the edit data
+         // store the edit data locally
          this.editData = {
            viewDiv: viewDiv,
            editDiv: editDiv,
@@ -430,7 +453,7 @@
              animate: false, //Animates the opening, closing and moving of Editor windows
              toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.editData.widgets.editor.render();
+         this.editData.widgets.editor._render();
          
          // create the form that does the validation/submit
          var commentForm = new Alfresco.forms.Form(formId + "-form");
@@ -444,11 +467,7 @@
                fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureCallback:
-            {
-               fn: this.onEditFormSubmitFailure,
-               scope: this
-            }
+            failureMessage: this._msg("comments.msg.formSubmitFailed")
          });
          commentForm.setSubmitAsJSON(true);
          commentForm.doBeforeFormSubmit =
@@ -460,10 +479,12 @@
               },
               scope: this
          }
-         
          commentForm.init();
       },
       
+      /**
+       * Edit form ajax request success handler
+       */
       onEditFormSubmitSuccess: function BlogComment_onCreateFormSubmitSuccess(response, object)
       {
          if (response.json.error != undefined)
@@ -484,84 +505,22 @@
          }
       },
       
-      onEditFormSubmitFailure: function BlogComment_onCreateFormSubmitFailure(response)
-      {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.formSubmitFailed")});
-      },
-      
-      
-      onEditFormCancelButtonClick: function(type, args)
+      /**
+       * Form cancel button click handler
+       */
+      onEditFormCancelButtonClick: function BlogComment_onEditFormCancelButtonClick(type, args)
       {
           this._hideEditView();
       },
-      
-      /**
-       * Makes sure that all forms get removed and if available the hidden content
-       * elements displayed again.
-       */
-      _hideEditView: function()
-      {
-         if (this.editData.editDiv != null)
-         {
-            // hide edit div and remove form
-            Dom.addClass(this.editData.editDiv, "hidden");
-            this.editData.editDiv.innerHTML = "";
-            this.editData.editDiv = null;
-         }
-         if (this.editData.viewDiv != null)
-         {
-            // display view div
-            Dom.removeClass(this.editData.viewDiv, "hidden");
-            this.editData.viewDiv = null;
-         }
-      },
-      
 
-      /*
-       * Rendering related functions
-       */       
-       
       /**
-       * Returns the display name given a person object
-       * @param person an object with userName, optionally with firstName and lastName.
-       * @return the display name of the person
+       * Renders a comment element.
+       * Each comment element consists of an edit and a view div.
        */
-      _generateUserDisplayName : function BlogPostList_getUserDisplayName(person)
+      renderComment: function BlogComment_renderComment(index, data)
       {
-            var displayName = person.userName;
-            if ((person.firstName != undefined && person.firstName.length > 0) ||
-                (person.lastName != undefined && person.lastName.length > 0))
-            {
-               displayName = '';
-               if (person.firstName != undefined)
-               {
-                  displayName = person.firstName + ' ';
-               }
-               if (person.lastName != undefined)
-               {
-                  displayName += person.lastName;
-               }
-            }
-            return displayName;
-      },
-      
-      _generateUserAvatarImg: function CommentList_generateUserAvatarImg(person)
-      {
-          if (person.avatarRef)
-          {
-             var avatarUrl = Alfresco.constants.PROXY_URI + 'api/node/' + person.avatarRef.replace('://','/') + '/content/thumbnails/avatar?c=queue&amp;ph=true';
-          }
-          else
-          {
-             var avatarUrl = Alfresco.constants.URL_CONTEXT + 'components/images/no-user-photo-64.png'
-          }
-          return '<img src="' + avatarUrl + '" alt="' + person.username + '-avatar-image" />';
-      },
-
-      renderComment: function(index, data)
-      {
-         var html = '';
          // add a div for the comment edit form
+         var html = '';
          html += '<div id="' + this.id + '-comment-edit-' + index + '" class="hidden"></div>';
          
          // output the view
@@ -573,7 +532,10 @@
          return html;
       },
       
-      renderCommentView: function(index, data)
+      /**
+       * Renders the content of the comment view div.
+       */
+      renderCommentView: function BlogComment_renderCommentView(index, data)
       {
          var html = '';
          
@@ -590,10 +552,10 @@
          html += '</div>';
   
          // avatar image
-         html += '<div class="authorPicture">' + this._generateUserAvatarImg(data.author) + '</div>'
+         html += '<div class="authorPicture">' + Alfresco.util.people.generateUserAvatarImg(data.author) + '</div>'
   
          // comment info and content
-         html += '<div class="nodeContent"><div class="userLink">' + this._generateUserDisplayName(data.author);
+         html += '<div class="nodeContent"><div class="userLink">' + Alfresco.util.people.generateUserLink(data.author);
          html += this._msg("comments.said") + ':';
          if (data.isUpdated)
          {
@@ -613,8 +575,11 @@
          return html;
       },
       
+      
+      // mouse over
+      
       /** Called when the mouse enters into a list item. */
-      onCommentElementMouseEntered: function CommentList_onListElementMouseEntered(layer, args)
+      onCommentElementMouseEntered: function CommentList_onCommentElementMouseEntered(layer, args)
       {
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
@@ -623,7 +588,7 @@
       },
       
       /** Called whenever the mouse exits a list item. */
-      onCommentElementMouseExited: function CommentList_onListElementMouseExited(layer, args)
+      onCommentElementMouseExited: function CommentList_onCommentElementMouseExited(layer, args)
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
@@ -637,6 +602,27 @@
        */
 
       /**
+       * Makes sure that all forms get removed and if available the hidden content
+       * elements displayed again.
+       */
+      _hideEditView: function CommentList__hideEditView()
+      {
+         if (this.editData.editDiv != null)
+         {
+            // hide edit div and remove form
+            Dom.addClass(this.editData.editDiv, "hidden");
+            this.editData.editDiv.innerHTML = "";
+            this.editData.editDiv = null;
+         }
+         if (this.editData.viewDiv != null)
+         {
+            // display view div
+            Dom.removeClass(this.editData.viewDiv, "hidden");
+            this.editData.viewDiv = null;
+         }
+      },   
+
+      /**
        * Gets a custom message
        *
        * @method _msg
@@ -644,7 +630,7 @@
        * @return {string} The custom message
        * @private
        */
-      _msg: function CommentList_msg(messageId)
+      _msg: function CommentList__msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.CommentList", Array.prototype.slice.call(arguments).slice(1));
       }

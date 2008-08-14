@@ -1,6 +1,0 @@
-<webscript>
-  <shortname>update-reply</shortname>
-  <description>Updates a reply</description>
-  <url>/modules/blog/comments/update-comment</url>
-  <format default="json"/>
-</webscript>
