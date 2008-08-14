@@ -166,7 +166,7 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler {
 					
 					// Read the remaining data
 					
-					rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen + 4, pkt.getBufferLength() - rxlen);
+					rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen, pkt.getBufferLength() - rxlen);
 					
 					// Update the total received length
 					
