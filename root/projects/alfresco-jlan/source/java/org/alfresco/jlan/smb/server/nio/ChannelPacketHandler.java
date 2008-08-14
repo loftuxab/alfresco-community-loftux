@@ -152,6 +152,14 @@ public abstract class ChannelPacketHandler extends PacketHandler {
 		if ( m_sockChannel != null) {
 			
 			try {
+				
+				// Close the associated socket
+				
+				if ( m_sockChannel.socket() != null)
+					m_sockChannel.socket().close();
+				
+				// Close the channel
+				
 				m_sockChannel.close();
 			}
 			catch (IOException ex) {

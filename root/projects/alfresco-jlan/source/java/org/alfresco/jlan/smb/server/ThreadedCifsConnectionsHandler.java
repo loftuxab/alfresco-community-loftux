@@ -108,6 +108,7 @@ public class ThreadedCifsConnectionsHandler implements CifsConnectionsHandler {
 			// Create the TCP/IP NetBIOS SMB/CIFS session handler(s), and host announcer(s)
 
 			SocketSessionHandler sessHandler = new NetBIOSSessionSocketHandler( srv, config.getSessionPort(), config.getSMBBindAddress(), hasDebug());
+			sessHandler.setSocketTimeout( config.getSocketTimeout());
 			
 			try {
 				
@@ -185,6 +186,7 @@ public class ThreadedCifsConnectionsHandler implements CifsConnectionsHandler {
 			// Create the TCP/IP native SMB session handler(s)
 
 			SocketSessionHandler sessHandler = new TcpipSMBSessionSocketHandler( srv, config.getTcpipSMBPort(), config.getSMBBindAddress(), hasDebug());
+			sessHandler.setSocketTimeout( config.getSocketTimeout());
 
 			try {
 				

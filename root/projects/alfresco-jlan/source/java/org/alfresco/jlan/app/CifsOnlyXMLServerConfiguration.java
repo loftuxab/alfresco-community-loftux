@@ -146,6 +146,10 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 	private static final int MemoryPoolMinimumAllocation	= 5;
 	private static final int MemoryPoolMaximumAllocation    = 500;
 	
+	// Maximum session timeout
+	
+	private static final int MaxSessionTimeout				= 60 * 60;	// 1 hour
+	
 	// Date formatter
 
 	private SimpleDateFormat m_dateFmt = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss");
@@ -936,6 +940,7 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 			boolean platformOK = false;
 
 			if ( elem.hasAttribute("platforms")) {
+				
 				// Get the list of platforms
 
 				String platformsStr = elem.getAttribute("platforms");
@@ -1397,6 +1402,35 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 			cifsConfig.setPrimaryWINSServer(primaryWINS);
 			if ( secondaryWINS != null)
 				cifsConfig.setSecondaryWINSServer(secondaryWINS);
+		}
+		
+		// Check if a session timeout is configured
+		
+		elem = findChildNode("sessionTimeout", host.getChildNodes());
+		if ( elem != null) {
+			
+			// Validate the session timeout value
+
+			String sessTmo = getText( elem);
+			if ( sessTmo != null && sessTmo.length() > 0) {
+				try {
+					
+					// Convert the timeout value to milliseconds
+					
+					int tmo = Integer.parseInt(sessTmo);
+					if ( tmo < 0 || tmo > MaxSessionTimeout)
+						throw new InvalidConfigurationException("Session timeout out of range (0 - " + MaxSessionTimeout + ")");
+					
+					// Convert the session timeout to milliseconds
+					
+					cifsConfig.setSocketTimeout( tmo * 1000);
+				}
+				catch (NumberFormatException ex) {
+					throw new InvalidConfigurationException("Invalid session timeout value, " + sessTmo);
+				}
+			}
+			else
+				throw new InvalidConfigurationException("Session timeout value not specified");
 		}
 	}
 

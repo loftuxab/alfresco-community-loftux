@@ -27,6 +27,7 @@ package org.alfresco.jlan.smb.server.nio.win32;
 
 import java.io.IOException;
 import java.nio.channels.CancelledKeyException;
+import java.nio.channels.SelectionKey;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -84,6 +85,10 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 	
 	private byte[] m_wakeupBuf = new byte[1];
 	
+	// Client socket session timeout
+	
+	private int m_clientSocketTimeout;
+	
 	// shutdown request flag
 	
 	private boolean m_shutdown;
@@ -95,8 +100,9 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 	 * @param srvLANA int
 	 * @param threadPool ThreadRequestPool
 	 * @param maxSess int
+	 * @param sockTmo int
 	 */
-	public AsyncWinsockCIFSRequestHandler( NetBIOSName srvName, int srvLANA, ThreadRequestPool threadPool, int maxSess) {
+	public AsyncWinsockCIFSRequestHandler( NetBIOSName srvName, int srvLANA, ThreadRequestPool threadPool, int maxSess, int sockTmo) {
 		super( maxSess);
 		
 		// File server name and LANA
@@ -107,6 +113,10 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		// Set the thread pool to use for request processing
 		
 		m_threadPool = threadPool;
+		
+		// Set the client socket timeout
+		
+		m_clientSocketTimeout = sockTmo;
 		
 		// Create the session queue
 		
@@ -145,6 +155,24 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		return ( getCurrentSessionCount() + m_sessQueue.numberOfSessions()) < getMaximumSessionCount() ? true : false;
 	}
 
+	/**
+	 * Return the client socket timeout, in milliseconds
+	 * 
+	 * @return int
+	 */
+	public final int getSocketTimeout() {
+		return m_clientSocketTimeout;
+	}
+	
+	/**
+	 * Set the client socket timeout, in milliseconds
+	 * 
+	 * @param tmo int
+	 */
+	public final void setSocketTimeout(int tmo) {
+		m_clientSocketTimeout = tmo;
+	}
+	
 	/**
 	 * Queue a new session to the request handler, wakeup the request handler thread to register it with the
 	 * selector.
@@ -287,6 +315,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 				// Iterate the selected keys
 				
 				Iterator<NetBIOSSelectionKey> keysIter = m_nbSelector.selectedKeys().iterator();
+				long timeNow = System.currentTimeMillis();
 				
 				while ( keysIter.hasNext()) {
 					
@@ -309,6 +338,10 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 							SMBSrvSession sess = (SMBSrvSession) selKey.attachment();
 							reqList.add(  new AsyncWinsockCIFSThreadRequest( sess, selKey, this));
 	
+							// Update the last I/O time for the session
+							
+							sess.setLastIOTime( timeNow);
+							
 							// Remove the selection key from the selected list
 							
 							keysIter.remove();
@@ -558,5 +591,58 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Check for idle sessions
+	 * 
+	 * @return int
+	 */
+	protected final int checkForIdleSessions() {
+		
+		// Check if the request handler has any active sessions
+		
+		int idleCnt = 0;
+		
+		if ( m_nbSelector != null && m_nbSelector.keys().size() > 0) {
+
+			// Time to check
+			
+			long checkTime = System.currentTimeMillis() - (long) m_clientSocketTimeout;
+			
+			// Enumerate the selector keys to get the session list
+			
+			Iterator<Integer> selKeys = m_nbSelector.keys().iterator();
+			
+			while ( selKeys.hasNext()) {
+				
+				// Get the current session via the selection key
+				
+				NetBIOSSelectionKey curKey = m_nbSelector.getSelectionKey( selKeys.next());
+				SMBSrvSession sess = (SMBSrvSession) curKey.attachment();
+				
+				// Check the time of the last I/O request on this session
+				
+				if ( sess.getLastIOTime() < checkTime) {
+					
+					// DEBUG
+					
+					if ( Debug.EnableInfo && hasDebug())
+						Debug.println( "[SMB] Closing idle session, " + sess.getUniqueId());
+					
+					// Close the session
+					
+					sess.closeSession();
+					
+					// Update the idle session count
+					
+					idleCnt++;
+				}
+			}
+		}
+		
+		// Return the count of idle sessions that were queued for removal
+		
+		return idleCnt;
 	}
 }

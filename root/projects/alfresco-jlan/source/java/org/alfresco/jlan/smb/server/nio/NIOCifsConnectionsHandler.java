@@ -30,6 +30,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -88,10 +89,109 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 	
 	private int m_sessId;
 	
+	// Client socket timeout, in milliseconds
+	
+	private int m_clientSocketTimeout;
+	
+	// Idle session reper thread
+	
+	private IdleSessionReaper m_idleSessReaper;
+	
 	// Debug output
 	
 	private boolean m_debug;
 	
+	/**
+	 * Idle Session Reaper Thread Class
+	 * 
+	 * <p>Check for sessions that have no recent I/O requests. The session timeout is configurable.
+	 */
+	protected class IdleSessionReaper implements Runnable {
+	
+		//	Reaper wakeup interval
+		
+		private long m_wakeup;
+		
+		// Reaper thread
+		
+		private Thread m_reaperThread;
+		
+		//	Shutdown request flag
+		
+		private boolean m_shutdown = false;
+		
+		/**
+		 * Class constructor
+		 * 
+		 * @param intvl long
+		 */
+		public IdleSessionReaper(long intvl) {
+			m_wakeup = intvl;
+			
+			// Create a thread for the reaper, and start the thread
+			
+			m_reaperThread = new Thread( this);
+			m_reaperThread.setDaemon( true);
+			m_reaperThread.setName( "CIFS_IdleSessionReaper_NIO");
+			
+			m_reaperThread.start();
+		}
+		
+		/**
+		 * Shutdown the connection reaper
+		 */
+		public final void shutdownRequest() {
+			m_shutdown = true;
+			m_reaperThread.interrupt();
+		}
+		
+		/**
+		 * Connection reaper thread
+		 */
+		public void run() {
+
+			//	Loop forever, or until shutdown
+
+			while ( m_shutdown == false) {
+						
+				//	Sleep for a while
+						
+				try {
+					Thread.sleep(m_wakeup);
+				}
+				catch(InterruptedException ex) {
+				}
+						
+				//	Check if there is a shutdown pending
+						
+				if ( m_shutdown == true)
+					break;
+				
+				// Check for idle sessions in the active CIFS request handlers
+				
+				Enumeration<CIFSRequestHandler> enumHandlers = m_requestHandlers.elements();
+				
+				while ( enumHandlers.hasMoreElements()) {
+					
+					// Get the current request handler and check for idle session
+					
+					CIFSRequestHandler curHandler = enumHandlers.nextElement();
+					if ( curHandler != null) {
+						
+						// Check for idle sessions
+					
+						int idleCnt = curHandler.checkForIdleSessions();
+					
+						// DEBUG
+						
+						if ( idleCnt > 0 && Debug.EnableInfo && hasDebug())
+							Debug.println( "[SMB] Idle session check, removed " + idleCnt + " sessions for " + curHandler.getName());
+					}
+				}
+			}
+		}
+	};
+			
 	/**
 	 * Class constructor
 	 */
@@ -183,10 +283,14 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 		if ( m_handlerList.numberOfHandlers() == 0)
 			throw new InvalidConfigurationException( "No CIFS session handlers enabled");
 		
+		// Set the client socket timeout
+		
+		m_clientSocketTimeout = config.getSocketTimeout();
+		
 		// Create the session request handler list and add the first handler
 
 		m_requestHandlers = new Vector<CIFSRequestHandler>();
-		CIFSRequestHandler reqHandler = new CIFSRequestHandler( m_server.getThreadPool(), SessionSocketsPerHandler, hasDebug());
+		CIFSRequestHandler reqHandler = new CIFSRequestHandler( m_server.getThreadPool(), SessionSocketsPerHandler, m_clientSocketTimeout, hasDebug());
 		reqHandler.setListener( this);
 		
 		m_requestHandlers.add( reqHandler); 
@@ -203,6 +307,11 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 		m_thread.setName( "CIFSConnectionsHandler");
 		m_thread.setDaemon( false);
 		m_thread.start();
+		
+		// Start the idle session reaper thread, if session timeouts are enabled
+		
+		if ( m_clientSocketTimeout > 0)
+			m_idleSessReaper = new IdleSessionReaper( m_clientSocketTimeout / 2);
 	}
 
 	/**
@@ -219,6 +328,11 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 			}
 			catch (Exception ex) {
 			}
+			
+			// Stop the idle session reaper thread, if enabled
+			
+			if ( m_idleSessReaper != null)
+				m_idleSessReaper.shutdownRequest();
 		}
 	}
 	
@@ -425,7 +539,7 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 				
 				// Create a new session request handler and add to the head of the list
 				
-				reqHandler = new CIFSRequestHandler( m_server.getThreadPool(), SessionSocketsPerHandler, hasDebug());
+				reqHandler = new CIFSRequestHandler( m_server.getThreadPool(), SessionSocketsPerHandler, m_clientSocketTimeout, hasDebug());
 				reqHandler.setListener( this);
 				
 				m_requestHandlers.add( 0, reqHandler);

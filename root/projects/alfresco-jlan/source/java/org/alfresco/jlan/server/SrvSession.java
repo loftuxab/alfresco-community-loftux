@@ -98,6 +98,10 @@ public abstract class SrvSession {
 	private ThreadLocal<Object> m_tx;
 	private ThreadLocal<TransactionalFilesystemInterface> m_txInterface;
 
+	// Time of last I/O on this session
+	
+	private long m_lastIO;
+	
 	/**
 	 * Class constructor
 	 * 
@@ -327,6 +331,15 @@ public abstract class SrvSession {
 	}
 
 	/**
+	 * Return the time of the last I/o on this session
+	 * 
+	 * @return long
+	 */
+	public final long getLastIOTime() {
+		return m_lastIO;
+	}
+	
+	/**
 	 * Set the authentication context, used during the initial session setup phase
 	 * 
 	 * @param ctx AuthContext
@@ -416,6 +429,15 @@ public abstract class SrvSession {
 		m_uniqueId = unid;
 	}
 
+	/**
+	 * Set the time of hte last I/O on this session
+	 * 
+	 * @param ioTime long
+	 */
+	public final void setLastIOTime(long ioTime) {
+		m_lastIO = ioTime;
+	}
+	
 	/**
 	 * Set the shutdown flag
 	 * 
