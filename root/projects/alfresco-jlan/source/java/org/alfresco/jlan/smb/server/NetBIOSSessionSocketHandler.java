@@ -69,6 +69,10 @@ public class NetBIOSSessionSocketHandler extends SocketSessionHandler {
 
 		try {
 
+			// Set a socket timeout
+			
+			sock.setSoTimeout( getSocketTimeout());
+			
 			// Create a packet handler for the session
 
 			SMBServer smbServer = (SMBServer) getServer();
@@ -112,11 +116,9 @@ public class NetBIOSSessionSocketHandler extends SocketSessionHandler {
 		// Create the NetBIOS SMB handler
 
 		SocketSessionHandler sessHandler = new NetBIOSSessionSocketHandler( server, cifsConfig.getSessionPort(), cifsConfig.getSMBBindAddress(), sockDbg);
+		sessHandler.setSocketTimeout( cifsConfig.getSocketTimeout());
+		
 		sessHandler.initializeSessionHandler( server);
-
-		// Add the session handler to the list of active handlers
-
-//		server.addSessionHandler(sessHandler);
 
 		// Run the NetBIOS session handler in a seperate thread
 

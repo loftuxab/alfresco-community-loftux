@@ -86,6 +86,7 @@ public class ConfigId {
 	public static final int SMBWin32NBWinsock 	= GroupSMB + 25;
 	public static final int SMBAuthenticator 	= GroupSMB + 26;
 	public static final int SMBDisableNIO		= GroupSMB + 27;
+	public static final int SMBSocketTimeout	= GroupSMB + 28;
 
 	// FTP server variables
 

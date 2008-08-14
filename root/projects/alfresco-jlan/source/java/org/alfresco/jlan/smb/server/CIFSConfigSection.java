@@ -53,6 +53,10 @@ public class CIFSConfigSection extends ConfigSection {
   
   public static final String SectionName = "CIFS";
   
+  // Default client socket timeout
+  
+  public static final int DefSessionTimeout	= 15 * 60 * 1000;	// 15 minutes, milliseconds
+  
   //  Server name
 
   private String m_name;
@@ -144,6 +148,10 @@ public class CIFSConfigSection extends ConfigSection {
   // Disable NIO based code
   
   private boolean m_disableNIO;
+  
+  // Client session socket timeout, in milliseconds
+  
+  private int m_clientSocketTimeout = DefSessionTimeout;
   
   //--------------------------------------------------------------------------------
   //  Win32 NetBIOS configuration
@@ -544,6 +552,15 @@ public class CIFSConfigSection extends ConfigSection {
     return m_tcpSMBPort;
   }
 
+  /**
+   * Return the client socket timeout, in millisconds
+   * 
+   * @return int
+   */
+  public final int getSocketTimeout() {
+	  return m_clientSocketTimeout;
+  }
+  
   /**
    * Set the authenticator to be used to authenticate users and share connections.
    *
@@ -1349,6 +1366,26 @@ public class CIFSConfigSection extends ConfigSection {
 	  return sts;
   }
 
+  /**
+   * et the client socket timeout, in milliseconds
+   * 
+   * @param tmo int
+   * @return int
+   * @exception InvalidConfigurationException 
+   */
+  public final int setSocketTimeout(int tmo)
+  	throws InvalidConfigurationException {
+	        
+	  //  Inform listeners, validate the configuration change
+
+	  int sts = fireConfigurationChange(ConfigId.SMBSocketTimeout, new Integer(tmo));
+	  m_clientSocketTimeout = tmo;
+    
+	  //  Return the change status
+    
+	  return sts;
+  }
+  
   /**
    * Close the configuration section
    */

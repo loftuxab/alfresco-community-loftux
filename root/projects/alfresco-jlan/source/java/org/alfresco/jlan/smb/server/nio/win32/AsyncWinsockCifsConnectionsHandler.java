@@ -26,6 +26,7 @@
 package org.alfresco.jlan.smb.server.nio.win32;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -100,10 +101,109 @@ public class AsyncWinsockCifsConnectionsHandler implements CifsConnectionsHandle
 	
 	private int m_sessId;
 	
+	// Client socket timeout, in milliseconds
+	
+	private int m_clientSocketTimeout;
+	
+	// Idle session reper thread
+	
+	private IdleSessionReaper m_idleSessReaper;
+	
 	// Debug output
 	
 	private boolean m_debug;
 	
+	/**
+	 * Idle Session Reaper Thread Class
+	 * 
+	 * <p>Check for sessions that have no recent I/O requests. The session timeout is configurable.
+	 */
+	protected class IdleSessionReaper implements Runnable {
+	
+		//	Reaper wakeup interval
+		
+		private long m_wakeup;
+		
+		// Reaper thread
+		
+		private Thread m_reaperThread;
+		
+		//	Shutdown request flag
+		
+		private boolean m_shutdown = false;
+		
+		/**
+		 * Class constructor
+		 * 
+		 * @param intvl long
+		 */
+		public IdleSessionReaper(long intvl) {
+			m_wakeup = intvl;
+			
+			// Create a thread for the reaper, and start the thread
+			
+			m_reaperThread = new Thread( this);
+			m_reaperThread.setDaemon( true);
+			m_reaperThread.setName( "CIFS_IdleSessionReaper_Winsock");
+			
+			m_reaperThread.start();
+		}
+		
+		/**
+		 * Shutdown the connection reaper
+		 */
+		public final void shutdownRequest() {
+			m_shutdown = true;
+			m_reaperThread.interrupt();
+		}
+		
+		/**
+		 * Connection reaper thread
+		 */
+		public void run() {
+
+			//	Loop forever, or until shutdown
+
+			while ( m_shutdown == false) {
+						
+				//	Sleep for a while
+						
+				try {
+					Thread.sleep(m_wakeup);
+				}
+				catch(InterruptedException ex) {
+				}
+						
+				//	Check if there is a shutdown pending
+						
+				if ( m_shutdown == true)
+					break;
+				
+				// Check for idle sessions in the active CIFS request handlers
+				
+				Enumeration<AsyncWinsockCIFSRequestHandler> enumHandlers = m_requestHandlers.elements();
+				
+				while ( enumHandlers.hasMoreElements()) {
+					
+					// Get the current request handler and check for idle session
+					
+					AsyncWinsockCIFSRequestHandler curHandler = enumHandlers.nextElement();
+					if ( curHandler != null) {
+						
+						// Check for idle sessions
+					
+						int idleCnt = curHandler.checkForIdleSessions();
+					
+						// DEBUG
+						
+						if ( idleCnt > 0 && Debug.EnableInfo && hasDebug())
+							Debug.println( "[SMB] Idle session check, removed " + idleCnt + " sessions for " + curHandler.getName());
+					}
+				}
+			}
+		}
+	};
+			
 	/**
 	 * Class constructor
 	 */
@@ -206,11 +306,15 @@ public class AsyncWinsockCifsConnectionsHandler implements CifsConnectionsHandle
 		if ( m_handlerList.numberOfHandlers() == 0)
 			throw new InvalidConfigurationException( "No CIFS session handlers enabled");
 		
+		// Set the client socket timeout
+		
+		m_clientSocketTimeout = config.getSocketTimeout();
+		
 		// Create the session request handler list and add the first handler
 
 		m_requestHandlers = new Vector<AsyncWinsockCIFSRequestHandler>();
 		
-		AsyncWinsockCIFSRequestHandler reqHandler = new AsyncWinsockCIFSRequestHandler( m_srvNbName, m_srvLANA, m_server.getThreadPool(), SessionSocketsPerHandler);
+		AsyncWinsockCIFSRequestHandler reqHandler = new AsyncWinsockCIFSRequestHandler( m_srvNbName, m_srvLANA, m_server.getThreadPool(), SessionSocketsPerHandler, m_clientSocketTimeout);
 		reqHandler.setListener( this);
 		reqHandler.setDebug( hasDebug());
 		
@@ -228,6 +332,11 @@ public class AsyncWinsockCifsConnectionsHandler implements CifsConnectionsHandle
 		m_thread.setName( "WinsockCIFSConnectionsHandler");
 		m_thread.setDaemon( false);
 		m_thread.start();
+		
+		// Start the idle session reaper thread, if session timeouts are enabled
+		
+		if ( m_clientSocketTimeout > 0)
+			m_idleSessReaper = new IdleSessionReaper( m_clientSocketTimeout / 2);
 	}
 
 	/**
@@ -243,6 +352,11 @@ public class AsyncWinsockCifsConnectionsHandler implements CifsConnectionsHandle
 			
 			m_shutdown = true;
 
+			// Stop the idle session reaper thread, if enabled
+			
+			if ( m_idleSessReaper != null)
+				m_idleSessReaper.shutdownRequest();
+			
 			// Close the first session handler socket to wakeup the listener thread
 
 			if ( m_handlerList.numberOfHandlers() > 0) {
@@ -492,7 +606,7 @@ public class AsyncWinsockCifsConnectionsHandler implements CifsConnectionsHandle
 			
 			// Create a new session request handler and add to the head of the list
 			
-			reqHandler = new AsyncWinsockCIFSRequestHandler( m_srvNbName, m_srvLANA, m_server.getThreadPool(), SessionSocketsPerHandler);
+			reqHandler = new AsyncWinsockCIFSRequestHandler( m_srvNbName, m_srvLANA, m_server.getThreadPool(), SessionSocketsPerHandler, m_clientSocketTimeout);
 			reqHandler.setListener( this);
 			reqHandler.setDebug( hasDebug());
 			

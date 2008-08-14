@@ -48,6 +48,10 @@ public abstract class SocketSessionHandler extends SessionHandlerBase implements
 
 	private ServerSocket m_srvSock;
 
+	// Client socket read timeout
+	
+	private int m_clientSockTmo;
+	
 	/**
 	 * Class constructor
 	 * 
@@ -68,6 +72,24 @@ public abstract class SocketSessionHandler extends SessionHandlerBase implements
 	 */
 	public final ServerSocket getSocket() {
 		return m_srvSock;
+	}
+
+	/**
+	 * Return the client socket timeout, in milliseconds
+	 * 
+	 * @return int
+	 */
+	public final int getSocketTimeout() {
+		return m_clientSockTmo;
+	}
+
+	/**
+	 * Set the client socket timeout, in milliseconds, zero for no timeout
+	 * 
+	 * @param tmo int
+	 */
+	public final void setSocketTimeout(int tmo) {
+		m_clientSockTmo = tmo;
 	}
 	
 	/**

@@ -28,6 +28,7 @@ package org.alfresco.jlan.smb.server;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -596,6 +597,15 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 		return getSMBServer().getServerName();
 	}
 
+	/**
+	 * Return the session state
+	 * 
+	 * @return int
+	 */
+	public final int getState() {
+		return m_state;
+	}
+	
 	/**
 	 * Hangup the session.
 	 * 
@@ -1217,6 +1227,21 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	
 					smbPkt = m_pktHandler.readPacket();
 				}
+				catch (SocketTimeoutException ex) {
+					
+					// Debug
+
+					if ( Debug.EnableInfo && hasDebug(SMBSrvSession.DBG_SOCKET))
+						debugPrintln("Socket read timed out, closing session");
+					
+					// Socket read timed out
+					
+					hangupSession("Socket read timeout");
+					
+					// Clear the request packet
+					
+					smbPkt = null;
+				}
 				catch (IOException ex) {
 					
 					// Check if there is no more data, the other side has dropped the connection
@@ -1267,6 +1292,11 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 				getThreadPool().queueRequest( new CIFSThreadRequest( this, smbPkt));
 				smbPkt = null;
 			}
+			
+			// Cleanup the session, then close the session/socket
+			
+			cleanupSession();
+			closeSession();
 		}
 		catch (Exception ex) {
 
