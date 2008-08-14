@@ -6,6 +6,15 @@
 	});
 //]]></script>
 <div class="yui-g wikipage-bar">
+<div class="wikipage-header">
+	<div class="back-nav">
+		<span class="backLink">
+			<a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">
+				${msg("header.back")}
+			</a>
+		</span>
+	</div>
+</div>
     <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">
       ${page.url.args["title"]?replace("_", " ")}
     </div>
@@ -62,8 +71,8 @@
                <@taglibraryLib.renderTagLibrary htmlid=args.htmlid site=page.url.templateArgs.site tags=tags />
                <!-- end tags -->
 			      <div>
-	               <input type="submit" id="${args.htmlid}-save-button" value="Save" />
-				      <input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
+	               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
+				      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
 	            </div>
 	            </form>
 			</div> 
@@ -72,12 +81,14 @@
 			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%">
 			<div class="yui-g" style="background: #CCC;">
 			   <div class="yui-u first"><h2>${result.title!""}</h2></div>
-			   <div class="yui-u align-right">
-			   <select id="${args.htmlid}-selectVersion">
-			   <#list result.versionhistory as version>
-			      <option value="${version.versionId}">${version.version} <#if version_index = 0>(Latest)</#if></option>
-			   </#list>
-			   </select>
+			   <div class="yui-u">
+			      <div style="float:right">
+			      <select id="${args.htmlid}-selectVersion">
+			      <#list result.versionhistory as version>
+			         <option value="${version.versionId}">${version.version} <#if version_index = 0>(Latest)</#if></option>
+			      </#list>
+			      </select>
+			      </div>
 			   </div>
 			</div>
 			<div id="#page">
@@ -86,23 +97,23 @@
 			</div>
 			<div id="${args.htmlid}-pagecontent" style="display:none;"><#if result.pagetext??>${result.pagetext}</#if></div>		
 			</div>
-			 <div style="display:none; margin-bottom: 5px;" id="${args.htmlid}-revertPanel"><button id="${args.htmlid}-revert-button">Revert</button></div>
+			 <div style="display:none; margin-bottom: 5px;" id="${args.htmlid}-revertPanel"><button id="${args.htmlid}-revert-button">${msg("button.revert")}</button></div>
 			<div class="yui-gb">
 			   <div class="yui-u first">
-			      <div class="columnHeader">Version History</div>
+			      <div class="columnHeader">${msg("label.versionHistory")}</div>
 			      <#if result.versionhistory??>
 			      <#list result.versionhistory as version>
 			      <table class="versionHistory">
 			         <tr><td colspan="2" class="pageTitle">${version.name}</td></tr>
-			         <tr><td class="attributeLabel">Version:</td><td class="attribute">${version.version}</td></tr>
-			         <tr><td class="attributeLabel">Modifier:</td><td class="attribute">${version.author}</td></tr>
-			         <tr><td class="attributeLabel">Modified on:</td><td class="attribute">${version.date}</td></tr>
+			         <tr><td class="attributeLabel">${msg("label.version")}:</td><td class="attribute">${version.version}</td></tr>
+			         <tr><td class="attributeLabel">${msg("label.modifier")}:</td><td class="attribute">${version.author}</td></tr>
+			         <tr><td class="attributeLabel">${msg("label.modifiedOn")}:</td><td class="attribute">${version.date}</td></tr>
 			      </table>
 			      </#list>
 			      </#if>
 			   </div>
 			   <div class="yui-u">
-			      <div class="columnHeader">Tags</div>
+			      <div class="columnHeader">${msg("label.tags")}</div>
 			      <#if result.tags??>
 			         <#list result.tags as tag>
 			            <div><span class="tagDetails">${tag}</span></div>
@@ -110,7 +121,7 @@
 			      </#if>
 			   </div>
 			   <div class="yui-u">
-			      <div class="columnHeader">Linked Pages</div>
+			      <div class="columnHeader">${msg("label.linkedPages")}</div>
 			      <#if result.links??>
 			         <#list result.links as link>
 			            <div><span><a href="${page.url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${link?replace(" ", "_")}">${link}</a></span></div>

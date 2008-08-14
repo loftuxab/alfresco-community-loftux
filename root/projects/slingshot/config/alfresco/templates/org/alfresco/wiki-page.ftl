@@ -10,19 +10,9 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-	<div class="yui-t1">
-   	<div id="yui-main">
-		   <div class="yui-b">
-		      <@region id="toolbar" scope="template" protected=true />
-		      <@region id="wikipage" scope="template" protected=true />
-   	   </div>
-   	</div>   
-   	<div class="yui-b">
-   	   <@region id="filter" scope="template" protected=true />
-   		<@region id="tags" scope="template" protected=true />
-   	</div>
+	   <@region id="toolbar" scope="template" protected=true />
+		<@region id="wikipage" scope="template" protected=true />
  	</div>
-	</div>
 </@>
 
 <@template.footer>
