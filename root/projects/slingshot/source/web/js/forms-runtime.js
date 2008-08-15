@@ -109,11 +109,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       errorContainer: null,
       
       /**
-       * Object holding the callback handlers and messages for pre-submission callback.
-       * The callback handlers are themselves an object of the form:
-       *   fn: function, // The handler to call when the event fires.
-       *   obj: object, // An object to pass back to the handler.
-       *   scope: object // The object to use for the scope of the handler.
+       * Object literal containing the abstract function for pre-submission form processing.
+       *   fn: function, // The override function.
+       *   obj: object, // An object to pass back to the function.
+       *   scope: object // The object to use for the scope of the function.
        * 
        * @property doBeforeFormSubmit
        * @type object
@@ -121,6 +120,26 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       doBeforeFormSubmit:
       {
          fn: function(form, obj){},
+         obj: null,
+         scope: this
+      },
+      
+      /**
+       * Object literal containing the abstract function for intercepting AJAX form submission.
+       * Returning false from the override will prevent the Forms Runtime from submitting the data.
+       *   fn: function, // The override function.
+       *   obj: object, // An object to pass back to the function.
+       *   scope: object // The object to use for the scope of the function.
+       * 
+       * @property doBeforeAjaxRequest
+       * @type object
+       */
+      doBeforeAjaxRequest:
+      {
+         fn: function(form, obj)
+         {
+            return true;
+         },
          obj: null,
          scope: this
       },
@@ -192,8 +211,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                var fnStopEvent = function(id, keyEvent)
                {
                   var event = keyEvent[1];
-                  var target = event.target;
-                  if (target.tagName.toLowerCase() == "input")
+                  var targetName = event.target.name;
+                  if (targetName && (targetName != "-"))
                   {
                      me._submitInvoked(event);
                      form.attributes.action.nodeValue = "";
@@ -727,12 +746,22 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   {
                      var jsonData = this._buildAjaxForSubmit(form);
                      
-                     if (Alfresco.logger.isDebugEnabled())
-                        Alfresco.logger.debug("Submitting JSON data: ", jsonData);
-                     
                      // set up specific config
                      config.dataObj = jsonData;
-                     Alfresco.util.Ajax.jsonRequest(config);
+                     
+                     // call the pre-request function, passing the config object for last-chance processing
+                     if (this.doBeforeAjaxRequest.fn.call(this.doBeforeAjaxRequest.scope, config, this.doBeforeAjaxRequest.obj))
+                     {
+                        if (Alfresco.logger.isDebugEnabled())
+                           Alfresco.logger.debug("Submitting JSON data: ", jsonData);
+
+                        Alfresco.util.Ajax.jsonRequest(config);
+                     }
+                     else
+                     {
+                        if (Alfresco.logger.isDebugEnabled())
+                           Alfresco.logger.debug("JSON data request cancelled in doBeforeAjaxRequest()");
+                     }
                   }
                   else
                   {
