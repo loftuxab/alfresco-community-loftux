@@ -613,6 +613,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 			// Enumerate the selector keys to get the session list
 			
 			Iterator<Integer> selKeys = m_nbSelector.keys().iterator();
+			Vector<SMBSrvSession> idleSessList = null;
 			
 			while ( selKeys.hasNext()) {
 				
@@ -624,6 +625,26 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 				// Check the time of the last I/O request on this session
 				
 				if ( sess != null && sess.getLastIOTime() < checkTime) {
+					
+					// Add to the list of idle sessions
+					
+					if ( idleSessList == null)
+						idleSessList = new Vector<SMBSrvSession>();
+					idleSessList.add( sess);
+				}
+			}
+			
+			// Close any sessions that are on the idle list
+			
+			if ( idleSessList != null) {
+				
+				// Close the idle sessions
+				
+				for ( int i = 0; i < idleSessList.size(); i++) {
+
+					// Get the current idle session
+					
+					SMBSrvSession sess = idleSessList.get( i);
 					
 					// DEBUG
 					
