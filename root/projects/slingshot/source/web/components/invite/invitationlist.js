@@ -197,10 +197,10 @@
          renderCellDescription = function InvitationList_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // we currently render all results the same way
-            var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName")
+            var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName");
             var email = oRecord.getData("email");
             var desc = "";
-            desc = '<h3 class="itemname">' + Alfresco.util.encodeHTML(name) + '</a></h3>';
+            desc = '<h3 class="itemname">' + Alfresco.util.encodeHTML(name) + '</h3>';
             desc += '<div class="detail">';
             desc += Alfresco.util.encodeHTML(email);
             desc += '</div>';

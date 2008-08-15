@@ -19,12 +19,25 @@
 }
 .people-finder .results table td
 {
-   border: none;
+   border-right: medium none;
+   border-top: 1px solid #f0f0f0;
 }
 .people-finder .results table .yui-dt-empty
 {
    background-color: transparent;
 }
+
+.people-finder tr.yui-dt-odd
+{
+   background-color: #ffffff;
+}
+.people-finder tr.yui-dt-odd.yui-dt-highlighted,
+.people-finder tr.yui-dt-even.yui-dt-highlighted
+{
+   background-color: #e8f6ff;
+   cursor: auto;
+}
+
 
 /**
  * If an element with "position: relative;" is used inside
@@ -71,16 +84,44 @@
    padding: 0.3em 1em 0.5em 0.5em;
 }
 
-.people-finder .search-button
+.people-finder .search-button button
 {
-   visibility: hidden;
+   padding-left: 2.5em; 
+   background: url(../images/search-16.png) no-repeat 10% 50%;
 }
 
 .people-finder .results
 {
    background-color: #f6f9fc;
-   height: 300px;
    overflow-x: hidden;
    overflow-y: auto;
    position: relative !important;
 }
+
+
+/* Compact Mode */
+.people-finder.compact div.title
+{
+   display: none;
+}
+
+.people-finder.compact .search-text input
+{
+   width: 14em;
+}
+
+.people-finder.compact .results
+{
+   height: 160px;
+}
+
+.people-finder.compact img.avatar
+{
+   width: 32px;
+}
+
+.people-finder.compact div.detail
+{
+   display: inline;
+}
+
