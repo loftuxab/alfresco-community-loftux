@@ -304,14 +304,14 @@
             var html = '';
             // begin actions
             html += '<div class="nodeEdit">';
-            html += '<' + tagName + ' class="onViewTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("topic.action.view") + '</a></' + tagName + '>';   
+            html += '<' + tagName + ' class="onViewTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("action.view") + '</a></' + tagName + '>';   
             /*if (data.permissions.edit)
             {
-               html += '<' + tagName + ' class="onEditTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("topic.action.edit") + '</a></' + tagName + '>';
+               html += '<' + tagName + ' class="onEditTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
             }*/
             if (data.permissions['delete'])
             {
-               html += '<' + tagName + ' class="onDeleteTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("topic.action.delete") + '</a></' + tagName + '>';
+               html += '<' + tagName + ' class="onDeleteTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("action.delete") + '</a></' + tagName + '>';
             }
             html += '</div>';
             return html;
@@ -353,32 +353,32 @@
                html += '<span class="nodeTitle"><a href="' + topicViewUrl + '">' + $html(data.title) + '</a> ';
                if (data.isUpdated)
                {
-                  html += '<span class="nodeStatus">(' + me._msg("topic.updated") + ')</span>';
+                  html += '<span class="nodeStatus">(' + me._msg("post.updated") + ')</span>';
                }
                html += '</span>';
                html += '<div class="published">';
-               html += '<span class="nodeAttrLabel">' + me._msg("topic.info.createdOn") + ': </span>';
+               html += '<span class="nodeAttrLabel">' + me._msg("post.createdOn") + ': </span>';
                html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
                html += '<span class="spacer"> | </span>';
-               html += '<span class="nodeAttrLabel">' + me._msg("topic.info.author") + ': </span>';
+               html += '<span class="nodeAttrLabel">' + me._msg("post.author") + ': </span>';
                html += '<span class="nodeAttrValue">' + authorLink + '</span>';
                html += '<br />';
                if (data.lastReplyBy)
                {
-                  html += '<span class="nodeAttrLabel">' + me._msg("topic.info.lastReplyBy") + ': </span>';
+                  html += '<span class="nodeAttrLabel">' + me._msg("post.lastReplyBy") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.lastReplyBy) + '</span>';                  
                   html += '<span class="spacer"> | </span>';
-                  html += '<span class="nodeAttrLabel">' + me._msg("topic.info.lastReplyOn") + ': </span>';
+                  html += '<span class="nodeAttrLabel">' + me._msg("post.lastReplyOn") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.lastReplyOn) + '</span>';
                }
                else
                {
-                  html += '<span class="nodeAttrLabel">' + me._msg("topic.footer.replies") + ': </span>';
-                  html += '<span class="nodeAttrValue">' + me._msg("topic.info.noReplies") + '</span>';                  
+                  html += '<span class="nodeAttrLabel">' + me._msg("replies.label") + ': </span>';
+                  html += '<span class="nodeAttrValue">' + me._msg("replies.noReplies") + '</span>';                  
                }
                html += '</div>';
                
-               html += '<div class="userLink">' + authorLink + ' ' + me._msg("topic.said") + ':</div>';
+               html += '<div class="userLink">' + authorLink + ' ' + me._msg("said") + ':</div>';
                html += '<div class="content yuieditor"></div>';
                html += '</div>'
                // end view
@@ -387,14 +387,14 @@
 
                // begin footer
                html += '<div class="nodeFooter">';
-               html += '<span class="nodeAttrLabel replyTo">' + me._msg("topic.footer.replies") + ': </span>';
+               html += '<span class="nodeAttrLabel replyTo">' + me._msg("replies.label") + ': </span>';
                html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
                html += '<span class="spacer"> | </span>';
                
-               html += '<span class="nodeAttrValue"><a href="' + topicViewUrl + '">' + me._msg("topic.footer.read") + '</a></span>';
+               html += '<span class="nodeAttrValue"><a href="' + topicViewUrl + '">' + me._msg("action.read") + '</a></span>';
                html += '<span class="spacer"> | </span>';
                
-               html += '<span class="nodeAttrLabel tag">' + me._msg("topic.tags") +': </span>';
+               html += '<span class="nodeAttrLabel tag">' + me._msg("tags.label") +': </span>';
                if (data.tags.length > 0)
                {
                   for (var x=0; x < data.tags.length; x++)
@@ -408,7 +408,7 @@
                }
                else
                {
-                  html += '<span class="nodeAttrValue">' + me._msg("topic.noTags") + '</span>';
+                  html += '<span class="nodeAttrValue">' + me._msg("tags.noTags") + '</span>';
                }
                html += '</div></div>';
                // end
@@ -427,7 +427,7 @@
                html += '<span class="nodeTitle"><a href="' + topicViewUrl + '">' + $html(data.title) + '</a> ';
                if (data.isUpdated)
                {
-                  html += '<span class="nodeStatus">(' + me._msg("topic.updated") + ')</span>';
+                  html += '<span class="nodeStatus">(' + me._msg("post.updated") + ')</span>';
                }
                html += '</div>';
                html += '</div>';
@@ -633,17 +633,8 @@
          // ajax request success handler
          var onDeleted = function DiscussionsTopicList__deleteTopic_onDeleted(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.unableDelete", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.deleted")});
-               
-               // reload the table
-               this._updateDiscussionsTopicList();
-            }
+            // reload the table
+            this._updateDiscussionsTopicList();
          };
           
          // construct the url to call
@@ -660,12 +651,13 @@
             url: url,
             method: "DELETE",
             responseContentType : "application/json",
+            successMessage: this._msg("message.delete.success"),
             successCallback:
             {
                fn: onDeleted,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedDelete")
+            failureMessage: this._msg("message.delete.failure")
          });
       },
       
@@ -745,7 +737,7 @@
       updateListTitle: function DiscussionsTopicList_updateListTitle()
       {
          var elem = Dom.get(this.id + '-listtitle');
-         var title = "<unknown filter>";
+         var title = this._msg("title.generic");
 
          var filterOwner = this.currentFilter.filterOwner;
          var filterId = this.currentFilter.filterId;
@@ -754,24 +746,24 @@
          {
             if (filterId == "new")
             {
-                title = this._msg("topiclist.title.newtopics");
+                title = this._msg("title.newtopics");
             }
             if (filterId == "hot")
             {
-               title = this._msg("topiclist.title.hottopics");
+               title = this._msg("title.hottopics");
             }
             else if (filterId == "all")
             {
-               title = this._msg("topiclist.title.alltopics");
+               title = this._msg("title.alltopics");
             }
             else if (filterId == "mine")
             {
-               title = this._msg("topiclist.title.mytopics");
+               title = this._msg("title.mytopics");
             }
          }
          else if (filterOwner == "Alfresco.TopicListTags")
          {
-            title = this._msg("topiclist.title.bytag", $html(filterData));
+            title = this._msg("title.bytag", $html(filterData));
          }
          
          elem.innerHTML = title;
@@ -891,6 +883,9 @@
             params = YAHOO.lang.merge(params, p_obj);
          }
 
+         // add the pageSize param
+         params.startIndex = (params.page-1) * params.pageSize;
+
          // check what url to call and with what parameters
          var filterOwner = this.currentFilter.filterOwner;
          var filterId = this.currentFilter.filterId;
@@ -923,21 +918,17 @@
             params.tag = filterData;
          }
          
-         // build the url
+         // build the url extension
          var urlExt = "";
          for (paramName in params)
          {
-            if (params[paramName] === null)
-            {
-               continue;
-            }
-            urlExt += "&" + paramName;
-            urlExt += "=";
-            urlExt += encodeURIComponent(params[paramName]);
+            urlExt += "&" + paramName + "=" + encodeURIComponent(params[paramName]);
          }
-         urlExt += "&startIndex=" + (params.page-1) * params.pageSize;
-
-         return url + "?" + urlExt.substring(1);
+         if (urlExt.length > 0)
+         {
+            urlExt = urlExt.substring(1);
+         }
+         return url + "?" + urlExt;
       }
    };
 })();

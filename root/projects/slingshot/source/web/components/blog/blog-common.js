@@ -73,25 +73,25 @@ Alfresco.util.blog.generatePostStatusLabel = function generatePostStatusLabel(me
 {
    if (data.isDraft)
    {
-      return "(" + me._msg("post.draft") + ")";
+      return "(" + me._msg("status.draft") + ")";
    }
    else if (data.isUpdated || data.isPublished)
    {
       var status = '';
       if (data.isUpdated)
       {
-         status += "(" + me._msg("post.updated") + ") ";
+         status += "(" + me._msg("status.updated") + ") ";
       }
 
       if (data.isPublished)
       {                  
          if (data.outOfDate)
          {
-            return status + "(" + me._msg("post.published.outofsync") + ")";
+            return status + "(" + me._msg("status.published.outofsync") + ")";
          }
          else
          {
-            return status + "(" + me._msg("post.published") + ")";
+            return status + "(" + me._msg("status.published") + ")";
          }
       }
       else
@@ -120,7 +120,7 @@ Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me
    desc += '<div class="nodeEdit">';
    if (data.permissions.edit)
    {
-      desc += '<' + tagName + ' class="onEditBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("post.action.edit") + '</a></' + tagName + '>';
+      desc += '<' + tagName + ' class="onEditBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
    }
    if (data.permissions.publishExt && ! data.isDraft)
    {
@@ -128,18 +128,18 @@ Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me
       {
          if (data.outOfDate)
          {
-            desc += '<' + tagName + ' class="onUpdateExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("post.action.updateexternal") + '</a></' + tagName + '>';
+            desc += '<' + tagName + ' class="onUpdateExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.updateexternal") + '</a></' + tagName + '>';
          }
-         desc += '<' + tagName + ' class="onUnpublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("post.action.unpublishexternal") + '</a></' + tagName + '>';
+         desc += '<' + tagName + ' class="onUnpublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.unpublishexternal") + '</a></' + tagName + '>';
       }
       else
       {
-         desc += '<' + tagName + ' class="onPublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("post.action.publishexternal") + '</a></' + tagName + '>';
+         desc += '<' + tagName + ' class="onPublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.publishexternal") + '</a></' + tagName + '>';
       }
    }
    if (data.permissions['delete'])
    {
-      desc += '<' + tagName + ' class="onDeleteBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("post.action.delete") + '</a></' + tagName + '>';
+      desc += '<' + tagName + ' class="onDeleteBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.delete") + '</a></' + tagName + '>';
    }
    desc += '</div>';
    return desc;

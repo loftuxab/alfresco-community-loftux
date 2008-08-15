@@ -220,7 +220,7 @@
                fn: this.loadCommentsSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.details.failed")
+            failureMessage: this._msg("message.loadComments.failure")
          });
          
       },
@@ -297,18 +297,9 @@
       {
          // ajax request success handler
          var onDeleted = function BlogComment_onDeleted(response, object)
-         {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.unableDeleted", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.deleted")});
-          
-               // reload the comments list
-               YAHOO.Bubbling.fire("refreshComments", {});
-            }
+         {          
+            // reload the comments list
+            YAHOO.Bubbling.fire("refreshComments", {});
          };
           
          // put together the url displayed in the activity feed
@@ -335,12 +326,13 @@
             url: url,
             method: "DELETE",
             responseContentType : "application/json",
+            successMessage: this._msg("message.delete.success"),
             successCallback:
             {
                fn: onDeleted,
                scope: this
             },
-            failureMessage: this._msg("comments.msg.failedDeleted")
+            failureMessage: this._msg("message.delete.failure")
          });
       },
 
@@ -369,7 +361,7 @@
                scope: this,
                obj: {formId: formId, row: row, data: data}
             },
-            failureMessage: this._msg("comments.msg.failedDeleted"),
+            failureMessage: this._msg("message.loadeditform.failure"),
             execScripts: true
          });
       },
@@ -421,11 +413,11 @@
 
          // store the edit data locally
          this.editData = {
-           viewDiv: viewDiv,
-           editDiv: editDiv,
-           row: row,
-           widgets : {},
-           formId: formId
+            viewDiv: viewDiv,
+            editDiv: editDiv,
+            row: row,
+            widgets : {},
+            formId: formId
          }
              
          // and finally register the form handling
@@ -447,11 +439,11 @@
          
          // instantiate the simple editor we use for the form
          this.editData.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content', {
-             height: '180px',
-             width: '700px',
-             dompath: false, //Turns on the bar at the bottom
-             animate: false, //Animates the opening, closing and moving of Editor windows
-             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
+            height: '180px',
+            width: '700px',
+            dompath: false, //Turns on the bar at the bottom
+            animate: false, //Animates the opening, closing and moving of Editor windows
+            toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
          this.editData.widgets.editor._render();
          
@@ -462,22 +454,23 @@
          commentForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          commentForm.setAJAXSubmit(true,
          {
+            successMessage: this._msg("message.savecomment.success"),
             successCallback:
             {
                fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("comments.msg.formSubmitFailed")
+            failureMessage: this._msg("message.savecomment.failure")
          });
          commentForm.setSubmitAsJSON(true);
          commentForm.doBeforeFormSubmit =
          {
-              fn: function(form, obj)
-              {
-                //Put the HTML back into the text area
-                this.editData.widgets.editor.saveHTML();
-              },
-              scope: this
+            fn: function(form, obj)
+            {
+               //Put the HTML back into the text area
+               this.editData.widgets.editor.saveHTML();
+            },
+            scope: this
          }
          commentForm.init();
       },
@@ -487,22 +480,14 @@
        */
       onEditFormSubmitSuccess: function BlogComment_onCreateFormSubmitSuccess(response, object)
       {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.submitErrorReturn", response.json.error)});
-         }
-         else
-         {
-            // the response contains the new data for the comment. Render the comment html
-            // and insert it into the view element
-            this.commentsData[this.editData.row] = response.json.item;
-            var html = this.renderCommentView(this.editData.row, response.json.item);
-            this.editData.viewDiv.innerHTML = html;
+         // the response contains the new data for the comment. Render the comment html
+         // and insert it into the view element
+         this.commentsData[this.editData.row] = response.json.item;
+         var html = this.renderCommentView(this.editData.row, response.json.item);
+         this.editData.viewDiv.innerHTML = html;
             
-            // hide the form and display an information message
-            this._hideEditView();  
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentUpdated")});
-         }
+         // hide the form and display an information message
+         this._hideEditView();
       },
       
       /**
@@ -543,11 +528,11 @@
          html += '<div class="nodeEdit">'
          if (data.permissions.edit)
          {
-            html += '<div class="onEditComment"><a href="#" class="blogcomment-action">' + this._msg("comments.action.edit") + '</a></div>';
+            html += '<div class="onEditComment"><a href="#" class="blogcomment-action">' + this._msg("action.edit") + '</a></div>';
          }
          if (data.permissions["delete"])
          {
-            html += '<div class="onDeleteComment"><a href="#" class="blogcomment-action">' + this._msg("comments.action.delete") + '</a></div>';
+            html += '<div class="onDeleteComment"><a href="#" class="blogcomment-action">' + this._msg("action.delete") + '</a></div>';
          }
          html += '</div>';
   
@@ -556,10 +541,10 @@
   
          // comment info and content
          html += '<div class="nodeContent"><div class="userLink">' + Alfresco.util.people.generateUserLink(data.author);
-         html += this._msg("comments.said") + ':';
+         html += this._msg("comment.said") + ':';
          if (data.isUpdated)
          {
-            html += '<span class="nodeStatus">(' + this._msg("comments.updated") + ')</span>';
+            html += '<span class="nodeStatus">(' + this._msg("comment.updated") + ')</span>';
          }
          html += '</div>'
          html += '<div class="content yuieditor">' + data.content + '</div>'
@@ -568,7 +553,7 @@
          // footer
          html += '<div class="commentFooter">'
          html += '<span class="nodeFooterBlock">'
-         html += '<span class="nodeAttrLabel">' + this._msg("comments.footer.postedOn") + ': ';
+         html += '<span class="nodeAttrLabel">' + this._msg("comment.postedOn") + ': ';
          html += Alfresco.util.formatDate(data.createdOn);
          html += '</span></span></div>';
          

@@ -205,12 +205,13 @@
          this.widgets.commentForm.setSubmitElements(this.widgets.okButton);
          this.widgets.commentForm.setAJAXSubmit(true,
          {
+            successMessage: this._msg("message.createcomment.success"),
             successCallback:
             {
                fn: this.onCreateFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("comments.msg.failedCreateComment")
+            failureMessage: this._msg("message.createcomment.failure")
          });
          this.widgets.commentForm.setSubmitAsJSON(true);
          this.widgets.commentForm.doBeforeFormSubmit =
@@ -234,20 +235,11 @@
        */
       onCreateFormSubmitSuccess: function CreateComment_onCreateFormSubmitSuccess(response, object)
       {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.unableCreateComment", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentCreated")});
-
-            // clear the content of the comment editor
-            this.widgets.editor.clearEditorDoc();
+         // clear the content of the comment editor
+         this.widgets.editor.clearEditorDoc();
             
-            // reload the comments list
-            YAHOO.Bubbling.fire("refreshComments", {});
-         }
+         // reload the comments list
+         YAHOO.Bubbling.fire("refreshComments", {});
       },
 
       /**

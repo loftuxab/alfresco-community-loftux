@@ -12,7 +12,7 @@
             <textarea id="${args.htmlid}-content" rows="8" cols="80" name="content" class="yuieditor"></textarea>
             <div class="nodeFormAction">
                <input type="submit" id="${args.htmlid}-submit" />
-               <input type="reset"  id="${args.htmlid}-cancel"  value="${msg('replies.form.cancel')}" />
+               <input type="reset"  id="${args.htmlid}-cancel"  value="${msg('action.cancel')}" />
             </div>
          </div>
       </form>

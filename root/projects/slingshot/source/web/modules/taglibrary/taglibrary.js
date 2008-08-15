@@ -106,7 +106,7 @@
             if (owner !== null)
             {
                var action = "";
-               action = owner.className;
+               action = owner.getAttribute("class");
                if (typeof me[action] == "function")
                {
                   // fetch the tag name, which is inside the form id-action-tag
@@ -250,14 +250,7 @@
       
       _onPopularTagsLoaded: function TagLibrary__onPopularTagsLoaded(response)
       {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("taglibrary.msg.unableLoadTags", response.json.error)});
-         }
-         else
-         {
-            this._displayPopularTags(response.json.tags);
-         }
+         this._displayPopularTags(response.json.tags);
       },
       
       /**

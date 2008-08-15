@@ -1,6 +1,6 @@
 <div class="editCommentForm">
    <div class="commentFormTitle">
-      ${msg("comments.editComment")}
+      ${msg("editComment")}
    </div>
    <div class="editComment">
       <form id="${args.htmlid}-form" method="POST" action="">
@@ -12,8 +12,8 @@
          <textarea id="${args.htmlid}-content" rows="8" cols="80" name="content"></textarea>
          
          <div class="commentFormAction">
-            <input type="submit" id="${args.htmlid}-submit"  value='${msg("editcomment.form.updateComment")}' />
-            <input type="reset"  id="${args.htmlid}-cancel" value="${msg('editcomment.form.cancel')}" />
+            <input type="submit" id="${args.htmlid}-submit"  value="${msg('action.update')}" />
+            <input type="reset"  id="${args.htmlid}-cancel" value="${msg('action.cancel')}" />
          </div>
       </form>
    </div>
