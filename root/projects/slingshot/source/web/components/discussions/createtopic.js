@@ -132,6 +132,7 @@
       
       /**
        * Initializes the create topic form dom.
+       * The html is already in the dom when the component gets loaded
        */
       _initFormValues: function CreateTopic_initFormValues()
       {          
@@ -167,7 +168,7 @@
          // initialize the tag library
          this.modules.tagLibrary = new Alfresco.TagLibrary(this.id);
          this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
-         //this.modules.tagLibrary.onReady();
+         this.modules.tagLibrary.onReady();
          
          // register the okButton
          this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
@@ -192,12 +193,13 @@
          topicForm.setSubmitElements(this.widgets.okButton);
          topicForm.setAJAXSubmit(true,
          {
+            successMessage: this._msg("message.savetopic.success"),
             successCallback:
             {
                fn: this.onFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("comments.msg.failedDeleted")
+            failureMessage: this._msg("message.savetopic.failure")
          });
          topicForm.setSubmitAsJSON(true);
          topicForm.doBeforeFormSubmit =
@@ -224,18 +226,9 @@
        */
       onFormSubmitSuccess: function CreateTopic_onFormSubmitSuccess(response, object)
       {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.submitErrorReturn", response.json.error)});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.topicCreated")});
-             
-            // the response contains the data of the created topic. redirect to the topic view page
-            var url = Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
-            window.location = url;
-         }
+         // the response contains the data of the created topic. redirect to the topic view page
+         var url = Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
+         window.location = url;
       },
       
       /**
@@ -245,28 +238,6 @@
       {
          // return to the page we came from
          history.go(-1);
-      },
-
-      /**
-       * Called when the mouse enters into the topic div
-       */
-      onTopicElementMouseEntered: function CreateTopic_onTopicElementMouseEntered(layer, args)
-      {
-         var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
-      },
-     
-      /**
-       * Called whenever the mouse exits the topic div
-       */
-      onTopicElementMouseExited: function CreateTopic_onTopicElementMouseExited(layer, args)
-      {
-         var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
 
       /**

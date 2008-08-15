@@ -60,11 +60,15 @@
          </div>
             
          <div class="bdft">
-            <input type="submit" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="15"/>
-            <input type="submit" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="17"/>
+            <input type="submit" id="${args.htmlid}-ok" value="${msg('button.ok')}" tabindex="15"/>
+            <input type="submit" id="${args.htmlid}-cancel" value="${msg('button.cancel')}" tabindex="17"/>
          </div>
 
       </form>
 
    </div>
 </div>
+
+<script type="text/javascript">//<![CDATA[
+Alfresco.util.addMessages(${messages}, "Alfresco.module.ConfigBlog");
+//]]></script>

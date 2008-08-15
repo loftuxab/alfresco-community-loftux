@@ -29,7 +29,7 @@
    <div class="topiclist-infobar yui-gd">
       <div class="yui-u first">
          <div id="${args.htmlid}-listtitle" class="listTitle">
-            ${msg("topiclist.title.generic")}
+            ${msg("title.generic")}
          </div>
       </div>
       <div class="yui-u align-right">

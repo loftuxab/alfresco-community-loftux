@@ -191,7 +191,7 @@
                fn: this.loadBlogPostDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.details.failed")
+            failureMessage: this._msg("message.loadpostdata.failure")
          });
       },
 
@@ -249,19 +249,19 @@
          html += '<div class="published">';
          if (! data.isDraft)
          {
-            html += '<span class="nodeAttrLabel">' + this._msg("post.info.publishedOn") + ':</span>';
+            html += '<span class="nodeAttrLabel">' + this._msg("post.publishedOn") + ':</span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
             html += '<span class="spacer"> | </span>';
          }
  
-         html += '<span class="nodeAttrLabel">' + this._msg("post.info.author") + ':</span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ':</span>';
          html += '<span class="nodeAttrValue">' + authorLink + '</span>';
 
          if (data.isPublished && data.postLink != undefined && data.postLink.length > 0)
          {
             html += '<span class="spacer"> | </span>';
-            html += '<span class="nodeAttrLabel">' + this._msg("post.info.externalLink") + ': </span>';
-            html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + this._msg("post.info.clickHere") + '</a></span>';
+            html += '<span class="nodeAttrLabel">' + this._msg("post.externalLink") + ': </span>';
+            html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + this._msg("post.clickHere") + '</a></span>';
          }
          
          html += '<span class="spacer"> | </span>';
@@ -339,25 +339,15 @@
       onDeleteBlogPost: function BlogPostView_onDeleteBlogPost(postId)
       {
          // ajax request success handler
-         var me = this;
          var onDeletedSuccess = function BlogPostList_onDeletedSuccess(response)
          {
-            if (response.json.error != undefined)
+            // load the blog post list page
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}",
             {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableDelete", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.deleted")});
-
-               // load the blog post list page
-               var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}",
-               {
-                  site: me.options.siteId,
-                  container: me.options.containerId
-               });    
-               window.location = url;
-            }
+               site: this.options.siteId,
+               container: this.options.containerId
+            });    
+            window.location = url;
          };
          
          // get the url to call
@@ -374,12 +364,13 @@
             url: url,
             method: "DELETE",
             responseContentType : "application/json",
+            successMessage: this._msg("message.delete.success"),
             successCallback:
             {
                fn: onDeletedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedDelete")
+            failureMessage: this._msg("message.delete.failure")
          });
       },
        
@@ -393,20 +384,10 @@
       onPublishExternal: function BlogPostView_onPublishExternal(postId)
       {
          // ajax call success handler
-         var me = this;
          var onPublishedSuccess = function BlogPostList_onPublishedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unablePublishExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
-
-               // re-render the post
-               this.loadBlogPostDataSuccess(response);
-            }
+            // re-render the post
+            this.loadBlogPostDataSuccess(response);
          };
          
          // get the url to call
@@ -423,12 +404,13 @@
             {
                action : "publish"
             },
+            successMessage: this._msg("message.publishedExternal.success"),
             successCallback:
             {
                fn: onPublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedPublishExternal")
+            failureMessage: this._msg("message.publishExternal.failure")
          });
       },
       
@@ -442,20 +424,10 @@
       onUpdateExternal: function BlogPostView_onUpdateExternal(postId)
       {
          // ajax request success handler
-         var me = this;
          var onUpdatedSuccess = function BlogPostList_onUpdatedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUpdateExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
-
-               // re-render the post
-               this.loadBlogPostDataSuccess(response);
-            }
+            // re-render the post
+            this.loadBlogPostDataSuccess(response);
          };
          
          // get the url to call
@@ -472,12 +444,13 @@
             {
                action : "update"
             },
+            successMessage: this._msg("message.updatedExternal.success"),
             successCallback:
             {
                fn: onUpdatedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedUpdateExternal")
+            failureMessage: this._msg("message.updateExternal.failure")
          });
       },
 
@@ -491,20 +464,10 @@
       onUnpublishExternal: function BlogPostView_onUnpublishExternal(postId)
       {
          // ajax request success handler
-         var me = this;
          var onUnpublishedSuccess = function BlogPostList_onUnpublishedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUnpublishExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unpublishExternal")});
-
-               // re-render the post
-               this.loadBlogPostDataSuccess(response);
-            }
+            // re-render the post
+            this.loadBlogPostDataSuccess(response);
          };
           
          // get the url to call
@@ -521,12 +484,13 @@
             {
                action : "unpublish"
             },
+            successMessage: this._msg("message.unpublishExternal.success"),
             successCallback:
             {
                fn: onUnpublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedUnpublishExternal")
+            failureMessage: this._msg("message.unpublishExternal.failure")
          });
       },
 

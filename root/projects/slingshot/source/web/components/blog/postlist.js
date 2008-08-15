@@ -341,17 +341,17 @@
                html += '<div class="published">';
                if (! data.isDraft)
                {
-                  html += '<span class="nodeAttrLabel">' + me._msg("post.info.publishedOn") + ': </span>';
+                  html += '<span class="nodeAttrLabel">' + me._msg("post.publishedOn") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
                   html += '<span class="spacer"> | </span>';
                }
-               html += '<span class="nodeAttrLabel">' + me._msg("post.info.author") + ': </span>';
+               html += '<span class="nodeAttrLabel">' + me._msg("post.author") + ': </span>';
                html += '<span class="nodeAttrValue">' + authorLink + '</span>';
                if (data.isPublished && data.postLink && data.postLink.length > 0)
                {
                   html += '<span class="spacer"> | </span>';
-                  html += '<span class="nodeAttrLabel">' + me._msg("post.info.externalLink") + ': </span>';
-                  html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + me._msg("post.info.clickHere") + '</a></span>';
+                  html += '<span class="nodeAttrLabel">' + me._msg("post.externalLink") + ': </span>';
+                  html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + me._msg("post.clickHere") + '</a></span>';
                }
                html += '</div>';
                html += '<div class="content yuieditor"></div>';
@@ -362,10 +362,10 @@
 
                // begin footer
                html += '<div class="nodeFooter">';
-               html += '<span class="nodeAttrLabel replyTo">' + me._msg("post.footer.replies") + ': </span>';
+               html += '<span class="nodeAttrLabel replyTo">' + me._msg("post.replies") + ': </span>';
                html += '<span class="nodeAttrValue">(' + data.commentCount + ')</span>';
                html += '<span class="spacer"> | </span>';
-               html += '<span class="nodeAttrValue"><a href="' + postViewUrl + '">' + me._msg("post.footer.read") + '</a></span>';
+               html += '<span class="nodeAttrValue"><a href="' + postViewUrl + '">' + me._msg("post.read") + '</a></span>';
                html += '<span class="spacer"> | </span>';
                
                html += '<span class="nodeAttrLabel tag">' + me._msg("post.tags") +': </span>';
@@ -510,7 +510,7 @@
                site: this.options.siteId,
                container: this.options.containerId
             });
-            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("header.blogRSS") + '</a>';
+            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("header.rssFeed") + '</a>';
          }
       },
 
@@ -677,20 +677,10 @@
       _deleteBlogPost: function BlogPostList__deleteBlogPost(postId)
       {
          // ajax request success handler
-         var me = this;
          var onDeletedSuccess = function BlogPostList_onDeletedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableDelete", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.deleted")});
-
-               // reload the table data
-               this._updateBlogPostList();
-            }
+            // reload the table data
+            this._updateBlogPostList();
          };
          
          // get the url to call
@@ -707,12 +697,13 @@
             url: url,
             method: "DELETE",
             responseContentType : "application/json",
+            successMessage: this._msg("message.delete.success"),
             successCallback:
             {
                fn: onDeletedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedDelete")
+            failureMessage: this._msg("message.delete.failure")
          });
       },
       
@@ -725,20 +716,10 @@
       _publishExternal: function BlogPostList__publishExternal(postId)
       {
          // ajax call success handler
-         var me = this;
          var onPublishedSuccess = function BlogPostList_onPublishedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unablePublishExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
-
-               // reload the table data
-               this._updateBlogPostList();
-            }
+            // reload the table data
+            this._updateBlogPostList();
          };
          
          // get the url to call
@@ -755,12 +736,13 @@
             {
                action : "publish"
             },
+            successMessage: this._msg("message.publishedExternal.success"),
             successCallback:
             {
                fn: onPublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedPublishExternal")
+            failureMessage: this._msg("message.publishExternal.failure")
          });
       },
       
@@ -774,20 +756,10 @@
       _updateExternal: function BlogPostList__updateExternal(postId)
       {
          // ajax request success handler
-         var me = this;
          var onUpdatedSuccess = function BlogPostList_onUpdatedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUpdateExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
-
-               // reload the table data
-               this._updateBlogPostList();
-            }
+            // reload the table data
+            this._updateBlogPostList();
          };
          
          // get the url to call
@@ -804,12 +776,13 @@
             {
                action : "update"
             },
+            successMessage: this._msg("message.updatedExternal.success"),
             successCallback:
             {
                fn: onUpdatedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedUpdateExternal")
+            failureMessage: this._msg("message.updateExternal.failure")
          });
       },
 
@@ -823,20 +796,10 @@
       _unpublishExternal: function BlogPostList__onUnpublishExternal(postId)
       {
          // ajax request success handler
-         var me = this;
          var onUnpublishedSuccess = function BlogPostList_onUnpublishedSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUnpublishExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unpublishExternal")});
-               
-               // reload the table data
-               this._updateBlogPostList();
-            }
+            // reload the table data
+            this._updateBlogPostList();
          };
           
          // get the url to call
@@ -853,12 +816,13 @@
             {
                action : "unpublish"
             },
+            successMessage: this._msg("message.unpublishExternal.success"),
             successCallback:
             {
                fn: onUnpublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedUnpublishExternal")
+            failureMessage: this._msg("message.unpublishExternal.failure")
          });
       },
       
@@ -941,7 +905,7 @@
       updateListTitle: function BlogPostList_updateListTitle()
       {
          var elem = Dom.get(this.id + '-listtitle');
-         var title = "<unknown filter>";
+         var title = this._msg("title.postlist");
 
          var filterOwner = this.currentFilter.filterOwner;
          var filterId = this.currentFilter.filterId;
@@ -950,34 +914,34 @@
          {
             if (filterId == "all")
             {
-                title = this._msg("postlist.title.allposts");
+                title = this._msg("title.allposts");
             }
             if (filterId == "new")
             {
-               title = this._msg("postlist.title.newposts");
+               title = this._msg("title.newposts");
             }
             else if (filterId == "mydrafts")
             {
-               title = this._msg("postlist.title.mydrafts");
+               title = this._msg("title.mydrafts");
             }
             else if (filterId == "mypublished")
             {
-               title = this._msg("postlist.title.mypublished");
+               title = this._msg("title.mypublished");
             }
             else if (filterId == "publishedext")
             {
-               title = this._msg("postlist.title.publishedext");
+               title = this._msg("title.publishedext");
             }
          }
          else if (filterOwner == "Alfresco.BlogPostListTags")
          {
-            title = this._msg("postlist.title.bytag", $html(filterData));
+            title = this._msg("title.bytag", $html(filterData));
          }
          else if (filterOwner == "Alfresco.BlogPostListArchive" && filterId == "bymonth")
          {
             var date = new Date(filterData.year, filterData.month, 1);
             var formattedDate = Alfresco.util.formatDate(date, "mmmm yyyy")
-            title = this._msg("postlist.title.bymonth", formattedDate);
+            title = this._msg("title.bymonth", formattedDate);
          }
          
          elem.innerHTML = title;

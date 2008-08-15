@@ -223,7 +223,7 @@
                fn: loadTopicDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("replies.msg.failedloadeditform")
+            failureMessage: this._msg("message.loadtopicdata.failure")
          });
       },
 
@@ -257,14 +257,14 @@
          
          // actions
          html += '<div class="nodeEdit">';
-         html += '<div class="onAddReply"><a href="#" class="topic-action-link-div">' + this._msg("topic.action.addReply") + '</a></div>';   
+         html += '<div class="onAddReply"><a href="#" class="topic-action-link-div">' + this._msg("action.reply") + '</a></div>';   
          if (data.permissions.edit)
          {
-            html += '<div class="onEditTopic"><a href="#" class="topic-action-link-div">' + this._msg("topic.action.edit") + '</a></div>';
+            html += '<div class="onEditTopic"><a href="#" class="topic-action-link-div">' + this._msg("action.edit") + '</a></div>';
          }
          if (data.permissions['delete'])
          {
-            html += '<div class="onDeleteTopic"><a href="#" class="topic-action-link-div">' + this._msg("topic.action.delete") + '</a></div>';
+            html += '<div class="onDeleteTopic"><a href="#" class="topic-action-link-div">' + this._msg("action.delete") + '</a></div>';
          }
          html += '</div>';
   
@@ -276,44 +276,44 @@
          html += '<div class="nodeTitle"><a href="' + Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, data.name) + '">' + $html(data.title) + '</a> ';
          if (data.isUpdated)
          {
-            html += '<span class="nodeStatus">(' + this._msg("topic.updated") + ')</span>';
+            html += '<span class="nodeStatus">(' + this._msg("post.updated") + ')</span>';
          }
          html += '</div>';
          
          html += '<div class="published">';
-         html += '<span class="nodeAttrLabel">' + this._msg("topic.info.createdOn") + ': </span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("post.createdOn") + ': </span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
          html += '<span class="spacer"> | </span>';
-         html += '<span class="nodeAttrLabel">' + this._msg("topic.info.author") + ': </span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ': </span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.author) + '</span>';
          html += '<br />';
          if (data.lastReplyBy)
          {
-            html += '<span class="nodeAttrLabel">' + this._msg("topic.info.lastReplyBy") + ': </span>';
+            html += '<span class="nodeAttrLabel">' + this._msg("post.lastReplyBy") + ': </span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.lastReplyBy) + '</span>';                  
             html += '<span class="spacer"> | </span>';
-            html += '<span class="nodeAttrLabel">' + this._msg("topic.info.lastReplyOn") + ': </span>';
+            html += '<span class="nodeAttrLabel">' + this._msg("post.lastReplyOn") + ': </span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.lastReplyOn) + '</span>';
          }
          else
          {
-            html += '<span class="nodeAttrLabel">' + this._msg("topic.footer.replies") + ': </span>';
-            html += '<span class="nodeAttrValue">' + this._msg("topic.info.noReplies") + '</span>';                  
+            html += '<span class="nodeAttrLabel">' + this._msg("replies.label") + ': </span>';
+            html += '<span class="nodeAttrValue">' + this._msg("replies.noReplies") + '</span>';                  
          }
          html += '</div>';
              
-         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + ' ' + this._msg("topic.said") + ':</div>';
+         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + ' ' + this._msg("said") + ':</div>';
          html += '<div class="content yuieditor">' + data.content + '</div>';
          html += '</div>'
          // end view
 
          // begin footer
          html += '<div class="nodeFooter">';
-         html += '<span class="nodeAttrLabel replyTo">' + this._msg("topic.footer.replies") + ': </span>';
+         html += '<span class="nodeAttrLabel replyTo">' + this._msg("replies.label") + ': </span>';
          html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
          html += '<span class="spacer"> | </span>';
              
-         html += '<span class="nodeAttrLabel tag">' + this._msg("topic.tags") +': </span>';
+         html += '<span class="nodeAttrLabel tag">' + this._msg("tags.label") +': </span>';
          if (data.tags.length > 0)
          {
             for (var x=0; x < data.tags.length; x++)
@@ -327,7 +327,7 @@
          }
          else
          {
-            html += '<span class="nodeAttrValue">' + this._msg("topic.noTags") + '</span>';
+            html += '<span class="nodeAttrValue">' + this._msg("tags.noTags") + '</span>';
          }
          html += '</div></div></div>';
           
@@ -361,20 +361,12 @@
          // ajax request success handler
          var onDeleted = function onDeleted(response)
          {
-            if (response.json.error != undefined)
+            var listUrl = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topiclist?container={container}",
             {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.deleted", response.json.error)});
-               var listUrl = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topiclist?container={container}",
-               {
-                  site: this.options.siteId,
-                  container: this.options.containerId
-               });
-               window.location = listUrl;
-            }
+               site: this.options.siteId,
+               container: this.options.containerId
+            });
+            window.location = listUrl;
          };
          
          // construct the url to call
@@ -391,12 +383,13 @@
             url: url,
             method: "DELETE",
             responseContentType : "application/json",
+            successMessage: this._msg("message.delete.success"),
             successCallback:
             {
                fn: onDeleted,
                scope: this
             },
-            failureMessage: this._msg("topic.msg.failedDelete")
+            failureMessage: this._msg("message.delete.failure")
          });
       },
       
@@ -445,7 +438,7 @@
                fn: this.onEditFormLoaded,
                scope: this
             },
-            failureMessage: "Could not load topic edit form"
+            failureMessage: this._msg("message.loadeditform.failure")
          });
       },
 
@@ -543,12 +536,13 @@
          commentForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          commentForm.setAJAXSubmit(true,
          {
+            successMessage: this._msg("message.savetopic.success"),
             successCallback:
             {
                fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("topic.msg.failedDelete")
+            failureMessage: this._msg("message.savetopic.failure")
          });
          commentForm.setSubmitAsJSON(true);
          commentForm.doBeforeFormSubmit =
@@ -571,25 +565,16 @@
        */
       onEditFormSubmitSuccess: function DiscussionsTopic_onCreateFormSubmitSuccess(response, object)
       {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.submitErrorReturn", response.json.error)});
-         }
-         else
-         {
-            // the response contains the new data for the comment. Render the comment html
-            // and insert it into the view element
-            this.topicData = response.json.item;
-            this.renderUI();
+         // the response contains the new data for the comment. Render the comment html
+         // and insert it into the view element
+         this.topicData = response.json.item;
+         this.renderUI();
             
-            // hide the form and show the ui
-            this._hideEditView();
-
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("comments.msg.commentUpdated")});
+         // hide the form and show the ui
+         this._hideEditView();
             
-            // inform the replies object about the update
-            this._fireTopicDataChangedEvent();
-         }
+         // inform the replies object about the update
+         this._fireTopicDataChangedEvent();
       },
       
       /**

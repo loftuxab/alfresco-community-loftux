@@ -33,7 +33,7 @@
    <div class="postlist-infobar yui-gd">
       <div class="yui-u first">
          <div id="${args.htmlid}-listtitle" class="listTitle">
-            ${msg("postlist.title.postlist")}
+            ${msg("title.postlist")}
          </div>
       </div>
       <div class="yui-u align-right">

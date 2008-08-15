@@ -1,8 +1,10 @@
+<#assign container = args.container!'discussions' />
+
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DiscussionsTopic("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site}",
-      containerId: "${args.container!'discussions'}",
+      containerId: "${container}",
       topicId: "${page.url.args.topicId!''}"
    }).setMessages(
       ${messages}
@@ -13,7 +15,7 @@
    <div class="left-aligned-cell listTitle">
       <span class="backLink">
          <#-- PENDING: should be generated to correctly handle different containers -->
-         <a href="${url.context}/page/site/${page.url.templateArgs.site}/discussions-topiclist">
+         <a href="${url.context}/page/site/${page.url.templateArgs.site}/discussions-topiclist?container=${container}">
             ${msg("header.back")}
          </a>
       </span>

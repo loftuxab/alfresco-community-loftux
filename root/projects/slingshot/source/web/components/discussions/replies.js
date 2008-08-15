@@ -276,7 +276,7 @@
                fn: loadRepliesDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("comments.msg.failedDeleted")
+            failureMessage: this._msg("message.loadreplies.failure")
          });
       },
 
@@ -376,14 +376,14 @@
          if (data.permissions.reply)
          {
             html += '<div class="onAddReply" id="' + this.id + '-onAddReply-' + saveRef + '">';
-            html += '<a href="#" class="reply-action-link">' + this._msg("replies.action.reply") + '</a>';
+            html += '<a href="#" class="reply-action-link">' + this._msg("action.reply") + '</a>';
             html += '</div>'
          }
         
          if (data.permissions.edit)
          {
             html += '<div class="onEditReply" id="' + this.id + '-onEditReply-' + saveRef + '">';
-            html += '<a href="#" class="reply-action-link">' + this._msg("replies.action.edit") + '</a>';
+            html += '<a href="#" class="reply-action-link">' + this._msg("action.edit") + '</a>';
             html += '</div>';
          }
          html += '</div>';
@@ -393,10 +393,10 @@
 
          // content            
          html += '<div class="nodeContent">';
-         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + this._msg("replies.said") + ': ';
+         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + this._msg("post.said") + ': ';
          if (data.isUpdated)
          {
-            html += '<span class="nodeStatus">(' + this._msg("replies.updated") + ')</span>';
+            html += '<span class="nodeStatus">(' + this._msg("post.updated") + ')</span>';
          }
          html += '</div>';
             
@@ -405,16 +405,16 @@
          
          // footer part
          html += '<div class="nodeFooter">';
-         html += '<span class="nodeAttrLabel replyTo">' + this._msg("replies.footer.replies") + ': </span>';
+         html += '<span class="nodeAttrLabel replyTo">' + this._msg("replies") + ': </span>';
          html += '<span class="nodeAttrValue">(' + (data.children != undefined ? data.children.length : 0) + ') </span>';
          if (data.replyCount > 0)
          {
             html += '<span class="nodeAttrValue">';
-            html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + saveRef + '">' + this._msg("replies.footer.hide") + '</a>'
+            html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + saveRef + '">' + this._msg("replies.hide") + '</a>'
             html += '</span>';
          }
          html += '<span class="spacer"> | </span>';
-         html += '<span class="nodeAttrLabel">' + this._msg("replies.footer.postedOn") + ': ' + '</span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("post.postedOn") + ': ' + '</span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
          html += '</div>';
          
@@ -497,7 +497,7 @@
                   formId : formId
                }
             },
-            failureMessage: this._msg("replies.msg.failedloadeditform")
+            failureMessage: this._msg("message.loadeditform.failure")
          });
       },
       
@@ -539,8 +539,8 @@
             {
                nodeRef: obj.nodeRef.replace(':/', '')
             });
-            formTitle = 'Edit reply';
-            submitButtonLabel = 'Update';
+            formTitle = this._msg('form.updateTitle');
+            submitButtonLabel = this._msg('action.update');
             content = data.content;
          }
          else
@@ -550,17 +550,17 @@
                nodeRef: obj.nodeRef.replace(':/', '')
             });
             
-            // find the data object for the reply
-            // PENDING: not really necessary, would simply remove
+            // for root replies we don't have a parent data object and therefore can
+            // tell whom to reply to
             if (data != null)
             {
-               formTitle = 'Reply to ' + Alfresco.util.people.generateUserLink(data.author);
+               formTitle = this._msg('form.replyToTitle', Alfresco.util.people.generateUserLink(data.author));
             }
             else
             {
-               formTitle = 'Add reply';
+               formTitle = this._msg('form.replyTitle');
             }
-            submitButtonLabel = 'Create';
+            submitButtonLabel = this._msg('action.create');
          }
          
          // set the values in the dom
@@ -626,6 +626,7 @@
          }
          replyForm.setAJAXSubmit(true,
          {
+            success: this._msg("message.savereply.success"),
             successCallback:
             {
                fn: this.onFormSubmitSuccess,
@@ -635,7 +636,7 @@
                   isEdit: isEdit
                }
             },
-            failureMessage: this._msg("replies.msg.failedloadeditform")
+            failureMessage: this._msg("message.savereply.failure")
          });
          replyForm.setSubmitAsJSON(true);
          replyForm.doBeforeFormSubmit =
@@ -658,13 +659,6 @@
        */
       onFormSubmitSuccess: function TopicReplies_onFormSubmitSuccess(response, obj)
       {
-         // check whether we got an error
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text:  this._msg("replies.msg.error") + response.json.error});
-            return;
-         }
-
          // in case of an edit reply, simply update the data/ui
          if (obj.isEdit)
          {
@@ -749,7 +743,7 @@
           var linkElem = Dom.get(this.id + '-showHideChildren-' + this.toSaveRef(nodeRef));
           if (linkElem !== null)
           {
-             linkElem.innerHTML = "Hide replies"
+             linkElem.innerHTML = this._msg("replies.hide");
           }
       },
       
@@ -763,7 +757,7 @@
           var repliesElem = Dom.get('replies-of-' + this.toSaveRef(nodeRef));
           Dom.addClass(repliesElem, "hidden");
           var linkElem = Dom.get(this.id + '-showHideChildren-' + this.toSaveRef(nodeRef));
-          linkElem.innerHTML = "Show replies";
+          linkElem.innerHTML = this._msg("replies.show");
       },
       
       /**

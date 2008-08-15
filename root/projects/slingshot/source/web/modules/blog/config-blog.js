@@ -161,7 +161,7 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
-               failureMessage: "Could not load Blog config template",
+               failureMessage: "Unable to load dialog", // TODO: message bundle won't be available here
                execScripts: true
             });
          }
@@ -224,12 +224,13 @@
          // JSON submit type
          this.modules.form.setAJAXSubmit(true,
          {
+            successMessage: this._msg("message.saveconfig.success"),
             successCallback:
             {
                fn: this.onSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.details.failure")
+            failureMessage: this._msg("message.saveconfig.failure")
          });
          this.modules.form.setSubmitAsJSON(true);
 
@@ -284,7 +285,7 @@
          // Display success message anyway
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.details.loadDialogDataFailed")
+            text: this._msg("message.loaddata.failure")
          });
          
          this._hideDialog();
@@ -301,12 +302,6 @@
          // Fire "blogConfigChanged" event
          YAHOO.Bubbling.fire("blogConfigChanged");
 
-         // Display success message
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this._msg("message.details.success")
-         });
-         
          this._hideDialog();
       },
 
@@ -402,7 +397,7 @@
        _msg: function ConfigBlog__msg(messageId)
        {
           return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
-       }
+       },
    };
 })();
 

@@ -172,12 +172,6 @@
          var me = this;
          var loadBlogPostDataSuccess = function CommentsList_loadCommentsSuccess(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.errorFormLoad", response.json.error)});
-               return;
-            }
-
             // set the blog data
             var data = response.json.item
             me.blogPostData = data;
@@ -205,7 +199,7 @@
                fn: loadBlogPostDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.details.failed")
+            failureMessage: this._msg("message.loadpostdata.failure")
          });
       },
 
@@ -294,11 +288,11 @@
          var saveButtonLabel = '';
          if (this.options.editMode)
          {
-            saveButtonLabel = this._msg('post.form.update');
+            saveButtonLabel = this._msg('action.update');
          }
          else
          {
-            saveButtonLabel = this._msg('post.form.saveAsDraft');
+            saveButtonLabel = this._msg('action.saveAsDraft');
          }
          this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button", {type: "submit", label: saveButtonLabel });
 
@@ -315,15 +309,15 @@
          var publishExternalButtonLabel = ''
          if (! this.options.editMode)
          {
-            publishExternalButtonLabel = this._msg('post.form.publishIntAndExt');
+            publishExternalButtonLabel = this._msg('action.publishIntAndExt');
          }
          else if (this.blogPostData.isPublished)
          {
-            publishExternalButtonLabel = this._msg('post.form.updateIntAndExt');
+            publishExternalButtonLabel = this._msg('action.updateIntAndExt');
          }
          else
          {
-            publishExternalButtonLabel = this._msg('post.form.updateIntAndPublishExt');
+            publishExternalButtonLabel = this._msg('action.updateIntAndPublishExt');
          }
          this.widgets.publishExternalButton = new YAHOO.widget.Button(this.id + "-publishexternal-button", {type: "button", label: publishExternalButtonLabel });
          this.widgets.publishExternalButton.subscribe("click", this.onFormPublishExternalButtonClick, this, true);         
@@ -354,7 +348,7 @@
                fn: this.onFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedFormSubmit")
+            failureMessage: this._msg("message.savepost.failure")
          });
          if (this.options.editMode)
          {
@@ -421,17 +415,11 @@
        * Form submit success handler
        */
       onFormSubmitSuccess: function BlogPostEdit_onFormSubmitSuccess(response)
-      {
-         if (response.json.error != undefined)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.errorFormSubmit", response.json.error)});
-            return;
-         }
-          
+      {          
          // check whether we have to do an external publich
          if (this.performExternalPublish)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.postSavedNowPublish")});             
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("message.postSavedNowPublish")});             
              
             //var nodeRef = response.json.item.nodeRef;    
             var postId = response.json.item.name;
@@ -448,7 +436,7 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.postSaved")});
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("message.savepost.success")});
             this._loadPostViewPage(response.json.item.name);
          }
       },
@@ -459,18 +447,9 @@
       onPublishExternal: function BlogPostEdit_onPublishExternal(postId)
       {
          // publish request success handler
-         var me = this;
          var onPublished = function BlogPostEdit_onPublished(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unablePublishExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.publishedExternal")});
-               me._loadPostViewPage(response.json.item.name);
-            }
+            this._loadPostViewPage(response.json.item.name);
          };
          
          // get the url to call
@@ -487,12 +466,13 @@
             {
                action : "publish"
             },
+            successMessage: this._msg("message.publishedExternal.success"),
             successCallback:
             {
                fn: onPublished,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedPublishExternal")
+            failureMessage: this._msg("message.publishExternal.failure")
          });
       },
       
@@ -502,18 +482,9 @@
       onUpdateExternal: function BlogPostEdit_onUpdateExternal(postId)
       {
          // update request success handler
-         var me = this;
          var onUpdated = function BlogPostEdit_onUpdated(response)
          {
-            if (response.json.error != undefined)
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.unableUpdateExternal", response.json.error)});
-            }
-            else
-            {
-               Alfresco.util.PopupManager.displayMessage({text: me._msg("post.msg.updatedExternal")});
-               me._loadPostViewPage(response.json.item.name);
-            }
+            this._loadPostViewPage(response.json.item.name);
          };
          
          // get the url to call
@@ -530,12 +501,13 @@
             {
                action : "update"
             },
+            successMessage: this._msg("message.updatedExternal.success"),
             successCallback:
             {
                fn: onUpdated,
                scope: this
             },
-            failureMessage: this._msg("post.msg.failedUpdateExternal")
+            failureMessage: this._msg("message.updateExternal.failure")
          });
       },
       

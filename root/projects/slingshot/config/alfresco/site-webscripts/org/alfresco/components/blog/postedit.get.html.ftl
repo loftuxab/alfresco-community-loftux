@@ -16,9 +16,9 @@
 //]]></script>
 
 <#if page.url.args.postId??>
-   <h1>${msg("postedit.editpost")}</h1>
+   <h1>${msg("editPost")}</h1>
 <#else>
-   <h1>${msg("postedit.createpost")}</h1>
+   <h1>${msg("createPost")}</h1>
 </#if>
 
 <div id="${args.htmlid}-container" class="editBlogPostForm hidden">
@@ -30,15 +30,15 @@
          <input type="hidden" id="${args.htmlid}-draft" name="draft" value=""/>
                
          <!-- title -->
-         <label>${msg("post.form.postTitle")}:</label>
+         <label>${msg("title")}:</label>
          <input type="text" id="${args.htmlid}-title" name="title" size="180" value="" />
 
          <!-- content -->
-         <label>${msg("post.form.postText")}:</label>
+         <label>${msg("text")}:</label>
          <textarea rows="8" id="${args.htmlid}-content" name="content" cols="180" class="yuieditor"></textarea> 
       
          <!-- tags -->
-         <label>${msg("post.tags")}:</label>
+         <label>${msg("tags")}:</label>
          <#assign tags=[] />
          <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
          <!-- Render the tag inputs -->
@@ -50,9 +50,9 @@
       </div>
       <div class="nodeFormAction">
          <input type="submit" id="${args.htmlid}-save-button" value="" />         
-         <input type="button" id="${args.htmlid}-publish-button" value="${msg('post.form.publish')}" class="hidden" />
+         <input type="button" id="${args.htmlid}-publish-button" value="${msg('action.publish')}" class="hidden" />
          <input type="button" id="${args.htmlid}-publishexternal-button" value="" />
-         <input type="reset" id="${args.htmlid}-cancel-button" value="${msg('post.form.cancel')}" />
+         <input type="reset" id="${args.htmlid}-cancel-button" value="${msg('action.cancel')}" />
       </div>
    </form>
 </div>

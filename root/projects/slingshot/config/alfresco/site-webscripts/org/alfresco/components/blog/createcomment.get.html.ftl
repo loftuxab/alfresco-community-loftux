@@ -8,7 +8,7 @@
 
 <div id="${args.htmlid}-form-container" class="addCommentForm hidden">
 	<div class="commentFormTitle">
-		${msg("comments.addComment")}
+		${msg("addComment")}:
 	</div>
 	<div class="editComment">
 		<form id="${htmlid}-form" method="post" action="">
@@ -22,7 +22,7 @@
 			<textarea id="${htmlid}-content" rows="8" cols="80" name="content"></textarea>
 			</div>
 			<div class="commentFormAction">
-				<input type="submit" id="${htmlid}-submit" value="${msg('comments.form.postComment')}" />
+				<input type="submit" id="${htmlid}-submit" value="${msg('postComment')}" />
 			</div>
 		</form>
 	</div>
