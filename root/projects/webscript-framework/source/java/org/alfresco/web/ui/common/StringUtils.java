@@ -331,6 +331,11 @@ public class StringUtils
      */
     public static String replace(String str, String repl, String with)
     {
+        if (str == null)
+        {
+            return null;
+        }
+        
         int lastindex = 0;
         int pos = str.indexOf(repl);
 
