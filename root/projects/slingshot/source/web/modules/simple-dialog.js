@@ -176,15 +176,32 @@
           
           /**
            * Object literal representing function to intercept form before submit.
-           *   fn: function, // The handler to call when the event fires.
-           *   obj: object, // An object to pass back to the handler.
-           *   scope: object // The object to use for the scope of the handler.
+           *   fn: function, // The override function.
+           *   obj: object, // An object to pass back to the function.
+           *   scope: object // The object to use for the scope of the function.
            *
            * @property doBeforeFormSubmit
            * @type object
            * @default null
            */
           doBeforeFormSubmit:
+          {
+             fn: null,
+             obj: null,
+             scope: window
+          },
+          
+          /**
+           * Object literal containing the abstract function for intercepting AJAX form submission.
+           *   fn: function, // The override function.
+           *   obj: object, // An object to pass back to the function.
+           *   scope: object // The object to use for the scope of the function.
+           * 
+           * @property doBeforeAjaxRequest
+           * @type object
+           * @default null
+           */
+          doBeforeAjaxRequest:
           {
              fn: null,
              obj: null,
@@ -404,6 +421,13 @@
          if (typeof doBeforeFormSubmit.fn == "function")
          {
             this.form.doBeforeFormSubmit = doBeforeFormSubmit;
+         }
+
+         // Custom ajax before-request interest registered?
+         var doBeforeAjaxRequest = this.options.doBeforeAjaxRequest;
+         if (typeof doBeforeAjaxRequest.fn == "function")
+         {
+            this.form.doBeforeAjaxRequest = doBeforeAjaxRequest;
          }
 
          // Initialise the form
