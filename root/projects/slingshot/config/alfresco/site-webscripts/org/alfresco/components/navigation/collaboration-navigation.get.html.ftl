@@ -11,5 +11,5 @@
 </#list>
 <span class="navigation-separator">|</span>
 <#assign linkClass><#if ("site-members" == activePage) || ("sent-invites" == activePage) || ("invite" == activePage)>class="active-page"</#if></#assign>
-<span class="navigation-item-alt"><a href="${url.context}/page/site/${activeSite}/invite" ${linkClass}>${msg("link.members")}</a></span>
+<span class="navigation-item-alt"><a href="${url.context}/page/site/${activeSite}/site-members" ${linkClass}>${msg("link.members")}</a></span>
 </div>

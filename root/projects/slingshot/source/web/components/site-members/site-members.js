@@ -24,10 +24,10 @@
  */
  
 /**
- * Site Finder component.
+ * Site Members component.
  * 
  * @namespace Alfresco
- * @class Alfresco.SiteFinder
+ * @class Alfresco.SiteMembers
  */
 (function()
 {
@@ -39,15 +39,20 @@
       Element = YAHOO.util.Element;
    
    /**
-    * SiteFinder constructor.
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+   
+   /**
+    * SiteMembers constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.SiteFinder} The new SiteFinder instance
+    * @return {Alfresco.SiteFinder} The new SiteMembers instance
     * @constructor
     */
-   Alfresco.SiteFinder = function(htmlId)
+   Alfresco.SiteMembers = function(htmlId)
    {
-      this.name = "Alfresco.SiteFinder";
+      this.name = "Alfresco.SiteMembers";
       this.id = htmlId;
       
       /* Register this component */
@@ -59,7 +64,7 @@
       return this;
    }
    
-   Alfresco.SiteFinder.prototype =
+   Alfresco.SiteMembers.prototype =
    {
       /**
        * Object container for initialization options
@@ -70,6 +75,14 @@
       options:
       {
          /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: "",
+         
+         /**
           * Maximum number of results displayed.
           * 
           * @property maxResults
@@ -79,21 +92,20 @@
          maxResults: 100,
          
          /**
-          * Flag to indicate whether private sites should be displayed
-          * 
-          * @property showPrivateSites
-          * @type boolean
-          * @default false
-          */
-         showPrivateSites: false,
-         
-         /**
           * The userid of the current user
           * 
           * @property currentUser
           * @type string
           */
-         currentUser: ""
+         currentUser: "",
+         
+         /**
+          * The role of the current user in the current site
+          * 
+          * @property currentUserRole
+          * @type string
+          */
+         currentUserRole: ""
       },
 
       /**
@@ -129,31 +141,13 @@
       searchTerm: "",
       
       /**
-       * List of sites the current user is a member of
-       * 
-       * @property memberOfSites
-       * @type object
-       */
-      memberOfSites: {},
-      
-      /**
-       * Flag to determine whether membership details have been
-       * retrieved yet, until they have join/leave buttons can
-       * not be shown
-       * 
-       * @property membershipsRetrieved
-       * @type boolean
-       */
-      membershipsRetrieved: false,
-      
-      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.Search} returns 'this' for method chaining
        */
-      setOptions: function SiteFinder_setOptions(obj)
+      setOptions: function SiteMembers_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -166,7 +160,7 @@
        * @param obj {object} Object literal specifying a set of messages
        * @return {Alfresco.Search} returns 'this' for method chaining
        */
-      setMessages: function SiteFinder_setMessages(obj)
+      setMessages: function SiteMembers_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -178,7 +172,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function SiteFinder_onComponentsLoaded()
+      onComponentsLoaded: function SiteMembers_onComponentsLoaded()
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -189,32 +183,19 @@
        *
        * @method onReady
        */
-      onReady: function SiteFinder_onReady()
+      onReady: function SiteMembers_onReady()
       {  
          var me = this;
          
-         // build a list of sites the current user is a member of
-         var config = {
-            method: "GET",
-            url: Alfresco.constants.PROXY_URI + "api/people/" + this.options.currentUser + "/sites",
-            successCallback: 
-            { 
-               fn: this._processMembership, 
-               scope: this 
-            },
-            failureMessage: Alfresco.util.message("site-finder.no-membership-detail", "Alfresco.SiteFinder")
-         };
-         Alfresco.util.Ajax.request(config);
-         
          // DataSource definition
-         var uriSearchResults = Alfresco.constants.PROXY_URI + "api/sites?";
+         var uriSearchResults = Alfresco.constants.PROXY_URI + "api/sites/" + me.options.siteId + "/memberships?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["url", "sitePreset", "shortName", "title", "description", "node", "tagScope", "isPublic", "button"]
+             fields: ["userName", "firstName", "lastName", "role", "avatar", "jobtitle", "organization"]
          };
          this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
          {
@@ -224,34 +205,44 @@
             {
                var items = [];
                
-               // determine list of sites to show
-               if (me.searchTerm.length == 0 && me.showPrivateSites)
+               // create a data format that the DataTable can use
+               for (var x = 0; x < oFullResponse.length; x++)
                {
-                  // if no search term and private sites are to be shown
-                  // just pass response through
-                  items = oFullResponse;
-               }
-               else
-               {
-                  for (var x = 0; x < oFullResponse.length; x++)
+                  var lowerSearchTerm = me.searchTerm.toLowerCase();
+                  var memberData = oFullResponse[x];
+                  var firstName = memberData.person.firstName;
+                  var lastName = memberData.person.lastName;
+                  
+                  // Determine if member matches search term
+                  if (firstName.toLowerCase().indexOf(lowerSearchTerm) != -1 ||
+                      lastName.toLowerCase().indexOf(lowerSearchTerm) != -1)
                   {
-                     var siteData = oFullResponse[x];
-                     var shortName = siteData.shortName;
-                     var title = siteData.title;
-                     var isPublic = siteData.isPublic;
+                     // create object to represent member
+                     var member = {
+                        "userName": memberData.person.userName,
+                        "firstName": firstName,
+                        "lastName": lastName,
+                        "role": memberData.role
+                     };
                      
-                     // Filter out private sites if necessary
-                     if (me.options.showPrivateSites ||
-                         (!me.options.showPrivateSites && isPublic))
+                     // add optional metadata
+                     if (memberData.person.avatar !== undefined)
                      {
-                        // Determine if site matches search term
-                        if (shortName.toLowerCase().indexOf(me.searchTerm.toLowerCase()) != -1 ||
-                            title.toLowerCase().indexOf(me.searchTerm.toLowerCase()) != -1)
-                        {
-                           // add site to list
-                           items.push(siteData);
-                        }
+                        member["avatar"] = memberData.person.avatar;
                      }
+                     
+                     if (memberData.person.jobtitle !== undefined)
+                     {
+                        member["jobtitle"] = memberData.person.jobtitle;
+                     }
+                     
+                     if (memberData.person.organization !== undefined)
+                     {
+                        member["organization"] = memberData.person.organization;
+                     }
+                     
+                     // add member to list
+                     items.push(member);
                   }
                }
                
@@ -271,8 +262,8 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
          
          // register the "enter" event on the search text field
-         var searchIinput = Dom.get(this.id + "-term");
-         new YAHOO.util.KeyListener(searchIinput, { keys:13 }, 
+         var searchInput = Dom.get(this.id + "-term");
+         new YAHOO.util.KeyListener(searchInput, { keys:13 }, 
          {
             fn: function() 
             {
@@ -288,24 +279,7 @@
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
       
-      _processMembership: function SiteFinder__processMembership(response)
-      {
-         if (response.json.error === undefined)
-         {
-            var sites = response.json;
-            for (var x = 0; x < sites.length; x++)
-            {
-               var site = sites[x];
-               
-               this.memberOfSites[site.shortName] = true;
-            }
-            
-            // indicate that membership details have been received
-            this.membershipsRetrieved = true;
-         }
-      },
-      
-      _setupDataTable: function SiteFinder_setupDataTable()
+      _setupDataTable: function SiteMembers_setupDataTable()
       {
          /**
           * DataTable Cell Renderers
@@ -316,24 +290,27 @@
          var me = this;
           
          /**
-          * Thumbnail custom datacell formatter
+          * User avatar custom datacell formatter
           *
-          * @method renderCellThumbnail
+          * @method renderCellAvatar
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellThumbnail = function SiteFinder_renderCellThumbnail(elCell, oRecord, oColumn, oData)
+         var renderCellAvatar = function SiteMembers_renderCellAvatar(elCell, oRecord, oColumn, oData)
          {
-            var shortName = oRecord.getData("shortName");
-            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";
-            var siteName = oRecord.getData("title");
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            // Render the icon
-            elCell.innerHTML = '<a href="' + url + '"><img src="' + 
-               Alfresco.constants.URL_CONTEXT + '/components/site-finder/images/site-64.png' + 
-               '" alt="' + siteName + '" title="' + siteName + '" /></a>';
+            var userName = oRecord.getData("userName");
+            var userUrl = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
+            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+            if (oRecord.getData("avatar") !== undefined)
+            {
+               avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
+            }
+
+            elCell.innerHTML = '<a href="' + userUrl + '"><img src="' + avatarUrl + '" alt="avatar" /></a>';
          };
 
          /**
@@ -347,18 +324,31 @@
           */
          renderCellDescription = function SiteFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var shortName = oRecord.getData("shortName");
-            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";         
-            var title = oRecord.getData("title");
-            var desc = oRecord.getData("description");
-            var isPublic = oRecord.getData("isPublic");
+            // Currently rendering all results the same way
+            var userName = oRecord.getData("userName");
+            var name = userName;
+            var firstName = oRecord.getData("firstName");
+            var lastName = oRecord.getData("lastName");
+            if ((firstName !== undefined) || (lastName !== undefined))
+            {
+               name = firstName ? firstName + " " : "";
+               name += lastName ? lastName : "";
+            }
+
+            var url = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
+            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
+            var organization = oRecord.getData("organization") ? oRecord.getData("organization") : "";
+            desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
+            if (title.length > 0)
+            {
+               desc += '<div><span class="attr-name">Title:</span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
+            }
+            if (organization.length > 0)
+            {
+               desc += '<div><span class="attr-name">Company:</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
+            }
             
-            // title/link to site page
-            var details = '<h3 class="sitename"><a href="' + url + '">' + title + '</a></h3>';
-            // description
-            details += '<div class="sitedescription">' + desc + '</div>';
-            
-            elCell.innerHTML = details;
+            elCell.innerHTML = desc;
          };
          
          /**
@@ -372,62 +362,52 @@
           */
          renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {
-            if (me.membershipsRetrieved)
+            // TODO: determine if actions should be visible, only are if current user is a site manager
+            
+            /*
+            if (true)
             {
-               var isPublic = oRecord.getData("isPublic");
-               if (isPublic)
+               var userName = oRecord.getData("userName");
+               var action = '<span id="' + me.id + '-button-' + userName + '"></span>';
+               elCell.innerHTML = action;
+               
+               // create button
+               var button = new YAHOO.widget.Button(
                {
-                  var shortName = oRecord.getData("shortName");
-                  var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
-                  elCell.innerHTML = action;
-                  
-                  // create button
-                  var button = new YAHOO.widget.Button(
-                  {
-                      container: me.id + '-button-' + shortName
-                  });
-                  
-                  // if the user is already a member of the site show leave button
-                  // otherwise show join button
-                  if (shortName in me.memberOfSites)
-                  {
-                     button.set("label", Alfresco.util.message("site-finder.leave", "Alfresco.SiteFinder"));
-                     button.set("onclick", { fn: me.doLeave, obj: shortName, scope: me});
-                  }
-                  else
-                  {
-                     button.set("label", Alfresco.util.message("site-finder.join", "Alfresco.SiteFinder"));
-                     button.set("onclick", { fn: me.doJoin, obj: shortName, scope: me});
-                  }
-                  
-                  me.buttons[shortName] = { button: button };
-               }
+                   container: me.id + '-button-' + userName
+               });
+               
+               button.set("label", Alfresco.util.message("site-members.uninvite", "Alfresco.SiteMembers"));
+               button.set("onclick", { fn: me.doRemove, obj: userName, scope: me});
+               
+               me.buttons[userName] = { button: button };
             }
             else
             {
+            */
                // output padding div so layout is not messed up due to missing buttons
                elCell.innerHTML = '<div></div>';
-            }
+            //}
          };
 
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "shortName", label: "Short Name", sortable: false, formatter: renderCellThumbnail
+            key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar
          },
          {
-            key: "title", label: "Title", sortable: false, formatter: renderCellDescription
+            key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "description", label: "Description", formatter: renderCellActions
+            key: "actions", label: "Actions", formatter: renderCellActions
          }
          ];
 
          YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' +
-            Alfresco.util.message("site-finder.enter-search-term", "Alfresco.SiteFinder") + '</span>';
+            Alfresco.util.message("site-members.enter-search-term", "Alfresco.SiteMembers") + '</span>';
 
          // DataTable definition
-         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-members", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
             initialLoad: false
@@ -453,7 +433,7 @@
                if (oResponse.results.length == 0)
                {
                   YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' + 
-                     Alfresco.util.message("message.empty", "Alfresco.SiteFinder") + '</span>';
+                     Alfresco.util.message("message.empty", "Alfresco.SiteMembers") + '</span>';
                }
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
@@ -468,113 +448,59 @@
        *
        * @method doSearch
        */
-      doSearch: function SiteFinder_doSearch()
+      doSearch: function SiteMembers_doSearch()
       {
          this.searchTerm = Dom.get(this.id + "-term").value;
          this._performSearch(this.searchTerm);
       },
       
       /**
-       * Join event handler
+       * Remove user event handler
        * 
-       * @method doJoin
+       * @method doRemove
        * @param event {object} The event object
-       * @param site {string} The shortName of the site to join
+       * @param user {string} The userName to remove
        */
-      doJoin: function SiteFinder_doJoin(event, site)
+      doRemove: function SiteMembers_doRemove(event, user)
       {
-         var user = this.options.currentUser;
+         alert("remove user '" + user + "' from site: " + me.options.siteId);
          
          // make ajax call to site service to join user
-         Alfresco.util.Ajax.jsonRequest(
-         {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
-            method: "PUT",
-            dataObj:
-            {
-               role: "SiteConsumer",
-               person:
-               {
-                  userName: user
-               }
-            },
-            successCallback:
-            {
-               fn: this._joinSuccess,
-               obj: site,
-               scope: this
-            },
-            failureMessage: Alfresco.util.message("site-finder.join-failure", "Alfresco.SiteFinder", this.options.currentUser, site)
-         });
-      },
-      
-      /**
-       * Callback handler used when a user is successfully added to a site
-       * 
-       * @method _joinSuccess
-       * @param response {object}
-       * @param siteData {object}
-       */
-      _joinSuccess: function SiteFinder__joinSuccess(response, site)
-      {
-         // add site to site membership list
-         this.memberOfSites[site] = true;
-         
-         // show popup message to confirm
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: Alfresco.util.message("site-finder.join-success", "Alfresco.SiteFinder", this.options.currentUser, site)
-         });
-         
-         // redo the search again to get updated info
-         this.doSearch();
-      },
-      
-      /**
-       * Leave event handler
-       * 
-       * @method doLeave
-       * @param event {object} The event object
-       * @param site {string} The shortName of the site to leave
-       */
-      doLeave: function SiteFinder_doLeave(event, site)
-      {
-         var user = this.options.currentUser;
-         
-         // make ajax call to site service to join user
+         /*
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
             method: "DELETE",
             successCallback:
             {
-               fn: this._leaveSuccess,
-               obj: site,
+               fn: this._removeSuccess,
+               obj: user,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-finder.leave-failure", "Alfresco.SiteFinder", this.options.currentUser, site)
+            failureMessage: Alfresco.util.message("site-members.remove-failure", "Alfresco.SiteMembers", user, me.options.siteId)
          });
+         */
       },
       
       /**
-       * Callback handler used when a user is successfully removed from a site
+       * Callback handler used when a user is successfully removed from the site
        * 
-       * @method _leaveSuccess
+       * @method _removeSuccess
        * @param response {object}
-       * @param siteData {object}
+       * @param user {object}
        */
-      _leaveSuccess: function SiteFinder__leaveSuccess(response, site)
+      _removeSuccess: function SiteMembers__removeSuccess(response, user)
       {
-         // remove site from site membership list
-         delete this.memberOfSites[site];
-         
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("site-finder.leave-success", "Alfresco.SiteFinder", this.options.currentUser, site)
+            text: Alfresco.util.message("site-members.remove-success", "Alfresco.SiteMembers", user)
          });
          
          // redo the search again to get updated info
+         
+         // TODO: can we just remove the data from the underlying data table rather than re-doing search?
+         
          this.doSearch();
       },
       
@@ -584,15 +510,15 @@
        *
        * @method _setDefaultDataTableErrors
        */
-      _setDefaultDataTableErrors: function SiteFinder__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function SiteMembers__setDefaultDataTableErrors()
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.SiteFinder");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.SiteFinder");
+         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.SiteMembers");
+         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.SiteMembers");
       },
       
       /**
-       * Updates site list by calling data webscript with current search term
+       * Updates members list by calling data webscript with current search term
        *
        * @method _performSearch
        * @param searchTerm {string} The term to search for
@@ -603,7 +529,7 @@
          this._setDefaultDataTableErrors();
          
          // Display loading message
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-finder.searching", "Alfresco.SiteFinder");
+         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-members.searching", "Alfresco.SiteMembers");
          
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -638,9 +564,9 @@
          
          this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
          {
-               success: successHandler,
-               failure: failureHandler,
-               scope: this
+            success: successHandler,
+            failure: failureHandler,
+            scope: this
          });
       },
 
