@@ -154,24 +154,29 @@ Alfresco.util.assertNotEmpty = function(param, message)
  * @throws {Error}
  */
 Alfresco.util.formatFileSize = function(fileSize)
-{   
-   if (fileSize < 999)
+{
+   if (typeof fileSize == "string")
    {
-      return fileSize + " B"
+      fileSize = parseInt(fileSize, 10);
    }
-   else if (fileSize < 999999)
+   
+   if (fileSize < 1024)
+   {
+      return fileSize + " " + Alfresco.util.message("size.bytes");
+   }
+   else if (fileSize < 1048576)
    {
       fileSize = Math.round(fileSize / 1024);
-      return fileSize + " KB"
+      return fileSize + " " + Alfresco.util.message("size.kilobytes");
    }
-   else if (fileSize < 999999999)
+   else if (fileSize < 1073741824)
    {
       fileSize = Math.round(fileSize / 1048576);
-      return fileSize + " MB";
+      return fileSize + " " + Alfresco.util.message("size.megabytes");
    }
 
    fileSize = Math.round(fileSize / 1073741824);
-   return fileSize + " GB";
+   return fileSize + " " + Alfresco.util.message("size.gigabytes");
 }
 
 /**
@@ -426,7 +431,7 @@ Alfresco.util.caretFix = function(p_formElement)
 }
 
 /**
- * Removed the fixes for the hidden caret problem in Firefox 2.x.
+ * Remove the fixes for the hidden caret problem in Firefox 2.x.
  * Should be called before hiding a form for re-use.
  *
  * @method Alfresco.util.undoCaretFix
@@ -573,16 +578,7 @@ Alfresco.util.YUILoaderHelper = function()
                base: Alfresco.constants.URL_CONTEXT + "yui/",
                filter: Alfresco.constants.DEBUG ? "DEBUG" : "",
                loadOptional: false,
-               skin:
-               {
-                  defaultSkin: Alfresco.constants.THEME,
-                  /* TODO: Remove these once bug fixed from YUI 2.5.1 */
-                  /* See: http://sourceforge.net/tracker/index.php?func=detail&aid=1954935&group_id=165715&atid=836478 */
-                  base: 'assets/skins/',
-                  path: 'skin.css',
-                  after: ['reset', 'fonts', 'grids', 'base'],
-                  rollup: 3
-               },
+               skin: {},
                onSuccess: Alfresco.util.YUILoaderHelper.onLoaderComplete,
                onFailure: function(event)
                {
@@ -601,8 +597,6 @@ Alfresco.util.YUILoaderHelper = function()
                varName: "SWFPlayer",
                requires: ['uploader'] // The FlashAdapter class is located in uploader.js
             });
-
-
          }
          
          if (p_aComponents.length > 0)
