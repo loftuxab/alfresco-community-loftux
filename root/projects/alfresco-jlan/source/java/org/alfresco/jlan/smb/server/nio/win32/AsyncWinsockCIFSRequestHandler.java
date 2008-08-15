@@ -623,7 +623,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 				
 				// Check the time of the last I/O request on this session
 				
-				if ( sess.getLastIOTime() < checkTime) {
+				if ( sess != null && sess.getLastIOTime() < checkTime) {
 					
 					// DEBUG
 					
