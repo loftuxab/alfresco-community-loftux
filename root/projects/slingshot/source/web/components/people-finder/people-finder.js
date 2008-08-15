@@ -85,7 +85,25 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+
+         /**
+          * Compact mode flag
+          * 
+          * @property compactMode
+          * @type boolean
+          * @default false
+          */
+         compactMode: false,
+
+         /**
+          * Single Select mode flag
+          * 
+          * @property singleSelectMode
+          * @type boolean
+          * @default false
+          */
+         singleSelectMode: false
       },
 
       /**
@@ -112,6 +130,22 @@
        */
       searchTerm: "",
       
+      /**
+       * Single selected user, for when in single select mode
+       * 
+       * @property singleSelectedUser
+       * @type string
+       */
+      singleSelectedUser: "",
+
+      /**
+       * Selected users. Keeps a list of selected users for correct Add button state.
+       * 
+       * @property selectedUsers
+       * @type object
+       */
+      selectedUsers: {},
+
       /**
        * Set multiple initialization options at once.
        *
@@ -158,6 +192,16 @@
       onReady: function PeopleFinder_onReady()
       {  
          var me = this;
+
+         // Compact mode?
+         if (this.options.compactMode)
+         {
+            Dom.addClass(this.id + "-body", "compact");
+         }
+         else
+         {
+            Dom.setStyle(this.id + "-results", "height", "300px");
+         }
 
          // Search button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
@@ -229,6 +273,7 @@
          var onKeyEnter = function PeopleFinder_onKeyEnter(id, keyEvent)
          {
             me.onSearchClick.call(me, keyEvent, null);
+            return false;
          }
 
          // Enter key listener
@@ -237,9 +282,6 @@
             keys: YAHOO.util.KeyListener.KEY.ENTER
          }, onKeyEnter, "keydown");
          enterListener.enable();
-
-         // Show button here to prevent UI artifacts on YUI button decoration
-         Dom.setStyle(this.id + "-search-button", "visibility", "visible");
       },
       
       /**
@@ -277,7 +319,7 @@
                avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
             }
 
-            elCell.innerHTML = '<img src="' + avatarUrl + '" alt="avatar" />';
+            elCell.innerHTML = '<img class="avatar" src="' + avatarUrl + '" alt="avatar" />';
          };
 
          /**
@@ -305,7 +347,14 @@
             var organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
             desc = '<h3 class="itemname">' + $html(name) + '</a></h3>';
             desc += '<div class="detail">' + $html(title) + '</div>';
-            desc += '<div class="detail">' + $html(organisation) + '</div>';
+            if (me.options.compactMode && organisation != "")
+            {
+               desc += '<div class="detail">&nbsp;(' + $html(organisation) + ')</div>';
+            }
+            else
+            {
+               desc += '<div class="detail">' + $html(organisation) + '</div>';
+            }
             elCell.innerHTML = desc;
          };
          
@@ -322,8 +371,8 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             
-            var id = oRecord.getData("userName");
-            var desc = '<span id="' + me.id + '-select-' + id + '"></span>';
+            var userName = oRecord.getData("userName");
+            var desc = '<span id="' + me.id + '-select-' + userName + '"></span>';
             elCell.innerHTML = desc;
 
             // create button
@@ -331,8 +380,8 @@
             {
                type: "button",
                label: me._msg("button.add") + " >>",
-               name: me.id + "-selectbutton-" + id,
-               container: me.id + '-select-' + id,
+               name: me.id + "-selectbutton-" + userName,
+               container: me.id + '-select-' + userName,
                onclick:
                {
                   fn: me.onPersonSelect,
@@ -340,13 +389,18 @@
                   scope: me
                }
             });
-            me.userSelectButtons[id] = button;
+            me.userSelectButtons[userName] = button;
+            
+            if ((userName in me.selectedUsers) || (me.options.singleSelectMode && me.singleSelectedUser != ""))
+            {
+               me.userSelectButtons[userName].set("disabled", true);
+            }
          };
 
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: 70
+            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: this.options.compactMode ? 36 : 70
          },
          {
             key: "person", label: "Description", sortable: false, formatter: renderCellDescription
@@ -362,6 +416,26 @@
             renderLoopSize: 8,
             initialLoad: false
          });
+
+         // Enable row highlighting
+         this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);
+         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
+      },
+      
+      /**
+       * Public function to clear the results DataTable
+       */
+      clearResults: function PeopleFinder_clearResults()
+      {
+         // Clear results DataTable
+         if (this.widgets.dataTable)
+         {
+            var recordCount = this.widgets.dataTable.getRecordSet().getLength();
+            this.widgets.dataTable.deleteRows(0, recordCount);
+         }
+         Dom.get(this.id + "-search-text").value = "";
+         this.singleSelectedUser = "";
+         this.selectedUsers = {};
       },
 
 
@@ -390,8 +464,22 @@
             email: p_obj.getData("email")
          });
          
-         // Disable the add button
-         this.userSelectButtons[userName].set("disabled", true);
+         // Add the userName to the selectedUsers object
+         this.selectedUsers[userName] = true;
+         this.singleSelectedUser = userName;
+         
+         // Disable the add button(s)
+         if (this.options.singleSelectMode)
+         {
+            for (button in this.userSelectButtons)
+            {
+               this.userSelectButtons[button].set("disabled", true);
+            }
+         }
+         else
+         {
+            this.userSelectButtons[userName].set("disabled", true);
+         }
       },
 
       /**
@@ -407,7 +495,7 @@
          var searchTermElem = Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
          searchTerm = $html(searchTerm);
-         if (searchTerm.length < 3)
+         if (searchTerm.length < 0)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -415,6 +503,8 @@
             });
             return;
          }
+         
+         this.userSelectButtons = {};
          
          this._performSearch(searchTerm);
       },
@@ -438,8 +528,20 @@
          // Should be person details in the arguments
          if (obj && (obj.userName !== null))
          {
-            // Re-enable the add button
-            this.userSelectButtons[obj.userName].set("disabled", false);
+            delete this.selectedUsers[obj.userName];
+            this.singleSelectedUser = "";
+            // Re-enable the add button(s)
+            if (this.options.singleSelectMode)
+            {
+               for (button in this.userSelectButtons)
+               {
+                  this.userSelectButtons[button].set("disabled", false);
+               }
+            }
+            else
+            {
+               this.userSelectButtons[obj.userName].set("disabled", false);
+            }
          }
       },
 
