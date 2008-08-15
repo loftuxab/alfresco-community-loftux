@@ -1,0 +1,80 @@
+.site-members 
+{
+	margin: 10px;
+}
+
+.site-members .heading
+{
+   color: #333333;
+   font-size: 153.9%;
+   margin: 16px 0px;
+}
+
+.site-members .search-controls
+{
+   border-top: 1px solid #bababa;
+   border-left: 1px solid #bababa;
+   border-right: 1px solid #bababa;
+   padding: 8px;
+   margin-top: 10px;
+   background-color: #aebccc;
+}
+
+.site-members .search-controls .search-term
+{
+   vertical-align: text-bottom;
+   height: 18px;
+   width: 75%;
+}
+
+.site-members .yui-dt-bd
+{
+   border: 1px solid #a1a1a1;
+}
+
+.site-members .yui-dt-bd table
+{
+	width: 100%;
+	border: none;
+}
+
+.site-members .yui-dt-bd table thead
+{
+	display: none;
+}
+
+.site-members .yui-dt td
+{
+   border: none;
+}
+
+.site-members .yui-dt-first
+{
+   width: 70px;
+}
+
+.site-members .yui-dt-last
+{
+   width: 75px;
+}
+
+.site-members tr.yui-dt-odd
+{
+   background-color: #fbfbfb;
+}
+
+.site-members h3 a
+{
+   color: #2b6eb5;
+}
+
+.site-members .attr-name
+{
+   color: #606060;
+}
+
+.site-members .attr-value
+{
+   color: #333333;
+}
+
