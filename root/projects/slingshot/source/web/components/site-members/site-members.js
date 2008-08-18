@@ -47,7 +47,7 @@
     * SiteMembers constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.SiteFinder} The new SiteMembers instance
+    * @return {Alfresco.SiteMembers} The new SiteMembers instance
     * @constructor
     */
    Alfresco.SiteMembers = function(htmlId)
@@ -117,7 +117,7 @@
       widgets: {},
       
       /**
-       * List of Join/Leave buttons
+       * List of uninvite buttons
        * 
        * @property buttons
        * @type array
@@ -205,7 +205,7 @@
              resultsList: "items",
              fields: ["userName", "firstName", "lastName", "role", "avatar", "jobtitle", "organization"]
          };
-         this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
+         this.widgets.dataSource.doBeforeParseData = function SiteMembers_doBeforeParseData(oRequest , oFullResponse)
          {
             var updatedResponse = oFullResponse;
                
@@ -300,7 +300,7 @@
           * DataTable Cell Renderers
           *
           * Each cell has a custom renderer defined as a custom function. See YUI documentation for details.
-          * These MUST be inline in order to have access to the Alfresco.SiteFinder class (via the "me" variable).
+          * These MUST be inline in order to have access to the Alfresco.SiteMembers class (via the "me" variable).
           */
          var me = this;
           
@@ -337,7 +337,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellDescription = function SiteFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
+         renderCellDescription = function SiteMembers_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // Currently rendering all results the same way
             var userName = oRecord.getData("userName");
@@ -367,32 +367,96 @@
          };
          
          /**
-          * Actions custom datacell formatter
+          * Role select custom datacell formatter
           *
-          * @method renderCellActions
+          * @method renderCellRoleSelect
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
+         renderCellRoleSelect = function SiteMembers_renderCellRoleSelect(elCell, oRecord, oColumn, oData)
          {
             if (me.isCurrentUserSiteAdmin)
             {
-               var userName = oRecord.getData("userName");
-               var action = '<span id="' + me.id + '-button-' + userName + '"></span>';
-               elCell.innerHTML = action;
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+               Dom.setStyle(elCell.parentNode, "text-align", "right");
                
-               // create button
-               var button = new YAHOO.widget.Button(
+               // create HTML for representing buttons
+               var userName = oRecord.getData("userName");
+               var currentRole = oRecord.getData("role");
+               elCell.innerHTML = '<span id="' + me.id + '-roleselector-' + userName + '"></span>';
+               
+               // create the roles menu
+               var rolesMenu = [
+                  {
+                     text: me._msg("role.siteconsumer"), value: "SiteConsumer", onclick: {
+                        fn: me.onRoleSelect, obj: { user: userName, currentRole: currentRole, newRole: "SiteConsumer" }, 
+                        scope: me
+                     }
+                  },
+                  {
+                     text: me._msg("role.sitecollaborator"), value: "SiteCollaborator", onclick: {
+                        fn: me.onRoleSelect, obj: { user: userName, currentRole: currentRole, newRole: "SiteCollaborator" }, 
+                        scope: me
+                     }
+                  },
+                  {
+                     text: me._msg("role.sitemanager"), value: "SiteManager", onclick: {
+                        fn: me.onRoleSelect, obj: { user: userName, currentRole: currentRole, newRole: "SiteManager" }, 
+                        scope: me
+                     }
+                  }
+               ];
+               
+               // create the role selector button
+               var roleselector = new YAHOO.widget.Button(
                {
-                   container: me.id + '-button-' + userName
+                  container: me.id + '-roleselector-' + userName,
+                  type: "menu",
+                  label: me.getRoleLabel(oRecord),
+                  menu: rolesMenu
                });
                
-               button.set("label", Alfresco.util.message("site-members.uninvite", "Alfresco.SiteMembers"));
-               button.set("onclick", { fn: me.doRemove, obj: userName, scope: me});
+               // store the buttons
+               me.buttons[userName + "-roleselector"] = { roleselector: roleselector };
+            }
+            else
+            {
+               // output padding div so layout is not messed up due to missing buttons
+               elCell.innerHTML = '<div></div>';
+            }
+         };
+         
+         /**
+          * Uninvite button custom datacell formatter
+          *
+          * @method renderCellUninvite
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         renderCellUninvite = function InvitationList_renderCellUninvite(elCell, oRecord, oColumn, oData)
+         {
+            if (me.isCurrentUserSiteAdmin)
+            {
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
                
-               me.buttons[userName] = { button: button };
+               // create HTML for representing buttons
+               var userName = oRecord.getData("userName");
+               elCell.innerHTML = '<span id="' + me.id + '-button-' + userName + '"></span>';
+               
+               // create the uninvite button
+               var button = new YAHOO.widget.Button(
+               {
+                   container: me.id + '-button-' + userName,
+                   label: Alfresco.util.message("site-members.uninvite", "Alfresco.SiteMembers"),
+                   onclick: { fn: me.doRemove, obj: userName, scope: me}
+               });
+               
+               // store the buttons
+               me.buttons[userName + "-button"] = { button: button };
             }
             else
             {
@@ -410,7 +474,10 @@
             key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", formatter: renderCellActions
+            key: "role", label: "Select Role", formatter: renderCellRoleSelect, width: 140
+         },
+         {
+            key: "uninvite", label: "Uninvite", formatter: renderCellUninvite, width: 80
          }
          ];
 
@@ -425,7 +492,7 @@
          });
          
          // Override abstract function within DataTable to set custom error message
-         this.widgets.dataTable.doBeforeLoadData = function SiteFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
+         this.widgets.dataTable.doBeforeLoadData = function SiteMembers_doBeforeLoadData(sRequest, oResponse, oPayload)
          {
             if (oResponse.error)
             {
@@ -451,6 +518,34 @@
             
             // Must return true to have the "Searching..." message replaced by the error message
             return true;
+         }
+      },
+      
+      /**
+       * Gets the label for the role of the given record
+       * 
+       * @method getRoleLabel
+       * @param oRecord {object}
+       * @return The display label for the role
+       */
+      getRoleLabel: function(record)
+      {
+         var roleName = "";
+         if (record.getData("role") != undefined)
+         {
+            roleName = record.getData("role");
+         }
+         
+         switch(roleName)
+         {
+            case "SiteConsumer":
+               return this._msg("role.siteconsumer");
+            case "SiteCollaborator":
+               return this._msg("role.sitecollaborator");
+            case "SiteManager":
+               return this._msg("role.sitemanager");
+            default:
+               return this._msg("role.unknown");
          }
       },
       
@@ -509,6 +604,63 @@
       },
       
       /**
+       * Called when the user selects a role in the role dropdown
+       * 
+       * @parma p_obj: object containing record and role to set
+       */
+      onRoleSelect: function SiteMembers_onRoleSelect(type, event, args)
+      {
+         var selectedRole = args.newRole;
+         var currentRole = args.currentRole;
+         var user = args.user;
+         
+         if (selectedRole !== currentRole)
+         {
+            // make ajax call to site service to change role
+            Alfresco.util.Ajax.jsonRequest(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + user,
+               method: "PUT",
+               dataObj:
+               {
+                  role: selectedRole,
+                  person:
+                  {
+                     userName: user
+                  }
+               },
+               successCallback:
+               {
+                  fn: this._changeRoleSuccess,
+                  obj: { user: user, role: selectedRole },
+                  scope: this
+               },
+               failureMessage: Alfresco.util.message("site-members.change-role-failure", "Alfresco.SiteMembers", user)
+            });
+         }
+      },
+      
+      /**
+       * Callback handler used when a users role is successfully changed
+       * 
+       * @method _changeRoleSuccess
+       * @param response {object}
+       * @param userRole {object}
+       */
+      _changeRoleSuccess: function SiteMembers__changeRoleSuccess(response, userRole)
+      {
+         // show popup message to confirm
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("site-members.change-role-success", "Alfresco.SiteMembers", 
+                  userRole.user, userRole.role)
+         });
+         
+         // redo the search again to get updated info
+         this.doSearch();
+      },
+      
+      /**
        * Resets the YUI DataTable errors to our custom messages
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
@@ -527,7 +679,7 @@
        * @method _performSearch
        * @param searchTerm {string} The term to search for
        */
-      _performSearch: function SiteFinder__performSearch(searchTerm)
+      _performSearch: function SiteMembers__performSearch(searchTerm)
       {
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
@@ -580,7 +732,7 @@
        * @method _buildSearchParams
        * @param searchTerm {string} Path to query
        */
-      _buildSearchParams: function SiteFinder__buildSearchParams(searchTerm)
+      _buildSearchParams: function SiteMembers__buildSearchParams(searchTerm)
       {
          var params = YAHOO.lang.substitute("size={maxResults}",
          {
@@ -588,6 +740,19 @@
          });
 
          return params;
+      },
+      
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function SiteMembers__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.SiteMembers", Array.prototype.slice.call(arguments).slice(1));
       }
    };
 })();
