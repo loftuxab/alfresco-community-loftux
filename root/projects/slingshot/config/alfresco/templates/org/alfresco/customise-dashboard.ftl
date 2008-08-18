@@ -8,6 +8,7 @@
 <div id="hd">
    <@region id="header" scope="global" protected=true />
    <@region id="title" scope="template" protected=true />
+   <@region id="navigation" scope="template" protected=true />
    <h1 class="sub-title">${page.title}</h1>
 </div>
 <div id="bd">

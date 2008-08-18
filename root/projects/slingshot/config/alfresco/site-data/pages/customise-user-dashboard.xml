@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
+   <id>customise-user-dashboard</id>      
    <title>Customize User Dashboard</title>
    <description>Customize dashboard layout and dashlets for a user dashboard</description>
    <template-instance>customise-user-dashboard</template-instance>
