@@ -474,8 +474,6 @@
        */
       doRemove: function SiteMembers_doRemove(event, user)
       {
-         alert("remove user '" + user + "' from site: " + this.options.siteId);
-         
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {
