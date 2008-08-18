@@ -272,16 +272,16 @@
        * Registers the form logic
        */
       _registerBlogPostForm: function BlogPostEdit__registerPostForm()
-      {  
-         // register the tag listener
-         this.modules.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
-         
+      {
+         // initialize the tag library
+         this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
+         this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
+         this.modules.tagLibrary.initialize();
+          
          // add the tags that are already set on the post
          if (this.options.editMode && this.blogPostData.tags.length > 0)
          {
-            // find the tag library component
-            var taglibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.TagLibrary");
-            taglibrary.addTags(this.blogPostData.tags);
+            this.modules.tagLibrary.setTags(this.blogPostData.tags);
          }
          
          // create the Button
@@ -361,8 +361,9 @@
             {
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
+               
                // update the tags set in the form
-               this.modules.tagLibraryListener.updateForm();
+               this.modules.tagLibrary.updateForm(this.id + "-form", "tags");
             },
             scope: this
          }

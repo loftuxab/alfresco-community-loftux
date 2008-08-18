@@ -212,10 +212,14 @@
          // Create new post button
          this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic,
          {
+            disabled: true
          });
-
+         
+         // initialize rss feed link
+         this._generateRSSFeedUrl();
+         
          // Simple view button
-         this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
+         this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
          {
             type: "checkbox",
             checked: this.options.simpleView
@@ -230,9 +234,6 @@
             template: this._msg("pagination.template"),
             pageReportTemplate: this._msg("pagination.template.page-report")
          });
-
-         // initialize rss feed link
-         this._generateRSSFeedUrl();
 
          // Hook action events for details view
          var fnActionHandlerDiv = function DiscussionsTopicList_fnActionHandlerDiv(layer, args)
@@ -295,7 +296,8 @@
             metaFields:
             {
                paginationRecordOffset: "startIndex",
-               totalRecords: "total"
+               totalRecords: "total",
+               forumPermissions: "forumPermissions"
             }
          };
          
@@ -504,6 +506,13 @@
             {
                this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
+            
+            // adapt the toolbar if we got permissions
+            if (oResponse.meta.forumPermissions)
+            {
+               me._updateToolbar(oResponse.meta.forumPermissions);
+            }
+            
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
@@ -521,6 +530,14 @@
             filterData: null
          }, this.options.initialFilter);
          YAHOO.Bubbling.fire("filterChanged", filterObj);
+      },
+      
+      /**
+       * Updates the toolbar using the provided forumPermissions.
+       */
+      _updateToolbar: function DiscussionsTopicList__updateToolbar(forumPermissions)
+      {
+         this.widgets.createPost.set("disabled", ! forumPermissions.create);
       },
       
       /**

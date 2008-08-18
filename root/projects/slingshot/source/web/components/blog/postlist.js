@@ -210,15 +210,17 @@
          // Create new post button
          this.widgets.createPost = Alfresco.util.createYUIButton(this, "createPost-button", this.onCreatePost,
          {
+            "disabled" : true
          });
 
          // Configure blog button
          this.widgets.configureBlog =  Alfresco.util.createYUIButton(this, "configureBlog-button", this.onConfigureBlog,
          {
+            "disabled" : true
          });
 
          // Simple view button
-         this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
+         this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
          {
             type: "checkbox",
             checked: this.options.simpleView
@@ -299,7 +301,8 @@
             metaFields:
             {
                paginationRecordOffset: "startIndex",
-               totalRecords: "total"
+               totalRecords: "total",
+               blogPermissions: "blogPermissions"
             }
          };
          
@@ -476,6 +479,13 @@
             {
                this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
+            
+            // extract the create permission and update the UI accordingly
+            if (oResponse.meta.blogPermissions)
+            {
+               me.updateToolbar(oResponse.meta.blogPermissions);
+            }
+            
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
@@ -514,6 +524,14 @@
          }
       },
 
+      /**
+       * Updates the toolbar using the passed permissions
+       */
+      updateToolbar : function BlogPostList_updateToolbar(blogPermissions)
+      {
+         this.widgets.createPost.set("disabled", ! blogPermissions.create)
+         this.widgets.configureBlog.set("disabled", ! blogPermissions.edit)
+      },
 
       // Actions
       

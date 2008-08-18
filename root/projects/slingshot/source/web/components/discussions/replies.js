@@ -281,23 +281,23 @@
       },
 
       /**
-       * Converts a html-id save nodeRef to a real one.
+       * Converts a html-id safe nodeRef to a real one.
        * 
-       * @param saveRef {string} a nodeReference where the separators have been replaced by _
+       * @param safeRef {string} a nodeReference where the separators have been replaced by _
        * @return {string} a valid node reference
        */
-      toNodeRef: function(saveRef)
+      toNodeRef: function(safeRef)
       {
-         return saveRef.replace(/_/, '://').replace(/_/, '/');
+         return safeRef.replace(/_/, '://').replace(/_/, '/');
       },
       
       /**
-       * Converts a node reference to a html-id save string.
+       * Converts a node reference to a html-id safe string.
        * 
        * @param nodeRef {string} a nodeReference where the separators have been replaced by _
        * @return {string} a nodeRef string usable in html id values
        */
-      toSaveRef: function(nodeRef)
+      toSafeRef: function(nodeRef)
       {
          return nodeRef.replace(':/', '').replace('/', '_');
       },
@@ -314,7 +314,7 @@
          
          // add the reply form element
          var replyFormDiv = document.createElement("div");
-         replyFormDiv.setAttribute("id", "reply-add-form-" + this.toSaveRef(this.options.topicRef));
+         replyFormDiv.setAttribute("id", "reply-add-form-" + this.toSafeRef(this.options.topicRef));
          elem.appendChild(replyFormDiv);
          
          for (var x=0; x < this.repliesData.length; x++)
@@ -338,24 +338,24 @@
          
          // we first generate the general html for an element, this is the
          // edit and view divs, the child replies div including the add reply div.
-         var saveRef = this.toSaveRef(data.nodeRef);
+         var safeRef = this.toSafeRef(data.nodeRef);
          var html = '';
-         html += '<div class="reply" id="reply-' + saveRef + '">'
+         html += '<div class="reply" id="reply-' + safeRef + '">'
          html += '</div>'
-         html += '<div id="reply-edit-form-' + saveRef + '" class="hidden"></div>';
-         html += '<div id="reply-add-form-' + saveRef + '" class="indented hidden"></div>';
-         html += '<div class="indented" id="replies-of-' + saveRef + '"></div>';
+         html += '<div id="reply-edit-form-' + safeRef + '" class="hidden"></div>';
+         html += '<div id="reply-add-form-' + safeRef + '" class="indented hidden"></div>';
+         html += '<div class="indented" id="replies-of-' + safeRef + '"></div>';
          replyDiv.innerHTML = html;
          parentDiv.appendChild(replyDiv);
          
          // render the reply content
-         var viewElem = Dom.get('reply-' + saveRef);
+         var viewElem = Dom.get('reply-' + safeRef);
          this.renderReplyView(viewElem, data);
          
          // render the children if they got already loaded
          if (data.children != undefined)
          {
-            var repliesElem = Dom.get('replies-of-' + saveRef);
+            var repliesElem = Dom.get('replies-of-' + safeRef);
             for (var x=0; x < data.children.length; x++)
             {
                this.renderReply(repliesElem, data.children[x]);
@@ -368,21 +368,21 @@
        */
       renderReplyView: function TopicReplies_renderReplyView(div, data)
       {
-         var saveRef = this.toSaveRef(data.nodeRef);
+         var safeRef = this.toSafeRef(data.nodeRef);
          var html = '';
                   
          // render the actions
          html += '<div class="nodeEdit">'
          if (data.permissions.reply)
          {
-            html += '<div class="onAddReply" id="' + this.id + '-onAddReply-' + saveRef + '">';
+            html += '<div class="onAddReply" id="' + this.id + '-onAddReply-' + safeRef + '">';
             html += '<a href="#" class="reply-action-link">' + this._msg("action.reply") + '</a>';
             html += '</div>'
          }
         
          if (data.permissions.edit)
          {
-            html += '<div class="onEditReply" id="' + this.id + '-onEditReply-' + saveRef + '">';
+            html += '<div class="onEditReply" id="' + this.id + '-onEditReply-' + safeRef + '">';
             html += '<a href="#" class="reply-action-link">' + this._msg("action.edit") + '</a>';
             html += '</div>';
          }
@@ -410,7 +410,7 @@
          if (data.replyCount > 0)
          {
             html += '<span class="nodeAttrValue">';
-            html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + saveRef + '">' + this._msg("replies.hide") + '</a>'
+            html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + safeRef + '">' + this._msg("replies.hide") + '</a>'
             html += '</span>';
          }
          html += '<span class="spacer"> | </span>';
@@ -427,7 +427,7 @@
       rerenderReplyUI: function TopicReplies_rerenderReplyUI(nodeRef)
       {
          // Get the view element and the data and update the html
-         var viewElem = Dom.get('reply-' + this.toSaveRef(nodeRef));
+         var viewElem = Dom.get('reply-' + this.toSafeRef(nodeRef));
          var data = this.findReplyDataObject(nodeRef);
          this.renderReplyView(viewElem, data);
       },
@@ -457,7 +457,7 @@
       showHideChildren: function TopicReplies_showideChildren(nodeRef)
       {
          // get the replies element
-         var repliesElem = Dom.get('replies-of-' + this.toSaveRef(nodeRef));
+         var repliesElem = Dom.get('replies-of-' + this.toSafeRef(nodeRef));
          if (Dom.hasClass(repliesElem, "hidden"))
          {
             this._showChildren(nodeRef);
@@ -477,7 +477,7 @@
       _loadEditForm: function TopicReplies__loadEditForm(nodeRef, isEdit)
       {          
          // construct the id to use for the form elements
-         var formId = this.id + this.toSaveRef(nodeRef) + (isEdit ? "-edit" : "-add");
+         var formId = this.id + this.toSafeRef(nodeRef) + (isEdit ? "-edit" : "-add");
          
          // execute ajax request to load the form
          Alfresco.util.Ajax.request(
@@ -510,15 +510,15 @@
          this._hideOpenForms();
          
          // insert the form at the right location
-         var saveRef = this.toSaveRef(obj.nodeRef);
+         var safeRef = this.toSafeRef(obj.nodeRef);
          var insertDiv = null;
          if (obj.isEdit)
          {
-            formDiv = Dom.get('reply-edit-form-' + saveRef);
+            formDiv = Dom.get('reply-edit-form-' + safeRef);
          }
          else
          {
-            formDiv = Dom.get('reply-add-form-' + saveRef);
+            formDiv = Dom.get('reply-add-form-' + safeRef);
          }
          formDiv.innerHTML = response.serverResponse.responseText;
          
@@ -534,7 +534,7 @@
          var viewDiv = null;
          if (obj.isEdit)
          {
-            viewDiv = Dom.get('reply-' + saveRef);
+            viewDiv = Dom.get('reply-' + safeRef);
             actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/node/{nodeRef}",
             {
                nodeRef: obj.nodeRef.replace(':/', '')
@@ -626,7 +626,7 @@
          }
          replyForm.setAJAXSubmit(true,
          {
-            success: this._msg("message.savereply.success"),
+            success: this._msg("message.safereply.success"),
             successCallback:
             {
                fn: this.onFormSubmitSuccess,
@@ -636,7 +636,7 @@
                   isEdit: isEdit
                }
             },
-            failureMessage: this._msg("message.savereply.failure")
+            failureMessage: this._msg("message.safereply.failure")
          });
          replyForm.setSubmitAsJSON(true);
          replyForm.doBeforeFormSubmit =
@@ -694,7 +694,7 @@
                data.children.push(response.json.item);
                
                // render the new reply
-               var parentElem = Dom.get('replies-of-' + this.toSaveRef(obj.nodeRef));
+               var parentElem = Dom.get('replies-of-' + this.toSafeRef(obj.nodeRef));
                this.renderReply(parentElem, response.json.item);
                
                // rerender the parent reply, which will update the reply count
@@ -736,11 +736,11 @@
       _showChildren: function TopicReplies__showChildren(nodeRef)
       {
           // show the replies element
-          var repliesElem = Dom.get('replies-of-' + this.toSaveRef(nodeRef));
+          var repliesElem = Dom.get('replies-of-' + this.toSafeRef(nodeRef));
           Dom.removeClass(repliesElem, "hidden");
           
           // the show/hide replies toggle link might not exist if there are no replies
-          var linkElem = Dom.get(this.id + '-showHideChildren-' + this.toSaveRef(nodeRef));
+          var linkElem = Dom.get(this.id + '-showHideChildren-' + this.toSafeRef(nodeRef));
           if (linkElem !== null)
           {
              linkElem.innerHTML = this._msg("replies.hide");
@@ -754,9 +754,9 @@
        */
       _hideChildren: function TopicReplies__hideChildren(nodeRef)
       {
-          var repliesElem = Dom.get('replies-of-' + this.toSaveRef(nodeRef));
+          var repliesElem = Dom.get('replies-of-' + this.toSafeRef(nodeRef));
           Dom.addClass(repliesElem, "hidden");
-          var linkElem = Dom.get(this.id + '-showHideChildren-' + this.toSaveRef(nodeRef));
+          var linkElem = Dom.get(this.id + '-showHideChildren-' + this.toSafeRef(nodeRef));
           linkElem.innerHTML = this._msg("replies.show");
       },
       

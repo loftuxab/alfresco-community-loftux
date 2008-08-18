@@ -122,7 +122,7 @@ Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me
    {
       desc += '<' + tagName + ' class="onEditBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
    }
-   if (data.permissions.publishExt && ! data.isDraft)
+   if (data.permissions.edit && ! data.isDraft)
    {
       if (data.isPublished)
       {

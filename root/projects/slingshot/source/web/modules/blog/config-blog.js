@@ -397,7 +397,7 @@
        _msg: function ConfigBlog__msg(messageId)
        {
           return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
-       },
+       }
    };
 })();
 
