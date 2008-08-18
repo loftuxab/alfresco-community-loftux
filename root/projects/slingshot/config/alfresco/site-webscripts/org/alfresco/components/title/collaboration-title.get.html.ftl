@@ -9,12 +9,17 @@
    <div class="links">
       <span class="navigation-item">
          <#assign linkClass><#if "invite" == activePage>class="active-page"</#if></#assign>
-         <a href="${url.context}/page/site/${page.url.templateArgs.site!""}/invite" ${linkClass}>${msg("link.invite")}</a>
+         <a href="${url.context}/page/site/${page.url.templateArgs.site!}/invite" ${linkClass}>${msg("link.invite")}</a>
       </span>
       <span class="navigation-separator">|</span>
       <span class="navigation-item">
          <#assign linkClass><#if "customise-site" == activePage>class="active-page"</#if></#assign>
-         <a href="${url.context}/page/site/${page.url.templateArgs.site!""}/customise-site" ${linkClass}>${msg("link.customiseSite")}</a>
+         <a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site" ${linkClass}>${msg("link.customiseSite")}</a>
+      </span>
+      <span class="navigation-separator">|</span>
+      <span class="navigation-item">
+         <#assign linkClass><#if "customise-dashboard" == activePage>class="active-page"</#if></#assign>
+         <a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard" ${linkClass}>${msg("link.customiseDashboard")}</a>
       </span>
    </div>
 </div>

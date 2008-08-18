@@ -1,6 +1,14 @@
 
 // Get available components of family/type dashlet
-var webscripts = sitedata.findWebScripts("user-dashlet");
+var webscripts;
+if(args.dashboardType == "user")
+{
+   webscripts = sitedata.findWebScripts("user-dashlet");
+}
+else if(args.dashboardType == "site")
+{
+   webscripts = sitedata.findWebScripts("site-dashlet");   
+}
 if(!webscripts)
 {
    webscripts = [];
@@ -28,7 +36,16 @@ for(var i = 0; i < webscripts.length; i++)
    }
 }
 
-var dashboardUrl = "user/" + user.name + "/dashboard";
+var dashboardUrl;
+if(args.dashboardType == "user")
+{
+   dashboardUrl = "user/" + user.name + "/dashboard";
+}
+else if(args.dashboardType == "site")
+{
+   dashboardUrl ="site/" + page.url.templateArgs.site + "/dashboard";
+}
+
 var components = sitedata.findComponents("page", null, dashboardUrl, null);
 if(components === undefined || components.length === 0)
 {
@@ -86,7 +103,16 @@ function getNoOfColumns(template)
 }
 
 // Get current template
-var dashboardPage = "user/" + user.name + "/dashboard";
+var dashboardPage;
+if(args.dashboardType == "user")
+{
+   dashboardPage = "user/" + user.name + "/dashboard";
+}
+else if(args.dashboardType == "site")
+{
+   dashboardPage = "site/" + page.url.templateArgs.site + "/dashboard";
+}
+
 var currentTemplate = sitedata.findTemplate(dashboardPage);
 var currentNoOfColumns = getNoOfColumns(currentTemplate);
 var currentLayout = {templateId: currentTemplate.id, noOfColumns: currentNoOfColumns, description: currentTemplate.description};
