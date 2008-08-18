@@ -317,7 +317,7 @@
             container: this.options.containerId,
             nodeRef: data.nodeRef.replace(":/", ""),
             itemTitle: this.options.itemTitle,
-            browseItemurl: browseItemUrl
+            browseItemurl: Alfresco.util.encodeHTML(browseItemUrl)
          });
          
          // execute ajax request
