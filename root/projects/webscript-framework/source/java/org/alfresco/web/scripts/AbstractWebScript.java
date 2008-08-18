@@ -262,7 +262,9 @@ public abstract class AbstractWebScript implements WebScript
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
         MessageMethod message = new MessageMethod(this);
-        params.put("message", message);     // for compatability with repo webscripts
+        params.put("message", message);     // for compatibility with repo webscripts
+        DateCompareMethod dateCompare = new DateCompareMethod();
+        params.put("dateCompare", dateCompare);
         params.put("msg", message);         // short form for presentation webscripts
         // add the webscript I18N resources as a JSON object
         params.put("messages", renderJSONResources(getResources()));
