@@ -79,13 +79,16 @@
       YAHOO.Bubbling.on("fileCopied", this.onFileAction, this);
       YAHOO.Bubbling.on("fileDeleted", this.onFileAction, this);
       YAHOO.Bubbling.on("fileMoved", this.onFileAction, this);
+      YAHOO.Bubbling.on("fileWorkflowed", this.onFileAction, this);
       YAHOO.Bubbling.on("folderCopied", this.onFileAction, this);
       YAHOO.Bubbling.on("folderDeleted", this.onFileAction, this);
       YAHOO.Bubbling.on("folderMoved", this.onFileAction, this);
+      YAHOO.Bubbling.on("folderWorkflowed", this.onFileAction, this);
       // Multi-file actions
       YAHOO.Bubbling.on("filesCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesDeleted", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesMoved", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("filesWorkflowed", this.onDocListRefresh, this)
       return this;
    }
    
@@ -180,6 +183,15 @@
           * @default 500
           */
          actionsPopupTimeout: 500,
+         
+         /**
+          * Delay before showing "loading" message for slow data requests
+          *
+          * @property loadingMessageDelay
+          * @type int
+          * @default 1000
+          */
+         loadingMessageDelay: 1000,
 
          /**
           * FileName to highlight on initial DataTable render.
@@ -343,6 +355,14 @@
          id: 0,
          tags: {}
       },
+      
+      /**
+       * Deferred function calls for after a document list update
+       *
+       * @property afterDocListUpdate
+       * @type array
+       */
+      afterDocListUpdate: [],
 
       /**
        * Set multiple initialization options at once.
@@ -403,9 +423,13 @@
          {
             this.currentPath = "/" + this.currentPath;
          }
+         else if (this.currentPath == "/")
+         {
+            this.currentPath = "";
+         }
 
          // Register History Manager path update callback
-         YAHOO.util.History.register("path", bookmarkedPath, function(newPath)
+         YAHOO.util.History.register("path", "", function(newPath)
          {
             Alfresco.logger.debug("HistoryManager: path changed:" + newPath);
             if (this.expectedHistoryEvent)
@@ -442,10 +466,17 @@
             {
                Alfresco.logger.debug("HistoryManager: page changed:" + newPage);
                // Update the DocList
-               this._updateDocList.call(this,
+               if (this.currentPage != newPage)
                {
-                  page: newPage
-               });
+                  this._updateDocList.call(this,
+                  {
+                     page: newPage
+                  });
+               }
+               else
+               {
+                  Alfresco.logger.debug("...page changed event ignored.");
+               }
             }, null, this);
 
             // YUI Paginator definition
@@ -492,7 +523,8 @@
             fields:
             [
                "index", "nodeRef", "type", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
-               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "contentUrl", "actionSet", "tags"
+               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
+               "activeWorkflows"
             ],
             metaFields:
             {
@@ -610,8 +642,11 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             var status = oRecord.getData("actionSet");
+            var tip = "";
+            var desc = "";
+            
+            // Locked by/Editing status
             var lockType = "";
-            var lockTip = "";
             switch (status)
             {
                case "locked":
@@ -628,13 +663,19 @@
             }
             if (lockType != "")
             {
-               lockTip = me._msg("tip." + lockType, oRecord.getData("lockedBy"), oRecord.getData("lockedByUser"));
-               elCell.innerHTML = '<span class="locked-by"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '-status-16.png" title="' + lockTip + '" alt="' + lockType + '" /></span>'
+               tip = me._msg("tip." + lockType, oRecord.getData("lockedBy"), oRecord.getData("lockedByUser"));
+               desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '-status-16.png" title="' + tip + '" alt="' + lockType + '" /></div>'
             }
-            else
+            
+            // In workflow status
+            status = oRecord.getData("activeWorkflows");
+            if (status != "")
             {
-               elCell.innerHTML = '';
+               tip = me._msg("tip.active-workflow", status.split(",").length);
+               desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/workflow-16.png" title="' + tip + '" alt="' + tip + '" /></div>'
             }
+            
+            elCell.innerHTML = desc;
          }
           
          /**
@@ -712,7 +753,7 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail"><span class="item-simple"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
                   desc += '<span class="item-simple"><b>' + me._msg("details.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
                }
                else
@@ -720,11 +761,8 @@
                   /**
                    * Detailed View
                    */
-                  /* Inline Rename
-                  desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
-                  */
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span class="item"><b>' + me._msg("details.modified-by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
+                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                  desc += '<span class="item"><b>' + me._msg("details.modified.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
                   var description = oRecord.getData("description");
                   if (description == "")
                   {
@@ -759,7 +797,7 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail"><span class="item-simple"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
                   desc += '<span class="item-simple"><b>' + me._msg("details.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
                }
                else
@@ -767,40 +805,55 @@
                   /**
                    * Detailed View
                    */
-                  /* Inline Rename
-                  desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
-                  */
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.modified-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span class="item"><b>' + me._msg("details.modified-by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
-                  desc += '<span class="item"><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span></div>';
-                  /* Created On field
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.created-on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
-                  desc += '<span><b>' + me._msg("details.created-by") + '</b> ' + oRecord.getData("createdBy") + '</span>';
-                  */
                   var description = oRecord.getData("description");
                   if (description == "")
                   {
                      description = me._msg("details.description.none");
                   }
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span></div>';
-                  /* Comments field
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.comments") + '</b> 0</span></div>';
-                  */
-                  /* Tags */
-                  var tags = oRecord.getData("tags");
-                  desc += '<div class="detail"><span class="item tag-item"><b>' + me._msg("details.tags") + '</b> ';
-                  if (tags.length > 0)
+
+                  if (oRecord.getData("status").indexOf("workingCopy") != -1)
                   {
-                     for (var i = 0, j = tags.length; i < j; i++)
-                     {
-                        desc += '<span id="' + generateTagId(me, tags[i]) + '" class="tag"><a href="#" class="tag-link" title="' + tags[i] + '"><span>' + $html(tags[i]) + '</span></a></span>';
-                     }
+                     /**
+                      * Working Copy
+                      */
+                     desc += '<div class="detail">';
+                     desc += '<span class="item"><b>' + me._msg("details.checked-out.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                     desc += '<span class="item"><b>' + me._msg("details.checked-out.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
+                     desc += '<span class="item"><b>' + me._msg("details.size") + '</b> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '</div><div class="detail">';
+                     desc += '<span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span>';
+                     desc += '</div>';
                   }
                   else
                   {
-                     desc += me._msg("details.tags.none");
+                     /**
+                      * Non-Working Copy
+                      */
+                     desc += '<div class="detail">';
+                     desc += '<span class="item"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                     desc += '<span class="item"><b>' + me._msg("details.modified.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
+                     desc += '<span class="item"><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span>';
+                     desc += '<span class="item"><b>' + me._msg("details.size") + '</b> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '</div><div class="detail">';
+                     desc += '<span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span>';
+                     desc += '</div>';
+
+                     /* Tags */
+                     var tags = oRecord.getData("tags");
+                     desc += '<div class="detail"><span class="item tag-item"><b>' + me._msg("details.tags") + '</b> ';
+                     if (tags.length > 0)
+                     {
+                        for (var i = 0, j = tags.length; i < j; i++)
+                        {
+                           desc += '<span id="' + generateTagId(me, tags[i]) + '" class="tag"><a href="#" class="tag-link" title="' + tags[i] + '"><span>' + $html(tags[i]) + '</span></a></span>';
+                        }
+                     }
+                     else
+                     {
+                        desc += me._msg("details.tags.none");
+                     }
+                     desc += '</span></div>';
                   }
-                  desc += '</span></div>';
                }
             }
             elCell.innerHTML = desc;
@@ -853,12 +906,14 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: this.options.usePagination ? 4 : 32,
-            //initialLoad: false,
+            renderLoopSize: this.options.usePagination ? 16 : 32,
+            initialLoad: false,
+            /*
             initialRequest: this._buildDocListParams(
             {
                page: this.currentPage
             }),
+            */
             paginationEventHandler: handlePagination,
             paginator: this.widgets.paginator
          });
@@ -914,13 +969,21 @@
                   fileName: this.options.highlightFile
                });
             }
+
+            // Deferred functions specified?
+            for (var i = 0, j = this.afterDocListUpdate.length; i < j; i++)
+            {
+               this.afterDocListUpdate[i].call(this);
+            }
+            this.afterDocListUpdate = [];
+            
          }, this, true);
          
          // Enable row highlighting
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
          
-         // Set the default view filter to be "path" and the owner to be "Alfresco.DocListTree"
+         // Set the default view filter to be "path" and the owner to be "Alfresco.DocListTree" unless set in initialFilter
          var filterObj = YAHOO.lang.merge(
          {
             filterId: "path",
@@ -1042,12 +1105,15 @@
        */
       onHistoryManagerReady: function DL_onHistoryManagerReady()
       {
-         // Fire pathChanged event for first-time population
-         YAHOO.Bubbling.fire("pathChanged",
+         if (this.options.initialFilter.filterId == "path")
          {
-            doclistSourcedEvent: true,
-            path: this.currentPath
-         });
+            // Fire pathChanged event for first-time population
+            YAHOO.Bubbling.fire("pathChanged",
+            {
+               path: this.currentPath,
+               doclibFirstTimeNav: true
+            });
+         }
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -1501,13 +1567,26 @@
                      filterOwner: "Alfresco.DocListFilter"
                   }
                },
-               message: this._msg("message.edit-offline.success", displayName),
                callback:
                {
                   fn: function DL_oAEO_success(data)
                   {
-                     window.location = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
-                  }
+                     // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
+                     var fnAfterUpdate = function DL_oAEO_success_afterUpdate()
+                     {
+                        Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: this._msg("message.edit-offline.success", displayName)
+                        });
+                        // Kick off the download 3 seconds after the confirmation message
+                        YAHOO.lang.later(3000, this, function()
+                        {
+                           window.location = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
+                        });
+                     }
+                     this.afterDocListUpdate.push(fnAfterUpdate);
+                  },
+                  scope: this
                }
             },
             failure:
@@ -1670,8 +1749,7 @@
                siteId: this.options.siteId,
                containerId: this.options.containerId,
                path: this.currentPath,
-               files: file,
-               width: "40em"
+               files: file
             });
          }
          else
@@ -1683,6 +1761,37 @@
             })
          }
          this.modules.moveTo.showDialog();
+      },
+
+      /**
+       * Assign workflow.
+       *
+       * @method onActionAssignWorkflow
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionAssignWorkflow: function DL_onActionAssignWorkflow(row)
+      {
+         var file = this.widgets.dataTable.getRecord(row).getData();
+         
+         if (!this.modules.assignWorkflow)
+         {
+            this.modules.assignWorkflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               files: file
+            });
+         }
+         else
+         {
+            this.modules.assignWorkflow.setOptions(
+            {
+               path: this.currentPath,
+               files: file
+            })
+         }
+         this.modules.assignWorkflow.showDialog();
       },
 
 
@@ -1704,6 +1813,7 @@
          // Should be a path in the arguments
          if (obj && (obj.path !== null))
          {
+            Alfresco.logger.debug("DL_onPathChanged: ", obj);
             if (!obj.doclistSourcedEvent)
             {
                /**
@@ -1714,9 +1824,10 @@
                {
                   // Flag to indicate we're expecting the HistoryManager's event
                   this.expectedHistoryEvent = true;
-
-                  var currentState = YAHOO.util.History.getCurrentState("path");
-                  if (obj.path != currentState)
+                  
+                  var bookmarkedState = YAHOO.util.History.getBookmarkedState("path");
+                  while (bookmarkedState != (bookmarkedState = decodeURIComponent(bookmarkedState)));
+                  if (obj.path != bookmarkedState)
                   {
                      var objNav =
                      {
@@ -1725,10 +1836,19 @@
                      
                      if (this.options.usePagination)
                      {
+                        this.currentPage = 1;
                         objNav.page = "1";
                      }
                      
                      YAHOO.util.History.multiNavigate(objNav);
+                  }
+                  else
+                  {
+                     // The HistoryManager won't fire in this case although we do need to update the DocList
+                     this._updateDocList.call(this,
+                     {
+                        path: obj.path
+                     });
                   }
                }
                catch (e)
@@ -1808,6 +1928,7 @@
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
+            Alfresco.logger.debug("DL_onFilterChanged: ", obj);
             // Should be a filterId in the arguments
             this.currentFilter =
             {
@@ -1842,12 +1963,22 @@
                // Scroll the record into view and highlight it
                var el = this.widgets.dataTable.getTrEl(recordFound);
                var yPos = Dom.getY(el);
+               if (YAHOO.env.ua.ie > 0)
+               {
+                  yPos = yPos - (document.body.clientHeight / 3)
+               }
+               else
+               {
+                  yPos = yPos - (window.innerHeight / 3);
+               }
                window.scrollTo(0, yPos);
                Alfresco.util.Anim.pulse(el);
                this.options.highlightFile = null;
 
                // Select the file
                Dom.get("checkbox-" + recordFound.getId()).checked = true;
+               this.selectedFiles[recordFound.getData("nodeRef")] = true;
+               YAHOO.Bubbling.fire("selectedFilesChanged");
             }
          }
       },
@@ -1923,19 +2054,60 @@
        */
       _updateDocList: function DL__updateDocList(p_obj)
       {
-         var successPath = (p_obj && p_obj.path) ? p_obj.path : this.currentPath;
+         Alfresco.logger.debug("DL__updateDocList: ", p_obj);
+         var successPath = (p_obj && (p_obj.path !== undefined)) ? p_obj.path : this.currentPath;
+         var successPage = (p_obj && (p_obj.page !== undefined)) ? p_obj.page : this.currentPage;
+         var loadingMessage = null;
 
+         // Clear the current document list if the data webscript is taking too long
+         var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
+         {
+            Alfresco.logger.debug("DL_fnShowLoadingMessage: slow data webscript detected.");
+            loadingMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               displayTime: 0,
+               text: '<span class="doclist"><span class="wait">' + $html(this._msg("message.loading")) + '</span></span>',
+               noEscape: true
+            });
+         }
+         
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
          
          var successHandler = function DL__uDL_successHandler(sRequest, oResponse, oPayload)
          {
+            if (timerShowLoadingMessage)
+            {
+               // Stop the timed function from clearing the document list
+               timerShowLoadingMessage.cancel();
+            }
+            if (loadingMessage)
+            {
+               loadingMessage.destroy();
+            }
+            
+            Alfresco.logger.debug("currentPath was [" + this.currentPath + "] now [" + successPath + "]");
+            Alfresco.logger.debug("currentPage was [" + this.currentPage + "] now [" + successPage + "]");
             this.currentPath = successPath;
+            this.currentPage = successPage;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
          var failureHandler = function DL__uDL_failureHandler(sRequest, oResponse)
          {
+            if (timerShowLoadingMessage)
+            {
+               // Stop the timed function from clearing the document list
+               timerShowLoadingMessage.cancel();
+            }
+            if (loadingMessage !== null)
+            {
+               loadingMessage.destroy();
+            }
+            
+            // Clear out deferred functions
+            this.afterDocListUpdate = [];
+
             if (oResponse.status == 401)
             {
                // Our session has likely timed-out, so refresh to offer the login page
@@ -1960,8 +2132,14 @@
                }
             }
          }
+
+         // Slow data webscript message
+         var timerShowLoadingMessage = YAHOO.lang.later(this.options.loadingMessageDelay, this, fnShowLoadingMessage);
          
-         this.widgets.dataSource.sendRequest(this._buildDocListParams(p_obj || {}),
+         // Update the DataSource
+         var requestParams = this._buildDocListParams(p_obj || {});
+         Alfresco.logger.debug("DataSource requestParams: ", requestParams);
+         this.widgets.dataSource.sendRequest(requestParams,
          {
             success: successHandler,
             failure: failureHandler,

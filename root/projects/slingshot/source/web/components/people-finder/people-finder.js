@@ -495,7 +495,7 @@
          var searchTermElem = Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
          searchTerm = $html(searchTerm);
-         if (searchTerm.length < 0)
+         if (searchTerm.length < 3)
          {
             Alfresco.util.PopupManager.displayMessage(
             {

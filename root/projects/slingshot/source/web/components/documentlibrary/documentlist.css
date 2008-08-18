@@ -233,6 +233,7 @@
 
 .doclist .documents .detail span.item
 {
+   float: left;
    padding-right: 2em;
 }
 
@@ -241,6 +242,16 @@
    padding-right: 0.5em;
 }
 
+
+/* Popups */
+
+.doclist span.wait
+{
+   background-image: url(images/wait.gif);
+   background-repeat: no-repeat;
+   padding: 4px 0 0 24px;
+   visibility: visible;
+}
 
 /* Tags */
 
@@ -290,7 +301,6 @@
 {
    background-position: 1px 0px;
    background-repeat: no-repeat;
-   color: #000;
    display: block;
    min-height: 16px;
    padding-left: 24px;
@@ -340,7 +350,6 @@
 }
 
 /* Actions: Icons */
-
 .doclist .onActionDetails a
 {
    background-image: url(images/details-16.png);
@@ -389,6 +398,11 @@
 .doclist .onActionUploadNewVersion a
 {
    background-image: url(images/upload-new-version-16.png);
+}
+
+.doclist .onActionAssignWorkflow a
+{
+   background-image: url(images/workflow-16.png);
 }
 
 

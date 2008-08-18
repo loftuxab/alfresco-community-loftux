@@ -185,6 +185,14 @@
                {
                   obj.popup.destroy();
                }
+               // Message?
+               if (obj.message)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: obj.message
+                  });
+               }
                // Callback function specified?
                if (obj.callback && obj.callback.fn)
                {
@@ -271,14 +279,14 @@
                scope: this,
                obj: success
             },
-            successMessage: (success && success.message) ? success.message : null,
+            successMessage: null,
             failureCallback:
             {
                fn: fnCallback,
                scope: this,
                obj: failure
             },
-            failureMessage: (failure && failure.message) ? failure.message : null,
+            failureMessage: null,
             url: url,
             method: webscript.method,
             responseContentType: Alfresco.util.Ajax.JSON,
