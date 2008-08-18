@@ -1,6 +1,6 @@
-// get the summary info for this site
-var json = remote.call("/slingshot/docsummary?site=" + page.url.templateArgs.site);
+// Get the Documents Modified data for this site
+var json = remote.call("/slingshot/doclib/doclist/documents/site/" + page.url.templateArgs.site + "/documentLibrary?filter=recentlyModified&max=10");
 
-// create the model
+// Create the model
 var docs = eval('(' + json + ')');
 model.docs = docs;

@@ -146,9 +146,9 @@
        */
        currentFilter:
        {
-          filterId: "path",
-          filterOwner: "",
-          filterData: ""
+          filterId: null,
+          filterOwner: null,
+          filterData: null
        },
 
       /**
@@ -330,6 +330,15 @@
                {
                   path: this.initialPath
                }
+            ]);
+         }
+         if (this.initialFilter !== null)
+         {
+            // We missed the pathChanged event, so fake it here
+            this.onFilterChanged("filterChanged",
+            [
+               null,
+               this.initialFilter
             ]);
          }
       },
@@ -706,6 +715,21 @@
                   filterData: obj.filterData
                };
                return;
+            }
+            
+            this.initialFilter = null;
+            
+            /**
+             * If this is the first filterChanged event and it's not a path then we
+             * need to kick off the the expansion process by expanding the root node.
+             */
+            if ((this.currentFilter.filterOwner == null) && (obj.filterId != "path"))
+            {
+               var node = this.widgets.treeview.getNodeByProperty("path", "");
+               if (node !== null)
+               {
+                  node.expand();
+               }
             }
             
             // Should be a filterId in the arguments

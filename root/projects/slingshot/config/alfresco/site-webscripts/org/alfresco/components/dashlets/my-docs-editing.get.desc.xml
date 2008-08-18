@@ -1,0 +1,6 @@
+<webscript>
+   <shortname>Documents I'm Editing</shortname>
+   <description>Documents I Am Editing Dashlet</description>
+   <family>user-dashlet</family>
+   <url>/components/dashlets/my-docs-editing</url>
+</webscript>
