@@ -12,7 +12,7 @@
       anyway a non visible "a"-tag is placed in each "li"-tag so we
       can get focus and thereafter listen to individual key events.
 
-      Inside the a element is a transparent gif width width ant height of 100%
+      Inside the a element is a transparent gif with width and height of 100%
       to make the browsers focus indication borders go around the whole dashlet.
 
       Since the cursor is changed using CSS selectors on the currently selected

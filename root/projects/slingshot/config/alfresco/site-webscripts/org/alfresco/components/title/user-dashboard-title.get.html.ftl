@@ -5,6 +5,6 @@
    </div>
    <div class="links">
       <#assign linkClass><#if "customise-dashboard" == activePage>class="active-page"</#if></#assign>
-      <a href="${url.context}/page/customise-dashboard" ${linkClass}>${msg("link.customiseDashboard")}</a>
+      <a href="${url.context}/page/customise-user-dashboard" ${linkClass}>${msg("link.customiseDashboard")}</a>
    </div>
 </div>

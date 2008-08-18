@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<page>
-   <title>Customize Dashboard</title>
-   <description>Customize dashboard layout and dashlets</description>
-   <template-instance>customise-dashboard</template-instance>
-   <authentication>user</authentication>
-</page>
