@@ -141,6 +141,14 @@
       searchTerm: "",
       
       /**
+       * Flag to determine whether the current user is a site administrator
+       * 
+       * @property isCurrentUserSiteAdmin
+       * @type boolean
+       */
+      isCurrentUserSiteAdmin: false,
+      
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -255,6 +263,13 @@
             return updatedResponse;
          }
          
+         // determine if current user is a site administrator
+         if (me.options.currentUserRole !== undefined &&
+             me.options.currentUserRole === "SiteManager")
+         {
+            this.isCurrentUserSiteAdmin = true;
+         }
+         
          // setup of the datatable.
          this._setupDataTable();
          
@@ -362,10 +377,7 @@
           */
          renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {
-            // TODO: determine if actions should be visible, only are if current user is a site manager
-            
-            /*
-            if (true)
+            if (me.isCurrentUserSiteAdmin)
             {
                var userName = oRecord.getData("userName");
                var action = '<span id="' + me.id + '-button-' + userName + '"></span>';
@@ -384,10 +396,9 @@
             }
             else
             {
-            */
                // output padding div so layout is not messed up due to missing buttons
                elCell.innerHTML = '<div></div>';
-            //}
+            }
          };
 
          // DataTable column defintions
@@ -463,13 +474,12 @@
        */
       doRemove: function SiteMembers_doRemove(event, user)
       {
-         alert("remove user '" + user + "' from site: " + me.options.siteId);
+         alert("remove user '" + user + "' from site: " + this.options.siteId);
          
          // make ajax call to site service to join user
-         /*
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + user,
             method: "DELETE",
             successCallback:
             {
@@ -477,9 +487,8 @@
                obj: user,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-members.remove-failure", "Alfresco.SiteMembers", user, me.options.siteId)
+            failureMessage: Alfresco.util.message("site-members.remove-failure", "Alfresco.SiteMembers", user)
          });
-         */
       },
       
       /**
@@ -498,9 +507,6 @@
          });
          
          // redo the search again to get updated info
-         
-         // TODO: can we just remove the data from the underlying data table rather than re-doing search?
-         
          this.doSearch();
       },
       

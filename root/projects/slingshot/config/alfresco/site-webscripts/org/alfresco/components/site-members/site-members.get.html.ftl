@@ -2,7 +2,8 @@
    new Alfresco.SiteMembers("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      currentUser: "${user.id}"
+      currentUser: "${user.id}",
+      currentUserRole: "${currentUserRole}"
    }).setMessages(
       ${messages}
    );
