@@ -57,6 +57,31 @@
       options:
       {
          /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: "",
+
+         /**
+          * ContainerId representing root container
+          *
+          * @property containerId
+          * @type string
+          * @default "documentLibrary"
+          */
+         containerId: "documentLibrary",
+
+         /**
+          * Current path being browsed.
+          * 
+          * @property currentPath
+          * @type string
+          */
+         currentPath: "",
+
+         /**
           * Object literal representing item to edit details for.
           * 
           * @property file
@@ -394,6 +419,21 @@
          // We're in a popup, so need the tabbing fix
          this.modules.form.applyTabFix();
          
+         // Register the ESC key to close the dialog
+         var escapeListener = new YAHOO.util.KeyListener(document,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(id, keyEvent)
+            {
+               this._hideDialog();
+            },
+            scope: this,
+            correctScope: true
+         });
+         escapeListener.enable();
+
          // Set focus to fileName input
          Dom.get(this.id + "-name").focus();
       },

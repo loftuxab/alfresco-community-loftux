@@ -364,6 +364,21 @@
          // Build the TreeView widget
          this._buildTree();
          
+         // Register the ESC key to close the dialog
+         var escapeListener = new YAHOO.util.KeyListener(document,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(id, keyEvent)
+            {
+               this.onCancel();
+            },
+            scope: this,
+            correctScope: true
+         });
+         escapeListener.enable();
+
          // Show the dialog
          this.widgets.dialog.show();
 
