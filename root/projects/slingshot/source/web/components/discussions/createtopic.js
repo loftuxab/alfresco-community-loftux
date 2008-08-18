@@ -162,13 +162,10 @@
        */
       _registerCreateTopicForm: function CreateTopic__registerCreateTopicForm()
       {
-         // register the tag listener
-         this.modules.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
-         
          // initialize the tag library
-         this.modules.tagLibrary = new Alfresco.TagLibrary(this.id);
+         this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
          this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
-         this.modules.tagLibrary.onReady();
+         this.modules.tagLibrary.initialize();
          
          // register the okButton
          this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
@@ -208,8 +205,9 @@
             {
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
+               
                // update the tags set in the form
-               this.modules.tagLibraryListener.updateForm();
+               this.modules.tagLibrary.updateForm(this.id + '-form', 'tags');
             },
             scope: this
          }

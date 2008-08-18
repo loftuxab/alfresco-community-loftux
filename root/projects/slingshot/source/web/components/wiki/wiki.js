@@ -42,6 +42,14 @@
       },		
 
       /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       */
+      modules: {},
+
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -140,8 +148,9 @@
 		
 		_setupEditForm: function()
 		{
-		   // register the tag listener
-         this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
+		   // fetch the tag listener
+         this.modules.tagLibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.module.TagLibrary");
+         this.modules.tagLibrary.initialize();
          
          this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
       	   height: '300px',
@@ -183,8 +192,9 @@
             {
                // Put the HTML back into the text area
                this.pageEditor.saveHTML();
+               
                // Update the tags set in the form
-               this.tagLibraryListener.updateForm();
+               this.modules.tagLibrary.updateForm(this.id + "-form", "tags");
                
                // Avoid submitting the input field used for entering tags
                var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");

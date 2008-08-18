@@ -6,7 +6,6 @@
 <!-- TagLibrary Assets -->
 <link rel="stylesheet" type="text/css" href="${page.url.context}/modules/taglibrary/taglibrary.css" />
 <script type="text/javascript" src="${page.url.context}/modules/taglibrary/taglibrary.js"></script>
-<script type="text/javascript" src="${page.url.context}/modules/taglibrary/taglibrarylistener.js"></script>
 
 <!-- CreateTopic Assets -->
 <link rel="stylesheet" type="text/css" href="${page.url.context}/components/discussions/createtopic.css" />

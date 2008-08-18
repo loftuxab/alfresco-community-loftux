@@ -26,18 +26,16 @@
 /**
  * TagLibrary
  * 
- * Component that manages a selection of tags.
- * Note: The component fires events whenever the selection of tags changes.
- *       Use TagLibraryListener to keep an html forn in sync with the TagLibrary.
+ * Module that manages the selection of tags in a form
  *
  * @namespace Alfresco
- * @class Alfresco.TagLibrary
+ * @class Alfresco.module.TagLibrary
  */
 (function()
 {
-   Alfresco.TagLibrary = function(htmlId)
+   Alfresco.module.TagLibrary = function(htmlId)
    {
-      this.name = "Alfresco.TagLibrary";
+      this.name = "Alfresco.module.TagLibrary";
       this.id = htmlId;
       
       /* Register this component */
@@ -49,7 +47,7 @@
       return this;
    };
 
-   Alfresco.TagLibrary.prototype =
+   Alfresco.module.TagLibrary.prototype =
    {
        /**
         * Object container for initialization options
@@ -71,6 +69,17 @@
           topN: 10
        },
 
+      /**
+       * Object literal used to generate unique tag ids
+       * 
+       * @property tagId
+       * @type object
+       */
+      tagId:
+      {
+         id: 0,
+         tags: {}
+      },
       
       /**
        * Currently selected tags.
@@ -80,76 +89,6 @@
        */
       currentTags: [],
 
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function TagLibrary_componentsLoaded()
-      {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
-      onReady: function TagLibrary_onReady()
-      {
-         // register an action handler for all elements with class tag-link.
-         // the action to be called is specified in the id of the enclosing li
-         // element
-         //this.registerDefaultActionHandler(this, this.id, "taglibrary-action", "li");
-         
-         // Hook tag actions
-         var me = this;
-         var fnActionHandlerDiv = function DiscussionsTopic_fnActionHandlerDiv(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "li");
-            if (owner !== null)
-            {
-               var action = "";
-               action = owner.getAttribute("class");
-               if (typeof me[action] == "function")
-               {
-                  // fetch the tag name, which is inside the form id-action-tag
-                  // PENDING: hold this information in the js object and generate
-                  // int id's like for the tag actions
-                  var id = owner.id;
-                  var tagName = id.substring((me.id + '-' + action + '-').length);
-                  me[action].call(me, tagName);
-                  args[1].stop = true;
-               }
-            }
-      		 
-            return true;
-         }
-         YAHOO.Bubbling.addDefaultAction("taglibrary-action", fnActionHandlerDiv);
-         
-         // load link for popular tags
-         YAHOO.util.Event.addListener(this.id + "-load-popular-tags-link", "click", this.onPopularTagsLinkClicked, this, true);
-         
-         // register the "enter" event on the tag text field to add the tag (otherwise
-         // the form gets submitted
-         var zinput = YAHOO.util.Dom.get(this.id + "-tag-input-field");
-         var me = this;
-         new YAHOO.util.KeyListener(zinput, 
-         {
-            keys:13
-         }, 
-         {
-            fn: function(eventName, event, obj) {
-               me.onAddTagButtonClick();
-               YAHOO.util.Event.stopEvent(event[1]);
-               return false;
-            },
-            scope:this,
-            correctScope:true
-         }, 
-         "keypress").enable();
-         
-         // button to add tag to list
-         var addTagButton = new YAHOO.widget.Button(this.id + "-add-tag-button", {type: "button"});
-         addTagButton.subscribe("click", this.onAddTagButtonClick, this, true);
-      },
-      
       /**
        * Set multiple initialization options at once.
        *
@@ -174,20 +113,122 @@
          Alfresco.util.addMessages(obj, this.name);
          return this;
       },
-      
+
       /**
-       * Set the currently selected tags. This method should be used
-       * to initialize the component to bring it in sync with what has
-       * been generated in html
-       *
-       * @method setCurrentTags
-       * @param tags {array} Array containing the tags (by name)
-       * @return {Alfresco.TagLibrary} returns 'this' for method chaining
+       * Sets the current list of tags.
+       * Use this method if the tags html and inputs have been generated on the server.
+       * If you create the taglibrary in javascript, use setTags to also update the UI.
        */
       setCurrentTags: function TagLibrary_setCurrentTags(tags)
       {
          this.currentTags = tags;
          return this;
+      },
+
+      /**
+       * Fired by YUILoaderHelper when required component script files have
+       * been loaded into the browser.
+       *
+       * @method onComponentsLoaded
+       */
+      onComponentsLoaded: function TagLibrary_componentsLoaded()
+      {
+      },
+
+      
+      /**
+       * Registers the tag library logic with the dom tree
+       */
+      initialize: function TagLibrary_initialize()
+      {
+         // Hook tag actions
+         var me = this;
+         var fnActionHandlerDiv = function DiscussionsTopic_fnActionHandlerDiv(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "li");
+            if (owner !== null)
+            {
+               var action = "";
+               action = owner.getAttribute("class");
+               if (typeof me[action] == "function")
+               {
+                  var tagName = me.findTagName(me, owner.id);
+                  me[action].call(me, tagName);
+                  args[1].stop = true;
+               }
+            }
+      		 
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("taglibrary-action", fnActionHandlerDiv);
+         
+         // load link for popular tags
+         YAHOO.util.Event.addListener(this.id + "-load-popular-tags-link", "click", this.onPopularTagsLinkClicked, this, true);
+         
+         // register the "enter" event on the tag text field to add the tag (otherwise
+         // the form gets submitted
+         var zinput = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+         var me = this;
+         new YAHOO.util.KeyListener(zinput, 
+         {
+            keys:13
+         }, 
+         {
+            fn: function(eventName, event, obj)
+            {
+               me.onAddTagButtonClick();
+               YAHOO.util.Event.stopEvent(event[1]);
+               return false;
+            },
+            scope: this,
+            correctScope: true
+         }, 
+         "keypress").enable();
+         
+         // button to add tag to list
+         var addTagButton = new YAHOO.widget.Button(this.id + "-add-tag-button", {type: "button"});
+         addTagButton.subscribe("click", this.onAddTagButtonClick, this, true);
+      },
+      
+      /**
+       * Generate ID alias for tag, suitable for DOM ID attribute
+       *
+       * @method generateTagId
+       * @param scope {object} instance that contains a tagId object (which stores the generated tag id mappings)
+       * @param tagName {string} Tag name
+       * @return {string} A unique DOM-safe ID for the tag
+       */
+      generateTagId : function generateTagId(scope, tagName, action)
+      {
+         var id = 0;
+         var tagId = scope.tagId;
+         if (tagName in tagId.tags)
+         {
+            id = tagId.tags[tagName];
+         }
+         else
+         {
+           tagId.id++;
+           id = tagId.tags[tagName] = tagId.id;
+         }
+         return scope.id + "-" + action + "-" + id;
+      },
+      
+      /**
+       * Returns the tagName given a id generated by generateTagId.
+       */
+      findTagName: function findTagName(scope, tagId)
+      {
+         var actionAndId = tagId.substring(scope.id.length + 1);
+         var tagIdValue = actionAndId.substring(actionAndId.indexOf('-') + 1);
+         for (tag in scope.tagId.tags)
+         {
+            if (scope.tagId.tags[tag] == tagIdValue)
+            {
+               return tag;
+            }
+         }
+         return null;
       },
       
       /**
@@ -196,17 +237,70 @@
        * be used to set the tags when using the taglibrary as a client-side
        * only component (no tags generated on the server)
        *
-       * @method setCurrentTags
+       * @method setTags
        * @param tags {array} Array containing the tags (by name)
        */
-      addTags: function TagLibrary_addTags(tags)
-      {  
+      setTags: function TagLibrary_setTags(tags)
+      {
+         // first make sure that there are no previous tags available
+         YAHOO.util.Dom.get(this.id + '-current-tags').innerHTML = '';
+         this.currentTags = [];
+         
          // add each tag to the list, also generating the html
          for (var x=0; x < tags.length; x++)
          {
             this._addTagImpl(tags[x]);
          }
       },
+
+      /**
+       * Get all tags currently selected
+       */
+      getTags: function TagLibrary_getTags()
+      {
+         return this.currentTags;
+      },
+      
+      
+      /**
+       * Updates a form with the currently selected tags.
+       * 
+       * @param formId {string} the id of the form to update
+       * @param tagsFieldName {string} the name of the field to use to store the tags in
+       */
+      updateForm: function TagLibrary_updateForm(formId, tagsFieldName)
+      {
+         // construct the complete name to use for the field
+         var fullFieldName = tagsFieldName + '[]';
+         
+         // clean out the currently available tag inputs
+         var formElem = YAHOO.util.Dom.get(formId);
+         
+         // find all input fields, delete the inputs that match the field name
+         var inputs = formElem.getElementsByTagName("input");
+         for (var x=0; x < inputs.length; x++)
+         {
+            if (inputs[x].name == fullFieldName)
+            {
+                // remove the field
+                inputs[x].parentNode.removeChild(inputs[x]);
+                x--;
+            }
+         }
+         
+         // generate inputs for the selected tags
+         for (var x=0; x < this.currentTags.length; x++)
+         {
+            var tagName = this.currentTags[x];
+            var elem = document.createElement('input');
+            elem.setAttribute('name', fullFieldName);
+            elem.setAttribute('value', tagName);
+            elem.setAttribute('type', 'hidden');
+            formElem.appendChild(elem);
+         }
+      },
+      
+      
 
       /**
        * Triggered by a click on one of the selected tags
@@ -276,7 +370,7 @@
          for (var x=0; x < tags.length; x++)
          {
             var elem = document.createElement('li');
-            var elemId = this.id + "-onAddTag-" + tags[x].name;
+            var elemId = this.generateTagId(this, tags[x].name, 'onAddTag');
             elem.setAttribute('id', elemId);
             elem.setAttribute('class', 'onAddTag');
             elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tags[x].name +
@@ -356,7 +450,7 @@
          */
          var currentTagsElem = YAHOO.util.Dom.get(this.id + "-current-tags")
          var elem = document.createElement('li');
-         var elemId = this.id + '-onRemoveTag-' + tagName;
+         var elemId = this.generateTagId(this, tagName, 'onRemoveTag');
          elem.setAttribute('id', elemId);
          elem.setAttribute('class', 'onRemoveTag');
          elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tagName +
@@ -389,7 +483,8 @@
          }
 
          // remove the ui element
-         var tagElemToRemove = YAHOO.util.Dom.get(this.id + "-onRemoveTag-" + tagName);
+         var elemId = this.generateTagId(this, tagName, 'onRemoveTag');
+         var tagElemToRemove = YAHOO.util.Dom.get(elemId);
          tagElemToRemove.parentNode.removeChild(tagElemToRemove);
          
          // inform interested parties about change

@@ -257,7 +257,10 @@
          
          // actions
          html += '<div class="nodeEdit">';
-         html += '<div class="onAddReply"><a href="#" class="topic-action-link-div">' + this._msg("action.reply") + '</a></div>';   
+         if (data.permissions.reply)
+         {
+            html += '<div class="onAddReply"><a href="#" class="topic-action-link-div">' + this._msg("action.reply") + '</a></div>';   
+         }
          if (data.permissions.edit)
          {
             html += '<div class="onEditTopic"><a href="#" class="topic-action-link-div">' + this._msg("action.edit") + '</a></div>';
@@ -456,8 +459,7 @@
          // use the already loaded data
          var data = this.topicData;
           
-         // find the right divs to insert the html into
-         var viewDiv = Dom.get(this.id + "-topic-view-div");
+         // find the edit div to populate
          var editDiv = Dom.get(this.id + "-topic-edit-div");
          
          // insert the html
@@ -482,11 +484,7 @@
          });
          Dom.get(formId + "-browseTopicUrl").setAttribute("value", browseUrl);
          Dom.get(formId + "-content").value = data.content;
-         
-         // show the form and hide the view
-         Dom.addClass(viewDiv, "hidden");
-         Dom.removeClass(editDiv, "hidden");
-             
+
          // and finally register the form handling
          this._registerEditTopicForm(data, formId);
       },
@@ -496,19 +494,14 @@
        */
       _registerEditTopicForm: function DiscussionsTopic__registerEditTopicForm(data, formId)
       {
-         // register the tag listener
-         this.modules.tagLibraryListener = new Alfresco.TagLibraryListener(formId + "-form", "tags");
-         
          // add the tags that are already set on the post
-         this.modules.tagLibrary = new Alfresco.TagLibrary(formId);
-         this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
-         this.modules.tagLibrary.onReady();
-         if (data.tags.length > 0)
+         if (this.modules.tagLibrary == undefined)
          {
-            // find the tag library component
-            //var taglibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.TagLibrary");
-            this.modules.tagLibrary.addTags(this.topicData.tags);
+            this.modules.tagLibrary = new Alfresco.module.TagLibrary(formId);
+            this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
          }
+         this.modules.tagLibrary.initialize();
+         this.modules.tagLibrary.setTags(this.topicData.tags);
          
          // register the okButton
          this.widgets.okButton = new YAHOO.widget.Button(formId + "-submit", {type: "submit"});
@@ -530,11 +523,11 @@
          this.widgets.editor._render();
          
          // create the form that does the validation/submit
-         var commentForm = new Alfresco.forms.Form(formId + "-form");
-         commentForm.setShowSubmitStateDynamically(true, false);
-         commentForm.setSubmitElements(this.widgets.okButton);
-         commentForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
-         commentForm.setAJAXSubmit(true,
+         var editForm = new Alfresco.forms.Form(formId + "-form");
+         editForm.setShowSubmitStateDynamically(true, false);
+         editForm.setSubmitElements(this.widgets.okButton);
+         editForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+         editForm.setAJAXSubmit(true,
          {
             successMessage: this._msg("message.savetopic.success"),
             successCallback:
@@ -544,20 +537,24 @@
             },
             failureMessage: this._msg("message.savetopic.failure")
          });
-         commentForm.setSubmitAsJSON(true);
-         commentForm.doBeforeFormSubmit =
+         editForm.setSubmitAsJSON(true);
+         editForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
+               
                // update the tags set in the form
-               this.modules.tagLibraryListener.updateForm();
+               this.modules.tagLibrary.updateForm(formId + "-form", "tags");
             },
             scope: this
          }
          
-         commentForm.init();
+         editForm.init();
+         
+         // show the form and hide the view
+         this._showEditView();
       },
       
       /**
@@ -594,6 +591,18 @@
          var viewDiv = Dom.get(this.id + "-topic-view-div");
          Dom.addClass(editDiv, "hidden");
          Dom.removeClass(viewDiv, "hidden");
+         editDiv.innerHTML = '';
+      },
+      
+      /**
+       * Hides the view and displays the form
+       */
+      _showEditView: function()
+      {
+         var editDiv = Dom.get(this.id + "-topic-edit-div");
+         var viewDiv = Dom.get(this.id + "-topic-view-div");
+         Dom.addClass(viewDiv, "hidden");
+         Dom.removeClass(editDiv, "hidden");
       },
 
       /**

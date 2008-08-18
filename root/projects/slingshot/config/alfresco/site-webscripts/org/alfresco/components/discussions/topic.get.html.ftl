@@ -25,6 +25,6 @@
 <div id="${args.htmlid}-topic">
    <div id="${args.htmlid}-topic-view-div">
    </div>
-   <div id="${args.htmlid}-topic-edit-div">
+   <div id="${args.htmlid}-topic-edit-div" class="hidden">
    </div>
 </div>

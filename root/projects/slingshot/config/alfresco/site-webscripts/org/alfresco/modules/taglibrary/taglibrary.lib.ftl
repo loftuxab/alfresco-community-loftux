@@ -32,7 +32,7 @@
 -->
 <#macro renderTagLibrary htmlid tags site>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.TagLibrary("${htmlid}").setOptions(
+   new Alfresco.module.TagLibrary("${htmlid}").setOptions(
    {
       siteId : "${site}"
    }).setMessages(
@@ -89,4 +89,9 @@
    </div>
    <br class="clear" />
 </div>
+
+
+<script type="text/javascript">//<![CDATA[
+Alfresco.util.addMessages(${messages}, "Alfresco.module.TagLibrary");
+//]]></script>
 </#macro>
