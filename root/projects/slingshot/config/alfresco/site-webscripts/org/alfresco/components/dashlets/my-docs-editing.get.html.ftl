@@ -1,8 +1,8 @@
 <#macro doclibUrl doc>
-   <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?html}#path=${doc.location.path}">${doc.displayName?html}</a>
+   <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?url}&amp;filter=editingMe">${doc.displayName?html}</a>
 </#macro>
 <div class="dashlet">
-   <div class="title">${msg("header.docSummary")}</div>
+   <div class="title">${msg("header")}</div>
    <div class="body scrollableList">
       <#if docs.message?exists>
          <span class="error">${docs.message}</span>
@@ -20,7 +20,7 @@
                      <div class="details">
                         <h4><@doclibUrl doc /></h4>
                         <div>
-                           ${msg("text.modified-by", modifiedBy)} ${msg("text.modified-on", doc.modifiedOn)}
+                           ${msg("text.editing-since", doc.modifiedOn?datetime("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string.medium_short)}
                         </div>
                      </div>
                   </div>
