@@ -1,3 +1,12 @@
+<#macro initialFilter>
+   <#assign filterId = page.url.args["filter"]!"path">
+   <#assign filterOwner>Alfresco.DocList<#if filterId == "path">Tree<#elseif filterId == "tag">Tags<#else>Filter</#if></#assign>
+      initialFilter:
+      {
+         filterId: "${filterId}",
+         filterOwner: "${filterOwner}"
+      },
+</#macro>
 <!--[if IE]>
    <iframe id="yui-history-iframe" src="${url.context}/yui/assets/blank.html"></iframe> 
 <![endif]-->
@@ -8,11 +17,7 @@
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${args.container!"documentLibrary"}",
       initialPath: "${page.url.args["path"]!""}",
-      initialFilter:
-      {
-         filterId: "path",
-         filterOwner: "Alfresco.DocListTree"
-      },
+      <@initialFilter />
       usePagination: ${(args.pagination!false)?string},
       highlightFile: "${page.url.args["file"]!""}"
    }).setMessages(
@@ -60,6 +65,7 @@
             <div class="onActionCopyTo"><a href="#" class="action-link" title="${msg("actions.document.copy-to")}"><span>${msg("actions.document.copy-to")}</span></a></div>
             <div class="onActionMoveTo"><a href="#" class="action-link" title="${msg("actions.document.move-to")}"><span>${msg("actions.document.move-to")}</span></a></div>
             <div class="onActionDelete"><a href="#" class="action-link" title="${msg("actions.document.delete")}"><span>${msg("actions.document.delete")}</span></a></div>
+            <div class="onActionAssignWorkflow"><a href="#" class="action-link" title="${msg("actions.document.assign-workflow")}"><span>${msg("actions.document.assign-workflow")}</span></a></div>
          </div>
       </div>
 

@@ -21,6 +21,7 @@
                   <li><span><span class="onActionCopyTo">${msg("menu.selected-items.copy")}</span></span></li>
                   <li><span><span class="onActionMoveTo">${msg("menu.selected-items.move")}</span></span></li>
                   <li><span><span class="onActionDelete">${msg("menu.selected-items.delete")}</span></span></li>
+                  <li><span><span class="onActionAssignWorkflow">${msg("menu.selected-items.assign-workflow")}</span></span></li>
                   <li><hr /></li>
                   <li><span><span class="onActionDeselectAll">${msg("menu.selected-items.deselect-all")}</span></span></li>
                </ul>

@@ -440,7 +440,6 @@
        * Copy Multiple Assets.
        *
        * @method onActionCopyTo
-       * @private
        */
       onActionCopyTo: function DLTB_onActionCopyTo()
       {
@@ -477,7 +476,6 @@
        * Move Multiple Assets.
        *
        * @method onActionMoveTo
-       * @private
        */
       onActionMoveTo: function DLTB_onActionMoveTo()
       {
@@ -515,7 +513,6 @@
        * Delete Multiple Assets.
        *
        * @method onActionDelete
-       * @private
        */
       onActionDelete: function DLTB_onActionDelete()
       {
@@ -654,6 +651,44 @@
          });
       },
 
+      /**
+       * Assign Multiple Assets to Workflow.
+       *
+       * @method onActionAssignWorkflow
+       */
+      onActionAssignWorkflow: function DLTB_onActionAssignWorkflow()
+      {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
+         var files = this.modules.docList.getSelectedFiles();
+         
+         if (!this.modules.workflow)
+         {
+            this.modules.workflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               files: files
+            });
+         }
+         else
+         {
+            this.modules.workflow.setOptions(
+            {
+               files: files
+            })
+         }
+         this.modules.workflow.showDialog();
+      },
+
+      /**
+       * Deselect currectly selected assets.
+       *
+       * @method onActionDeselectAll
+       */
       onActionDeselectAll: function DLTB_onActionDeselectAll()
       {
          if (this.modules.docList)
