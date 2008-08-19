@@ -65,9 +65,10 @@
                     distribute-extensions-office2003,
                     distribute-deployment,
                     distribute-sample-extensions,
+                    distribute-installers,
                     distribute-docs,
                     revert-changes" />
-                    
+
    <target name="set-build-number"
            depends="init, set-build-devbox-number, set-revision-number">
       <property file="${dir.project.repository.config}/alfresco/version.properties" />
@@ -198,11 +199,11 @@
 
    <target name="distribute-wcm" 
            description="Creates the distibution files for WCM"
-           depends="distribute-wcm-windows, 
+           depends="assemble-virtual,
+                    distribute-wcm-windows,
                     distribute-wcm-linux" />
 
-   <target name="distribute-wcm-windows" 
-           depends="assemble-virtual">
+   <target name="distribute-wcm-windows">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
          <zipfileset dir="${dir.continuous.assemble.virtualtomcat}" 
                      prefix="virtual-tomcat" />
@@ -218,8 +219,7 @@
       </zip>
    </target>
 
-   <target name="distribute-wcm-linux"
-           depends="assemble-virtual">
+   <target name="distribute-wcm-linux">
       <tar destfile="${dir.continuous.dist}/${file.name.dist.wcm}.tar.gz" 
            longfile="gnu" 
            compression="gzip">
@@ -248,7 +248,7 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.continuous.assemble.virtualtomcat}" />
-      <unzip src="${dir.project.3rdparty.distro}/${file.name.zip.tomcatvirt.custom}" 
+      <unzip src="${dir.name.binaries}/tomcat/${file.name.zip.tomcatvirt.custom}"
              dest="${dir.continuous.assemble}" />
       <move file="${dir.continuous.assemble}/${file.name.base.zip.tomcatvirt.custom}"
             tofile="${dir.continuous.assemble.virtualtomcat}" />
@@ -263,12 +263,11 @@
 
    <target name="distribute-tomcat" 
            description="Creates the distibution files for Tomcat"
-           depends="distribute-tomcat-windows,
-                    distribute-tomcat-linux,
-                    distribute-tomcat-installers" />
+           depends="assemble-tomcat,
+                    distribute-tomcat-windows,
+                    distribute-tomcat-linux" />
 
-   <target name="distribute-tomcat-windows" 
-           depends="assemble-tomcat">
+   <target name="distribute-tomcat-windows">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.tomcat}.zip">
          <zipfileset dir="${dir.continuous.assemble.tomcat}"
                      prefix="tomcat"
@@ -290,9 +289,8 @@
                      excludes="**/*.sh" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
-         <zipfileset dir="${dir.project.3rdparty.distro}"
-                     prefix="bin"
-                     includes="imconvert.exe,pdf2swf.exe" />
+         <zipfileset dir="${dir.name.binaries.installer.win32}"
+                     prefix="bin" />
          <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
          <zipfileset dir="${dir.continuous.dist}"
@@ -304,8 +302,7 @@
       </zip>
    </target>
 
-   <target name="distribute-tomcat-linux" 
-           depends="assemble-tomcat">
+   <target name="distribute-tomcat-linux">
       <tar destfile="${dir.continuous.dist}/${file.name.dist.tomcat}.tar.gz" 
            longfile="gnu" 
            compression="gzip">
@@ -343,18 +340,18 @@
       </tar>
    </target>
 
-   <target name="distribute-tomcat-installers"
-           depends="init, assemble-virtual">
+   <target name="distribute-installers"
+           depends="init, assemble-tomcat, assemble-virtual">
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/quick-installer/output" />
-      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer127.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
+      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer127.exe}" output="build/error-ij.txt" failifexecutionfails="false">
-         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer127.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
       <move todir="${dir.continuous.dist}" failonerror="no">
@@ -363,11 +360,12 @@
          </fileset>
       </move>
    </target>
+
    <target name="assemble-tomcat"
-           depends="init">
+           depends="init, set-build-number">
       <mkdir dir="${dir.continuous.dist}" />
 
-      <unzip src="${dir.project.3rdparty.distro}/${file.name.distro.tomcat}" 
+      <unzip src="${dir.name.binaries}/tomcat/${file.name.distro.tomcat}"
              dest="${dir.continuous.assemble}" />
       <move file="${dir.continuous.assemble}/${dir.name.distro.tomcat}" 
             tofile="${dir.continuous.assemble.tomcat}" />
