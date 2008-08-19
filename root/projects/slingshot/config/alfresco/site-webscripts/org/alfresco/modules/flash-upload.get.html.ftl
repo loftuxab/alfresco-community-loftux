@@ -1,4 +1,4 @@
-<div id="${args.htmlid}-dialog" class="file-upload">
+<div id="${args.htmlid}-dialog" class="flash-upload">
    <div class="hd">
       <span id="${args.htmlid}-title-span"></span>
    </div>
@@ -51,7 +51,7 @@
       <div style="display:none">
          <div id="${args.htmlid}-left-div" class="fileupload-left-div">
             <span class="fileupload-percentage-span hidden">&nbsp;</span>
-            <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hidden</#if>">
+            <select class="fileupload-contentType-select <#if (contentTypes?size == 1)>hidden</#if>">
                <#if (contentTypes?size > 0)>
                   <#list contentTypes as contentType>
                      <option value="${contentType.id}">${contentType.value}</option>
@@ -78,5 +78,5 @@
 </div>
 
 <script type="text/javascript">//<![CDATA[
-Alfresco.util.addMessages(${messages}, "Alfresco.module.FileUpload");
+Alfresco.util.addMessages(${messages}, "Alfresco.module.FlashUpload");
 //]]></script>
