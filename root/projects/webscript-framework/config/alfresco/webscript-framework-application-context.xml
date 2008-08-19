@@ -122,6 +122,7 @@
             <prop key="fbml">text/html</prop>
             <prop key="php">text/htm</prop>
             <prop key="js">text/javascript</prop>
+            <prop key="calendar">text/calendar</prop>
          </props>
       </property>
    </bean>
