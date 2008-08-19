@@ -211,6 +211,13 @@ hr
    color:white;
 }
 
+.yui-skin-default #message .bd span.wait
+{
+   background-image: url(images/wait.gif);
+   background-repeat: no-repeat;
+   padding: 4px 0 0 24px;
+   visibility: visible;
+}
 
 /* Style the default prompt */
 

@@ -702,14 +702,27 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   var submitUrl = form.attributes.action.nodeValue;
                   
                   if (Alfresco.logger.isDebugEnabled())
+                  {
                      Alfresco.logger.debug("Performing AJAX submission to url: ", submitUrl);
-                  
+                  }
+
                   // determine how to submit the form, if the enctype
                   // on the form is set to "application/json" then
                   // package the form data as an AJAX string and post
-                  if (form.enctype && form.enctype === "multipart/form-data")
+                  if (form.enctype && form.enctype == "multipart/form-data")
                   {
-                     this._showInternalError("AJAX multipart/form-data submission is not supported");
+                     var d = form.ownerDocument;
+                     var iframe = d.createElement("iframe");
+                     iframe.style.display = "none";
+                     YAHOO.util.Dom.generateId(iframe, "formAjaxSubmit");
+                     iframe.name = iframe.id;
+                     document.body.appendChild(iframe);
+
+                     // makes it possible to target the frame properly in IE.
+                     window.frames[iframe.name].name = iframe.name;
+
+                     form.target = iframe.name;
+                     form.submit();
                      return;
                   }
                   

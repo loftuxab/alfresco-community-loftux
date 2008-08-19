@@ -324,6 +324,22 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
 }
 
 /**
+ * Checkif flash is installed.
+ * Returns true if a flash player of the required version is installed
+ *
+ * @method Alfresco.util.isFlashInstalled
+ * @param reqMajorVer {int}
+ * @param reqMinorVer {int}
+ * @param reqRevision {int}
+ * @return {boolean} Returns true if a flash player of the required version is installed
+ * @static
+ */
+Alfresco.util.hasRequiredFlashPlayer = function(reqMajorVer, reqMinorVer, reqRevision)
+{
+   return DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision);
+}
+
+/**
  * Add a component's messages to the central message store.
  *
  * @method Alfresco.util.addMessages
@@ -777,6 +793,7 @@ Alfresco.util.PopupManager = function()
       {
          title: null,
          text: null,
+         spanClass: "message",
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
          displayTime: 2.5,
@@ -794,7 +811,8 @@ Alfresco.util.PopupManager = function()
        * @param config {object}
        * The config object is in the form of:
        * {
-       *    text: {string},         // The message text to display, mandatory 
+       *    text: {string},         // The message text to display, mandatory
+       *    spanClass: {string},    // The class of the span wrapping the text
        *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when shpwing and hiding the message,
        *                                            // default is YAHOO.widget.ContainerEffect.FADE
        *    effectDuration: {int},  // time in seconds that the effect should be played, default is 0.5
@@ -826,7 +844,8 @@ Alfresco.util.PopupManager = function()
          });
 
          // Set the message that should be displayed
-         message.setBody(c.noEscape ? c.text : $html(c.text));
+         var bd =  "<span class='" + c.spanClass + "'>" + (c.noEscape ? c.text : $html(c.text)) + "</span>";
+         message.setBody(bd);
 
          /**
           * Add it to the dom, center it, schedule the fade out of the message

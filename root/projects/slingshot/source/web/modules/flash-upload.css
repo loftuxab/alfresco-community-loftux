@@ -1,12 +1,12 @@
 /* Style YUI components */
 
-.file-upload .hidden
+.flash-upload .hidden
 {
    display: none;
 }
 
 /* Center text and buttons inside p elements */
-.file-upload p
+.flash-upload p
 {
    text-align: center;
 }
@@ -173,7 +173,7 @@
    top: 7px;
 }
 
-.file-upload .fileupload-fileButton-span button
+.flash-upload .fileupload-fileButton-span button
 {
    padding-left: 2.5em;
    background: url(images/remove-16.png) 10% 50% no-repeat;
@@ -181,17 +181,17 @@
 
 /* General styling */
 
-.yui-panel-container .file-upload
+.yui-panel-container .flash-upload
 {
    width: 640px;
 }
 
-.file-upload .yui-gd div.first
+.flash-upload .yui-gd div.first
 {
    width: 10.5em;   
 }
 
-.file-upload textarea
+.flash-upload textarea
 {
    width: 30em;
 }
