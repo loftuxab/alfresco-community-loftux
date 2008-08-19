@@ -132,7 +132,7 @@ Alfresco.util.createImageEditor = function(id, options)
       Alfresco.util.Ajax.request(
  		{
  		   method: Alfresco.util.Ajax.GET,
- 		   url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/images/site/" + options.siteId + "/media",
+ 		   url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/images/site/" + options.siteId + "/documentLibrary?filter=node",
  			successCallback:
  			{
  				fn: function(e) {
