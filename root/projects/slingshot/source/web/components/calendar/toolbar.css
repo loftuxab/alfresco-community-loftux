@@ -3,3 +3,14 @@
    padding-left: 2.5em; 
    background: url(images/add-event-16.png) no-repeat 10% 50%;
 }
+
+.toolbar .first div 
+{
+   float: left;
+}
+
+div.separator
+{
+   padding: 0 5px;
+   text-align: center;
+}
