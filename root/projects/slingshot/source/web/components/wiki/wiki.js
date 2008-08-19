@@ -42,14 +42,6 @@
       },		
 
       /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: {},
-
-      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -148,19 +140,19 @@
 		
 		_setupEditForm: function()
 		{
-		   // fetch the tag listener
-         this.modules.tagLibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.module.TagLibrary");
-         this.modules.tagLibrary.initialize();
+		   // register the tag listener
+         this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
          
-         this.pageEditor = new YAHOO.widget.SimpleEditor(this.id + '-pagecontent', {
-      	   height: '300px',
-      		width: '538px',
-      		dompath: false, //Turns on the bar at the bottom
-      		animate: false, //Animates the opening, closing and moving of Editor windows
-      	   markup: "xhtml"
-      	});
-
-      	this.pageEditor.render();
+         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent', {
+            height: '300px',
+            width: '538px',
+            dompath: false, // Turns on the bar at the bottom
+            animate: false, // Animates the opening, closing and moving of Editor windows
+            markup: "xhtml",
+            siteId: this.options.siteId
+         });
+         
+         this.pageEditor.render();
 
          var saveButtonId = this.id + "-save-button";
          var saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
@@ -192,9 +184,8 @@
             {
                // Put the HTML back into the text area
                this.pageEditor.saveHTML();
-               
                // Update the tags set in the form
-               this.modules.tagLibrary.updateForm(this.id + "-form", "tags");
+               this.tagLibraryListener.updateForm();
                
                // Avoid submitting the input field used for entering tags
                var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
@@ -300,7 +291,7 @@
 		
 		_redirect: function()
 		{
-		   // Redirect to the "view" tab
+		   // "Redirect" to the "view" tab
 		   var url = this._getAbsolutePath();
 		   url += this.options.pageTitle;
 		   window.location = url;   
