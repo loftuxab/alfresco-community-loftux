@@ -52,32 +52,34 @@ public class LDAPUserMapper implements AttributesMapper
         {
             user = new LDAPUser(userId);
 
-            String firstName = (String) attributes.get("givenName").get();
+            Attribute firstName = attributes.get("givenName");
             if(firstName != null)
             {
-                user.setFirstName(firstName);
+                user.setFirstName((String)firstName.get());
             }
             
+            /*
             String middleName = null; // TODO
             if(middleName != null)
             {
                 user.setMiddleName(middleName);
             }
+            */
             
-            String lastName = (String)attributes.get("sn").get();
+            Attribute lastName = attributes.get("sn");
             if(lastName != null)
             {
-                user.setLastName(lastName);
+                user.setLastName((String) lastName.get());
             }
             
-            String email = (String) attributes.get("email").get();
+            Attribute email = attributes.get("email");
             if(email == null)
             {
-                email = (String) attributes.get("emailAddress").get();
+                email = attributes.get("emailAddress");
             }
             if(email != null)
             {
-                user.setEmail(email);
+                user.setEmail((String)email.get());
             }
             
             Attribute description = attributes.get("description");

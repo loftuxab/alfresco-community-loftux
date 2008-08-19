@@ -224,11 +224,26 @@ public class LDAPUserBean
      */
     public LDAPUser get(String userId) 
     {
-        DistinguishedName dn = new DistinguishedName("dc=public,dc=people");        
+//        DistinguishedName dn = new DistinguishedName("dc=public,dc=people");        
         //dn.add("cn", userId);
-        dn.add("uid", userId);
+  //      dn.add("uid", userId);
 
-        return (LDAPUser) ldapTemplate.lookup(dn, new LDAPUserMapper());
+        //return (LDAPUser) ldapTemplate.lookup(dn, new LDAPUserMapper());
+        
+
+        //List list = ldapTemplate.search(dnString, "(objectclass=inetOrgPerson)", new LDAPUserMapper());
+        
+        LDAPUser user = null;
+        
+        String dnString = "uid=" + userId + ",dc=public,dc=people";
+        List list = ldapTemplate.search(dnString, "(objectclass=inetOrgPerson)", new LDAPUserMapper());
+        if(list != null && list.size() > 0)
+        {
+            user = (LDAPUser) list.get(0);
+        }
+        
+        return user;
+        
     }   
     
 
