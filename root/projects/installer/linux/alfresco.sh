@@ -6,6 +6,7 @@ APPSERVER=/opt/alfresco/tomcat
 export JAVA_OPTS='-Xms128m -Xmx512m -XX:MaxPermSize=128m -server'
 # Following only needed for Sun JVMs before to 1.5 update 8
 export JAVA_OPTS="${JAVA_OPTS} -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader\$1,doBody -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo\$Merger,mergeIndexes -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo\$Merger,mergeDeletions"
+export PATH="$ALF_HOME/bin";$(PATH)"
 #
 if [ "$1" = "start" ]; then
   "$APPSERVER"/bin/startup.sh

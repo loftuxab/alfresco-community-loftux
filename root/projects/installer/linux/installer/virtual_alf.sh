@@ -4,9 +4,7 @@
 ALF_HOME=@@ALFRESCO_DIR@@
 cd "$ALF_HOME"
 APPSERVER="$ALF_HOME"/virtual-tomcat
-if [ -r "$ALF_HOME"/java ]; then
-   export JAVA_HOME="$ALF_HOME"/java
-fi
+export JAVA_HOME="@@JAVA_HOME@@"
 
 # Start virtual-tomcat
 #

@@ -35,7 +35,7 @@ db.password=@@DB_USERPWD@@
 # HSQL connection
 #
 #hsql#db.driver=org.hsqldb.jdbcDriver
-#hsql#db.url=jdbc:hsqldb:file:@@ALF_DATA/hsql_data/alfresco;ifexists=true;shutdown=true;
+#hsql#db.url=jdbc:hsqldb:file:@@ALF_DATA@@/hsql_data/alfresco;ifexists=true;shutdown=true;
 
 #
 # MySQL connection (This is default and requires mysql-connector-java-5.0.3-bin.jar, which ships with the Alfresco server)

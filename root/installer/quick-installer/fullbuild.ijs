@@ -11,3 +11,4 @@
 ::BuilderAPI::ModifyObject -object "OpenOffice File" -active Yes
 ::BuilderAPI::ModifyObject -object "Java" -active Yes
 ::BuilderAPI::ModifyObject -object "OpenOffice" -active Yes
+::BuilderAPI::ModifyObject -object "OOLocation" -active No
