@@ -93,6 +93,12 @@ h4
    font-weight: bold;
 }
 
+h3 .light,
+h4 .light
+{
+   color: #a2a2a2;
+}
+
 p
 {
    padding-top: 10px;
