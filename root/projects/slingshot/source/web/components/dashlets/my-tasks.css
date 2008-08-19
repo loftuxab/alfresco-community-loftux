@@ -1,0 +1,99 @@
+.my-tasks .task-icon
+{
+   float: left;
+   padding-left: 0.25em;
+}
+
+.my-tasks .task-details
+{
+   padding-left: 2.5em;
+}
+
+.my-tasks .toolbar a,
+.my-tasks .toolbar a:visited
+{
+   padding: 3px 4px;
+}
+
+.my-tasks .toolbar a:active,
+.my-tasks .toolbar a:hover
+{
+   text-decoration: none;
+}
+
+.my-tasks .toolbar a.active,
+.my-tasks .toolbar a.active:visited
+{
+   background-color: #d4e9f7;
+   color: #000;
+}
+
+.my-tasks .separator
+{
+   padding: 0 0.5em;
+}
+
+.my-tasks .priority
+{
+   background-color: #e6f0f8;
+   border: 1px solid #0070bb;
+   color: #0070bb;
+   display: block;
+   text-align: center;
+   width: 1.2em;
+}
+
+.my-tasks .priority.overdue
+{
+   background-color: #fff2e9;
+   border: 1px solid #ff7b28;
+   color: #ff7b28;
+}
+
+.my-tasks .task-status
+{
+}
+
+.my-tasks .task-resources
+{
+   border-bottom: 1px solid #e6e6e6;
+   border-top: 1px solid #e6e6e6;
+   margin: 0.5em 0;
+}
+
+.my-tasks .task-resource
+{
+   padding: 0.25em;
+}
+
+.my-tasks .resource-spacer
+{
+   border-bottom: 1px dashed #e6e6e6;
+}
+
+.my-tasks .task-resource-link
+{
+}
+
+.my-tasks .task-resource-link img
+{
+   margin-bottom: -3px;
+}
+
+.my-tasks .task-resource-link span
+{
+}
+
+.my-tasks .task-transitions
+{
+}
+
+.my-tasks .task-transition
+{
+}
+
+.my-tasks a.task-transition,
+.my-tasks a.task-transition:visited
+{
+   color: #2b6eb5;
+}
