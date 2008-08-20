@@ -63,6 +63,11 @@
    background-color: #fbfbfb;
 }
 
+.site-members .yui-dt-col-2
+{
+   overflow: visible !important;
+}
+
 .site-members h3 a
 {
    color: #2b6eb5;
