@@ -3765,14 +3765,13 @@ InstallComponent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -setup Install -type actio
 Condition B612D657-48C1-421E-A810-D1FF82C768E2 -active Yes -parent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id B612D657-48C1-421E-A810-D1FF82C768E2
 InstallComponent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -setup Install -type action -conditions 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -title {Locate Java Runtime} -component LocateJavaRuntime -command insert -active Yes -parent 991553B3-06E2-412E-89E5-1829C782E086
 Condition 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -active Yes -parent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id 5A7AF50A-C33F-47B4-BAAD-0869D47D5901
-InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition A1AF4F54-A600-430D-AA51-39C5EA26D457 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id A1AF4F54-A600-430D-AA51-39C5EA26D457
 Condition 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {String Is Condition} -component StringIsCondition -TreeObject::id 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86
 InstallComponent B8BC4D70-2048-4DD5-B15B-76050F07566F -setup Install -type action -conditions 9C516685-6F30-4420-A108-8F51B16D3AB8 -title {Move Forward} -component MoveForward -command insert -active No -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
 Condition 9C516685-6F30-4420-A108-8F51B16D3AB8 -active Yes -parent B8BC4D70-2048-4DD5-B15B-76050F07566F -title {String Is Condition} -component StringIsCondition -TreeObject::id 9C516685-6F30-4420-A108-8F51B16D3AB8
-InstallComponent 70B3FBF5-B133-4CB8-B1FF-786C6C2B29E7 -setup Install -type action -conditions C8B78D3B-BCBD-4CA6-A167-C117BAABB70E -title {Launch Web Browser} -component LaunchWebBrowser -command insert -active No -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
-Condition C8B78D3B-BCBD-4CA6-A167-C117BAABB70E -active Yes -parent 70B3FBF5-B133-4CB8-B1FF-786C6C2B29E7 -title {String Is Condition} -component StringIsCondition -TreeObject::id C8B78D3B-BCBD-4CA6-A167-C117BAABB70E
-InstallComponent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
+InstallComponent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -setup Install -type action -conditions 05F74B3F-2FC4-4C99-AC27-099896306EC9 -title {Execute Script} -component ExecuteScript -command insert -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
+Condition 05F74B3F-2FC4-4C99-AC27-099896306EC9 -active Yes -parent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -title {String Is Condition} -component StringIsCondition -TreeObject::id 05F74B3F-2FC4-4C99-AC27-099896306EC9
 InstallComponent 57EE088D-54C3-4C9F-8596-064B5255EE8A -setup Install -type pane -conditions {4A4E9BFB-63A5-43F8-8F53-B70CC0257653 E35F2477-2025-4C48-BE4A-BC2DB58EFD16} -title {Setup Type} -component SetupType -command insert -active Yes -parent StandardInstall
 Condition 4A4E9BFB-63A5-43F8-8F53-B70CC0257653 -active Yes -parent 57EE088D-54C3-4C9F-8596-064B5255EE8A -title {Script Condition} -component ScriptCondition -TreeObject::id 4A4E9BFB-63A5-43F8-8F53-B70CC0257653
 Condition E35F2477-2025-4C48-BE4A-BC2DB58EFD16 -active Yes -parent 57EE088D-54C3-4C9F-8596-064B5255EE8A -title {String Is Condition} -component StringIsCondition -TreeObject::id E35F2477-2025-4C48-BE4A-BC2DB58EFD16
@@ -3790,12 +3789,12 @@ InstallComponent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A -setup Install -type pane 
 InstallComponent 3C792AD2-7426-4EB0-B6EB-BBE13E8C56F1 -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 InstallComponent 95BB0407-03A2-493A-B74A-133E8F7F111A -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 InstallComponent A7A67250-725D-453B-94A7-3384D68498D3 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
-InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane -conditions {6AD46333-4FF3-48A6-A054-61D16F32A431 D4D47D94-3A94-47CD-AD89-6101CC515BE4} -title {Installing Java} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane -conditions {6AD46333-4FF3-48A6-A054-61D16F32A431 D4D47D94-3A94-47CD-AD89-6101CC515BE4} -title {Installing Java} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition 6AD46333-4FF3-48A6-A054-61D16F32A431 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6AD46333-4FF3-48A6-A054-61D16F32A431
 Condition D4D47D94-3A94-47CD-AD89-6101CC515BE4 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {String Is Condition} -component StringIsCondition -TreeObject::id D4D47D94-3A94-47CD-AD89-6101CC515BE4
 InstallComponent C106AE81-88CA-44E9-8B7C-37C6579863FF -setup Install -type action -title {Execute JDK Install} -component ExecuteExternalProgram -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 0AF858DB-8B09-447B-8FBC-AAE5B05C3848 -title {Write Text To File} -component WriteTextToFile -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-Condition 0AF858DB-8B09-447B-8FBC-AAE5B05C3848 -active Yes -parent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 0AF858DB-8B09-447B-8FBC-AAE5B05C3848
+InstallComponent 8172F70F-8736-44D8-879E-694FF48D4E0A -setup Install -type action -conditions D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
+Condition D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -active Yes -parent 8172F70F-8736-44D8-879E-694FF48D4E0A -title {File Exists Condition} -component FileExistsCondition -TreeObject::id D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5
 InstallComponent 88616588-AAF8-4428-BFE9-387E739DF9EE -setup Install -type action -conditions 7D41BB02-0A0A-4F47-85B1-F7D8D2957483 -title {Delete File} -component DeleteFile -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition 7D41BB02-0A0A-4F47-85B1-F7D8D2957483 -active Yes -parent 88616588-AAF8-4428-BFE9-387E739DF9EE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 7D41BB02-0A0A-4F47-85B1-F7D8D2957483
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
@@ -3805,7 +3804,7 @@ InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type actio
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding Samples} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
+InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding Samples} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 InstallComponent 6167A49E-551C-4CF3-944D-1FDBDD9C0106 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -command reorder -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
 InstallComponent CD057CD8-68CA-4230-8D9E-F84606DC3EFD -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
@@ -3879,9 +3878,9 @@ InstallComponent F7CA4AE5-D8B9-442E-BF9D-D17274CA2DD4 -setup Install -type actio
 InstallComponent C72E7455-ECDC-40BA-AA40-7CCF83EF3836 -setup Install -type action -title {Install Start Shortcut} -component InstallWindowsShortcut -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
 InstallComponent 463D8747-52D1-4E56-A197-91C1EF3E5097 -setup Install -type action -title {Install Stop Shortcut} -component InstallWindowsShortcut -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
 InstallComponent 2A57E08F-A0AB-41E2-8A2A-67B4B40B539F -setup Install -type action -title {Install JSF Shortcut} -component InstallWindowsShortcut -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
-InstallComponent 81526AC1-7040-4335-AE34-C16B80AA2A97 -setup Install -type action -conditions 0232328F-35BE-466D-AD26-59E5A916E390 -title {Install V-Stop Shortcut} -component InstallWindowsShortcut -command reorder -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
+InstallComponent 81526AC1-7040-4335-AE34-C16B80AA2A97 -setup Install -type action -conditions 0232328F-35BE-466D-AD26-59E5A916E390 -title {Install V-Stop Shortcut} -component InstallWindowsShortcut -command insert -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
 Condition 0232328F-35BE-466D-AD26-59E5A916E390 -active Yes -parent 81526AC1-7040-4335-AE34-C16B80AA2A97 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id 0232328F-35BE-466D-AD26-59E5A916E390
-InstallComponent EA551630-2C10-4F67-A450-D945DBFEE92F -setup Install -type action -conditions 77D3BEF2-4EDE-4DF6-81BC-A7697E516AC5 -title {Install V-Start Shortcut} -component InstallWindowsShortcut -command reorder -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
+InstallComponent EA551630-2C10-4F67-A450-D945DBFEE92F -setup Install -type action -conditions 77D3BEF2-4EDE-4DF6-81BC-A7697E516AC5 -title {Install V-Start Shortcut} -component InstallWindowsShortcut -command insert -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
 Condition 77D3BEF2-4EDE-4DF6-81BC-A7697E516AC5 -active Yes -parent EA551630-2C10-4F67-A450-D945DBFEE92F -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id 77D3BEF2-4EDE-4DF6-81BC-A7697E516AC5
 InstallComponent 938F90BA-7FA5-4B51-B566-06BAEFFBE8A9 -setup Install -type action -title {Install Website Shortcut} -component InstallWindowsShortcut -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
 InstallComponent 847D20F0-88F0-4A85-ABAA-BF2FA978F0B4 -setup Install -type action -conditions 2E6B0279-80CE-43C4-8989-C1D3EED88441 -title {Uninstall Shortcut} -component InstallProgramFolderShortcut -command insert -active Yes -parent 289DDD79-2080-47F9-98B6-9F30493AA1F0
@@ -3911,6 +3910,7 @@ InstallComponent 9F007B25-0D36-4E27-81D9-CAA6FE600D60 -setup Install -type actio
 InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 2521C09F-C692-49D8-BD76-C69BFFEF1F24 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent D05A76C6-7FC5-416A-A4D0-45D5C7B9E0C1 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -title {Write Text To File} -component WriteTextToFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
 InstallComponent 8DF4772F-BB98-471E-99C9-CB3FEDD66C60 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
@@ -3971,11 +3971,11 @@ array set Properties {
 05638A52-3DB5-4AE9-B314-D3E763CC71E1,Alias
 {Setup Actions}
 
-0AF858DB-8B09-447B-8FBC-AAE5B05C3848,CheckCondition
+05F74B3F-2FC4-4C99-AC27-099896306EC9,CheckCondition
 {Before Action is Executed}
 
-0AF858DB-8B09-447B-8FBC-AAE5B05C3848,Filename
-<%InstallDir%>/jdk/bin/java.exe
+05F74B3F-2FC4-4C99-AC27-099896306EC9,String
+<%JavaFound%>
 
 0E2B711C-DEBF-49E5-A966-C2D5177AE431,CheckCondition
 {Before Action is Executed}
@@ -4296,7 +4296,7 @@ false
 {0 conditions}
 
 3BB22315-C35F-4437-A6E9-5E18B74DA487,Conditions
-{0 conditions}
+{1 condition}
 
 3BB22315-C35F-4437-A6E9-5E18B74DA487,TclScript
 {proc LaunchURL { URL } {
@@ -4363,10 +4363,7 @@ LaunchApplication
 160
 
 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE,Conditions
-{1 condition}
-
-3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE,FileOpenAction
-{Append to file}
+{0 conditions}
 
 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE,Files
 <%InstallDir%>/SetPaths.bat
@@ -4894,18 +4891,6 @@ derby
 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A,Title,subst
 1
 
-70B3FBF5-B133-4CB8-B1FF-786C6C2B29E7,Active
-No
-
-70B3FBF5-B133-4CB8-B1FF-786C6C2B29E7,Conditions
-{1 condition}
-
-70B3FBF5-B133-4CB8-B1FF-786C6C2B29E7,ExecuteAction
-{Before Pane is Displayed}
-
-70B3FBF5-B133-4CB8-B1FF-786C6C2B29E7,URL
-http://java.sun.com/javase/downloads/
-
 7132E75E-0CA4-41E8-9BA6-B3D52D57281E,CheckCondition
 {Before Action is Executed}
 
@@ -5021,7 +5006,7 @@ false
 {Before Action is Executed}
 
 7D41BB02-0A0A-4F47-85B1-F7D8D2957483,Filename
-<%InstallDir%>/jdk/bin/java.exe
+<%InstallDir%>/jdk/bin/javac.exe
 
 7DDFE8E9-C854-4605-8319-0B0ACB10DA2D,CheckCondition
 {Before Action is Executed}
@@ -5058,6 +5043,18 @@ Windows
 
 81526AC1-7040-4335-AE34-C16B80AA2A97,WorkingDirectory
 <%InstallDir%>
+
+8172F70F-8736-44D8-879E-694FF48D4E0A,AutoUpdate
+Yes
+
+8172F70F-8736-44D8-879E-694FF48D4E0A,Conditions
+{1 condition}
+
+8172F70F-8736-44D8-879E-694FF48D4E0A,Value
+<%InstallDir%>/jdk
+
+8172F70F-8736-44D8-879E-694FF48D4E0A,VirtualText
+JavaHome
 
 82B93F75-2DE4-43F5-A54C-CDC155048FA3,CheckCondition
 {Before Action is Executed}
@@ -5677,15 +5674,6 @@ C72E7455-ECDC-40BA-AA40-7CCF83EF3836,TargetFileName
 C72E7455-ECDC-40BA-AA40-7CCF83EF3836,WorkingDirectory
 <%InstallDir%>
 
-C8B78D3B-BCBD-4CA6-A167-C117BAABB70E,CheckCondition
-{Before Action is Executed}
-
-C8B78D3B-BCBD-4CA6-A167-C117BAABB70E,Operator
-false
-
-C8B78D3B-BCBD-4CA6-A167-C117BAABB70E,String
-<%JavaFound%>
-
 C8D4D791-2898-4FD5-A5EB-317C01AD0B62,Action
 {Uninstall Actions}
 
@@ -5742,6 +5730,12 @@ false
 
 D4D47D94-3A94-47CD-AD89-6101CC515BE4,String
 <%JavaFound%>
+
+D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5,CheckCondition
+{Before Action is Executed}
+
+D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5,Filename
+<%InstallDir%>/jdk/bin/javac.exe
 
 D6ADB379-F913-4ED1-9274-84E788B989B0,CheckCondition
 {Before Action is Executed}
@@ -6455,7 +6449,9 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 {View Alfresco Labs Wiki}
 
 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE,TextToWrite
-{SET JAVA_HOME=<%InstallDir%>\jdk}
+{@ECHO OFF
+REM Set Paths Utility - created by installer
+SET JAVA_HOME=<%JavaHome%>}
 
 3D88EE52-1868-4E40-8C75-4A27EF566021,Caption
 {Please give details of the database server to use.  The installer will attempt to create the database as named below.}
