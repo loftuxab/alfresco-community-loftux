@@ -377,11 +377,11 @@
           */
          renderCellRoleSelect = function SiteMembers_renderCellRoleSelect(elCell, oRecord, oColumn, oData)
          {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.setStyle(elCell.parentNode, "text-align", "right");
+            
             if (me.isCurrentUserSiteAdmin)
             {
-               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-               Dom.setStyle(elCell.parentNode, "text-align", "right");
-               
                // create HTML for representing buttons
                var userName = oRecord.getData("userName");
                var currentRole = oRecord.getData("role");
@@ -439,10 +439,10 @@
           */
          renderCellUninvite = function InvitationList_renderCellUninvite(elCell, oRecord, oColumn, oData)
          {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
             if (me.isCurrentUserSiteAdmin)
             {
-               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-               
                // create HTML for representing buttons
                var userName = oRecord.getData("userName");
                elCell.innerHTML = '<span id="' + me.id + '-button-' + userName + '"></span>';
@@ -468,7 +468,7 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar
+            key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar, width: 64
          },
          {
             key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription
