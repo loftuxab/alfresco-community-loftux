@@ -49,8 +49,12 @@
       this.name = "Alfresco.module.DoclibWorkflow";
       this.id = htmlId;
 
-      /* Load YUI Components */
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "calendar"], this.onComponentsLoaded, this);
+
+      // Initialise prototype properties
+      this.widgets = {};
+      this.modules = {};
 
       return this;
    };
@@ -104,7 +108,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -112,7 +116,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Container element for template in DOM.

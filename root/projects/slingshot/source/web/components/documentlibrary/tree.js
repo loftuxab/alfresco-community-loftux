@@ -52,9 +52,20 @@
     */
    Alfresco.DocListTree = function DLT_constructor(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.DocListTree";
       this.id = htmlId;
       
+      // Initialise prototype properties
+      this.widgets = {};
+      this.currentFilter =
+      {
+         filterId: null,
+         filterOwner: null,
+         filterData: null
+      };
+      this.pathsToExpand = [];
+
       // Register this component
       Alfresco.util.ComponentManager.register(this);
       
@@ -104,7 +115,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Flag set after TreeView instantiated.
@@ -144,12 +155,7 @@
        * @property currentFilter
        * @type object
        */
-       currentFilter:
-       {
-          filterId: null,
-          filterOwner: null,
-          filterData: null
-       },
+       currentFilter: null,
 
       /**
        * Tracks if this component is the active filter owner.
@@ -165,7 +171,7 @@
        * @property pathsToExpand
        * @type array
        */
-      pathsToExpand: [],
+      pathsToExpand: null,
 
       /**
        * Selected tree node.

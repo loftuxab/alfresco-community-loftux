@@ -52,6 +52,7 @@
     */
    Alfresco.DocListFilter = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.DocListFilter";
       this.id = htmlId;
       

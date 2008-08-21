@@ -41,6 +41,9 @@
    {
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
+      
+      // Initialise prototype properties
+      this.widgets = {};
             
       return this;
    };
@@ -77,7 +80,7 @@
        * @property widgets
        * @type object
        */
-       widgets: {},
+       widgets: null,
 
       /**
        * Fired by YUILoaderHelper when required component script files have
