@@ -64,6 +64,9 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
     
     /** Multi-part form data, if provided */
     private FormData formData;
+    
+    /** Content read from the inputstream */
+    private Content content = null;
 
     /**
      * Construct
@@ -305,14 +308,20 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
      */
     public Content getContent()
     {
-        try
+        // ensure we only try to read the content once - as this method may be called several times
+        // but the underlying inputstream itself can only be processed a single time
+        if (content == null)
         {
-            return new InputStreamContent(req.getInputStream(), getContentType(), req.getCharacterEncoding());
+            try
+            {
+                content = new InputStreamContent(req.getInputStream(), getContentType(), req.getCharacterEncoding());
+            }
+            catch(IOException e)
+            {
+                throw new WebScriptException("Failed to retrieve request content", e);
+            }
         }
-        catch(IOException e)
-        {
-            throw new WebScriptException("Failed to retrieve request content", e);
-        }
+        return content;
     }
 
     /**

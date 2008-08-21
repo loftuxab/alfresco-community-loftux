@@ -209,10 +209,12 @@
          <span class="label">${msg("label.postcode")}:</span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companypostcode" value="${profile.companyPostcode!""}" /></span>
       </div>
+      <!--
       <div class="row">
          <span class="label">${msg("label.map")}:</span>
          <span class="check"><input type="checkbox" id="${args.htmlid}-input-showmap" /> ${msg("label.showmap")}</span>
       </div>
+      -->
       <div class="row">
          <span class="label">${msg("label.telephone")}:</span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companytelephone" value="${profile.companyTelephone!""}" /></span>
