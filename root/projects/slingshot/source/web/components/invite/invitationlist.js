@@ -515,7 +515,8 @@
          // check the current entry to see what we have to do
          var recs = inviteData.recs;
          var currentRecord = recs[inviteData.index];
-         if (currentRecord.getData('userName') != undefined)
+         this._doInviteUser(inviteData);
+         /*if (currentRecord.getData('userName') != undefined)
          {
             // set got a username, a simply join will be enough
             this._doJoinExistingUser(inviteData);
@@ -523,7 +524,7 @@
          else
          {
             this._doInviteNewUser(inviteData);
-         }
+         }*/
       },
       
       _finalizeInvites: function(inviteData)
@@ -537,6 +538,46 @@
          // inform the user
          var message = this._msg(this._msg("invitationlist.inviteresult"), inviteData.successes.length, inviteData.failures.length);
          Alfresco.util.PopupManager.displayMessage({text: message });
+      },
+      
+      _doInviteUser: function(inviteData)
+      {
+         // fetch the record to process
+         var record = inviteData.recs[inviteData.index];
+         var firstName = record.getData('firstName');
+         var lastName = record.getData('lastName');
+         var email = record.getData('email');
+         
+         // We have to do a backend call for each invited person
+         var serverPath = window.location.protocol + "//" + window.location.host + Alfresco.constants.URL_CONTEXT;
+         Alfresco.util.Ajax.request(
+         {
+            method: "GET",
+            url: Alfresco.constants.PROXY_URI + "api/invite/start",
+            dataObj:
+            {
+               inviteeFirstName: firstName,
+               inviteeLastName: lastName,
+               inviteeEmail: email,
+               siteShortName : this.options.siteId,
+               inviteeSiteRole : this.getRoleName(record),
+               serverPath : serverPath,
+               acceptUrl : 'page/accept-invite',
+               rejectUrl : 'page/reject-invite'
+            },
+            successCallback:
+            {
+               fn: this._successCallback,
+               obj: inviteData,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: inviteData,
+               scope: this
+            }
+         });
       },
       
       _doInviteNewUser: function(inviteData)

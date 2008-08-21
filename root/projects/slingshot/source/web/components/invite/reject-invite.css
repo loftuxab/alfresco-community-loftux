@@ -1,0 +1,26 @@
+.reject-invite-body {
+   margin: 10px;
+   text-align: center;
+   font-size: 116%;
+}
+
+.main-content {
+   margin-bottom: 50px 0px 50px 0px;
+}
+
+.actions {
+   margin-top: 10px;
+}
+
+.site-name {
+   font-weight: bold;
+}
+
+.toolbar span.crumb
+{
+   font-size: 116%;
+}
+
+.hidden {
+  display: none !important;
+}
