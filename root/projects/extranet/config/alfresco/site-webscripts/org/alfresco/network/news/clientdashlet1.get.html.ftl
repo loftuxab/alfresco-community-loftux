@@ -172,7 +172,7 @@ body
 <table width="100%" style="margin-top: 4px;">
 <tr>
 <td class="header2">
-	Join Alfresco Network
+	Explore the Alfresco Community Network
 </td>
 </tr>
 </table>
@@ -182,11 +182,8 @@ body
 <table width="100%">
 <tr>
 <td class="linkthru">
-	Interested in finding out about Alfresco add-ons and extensions?
-	<br/>
-	<br/>Join
-	<a target="_blank" href="http://network.alfresco.com?ref=30b1labs">Alfresco Network</a>
-	today!
+	Connect with other Alfresco community members to share ideas, experiences and resources.
+	<br/>Join the <a target="_blank" href="http://network.alfresco.com?ref=30b1labs">Alfresco Community Network</a> today!
 </td>
 </tr>
 </table>
