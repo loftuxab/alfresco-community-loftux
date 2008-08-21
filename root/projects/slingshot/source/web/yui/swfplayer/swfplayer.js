@@ -50,7 +50,7 @@ YAHOO.widget.SWFPlayer = function(containerId, attributes)
  * @final
  * @default "assets/uploader.swf"
  */
-YAHOO.widget.Uploader.SWFURL = "assets/SWFPlayer.swf";
+YAHOO.widget.SWFPlayer.SWFURL = "assets/SWFPlayer.swf";
 
 YAHOO.extend(YAHOO.widget.SWFPlayer, YAHOO.widget.FlashAdapter,
 {

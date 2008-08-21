@@ -1,0 +1,53 @@
+div.preview
+{
+   background-color: #5C5C5C;
+   padding: 1em 1em 1em 1em;
+   width:37em;
+}
+
+div.preview span,
+div.preview div   
+{
+   color: #FFFFFF;   
+}
+
+div.preview .hd
+{
+   height: 2.4em;
+   line-height: 2.4em;
+}
+
+div.preview img,
+div.preview span,
+div.preview input
+{
+   vertical-align: middle;
+}
+
+div.preview input
+{
+   width: 1.5em;
+}
+
+div.preview .bd,
+div.preview .ft
+{
+   text-align: center;
+}
+
+div.preview .bd .preview-swf
+{
+   width: 100%;
+   height: 45em;
+}
+
+div.preview .bd .preview-swf div
+{
+   padding-top: 20em;
+}
+
+div.preview .ft
+{
+   height: 2em;
+   line-height: 2em;
+}

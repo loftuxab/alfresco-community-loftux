@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Preview</shortname>
+  <description>Displays a flash preview of document.</description>
+  <url>/components/preview/preview</url>
+</webscript>
