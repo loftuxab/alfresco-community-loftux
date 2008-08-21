@@ -259,17 +259,53 @@
          Dom.setStyle(swfPlayerDiv, "height", panelHeight - 80 + "px");
 
          // Create and save a reference to the swfPlayer so we can call it later
-         this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#5C5C5C"});
+         this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#FFFFFF"}); //"#5C5C5C"});
          this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
          this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
          this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
 
          // The contentReady event can't be used since it crashes FF2 on Mac
          //this.swfPlayer.subscribe("contentReady", this.onContentReady, this, true);
-
+         this.onContentReady(null);
          // Show panel and handle if flash is loaded later
-         this._showPanel();
+         //this._showPanel();
+
       },      
+
+      ready: false,
+
+      onContentReady: function DP_onContentReady(event)
+      {
+         if(!this.ready)
+         {
+            this.ready = true;
+            this._initFlash(0);
+         }
+      },
+
+      _initFlash: function DP__initFlash(attempt)
+      {
+         var debug = true;
+         if (this.swfPlayer.init(debug))
+         {
+            this._showPanel();
+
+         }
+         else if (attempt < 7)
+         {
+            //alert('Attempt (' + attempt + '):' + url);
+            // The flash movie wasn't loaded, try againg in 0.5 sec
+            YAHOO.lang.later(500, this, this._initFlash, [++attempt], false);
+         }
+         else
+         {
+            // Give up something is probably wrong
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: "Flash movie doesn't seem to respond on init call."
+            });
+         }
+      },
 
       /**
        * Fired by the SWFPlayer when the swf for the nodeRef failed to load.
@@ -421,6 +457,7 @@
        */
       _applyConfig: function DP__applyConfig()
       {
+
          // Set the panel title and image
          this.widgets.titleText["innerHTML"] = this.showConfig.fileName;
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.showConfig.icon32.substring(1);
@@ -436,7 +473,8 @@
          url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
 
          // Call the load function but wait a bit to make safari work
-         YAHOO.lang.later(250, this, this._load, [url, 0], false);
+         YAHOO.lang.later(1000, this, this._load, [url, 0], false);
+         //this.swfPlayer.load(url);
       },
 
       /**
@@ -448,32 +486,26 @@
        */
       _load: function DP_load(url, attempt)
       {
-         // Set to true if swfplayer should display debug text inside itself
-         var debug = false;
-         if (this.swfPlayer.init(debug))
+         try
          {
-            try
+            // The flash movie has loaded, its ok to call a method on it
+            this.swfPlayer.load(url);
+         }
+         catch(e)
+         {
+            if (attempt < 7)
             {
-               // The flash movie has loaded, its ok to call a method on it
-               this.swfPlayer.load(url);
-            }
-            catch(e)
-            {
+               // The flash movie wasn't loaded, try againg in 0.5 sec
                YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
             }
-         }
-         else if (attempt < 7)
-         {
-            // The flash movie wasn't loaded, try againg in 0.5 sec
-            YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
-         }
-         else
-         {
-            // Give up something is probably wrong
-            Alfresco.util.PopupManager.displayMessage(
+            else
             {
-               text: "Flash movie doesn't seem to load"
-            });
+               // Give up something is probably wrong
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: "Flash movie doesn't seem to respond on load call."
+               });
+            }
          }
       },
 
@@ -485,6 +517,9 @@
        */
       _showPanel: function DP__showPanel()
       {
+         this.panel.show();
+
+         
          // Reset references and the gui before showing it
          this.widgets.previousButton.set("disabled", true);
          this.widgets.nextButton.set("disabled", true);
@@ -493,8 +528,21 @@
          this._applyConfig();
 
          // Show the upload panel
-         this.panel.show();
+         //this.panel.show();
+      },
+
+      /**
+       * Hides the panel.
+       *
+       * @method hidePanel
+       * @private
+       */
+      hidePanel: function DP_showPanel()
+      {
+         // Hide the upload panel
+         this.panel.hide();
       }
+
 
    };
 

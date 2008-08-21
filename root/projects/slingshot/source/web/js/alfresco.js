@@ -129,6 +129,29 @@ Alfresco.util.arrayToObject = function(arr)
 }
 
 /**
+ * Check if an array contains an object
+ * @method Alfresco.util.contains
+ * @param arr {array} Array to convert to object
+ * @param el {object} The element to be searched for in the array
+ * @return {boolean} True if arr contains el
+ * @static
+ */
+Alfresco.util.arrayContains = function(arr, el)
+{
+   if (arr)
+   {
+      for (var i = 0; i < arr.length; i++)
+      {
+          if(arr[i] == el)
+          {
+             return true;
+          }
+      }
+   }
+   return false;
+}
+
+/**
  * Asserts param contains a proper value
  * @method Alfresco.util.assertNotEmpty
  * @param param {object} Parameter to assert valid
