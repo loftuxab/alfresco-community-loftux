@@ -54,6 +54,8 @@
    {
       this.name = "Alfresco.DocumentLinks";
       this.id = htmlId;
+      
+      // initialise prototype properties
       this.widgets = {};
       
       /* Register this component */
@@ -62,36 +64,14 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
    
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
+      
       return this;
    }
    
    Alfresco.DocumentLinks.prototype =
    {
-      /**
-       * Object container for initialization options
-       *
-       * @property options
-       * @type object
-       */
-      options:
-      {
-         /**
-          * Current siteId.
-          * 
-          * @property siteId
-          * @type string
-          */
-         siteId: "",
-         
-         /**
-          * The NodeRef of the document to show links for
-          *
-          * @property nodeRef
-          * @type string
-          */
-         nodeRef: null
-      },
-      
       /**
        * Object container for storing YUI widget instances.
        * 
@@ -99,19 +79,6 @@
        * @type object
        */
        widgets: {},
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function DocumentLinks_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
       
       /**
        * Set messages for this component.
@@ -134,18 +101,18 @@
        */
       onComponentsLoaded: function DocumentLinks_onComponentsLoaded()
       {
-         Event.onContentReady(this.id, this.onReady, this, true);
+         // don't need to do anything we will be informed via an event when data is ready
       },
       
       /**
-       * Fired by YUI when parent element is available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
+       * Event handler called when the "documentDetailsAvailable" event is received
        */
-      onReady: function DocumentLinks_onReady()
-      {  
-         var contentUrl = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "")
+      onDocumentDetailsAvailable: function DocumentLinks_onDocumentDetailsAvailable(layer, args)
+      {
+         var docData = args[1];
+         
+         // construct the base content URL
+         var contentUrl = Alfresco.constants.PROXY_URI + docData.contentUrl
          
          // populate the text field with the download url
          var downloadUrl = contentUrl + "?a=true";
@@ -191,7 +158,7 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("document-links.nocopy")});
+            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("document-links.nocopy", "Alfresco.DocumentLinks")});
          }
       }
    };

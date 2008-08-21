@@ -90,15 +90,44 @@
        */
       onReady: function DocumentDetails_onReady()
       {
-         // TODO: A relevant title and name needs to be passed in
+         var config = {
+            method: "GET",
+            url: Alfresco.constants.PROXY_URI + '/slingshot/doclib/doclist/documents/node/' + 
+                 this.options.nodeRef.replace(":/", "") + '?filter=node',
+            successCallback: 
+            { 
+               fn: this._getDataSuccess, 
+               scope: this 
+            },
+            failureMessage: "Failed to load data for document details"
+         };
+         Alfresco.util.Ajax.request(config);
          
-         var eventData = { 
-            itemNodeRef: this.options.nodeRef,
-            itemTitle: "Title",
-            itemName: "Name"
+      },
+      
+      /**
+       * Success handler called when the AJAX call to the doclist web script returns successfully
+       *
+       * @response The response object
+       */
+      _getDataSuccess: function DocumentDetails__getDataSuccess(response)
+      {
+         if (response.json !== undefined)
+         {
+            var docData = response.json.items[0];
+            
+            // fire event to inform any listening components that the data is ready
+            YAHOO.Bubbling.fire("documentDetailsAvailable", docData);
+            
+            // fire event to show comments for document
+            var eventData = { 
+               itemNodeRef: this.options.nodeRef,
+               itemTitle: docData.displayName,
+               itemName: docData.displayName
+            }
+            
+            YAHOO.Bubbling.fire("setCommentedNode", eventData);
          }
-         
-         YAHOO.Bubbling.fire("setCommentedNode", eventData);
       }
    };
 })();

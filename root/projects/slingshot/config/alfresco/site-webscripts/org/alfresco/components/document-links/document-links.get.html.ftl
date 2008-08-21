@@ -1,10 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocumentLinks("${args.htmlid}").setOptions(
-   {
-      nodeRef: "${page.url.args.nodeRef}"
-   }).setMessages(
-      ${messages}
-   );
+   new Alfresco.DocumentLinks("${args.htmlid}").setMessages(${messages});
 //]]></script>
 
 <div id="${args.htmlid}-body" class="document-links">
