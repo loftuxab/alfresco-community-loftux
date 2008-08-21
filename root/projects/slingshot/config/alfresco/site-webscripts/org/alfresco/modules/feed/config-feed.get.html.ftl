@@ -18,7 +18,11 @@
                 <#list limits as limit><option value="${limit}">${limit}</option></#list>
                </select>
             </div>
-         </div>   
+         </div>
+         <div class="yui-gd">
+            <div class="yui-u first"><label for="${args.htmlid}-new_window">${msg("label.new_window")}:</label></div>
+            <div class="yui-u"><input type="checkbox" id="${args.htmlid}-new_window" name="new_window" /></div>
+         </div>
          <div class="bdft">
             <input type="submit" id="${args.htmlid}-ok" value="${msg("button.ok")}" />
             <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" />
