@@ -103,14 +103,6 @@
       widgets: {},
 
       /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: {},
-
-      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -294,7 +286,7 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this)});
+            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
          }
       },
       

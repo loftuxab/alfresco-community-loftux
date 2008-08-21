@@ -43,6 +43,9 @@ public class InputStreamContent implements Content, Serializable
     private String mimetype;
     private String encoding;
     
+    /** cached result - to ensure we only read it once */
+    private String content;
+    
     
     /**
      * Constructor
@@ -63,15 +66,19 @@ public class InputStreamContent implements Content, Serializable
     public String getContent()
         throws IOException
     {
-        ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
-        FileCopyUtils.copy(stream, os);  // both streams are closed
-        byte[] bytes = os.toByteArray();
-        // get the encoding for the string
-        String encoding = getEncoding();
-        // create the string from the byte[] using encoding if necessary
-        String content = (encoding == null) ? new String(bytes) : new String(bytes, encoding);
-        // done
-        return content;
+        // ensure we only try to read the content once - as this method may be called several times
+        // but the inputstream can only be processed a single time
+        if (this.content == null)
+        {
+            ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
+            FileCopyUtils.copy(stream, os);  // both streams are closed
+            byte[] bytes = os.toByteArray();
+            // get the encoding for the string
+            String encoding = getEncoding();
+            // create the string from the byte[] using encoding if necessary
+            this.content = (encoding == null) ? new String(bytes) : new String(bytes, encoding);
+        }
+        return this.content;
     }
     
     /* (non-Javadoc)
