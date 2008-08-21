@@ -17,7 +17,14 @@ if (nodeRef !== null)
       
       // create an array of paths
       var path = doc.items[0].location.path;
-      var folders = path.substring(1, path.length).split("/");
-      model.folders = folders;
+      if (path === "/")
+      {
+         model.folders = [];
+      }
+      else
+      {
+         var folders = path.substring(1, path.length).split("/");
+         model.folders = folders;
+      }
    }
 }

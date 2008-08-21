@@ -76,7 +76,17 @@
           * Name of the item to comment about.
           * TODO: This is used for activity feed and should not be necessary here
           */
-         itemName: null
+         itemName: null,
+         
+         /**
+          * Width to use for comment editor
+          */
+         width: 538,
+         
+         /**
+          * Height to use for comment editor
+          */
+         height: 250
       },
       
       /**
@@ -190,8 +200,8 @@
          
          // instantiate the simple editor we use for the form
          this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
-            height: '250px',
-            width: '538px',
+            height: this.options.height + 'px',
+            width: this.options.width + 'px',
             dompath: false, //Turns on the bar at the bottom
             animate: false, //Animates the opening, closing and moving of Editor windows
             markup: "xhtml",
