@@ -56,8 +56,16 @@
     */
    Alfresco.TopicListTags = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.TopicListTags";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.tagId =
+      {
+         id: 0,
+         tags: {}
+      };
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -116,11 +124,7 @@
        * @property tagId
        * @type object
        */
-      tagId:
-      {
-         id: 0,
-         tags: {}
-      },
+      tagId: null,
 
       /**
        * Selected filter.

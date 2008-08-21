@@ -27,8 +27,17 @@
     */
    Alfresco.TopicReplies = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.TopicReplies";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
+      this.editData =
+      {
+         formDiv : null,
+         viewDiv : null
+      };
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -90,10 +99,7 @@
       /**
        * Stores editing related data
        */
-      editData : {      
-         formDiv : null,
-         viewDiv : null
-      },
+      editData : null,
       
       /**
        * Stores the displayed data
@@ -106,7 +112,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Set multiple initialization options at once.

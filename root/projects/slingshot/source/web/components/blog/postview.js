@@ -30,8 +30,16 @@
     */
    Alfresco.BlogPostView = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.BlogPostView";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.tagId =
+      {
+         id: 0,
+         tags: {}
+      };
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -89,11 +97,7 @@
        * @property tagId
        * @type object
        */
-      tagId:
-      {
-         id: 0,
-         tags: {}
-      },
+      tagId: null,
       
       /**
        * Set multiple initialization options at once.
