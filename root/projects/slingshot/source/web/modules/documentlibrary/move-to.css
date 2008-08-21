@@ -15,6 +15,11 @@
    background-color: #ffffff;
 }
 
+.move-to .ygtvitem .no-permission
+{
+   color: #c0c0c0;
+}
+
 .move-to .ygtvlabel,
 .move-to .ygtvlabel:link,
 .move-to .ygtvlabel:visited,
