@@ -15,6 +15,19 @@ if (uri !== "")
    model.items = getRSSFeed(uri);
 }
 
+var target;
+if (json.isNull("new_window"))
+{
+   // Doesn't seem to like setting properties as boolean so we use a string instead
+   target = "_self";
+}
+else
+{
+   target = "_blank";
+}
+model.target = target;
+c.properties["target"] = target;
+
 var limit = String(json.get("limit"));
 if (limit === "all")
 {
