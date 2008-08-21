@@ -142,6 +142,11 @@
    background-color: #ffffff;
 }
 
+.copy-to .ygtvitem .no-permission
+{
+   color: #c0c0c0;
+}
+
 .copy-to .ygtvlabel,
 .copy-to .ygtvlabel:link,
 .copy-to .ygtvlabel:visited,

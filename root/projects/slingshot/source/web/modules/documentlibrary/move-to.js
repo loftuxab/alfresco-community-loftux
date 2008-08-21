@@ -40,10 +40,16 @@
 
    Alfresco.module.DoclibMoveTo = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.module.DoclibMoveTo";
       this.id = htmlId;
 
-      /* Load YUI Components */
+      // Initialise prototype properties
+      this.widgets = {};
+      this.modules = {};
+      this.pathsToExpand = [];
+
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "treeview"], this.onComponentsLoaded, this);
 
       return this;
@@ -107,7 +113,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -115,7 +121,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Container element for template in DOM.
@@ -131,7 +137,7 @@
        * @property pathsToExpand
        * @type array
        */
-      pathsToExpand: [],
+      pathsToExpand: null,
 
       /**
        * Selected tree node.
@@ -254,7 +260,7 @@
           * @param node {object} Parent node
           * @param fnLoadComplete {function} Expanding node's callback function
           */
-         this.fnLoadNodeData = function DLMT_oR_fnLoadNodeData(node, fnLoadComplete)
+         this.fnLoadNodeData = function DLMT_fnLoadNodeData(node, fnLoadComplete)
          {
             // Get the path this node refers to
             var nodePath = node.data.path;
@@ -279,7 +285,9 @@
                            label: item.name,
                            path: nodePath + "/" + item.name,
                            nodeRef: item.nodeRef,
-                           description: item.description
+                           description: item.description,
+                           userAccess: item.userAccess,
+                           style: item.userAccess.create ? "" : "no-permission"
                         }, node, false);
 
                         if (!item.hasChildren)
@@ -574,8 +582,12 @@
       onNodeClicked: function DLMT_onNodeClicked(node)
       {
          Alfresco.logger.debug("DLMT_onNodeClicked");
-         this.pathChanged(node.data.path);
-         this._updateSelectedNode(node);
+         var userAccess = node.data.userAccess;
+         if (userAccess.create)
+         {
+            this.pathChanged(node.data.path);
+            this._updateSelectedNode(node);
+         }
          return false;
       },
 

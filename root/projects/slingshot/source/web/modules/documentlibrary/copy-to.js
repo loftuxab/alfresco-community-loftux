@@ -40,10 +40,16 @@
 
    Alfresco.module.DoclibCopyTo = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.module.DoclibCopyTo";
       this.id = htmlId;
 
-      /* Load YUI Components */
+      // Initialise prototype properties
+      this.widgets = {};
+      this.modules = {};
+      this.pathsToExpand = [];
+
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "treeview"], this.onComponentsLoaded, this);
 
       // Decoupled event listeners
@@ -160,7 +166,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -168,7 +174,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Container element for template in DOM.
@@ -184,7 +190,7 @@
        * @property pathsToExpand
        * @type array
        */
-      pathsToExpand: [],
+      pathsToExpand: null,
 
       /**
        * Selected tree node.
@@ -336,7 +342,9 @@
                            label: item.name,
                            path: nodePath + "/" + item.name,
                            nodeRef: item.nodeRef,
-                           description: item.description
+                           description: item.description,
+                           userAccess: item.userAccess,
+                           style: item.userAccess.create ? "" : "no-permission"
                         }, node, false);
 
                         if (!item.hasChildren)
@@ -756,8 +764,12 @@
       onNodeClicked: function DLCT_onNodeClicked(node)
       {
          Alfresco.logger.debug("DLCT_onNodeClicked");
-         this.pathChanged(node.data.path);
-         this._updateSelectedNode(node);
+         var userAccess = node.data.userAccess;
+         if (userAccess.create)
+         {
+            this.pathChanged(node.data.path);
+            this._updateSelectedNode(node);
+         }
          return false;
       },
 

@@ -29,7 +29,7 @@
 
 .workflow a.remove-person
 {
-   background-image: url(../images/remove-16.png);
+   background-image: url(images/remove-16.png);
    display: block;
    height: 16px;
 }
