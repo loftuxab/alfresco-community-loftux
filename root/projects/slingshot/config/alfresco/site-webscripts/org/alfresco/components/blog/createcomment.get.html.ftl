@@ -1,6 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.CreateComment("${args.htmlid}").setOptions(
    {
+      height: ${args.editorHeight!250},
+      width: ${args.editorWidth!538}
    }).setMessages(
       ${messages}
    );

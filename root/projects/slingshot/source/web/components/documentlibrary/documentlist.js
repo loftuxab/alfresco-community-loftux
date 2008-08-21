@@ -791,7 +791,9 @@
                /**
                 * Documents
                 */
-               desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="#" class="preview-link">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
+               var docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+                
+               desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
                if (me.options.simpleView)
                {
                   /**
