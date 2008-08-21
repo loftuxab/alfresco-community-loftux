@@ -81,7 +81,7 @@
           * @type string
           * @default "all"
           */
-         activeFilter: "all",
+         activeFilter: "all"
       },
       
       /**
@@ -338,26 +338,40 @@
       onTransitionTask: function MyTasks_onTransitionTask(taskTransition)
       {
          var params = taskTransition.split(" ");
-         if (params.length == 2)
+         var taskId = null;
+         var transitionId = null;
+         
+         if (params.length == 1)
          {
-            var taskId, transitionId;
             if (params[0].indexOf("jbpm$") != -1)
             {
                taskId = params[0];
-               transitionId = params[1];
+               transitionId = "";
+            }
+         }
+         else if (params.length == 2)
+         {
+            if (params[0].indexOf("jbpm$") != -1)
+            {
+               taskId = params[0];
+               transitionId = "/" + params[1];
             }
             else
             {
-               transitionId = params[0];
+               transitionId = "/" + params[0];
                taskId = params[1];
             }
 
-            var url = YAHOO.lang.substitute("api/workflow/task/end/{taskId}/{transitionId}",
+         }
+         
+         if (taskId !== null)
+         {
+            var url = YAHOO.lang.substitute("api/workflow/task/end/{taskId}{transitionId}",
             {
                taskId: taskId,
                transitionId: transitionId
             });
-            
+
             // Transition the task
             Alfresco.util.Ajax.request(
             {
@@ -386,6 +400,6 @@
       _msg: function MyTasks__msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.MyTasks", Array.prototype.slice.call(arguments).slice(1));
-      },
+      }
    };
 })();
