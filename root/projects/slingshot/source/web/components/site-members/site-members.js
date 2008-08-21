@@ -55,6 +55,13 @@
       this.name = "Alfresco.SiteMembers";
       this.id = htmlId;
       
+      // initialise prototype properties
+      this.widgets = {};
+      this.buttons = [];
+      this.modules = {};
+      this.searchTerm = "";
+      this.isCurrentUserSiteAdmin = false;
+      
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
@@ -146,7 +153,7 @@
        * @property isCurrentUserSiteAdmin
        * @type boolean
        */
-      isCurrentUserSiteAdmin: false,
+      isCurrentUserSiteAdmin: null,
       
       /**
        * Set multiple initialization options at once.
