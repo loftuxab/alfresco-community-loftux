@@ -25,8 +25,19 @@
     */
    Alfresco.CommentList = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.CommentList";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.editData = 
+      {
+         editDiv : null,
+         viewDiv : null,
+         row : -1,
+         data : null,
+         widgets : {}
+      };
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -99,13 +110,7 @@
        * Object containing data about the currently edited
        * comment.
        */
-      editData: {
-         editDiv : null,
-         viewDiv : null,
-         row : -1,
-         data : null,
-         widgets : {}
-      },
+      editData: null,
       
       /**
        * Comments data

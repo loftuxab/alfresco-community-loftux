@@ -41,8 +41,12 @@
     */
    Alfresco.AddEmailInvite = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.AddEmailInvite";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -71,7 +75,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Set multiple initialization options at once.

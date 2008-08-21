@@ -28,8 +28,13 @@
    */
    Alfresco.CreateTopic = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.CreateTopic";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
+      this.modules = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -73,7 +78,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Object container for storing module instances.
@@ -81,7 +86,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
       
       /**
        * Set multiple initialization options at once.

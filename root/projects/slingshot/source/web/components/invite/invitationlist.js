@@ -47,8 +47,13 @@
     */
    Alfresco.InvitationList = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.InvitationList";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
+      this.listWidgets = [];
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -87,9 +92,9 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
-      listWidgets: [],
+      listWidgets: null,
       
       /** Auto-incremented unique id for each element added to the
        * tabel.

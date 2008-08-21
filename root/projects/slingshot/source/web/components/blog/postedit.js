@@ -29,8 +29,13 @@
     */
    Alfresco.BlogPostEdit = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.BlogPostEdit";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
+      this.modules = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -85,7 +90,7 @@
        * @property widgets
        * @type object
        */
-      widgets : {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -93,7 +98,7 @@
        * @property modules
        * @type object
        */
-      modules : {},
+      modules: null,
 
       /**
        * Stores the data of the currently edited blog post

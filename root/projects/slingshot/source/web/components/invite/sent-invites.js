@@ -52,8 +52,13 @@
     */
    Alfresco.SentInvites = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.SentInvites";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
+      this.actionButtons = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -89,7 +94,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Object container for storing YUI button instances, indexed by username.
@@ -97,7 +102,7 @@
        * @property userSelectButtons
        * @type object
        */
-      actionButtons: {},
+      actionButtons: null,
       
       /**
        * Current search term, obtained from form input field.

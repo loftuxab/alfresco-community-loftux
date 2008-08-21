@@ -54,6 +54,11 @@
    {
       this.name = "Alfresco.BlogPostListArchive";
       this.id = htmlId;
+      this.monthId =
+      {
+         id: 0,
+         months: {}
+      };
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -103,11 +108,7 @@
        * @property tagId
        * @type object
        */
-      monthId:
-      {
-         id: 0,
-         months: {}
-      },
+      monthId: null,
 
       /**
        * Selected filter.

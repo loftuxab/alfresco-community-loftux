@@ -2,6 +2,9 @@
 
 function main()
 {
+   // make sure we don't redirect by default
+   model.doRedirect = false;
+    
    // fetch the user information from the url
    var inviteTicket = page.url.args.inviteTicket;
    var inviteId = page.url.args.inviteId;
@@ -14,7 +17,7 @@ function main()
       model.error = "Parameters missing!";
       return;
    }
-   
+
    var url = '/api/inviteresponse/accept' +
              '?inviteId=' + inviteId +
              '&inviteeUserName=' + inviteeUserName +
@@ -32,8 +35,8 @@ function main()
    else
    {
       // redirect to the site dashboard
-      status.setLocation('/page/site/' + siteShortName + '/dashboard');
-      status.setRedirect(true);
+      model.doRedirect = true;
+      model.siteShortName = siteShortName;
    }
 }
 

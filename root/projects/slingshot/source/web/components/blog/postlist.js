@@ -53,8 +53,19 @@
     */
    Alfresco.BlogPostList = function(htmlId)
    {
+      /* Mandatory properties */
       this.name = "Alfresco.BlogPostList";
       this.id = htmlId;
+      
+      /* Initialise prototype properties */
+      this.widgets = {};
+      this.modules = {};
+      this.currentFilter = {};
+      this.tagId =
+      {
+         id: 0,
+         tags: {}
+      };
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -128,9 +139,7 @@
        * @property currentFilter
        * @type object
        */
-      currentFilter:
-      {
-      },
+      currentFilter: null,
 
       /**
        * Object container for storing YUI widget instances.
@@ -138,7 +147,7 @@
        * @property widgets
        * @type object
        */
-      widgets : {},
+      widgets : null,
       
       /**
        * Object container for storing module instances.
@@ -146,7 +155,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
       
       /**
        * Object literal used to generate unique tag ids
@@ -154,11 +163,7 @@
        * @property tagId
        * @type object
        */
-      tagId:
-      {
-         id: 0,
-         tags: {}
-      },
+      tagId: null,
       
       /**
        * Set multiple initialization options at once.
