@@ -52,13 +52,21 @@
     */
    Alfresco.DocListTags = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.DocListTags";
       this.id = htmlId;
       
-      /* Register this component */
+      // Initialise prototype properties
+      this.tagId =
+      {
+         id: 0,
+         tags: {}
+      };
+
+      // Register this component
       Alfresco.util.ComponentManager.register(this);
       
-      /* Load YUI Components */
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
@@ -112,11 +120,7 @@
        * @property tagId
        * @type object
        */
-      tagId:
-      {
-         id: 0,
-         tags: {}
-      },
+      tagId: null,
 
       /**
        * Selected filter.

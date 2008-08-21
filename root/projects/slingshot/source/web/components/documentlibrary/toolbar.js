@@ -52,13 +52,25 @@
     */
    Alfresco.DocListToolbar = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.DocListToolbar";
       this.id = htmlId;
       
-      /* Register this component */
+      // Initialise prototype properties
+      this.widgets = {};
+      this.modules = {};
+      this.selectedFiles = [];
+      this.currentFilter =
+      {
+         filterId: "",
+         filterOwner: "",
+         filterData: ""
+      };
+
+      // Register this component
       Alfresco.util.ComponentManager.register(this);
 
-      /* Load YUI Components */
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
@@ -67,7 +79,7 @@
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       YAHOO.Bubbling.on("selectedFilesChanged", this.onSelectedFilesChanged, this);
-   
+
       return this;
    }
    
@@ -122,12 +134,7 @@
        * @property currentFilter
        * @type string
        */
-      currentFilter:
-      {
-         filterId: "",
-         filterOwner: "",
-         filterData: ""
-      },
+      currentFilter: null,
 
       /**
        * FileUpload module instance.
@@ -143,7 +150,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -151,7 +158,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Array of selected states for visible files.
@@ -159,7 +166,7 @@
        * @property selectedFiles
        * @type array
        */
-      selectedFiles: [],
+      selectedFiles: null,
 
       /**
        * Set multiple initialization options at once.
@@ -817,7 +824,7 @@
          if (this.modules.docList)
          {
             var files = this.modules.docList.getSelectedFiles();
-            this.widgets["selectedItems"].set("disabled", (files.length == 0))
+            this.widgets["selectedItems"].set("disabled", (files.length == 0));
          }
       },
    

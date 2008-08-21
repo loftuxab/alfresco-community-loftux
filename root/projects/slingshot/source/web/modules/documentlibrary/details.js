@@ -40,10 +40,15 @@
 
    Alfresco.module.DoclibDetails = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.module.DoclibDetails";
       this.id = htmlId;
 
-      /* Load YUI Components */
+      // Initialise prototype properties
+      this.widgets = {};
+      this.modules = {};
+
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json"], this.onComponentsLoaded, this);
 
       return this;
@@ -94,7 +99,7 @@
           *
           * @property: width
           * @type: integer
-          * @default: 50em
+          * @default: 40em
           */
          width: "40em"
       },
@@ -105,7 +110,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -113,7 +118,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Container element for template in DOM.
@@ -462,7 +467,7 @@
        * @return {string} The custom message
        * @private
        */
-       _msg: function DLTB__msg(messageId)
+       _msg: function DLD__msg(messageId)
        {
           return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }
