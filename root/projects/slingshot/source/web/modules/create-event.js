@@ -166,35 +166,22 @@
 		 	   YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
 		 	}
          
-         var me = this;
-         
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
-         eventForm.addValidation("td", function (field, args, event, form, silent)
-         {      
-            // Check that the end date is after the start date
-            var startDate = new Date(Dom.get("from").value + " " + Dom.get(me.id + "-start").value);
-            var toDate = new Date(Dom.get("to").value + " " + Dom.get(me.id + "-end").value);
-            
-            var after = YAHOO.widget.DateMath.after(toDate, startDate);
-            
-            if (Alfresco.logger.isDebugEnabled())
-            {
-               Alfresco.logger.debug("Current start date: " + Dom.get("from").value + " " + Dom.get(me.id + "-start").value);
-               Alfresco.logger.debug("Current end date: " + Dom.get("to").value + " " + Dom.get(me.id + "-end").value);
-               Alfresco.logger.debug("End date is after start date: " + after);
-            }
-            
-            if (!after && !silent)
-            {
-               form.addError(form.getFieldLabel(field.id) + " cannot be before the start date.", field);
-            }
-            
-            return after;
-            
-         }, null, "focus");
-                          
+         
+         var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"];
+         for (var i=0; i < dateElements.length; i++)
+         {
+            eventForm.addValidation(dateElements[i], this._onDateValidation, { "obj": this }, "blur");
+         }
+         
+         // Setup date validation
+         eventForm.addValidation("td", this._onDateValidation, { "obj": this }, "focus");
+         eventForm.addValidation("fd", this._onDateValidation, { "obj": this }, "focus");
+         eventForm.addValidation(this.id + "-start", this._onDateValidation, { "obj": this }, "blur");
+         eventForm.addValidation(this.id + "-end", this._onDateValidation, { "obj": this }, "blur");
+                     
          // OK Button
          var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
          {
@@ -221,10 +208,6 @@
 				var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
 				Dom.get("fd").value = dateStr;
 				Dom.get("td").value = dateStr;
-
-				var ansiDate = Alfresco.util.formatDate(today, "yyyy/mm/dd");
-				Dom.get("from").value = ansiDate;
-				Dom.get("to").value = ansiDate;
 			}
 			else  // Event Edit
 			{   
@@ -255,6 +238,19 @@
 			}
 			
 			eventForm.setSubmitAsJSON(true);
+			eventForm.doBeforeFormSubmit =
+         {
+            fn: function(form, obj)
+            {
+               // Set the value of the hidden form variables	
+   				var start = Alfresco.util.formatDate(Dom.get("fd").value, "ddd, d mmmm yyyy");
+   				Dom.get(this.id + "-from").value = Alfresco.util.formatDate(start, "yyyy/mm/dd");
+   				
+   				var to = Alfresco.util.formatDate(Dom.get("td").value, "ddd, d mmmm yyyy");
+      			Dom.get(this.id + "-to").value = Alfresco.util.formatDate(to, "yyyy/mm/dd");
+            },
+            scope: this
+         }
          // We're in a popup, so need the tabbing fix
          eventForm.applyTabFix();
 			eventForm.init();
@@ -285,6 +281,33 @@
          // Set intial focus
          YAHOO.util.Dom.get(this.id + "-title").focus();
          console.log(YAHOO.util.Dom.get(this.id + "-title"));
+		},
+		
+		_onDateValidation: function(field, args, event, form, silent)
+		{
+		   var Dom = YAHOO.util.Dom;
+         // Check that the end date is after the start date
+         var start = Alfresco.util.formatDate(Dom.get("fd").value, "yyyy/mm/dd");
+         var startDate = new Date(start + " " + Dom.get(args.obj.id + "-start").value);
+         
+         var to = Alfresco.util.formatDate(Dom.get("td").value, "yyyy/mm/dd");
+         var toDate = new Date(to + " " + Dom.get(args.obj.id + "-end").value);
+         
+         var after = YAHOO.widget.DateMath.after(toDate, startDate);
+         
+         if (Alfresco.logger.isDebugEnabled())
+         {
+            Alfresco.logger.debug("Current start date: " + start + " " + Dom.get(args.obj.id + "-start").value);
+            Alfresco.logger.debug("Current end date: " + to + " " + Dom.get(args.obj.id + "-end").value);
+            Alfresco.logger.debug("End date is after start date: " + after);
+         }
+         
+         if (!after && !silent)
+         {
+            form.addError(form.getFieldLabel(field.id) + " cannot be before the start date.", field);
+         }
+         
+         return after;
 		},
 		
 		/**
@@ -341,7 +364,7 @@
 		 * button in the event creation form. Displays a mini YUI calendar.
 		 * Gets called for both the start and end date buttons.
 		 *
-		 * @method onCreateEventSuccess
+		 * @method onDateSelectButton
 		 * @param e {object} DomEvent
 		 */
 		onDateSelectButton: function(e)
@@ -376,18 +399,15 @@
 					if (container.indexOf("enddate") > -1)
 					{
 						prettyId = "td";
-						hiddenId = "to";
 					}
 					else
 					{
 						prettyId = "fd";
-					   hiddenId = "from";
 					}
 
 					date = args[0][0];
 					var selectedDate = new Date(date[0], (date[1]-1), date[2]);
 
-               Dom.get(hiddenId).value = Alfresco.util.formatDate(selectedDate, "yyyy/mm/d");
                var elem = Dom.get(prettyId);
 					elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
 					elem.focus();			
@@ -431,7 +451,8 @@
 					from: result.event.from,
 					start: result.event.start,
 					end: result.event.end,
-					uri: result.event.uri
+					uri: result.event.uri,
+					tags: result.event.tags
 				});
 				// Refresh the tag component
 				YAHOO.Bubbling.fire('onTagRefresh');
