@@ -1,0 +1,25 @@
+.document-links
+{
+	margin: 10px;
+}
+
+.document-links .heading
+{
+   color: #333333;
+   font-size: 131%;
+}
+
+.document-links .url-title
+{
+   color: #333333;
+   font-size: 100%;
+   padding-top: 12px;
+   padding-bottom: 4px;
+}
+
+.document-links .link-value
+{
+   width: 178px;
+   margin-bottom: 8px;
+   padding: 4px;
+}
