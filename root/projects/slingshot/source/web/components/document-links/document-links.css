@@ -1,6 +1,9 @@
 .document-links
 {
-	margin: 10px;
+   background-color: #fafafa;
+   margin-right: -10px;
+	padding: 20px 10px 25px 25px;
+	border-left: 1px solid #ccc;
 }
 
 .document-links .heading
@@ -13,7 +16,7 @@
 {
    color: #333333;
    font-size: 100%;
-   padding-top: 12px;
+   padding-top: 20px;
    padding-bottom: 4px;
 }
 

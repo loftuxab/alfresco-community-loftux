@@ -50,6 +50,14 @@
       this.name = "Alfresco.SiteFinder";
       this.id = htmlId;
       
+      // initialise prototype properties
+      this.widgets = {};
+      this.buttons = [];
+      this.modules = {};
+      this.searchTerm = "";
+      this.memberOfSites = {};
+      this.membershipsRetrieved = false;
+      
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
@@ -126,7 +134,7 @@
        * @property searchTerm
        * @type string
        */
-      searchTerm: "",
+      searchTerm: null,
       
       /**
        * List of sites the current user is a member of
@@ -144,7 +152,7 @@
        * @property membershipsRetrieved
        * @type boolean
        */
-      membershipsRetrieved: false,
+      membershipsRetrieved: null,
       
       /**
        * Set multiple initialization options at once.
