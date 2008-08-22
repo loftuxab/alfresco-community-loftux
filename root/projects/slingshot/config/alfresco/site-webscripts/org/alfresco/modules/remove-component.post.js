@@ -10,12 +10,18 @@ if (component)
    var pos = getComponentPosition(component);
    
    var components = sitedata.findComponents("page", null, "user/" + user.name + "/dashboard", null);
+   var re = /^component-(\d+)-(\d+)$/;
    var c, coord;
    for (var idx=0; idx < components.length; idx++)
    {
       c = components[idx];
-      coord = getComponentPosition(c);
+      if (!re.test(c.properties["region-id"]))
+      {
+         continue;
+      }
       
+      coord = getComponentPosition(c);
+     
       if (coord.column > pos.column)
       {
          break; // nothing more to do
@@ -44,12 +50,12 @@ function getComponentPosition(component)
 {
    var re = /^component-(\d+)-(\d+)$/;
    var regionId = component.properties["region-id"];
-   
+  
    var result = regionId.match(re);
-   
+  
    return {
       row: result[2],
       column: result[1]
-   };
+   };   
 }
 
