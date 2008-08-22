@@ -6,29 +6,21 @@ function main()
    model.doRedirect = false;
     
    // fetch the user information from the url
-   var inviteTicket = page.url.args.inviteTicket;
    var inviteId = page.url.args.inviteId;
-   var inviteeUserName = page.url.args.inviteeUserName;
-   var siteShortName = page.url.args.siteShortName;
-
-   if ((inviteTicket == undefined) || (inviteId == undefined) ||
-       (inviteeUserName == undefined) || (siteShortName == undefined))
+   var inviteTicket = page.url.args.inviteTicket;
+   if ((inviteId == undefined) || (inviteTicket == undefined))
    {
       model.error = "Parameters missing!";
       return;
    }
-
-   var url = '/api/inviteresponse/accept' +
-             '?inviteId=' + inviteId +
-             '&inviteeUserName=' + inviteeUserName +
-             '&siteShortName=' + siteShortName +
-             '&inviteTicket=' + inviteTicket;
              
    // do invite request and redirect if it succeedes, show error otherwise
+   var url = '/api/invite/' + inviteId + '/' + inviteTicket;
    var connector = remote.connect("alfresco");
-   var result = connector.get(url);
+   var result = connector.put(url, "{}", "application/json");
    if (result.status != status.STATUS_OK)
    {
+      model.doRedirect = false;
       var json = eval('(' + result.response + ')');
       model.error = json.message; // result.response;
    }
@@ -36,7 +28,8 @@ function main()
    {
       // redirect to the site dashboard
       model.doRedirect = true;
-      model.siteShortName = siteShortName;
+      var data = eval('(' + result.response + ')');
+      model.siteShortName = data.siteShortName;
    }
 }
 

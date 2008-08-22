@@ -8,22 +8,19 @@
 <#-- Body -->
 <div class="accept-invite-body">
 <#if (! doRedirect)>
-   <h1>Processing invite acceptance failed</h1>
+   <h1>${msg("error.acceptfailed.title")}</h1>
 
-   <p>Unfortunately your invite acceptance could not be registered</p>
-
-   <p>Most probably this happened because the inviter canceled the invitation.</p>
+   <p>${msg("error.acceptfailed.text")}</p>
 <#else>
 <#-- redirect logic -->
 <script type="text/javascript">//<![CDATA[
    window.location = "${page.url.context}/page/site/${siteShortName}/dashboard";
 //]]></script>
 
-   <h1>Acceptance registered. Redirecting...</h1>
+   <h1>${msg("acceptregistered.title")}</h1>
    
-   <p>You should automatically be redirected to the site dashboard page.
-   Click following link if this is not the case:</p>
-   
-   <a href="${redirectUrl}">${redirectUrl}</a>
+   <p>${msg("acceptregistered.text")}</p>
+   <br />
+   <a href="${page.url.context}/page/site/${siteShortName}/dashboard">${page.url.context}/page/site/${siteShortName}/dashboard</a>
 </#if>
 </div>

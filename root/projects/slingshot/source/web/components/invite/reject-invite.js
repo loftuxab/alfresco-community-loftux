@@ -24,10 +24,10 @@
  */
  
 /**
- * DeclineInvite component.
+ * RejectInvite component.
  * 
  * @namespace Alfresco
- * @class Alfresco.DeclineInvite
+ * @class Alfresco.RejectInvite
  */
 (function()
 {
@@ -44,16 +44,16 @@
    var $html = Alfresco.util.encodeHTML;
 
    /**
-    * DeclineInvite constructor.
+    * RejectInvite constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.DeclineInvite} The new DeclineInvite instance
+    * @return {Alfresco.RejectInvite} The new RejectInvite instance
     * @constructor
     */
-   Alfresco.DeclineInvite = function(htmlId)
+   Alfresco.RejectInvite = function(htmlId)
    {
       /* Mandatory properties */
-      this.name = "Alfresco.DeclineInvite";
+      this.name = "Alfresco.RejectInvite";
       this.id = htmlId;
       
       /* Initialise prototype properties */
@@ -68,7 +68,7 @@
       return this;
    }
    
-   Alfresco.DeclineInvite.prototype =
+   Alfresco.RejectInvite.prototype =
    {
       /**
        * Object container for initialization options
@@ -79,14 +79,6 @@
       options:
       {
          /**
-          * Current siteId.
-          * 
-          * @property siteId
-          * @type string
-          */
-         siteId: "",
-
-         /**
           * Current inviteId.
           * 
           * @property inviteId
@@ -95,20 +87,12 @@
          inviteId: "",   
          
          /**
-          * Current inviteeUserName.
-          * 
-          * @property inviteeUserName
-          * @type string
-          */      
-         inviteeUserName: "",
-         
-         /**
           * Current ticket.
           * 
           * @property ticket
           * @type string
           */
-         inviteTicket: "",
+         inviteTicket: ""
       },
 
       /**
@@ -124,9 +108,9 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DeclineInvite} returns 'this' for method chaining
+       * @return {Alfresco.RejectInvite} returns 'this' for method chaining
        */
-      setOptions: function DeclineInvite_setOptions(obj)
+      setOptions: function RejectInvite_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -137,9 +121,9 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DeclineInvite} returns 'this' for method chaining
+       * @return {Alfresco.RejectInvite} returns 'this' for method chaining
        */
-      setMessages: function DeclineInvite_setMessages(obj)
+      setMessages: function RejectInvite_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -151,7 +135,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function DeclineInvite_onComponentsLoaded()
+      onComponentsLoaded: function RejectInvite_onComponentsLoaded()
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -162,7 +146,7 @@
        *
        * @method onReady
        */
-      onReady: function DeclineInvite_onReady()
+      onReady: function RejectInvite_onReady()
       {         
          // Reject button
          this.widgets.declineButton = Alfresco.util.createYUIButton(this, "decline-button", this.onDeclineClick);
@@ -178,10 +162,10 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onDeclineClick: function DeclineInvite_onDeclineClick(e, p_obj)
+      onDeclineClick: function RejectInvite_onDeclineClick(e, p_obj)
       {
          // success handler
-         var success = function DeclineInvite_onDeclineClick_success(response)
+         var success = function RejectInvite_onDeclineClick_success(response)
          {
             // show the decline confirmed message
             Dom.addClass(Dom.get(this.id + "-confirm"), "hidden");
@@ -190,27 +174,17 @@
          
          // construct the url to call
          var url = YAHOO.lang.substitute(window.location.protocol + "//" + window.location.host +
-            Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/inviteresponse/reject",
+            Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/invite/{inviteId}/{inviteTicket}",
          {
-            action: action,
-            siteShortName: this.options.siteId,
-            inviteId: this.options.inviteId,
-            inviteeUserName: this.options.inviteeUserName,
-            inviteTicket: this.options.inviteTicket
+            inviteId : this.options.inviteId,
+            inviteTicket : this.options.inviteTicket
          });
 
          // make a backend call to decline the request
          Alfresco.util.Ajax.request(
          {
-            method: "GET",
+            method: "DELETE",
             url: url,
-            dataObj:
-            {
-               siteShortName: this.options.siteId,
-               inviteId: this.options.inviteId,
-               inviteeUserName: this.options.inviteeUserName,
-               inviteTicket: this.options.inviteTicket
-            },
             responseContentType : "application/json",
             successCallback:
             {
@@ -228,15 +202,13 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onAcceptClick: function DeclineInvite_onAcceptClick(e, p_obj)
+      onAcceptClick: function RejectInvite_onAcceptClick(e, p_obj)
       {
          // redirect to the accept invite page
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "accept-invite" +
-            "?siteShortName={siteShortName}&inviteid={inviteId}&inviteeUserName={inviteeUserName}&inviteTicket={inviteTicket}",
+            "?inviteId={inviteId}&inviteTicket={inviteTicket}",
          {
-            siteShortName : this.options.siteId,
             inviteId : this.options.inviteId,
-            inviteeUserName : this.options.inviteeUserName,
             inviteTicket : this.options.inviteTicket
          });
          window.location = url;
@@ -254,9 +226,9 @@
        * @return {string} The custom message
        * @private
        */
-      _msg: function DeclineInvite__msg(messageId)
+      _msg: function RejectInvite__msg(messageId)
       {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.DeclineInvite", Array.prototype.slice.call(arguments).slice(1));
+         return Alfresco.util.message.call(this, messageId, "Alfresco.RejectInvite", Array.prototype.slice.call(arguments).slice(1));
       }
    };
 })();
