@@ -4,10 +4,29 @@
    margin-right: -10px;
 	padding: 20px 10px 25px 25px;
 	border-left: 1px solid #ccc;
+	border-top: 1px dashed #ccc;
 }
 
 .document-actions .heading
 {
    color: #333333;
    font-size: 131%;
+   padding-bottom: 16px;
+}
+
+.document-actions .doclist
+{
+   visibility: visible;
+}
+
+.doclist .action-set a:active,
+.doclist .action-set a:hover
+{
+   background-color: #fafafa;
+   text-decoration: underline;
+}
+
+.doclist .action-set div
+{
+   padding: 4px;
 }

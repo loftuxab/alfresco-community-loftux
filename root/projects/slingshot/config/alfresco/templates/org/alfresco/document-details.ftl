@@ -4,11 +4,10 @@
    <link rel="stylesheet" type="text/css" href="${url.context}/components/blog/postview.css" />
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/document-details/document-details.css" />
    
-   <!-- General Blog Assets (used for commenting) -->
    <script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></script>
    <script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></script>
-   <script type="text/javascript" src="${page.url.context}/templates/document-details/document-details.js"></script>
-   
+   <script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></script>
+   <script type="text/javascript" src="${page.url.context}/templates/document-details/document-details.js"></script>   
 </@>
 
 <@template.body>
