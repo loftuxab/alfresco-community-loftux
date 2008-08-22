@@ -32,6 +32,7 @@ import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.User;
+import org.alfresco.util.URLEncoder;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.apache.commons.logging.Log;
@@ -134,7 +135,7 @@ public class AlfrescoUserFactory extends UserFactory
                     ((HttpRequestContext)context).getRequest().getSession(), currentUserId, ALFRESCO_ENDPOINT_ID);
             
             // build the REST URL to retrieve user details
-            String uri = "/webframework/content/metadata?user=" + userId;
+            String uri = "/webframework/content/metadata?user=" + URLEncoder.encode(userId);
             
             // invoke and check for OK response
             Response response = connector.call(uri);

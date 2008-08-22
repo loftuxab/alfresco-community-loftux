@@ -267,7 +267,8 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         }
         catch (IOException ex)
         {
-            throw new ModelObjectPersisterException("Unable to save object: " + path + " (" + _path + ")", ex);
+            throw new ModelObjectPersisterException("Unable to save object: " + path + " due to error: "
+                    + ex.getMessage(), ex);
         }
         
         return saved;

@@ -1,6 +1,6 @@
 <#assign siteActive><#if page.url.templateArgs.site??>true<#else>false</#if></#assign>
-<#assign isGuest=(user.name == 'guest') />
-<#if (! isGuest)>
+<#assign isGuest = (user.name=='guest') />
+<#if !isGuest>
 <script type="text/javascript">//<![CDATA[
    var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions({
       siteId: "${page.url.templateArgs.site!""}",
@@ -17,13 +17,12 @@
          <img src="${url.context}/themes/${theme}/images/app-logo.png" alt="Alfresco Share" />
       </div>
    </div>
-   
 
    <div class="menu-wrapper">
-      <#if (! isGuest)>
+      <#if !isGuest>
       <div class="personal-menu">
-         <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>
-         <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name}/profile">${msg("link.myProfile")}</a></span>
+         <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name?url}/dashboard">${msg("link.myDashboard")}</a></span>
+         <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.myProfile")}</a></span>
          <span class="menu-item-icon sites"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
       </div>
       </#if>
@@ -32,7 +31,7 @@
          <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
          <#if (! isGuest)>
          <span class="menu-item-separator">|</span>
-         <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")} (${user.name})</a></span>
+         <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")} (${user.name?html})</a></span>
          <span class="menu-item-separator">|</span>
          <span class="menu-item">
             <span class="search-container">
@@ -45,7 +44,7 @@
       </div>
    </div>
 
-   <#if (! isGuest)>
+   <#if !isGuest>
    <div id="${args.htmlid}-searchtogglemenu" class="searchtoggle hidden">
       <div class="bd">
          <ul>

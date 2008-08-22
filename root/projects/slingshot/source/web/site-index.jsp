@@ -1,4 +1,5 @@
 <%@ page import="org.alfresco.web.site.*" %>
+<%@ page import="org.alfresco.util.URLEncoder" %>
 <%@ page import="java.util.*" %>
 <%
    // retrieve user name from the session
@@ -15,5 +16,5 @@
    }
    
    // forward to user specific dashboard page
-   response.sendRedirect(request.getContextPath() + "/page/user/" + userid + "/dashboard");
+   response.sendRedirect(request.getContextPath() + "/page/user/" + URLEncoder.encode(userid) + "/dashboard");
 %>

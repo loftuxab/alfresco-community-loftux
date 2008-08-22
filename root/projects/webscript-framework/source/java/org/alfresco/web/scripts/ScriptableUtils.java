@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
+import org.alfresco.util.URLEncoder;
 import org.alfresco.web.ui.common.StringUtils;
 
 /**
@@ -52,5 +53,10 @@ public class ScriptableUtils
     public String encodeJavaScript(String s)
     {
         return StringUtils.encodeJavascript(s);
+    }
+    
+    public String urlEncode(String s)
+    {
+        return URLEncoder.encode(s);
     }
 }

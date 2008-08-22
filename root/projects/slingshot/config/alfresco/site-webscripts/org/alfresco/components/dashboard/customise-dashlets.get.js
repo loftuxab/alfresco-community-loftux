@@ -1,3 +1,13 @@
+function getNoOfColumns(template)
+{
+   var noOfColumns = 0;
+   while(template.properties["gridColumn" + (noOfColumns + 1)] !== null)
+   {
+      noOfColumns++;
+   }
+   return noOfColumns;
+}
+
 
 // Get available components of family/type dashlet
 var webscripts;
@@ -19,7 +29,6 @@ if(tmp || tmp.length > 0)
    webscripts = webscripts.concat(tmp);
 }
 
-
 // Transform the webscripts to easy-to-access dashlet items for the template
 var availableDashlets = [];
 for(var i = 0; i < webscripts.length; i++)
@@ -30,23 +39,23 @@ for(var i = 0; i < webscripts.length; i++)
    {
       availableDashlets[i] = {url: uris[0], shortName: webscript.shortName, description: webscript.description};
    }
-   else
-   {
-      // skip this webscript since it lacks uri or shortName
-   }
+   // else skip this webscript since it lacks uri or shortName
 }
 
 var dashboardUrl;
+var dashboardId;
 if(args.dashboardType == "user")
 {
-   dashboardUrl = "user/" + user.name + "/dashboard";
+   dashboardId = "user/" + user.name + "/dashboard";
+   dashboardUrl = "user/" + stringUtils.urlEncode(user.name) + "/dashboard";
 }
 else if(args.dashboardType == "site")
 {
-   dashboardUrl ="site/" + page.url.templateArgs.site + "/dashboard";
+   dashboardId = "site/" + page.url.templateArgs.site + "/dashboard";
+   dashboardUrl = dashboardId;
 }
 
-var components = sitedata.findComponents("page", null, dashboardUrl, null);
+var components = sitedata.findComponents("page", null, dashboardId, null);
 if(components === undefined || components.length === 0)
 {
    components = [];
@@ -62,7 +71,7 @@ for(i = 0; i < components.length; i++)
    var url = comp.properties.url;
    if(regionId !== null && url !== null)
    {
-      // Creat dashlet
+      // Create dashlet
       var shortName;
       var description;
       for(var j = 0; j < availableDashlets.length; j++)
@@ -85,40 +94,17 @@ for(i = 0; i < components.length; i++)
          columns[column-1][row-1] = dashlet;
       }
    }
-   else
-   {
-      // skip this component since it lacks regionId or shortName
-   }
-}
-
-
-function getNoOfColumns(template)
-{
-   var noOfColumns = 0;
-   while(template.properties["gridColumn" + (noOfColumns + 1)] !== null)
-   {
-      noOfColumns++;
-   }
-   return noOfColumns;
+   // else skip this component since it lacks regionId or shortName
 }
 
 // Get current template
-var dashboardPage;
-if(args.dashboardType == "user")
-{
-   dashboardPage = "user/" + user.name + "/dashboard";
-}
-else if(args.dashboardType == "site")
-{
-   dashboardPage = "site/" + page.url.templateArgs.site + "/dashboard";
-}
-
-var currentTemplate = sitedata.findTemplate(dashboardPage);
+var currentTemplate = sitedata.findTemplate(dashboardId);
 var currentNoOfColumns = getNoOfColumns(currentTemplate);
 var currentLayout = {templateId: currentTemplate.id, noOfColumns: currentNoOfColumns, description: currentTemplate.description};
 
 // Define the model for the template
 model.availableDashlets = availableDashlets;
 model.dashboardUrl = dashboardUrl;
+model.dashboardId = dashboardId;
 model.columns = columns;
 model.currentLayout = currentLayout;

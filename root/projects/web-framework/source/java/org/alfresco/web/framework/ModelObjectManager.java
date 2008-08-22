@@ -223,8 +223,9 @@ public final class ModelObjectManager
             }
             catch (ModelObjectPersisterException mope)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Unable to save object: " + object.getId() + " of type " + object.getTypeId() + " to storage: " + persister.getId()); 
+                if (logger.isInfoEnabled())
+                    logger.info("Unable to save object: " + object.getId() + " of type " + object.getTypeId() +
+                            " to storage: " + persister.getId() + " due to error: " + mope.getMessage()); 
             }                                
         }
         

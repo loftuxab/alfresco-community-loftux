@@ -1,4 +1,3 @@
-
 function getNoOfColumns(template)
 {
    var noOfColumns = 0;
@@ -11,16 +10,16 @@ function getNoOfColumns(template)
 
 
 // Get current template
-var dashboardPage;
+var dashboardId;
 if(args.dashboardType == "user")
 {                              
-   dashboardPage = "user/" + user.name + "/dashboard";
+   dashboardId = "user/" + user.name + "/dashboard";
 }
 else if(args.dashboardType == "site")
 {
-   dashboardPage = "site/" + page.url.templateArgs.site + "/dashboard";   
+   dashboardId = "site/" + page.url.templateArgs.site + "/dashboard";   
 }
-var currentTemplate = sitedata.findTemplate(dashboardPage);
+var currentTemplate = sitedata.findTemplate(dashboardId);
 var currentNoOfColumns = getNoOfColumns(currentTemplate);
 var currentLayout = {templateId: currentTemplate.id, noOfColumns: currentNoOfColumns, description: currentTemplate.description};
 
@@ -36,4 +35,3 @@ var layouts = [
 // Prepare model for template
 model.currentLayout = currentLayout;
 model.layouts = layouts;
-
