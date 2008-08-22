@@ -1,5 +1,10 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocumentPath("${args.htmlid}").setMessages(${messages});
+   new Alfresco.DocumentPath("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!""}"
+   }).setMessages(
+      ${messages}
+   );
 //]]></script>
 
 <div class="path-nav">

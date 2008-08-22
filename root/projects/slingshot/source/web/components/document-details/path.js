@@ -55,9 +55,6 @@
       this.name = "Alfresco.DocumentPath";
       this.id = htmlId;
       
-      // initialise prototype properties
-      this.widgets = {};
-      
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
@@ -73,12 +70,34 @@
    Alfresco.DocumentPath.prototype =
    {
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
+       * Object container for initialization options
+       *
+       * @property options
        * @type object
        */
-       widgets: {},
+      options:
+      {
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: ""
+      },
+      
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.Search} returns 'this' for method chaining
+       */
+      setOptions: function SiteMembers_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
       
       /**
        * Set messages for this component.
@@ -111,6 +130,8 @@
       {
          var docData = args[1];
          var pathHtml = "";
+         var baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary#path=";
+         var pathUrl = "/";
          
          // create an array of paths
          var path = docData.location.path;
@@ -125,19 +146,38 @@
             
             for (var x = 0; x < folders.length; x++)
             {
+               pathUrl += folders[x];
+               
                pathHtml += '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/documentlibrary/images/folder-closed-16.png';
-               pathHtml += '" /><span class="path-link">';
+               pathHtml += '" /><span class="path-link"><a href="' + baseLinkUrl;
+               pathHtml += this._encodePath(pathUrl);
+               pathHtml += '">'
                pathHtml += $html(folders[x]);
-               pathHtml += "</span>";
+               pathHtml += '</a></span>';
                
                if (x < (folders.length-1))
                {
                   pathHtml += "&nbsp;>&nbsp;";
+                  pathUrl += "/";
                }
             }
          }
          
          Dom.get(this.id + "-path").innerHTML = pathHtml;
+      },
+      
+      /**
+       * Encodes the given path for use on a URL
+       *
+       * @method _encodePath
+       * @param path The path to encode
+       * @return The encoded path
+       */
+      _encodePath: function DocumentPath__encodePath(path)
+      {
+         var encodedPath = (YAHOO.env.ua.gecko) ? encodeURIComponent(path) : path;
+         
+         return encodedPath;
       }
    };
 })();
