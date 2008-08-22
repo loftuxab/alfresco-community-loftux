@@ -25,8 +25,6 @@
 package org.alfresco.web.scripts.jsf;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Map;
 
 import javax.faces.component.UIComponent;
@@ -36,14 +34,14 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.FacesEvent;
 
-import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.URLDecoder;
 import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Match;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.RuntimeContainer;
+import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
+import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.ui.common.component.SelfRenderingComponent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -143,15 +141,8 @@ public class UIWebScript extends SelfRenderingComponent
       if (value != null && value.length() != 0)
       {
          // found web-script URL for this component
-         try
-         {
-            String url = URLDecoder.decode(value, "UTF-8");
-            queueEvent(new WebScriptEvent(this, url));
-         }
-         catch (UnsupportedEncodingException e)
-         {
-            throw new AlfrescoRuntimeException("Unable to decode utf-8 script url.");
-         }
+         String url = URLDecoder.decode(value);
+         queueEvent(new WebScriptEvent(this, url));
       }
    }
 

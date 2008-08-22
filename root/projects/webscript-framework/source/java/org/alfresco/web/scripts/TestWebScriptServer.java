@@ -33,12 +33,12 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.util.URLDecoder;
 import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
@@ -541,12 +541,12 @@ public class TestWebScriptServer implements ApplicationContextAware
                 for (String arg : args)
                 {
                     String[] parts = arg.split("=");
-                    req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1], "UTF-8") : null);
+                    req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1]) : null);
                 }
-                req.setQueryString(URLDecoder.decode(uriArgs, "UTF-8"));
+                req.setQueryString(URLDecoder.decode(uriArgs));
             }
             String requestURI = "/alfresco/service" + (iArgIndex == -1 ? uri : uri.substring(0, iArgIndex));
-            req.setRequestURI(URLDecoder.decode(requestURI, "UTF-8"));
+            req.setRequestURI(URLDecoder.decode(requestURI));
         }
         
         return req;

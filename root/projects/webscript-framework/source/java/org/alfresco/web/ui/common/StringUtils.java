@@ -92,7 +92,7 @@ public class StringUtils
         {
             return "";
         }
-
+        
         StringBuilder sb = null;      //create on demand
         String enc;
         char c;
@@ -106,14 +106,12 @@ public class StringUtils
                 case '&': enc = "&amp;"; break;     //&
                 case '<': enc = "&lt;"; break;      //<
                 case '>': enc = "&gt;"; break;      //>
-
-                //misc
-                //case 0x80: enc = "&euro;"; break;  sometimes euro symbol is ascii 128, should we suport it?
+                
                 case '\u20AC': enc = "&euro;";  break;
                 case '\u00AB': enc = "&laquo;"; break;
                 case '\u00BB': enc = "&raquo;"; break;
                 case '\u00A0': enc = "&nbsp;"; break;
-
+                
                 default:
                     if (((int)c) >= 0x80)
                     {
@@ -122,13 +120,13 @@ public class StringUtils
                     }
                 break;
             }
-
+            
             if (enc != null)
             {
                 if (sb == null)
                 {
                     String soFar = string.substring(0, i);
-                    sb = new StringBuilder(i + 8);
+                    sb = new StringBuilder(i + 16);
                     sb.append(soFar);
                 }
                 sb.append(enc);
@@ -141,7 +139,7 @@ public class StringUtils
                 }
             }
         }
-
+        
         if (sb == null)
         {
             return string;

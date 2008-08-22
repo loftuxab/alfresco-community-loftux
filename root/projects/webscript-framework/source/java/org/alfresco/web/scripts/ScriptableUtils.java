@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
+import org.alfresco.util.URLDecoder;
 import org.alfresco.util.URLEncoder;
 import org.alfresco.web.ui.common.StringUtils;
 
@@ -58,5 +59,10 @@ public class ScriptableUtils
     public String urlEncode(String s)
     {
         return URLEncoder.encode(s);
+    }
+    
+    public String urlDecode(String s)
+    {
+        return URLDecoder.decode(s);
     }
 }
