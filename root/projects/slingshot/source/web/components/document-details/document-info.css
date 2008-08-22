@@ -1,0 +1,40 @@
+.document-info
+{
+	padding: 0px 10px 25px 0px;
+}
+
+.document-info .heading
+{
+   color: #333333;
+   font-size: 131%;
+   padding: 20px 0px;
+}
+
+.document-info .info-section
+{
+   border-bottom: 1px dashed #c2c2c2;
+   padding: 0px 5px 20px 5px;
+}
+
+.document-info .tag
+{
+   padding-bottom: 8px;
+}
+
+.document-info .tag img
+{
+   vertical-align: -4px;
+}
+
+.document-info .meta-label
+{
+   font-size: 100%;
+   color: #606060;
+   padding-right: 3px;
+}
+
+.document-info .meta-value
+{
+   font-size: 100%;
+   color: #333333;
+}

@@ -1,0 +1,13 @@
+.document-actions
+{
+   background-color: #fafafa;
+   margin-right: -10px;
+	padding: 20px 10px 25px 25px;
+	border-left: 1px solid #ccc;
+}
+
+.document-actions .heading
+{
+   color: #333333;
+   font-size: 131%;
+}
