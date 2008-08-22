@@ -1,5 +1,5 @@
 <webscript>
   <shortname>path-navigation</shortname>
   <description>Path navigation component used in the document details page</description>
-  <url>/components/navigation/path</url>
+  <url>/components/document-details/path</url>
 </webscript>
