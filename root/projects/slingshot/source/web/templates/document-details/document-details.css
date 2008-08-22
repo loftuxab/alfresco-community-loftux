@@ -1,4 +1,9 @@
 /* Document Details Template */
 
+.document-details-comments
+{
+   border-right: 1px solid #ccc;
+   padding-bottom: 20px;
+}
 
 

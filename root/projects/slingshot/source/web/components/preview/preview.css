@@ -2,7 +2,7 @@ div.preview
 {
    background-color: #5C5C5C;
    padding: 1em 1em 1em 1em;
-   width:37em;
+   margin-left: -10px;
 }
 
 div.preview span,
@@ -15,6 +15,7 @@ div.preview .hd
 {
    height: 2.4em;
    line-height: 2.4em;
+   padding-bottom: 1em;
 }
 
 div.preview img,
@@ -50,4 +51,5 @@ div.preview .ft
 {
    height: 2em;
    line-height: 2em;
+   padding-top: 1em;
 }

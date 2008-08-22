@@ -23,8 +23,10 @@
       <div class="yui-g">
          <div class="yui-g first">
             <@region id="preview" scope="template" protected=true />
-            <@region id="comments" scope="template" protected=true />
-            <@region id="createcomment" scope="template" protected=true />
+            <div class="document-details-comments">
+               <@region id="comments" scope="template" protected=true />
+               <@region id="createcomment" scope="template" protected=true />
+            </div>
          </div>
          <div class="yui-g"> 
             <div class="yui-u first"> 
