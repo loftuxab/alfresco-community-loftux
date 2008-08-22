@@ -112,7 +112,13 @@
              <region-id>component-2-3</region-id>
              <source-id>user/${userid}/dashboard</source-id>
              <url>/components/dashlets/my-activities</url>
-          </component>         
+          </component>   
+          <component>
+             <scope>page</scope>
+             <region-id>component-3-1</region-id>
+             <source-id>user/${userid}/dashboard</source-id>
+             <url>/components/dashlets/user-welcome</url>
+          </component>      
       </components>
       <pages>
          <page id="user/${userid}/dashboard">
