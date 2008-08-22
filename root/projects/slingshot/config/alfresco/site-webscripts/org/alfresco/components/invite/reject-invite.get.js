@@ -15,31 +15,14 @@ function main()
       }
    }
    
-   // fetch the site name the user wants to cancel
-   var json = remote.call("/api/sites/" + page.url.args.siteShortName);
-   var profile =
-   {
-      title: "",
-      shortName: ""
-   };
-
+   //fetch the invite information, which gives us all information required to display the page
+   var url = "/api/invite/" + page.url.args.inviteId + "/" + page.url.args.inviteTicket;
+   var json = remote.call(url);
    if (json.status == 200)
    {
       // Create javascript objects from the repo response
-      var obj = eval('(' + json + ')');
-      if (obj)
-      {
-         profile = obj;
-      }
-   }
-   model.profile = profile;
-   
-   // also fetch the invite information, we need the name of the inviter
-   var json = remote.call("/api/invites?inviteId=jbpm$" + page.url.args.inviteId);
-   if (json.status == 200)
-   {
-      // Create javascript objects from the repo response
-      model.inviteData = eval('(' + json + ')');
+      var data = eval('(' + json + ')');
+      model.invite = data.invite;
    }
    else
    {

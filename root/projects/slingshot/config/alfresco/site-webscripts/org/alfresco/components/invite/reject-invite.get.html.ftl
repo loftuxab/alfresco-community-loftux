@@ -8,52 +8,54 @@
 <#-- error -->
 <#if (error?? && error)>
 <div class="reject-invite-body">
-   <h1>Invitation not found</h1>
-   <p>No invitation found. The inviter has probably canceled the invitation in the meantime.</p>
+   <h1>${msg("error.noinvitation.title")}</h1>
+   <p>${msg("error.noinvitation.text")}</p>
 </div>
 
 <#-- content -->
 <#else>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DeclineInvite("${args.htmlid}").setOptions(
+   new Alfresco.RejectInvite("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args.siteShortName!''}",
-      inviteId: "jbpm$${page.url.args.inviteId!''}",
-      inviteeUserName: "${page.url.args.inviteeUserName!''}",
-      inviteTicket: "${page.url.args.inviteTicket!''}",
+      inviteId: "${page.url.args.inviteId!''}",
+      inviteTicket: "${page.url.args.inviteTicket!''}"
    }).setMessages(
       ${messages}
    );
 //]]></script>
 
+<#-- construct the inviter name -->
+<#assign inviter=invite.inviter.userName />
+<#if (invite.inviter.firstName?? || invite.inviter.lastName??)>
+   <#assign inviter=(invite.inviter.firstName!'' + ' ' + invite.inviter.lastName!'') />
+</#if>
+<#assign siteName><#if (invite.site.title?? && invite.site.title?length > 0)>${invite.site.title}<#else>${invite.site.shortName}</#if></#assign>
+<#assign siteMarkup><span class="site-name">${siteName}</span></#assign>
 <div class="reject-invite-body">
    <div id="${args.htmlid}-confirm" class="main-content">
       <div class="question">
-         Are you sure you want to reject the invitation from ||USER|| to join the<br />
-         <span class="site-name"><#if (profile.title != "")>${profile.title}<#else>${profile.shortName}</#if></span> collaboration site?
+         ${msg("reject.question", inviter, siteMarkup)}
       </div>
       <div class="actions">
          <span id="${args.htmlid}-decline-button" class="yui-button yui-push-button"> 
             <span class="first-child"> 
-               <input type="button" name="decline-button" value="Yes, Reject"> 
+               <input type="button" name="decline-button" value="${msg("action.reject")}"> 
             </span> 
          </span> 
          <span id="${args.htmlid}-accept-button" class="yui-button yui-push-button"> 
             <span class="first-child"> 
-               <input type="button" name="accept-button" value="No, Accept">
+               <input type="button" name="accept-button" value="${msg("action.accept")}">
             </span>
          </span>
       </div>
    </div>
    
    <div id="${args.htmlid}-declined" class="main-content hidden">
-      <p>||User||'s invitation to join the
-      <#if (profile.title != "")>${profile.title}<#else>${profile.shortName}</#if> site
-      has been rejected.<p>
+      <p>${msg("message.rejected", inviter, siteMarkup)}<p>
    </div>
    
    <div id="${args.htmlid}-learn-more" class="learn-more">
-      <p>Learn more about Share at <a href="http://www.alfresco.com">www.alfresco.com</a></p>
+      <p>${msg("learn.more")} <a href="http://www.alfresco.com">www.alfresco.com</a></p>
    </div>
 </div>
 </#if>
