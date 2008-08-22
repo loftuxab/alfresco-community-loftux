@@ -103,7 +103,7 @@
       {
          // don't need to do anything we will be informed via an event when data is ready
       },
-      
+            
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
        */
@@ -141,6 +141,11 @@
          {
             onclick: { fn: this._handleCopyClick, obj: "-page-url", scope: this}
          });
+ 
+         // add focus event handlers to fields        
+         Event.addListener(Dom.get(this.id + "-download-url"), "focus", this._handleFocus, "-download-url", this);
+         Event.addListener(Dom.get(this.id + "-view-url"), "focus", this._handleFocus, "-view-url", this);
+         Event.addListener(Dom.get(this.id + "-page-url"), "focus", this._handleFocus, "-page-url", this);
       },
       
       /**
@@ -159,6 +164,24 @@
          else
          {
             Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("document-links.nocopy", "Alfresco.DocumentLinks")});
+         }
+      },
+      
+      /**
+       * Event handler used to select text in the field when focus is received
+       *
+       * @method _handleFocus
+       * @param event The event
+       * @field The suffix of the id of the field to select
+       */
+      _handleFocus: function DocumentLinks__handleFocus(event, field)
+      {
+         YAHOO.util.Event.stopEvent(event);
+         
+         var fieldObj = Dom.get(this.id + field);
+         if (fieldObj && fieldObj.select)
+         {
+            fieldObj.select();
          }
       }
    };
