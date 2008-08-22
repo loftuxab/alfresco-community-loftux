@@ -112,7 +112,7 @@
          var docData = args[1];
          
          // construct the base content URL
-         var contentUrl = Alfresco.constants.PROXY_URI + docData.contentUrl
+         var contentUrl = Alfresco.constants.PROXY_URI + docData.contentUrl;
          
          // populate the text field with the download url
          var downloadUrl = contentUrl + "?a=true";
