@@ -43,7 +43,8 @@
    <script type="text/javascript">//<![CDATA[
    new Alfresco.DocumentDetails().setOptions(
    {
-      nodeRef: "${url.args.nodeRef}"
+      nodeRef: "${url.args.nodeRef}",
+      siteId: "${page.url.templateArgs.site!""}"
    });
    //]]></script>
 

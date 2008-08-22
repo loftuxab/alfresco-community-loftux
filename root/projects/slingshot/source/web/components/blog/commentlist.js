@@ -74,9 +74,9 @@
           *
           * @property containerId
           * @type string
-          * @default "blog"
+          * @default ""
           */
-         containerId: "blog",
+         containerId: "",
          
          /**
           * Node reference of the item to comment about
@@ -90,10 +90,10 @@
          itemTitle: null,
          
          /**
-          * Name of the item to comment about.
+          * Url of the item to comment about.
           * TODO: This is used for activity feed and should not be necessary here
           */
-         itemName: null,
+         itemUrl: null,
          
          /**
           * Width to use for comment editor
@@ -195,11 +195,11 @@
       onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemName !== null) && (obj.itemTitle !== null))
+         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemTitle !== null) && (obj.itemUrl !== null))
          {
             this.options.itemNodeRef = obj.itemNodeRef;
-            this.options.itemName = obj.itemName;
             this.options.itemTitle = obj.itemTitle;
+            this.options.itemUrl = obj.itemUrl;
             this._loadCommentsList();
          }
       },
@@ -209,7 +209,7 @@
        */
       refreshComments: function CommentList_onFilterChanged(layer, args)
       {
-         if (this.options.itemNodeRef && this.options.itemName && this.options.itemTitle)
+         if (this.options.itemNodeRef && this.options.itemTitle && this.options.itemUrl)
          {
             this._loadCommentsList();
          }
@@ -316,14 +316,6 @@
             // reload the comments list
             YAHOO.Bubbling.fire("refreshComments", {});
          };
-          
-         // put together the url displayed in the activity feed
-         var browseItemUrl = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postview?container={container}&postId={postId}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            postId: this.options.itemName
-         });
 
          // put together the request url to delete the comment
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "/api/comment/node/{nodeRef}/?site={site}&container={container}&itemTitle={itemTitle}&browseItemUrl={browseItemUrl}",
@@ -332,7 +324,7 @@
             container: this.options.containerId,
             nodeRef: data.nodeRef.replace(":/", ""),
             itemTitle: this.options.itemTitle,
-            browseItemurl: Alfresco.util.encodeHTML(browseItemUrl)
+            browseItemUrl: Alfresco.util.encodeHTML(this.options.itemUrl)
          });
          
          // execute ajax request
@@ -414,12 +406,7 @@
          Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
          Dom.get(formId + "-itemTitle").setAttribute("value", this.options.itemTitle);
-         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postview?postId={itemName}",
-         {
-            site: this.options.siteId,
-            itemName: this.options.itemName
-         });
-         Dom.get(formId + "-browseItemUrl").setAttribute("value", browseUrl);
+         Dom.get(formId + "-browseItemUrl").setAttribute("value", this.options.itemUrl);
          Dom.get(formId + "-content").value = data.content;
          
          // show the form and hide the view

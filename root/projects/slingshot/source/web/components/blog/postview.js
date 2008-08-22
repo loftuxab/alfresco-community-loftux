@@ -222,10 +222,24 @@
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
          
          // inform interested comment components about the loaded blog post
+         this.sendCommentedNodeEvent();
+      },
+      
+      /**
+       * Sends out a setCommentedNode bubble event.
+       */
+      sendCommentedNodeEvent: function BlogPostView_sendCommentedNodeEvent()
+      {
+         // construct the itemUrl
+         var itemUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postview?postId={itemName}",
+         {
+            site: this.options.siteId,
+            itemName: this.blogPostData.name
+         });
          var eventData = {
-            itemNodeRef: data.nodeRef,
-            itemTitle: data.title,
-            itemName: data.name
+            itemNodeRef: this.blogPostData.nodeRef,
+            itemTitle: this.blogPostData.title,
+            itemUrl: itemUrl
          }
          YAHOO.Bubbling.fire("setCommentedNode", eventData);
       },

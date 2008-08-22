@@ -77,10 +77,10 @@
          itemTitle: null,
          
          /**
-          * Name of the item to comment about.
+          * Url of the item to comment about.
           * TODO: This is used for activity feed and should not be necessary here
           */
-         itemName: null,
+         itemUrl: null,
          
          /**
           * Width to use for comment editor
@@ -142,10 +142,10 @@
       onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemName !== null) && (obj.itemTitle !== null))
+         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemUrl !== null) && (obj.itemTitle !== null))
          {
             this.options.itemNodeRef = obj.itemNodeRef;
-            this.options.itemName = obj.itemName;
+            this.options.itemUrl = obj.itemUrl;
             this.options.itemTitle = obj.itemTitle;
             this.initializeCreateCommentForm(); 
          }
@@ -182,12 +182,7 @@
          
          // browseItemUrl
          var browseItemUrlElem = Dom.get(this.id + '-browseItemUrl');
-         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postview?postId={itemName}",
-         {
-            site: this.options.siteId,
-            itemName: this.options.itemName
-         });
-         browseItemUrlElem.setAttribute("value", browseUrl);
+         browseItemUrlElem.setAttribute("value", this.options.itemUrl);
          
          // register the behaviour with the form and display it finally
          this.registerCreateCommentForm();
