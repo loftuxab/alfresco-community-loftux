@@ -3,5 +3,5 @@
    <scope>template</scope>
    <region-id>path</region-id>
    <source-id>document-details</source-id>
-   <url>/components/navigation/path</url>
+   <url>/components/document-details/path</url>
 </component>
