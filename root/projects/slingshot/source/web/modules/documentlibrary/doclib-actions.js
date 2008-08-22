@@ -213,6 +213,10 @@
             {
                success = {};
             }
+            if (typeof failure != "object")
+            {
+               failure = {};
+            }
             
             success.popup = Alfresco.util.PopupManager.displayMessage(
             {
@@ -220,6 +224,7 @@
                displayTime: 0,
                text: wait.message
             });
+            failure.popup = success.popup;
          }
 
          var url;
@@ -234,37 +239,8 @@
          
          if (params)
          {
-            url +=  "/";
-            // Using nodeRef-based or site, container?
-            if (params.nodeRef)
-            {
-               url += "node/" + params.nodeRef.replace(":/", "");
-            }
-            else
-            {
-               url += "site/" + params.siteId + "/" + params.containerId;
-            }
-
-            // Add path and file if supplied
-            if (params.path)
-            {
-               path = params.path;
-            }
-            if (params.file)
-            {
-               path += "/" + params.file;
-            }
-            url += path;
-            
-            configObj =
-            {
-               nodeRef: params.nodeRef,
-               siteId: params.siteId,
-               containerId: params.containerId,
-               path: params.path,
-               file: params.file,
-               path: path
-            }
+            url = YAHOO.lang.substitute(url, params);
+            configObj = params;
          }
          if (webscript.queryString)
          {

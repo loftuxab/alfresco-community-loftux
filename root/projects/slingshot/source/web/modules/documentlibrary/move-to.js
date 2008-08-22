@@ -180,8 +180,6 @@
        */
       onComponentsLoaded: function DLMT_onComponentsLoaded()
       {
-         // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
       },
       
       /**
@@ -190,6 +188,12 @@
        */
       showDialog: function DLMT_showDialog()
       {
+         // DocLib Actions module
+         if (!this.modules.actions)
+         {
+            this.modules.actions = new Alfresco.module.DoclibActions();
+         }
+         
          if (!this.containerDiv)
          {
             // Load the UI template from the server
@@ -247,10 +251,8 @@
          });
          this.widgets.dialog.render(document.body);
          
-         // OK button
+         // OK and cancel buttons
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", this.onOK);
-
-         // Cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
 
          /**
@@ -506,7 +508,7 @@
             },
             webscript:
             {
-               name: "move-to",
+               name: "move-to/site/{site}/{container}{path}",
                method: Alfresco.util.Ajax.POST
             },
             wait:
@@ -515,8 +517,8 @@
             },
             params:
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
+               site: this.options.siteId,
+               container: this.options.containerId,
                path: this.selectedNode.data.path
             },
             config:
