@@ -1,7 +1,8 @@
 div.preview
 {
-   background-color: #5C5C5C;
+   background-color: #434343;
    padding: 1em 1em 1em 1em;
+   /*width: 37em;*/
    margin-left: -10px;
 }
 
@@ -27,7 +28,7 @@ div.preview input
 
 div.preview input
 {
-   width: 1.5em;
+   width: 1.8em;
 }
 
 div.preview .bd,
@@ -39,7 +40,7 @@ div.preview .ft
 div.preview .bd .preview-swf
 {
    width: 100%;
-   height: 45em;
+   height: 45em;   
 }
 
 div.preview .bd .preview-swf div

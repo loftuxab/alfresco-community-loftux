@@ -25,10 +25,10 @@
 
 
 /**
- * Preview component.
+ * FullPreview component.
  *
  * @namespace Alfresco
- * @class Alfresco.Preview
+ * @class Alfresco.FullPreview
  */
 (function()
 {
@@ -43,9 +43,9 @@
     * @constructor
     * @private
     */
-   Alfresco.Preview = function(containerId)
+   Alfresco.FullPreview = function(containerId)
    {
-      this.name = "Alfresco.Preview";
+      this.name = "Alfresco.FullPreview";
       this.id = containerId;
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/swfplayer/assets/SWFPlayer.swf";
 
@@ -55,15 +55,15 @@
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "swfplayer"], this.onComponentsLoaded, this);
 
-      YAHOO.Bubbling.on("hideFlash", this.onHideFlash, this);
-      YAHOO.Bubbling.on("showFlash", this.onShowFlash, this);
+      // Listen for events from other components that wants tis component to show itself
+      YAHOO.Bubbling.on("showFullPreview", this.onShowFullPreview, this);
 
       this.widgets = {};
 
       return this;
    }
 
-   Alfresco.Preview.prototype =
+   Alfresco.FullPreview.prototype =
    {
       /**
        * Object container for initialization options
@@ -185,21 +185,27 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function P_onComponentsLoaded()
+      onComponentsLoaded: function FP_onComponentsLoaded()
       {
 
+         // nodeRef is mandatory
+         if (this.options.nodeRef === undefined)
+         {
+             throw new Error("A nodeRef must be provided");
+         }
+
+         // Pass in the path to the .swf movie
          YAHOO.widget.SWFPlayer.SWFURL = this.swf;
          
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
-         this.widgets.swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
          this.widgets.swfPlayerMessage = Dom.get(this.id + "-swfPlayerMessage-div");
          this.widgets.titleText = Dom.get(this.id + "-title-span");
          this.widgets.titleImg = Dom.get(this.id + "-title-img");
 
-         // Create and save a references to the buttons so we can alter them later
+         // Create and save a references to the buttons  so we can alter them later
          this.widgets.previousButton = Alfresco.util.createYUIButton(this, "previous-button", this.onPreviousButtonClick);
          this.widgets.nextButton = Alfresco.util.createYUIButton(this, "next-button", this.onNextButtonClick);
-         this.widgets.fullPreviewButton = Alfresco.util.createYUIButton(this, "fullPreview-button", this.onFullPreviewButtonClick);
+         this.widgets.closeButton = Alfresco.util.createYUIButton(this, "close-button", this.onCloseButtonClick);
 
          // Listen for changes on the "Jump to page" textfield
          this.widgets.jumpToPageTextField = Dom.get(this.id + "-jumpToPage-textfield");
@@ -217,29 +223,41 @@
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
          // Show the hidden buttons now that they have become styled as yui buttons
-         Dom.setStyle(this.id + "-ft-div", "visibility", "");
+         Dom.setStyle(this.id + "-hd-div", "visibility", "");
 
-         // nodeRef is mandatory
-         if (this.options.nodeRef === undefined)
-         {
-             throw new Error("A nodeRef must be provided");
-         }
+         // Create the YUI panel
+         this._createPanel();
+      },
 
+      /**
+       * Helper method for creating flash object if appropriate
+       *
+       * @method _createFlash
+       */
+      _createFlash: function FP__createFlash()
+      {
          if(Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
          {
             if(this._resolvePreview())
             {
-               // Create and save a reference to the swfPlayer so we can call it later
-               this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#434343"});
-               this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
-               this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
-               this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
-               this.swfPlayer.subscribe("contentReady", this.onContentReady, this, true);
+               if(this.swfPlayer == null)
+               {
+                  // Maximize the height of the swf div
+                  var swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
+                  Dom.setStyle(swfPlayerDiv, "height", Dom.getViewportHeight() - 100 + "px");
+
+                  // Create and save a reference to the swfPlayer so we can call it later
+                  this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#DCDCDC"});
+                  this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
+                  this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
+                  this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
+                  this.swfPlayer.subscribe("contentReady", this.onContentReady, this, true);
+               }
             }
             else
             {
                // Cant find a preview
-               var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "?a=true/"; 
+               var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "?a=true/";
                var message = Alfresco.util.message("label.noPreview", this.name, {"0": url});
                this.widgets.swfPlayerMessage["innerHTML"] = message;
             }
@@ -253,14 +271,13 @@
 
       },
 
-
       /**
        * Helper method for deciding what preview to use, if any
        *
        * @method _resolvePreview
        * @return the name of the preview to use or nullif none is appropriate
        */
-      _resolvePreview: function P__resolvePreview(event)
+      _resolvePreview: function FP__resolvePreview(event)
       {
          // Try to prioritise usage of imgpreview for images and webpreview for other content
          var ps = this.options.previews;
@@ -281,7 +298,7 @@
        *
        * @method onContentReady
        */
-      onContentReady: function P_onContentReady(event)
+      onContentReady: function FP_onContentReady(event)
       {
          if(!this.contentReady)
          {
@@ -298,12 +315,37 @@
       },
 
       /**
+       * Helper method for creating the YUI Panel
+       *
+       * @method _createPanel
+       */
+      _createPanel: function()
+      {
+         var panelHeight = Dom.getViewportHeight() - 60;
+         this.widgets.fullPreviewPanel = Dom.get(this.id + "-fullPreview-panel");
+         this.widgets.panel = new YAHOO.widget.Panel(this.widgets.fullPreviewPanel,
+         {
+            modal: true,
+            draggable: false,
+            fixedcenter: true,
+            close: false,
+            visible: false,
+            height: panelHeight + "px",
+            underlay: "none"
+         });
+
+         // Add it to the Dom
+         this.widgets.panel.render();
+
+      },
+
+      /**
        * Fired by the SWFPlayer when the swf for the nodeRef failed to load.
        *
        * @method onLoadedSwfError
        * @param event {object} an SWFPlayer "swfLoadedfError" event
        */
-      onLoadedSwfError: function P_onLoadedSwfError(event)
+      onLoadedSwfError: function FP_onLoadedSwfError(event)
       {
          // Disable buttons and hide panel
          this.widgets.previousButton.set("disabled", true);
@@ -336,7 +378,7 @@
        * @method onLoadedSwfReady
        * @param event {object} an SWFPlayer "swfLoadedReady" event
        */
-      onLoadedSwfReady: function P_onLoadedSwfReady(event)
+      onLoadedSwfReady: function FP_onLoadedSwfReady(event)
       {
          this._handleSuccessFullLoadedSwfEvent(event);
       },
@@ -347,7 +389,7 @@
        * @method onLoadedSwfOnFrame
        * @param event {object} an SWFPlayer "loadedSwfOnFrame" event
        */
-      onLoadedSwfOnFrame: function P_onLoadedSwfOnFrame(event)
+      onLoadedSwfOnFrame: function FP_onLoadedSwfOnFrame(event)
       {
          this._handleSuccessFullLoadedSwfEvent(event);
       },
@@ -358,7 +400,7 @@
        * @method _handleSuccessFullLoadedSwfEvent
        * @param event {object} an SWFPlayer "swfLoadedEnterFrame" or "swfLoadedReady" event
        */
-      _handleSuccessFullLoadedSwfEvent: function P__handleSuccessFullLoadedSwfEvent(event)
+      _handleSuccessFullLoadedSwfEvent: function FP__handleSuccessFullLoadedSwfEvent(event)
       {
          // Update our local model of the loaded swf
          this.loadedSwf =
@@ -390,7 +432,7 @@
        * @method onJumpToPageTextFieldChange
        * @param event {object} a input text "change" event
        */
-      onJumpToPageTextFieldChange: function P_onJumpToPageTextFieldChange(event)
+      onJumpToPageTextFieldChange: function FP_onJumpToPageTextFieldChange(event)
       {
          var newFrame = parseInt(event.target.value);
          if (newFrame > this.loadedSwf.totalFrames)
@@ -420,7 +462,7 @@
        * @method onPreviousButtonClick
        * @param event {object} a Button "click" event
        */
-      onPreviousButtonClick: function P_onPreviousButtonClick()
+      onPreviousButtonClick: function FP_onPreviousButtonClick()
       {
          this.swfPlayer.goToFrameNo(this.loadedSwf.currentFrame - 1);
       },
@@ -433,48 +475,48 @@
        * @method onNextButtonClick
        * @param event {object} a Button "click" event
        */
-      onNextButtonClick: function P_onNextButtonClick()
+      onNextButtonClick: function FP_onNextButtonClick()
       {
          this.swfPlayer.goToFrameNo(this.loadedSwf.currentFrame + 1);
       },
 
       /**
-       * Fired when the user clicks the full screen button.
-       * Will trigger the FullPreview component to be displayed
+       * Fired when the user clicks the close button.
+       * Will hide this content.
        *
-       * @method onFullPreviewButtonClick
+       * @method onCloseButtonClick
        * @param event {object} a Button "click" event
        */
-      onFullPreviewButtonClick: function P_onFullPreviewButtonClick()
+      onCloseButtonClick: function FP_onCloseButtonClick()
       {
-         YAHOO.Bubbling.fire("showFullPreview");
+         // Tell other components that they can display their flash movies again
+         YAHOO.Bubbling.fire("showFlash");
+
+         this.widgets.panel.hide();
       },
 
       /**
-       * Fired any another component, i.e FullPreview, to give this component
-       * a chance to hide its flash movies so they don't overlap.
+       * Fired any another component, i.e Preview, to displays the panel with the full preview.
        *
-       * @method onHideFlash
+       * @method onShowFullPreview
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onHideFlash: function P_onHideFlash(layer, args)
+      onShowFullPreview: function FP_onShowFullPreview(layer, args)
       {
-         Dom.setStyle(this.widgets.swfPlayerDiv, "visibility", "hidden");
-      },
+         // Tell other components that they should hide their flash movies so they dont overlap
+         YAHOO.Bubbling.fire("hideFlash");
 
+         this.widgets.panel.show();
 
-      /**
-       * Fired any another component, i.e FullPreview, to give this component
-       * a chance to show its flash movies again when the risk of overlap is gone.
-       *
-       * @method onShowFlash
-       * @param layer {object} Event fired (unused)
-       * @param args {array} Event parameters (unused)
-       */
-      onShowFlash: function P_onShowFlash(layer, args)
-      {
-         Dom.setStyle(this.widgets.swfPlayerDiv, "visibility", "");
+         this._createFlash();
+
+         var mask = Dom.get(this.id + "-fullPreview-panel_mask");
+         if(!Dom.hasClass("full-preview-mask"))
+         {
+            Dom.addClass(mask, "full-preview-mask");            
+         }
+         Dom.setStyle(this.widgets.fullPreviewPanel, "border-style", "none");
       }
 
 

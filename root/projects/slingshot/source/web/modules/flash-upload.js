@@ -440,7 +440,7 @@
          {
             this.showConfig.uploadDirectory = "/";
          }
-         // Check if the uploader has been shoed before
+         // Check if the uploader has been showed before
          if (this.panel)
          {
             this._showPanel();
