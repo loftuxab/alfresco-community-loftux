@@ -39,7 +39,7 @@ package
 		private function test():void
 		{
 			init(true);
-			load("http://localhost:8080/share/proxy/alfresco/api/node/workspace/SpacesStore/808fe496-3136-417d-82a0-cb817ff6931f/content/thumbnails/imgpreview?c=force&alf_ticket=TICKET_485029681eab75ce17cb6e857944f86bf6c38e65&noCacheToken=1219327173291");
+			//load("http://localhost:8080/share/proxy/alfresco/api/node/workspace/SpacesStore/808fe496-3136-417d-82a0-cb817ff6931f/content/thumbnails/imgpreview?c=force&alf_ticket=TICKET_485029681eab75ce17cb6e857944f86bf6c38e65&noCacheToken=1219327173291");
 		}
 		
 		override protected function initializeComponent():void {
@@ -365,8 +365,10 @@ package
 	     */
 		private function goTo(frame:Object, scene:String=null, play:Boolean=false):void 
 		{
+		    t("Do goTo?");  
 			if(content is MovieClip)
       		{
+      			t("Do goTo since its a movie clip");  
       			var mc:MovieClip = content as MovieClip;      		      		
 		        if(!mc.hasEventListener(Event.ENTER_FRAME)) 
 		        {

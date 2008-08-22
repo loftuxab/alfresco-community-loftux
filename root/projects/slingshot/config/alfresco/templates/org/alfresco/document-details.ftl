@@ -39,6 +39,7 @@
          </div>
       </div>
    </div>
+   <@region id="full-preview" scope="template" protected=true />      
    
    <script type="text/javascript">//<![CDATA[
    new Alfresco.DocumentDetails().setOptions(

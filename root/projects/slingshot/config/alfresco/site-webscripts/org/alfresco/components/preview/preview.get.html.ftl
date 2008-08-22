@@ -21,7 +21,7 @@ new Alfresco.Preview("${args.htmlid}").setOptions({
          <div id="${args.htmlid}-swfPlayerMessage-div"></div>
       </div>
    </div>
-   <div class="ft">
+   <div id="${args.htmlid}-ft-div" class="ft" style="visibility: hidden;">
       <input id="${args.htmlid}-previous-button" type="button" value="${msg("button.previous")}" />
       <span  id="${args.htmlid}-currentFrame-span">${msg("label.currentFrame")}</span>
       <input id="${args.htmlid}-next-button" type="button" value="${msg("button.next")}" />
