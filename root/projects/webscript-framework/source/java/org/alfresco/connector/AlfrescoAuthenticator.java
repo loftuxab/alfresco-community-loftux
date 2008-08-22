@@ -25,6 +25,7 @@
 package org.alfresco.connector;
 
 import org.alfresco.connector.exception.AuthenticationException;
+import org.alfresco.util.URLEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentException;
@@ -68,7 +69,7 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
             if(logger.isDebugEnabled())
                 logger.debug("Authenticating user: " + user);
             
-            Response response = remoteClient.call("/api/login?u=" + user + "&pw=" + pass);
+            Response response = remoteClient.call("/api/login?u=" + URLEncoder.encode(user) + "&pw=" + pass);
             
             // read back the ticket
             if (response.getStatus().getCode() == 200)

@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.framework;
 
+import java.net.URLDecoder;
+
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 
 /**
@@ -85,7 +87,7 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     
     /**
      * Default way to convert an object id into a storage path
-     * This just adds the .xml extension to the id
+     * This just adds the .xml extension to the id.
      * 
      * @param objectId the object id
      * 

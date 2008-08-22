@@ -1,7 +1,7 @@
 <div class="dashlet">
    <div class="title">${msg("header.myLimitedProfile")}</div>
    <div class="toolbar">
-      <a href="${url.context}/page/user/${user.name}/profile">${msg("link.viewFullProfile")}</a>
+      <a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.viewFullProfile")}</a>
    </div>
    <div class="body">
       <table cellspacing="0" cellpadding="0" border="0" width="100%">

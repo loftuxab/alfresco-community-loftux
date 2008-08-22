@@ -33,7 +33,8 @@
          description: "${currentLayout.description}",
          icon: "${url.context}/components/dashboard/images/${currentLayout.templateId}.png"         
       },
-      dashboardUrl: "${dashboardUrl}"
+      dashboardUrl: "${dashboardUrl}",
+      dashboardId: "${dashboardId}"
    });
    //]]></script>
 

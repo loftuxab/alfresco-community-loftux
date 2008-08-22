@@ -132,7 +132,15 @@
           * @property dashboardUrl
           * @type {string}
           */
-         dashboardUrl: null
+         dashboardUrl: null,
+         
+         /**
+          * The ID to the dashboard that is configured
+          *
+          * @property dashboardId
+          * @type {string}
+          */
+         dashboardId: null
       },
 
       /**
@@ -347,9 +355,9 @@
          }
 
          // Prepare save request config
-         var dashboardPage = this.options.dashboardUrl;
+         var dashboardUrl = this.options.dashboardUrl;
          var templateId = this.options.currentLayout.templateId;
-         var dataObj = {dashboardPage: dashboardPage, templateId: templateId, dashlets: dashlets};
+         var dataObj = {dashboardPage: this.options.dashboardId, templateId: templateId, dashlets: dashlets};
 
          // Do the request and send the user to the dashboard after wards
          Alfresco.util.Ajax.jsonRequest(
@@ -361,7 +369,7 @@
                fn: function()
                {
                   // Send the user to the newly configured dashboard
-                  document.location.href = Alfresco.constants.URL_CONTEXT + "page/" + dashboardPage;
+                  document.location.href = Alfresco.constants.URL_CONTEXT + "page/" + dashboardUrl;
                },
                scope: this
             },
