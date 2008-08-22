@@ -24,13 +24,10 @@
  */
 package org.alfresco.web.scripts.jsf;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.Content;
-import org.alfresco.web.scripts.Runtime;
+import org.alfresco.util.URLDecoder;
 import org.alfresco.web.scripts.Match;
+import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
 
 /**
@@ -49,19 +46,12 @@ public class WebScriptJSFRequest extends WebScriptRequestURLImpl
     */
    public WebScriptJSFRequest(Runtime container, String[] scriptUrlParts, Match match)
    {
-       super(container, scriptUrlParts, match);
-       // decode url args (as they would be if this was a servlet)
-       try
-       {
-          for (String name : this.queryArgs.keySet())
-          {
-             this.queryArgs.put(name, URLDecoder.decode(this.queryArgs.get(name), "UTF-8"));
-          }
-       }
-       catch (UnsupportedEncodingException e)
-       {
-          throw new AlfrescoRuntimeException("Unable to decode UTF-8 url!", e);
-       }
+      super(container, scriptUrlParts, match);
+      // decode url args (as they would be if this was a servlet)
+      for (String name : this.queryArgs.keySet())
+      {
+         this.queryArgs.put(name, URLDecoder.decode(this.queryArgs.get(name)));
+      }
    }
 
    /* (non-Javadoc)

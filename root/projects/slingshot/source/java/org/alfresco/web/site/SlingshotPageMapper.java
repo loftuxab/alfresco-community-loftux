@@ -24,8 +24,6 @@
  */
 package org.alfresco.web.site;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -36,6 +34,7 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.URLDecoder;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.scripts.ProcessorModelHelper;
@@ -103,14 +102,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
         // Strip off the webapp name (if any - may be ROOT i.e. "/")
         HttpServletRequest req = ((HttpServletRequest)request);
     	String requestURI = req.getRequestURI().substring(req.getContextPath().length());
-        try
-        {
-            requestURI = URLDecoder.decode(requestURI, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            // ignore and the original URI will be used
-        }
+        requestURI = URLDecoder.decode(requestURI);
         
     	// Extract page Id from the rest of the URI
     	String pageId = null;

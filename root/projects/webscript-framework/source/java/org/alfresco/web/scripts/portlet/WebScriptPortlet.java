@@ -25,8 +25,6 @@
 package org.alfresco.web.scripts.portlet;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
@@ -41,16 +39,16 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.WindowState;
 
-import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.URLDecoder;
 import org.alfresco.web.scripts.AbstractRuntime;
-import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Description;
 import org.alfresco.web.scripts.Match;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.RuntimeContainer;
+import org.alfresco.web.scripts.WebScript;
+import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
+import org.alfresco.web.scripts.WebScriptResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -173,17 +171,10 @@ public class WebScriptPortlet implements Portlet
                     for (String argValue : param.getValue())
                     {
                         scriptUrlArgs.append((scriptUrlArgs.length() == 0) ? "" : "&");
+                        
                         // decode url arg (as it would be if this was a servlet)
-                        try
-                        {
-                            scriptUrlArgs.append(argName).append("=")
-                                         .append(URLDecoder.decode(argValue, "UTF-8"));
-                        }
-                        catch (UnsupportedEncodingException e)
-                        {
-                           throw new AlfrescoRuntimeException("Unable to decode UTF-8 url!", e);
-                        }
-                       
+                        scriptUrlArgs.append(argName).append("=")
+                                     .append(URLDecoder.decode(argValue));
                     }
                 }
             }

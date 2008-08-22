@@ -25,7 +25,10 @@
 package org.alfresco.util;
 
 /**
- * UTF-8 URL character encoder. Based on the w3 Consortium URLUTF8Encoder class.
+ * UTF-8 URL character encoder. Based on an optimized and improved version
+ * of the w3 Consortium URLUTF8Encoder class.
+ * 
+ * @author kevinr
  */
 public final class URLEncoder
 {
@@ -88,51 +91,66 @@ public final class URLEncoder
      *        secondly each of these bytes is encoded as "%xx".
      * </ul>
      *
-     * @param s     The string to be encoded
+     * @param s     The non-null string to be encoded
+     * 
      * @return The encoded string
      */
     public static String encode(String s)
     {
-        StringBuffer sbuf = new StringBuffer(s.length() + 16);
+        StringBuilder sb = null;      //create on demand
+        char ch;
         int len = s.length();
         for (int i = 0; i < len; i++)
         {
-            int ch = s.charAt(i);
-            if ('A' <= ch && ch <= 'Z')             // 'A'..'Z'
+            ch = s.charAt(i);
+            
+            if (('A' <= ch && ch <= 'Z') ||             // 'A'..'Z'
+                ('a' <= ch && ch <= 'z') ||             // 'a'..'z'
+                ('0' <= ch && ch <= '9') ||             // '0'..'9'
+                ch == '-' || ch == '_' ||               // unreserved
+                ch == '.' || ch == '!' ||
+                ch == '~' || ch == '*' ||
+                ch == '(' || ch == ')')
             {
-                sbuf.append((char)ch);
+                if (sb != null)
+                {
+                    sb.append(ch);
+                }
             }
-            else if ('a' <= ch && ch <= 'z')        // 'a'..'z'
+            else if ((int)ch <= 0x007f)                 // other ASCII including single quote ' and space
             {
-                sbuf.append((char)ch);
+                if (sb == null)
+                {
+                    String soFar = s.substring(0, i);
+                    sb = new StringBuilder(len + 16);
+                    sb.append(soFar);
+                }
+                sb.append(hex[ch]);
             }
-            else if ('0' <= ch && ch <= '9')        // '0'..'9'
-            { 
-                sbuf.append((char)ch);
-            }
-            else if (ch == '-' || ch == '_'         // unreserved
-                     || ch == '.' || ch == '!'
-                     || ch == '~' || ch == '*'
-                     || ch == '(' || ch == ')')
+            else if ((int)ch <= 0x07FF)                 // non-ASCII <= 0x7FF
             {
-                sbuf.append((char)ch);
+                if (sb == null)
+                {
+                    String soFar = s.substring(0, i);
+                    sb = new StringBuilder(len + 16);
+                    sb.append(soFar);
+                }
+                sb.append(hex[0xc0 | (ch >> 6)]);
+                sb.append(hex[0x80 | (ch & 0x3F)]);
             }
-            else if (ch <= 0x007f)                  // other ASCII including single quote ' and space
+            else                                        // 0x7FF < ch <= 0xFFFF
             {
-                sbuf.append(hex[ch]);
-            }
-            else if (ch <= 0x07FF)                  // non-ASCII <= 0x7FF
-            {        
-                sbuf.append(hex[0xc0 | (ch >> 6)]);
-                sbuf.append(hex[0x80 | (ch & 0x3F)]);
-            }
-            else                                    // 0x7FF < ch <= 0xFFFF
-            {
-                sbuf.append(hex[0xe0 | (ch >> 12)]);
-                sbuf.append(hex[0x80 | ((ch >> 6) & 0x3F)]);
-                sbuf.append(hex[0x80 | (ch & 0x3F)]);
+                if (sb == null)
+                {
+                    String soFar = s.substring(0, i);
+                    sb = new StringBuilder(len + 16);
+                    sb.append(soFar);
+                }
+                sb.append(hex[0xe0 | (ch >> 12)]);
+                sb.append(hex[0x80 | ((ch >> 6) & 0x3F)]);
+                sb.append(hex[0x80 | (ch & 0x3F)]);
             }
         }
-        return sbuf.toString();
+        return (sb != null ? sb.toString() : s);
     }
 }
