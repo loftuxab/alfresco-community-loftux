@@ -46,15 +46,16 @@
 
    Alfresco.module.DoclibWorkflow = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.module.DoclibWorkflow";
       this.id = htmlId;
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "calendar"], this.onComponentsLoaded, this);
 
       // Initialise prototype properties
       this.widgets = {};
       this.modules = {};
+
+      // Load YUI Components
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "calendar"], this.onComponentsLoaded, this);
 
       return this;
    };
@@ -159,8 +160,6 @@
        */
       onComponentsLoaded: function DLW_onComponentsLoaded()
       {
-         // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
       },
 
       /**
@@ -419,6 +418,7 @@
          var fnDueDateClick = function DLW_fnDueDateClick(layer, args)
          {
             me.widgets.calendarOverlay.show();
+            args[1].stop = true;
          }
          YAHOO.Bubbling.addDefaultAction("due-date", fnDueDateClick);
 
@@ -608,6 +608,7 @@
        */
       onCancel: function DLW_onCancel(e, p_obj)
       {
+         this.widgets.calendarOverlay.hide();
          this._hideDialog();
       },
 
@@ -688,7 +689,12 @@
          // Clear people finder
          this.modules.peopleFinder.clearResults();
 
-         // Workflow details
+         // Clear date
+         Dom.get(this.id + "-dueDate-checkbox").checked = false;
+         Dom.get(this.id + "-dueDate").innerHTML = this._msg("label.due-date.none");
+         Dom.get(this.id + "-date").value = "";
+
+         // Clear comment
          Dom.get(this.id + "-comment").value = "";
 
          // Initialise the Forms Runtime

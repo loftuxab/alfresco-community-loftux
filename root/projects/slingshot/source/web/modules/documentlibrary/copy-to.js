@@ -233,8 +233,6 @@
        */
       onComponentsLoaded: function DLCT_onComponentsLoaded()
       {
-         // DocLib Actions module
-         this.modules.actions = new Alfresco.module.DoclibActions();
       },
       
       /**
@@ -243,6 +241,12 @@
        */
       showDialog: function DLCT_showDialog()
       {
+         // DocLib Actions module
+         if (!this.modules.actions)
+         {
+            this.modules.actions = new Alfresco.module.DoclibActions();
+         }
+         
          if (!this.containerDiv)
          {
             // Load the UI template from the server
@@ -638,22 +642,25 @@
             });
          }
 
+         var webscriptName;
          if (this.options.mode == DLCT.MODE_SITE)
          {
+            webscriptName = "copy-to/site/{site}/{container}{path}"
             // Parameters are site, container-based
             params =
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
+               site: this.options.siteId,
+               container: this.options.containerId,
                path: this.selectedNode.data.path
             }
          }
          else
          {
+            webscriptName = "copy-to/node/{nodeRef}/{path}"
             // Parameters are nodeRef-based
             params =
             {
-               nodeRef: this.options.nodeRef,
+               nodeRef: this.options.nodeRef.replace(":/", ""),
                path: this.selectedNode.data.path
             }
          }
@@ -679,7 +686,7 @@
             },
             webscript:
             {
-               name: "copy-to",
+               name: webscriptName,
                method: Alfresco.util.Ajax.POST
             },
             wait:

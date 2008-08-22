@@ -52,13 +52,32 @@
     */
    Alfresco.DocumentList = function(htmlId)
    {
+      // Mandatory properties
       this.name = "Alfresco.DocumentList";
       this.id = htmlId;
+
+      // Initialise prototype properties
+      this.widgets = {};
+      this.currentFilter =
+      {
+         filterId: "path",
+         filterOwner: "",
+         filterData: ""
+      };
+      this.modules = {};
+      this.actions = {};
+      this.selectedFiles = {};
+      this.tagId =
+      {
+         id: 0,
+         tags: {}
+      };
+      this.afterDocListUpdate = [];
       
-      /* Register this component */
+      // Register this component
       Alfresco.util.ComponentManager.register(this);
 
-      /* Load YUI Components */
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
       
       /**
@@ -80,15 +99,19 @@
       YAHOO.Bubbling.on("fileDeleted", this.onFileAction, this);
       YAHOO.Bubbling.on("fileMoved", this.onFileAction, this);
       YAHOO.Bubbling.on("fileWorkflowed", this.onFileAction, this);
+      YAHOO.Bubbling.on("filePermissionsUpdated", this.onFileAction, this);
       YAHOO.Bubbling.on("folderCopied", this.onFileAction, this);
       YAHOO.Bubbling.on("folderDeleted", this.onFileAction, this);
       YAHOO.Bubbling.on("folderMoved", this.onFileAction, this);
       YAHOO.Bubbling.on("folderWorkflowed", this.onFileAction, this);
+      YAHOO.Bubbling.on("folderPermissionsUpdated", this.onFileAction, this);
       // Multi-file actions
       YAHOO.Bubbling.on("filesCopied", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesDeleted", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesMoved", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("filesWorkflowed", this.onDocListRefresh, this)
+      YAHOO.Bubbling.on("filesPermissionsUpdated", this.onDocListRefresh, this);
+
       return this;
    }
    
@@ -191,7 +214,7 @@
           * @type int
           * @default 1000
           */
-         loadingMessageDelay: 1000,
+         loadingMessageDelay: 500,
 
          /**
           * FileName to highlight on initial DataTable render.
@@ -260,12 +283,7 @@
        * @property currentFilter
        * @type object
        */
-      currentFilter:
-      {
-         filterId: "path",
-         filterOwner: "",
-         filterData: ""
-      },
+      currentFilter: null,
 
       /**
        * FileUpload module instance.
@@ -281,7 +299,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Object container for storing module instances.
@@ -289,7 +307,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Object container for storing action markup elements.
@@ -297,7 +315,7 @@
        * @property actions
        * @type object
        */
-      actions: {},
+      actions: null,
 
       /**
        * Object literal of selected states for visible files (indexed by nodeRef).
@@ -305,7 +323,7 @@
        * @property selectedFiles
        * @type object
        */
-      selectedFiles: {},
+      selectedFiles: null,
 
       /**
        * Flag to indicate this HistoryManager event was expected.
@@ -350,11 +368,7 @@
        * @property tagId
        * @type object
        */
-      tagId:
-      {
-         id: 0,
-         tags: {}
-      },
+      tagId: null,
       
       /**
        * Deferred function calls for after a document list update
@@ -362,7 +376,16 @@
        * @property afterDocListUpdate
        * @type array
        */
-      afterDocListUpdate: [],
+      afterDocListUpdate: null,
+
+      /**
+       * Metadata returned by doclist data webscript
+       *
+       * @property doclistMetadata
+       * @type object
+       * @default null
+       */
+      doclistMetadata: null,
 
       /**
        * Set multiple initialization options at once.
@@ -524,7 +547,7 @@
             [
                "index", "nodeRef", "type", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
-               "activeWorkflows"
+               "activeWorkflows", "location", "permissions"
             ],
             metaFields:
             {
@@ -532,6 +555,13 @@
                totalRecords: "totalRecords"
             }
          };
+
+         // Intercept data returned from data webscript to extract custom metadata
+         this.widgets.dataSource.doBeforeCallback = function DL_doBeforeCallback(oRequest, oFullResponse, oParsedResponse)
+         {
+            me.doclistMetadata = oFullResponse.metadata;
+            return oParsedResponse;
+         }
          
          
          /**
@@ -1005,8 +1035,8 @@
                var target = args[1].target;
                if (typeof me[action] == "function")
                {
-                  me[action].call(me, target.offsetParent, owner);
                   args[1].stop = true;
+                  me[action].call(me, target.offsetParent, owner);
                }
             }
       		 
@@ -1288,11 +1318,16 @@
          // Call through to get the row highlighted by YUI
          this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
 
+         /**
+          * NOTE: YUI 2.6.0 drops the yuiRecordId property. The value can be found in target.id
+          */
          var target = oArgs.target;
+
          // elRename is the element id of the rename file link
          // var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
+
          // elActions is the element id of the active table cell where we'll inject the actual links
-         var elActions = Dom.get(this.id + "-actions-" + target.yuiRecordId);
+         var elActions = Dom.get(this.id + "-actions-" + (target.yuiRecordId || target.id));
 
          // Inject the correct action elements into the actionsId element
          if (elActions.firstChild === null)
@@ -1337,9 +1372,12 @@
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
 
+         /**
+          * NOTE: YUI 2.6.0 drops the yuiRecordId property. The value can be found in target.id
+          */
          var target = oArgs.target;
          // var renameId = this.id + "-rename-" + target.yuiRecordId;
-         var elActions = Dom.get(this.id + "-actions-" + target.yuiRecordId);
+         var elActions = Dom.get(this.id + "-actions-" + (target.yuiRecordId || target.id));
 
          if (!this.showingMoreActions)
          {
@@ -1531,13 +1569,13 @@
             },
             webscript:
             {
-               name: "file",
+               name: "file/site/{site}/{container}{path}/{file}",
                method: Alfresco.util.Ajax.DELETE
             },
             params:
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
+               site: this.options.siteId,
+               container: this.options.containerId,
                path: this.currentPath,
                file: fileName
             }
@@ -1597,13 +1635,13 @@
             },
             webscript:
             {
-               name: "checkout",
+               name: "checkout/site/{site}/{container}{path}/{file}",
                method: Alfresco.util.Ajax.POST
             },
             params:
             {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
+               site: this.options.siteId,
+               container: this.options.containerId,
                path: this.currentPath,
                file: fileName
             }
@@ -1693,12 +1731,12 @@
             },
             webscript:
             {
-               name: "cancel-checkout",
+               name: "cancel-checkout/node/{nodeRef}",
                method: Alfresco.util.Ajax.POST
             },
             params:
             {
-               nodeRef: nodeRef
+               nodeRef: nodeRef.replace(":/", "")
             }
          });
       },
@@ -1794,6 +1832,37 @@
             })
          }
          this.modules.assignWorkflow.showDialog();
+      },
+
+      /**
+       * Set permissions on a single document or folder.
+       *
+       * @method onActionManagePermissions
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionManagePermissions: function DL_onActionManagePermissions(row)
+      {
+         var file = this.widgets.dataTable.getRecord(row).getData();
+         
+         if (!this.modules.permissions)
+         {
+            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               files: file
+            });
+         }
+         else
+         {
+            this.modules.permissions.setOptions(
+            {
+               path: this.currentPath,
+               files: file
+            })
+         }
+         this.modules.permissions.showDialog();
       },
 
 
@@ -1915,6 +1984,19 @@
        */
       onDocListRefresh: function DL_onDocListRefresh(layer, args)
       {
+         var obj = args[1];
+         if (obj && (obj.highlightFile !== null))
+         {
+            // We need to defer the highlight until after the doclist has refreshed
+            var fnAfterUpdate = function DL_oDLR_fnAfterUpdate()
+            {
+               YAHOO.Bubbling.fire("highlightFile",
+               {
+                  fileName: obj.highlightFile
+               })
+            }
+            this.afterDocListUpdate.push(fnAfterUpdate);
+         }
          this._updateDocList.call(this);
       },
 
@@ -1948,7 +2030,7 @@
 
       /**
        * Highlight file event handler
-       * Used when a component (including the DocList itself on loading) wants to scroll to and hightlight a file
+       * Used when a component (including the DocList itself on loading) wants to scroll to and highlight a file
        *
        * @method onHighlightFile
        * @param layer {object} Event fired (unused)
@@ -2068,7 +2150,7 @@
             loadingMessage = Alfresco.util.PopupManager.displayMessage(
             {
                displayTime: 0,
-               text: '<span class="doclist"><span class="wait">' + $html(this._msg("message.loading")) + '</span></span>',
+               text: '<span class="wait">' + $html(this._msg("message.loading")) + '</span>',
                noEscape: true
             });
          }
