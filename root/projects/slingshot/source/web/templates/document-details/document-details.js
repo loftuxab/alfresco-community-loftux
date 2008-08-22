@@ -55,7 +55,15 @@
        */
       options:
       {
-         nodeRef: null
+         nodeRef: null,
+         
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: ""
       },
 
       /**
@@ -120,10 +128,15 @@
             YAHOO.Bubbling.fire("documentDetailsAvailable", docData);
             
             // fire event to show comments for document
+            var itemUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/document-details?nodeRef={nodeRef}",
+            {
+               site: this.options.siteId,
+               nodeRef: this.options.nodeRef
+            });
             var eventData = { 
                itemNodeRef: this.options.nodeRef,
                itemTitle: docData.displayName,
-               itemName: docData.displayName
+               itemUrl: itemUrl
             }
             
             YAHOO.Bubbling.fire("setCommentedNode", eventData);

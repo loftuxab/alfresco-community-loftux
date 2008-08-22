@@ -2,6 +2,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.CommentList("${args.htmlid}").setOptions(
    {
+      siteId: "${page.url.templateArgs.site!""}",
+      containerId: "${args.container!"blog"}",
       height: ${args.editorHeight!180},
       width: ${args.editorWidth!700}
    }).setMessages(
