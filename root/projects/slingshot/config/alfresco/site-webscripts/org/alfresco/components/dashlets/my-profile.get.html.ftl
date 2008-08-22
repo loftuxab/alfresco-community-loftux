@@ -3,21 +3,36 @@
    <div class="toolbar">
       <a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.viewFullProfile")}</a>
    </div>
-   <div class="body">
-      <table cellspacing="0" cellpadding="0" border="0" width="100%">
-         <tr>
-            <td>
-               <h3 style="padding:2px">${user.properties["firstName"]} ${user.properties["lastName"]}, Welcome</h3>
-               <h4 style="padding:2px">${msg("label.organization")}: ${user.properties["organization"]!""}</h4>
-               <h4 style="padding:2px">${msg("label.jobTitle")}: ${user.properties["jobtitle"]!""}</h4>
-               <h4 style="padding:2px">${msg("label.location")}: ${user.properties["location"]!""}</h4>
-            </td>
+   <div class="body profile">
+      
+      <div class="photorow">
+         <div class="photo">
             <#if user.properties.avatar??>
-            <td style="width:64px;padding-left:8px" valign="middle">
-               <img src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" alt="" />
-            </td>
+               <img  class="photoimg" src="${url.context}/proxy/alfresco/api/node/${user.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" alt="" />
+            <#else>
+               <img class="photoimg" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
             </#if>
-         </tr>
-      </table>
+         </div>
+         <div class="namelabel">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</div>
+         <div class="fieldlabel">${user.properties["jobtitle"]!""}</div>
+      </div>
+      <hr/>
+      <div class="row">
+         <span class="fieldlabelright">${msg("label.email")}:</span>
+         <span class="fieldvalue"><#if user.properties["email"]??><a href="mailto:${user.properties["email"]!""}">${user.properties["email"]}</a></#if></span>
+      </div>
+      <div class="row">
+         <span class="fieldlabelright">${msg("label.phone")}:</span>
+         <span class="fieldvalue">${user.properties["telephone"]!""}</span>
+      </div>
+      <div class="row">
+         <span class="fieldlabelright">${msg("label.skype")}:</span>
+         <span class="fieldvalue">${user.properties["skype"]!""}</span>
+      </div>
+      <div class="row">
+         <span class="fieldlabelright">${msg("label.msn")}:</span>
+         <span class="fieldvalue">${user.properties["msn"]!""}</span>
+      </div>   
+    
    </div>
 </div>
