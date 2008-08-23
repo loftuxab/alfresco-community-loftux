@@ -77,6 +77,11 @@
    background-image: url(images/workflow-16.png);
 }
 
+.toolbar .onActionManagePermissions
+{
+   background-image: url(images/permissions-16.png);
+}
+
 .toolbar .onActionDeselectAll
 {
    background-image: url(images/select-none-16.png);

@@ -1,0 +1,30 @@
+.permissions .hd .light
+{
+   font-weight: normal;
+}
+
+.permissions select
+{
+   width: 26.5em;
+}
+
+.permissions .hidden
+{
+   display: none;
+}
+
+.permissions .yui-gd .yui-u.first
+{
+   width: 18% !important;
+}
+
+.permissions .yui-gd .yui-u
+{
+   width: 70% !important;
+}
+
+.permissions .quick-actions
+{
+   border: 1px dashed #c0c0c0;
+   text-align: center;
+}
