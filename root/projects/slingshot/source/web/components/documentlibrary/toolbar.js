@@ -79,6 +79,7 @@
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       YAHOO.Bubbling.on("selectedFilesChanged", this.onSelectedFilesChanged, this);
+      YAHOO.Bubbling.on("userAccess", this.onUserAccess, this);
 
       return this;
    }
@@ -216,11 +217,19 @@
          // Reference to self used by inline functions
          var me = this;
          
-         // New Folder button
-         this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder);
+         // New Folder button: user needs "create" access
+         this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder,
+         {
+            disabled: true,
+            value: "create"
+         });
          
-         // File Upload button
-         this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload);
+         // File Upload button: user needs  "create" access
+         this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload,
+         {
+            disabled: true,
+            value: "create"
+         });
 
          // Selected Items menu button
          this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
@@ -229,6 +238,7 @@
             menu: "selectedItems-menu",
             disabled: true
          });
+         this.widgets.selectedItems.getMenu().beforeShowEvent.fire();
 
          // Folder Up Navigation button
          this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp,
@@ -692,6 +702,39 @@
       },
 
       /**
+       * Manage Permissions of Multiple Assets.
+       *
+       * @method onActionManagePermissions
+       */
+      onActionManagePermissions: function DLTB_onActionManagePermissions()
+      {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
+         var files = this.modules.docList.getSelectedFiles();
+         
+         if (!this.modules.permissions)
+         {
+            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-workflow").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               files: files
+            });
+         }
+         else
+         {
+            this.modules.permissions.setOptions(
+            {
+               files: files
+            })
+         }
+         this.modules.permissions.showDialog();
+      },
+
+      /**
        * Deselect currectly selected assets.
        *
        * @method onActionDeselectAll
@@ -812,6 +855,42 @@
       },
 
       /**
+       * User Access event handler
+       *
+       * @method onUserAccess
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onUserAccess: function DLTB_onUserAccess(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.userAccess !== null))
+         {
+            var widget, widgetPermissions;
+            for (index in this.widgets)
+            {
+               widget = this.widgets[index];
+               if (widget.get("srcelement").className != "no-access-check")
+               {
+                  widget.set("disabled", false)
+                  if (widget.get("value") != "")
+                  {
+                     widgetPermissions = widget.get("value").split(",");
+                     for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
+                     {
+                        if (!obj.userAccess[widgetPermissions[i]])
+                        {
+                           widget.set("disabled", true)
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+
+      /**
        * Selected Files Changed event handler.
        * Determines whether to enable or disable the multi-file action drop-down
        *
@@ -824,6 +903,28 @@
          if (this.modules.docList)
          {
             var files = this.modules.docList.getSelectedFiles();
+            
+            // Work out what the user has permission to do
+            var finalAccess = {}, userAccess;
+            for (var i = 0, ii = files.length; i < ii; i++)
+            {
+               userAccess = files[i].permissions.userAccess;
+               for (access in userAccess)
+               {
+                  finalAccess[access] = (finalAccess[access] === undefined ? userAccess[access] : finalAccess[access] && userAccess[access]);
+               }
+            }
+            
+            var menuItems = this.widgets["selectedItems"].getMenu().getItems();
+            var menuItem, accessRequired;
+            for (index in menuItems)
+            {
+               menuItem = menuItems[index];
+               accessRequired = menuItem.element.firstChild.rel;
+
+               menuItem.cfg.setProperty("disabled", (accessRequired == "") || finalAccess[accessRequired] ? false : true);
+            }
+            
             this.widgets["selectedItems"].set("disabled", (files.length == 0));
          }
       },

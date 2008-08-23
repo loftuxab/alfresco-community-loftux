@@ -73,6 +73,7 @@
          tags: {}
       };
       this.afterDocListUpdate = [];
+      this.doclistMetadata = {};
       
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -214,7 +215,7 @@
           * @type int
           * @default 1000
           */
-         loadingMessageDelay: 500,
+         loadingMessageDelay: 1000,
 
          /**
           * FileName to highlight on initial DataTable render.
@@ -560,6 +561,17 @@
          this.widgets.dataSource.doBeforeCallback = function DL_doBeforeCallback(oRequest, oFullResponse, oParsedResponse)
          {
             me.doclistMetadata = oFullResponse.metadata;
+            
+            // Container userAccess event
+            var permissions = me.doclistMetadata.permissions;
+            if (permissions && permissions.userAccess)
+            {
+               YAHOO.Bubbling.fire("userAccess",
+               {
+                  userAccess: permissions.userAccess
+               });
+            }
+            
             return oParsedResponse;
          }
          
@@ -1337,15 +1349,60 @@
             // Retrieve the actionSet for this asset
             var record = this.widgets.dataTable.getRecord(target);
             var actionSet = record.getData("actionSet");
-            // Now clone the actionSet template node from the DOM
+            
+            // Clone the actionSet template node from the DOM
             var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
+            
             // Token replacement
             clone.innerHTML = YAHOO.lang.substitute(unescape(clone.innerHTML),
             {
                downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true"
             });
+            
+            // Generate an id
             clone.id = elActions.id + "_a";
+            
+            // Simple or detailed view
             Dom.addClass(clone, this.options.simpleView ? "simple" : "detailed");
+            
+            // Trim the items in the clone depending on the user's access
+            var userAccess = record.getData("permissions").userAccess;
+            var actions = YAHOO.util.Selector.query("div", clone);
+            var actionPermissions, i, ii, j, jj;
+            for (i = 0, ii = actions.length; i < ii; i++)
+            {
+               if (actions[i].firstChild.rel != "")
+               {
+                  actionPermissions = actions[i].firstChild.rel.split(",");
+                  for (j = 0, jj = actionPermissions.length; j < jj; j++)
+                  {
+                     if (!userAccess[actionPermissions[j]])
+                     {
+                        clone.removeChild(actions[i]);
+                        break;
+                     }
+                  }
+               }
+            }
+            
+            // Need the "More >" container?
+            var splitAt = record.getData("type") == "folder" ? 1 : 3;
+            actions = YAHOO.util.Selector.query("div", clone);
+            if (actions.length > splitAt)
+            {
+               var moreContainer = Dom.get(this.id + "-moreActions").cloneNode(true);
+               var containerDivs = YAHOO.util.Selector.query("div", moreContainer);
+               // Insert the two necessary DIVs before the third action item
+               Dom.insertBefore(containerDivs[0], actions[splitAt]);
+               Dom.insertBefore(containerDivs[1], actions[splitAt]);
+               // Now make action items three onwards children of the 2nd DIV
+               var moreActions = actions.slice(splitAt);
+               for (index in moreActions)
+               {
+                  containerDivs[1].appendChild(moreActions[index]);
+               }
+            }
+            
             elActions.appendChild(clone);
          }
          

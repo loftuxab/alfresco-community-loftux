@@ -15,9 +15,12 @@
 <!-- Details Assets -->
 <link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/details.css" />
 <script type="text/javascript" src="${page.url.context}/modules/documentlibrary/details.js"></script>
-<!-- Workflow Assets -->
+<!-- Assign Workflow Assets -->
 <link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/workflow.css" />
 <script type="text/javascript" src="${page.url.context}/modules/documentlibrary/workflow.js"></script>
-<!-- People Finder Assets (req'd by Workflow) -->
+<!-- People Finder Assets (req'd by Assign Workflow) -->
 <link rel="stylesheet" type="text/css" href="${page.url.context}/components/people-finder/people-finder.css" />
 <script type="text/javascript" src="${page.url.context}/components/people-finder/people-finder.js"></script>
+<!-- Manage Permissions Assets -->
+<link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/permissions.css" />
+<script type="text/javascript" src="${page.url.context}/modules/documentlibrary/permissions.js"></script>

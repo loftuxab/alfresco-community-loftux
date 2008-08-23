@@ -243,16 +243,6 @@
 }
 
 
-/* Popups */
-
-.doclist span.wait
-{
-   background-image: url(images/wait.gif);
-   background-repeat: no-repeat;
-   padding: 4px 0 0 24px;
-   visibility: visible;
-}
-
 /* Tags */
 
 .doclist .documents .detail span.tag-item
@@ -403,6 +393,11 @@
 .doclist .onActionAssignWorkflow a
 {
    background-image: url(images/workflow-16.png);
+}
+
+.doclist .onActionManagePermissions a
+{
+   background-image: url(images/permissions-16.png);
 }
 
 
