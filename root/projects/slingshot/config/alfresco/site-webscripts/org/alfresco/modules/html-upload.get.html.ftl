@@ -3,8 +3,9 @@
       <span id="${args.htmlid}-title-span"></span>
    </div>
    <div class="bd">
-      <form id="${args.htmlid}-htmlupload-form" action="${url.context}/proxy/alfresco/api/upload.html"
-            method="POST" enctype="multipart/form-data" accept-charset="utf-8">
+      <form id="${args.htmlid}-htmlupload-form" action=""
+            method="POST" enctype="multipart/form-data" accept-charset="utf-8"
+            action="${url.context}/proxy/alfresco/api/upload.html" >
          <input type="hidden" id="${args.htmlid}-siteId-hidden" name="siteId" value=""/>
          <input type="hidden" id="${args.htmlid}-containerId-hidden" name="containerId" value=""/>
          <input type="hidden" id="${args.htmlid}-username-hidden" name="username" value=""/>
@@ -12,8 +13,10 @@
          <input type="hidden" id="${args.htmlid}-uploadDirectory-hidden" name="uploadDirectory" value=""/>
          <input type="hidden" id="${args.htmlid}-overwrite-hidden" name="overwrite" value=""/>
          <input type="hidden" id="${args.htmlid}-thumbnails-hidden" name="thumbnails" value=""/>
-         <input type="hidden" id="${args.htmlid}-success-hidden" name="success" value=""/>
-         <input type="hidden" id="${args.htmlid}-failure-hidden" name="failure" value="alert('Failure!');"/>
+         <input type="hidden" id="${args.htmlid}-successCallback-hidden" name="successCallback" value=""/>
+         <input type="hidden" id="${args.htmlid}-successScope-hidden" name="successScope" value=""/>
+         <input type="hidden" id="${args.htmlid}-failureCallback-hidden" name="failureCallback" value=""/>
+         <input type="hidden" id="${args.htmlid}-failureScope-hidden" name="failureScope" value=""/>
 
          <p>
             <span id="${args.htmlid}-singleUploadTip-span">${msg("label.singleUploadTip")}</span>

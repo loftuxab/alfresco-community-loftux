@@ -224,7 +224,8 @@
          // Show uploader for single file select - override the upload URL to use avatar upload service
          var uploadConfig =
          {
-            uploadURL: "slingshot/profile/uploadavatar",
+            flashUploadURL: "slingshot/profile/uploadavatar",
+            htmlUploadURL: "slingshot/profile/uploadavatar.html",
             username: this.options.userId,
             mode: this.fileUpload.MODE_SINGLE_UPLOAD,
             onFileUploadComplete:

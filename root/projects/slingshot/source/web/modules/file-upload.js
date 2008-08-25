@@ -79,7 +79,7 @@
 
       // Create the appropriate uploader component
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
-      if(this.hasRequiredFlashPlayer)
+      if(this.hasRequiredFlashPlayer)        
       {
          this.uploader = Alfresco.module.getFlashUploadInstance();
       }
@@ -149,7 +149,8 @@
          onFileUploadComplete: null,
          overwrite: true,
          thumbnails: null,
-         uploadURL: null,
+         htmlUploadURL: null,
+         flashUploadURL: null,
          username: null
       },
 
@@ -183,6 +184,9 @@
        *                             // If false and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to append a number to the versionable filename to avoid
        *                             // an overwrite and a new version
+       *    htmlUploadURL: null,     // Overrides default url to post the file to if the html version is used
+       *    flashUploadURL: null,    // Overrides default url to post the files to if the flash version is used
+       *    username: null           // If a file should be associated with a user
        * }
        */
       show: function FU_show(config)
@@ -195,6 +199,15 @@
          if(!this.hasRequiredFlashPlayer && this.showConfig.mode == this.MODE_MULTI_UPLOAD)
          {
             this.showConfig.mode = this.MODE_SINGLE_UPLOAD;
+         }
+
+         if(this.hasRequiredFlashPlayer)
+         {
+            this.showConfig.uploadURL = this.showConfig.flashUploadURL;
+         }
+         else
+         {
+            this.showConfig.uploadURL = this.showConfig.htmlUploadURL;
          }
 
          // Let the uploader instance show itself
