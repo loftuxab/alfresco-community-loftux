@@ -59,13 +59,6 @@
 
    Alfresco.module.CreateSite.prototype =
    {
-      /**
-       * Panel instance.
-       * 
-       * @property panel
-       * @type YUI.widget.Panel
-       */
-      panel: null,
 
       /**
        * Object container for storing YUI widget instances.
@@ -83,7 +76,7 @@
        * @param obj {object} Object literal specifying a set of messages
        * @return {Alfresco.module.CreateSite} returns 'this' for method chaining
        */
-      setMessages: function FU_setMessages(obj)
+      setMessages: function CS_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -95,7 +88,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function()
+      onComponentsLoaded: function CS_onComponentsLoaded()
       {
          /* Shortcut for dummy instance */
          if (this.id === null)
@@ -109,9 +102,9 @@
        *
        * @method show
        */
-      show: function()
+      show: function CS_show()
       {
-         if(this.panel)
+         if(this.widgets.panel)
          {
             /**
              * The panel gui has been showed before and its gui has already
@@ -150,7 +143,7 @@
        * @method onTemplateLoaded
        * @param response {object} a Alfresco.util.Ajax.request response object 
        */
-      onTemplateLoaded: function(response)
+      onTemplateLoaded: function CS_onTemplateLoaded(response)
       {
          // Inject the template from the XHR request into a new DIV element
          var containerDiv = document.createElement("div");
@@ -159,7 +152,7 @@
          // The panel is created from the HTML returned in the XHR request, not the container
          var panelDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
 
-         this.panel = new YAHOO.widget.Panel(panelDiv,
+         this.widgets.panel = new YAHOO.widget.Panel(panelDiv,
          {
             modal: true,
             draggable: false,
@@ -169,7 +162,7 @@
          });
 
          // Add it to the Dom
-         this.panel.render(document.body);
+         this.widgets.panel.render(document.body);
 
          // Create the cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -200,6 +193,13 @@
             fn: function(){
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
+               this.widgets.panel.hide();
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.creating", this.name),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
             },
             obj: null,
             scope: this
@@ -212,6 +212,11 @@
             {
                fn: this.onCreateSiteSuccess,
                scope: this               
+            },
+            failureCallback:
+            {
+               fn: this.onCreateSiteFailure,
+               scope: this
             }
          });
          createSiteForm.setSubmitAsJSON(true);
@@ -236,7 +241,7 @@
        * @param type
        * @param args
        */
-      onIsPublicChange: function(type, args)
+      onIsPublicChange: function CS_onIsPublicChange(type, args)
       {
         this.widgets.isPublic.value = this.widgets.isPublicCheckbox.checked ? "true" : "false";
       },
@@ -249,9 +254,9 @@
        * @param type
        * @param args
        */
-      onCancelButtonClick: function(type, args)
+      onCancelButtonClick: function CS_onCancelButtonClick(type, args)
       {
-        this.panel.hide();
+        this.widgets.panel.hide();
       },
 
       /**
@@ -261,7 +266,7 @@
        * @method onCreateSiteSuccess
        * @param response
        */
-      onCreateSiteSuccess: function(response)
+      onCreateSiteSuccess: function CS_onCreateSiteSuccess(response)
       {
          if (response.json !== undefined && response.json.success)
          {
@@ -270,8 +275,34 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
+            this._adjustGUIAfterFailure();
          }
+      },
+
+      /**
+       * Called when a site failed to be created.
+       *
+       * @method onCreateSiteFailure
+       * @param response
+       */
+      onCreateSiteFailure: function CS_onCreateSiteFailure(response)
+      {
+         this._adjustGUIAfterFailure();
+      },
+
+      /**
+       * Helper method that restores the gui and displays an error message.
+       *
+       * @method _adjustGUIAfterFailure
+       * @param response
+       */
+      _adjustGUIAfterFailure: function CS__adjustGUIAfterFailure(response)
+      {
+         this.widgets.feedbackMessage.destroy();
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+         this.widgets.panel.show();
+         Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
       },
 
       /**
@@ -280,10 +311,10 @@
        * @method _showPanel
        * @private
        */
-      _showPanel: function()
+      _showPanel: function CS__showPanel()
       {
          // Show the upload panel
-         this.panel.show();
+         this.widgets.panel.show();
 
          // Firefox insertion caret fix
          Alfresco.util.caretFix(this.id + "-form");

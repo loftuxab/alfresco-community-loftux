@@ -876,7 +876,32 @@
          else if (this.state === this.STATE_FINISHED)
          {
             // Tell the document list to refresh itself if present
-            YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
+            // and if a single mode was used to highlight the file 
+            var fileName = null;
+            if (this.showConfig.mode === this.MODE_SINGLE_UPLOAD || this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+            {
+               for (var i in this.fileStore)
+               {
+                  var f = this.fileStore[i];
+                  if (f && f.state === this.STATE_SUCCESS)
+                  {
+                     fileName = f.fileName;
+                     break;
+                  }
+               }
+            }
+            if(fileName)
+            {
+               YAHOO.Bubbling.fire("doclistRefresh",
+               {
+                  currentPath: this.showConfig.path,
+                  highlightFile: fileName
+               });
+            }
+            else
+            {
+               YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
+            }
          }
 
          // Reset the message for empty datatables for other components
