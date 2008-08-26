@@ -140,9 +140,9 @@
 		
 		_setupEditForm: function()
 		{
-		   // register the tag listener
-         this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id + "-form", "tags");
-         
+		   this.tagLibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.module.TagLibrary");
+         this.tagLibrary.initialize();
+                
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent', {
             height: '300px',
             width: '538px',
@@ -185,7 +185,7 @@
                // Put the HTML back into the text area
                this.pageEditor.saveHTML();
                // Update the tags set in the form
-               this.tagLibraryListener.updateForm();
+               this.tagLibrary.updateForm(this.id + "-form", "tags");
                
                // Avoid submitting the input field used for entering tags
                var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
