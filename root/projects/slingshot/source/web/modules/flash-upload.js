@@ -667,7 +667,7 @@
          fileInfo.fileButton.set("disabled", true);
          
          // Extract the nodeRef from the JSON response
-         var json = YAHOO.lang.JSON.parse(event.data);
+         var json = Alfresco.util.parseJSON(event.data);
          if (json)
          {
             fileInfo.nodeRef = json.nodeRef;
