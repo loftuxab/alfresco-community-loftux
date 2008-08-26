@@ -1,15 +1,16 @@
+var dashboardURL = json.get("dashboardURL");
 
 var componentId = json.get("componentId");
 var component = sitedata.getComponent(componentId);
 
 if (component)
 {
-   var regionId = component.properties["region-id"];
-   sitedata.unbindComponent("page", regionId, "user/" + user.name + "/dashboard"); 
+   var regionId = component.properties["region-id"]; 
+   sitedata.unbindComponent("page", regionId, dashboardURL);
    
    var pos = getComponentPosition(component);
    
-   var components = sitedata.findComponents("page", null, "user/" + user.name + "/dashboard", null);
+   var components = sitedata.findComponents("page", null, dashboardURL, null);
    var re = /^component-(\d+)-(\d+)$/;
    var c, coord;
    for (var idx=0; idx < components.length; idx++)
