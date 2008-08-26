@@ -204,7 +204,7 @@
          // build a list of sites the current user is a member of
          var config = {
             method: "GET",
-            url: Alfresco.constants.PROXY_URI + "api/people/" + this.options.currentUser + "/sites",
+            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.options.currentUser) + "/sites",
             successCallback: 
             { 
                fn: this._processMembership, 
@@ -496,7 +496,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.jsonRequest(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
             method: "PUT",
             dataObj:
             {
@@ -552,7 +552,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
             method: "DELETE",
             successCallback:
             {
