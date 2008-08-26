@@ -1136,24 +1136,19 @@
             params.toDate = toDate.getTime();
          }
          
-         // build the url params string
+         // build the url extension
          var urlExt = "";
          for (paramName in params)
          {
-            if (params[paramName] === null)
+            if (params[paramName] !== null)
             {
-               continue;
+               urlExt += "&" + paramName + "=" + encodeURIComponent(params[paramName]);
             }
-            urlExt += "&" + paramName;
-            urlExt += "=";
-            urlExt += encodeURIComponent(params[paramName]);
          }
-         
-         // cut off the first &
-         if (urlExt.length > 0) {
+         if (urlExt.length > 0)
+         {
             urlExt = urlExt.substring(1);
          }
-         
          return url + "?" + urlExt;
       }
    };

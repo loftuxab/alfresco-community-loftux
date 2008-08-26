@@ -944,7 +944,10 @@
          var urlExt = "";
          for (paramName in params)
          {
-            urlExt += "&" + paramName + "=" + encodeURIComponent(params[paramName]);
+            if (params[paramName] !== null)
+            {
+               urlExt += "&" + paramName + "=" + encodeURIComponent(params[paramName]);
+            }
          }
          if (urlExt.length > 0)
          {
