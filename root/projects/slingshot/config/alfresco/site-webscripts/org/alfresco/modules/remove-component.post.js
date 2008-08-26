@@ -24,7 +24,7 @@ if (component)
      
       if (coord.column > pos.column)
       {
-         break; // nothing more to do
+         continue; // the order of the components is not guaranteed so we need to continue
       }
       
       if (coord.column === pos.column && coord.row > pos.row)
