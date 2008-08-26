@@ -22,10 +22,30 @@
 
   	Alfresco.WelcomeDashlet.prototype =
   	{	
-  	   setComponentId: function(id)
-  	   {
-  	      this.componentId = id;
-  	   },
+  	   
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type Object
+       */
+      options:
+      {
+         componentId: "",
+         dashboardURL: "",
+      },
+        	   
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       */
+      setOptions: function WelcomeDashlet_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
   	   
 		/**
 		 * Fired by YUILoaderHelper when required component script files have
@@ -51,7 +71,14 @@
    			type: "push"
    		});  
 		},
-		
+
+		/*
+	 	 * Fired when the "Thanks, now remove this" button is clicked.
+	 	 * Kicks off an AJAX call to remove the component from the dashboard.
+	 	 * 
+	 	 * @param e {Object} DomEvent
+	 	 * @method  onRemoveSelect
+	 	 */		
 		onRemoveSelect: function(e)
 		{
 		   // Make the call to have the component remove itself
@@ -60,7 +87,8 @@
 				method: Alfresco.util.Ajax.POST,
 				requestContentType: Alfresco.util.Ajax.JSON,
 				dataObj: {
-				   componentId: this.componentId
+				   componentId: this.options.componentId,
+				   dashboardURL: this.options.dashboardURL
 				},
 				successCallback:
 				{
@@ -75,15 +103,29 @@
 			});
 		},
 		
+		/**
+		 * Event handler that gets fired when the component is  
+		 * successfully removed from the dashboard. Reloads the current page.
+		 *
+		 * @param e {Object} DomEvent
+		 * @method onComponentRemoved
+		 */
 		onComponentRemoved: function(e)
 		{
 		   // Reload the dashboard
 		   window.location.reload();  
 		},
 		
+		/**
+		 * Event handler that gets fired when removing the component 
+		 * from the dashboard fails. Currently doesn't do anything.
+		 *
+		 * @param e {Object} DomEvent
+		 * @method onRemoveFailed
+		 */ 
 		onRemoveFailed: function(e)
 		{
-		   
+		   // Do nothing at the moment   
 		}
 	
 	};

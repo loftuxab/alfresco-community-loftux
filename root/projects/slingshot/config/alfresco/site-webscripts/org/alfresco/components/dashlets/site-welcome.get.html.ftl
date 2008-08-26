@@ -1,7 +1,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.WelcomeDashlet("${args.htmlid}").setOptions({
       componentId: "${instance.object.id}",
-      dashboardURL: "user/${user.name}/dashboard"
+      dashboardURL: "site/${page.url.templateArgs.site}/dashboard"
    });
 //]]></script>
 <div class="dashlet">
@@ -20,4 +20,3 @@
    </div>
 </div>
 </div>
-
