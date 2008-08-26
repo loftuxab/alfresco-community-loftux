@@ -15,7 +15,7 @@ function main()
    }
              
    // do invite request and redirect if it succeedes, show error otherwise
-   var url = '/api/invite/' + inviteId + '/' + inviteTicket;
+   var url = '/api/invite/' + inviteId + '/' + inviteTicket + '/accept';
    var connector = remote.connect("alfresco");
    var result = connector.put(url, "{}", "application/json");
    if (result.status != status.STATUS_OK)

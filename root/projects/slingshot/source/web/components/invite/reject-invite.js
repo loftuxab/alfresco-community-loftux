@@ -174,7 +174,7 @@
          
          // construct the url to call
          var url = YAHOO.lang.substitute(window.location.protocol + "//" + window.location.host +
-            Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/invite/{inviteId}/{inviteTicket}",
+            Alfresco.constants.URL_CONTEXT + "proxy/alfresco-noauth/api/invite/{inviteId}/{inviteTicket}/reject",
          {
             inviteId : this.options.inviteId,
             inviteTicket : this.options.inviteTicket
@@ -183,7 +183,7 @@
          // make a backend call to decline the request
          Alfresco.util.Ajax.request(
          {
-            method: "DELETE",
+            method: "PUT",
             url: url,
             responseContentType : "application/json",
             successCallback:
