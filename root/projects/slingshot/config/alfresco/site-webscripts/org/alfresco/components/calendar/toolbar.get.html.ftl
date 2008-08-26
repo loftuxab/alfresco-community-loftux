@@ -6,10 +6,12 @@
 <div id="${args.htmlid}-body" class="toolbar calendar-toolbar">
    <div class="yui-g calendar-bar">
       <div class="yui-u first">
+         <#if role = "SiteCollaborator" || role = "SiteManager">
           <div id="${args.htmlid}-viewButtons" class="addEvent">
             <button id="${args.htmlid}-addEvent-button" name="addEvent">${msg("button.add-event")}</button>
           </div>
           <div class="separator">|</div>
+          </#if>
           <div><a href="${page.url.context}/proxy/alfresco/calendar/eventList?site=${page.url.templateArgs["site"]}&format=calendar" target="_blank" id="${args.htmlid}-publishEvents-button" name="publishEvent">${msg("button.publish")}</a></div>
       </div> 
        <div class="yui-u align-right">

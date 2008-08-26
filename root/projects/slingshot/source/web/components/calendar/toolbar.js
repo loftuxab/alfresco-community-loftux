@@ -61,7 +61,11 @@
    	init: function()
    	{
 	      /* Add Event Button */
-         var aeButton = Alfresco.util.createYUIButton(this, "addEvent-button", this.onButtonClick);
+	      if (YAHOO.util.Dom.get(this.id + "-addEvent-button"))
+	      {
+	          var aeButton = Alfresco.util.createYUIButton(this, "addEvent-button", this.onButtonClick);
+	      }
+        
          /* Publish button */
          var publishButton = Alfresco.util.createYUIButton(this, "publishEvents-button", null, {
             type: "link"
