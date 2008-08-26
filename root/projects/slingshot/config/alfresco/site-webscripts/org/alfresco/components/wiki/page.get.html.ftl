@@ -54,7 +54,7 @@
 	        <div id="#page"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
 <#elseif action == "edit">	        
 	        <div id="#edit">
-	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="POST">
+	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
 	            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
 	            <input type="hidden" name="context" value="${pageContext?html}" />
                <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
@@ -65,6 +65,7 @@
                   <#assign tags=[] />
                </#if>
                <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+               
                <!-- Render the tag inputs -->
                <@taglibraryLib.renderTagInputs htmlid=args.htmlid tags=tags tagInputName="tags" />
                <!-- Render the library component -->
