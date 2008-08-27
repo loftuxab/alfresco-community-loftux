@@ -118,29 +118,40 @@
          var downloadUrl = contentUrl + "?a=true";
          Dom.get(this.id + "-download-url").value = downloadUrl;
          
+         var clipboard = (window.clipboardData && clipboardData.setData);
+         
          // create YUI button for download copy button
-         this.widgets.downloadCopyButton = Alfresco.util.createYUIButton(this, "download-button", null,
+         if (clipboard)
          {
-            onclick: { fn: this._handleCopyClick, obj: "-download-url", scope: this}
-         });
+            this.widgets.downloadCopyButton = Alfresco.util.createYUIButton(this, "download-button", null,
+            {
+               onclick: { fn: this._handleCopyClick, obj: "-download-url", scope: this}
+            });
+         }
          
          // populate the text field with the view url
          Dom.get(this.id + "-view-url").value = contentUrl;
          
          // create YUI button for view copy button
-         this.widgets.viewCopyButton = Alfresco.util.createYUIButton(this, "view-button", null,
+         if (clipboard)
          {
-            onclick: { fn: this._handleCopyClick, obj: "-view-url", scope: this}
-         });
+            this.widgets.viewCopyButton = Alfresco.util.createYUIButton(this, "view-button", null,
+            {
+               onclick: { fn: this._handleCopyClick, obj: "-view-url", scope: this}
+            });
+         }
          
          // populate the text field with the page url
          Dom.get(this.id + "-page-url").value = window.location.href;
          
          // create YUI button for page copy button
-         this.widgets.pageCopyButton = Alfresco.util.createYUIButton(this, "page-button", null,
+         if (clipboard)
          {
-            onclick: { fn: this._handleCopyClick, obj: "-page-url", scope: this}
-         });
+            this.widgets.pageCopyButton = Alfresco.util.createYUIButton(this, "page-button", null,
+            {
+               onclick: { fn: this._handleCopyClick, obj: "-page-url", scope: this}
+            });
+         }
  
          // add focus event handlers to fields        
          Event.addListener(Dom.get(this.id + "-download-url"), "focus", this._handleFocus, "-download-url", this);
@@ -157,14 +168,7 @@
        */
       _handleCopyClick: function DocumentLinks__handleCopyClick(event, urlId)
       {
-         if (window.clipboardData && clipboardData.setData)
-         {
-            clipboardData.setData("Text", Dom.get(this.id + urlId).value);
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("document-links.nocopy", "Alfresco.DocumentLinks")});
-         }
+         clipboardData.setData("Text", Dom.get(this.id + urlId).value);
       },
       
       /**

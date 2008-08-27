@@ -1,5 +1,5 @@
 <#macro doclibUrl doc>
-   <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?html}#path=${doc.location.path}">${doc.displayName?html}</a>
+   <a href="${url.context}/page/site/${doc.location.site}/document-details?nodeRef=${doc.nodeRef}">${doc.displayName?html}</a>
 </#macro>
 <div class="dashlet">
    <div class="title">${msg("header.docSummary")}</div>
