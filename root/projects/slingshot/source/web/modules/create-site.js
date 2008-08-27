@@ -275,7 +275,7 @@
          }
          else
          {
-            this._adjustGUIAfterFailure();
+            this._adjustGUIAfterFailure(response);
          }
       },
 
@@ -287,7 +287,7 @@
        */
       onCreateSiteFailure: function CS_onCreateSiteFailure(response)
       {
-         this._adjustGUIAfterFailure();
+         this._adjustGUIAfterFailure(response);
       },
 
       /**
@@ -302,7 +302,13 @@
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
          this.widgets.panel.show();
-         Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
+         var text = Alfresco.util.message("message.failure", this.name);
+         if(response.json.message)
+         {
+            var tmp = Alfresco.util.message(response.json.message, this.name);
+            text = tmp ? tmp : text;
+         }
+         Alfresco.util.PopupManager.displayPrompt({text: text});
       },
 
       /**

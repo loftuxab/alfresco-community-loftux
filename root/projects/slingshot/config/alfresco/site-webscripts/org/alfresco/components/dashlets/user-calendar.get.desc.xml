@@ -1,5 +1,5 @@
 <webscript>
-   <shortname>User calendar</shortname>
+   <shortname>User Calendar</shortname>
    <description>Lists the site events for the current user.</description>
    <family>user-dashlet</family>
    <url>/components/dashlets/user-calendar</url>

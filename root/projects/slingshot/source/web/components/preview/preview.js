@@ -216,9 +216,6 @@
          var message = Alfresco.util.message("label.currentFrame", this.name, {"0": "0", "1": "0"});
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
-         // Show the hidden buttons now that they have become styled as yui buttons
-         Dom.setStyle(this.id + "-ft-div", "visibility", "");
-
          // nodeRef is mandatory
          if (this.options.nodeRef === undefined)
          {
@@ -339,6 +336,15 @@
       onLoadedSwfReady: function P_onLoadedSwfReady(event)
       {
          this._handleSuccessFullLoadedSwfEvent(event);
+
+         // Show the fullscreen button now that it has become styled as a yui button
+         Dom.setStyle(this.id + "-fullscreen-div", "visibility", "");
+
+         // Show the navigation controls if there are more pages than 1
+         if(parseInt(event.totalFrames) > 1)
+         {
+            Dom.setStyle(this.id + "-controls-div", "visibility", "");
+         }
       },
 
       /**
@@ -393,23 +399,7 @@
       onJumpToPageTextFieldChange: function P_onJumpToPageTextFieldChange(event)
       {
          var newFrame = parseInt(event.target.value);
-         if (newFrame > this.loadedSwf.totalFrames)
-         {
-            var message = Alfresco.util.message("message.invalidFrame", this.name);
-            message = YAHOO.lang.substitute(message,
-            {
-               "0": "1",
-               "1": this.loadedSwf.totalFrames
-            });
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: message
-            });
-         }
-         else
-         {
-            this.swfPlayer.goToFrameNo(newFrame);
-         }
+         this.swfPlayer.goToFrameNo(newFrame);
       },
 
       /**

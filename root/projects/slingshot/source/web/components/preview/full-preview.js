@@ -237,7 +237,7 @@
       {
          if(Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
          {
-            if(this._resolvePreview())
+            if(this._resolvePreviewUrl())
             {
                if(this.swfPlayer == null)
                {
@@ -273,23 +273,33 @@
       /**
        * Helper method for deciding what preview to use, if any
        *
-       * @method _resolvePreview
+       * @method _resolvePreviewUrl
        * @return the name of the preview to use or nullif none is appropriate
        */
-      _resolvePreview: function FP__resolvePreview(event)
+      _resolvePreviewUrl: function FP__resolvePreviewUrl(event)
       {
+         // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
+         var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
+
          // Try to prioritise usage of imgpreview for images and webpreview for other content
          var ps = this.options.previews;
          var preview, webpreview = "webpreview", imgpreview = "imgpreview";
-         if(this.options.mimeType.match(/^image\/\w+/))
+         if(this.options.mimeType.match(/image\/jpeg|image\/gif|image\/png/))
          {
-            preview = Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : (Alfresco.util.arrayContains(ps, webpreview) ? webpreview : null);
+            var url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + "?a=true/";
+            return url;
          }
          else
          {
             preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
+            if(preview)
+            {
+               var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview;
+               url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
+               return url;
+            }
          }
-         return preview;
+         return null;
       },
 
       /**
@@ -304,12 +314,8 @@
             // Flash movie makes this call twice, make sure we only react on it once
             this.contentReady = true;
 
-            // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
-            var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
-            var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + this._resolvePreview();
-            url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
 
-            this.swfPlayer.load(url);
+            this.swfPlayer.load(this._resolvePreviewUrl());
          }
       },
 
@@ -380,6 +386,12 @@
       onLoadedSwfReady: function FP_onLoadedSwfReady(event)
       {
          this._handleSuccessFullLoadedSwfEvent(event);
+
+         // Show the navigation controls if there are more pages than 1
+         if(parseInt(event.totalFrames) > 1)
+         {
+            Dom.setStyle(this.id + "-controls-div", "visibility", "");
+         }
       },
 
       /**
@@ -434,24 +446,8 @@
       onJumpToPageTextFieldChange: function FP_onJumpToPageTextFieldChange(event)
       {
          var newFrame = parseInt(event.target.value);
-         if (newFrame > this.loadedSwf.totalFrames)
-         {
-            var message = Alfresco.util.message("message.invalidFrame", this.name);
-            message = YAHOO.lang.substitute(message,
-            {
-               "0": "1",
-               "1": this.loadedSwf.totalFrames
-            });
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: message
-            });
-         }
-         else
-         {
-            this.swfPlayer.goToFrameNo(newFrame);
-         }
-      },
+         this.swfPlayer.goToFrameNo(newFrame);
+x      },
 
       /**
        * Fired when the user clicks the previous button.

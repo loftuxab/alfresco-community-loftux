@@ -227,12 +227,24 @@
                   }
                   else
                   {
-                     failureMessage: Alfresco.util.message("message.deleteFailed", this.name)
+                     Alfresco.util.PopupManager.displayMessage({
+                        text: Alfresco.util.message("message.deleteFailed", this.name)
+                     });
                   }
                },
                scope: this
             },
-            failureMessage: Alfresco.util.message("message.deleteFailed", this.name)
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  feedbackMessage.destroy();
+                  Alfresco.util.PopupManager.displayMessage({
+                     text: Alfresco.util.message("message.deleteFailed", this.name)
+                  });
+               },
+               scope: this
+            }
          });
       }
 
