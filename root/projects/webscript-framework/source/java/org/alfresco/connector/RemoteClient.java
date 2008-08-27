@@ -589,7 +589,28 @@ public class RemoteClient extends AbstractClient
                 }
             }
             
+            // locate response encoding from the headers
+            String encoding = null;
+            String ct = connection.getContentType();
+            if (ct != null)
+            {
+                int csi = ct.indexOf(CHARSETEQUALS);
+                if (csi != -1)
+                {
+                    encoding = ct.substring(csi + CHARSETEQUALS.length());
+                }
+            }
+            if (logger.isDebugEnabled())
+                logger.debug("Response encoding: " + ct);
+            
             // perform the stream write from the response to the output
+            boolean trace = logger.isTraceEnabled();
+            StringBuilder traceBuf = null;
+            if (trace)
+            {
+                traceBuf = new StringBuilder(4096);
+                traceBuf.append('\n');
+            }
             boolean responseCommit = false;
             if (connection.getResponseCode() != HttpServletResponse.SC_NOT_MODIFIED)
             {
@@ -603,11 +624,25 @@ public class RemoteClient extends AbstractClient
                         while (read != -1)
                         {
                             out.write(buffer, 0, read);
+                            
+                            if (trace)
+                            {
+                                if (ct != null && (ct.startsWith("text/") || ct.startsWith("application/json")))
+                                {
+                                    traceBuf.append(new String(buffer, 0, read));
+                                }
+                            }
+                            
                             read = input.read(buffer);
                         }
                     }
         		    finally
         		    {
+                        if (trace)
+                        {
+                            logger.trace("Output from: " + url.toString());
+                            logger.trace(traceBuf.toString());
+                        }
                         try
                         {
                             input.close();
@@ -624,18 +659,6 @@ public class RemoteClient extends AbstractClient
                                 logger.warn("Exception during close() of HTTP API connection", e);
                         }
                     }
-                }
-            }
-            
-            // locate response encoding from the headers
-            String encoding = null;
-            String ct = connection.getContentType();
-            if (ct != null)
-            {
-                int csi = ct.indexOf(CHARSETEQUALS);
-                if (csi != -1)
-                {
-                    encoding = ct.substring(csi + CHARSETEQUALS.length());
                 }
             }
             
