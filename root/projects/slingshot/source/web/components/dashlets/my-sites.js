@@ -49,6 +49,8 @@
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
 
+      YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
+
       return this;
    }
 
@@ -61,6 +63,41 @@
        * @type Alfresco.module.CreateSite
        */
       createSite: null,
+
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type {object} site object literal of the form:
+       * {
+       *    shortName: {string} the shortName of the site
+       *    title: {string} the title of the site
+       * }
+       */
+      options:
+      {
+         /**
+          * An array with shortNames in the same order as they are listed in the html template
+          *
+          * @property sites
+          * @type Array
+          */
+         sites: []
+      },
+
+
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       */
+      setOptions: function DL_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
 
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -78,11 +115,31 @@
        */
       onReady: function()
       {
-         //var createSiteButton = new YAHOO.widget.Button(this.id + "-createSite-button", {type: "button"});
-         //createSiteButton.subscribe("click", this.onCreateSiteButtonClick, this, true);
-         
+         // Listen on clicks for the create site link
          var createSiteLink = document.getElementById(this.id + "-createSite-button");
          YAHOO.util.Event.addListener(createSiteLink, "click", this.onCreateSiteLinkClick, this, true);
+
+         // Listen on clicks for delete site icons
+         var sites = this.options.sites;
+         for (var i = 0; i < sites.length; i++)
+         {
+            var deleteSpan = document.getElementById(this.id + "-delete-span-" + i);
+            if(deleteSpan)
+            {
+               YAHOO.util.Event.addListener(deleteSpan, "click",
+                     function (event)
+                     {
+                        // Find the index of the site-delete link by looking at its id
+                        var id = event.target.id;
+                        var site = sites[new Number(id.substring(id.lastIndexOf("-") + 1))];
+
+                        // Fin the site through the index and display the delete dialog for the site
+                        Alfresco.module.getDeleteSiteInstance().show({site: site});
+                     },
+                     this, true);
+            }
+         }
+
       },
 
       /**
@@ -92,11 +149,29 @@
        */
       onCreateSiteLinkClick: function(event)
       {
+         // Create the CreateSite module if it doesnt exist
          if (this.createSite === null)
          {
             this.createSite = new Alfresco.module.CreateSite(this.id + "-createSite");
          }
+         // and show it
          this.createSite.show();
-      }
+      },
+
+      /**
+       * Fired any another component, DeleteSite, to let other components know
+       * that a site has been deleted.
+       *
+       * @method onSiteDeleted
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
+       */
+      onSiteDeleted: function CS_onSiteDeleted(layer, args)
+      {
+         // Hide the site in this component
+         var site = args[1].site;
+         YAHOO.util.Dom.setStyle(this.id + "-site-div-" + site.shortName, "display", "none");
+      }      
+
    };
 })();

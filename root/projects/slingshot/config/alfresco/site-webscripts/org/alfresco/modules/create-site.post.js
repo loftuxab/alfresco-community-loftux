@@ -20,6 +20,5 @@ if(repoJSON.shortName)
 else
 {
    // Something is wrong, indicate it in the response
-   model.success = false;
 }
 
