@@ -298,10 +298,38 @@
        */
       onDeleteComment: function BlogComment_onEditComment(row)
       {
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.confirm.delete"),
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function BlogComment_onDeleteComment_delete()
+               {
+                  this.destroy();
+                  me._onDeleteCommentConfirm.call(me, row);
+               },
+               isDefault: true
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function BlogComment_onDeleteComment_cancel()
+               {
+                  this.destroy();
+               }
+            }]
+         });
+      },
+
+      /**
+       * Delete comment implementation.
+       */
+      _onDeleteCommentConfirm: function BlogComment__onDeleteCommentConfirm(row)
+      {
          var data = this.commentsData[row];
          this._deleteComment(row, data);
       },
-
 
       // Action implementation
       

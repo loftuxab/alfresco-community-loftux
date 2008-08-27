@@ -367,6 +367,35 @@
        */
       onDeleteTopic: function DiscussionsTopic_onDeleteTopic()
       {
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.confirm.delete", $html(this.topicData.title)),
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function DiscussionsTopic_onDeleteTopic_delete()
+               {
+                  this.destroy();
+                  me._deleteTopicConfirm.call(me);
+               },
+               isDefault: true
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function DiscussionsTopic_onDeleteTopic_cancel()
+               {
+                  this.destroy();
+               }
+            }]
+         });
+      },
+      
+      /**
+       * Delete topic implementation
+       */
+      _deleteTopicConfirm: function DiscussionsTopic__deleteTopicConfirm()
+      {
          // ajax request success handler
          var onDeleted = function onDeleted(response)
          {
@@ -561,6 +590,12 @@
          
          // show the form and hide the view
          this._showEditView();
+         
+         // TODO: disabled as it does not work correctly on IE. The focus is set
+         // but hitting tab moves the focus to the focus to the address bar instead
+         // of the editor
+         // focus the title text field
+         //Dom.get(formId + "-title").focus();
       },
       
       /**

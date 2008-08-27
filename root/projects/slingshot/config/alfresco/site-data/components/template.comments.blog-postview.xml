@@ -6,5 +6,6 @@
    <url>/components/blog/comments</url>
    <properties>
       <container>blog</container>
+      <editorWidth>538</editorWidth>
    </properties>
 </component>

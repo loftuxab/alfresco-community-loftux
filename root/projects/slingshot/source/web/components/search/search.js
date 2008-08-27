@@ -111,7 +111,6 @@
           */
          initialSearchTerm : "",
          
-         
          /**
           * States whether all sites should be searched.
           * This field only has an effect if siteId != ""
@@ -202,9 +201,10 @@
        * @method onReady
        */
       onReady: function Search_onReady()
-      {  
-         // Temporary search button
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.searchButtonClick);
+      {
+         // Toggle scope link
+         var toggleScopeLink = Dom.get(this.id + "-scope-toggle-link");
+         YAHOO.util.Event.addListener(toggleScopeLink, "click", this.onToggleSearchScope, this, true);
 
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/search?";
@@ -231,8 +231,8 @@
          Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
          Alfresco.util.registerDefaultActionHandler(this.id, "search-scope-toggle", "a", this);
 
-         // tell the header that the search component exists on this page and thus no
-         // refresh is required
+         // tell the header that the search component exists on this page and therefore no
+         // page refresh is required for new search terms
          YAHOO.Bubbling.fire("searchComponentExists", {});
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
@@ -370,15 +370,13 @@
          }
       },
 
+      /**
+       * Constructs the browse url for a given record.
+       */
       _getBrowseUrlForRecord: function (oRecord)
       {
          var url = "#";
-         if (oRecord.getData("downloadUrl") != undefined)
-         {
-            // Download urls always go to the repository, use the proxy context therefore
-            url = Alfresco.constants.PROXY_URI + oRecord.getData("downloadUrl");
-         }
-         else if (oRecord.getData("browseUrl") != undefined)
+         if (oRecord.getData("browseUrl") != undefined)
          {
             // browse urls always go to a page. We assume that the url contains the page name and all
             // parameters. What we have to add is the absolute path and the site param
@@ -395,6 +393,10 @@
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
 
+      /**
+       * Perform a search for a given tag
+       * The tag is simply handled as search term
+       */
       searchByTag: function Search_searchTag(param)
       {
          // send a search bubble event to load the list
@@ -407,7 +409,7 @@
       /**
        * Triggered by the search all/site only link
        */
-      toggleSearchScope: function Search_switchSearchScope()
+      onToggleSearchScope: function Search_onToggleSearchScope()
       {
          var searchAll = ! this.searchAll;
          // send a search bubble event to load the list
@@ -470,15 +472,12 @@
        */
       _performSearch: function Search__performSearch(searchTerm, searchAll)
       {
-         // Reset the custom error messages
-         this._setDefaultDataTableErrors();
-         
-         // Display loading message
-         YAHOO.widget.DataTable.MSG_EMPTY = "Searching term '" + searchTerm + "'"; // this._msg("message.loading");
-         //this.widgets.dataTable.render();
-         
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+          
+         // update the ui to show that a search is on-going
+         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("search.info.searching");
+         this.widgets.dataTable.render();
          
          function successHandler(sRequest, oResponse, oPayload)
          {
@@ -486,8 +485,8 @@
             this.searchAll = searchAll;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             // update the result info
-            this._updateResultsInfo();
-            this._updateSearchAllLinks();
+            this._updateSearchInfo();
+            this._updateSearchScopeLink();
          }
          
          function failureHandler(sRequest, oResponse)
@@ -520,7 +519,12 @@
          });
       },
       
-      _updateResultsInfo: function Search__updateSearchResultsInfo()
+      /**
+       * Updates the search info field.
+       * 
+       * @param isSearch {boolean} if true, a search is currently being performed, false otherwise
+       */
+      _updateSearchInfo: function Search__updateSearchInfo()
       {
          // update the search results field
          var searchFor = '<b>' + Alfresco.util.encodeHTML(this.searchTerm) + '</b>';
@@ -530,20 +534,20 @@
          {
             resultsCount = this._msg("search.info.morethan", resultsCount);
          }
-         var html = this._msg("search.info.resultinfo", searchFor, searchIn, resultsCount);
+         var text = this._msg("search.info.resultinfo", searchFor, searchIn, resultsCount);
          if (this.hasMoreResults)
          {
-            html += " " + this._msg("search.info.onlyshowing", this.resultsCount);
+            text += " " + this._msg("search.info.onlyshowing", this.resultsCount);
          }
          
-         var elems = YAHOO.util.Dom.getElementsByClassName("search-result-info");
-         for (x in elems)
-         {
-            elems[x].innerHTML = html;
-         }
+         // set the text
+         Dom.get(this.id + '-search-info').innerHTML = text;
       },
       
-      _updateSearchAllLinks: function Search__updateSearchAllLinks()
+      /**
+       * Updates the search scope link
+       */
+      _updateSearchScopeLink: function Search__updateSearchScopeLink()
       {
          // only proceed if there's a site to switch to
          if (this.options.siteId == "")
@@ -552,21 +556,22 @@
          }
          
          // update the search results field
-         var text = "";
          if (this.searchAll)
          {
-            text = this._msg("search.searchsiteonly", this.options.siteId);
+            var text = this._msg("search.searchsiteonly", this.options.siteId);
          }
          else
          {
-            text = this._msg("search.searchall");
+            var text = this._msg("search.searchall");
          }
          
-         var elems = YAHOO.util.Dom.getElementsByClassName("search-scope-toggle");
-         for (x in elems)
-         {
-            elems[x].innerHTML = text;
-         }
+         // Update the link text
+         var elem = Dom.get(this.id + '-scope-toggle-link');
+         elem.innerHTML = text;
+         
+         // show the link if it was hidden
+         var container = Dom.get(this.id + '-scope-toggle-container');
+         Dom.removeClass(container, "hidden");
       },
 
       /**

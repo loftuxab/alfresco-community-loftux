@@ -356,6 +356,38 @@
        */
       onDeleteBlogPost: function BlogPostView_onDeleteBlogPost(postId)
       {
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.confirm.delete", $html(this.blogPostData.title)),
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function BlogPostList_onDeleteBlogPost_delete()
+               {
+                  this.destroy();
+                  me._deleteBlogPostConfirm.call(me, me.blogPostData.name);
+               },
+               isDefault: true
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function BlogPostList_onDeleteBlogPost_cancel()
+               {
+                  this.destroy();
+               }
+            }]
+         });
+      },
+      
+      /**
+       * Blog post deletion implementation
+       * 
+       * @method _deleteBlogPostConfirm
+       * @param postId {string} the id of the blog post to delete
+       */
+      _deleteBlogPostConfirm: function BlogPostView__deleteBlogPostConfirm(postId)
+      {
          // ajax request success handler
          var onDeletedSuccess = function BlogPostList_onDeletedSuccess(response)
          {

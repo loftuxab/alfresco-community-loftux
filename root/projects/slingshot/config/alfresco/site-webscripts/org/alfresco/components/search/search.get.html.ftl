@@ -10,26 +10,18 @@
    );
 //]]></script>
 
-<#macro resultbar uniqueid cssclass>
-   <div class="${cssclass}">
-      <span class="search-result-info">
+<div id="${args.htmlid}-body" class="search">
+   <div class="resultbar">
+      <span id="${args.htmlid}-search-info">
+         ${msg("search.info.searching")}
       </span>
       
-      <#-- Only add switch if we are in a site context -->
-      <#if siteId?has_content>
-      <span>
+      <span id="${args.htmlid}-scope-toggle-container" class="hidden">
       (
-      <a href="#" id="${args.htmlid}-toggleSearchScope-${uniqueid}" class="search-scope-toggle">
-      </a>
+         <a href="#" id="${args.htmlid}-scope-toggle-link" class="search-scope-toggle"></a>
       )
       </span>
-      </#if>
    </div>
-</#macro>
-
-<div id="${args.htmlid}-body" class="search">
-	<@resultbar uniqueid="first" cssclass="resultbar" />
-	
-	<#-- this div contains the search results -->
-	<div id="${args.htmlid}-results" class="results"></div>
+   
+   <div id="${args.htmlid}-results" class="results"></div>
 </div>

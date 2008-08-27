@@ -325,7 +325,7 @@
          
          for (var x=0; x < this.repliesData.length; x++)
          {
-            this.renderReply(rootDiv, this.repliesData[x]);
+            this.renderReply(rootDiv, this.repliesData[x], false);
          }
          
          // attach the rollover listeners
@@ -338,7 +338,7 @@
       /**
        * Renders an individual reply element
        */
-      renderReply: function TopicReplies_renderReply(parentDiv, data)
+      renderReply: function TopicReplies_renderReply(parentDiv, data, highlight)
       {
          var replyDiv = document.createElement("div");
          
@@ -364,8 +364,14 @@
             var repliesElem = Dom.get('replies-of-' + safeRef);
             for (var x=0; x < data.children.length; x++)
             {
-               this.renderReply(repliesElem, data.children[x]);
+               this.renderReply(repliesElem, data.children[x], false);
             }
+         }
+         
+         if (highlight)
+         {
+            Alfresco.util.Anim.pulse(viewElem);
+            this._scrollToElement(viewElem);
          }
       },
       
@@ -430,12 +436,17 @@
       /**
        * Re-renders the view UI for a reply element
        */
-      rerenderReplyUI: function TopicReplies_rerenderReplyUI(nodeRef)
+      rerenderReplyUI: function TopicReplies_rerenderReplyUI(nodeRef, highlight)
       {
          // Get the view element and the data and update the html
          var viewElem = Dom.get('reply-' + this.toSafeRef(nodeRef));
          var data = this.findReplyDataObject(nodeRef);
          this.renderReplyView(viewElem, data);
+         
+         if (highlight)
+         {
+            Alfresco.util.Anim.pulse(viewElem);
+         }
       },
       
       
@@ -613,6 +624,7 @@
          this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content', {
             height: '250px',
             width: '538px',
+            focusAtStart: true,
             dompath: false, //Turns on the bar at the bottom
             animate: false, //Animates the opening, closing and moving of Editor windows
             markup: "xhtml",
@@ -632,7 +644,7 @@
          }
          replyForm.setAJAXSubmit(true,
          {
-            success: this._msg("message.safereply.success"),
+            successMessage: this._msg("message.savereply.success"),
             successCallback:
             {
                fn: this.onFormSubmitSuccess,
@@ -642,7 +654,7 @@
                   isEdit: isEdit
                }
             },
-            failureMessage: this._msg("message.safereply.failure")
+            failureMessage: this._msg("message.savereply.failure")
          });
          replyForm.setSubmitAsJSON(true);
          replyForm.doBeforeFormSubmit =
@@ -658,6 +670,9 @@
          
          // now show the form
          this._showForm();
+         
+         // finally scroll to the form
+         this._scrollToElement(this.editData.formDiv);
       },
       
       /**
@@ -673,7 +688,7 @@
             YAHOO.lang.augmentObject(data, response.json.item, true);
             
             // rerender the ui
-            this.rerenderReplyUI(data.nodeRef);
+            this.rerenderReplyUI(data.nodeRef, true);
          }
          // in case of a create, add the new data and insert a new reply element
          else
@@ -686,7 +701,7 @@
                
                // render the new reply
                var parentElem = Dom.get(this.id + '-replies-root');
-               this.renderReply(parentElem, response.json.item);
+               this.renderReply(parentElem, response.json.item, true);
             }
             else
             {
@@ -701,10 +716,10 @@
                
                // render the new reply
                var parentElem = Dom.get('replies-of-' + this.toSafeRef(obj.nodeRef));
-               this.renderReply(parentElem, response.json.item);
+               this.renderReply(parentElem, response.json.item, true);
                
                // rerender the parent reply, which will update the reply count
-               this.rerenderReplyUI(obj.nodeRef);
+               this.rerenderReplyUI(obj.nodeRef, false);
             }
             
             // make sure the rolover listener gets attached to the new element
@@ -797,6 +812,23 @@
          
          // show the form element
          Dom.removeClass(this.editData.formDiv, "hidden");
+      },
+      
+      /**
+       * Vertically scrolls the browser window to the passed element
+       */
+      _scrollToElement: function TopicReplies__scrollToElement(el)
+      {
+         var yPos = Dom.getY(el);
+         if (YAHOO.env.ua.ie > 0)
+         {
+            yPos = yPos - (document.body.clientHeight / 3)
+         }
+         else
+         {
+            yPos = yPos - (window.innerHeight / 3);
+         }
+         window.scrollTo(0, yPos);
       },
       
       /**
