@@ -2,6 +2,10 @@
 	margin: 0 -10px;
 }
 
+.search .hidden {
+  display: none;
+}
+
 .search .yui-dt-bd table{
 	width: 100%;
 	border: none;
@@ -23,6 +27,7 @@
 	background-color:#E3EAEC;
 	border-bottom:2px solid #F0F3F4;
 	border-top:2px solid #F0F3F4;
+	height: 1.25em;
 }
 
 .search .resultbar.gobottom {	

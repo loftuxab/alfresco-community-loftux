@@ -4,4 +4,7 @@
    <region-id>people-finder</region-id>
    <source-id>invite</source-id>
    <url>/components/people-finder/people-finder</url>
+   <properties>
+      <minSearchTermLength>0</minSearchTermLength>
+   </properties>
 </component>

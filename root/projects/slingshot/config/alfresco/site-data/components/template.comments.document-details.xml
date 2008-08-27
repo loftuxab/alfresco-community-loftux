@@ -7,5 +7,6 @@
    <properties>
       <container>documentLibrary</container>
       <editorWidth>470</editorWidth>
+      <editorHeight>100</editorHeight>
    </properties>
 </component>

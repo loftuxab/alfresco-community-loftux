@@ -639,10 +639,31 @@
       /**
        * Handler for the delete topic action links.
        */
-      onDeleteTopic: function DiscussionsTopicList_onDeletePost(row)
+      onDeleteTopic: function DiscussionsTopicList_onDeleteTopic(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         this._deleteTopic(record.getData('name'));
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.confirm.delete", $html(record.getData('title'))),
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function DiscussionsTopicList_onDeleteTopic_delete()
+               {
+                  this.destroy();
+                  me._deleteTopicConfirm.call(me, record.getData('name'));
+               },
+               isDefault: true
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function DiscussionsTopicList_onDeleteTopic_cancel()
+               {
+                  this.destroy();
+               }
+            }]
+         });
       },
       
       /**
@@ -650,7 +671,7 @@
        * 
        * @param topicId {string} the id of the topic to delete
        */
-      _deleteTopic: function DiscussionsTopicList__deleteTopic(topicId)
+      _deleteTopicConfirm: function DiscussionsTopicList__deleteTopicConfirm(topicId)
       {
          // ajax request success handler
          var onDeleted = function DiscussionsTopicList__deleteTopic_onDeleted(response)

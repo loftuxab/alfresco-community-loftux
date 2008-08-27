@@ -103,7 +103,16 @@
           * @type boolean
           * @default false
           */
-         singleSelectMode: false
+         singleSelectMode: false,
+         
+         /**
+          * Number of characters required for a search.
+          * 
+          * @property minSearchTermLength
+          * @type int
+          * @default 3
+          */
+         minSearchTermLength: 3
       },
 
       /**
@@ -244,6 +253,10 @@
                         items.push(personData);
                      }
                   }
+               }
+               else
+               {
+                  items = oFullResponse.people;
                }
                
                // we need to wrap the array inside a JSON object so the DataTable is happy
@@ -495,11 +508,11 @@
          var searchTermElem = Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
          searchTerm = $html(searchTerm);
-         if (searchTerm.length < 3)
+         if (searchTerm.length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.minimum-length")
+               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
             });
             return;
          }

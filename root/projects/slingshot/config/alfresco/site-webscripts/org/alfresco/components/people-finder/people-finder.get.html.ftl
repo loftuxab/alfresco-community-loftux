@@ -1,7 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.PeopleFinder("${args.htmlid}").setOptions(
    {
-      siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>"
+      siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
+      minSearchTermLength: "${args.minSearchTermLength!'3'}"
    }).setMessages(
       ${messages}
    );

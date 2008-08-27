@@ -627,10 +627,31 @@
        * @method onDeleteBlogPost
        * @param row {object} DataTable row representing post to be actioned
        */
-      onDeleteBlogPost: function BlogPostList_onDeletePost(row)
+      onDeleteBlogPost: function BlogPostList_onDeleteBlogPost(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         this._deleteBlogPost(record.getData('name'));
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.confirm.delete", $html(record.getData('title'))),
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function BlogPostList_onDeleteBlogPost_delete()
+               {
+                  this.destroy();
+                  me._deleteBlogPostConfirm.call(me, record.getData('name'));
+               },
+               isDefault: true
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function BlogPostList_onDeleteBlogPost_cancel()
+               {
+                  this.destroy();
+               }
+            }]
+         });
       },
       
       /**
@@ -694,13 +715,13 @@
       /**
        * Blog post deletion implementation
        * 
-       * @method _deleteBlogPost
+       * @method _deleteBlogPostConfirm
        * @param postId {string} the id of the blog post to delete
        */
-      _deleteBlogPost: function BlogPostList__deleteBlogPost(postId)
+      _deleteBlogPostConfirm: function BlogPostList__deleteBlogPostConfirm(postId)
       {
          // ajax request success handler
-         var onDeletedSuccess = function BlogPostList_onDeletedSuccess(response)
+         var onDeletedSuccess = function BlogPostList_deleteBlogPostConfirm_onDeletedSuccess(response)
          {
             // reload the table data
             this._updateBlogPostList();
