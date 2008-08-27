@@ -193,6 +193,13 @@ div.agenda-item {
 	margin-bottom: 20px;
 }
 
+div.agenda-item div.cal-event-entry {
+   font-size: 12px;
+	color: #333;
+	text-align: left;
+	padding: 2px;
+}
+
 div.cal-event-entry a {
 	text-decoration: none;
 }
