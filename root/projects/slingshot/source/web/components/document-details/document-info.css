@@ -1,36 +1,41 @@
 .document-info
 {
-	padding: 0px 10px 25px 0px;
+	padding: 0em 1em 0em 0em;
 }
 
 .document-info .heading
 {
    color: #333333;
    font-size: 131%;
-   padding: 20px 0px;
+   padding: 1em 0em;
+}
+
+.document-info .info
+{
+   line-height: 1.5em;
 }
 
 .document-info .info-section
 {
    border-bottom: 1px dashed #c2c2c2;
-   padding: 0px 5px 20px 5px;
+   padding: 0px 0.5em 1.5em 0.5em;
 }
 
 .document-info .tag
 {
-   padding-bottom: 8px;
+   padding-bottom: 0.6em;
 }
 
 .document-info .tag img
 {
-   vertical-align: -4px;
+   vertical-align: -0.3em;
 }
 
 .document-info .meta-label
 {
    font-size: 100%;
    color: #606060;
-   padding-right: 3px;
+   padding-right: 0.3em;
 }
 
 .document-info .meta-value

@@ -174,7 +174,7 @@
          
          // update the download link for the download link
          var url = Alfresco.constants.PROXY_URI + this.docData.contentUrl;
-         Dom.get(this.id + "-download-action").href = url;
+         Dom.get(this.id + "-download-action").href = url + "?a=true";
          
          // Hook action events
          var fnActionHandler = function DocumentActions_fnActionHandler(layer, args)

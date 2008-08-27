@@ -1,10 +1,10 @@
 .document-links
 {
    background-color: #fafafa;
-   margin-right: -10px;
-	padding: 20px 10px 25px 25px;
+	padding: 1.5em 1em 2em 2em;
 	border-left: 1px solid #ccc;
 	border-top: 1px dashed #ccc;
+	margin-right: -10px;
 }
 
 .document-links .heading
@@ -17,13 +17,18 @@
 {
    color: #333333;
    font-size: 100%;
-   padding-top: 20px;
-   padding-bottom: 4px;
+   padding-top: 1.5em;
+   padding-bottom: 0.4em;
 }
 
 .document-links .link-value
 {
    width: 178px;
-   margin-bottom: 8px;
-   padding: 4px;
+   margin-bottom: 1em;
+   padding: 0.4em;
+}
+
+.document-links .copy-button
+{
+   display: none;
 }
