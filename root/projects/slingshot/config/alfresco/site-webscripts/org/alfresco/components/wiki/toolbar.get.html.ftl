@@ -7,7 +7,7 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar">
    <div class="header">
-        <div class="new-page"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
+        <div class="new-page"><a href="${page.url.context}/page/site/${page.url.templateArgs["site"]}/wiki-create" id="${args.htmlid}-create-button">${msg("button.create")}</a></div>
         <div class="separator">|</div>
         <div class="delete-page"><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
         <div class="separator">|</div>
@@ -15,6 +15,7 @@
          
    </div>
    <div id="${args.htmlid}-rssFeed" class="rss-feed"><a href="${url.context}/proxy/alfresco/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">RSS feed</a></div>
+<#--
    <div id="${args.htmlid}-createpanel">
       <div class="hd">${msg("panel.create.title")}</div>
       <div class="bd">
@@ -28,6 +29,7 @@
       </div>
       <div class="ft">${msg("panel.create.footer")}</div>
    </div>
+-->
    <div id="${args.htmlid}-renamepanel">
         <div class="hd">${msg("panel.rename.title")}</div>
         <div class="bd">
