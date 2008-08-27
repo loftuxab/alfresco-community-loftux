@@ -748,8 +748,10 @@
             }
         },
         
-        _createEventContainer: function(event)
+        _createEventContainer: function(event, label)
         {
+           label = label || event.name; // set default value if none specified
+           
            var div = document.createElement("div");
            var classes = ["cal-event-entry"];
            for (var i=0; i < event.tags.length; i++)
@@ -757,7 +759,7 @@
               classes.push("cal-" + event.tags[i]);
            }
            div.setAttribute("class", classes.join(" "));
-           div.innerHTML = '<a href="#">' + event.name + '</a>';
+           div.innerHTML = '<a href="#">' + label + '</a>';
            YAHOO.util.Event.addListener(div, 'click', this.onEventClick, event, this);
            return div;
         },
@@ -775,55 +777,55 @@
 		refreshAgenda: function()
 		{
 			var Dom = YAHOO.util.Dom;
-			var innerHTML = "";
+			var elem = Dom.get(this.id + "-agendaContainer");
+			
+			if (elem.hasChildNodes())
+         {
+            while (elem.childNodes.length >= 1)
+            {
+               elem.removeChild(elem.firstChild);       
+            } 
+         }
 			
 			for (var key in this.eventData)
 			{
 				if (this.eventData.hasOwnProperty(key)) {
 					var dateParts = key.split("/");
 					var eventdate = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
-					innerHTML += this.agendaDayCellRenderer(eventdate);
+					var div = document.createElement("div");
+					div.setAttribute("class", "agenda-item");
+					this.renderAgendaItems(eventdate, div);
+					elem.appendChild(div);
 				}
 			}
-			
-			var elem = Dom.get(this.id + "-agendaContainer");
-			elem.innerHTML = innerHTML;
 		},
 		
-		/**
-		 * This method generates the HTML to display the events 
-		 * for a given day, specified by the "date" parameter.
-		 * 
-		 * @method agendaItemCellRenderer
-		 * @param date {Date} JavaScript date object
-		 */
-		agendaDayCellRenderer: function(date)
+      /**
+   	 * This method generates the HTML to display the events 
+   	 * for a given day, specified by the "date" parameter.
+   	 * 
+   	 * @method agendaItemCellRenderer
+   	 * @param date {Date} JavaScript date object
+   	 * @param parent {Dom} DOM element to append to
+   	 */
+		renderAgendaItems: function(date, parent)
 		{
-			var thedate = Alfresco.util.formatDate(date, "m/d/yyyy");
+		   var title = Alfresco.util.formatDate(date, "mediumDate");
+			var div = document.createElement("div");
+			div.setAttribute("class", "dayheader");
+			div.innerHTML = title;
+			parent.appendChild(div);
+			
 			var events = this.eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
-			var html = "";
-			if (events && events.length > 0)
-			{
-				var title = Alfresco.util.formatDate(date, "mediumDate");
-				html += '<div class="agenda-item">'
-				html += '<div class="dayheader">' + title + '</div>';
-				html += '<table class="daytable">'
-				for (var i=0; i < events.length; i++)
-				{
-					var event = events[i];
-				   html += '<tr><td><div class="';
-				   var classes = ["cal-event-entry"];
-				   for (var j=0; j < event.tags.length; j++)
-               {
-                  classes.push("cal-" + event.tags[j]);
-               }
-               html += classes.join(" ");
-               html += '">' + event.start + " " + event.name;
-				   html += '</div></td></tr>';
-				}
-				html += '</table></div>';
-			}
-			return html;
+         if (events && events.length > 0)
+   		{
+			   var event;
+			   for (var i=0; i < events.length; i++)
+   			{
+   			   event = events[i];
+   				parent.appendChild(this._createEventContainer(event, event.start + " " + event.name));	
+   			}
+         }
 		}
 
     };
