@@ -217,7 +217,6 @@
          // Create new post button
          this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic,
          {
-            disabled: true
          });
          
          // initialize rss feed link
@@ -424,6 +423,9 @@
             // simple view
             else
             {
+               // add a class to the parent div so that we can add a separator line in the simple view
+               Dom.addClass(elCell, 'row-separator');
+                
                html += '<div class="node topic simple">';
                
                // begin actions
@@ -542,7 +544,11 @@
        */
       _updateToolbar: function DiscussionsTopicList__updateToolbar(forumPermissions)
       {
-         this.widgets.createPost.set("disabled", ! forumPermissions.create);
+         if (forumPermissions.create)
+         {
+            var elem = Dom.get(this.id + '-create-topic-container');
+            Dom.removeClass(elem, 'hidden');
+         }
       },
       
       /**
@@ -713,6 +719,14 @@
        */
       onEventHighlightRow: function DiscussionsTopicList_onEventHighlightRow(oArgs)
       {
+         // only highlight if we got actions to show
+         var record = this.widgets.dataTable.getRecord(oArgs.target);
+         var permissions = record.getData('permissions');
+         if (! (permissions.edit || permissions["delete"]))
+         {
+            return;
+         }
+         
          var target = oArgs.target;
          var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
          YAHOO.util.Dom.addClass(elem, 'overNode');

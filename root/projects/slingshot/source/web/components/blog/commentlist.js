@@ -185,7 +185,7 @@
          YAHOO.Bubbling.addDefaultAction("blogcomment-action", fnActionHandlerDiv);
 
          // initialize the mouse over listener
-         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onCommentElementMouseEntered, this.onCommentElementMouseExited);
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onCommentElementMouseEntered, this.onCommentElementMouseExited, this);
       },      
       
       
@@ -282,6 +282,12 @@
          
          // keep a reference to the loaded data
          this.commentsData = comments;
+         
+         // inform the create comment component of whether the user can create a comment
+         var eventData = {
+            canCreateComment: response.json.nodePermissions.create
+         }
+         YAHOO.Bubbling.fire("setCanCreateComment", eventData);
       },
 
       /**
@@ -596,6 +602,15 @@
       /** Called when the mouse enters into a list item. */
       onCommentElementMouseEntered: function CommentList_onCommentElementMouseEntered(layer, args)
       {
+         // find out whether the user has actions, otherwise we won't show an overlay
+         var id = args[1].target.id;
+         var index = id.substring((this.id + '-comment-view-').length);
+         var permissions = this.commentsData[index].permissions;
+         if (! (permissions.edit || permissions["delete"]))
+         {
+            return;
+         }
+          
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );

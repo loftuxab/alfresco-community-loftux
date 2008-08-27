@@ -21,6 +21,10 @@
    float: left;
 }
 
+.topiclist-header .hidden {
+   display: none;
+}
+
 .toolbar .createTopic button {
    padding-left: 2.5em; 
    background: url(../images/new-blog-16.png) no-repeat 10% 50%;
@@ -103,7 +107,13 @@
 	padding: 0px;
 }
 
+.topiclist .row-separator {
+   border-bottom: 1px solid #c6c6c6;
+}
 
+.topiclist tr.yui-dt-odd .node{
+  border-color:#EDF5FF;
+}
 
 /* Topic list elements */
 /********
@@ -126,12 +136,12 @@ html>body .node, .reply, .comment {
 .comment table td {
   vertical-align: top;
 }
-.node.simple{
+.node.simple {
   padding: 5px;
 }
 .overNode {
-  background-color: #fffef5;
-  border: 2px solid #5A7380;
+  background-color: #fffef5 !important;
+  border: 2px solid #5A7380 !important;
 }
 .node .published {
   margin: 5px 0 10px 0;

@@ -17,6 +17,10 @@
 
 /* toolbar */
 
+.postlist-header .hidden {
+   display: none;
+}
+
 .postlist-header .toolbar
 {
    clear: both;
@@ -101,6 +105,13 @@
 	border: none !important;
 }
 
+.blog-postlist .row-separator {
+   border-bottom: 1px solid #c6c6c6;
+}
+
+.blog-postlist tr.yui-dt-odd .node{
+  border-color:#EDF5FF;
+}
 
 
 /* List elements */
@@ -191,7 +202,7 @@
 
 
 .overNode {
-  background-color: #fffef5;
+  background-color: #fffef5 !important;
   border: 2px solid #5A7380 !important;
 }
 .node .published {

@@ -262,7 +262,7 @@
             this.rolePickers[roleValue] = new YAHOO.widget.Button(roleElementId,
             {
                type: "menu", 
-               menu: roleElementId + "-select",
+               menu: roleElementId + "-select"
             });
             this.rolePickers[roleValue].getMenu().subscribe("click", this.onRoleSelected, this.rolePickers[roleValue]);
          }

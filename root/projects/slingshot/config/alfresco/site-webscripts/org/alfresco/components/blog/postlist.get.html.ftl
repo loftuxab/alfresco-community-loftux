@@ -18,10 +18,14 @@
 <div class="postlist-header">
    <div id="${args.htmlid}-postlistBar" class="yui-g toolbar">
       <div class="yui-u first">
-         <div class="createPost hideable"><button id="${args.htmlid}-createPost-button" name="postlist-createPost-button">${msg("header.createPost")}</button></div>
-         <div class="separator hideable">|</div>
-         <div class="configureBlog hideable"><button id="${args.htmlid}-configureBlog-button" class="configureBlog" name="postlist-configureBlog-button">${msg("header.configureBlog")}</button></div>
-         <div class="separator hideable">|</div>
+         <div id="${args.htmlid}-create-post-container" class="hidden">
+            <div class="createPost hideable"><button id="${args.htmlid}-createPost-button" name="postlist-createPost-button">${msg("header.createPost")}</button></div>
+            <div class="separator hideable">|</div>
+         </div>
+         <div id="${args.htmlid}-configure-blog-container" class="hidden">
+            <div class="configureBlog hideable"><button id="${args.htmlid}-configureBlog-button" class="configureBlog" name="postlist-configureBlog-button">${msg("header.configureBlog")}</button></div>
+            <div class="separator hideable">|</div>
+         </div>
          <div id="${args.htmlid}-rssFeed" class="rss-feed hideable"></div>
       </div>
       <div class="yui-u align-right">
