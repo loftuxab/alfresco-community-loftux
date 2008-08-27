@@ -1,5 +1,5 @@
 /*
- *** Alfresco.Wiki
+ *** Alfresco.WikiToolbar
 */
 (function()
 {
@@ -72,50 +72,22 @@
    	 */
    	init: function()
    	{
-   	   this.panel = new YAHOO.widget.Panel(this.id + "-createpanel", { width:"320px", visible:false, constraintoviewport:true } );
-	      this.panel.render();
-	      
-	      var saveButton = Alfresco.util.createYUIButton(this, "save-button", null,
-	      {
-	      	type: "submit"
-	      });
-	      
-	      var pageForm = new Alfresco.forms.Form(this.id + "-addPageForm");
-         pageForm.addValidation(this.id + "-pagetitle", Alfresco.forms.validation.mandatory, null, "blur");
-         pageForm.addValidation(this.id + "-pagetitle", Alfresco.forms.validation.nodeName, null, "keyup");
-	      pageForm.setShowSubmitStateDynamically(true);
-	      pageForm.setSubmitElements(saveButton);
-	      pageForm.setSubmitAsJSON(false);
-	      pageForm.doBeforeFormSubmit.fn = function(form, obj)
-	      {
-	         var elem = YAHOO.util.Dom.get(this.id + "-pagetitle");
-	         if (elem)
-	         {
-	            // Fix for Firefox 2.x
-	            var title = YAHOO.util.Dom.get(this.id + "-title");
-               title.value = elem.value.replace(/\s+/g, "_");
-               elem.disabled = true;
-	         }
-	      };
-	      pageForm.doBeforeFormSubmit.scope = this;
-	      pageForm.init();
-	      
-	      // Create button
-	      var createButton = Alfresco.util.createYUIButton(this, "create-button", this.onCreateClick,
-	      {
-	      	type: "push"
-	      });
-	      
-	      // Delete button
-	      var opts = {
-	         type: "push"
-	      };
-	      
-	      if (!this.title || this.title.length == 0)
-	      {
-	         opts["disabled"] = true;
-	      }
-	      
+         // Create button
+   	   var createButton = Alfresco.util.createYUIButton(this, "create-button", null,
+         {
+   	      type: "link"
+   	   });
+
+         // Delete button
+         var opts = {
+            type: "push"
+         };
+   
+         if (!this.title || this.title.length == 0)
+         {
+            opts["disabled"] = true;
+         }
+   
 	      var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
 	      var renameButton = Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
 	      
@@ -220,48 +192,6 @@
 	      this.deleteDialog.hide();
 	      // Redirect to the wiki landing page
          window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki";
-	   },
-	   
-	   /**
-   	 * Event handler for when the user hits the 'New Page' button.
-   	 * Opens up the create page panel.
-   	 *
-   	 * @method onCreateClick
-   	 * @param e {object} DomEvent
-   	 */
-	   onCreateClick: function(e)
-	   {
-	      // Clear the text field any previously entered values
-	      var pageNameField = document.getElementById(this.id + "-title");
-	      if (pageNameField)
-	      {
-	         pageNameField.value = "";
-	      }
-	      
-	      this.panel.show();
-	   },
-	   
-	   /**
-   	 * Event handler for save button on the page creation panel.
-   	 * Modifies the URL to redirect the user to the page with the title they
-   	 * specified in the text field.
-   	 *
-   	 * @method onSaveClick
-   	 * @param e {object} DomEvent
-   	 */
-	   onSaveClick: function(e)
-	   {
-	      var elem = YAHOO.util.Dom.get(this.id + "-title");
-	      if (elem)
-	      {
-	         var title = elem.value;
-	         if (title)
-	         {
-	            title = title.replace(/\s+/g, "_");
-	            // Change the location bar
-   	         window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(title);
-	         } 
-	      } 
 	   },
 	   
 	   /**

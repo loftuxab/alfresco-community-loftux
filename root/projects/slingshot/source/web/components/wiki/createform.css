@@ -1,0 +1,26 @@
+.wikipage-header {
+  width: auto;
+  height: 30px;
+  background-color: #ebeff1;
+  border-bottom: 2px solid #929292;
+  margin: 0 -10px;
+  padding-right: 10px;
+}
+
+.wikipage-header .back-nav {
+  font-family: Helvetica, Trebuchet, sans-serif;
+  font-weight: normal;
+  font-size: 113.1%;
+  color: #333333;
+  float: left;
+  padding: 4px 10px;
+}
+
+.wikipage-header .backLink {
+  font-family: Arial, sans-serif;
+  font-weight: normal;
+  font-size: 116%;
+  color: #333333;
+  background: transparent url(../images/back-arrow.png) no-repeat scroll 3px 3px;
+  padding: 0 5px 0 19px;
+}
