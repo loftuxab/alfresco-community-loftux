@@ -6,7 +6,7 @@
    <url>/components/blog/createcomment</url>
    <properties>
       <container>blog</container>
-      <editorHeight>200</editorHeight>
+      <editorHeight>150</editorHeight>
       <editorWidth>538</editorWidth>
    </properties>
 </component>

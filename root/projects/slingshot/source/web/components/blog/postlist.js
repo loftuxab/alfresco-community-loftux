@@ -215,13 +215,11 @@
          // Create new post button
          this.widgets.createPost = Alfresco.util.createYUIButton(this, "createPost-button", this.onCreatePost,
          {
-            "disabled" : true
          });
 
          // Configure blog button
          this.widgets.configureBlog =  Alfresco.util.createYUIButton(this, "configureBlog-button", this.onConfigureBlog,
          {
-            "disabled" : true
          });
 
          // Simple view button
@@ -399,6 +397,9 @@
             // simple view
             else
             {
+               // add a class to the parent div so that we can add a separator line in the simple view
+               Dom.addClass(elCell, 'row-separator');
+               
                html += '<div class="node post simple">';
                
                // begin actions
@@ -534,8 +535,16 @@
        */
       updateToolbar : function BlogPostList_updateToolbar(blogPermissions)
       {
-         this.widgets.createPost.set("disabled", ! blogPermissions.create)
-         this.widgets.configureBlog.set("disabled", ! blogPermissions.edit)
+         if (blogPermissions.create)
+         {
+            var elem = Dom.get(this.id + '-create-post-container');
+            Dom.removeClass(elem, 'hidden');
+         }
+         if (blogPermissions.edit)
+         {
+            var elem = Dom.get(this.id + '-configure-blog-container');
+            Dom.removeClass(elem, 'hidden');
+         }
       },
 
       // Actions
@@ -780,7 +789,7 @@
             {
                action : "publish"
             },
-            successMessage: this._msg("message.publishedExternal.success"),
+            successMessage: this._msg("message.publishExternal.success"),
             successCallback:
             {
                fn: onPublishedSuccess,
@@ -882,6 +891,14 @@
        */
       onEventHighlightRow: function BlogPostList_onEventHighlightRow(oArgs)
       {
+         // only highlight if we got actions to show
+         var record = this.widgets.dataTable.getRecord(oArgs.target);
+         var permissions = record.getData('permissions');
+         if (! (permissions.edit || permissions["delete"]))
+         {
+            return;
+         }
+          
          var target = oArgs.target;
          var elem = YAHOO.util.Dom.getElementsByClassName('post', null, target, null);
          YAHOO.util.Dom.addClass(elem, 'overNode');

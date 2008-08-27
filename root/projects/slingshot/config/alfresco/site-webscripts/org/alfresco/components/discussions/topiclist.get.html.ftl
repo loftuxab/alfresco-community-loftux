@@ -17,8 +17,10 @@
 <div class="topiclist-header">
    <div id="${args.htmlid}-topiclistBar" class="yui-g toolbar">
       <div class="yui-u first">
-         <div class="createTopic hideable"><button id="${args.htmlid}-createTopic-button" name="postlist-createTopic-button">${msg("header.createTopic")}</button></div>
-         <div class="separator hideable">|</div>
+         <div id="${args.htmlid}-create-topic-container" class="hidden">
+            <div class="createTopic hideable"><button id="${args.htmlid}-createTopic-button" name="postlist-createTopic-button">${msg("header.createTopic")}</button></div>
+            <div class="separator hideable">|</div>
+         </div>
          <div id="${args.htmlid}-rssFeed" class="rss-feed hideable">${msg("header.rssFeed")}</div>
       </div>
       <div class="yui-u align-right">

@@ -182,7 +182,7 @@
          YAHOO.Bubbling.addDefaultAction("reply-action-link", fnActionHandlerDiv);
 
          // Hook the show/hide link
-         var fnActionHandlerDiv = function TopicReplies_fnActionHandlerDiv(layer, args)
+         var fnShowHideChildrenHandler = function TopicReplies_fnShowHideChildrenHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "a");
             if (owner !== null)
@@ -202,10 +202,10 @@
             }
             return true;
          }
-         YAHOO.Bubbling.addDefaultAction("showHideChildren", fnActionHandlerDiv);
+         YAHOO.Bubbling.addDefaultAction("showHideChildren", fnShowHideChildrenHandler);
 
          // initialize the mouse over listener
-         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onReplyElementMouseEntered, this.onReplyElementMouseExited);
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onReplyElementMouseEntered, this.onReplyElementMouseExited, this);
       },
       
       
@@ -305,7 +305,7 @@
        */
       toSafeRef: function(nodeRef)
       {
-         return nodeRef.replace(':/', '').replace('/', '_');
+         return nodeRef.replace(':/', '').replace('/', '_').replace('/', '_');
       },
 
       /**
@@ -750,6 +750,31 @@
       },
       
       /**
+       * Implementation of findReplyDataObject
+       */
+      _findReplyDataObjectImpl: function TopicReplies__findReplyDataObjectImpl(arr, nodeRef)
+      {
+         for (var  x=0; x < arr.length; x++)
+         {
+            // check the element
+            if (arr[x].nodeRef == nodeRef)
+            {
+               return arr[x];
+            }
+            // check the children recursively
+            else if (arr[x].children != undefined)
+            {
+               var result = this._findReplyDataObjectImpl(arr[x].children, nodeRef);
+               if (result !== null)
+               {
+                  return result;
+               }
+            }
+         }
+         return null;
+      },
+      
+      /**
        * Shows the children of a reply
        * 
        * @param nodeRef the nodeRef of the reply for which children should be shown
@@ -831,37 +856,21 @@
          window.scrollTo(0, yPos);
       },
       
-      /**
-       * Implementation of findReplyDataObject
-       */
-      _findReplyDataObjectImpl: function TopicReplies__findReplyDataObjectImpl(arr, nodeRef)
-      {
-         for (var  x=0; x < arr.length; x++)
-         {
-            // check the element
-            if (arr[x].nodeRef == nodeRef)
-            {
-               return arr[x];
-            }
-            // check the children recursively
-            else if (arr[x].children != undefined)
-            {
-               var result = this._findReplyDataObjectImpl(arr[x].children, nodeRef);
-               if (result !== null)
-               {
-                  return result;
-               }
-            }
-         }
-         return null;
-      },
-      
-      
       // mouse hover functionality
       
       /** Called when the mouse enters into a list item. */
       onReplyElementMouseEntered: function TopicReplies_onReplyElementMouseEntered(layer, args)
       {
+         // only highlight if there are actions on the specific element
+         nodeRef = args[1].target.id.substring(('reply-').length);
+         nodeRef = this.toNodeRef(nodeRef);
+         var data = this.findReplyDataObject(nodeRef);
+         var permissions = data.permissions;
+         if (! (permissions.edit || permissions.reply || permissions['delete']))
+         {
+            return;
+         }
+         
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );

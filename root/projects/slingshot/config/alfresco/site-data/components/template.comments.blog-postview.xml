@@ -7,5 +7,6 @@
    <properties>
       <container>blog</container>
       <editorWidth>538</editorWidth>
+      <editorHeight>150</editorHeight>
    </properties>
 </component>

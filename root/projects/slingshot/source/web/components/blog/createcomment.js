@@ -34,7 +34,8 @@
       Alfresco.util.YUILoaderHelper.require(["event", "editor"], this.onComponentsLoaded, this);
       
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);      
+      YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
+      YAHOO.Bubbling.on("setCanCreateComment", this.onSetCanCreateComment, this);
       
       return this;
    }
@@ -90,7 +91,17 @@
          /**
           * Height to use for comment editor
           */
-         height: 250
+         height: 250,
+         
+         /**
+          * Tells whether the user can create comments.
+          * The component is not displayed unless this field is true
+          * 
+          * @property canCreateComment
+          * @type boolean
+          * @default false
+          */
+         canCreateComment: false
       },
       
       /**
@@ -100,6 +111,11 @@
        * @type object
        */
       widgets: null,
+      
+      /**
+       * States whether the view has already been initialized
+       */
+      initialized: false,
       
       /**
        * Set multiple initialization options at once.
@@ -147,15 +163,42 @@
             this.options.itemNodeRef = obj.itemNodeRef;
             this.options.itemUrl = obj.itemUrl;
             this.options.itemTitle = obj.itemTitle;
-            this.initializeCreateCommentForm(); 
+            this.initializeCreateCommentForm();
          }
-      }, 
+      },
+      
+      /**
+       * Called by a bubble event to set whether the user is allowed to comment.
+       */
+      onSetCanCreateComment: function CommentList_onSetCanCreateComment(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.canCreateComment !== null))
+         {
+            this.options.canCreateComment = obj.canCreateComment;
+            this.initializeCreateCommentForm();
+         }
+      },
       
       /**
        * Initializes the create comment form.
        */
       initializeCreateCommentForm: function CreateComment_initializeCreateCommentForm()
       {
+         // only continue if the user is allowed to create a comment
+         if (! this.options.canCreateComment)
+         {
+            return;
+         }
+         
+         // return if we have already been initialized
+         if (this.initialized)
+         {
+            return;
+         }
+         this.initialized = true;
+         
+          
          // action url
          var form = Dom.get(this.id + '-form');         
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{nodeRef}/comments",

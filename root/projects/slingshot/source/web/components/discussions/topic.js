@@ -186,7 +186,7 @@
          Alfresco.util.tags.registerTagActionHandler(this);
           
          // initialize the mouse over listener
-         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onTopicElementMouseEntered, this.onTopicElementMouseExited);
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onTopicElementMouseEntered, this.onTopicElementMouseExited, this);
           
          // load the topic data
          this._loadTopicData();
@@ -651,6 +651,13 @@
        */
       onTopicElementMouseEntered: function DiscussionsTopicList_onTopicElementMouseEntered(layer, args)
       {
+         // make sure the user sees at least one action, otherwise we won't highlight
+         var permissions = this.topicData.permissions;
+         if (! (permissions.edit || permissions["delete"]))
+         {
+            return;
+         } 
+         
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );

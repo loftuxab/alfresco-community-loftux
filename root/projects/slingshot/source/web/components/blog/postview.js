@@ -167,7 +167,7 @@
          Alfresco.util.tags.registerTagActionHandler(this);
           
          // initialize the mouse over listener
-         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onPostElementMouseEntered, this.onPostElementMouseExited);
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onPostElementMouseEntered, this.onPostElementMouseExited, this);
           
          // load the post data
          this._loadBlogPostData();
@@ -454,7 +454,7 @@
             {
                action : "publish"
             },
-            successMessage: this._msg("message.publishedExternal.success"),
+            successMessage: this._msg("message.publishExternal.success"),
             successCallback:
             {
                fn: onPublishedSuccess,
@@ -550,6 +550,13 @@
       /** Called when the mouse enters into a list item. */
       onPostElementMouseEntered: function BlogPostView_onListElementMouseEntered(layer, args)
       {
+         // make sure the user sees at least one action, otherwise we won't highlight
+         var permissions = this.blogPostData.permissions;
+         if (! (permissions.edit || permissions["delete"]))
+         {
+            return;
+         }
+          
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
