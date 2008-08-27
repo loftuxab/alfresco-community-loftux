@@ -3,3 +3,5 @@
 <script type="text/javascript" src="${page.url.context}/components/dashlets/my-sites.js"></script>
 <link rel="stylesheet" type="text/css" href="${page.url.context}/modules/create-site.css"/>
 <script type="text/javascript" src="${page.url.context}/modules/create-site.js"></script>
+<link rel="stylesheet" type="text/css" href="${page.url.context}/modules/delete-site.css"/>
+<script type="text/javascript" src="${page.url.context}/modules/delete-site.js"></script>

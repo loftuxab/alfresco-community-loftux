@@ -244,17 +244,7 @@
        */
       showConfig: {},
 
-      /**
-       * Since is YAHOO.widget.DataTable.MSG_EMPTY is global and can't be set
-       * on an individual datatable it is stored here. When the uploader closes
-       * YAHOO.widget.DataTable.MSG_EMPTY will be set with it's previous value.
-       *
-       * @property previousFileListEmptyMessage
-       * @type string
-       */
-      previousFileListEmptyMessage: null,
-
-      /**
+     /**
        * THe "Upload file(s)" button should only be visible when all selected
        * files have been added to the datatable and datasource.
        * noOfUnrenderedRows keeps track of how many of of the added files that
@@ -427,9 +417,6 @@
        */
       show: function FU_show(config)
       {
-         // Remember the the label used by other components so we can reset it at close
-         this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
-
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
          if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
@@ -626,11 +613,11 @@
          var fileInfo = this.fileStore[flashId];
 
          // Set percentage
-         var STATE_FINISHED = event["bytesLoaded"] / event["bytesTotal"];
-         fileInfo.progressPercentage["innerHTML"] = Math.round(STATE_FINISHED * 100) + "%";
+         var percentage = event["bytesLoaded"] / event["bytesTotal"];
+         fileInfo.progressPercentage["innerHTML"] = Math.round(percentage * 100) + "%";
 
          // Set progress position
-         var left = (-400 + (STATE_FINISHED * 400));
+         var left = (-400 + (percentage * 400));
          YAHOO.util.Dom.setStyle(fileInfo.progress, "left", left + "px");
       },
 
@@ -665,7 +652,7 @@
          var fileInfo = this.fileStore[event["id"]];
          fileInfo.state = this.STATE_SUCCESS;
          fileInfo.fileButton.set("disabled", true);
-         
+
          // Extract the nodeRef from the JSON response
          var json = Alfresco.util.parseJSON(event.data);
          if (json)
@@ -903,9 +890,6 @@
                YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
             }
          }
-
-         // Reset the message for empty datatables for other components
-         YAHOO.widget.DataTable.MSG_EMPTY = this.previousFileListEmptyMessage;
 
          // Hide the panel
          this.panel.hide();
@@ -1197,7 +1181,6 @@
           */
          YAHOO.widget.DataTable._bStylesheetFallback = !!YAHOO.env.ua.ie;
          var dataTableDiv = Dom.get(this.id + "-filelist-table");
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("label.noFiles", this.name);
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
             scrollable: true,
@@ -1235,6 +1218,8 @@
 
          // Show the upload panel
          this.panel.show();
+                  
+         this.dataTable.showTableMessage(Alfresco.util.message("label.noFiles", this.name), "fileUploadTableMessage");
       },
 
       /**
