@@ -1,5 +1,5 @@
 <webscript>
-   <shortname>Getting Started Dashlet</shortname>
+   <shortname>Getting Started</shortname>
    <description>Displays a welcome note to the user</description>
    <family>user-dashlet</family>
    <url>/components/dashlets/user-welcome</url>

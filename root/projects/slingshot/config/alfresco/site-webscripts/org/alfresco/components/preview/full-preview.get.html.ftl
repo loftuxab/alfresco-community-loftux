@@ -19,7 +19,7 @@ new Alfresco.FullPreview("${args.htmlid}").setOptions({
          <div class="close">
             <input id="${args.htmlid}-close-button" type="button" value="${msg("button.close")}" />
          </div>
-         <div class="controls">
+         <div id="${args.htmlid}-controls-div" class="controls" style="visibility: hidden;">
             <input id="${args.htmlid}-previous-button" type="button" value="${msg("button.previous")}" />
             <span  id="${args.htmlid}-currentFrame-span">${msg("label.currentFrame")}</span>
             <input id="${args.htmlid}-next-button" type="button" value="${msg("button.next")}" />

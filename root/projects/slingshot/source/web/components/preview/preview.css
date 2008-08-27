@@ -19,6 +19,16 @@ div.preview .hd
    padding-bottom: 1em;
 }
 
+div.preview .hd .title
+{
+   float: left;   
+}
+
+div.preview .hd .fullscreen
+{
+   float: right;
+}
+
 div.preview img,
 div.preview span,
 div.preview input
@@ -32,7 +42,7 @@ div.preview input
 }
 
 div.preview .bd,
-div.preview .ft
+div.preview .controls
 {
    text-align: center;
 }
@@ -48,9 +58,9 @@ div.preview .bd .preview-swf div
    padding-top: 20em;
 }
 
-div.preview .ft
+div.preview .controls
 {
    height: 2em;
    line-height: 2em;
-   padding-top: 1em;
+   padding-bottom: 1em;
 }
