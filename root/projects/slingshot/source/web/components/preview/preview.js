@@ -239,7 +239,7 @@
             else
             {
                // Cant find a preview
-               var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "?a=true/"; 
+               var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true"; 
                var message = Alfresco.util.message("label.noPreview", this.name, {"0": url});
                this.widgets.swfPlayerMessage["innerHTML"] = message;
             }
