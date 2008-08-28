@@ -64,9 +64,9 @@
          var saveButtonId = this.id + "-save-button";
          var saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
 
-      	var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancel,
+      	var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", null,
       	{
-      		type: "push"
+      		type: "link"
       	});
       	
          // Create the form that does the validation/submit
@@ -134,20 +134,7 @@
 	   
          // Redirect to the page that has just been created
          window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + name;
-	   },
-	   
-      /**
-   	 * Fired when the user decides not to delete a page.
-   	 * Hides the confirmation dialog.
-   	 *
-   	 * @method onCancel
-   	 * @param e {object} DomEvent
-   	 */
-	   onCancel: function(e)
-	   {
-	   },
-	   
-
+	   }
    };
       
 })();      
