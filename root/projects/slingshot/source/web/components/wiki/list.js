@@ -63,6 +63,36 @@
              div.innerHTML = this.$parser.parse(div.innerHTML);
           }
           
+          YAHOO.Bubbling.addDefaultAction('delete-link', function(layer, args)
+          {
+             var href = args[1].target;
+             if (href)
+             {
+                var title;
+                // Search for the "alt" attribute as that has the page title
+                var node;
+                for (var i=0; i < href.attributes.length; i++)
+                {
+                   node = href.attributes[i];
+                   if (node.nodeName.toLowerCase() === 'title')
+                   {
+                      title = node.nodeValue;
+                      break; 
+                   }
+                }
+                
+                if (title)
+                {
+                   // Trigger the delete dialog in the toolbar
+                   YAHOO.Bubbling.fire('deletePage', {
+                      title: title
+                   });
+                }
+             }
+             
+             return true;
+          });          
+          
           YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this);
        },
        
