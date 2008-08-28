@@ -133,7 +133,7 @@
                         var id = event.target.id;
                         var site = sites[new Number(id.substring(id.lastIndexOf("-") + 1))];
 
-                        // Fin the site through the index and display the delete dialog for the site
+                        // Find the site through the index and display the delete dialog for the site
                         Alfresco.module.getDeleteSiteInstance().show({site: site});
                      },
                      this, true);
