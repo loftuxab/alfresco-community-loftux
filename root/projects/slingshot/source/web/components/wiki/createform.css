@@ -1,3 +1,21 @@
+.wikipage {
+   margin: 4px;
+/*   border: thin solid #000; */
+   padding: 4px;
+   background-color: #FAFAFA;
+}
+
+.wikipage .label
+{
+   display: block;
+   float: left;
+   padding-right: 0.8em;
+   padding-top: 0.3em;
+   width: 10em;
+   text-align: right;
+   font-weight: bold;
+}
+
 .wikipage-header {
   width: auto;
   height: 30px;
@@ -24,3 +42,21 @@
   background: transparent url(../images/back-arrow.png) no-repeat scroll 3px 3px;
   padding: 0 5px 0 19px;
 }
+
+.wikipage input, wikipage textarea {
+  margin-bottom: 15px;
+}
+.wikipage .yui-editor-container {
+  margin: 0px 0px 10px 145px;
+}
+
+.wikipage .formAction {
+   margin-left: 145px;
+}
+
+/* Tag lib */
+.wikipage .taglibrary {
+  margin-bottom : 10px;
+  margin-left : 145px;	
+}
+
