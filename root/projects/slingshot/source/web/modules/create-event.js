@@ -1,3 +1,7 @@
+// Ensure namespaces exist
+Alfresco.module.event =  Alfresco.module.event || {}; 
+Alfresco.module.event.validation = Alfresco.module.event.validation || {};
+
 /**
  * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
@@ -169,6 +173,7 @@
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
+         eventForm.addValidation(this.id + "-tags", Alfresco.module.event.validation.tags, null, "keyup");
          
          var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"];
          for (var i=0; i < dateElements.length; i++)
@@ -460,6 +465,32 @@
 	  	}
    };
 })();
+
+/**
+ * Tags entry field validation handler, tests that the given field's value is a valid.
+ * This is identical to the test for the name for a node in the repository minus the requirement
+ * that there must not be any white space; tags are separated by white space.
+ *
+ * @method nodeName
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.module.event.validation.tags = function mandatory(field, args, event, form, silent)
+{
+   if (!args)
+   {
+      args = {};
+   }
+
+   args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/;
+   args.match = false;
+
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent); 
+};
 
 /* Dummy instance to load optional YUI components early */
 new Alfresco.module.AddEvent(null);
