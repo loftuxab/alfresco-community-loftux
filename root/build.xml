@@ -569,6 +569,12 @@
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.slingshot.yui}"
              dest="${dir.deploy.tomcat.application.slingshot}" />
+
+      <!-- Copy our yui directory to apply YUI fixes -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/yui" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.slingshot.src.web}/yui" />
+      </copy>
+
    </target>
    
    <target name="deploy-dynamicwebsite-tomcat" depends="init" 

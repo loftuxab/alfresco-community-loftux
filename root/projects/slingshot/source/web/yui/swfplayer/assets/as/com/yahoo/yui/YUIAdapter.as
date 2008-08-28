@@ -1,97 +1,202 @@
 package com.yahoo.yui
 {
-    import flash.display.*;
-    import flash.errors.*;
-    import flash.events.*;
-    import flash.external.*;
-    import flash.system.*;
+	import flash.display.Sprite;
+	import flash.display.StageAlign;
+	import flash.display.StageScaleMode;
+	import flash.display.DisplayObject;
+	import flash.errors.IOError;
+	import flash.events.Event;
+	import flash.external.ExternalInterface;
+	import flash.system.Security;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
+	import flash.text.TextFormat;
 
-    public class YUIAdapter extends Sprite
-    {
-        protected var elementID:String;
-        protected var javaScriptEventHandler:String;
-        private var _component:DisplayObject;
+	public class YUIAdapter extends Sprite
+	{
+		
+	//--------------------------------------
+	//  Constructor
+	//--------------------------------------
+	
+		/**
+		 * Constructor.
+		 */
+		public function YUIAdapter()
+		{
+			super();
+			
+			this._errorText = new TextField();
+			this._errorText.defaultTextFormat = new TextFormat("_sans", 10, 0xff0000);
+			this._errorText.wordWrap = true;
+			this._errorText.autoSize = TextFieldAutoSize.LEFT;
+			this._errorText.selectable = false;
+			this._errorText.mouseEnabled = false;
+			this.addChild(this._errorText);
+			
+			this.addEventListener(Event.ADDED, addedHandler);
+			
+			if(this.stage)
+			{
+				this.stage.addEventListener(Event.RESIZE, stageResizeHandler);
+				this.stage.scaleMode = StageScaleMode.NO_SCALE;
+				this.stage.align = StageAlign.TOP_LEFT;
+			}
+			
+			if(ExternalInterface.available)
+			{
+				this.initializeComponent();
+			
+				var swfReady:Object = {type: "swfReady"};
+				this.dispatchEventToJavaScript(swfReady);
+			}
+			else
+			{
+				throw new IOError("Flash YUIComponent cannot communicate with JavaScript content.");
+			}
+		}
+		
+	//--------------------------------------
+	//  Properties
+	//--------------------------------------
+	
+		/**
+		 * The element id that references the SWF in the HTML.
+		 */
+		protected var elementID:String;
+		
+		/**
+		 * The globally accessible JavaScript function that accepts events through ExternalInterface.
+		 */
+		protected var javaScriptEventHandler:String;
+		
+		/**
+		 * The reference to the Flash component.
+		 */
+		private var _component:DisplayObject;
+		
+		/**
+		 * @private
+		 */
+		protected function get component():DisplayObject
+		{
+			return this._component;
+		}
+		
+		/**
+		 * @private
+		 */
+		protected function set component(value:DisplayObject):void
+		{
+			this._component = value;
+			this.refreshComponentSize();
+		}
+		
+		/**
+		 * @private
+		 * For errors that cannot be passed to JavaScript.
+		 * (ONLY SecurityErrors when ExternalInterface is not available!)
+		 */
+		private var _errorText:TextField;
+		
+	//--------------------------------------
+	//  Protected Methods
+	//--------------------------------------
+		
+		/**
+		 * To be overridden by subclasses to add ExternalInterface callbacks.
+		 */
+		protected function initializeComponent():void
+		{
+			this.elementID = this.loaderInfo.parameters["elementID"];
+			this.javaScriptEventHandler = this.loaderInfo.parameters["eventHandler"];
+			
+			var allowedDomain:String = this.loaderInfo.parameters["allowedDomain"];
+			if(allowedDomain)
+			{
+				Security.allowDomain(allowedDomain);
+				this.log("allowing: " + allowedDomain);
+			}
+		}
+		
+		/**
+		 * Sends a log message to the YUI Logger.
+		 */
+		protected function log(message:Object, category:String = null):void
+		{
+			if(message == null) message = "";
+			this.dispatchEventToJavaScript({type: "log", message: message.toString(), category: category});
+		}
+		
+		protected function showFatalError(message:Object):void
+		{
+			if(!message) message = "";
+			if(this._errorText)
+			{
+				this._errorText.appendText(message.toString());
+				//scroll to the new error if needed
+				this._errorText.scrollV = this._errorText.maxScrollV;
+				this._errorText.mouseEnabled = true;
+				this._errorText.selectable = true;
+			}
+		}
+		
+		/**
+		 * @private
+		 *
+		 * Dispatches an event object to the JavaScript wrapper element.
+		 */
+		protected function dispatchEventToJavaScript(event:Object):void
+		{
+			try
+			{
+				ExternalInterface.call(this.javaScriptEventHandler, this.elementID, event);
+			}
+			catch(error:SecurityError)
+			{
+				this.showFatalError("Warning: Cannot establish communication between YUI Charts and JavaScript. YUI Charts must be served from HTTP and cannot be viewed locally with file:/// protocol unless location is trusted by Flash Player.\n\nFor more information see:\nhttp://www.adobe.com/products/flashplayer/articles/localcontent/\n\n");
+			}
+		}
 
-        public function YUIAdapter()
-        {
-            var _loc_1:Object;
-            this.stage.addEventListener(Event.RESIZE, stageResizeHandler);
-            this.stage.scaleMode = StageScaleMode.NO_SCALE;
-            this.stage.align = StageAlign.TOP_LEFT;
-            if (ExternalInterface.available)
-            {
-                this.initializeComponent();
-                _loc_1 = {type:"swfReady"};
-                this.dispatchEventToJavaScript(_loc_1);
-            }
-            else
-            {
-                throw new IOError("Flash YUIComponent cannot communicate with JavaScript content.");
-            }// end else if
-            return;
-        }// end function
-
-        protected function set component(param1:DisplayObject) : void
-        {
-            this._component = param1;
-            this.refreshComponentSize();
-            return;
-        }// end function
-
-        protected function log(param1:Object, param2:String = null) : void
-        {
-            if (param1 == null)
-            {
-                param1 = "";
-            }// end if
-            this.dispatchEventToJavaScript({type:"log", message:param1.toString(), category:param2});
-            return;
-        }// end function
-
-        protected function initializeComponent() : void
-        {
-            var _loc_1:String;
-            this.elementID = this.loaderInfo.parameters["elementID"];
-            this.javaScriptEventHandler = this.loaderInfo.parameters["eventHandler"];
-            _loc_1 = this.loaderInfo.parameters["allowedDomain"];
-            if (_loc_1)
-            {
-                Security.allowDomain(_loc_1);
-                this.log("allowing: " + _loc_1);
-            }// end if
-            return;
-        }// end function
-
-        protected function refreshComponentSize() : void
-        {
-            if (this.component)
-            {
-                var _loc_1:int;
-                this.component.y = 0;
-                this.component.x = _loc_1;
-                this.component.width = this.stage.stageWidth;
-                this.component.height = this.stage.stageHeight;
-            }// end if
-            return;
-        }// end function
-
-        protected function stageResizeHandler(param1:Event) : void
-        {
-            this.refreshComponentSize();
-            this.log("resize (width: " + this.stage.stageWidth + ", height: " + this.stage.stageHeight + ")", LoggerCategory.INFO);
-            return;
-        }// end function
-
-        protected function dispatchEventToJavaScript(param1:Object) : void
-        {
-            ExternalInterface.call(this.javaScriptEventHandler, this.elementID, param1);
-            return;
-        }// end function
-
-        protected function get component() : DisplayObject
-        {
-            return this._component;
-        }// end function
-
-    }
+		/**
+		 * @private
+		 * 
+		 * The size of the SWF/stage is dependant on the container it is in.
+		 * The visual component will resize to match the stage size.
+		 */
+		protected function stageResizeHandler(event:Event):void
+		{
+			this.refreshComponentSize();
+			
+			if(this._errorText)
+			{
+				this._errorText.width = this.stage.stageWidth;
+				this._errorText.height = this.stage.stageHeight;
+			}
+			
+			this.log("resize (width: " + this.stage.stageWidth + ", height: " + this.stage.stageHeight + ")", LoggerCategory.INFO);
+		}
+		
+		/**
+		 * @private
+		 */
+		protected function refreshComponentSize():void
+		{
+			if(this.component)
+			{
+				this.component.x = this.component.y = 0;
+				this.component.width = this.stage.stageWidth;
+				this.component.height = this.stage.stageHeight;
+			}
+		}
+		
+		/**
+		 * @private
+		 * ensures that errorText is always on top!
+		 */
+		protected function addedHandler(event:Event):void
+		{
+			this.setChildIndex(this._errorText, this.numChildren - 1);
+		}
+	}
 }

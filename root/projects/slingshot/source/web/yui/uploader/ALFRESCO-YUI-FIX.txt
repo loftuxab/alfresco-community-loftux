@@ -1,0 +1,34 @@
+Alfresco FIXES:
+
+----------------------------------------
+
+FIX1: FLASH MOVIES MUST BE TRANSPARENT
+
+Description:
+
+There is no way to pass in param "wmode" as "transparent" to the FlashAdapter class in YUI.
+This must be done since flash will otherwise always be on top of the z-index stack.
+That would make popups only be partly displayed if a flashmovie was in the way.
+
+Affected files:
+
+uploader-exprimental.js
+uploader-exprimental-min.js
+uploader-exprimental-debug.js
+
+---------------------------------------
+
+FIX2: FILES WITH 0B IN SIZE
+
+Description:
+
+If a file (or one of several files) is selected that has 0b in size, an error is thrown.
+YUI did not catch this so therefore NO files was communicated to the javascript.
+Now its catche and all files including the one with 0b in size will be sent to javascript.
+Since this file cant be uploaded the javascript should inform the user about this.
+
+Affected files:
+
+Uploader.as - NOTE! Look in web/yui/swfplayer/assets/as/Uploader.as for the new source code.
+
+---------------------------------------
