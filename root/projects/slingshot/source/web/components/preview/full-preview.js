@@ -246,7 +246,7 @@
                   Dom.setStyle(swfPlayerDiv, "height", Dom.getViewportHeight() - 100 + "px");
 
                   // Create and save a reference to the swfPlayer so we can call it later
-                  this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#DCDCDC"});
+                  this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", null, {wmode: "transparent"});
                   this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
                   this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
                   this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);

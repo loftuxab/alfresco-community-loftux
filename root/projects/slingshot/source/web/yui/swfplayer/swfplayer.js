@@ -8,9 +8,9 @@
  * @constructor
  * @param containerId {HTMLElement} Container element for the Flash Player instance.
  */
-YAHOO.widget.SWFPlayer = function(containerId, attributes)
+YAHOO.widget.SWFPlayer = function(containerId, attributes, params)
 {
-   YAHOO.widget.SWFPlayer.superclass.constructor.call(this, YAHOO.widget.SWFPlayer.SWFURL, containerId, attributes);
+   YAHOO.widget.SWFPlayer.superclass.constructor.call(this, YAHOO.widget.SWFPlayer.SWFURL, containerId, attributes, params);
 
    /**
     * Fires when if problems occur with the swf the user wanted to load.  

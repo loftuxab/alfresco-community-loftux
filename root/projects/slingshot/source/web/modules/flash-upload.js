@@ -570,8 +570,17 @@
             var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
-               this.noOfUnrenderedRows++;
-               this.dataTable.addRow(data, 0);
+               if(data.size == 0)
+               {
+                  Alfresco.util.PopupManager.displayMessage({
+                     text: Alfresco.util.message("message.zeroByteFileSelected", this.name, {"0": data.name})
+                  });
+               }
+               else
+               {
+                  this.noOfUnrenderedRows++;
+                  this.dataTable.addRow(data, 0);                  
+               }
             }
          }
       },
