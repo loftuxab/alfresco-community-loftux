@@ -13,4 +13,17 @@ div.separator
 {
    padding: 0 5px;
    text-align: center;
+   margin-top: 5px;
+}
+
+.toolbar .ical-feed
+{
+   margin-top: 5px;
+}
+
+.toolbar .ical-feed a
+{
+   background-image: url(../images/feed-icon-16-blue.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
 }
