@@ -248,11 +248,12 @@
        */
       onTagRefresh: function DLTg_onRefresh(layer, args)
       {
-         var timestamp = new Date().getTime();
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/site/{site}/{container}/tagscopetags?d=" + timestamp + "&topN=" + this.options.numTags,
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&tn={tn}",
          {
             site: this.options.siteId,
-            container: this.options.containerId
+            container: this.options.containerId,
+            d: new Date().getTime(),
+            tn: this.options.numTags
          });
          
          Alfresco.util.Ajax.request(

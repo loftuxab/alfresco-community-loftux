@@ -116,8 +116,12 @@
        */
       onTagRefresh: function TagComponent_onRefresh(e)
       {
-         var timestamp = new Date().getTime();
-         var uri = "api/site/" + this.options.siteId + "/" + this.options.container + "/tagscopetags?d=" + timestamp;
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}",
+         {
+            site: this.options.siteId,
+            container: this.options.container,
+            d: new Date().getTime()
+         });
          
          Alfresco.util.Ajax.request({
             method: Alfresco.util.Ajax.GET,

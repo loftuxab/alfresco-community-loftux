@@ -324,9 +324,12 @@
       onPopularTagsLinkClicked: function TagLibrary_onPopularTagsLinkClicked(e, obj)
       {
          // load the popular tags through an ajax call
-         // make an ajax request to delete the topic
-         var url = Alfresco.constants.PROXY_URI + "api/site/" + this.options.siteId +
-                   "/tagscopetags?topN=" + this.options.topN;
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/tags?d={d}&tn={tn}",
+         {
+            site: this.options.siteId,
+            d: new Date().getTime(),
+            tn: this.options.topN
+         });
          Alfresco.util.Ajax.request(
          {
             url: url,

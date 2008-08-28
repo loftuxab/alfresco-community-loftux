@@ -2,7 +2,7 @@
 
 function getTags(site, container)
 {
-    var url = "/api/site/" + site + "/" + container + "/tagscopetags";
+    var url = "/api/tagscopes/site/" + site + "/" + container + "/tags";
     var data = doGetCall(url);
     if (data === null)
     {
