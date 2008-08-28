@@ -15,21 +15,7 @@
          
    </div>
    <div id="${args.htmlid}-rssFeed" class="rss-feed"><a href="${url.context}/proxy/alfresco/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">RSS feed</a></div>
-<#--
-   <div id="${args.htmlid}-createpanel">
-      <div class="hd">${msg("panel.create.title")}</div>
-      <div class="bd">
-         <form id="${args.htmlid}-addPageForm" method="get" action="${url.context}/page/site/${page.url.templateArgs["site"]}/wiki-page">
-            <fieldset>
-               <input type="hidden" id="${args.htmlid}-title" name="title"/>
-               <input type="text" id="${args.htmlid}-pagetitle" name="pagetitle" value="" size="30"/>
-               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}"/>
-            </fieldset>
-         </form>
-      </div>
-      <div class="ft">${msg("panel.create.footer")}</div>
-   </div>
--->
+   
    <div id="${args.htmlid}-renamepanel">
         <div class="hd">${msg("panel.rename.title")}</div>
         <div class="bd">

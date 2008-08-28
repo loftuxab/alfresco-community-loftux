@@ -140,6 +140,27 @@
          });        
 	      renameForm.setSubmitAsJSON(true);
 	      renameForm.init();
+	      
+	      // Listen for when an event has been updated
+		   YAHOO.Bubbling.on("deletePage", this.onDeletePage, this);
+	   },
+
+	   /**
+		 * Kicks off a page delete confirmation dialog.
+		 * Fired when a delete link is clicked - 
+		 * primarily the "delete" link on the listing page.
+		 *
+		 * @method onDeletePage
+		 * @param e {object} DomEvent
+		 */	   
+	   onDeletePage: function(e, args)
+	   {
+	      var title = args[1].title;
+	      if (title)
+	      {
+	         this.title = title;
+	         this.deleteDialog.show();
+	      }
 	   },
 	   
 	   /**
@@ -151,10 +172,6 @@
 		 */
 	   onConfirm: function(e)
 	   {
-	      var params = {
-	         "context": Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(this.title)
-	      };
-	      
 	      Alfresco.util.Ajax.request(
    		{
    		   method: Alfresco.util.Ajax.DELETE,
