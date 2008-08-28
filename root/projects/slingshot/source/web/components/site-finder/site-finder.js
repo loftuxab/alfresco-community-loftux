@@ -63,7 +63,9 @@
 
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
-   
+
+      YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
+
       return this;
    }
    
@@ -386,7 +388,12 @@
                if (isPublic)
                {
                   var shortName = oRecord.getData("shortName");
+                  var title = oRecord.getData("title");
                   var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
+                  if (shortName in me.memberOfSites)
+                  {
+                     action = '<span id="' + me.id + '-deleteButton-' + shortName + '"></span>&nbsp;' + action;
+                  }
                   elCell.innerHTML = action;
                   
                   // create button
@@ -399,6 +406,15 @@
                   // otherwise show join button
                   if (shortName in me.memberOfSites)
                   {
+                     // delete site button
+                     var deleteButton = new YAHOO.widget.Button(
+                     {
+                         container: me.id + '-deleteButton-' + shortName
+                     });
+                     deleteButton.set("label", Alfresco.util.message("site-finder.delete", "Alfresco.SiteFinder"));
+                     deleteButton.set("onclick", { fn: me.doDelete, obj: {shortName: shortName, title: title}, scope: me});
+
+                     // leave button
                      button.set("label", Alfresco.util.message("site-finder.leave", "Alfresco.SiteFinder"));
                      button.set("onclick", { fn: me.doLeave, obj: shortName, scope: me});
                   }
@@ -585,7 +601,20 @@
          // redo the search again to get updated info
          this.doSearch();
       },
-      
+
+
+      /**
+       * Delete event handler
+       *
+       * @method doDelete
+       * @param event {object} The event object
+       * @param site {object} An object literal of the site to delete
+       */
+      doDelete: function SiteFinder_doDelete(event, site)
+      {
+         Alfresco.module.getDeleteSiteInstance().show({site: site});
+      },
+
       /**
        * Resets the YUI DataTable errors to our custom messages
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
@@ -666,6 +695,38 @@
          });
 
          return params;
+      },
+
+
+      /**
+       * Fired any another component, DeleteSite, to let other components know
+       * that a site has been deleted.
+       * Performs the search again.
+       *
+       * @method onSiteDeleted
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
+       */
+      onSiteDeleted: function CS_onSiteDeleted(layer, args)
+      {
+         this.searchTerm = Dom.get(this.id + "-term").value;
+         this._performSearch(this.searchTerm);
+
+         /*
+         var site = args[1].site;
+         var rs = this.widgets.dataTable.getRecordSet();
+         var length = rs.getLength();
+         for (var i = 0; i < length; i++)
+         {
+            var record = rs.getRecord(i);
+            if(record.getData("shortName") == site.shortName)
+            {
+               var index = rs.getRecordIndex(record);
+               rs.deleteRecord(index);
+            }
+         }
+          */
       }
+
    };
 })();
