@@ -36,7 +36,7 @@
       
       <div class="formAction">
          <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
-	      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
+         <a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki" id="${args.htmlid}-cancel-button">${msg("button.cancel")}</a>
       </div>
       </form>
 </div>
