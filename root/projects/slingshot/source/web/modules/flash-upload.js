@@ -536,7 +536,7 @@
        * Fired by YUI:s DataTable when a row has been added to the data table list.
        * Keeps track of added files.
        *
-       * @method onReady
+       * @method onRowAddEvent
        * @param event {object} a DataTable "rowAdd" event
        */
       onRowAddEvent: function FU_onRowAddEvent(event)
@@ -549,6 +549,22 @@
          if (this.noOfUnrenderedRows === 0)
          {
             this.widgets.uploadButton.set("disabled", false);
+         }
+      },
+
+
+      /**
+       * Fired by YUI:s DataTable when a row has been added to the data table list.
+       * Keeps track of added files.
+       *
+       * @method onRowDeleteEvent
+       * @param event {object} a DataTable "rowDelete" event
+       */
+      onRowDeleteEvent: function FU_onRowDeleteEvent(event)
+      {
+         if (this.dataTable.getRecordSet().getLength() === 0)
+         {
+            this.dataTable.showTableMessage(Alfresco.util.message("label.noFiles", this.name), "fileUploadTableMessage");            
          }
       },
 
@@ -1198,6 +1214,8 @@
             renderLoopSize: 1
          });
          this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
+         this.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
+
       },
 
       /**
