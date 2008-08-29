@@ -1,6 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.WikiCreateForm("${args.htmlid}").setSiteId(
       "${page.url.templateArgs["site"]!""}"
+   ).setMessages(
+      ${messages}
    );
 //]]></script>
 <div class="wikipage-header">
