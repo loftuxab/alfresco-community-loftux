@@ -201,18 +201,35 @@
                fn: this.onFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.savetopic.failure")
+            failureMessage: this._msg("message.savetopic.failure"),
+            failureCallback:
+            {
+               fn: this.onFormSubmitFailure,
+               scope: this
+            },
          });
          topicForm.setSubmitAsJSON(true);
          topicForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
+               // disable buttons
+               this.widgets.okButton.set("disabled", false);
+               this.widgets.cancelButton.set("disabled", false);
+                
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
                
                // update the tags set in the form
                this.modules.tagLibrary.updateForm(this.id + '-form', 'tags');
+               
+               // show a wait message
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message(this._msg("message.submitting")),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
             },
             scope: this
          }
@@ -232,6 +249,19 @@
          // the response contains the data of the created topic. redirect to the topic view page
          var url = Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, response.json.item.name);
          window.location = url;
+      },
+      
+      /**
+       * Reenables the inputs which got disabled as part of a comment submit
+       */
+      onFormSubmitFailure: function CreateComment_onFormSubmitFailure()
+      {
+         // enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+         
+         // hide message
+         this.widgets.feedbackMessage.destroy();
       },
       
       /**

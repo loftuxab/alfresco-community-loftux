@@ -1,7 +1,11 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.InvitationList("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!""}"
+      siteId: "${page.url.templateArgs.site!""}",
+      roles:
+      [
+         <#list siteRoles as siteRole>"${siteRole}"<#if siteRole_has_next>,</#if></#list>
+      ]
    }).setMessages(
       ${messages}
    );
@@ -16,9 +20,9 @@
    <div id="${args.htmlid}-invitationBar" class="invitelist-bar">
       <button id="${args.htmlid}-selectallroles-button">${msg("invitationlist.selectallroles")}</button>
       <select id="${args.htmlid}-selectallroles-menu">
-         <option value="consumer">${msg("role.siteconsumer")}</option>
-         <option value="collaborator">${msg("role.sitecollaborator")}</option>
-         <option value="manager">${msg("role.sitemanager")}</option>
+         <#list siteRoles as siteRole>
+         <option value="${siteRole}">${msg('role.' + siteRole)}</option>
+         </#list>
       </select>
    </div>
 

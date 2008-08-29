@@ -57,6 +57,7 @@
       
       // initialise prototype properties
       this.widgets = {};
+      this.listWidgets = {};
       this.buttons = [];
       this.modules = {};
       this.searchTerm = "";
@@ -112,7 +113,12 @@
           * @property currentUserRole
           * @type string
           */
-         currentUserRole: ""
+         currentUserRole: "",
+         
+         /**
+          * Holds the list of roles available in the site
+          */
+         roles: []
       },
 
       /**
@@ -121,15 +127,23 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property listWidgets
+       * @type object
+       */
+      listWidgets: null,
+ 
       /**
        * List of uninvite buttons
        * 
        * @property buttons
        * @type array
        */
-      buttons: [],
+      buttons: null,
 
       /**
        * Object container for storing module instances.
@@ -137,7 +151,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Search term used for the site search.
@@ -363,11 +377,11 @@
             desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
             if (title.length > 0)
             {
-               desc += '<div><span class="attr-name">Title:</span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
+               desc += '<div><span class="attr-name">' + me._msg('title') + ': </span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
             }
             if (organization.length > 0)
             {
-               desc += '<div><span class="attr-name">Company:</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
+               desc += '<div><span class="attr-name">' + me._msg('company') + ':</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
             }
             
             elCell.innerHTML = desc;
@@ -387,43 +401,50 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
             
+            var currentRole = oRecord.getData("role");
+            
             if (me.isCurrentUserSiteAdmin)
             {
                // create HTML for representing buttons
                var userName = oRecord.getData("userName");
-               var currentRole = oRecord.getData("role");
                elCell.innerHTML = '<span id="' + me.id + '-roleselector-' + userName + '"></span>';
                
                // create the roles menu
-               var rolesMenu = [
+               var rolesMenu = [];
+               for (var x=0; x < me.options.roles.length; x++)
+               {
+                  var role = me.options.roles[x];
+                  rolesMenu.push(
                   {
-                     text: me._msg("role.siteconsumer"), value: "SiteConsumer", onclick: {
-                        fn: me.onRoleSelect, obj: { user: userName, currentRole: currentRole, newRole: "SiteConsumer" }, 
-                        scope: me
-                     }
-                  },
-                  {
-                     text: me._msg("role.sitecollaborator"), value: "SiteCollaborator", onclick: {
-                        fn: me.onRoleSelect, obj: { user: userName, currentRole: currentRole, newRole: "SiteCollaborator" }, 
-                        scope: me
-                     }
-                  },
-                  {
-                     text: me._msg("role.sitemanager"), value: "SiteManager", onclick: {
-                        fn: me.onRoleSelect, obj: { user: userName, currentRole: currentRole, newRole: "SiteManager" }, 
+                     text: me._msg("role." + role),
+                     value: role,
+                     onclick:
+                     {
+                        fn: me.onRoleSelect,
+                        obj: {
+                           user: userName,
+                           currentRole: currentRole,
+                           newRole: role
+                        },
                         scope: me
                      }
                   }
-               ];
+                  );
+               }
                
                // create the role selector button
                var roleselector = new YAHOO.widget.Button(
                {
                   container: me.id + '-roleselector-' + userName,
                   type: "menu",
-                  label: me.getRoleLabel(oRecord),
+                  label: me._msg("role." + currentRole),
                   menu: rolesMenu
                });
+               
+               // store a reference to the role selector button
+               me.listWidgets[userName] = {
+                  roleSelector: roleselector
+               };
                
                // store the buttons
                me.buttons[userName + "-roleselector"] = { roleselector: roleselector };
@@ -431,7 +452,7 @@
             else
             {
                // output padding div so layout is not messed up due to missing buttons
-               elCell.innerHTML = '<div></div>';
+               elCell.innerHTML = '<div>' + me._msg("role." + currentRole) + '</div>';
             }
          };
          
@@ -458,7 +479,7 @@
                var button = new YAHOO.widget.Button(
                {
                    container: me.id + '-button-' + userName,
-                   label: Alfresco.util.message("site-members.uninvite", "Alfresco.SiteMembers"),
+                   label: me._msg("site-members.uninvite"),
                    onclick: { fn: me.doRemove, obj: userName, scope: me}
                });
                
@@ -489,7 +510,7 @@
          ];
 
          YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' +
-            Alfresco.util.message("site-members.enter-search-term", "Alfresco.SiteMembers") + '</span>';
+            this._msg("site-members.enter-search-term") + '</span>';
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-members", columnDefinitions, this.widgets.dataSource,
@@ -518,41 +539,13 @@
                if (oResponse.results.length == 0)
                {
                   YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' + 
-                     Alfresco.util.message("message.empty", "Alfresco.SiteMembers") + '</span>';
+                     me._msg("message.empty") + '</span>';
                }
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
             
             // Must return true to have the "Searching..." message replaced by the error message
             return true;
-         }
-      },
-      
-      /**
-       * Gets the label for the role of the given record
-       * 
-       * @method getRoleLabel
-       * @param oRecord {object}
-       * @return The display label for the role
-       */
-      getRoleLabel: function(record)
-      {
-         var roleName = "";
-         if (record.getData("role") != undefined)
-         {
-            roleName = record.getData("role");
-         }
-         
-         switch(roleName)
-         {
-            case "SiteConsumer":
-               return this._msg("role.siteconsumer");
-            case "SiteCollaborator":
-               return this._msg("role.sitecollaborator");
-            case "SiteManager":
-               return this._msg("role.sitemanager");
-            default:
-               return this._msg("role.unknown");
          }
       },
       
@@ -576,6 +569,38 @@
        */
       doRemove: function SiteMembers_doRemove(event, user)
       {
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.removing"),
+            spanClass: "wait",
+            displayTime: 0
+         });
+         
+         // request success handler
+         var success = function SiteMembers_doRemove_success(response, user)
+         {
+            // hide the wait message
+            this.widgets.feedbackMessage.destroy();
+             
+            // show popup message to confirm
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("site-members.remove-success", user)
+            });
+         
+            // remove the entry
+            var recordIndex = this.widgets.dataTable.getRecordIndex(event.target);
+            this.widgets.dataTable.deleteRow(recordIndex);
+         };
+         
+         // request failure handler
+         var failure = function SiteMembers_doRemove_failure(response)
+         {
+            // remove the message
+            this.widgets.feedbackMessage.destroy();
+         }
+          
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {
@@ -583,31 +608,17 @@
             method: "DELETE",
             successCallback:
             {
-               fn: this._removeSuccess,
+               fn: success,
                obj: user,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-members.remove-failure", "Alfresco.SiteMembers", user)
+            failureMessage: this._msg("site-members.remove-failure", user),
+            failureCallback:
+            {
+               fn: failure,
+               scope: this
+            }
          });
-      },
-      
-      /**
-       * Callback handler used when a user is successfully removed from the site
-       * 
-       * @method _removeSuccess
-       * @param response {object}
-       * @param user {object}
-       */
-      _removeSuccess: function SiteMembers__removeSuccess(response, user)
-      {
-         // show popup message to confirm
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: Alfresco.util.message("site-members.remove-success", "Alfresco.SiteMembers", user)
-         });
-         
-         // redo the search again to get updated info
-         this.doSearch();
       },
       
       /**
@@ -617,8 +628,45 @@
        */
       onRoleSelect: function SiteMembers_onRoleSelect(type, event, args)
       {
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.changingrole"),
+            spanClass: "wait",
+            displayTime: 0
+         });
+         
+         // request success handler
+         var success = function SiteMembers_onRoleSelect_success(response, userRole)
+         {
+            // hide the wait message
+            this.widgets.feedbackMessage.destroy();
+            
+            // show popup message to confirm
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("site-members.change-role-success", userRole.user, userRole.role)
+            });
+
+            // update the data and table
+            var recordIndex = this.widgets.dataTable.getRecordIndex(event[0].target);
+            var data = this.widgets.dataTable.getRecord(recordIndex).getData();
+            data.role = args.newRole;
+            this.widgets.dataTable.updateRow(recordIndex, data);
+         };
+         
+         // request failure handler
+         var failure = function SiteMembers_onRoleSelect_failure(response)
+         {
+            // remove the message
+            this.widgets.feedbackMessage.destroy();
+         };
+         
+         // fetch the current and new roles to see whether we have to change the role
+         var recordIndex = this.widgets.dataTable.getRecordIndex(event[0].target);
+         var data = this.widgets.dataTable.getRecord(recordIndex).getData();
+         var currentRole = data.role;
          var selectedRole = args.newRole;
-         var currentRole = args.currentRole;
          var user = args.user;
          
          if (selectedRole !== currentRole)
@@ -638,34 +686,23 @@
                },
                successCallback:
                {
-                  fn: this._changeRoleSuccess,
-                  obj: { user: user, role: selectedRole },
+                  fn: success,
+                  obj: {
+                     user: user,
+                     role: selectedRole
+                  },
                   scope: this
                },
-               failureMessage: Alfresco.util.message("site-members.change-role-failure", "Alfresco.SiteMembers", user)
+               failureMessage: this._msg("site-members.change-role-failure", user),
+               failureCallback:
+               {
+                  fn: failure,
+                  scope: this
+               },
             });
          }
       },
-      
-      /**
-       * Callback handler used when a users role is successfully changed
-       * 
-       * @method _changeRoleSuccess
-       * @param response {object}
-       * @param userRole {object}
-       */
-      _changeRoleSuccess: function SiteMembers__changeRoleSuccess(response, userRole)
-      {
-         // show popup message to confirm
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: Alfresco.util.message("site-members.change-role-success", "Alfresco.SiteMembers", 
-                  userRole.user, userRole.role)
-         });
-         
-         // redo the search again to get updated info
-         this.doSearch();
-      },
+
       
       /**
        * Resets the YUI DataTable errors to our custom messages
@@ -692,7 +729,7 @@
          this._setDefaultDataTableErrors();
          
          // Display loading message
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-members.searching", "Alfresco.SiteMembers");
+         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("site-members.searching");
          
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());

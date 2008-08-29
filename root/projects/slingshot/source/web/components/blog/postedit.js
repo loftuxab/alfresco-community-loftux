@@ -282,7 +282,7 @@
          this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
          this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
          this.modules.tagLibrary.initialize();
-          
+         
          // add the tags that are already set on the post
          if (this.options.editMode && this.blogPostData.tags.length > 0)
          {
@@ -326,7 +326,7 @@
          }
          this.widgets.publishExternalButton = new YAHOO.widget.Button(this.id + "-publishexternal-button", {type: "button", label: publishExternalButtonLabel });
          this.widgets.publishExternalButton.subscribe("click", this.onFormPublishExternalButtonClick, this, true);         
-                  
+         
          // cancel button
          this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
@@ -353,7 +353,12 @@
                fn: this.onFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.savepost.failure")
+            failureMessage: this._msg("message.savepost.failure"),
+            failureCallback:
+            {
+               fn: this.onFormSubmitFailure,
+               scope: this
+            }
          });
          if (this.options.editMode)
          {
@@ -364,11 +369,28 @@
          {
             fn: function(form, obj)
             {
+                // disable ui elements
+               this.widgets.saveButton.set("disabled", true);
+               if (this.widgets.publishButton)
+               {
+                  this.widgets.publishButton.set("disabled", true);
+               }
+               this.widgets.publishExternalButton.set("disabled", true);
+               this.widgets.cancelButton.set("disabled", true);
+                
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
                
                // update the tags set in the form
                this.modules.tagLibrary.updateForm(this.id + "-form", "tags");
+               
+               // show a wait message
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message(this._msg("message.submitting")),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
             },
             scope: this
          }
@@ -421,11 +443,20 @@
        * Form submit success handler
        */
       onFormSubmitSuccess: function BlogPostEdit_onFormSubmitSuccess(response)
-      {          
+      {
+         // hide the wait message
+         this.widgets.feedbackMessage.destroy();
+         
          // check whether we have to do an external publich
          if (this.performExternalPublish)
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("message.postSavedNowPublish")});             
+            // show a new wait message
+            this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               text: Alfresco.util.message(this._msg("message.postSavedNowPublish")),
+               spanClass: "wait",
+               displayTime: 0
+            });
              
             //var nodeRef = response.json.item.nodeRef;    
             var postId = response.json.item.name;
@@ -448,6 +479,24 @@
       },
 
       /**
+       * Reenables the inputs which got disabled as part of a comment submit
+       */
+      onFormSubmitFailure: function BlogPostEdit_onFormSubmitFailure()
+      {
+         // enable the buttons
+         this.widgets.saveButton.set("disabled", false);
+         if (this.widgets.publishButton)
+         {
+            this.widgets.publishButton.set("disabled", false);
+         }
+         this.widgets.publishExternalButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+         
+         // hide the wait message
+         this.widgets.feedbackMessage.destroy();
+      },
+
+      /**
        * Publishes the blog post to an external blog.
        */
       onPublishExternal: function BlogPostEdit_onPublishExternal(postId)
@@ -455,9 +504,31 @@
          // publish request success handler
          var onPublished = function BlogPostEdit_onPublished(response)
          {
-            this._loadPostViewPage(response.json.item.name);
+            this._loadPostViewPage(postId);
          };
          
+         // publish request failure handler
+         var onPublishFailed = function BlogPostEdit_onPublishFailed(response)
+         {
+            // let the user know that the publish failed, then redirect to the view page
+            this.widgets.feedbackMessage.destroy();
+            var me = this;
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: this._msg("message.publishExternal.failure"),
+               buttons: [
+               {
+                  text: this._msg('button.ok'),
+                  handler: function()
+                  {
+                     me._loadPostViewPage(postId);
+                  },
+                  isDefault: true
+               }]
+            });
+            
+         };
+                  
          // get the url to call
          var url = Alfresco.util.blog.generatePublishingRestURL(this.options.siteId, this.options.containerId, postId);
          
@@ -478,7 +549,11 @@
                fn: onPublished,
                scope: this
             },
-            failureMessage: this._msg("message.publishExternal.failure")
+            failureCallback:
+            {
+               fn: onPublishFailed,
+               scope: this
+            }
          });
       },
       
@@ -490,7 +565,29 @@
          // update request success handler
          var onUpdated = function BlogPostEdit_onUpdated(response)
          {
-            this._loadPostViewPage(response.json.item.name);
+            this._loadPostViewPage(postId);
+         };
+         
+         // update request failure handler
+         var onUpdateFailed = function BlogPostEdit_onUpdateFailed(response)
+         {
+            // let the user know that the publish failed, then redirect to the view page
+            this.widgets.feedbackMessage.destroy();
+            var me = this;
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: this._msg("message.updateExternal.failure"),
+               buttons: [
+               {
+                  text: this._msg('button.ok'),
+                  handler: function()
+                  {
+                     me._loadPostViewPage(postId);
+                  },
+                  isDefault: true
+               }]
+            });
+            
          };
          
          // get the url to call
@@ -513,10 +610,13 @@
                fn: onUpdated,
                scope: this
             },
-            failureMessage: this._msg("message.updateExternal.failure")
+            failureCallback:
+            {
+               fn: onUpdateFailed,
+               scope: this
+            }
          });
       },
-      
       
       /**
        * PRIVATE FUNCTIONS

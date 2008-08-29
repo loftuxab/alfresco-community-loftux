@@ -86,6 +86,11 @@
          siteId: "",
 
          /**
+          * Title of the site
+          */
+         siteTitle: "",
+
+         /**
           * ContainerId representing root container
           *
           * @property containerId
@@ -558,7 +563,7 @@
          // update the search results field
          if (this.searchAll)
          {
-            var text = this._msg("search.searchsiteonly", this.options.siteId);
+            var text = this._msg("search.searchsiteonly", this.options.siteName);
          }
          else
          {

@@ -654,15 +654,32 @@
                   isEdit: isEdit
                }
             },
-            failureMessage: this._msg("message.savereply.failure")
+            failureMessage: this._msg("message.savereply.failure"),
+            failureCallback:
+            {
+               fn: this.onFormSubmitFailure,
+               scope: this
+            },
          });
          replyForm.setSubmitAsJSON(true);
          replyForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
+               // disable buttons
+               this.widgets.okButton.set("disabled", true);
+               this.widgets.cancelButton.set("disabled", true);
+         
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
+               
+               // show a wait message
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message(this._msg("message.submitting")),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
             },
             scope: this
          }
@@ -680,6 +697,9 @@
        */
       onFormSubmitSuccess: function TopicReplies_onFormSubmitSuccess(response, obj)
       {
+         // remove wait message
+         this.widgets.feedbackMessage.destroy();
+          
          // in case of an edit reply, simply update the data/ui
          if (obj.isEdit)
          {
@@ -728,6 +748,19 @@
          
          // finally hide the form / show the updated view in case of an edit
          this._hideOpenForms();
+      },
+
+      /**
+       * Form submit failure handler
+       */
+      onFormSubmitFailure: function TopicReplies_onFormSubmitFailure(response, obj)
+      {
+         // enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+         
+         // hide message
+         this.widgets.feedbackMessage.destroy();
       },
 
       /**

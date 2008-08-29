@@ -83,7 +83,12 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+         
+         /**
+          * Available roles for the site.
+          */
+         roles: [],
       },
 
       /**
@@ -94,14 +99,15 @@
        */
       widgets: null,
       
+      /**
+       * Object container for storing YUI widget instances used in the list cells
+       */
       listWidgets: null,
       
       /** Auto-incremented unique id for each element added to the
        * tabel.
        */
       uniqueRecordId : 1,
-      
-      actionsColumnTemplate : null,
       
       /**
        * Set multiple initialization options at once.
@@ -159,7 +165,6 @@
          });
          
          // setup the datasource
-         // fields of data are available in the RecordSet 
          this.widgets.dataSource = new YAHOO.util.DataSource( [ ] ); 
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
          this.widgets.dataSource.responseSchema = { 
@@ -169,15 +174,22 @@
          // setup of the datatable
          this._setupDataTable();
 
+         // make sure the invite button is initially disabled
          this._enableDisableInviteButton();
 
-         // Hook action events
-         // TODO: cleanup
-         Alfresco.util.myRegisterDefaultActionHandler(this.id, "remove-item-button", "span", this);
+         // Hook remove invitee action handler
+         var me = this;
+         var fnRemoveInviteeHandler = function InvitationList_fnRemoveInviteeHandler(layer, args)
+         {
+            // call the remove method
+            me.removeInvitee.call(me, args[1].anchor);
+            args[1].stop = true;
+            return true;
+         }
+         YAHOO.Bubbling.addDefaultAction("remove-item-button", fnRemoveInviteeHandler);
          
          // show the component now, this avoids painting issues of the dropdown button
          Dom.setStyle(this.id + "-invitationBar", "visibility", "visible");
-         
       },
       
       _setupDataTable: function InvitationList_setupDataTable()
@@ -212,6 +224,15 @@
             elCell.innerHTML = desc;
          };
 
+         /**
+          * Role selector datacell formatter
+          *
+          * @method renderCellRole
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
          renderCellRole = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -229,23 +250,26 @@
             Dom.setStyle(templateInstance, "display", "");
 
             // define the role dropdown menu and the event listeners
-            var rolesMenu = [
+            var rolesMenu = [];
+            for (var x=0; x < me.options.roles.length; x++)
+            {
+               var role = me.options.roles[x];
+               rolesMenu.push(
                {
-                  text: me._msg("role.siteconsumer"), value: "consumer", onclick: {
-                     fn: me.onRoleSelect, obj: { record: oRecord, role: "consumer" }, scope: me
-                  }
-               },
-               {
-                  text: me._msg("role.sitecollaborator"), value: "collaborator", onclick: {
-                     fn: me.onRoleSelect, obj: { record: oRecord, role: "collaborator" }, scope: me
-                  }
-               },
-               {
-                  text: me._msg("role.sitemanager"), value: "manager", onclick: {
-                     fn: me.onRoleSelect, obj: { record: oRecord, role: "manager" }, scope: me
+                  text: me._msg("role." + role),
+                  value: role,
+                  onclick:
+                  {
+                     fn: me.onRoleSelect,
+                     obj: {
+                        record: oRecord,
+                        role: role
+                     },
+                     scope: me
                   }
                }
-            ];
+               );
+            }
 
             // Insert the templateInstance to the column.
             cell.appendChild (templateInstance);
@@ -262,6 +286,15 @@
             me.listWidgets[id] = { button: button };
          };
 
+         /**
+          * Remove user datacell formatter
+          *
+          * @method renderCellRemoveButton
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
          renderCellRemoveButton = function InvitationList_renderCellRemoveButton(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -293,67 +326,24 @@
          });
       },
 
-
+      /**
+       * Returns the role label for a given record.
+       */
       getRoleLabel: function(record)
       {
-         var roleName = "";
          if (record.getData("role") != undefined)
          {
-            roleName = record.getData("role");
+            return this._msg('role.' + record.getData("role"));
          }
-         switch(roleName)
+         else
          {
-            case "":
-               return this._msg("invitationlist.selectrole");
-            case "consumer":
-               return this._msg("role.siteconsumer");
-            case "collaborator":
-               return this._msg("role.sitecollaborator");
-            case "manager":
-               return this._msg("role.sitemanager");
-            default:
-               return "<unknown role>";
+            return this._msg("invitationlist.selectrole");
          }
       },
       
       /**
-       * Returns the role name as expected by the rest API.
-       */
-      getRoleName: function(record)
-      {
-         var roleName = "";
-         if (record.getData("role") != undefined)
-         {
-            roleName = record.getData("role");
-         }
-         switch(roleName)
-         {
-            case "collaborator":
-               return "SiteCollaborator";
-            case "manager":
-               return "SiteManager";
-            case "consumer":
-            default:
-               return "SiteConsumer";
-         }
-      },
-      
-      /**
-       * Triggered by the InvitationList all/site only link
-       */
-      toggleInvitationListScope: function InvitationList_switchInvitationListScope()
-      {
-         var InvitationListAll = ! this.InvitationListAll;
-         // send a InvitationList bubble event to load the list
-         YAHOO.Bubbling.fire("onInvitationList",
-         {
-            InvitationListAll : InvitationListAll
-         });
-      },
-      
-      /**
-       * BubbleEvent:
-       * Called by the other components to add invitees to the list of invites
+       * Adds an invite to the list.
+       * This function is called through a bubble event
        */ 
       onAddInvite: function Invitationlist_onAddInvite(layer, args)
       {   
@@ -369,10 +359,9 @@
       },
       
       /**
-       * DefaultActionListener:
-       * Called when the user clicks on the "remove invitee" button
+       * Remove invitee action handler
        */
-      removeInvitee: function InvitationList_removeInvitee(owner, param)
+      removeInvitee: function InvitationList_removeInvitee(owner)
       {
          // find the correct row
          var recordId = this.widgets.dataTable.getRecordIndex(owner);
@@ -415,7 +404,7 @@
       {
          // set the role for the passed record
          var selectedRole = p_obj.role;
-         var x = 10; // PENDING: why does the first access to p_obj fail?!?
+         var x = 10; // strange: first access to p_obj fails
          var role = p_obj.role;
          var record = p_obj.record;
          this._setRoleForRecord(record, role);
@@ -427,6 +416,9 @@
          Event.preventDefault(domEvent);
       },
       
+      /**
+       * Implementation of set all roles functionality
+       */
       _setAllRolesImpl: function(roleName)
       {
          var recordSet = this.widgets.dataTable.getRecordSet();
@@ -469,6 +461,10 @@
          return true;
       },
       
+      /**
+       * Enables or disables the invite button.
+       * The invite button is only enabled if a role has been selected for all invitees
+       */
       _enableDisableInviteButton: function InvitationList__enableDisableInviteButton()
       {
          var enable = this.widgets.dataTable.getRecordSet().getLength() > 0 &&
@@ -489,7 +485,16 @@
             return;
          }
 
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("invitationlist.pleasewait")});
+         // disable button
+         this.widgets.inviteButton.set("disabled", true);
+
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.wait"),
+            spanClass: "wait",
+            displayTime: 0
+         });
          
          // copy over all records
          var recs = [];
@@ -505,9 +510,13 @@
              failures: []
          };
          
+         // kick off the processing
          this._processInviteData(inviteData);
       },
       
+      /**
+       * Processes the invite data.
+       */
       _processInviteData: function(inviteData)
       {   
          // check if we are already done
@@ -516,42 +525,40 @@
             this._finalizeInvites(inviteData);
             return;
          }
-         
-         // check the current entry to see what we have to do
-         var recs = inviteData.recs;
-         var currentRecord = recs[inviteData.index];
-         this._doInviteUser(inviteData);
-         /*if (currentRecord.getData('userName') != undefined)
-         {
-            // set got a username, a simply join will be enough
-            this._doJoinExistingUser(inviteData);
-         }
          else
          {
-            this._doInviteNewUser(inviteData);
-         }*/
-      },
-      
-      _finalizeInvites: function(inviteData)
-      {  
-         // remove the entries that were successful
-         for (var x=inviteData.successes.length - 1; x >= 0; x--)
-         {
-            this.widgets.dataTable.deleteRow(inviteData.successes[x]);
+            this._doInviteUser(inviteData);
          }
-         
-         // inform the user
-         var message = this._msg(this._msg("invitationlist.inviteresult"), inviteData.successes.length, inviteData.failures.length);
-         Alfresco.util.PopupManager.displayMessage({text: message });
       },
       
-      _doInviteUser: function(inviteData)
+      /**
+       * Invites one user and returns to _processInviteData on completion.
+       * 
+       * @param inviteData data about all invites including the info which invite should be processed
+       */
+      _doInviteUser: function InvitationList__doInviteUser(inviteData)
       {
+         // success handler
+         var success = function InvitationList__doInviteUser_success(response)
+         {
+            inviteData.successes.push(inviteData.index);
+            inviteData.index++;
+            this._processInviteData(inviteData);
+         };
+
+         var failure = function InvitationList__doInviteUser_failure(response)
+         {
+            inviteData.failures.push(inviteData.index);
+            inviteData.index++;
+            this._processInviteData(inviteData);
+         };
+          
          // fetch the record to process
          var record = inviteData.recs[inviteData.index];
          var firstName = record.getData('firstName');
          var lastName = record.getData('lastName');
          var email = record.getData('email');
+         var role = record.getData('role');
          
          // We have to do a backend call for each invited person
          var serverPath = window.location.protocol + "//" + window.location.host + Alfresco.constants.URL_CONTEXT;
@@ -565,112 +572,44 @@
                inviteeLastName: lastName,
                inviteeEmail: email,
                siteShortName : this.options.siteId,
-               inviteeSiteRole : this.getRoleName(record),
+               inviteeSiteRole : role,
                serverPath : serverPath,
                acceptUrl : 'page/accept-invite',
                rejectUrl : 'page/reject-invite'
             },
             successCallback:
             {
-               fn: this._successCallback,
-               obj: inviteData,
+               fn: success,
                scope: this
             },
             failureCallback:
             {
-               fn: this._failureCallback,
-               obj: inviteData,
+               fn: failure,
                scope: this
             }
          });
       },
-      
-      _doInviteNewUser: function(inviteData)
-      {
-         // fetch the record to process
-         var record = inviteData.recs[inviteData.index];
-         var firstName = record.getData('firstName');
-         var lastName = record.getData('lastName');
-         var email = record.getData('email');
-         
-         // We have to do a backend call for each invited person
-         Alfresco.util.Ajax.request(
+
+      /**
+       * Called when all invites have been processed
+       */
+      _finalizeInvites: function(inviteData)
+      {  
+         // remove the entries that were successful
+         for (var x=inviteData.successes.length - 1; x >= 0; x--)
          {
-            method: "GET",
-            url: Alfresco.constants.PROXY_URI + "api/invite/start",
-            dataObj:
-            {
-               inviteeFirstName: firstName,
-               inviteeLastName: lastName,
-               inviteeEmail: email,
-               siteShortName : this.options.siteId
-            },
-            successCallback:
-            {
-               fn: this._successCallback,
-               obj: inviteData,
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: this._failureCallback,
-               obj: inviteData,
-               scope: this
-            }
-         });
-      },
-      
-      _doJoinExistingUser: function(inviteData)
-      {
-         // fetch the record to process
-         var record = inviteData.recs[inviteData.index];
+            this.widgets.dataTable.deleteRow(inviteData.successes[x]);
+         }
          
-         var user = record.getData('userName');
-         var role = this.getRoleName(record);
-         var site = this.options.siteId;
+         // remove wait message
+         this.widgets.feedbackMessage.destroy();
          
-         // make ajax call to site service to join user
-         Alfresco.util.Ajax.jsonRequest(
-         {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
-            method: "PUT",
-            dataObj:
-            {
-               role: role,
-               person:
-               {
-                  userName: user,
-                  url: "/alfresco/service/api/people/" + encodeURIComponent(user)
-               },
-               url: "/alfresco/service/api/sites/" + site + "/memberships/" + encodeURIComponent(user)
-            },
-            successCallback:
-            {
-               fn: this._successCallback,
-               obj: inviteData,
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: this._failureCallback,
-               obj: inviteData,
-               scope: this
-            }
-         });
-      },
-      
-      _successCallback: function(response, inviteData)
-      {
-         inviteData.successes.push(inviteData.index);
-         inviteData.index++;
-         this._processInviteData(inviteData);
-      },
-      
-      _failureCallback: function(response, inviteData)
-      {
-         inviteData.failures.push(inviteData.index);
-         inviteData.index++;
-         this._processInviteData(inviteData);
+         // inform the user
+         var message = this._msg("message.inviteresult", inviteData.successes.length, inviteData.failures.length);
+         Alfresco.util.PopupManager.displayMessage({text: message });
+         
+         // re-enable invite button
+         this.widgets.inviteButton.set("disabled", false);
       },
 
       /**
@@ -688,51 +627,3 @@
 
    };
 })();
-
-
-/**
- * Register a default action handler for a given set
- * of elements described by their class name.
- * @parma handlerObject object that is used as for the method calls
- * @param className The elements to which the action should be added to
- * @param ownerTagName the owner tag name to search for. This has to be a
- *        parent element of the default action element. The id of this element is used
- *        to call the correct method. Id's should follow the form htmlid-actionname[-param]
- *        Actions methods should have the form f(htmlid, ownerId, param)
- */
-Alfresco.util.myRegisterDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
-{         
-   // Hook the tag events
-   YAHOO.Bubbling.addDefaultAction(className,
-      function TagLibrary_genericDefaultAction(layer, args)
-      {
-         var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
-         if (owner !== null)
-         {
-            // check that the html id matches, abort otherwise
-            var tmp = owner.id;
-            if (tmp.indexOf(htmlId) != 0)
-            {
-               return true;
-            }
-            var tmp = tmp.substring(htmlId.length + 1);
-            var parts = tmp.split('-');
-            if (parts.length < 1)
-            {
-               // stop here
-               return true;
-            }
-            // the first entry is the handler method to call
-            var action = parts[0];
-            if (typeof handlerObject[action] == "function")
-            {
-               // extract the param part of the id
-               var param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
-               handlerObject[action].call(handlerObject, owner, param);
-               args[1].stop = true;
-            }
-         }
-         return true;
-      }
-   );
-}

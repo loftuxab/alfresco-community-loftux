@@ -3,7 +3,11 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       currentUser: "${user.id}",
-      currentUserRole: "${currentUserRole}"
+      currentUserRole: "${currentUserRole}",
+      roles:
+      [
+         <#list siteRoles as siteRole>"${siteRole}"<#if siteRole_has_next>,</#if></#list>
+      ]
    }).setMessages(
       ${messages}
    );

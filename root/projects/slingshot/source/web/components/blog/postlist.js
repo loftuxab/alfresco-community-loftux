@@ -166,6 +166,15 @@
       tagId: null,
       
       /**
+       * Tells whether an action is currently ongoing.
+       * 
+       * @property busy
+       * @type boolean
+       * @see _setBusy/_releaseBusy
+       */
+      busy: false,
+      
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -567,7 +576,7 @@
        * Action handler for the configure blog button
        */
       onConfigureBlog: function BlogPostList_onConfigureBlog(e, p_obj)
-      {
+      {         
          // load the module if not yet done
          if (!this.modules.configblog)
          {
@@ -637,7 +646,7 @@
        * @param row {object} DataTable row representing post to be actioned
        */
       onDeleteBlogPost: function BlogPostList_onDeleteBlogPost(row)
-      {
+      {  
          var record = this.widgets.dataTable.getRecord(row);
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
@@ -729,9 +738,18 @@
        */
       _deleteBlogPostConfirm: function BlogPostList__deleteBlogPostConfirm(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+          
          // ajax request success handler
          var onDeletedSuccess = function BlogPostList_deleteBlogPostConfirm_onDeletedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // reload the table data
             this._updateBlogPostList();
          };
@@ -756,7 +774,15 @@
                fn: onDeletedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure")
+            failureMessage: this._msg("message.delete.failure"),
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  this._releaseBusy();
+               },
+               scope: this
+            }
          });
       },
       
@@ -768,9 +794,18 @@
        */
       _publishExternal: function BlogPostList__publishExternal(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+          
          // ajax call success handler
          var onPublishedSuccess = function BlogPostList_onPublishedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // reload the table data
             this._updateBlogPostList();
          };
@@ -795,7 +830,12 @@
                fn: onPublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.publishExternal.failure")
+            failureMessage: this._msg("message.publishExternal.failure"),
+            failureCallback:
+            {
+               fn: function(response) { this._releaseBusy(); },
+               scope: this
+            }
          });
       },
       
@@ -808,9 +848,18 @@
        */
       _updateExternal: function BlogPostList__updateExternal(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+          
          // ajax request success handler
          var onUpdatedSuccess = function BlogPostList_onUpdatedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+             
             // reload the table data
             this._updateBlogPostList();
          };
@@ -835,7 +884,12 @@
                fn: onUpdatedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.updateExternal.failure")
+            failureMessage: this._msg("message.updateExternal.failure"),
+            failureCallback:
+            {
+               fn: function(response) { this._releaseBusy(); },
+               scope: this
+            }
          });
       },
 
@@ -848,9 +902,18 @@
        */
       _unpublishExternal: function BlogPostList__onUnpublishExternal(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+          
          // ajax request success handler
          var onUnpublishedSuccess = function BlogPostList_onUnpublishedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+             
             // reload the table data
             this._updateBlogPostList();
          };
@@ -875,7 +938,15 @@
                fn: onUnpublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.unpublishExternal.failure")
+            failureMessage: this._msg("message.unpublishExternal.failure"),
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  this._releaseBusy();
+               },
+               scope: this
+            }
          });
       },
       
@@ -1021,6 +1092,44 @@
          this._updateBlogPostList();
       },
 
+      /**
+       * Displays the provided busyMessage but only in case
+       * the component isn't busy set.
+       * 
+       * @return true if the busy state was set, false if the component is already busy
+       */
+      _setBusy: function BlogPostList__setBusy(busyMessage)
+      {
+         if (this.busy)
+         {
+            return false;
+         }
+         this.busy = true;
+         this.widgets.busyMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: busyMessage,
+            spanClass: "wait",
+            displayTime: 0
+         });
+         return true;
+      },
+      
+      /**
+       * Removes the busy message and marks the component as non-busy
+       */
+      _releaseBusy: function BlogPostList__releaseBusy()
+      {
+         if (this.busy)
+         {
+            this.widgets.busyMessage.destroy();
+            this.busy = false;
+            return true;
+         }
+         else
+         {
+            return false;
+         }
+      },
 
       /**
        * Gets a custom message
@@ -1055,12 +1164,21 @@
        */
       _updateBlogPostList: function BlogPostList__updateBlogPostList(p_obj)
       {
+         // show busy message
+         /*if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }*/
+          
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
          
          // ajax request success handler
          var successHandler = function BlogPostList__updateBlogPostList_successHandler(sRequest, oResponse, oPayload)
          {
+            // remove busy message
+            //this._releaseBusy();
+            
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             this.updateListTitle();
          }
@@ -1068,6 +1186,9 @@
          // ajax request failure handler
          var failureHandler = function BlogPostList__updateBlogPostList_failureHandler(sRequest, oResponse)
          {
+            // remove busy message
+            //this._releaseBusy();
+            
             if (oResponse.status == 401)
             {
                // Our session has likely timed-out, so refresh to offer the login page
