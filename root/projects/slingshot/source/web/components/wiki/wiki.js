@@ -3,6 +3,11 @@
 */
 (function()
 {
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+    
 	Alfresco.Wiki = function(containerId)
    {
 	   this.name = "Alfresco.Wiki";
@@ -50,6 +55,19 @@
       setOptions: function Wiki_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
+      
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.WikiCreateForm} returns 'this' for method chaining
+       */
+      setMessages: function(obj)
+      { 
+         Alfresco.util.addMessages(obj, this.name);
          return this;
       },
 		
@@ -182,6 +200,14 @@
          {
             fn: function(form, obj)
             {
+               // Display pop-up to indicate that the page is being saved
+               var savingMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  displayTime: 0,
+                  text: '<span class="wait">' + $html(Alfresco.util.message("message.saving", this.name)) + '</span>',
+                  noEscape: true
+               });
+                  
                // Put the HTML back into the text area
                this.pageEditor.saveHTML();
                // Update the tags set in the form

@@ -3,6 +3,11 @@
 */
 (function()
 {
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+    
 	Alfresco.WikiCreateForm = function(containerId)
    {
 	   this.name = "Alfresco.WikiCreateForm";
@@ -27,17 +32,30 @@
    		this.siteId = siteId;
    		return this;
    	},
+   	
+       /**
+        * Set messages for this component.
+        *
+        * @method setMessages
+        * @param obj {object} Object literal specifying a set of messages
+        * @return {Alfresco.WikiCreateForm} returns 'this' for method chaining
+        */
+       setMessages: function(obj)
+       { 
+          Alfresco.util.addMessages(obj, this.name);
+          return this;
+       },
    		
-	   /**
-		 * Fired by YUILoaderHelper when required component script files have
-		 * been loaded into the browser.
-		 *
-		 * @method onComponentsLoaded
-		 */
-		componentsLoaded: function()
-		{
-			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
-		},
+       /**
+		  * Fired by YUILoaderHelper when required component script files have
+		  * been loaded into the browser.
+		  *
+		  * @method onComponentsLoaded
+		  */
+       componentsLoaded: function()
+       {
+          YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
+       },
 		
 		/**
    	 * Fired by YUI when parent element is available for scripting.
@@ -107,6 +125,14 @@
                title = title.replace(/\s+/g, "_");
                // Set the "action" attribute of the form based on the page title
                form.action =  Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + title;
+               
+               // Display pop-up to indicate that the page is being saved
+               var savingMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  displayTime: 0,
+                  text: '<span class="wait">' + $html(Alfresco.util.message("message.saving", this.name)) + '</span>',
+                  noEscape: true
+               });
             },
             scope: this
          }

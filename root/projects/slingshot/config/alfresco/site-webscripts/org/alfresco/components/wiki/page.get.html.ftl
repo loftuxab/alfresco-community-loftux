@@ -3,7 +3,9 @@
 	   "siteId": "${page.url.templateArgs.site}",
 	   "pageTitle": "${page.url.args["title"]!""}",
 	   "mode": "${page.url.args["action"]!"view"}"
-	});
+	}).setMessages(
+      ${messages}
+   );
 //]]></script>
 <div class="yui-g wikipage-bar">
 <div class="wikipage-header">
