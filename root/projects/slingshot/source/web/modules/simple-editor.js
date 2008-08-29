@@ -49,11 +49,8 @@ Alfresco.gutter = function(myEditor) {
                  }, 1);
                  anim.animate();
              }, this, true);
-             var warn = '';
-             if (myEditor.browser.webkit || myEditor.browser.opera) {
-                 warn = myEditor.STR_IMAGE_COPY;
-             }
-             this.gutter.setBody('<h2>Library Images</h2><div id="image_results"></div>' + warn);
+         
+             this.gutter.setBody('<h2>Library Images</h2><div id="image_results"></div>');
              this.gutter.render(document.body);
          },
          
@@ -132,7 +129,7 @@ Alfresco.util.createImageEditor = function(id, options)
       Alfresco.util.Ajax.request(
  		{
  		   method: Alfresco.util.Ajax.GET,
- 		   url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/images/site/" + options.siteId + "/documentLibrary?filter=node",
+ 		   url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/images/site/" + options.siteId + "/documentLibrary?filter=all",
  			successCallback:
  			{
  				fn: function(e) {
