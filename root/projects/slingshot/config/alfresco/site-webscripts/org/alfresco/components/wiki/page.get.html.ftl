@@ -1,8 +1,16 @@
+<!-- tags -->
+<#if result.tags?? && result.tags?size &gt; 0>
+   <#assign tags=result.tags />
+<#else>
+   <#assign tags=[] />
+</#if>
+   
 <script type="text/javascript">//<![CDATA[
 	new Alfresco.Wiki("${args.htmlid}").setOptions({
 	   "siteId": "${page.url.templateArgs.site}",
 	   "pageTitle": "${page.url.args["title"]!""}",
-	   "mode": "${page.url.args["action"]!"view"}"
+	   "mode": "${page.url.args["action"]!"view"}",
+	   "tags": [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>]
 	}).setMessages(
       ${messages}
    );
@@ -60,18 +68,11 @@
 	            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
 	            <input type="hidden" name="context" value="${pageContext?html}" />
                <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
-               <!-- tags -->
-               <#if result.tags?? && result.tags?size &gt; 0>
-                  <#assign tags=result.tags />
-               <#else>
-                  <#assign tags=[] />
-               </#if>
+              
                <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
                
                <!-- Render the tag inputs -->
-               <@taglibraryLib.renderTagInputs htmlid=args.htmlid tags=tags tagInputName="tags" />
-               <!-- Render the library component -->
-               <@taglibraryLib.renderTagLibrary htmlid=args.htmlid site=page.url.templateArgs.site tags=tags />
+               <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
                <!-- end tags -->
 			      <div>
 	               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />

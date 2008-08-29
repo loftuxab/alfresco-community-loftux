@@ -43,7 +43,8 @@
       {
          siteId: "",
          pageTitle: "",
-         mode: "view" // default is "view" mode
+         mode: "view", // default is "view" mode
+         tags: []
       },		
 
       /**
@@ -158,8 +159,13 @@
 		
 		_setupEditForm: function()
 		{
-		   this.tagLibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.module.TagLibrary");
+		   this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
+		   this.tagLibrary.setOptions({ siteId: this.options.siteId });
          this.tagLibrary.initialize();
+         if (this.options.tags.length > 0)
+         {
+            this.tagLibrary.setTags(this.options.tags);
+         }
                 
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent', {
             height: '300px',
