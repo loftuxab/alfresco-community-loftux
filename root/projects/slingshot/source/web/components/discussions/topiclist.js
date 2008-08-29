@@ -168,6 +168,15 @@
       tagId: null,
       
       /**
+       * Tells whether an action is currently ongoing.
+       * 
+       * @property busy
+       * @type boolean
+       * @see _setBusy/_releaseBusy
+       */
+      busy: false,
+      
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -679,9 +688,18 @@
        */
       _deleteTopicConfirm: function DiscussionsTopicList__deleteTopicConfirm(topicId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+          
          // ajax request success handler
          var onDeleted = function DiscussionsTopicList__deleteTopic_onDeleted(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // reload the table
             this._updateDiscussionsTopicList();
          };
@@ -706,7 +724,15 @@
                fn: onDeleted,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure")
+            failureMessage: this._msg("message.delete.failure"),
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  this._releaseBusy();
+               },
+               scope: this
+            }
          });
       },
       
@@ -836,6 +862,45 @@
       onDiscussionsTopicListRefresh: function DiscussionsTopicList_onDiscussionsTopicListRefresh(layer, args)
       {
          this._updateDiscussionsTopicList({});
+      },
+
+      /**
+       * Displays the provided busyMessage but only in case
+       * the component isn't busy set.
+       * 
+       * @return true if the busy state was set, false if the component is already busy
+       */
+      _setBusy: function BlogPostList__setBusy(busyMessage)
+      {
+         if (this.busy)
+         {
+            return false;
+         }
+         this.busy = true;
+         this.widgets.busyMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: busyMessage,
+            spanClass: "wait",
+            displayTime: 0
+         });
+         return true;
+      },
+      
+      /**
+       * Removes the busy message and marks the component as non-busy
+       */
+      _releaseBusy: function BlogPostList__releaseBusy()
+      {
+         if (this.busy)
+         {
+            this.widgets.busyMessage.destroy();
+            this.busy = false;
+            return true;
+         }
+         else
+         {
+            return false;
+         }
       },
 
       /**

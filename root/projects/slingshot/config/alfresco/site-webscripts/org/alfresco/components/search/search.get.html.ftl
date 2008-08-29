@@ -2,6 +2,7 @@
    new Alfresco.Search("${args.htmlid}").setOptions(
    {
       siteId: "${siteId}",
+      siteName: "${siteName}",
       containerId: "",
       initialSearchTerm: "${searchTerm?html}",
       initialSearchAll: "${searchAll?string}"

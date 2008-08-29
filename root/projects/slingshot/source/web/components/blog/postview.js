@@ -35,6 +35,7 @@
       this.id = htmlId;
       
       /* Initialise prototype properties */
+      this.widgets = {};
       this.tagId =
       {
          id: 0,
@@ -92,12 +93,29 @@
       blogPostData: null,
       
       /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets : null,
+      
+      /**
        * Object literal used to generate unique tag ids
        * 
        * @property tagId
        * @type object
        */
       tagId: null,
+      
+      /**
+       * Tells whether an action is currently ongoing.
+       * 
+       * @property busy
+       * @type boolean
+       * @see setBusy/releaseBusy
+       */
+      busy: false,
       
       /**
        * Set multiple initialization options at once.
@@ -388,9 +406,18 @@
        */
       _deleteBlogPostConfirm: function BlogPostView__deleteBlogPostConfirm(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+          
          // ajax request success handler
          var onDeletedSuccess = function BlogPostList_onDeletedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // load the blog post list page
             var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postlist?container={container}",
             {
@@ -420,7 +447,12 @@
                fn: onDeletedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure")
+            failureMessage: this._msg("message.delete.failure"),
+            failureCallback:
+            {
+               fn: function(response) { this._releaseBusy(); },
+               scope: this
+            }
          });
       },
        
@@ -433,9 +465,18 @@
        */
       onPublishExternal: function BlogPostView_onPublishExternal(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+         
          // ajax call success handler
          var onPublishedSuccess = function BlogPostList_onPublishedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // re-render the post
             this.loadBlogPostDataSuccess(response);
          };
@@ -460,7 +501,12 @@
                fn: onPublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.publishExternal.failure")
+            failureMessage: this._msg("message.publishExternal.failure"),
+            failureCallback:
+            {
+               fn: function(response) { this._releaseBusy(); },
+               scope: this
+            }
          });
       },
       
@@ -473,9 +519,18 @@
        */
       onUpdateExternal: function BlogPostView_onUpdateExternal(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+         
          // ajax request success handler
          var onUpdatedSuccess = function BlogPostList_onUpdatedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // re-render the post
             this.loadBlogPostDataSuccess(response);
          };
@@ -500,7 +555,12 @@
                fn: onUpdatedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.updateExternal.failure")
+            failureMessage: this._msg("message.updateExternal.failure"),
+            failureCallback:
+            {
+               fn: function(response) { this._releaseBusy(); },
+               scope: this
+            }
          });
       },
 
@@ -513,9 +573,18 @@
        */
       onUnpublishExternal: function BlogPostView_onUnpublishExternal(postId)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+         
          // ajax request success handler
          var onUnpublishedSuccess = function BlogPostList_onUnpublishedSuccess(response)
          {
+            // remove busy message
+            this._releaseBusy();
+            
             // re-render the post
             this.loadBlogPostDataSuccess(response);
          };
@@ -540,7 +609,12 @@
                fn: onUnpublishedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.unpublishExternal.failure")
+            failureMessage: this._msg("message.unpublishExternal.failure"),
+            failureCallback:
+            {
+               fn: function(response) { this._releaseBusy(); },
+               scope: this
+            }
          });
       },
 
@@ -576,6 +650,45 @@
       /**
        * PRIVATE FUNCTIONS
        */
+
+      /**
+       * Displays the provided busyMessage but only in case
+       * the component isn't busy set.
+       * 
+       * @return true if the busy state was set, false if the component is already busy
+       */
+      _setBusy: function BlogPostList__setBusy(busyMessage)
+      {
+         if (this.busy)
+         {
+            return false;
+         }
+         this.busy = true;
+         this.widgets.busyMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: busyMessage,
+            spanClass: "wait",
+            displayTime: 0
+         });
+         return true;
+      },
+      
+      /**
+       * Removes the busy message and marks the component as non-busy
+       */
+      _releaseBusy: function BlogPostList__releaseBusy()
+      {
+         if (this.busy)
+         {
+            this.widgets.busyMessage.destroy();
+            this.busy = false;
+            return true;
+         }
+         else
+         {
+            return false;
+         }
+      },
 
       /**
        * Gets a custom message

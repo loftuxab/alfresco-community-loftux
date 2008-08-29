@@ -38,6 +38,7 @@
          data : null,
          widgets : {}
       };
+      this.widgets = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -107,6 +108,14 @@
       },
       
       /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets: null,
+      
+      /**
        * Object containing data about the currently edited
        * comment.
        */
@@ -116,6 +125,15 @@
        * Comments data
        */
       commentsData: null,
+      
+      /**
+       * Tells whether an action is currently ongoing.
+       * 
+       * @property busy
+       * @type boolean
+       * @see _setBusy/_releaseBusy
+       */
+      busy: false,
       
       /**
        * Set multiple initialization options at once.
@@ -303,7 +321,7 @@
        * Delete comment action links handler.
        */
       onDeleteComment: function BlogComment_onEditComment(row)
-      {
+      {   
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
          {
@@ -344,11 +362,27 @@
        */
       _deleteComment: function BlogComment__deleteComment(row, data)
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }
+         
          // ajax request success handler
-         var onDeleted = function BlogComment_onDeleted(response, object)
-         {          
+         var success = function BlogComment__deleteComment_success(response, object)
+         {
+            // remove busy message
+            this._releaseBusy();
+            
             // reload the comments list
             YAHOO.Bubbling.fire("refreshComments", {});
+         };
+         
+         // ajax request success handler
+         var failure = function BlogComment__deleteComment_failure(response, object)
+         {
+            // remove busy message
+            this._releaseBusy();
          };
 
          // put together the request url to delete the comment
@@ -370,10 +404,15 @@
             successMessage: this._msg("message.delete.success"),
             successCallback:
             {
-               fn: onDeleted,
+               fn: success,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure")
+            failureMessage: this._msg("message.delete.failure"),
+            failureCallback:
+            {
+               fn: failure,
+               scope: this
+            }
          });
       },
 
@@ -496,13 +535,29 @@
                fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.savecomment.failure")
+            failureMessage: this._msg("message.savecomment.failure"),
+            failureCallback:
+            {
+               fn: this.onEditFormSubmitFailure,
+               scope: this
+            }
          });
          commentForm.setSubmitAsJSON(true);
          commentForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
+               this.editData.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.creating", this.name),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
+               
+               this.editData.widgets.okButton.set("disabled", true);
+               this.editData.widgets.cancelButton.set("disabled", true);
+               this.editData.widgets.editor._disableEditor(true);
+                
                //Put the HTML back into the text area
                this.editData.widgets.editor.saveHTML();
             },
@@ -512,10 +567,12 @@
       },
       
       /**
-       * Edit form ajax request success handler
+       * Edit form submit success handler
        */
       onEditFormSubmitSuccess: function BlogComment_onCreateFormSubmitSuccess(response, object)
       {
+         this.editData.widgets.feedbackMessage.destroy();
+          
          // the response contains the new data for the comment. Render the comment html
          // and insert it into the view element
          this.commentsData[this.editData.row] = response.json.item;
@@ -524,6 +581,17 @@
             
          // hide the form and display an information message
          this._hideEditView();
+      },
+      
+      /**
+       * Edit form submit failure handler
+       */
+      onEditFormSubmitFailure: function BlogComment_onEditFormSubmitFailure(response, args)
+      {
+         this.editData.widgets.feedbackMessage.destroy();
+         this.editData.widgets.okButton.set("disabled", false);
+         this.editData.widgets.cancelButton.set("disabled", false);
+         this.editData.widgets.editor._disableEditor(false);
       },
       
       /**
@@ -651,6 +719,45 @@
             this.editData.viewDiv = null;
          }
       },   
+
+      /**
+       * Displays the provided busyMessage but only in case
+       * the component isn't busy set.
+       * 
+       * @return true if the busy state was set, false if the component is already busy
+       */
+      _setBusy: function BlogComment__setBusy(busyMessage)
+      {
+         if (this.busy)
+         {
+            return false;
+         }
+         this.busy = true;
+         this.widgets.busyMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: busyMessage,
+            spanClass: "wait",
+            displayTime: 0
+         });
+         return true;
+      },
+      
+      /**
+       * Removes the busy message and marks the component as non-busy
+       */
+      _releaseBusy: function BlogComment__releaseBusy()
+      {
+         if (this.busy)
+         {
+            this.widgets.busyMessage.destroy();
+            this.busy = false;
+            return true;
+         }
+         else
+         {
+            return false;
+         }
+      },
 
       /**
        * Gets a custom message

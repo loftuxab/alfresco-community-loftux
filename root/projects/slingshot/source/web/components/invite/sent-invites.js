@@ -349,20 +349,7 @@
             var invitee = oRecord.getData("invitee");
             
             var sentDate = Alfresco.util.formatDate(oRecord.getData('sentInviteDate'));
-            var role = oRecord.getData("role");
-            if (role == 'SiteManager')
-            {
-               role = me._msg('role.sitemanager');
-            }
-            else if (role == 'Collaborator')
-            {
-               role = me._msg('role.collaborator');
-            }
-            else if (role == 'Consumer')
-            {
-               role = me._msg('role.consumer');
-            }
-            
+            var role = me._msg("role." + oRecord.getData("role"));
             var desc = '<div class="to-invitee"><span class="attr-label">' + me._msg('info.to') + ': </span>';
             desc += '<span class="attr-value">' + generateUserNameLink(invitee) + '</span>';
             desc += '</div>';
@@ -469,9 +456,23 @@
        */
       cancelInvite: function SentInvites_cancelInvite(record)
       {
+         // disable the button
+         this.actionButtons[record.getData('invitee').userName].set('disabled', true);
+          
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.removing"),
+            spanClass: "wait",
+            displayTime: 0
+         });
+         
          // ajax request success handler
          var success = function SentInvites_cancelInvite_success(response)
          {
+            // hide the wait message
+            this.widgets.feedbackMessage.destroy();
+             
             // remove the record from the list
             var index = this.widgets.dataTable.getRecordIndex(record);
             if (index != null)
@@ -479,6 +480,15 @@
                this.widgets.dataTable.deleteRow(index);
             }
          };
+         
+         // request failure handler
+         var failure = function SentInvites_cancelInvite_failure(response)
+         {
+            // remove the message
+            this.widgets.feedbackMessage.destroy();
+
+            this.actionButtons[record.getData('invitee').userName].set('disabled', true);
+         }
          
          // get the url to call
          var url = Alfresco.constants.PROXY_URI + "api/invite/cancel";
@@ -499,7 +509,12 @@
                fn: success,
                scope: this
             },
-            failureMessage: this._msg("message.cancel.failure")
+            failureMessage: this._msg("message.cancel.failure"),
+            failureCallback:
+            {
+               fn: failure,
+               scope: this
+            },
          });
          
       },

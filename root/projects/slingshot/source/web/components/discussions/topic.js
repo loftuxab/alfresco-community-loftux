@@ -119,6 +119,15 @@
       tagId: null,
       
       /**
+       * Tells whether an action is currently ongoing.
+       * 
+       * @property busy
+       * @type boolean
+       * @see _setBusy/_releaseBusy
+       */
+      busy: false,
+      
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -396,6 +405,12 @@
        */
       _deleteTopicConfirm: function DiscussionsTopic__deleteTopicConfirm()
       {
+         // show busy message
+         if (! this._setBusy(this._msg('message.wait')))
+         {
+            return;
+         }          
+          
          // ajax request success handler
          var onDeleted = function onDeleted(response)
          {
@@ -427,7 +442,15 @@
                fn: onDeleted,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure")
+            failureMessage: this._msg("message.delete.failure"),
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  this._releaseBusy();
+               },
+               scope: this
+            }
          });
       },
       
@@ -570,18 +593,35 @@
                fn: this.onEditFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.savetopic.failure")
+            failureMessage: this._msg("message.savetopic.failure"),
+            failureCallback:
+            {
+               fn: this.onEditFormSubmitFailure,
+               scope: this
+            }
          });
          editForm.setSubmitAsJSON(true);
          editForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
-            {
+            {   
+               // disable the buttons
+               this.widgets.okButton.set("disabled", true);
+               this.widgets.cancelButton.set("disabled", true);
+               
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
                
                // update the tags set in the form
                this.modules.tagLibrary.updateForm(formId + "-form", "tags");
+               
+               // show a wait message
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message(this._msg("message.submitting")),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
             },
             scope: this
          }
@@ -601,8 +641,11 @@
       /**
        * Edit form submit success handler
        */
-      onEditFormSubmitSuccess: function DiscussionsTopic_onCreateFormSubmitSuccess(response, object)
+      onEditFormSubmitSuccess: function DiscussionsTopic_onEditFormSubmitSuccess(response, object)
       {
+         // remove busy message
+         this._releaseBusy();
+         
          // the response contains the new data for the comment. Render the comment html
          // and insert it into the view element
          this.topicData = response.json.item;
@@ -613,6 +656,19 @@
             
          // inform the replies object about the update
          this._fireTopicDataChangedEvent();
+      },
+      
+      /**
+       * Edit form submit failure handler
+       */
+      onEditFormSubmitFailure: function DiscussionsTopic_onEditFormSubmitFailure(response, object)
+      {
+         // remove busy message
+         this._releaseBusy();
+          
+         // enable the buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
       },
       
       /**
@@ -686,6 +742,45 @@
             topicId: this.topicData.name
          }
          YAHOO.Bubbling.fire("topicDataChanged", eventData);
+      },
+      
+      /**
+       * Displays the provided busyMessage but only in case
+       * the component isn't busy set.
+       * 
+       * @return true if the busy state was set, false if the component is already busy
+       */
+      _setBusy: function DiscussionsTopic__setBusy(busyMessage)
+      {
+         if (this.busy)
+         {
+            return false;
+         }
+         this.busy = true;
+         this.widgets.busyMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: busyMessage,
+            spanClass: "wait",
+            displayTime: 0
+         });
+         return true;
+      },
+      
+      /**
+       * Removes the busy message and marks the component as non-busy
+       */
+      _releaseBusy: function DiscussionsTopic__releaseBusy()
+      {
+         if (this.busy)
+         {
+            this.widgets.busyMessage.destroy();
+            this.busy = false;
+            return true;
+         }
+         else
+         {
+            return false;
+         }
       },
 
       /**

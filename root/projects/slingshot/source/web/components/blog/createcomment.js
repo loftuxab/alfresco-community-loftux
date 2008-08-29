@@ -263,7 +263,11 @@
                fn: this.onCreateFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.createcomment.failure")
+            failureMessage: this._msg("message.createcomment.failure"),
+            failureCallback: {
+               fn: function() { this.enableInputs(); },
+               scope: this
+            }
          });
          this.widgets.commentForm.setSubmitAsJSON(true);
          this.widgets.commentForm.doBeforeFormSubmit =
@@ -272,6 +276,15 @@
             {
                //Put the HTML back into the text area
                this.widgets.editor.saveHTML();
+
+               this.widgets.editor._disableEditor(true);
+               this.widgets.okButton.set("disabled", true);
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.creating", this.name),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
             },
             scope: this
          }
@@ -292,6 +305,18 @@
             
          // reload the comments list
          YAHOO.Bubbling.fire("refreshComments", {});
+         
+         this.enableInputs();
+      },
+
+      /**
+       * Reenables the inputs which got disabled as part of a comment submit
+       */
+      enableInputs: function CreateComment_enableInputs()
+      {
+         this.widgets.feedbackMessage.destroy();
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.editor._disableEditor(false);
       },
 
       /**
