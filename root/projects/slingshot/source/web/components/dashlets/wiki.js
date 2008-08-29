@@ -94,20 +94,27 @@
 		{
 		   var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + encodeURIComponent(this.guid);
          
-		   if (!this.configDialog)
+         if (!this.configDialog)
          {
-            this.configDialog = new Alfresco.module.SimpleDialog(this.id + "-configDialog").setOptions(
+		      this.configDialog = new Alfresco.module.SimpleDialog(this.id + "-configDialog").setOptions(
             {
                width: "50em",
                templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + this.siteId,
                actionUrl: actionUrl,
                onSuccess:
                {
-                  fn: function WikiDashlet_onConfigFeed_callback(response)
+                  fn: function WikiDashlet_onConfigFeed_callback(e)
                   {
-                     var txt = response.serverResponse.responseText;
-                     var div = document.getElementById(this.id + "-scrollableList");
-                     div.innerHTML = this.parser.parse(txt);
+                     var obj = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
+                     if (obj)
+                     {
+                        var content = obj["content"];
+                        var div = document.getElementById(this.id + "-scrollableList");
+                        div.innerHTML = this.parser.parse(content);
+                        
+                        // Update the title
+                        document.getElementById(this.id + "-title").innerHTML = obj["title"];
+                     }
                   },
                   scope: this
                }
@@ -120,6 +127,7 @@
                actionUrl: actionUrl
             });
          }
+         
          this.configDialog.show();
 		}
 	

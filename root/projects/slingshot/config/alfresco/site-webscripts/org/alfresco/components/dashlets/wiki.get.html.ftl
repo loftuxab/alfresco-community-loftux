@@ -4,15 +4,15 @@
    ).setSiteId("${page.url.templateArgs.site!""}");
 //]]></script>
 <div class="dashlet">
-   <div class="title">Wiki</div>
+   <div class="title" id="${args.htmlid}-title">${pageTitle!""}</div>
    <div class="toolbar">
-       <a href="#" id="${args.htmlid}-wiki-link">Configure</a>
+       <a href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
    </div>
    <div class="body scrollableList" id="${args.htmlid}-scrollableList">
    <#if wikipage?exists>
       ${wikipage}
    <#else>
-		<em>No page is configured.</em>
+		<em>${msg("label.noconfig")}.</em>
 	</#if>
 	</div><#-- end of body -->
 </div><#-- end of dashlet -->

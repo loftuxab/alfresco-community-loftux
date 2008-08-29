@@ -1,5 +1,5 @@
 <div id="${args.htmlid}-configDialog" class="config-feed">
-   <div class="hd">Select wiki page</div>
+   <div class="hd">${msg("label.header")}</div>
    <div class="bd">
       <form id="${args.htmlid}-form" action="" method="POST">
          <input type="hidden" name="siteId" value="${url.templateArgs.siteId}"/>
