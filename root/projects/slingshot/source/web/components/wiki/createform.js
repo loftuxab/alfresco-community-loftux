@@ -65,7 +65,8 @@
    	 */
    	init: function()
    	{
-   	   this.tagLibrary = Alfresco.util.ComponentManager.findFirst("Alfresco.module.TagLibrary");
+         this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
+		   this.tagLibrary.setOptions({ siteId: this.siteId });
          this.tagLibrary.initialize();
 
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent', {
