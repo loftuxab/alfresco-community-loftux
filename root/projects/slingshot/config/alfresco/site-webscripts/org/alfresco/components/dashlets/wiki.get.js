@@ -10,5 +10,7 @@ if (wikipage)
    if (result.status == status.STATUS_OK)
    {
       model.wikipage = result.response;
-   }    
+   }
+   
+   model.pageTitle = String(wikipage).replace(/_/g, " ");    
 }

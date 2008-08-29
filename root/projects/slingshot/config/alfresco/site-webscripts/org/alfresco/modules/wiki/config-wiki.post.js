@@ -4,10 +4,12 @@ if (!json.isNull("wikipage"))
 {
    var wikipage = String(json.get("wikipage"));   
    model.pagecontent = getPageText(wikipage);
+   model.title = wikipage.replace(/_/g, " ");
 }
 else
 {
    model.pagecontent = "No page is configured";
+   model.title = "";
 }
 
 function getPageText(wikipage)
