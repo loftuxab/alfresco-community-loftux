@@ -29,11 +29,8 @@
       <!-- tags -->
          <span class="label">${msg("label.tags")}:</span>
          <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-
-         <!-- Render the tag inputs -->
-         <@taglibraryLib.renderTagInputs htmlid=args.htmlid tagInputName="tags" tags=[] />
-         <!-- Render the library component -->
-         <@taglibraryLib.renderTagLibrary htmlid=args.htmlid site=page.url.templateArgs.site tags=[] />
+         
+         <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
          <!-- end tags -->
       
       <div class="formAction">
