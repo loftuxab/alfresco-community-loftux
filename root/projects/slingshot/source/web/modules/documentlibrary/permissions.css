@@ -15,16 +15,29 @@
 
 .permissions .yui-gd .yui-u.first
 {
-   width: 18% !important;
+   width: auto !important;
+   padding-top: 0.75em !important;
 }
 
-.permissions .yui-gd .yui-u
+.permissions .yui-gd .yui-u.first.reset-btn
 {
-   width: 70% !important;
+   padding-top: 0em !important;
+   width: 25% !important;
 }
 
-.permissions .quick-actions
+.permissions .actions
 {
-   border: 1px dashed #c0c0c0;
-   text-align: center;
+   margin-left: 5em;
+}
+
+.permissions .groups
+{
+   border: 1px solid #c0c0c0;
+   margin: 0em 4em 1em 4em;
+}
+
+.permissions h2
+{
+   padding: 0em 0em 0.75em 0em !important;
+   margin-left: 3.33em;
 }

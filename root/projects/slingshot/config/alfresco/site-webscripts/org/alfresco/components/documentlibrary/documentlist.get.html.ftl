@@ -67,9 +67,9 @@
       <div id="${args.htmlid}-actionSet-document" class="action-set">
          <div class="onActionDownload"><a rel="" href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download")}"><span>${msg("actions.document.download")}</span></a></div>
          <div class="onActionEditOffline"><a rel="edit" href="#" class="action-link" title="${msg("actions.document.edit-offline")}"><span>${msg("actions.document.edit-offline")}</span></a></div>
-         <div class="onActionDetails"><a rel="" href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
+         <div class="onActionDetails"><a rel="edit" href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
          <div class="onActionCopyTo"><a rel="" href="#" class="action-link" title="${msg("actions.document.copy-to")}"><span>${msg("actions.document.copy-to")}</span></a></div>
-         <div class="onActionMoveTo"><a rel="" href="#" class="action-link" title="${msg("actions.document.move-to")}"><span>${msg("actions.document.move-to")}</span></a></div>
+         <div class="onActionMoveTo"><a rel="delete" href="#" class="action-link" title="${msg("actions.document.move-to")}"><span>${msg("actions.document.move-to")}</span></a></div>
          <div class="onActionDelete"><a rel="delete" href="#" class="action-link" title="${msg("actions.document.delete")}"><span>${msg("actions.document.delete")}</span></a></div>
          <div class="onActionAssignWorkflow"><a rel="" href="#" class="action-link" title="${msg("actions.document.assign-workflow")}"><span>${msg("actions.document.assign-workflow")}</span></a></div>
          <div class="onActionManagePermissions"><a rel="permissions" href="#" class="action-link" title="${msg("actions.document.manage-permissions")}"><span>${msg("actions.document.manage-permissions")}</span></a></div>
@@ -90,9 +90,9 @@
       </div>
 
       <div id="${args.htmlid}-actionSet-folder" class="action-set">
-         <div class="onActionDetails"><a rel="" href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
+         <div class="onActionDetails"><a rel="edit" href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
          <div class="onActionCopyTo"><a rel="" href="#" class="action-link" title="${msg("actions.folder.copy-to")}"><span>${msg("actions.folder.copy-to")}</span></a></div>
-         <div class="onActionMoveTo"><a rel="" href="#" class="action-link" title="${msg("actions.folder.move-to")}"><span>${msg("actions.folder.move-to")}</span></a></div>
+         <div class="onActionMoveTo"><a rel="delete" href="#" class="action-link" title="${msg("actions.folder.move-to")}"><span>${msg("actions.folder.move-to")}</span></a></div>
          <div class="onActionDelete"><a rel="delete" href="#" class="action-link" title="${msg("actions.folder.delete")}"><span>${msg("actions.folder.delete")}</span></a></div>
          <div class="onActionManagePermissions"><a rel"permissions" href="#" class="action-link" title="${msg("actions.document.manage-permissions")}"><span>${msg("actions.document.manage-permissions")}</span></a></div>
       </div>

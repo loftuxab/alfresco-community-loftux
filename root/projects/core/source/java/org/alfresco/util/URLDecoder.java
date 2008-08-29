@@ -49,9 +49,9 @@ public final class URLDecoder
      * 
      * @return the decoded <code>String</code>
      */
-    public static String decode(String s) 
+    public static String decode(final String s) 
     {
-        int len = s.length();
+        final int len = s.length();
         StringBuilder sb = null;
         int i = 0;
         
@@ -74,7 +74,7 @@ public final class URLDecoder
                 {
                     if (sb == null)
                     {
-                        String soFar = s.substring(0, i);
+                        final String soFar = s.substring(0, i);
                         sb = new StringBuilder(len + 16);
                         sb.append(soFar);
                     }

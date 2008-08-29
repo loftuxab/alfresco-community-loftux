@@ -9,7 +9,7 @@
   
   <#-- Exception details -->
   "message" : "${jsonUtils.encodeJSONString(status.message)}",  
-  "exception" : "<#if status.exception?exists>${jsonUtils.encodeJSONString(status.exception.class.name)}<#if status.exception.message?exists> - ${status.exception.message?j_string}</#if></#if>",
+  "exception" : "<#if status.exception?exists>${jsonUtils.encodeJSONString(status.exception.class.name)}<#if status.exception.message?exists> - ${jsonUtils.encodeJSONString(status.exception.message)}</#if></#if>",
   
   <#-- Exception call stack --> 
   "callstack" : 

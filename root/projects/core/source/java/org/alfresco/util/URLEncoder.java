@@ -95,11 +95,11 @@ public final class URLEncoder
      * 
      * @return The encoded string
      */
-    public static String encode(String s)
+    public static String encode(final String s)
     {
         StringBuilder sb = null;      //create on demand
         char ch;
-        int len = s.length();
+        final int len = s.length();
         for (int i = 0; i < len; i++)
         {
             ch = s.charAt(i);
@@ -121,7 +121,7 @@ public final class URLEncoder
             {
                 if (sb == null)
                 {
-                    String soFar = s.substring(0, i);
+                    final String soFar = s.substring(0, i);
                     sb = new StringBuilder(len + 16);
                     sb.append(soFar);
                 }
@@ -131,7 +131,7 @@ public final class URLEncoder
             {
                 if (sb == null)
                 {
-                    String soFar = s.substring(0, i);
+                    final String soFar = s.substring(0, i);
                     sb = new StringBuilder(len + 16);
                     sb.append(soFar);
                 }
@@ -142,7 +142,7 @@ public final class URLEncoder
             {
                 if (sb == null)
                 {
-                    String soFar = s.substring(0, i);
+                    final String soFar = s.substring(0, i);
                     sb = new StringBuilder(len + 16);
                     sb.append(soFar);
                 }
