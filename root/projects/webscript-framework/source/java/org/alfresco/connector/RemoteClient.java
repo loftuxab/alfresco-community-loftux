@@ -648,7 +648,6 @@ public class RemoteClient extends AbstractClient
                             input.close();
                             if (responseCommit)
                             {
-                                out.flush();
                                 out.close();
                             }
                             connection.disconnect();

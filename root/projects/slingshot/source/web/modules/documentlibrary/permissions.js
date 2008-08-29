@@ -105,9 +105,9 @@
           *
           * @property: width
           * @type: integer
-          * @default: 40em
+          * @default: 44em
           */
-         width: "40em"
+         width: "44em"
       },
       
       /**
@@ -267,11 +267,9 @@
             this.rolePickers[roleValue].getMenu().subscribe("click", this.onRoleSelected, this.rolePickers[roleValue]);
          }
          
-         // Quick action buttons
+         // Reset Permissions button
          this.widgets.resetAll = Alfresco.util.createYUIButton(this, "reset-all", this.onResetAll);
-         this.widgets.denyAll = Alfresco.util.createYUIButton(this, "deny-all", this.onDenyAll);
-         this.widgets.allowAllMembers = Alfresco.util.createYUIButton(this, "allow-members-collaborate", this.onAllowAllMembers);
-
+         
          // Show the dialog
          this._showDialog();
       },
@@ -305,30 +303,6 @@
       onResetAll: function DLP_onResetAll(e, p_obj)
       {
          this._applyPermissions("reset-all");
-      },
-      
-      /**
-       * Deny All button event handler
-       *
-       * @method onDenyAll
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
-       */
-      onDenyAll: function DLP_onDenyAll(e, p_obj)
-      {
-         this._applyPermissions("deny-all");
-      },
-      
-      /**
-       * All All Members button event handler
-       *
-       * @method onAllowAllMembers
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
-       */
-      onAllowAllMembers: function DLP_onAllowAllMembers(e, p_obj)
-      {
-         this._applyPermissions("allow-members-collaborate");
       },
       
       /**
