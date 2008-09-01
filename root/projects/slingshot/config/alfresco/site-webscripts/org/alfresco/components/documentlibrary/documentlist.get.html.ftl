@@ -60,6 +60,10 @@
          <div class="more-actions hidden"></div>
       </div>
       
+      <#--
+         IMPORTANT: Do not add linefeeds between tags on individual actions as this will break DOM parsing code.
+         (See note in documentlist.js)
+      -->
       <!-- Action Set Templates -->
       <div id="${args.htmlid}-actionSet-empty" class="action-set">
       </div>

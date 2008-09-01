@@ -18,14 +18,19 @@
    visibility: visible;
 }
 
-.doclist .action-set a:active,
-.doclist .action-set a:hover
+.document-actions .action-set
+{
+   visibility: hidden;
+}
+
+.document-actions .doclist .action-set a:active,
+.document-actions .doclist .action-set a:hover
 {
    background-color: #fafafa;
    text-decoration: underline;
 }
 
-.doclist .action-set div
+.document-actions .doclist .action-set div
 {
    padding: 0.3em;
 }

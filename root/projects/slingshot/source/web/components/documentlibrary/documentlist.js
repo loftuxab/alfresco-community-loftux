@@ -1365,6 +1365,10 @@
             // Simple or detailed view
             Dom.addClass(clone, this.options.simpleView ? "simple" : "detailed");
             
+            /**
+             * NOTE: If linefeeds exist between the <div> and <a> tags, the firstChild property
+             *       in the outer loop will return a text node "\n" instead of the <a> tag.
+             */
             // Trim the items in the clone depending on the user's access
             var userAccess = record.getData("permissions").userAccess;
             var actions = YAHOO.util.Selector.query("div", clone);

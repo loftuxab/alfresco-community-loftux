@@ -172,9 +172,38 @@
          // remember the data for the document
          this.docData = args[1];
          
-         // update the download link for the download link
+         // update the href for the download link
          var url = Alfresco.constants.PROXY_URI + this.docData.contentUrl;
          Dom.get(this.id + "-download-action").href = url + "?a=true";
+         
+         /**
+          * NOTE: If linefeeds exist between the <div> and <a> tags, the firstChild property
+          *       in the outer loop will return a text node "\n" instead of the <a> tag.
+          */
+          // Disable actions not accessible to current user
+          var actionsContainer = Dom.get(this.id + "-actionSet-document");
+         if (this.docData.permissions && this.docData.permissions.userAccess)
+         {
+            var userAccess = this.docData.permissions.userAccess;
+            var actions = YAHOO.util.Selector.query("div", actionsContainer);
+            var actionPermissions, i, ii, j, jj;
+            for (i = 0, ii = actions.length; i < ii; i++)
+            {
+               if (actions[i].firstChild.rel != "")
+               {
+                  actionPermissions = actions[i].firstChild.rel.split(",");
+                  for (j = 0, jj = actionPermissions.length; j < jj; j++)
+                  {
+                     if (!userAccess[actionPermissions[j]])
+                     {
+                        actionsContainer.removeChild(actions[i]);
+                        break;
+                     }
+                  }
+               }
+            }
+         }
+         Dom.setStyle(actionsContainer, "visibility", "visible");
          
          // Hook action events
          var fnActionHandler = function DocumentActions_fnActionHandler(layer, args)
