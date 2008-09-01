@@ -13,14 +13,6 @@ namespace AlfrescoExcel2003
       public Login()
       {
          InitializeComponent();
-         if (txtUsername.Text.Length == 0)
-         {
-            txtUsername.Focus();
-         }
-         else
-         {
-            txtPassword.Focus();
-         }
       }
 
       public string Username
@@ -44,6 +36,18 @@ namespace AlfrescoExcel2003
          set
          {
             txtPassword.Text = value;
+         }
+      }
+
+      private void Login_Activated(object sender, EventArgs e)
+      {
+         if (txtUsername.Text.Length == 0)
+         {
+            this.ActiveControl = txtUsername;
+         }
+         else
+         {
+            this.ActiveControl = txtPassword;
          }
       }
    }

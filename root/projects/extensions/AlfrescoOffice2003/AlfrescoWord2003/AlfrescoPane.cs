@@ -174,7 +174,13 @@ namespace AlfrescoWord2003
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
             if (strAuthTicket != "")
             {
-               theURI += "&ticket=" + strAuthTicket;
+               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+            }
+
+            if ((strAuthTicket == "") && !isClosing)
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
             }
 
             if (m_ClearSession)
@@ -222,7 +228,13 @@ namespace AlfrescoWord2003
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
             if (strAuthTicket != "")
             {
-               theURI += "&ticket=" + strAuthTicket;
+               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+            }
+
+            if (strAuthTicket == "")
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
             }
 
             if (m_ClearSession)
@@ -258,7 +270,7 @@ namespace AlfrescoWord2003
          }
          catch (Exception e)
          {
-            MessageBox.Show("Unable to open the document from Alfresco: " + e.Message, "Alfresco Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(Properties.Resources.UnableToOpen + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 
@@ -286,53 +298,60 @@ namespace AlfrescoWord2003
          object trueValue = true;
          object falseValue = false;
 
-         // Create a new document if no document currently open
-         if (m_WordApplication.Selection == null)
+         try
          {
-            m_WordApplication.Documents.Add(ref missingValue, ref missingValue, ref missingValue, ref missingValue);
-         }
+            // Create a new document if no document currently open
+            if (m_WordApplication.Selection == null)
+            {
+               m_WordApplication.Documents.Add(ref missingValue, ref missingValue, ref missingValue, ref missingValue);
+            }
 
-         object range = m_WordApplication.Selection.Range;
+            object range = m_WordApplication.Selection.Range;
 
-         // WebDAV or CIFS?
-         string strFullPath = m_ServerDetails.getFullPath(relativePath, m_WordApplication.ActiveDocument.FullName);
-         string strExtn = Path.GetExtension(relativePath).ToLower();
+            // WebDAV or CIFS?
+            string strFullPath = m_ServerDetails.getFullPath(relativePath, m_WordApplication.ActiveDocument.FullName);
+            string strExtn = Path.GetExtension(relativePath).ToLower();
 
-         if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
-         {
-            if (m_DebugMode)
+            if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
             {
-               MessageBox.Show("Image path=\n" + strFullPath, "Insert Image", MessageBoxButtons.OK, MessageBoxIcon.Information);
+               if (m_DebugMode)
+               {
+                  MessageBox.Show("Image path=\n" + strFullPath, "Insert Image", MessageBoxButtons.OK, MessageBoxIcon.Information);
+               }
+               m_WordApplication.ActiveDocument.InlineShapes.AddPicture(strFullPath, ref falseValue, ref trueValue, ref range);
             }
-            m_WordApplication.ActiveDocument.InlineShapes.AddPicture(strFullPath, ref falseValue, ref trueValue, ref range);
+            else if (".doc".IndexOf(strExtn) != -1)
+            {
+               if (m_DebugMode)
+               {
+                  MessageBox.Show("Document path=\n" + strFullPath, "Insert Document", MessageBoxButtons.OK, MessageBoxIcon.Information);
+               }
+               m_WordApplication.Selection.InsertFile(strFullPath, ref missingValue, ref trueValue, ref missingValue, ref missingValue);
+            }
+            else
+            {
+               object filename = strFullPath;
+               object iconFilename = Type.Missing;
+               object iconIndex = Type.Missing;
+               object iconLabel = Path.GetFileName(strFullPath);
+               string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
+               if (defaultIcon.Contains(","))
+               {
+                  string[] iconData = defaultIcon.Split(new char[] { ',' });
+                  iconFilename = iconData[0];
+                  iconIndex = iconData[1];
+               }
+               if (m_DebugMode)
+               {
+                  MessageBox.Show("Object path=\n" + strFullPath, "Insert OLE Object", MessageBoxButtons.OK, MessageBoxIcon.Information);
+               }
+               m_WordApplication.ActiveDocument.InlineShapes.AddOLEObject(ref missingValue, ref filename, ref falseValue, ref trueValue,
+                  ref iconFilename, ref iconIndex, ref iconLabel, ref range);
+            }
          }
-         else if (".doc".IndexOf(strExtn) != -1)
+         catch (Exception e)
          {
-            if (m_DebugMode)
-            {
-               MessageBox.Show("Document path=\n" + strFullPath, "Insert Document", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            m_WordApplication.Selection.InsertFile(strFullPath, ref missingValue, ref trueValue, ref missingValue, ref missingValue);
-         }
-         else
-         {
-            object filename = strFullPath;
-            object iconFilename = Type.Missing;
-            object iconIndex = Type.Missing;
-            object iconLabel = Path.GetFileName(strFullPath);
-            string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
-            if (defaultIcon.Contains(","))
-            {
-               string[] iconData = defaultIcon.Split(new char[] { ',' });
-               iconFilename = iconData[0];
-               iconIndex = iconData[1];
-            }
-            if (m_DebugMode)
-            {
-               MessageBox.Show("Object path=\n" + strFullPath, "Insert OLE Object", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            m_WordApplication.ActiveDocument.InlineShapes.AddOLEObject(ref missingValue, ref filename, ref falseValue, ref trueValue,
-               ref iconFilename, ref iconIndex, ref iconLabel, ref range);
+            MessageBox.Show(Properties.Resources.UnableToInsert + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 
@@ -389,7 +408,7 @@ namespace AlfrescoWord2003
          }
          catch (Exception e)
          {
-            MessageBox.Show("Unable to save the document to Alfresco: " + e.Message, "Alfresco Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(Properties.Resources.UnableToSave + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 

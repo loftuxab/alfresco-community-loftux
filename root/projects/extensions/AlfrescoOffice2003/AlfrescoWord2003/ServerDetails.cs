@@ -375,7 +375,7 @@ namespace AlfrescoWord2003
          {
             // Use WebDAV
             fullPath = WebDAVURL + relativePath;
-            fullPath += "?ticket=" + getAuthenticationTicket(false);
+            fullPath += "?ticket=" + Uri.EscapeDataString(getAuthenticationTicket(false));
          }
 
          return fullPath;
@@ -441,7 +441,7 @@ namespace AlfrescoWord2003
                               if ((strAuthTicket == "401") || (strAuthTicket == ""))
                               {
                                  // Retry?
-                                 bRetry = (MessageBox.Show("Couldn't authenticate with Alfresco server.", "Alfresco Authentication", MessageBoxButtons.RetryCancel) == DialogResult.Retry);
+                                 bRetry = (MessageBox.Show(Properties.Resources.UnableToAuthenticate, Properties.Resources.MessageBoxTitle, MessageBoxButtons.RetryCancel) == DialogResult.Retry);
                               }
                               else
                               {

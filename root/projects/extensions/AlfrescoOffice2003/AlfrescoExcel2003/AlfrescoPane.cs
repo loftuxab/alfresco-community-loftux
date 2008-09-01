@@ -173,7 +173,13 @@ namespace AlfrescoExcel2003
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
             if (strAuthTicket != "")
             {
-               theURI += "&ticket=" + strAuthTicket;
+               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+            }
+
+            if ((strAuthTicket == "") && !isClosing)
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
             }
 
             if (m_ClearSession)
@@ -224,7 +230,13 @@ namespace AlfrescoExcel2003
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
             if (strAuthTicket != "")
             {
-               theURI += "&ticket=" + strAuthTicket;
+               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+            }
+
+            if (strAuthTicket == "")
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
             }
 
             if (m_ClearSession)
@@ -257,7 +269,7 @@ namespace AlfrescoExcel2003
          }
          catch (Exception e)
          {
-            MessageBox.Show("Unable to open the workbook from Alfresco: " + e.Message, "Alfresco Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(Properties.Resources.UnableToOpen + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 
@@ -300,7 +312,7 @@ namespace AlfrescoExcel2003
             }
             catch (Exception e)
             {
-               MessageBox.Show(e.Message);
+               MessageBox.Show(e.Message, Properties.Resources.MessageBoxTitle);
             }
          }
          else
@@ -371,7 +383,7 @@ namespace AlfrescoExcel2003
          }
          catch (Exception e)
          {
-            MessageBox.Show("Unable to save the workbook to Alfresco: " + e.Message, "Alfresco Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(Properties.Resources.UnableToSave + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 

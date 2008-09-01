@@ -116,6 +116,7 @@ namespace AlfrescoExcel2003
          this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
          this.Text = "Login";
          this.TopMost = true;
+         this.Activated += new System.EventHandler(this.Login_Activated);
          this.ResumeLayout(false);
          this.PerformLayout();
 
