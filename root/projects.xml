@@ -1574,6 +1574,11 @@
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.slingshot.yui}" 
              dest="${dir.project.slingshot.assemble}" />
+
+      <!-- Copy our yui directory to apply YUI fixes -->
+      <copy todir="${dir.project.slingshot.assemble}/yui">
+         <fileset dir="${dir.project.slingshot.src.web}/yui" />
+      </copy>
    </target>  
    
    <target name="test-slingshot" 
