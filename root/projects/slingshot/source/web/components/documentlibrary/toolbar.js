@@ -958,6 +958,10 @@
          {
             var eCrumb = new Element(document.createElement("span"));
             eCrumb.addClass("crumb");
+            if (i > 0)
+            {
+               eCrumb.addClass("folder")
+            }
 
             // Last crumb shouldn't be rendered as a link
             if (j - i < 2)
@@ -983,7 +987,8 @@
                eCrumb.appendChild(eLink);
                eCrumb.appendChild(new Element(document.createElement("span"),
                {
-                  innerHTML: " &gt; "
+                  innerHTML: " &gt; ",
+                  className: "separator"
                }));
             }
             eBreadcrumb.appendChild(eCrumb);

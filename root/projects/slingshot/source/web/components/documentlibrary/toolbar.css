@@ -104,7 +104,14 @@
 
 .toolbar span.crumb
 {
-   font-size: 116%;
+   font-size: 100%;
+}
+
+.toolbar span.folder
+{
+   background-image: url(images/folder-closed-16.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
 }
 
 .toolbar .rss-feed
@@ -127,7 +134,7 @@
 .toolbar .description span.message
 {
    color: #000;
-   font-size: 116%;
+   font-size: 108%;
 }
 
 .toolbar .description span.more
