@@ -9,6 +9,10 @@ namespace AlfrescoPowerPoint2003
 {
    public partial class ThisAddIn
    {
+      private const string COMMANDBAR_NAME = "Alfresco";
+      private const string COMMANDBAR_BUTTON_CAPTION = "Alfresco";
+      private const string COMMANDBAR_BUTTON_DESCRIPTION = "Show/hide the Alfresco Add-In window";
+
       private AlfrescoPane m_AlfrescoPane;
       private string m_DefaultTemplate = "wcservice/office/";
       private AppWatcher m_AppWatcher;
@@ -82,7 +86,7 @@ namespace AlfrescoPowerPoint2003
          // Try to get a handle to an existing Alfresco CommandBar
          try
          {
-            m_CommandBar = Application.CommandBars["Alfresco"];
+            m_CommandBar = Application.CommandBars[COMMANDBAR_NAME];
 
             // If we found the CommandBar, then it's a permanent one we need to delete
             // Note: if the user has manually created a toolbar called "Alfresco" it will get torched here
@@ -97,7 +101,7 @@ namespace AlfrescoPowerPoint2003
          }
 
          // Create a temporary CommandBar named "Alfresco"
-         m_CommandBar = Application.CommandBars.Add("Alfresco", Office.MsoBarPosition.msoBarTop, falseValue, trueValue);
+         m_CommandBar = Application.CommandBars.Add(COMMANDBAR_NAME, Office.MsoBarPosition.msoBarTop, falseValue, trueValue);
 
          if (m_CommandBar != null)
          {
@@ -109,8 +113,8 @@ namespace AlfrescoPowerPoint2003
             if (m_AlfrescoButton != null)
             {
                m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonCaption;
-               m_AlfrescoButton.Caption = "Alfresco";
-               m_AlfrescoButton.DescriptionText = "Show/hide the Alfresco Add-In window";
+               m_AlfrescoButton.Caption = COMMANDBAR_BUTTON_CAPTION;
+               m_AlfrescoButton.DescriptionText = COMMANDBAR_BUTTON_DESCRIPTION;
                Bitmap bmpButton = new Bitmap(GetType(), "toolbar.ico");
                m_AlfrescoButton.Picture = new ToolbarPicture(bmpButton);
                Bitmap bmpMask = new Bitmap(GetType(), "toolbar_mask.ico");

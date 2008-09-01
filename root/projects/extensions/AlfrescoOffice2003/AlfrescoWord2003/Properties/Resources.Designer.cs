@@ -59,5 +59,50 @@ namespace AlfrescoWord2003.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Alfresco Office Add-In.
+        /// </summary>
+        internal static string MessageBoxTitle {
+            get {
+                return ResourceManager.GetString("MessageBoxTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn&apos;t authenticate with Alfresco server.
+        /// </summary>
+        internal static string UnableToAuthenticate {
+            get {
+                return ResourceManager.GetString("UnableToAuthenticate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to insert content into the document.
+        /// </summary>
+        internal static string UnableToInsert {
+            get {
+                return ResourceManager.GetString("UnableToInsert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to open the document from Alfresco.
+        /// </summary>
+        internal static string UnableToOpen {
+            get {
+                return ResourceManager.GetString("UnableToOpen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to save the document to Alfresco.
+        /// </summary>
+        internal static string UnableToSave {
+            get {
+                return ResourceManager.GetString("UnableToSave", resourceCulture);
+            }
+        }
     }
 }
