@@ -32,6 +32,8 @@
 <!--      <property file="${basedir}/projects/repository/config/alfresco/version.properties" /> -->
       <property file="${basedir}/build.properties" />
       <property file="${basedir}/shared.properties" />
+      
+      <echo>user.home = ${user.home}</echo>
 
       <path id="classpath.compile">
          <fileset dir="${dir.project.3rdparty.lib}">
