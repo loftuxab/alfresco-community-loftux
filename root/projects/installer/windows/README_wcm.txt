@@ -27,7 +27,7 @@ WCM Functionality
 
 You should now find 2 additional spaces in your Alfresco repository:
 - Web Projects in Company Home
-- Content Forms in Data Dictionary
+- Web Forms in Data Dictionary
 
 If you wish to use the Website Preview feature, you will need to start
 the Alfresco Virtualization server:
