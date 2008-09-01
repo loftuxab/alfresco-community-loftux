@@ -41,7 +41,7 @@ public interface DeploymentReceiverService
      * to a receiver side deployment configuration.  
      * @param user The user name for authentication.
      * @param password The password for the user.
-     * @return A transaction token.
+     * @return A transaction ticket.
      */
     public String begin(String target, String user, String password);
     

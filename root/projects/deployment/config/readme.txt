@@ -1,5 +1,5 @@
-Setting up the Alfresco Deployment Receiver
--------------------------------------------
+Setting up the Alfresco File System Receiver
+--------------------------------------------
 
 1. Unzip the deployment zip file into a convenient location. (It does not
    make it's own directory.) For discussion's sake let's say that the zip file
@@ -24,7 +24,10 @@ Setting up the Alfresco Deployment Receiver
       
         dep.metadatadir=/opt/deployment/depmetadata
         
-   D. dep.rmi.port - The port number to use for RMI. Choose this so as not to
+   D. dep.rmi.port - The port number to use for the RMI registry. Choose this so as not to
+      conflict with any other services.
+      
+   E. dep.rmi.service.port - The port number to use for RMI service. Choose this so as not to
       conflict with any other services.
       
 3. Configure application-context.xml. Open the file in a text editor and modify
@@ -68,15 +71,7 @@ Setting up the Alfresco Deployment Receiver
     looked for and executed. If that is not found then "program" is looked for and
     executed.
 
-4. Configure deploy_start.sh (or deploy_start.bat). Adjust the classpath so that all the listed jars have
-   the correct path prefix. For example:
-   
-nohup java -server -cp /opt/deployment/alfresco-deployment.jar:/opt/deployment/spring-2.0.2.jar:/opt/deployment/commons-logging-1.0.4.jar:/opt/deployment/alfresco-core.jar:/opt/deployment/jug.jar:/opt/deployment org.alfresco.deployment.Main /opt/deployment/application-context.xml >/opt/deployment/deployment.log 2>&1 &
-
-   Note the final member of the classpath: /opt/deployment. This is necessary for the
-   deployment receiver to properly configure itself.
-
-5. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
+4. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
    content to be owned by.
    
    

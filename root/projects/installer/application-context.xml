@@ -39,17 +39,6 @@
             	    	 -->
             	    </map>
             	</entry>
-               <entry key="sampleTarget">
-                   <map>
-                     <entry key="root"><value>target</value></entry>
-                     <entry key="user"><value>Giles</value></entry>
-                     <entry key="password"><value>Watcher</value></entry>
-                     <entry key="runnable"><value>org.alfresco.deployment.SampleRunnable</value></entry>
-                     <!-- 
-                     <entry key="program"><value>/path/to/program</value></entry>
-                      -->
-                   </map>
-               </entry>
             </map>
         </property>
     </bean>
@@ -79,6 +68,9 @@
 		</property>
 		<property name="registryPort">
 			<value>${dep.rmi.port}</value>
+		</property>
+		<property name="servicePort">
+			<value>${dep.rmi.service.port}</value>
 		</property>
 	</bean>
 </beans>

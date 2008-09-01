@@ -26,6 +26,9 @@
 package org.alfresco.deployment;
 
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.alfresco.deployment.impl.server.DeploymentReceiverServiceImpl;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Main class for Deployment Receiver.
@@ -33,6 +36,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class Main
 {
+	 private static Log logger = LogFactory.getLog(Main.class);
     /**
      * @param args
      */
@@ -43,6 +47,9 @@ public class Main
             System.err.println("Usage: org.alfresco.deployment.Main application-context.xml");
             System.exit(1);
         }
+        
+
+        logger.info("Alfresco File System Receiver Starting");
         @SuppressWarnings("unused")
         FileSystemXmlApplicationContext context =
             new FileSystemXmlApplicationContext(args[0]);

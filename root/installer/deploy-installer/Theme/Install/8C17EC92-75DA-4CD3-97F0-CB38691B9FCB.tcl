@@ -27,21 +27,28 @@ proc CreateWindow.8C17EC92-75DA-4CD3-97F0-CB38691B9FCB {wizard id} {
     grid $base.separator -row 1 -column 0 -sticky ew 
 
     Label $base.caption -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text3]
-    grid $base.caption -row 2 -sticky nsew -padx 8 -pady [list 8 4]
+    grid $base.caption -row 1 -sticky nsew -padx 8 -pady [list 8 4]
     $id widget set Caption -widget $base.caption
 
     frame $base.clientarea
     grid  $base.clientarea -row 3 -sticky nsew -padx 8 -pady 4
     $id widget set ClientArea -widget $base.clientarea -type frame
 
-    grid rowconfigure    $base.clientarea 1 -weight 1
+    grid rowconfigure    $base.clientarea 4 -weight 1
     grid columnconfigure $base.clientarea 0 -weight 1
 
-    ttk::label $base.clientarea.label -text "RMI Port Number"
+    ttk::label $base.clientarea.label -text "RMI Registry Port Number"
     grid $base.clientarea.label -row 0 -column 0 -sticky w -padx 10 -pady 2
 
     ttk::entry $base.clientarea.entry -textvariable ::info(RMIPORT)
     grid $base.clientarea.entry -row 1 -column 0 -sticky new -padx {10 0} -pady 1
+
+    ttk::label $base.clientarea.label2 -text "RMI Service Port Number"
+    grid $base.clientarea.label2 -row 2 -column 0 -sticky w -padx 10 -pady 2
+
+    ttk::entry $base.clientarea.entry2 -textvariable ::info(RMISERVICEPORT)
+    grid $base.clientarea.entry2 -row 3 -column 0 -sticky new -padx {10 0} -pady 1
+
 
     Label $base.message -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text4]
     grid $base.message -row 4 -sticky nsew -padx 8 -pady [list 4 8]
