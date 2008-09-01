@@ -75,6 +75,7 @@
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
+      YAHOO.Bubbling.on("blogConfigChanged", this.onBlogConfigChanged, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("blogpostlistRefresh", this.onBlogPostListRefresh, this);
       
@@ -173,6 +174,11 @@
        * @see _setBusy/_releaseBusy
        */
       busy: false,
+      
+      /**
+       * True if publishing actions should be displayed
+       */
+      showPublishingActions: false,
       
       /**
        * Set multiple initialization options at once.
@@ -314,7 +320,7 @@
             {
                paginationRecordOffset: "startIndex",
                totalRecords: "total",
-               blogPermissions: "blogPermissions"
+               metadata: "metadata"
             }
          };
          
@@ -347,7 +353,7 @@
                html += '<div class="node post">';
 
                // actions
-               html += Alfresco.util.blog.generateBlogPostActions(me, data, 'div');
+               html += Alfresco.util.blog.generateBlogPostActions(me, data, 'div', me.showPublishingActions);
    
                // begin view
                html += '<div class="nodeContent">';
@@ -412,7 +418,7 @@
                html += '<div class="node post simple">';
                
                // begin actions
-               html += Alfresco.util.blog.generateBlogPostActions(me, data, 'span');
+               html += Alfresco.util.blog.generateBlogPostActions(me, data, 'span', me.showPublishingActions);
    
                // begin view
                html += '<div class="nodeContent">';
@@ -496,10 +502,13 @@
             }
             
             // extract the create permission and update the UI accordingly
-            if (oResponse.meta.blogPermissions)
+            if (oResponse.meta.metadata.blogPermissions)
             {
-               me.updateToolbar(oResponse.meta.blogPermissions);
+               me.updateToolbar(oResponse.meta.metadata.blogPermissions);
             }
+            
+            // set whether publishing actions should be available
+            me.showPublishingActions = oResponse.meta.metadata.externalBlogConfig;
             
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
@@ -727,6 +736,16 @@
          }
       },
       
+      /**
+       * On blog config changed h handler
+       *
+       * @method onTagSelected
+       */
+      onBlogConfigChanged: function BlogPostList_onBlogConfigChanged(layer, args)
+      {
+         // refresh the list
+         this._updateBlogPostList();
+      },
       
       // Actions implementation
       
