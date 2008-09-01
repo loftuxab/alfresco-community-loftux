@@ -300,12 +300,11 @@
             // we currently render all results the same way
             var site = oRecord.getData("site");
             var url = me._getBrowseUrlForRecord(oRecord);
-            var desc = "";
             // title/link to view page
-            desc = '<h3 class="itemname"><a target="_blank" href="' + encodeURI(url) + '">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
+            var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
             // link to the site
             desc += '<div class="detail">';
-            desc += '   In Site: <a  target="_blank" href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
+            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
             desc += '</div>';
             desc += '<div class="details">';
             desc += '   Tags: ';
