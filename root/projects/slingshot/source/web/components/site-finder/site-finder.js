@@ -456,6 +456,8 @@
             renderLoopSize: 32,
             initialLoad: false
          });
+         this.widgets.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
+
          
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function SiteFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -709,10 +711,6 @@
        */
       onSiteDeleted: function CS_onSiteDeleted(layer, args)
       {
-         this.searchTerm = Dom.get(this.id + "-term").value;
-         this._performSearch(this.searchTerm);
-
-         /*
          var site = args[1].site;
          var rs = this.widgets.dataTable.getRecordSet();
          var length = rs.getLength();
@@ -721,12 +719,27 @@
             var record = rs.getRecord(i);
             if(record.getData("shortName") == site.shortName)
             {
-               var index = rs.getRecordIndex(record);
-               rs.deleteRecord(index);
+               this.widgets.dataTable.deleteRow(record);
             }
          }
-          */
-      }
+
+      },
+
+       /**
+        * Fired by YUI:s DataTable when a row has been added to the data table list.
+        * Keeps track of added files.
+        *
+        * @method onRowDeleteEvent
+        * @param event {object} a DataTable "rowDelete" event
+        */
+       onRowDeleteEvent: function FU_onRowDeleteEvent(event)
+       {
+          if (this.widgets.dataTable.getRecordSet().getLength() === 0)
+          {
+             this.widgets.dataTable.showTableMessage(Alfresco.util.message("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
+          }
+       }
+
 
    };
 })();
