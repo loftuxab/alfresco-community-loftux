@@ -37,6 +37,11 @@
 	border: none;
 }
 
+.site-finder .siteFinderTableMessage
+{
+    white-space: nowrap;
+}
+
 .site-finder .yui-dt-bd table thead
 {
 	display: none;
@@ -54,7 +59,7 @@
 
 .site-finder .yui-dt-last
 {
-   width: 75px;
+   width: 165px;
 }
 
 .site-finder tr.yui-dt-odd
