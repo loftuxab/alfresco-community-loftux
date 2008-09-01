@@ -113,7 +113,7 @@ Alfresco.util.blog.generatePostStatusLabel = function generatePostStatusLabel(me
  * @param tagName the tag name to use for the actions. This will either be div or span, depending
  *                whether the actions are for the simple or detailed view.
  */         
-Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me, data, tagName)
+Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me, data, tagName, showPublishingActions)
 {
    var desc = '';
    // begin actions
@@ -122,7 +122,7 @@ Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me
    {
       desc += '<' + tagName + ' class="onEditBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
    }
-   if (data.permissions.edit && ! data.isDraft)
+   if (data.permissions.edit && ! data.isDraft && showPublishingActions)
    {
       if (data.isPublished)
       {

@@ -118,6 +118,14 @@
       busy: false,
       
       /**
+       * True if publishing actions should be displayed
+       * 
+       * @property showPublishingActions
+       * @type boolean
+       */
+      showPublishingActions: false,
+      
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -228,6 +236,7 @@
          // store the returned data locally
          var data = response.json.item
          this.blogPostData = data;
+         this.showPublishingActions = response.json.metadata.externalBlogConfig;
          
          // get the container div to insert the the post into
          var viewDiv = Dom.get(this.id + '-post-view-div');
@@ -274,7 +283,7 @@
           
          var html = '';
          html += '<div id="' + this.id + '-postview" class="node post postview">'
-         html += Alfresco.util.blog.generateBlogPostActions(this, data, 'div');
+         html += Alfresco.util.blog.generateBlogPostActions(this, data, 'div', this.showPublishingActions);
   
          // content
          html += '<div class="nodeContent">';
