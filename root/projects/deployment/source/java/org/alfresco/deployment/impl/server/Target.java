@@ -210,10 +210,9 @@ public class Target implements Serializable
      * @return
      */
     public File getFileForPath(String path)
-    {
+   {
         return new File(fRootDirectory + normalizePath(path));
     }
-
     private static final String fgSeparatorReplacement;
 
     static
@@ -277,8 +276,11 @@ public class Target implements Serializable
         for (String path : toClone)
         {
             File file = new File(path);
-            Path filePath = new Path(path);
-            File dir = new File(filePath.getParent().toString());
+            File dir = new File(file.getParent());     
+            
+            //Path filePath = new Path(path);
+            //File dir = new File(filePath.getParent().toString());
+            
             dir.mkdirs();
             DirectoryMetaData md = null;
             if (!file.exists())

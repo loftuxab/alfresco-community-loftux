@@ -93,5 +93,8 @@
 		<property name="registryPort">
 			<value>${dep.rmi.port}</value>
 		</property>
+		<property name="servicePort">
+			<value>${dep.rmi.service.port}</value>
+		</property>
 	</bean>
 </beans>

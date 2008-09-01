@@ -3,7 +3,7 @@ AllowLanguageSelection
 Yes
 
 AppName
-{Alfresco Deployment Server}
+{Alfresco File System Receiver}
 
 ApplicationID
 15d54dc2-562d-11dc-8314-0800200c9a66
@@ -13,6 +13,12 @@ ApplicationURL
 
 AutoFileGroups
 No
+
+AutoRefreshFiles
+Yes
+
+BuildFailureAction
+{Fail (recommended)}
 
 CancelledInstallAction
 {Rollback and Stop}
@@ -56,6 +62,9 @@ DEPTARGET
 DEPUSER
 admin
 
+DefaultDirectoryLocation
+{}
+
 DefaultLanguage
 English
 
@@ -92,10 +101,22 @@ Yes
 Language,fr
 Yes
 
+Language,hu
+Yes
+
+Language,it
+Yes
+
+Language,nl
+Yes
+
 Language,pl
 Yes
 
 Language,pt_br
+Yes
+
+Language,ru
 Yes
 
 PackageDescription
@@ -122,6 +143,9 @@ PackageSummary
 PackageVersion
 <%MajorVersion%>.<%MinorVersion%>
 
+PreserveFileAttributes
+Yes
+
 PreserveFilePermissions
 Yes
 
@@ -129,10 +153,13 @@ ProjectID
 CB2C8E57-4826-4821-B9A1-7191DEB3B6CD
 
 ProjectVersion
-1.2.0.2
+1.2.8.0
 
 RMIPORT
 44100
+
+RMISERVICEPORT
+44101
 
 SaveOnlyToplevelDirs
 No
@@ -145,6 +172,9 @@ AlfrescoDeploy
 
 SkipUnusedFileGroups
 Yes
+
+SystemLanguage
+c
 
 Theme
 Modern_Wizard
@@ -159,10 +189,16 @@ UpgradeApplicationID
 {}
 
 Version
-2.1
+2.2
 
 ViewReadme
 Yes
+
+WizardHeight
+365
+
+WizardWidth
+500
 
 }
 
@@ -199,10 +235,10 @@ File ::8E3E7956-6EEA-4B8F-8D40-F92847C38297 -name W:/V21/root/projects/deploymen
 File ::D9F4C8FD-8ABF-4A83-89F9-53899BB3D24C -name W:/V21/root/projects/deployment/build/assemble/alfresco-core.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::B4F13A48-B7CB-432F-A5F2-88B942CBEF28 -name W:/V21/root/projects/deployment/build/assemble/alfresco-deployment.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::D78459BA-8E76-40B3-B41B-A22EA92BD378 -name W:/V21/root/projects/deployment/build/assemble/commons-logging-1.0.4.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::BE383A20-2335-40B7-88FE-C5BE7D3C7C6A -name W:/V21/root/projects/deployment/build/assemble/jug.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::4237A356-22D6-4A34-9C61-9071508A7267 -name W:/V21/root/projects/deployment/build/assemble/readme.txt -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::F8C990F8-7588-42FB-8C8F-CB58E33D03E6 -name W:/V21/root/projects/installer/deployment.properties -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::5A5F76C5-7F49-4F69-B473-95096A76F43F -name W:/V21/root/projects/installer/application-context.xml -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::A07BFF00-FA26-415F-93CB-3C9003EAD050 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/jug-lgpl-2.0.0.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 FileGroup ::03791E78-4713-45B0-8559-C66EA67DB28A -setup Install -active Yes -platforms Windows -name {Windows scripts} -parent FileGroups
 File ::D6EBA3BA-8849-4530-AF11-6B6B1BD0A40D -name W:/V21/root/projects/deployment/build/assemble/deploy_start.bat -location ../../projects/deployment/build/assemble -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 File ::E1A99665-AF17-41BF-A38B-31FA8EA7631E -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 03791E78-4713-45B0-8559-C66EA67DB28A
@@ -215,8 +251,8 @@ SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active Yes -pla
 
 InstallComponent 185DEE53-68ED-4921-9CA3-E480BE16988A -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
 InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane -conditions {3FB18EB1-8713-42CF-AF1C-26756FA05D10 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
-Condition 3FB18EB1-8713-42CF-AF1C-26756FA05D10 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {Script Condition} -component ScriptCondition
-Condition 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Permission Condition} -component FilePermissionCondition
+Condition 3FB18EB1-8713-42CF-AF1C-26756FA05D10 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {Script Condition} -component ScriptCondition -TreeObject::id 3FB18EB1-8713-42CF-AF1C-26756FA05D10
+Condition 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Permission Condition} -component FilePermissionCondition -TreeObject::id 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B
 InstallComponent A8D2B553-0B34-480D-B790-0549DCC7F087 -setup Install -type pane -title {Set Data} -component CustomBlankPane2 -active Yes -parent StandardInstall
 InstallComponent 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1 -setup Install -type pane -title {Set User} -component CustomBlankPane2 -active Yes -parent StandardInstall
 InstallComponent 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB -setup Install -type pane -title {Set Port} -component CustomBlankPane2 -active Yes -parent StandardInstall
@@ -227,21 +263,21 @@ InstallComponent F46C9198-80E1-466C-9034-9BC1AA83A5C6 -setup Install -type actio
 InstallComponent 098C7D04-1810-423D-B546-0B9530DB442E -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent D3C20805-32F3-4D27-A208-14416A55DC0A
 InstallComponent B8789CBA-5346-4622-B110-5C07D63D8D1B -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
 InstallComponent 60993F14-4B6A-4F15-AD0D-F2419D5D27D0 -setup Install -type action -conditions {41C7A8A3-A7DC-4587-AAA1-2BF41B539E1A 6C00D61A-BAED-436E-B4A0-21849D61BD47} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent B8789CBA-5346-4622-B110-5C07D63D8D1B
-Condition 41C7A8A3-A7DC-4587-AAA1-2BF41B539E1A -active Yes -parent 60993F14-4B6A-4F15-AD0D-F2419D5D27D0 -title {File Exists Condition} -component FileExistsCondition
-Condition 6C00D61A-BAED-436E-B4A0-21849D61BD47 -active Yes -parent 60993F14-4B6A-4F15-AD0D-F2419D5D27D0 -title {String Is Condition} -component StringIsCondition
+Condition 41C7A8A3-A7DC-4587-AAA1-2BF41B539E1A -active Yes -parent 60993F14-4B6A-4F15-AD0D-F2419D5D27D0 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 41C7A8A3-A7DC-4587-AAA1-2BF41B539E1A
+Condition 6C00D61A-BAED-436E-B4A0-21849D61BD47 -active Yes -parent 60993F14-4B6A-4F15-AD0D-F2419D5D27D0 -title {String Is Condition} -component StringIsCondition -TreeObject::id 6C00D61A-BAED-436E-B4A0-21849D61BD47
 InstallComponent 76737D66-740C-407E-848A-1CCCADF7D84C -setup Install -type pane -title {Copying Files} -component CopyFiles -active Yes -parent DefaultInstall
 InstallComponent EEB924A9-DD95-45D6-A6D4-940B4EE700D2 -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent 76737D66-740C-407E-848A-1CCCADF7D84C
 InstallComponent 4FAEC1C0-72BE-4D92-A9C4-26B3D9D061FD -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 76737D66-740C-407E-848A-1CCCADF7D84C
 InstallComponent 4D20F123-6E6F-4C03-92DC-D953FB62F7CE -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 76737D66-740C-407E-848A-1CCCADF7D84C
 InstallComponent 5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent DefaultInstall
 InstallComponent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -setup Install -type action -conditions {77F3EF54-333D-4039-8ACC-F729F99502AB 10199168-B558-4610-AC84-91459D922A2F} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent 5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E
-Condition 77F3EF54-333D-4039-8ACC-F729F99502AB -active Yes -parent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -title {File Exists Condition} -component FileExistsCondition
-Condition 10199168-B558-4610-AC84-91459D922A2F -active Yes -parent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -title {String Is Condition} -component StringIsCondition
+Condition 77F3EF54-333D-4039-8ACC-F729F99502AB -active Yes -parent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 77F3EF54-333D-4039-8ACC-F729F99502AB
+Condition 10199168-B558-4610-AC84-91459D922A2F -active Yes -parent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -title {String Is Condition} -component StringIsCondition -TreeObject::id 10199168-B558-4610-AC84-91459D922A2F
 InstallComponent 1ECDBB48-FBA6-4FE7-80D8-892A0D43E8EC -setup Install -type action -title {Console Ask Yes Or No} -component ConsoleAskYesOrNo -active Yes -parent ConsoleInstall
 InstallComponent A4FABD03-7CBF-47CF-B451-E90B072314E6 -setup Install -type action -conditions ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2 -title Exit -component Exit -command insert -active Yes -parent ConsoleInstall
-Condition ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2 -active Yes -parent A4FABD03-7CBF-47CF-B451-E90B072314E6 -title {String Is Condition} -component StringIsCondition
+Condition ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2 -active Yes -parent A4FABD03-7CBF-47CF-B451-E90B072314E6 -title {String Is Condition} -component StringIsCondition -TreeObject::id ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2
 InstallComponent 3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E -setup Install -type action -conditions 8B62889B-949F-41CC-B2DE-0C03145DE416 -title {Console Get User Input} -component ConsoleGetUserInput -command insert -active Yes -parent ConsoleInstall
-Condition 8B62889B-949F-41CC-B2DE-0C03145DE416 -active Yes -parent 3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E -title {File Permission Condition} -component FilePermissionCondition
+Condition 8B62889B-949F-41CC-B2DE-0C03145DE416 -active Yes -parent 3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E -title {File Permission Condition} -component FilePermissionCondition -TreeObject::id 8B62889B-949F-41CC-B2DE-0C03145DE416
 InstallComponent 3AD5798F-A12B-4033-81BE-280FE617C152 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
 InstallComponent 82FEF2F0-F699-460A-8722-BA4DC8EB08D5 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent ConsoleInstall
 InstallComponent 01472B6B-51CF-4489-8D7B-930E4CC4DA03 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
@@ -251,30 +287,30 @@ InstallComponent 79909EDE-134A-4BBF-8671-BEEB6461346D -setup Install -type actio
 InstallComponent EA91E082-AE52-4F66-8547-16F25AB2BB05 -setup Install -type actiongroup -title {Setup Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent D7C4D154-102D-4E69-BCE9-DE736306B3F2 -setup Install -type actiongroup -title {Startup Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 9B6636CA-B716-42BA-9086-1A696378A545 -setup Install -type action -conditions {05688F0D-447E-4A70-B1DC-1B9433C0F842 2C9998AE-3A35-4709-8148-E361FCC88B70} -title Exit -component Exit -command insert -active Yes -parent D7C4D154-102D-4E69-BCE9-DE736306B3F2
-Condition 05688F0D-447E-4A70-B1DC-1B9433C0F842 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {String Is Condition} -component StringIsCondition
-Condition 2C9998AE-3A35-4709-8148-E361FCC88B70 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {Ask Yes or No} -component AskYesOrNo
+Condition 05688F0D-447E-4A70-B1DC-1B9433C0F842 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {String Is Condition} -component StringIsCondition -TreeObject::id 05688F0D-447E-4A70-B1DC-1B9433C0F842
+Condition 2C9998AE-3A35-4709-8148-E361FCC88B70 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {Ask Yes or No} -component AskYesOrNo -TreeObject::id 2C9998AE-3A35-4709-8148-E361FCC88B70
 InstallComponent FFD2219F-EE00-42D2-9AAC-6BBF1EFA38E1 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent D7C4D154-102D-4E69-BCE9-DE736306B3F2
 InstallComponent DAFEBC2A-575A-4986-9018-E1E8760F43B0 -setup Install -type action -title {Create Install Panes} -component CreateInstallPanes -active Yes -parent D7C4D154-102D-4E69-BCE9-DE736306B3F2
 InstallComponent A88C91B3-4613-42A4-8B24-8A95EE4C72CB -setup Install -type actiongroup -title {Install Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 1F4F3EE9-AAFC-4A65-8F54-4ED69DE1E047 -setup Install -type action -title {Install Selected Files} -component InstallSelectedFiles -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 InstallComponent FA8418AE-1213-4FEC-B2DE-ABA3AD6B0762 -setup Install -type action -conditions C58D266E-9F05-4233-80A6-DE03A0259B23 -title {Install Uninstaller} -component InstallUninstaller -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-Condition C58D266E-9F05-4233-80A6-DE03A0259B23 -active Yes -parent FA8418AE-1213-4FEC-B2DE-ABA3AD6B0762 -title {String Is Condition} -component StringIsCondition
+Condition C58D266E-9F05-4233-80A6-DE03A0259B23 -active Yes -parent FA8418AE-1213-4FEC-B2DE-ABA3AD6B0762 -title {String Is Condition} -component StringIsCondition -TreeObject::id C58D266E-9F05-4233-80A6-DE03A0259B23
 InstallComponent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -setup Install -type action -conditions 27CE19A4-5473-40A5-BF94-434825CB85B6 -title {Windows Uninstall Registry} -component AddWindowsUninstallEntry -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-Condition 27CE19A4-5473-40A5-BF94-434825CB85B6 -active Yes -parent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -title {String Is Condition} -component StringIsCondition
+Condition 27CE19A4-5473-40A5-BF94-434825CB85B6 -active Yes -parent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -title {String Is Condition} -component StringIsCondition -TreeObject::id 27CE19A4-5473-40A5-BF94-434825CB85B6
 InstallComponent 27951917-16C4-4604-BC60-F67560355F36 -setup Install -type action -title {Win Start Shortcut} -component InstallWindowsShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 InstallComponent 866731A5-0954-4EFC-8A47-20EFC1398504 -setup Install -type action -conditions A6A56774-42B3-4BA4-A026-726EEB98383F -title {Nix Start Shortcut} -component InstallDesktopShortcut -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-Condition A6A56774-42B3-4BA4-A026-726EEB98383F -active Yes -parent 866731A5-0954-4EFC-8A47-20EFC1398504 -title {Platform Condition} -component PlatformCondition
+Condition A6A56774-42B3-4BA4-A026-726EEB98383F -active Yes -parent 866731A5-0954-4EFC-8A47-20EFC1398504 -title {Platform Condition} -component PlatformCondition -TreeObject::id A6A56774-42B3-4BA4-A026-726EEB98383F
 InstallComponent 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68 -setup Install -type action -title {Win Stop Shortcut} -component InstallWindowsShortcut -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 InstallComponent 776A577D-90EB-4CDA-A881-BAA643FD698D -setup Install -type action -conditions BAC94ABE-77BA-40D2-B427-C641FCE5559E -title {Nix Stop Shortcut} -component InstallDesktopShortcut -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-Condition BAC94ABE-77BA-40D2-B427-C641FCE5559E -active Yes -parent 776A577D-90EB-4CDA-A881-BAA643FD698D -title {Platform Condition} -component PlatformCondition
+Condition BAC94ABE-77BA-40D2-B427-C641FCE5559E -active Yes -parent 776A577D-90EB-4CDA-A881-BAA643FD698D -title {Platform Condition} -component PlatformCondition -TreeObject::id BAC94ABE-77BA-40D2-B427-C641FCE5559E
 InstallComponent 679A07B2-4D09-4796-8F0F-BC470030E967 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 InstallComponent 1872EB29-D3C3-49FD-B375-0E33A95CA384 -setup Install -type action -conditions EFFFBFA5-266A-4EC5-B904-A29CF90966FF -title {Uninstall Shortcut} -component InstallProgramFolderShortcut -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-Condition EFFFBFA5-266A-4EC5-B904-A29CF90966FF -active Yes -parent 1872EB29-D3C3-49FD-B375-0E33A95CA384 -title {String Is Condition} -component StringIsCondition
+Condition EFFFBFA5-266A-4EC5-B904-A29CF90966FF -active Yes -parent 1872EB29-D3C3-49FD-B375-0E33A95CA384 -title {String Is Condition} -component StringIsCondition -TreeObject::id EFFFBFA5-266A-4EC5-B904-A29CF90966FF
 InstallComponent 4E511E67-0388-4572-BC5E-A168E4AE3E30 -setup Install -type actiongroup -title {Finish Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -setup Install -type action -conditions {6C0762ED-9B8B-470A-882D-366AD1144DD5 362DF1C8-26F9-4D27-9D32-A9367E4361F1 7046774A-E126-4EB2-8B28-D1A903FA9F28} -title {View Readme Window} -component TextWindow -command insert -active Yes -parent 4E511E67-0388-4572-BC5E-A168E4AE3E30
-Condition 6C0762ED-9B8B-470A-882D-366AD1144DD5 -active Yes -parent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -title {String Is Condition} -component StringIsCondition
-Condition 362DF1C8-26F9-4D27-9D32-A9367E4361F1 -active Yes -parent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -title {String Is Condition} -component StringIsCondition
-Condition 7046774A-E126-4EB2-8B28-D1A903FA9F28 -active Yes -parent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -title {File Exists Condition} -component FileExistsCondition
+Condition 6C0762ED-9B8B-470A-882D-366AD1144DD5 -active Yes -parent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -title {String Is Condition} -component StringIsCondition -TreeObject::id 6C0762ED-9B8B-470A-882D-366AD1144DD5
+Condition 362DF1C8-26F9-4D27-9D32-A9367E4361F1 -active Yes -parent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -title {String Is Condition} -component StringIsCondition -TreeObject::id 362DF1C8-26F9-4D27-9D32-A9367E4361F1
+Condition 7046774A-E126-4EB2-8B28-D1A903FA9F28 -active Yes -parent C24DB57E-8A2F-4608-BF39-34DE6FFAD232 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 7046774A-E126-4EB2-8B28-D1A903FA9F28
 InstallComponent 28BA537C-B491-4591-AEB3-A8FF3488D9D3 -setup Install -type actiongroup -title {Cancel Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent CBBC5A1A-FF15-44CE-A623-320AB732C71D -setup Install -type actiongroup -title {Setup Text Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent A633CA65-3F99-48B7-BA6D-FA4E85696100 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent CBBC5A1A-FF15-44CE-A623-320AB732C71D
@@ -286,11 +322,11 @@ InstallComponent DAE1426B-CC4E-4EF8-B525-4FADBE0C7726 -setup Uninstall -type act
 InstallComponent 9357639A-760D-4BDB-AE1C-863ACFDBAEE5 -setup Uninstall -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 0157B67A-505B-4411-A8FA-D32E045725A5
 InstallComponent 9DF565C0-6E67-4198-83D2-E74B785264BD -setup Uninstall -type action -title {Move Forward} -component MoveForward -active Yes -parent 0157B67A-505B-4411-A8FA-D32E045725A5
 InstallComponent A6E46E2E-88B0-450E-8080-CA4034227A6C -setup Uninstall -type pane -conditions 0C1B028B-84B1-476C-90D5-EEBEB819A2AF -title {Uninstall Details} -component UninstallDetails -command insert -active Yes -parent StandardUninstall
-Condition 0C1B028B-84B1-476C-90D5-EEBEB819A2AF -active Yes -parent A6E46E2E-88B0-450E-8080-CA4034227A6C -title {String Is Condition} -component StringIsCondition
+Condition 0C1B028B-84B1-476C-90D5-EEBEB819A2AF -active Yes -parent A6E46E2E-88B0-450E-8080-CA4034227A6C -title {String Is Condition} -component StringIsCondition -TreeObject::id 0C1B028B-84B1-476C-90D5-EEBEB819A2AF
 InstallComponent 1C7A02C6-9224-47D5-8586-99F20010BA7B -setup Uninstall -type pane -title {Uninstall Complete} -component UninstallComplete -active Yes -parent StandardUninstall
 InstallComponent 7418CBDF-4112-44CE-AFEE-87E208EFC046 -setup Uninstall -type action -title {Console Ask Yes Or No} -component ConsoleAskYesOrNo -active Yes -parent ConsoleUninstall
 InstallComponent 032FBA6F-F736-483B-8499-6BE702CD9EE6 -setup Uninstall -type action -conditions 573D9A46-0AC4-4E85-8081-1B19E4304E6B -title Exit -component Exit -command insert -active Yes -parent ConsoleUninstall
-Condition 573D9A46-0AC4-4E85-8081-1B19E4304E6B -active Yes -parent 032FBA6F-F736-483B-8499-6BE702CD9EE6 -title {String Is Condition} -component StringIsCondition
+Condition 573D9A46-0AC4-4E85-8081-1B19E4304E6B -active Yes -parent 032FBA6F-F736-483B-8499-6BE702CD9EE6 -title {String Is Condition} -component StringIsCondition -TreeObject::id 573D9A46-0AC4-4E85-8081-1B19E4304E6B
 InstallComponent C0127B2B-279D-41E9-B5BF-E8C61362F845 -setup Uninstall -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleUninstall
 InstallComponent 64B57BEF-92CD-43C2-97FF-6C4C766E5CCA -setup Uninstall -type action -title {Execute Action} -component ExecuteAction -active Yes -parent ConsoleUninstall
 InstallComponent 4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59 -setup Uninstall -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleUninstall
@@ -300,8 +336,8 @@ InstallComponent 99702374-9D9D-47E7-91A8-0BFE229D5759 -setup Uninstall -type act
 InstallComponent D14D0B49-BF35-4861-A7F0-516681E1DB06 -setup Uninstall -type actiongroup -title {Setup Actions} -active Yes -parent ActionGroupsUninstall
 InstallComponent 7B531FBB-A206-4955-84FE-D668C953700C -setup Uninstall -type actiongroup -title {Startup Actions} -active Yes -parent ActionGroupsUninstall
 InstallComponent 06312126-B2BD-46FA-BB98-56DFD8D1C53E -setup Uninstall -type action -conditions {82626A44-8DF9-4D53-8460-5DC03E855581 D48D5141-FE42-4E9F-94A0-B318959410E7} -title Exit -component Exit -command insert -active Yes -parent 7B531FBB-A206-4955-84FE-D668C953700C
-Condition 82626A44-8DF9-4D53-8460-5DC03E855581 -active Yes -parent 06312126-B2BD-46FA-BB98-56DFD8D1C53E -title {String Is Condition} -component StringIsCondition
-Condition D48D5141-FE42-4E9F-94A0-B318959410E7 -active Yes -parent 06312126-B2BD-46FA-BB98-56DFD8D1C53E -title {Ask Yes or No} -component AskYesOrNo
+Condition 82626A44-8DF9-4D53-8460-5DC03E855581 -active Yes -parent 06312126-B2BD-46FA-BB98-56DFD8D1C53E -title {String Is Condition} -component StringIsCondition -TreeObject::id 82626A44-8DF9-4D53-8460-5DC03E855581
+Condition D48D5141-FE42-4E9F-94A0-B318959410E7 -active Yes -parent 06312126-B2BD-46FA-BB98-56DFD8D1C53E -title {Ask Yes or No} -component AskYesOrNo -TreeObject::id D48D5141-FE42-4E9F-94A0-B318959410E7
 InstallComponent 826936A6-0802-4BED-82CE-5190175E0877 -setup Uninstall -type actiongroup -title {Uninstall Actions} -active Yes -parent ActionGroupsUninstall
 InstallComponent 5591DB4D-C5B5-4856-866A-4F1B8A8F31DC -setup Uninstall -type action -title {Uninstall Selected Files} -component UninstallSelectedFiles -active Yes -parent 826936A6-0802-4BED-82CE-5190175E0877
 InstallComponent 7EEE05F1-15DE-49A8-9F99-7A58EB6279F8 -setup Uninstall -type actiongroup -title {Finish Actions} -active Yes -parent ActionGroupsUninstall
@@ -347,11 +383,11 @@ array set Properties {
 03791E78-4713-45B0-8559-C66EA67DB28A,Destination
 <%InstallDir%>
 
+03791E78-4713-45B0-8559-C66EA67DB28A,FileSize
+2224
+
 03791E78-4713-45B0-8559-C66EA67DB28A,Name
 {Windows scripts}
-
-03791E78-4713-45B0-8559-C66EA67DB28A,Size
-1269
 
 05688F0D-447E-4A70-B1DC-1B9433C0F842,CheckCondition
 {Before Action is Executed}
@@ -361,6 +397,9 @@ array set Properties {
 
 06312126-B2BD-46FA-BB98-56DFD8D1C53E,Comment
 {Ask the user if they want to proceed with the uninstall.}
+
+098C7D04-1810-423D-B546-0B9530DB442E,Conditions
+{0 conditions}
 
 0C1B028B-84B1-476C-90D5-EEBEB819A2AF,String
 <%ErrorsOccurred%>
@@ -372,7 +411,7 @@ array set Properties {
 <%InstallDir%>/alfresco.ico
 
 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68,ShortcutName
-{Stop Deployment Server}
+{Stop File System Receiver}
 
 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68,TargetFileName
 <%InstallDir%>/deploy_stop.bat
@@ -456,7 +495,7 @@ Yes
 <%InstallDir%>/alfresco.ico
 
 27951917-16C4-4604-BC60-F67560355F36,ShortcutName
-{Start Deployment Server}
+{Start File System Receiver}
 
 27951917-16C4-4604-BC60-F67560355F36,TargetFileName
 <%InstallDir%>/deploy_start.bat
@@ -475,6 +514,9 @@ false
 
 28BA537C-B491-4591-AEB3-A8FF3488D9D3,Alias
 {Cancel Actions}
+
+28BA537C-B491-4591-AEB3-A8FF3488D9D3,Conditions
+{0 conditions}
 
 28C9FDFC-2566-4AB8-8C2A-C47501C48BFF,Alias
 {Cancel Actions}
@@ -611,6 +653,9 @@ ViewReadme
 4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59,Message,subst
 1
 
+4C7D2162-0B33-4BEE-ACB3-365BB28E91E3,Conditions
+{1 condition}
+
 4E511E67-0388-4572-BC5E-A168E4AE3E30,Alias
 {Finish Actions}
 
@@ -625,6 +670,9 @@ false
 
 573D9A46-0AC4-4E85-8081-1B19E4304E6B,String
 <%Answer%>
+
+5B747634-BDE6-4E1C-9D67-3E45A888DB9B,Conditions
+{0 conditions}
 
 5B747634-BDE6-4E1C-9D67-3E45A888DB9B,State
 disabled
@@ -682,9 +730,11 @@ ViewReadme
 "@@DEPLOG@@" "<%DEPLOG%>"
 "@@DEPMETA@@" "<%DEPMETA%>"
 "@@RMIPORT@@" "<%RMIPORT%>"
+"@@RMISERVICEPORT@@" "<%RMISERVICEPORT%>"
 "@@DEPTARGET@@" "<%DEPTARGET%>"
 "@@DEPUSER@@" "<%DEPUSER%>"
-"@@DEPPWD@@" "<%DEPPWD%>"}
+"@@DEPPWD@@" "<%DEPPWD%>"
+}
 
 6C00D61A-BAED-436E-B4A0-21849D61BD47,CheckCondition
 {Before Action is Executed}
@@ -747,7 +797,7 @@ Yes
 <%InstallDir%>/AlfrescoLogo32.gif
 
 776A577D-90EB-4CDA-A881-BAA643FD698D,ShortcutName
-{Stop Deployment Server}
+{Stop File System Receiver}
 
 776A577D-90EB-4CDA-A881-BAA643FD698D,TargetFileName
 <%InstallDir%>/deploy_stop.sh
@@ -794,6 +844,9 @@ A92DA43F-C102-49A4-89FB-F2A2B18949D1
 840E153B-F29E-4184-8941-3C26F456EB0D,Description,subst
 1
 
+840E153B-F29E-4184-8941-3C26F456EB0D,DisplayName,subst
+1
+
 840E153B-F29E-4184-8941-3C26F456EB0D,Name
 Custom
 
@@ -807,7 +860,7 @@ No
 <%InstallDir%>/AlfrescoLogo32.gif
 
 866731A5-0954-4EFC-8A47-20EFC1398504,ShortcutName
-{Start Deployment Server}
+{Start File System Receiver}
 
 866731A5-0954-4EFC-8A47-20EFC1398504,TargetFileName
 <%InstallDir%>/deploy_start.sh
@@ -881,11 +934,11 @@ Finish
 9C895371-373A-4923-840C-4F98632E4A99,Destination
 <%InstallDir%>
 
+9C895371-373A-4923-840C-4F98632E4A99,FileSize
+2848051
+
 9C895371-373A-4923-840C-4F98632E4A99,Name
 {Program Files}
-
-9C895371-373A-4923-840C-4F98632E4A99,Size
-2826417
 
 A633CA65-3F99-48B7-BA6D-FA4E85696100,Conditions
 {0 conditions}
@@ -938,6 +991,9 @@ A6E46E2E-88B0-450E-8080-CA4034227A6C,Title,subst
 A88C91B3-4613-42A4-8B24-8A95EE4C72CB,Alias
 {Install Actions}
 
+A88C91B3-4613-42A4-8B24-8A95EE4C72CB,Conditions
+{0 conditions}
+
 A8D2B553-0B34-480D-B790-0549DCC7F087,Active
 Yes
 
@@ -966,6 +1022,9 @@ A8D2B553-0B34-480D-B790-0549DCC7F087,Title,subst
 1
 
 A92DA43F-C102-49A4-89FB-F2A2B18949D1,Description,subst
+1
+
+A92DA43F-C102-49A4-89FB-F2A2B18949D1,DisplayName,subst
 1
 
 A92DA43F-C102-49A4-89FB-F2A2B18949D1,FileGroups
@@ -1046,6 +1105,9 @@ B8789CBA-5346-4622-B110-5C07D63D8D1B,CancelButton,subst
 B8789CBA-5346-4622-B110-5C07D63D8D1B,Caption,subst
 1
 
+B8789CBA-5346-4622-B110-5C07D63D8D1B,Conditions
+{0 conditions}
+
 B8789CBA-5346-4622-B110-5C07D63D8D1B,Message,subst
 1
 
@@ -1070,6 +1132,9 @@ C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Caption,subst
 C24DB57E-8A2F-4608-BF39-34DE6FFAD232,CloseButton,subst
 1
 
+C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Conditions
+{3 conditions}
+
 C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Message,subst
 1
 
@@ -1082,11 +1147,11 @@ C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Title,subst
 C3FE0508-0773-40D6-97C4-1FE52205D032,Destination
 <%InstallDir%>
 
+C3FE0508-0773-40D6-97C4-1FE52205D032,FileSize
+4668
+
 C3FE0508-0773-40D6-97C4-1FE52205D032,Name
 {Linux scripts}
-
-C3FE0508-0773-40D6-97C4-1FE52205D032,Size
-4748
 
 C58D266E-9F05-4233-80A6-DE03A0259B23,CheckCondition
 {Before Action is Executed}
@@ -1190,6 +1255,9 @@ D700B54B-CEAC-48E9-8AC8-94D982B73406,Title,subst
 D7C4D154-102D-4E69-BCE9-DE736306B3F2,Alias
 {Startup Actions}
 
+D7C4D154-102D-4E69-BCE9-DE736306B3F2,Conditions
+{0 conditions}
+
 DAE1426B-CC4E-4EF8-B525-4FADBE0C7726,State
 disabled
 
@@ -1213,6 +1281,9 @@ DEPMETA
 
 EA91E082-AE52-4F66-8547-16F25AB2BB05,Alias
 {Setup Actions}
+
+EA91E082-AE52-4F66-8547-16F25AB2BB05,Conditions
+{0 conditions}
 
 EEB924A9-DD95-45D6-A6D4-940B4EE700D2,State
 disabled
@@ -1244,10 +1315,16 @@ DEPDATA
 F46C9198-80E1-466C-9034-9BC1AA83A5C6,Action
 {Install Actions}
 
+F46C9198-80E1-466C-9034-9BC1AA83A5C6,Conditions
+{0 conditions}
+
 F6005EED-F116-409B-82E7-662D4A7065E8,Components
 A92DA43F-C102-49A4-89FB-F2A2B18949D1
 
 F6005EED-F116-409B-82E7-662D4A7065E8,Description,subst
+1
+
+F6005EED-F116-409B-82E7-662D4A7065E8,DisplayName,subst
 1
 
 F6005EED-F116-409B-82E7-662D4A7065E8,Name
@@ -1619,6 +1696,66 @@ Windows,ProgramReadme
 Windows,WindowsIcon
 {Setup Blue Screen.ico}
 
+ZipArchive,Active
+No
+
+ZipArchive,CompressionLevel
+6
+
+ZipArchive,DefaultDirectoryPermission
+0755
+
+ZipArchive,DefaultFilePermission
+0755
+
+ZipArchive,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+ZipArchive,FallBackToConsole
+Yes
+
+ZipArchive,InstallDir
+<%Home%>/<%ShortAppName%>
+
+ZipArchive,InstallMode
+Standard
+
+ZipArchive,InstallType
+Typical
+
+ZipArchive,OutputFileName
+<%ShortAppName%>-<%Version%>.zip
+
+ZipArchive,ProgramExecutable
+{}
+
+ZipArchive,ProgramFolderAllUsers
+No
+
+ZipArchive,ProgramFolderName
+<%AppName%>
+
+ZipArchive,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+ZipArchive,ProgramName
+{}
+
+ZipArchive,ProgramReadme
+<%InstallDir%>/README.txt
+
+ZipArchive,PromptForRoot
+Yes
+
+ZipArchive,RequireRoot
+No
+
+ZipArchive,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+ZipArchive,VirtualTextMap
+{<%InstallDir%> <%ShortAppName%>}
+
 }
 
 ::msgcat::mcmset de {
@@ -1655,10 +1792,10 @@ C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
 {User Account}
 
 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1,Message
-{Please enter the details of the user account that should be used to access deployment data from the Alfresco server}
+{Please enter the details of the user account that should be used to secure this file system receiver}
 
 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1,Subtitle
-{Details of user account to access Alfresco server}
+{Details of user account to secure this file system receiver}
 
 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1,Title
 {User Account}
@@ -1679,13 +1816,13 @@ C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
 {Port details}
 
 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB,Message
-{Please enter the RMI port number of the Alfresco server required to access deployment data}
+{Please enter the RMI port numbers to use }
 
 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB,Subtitle
-{Alfresco server port to use to access deployment data}
+{Alfresco server ports}
 
 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB,Title
-{Remote Port Number}
+{Port Number}
 
 A1F5A59E-0134-431A-B5DC-4AEE624D7D43,Caption
 {Set Data Location}
@@ -1703,13 +1840,13 @@ A8D2B553-0B34-480D-B790-0549DCC7F087,Caption
 {Set Deployment Locations}
 
 A8D2B553-0B34-480D-B790-0549DCC7F087,Message
-{Enter the locations you wish to use for the Deployment Server data}
+{Enter the locations you wish to use for the File System Receiver data}
 
 A8D2B553-0B34-480D-B790-0549DCC7F087,Subtitle
-{Provide locations for deployment data components}
+{Provide file locations for deployment data}
 
 A8D2B553-0B34-480D-B790-0549DCC7F087,Title
-{Deploment Data Location}
+{Deployment settings}
 
 A92DA43F-C102-49A4-89FB-F2A2B18949D1,Description
 <%ProgramFilesDescription%>
@@ -1733,12 +1870,12 @@ D48D5141-FE42-4E9F-94A0-B318959410E7,Title
 <%UninstallApplicationText%>
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption
-{Please locate where you would like to install the Alfresco Deployment Server.
+{Please locate where you would like to install the Alfresco File System Receiver.
 
-Use the Browse... button to navigate to find an existing Alfresco installation.}
+Use the Browse... button to navigate to find an existing Alfresco File System Receiver installation.}
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Subtitle
-{Where do you want to install the Alfresco Deployment Server?}
+{Where do you want to install the Alfresco File System Receiver ?}
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Title
 {Choose installation location}

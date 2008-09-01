@@ -47,6 +47,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Server implementation.
@@ -71,6 +73,8 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     
     private Map<String, Boolean> fTargetBusy;
     
+    private static Log logger = LogFactory.getLog(DeploymentReceiverServiceImpl.class);
+    
     public DeploymentReceiverServiceImpl()
     {
         fDone = false;
@@ -85,8 +89,14 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     
     public void init()
     {
+    	logger.info("Initialising Implementation");
+    	logger.debug("configuration dataDirectory:" + fConfiguration.getDataDirectory());
+    	logger.debug("configuration metaDataDirectory:" + fConfiguration.getMetaDataDirectory());
+    	logger.debug("configuration logDirectory:" + fConfiguration.getLogDirectory());
+    	
         for (String target : fConfiguration.getTargetNames())
         {
+        	logger.debug("configuration target:" + target);
             fTargetBusy.put(target, false);
         }
         fThread = new Thread(this);
@@ -95,6 +105,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     
     public void shutDown()
     {
+    	logger.info("Shutting down Implementation");
         fDone = true;
         synchronized (this)
         {
@@ -106,7 +117,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (InterruptedException e)
         {
-            // Do nothing.
+        	logger.error("Unable to join implementation thread while shutting down", e);
         }
     }
     
@@ -115,9 +126,11 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
      */
     public synchronized void abort(String ticket)
     {
+      	logger.info("Abort ticket: " + ticket);
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
+        	logger.warn("Could not abort, timed out or invalid token ticket:" + ticket);
             throw new DeploymentException("Deployment timed out or invalid token.");  
         }
         if (deployment.getState() != DeploymentState.WORKING)
@@ -133,6 +146,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (IOException e)
         {
+        	logger.error("Error while aborting ticket:" + ticket, e);
             throw new DeploymentException("Traumatic failure. Could not abort cleanly.");
         }
     }
@@ -142,15 +156,26 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
      */
     public String begin(String targetName, String user, String password)
     {
+    	logger.debug("begin of target:" + targetName);
         Target target = fConfiguration.getTarget(targetName);
         if (target == null)
         {
+        	logger.warn("No such target:" + targetName);
             throw new DeploymentException("No such target: " + targetName);
         }
         if (!user.equals(target.getUser()) || !password.equals(target.getPassword()))
         {
+        	logger.warn("Invalid user name or password");
             throw new DeploymentException("Invalid user name or password.");
         }
+        
+        // Check that the root directory exists
+        File root = new File(target.getRootDirectory()); 
+        if(!root.exists())
+        {
+        	 throw new DeploymentException("Root directory does not exist. rootDirectory:" + target.getRootDirectory()); 
+        }
+        
         synchronized (this)
         {
             if (fTargetBusy.get(targetName))
@@ -158,6 +183,8 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                 throw new DeploymentException("Deployment in progress to " + targetName);
             }
             String ticket = GUID.generate();
+            logger.debug("begin deploy, target:" + targetName + "ticket:" + ticket);
+            
             try
             {
                 Deployment deployment = 
@@ -167,6 +194,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             catch (IOException e)
             {
                 // TODO How to we recover from this?
+            	logger.error("Could not create logfile", e);
                 throw new DeploymentException("Could not create logfile; Deployment cannot continue", e);
             }
             fTargetBusy.put(targetName, true);
@@ -182,8 +210,11 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-            throw new DeploymentException("Could not commit because deployment timed out.");
+        	String msg = "Could not commit because deployment timed out or invalid token ticket:" + ticket;
+        	logger.error(msg);
+            throw new DeploymentException(msg);
         }
+        logger.debug("commit ticket:" + ticket);
         try
         {
             deployment.finishWork();
@@ -210,7 +241,9 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                     }
                     case FILE :
                     {
-                        File f = deployment.getFileForPath(path);
+                    	logger.debug("add file:" + path);
+                        // If file already exists then rename it
+                    	File f = deployment.getFileForPath(path);
                         if (f.exists())
                         {
                             File dest = new File(f.getAbsolutePath() + ".alf");
@@ -233,6 +266,8 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                     }
                     case DELETED :
                     {
+                    	logger.debug("delete file:" + path);
+                    	// prepare the file for deletion by renaming it
                         File f = deployment.getFileForPath(path);
                         if (f.exists())
                         {
@@ -248,6 +283,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                     }
                     default :
                     {
+                    	logger.error("Internal error: unknown file type: " + file.getType());
                         throw new DeploymentException("Internal error: unknown file type: " + file.getType());
                     }
                 }
@@ -275,12 +311,14 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             File preLocation = new File(fConfiguration.getDataDirectory() + File.separatorChar + ticket);
             preLocation.delete();
             deployment.finishCommit();
+            logger.debug("commited successfully ticket:" + ticket);
         }
         catch (Exception e)
         {
             if (!recover(ticket, deployment))
             {
-                throw new DeploymentException("Failure during prepare phase; rolled back.", e);
+            	logger.error("Failure during commit phase; rolled back.", e);
+                throw new DeploymentException("Failure during commit phase; rolled back.", e);
             }
         }
         finally
@@ -323,6 +361,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                         }
                     }
                     deployment.rollback();
+                    logger.info("recover action=rollback for ticket:" + ticket);
                     return false;
                 }
                 // In this case the only thing we can do is go forward because
@@ -344,16 +383,19 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                     File preLocation = new File(fConfiguration.getDataDirectory() + File.separatorChar + ticket);
                     preLocation.delete();
                     deployment.finishCommit();
+                    logger.info("recover action=commit for ticket:" + ticket);
                     return true;
                 }
                 default :
                 {
+                	logger.error("unknown state for recovery of ticket:" + ticket);
                     throw new DeploymentException("recover called while state = " + deployment.getState());
                 }
             }
         }
         catch (Exception e)
         {
+        	logger.error("Recovery failed for " + ticket, e);
             throw new DeploymentException("Recovery failed for " + ticket, e);
         }
     }
@@ -378,8 +420,9 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (IOException e)
         {
+        	logger.error("Could not update log. Aborted.", e);
             abort(token);
-            throw new DeploymentException("Could not update log. Aborted.", e);
+            throw new DeploymentException("Could not update log.", e);
         }
     }
 
@@ -402,6 +445,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         catch (IOException e)
         {
             // TODO Do cleanup.
+          	logger.error("finishSend",  e);
             throw new DeploymentException("I/O error closing sent file and logging.");
         }
     }
@@ -430,9 +474,9 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#mkdir(java.lang.String, java.lang.String, java.lang.String)
      */
-    public synchronized void mkdir(String token, String path, String guid)
+    public synchronized void mkdir(String ticket, String path, String guid)
     {
-        Deployment deployment = fDeployments.get(token);
+        Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
             throw new DeploymentException("Deployment timed out or invalid token.");
@@ -447,7 +491,8 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (IOException e)
         {
-            abort(token);
+            abort(ticket);
+          	logger.error("Unable to mkdir path:" + path, e);
             throw new DeploymentException("Could not log mkdir of " + path + ". Aborted.");
         }
     }
@@ -476,7 +521,8 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         catch (IOException e)
         {
             abort(ticket);
-            throw new DeploymentException("Could Not Open " + path + " for write. Aborted.", e);
+        	logger.error("Could not open path for writing path :" + path, e);
+            throw new DeploymentException("Could Not Open " + path + " for write.", e);
         }
     }
 
@@ -486,6 +532,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     public synchronized void shutDown(String user, String password)
     {
         fContext.close();
+        logger.info("Shut down");
         System.exit(0);
     }
 

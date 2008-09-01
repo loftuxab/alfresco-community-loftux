@@ -34,7 +34,11 @@ import java.util.Set;
 
 import org.alfresco.deployment.FSDeploymentRunnable;
 import org.alfresco.deployment.impl.DeploymentException;
+import org.alfresco.deployment.impl.server.DeploymentReceiverServiceImpl;
 import org.alfresco.deployment.impl.server.Target;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This is a class to hold deployment receiver side configuration.
@@ -52,6 +56,8 @@ public class Configuration
     private String fLogDirectory;
     
     private String fDataDirectory;
+ 
+    private static Log logger = LogFactory.getLog(Configuration.class);
     
     public Configuration()
     {
@@ -81,20 +87,24 @@ public class Configuration
     @SuppressWarnings("unchecked")
     public void init()
     {
+    	
         // Create the various necessary directories if they don't already exits.
         File meta = new File(fMetaDataDirectory);
         if (!meta.exists())
         {
+        	logger.info("creating meta data directory:" + meta.toString());
             meta.mkdirs();
         }
         File log = new File(fLogDirectory);
         if (!log.exists())
         {
+         	logger.info("creating log data directory:" + log.toString());
             log.mkdirs();
         }
         File data = new File(fDataDirectory);
         if (!data.exists())
         {
+        	logger.info("creating data directory:" + data.toString());
             data.mkdirs();
         }
         for (Map.Entry<String, Map<String, Object>> entry : fTargetData.entrySet())
@@ -124,6 +134,14 @@ public class Configuration
             {
                 runnables = new ArrayList<FSDeploymentRunnable>();
             }
+            
+            // Create the root directory if it does not already exist
+            File rootFile = new File(root); 
+            if(!rootFile.exists()){
+            	logger.info("creating root data directory:" + rootFile.toString());
+            	rootFile.mkdirs(); 
+            }
+            
             fTargets.put(targetName, new Target(targetName,
                                                 root,
                                                 fMetaDataDirectory + File.separator + targetName + ".md",

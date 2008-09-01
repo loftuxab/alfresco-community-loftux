@@ -44,6 +44,9 @@ import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
 import org.alfresco.util.Deleter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This is a record of an ongoing deployment.
  * @author britt
@@ -51,6 +54,8 @@ import org.alfresco.util.Deleter;
 public class Deployment implements Iterable<DeployedFile>, Serializable
 {
     private static final long serialVersionUID = 4752110479673700145L;
+    
+    private static Log logger = LogFactory.getLog(Deployment.class);
 
     /**
      * Timestamp of last time this deployment was talked to.
@@ -278,6 +283,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         }
         catch (IOException e)
         {
+        	logger.error("Exception in rollback", e);
             // Do nothing.
         }
     }

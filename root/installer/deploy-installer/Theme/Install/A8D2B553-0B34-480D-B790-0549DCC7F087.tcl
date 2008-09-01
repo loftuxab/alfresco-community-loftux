@@ -37,7 +37,7 @@ proc CreateWindow.A8D2B553-0B34-480D-B790-0549DCC7F087 {wizard id} {
     grid rowconfigure    $base.clientarea 7 -weight 1
     grid columnconfigure $base.clientarea 0 -weight 1
 
-    ttk::label $base.clientarea.label -text "Data Location"
+    ttk::label $base.clientarea.label -text "Temporary Data Location"
     grid $base.clientarea.label -row 0 -column 0 -sticky w -padx 10 -pady 2
 
     ttk::entry $base.clientarea.entry -textvariable ::info(DEPDATA)
@@ -64,7 +64,7 @@ proc CreateWindow.A8D2B553-0B34-480D-B790-0549DCC7F087 {wizard id} {
     ttk::button $base.clientarea.browse3 -text "..." -width 3 -command [list ::InstallAPI::PromptForDirectory -virtualtext DEPMETA]
     grid $base.clientarea.browse3 -row 5 -column 1 -sticky nw -padx {0 10}
 
-    ttk::label $base.clientarea.label4 -text "Metadata Location"
+    ttk::label $base.clientarea.label4 -text "Target Location (where to deploy files)"
     grid $base.clientarea.label4 -row 6 -column 0 -sticky w -padx 10 -pady 2
 
     ttk::entry $base.clientarea.entry4 -textvariable ::info(DEPTARGET)
