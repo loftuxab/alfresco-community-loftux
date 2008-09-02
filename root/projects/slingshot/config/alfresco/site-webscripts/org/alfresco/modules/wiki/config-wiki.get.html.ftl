@@ -12,7 +12,8 @@
                   <option value="${p.name}">${p.title}</option>
                </#list>
                </select>
-            <#else><em>${msg("label.no-pages")}</em>
+            <#else>
+                ${msg("label.no-pages")}
             </#if>
             </div>
          </div>

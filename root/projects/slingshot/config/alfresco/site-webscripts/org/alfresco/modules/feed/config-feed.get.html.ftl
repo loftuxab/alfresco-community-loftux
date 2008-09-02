@@ -10,7 +10,7 @@
             <div class="yui-u"><input id="${args.htmlid}-url" type="text" name="url" value=""/>&nbsp;*</div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first"><label>${msg("label.display_items")}:</label></div>
+            <div class="yui-u first"><label>${msg("label.displayItems")}:</label></div>
             <div class="yui-u">
                <select id="${args.htmlid}-limit" name="limit">
                 <option value="all">All</option>
@@ -20,7 +20,7 @@
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first"><label for="${args.htmlid}-new_window">${msg("label.new_window")}:</label></div>
+            <div class="yui-u first"><label for="${args.htmlid}-new_window">${msg("label.newWindow")}:</label></div>
             <div class="yui-u"><input type="checkbox" id="${args.htmlid}-new_window" name="new_window" /></div>
          </div>
          <div class="bdft">

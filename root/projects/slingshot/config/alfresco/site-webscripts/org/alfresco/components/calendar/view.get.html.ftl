@@ -13,10 +13,10 @@
 <div id="eventInfoPanel"></div>
 <div id="calendar-view" class="yui-navset">
 <ul class="yui-nav">
-  <li><a href="#day"><em>${msg("label.day")}</em></a></li>
-  <li><a href="#week"><em>${msg("label.week")}</em></a></li>
-  <li class="selected"><a href="#month"><em>${msg("label.month")}</em></a></li>
-  <li><a href="#agenda"><em>${msg("label.agenda")}</em></a></li>
+  <li><a href="#day">${msg("label.day")}</a></li>
+  <li><a href="#week">${msg("label.week")}</a></li>
+  <li class="selected"><a href="#month">${msg("label.month")}</a></li>
+  <li><a href="#agenda">${msg("label.agenda")}</a></li>
 </ul>
 
 <div class="yui-content" style="background: #FFFFFF;">

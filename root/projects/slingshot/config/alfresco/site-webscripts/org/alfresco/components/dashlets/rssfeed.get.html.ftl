@@ -9,7 +9,7 @@
    });
 //]]></script>
 <div class="dashlet">
-   <div class="title">${title!""}</div>
+   <div class="title">${title!msg("label.header")}</div>
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-configFeed-link">${msg("label.configure")}</a>
    </div>
@@ -19,7 +19,7 @@
 		   <#if item_index &lt; limit?number><@feedLib.renderItem item=item target=target/><#else><#break></#if>
 		</#list>
 	<#else>
-		<em>${msg("label.no_items")}.</em>
+		${msg("label.noItems")}
 	</#if>
 	</div><#-- end of body -->
 </div><#-- end of dashlet -->
