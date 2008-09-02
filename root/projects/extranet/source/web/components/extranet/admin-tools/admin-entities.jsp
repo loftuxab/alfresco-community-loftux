@@ -10,10 +10,11 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
-	// safety check
-	org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
-	if(user == null || !user.isAdmin())
+    AdminUtil admin = new AdminUtil(request);
+    // safety check
+    if( !admin.isAuthorizedAdmin())
 	{
+        //TODO: redirect to front page with error message
 		out.println("Access denied");
 		return;
 	}
@@ -25,25 +26,25 @@
 	{
 		entityType = AbstractUser.ENTITY_TYPE;
 	}
-	
+
 	// get the appropriate entity service
 	EntityService entityService = ExtranetHelper.getEntityService(request, entityType);
-	
+
 	// properties
 	String[] propertyNames = ExtranetHelper.getEntityPropertyNames(entityType);
 	String entityTitle = entityType;
-		
+
 	// get a list of entities
 	List entityList = entityService.list();
 %>
 <html>
    <head><title><%=entityTitle%>s</title></head>
    <body>
-   
+
    	<form method="POST" action="/extranet/">
    		<input type="hidden" name="p" value="admin-tools"/>
    		<input type="hidden" id="dispatchTo" name="dispatchTo" value="admin-entities"/>
-   		
+
    		<select name="entity_type" onchange="document.forms[0].submit()">
    			<option <%=(AbstractUser.ENTITY_TYPE.equals(entityType) ? " selected " : "")%> value="<%=AbstractUser.ENTITY_TYPE%>">User</option>
    			<option <%=(AbstractGroup.ENTITY_TYPE.equals(entityType) ? " selected " : "")%> value="<%=AbstractGroup.ENTITY_TYPE%>">Group</option>
@@ -57,12 +58,12 @@
 	for(int i = 0; i < propertyNames.length; i++)
 	{
 %>
-				<td><%=propertyNames[i]%></td>
+				<th><%=propertyNames[i]%></th>
 <%
 	}
 %>
 			</tr>
-		
+
 <%
 	for(int i = 0; i < entityList.size(); i++)
 	{
@@ -81,13 +82,13 @@
 			</tr>
 <%
 	}
-%>	
+%>
 		</table>
-		
+
 		<input type="button" value="add_entity" onclick="document.getElementById('dispatchTo').value='admin-entities-add'; document.forms[0].submit()" />
 		<input type="button" value="edit_entity"  onclick="document.getElementById('dispatchTo').value='admin-entities-edit'; document.forms[0].submit()" />
 		<input type="button" value="remove_entity"  onclick="document.getElementById('dispatchTo').value='admin-entities-remove'; document.forms[0].submit()" />
 	</form>
-	
+
    </body>
 </html>
