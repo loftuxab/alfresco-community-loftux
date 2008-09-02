@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <page-association>
-  <title>Resources</title>
+  <title>Extensions</title>
   <source-id>home</source-id>
-  <dest-id>resources</dest-id>
+  <dest-id>extensions</dest-id>
   <assoc-type>community</assoc-type>
   
   <properties>
