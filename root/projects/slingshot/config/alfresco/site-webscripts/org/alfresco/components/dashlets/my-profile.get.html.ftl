@@ -16,22 +16,22 @@
          <div class="namelabel">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</div>
          <div class="fieldlabel">${user.properties["jobtitle"]!""}</div>
       </div>
-      <hr/>
+      <hr class="clear"/>
       <div class="row">
-         <span class="fieldlabelright">${msg("label.email")}:</span>
-         <span class="fieldvalue"><#if user.properties["email"]??><a href="mailto:${user.properties["email"]!""}">${user.properties["email"]}</a></#if></span>
+         <div class="fieldlabelright">${msg("label.email")}:</div>
+         <div class="fieldvalue"><#if user.properties["email"]??><a href="mailto:${user.properties["email"]!""}">${user.properties["email"]}</a></#if></div>
       </div>
       <div class="row">
-         <span class="fieldlabelright">${msg("label.phone")}:</span>
-         <span class="fieldvalue">${user.properties["telephone"]!""}</span>
+         <div class="fieldlabelright">${msg("label.phone")}:</div>
+         <div class="fieldvalue">${user.properties["telephone"]!""}</div>
       </div>
       <div class="row">
-         <span class="fieldlabelright">${msg("label.skype")}:</span>
-         <span class="fieldvalue">${user.properties["skype"]!""}</span>
+         <div class="fieldlabelright">${msg("label.skype")}:</div>
+         <div class="fieldvalue">${user.properties["skype"]!""}</div>
       </div>
       <div class="row">
-         <span class="fieldlabelright">${msg("label.msn")}:</span>
-         <span class="fieldvalue">${user.properties["msn"]!""}</span>
+         <div class="fieldlabelright">${msg("label.msn")}:</div>
+         <div class="fieldvalue">${user.properties["msn"]!""}</div>
       </div>   
     
    </div>

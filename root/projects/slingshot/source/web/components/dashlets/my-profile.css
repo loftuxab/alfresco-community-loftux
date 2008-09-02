@@ -1,60 +1,48 @@
-.profile .fieldlabelright
-{
-   display: block;
-   float: left;
-   padding-right: 0.8em;
-   width: 4em;
-   margin-left: 2em;
-   text-align: right;
-   font-weight: bold;
-}
-
-.profile .fieldvalue
-{
-   display: block;
-   margin-left: 6em;
-   min-height: 1.2em;
-   padding-left: 1.5em;
-}
-
-.profile .row
-{
-   padding: 0.333em;
-}
-
 .profile .photorow
 {
-   margin-left: 2em;
-   padding: 0.333em;
-   height: 7em;
+   float: left;
+   padding-bottom: 0.5em;
 }
 
 .profile .photo
 {
-   padding: 0.5em;
    float: left;
-}
-
-.profile .label
-{
-   display: block;
-   float: left;
-   padding-right: 0.8em;
-   padding-top: 0.3em;
-   width: 10em;
-   text-align: right;
-   font-weight: bold;
 }
 
 .profile .namelabel
 {
-   margin-left: 96px;
    font-size: 123.1%;
    line-height: 1.7em;
+   margin-left: 80px;
 }
 
 .profile .fieldlabel
 {
-   margin-left: 96px;
    line-height: 1.5em;
+   margin-left: 80px;
+}
+
+.profile hr.clear
+{
+   margin-bottom: 0.5em;
+}
+
+.profile .row
+{
+   padding: 0.3em;
+}
+
+.profile .fieldlabelright
+{
+   float: left;
+   font-weight: bold;
+   text-align: right;
+   width: 4em;
+}
+
+.profile .fieldvalue
+{
+   margin-left: 4.5em;
+   min-height: 1.2em;
+   overflow: hidden;
 }
