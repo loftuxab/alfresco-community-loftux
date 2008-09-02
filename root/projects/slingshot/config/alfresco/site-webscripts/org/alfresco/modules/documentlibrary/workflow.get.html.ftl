@@ -38,7 +38,10 @@
          <div class="yui-g">
             <h2>${msg("header.comment")}:</h2>
          </div>
-         <div class="field"><textarea id="${args.htmlid}-comment" name="description" rows="3" tabindex="5"></textarea></div>
+         <div class="field">
+            <textarea id="${args.htmlid}-comment" name="description" rows="3" tabindex="5"></textarea>
+            <span>${msg("label.comment.max-length")}</span>
+            </div>
          <div class="bdft">
             <input type="button" id="${args.htmlid}-ok" value="${msg("button.assign")}" tabindex="6" />
             <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="7" />
