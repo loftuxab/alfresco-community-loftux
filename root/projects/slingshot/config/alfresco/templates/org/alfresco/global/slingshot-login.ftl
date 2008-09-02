@@ -15,7 +15,7 @@
 <@template.body>
    <div id="alflogin" class="login-panel">
       <div class="login-logo"></div>
-      <form accept-charset="UTF-8" method="post" action="${url.context}/login">
+      <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/login">
          <fieldset>
             <div style="padding-top:96px">
                <span id="txt-username"></span>
@@ -30,7 +30,7 @@
                <input type="password" id="password" name="password" maxlength="256" style="width:200px"/>
             </div>
             <div style="padding-top:16px">
-               <input type="submit" value="Login" id="btn-login" class="login-button" />
+               <input type="submit" id="btn-login" class="login-button" onclick="javascript:alfLogin()" />
             </div>
             <div style="padding-top:32px">
                <span class="login-copyright">
@@ -44,9 +44,37 @@
    </div>
    
    <script type="text/javascript">//<![CDATA[
+   function alfLogin()
+   {
+      Dom.get("btn-login").disabled = true;
+      return true;
+   }
+   
    YAHOO.util.Event.onContentReady("alflogin", function()
    {
       var Dom = YAHOO.util.Dom;
+      
+      // Prevent the Enter key from causing a double form submission
+      var form = Dom.get("loginform");
+      // add the event to the form and make the scope of the handler this form.
+      YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
+      var fnStopEvent = function(id, keyEvent)
+      {
+         if (form.getAttribute("alflogin") == null)
+         {
+            form.setAttribute("alflogin", true);
+         }
+         else
+         {
+            form.attributes.action.nodeValue = "";
+         }
+      }
+      
+      var enterListener = new YAHOO.util.KeyListener(form,
+      {
+         keys: YAHOO.util.KeyListener.KEY.ENTER
+      }, fnStopEvent, "keydown");
+      enterListener.enable();
       
       // set I18N labels
       Dom.get("txt-username").innerHTML = Alfresco.util.message("label.username") + ":";
@@ -72,8 +100,8 @@
    <#if url.args["error"]??>
    Alfresco.util.PopupManager.displayPrompt(
       {
-         title: "Failed to Login",
-         text: "The remote server may be unavailable or your authentication details have not been recognised."
+         title: Alfresco.util.message("message.loginfailure"),
+         text: Alfresco.util.message("message.loginautherror")
       });
    </#if>
    //]]></script>
