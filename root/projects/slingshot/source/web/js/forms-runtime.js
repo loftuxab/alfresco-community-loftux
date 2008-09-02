@@ -212,7 +212,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                {
                   var event = keyEvent[1];
                   var targetName = event.target.name;
-                  if (targetName && (targetName != "-"))
+                  if (targetName && (targetName != "-") && (event.target.tagName != "TEXTAREA"))
                   {
                      me._submitInvoked(event);
                      form.attributes.action.nodeValue = "";
