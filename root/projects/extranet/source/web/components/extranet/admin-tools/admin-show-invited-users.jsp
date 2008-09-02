@@ -11,10 +11,11 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
-	// safety check
-	org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
-	if(user == null || !user.isAdmin())
+    // safety check
+	AdminUtil admin = new AdminUtil(request);
+    if( !admin.isAuthorizedAdmin())
 	{
+        //TODO: replace with redirect and error message
 		out.println("Access denied");
 		return;
 	}
@@ -24,7 +25,7 @@
    	<title>Show Pending Invited Users</title>
    </head>
    <body>
-      
+
 	<table>
 		<tr>
 			<td>User ID</td>
@@ -37,14 +38,14 @@
 <%
 	// get services
 	InvitationService invitationService = ExtranetHelper.getInvitationService(request);
-	
+
 	List invitedUsers = invitationService.list();
 	for(int i = 0; i < invitedUsers.size(); i++)
 	{
 		DatabaseInvitedUser dbUser = (DatabaseInvitedUser) invitedUsers.get(i);
 		if(!dbUser.isCompleted())
 		{
-		
+
 %>
 		<tr>
 			<td>
@@ -73,6 +74,6 @@
 %>
 
 	</table>
-			
+
    </body>
 </html>
