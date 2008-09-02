@@ -26,8 +26,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
                <div class="actions">
                   <span id="${args.htmlid}-delete-span-${site_index}"
                      class="delete"
-                     href=""
-                     title="${msg("link.deleteSite")}"/>
+                     title="${msg("link.deleteSite")}">&nbsp;</span>
                </div>
             </div>
          </#list>
