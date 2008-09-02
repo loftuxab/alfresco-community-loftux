@@ -58,7 +58,7 @@
                <div class="layoutDescription">${layout.description}</div>               
                <div class="layoutBox">
                   <span>
-                     <img class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png"/>
+                     <img id="${args.htmlid}-select-img-${layout.templateId}" class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png"/>
                      <input id="${args.htmlid}-select-button-${layout.templateId}" type="button" value="${msg("button.select")}"/>
                   </span>
                </div>
