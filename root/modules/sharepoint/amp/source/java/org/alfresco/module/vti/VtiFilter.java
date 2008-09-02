@@ -62,6 +62,7 @@ public class VtiFilter implements Filter
     public static final String METHOD_POST = "POST";
     public static final String METHOD_PUT = "PUT";
     public static final String METHOD_TRACE = "TRACE";
+    public static final String METHOD_PROPFIND = "PROPFIND";
 
     public final static String AUTHENTICATION_USER = "_vtiAuthTicket";
 
@@ -93,11 +94,19 @@ public class VtiFilter implements Filter
         // Assume it's an HTTP request
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Checking request for VTI or not");
+        }
         Map<String, Object> session = sessionManager.getSession(httpRequest);
         if (session == null) 
         {
             if (!accessChecker.isRequestAcceptableForRoot(httpRequest)) 
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Target is not VTI request. Go to the next filter");
+                }
                 chain.doFilter(request, response);
             } 
             else 
@@ -105,11 +114,19 @@ public class VtiFilter implements Filter
                 session = sessionManager.createSession(httpRequest, httpResponse);
             }
         }
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Target is not VTI request");
+        }
                 
         // Ajust headers
         String httpMethod = httpRequest.getMethod();
         if (METHOD_OPTIONS.equals(httpMethod))
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Return VTI answer for OPTIONS request");
+            }
             httpResponse.setHeader("MS-Author-Via", "MS-FP/4.0,DAV");
             httpResponse.setHeader("MicrosoftOfficeWebServer", "5.0_Collab");
             httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
@@ -120,10 +137,24 @@ public class VtiFilter implements Filter
         }
         else if (METHOD_HEAD.equals(httpMethod) || METHOD_GET.equals(httpMethod))
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Return VTI answer for HEAD request");
+            }
             httpResponse.setHeader("Public-Extension", "http://schemas.microsoft.com/repl-2");
             httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
             httpResponse.setHeader("Cache-Control", "no-cache");
             httpResponse.setContentType("text/html");
+        }
+        else if (METHOD_PROPFIND.equals(httpMethod))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Return VTI answer for PROPFIND request");
+            }
+            httpResponse.setHeader("Public-Extension", "http://schemas.microsoft.com/repl-2");
+            httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
+            httpResponse.setHeader("Cache-Control", "no-cache");              
         }
         else if (METHOD_POST.equals(httpMethod))
         {
@@ -136,8 +167,14 @@ public class VtiFilter implements Filter
         String alfrescoContext = (String)request.getAttribute(VtiServletContainer.VTI_ALFRESCO_CONTEXT);
         //Check resource existence
         String uri = httpRequest.getRequestURI();        
-        if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod)) && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.startsWith(alfrescoContext + "/history/a") && !uri.startsWith(alfrescoContext + "/resources"))
+        String if_header = httpRequest.getHeader("If");
+        if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod))  && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.startsWith(alfrescoContext + "/history/a")
+                && !uri.startsWith(alfrescoContext + "/resources") && if_header == null)
         {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Checking is resource exist");
+            }
                String decodedUrl = URLDecoder.decode(httpRequest.getRequestURI(), "UTF-8");
             // remove '/' character
             if (decodedUrl.length() > alfrescoContext.length())
@@ -149,10 +186,18 @@ public class VtiFilter implements Filter
                 httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 httpResponse.getOutputStream().write("NOT FOUND".getBytes());
                 httpResponse.getOutputStream().close();
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Resource doesn't exist");
+                }
                 return;
             }
             else
             {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Resource exists");
+                }
                 return;
             }
         }        
@@ -160,6 +205,11 @@ public class VtiFilter implements Filter
         // Auth
 
         // Get the user details object from the session
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Check authentication");
+        }
 
         VtiUser user = (VtiUser) session.get(AUTHENTICATION_USER);
 
@@ -222,7 +272,10 @@ public class VtiFilter implements Filter
                 
                 httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Vti Server\"");
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.flushBuffer();
+                if (!METHOD_PROPFIND.equals(httpMethod))
+                {
+                    response.getOutputStream().flush();
+                }
                 return;
             }
             else
@@ -254,14 +307,23 @@ public class VtiFilter implements Filter
                httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Vti Server\"");
                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-               httpResponse.flushBuffer();
+                if (!METHOD_PROPFIND.equals(httpMethod))
+                {
+                    response.getOutputStream().flush();
+                }
                return;
             }
         }
 
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Request accepted");
+        }
         // Chain other filters
-
+        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null)
+        {
         response.getOutputStream().flush();
+        }
         chain.doFilter(request, response);
     }
    

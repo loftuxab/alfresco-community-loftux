@@ -260,4 +260,19 @@ public class VtiPathHelper extends AbstractLifecycleBean
 		// do nothing
 	}
 
+    public NodeRef getRootNodeRef()
+    {
+        return rootNodeRef;
+    }
+
+    public String getRootPath()
+    {
+        return rootPath;
+    }
+
+    public String getStorePath()
+    {
+        return storePath;
+    }
+
 }

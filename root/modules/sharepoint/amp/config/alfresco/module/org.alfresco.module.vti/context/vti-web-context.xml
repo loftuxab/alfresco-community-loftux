@@ -43,6 +43,14 @@
 					<property name="pattern" value="/_vti_bin/usergroup.asmx"/>
 					<property name="servlet" ref="soap"/>
 				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value=""/>
+					<property name="servlet" ref="vtiPropfindServlet"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="if_header_servlet"/>
+					<property name="servlet" ref="vtiIfHeaderServlet"/>
+				</bean>		
 			</list>
 		</constructor-arg>
 		<!-- FILTERS -->
@@ -75,6 +83,10 @@
 				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
 					<property name="pattern" value="/_vti_bin/webs.asmx"/>
 					<property name="servlet" ref="soap"/>
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value=""/>
+					<property name="servlet" ref="vtiPropfindServlet"/>
 				</bean>
 			</list>
 		</constructor-arg>
@@ -141,6 +153,17 @@
 	</bean>
 	
 	<bean id="vtiResourceServlet" class="org.alfresco.module.vti.VtiResourceServlet">
+	</bean>
+	
+	<bean id="vtiPropfindServlet" class="org.alfresco.module.vti.VtiPropfindServlet">		
+		<property name="pathHelper" ref="vtiPathHelper" />		
+	</bean>
+	
+	<bean id="vtiIfHeaderServlet" class="org.alfresco.module.vti.VtiIfHeaderServlet">
+		<property name="nodeService" ref="NodeService" />
+		<property name="fileFolderService" ref="FileFolderService" />
+		<property name="checkOutCheckInService" ref="CheckoutCheckinService" />
+		<property name="authenticationService" ref="AuthenticationService" />
 	</bean>
 	
 	<bean id="soap" class="org.springframework.ws.transport.http.MessageDispatcherServlet">

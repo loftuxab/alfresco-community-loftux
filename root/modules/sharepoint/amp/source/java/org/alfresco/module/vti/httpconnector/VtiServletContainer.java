@@ -43,6 +43,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.module.vti.VtiFilter;
+import org.alfresco.repo.webdav.WebDAV;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
 *
 * @author Stas Sokolovsky
@@ -70,11 +75,22 @@ public class VtiServletContainer
     
     public static final String VTI_ALFRESCO_CONTEXT = "ALFRESCO-DEPLOYMENT-CONTEXT";
 
+    /** Logger */
+    private static Log logger = LogFactory.getLog(VtiServletContainer.class);
+
     public VtiServletContainer(List<ServletPattern> servletList, List<FilterPattern> filterList) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Initializing VtiServletContainer");
+        }
         if (filterList != null) {
             filters = filterList;
         } else {
             filterList = new ArrayList<FilterPattern>();
+        }
+        if (logger.isDebugEnabled()) {
+            for (FilterPattern filterPattern : filterList) {
+                logger.debug("Adding filter for pattern '" + filterPattern.getPattern() + "'");
+            }
         }
         exactMatchServlets = new ArrayList<ServletPattern>(); 
         prefixServlets = new ArrayList<ServletPattern>();
@@ -82,6 +98,9 @@ public class VtiServletContainer
         servlets = new HashSet<Servlet>();
         if (servletList != null) {
             for (ServletPattern servletPattern : servletList) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Adding servlet for pattern '" + servletPattern.getPattern() + "'");
+                }
                 servlets.add(servletPattern.getServlet());
                 String pattern = servletPattern.getPattern();
                 if (pattern.endsWith(MULTIPLIER_PATTERN))
@@ -98,6 +117,9 @@ public class VtiServletContainer
                 }
             }
         } 
+        if (logger.isDebugEnabled()) {
+            logger.debug("VtiServletContainer was successfully initalized");
+        }        
     }
     
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -105,6 +127,9 @@ public class VtiServletContainer
         Thread.currentThread().setContextClassLoader(VtiServletContainer.class.getClassLoader());
         try {    
             request.setAttribute(VTI_ALFRESCO_CONTEXT, context);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Process request");
+            }
             new HttpFilterChain(request).doFilter(request, response);
         } finally {
             Thread.currentThread().setContextClassLoader(classLoader);
@@ -112,6 +137,9 @@ public class VtiServletContainer
     }
     
     public void setServletContext(ServletContext servletContext) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Setting servlet context to all servlets");
+        }
         if (servletContext != null) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             Thread.currentThread().setContextClassLoader(VtiServletContainer.class.getClassLoader());
@@ -121,9 +149,11 @@ public class VtiServletContainer
                     ServletConfig config = new ServletConfigStub(servletContext, VTI_SERVLET_NAME + index);
                     servlet.init(config);
                     index++;
-                }
-                Thread.currentThread().setContextClassLoader(classLoader);
+                }                
             } catch (Exception e) {
+                if (logger.isErrorEnabled()) {
+                    logger.error("Exception while setting servlet context to vti servlets ", e);
+                }
                 throw new RuntimeException(e);
             } finally {
                 Thread.currentThread().setContextClassLoader(classLoader);
@@ -138,8 +168,38 @@ public class VtiServletContainer
 
     public void doServlets(ServletRequest request, ServletResponse response) throws IOException, ServletException
     {
-        String uri = getUri((HttpServletRequest)request);
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String uri = getUri(httpRequest);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Find appropriate servlet by pattern for uri='" + uri + "'");
+        }
         HttpServlet targetServlet = null;
+        
+        String httpMethod = httpRequest.getMethod();
+        if (httpMethod.equals(WebDAV.METHOD_PROPFIND))
+        {
+            for (ServletPattern servletPattern : exactMatchServlets) 
+            {         
+                if (servletPattern.getPattern().equals(""))
+                {
+                    targetServlet = servletPattern.getServlet();
+                    break;
+                }                
+            } 
+        }
+        
+        if (httpMethod.equals(VtiFilter.METHOD_GET) && httpRequest.getHeader("If") != null)
+        {
+            for (ServletPattern servletPattern : exactMatchServlets) 
+            {         
+                if (servletPattern.getPattern().equals("if_header_servlet"))
+                {
+                    targetServlet = servletPattern.getServlet();
+                    break;
+                }                
+            }            
+        }
+        
         for (ServletPattern servletPattern : exactMatchServlets) {
             if (isMatch(uri, servletPattern.getPattern())) {
                 targetServlet = servletPattern.getServlet();
@@ -171,6 +231,10 @@ public class VtiServletContainer
             }
         }
         if (targetServlet != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Servlet found for requested uri");
+                logger.debug("Execute target servlet");
+            }
             targetServlet.service(request, response);
         }
     }
@@ -190,6 +254,9 @@ public class VtiServletContainer
 
         public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException
         {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Find appropriate filters by pattern for uri='" + uri + "'");
+            }
             if (uri == null)
             {
                 return;
@@ -200,9 +267,15 @@ public class VtiServletContainer
                 if (isMatch(uri, filterPattern.getPattern()))
                 {
                     Filter filter = filterPattern.getFilter();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Process filter");
+                    }
                     filter.doFilter(request, response, this);
                     return;
                 }
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Filter accept request for uri='" + uri + "'");
             }
             doServlets(request, response);
         }
@@ -225,7 +298,7 @@ public class VtiServletContainer
         {
             if (pattern.endsWith(MULTIPLIER_PATTERN))
             {
-                if (uri.startsWith(pattern.substring(0, pattern.length() - 1)))
+                if (uri.contains(pattern.substring(0, pattern.length() - 1)))
                 {
                     result = true;
                 }
@@ -239,7 +312,7 @@ public class VtiServletContainer
             }
             else
             {
-                if (uri.equals(pattern))
+                if (uri.contains(pattern))
                 {
                     result = true;
                 }

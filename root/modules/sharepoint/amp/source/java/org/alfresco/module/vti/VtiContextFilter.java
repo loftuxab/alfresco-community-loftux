@@ -38,6 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.vti.httpconnector.VtiServletContainer;
 import org.alfresco.module.vti.httpconnector.VtiSessionManager;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import javax.servlet.Filter;
@@ -60,6 +62,9 @@ public class VtiContextFilter implements Filter
     
     private VtiSessionManager sessionManager;
     
+    /** Logger */
+    private static Log logger = LogFactory.getLog(VtiContextFilter.class);
+    
     public void init(FilterConfig filterConfig) throws ServletException
     {        
         WebApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(filterConfig.getServletContext());
@@ -68,6 +73,9 @@ public class VtiContextFilter implements Filter
         contextContainer = (VtiServletContainer) context.getBean("vtiContextServletContainer");
         container = (VtiServletContainer) context.getBean("vtiServletContainer");
         ServletContext servletContext = filterConfig.getServletContext();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Setting Alfresco context to Vti servlet containers");
+        }
         contextContainer.setServletContext(servletContext);
         container.setServletContext(servletContext);
     }
@@ -75,11 +83,20 @@ public class VtiContextFilter implements Filter
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Checking request for VTI or not");
+        }
         if (sessionManager.getSession(httpRequest) == null) {
             if (!accessChecker.isRequestAcceptableForRoot(httpRequest)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Target is not VTI request. Go to the next filter");
+                }
                 chain.doFilter(request, response);
                 return;
             }
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("Target is VTI request");
         }
         contextContainer.service((HttpServletRequest)request, (HttpServletResponse)response);
     }
