@@ -4,18 +4,16 @@ model.siteId = siteId;
 model.siteName = siteId;
 model.searchTerm = (page.url.args["t"] != undefined) ? page.url.args["t"] : "";
 
+model.searchAll = true;
 if (page.url.args["a"] != undefined)
 {
-   model.searchAll = (page.url.args["a"] != "false"); // we want to default to true
-}
-else
-{
-   model.searchAll = true;
+   // default to search all if not specified
+   model.searchAll = (page.url.args["a"] != "false");
 }
 
 // fetch the site title if we got a site id
-if (siteId.length > 0)
-{  
+if (siteId.length != 0)
+{
    // Call the repository for the site profile
    var json = remote.call("/api/sites/" + siteId);
    if (json.status == 200)
@@ -24,7 +22,7 @@ if (siteId.length > 0)
       var obj = eval('(' + json + ')');
       if (obj)
       {
-         model.siteName = (obj.title.length > 0) ? obj.title : obj.shortName;
+         model.siteName = (obj.title.length != 0) ? obj.title : obj.shortName;
       }
    }
 }

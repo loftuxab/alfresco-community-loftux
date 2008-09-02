@@ -253,7 +253,7 @@
           * These MUST be inline in order to have access to the Alfresco.Search class (via the "me" variable).
           */
          var me = this;
-          
+         
          /**
           * Thumbnail custom datacell formatter
           *
@@ -274,7 +274,7 @@
             var url = me._getBrowseUrlForRecord(oRecord);
             var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/generic-result.png'; //  oRecord.getData("icon32").substring(1);
             
-            // use the preview image for the document library
+            // use the preview image for the document
             if (oRecord.getData("type") == "file")
             {
                imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
@@ -282,8 +282,7 @@
             }
             
             // Render the cell
-            // TODO: this should use the correct icon
-            elCell.innerHTML = '<span class="demo-other"><a href="' + encodeURI(url) + '" target="_blank"><img src="' + imageUrl + '" alt="' + extn + '" /></a></span>';
+            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + extn + '" /></a></span>';
          };
 
          /**
@@ -304,10 +303,12 @@
             var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
             // link to the site
             desc += '<div class="detail">';
-            desc += '   In Site: <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
+            desc += me._msg("message.insite");
+            desc += ': <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
             desc += '</div>';
             desc += '<div class="details">';
-            desc += '   Tags: ';
+            desc += me._msg("message.tags");
+            desc += ': ';
             var tags = oRecord.getData("tags");
             for (var x=0; x < tags.length; x++)
             {
@@ -454,7 +455,6 @@
          }
       },
 
-      
       /**
        * Resets the YUI DataTable errors to our custom messages
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
