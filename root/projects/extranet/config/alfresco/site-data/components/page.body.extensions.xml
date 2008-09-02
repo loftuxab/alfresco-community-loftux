@@ -2,12 +2,12 @@
 
 <component> 
 
-	<title>Alfresco Forge</title>  
-	<url>/components/extranet/alfresco-forge</url>
+	<title>Alfresco Extensions Directory</title>  
+	<url>/components/extranet/alfresco-extensions</url>
 	
 	<!-- Binding --> 
 	<scope>page</scope>
 	<region-id>body</region-id>
-	<source-id>resources</source-id>
+	<source-id>extensions</source-id>
   
 </component>
