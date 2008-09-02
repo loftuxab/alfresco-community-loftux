@@ -4,7 +4,7 @@
    ).setSiteId("${page.url.templateArgs.site!""}");
 //]]></script>
 <div class="dashlet">
-   <div class="title" id="${args.htmlid}-title">${pageTitle!""}</div>
+   <div class="title" id="${args.htmlid}-title">${pageTitle!msg("label.header")}</div>
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
    </div>
@@ -12,7 +12,7 @@
    <#if wikipage?exists>
       ${wikipage}
    <#else>
-		<em>${msg("label.noconfig")}.</em>
+		${msg("label.noConfig")}
 	</#if>
 	</div><#-- end of body -->
 </div><#-- end of dashlet -->

@@ -11,7 +11,7 @@
 	   </div>
 		</#list>
 	<#else>
-		<em>${msg("label.noActivities")}</em>
+		${msg("label.noActivities")}
 	</#if>
 	</div><#-- end of body -->
 </div><#-- end of dashlet -->

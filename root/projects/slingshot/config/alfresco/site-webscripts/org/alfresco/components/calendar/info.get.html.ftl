@@ -33,7 +33,7 @@
 	        <#if result.allday?exists>
 	        <div class="yui-gd">
 	         <div class="yui-u first">&nbsp;</div>
-	         <div class="yui-u"><em>${msg("label.allday")}</em></div>
+	         <div class="yui-u">${msg("label.allday")}</div>
 	        </div>
 	        </#if>
            <div class="yui-gd">

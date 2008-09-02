@@ -3,7 +3,7 @@
 //]]></script>
 
 <div class="dashlet">
-   <div class="title">Calendar</div>
+   <div class="title">${msg("label.header")}</div>
    <div class="body scrollableList">
       <#-- Events go here -->
       <div id="${args.htmlid}-eventsContainer"></div>

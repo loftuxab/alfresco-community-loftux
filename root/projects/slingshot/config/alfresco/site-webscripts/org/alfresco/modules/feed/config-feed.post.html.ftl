@@ -5,5 +5,5 @@
 	   <#if item_index &lt; limit?number><@feedLib.renderItem item=item target=target/><#else><#break></#if>
 	</#list>
 <#else>
-	<em>No news items.</em>
+	No news items.
 </#if>

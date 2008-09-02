@@ -11,8 +11,8 @@
          <button id="${args.htmlid}-remove-button">${msg("button.label")}</button>
       </div>
       <div style="float:left;">
-         <h3>${msg("label.header")}!</h3>
-         <p>${msg("label.intro")}...</p>
+         <h3>${msg("label.header")}</h3>
+         <p>${msg("label.intro")}</p>
       </div>
    </div>
    <div style="clear:both">

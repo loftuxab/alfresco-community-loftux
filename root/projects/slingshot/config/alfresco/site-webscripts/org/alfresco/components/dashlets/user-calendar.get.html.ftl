@@ -4,7 +4,7 @@
 //]]></script>
 -->
 <div class="dashlet">
-   <div class="title">Calendar</div>
+   <div class="title">${msg("label.header")}</div>
    <div class="body scrollableList">
  	   <#if eventList?size &gt; 0>
  	   <#list eventList as event>
@@ -20,7 +20,7 @@
  	      </table>
  	   </#list>
  	   <#else>
- 	      <div>No upcoming events</div>
+ 	      <div>${msg("label.noEvents")}</div>
  	   </#if>
    </div>
 </div>
