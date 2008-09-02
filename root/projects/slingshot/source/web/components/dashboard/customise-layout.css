@@ -90,6 +90,7 @@
    padding:1em;
    vertical-align:middle;
    height:10em;
+   cursor: pointer;   
 }
 
 /* Add a bit of green around the current layout */

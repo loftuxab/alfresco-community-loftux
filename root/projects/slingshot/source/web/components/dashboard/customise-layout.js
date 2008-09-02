@@ -141,28 +141,40 @@
          this.widgets.selectButtons = [];
          for (var layoutId in this.options.layouts)
          {
-               this.widgets.selectButtons[layoutId] = Alfresco.util.createYUIButton(this, "select-button-" + layoutId, this.onSelectButtonClick);
+            this.widgets.selectButtons[layoutId] = Alfresco.util.createYUIButton(this, "select-button-" + layoutId, function (event, button)
+            {
+               // Find out what layout that is chosen by lokking at the clicked button's id
+               var id = button.get("id");
+               var selectedLayoutId = id.substring((this.id + "-select-button-").length);
+               this.onSelectLayoutClick(selectedLayoutId);
+            });
+
+            var selectLayoutLink = document.getElementById(this.id + "-select-img-" + layoutId);
+            YAHOO.util.Event.addListener(selectLayoutLink, "click", function (event)
+            {
+               // Find out what layout that is chosen by lokking at the clicked button's id
+               var id = event.target.id;
+               var selectedLayoutId = id.substring((this.id + "-select-img-").length);
+               this.onSelectLayoutClick(selectedLayoutId);
+            }, this, true);
+
          }
       },
 
       /**
-       * Fired when the user clicks one of the select buttons for a layout.
+       * Fired when the user clicks one of the select buttons or icons for a layout.
        * Changes the current layout to the selected layout and throws an global
        * event, that can be captured by other components, such as
        * Alfresco.CustomiseDashlets. 
        *
-       * @method onSelectButtonClick
-       * @param event {object} an "click" event
+       * @method onSelectLayoutClick
+       * @param selectedLayoutId {string} The id of the selected layout
        */
-      onSelectButtonClick: function CD_onSelectButtonClick(event, button)
+      onSelectLayoutClick: function CD_onSelectLayoutClick(selectedLayoutId)
       {
          // Get references to the divs that should be shown or hidden
          var layoutsDiv = Dom.get(this.id + "-layouts-div");
          var currentLayoutDiv = Dom.get(this.id + "-currentLayout-div");
-
-         // Find out what layout that is chosen by lokking at the clicked button's id
-         var buttonId = button.get("id");
-         var selectedLayoutId = buttonId.substring((this.id + "-select-button-").length);
 
          // Hide the div that displays the available layouts
          Dom.setStyle(layoutsDiv, "display", "none");
