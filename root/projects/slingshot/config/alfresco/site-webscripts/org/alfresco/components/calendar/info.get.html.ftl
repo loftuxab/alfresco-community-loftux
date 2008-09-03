@@ -45,10 +45,10 @@
 				<div class="yui-u" id="${args.htmlid}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("EEEE, MMMM dd yyyy")}</#if><#if !result.allday?exists> at ${result.end!""}</#if></div>
 			</div>
 			</div>
-         	<div class="yui-g">
-	            <input type="submit" id="${args.htmlid}-edit-button" value="${msg("button.edit")}" />
-				   <input type="submit" id="${args.htmlid}-delete-button" value="${msg("button.delete")}" />
-				   <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.close")}" />
-	        </div>
+      	<div class="bdft">
+            <input type="submit" id="${args.htmlid}-edit-button" value="${msg("button.edit")}" />
+			   <input type="submit" id="${args.htmlid}-delete-button" value="${msg("button.delete")}" />
+			   <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.close")}" />
+        </div>
       </div>
 </div>

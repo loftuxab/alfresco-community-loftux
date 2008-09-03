@@ -70,7 +70,7 @@
    
       /**
        * Fired by YUI when parent element is available for scripting.
-       * Registers event handler on 'onTagRefresh' event. If a component wants to refresh
+       * Registers event handler on "tagRefresh" event. If a component wants to refresh
        * the tags component, they need to fire this event.
        *
        * @method onReady
@@ -79,7 +79,7 @@
       {
          this._registerDefaultActionHandler();
          
-         YAHOO.Bubbling.on("onTagRefresh", this.onTagRefresh, this);
+         YAHOO.Bubbling.on("tagRefresh", this.onTagRefresh, this);
       },
       
       /**
