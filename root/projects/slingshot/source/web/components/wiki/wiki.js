@@ -4,6 +4,13 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
+
+   /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML;
@@ -121,7 +128,7 @@
    		});
    		
    		// Hide the revert button
-   		var div  = YAHOO.util.Dom.get(this.id + "-revertPanel");
+   		var div  = Dom.get(this.id + "-revertPanel");
    		if (div)
    		{
    		   div.style.display = "none";
@@ -137,7 +144,7 @@
             title: this.options.pageTitle,
          });
 		   
-		   var div = YAHOO.util.Dom.get(this.id + "-pagecontent");
+		   var div = Dom.get(this.id + "-pagecontent");
    		var obj = {
    		   "pagecontent": div.innerHTML
    	   }
@@ -159,17 +166,22 @@
 		
 		_setupEditForm: function()
 		{
+		   var width = Dom.get(this.id + "-form").offsetWidth - 16;
 		   this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
-		   this.tagLibrary.setOptions({ siteId: this.options.siteId });
+		   this.tagLibrary.setOptions(
+		   {
+		      siteId: this.options.siteId
+		   });
          this.tagLibrary.initialize();
          if (this.options.tags.length > 0)
          {
             this.tagLibrary.setTags(this.options.tags);
          }
                 
-         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent', {
-            height: '300px',
-            width: '538px',
+         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
+         {
+            height: Math.max(document.height - 450, 300) + 'px',
+            width: width + 'px',
             dompath: false, // Turns on the bar at the bottom
             animate: false, // Animates the opening, closing and moving of Editor windows
             markup: "xhtml",
@@ -179,7 +191,10 @@
          this.pageEditor.render();
 
          var saveButtonId = this.id + "-save-button";
-         var saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
+         var saveButton = new YAHOO.widget.Button(saveButtonId,
+         {
+            type: "submit"
+         });
 
    		var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelSelect,
    		{
@@ -220,7 +235,7 @@
                this.tagLibrary.updateForm(this.id + "-form", "tags");
                
                // Avoid submitting the input field used for entering tags
-               var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+               var tagInputElem = Dom.get(this.id + "-tag-input-field");
                if (tagInputElem)
                {
                   tagInputElem.disabled = true;
@@ -263,7 +278,7 @@
 		   });
 		   
 		   // Decide whether to display the revert button or not
-		   var div  = YAHOO.util.Dom.get(this.id + "-revertPanel");
+		   var div  = Dom.get(this.id + "-revertPanel");
 		   if (select.selectedIndex === 0)
 		   {
 		      div.style.display = "none";
@@ -276,10 +291,10 @@
 		
 		onVersionInfo: function(e)
 		{
-		   var page = YAHOO.util.Dom.get("#page");
+		   var page = Dom.get("#page");
 		   page.innerHTML = this.parser.parse(e.serverResponse.responseText);
 		   
-		   var pagecontent = YAHOO.util.Dom.get(this.id + "-pagecontent");
+		   var pagecontent = Dom.get(this.id + "-pagecontent");
 		   if (pagecontent)
 		   {
 		      // We store the raw content in this hidden div

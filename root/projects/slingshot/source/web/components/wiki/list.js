@@ -93,7 +93,7 @@
              return true;
           });          
           
-          YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this);
+          YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
        },
        
        onTagSelected: function(e, args)
