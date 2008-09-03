@@ -3,7 +3,7 @@
    <div class="body scrollableList">
 	<#if entries?exists && entries?size &gt; 0>
 		<#list entries as entry>
-	   <div class="detail-list-item">
+	   <div class="detail-list-item <#if (!entry_has_next)>last</#if>">
    		<div>
    		   <h4>${entry.title}</h4>
    		   ${entry.summary}

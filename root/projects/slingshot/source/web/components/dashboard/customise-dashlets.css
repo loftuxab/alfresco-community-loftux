@@ -191,25 +191,25 @@
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns4
 {
-   width: 84em;
+   width: 90em;
 }
 
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns3
 {
-   width: 63em;
+   width: 66em;
 }
 
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns2
 {
-   width: 42em;
+   width: 48em;
 }
 
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns1
 {
-   width: 20em;
+   width: 26em;
 }
 
 /* Make sure the columns are displayed on row even though they are block elements  */
@@ -217,4 +217,24 @@
 {
    float: left;
    width: 20em;
+}
+
+.customise-dashlets div.used div.usedActions
+{
+   float: left;
+   width: 3em;
+   padding-top:17em;
+}
+
+.customise-dashlets span.trashcan
+{
+   background-image: url(../images/trash-48.png);
+   background-repeat: no-repeat;
+   background-position: center;
+   padding:1em 1.5em 1.5em;
+}
+
+.customise-dashlets span.trashcan.target
+{
+   background-image: url(../images/trashdark-48.png);
 }

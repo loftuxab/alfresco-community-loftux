@@ -1,0 +1,20 @@
+div.dashlet.site-welcome .body {
+   background-color:#FEFFFD;
+}
+
+div.dashlet.site-welcome div.detail-list-item h4
+{
+   color:#038603;
+   padding-bottom: 0.5em;
+}
+
+div.dashlet.site-welcome div.detail-list-item div
+{
+   padding-bottom: 0.5em;
+}
+
+div.dashlet.site-welcome a
+{
+   color: #4F94C9
+}
+

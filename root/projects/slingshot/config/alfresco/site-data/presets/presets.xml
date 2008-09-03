@@ -21,11 +21,17 @@
             <scope>page</scope>
             <region-id>component-1-1</region-id>
             <source-id>site/${siteid}/dashboard</source-id>
-            <url>/components/dashlets/colleagues</url>
+            <url>/components/dashlets/site-welcome</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-1-2</region-id>
+            <source-id>site/${siteid}/dashboard</source-id>
+            <url>/components/dashlets/colleagues</url>
+         </component>
+         <component>
+            <scope>page</scope>
+            <region-id>component-1-3</region-id>
             <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/calendar</url>
          </component>
@@ -52,13 +58,7 @@
             <region-id>component-3-2</region-id>
             <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/wiki</url>
-         </component>  
-         <component>
-            <scope>page</scope>
-            <region-id>component-3-3</region-id>
-            <source-id>site/${siteid}/dashboard</source-id>
-            <url>/components/dashlets/site-welcome</url>
-         </component>          
+         </component>
       </components>
       <pages>
          <page id="site/${siteid}/dashboard">
@@ -87,11 +87,17 @@
             <scope>page</scope>
             <region-id>component-1-1</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/my-profile</url>
+            <url>/components/dashlets/user-welcome</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-1-2</region-id>
+            <source-id>user/${userid}/dashboard</source-id>
+            <url>/components/dashlets/my-profile</url>
+         </component>
+         <component>
+            <scope>page</scope>
+            <region-id>component-1-3</region-id>
             <source-id>user/${userid}/dashboard</source-id>
             <url>/components/dashlets/my-sites</url>
          </component>
@@ -119,12 +125,6 @@
              <source-id>user/${userid}/dashboard</source-id>
              <url>/components/dashlets/my-activities</url>
           </component>   
-          <component>
-             <scope>page</scope>
-             <region-id>component-3-1</region-id>
-             <source-id>user/${userid}/dashboard</source-id>
-             <url>/components/dashlets/user-welcome</url>
-          </component>      
       </components>
       <pages>
          <page id="user/${userid}/dashboard">

@@ -12,7 +12,7 @@
          <#else>
             <#list docs.items as doc>
                <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser}/profile">${doc.modifiedBy}</a></#assign>
-               <div class="detail-list-item">
+               <div class="detail-list-item  <#if (!doc_has_next)>last</#if>">
                   <div>
                      <div class="icon">
                         <img src="${url.context}/components/images/generic-file-32.png" alt="${doc.displayName?html}" />

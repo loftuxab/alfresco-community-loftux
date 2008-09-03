@@ -19,7 +19,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
    <div class="body scrollableList">
       <#if sites??>
          <#list sites as site>
-            <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item">
+            <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if (!site_has_next)>last</#if>">
                <div class="site">
                   <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a>
                </div>

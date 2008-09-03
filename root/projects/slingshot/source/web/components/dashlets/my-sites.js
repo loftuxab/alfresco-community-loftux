@@ -152,7 +152,7 @@
          // Create the CreateSite module if it doesnt exist
          if (this.createSite === null)
          {
-            this.createSite = new Alfresco.module.CreateSite(this.id + "-createSite");
+            this.createSite = Alfresco.module.getCreateSiteInstance(); //new Alfresco.module.CreateSite(this.id + "-createSite");
          }
          // and show it
          this.createSite.show();
