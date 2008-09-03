@@ -2992,13 +2992,18 @@
       
       <!-- Additional development mode support -->
       <echo>${dir.project.extranet}/dev/extranet.properties</echo>
-      <copy file="${dir.project.extranet}/dev/extranet.properties" 
-	    tofile="${dir.project.extranet.assemble}/WEB-INF/classes/alfresco/extranet.properties"
+      <echo>${home.tomcat.application}/shared/classes/alfresco/extension</echo>
+      <copy file="${dir.project.extranet}/dev/custom-extranet.properties"
+	    tofile="${home.tomcat.application}/shared/classes/alfresco/extension/custom-extranet.properties"
 	    failonerror="false" 
 	    overwrite="true" />
-      <copy file="${dir.project.extranet}/dev/web-framework-config-custom.xml" 
-	    tofile="${dir.project.extranet.assemble}/WEB-INF/classes/alfresco/extension/web-framework-config-custom.xml"
-	    failonerror="false" 
+      <copy file="${dir.project.extranet}/dev/web-framework-config-custom.xml"
+	    tofile="${home.tomcat.application}/shared/classes/alfresco/extension/web-framework-config-custom.xml"
+	    failonerror="false"
+	    overwrite="true" />
+      <copy file="${dir.project.extranet}/dev/extranet-application-custom-context.xml"
+	    tofile="${home.tomcat.application}/shared/classes/alfresco/extension/extranet-application-custom-context.xml"
+	    failonerror="false"
 	    overwrite="true" />
 
       <!-- add all JAR to WEB-INF/lib -->
