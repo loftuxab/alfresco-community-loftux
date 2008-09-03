@@ -84,10 +84,10 @@
       
       /**
        * Registers a default action listener on <em>all</em> of the tag links in the 
-       * component. Fires 'onTagSelected' event with the name of the tag that was selected.
+       * component. Fires "tagSelected" event with the name of the tag that was selected.
        *
        * To register for the event, interested components should do something like this:
-       * YAHOO.Bubbling.on("onTagSelected", this.onTagSelected, this); 
+       * YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this); 
        *
        * @method _registerDefaultActionHandler
        */
@@ -99,7 +99,7 @@
             if (link)
             {
                var tagName = link.firstChild.nodeValue;
-               YAHOO.Bubbling.fire('onTagSelected', {
+               YAHOO.Bubbling.fire("tagSelected", {
                   "tagname": tagName
                });
             }
