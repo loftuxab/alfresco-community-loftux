@@ -161,7 +161,7 @@
          // Listen for when an event has been deleted as view will need refreshing.
          YAHOO.Bubbling.on("eventDeleted", this.onEventDelete, this);
          // Listen for when an event has been updated
-         YAHOO.Bubbling.on("eventUpdated", this.onEventUpdate, this);
+         YAHOO.Bubbling.on("eventUpdated", this.onEventUpdated, this);
 
          YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
          
@@ -352,11 +352,11 @@
       /**
        * Gets called when an event is (successfully) updated.
        *
-       * @method onEventUpdate
+       * @method onEventUpdated
        * @param e {object} Event fired
        * @param args {array} Event parameters
        */
-      onEventUpdate: function(e, args)
+      onEventUpdated: function(e, args)
       {
          this._loadData(); // refresh the data
       },
@@ -459,12 +459,14 @@
                   dateEnd = DateMath.add(dateBegin, DateMath.DAY, 1);
                   f = this.refreshDay;
                   break;
+
                case 1: // week
                   dateBegin = DateMath.subtract(this.currentDate, DateMath.DAY, this.currentDate.getDay());
                   dateBegin.setHours(0, 0, 0);
                   dateEnd = DateMath.add(dateBegin, DateMath.DAY, 7);
                   f = this.refreshWeek;
                   break;
+
                case 2: // month
                   dateBegin = DateMath.findMonthStart(this.currentDate);
                   var monthEnd = DateMath.findMonthEnd(this.currentDate);
@@ -472,6 +474,11 @@
                   dateEnd = DateMath.add(monthEnd, DateMath.DAY, 1);
                   f = this.refreshMonth;
                   break;
+               
+               case 3: // agenda
+                  dateBegin = new Date();
+                  dateEnd = DateMath.add(dateBegin, DateMath.YEAR, 999)
+                  f = this.refreshAgenda;
             }
 
             if (DateMath.between(eventDate, dateBegin, dateEnd))
@@ -817,17 +824,32 @@
                elem.removeChild(elem.firstChild);       
             } 
          }
+         
+         var now = new Date(), dateParts, eventDate, div, atLeastOneEvent = false;
       
          for (var key in this.eventData)
          {
-            if (this.eventData.hasOwnProperty(key)) {
-               var dateParts = key.split("/");
-               var eventdate = DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
-               var div = document.createElement("div");
-               div.setAttribute("class", "agenda-item");
-               this.renderAgendaItems(eventdate, div);
-               elem.appendChild(div);
+            if (this.eventData.hasOwnProperty(key))
+            {
+               dateParts = key.split("/");
+               eventDate = DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
+               if (eventDate > now)
+               {
+                  atLeastOneEvent = true;
+                  div = document.createElement("div");
+                  div.setAttribute("class", "agenda-item");
+                  this.renderAgendaItems(eventDate, div);
+                  elem.appendChild(div);
+               }
             }
+         }
+         
+         if (!atLeastOneEvent)
+         {
+            div = document.createElement("div");
+            div.setAttribute("class", "no-agenda-items");
+            div.innerHTML = Alfresco.util.message("message.no-agenda-items", this.name);
+            elem.appendChild(div);
          }
       },
    

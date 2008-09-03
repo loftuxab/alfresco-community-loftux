@@ -74,7 +74,7 @@
       <div id="${args.htmlid}-monthLabel" class="date-title"></div>
       <table id="month-view">
       <tr>
-      <#assign days_in_week = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]>
+      <#assign days_in_week = msg("days.medium")?split(",") >
       <#list days_in_week as day>
          <th align="center" width="14%">${day}</th>
          </#list>
@@ -94,6 +94,7 @@
       </table>
    </div>
    <div id="${args.htmlid}-agenda">
+      <div class="date-title">${msg("title.agenda")}</div>
       <div id="${args.htmlid}-agendaContainer" style="width: 100%;"></div>
    </div>
 </div>

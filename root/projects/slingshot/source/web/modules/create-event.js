@@ -188,13 +188,13 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          eventForm.addValidation(this.id + "-end", this._onDateValidation, { "obj": this }, "blur");
                      
          // OK Button
-         var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
+         this.okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
          {
             type: "submit"
          });
          
          eventForm.setShowSubmitStateDynamically(true);
-         eventForm.setSubmitElements(okButton);
+         eventForm.setSubmitElements(this.okButton);
 
          if (!this.options.eventURI) // Create
          {
@@ -253,6 +253,8 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
                
                var to = Alfresco.util.formatDate(Dom.get("td").value, "ddd, d mmmm yyyy");
                Dom.get(this.id + "-to").value = Alfresco.util.formatDate(to, "yyyy/mm/dd");
+               
+               this.okButton.set("disabled", true);
             },
             scope: this
          }
@@ -266,14 +268,16 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           * Button declarations that, when clicked, display
           * the calendar date picker widget.
           */
-         var startButton = new YAHOO.widget.Button({
+         var startButton = new YAHOO.widget.Button(
+         {
              type: "push",
              id: "calendarpicker",
              container: this.id + "-startdate"
          });
          startButton.on("click", this.onDateSelectButton);
 
-         var endButton = new YAHOO.widget.Button({
+         var endButton = new YAHOO.widget.Button(
+         {
             type: "push",
             id: "calendarendpicker",
             container: this.id + "-enddate"
@@ -442,8 +446,8 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method onCreateEventSuccess
        * @param e {object} DomEvent
        */
-        onCreateEventSuccess: function(e)
-        {
+      onCreateEventSuccess: function(e)
+      {
          this.panel.destroy();
 
          var result = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
@@ -459,9 +463,9 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
                tags: result.event.tags
             });
             // Refresh the tag component
-            YAHOO.Bubbling.fire('onTagRefresh');
+            YAHOO.Bubbling.fire("tagRefresh");
          }
-        }
+      }
    };
 })();
 
