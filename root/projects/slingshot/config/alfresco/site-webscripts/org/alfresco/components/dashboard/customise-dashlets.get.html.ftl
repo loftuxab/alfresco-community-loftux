@@ -78,28 +78,32 @@
 
       <div id="${args.htmlid}-wrapper-div" class="noOfColumns${currentLayout.noOfColumns}">
 
+         <div class="trashcan">&nbsp;</div>
          <#list columns as column>
             <div class="column" id="${args.htmlid}-column-div-${column_index + 1}" <#if (column_index >= currentLayout.noOfColumns)>style="display: none;"</#if>>
-               <h3 class="padded">Column ${column_index + 1}</h3>
-               <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
-                  <#list column as dashlet>
-                     <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
-                        <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif"></a>
-                        <span>${dashlet.shortName}</span>
-                        <div class="draggable" title="${dashlet.description}"></div>
-                     </li>
-                  </#list>
-               </ul>
+            <h3 class="padded">Column ${column_index + 1}</h3>
+            <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
+               <#list column as dashlet>
+                  <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
+                     <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif"></a>
+                     <span>${dashlet.shortName}</span>
+                     <div class="draggable" title="${dashlet.description}"></div>
+                  </li>
+               </#list>
+            </ul>
             </div>
          </#list>
-
-      </div>
+         <div class="usedActions">
+            <span id="${args.htmlid}-trashcan-img" class="trashcan" title="${msg("help.trashcan")}">&nbsp;</span>
+         </div>
 
    </div>
 
-   <div class="actions">
+</div>
+
+<div class="actions">
       
-      <hr/>
+   <hr/>
       <div>
          <div class="buttons">
             <input id="${args.htmlid}-save-button" type="button" value="${msg("button.save")}" />

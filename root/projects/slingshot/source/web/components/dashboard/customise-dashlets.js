@@ -217,9 +217,13 @@
 
          // Save a reference to the dashlet list and garbage can
          this.widgets.dashletListEl = Dom.get(this.id + "-column-ul-0");
+         this.widgets.trashcanListEl = Dom.get(this.id + "-trashcan-img");
+         
 
          // ... and create a delete drop target on them
          new YAHOO.util.DDTarget(this.widgets.dashletListEl, this.DND_GROUP_DELETE_DASHLET);
+         new YAHOO.util.DDTarget(this.widgets.trashcanListEl, this.DND_GROUP_DELETE_DASHLET);
+         
 
          YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
          YAHOO.Bubbling.on("onDashboardLayoutsDisplayed", this.onDashboardLayoutsDisplayed, this);
@@ -879,14 +883,14 @@
       isAddTarget: function CD_isAddTarget(el)
       {
          // Either el is a column/ul ...
-         if (el === this.widgets.dashletListEl)
+         if (el === this.widgets.dashletListEl || el === this.widgets.trashcanListEl)
          {
             return false;
          }
          else if (el){
             // .. or it was a dashlet/li, then check its column/ul instead. 
             el = el.parentNode;
-            if(el === this.widgets.dashletListEl)
+            if(el === this.widgets.dashletListEl || el === this.widgets.trashcanListEl)
             {
                return false;
             }
@@ -1222,6 +1226,11 @@
                Dom.removeClass(prevDestEl, "deleteDrag");
             }
          }
+         else if(prevDestEl === this.customiseDashletComponent.widgets.trashcanListEl)
+         {
+            this._changeCursor(Alfresco.util.Cursor.DRAG);
+            Dom.removeClass(prevDestEl, "target");
+         }
       },
 
       /**
@@ -1261,7 +1270,7 @@
       {
          this.isOver = true;
          
-         // Get the element the proxy was dragged over
+         // Get the element the proxy was dragged over 
          var destEl = Dom.get(id);
          var srcEl = this.getEl();
          var srcElColumn = this.customiseDashletComponent.getColumnIndex(srcEl);
@@ -1330,6 +1339,11 @@
             {
                // Cursor should be the drag cursor, keep it.
             }
+         }
+         else if(destEl === this.customiseDashletComponent.widgets.trashcanListEl)
+         {
+            this._changeCursor(Alfresco.util.Cursor.DROP_VALID);
+            Dom.addClass(destEl, "target");
          }
       }
    });

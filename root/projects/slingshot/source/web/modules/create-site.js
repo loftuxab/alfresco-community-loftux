@@ -47,6 +47,12 @@
    {
       this.name = "Alfresco.module.CreateSite";
       this.id = containerId;
+
+      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      if (instance !== undefined && instance.length > 0)
+      {
+         throw new Error("An instance of Alfresco.module.FileUpload already exists.");
+      }
       
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -347,5 +353,17 @@
    };
 })();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.CreateSite(null);
+Alfresco.module.getCreateSiteInstance = function()
+{
+   var instanceId = "alfresco-createSite-instance";
+   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   if (instance !== undefined && instance.length > 0)
+   {
+      instance = instance[0];
+   }
+   else
+   {
+      instance = new Alfresco.module.CreateSite(instanceId);
+   }
+   return instance;
+}

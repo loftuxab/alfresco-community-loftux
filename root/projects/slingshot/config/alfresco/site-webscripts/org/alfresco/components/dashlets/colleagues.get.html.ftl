@@ -4,7 +4,7 @@
 
 <#if (memberships?size > 0)>
    <#list memberships as m>
-   <div class="detail-list-item">
+   <div class="detail-list-item  <#if (!m_has_next)>last</#if>">
       <div class="avatar">
          <img src="${url.context}<#if m.avatar??>/proxy/alfresco/api/node/${m.avatar?replace(':/','')}/content/thumbnails/avatar?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="Avatar" />
       </div>
