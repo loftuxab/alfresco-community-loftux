@@ -6,8 +6,8 @@
 	<url>/components/extranet/alfresco-extensions</url>
 	
 	<!-- Binding --> 
-	<scope>page</scope>
-	<region-id>body</region-id>
-	<source-id>extensions</source-id>
-  
+	<scope>global</scope>
+	<region-id>alfresco-extensions</region-id>
+	<source-id>global</source-id>
+	  
 </component>
