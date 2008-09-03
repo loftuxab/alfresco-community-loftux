@@ -1,4 +1,4 @@
-<!-- tags -->
+<#-- Tags -->
 <#if result.tags?? && result.tags?size &gt; 0>
    <#assign tags=result.tags />
 <#else>
@@ -6,7 +6,8 @@
 </#if>
    
 <script type="text/javascript">//<![CDATA[
-	new Alfresco.Wiki("${args.htmlid}").setOptions({
+	new Alfresco.Wiki("${args.htmlid}").setOptions(
+	{
 	   "siteId": "${page.url.templateArgs.site}",
 	   "pageTitle": "${page.url.args["title"]!""}",
 	   "mode": "${page.url.args["action"]!"view"}",
@@ -16,47 +17,50 @@
    );
 //]]></script>
 <div class="yui-g wikipage-bar">
-<div class="wikipage-header">
-	<div class="back-nav">
-		<span class="backLink">
-			<a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">
-				${msg("header.back")}
-			</a>
-		</span>
-	</div>
-</div>
-    <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">
-      ${page.url.args["title"]?replace("_", " ")}
-    </div>
-    <div class="yui-u align-right">
-    <#assign action = page.url.args["action"]!"view"> 
-    <#assign tabs =
-	    [
-	      { 
-	         "id": "#page",
-	         "label": msg("tab.view"),
-	         "action": "view"
-	      },
-	      {
-	         "id": "#edit",
-	         "label": msg("tab.edit"),
-	         "action": "edit"
-	      },
-	      {
-	         "id": "#history",
-	         "label": msg("tab.details"),
-	         "action": "details"
-	      }
-	    ]>
-	    <#list tabs as tab>
- 	      <#if tab.action == action>
- 	         <span class="tabSelected">${tab.label}</span>
- 	      <#else>
- 	         <a href="?title=${page.url.args["title"]!""}&action=${tab.action}" class="tabLabel">${tab.label}</a>
- 	      </#if>
- 	      <#if tab_has_next><span class="separator">|</span></#if>
- 	    </#list>
-    </div>
+   <div class="wikipage-header">
+      <div class="back-nav">
+         <span class="backLink">
+            <a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">${msg("header.back")}</a>
+         </span>
+      </div>
+   </div>
+
+   <div class="title-bar">
+      <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">
+         ${page.url.args["title"]?replace("_", " ")}
+      </div>
+      <div class="yui-u align-right">
+<#assign action = page.url.args["action"]!"view"> 
+<#assign tabs =
+[
+   { 
+      "id": "#page",
+      "label": msg("tab.view"),
+      "action": "view"
+   },
+   {
+      "id": "#edit",
+      "label": msg("tab.edit"),
+      "action": "edit"
+   },
+   {
+      "id": "#history",
+      "label": msg("tab.details"),
+      "action": "details"
+   }
+]>
+<#list tabs as tab>
+   <#if tab.action == action>
+         <span class="tabSelected">${tab.label}</span>
+   <#else>
+         <a href="?title=${page.url.args["title"]!""}&action=${tab.action}" class="tabLabel">${tab.label}</a>
+   </#if>
+   <#if tab_has_next>
+         <span class="separator">|</span>
+   </#if>
+</#list>
+      </div>
+   </div>
 </div>  
 <div id="${args.htmlid}-wikipage" class="yui-navset">       
 	    <div class="yui-content" style="background: #FFFFFF;"> 
@@ -82,7 +86,7 @@
 			</div> 
 <#elseif action == "details">	    		
 			<div id="#history">
-			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%">
+			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%; height:400px; overflow-y:auto">
 			<div class="yui-g" style="background: #CCC;">
 			   <div class="yui-u first"><h2>${result.title!""}</h2></div>
 			   <div class="yui-u">
