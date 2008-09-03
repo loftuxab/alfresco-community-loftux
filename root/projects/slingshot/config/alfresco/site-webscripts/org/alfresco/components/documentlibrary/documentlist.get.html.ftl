@@ -98,7 +98,7 @@
          <div class="onActionCopyTo"><a rel="" href="#" class="action-link" title="${msg("actions.folder.copy-to")}"><span>${msg("actions.folder.copy-to")}</span></a></div>
          <div class="onActionMoveTo"><a rel="delete" href="#" class="action-link" title="${msg("actions.folder.move-to")}"><span>${msg("actions.folder.move-to")}</span></a></div>
          <div class="onActionDelete"><a rel="delete" href="#" class="action-link" title="${msg("actions.folder.delete")}"><span>${msg("actions.folder.delete")}</span></a></div>
-         <div class="onActionManagePermissions"><a rel"permissions" href="#" class="action-link" title="${msg("actions.document.manage-permissions")}"><span>${msg("actions.document.manage-permissions")}</span></a></div>
+         <div class="onActionManagePermissions"><a rel="permissions" href="#" class="action-link" title="${msg("actions.document.manage-permissions")}"><span>${msg("actions.document.manage-permissions")}</span></a></div>
       </div>
    </div>
 
