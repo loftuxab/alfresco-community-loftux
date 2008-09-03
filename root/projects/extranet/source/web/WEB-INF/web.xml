@@ -15,10 +15,12 @@
          classpath:alfresco/extranet-application-context.xml
 		 <!-- 
          To give final control over the tuning of the custom environment, 
-         the custom-web-context.xml file is processed last (note: 
-         custom-web-context.xml isn't part of the source tree itself).
+         the extranet-application-custom-context.xml file is processed last (note: 
+         extranet-application-custom-context.xml isn't part of the source tree 
+		 itself and can exist outside of the webapp such as
+		 [TOMCAT_ROOT]/shared/classes/alfresco/extension).
          -->
-		 classpath*:alfresco/extension/custom-web-context.xml
+		 classpath*:alfresco/extension/extranet-application-custom-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>
