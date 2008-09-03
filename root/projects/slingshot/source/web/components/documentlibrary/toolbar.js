@@ -782,7 +782,7 @@
       onPathChanged: function DLTB_onPathChanged(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.path !== null))
+         if (obj && obj.path)
          {
             // Should be a path in the arguments
             this.currentPath = obj.path;
