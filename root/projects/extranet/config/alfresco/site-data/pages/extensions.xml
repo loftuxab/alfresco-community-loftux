@@ -2,6 +2,6 @@
 
 <page>
   <title>Extensions</title>
-  <template-instance>application</template-instance>
+  <template-instance>extensions</template-instance>
   <authentication>none</authentication>  
 </page>
