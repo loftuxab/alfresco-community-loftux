@@ -1,43 +1,55 @@
-.y2008 .w25 td { 
-	background-color:yellow 
+tr.odd td
+{
+	background-color: #f8f8f8;
 }
 
-tr.odd  td {
-	background-color: #D3E6FE;
-}
-
-tr.even  td {
+tr.even td 
+{
 	background-color: #FFFFFF;
 }
 
-table#week-view {
-	border: 1px solid #000000;
+table#week-view
+{
+	border: 1px solid #c0c0c0;
 }
 
-table#week-view th {
+table#week-view th
+{
+   height: 2em;
 	text-align: center;
+	vertical-align: middle;
 }
 
-table#week-view th a {
+table#week-view th a
+{
 	text-decoration: none;
 }
 
-.yui-content {
+#week-view .label
+{
+   text-align: center;
+}
+
+.yui-content
+{
 	background: #FFFFFF; /* content background color */
 }
 
-table#month-view {
+table#month-view
+{
 	width: 100%; 
 	border-collapse: collapse;
 }
-table#month-view th {
+table#month-view th
+{
 	text-align: center;
 	border-bottom: 1px solid #CCCCCC;
 	font-weight: normal;
 	color: #000000;
 }
 
-table#month-view td {
+table#month-view td
+{
 	height: 80px;
 	width: 14%;
 	vertical-align: top;
@@ -46,52 +58,61 @@ table#month-view td {
 	border: 1px solid #CCCCCC;
 }
 
-div.dayLabel {
+div.dayLabel
+{
 	text-align: right;
 	padding-right: 5px;
 	margin: 0;
 }
 
-div.dayLabel a {
+div.dayLabel a
+{
 	text-decoration: none;
-/*	color: #808080; */
-	color: #000000; /* text color */
+	color: #000000;
 	font-size: normal;
 }
 
-div.cal-event-entry {
+div.cal-event-entry
+{
 	font-size: 11px;
 	padding-left: 5px;
 	color: #000000;
 }
 
-#monthLabel {
+#monthLabel
+{
 	font-weight: bold;
 	text-align: center;
 }
 
-div.boxOutline {
+div.boxOutline
+{
 	margin: 0;
 	overflow: hidden;
 }
 
-.nextBtn {
+.nextBtn
+{
 	background: url(/slingshot/images/calendar/next.gif) no-repeat center center;
 }
 
-.today {
+.today
+{
 	background-color: #FFFFCC;
 }
 
-#calendarcontainer {
+#calendarcontainer
+{
 	padding:10px;
 }
 
-#calendarmenu {
+#calendarmenu
+{
    position: absolute; 
 }
 
-#calendarendpicker button, #calendarpicker button {
+#calendarendpicker button, #calendarpicker button
+{
 	background: url(images/calendar-16.png) center center no-repeat;
    text-align: left;
    text-indent: -10em;
@@ -101,46 +122,66 @@ div.boxOutline {
    white-space: nowrap;
 }
  
-#year-field { 
+#year-field
+{ 
 	width: 3em;
 }
 
-#datefields {
+#datefields
+{
 	border: solid 1px #666;
 	padding: .5em;
 }
 
-#calendarpicker  {
+#calendarpicker
+{
 	vertical-align: baseline;	
 }
 
-#calendar-view {
+#calendar-view
+{
 	visibility: hidden;
 }
 
+#calendar-view .date-title
+{
+   color: #000;
+   font-size: 146.5%;
+   padding: 0.3em 0 0.7em 0.5em;
+   text-align: center;
+}
+
 /* Styles calendar dashlet */
-.yui-skin-sam .yui-calendar td.event { background-color:#999; }
+.yui-skin-sam .yui-calendar td.event
+{
+   background-color:#999;
+}
 
 /* Day view styles */
-div.timeLabel {
-  	height: 20px;
-  	width: 50px;
-  	font-size: 12px;
-	border: 1px solid #CCC;
-	border-bottom: none;
-	text-align: right;
-	padding-right: 5px;
+div.timeLabel
+{
+	border-bottom: 2px solid #c0c0c0;
+  	height: 30px;
+	padding-right: 1px;
+	padding-top: 4px;
+	text-align: center;
+  	width: 56px;
+}
+div.timeLabel.last
+{
+   border-bottom: none;
 }
 
-div#timeLabels {
+div#timeLabels
+{
     float: left;
     width: 57px;
-    border: 1px solid black;
+    border-right: 1px solid black;
 }
 
-div.dayEventsView {
+div.dayEventsView
+{
 	float: left;
-/*	border: 1px solid red; */
 	font-family: Arial;
 	font-size: 11px;
 	text-align: left;
@@ -148,13 +189,15 @@ div.dayEventsView {
 	height: 100px;
 }
 
-div#dayContainer {
+div#dayContainer
+{
     float: left; 
     width: 100%;
-    border: 1px solid blue;
+    border: 1px solid #a0a0a0;
 }
 
-div.dayEvent {
+div.dayEvent
+{
     position: absolute; 
     font-family: Arial;
     font-size: 11px;
@@ -164,7 +207,8 @@ div.dayEvent {
 }
 
 /** Styling for the agenda view **/
-div.dayheader {
+div.dayheader
+{
 	width: auto;
 	border-bottom: 1px solid #000;
 	font-family: Arial;
@@ -173,38 +217,46 @@ div.dayheader {
 	margin-bottom: 5px;
 }
 
-table.daytable {
+table.daytable
+{
 	width: auto;
 }
 
-table.daytable td.timelabel {
+table.daytable td.timelabel
+{
 	width: 7%;
 }
 
-table.daytable td {
+table.daytable td
+{
 	font-size: 12px;
 	color: #333;
 	text-align: left;
 	padding: 2px;
 }
 
-div.agenda-item {
+div.agenda-item
+{
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-div.agenda-item div.cal-event-entry {
+div.agenda-item div.cal-event-entry
+{
    font-size: 12px;
 	color: #333;
 	text-align: left;
 	padding: 2px;
 }
 
-div.cal-event-entry a {
+div.cal-event-entry a
+{
 	text-decoration: none;
 }
 
-div.calendar-currentMonth {
+div.calendar-currentMonth
+{
+   margin-right: 15px;
    text-align: center;
 }
 
@@ -214,7 +266,8 @@ div.calendar-currentMonth {
 }
 
 /* Override default textfield width for start and end time textfields */
-span.eventTime  input[type="text"] {
+span.eventTime  input[type="text"]
+{
    width: 5em;
 }
 
@@ -224,3 +277,19 @@ span.eventTime  input[type="text"] {
    filter:alpha(opacity=40);
 }
 
+#calendar
+{
+   margin: 0.5em 15px 1em 0;
+}
+
+.yui-skin-default .yui-calcontainer
+{
+   background-color: #fff;
+   border: none;
+}
+
+.yui-skin-default .yui-navset .yui-content,
+.yui-skin-default .yui-navset .yui-navset-top .yui-content
+{
+   border-color: #a0a0a0;
+}

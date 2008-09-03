@@ -47,14 +47,14 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
 
    Alfresco.module.AddEvent.prototype =
    {
-		/**
-	    * AddModule module instance.
-	    *
-	    * @property panel
-	    * @type Alfresco.module.AddEvent
-	    */
-		panel: null,
-				
+      /**
+       * AddModule module instance.
+       *
+       * @property panel
+       * @type Alfresco.module.AddEvent
+       */
+      panel: null,
+            
       /**
         * Object container for initialization options
         *
@@ -65,14 +65,14 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        {
           siteId: "",
           /**
-    		 * Stores the URI of the event IF an edit is happening 
-    		 *
-    		 * @property eventURI
-    		 * @type String
-    		 */
+           * Stores the URI of the event IF an edit is happening 
+           *
+           * @property eventURI
+           * @type String
+           */
           eventURI: null,
           displayDate: null
-       },		
+       },      
 
        /**
         * Set multiple initialization options at once.
@@ -86,60 +86,60 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           return this;
        },
        
-		/**
-		 * Fired by YUILoaderHelper when required component script files have
-		 * been loaded into the browser.
-		 *
-		 * @method onComponentsLoaded
-		 */
-   		componentsLoaded: function()
-      	{
-         	/* Shortcut for dummy instance */
-         	if (this.id === null)
-         	{
-            	return;
-         	}
-      	},
+      /**
+       * Fired by YUILoaderHelper when required component script files have
+       * been loaded into the browser.
+       *
+       * @method onComponentsLoaded
+       */
+         componentsLoaded: function()
+         {
+            /* Shortcut for dummy instance */
+            if (this.id === null)
+            {
+               return;
+            }
+         },
 
-		/**
-		 * Renders the event create form. If the form has been previously rendered
-		 * it clears the form of any previously entered values otherwise fires off a
-		 * request to web script that generates the form.
-		 *
-		 * @method show
-		 */
+      /**
+       * Renders the event create form. If the form has been previously rendered
+       * it clears the form of any previously entered values otherwise fires off a
+       * request to web script that generates the form.
+       *
+       * @method show
+       */
        show: function()
        {
           var args = {
-				"htmlid": this.id,
-				"site": this.options.siteId
-			}
-			
-			if (this.options.eventURI)
-			{
-				args['uri'] = this.options.eventURI;
-			}
-			
-			Alfresco.util.Ajax.request(
-		    {
-		    	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
-				dataObj: args,
-				successCallback:
-				{
-					fn: this.templateLoaded,
-					scope: this
-				},
-		        failureMessage: "Could not load add event form"
-			});
-      	},
+            "htmlid": this.id,
+            "site": this.options.siteId
+         }
+         
+         if (this.options.eventURI)
+         {
+            args['uri'] = this.options.eventURI;
+         }
+         
+         Alfresco.util.Ajax.request(
+          {
+             url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+            dataObj: args,
+            successCallback:
+            {
+               fn: this.templateLoaded,
+               scope: this
+            },
+              failureMessage: "Could not load add event form"
+         });
+         },
 
-		/**
-		 * Fired when the event create form has loaded successfully.
-		 * Sets up the various widgets on the form and initialises the forms runtime.
-		 *
-		 * @method templateLoaded
-		 * @param response {object} DomEvent
-		 */
+      /**
+       * Fired when the event create form has loaded successfully.
+       * Sets up the various widgets on the form and initialises the forms runtime.
+       *
+       * @method templateLoaded
+       * @param response {object} DomEvent
+       */
        templateLoaded: function(response)
        {
           // Inject the template from the XHR request into a new DIV element
@@ -164,11 +164,11 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           var Dom = YAHOO.util.Dom;
 
           // "All day" check box
-		 	var allDay = Dom.get(this.id + "-allday");
-		 	if (allDay)
-		 	{
-		 	   YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
-		 	}
+          var allDay = Dom.get(this.id + "-allday");
+          if (allDay)
+          {
+             YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
+          }
          
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
@@ -196,26 +196,26 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          eventForm.setShowSubmitStateDynamically(true);
          eventForm.setSubmitElements(okButton);
 
-			if (!this.options.eventURI) // Create
-			{
-				eventForm.setAJAXSubmit(true,
-				{
-					successCallback:
-					{
-						fn: this.onCreateEventSuccess,
-						scope: this
-					}
-				});
-	      
-				// Initialise the start and end dates to today
-				var today = this.options.displayDate || new Date();
+         if (!this.options.eventURI) // Create
+         {
+            eventForm.setAJAXSubmit(true,
+            {
+               successCallback:
+               {
+                  fn: this.onCreateEventSuccess,
+                  scope: this
+               }
+            });
+         
+            // Initialise the start and end dates to today
+            var today = this.options.displayDate || new Date();
             // Pretty formatting
-				var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
-				Dom.get("fd").value = dateStr;
-				Dom.get("td").value = dateStr;
-			}
-			else  // Event Edit
-			{   
+            var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
+            Dom.get("fd").value = dateStr;
+            Dom.get("td").value = dateStr;
+         }
+         else  // Event Edit
+         {   
             var form = document.getElementById(this.id + "-addEvent-form");
             // Reset the "action" attribute
             form.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + this.options.eventURI;
@@ -223,74 +223,73 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
             eventForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
             eventForm.setAJAXSubmit(true,
             {
-	            successCallback:
-	            {
-		            fn: this.onEventUpdated,
-		            scope: this
-	            }
+               successCallback:
+               {
+                  fn: this.onEventUpdated,
+                  scope: this
+               }
             });        
-	         
-	         // Is this an all day event?
-	         var startTime = Dom.get(this.id + "-start");
-	         var endTime = Dom.get(this.id + "-end");
-	         
-	         // TODO: perhaps "allday" property to calendar event
-	         if (startTime.value === "00:00" && (startTime.value === endTime.value))
-	         {
-	            allDay.setAttribute("checked", "checked");
-	            this._displayTimeFields(false);
-	         }
-			}
-			
-			eventForm.setSubmitAsJSON(true);
-			eventForm.doBeforeFormSubmit =
+            
+            // Is this an all day event?
+            var startTime = Dom.get(this.id + "-start");
+            var endTime = Dom.get(this.id + "-end");
+            
+            // TODO: perhaps "allday" property to calendar event
+            if (startTime.value === "00:00" && (startTime.value === endTime.value))
+            {
+               allDay.setAttribute("checked", "checked");
+               this._displayTimeFields(false);
+            }
+         }
+         
+         eventForm.setSubmitAsJSON(true);
+         eventForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
-               // Set the value of the hidden form variables	
-   				var start = Alfresco.util.formatDate(Dom.get("fd").value, "ddd, d mmmm yyyy");
-   				Dom.get(this.id + "-from").value = Alfresco.util.formatDate(start, "yyyy/mm/dd");
-   				
-   				var to = Alfresco.util.formatDate(Dom.get("td").value, "ddd, d mmmm yyyy");
-      			Dom.get(this.id + "-to").value = Alfresco.util.formatDate(to, "yyyy/mm/dd");
+               // Set the value of the hidden form variables   
+               var start = Alfresco.util.formatDate(Dom.get("fd").value, "ddd, d mmmm yyyy");
+               Dom.get(this.id + "-from").value = Alfresco.util.formatDate(start, "yyyy/mm/dd");
+               
+               var to = Alfresco.util.formatDate(Dom.get("td").value, "ddd, d mmmm yyyy");
+               Dom.get(this.id + "-to").value = Alfresco.util.formatDate(to, "yyyy/mm/dd");
             },
             scope: this
          }
          // We're in a popup, so need the tabbing fix
          eventForm.applyTabFix();
-			eventForm.init();
-			
-			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
+         eventForm.init();
+         
+         var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
-			/**
-			 * Button declarations that, when clicked, display
-			 * the calendar date picker widget.
-			 */
-			var startButton = new YAHOO.widget.Button({
-				 type: "push",
-				 id: "calendarpicker",
-				 container: this.id + "-startdate"
-			});
-			startButton.on("click", this.onDateSelectButton);
+         /**
+          * Button declarations that, when clicked, display
+          * the calendar date picker widget.
+          */
+         var startButton = new YAHOO.widget.Button({
+             type: "push",
+             id: "calendarpicker",
+             container: this.id + "-startdate"
+         });
+         startButton.on("click", this.onDateSelectButton);
 
-			var endButton = new YAHOO.widget.Button({
-				type: "push",
-				id: "calendarendpicker",
-				container: this.id + "-enddate"
-			});
-			endButton.on("click", this.onDateSelectButton);
+         var endButton = new YAHOO.widget.Button({
+            type: "push",
+            id: "calendarendpicker",
+            container: this.id + "-enddate"
+         });
+         endButton.on("click", this.onDateSelectButton);
 
-			// Display the panel
-			this.panel.show();
+         // Display the panel
+         this.panel.show();
 
          // Set intial focus
          YAHOO.util.Dom.get(this.id + "-title").focus();
-         console.log(YAHOO.util.Dom.get(this.id + "-title"));
-		},
-		
-		_onDateValidation: function(field, args, event, form, silent)
-		{
-		   var Dom = YAHOO.util.Dom;
+      },
+      
+      _onDateValidation: function(field, args, event, form, silent)
+      {
+         var Dom = YAHOO.util.Dom;
          // Check that the end date is after the start date
          var start = Alfresco.util.formatDate(Dom.get("fd").value, "yyyy/mm/dd");
          var startDate = new Date(start + " " + Dom.get(args.obj.id + "-start").value);
@@ -313,156 +312,156 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          }
          
          return after;
-		},
-		
-		/**
-		 * Event handler that gets called when the user clicks on the "All day" event
-		 * checkbox in the event create / edit form. If selected, hides the time fields
-		 * from view.
-		 *
-		 * @method onAllDaySelect
-		 * @param e {object} DomEvent
-		 */
-		onAllDaySelect: function(e)
-		{
-		  var checkbox = e.target;
-		  var display = true; // Time fields are enabled by default
-		  
-		  if (checkbox.checked)
-		  {
-		     display = false;
-		  } 
-		  
-		 this._displayTimeFields(display);
-		},
-		
+      },
+      
+      /**
+       * Event handler that gets called when the user clicks on the "All day" event
+       * checkbox in the event create / edit form. If selected, hides the time fields
+       * from view.
+       *
+       * @method onAllDaySelect
+       * @param e {object} DomEvent
+       */
+      onAllDaySelect: function(e)
+      {
+        var checkbox = e.target;
+        var display = true; // Time fields are enabled by default
+        
+        if (checkbox.checked)
+        {
+           display = false;
+        } 
+        
+       this._displayTimeFields(display);
+      },
+      
       /**
        * If the user selectes the "All day" event option, then the start and end
        * time fields are hidden from view. The date field remains active.
        *
        * @method _displayTimeFields
        * @param display {Boolean} if true, displays the start / end time fields
-       */	
-		_displayTimeFields: function(display)
-		{
-		  var ids = [this.id + "-starttime", this.id + "-endtime"];
-		  var elem;
-		  for (var i=0; i < ids.length; i++)
-		  {
-		     elem = document.getElementById(ids[i]);
-		     if (elem)
-		     {
-		       elem.style.display = (display ? "inline" : "none");
-		     }
-		  } 
-		},
-		
-		onEventUpdated: function(e)
-		{
-			this.panel.destroy();
-			// Fire off "eventUpdated" event
-			YAHOO.Bubbling.fire('eventUpdated');
-		},
+       */   
+      _displayTimeFields: function(display)
+      {
+        var ids = [this.id + "-starttime", this.id + "-endtime"];
+        var elem;
+        for (var i=0; i < ids.length; i++)
+        {
+           elem = document.getElementById(ids[i]);
+           if (elem)
+           {
+             elem.style.display = (display ? "inline" : "none");
+           }
+        } 
+      },
+      
+      onEventUpdated: function(e)
+      {
+         this.panel.destroy();
+         // Fire off "eventUpdated" event
+         YAHOO.Bubbling.fire('eventUpdated');
+      },
 
-		/**
-		 * Event handler that gets fired when a user clicks on the date selection
-		 * button in the event creation form. Displays a mini YUI calendar.
-		 * Gets called for both the start and end date buttons.
-		 *
-		 * @method onDateSelectButton
-		 * @param e {object} DomEvent
-		 */
-		onDateSelectButton: function(e)
-		{
-			var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
-			oCalendarMenu.setBody("&#32;");
-			oCalendarMenu.body.id = "calendarcontainer";
+      /**
+       * Event handler that gets fired when a user clicks on the date selection
+       * button in the event creation form. Displays a mini YUI calendar.
+       * Gets called for both the start and end date buttons.
+       *
+       * @method onDateSelectButton
+       * @param e {object} DomEvent
+       */
+      onDateSelectButton: function(e)
+      {
+         var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
+         oCalendarMenu.setBody("&#32;");
+         oCalendarMenu.body.id = "calendarcontainer";
 
-			var container = this.get("container");
-			// Render the Overlay instance into the Button's parent element
-			oCalendarMenu.render(container);
+         var container = this.get("container");
+         // Render the Overlay instance into the Button's parent element
+         oCalendarMenu.render(container);
 
-			// Align the Overlay to the Button instance
-			oCalendarMenu.align();
+         // Align the Overlay to the Button instance
+         oCalendarMenu.align();
 
-   			var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
-			oCalendar.render();
+            var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
+         oCalendar.render();
 
-			oCalendar.changePageEvent.subscribe(function () {
-				window.setTimeout(function () {
-					oCalendarMenu.show();
-				}, 0);
-			});
+         oCalendar.changePageEvent.subscribe(function () {
+            window.setTimeout(function () {
+               oCalendarMenu.show();
+            }, 0);
+         });
          var me = this;
          
-			oCalendar.selectEvent.subscribe(function (type, args) {
-				var date;
-				var Dom = YAHOO.util.Dom;
+         oCalendar.selectEvent.subscribe(function (type, args) {
+            var date;
+            var Dom = YAHOO.util.Dom;
 
-				if (args) {
-					var prettyId, hiddenId;
-					if (container.indexOf("enddate") > -1)
-					{
-						prettyId = "td";
-					}
-					else
-					{
-						prettyId = "fd";
-					}
+            if (args) {
+               var prettyId, hiddenId;
+               if (container.indexOf("enddate") > -1)
+               {
+                  prettyId = "td";
+               }
+               else
+               {
+                  prettyId = "fd";
+               }
 
-					date = args[0][0];
-					var selectedDate = new Date(date[0], (date[1]-1), date[2]);
+               date = args[0][0];
+               var selectedDate = new Date(date[0], (date[1]-1), date[2]);
 
                var elem = Dom.get(prettyId);
-					elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
-					elem.focus();			
-				}
+               elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
+               elem.focus();         
+            }
 
-				oCalendarMenu.hide();
-			});
-		},
+            oCalendarMenu.hide();
+         });
+      },
 
-		/**
-		 * Event handler that gets fired when a user clicks
-		 * on the cancel button in the event create form.
-		 *
-		 * @method onCancelButtonClick
-		 * @param e {object} DomEvent
-		 * @param obj {object} Object passed back from addListener method
-		 */
-		onCancelButtonClick: function(e, obj)
-		{
-		     this.panel.destroy();
-		},
+      /**
+       * Event handler that gets fired when a user clicks
+       * on the cancel button in the event create form.
+       *
+       * @method onCancelButtonClick
+       * @param e {object} DomEvent
+       * @param obj {object} Object passed back from addListener method
+       */
+      onCancelButtonClick: function(e, obj)
+      {
+           this.panel.destroy();
+      },
 
-		/**
-		 * Event handler that gets fired when an event is (successfully) created.
-		 * It in turns fires an 'onEventSaved' event passing in the name and start date
-		 * of the newly created event.
-		 *
-		 * @method onCreateEventSuccess
-		 * @param e {object} DomEvent
-		 */
-	  	onCreateEventSuccess: function(e)
-	  	{
-			this.panel.destroy();
+      /**
+       * Event handler that gets fired when an event is (successfully) created.
+       * It in turns fires an "eventSaved" event passing in the name and start date
+       * of the newly created event.
+       *
+       * @method onCreateEventSuccess
+       * @param e {object} DomEvent
+       */
+        onCreateEventSuccess: function(e)
+        {
+         this.panel.destroy();
 
-			var result = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
-			if (result.event)
-			{
-				YAHOO.Bubbling.fire('onEventSaved',
-				{
-					name: result.event.name,
-					from: result.event.from,
-					start: result.event.start,
-					end: result.event.end,
-					uri: result.event.uri,
-					tags: result.event.tags
-				});
-				// Refresh the tag component
-				YAHOO.Bubbling.fire('onTagRefresh');
-			}
-	  	}
+         var result = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
+         if (result.event)
+         {
+            YAHOO.Bubbling.fire("eventSaved",
+            {
+               name: result.event.name,
+               from: result.event.from,
+               start: result.event.start,
+               end: result.event.end,
+               uri: result.event.uri,
+               tags: result.event.tags
+            });
+            // Refresh the tag component
+            YAHOO.Bubbling.fire('onTagRefresh');
+         }
+        }
    };
 })();
 

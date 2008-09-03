@@ -1,3 +1,17 @@
+.toolbar
+{
+   background-color: #E3EAEC;
+   border-bottom: 2px solid #C7CCCE;
+   margin: 0 -10px;
+   min-height: 2em;
+   padding: 0.5em;
+}
+
+.toolbar .inline
+{
+   display: inline;
+}
+
 .toolbar .addEvent button
 {
    padding-left: 2.5em; 
@@ -7,6 +21,11 @@
 .toolbar .first div 
 {
    float: left;
+}
+
+.toolbar .yui-buttongroup .yui-button
+{
+   margin: auto 0;
 }
 
 div.separator
@@ -26,4 +45,16 @@ div.separator
    background-image: url(../images/feed-icon-16-blue.png);
    background-repeat: no-repeat;
    padding-left: 20px;
+}
+
+.yui-skin-default .yui-navset .yui-nav,
+.yui-skin-default .yui-navset .yui-navset-top .yui-nav { /* protect nested tabviews from other orientations */
+    border: solid #2647a0; /* color between tab list and content */
+    border-width: 0;
+}
+
+.yui-navset
+{
+   margin: 0 -10px;
+   padding: 0.5em 0.5em 0 10px;
 }
