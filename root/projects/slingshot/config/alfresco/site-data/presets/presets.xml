@@ -25,18 +25,6 @@
          </component>
          <component>
             <scope>page</scope>
-            <region-id>component-1-2</region-id>
-            <source-id>site/${siteid}/dashboard</source-id>
-            <url>/components/dashlets/colleagues</url>
-         </component>
-         <component>
-            <scope>page</scope>
-            <region-id>component-1-3</region-id>
-            <source-id>site/${siteid}/dashboard</source-id>
-            <url>/components/dashlets/calendar</url>
-         </component>
-         <component>
-            <scope>page</scope>
             <region-id>component-2-1</region-id>
             <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/docsummary</url>
@@ -57,7 +45,7 @@
             <scope>page</scope>
             <region-id>component-3-2</region-id>
             <source-id>site/${siteid}/dashboard</source-id>
-            <url>/components/dashlets/wiki</url>
+            <url>/components/dashlets/colleagues</url>
          </component>
       </components>
       <pages>
@@ -93,18 +81,6 @@
             <scope>page</scope>
             <region-id>component-1-2</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/my-profile</url>
-         </component>
-         <component>
-            <scope>page</scope>
-            <region-id>component-1-3</region-id>
-            <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/my-sites</url>
-         </component>
-         <component>
-            <scope>page</scope>
-            <region-id>component-1-3</region-id>
-            <source-id>user/${userid}/dashboard</source-id>
             <url>/components/dashlets/user-calendar</url>
          </component>
          <component>
@@ -124,13 +100,25 @@
              <region-id>component-2-3</region-id>
              <source-id>user/${userid}/dashboard</source-id>
              <url>/components/dashlets/my-activities</url>
-          </component>   
+          </component>
+         <component>
+            <scope>page</scope>
+            <region-id>component-3-1</region-id>
+            <source-id>user/${userid}/dashboard</source-id>
+            <url>/components/dashlets/my-profile</url>
+         </component>
+         <component>
+            <scope>page</scope>
+            <region-id>component-3-2</region-id>
+            <source-id>user/${userid}/dashboard</source-id>
+            <url>/components/dashlets/my-sites</url>
+         </component>
       </components>
       <pages>
          <page id="user/${userid}/dashboard">
             <title>User Dashboard</title>
             <description>Users dashboard page</description>
-            <template-instance>dashboard-2-columns-wide-right</template-instance>
+            <template-instance>dashboard-3-columns</template-instance>
             <authentication>user</authentication>
          </page>
       </pages>
