@@ -3,6 +3,11 @@
    padding: 0.5em 0 1em;
 }
 
+.treeview .ygtvspacer
+{
+   width: 18px;
+}
+
 .treeview .ygtvitem
 {
    background-color: #ffffff;
