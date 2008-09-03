@@ -15,7 +15,7 @@
 <@template.body>
    <div id="alflogin" class="login-panel">
       <div class="login-logo"></div>
-      <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/login">
+      <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/login" onsubmit="return alfLogin();">
          <fieldset>
             <div style="padding-top:96px">
                <span id="txt-username"></span>
@@ -30,7 +30,7 @@
                <input type="password" id="password" name="password" maxlength="256" style="width:200px"/>
             </div>
             <div style="padding-top:16px">
-               <input type="submit" id="btn-login" class="login-button" onclick="javascript:alfLogin()" />
+               <input type="submit" id="btn-login" class="login-button" />
             </div>
             <div style="padding-top:32px">
                <span class="login-copyright">
@@ -46,7 +46,7 @@
    <script type="text/javascript">//<![CDATA[
    function alfLogin()
    {
-      Dom.get("btn-login").disabled = true;
+      YAHOO.util.Dom.get("btn-login").setAttribute("disabled", true);
       return true;
    }
    
