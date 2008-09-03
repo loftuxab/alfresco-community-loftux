@@ -574,6 +574,117 @@ Alfresco.util.contentURL = function(nodeRef, name, attach)
 }
 
 /**
+ * Returns the value of the specified query string parameter.
+ *
+ * @method getQueryStringParameter
+ * @param {string} paramName Name of the parameter we want to look up.
+ * @param {string} queryString Optional URL to look at. If not specified,
+ *     this method uses the URL in the address bar.
+ * @return {string} The value of the specified parameter, or null.
+ * @static
+ */
+Alfresco.util.getQueryStringParameter = function(paramName, url)
+{
+    var params = this.getQueryStringParameters(url);
+    
+    if (paramName in params)
+    {
+       return params[paramName];
+    }
+
+    return null;
+}
+
+/**
+ * Returns the query string parameters as an object literal.
+ * Parameters appearing more than once are returned an an array.
+ * This method has been extracted from the YUI Browser History Manager.
+ * It can be used here without the overhead of the History JavaScript include.
+ *
+ * @method getQueryStringParameters
+ * @param queryString {string} Optional URL to look at. If not specified,
+ *     this method uses the URL in the address bar.
+ * @return {object} Object literal containing QueryString parameters as name/value pairs
+ * @static
+ */
+Alfresco.util.getQueryStringParameters = function(url)
+{
+   var i, len, idx, queryString, params, tokens, name, value, objParams;
+
+   url = url || top.location.href;
+
+   idx = url.indexOf("?");
+   queryString = idx >= 0 ? url.substr(idx + 1) : url;
+
+   // Remove the hash if any
+   idx = queryString.lastIndexOf("#");
+   queryString = idx >= 0 ? queryString.substr(0, idx) : queryString;
+
+   params = queryString.split("&");
+
+   objParams = {};
+
+   for (i = 0, len = params.length; i < len; i++)
+   {
+      tokens = params[i].split("=");
+      if (tokens.length >= 2)
+      {
+         name = tokens[0];
+         value = unescape(tokens[1]);
+         switch (typeof objParams[name])
+         {
+            case "undefined":
+               objParams[name] = value;
+               break;
+
+            case "string":
+               objParams[name] = [objParams[name]].concat(value);
+               break;
+
+            case "object":
+               objParams[name] = objParams[name].concat(value);
+               break;
+         }
+      }
+   }
+
+   return objParams;
+}
+
+/**
+ * Turns an object literal into a valid queryString.
+ * Format of the object is as returned from the getQueryStringParameters() function.
+ *
+ * @method toQueryString
+ * @param params {object} Object literal containing QueryString parameters as name/value pairs
+ * @return {string} QueryString-formatted string
+ * @static
+ */
+Alfresco.util.toQueryString = function(p_params)
+{
+   var qs = "?", i, ii, value;
+   for (name in p_params)
+   {
+      value = p_params[name];
+      if (typeof value == "object")
+      {
+         for (val in value)
+         {
+            qs += name + "=" + escape(value[val]) + "&";
+         }
+      }
+      else if (typeof value == "string")
+      {
+         qs += name + "=" + escape(value) + "&";
+      }
+   }
+   
+   // Return the string after removing the last character
+   return qs.substring(0, qs.length - 1);
+}
+
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */
@@ -1238,6 +1349,22 @@ Alfresco.util.Ajax = function()
 
          // Encode url to make sure it is transfered correctly
          c.url = encodeURI(c.url);
+         
+         // Do we need to tunnel the HTTP method if the client can't support it (Adobe AIR)
+         if (YAHOO.env.ua.air > 0)
+         {
+            // Check for unsupported HTTP methods
+            if (c.method.toUpperCase() == "PUT" || c.method.toUpperCase() == "DELETE")
+            {
+               // Check we're not tunnelling already
+               var alfMethod = Alfresco.util.getQueryStringParameter("alf_method", c.url);
+               if (alfMethod === null)
+               {
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + "alf_method=" + c.method;
+                  c.method = this.POST;
+               }
+            }
+         }
 
          // Make the request
          YAHOO.util.Connect.asyncRequest (c.method, c.url, callback, c.dataStr);
@@ -1851,8 +1978,8 @@ Alfresco.thirdparty.dateFormat = function()
    	The date defaults to the current date/time.
    	The mask defaults ``"ddd mmm d yyyy HH:MM:ss"``.
    */
-   var DAY_NAMES = Alfresco.util.message("days").split(",");
-	var MONTH_NAMES = Alfresco.util.message("months").split(",");
+   var DAY_NAMES = (Alfresco.util.message("days.medium") + "," + Alfresco.util.message("days.long")).split(",");
+   var MONTH_NAMES = (Alfresco.util.message("months.short") + "," + Alfresco.util.message("months.long")).split(",");
    
    var dateFormat = function () {
    	var   token        = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloZ]|"[^"]*"|'[^']*'/g,
