@@ -8,7 +8,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed [@nsLib.feedNS/]>
 
-[@feedLib.generic id="urn:uuid:checkedout" title="Checked out Documents" author="${person.properties.userName}"]
+[@feedLib.generic "urn:uuid:checkedout" "Checked out Documents" "${person.properties.userName}"]
   [@pagingLib.links cursor=cursor/]
 [/@feedLib.generic]
 

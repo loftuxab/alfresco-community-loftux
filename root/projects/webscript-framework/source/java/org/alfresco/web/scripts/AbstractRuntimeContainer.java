@@ -62,6 +62,7 @@ public abstract class AbstractRuntimeContainer
     private SearchPath searchPath; 
     private ConfigService configService;
     private Map<String, Object> scriptObjects;
+    private Map<String, Object> templateObjects;
 
     /**
      * @param name
@@ -126,6 +127,14 @@ public abstract class AbstractRuntimeContainer
     {
         this.scriptObjects = scriptObjects;
     }
+    
+    /**
+     * @param templateObjects
+     */
+    public void setTemplateObjects(Map<String, Object> templateObjects)
+    {
+        this.templateObjects = templateObjects;
+    }
 
     
     /* (non-Javadoc)
@@ -156,8 +165,7 @@ public abstract class AbstractRuntimeContainer
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
         params.put("date", new Date());
-        params.put("argreplace", new ArgReplaceMethod());
-        params.put("encodeuri", new UrlEncodeMethod());
+        params.putAll(templateObjects);
         
         return Collections.unmodifiableMap(params);
     }

@@ -207,8 +207,17 @@
            </entry>
          </map>
       </property>
+      <property name="templateObjects">
+         <map>
+           <entry key="argreplace">
+              <bean class="org.alfresco.web.scripts.ArgReplaceMethod"/>
+           </entry>
+           <entry key="encodeuri">
+              <bean class="org.alfresco.web.scripts.UrlEncodeMethod"/>
+           </entry>
+         </map>
+      </property>
    </bean>
-
 
    <!--                                               -->
    <!--  Web Script Presentation (Web Tier) Container -->
