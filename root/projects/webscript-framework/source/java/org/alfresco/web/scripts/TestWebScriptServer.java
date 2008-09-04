@@ -33,6 +33,9 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -538,30 +541,38 @@ public class TestWebScriptServer implements ApplicationContextAware
      * @param uri
      * @return  mock http servlet request
      * @throws UnsupportedEncodingException 
+     * @throws MalformedURLException 
      */
     private MockHttpServletRequest createRequest(String method, String uri)
-        throws UnsupportedEncodingException
+        throws UnsupportedEncodingException, MalformedURLException
     {
+        // extract only path portions of URI, ignore host & port
+        URL url = new URL(new URL("http://localhost"), uri);
+        String path = url.getPath();
+        
+        if (!(path.startsWith("/alfresco/service") || path.startsWith("/a/s")))
+        {
+            path = "/alfresco/service" + path;
+        }
+        
         MockHttpServletRequest req = new MockHttpServletRequest(method, uri);
-
         req.setContextPath("/alfresco");
         req.setServletPath("/service");
 
         if (uri != null)
         {
-            int iArgIndex = uri.indexOf('?');
-            if (iArgIndex != -1 && iArgIndex != uri.length() -1)
+            String queryString = url.getQuery();
+            if (queryString != null && queryString.length() > 0)
             {
-                String uriArgs = uri.substring(iArgIndex +1);
-                String[] args = uriArgs.split("&");
+                String[] args = queryString.split("&");
                 for (String arg : args)
                 {
                     String[] parts = arg.split("=");
                     req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1]) : null);
                 }
-                req.setQueryString(URLDecoder.decode(uriArgs));
+                req.setQueryString(URLDecoder.decode(queryString, "UTF-8"));
             }
-            String requestURI = "/alfresco/service" + (iArgIndex == -1 ? uri : uri.substring(0, iArgIndex));
+            String requestURI = path;
             req.setRequestURI(URLDecoder.decode(requestURI));
         }
         

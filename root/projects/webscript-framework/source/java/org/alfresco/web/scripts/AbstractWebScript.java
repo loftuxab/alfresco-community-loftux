@@ -261,7 +261,6 @@ public abstract class AbstractWebScript implements WebScript
         // populate model with template methods
         params.put("absurl", new AbsoluteUrlMethod(req.getServerPath()));
         params.put("scripturl", new ScriptUrlMethod(req, res));
-        params.put("argreplace", new ArgReplaceMethod());
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
         MessageMethod message = new MessageMethod(this);

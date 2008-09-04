@@ -32,7 +32,7 @@ package org.alfresco.util;
  */
 public final class URLEncoder
 {
-    final static String[] hex = {
+    private final static String[] hex = {
         "%00", "%01", "%02", "%03", "%04", "%05", "%06", "%07",
         "%08", "%09", "%0a", "%0b", "%0c", "%0d", "%0e", "%0f",
         "%10", "%11", "%12", "%13", "%14", "%15", "%16", "%17",
@@ -75,6 +75,9 @@ public final class URLEncoder
      * <li><p>The ASCII characters 'a' through 'z', 'A' through 'Z',
      *        and '0' through '9' remain the same.
      *
+     * <li><p>The URI reserved characters ; , / ? : @ & = + $ only remain the same
+     *        if the parameter reserveUriChars is true 
+     * 
      * <li><p>The unreserved characters - _ . ! ~ * ( ) remain the same.
      *
      * <li><p>The unreserved character ' is converted into "%27" - it is NOT left unencoded!
@@ -93,9 +96,10 @@ public final class URLEncoder
      *
      * @param s     The non-null string to be encoded
      * 
+     * @param reserveUriChars  true => uri reserved characters are not encoded
      * @return The encoded string
      */
-    public static String encode(final String s)
+    private static String encode(String s, boolean reserveUriChars)
     {
         StringBuilder sb = null;      //create on demand
         char ch;
@@ -138,7 +142,16 @@ public final class URLEncoder
                 sb.append(hex[0xc0 | (ch >> 6)]);
                 sb.append(hex[0x80 | (ch & 0x3F)]);
             }
-            else                                        // 0x7FF < ch <= 0xFFFF
+            else if (reserveUriChars &&             // uri reserved
+                      (ch == ';' || ch == ','
+                       || ch == '/' || ch == '?'
+                       || ch == ':' || ch == '@'
+                       || ch == '&' || ch == '='
+                       || ch == '+' || ch == '$'))
+            {
+                sbuf.append((char)ch);
+            }
+            else if (ch <= 0x007f)                  // other ASCII including single quote ' and space
             {
                 if (sb == null)
                 {
@@ -153,4 +166,93 @@ public final class URLEncoder
         }
         return (sb != null ? sb.toString() : s);
     }
+    
+    /*
+     * @See org.alfresco.util.URLEncoder.encodeUriComponent(s)
+     */
+    public static String encode(String s)
+    {
+        return encode(s, false);
+    }
+
+    /**
+     * Encode a string to the UTF-8-in-URL proposal. There are some changes
+     * from the standard, this is what happens:
+     *
+     * <ul>
+     * <li><p>The ASCII characters 'a' through 'z', 'A' through 'Z',
+     *        and '0' through '9' remain the same.
+     *
+     * <li><p>The unreserved characters - _ . ! ~ * ( ) remain the same.
+     *
+     * <li><p>The unreserved character ' is converted into "%27" - it is NOT left unencoded!
+     *
+     * <li><p>The space character ' ' is converted into "%20" - NOT a plus sign!
+     *
+     * <li><p>All other ASCII characters are converted into the
+     *        3-character string "%xy", where xy is
+     *        the two-digit hexadecimal representation of the character
+     *        code
+     *
+     * <li><p>All non-ASCII characters are encoded in two steps: first
+     *        to a sequence of 2 or 3 bytes, using the UTF-8 algorithm;
+     *        secondly each of these bytes is encoded as "%xx".
+     * </ul>
+     *
+     * @param s     The string to be encoded
+     * @return The encoded string
+     */
+    public static String encodeUriComponent(String s)
+    {
+        return encode(s, false);
+    }
+
+    /**
+     * Encode a string to the UTF-8-in-URL proposal. There are some changes
+     * from the standard, this is what happens:
+     *
+     * <ul>
+     * <li><p>The ASCII characters 'a' through 'z', 'A' through 'Z',
+     *        and '0' through '9' remain the same.
+     *
+     * <li><p>The URI reserved characters ; , / ? : @ & = + $ remain the same.
+     * 
+     * <li><p>The unreserved characters - _ . ! ~ * ( ) remain the same.
+     *
+     * <li><p>The unreserved character ' is converted into "%27" - it is NOT left unencoded!
+     *
+     * <li><p>The space character ' ' is converted into "%20" - NOT a plus sign!
+     *
+     * <li><p>All other ASCII characters are converted into the
+     *        3-character string "%xy", where xy is
+     *        the two-digit hexadecimal representation of the character
+     *        code
+     *
+     * <li><p>All non-ASCII characters are encoded in two steps: first
+     *        to a sequence of 2 or 3 bytes, using the UTF-8 algorithm;
+     *        secondly each of these bytes is encoded as "%xx".
+     * </ul>
+     *
+     * @param s     The string to be encoded
+     * @return The encoded string
+     */
+    public static String encodeUri(String s)
+    {
+        return encode(s, true);
+    }
+    
+//    public static void main(String[] args)
+//    {
+//        System.out.println("'" + encodeUri("//") + "'");
+//        System.out.println("'" + encodeUri("/a") + "'");
+//        System.out.println("'" + encodeUri("a") + "'");
+//        System.out.println("'" + encodeUri("a/") + "'");
+//        System.out.println("'" + encodeUri("/a/b c") + "'");
+//        System.out.println("'" + encodeUri("/a/b c/") + "'");
+//        System.out.println("'" + encodeUri("/a/b c/a?") + "'");
+//        System.out.println("'" + encodeUri("/a/b c/a?a=1") + "'");
+//        System.out.println("'" + encodeUri("/a/b c/a?a=1&a=al fresco&b=fdfdf&") + "'");
+//        System.out.println("'" + encode("/a/b c/a?a=1&a=al fresco&b=fdfdf&") + "'");
+//    }
+    
 }

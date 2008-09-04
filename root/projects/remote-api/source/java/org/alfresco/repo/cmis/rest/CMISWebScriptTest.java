@@ -25,21 +25,17 @@
 package org.alfresco.repo.cmis.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.io.StringWriter;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.alfresco.repo.cmis.rest.xsd.CMISValidator;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
-import org.springframework.core.io.ClassPathResource;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -52,71 +48,19 @@ import org.xml.sax.SAXException;
  */
 public class CMISWebScriptTest extends BaseWebScriptTest
 {
-    /** XML Schema Validation */
-    private static DocumentBuilder documentBuilder = null;
-    private static Validator appValidator = null;
-    private static Validator atomValidator = null;
-    
-    
-    /**
-     * Gets document parser
-     * 
-     * @return  document parser
-     * @throws ParserConfigurationException
-     */
-    protected static DocumentBuilder getDocumentBuilder()
-        throws ParserConfigurationException
-    {
-        if (documentBuilder == null)
-        {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setNamespaceAware(true);
-            documentBuilder = builderFactory.newDocumentBuilder();
-        }
-        return documentBuilder;
-    }
-    
-    /**
-     * Gets CMIS Atom Publishing Protocol XML Validator
-     * 
-     * @return  APP Validator
-     * @throws IOException
-     * @throws SAXException
-     */
-    protected static Validator getAppValidator()
-        throws IOException, SAXException
-    {
-        if (appValidator == null)
-        {
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Source schemaFile = new StreamSource(new ClassPathResource("org/alfresco/repo/cmis/rest/xsd/APP.xsd").getFile());
-            Schema schema = factory.newSchema(schemaFile);
-            appValidator = schema.newValidator();
-        }
-        return appValidator;
-    }
-    
-    /**
-     * Gets CMIS Atom Validator
-     * 
-     * @return CMIS Atom Validator
-     * @throws IOException
-     * @throws SAXException
-     */
-    protected static Validator getCMISAtomValidator()
-        throws IOException, SAXException
-    {
-        if (atomValidator == null)
-        {
-            SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Source schemaFile = new StreamSource(new ClassPathResource("org/alfresco/repo/cmis/rest/xsd/ATOM4CMIS.xsd").getFile());
-            Schema schema = factory.newSchema(schemaFile);
-            atomValidator = schema.newValidator();
-        }
-        
-        return atomValidator;
-    }
+    private CMISValidator cmisValidator = new CMISValidator();
 
+    
+    /**
+     * Gets CMIS Validator
+     * 
+     * @return  CMIS Validator
+     */
+    protected CMISValidator getCMISValidator()
+    {
+        return cmisValidator;
+    }
+    
     /**
      * Asserts XML complies with specified Validator
      * 
@@ -125,34 +69,56 @@ public class CMISWebScriptTest extends BaseWebScriptTest
      * @throws IOException
      * @throws ParserConfigurationException
      */
-    public void assertValidXML(String xml, Validator validator)
+    protected void assertValidXML(String xml, Validator validator)
         throws IOException, ParserConfigurationException
     {
         try
         {
-            Document document = getDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+            Document document = cmisValidator.getDocumentBuilder().parse(new InputSource(new StringReader(xml)));
             validator.validate(new DOMSource(document));
         }
         catch (SAXException e)
         {
-            fail(e.toString() + "\n\n" + xml);
+            fail(cmisValidator.toString(e, xml));
         }
-    }    
-    
+    }
+     
     /**
-    public static void main(String[] args) throws IOException, ParserConfigurationException
+     * Load text from file specified by class path
+     * 
+     * @param classPath  XML file
+     * @return  XML
+     * @throws IOException
+     */
+    protected String loadString(String classPath)
+        throws IOException
     {
+        InputStream input = getClass().getResourceAsStream(classPath);
+        if (input == null)
+        {
+            throw new IOException(classPath + " not found.");
+        }
+
+        InputStreamReader reader = new InputStreamReader(input);
+        StringWriter writer = new StringWriter();
+
         try
         {
-            Document document = getDocumentBuilder().parse(new ClassPathResource("test.xml").getFile());
-            getAppValidator().validate(new DOMSource(document));
+            char[] buffer = new char[4096];
+            int bytesRead = -1;
+            while ((bytesRead = reader.read(buffer)) != -1)
+            {
+                writer.write(buffer, 0, bytesRead);
+            }
+            writer.flush();
         }
-        catch (SAXException e)
+        finally
         {
-            fail(e.toString());
+            reader.close();
+            writer.close();
         }
         
+        return writer.toString();
     }
-    */
     
 }
