@@ -62,7 +62,6 @@
 			{
 				success: this.onSuccess,
 				failure: this.onFailure,
-				//argument: [cal],
 				scope: this
 			};
 		
@@ -81,14 +80,19 @@
 		   var html = "";
 		   try 
 		   {
-				var eventList = YAHOO.lang.JSON.parse(o.responseText); 
+				var eventList = YAHOO.lang.JSON.parse(o.responseText);
+				var now = new Date();
 				
 				for (var key in eventList)
    			{
-   				if (eventList.hasOwnProperty(key)) {
+   				if (eventList.hasOwnProperty(key))
+   				{
    					var dateParts = key.split("/");
-   					var date = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
-   					html += this._dayRenderer(date, eventList);
+   					var date = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0] - 1), dateParts[1]);
+   					if (date > now)
+   					{
+      					html += this._dayRenderer(date, eventList);
+   					}
    				}
    			}
          } 
@@ -104,23 +108,22 @@
 		
 		_dayRenderer: function(date, eventData)
 		{
-		   var thedate = Alfresco.util.formatDate(date, "m/d/yyyy");
-   		var events = eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
-   		var html = "";
+		   var theDate = Alfresco.util.formatDate(date, "m/d/yyyy");
+   		var events = eventData[theDate];
+   		var html = "", item;
    		if (events && events.length > 0)
    		{
-   			var title = Alfresco.util.formatDate(date, "mediumDate");
-   			html += '<div class="agenda-item">'
-   			html += '<div class="dayheader">' + title + '</div>';
-   			html += '<table class="daytable">'
-   			for (var i=0; i < events.length; i++)
+   			var title = Alfresco.util.formatDate(date, "fullDate");
+				var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/calendar?date=" + theDate;
+   			html += '<div class="detail-list-item">'
+   			html += '<div class="icon"><img src="' + Alfresco.constants.URL_CONTEXT + '/components/calendar/images/calendar-16.png" alt="day" /></div>'
+   			html += '<div class="details2"><h4>' + title + '</h4>';
+   			for (var i = 0, ii = events.length; i < ii; i++)
    			{
-   				var event = events[i];
-   				html += '<tr><td class="timelabel">' + event.start + '</td><td><a href="';
-   				var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/calendar?date=" + thedate;
-   				html += url + '">' + event.name + '</a></td></tr>';
+   				item = events[i];
+   				html += '<div><span>' + item.start + ' <a href="' + url + '">' + item.name + '</a></span></div>';
    			}
-   			html += '</table></div>';
+   			html += '</div></div>';
    		}
    		return html;   
 		},
