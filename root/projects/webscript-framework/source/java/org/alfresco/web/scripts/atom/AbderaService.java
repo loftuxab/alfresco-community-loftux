@@ -69,14 +69,14 @@ public interface AbderaService
      * 
      * @return  feed
      */
-    public Feed newFeed();
+    public Feed createFeed();
 
     /**
      * Construct an Atom Entry
      * 
      * @return  entry
      */
-    public Entry newEntry();
+    public Entry createEntry();
 
     /**
      * Parse Atom
@@ -138,10 +138,10 @@ public interface AbderaService
     public Writer getWriter(String writer);
 
     /**
-     * Gets registered QName extensions
-     *  
-     * @return  map of QNames by Alias
+     * Gets the map of registered QNames (indexed by alias)
+     * 
+     * @return  qnames
      */
-    public Map<String, QName> getQNameExtensions();
-
+    public Map<String, QName> getQNames();
+    
 }

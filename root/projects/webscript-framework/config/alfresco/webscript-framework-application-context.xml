@@ -35,14 +35,8 @@
             <value>json</value>
          </list>
       </property>
-      <property name="qnames">
-         <map>
-            <entry key="UUID" value="{http://www.alfresco.org}uuid" />
-         </map>
-      </property>
-      <!-- TODO: support for parser options -->
-   </bean>   
-
+   </bean>
+   
 
    <!--                      -->
    <!--  Formats / Mimetypes -->
