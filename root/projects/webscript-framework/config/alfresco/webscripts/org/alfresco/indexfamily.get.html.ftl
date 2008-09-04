@@ -1,24 +1,13 @@
+<#import "/org/alfresco/webscripts.lib.html.ftl" as wsLib/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head> 
-    <title>Index of Web Scripts Family '${family.path}'</title> 
-    <link rel="stylesheet" href="${url.context}/css/main.css" TYPE="text/css">
-  </head>
+  <@wsLib.head>Index of Web Scripts Family '${family.path}'</@wsLib.head>
   <body>
-   <table>
-     <tr>
-        <td><img src="${url.context}/images/logo/AlfrescoLogo32.png" alt="Alfresco" /></td>
-        <td><nobr><span class="title">Index of Web Scripts Family '${family.path}'</span></nobr></td>
-     </tr>
-     <tr><td><td>${family.scripts?size} Web Scripts
-    </table>
+    <div>
+    <@wsLib.indexheader size=family.scripts?size>Index of Web Scripts Family '${family.path}'</@wsLib.indexheader>
     <br>
-    <table>
-      <tr><td><a href="${url.serviceContext}/index">Back to Web Scripts Home</a>
-      <#if family.parent?exists>
-         <tr><td><a href="${url.serviceContext}/index/family${family.parent.path}">Up to ${family.parent.path}</a>
-      </#if>
-    </table>
+    <@wsLib.home/>
+    <@wsLib.parent path=family pathname="family"/>
     <br>
     <#if family.children?size &gt; 0>
        <table>
@@ -61,5 +50,6 @@
     </table>
     <br>
     </#list>
+    </div>
   </body>
 </html>

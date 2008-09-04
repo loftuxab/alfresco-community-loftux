@@ -1,10 +1,9 @@
+<#import "/org/alfresco/webscripts.lib.html.ftl" as wsLib/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-   <head> 
-      <title>Alfresco Javascript Debugger</title> 
-      <link rel="stylesheet" href="${url.context}/css/base.css" type="text/css" />
-   </head>
+   <@wsLib.head>Alfresco Javascript Debugger</@wsLib.head>
    <body>
+     <div>
       <form action="${url.serviceContext}${url.match}" method="post">
          <div>
             <input type="hidden" name="visible" value="<#if visible>false<#else>true</#if>" />
@@ -19,5 +18,6 @@
             </table>
          </div>
       </form>
+      </div>
    </body>
 </html>

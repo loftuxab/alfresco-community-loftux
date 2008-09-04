@@ -1,10 +1,9 @@
+<#import "/org/alfresco/webscripts.lib.html.ftl" as wsLib/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head> 
-    <title>Installed Web Script: ${installedScript.id}</title> 
-    <link rel="stylesheet" href="${url.context}/css/base.css" TYPE="text/css"/>
-  </head>
+  <@wsLib.head>Installed Web Script: ${installedScript.id}</@wsLib.head>
   <body>
+    <div>
     <table>
       <tr><td><img src="${url.context}/images/logo/AlfrescoLogo32.png" alt="Alfresco"/><td><nobr><span class="title">Installed Web Script: ${installedScript.id}</span></nobr>
       <tr><td><td>${date?datetime}
@@ -36,5 +35,6 @@
       <tr><td>${file.path}<td>(store: ${file.store})
      </#list>
     </table>
+    </div>
   </body>
 </html>
