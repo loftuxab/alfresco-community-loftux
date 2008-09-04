@@ -71,7 +71,7 @@
 .customise-dashlets ul.usedList
 {
    width: 17.5em;
-   height: 17em;
+   height: 17.3em;
    border: 1px solid #BFBFBF;
    padding-top:0.2em;
 }
@@ -80,7 +80,7 @@
 .customise-dashlets ul.availableList
 {
    width: 56em;
-   height: 17.5em;
+   height: 17.3em;
    overflow-y: auto;
    margin-left: auto;
    margin-right: auto;
@@ -197,33 +197,35 @@
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns3
 {
-   width: 66em;
+   width: 61em;
 }
 
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns2
 {
-   width: 48em;
+   width: 41em;
 }
 
 /* Must adjust the width to make the column list centered */
 .customise-dashlets div.used div.noOfColumns1
 {
-   width: 26em;
+   width: 22em;
 }
 
 /* Make sure the columns are displayed on row even though they are block elements  */
 .customise-dashlets div.used div div.column
 {
    float: left;
-   width: 20em;
+   padding:1em;
+   width:17em;
 }
 
 .customise-dashlets div.used div.usedActions
 {
    float: left;
-   width: 3em;
-   padding-top:17em;
+   width: 1em;
+   padding-top:9em;
+   padding-left:0.5em;
 }
 
 .customise-dashlets span.trashcan
@@ -232,6 +234,7 @@
    background-repeat: no-repeat;
    background-position: center;
    padding:1em 1.5em 1.5em;
+   line-height: 54px;
 }
 
 .customise-dashlets span.trashcan.target

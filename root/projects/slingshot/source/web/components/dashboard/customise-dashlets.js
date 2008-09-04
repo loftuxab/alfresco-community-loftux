@@ -1130,7 +1130,11 @@
          var destEl = Dom.get(id);
          this.droppedOnEl = destEl;
 
-         if (!this.customiseDashletComponent.isAddTarget(this.droppedOnEl))
+         if(destEl === this.customiseDashletComponent.widgets.trashcanListEl && Dom.hasClass(destEl, "target")){
+            Dom.removeClass(destEl, "target");
+         }
+
+         if (!this.customiseDashletComponent.isAddTarget(destEl))//this.droppedOnEl))
          {
             // If it wasn't a drop target do nothing...
             return;

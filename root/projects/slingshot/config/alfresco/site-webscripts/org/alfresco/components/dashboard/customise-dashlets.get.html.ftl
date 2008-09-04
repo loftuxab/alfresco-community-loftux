@@ -78,7 +78,7 @@
 
       <div id="${args.htmlid}-wrapper-div" class="noOfColumns${currentLayout.noOfColumns}">
 
-         <div class="trashcan">&nbsp;</div>
+         <div class="usedActions">&nbsp;</div>
          <#list columns as column>
             <div class="column" id="${args.htmlid}-column-div-${column_index + 1}" <#if (column_index >= currentLayout.noOfColumns)>style="display: none;"</#if>>
             <h3 class="padded">Column ${column_index + 1}</h3>
@@ -97,9 +97,9 @@
             <span id="${args.htmlid}-trashcan-img" class="trashcan" title="${msg("help.trashcan")}">&nbsp;</span>
          </div>
 
-   </div>
+      </div>
 
-</div>
+    </div>
 
 <div class="actions">
       
