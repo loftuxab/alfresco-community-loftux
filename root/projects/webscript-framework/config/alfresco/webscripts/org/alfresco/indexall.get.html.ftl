@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head>
       <title>Index of All Web Scripts</title> 
-      <link rel="stylesheet" href="${url.context}/css/base.css" type="text/css" />
+      <link rel="stylesheet" href="${url.context}/css/main.css" type="text/css" />
    </head>
    <body>
       <div>
@@ -30,17 +30,22 @@
                <#list desc.URIs as uri>
                <tr><td><a href="${url.serviceContext}${uri?html}">${desc.method?html} ${url.serviceContext}${uri?html}</a></td></tr>
                </#list>
-               <tr><td></td></tr>
             </table>
+            <#if desc.description??>
             <table>
-               <#if desc.description??><tr><td>Description:</td><td>${desc.description}</td></tr><#else></#if>
+               <tr><td>---</td></tr>
+               <tr><td>${desc.description}</td></tr>
+               <tr><td>---</td></tr>
+            </table>
+            </#if>
+            <table>
                <tr><td>Authentication:</td><td>${desc.requiredAuthentication}</td></tr>
                <tr><td>Transaction:</td><td>${desc.requiredTransaction}</td></tr>
                <tr><td>Format Style:</td><td>${desc.formatStyle}</td></tr>
                <tr><td>Default Format:</td><td>${desc.defaultFormat!"<i>Determined at run-time</i>"}</td></tr>
                <tr><td></td></tr>
                <tr><td>Id:</td><td><a href="${url.serviceContext}/script/${desc.id}">${desc.id}</a></td></tr>
-               <tr><td>Description:</td><td><a href="${url.serviceContext}/description/${desc.id}">${desc.storePath}/${desc.descPath}</a></td></tr>
+               <tr><td>Descriptor:</td><td><a href="${url.serviceContext}/description/${desc.id}">${desc.storePath}/${desc.descPath}</a></td></tr>
             </table>
             <br/>
             </#list>
