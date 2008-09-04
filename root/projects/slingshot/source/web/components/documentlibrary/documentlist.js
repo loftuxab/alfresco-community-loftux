@@ -993,6 +993,13 @@
             {
                this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
+            
+            // We don't get an initEvent for an empty recordSet, but we'd like one anyway
+            if (oResponse.results.length == 0)
+            {
+               this.fireEvent("initEvent");
+            }
+            
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
@@ -2050,15 +2057,7 @@
          var obj = args[1];
          if (obj && (obj.highlightFile !== null))
          {
-            // We need to defer the highlight until after the doclist has refreshed
-            var fnAfterUpdate = function DL_oDLR_fnAfterUpdate()
-            {
-               YAHOO.Bubbling.fire("highlightFile",
-               {
-                  fileName: obj.highlightFile
-               })
-            }
-            this.afterDocListUpdate.push(fnAfterUpdate);
+            this.options.highlightFile = obj.highlightFile;
          }
          this._updateDocList.call(this);
       },
@@ -2232,6 +2231,13 @@
             {
                loadingMessage.destroy();
             }
+
+            // Updating the Doclist may change the file selection
+            var fnAfterUpdate = function DL__uDL_sH_fnAfterUpdate()
+            {
+               YAHOO.Bubbling.fire("selectedFilesChanged");
+            }
+            this.afterDocListUpdate.push(fnAfterUpdate);
             
             Alfresco.logger.debug("currentPath was [" + this.currentPath + "] now [" + successPath + "]");
             Alfresco.logger.debug("currentPage was [" + this.currentPage + "] now [" + successPage + "]");
