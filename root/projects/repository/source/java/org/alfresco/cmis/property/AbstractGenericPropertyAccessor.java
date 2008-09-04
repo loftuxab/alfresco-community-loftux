@@ -24,6 +24,7 @@
  */
 package org.alfresco.cmis.property;
 
+
 /**
  * Base class for generic property accessors
  *  
@@ -33,5 +34,5 @@ package org.alfresco.cmis.property;
 public abstract class AbstractGenericPropertyAccessor extends AbstractPropertyAccessor implements GenericPropertyAccessor
 {
 
-
+   
 }
