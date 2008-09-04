@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.http.HttpServletResponse;
@@ -335,7 +336,8 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String> createHeaders(WebScriptRequest req)
     {
-        Map<String, String> headers = new HashMap<String, String>(8, 1.0f);
+        // NOTE: headers names are case-insensitive according to HTTP Spec
+        Map<String, String> headers = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
         String[] names = req.getHeaderNames();
         for (String name : names)
         {
@@ -352,13 +354,14 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String[]> createHeadersM(WebScriptRequest req)
     {
-        Map<String, String[]> args = new HashMap<String, String[]>(8, 1.0f);
+        // NOTE: headers names are case-insensitive according to HTTP Spec
+        Map<String, String[]> headers = new TreeMap<String, String[]>(String.CASE_INSENSITIVE_ORDER);
         String[] names = req.getHeaderNames();
         for (String name : names)
         {
-            args.put(name, req.getHeaderValues(name));
+            headers.put(name, req.getHeaderValues(name));
         }
-        return args;
+        return headers;
     }
 
     /**
