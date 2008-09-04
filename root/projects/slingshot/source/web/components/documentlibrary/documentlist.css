@@ -145,7 +145,7 @@
 
 .doclist .yui-dt-liner
 {
-   padding: 4px;
+   padding: 2px 4px;
 }
 
 .doclist .yui-dt-error
@@ -282,42 +282,55 @@
 .doclist .action-set div
 {
    display: block;
-   margin: 2px 0px;
-   padding: 1px 0px;
+   margin: 0;
 }
 
 .doclist a.action-link,
-.doclist a.simple-link
-{
-   background-position: 1px 0px;
-   background-repeat: no-repeat;
-   display: block;
-   min-height: 16px;
-   padding-left: 24px;
-}
-
+.doclist a.simple-link,
 .doclist a.show-more
 {
+   background-position: 3px 3px;
+   background-repeat: no-repeat;
+   border: 1px solid #e8f6ff;
    display: block;
-   font-weight: bold;
    min-height: 16px;
+   padding: 2px 0 2px 24px;
 }
 
 .doclist .action-set a:active,
-.doclist .action-set a:hover
+.doclist .action-set a:hover,
+.doclist .action-set .highlighted
 {
    background-color: #fff;
+   border: 1px solid #2b6eb5;
    text-decoration: none;
 }
 
 .doclist div.more-actions
 {
-   background-color: #e8f6ff;
-   border: 1px solid #808080;
+   background-color: #fff;
+   border: 1px solid #2b6eb5;
    clear: left;
+   margin-left: -62px;
+   margin-top: 1px;
    position: absolute;
-   width: 140px;
+   width: 200px;
 }
+
+.doclist .more-actions a.action-link,
+.doclist .more-actions a.simple-link
+{
+   border: 1px solid #fff;
+}
+
+.doclist .more-actions a:active,
+.doclist .more-actions a:hover
+{
+   background-color: #2b6eb5;
+   border: 1px solid #2b6eb5;
+   color: #fff;
+}
+
 
 /* Actions: Simple view */
 .doclist div.simple div
@@ -340,6 +353,11 @@
 }
 
 /* Actions: Icons */
+.doclist .onActionShowMore a
+{
+   background-image: url(images/plus-sign-16.png);
+}
+
 .doclist .onActionDetails a
 {
    background-image: url(images/details-16.png);
