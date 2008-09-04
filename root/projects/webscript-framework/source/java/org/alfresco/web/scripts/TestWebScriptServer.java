@@ -384,7 +384,15 @@ public class TestWebScriptServer implements ApplicationContextAware
             {
                 return "No command entered yet.";
             }
-            return "repeating command " + lastCommand + "\n\n" + interpretCommand(lastCommand);
+            
+            if (command.length > 1 && command[1].equals("show"))
+            {
+                return lastCommand;
+            }
+            else
+            {
+                return "repeating command " + lastCommand + "\n\n" + interpretCommand(lastCommand);
+            }
         }
         
         // remember last command
