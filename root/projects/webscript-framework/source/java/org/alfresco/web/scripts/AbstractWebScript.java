@@ -187,6 +187,7 @@ public abstract class AbstractWebScript implements WebScript
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
+        params.put("format", new FormatModel(container.getFormatRegistry(), req.getFormat()));
         params.put("args", createArgs(req));
         params.put("argsM", createArgsM(req));
         params.put("headers", createHeaders(req));
@@ -243,6 +244,7 @@ public abstract class AbstractWebScript implements WebScript
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
+        params.put("format", new FormatModel(container.getFormatRegistry(), req.getFormat()));
         params.put("args", createArgs(req));
         params.put("argsM", createArgsM(req));
         params.put("headers", createHeaders(req));
@@ -259,6 +261,7 @@ public abstract class AbstractWebScript implements WebScript
         // populate model with template methods
         params.put("absurl", new AbsoluteUrlMethod(req.getServerPath()));
         params.put("scripturl", new ScriptUrlMethod(req, res));
+        params.put("argreplace", new ArgReplaceMethod());
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
         MessageMethod message = new MessageMethod(this);

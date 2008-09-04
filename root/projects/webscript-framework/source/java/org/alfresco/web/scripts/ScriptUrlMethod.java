@@ -79,30 +79,37 @@ public final class ScriptUrlMethod implements TemplateMethodModelEx
             if (arg0 instanceof TemplateScalarModel)
             {
                 String arg = ((TemplateScalarModel)arg0).getAsString();
-                
                 StringBuffer buf = new StringBuffer(128);
-                buf.append(prefixServiceUrl ? req.getServicePath() : "");
-                buf.append(arg);
-                if (arg.length() != 0)
+                
+                if (prefixServiceUrl)
                 {
-                   if (arg.indexOf('?') == -1)
-                   {
-                      buf.append('?');
-                   }
-                   else
-                   {
-                      buf.append('&');
-                   }
+                    buf.append(req.getServicePath());
+                    if (arg.length() > 0)
+                    {
+                        if (arg.indexOf('?') == -1)
+                        {
+                            buf.append('?');
+                        }
+                        buf.append(arg);
+                    }
                 }
                 else
                 {
-                   buf.append('?');
+                    buf.append(arg);
                 }
-                buf.append("guest=" + (req.isGuest() ? "true" : ""));
+                    
+                if (buf.indexOf("?guest") == -1 && buf.indexOf("&guest") == -1)
+                {
+                    buf.append(buf.indexOf("?") == -1 ? '?' : '&');
+                    buf.append("guest=" + (req.isGuest() ? "true" : ""));
+                }
                 if (req.getFormatStyle() == FormatStyle.argument)
                 {
-                    buf.append("&format=");
-                    buf.append(req.getFormat());
+                    if (buf.indexOf("?format") == -1 && buf.indexOf("&format") == -1)
+                    {
+                        buf.append(buf.indexOf("?") == -1 ? '?' : '&');
+                        buf.append("format=" + req.getFormat());
+                    }
                 }
                 
                 result = res.encodeScriptUrl(buf.toString());
