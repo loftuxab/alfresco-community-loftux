@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head> 
     <title>Index of Web Scripts Family '${family.path}'</title> 
-    <link rel="stylesheet" href="${url.context}/css/base.css" TYPE="text/css">
+    <link rel="stylesheet" href="${url.context}/css/main.css" TYPE="text/css">
   </head>
   <body>
    <table>
@@ -43,15 +43,21 @@
       </#list>
       <tr><td>
     </table>
+    <#if desc.description??>
     <table>
-      <#if desc.description??><tr><td>Description:<td>${desc.description}<#else></#if>
+       <tr><td>---</td></tr>
+       <tr><td>${desc.description}</td></tr>
+       <tr><td>---</td></tr>
+    </table>
+    </#if>
+    <table>
       <tr><td>Authentication:<td>${desc.requiredAuthentication}
       <tr><td>Transaction:<td>${desc.requiredTransaction}
       <tr><td>Format Style:<td>${desc.formatStyle}
       <tr><td>Default Format:<td>${desc.defaultFormat!"<i>Determined at run-time</i>"}
       <tr><td>
       <tr><td>Id:<td><a href="${url.serviceContext}/script/${desc.id}">${desc.id}</a>
-      <tr><td>Description:<td><a href="${url.serviceContext}/description/${desc.id}">${desc.storePath}/${desc.descPath}</a>
+      <tr><td>Descriptor:<td><a href="${url.serviceContext}/description/${desc.id}">${desc.storePath}/${desc.descPath}</a>
     </table>
     <br>
     </#list>

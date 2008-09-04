@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head> 
     <title>Index of Failed Web Scripts</title> 
-    <link rel="stylesheet" href="${url.context}/css/base.css" TYPE="text/css">
+    <link rel="stylesheet" href="${url.context}/css/main.css" TYPE="text/css">
   </head>
   <body>
    <table>
