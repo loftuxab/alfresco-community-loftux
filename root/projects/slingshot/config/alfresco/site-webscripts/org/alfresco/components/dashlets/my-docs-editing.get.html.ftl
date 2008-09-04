@@ -10,7 +10,7 @@
          <#if docs.items?size == 0>
             <span>${msg("label.noItems")}</span>
          <#else>
-            <#list docs.items as doc>
+            <#list docs.items?sort_by("modifiedOn") as doc>
                <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser}/profile">${doc.modifiedBy}</a></#assign>
                <div class="detail-list-item">
                   <div>
@@ -20,7 +20,7 @@
                      <div class="details">
                         <h4><@doclibUrl doc /></h4>
                         <div>
-                           ${msg("text.editing-since", doc.modifiedOn?datetime("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string.medium_short)}
+                           ${msg("text.editing-since", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm"))}
                         </div>
                      </div>
                   </div>

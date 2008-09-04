@@ -2058,11 +2058,11 @@ Alfresco.thirdparty.dateFormat = function()
 
    // Some common format strings
    dateFormat.masks = {
-   	"default":       "ddd mmm d yyyy HH:MM:ss",
-   	shortDate:       "m/d/yy",
-   	mediumDate:      "mmm d, yyyy",
-   	longDate:        "mmmm d, yyyy",
-   	fullDate:        "dddd, mmmm d, yyyy",
+   	"default":       "ddd d mmm yyyy HH:MM:ss",
+   	shortDate:       "d/m/yy",
+   	mediumDate:      "d mmm, yyyy",
+   	longDate:        "d mmmm, yyyy",
+   	fullDate:        "dddd, d mmmm, yyyy",
    	shortTime:       "h:MM TT",
    	mediumTime:      "h:MM:ss TT",
    	longTime:        "h:MM:ss TT Z",
