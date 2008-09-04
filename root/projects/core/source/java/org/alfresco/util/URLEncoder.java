@@ -149,7 +149,7 @@ public final class URLEncoder
                        || ch == '&' || ch == '='
                        || ch == '+' || ch == '$'))
             {
-                sbuf.append((char)ch);
+                sb.append((char)ch);
             }
             else if (ch <= 0x007f)                  // other ASCII including single quote ' and space
             {

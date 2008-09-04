@@ -35,7 +35,6 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -302,12 +301,12 @@ public class TestWebScriptServer implements ApplicationContextAware
                 for (String arg : args)
                 {
                     String[] parts = arg.split("=");
-                    req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1], "UTF-8") : null);
+                    req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1]) : null);
                 }
-                req.setQueryString(URLDecoder.decode(queryString, "UTF-8"));
+                req.setQueryString(URLDecoder.decode(queryString));
             }
             String requestURI = path;
-            req.setRequestURI(URLDecoder.decode(requestURI, "UTF-8"));
+            req.setRequestURI(URLDecoder.decode(requestURI));
         }
         
         return req;
@@ -559,53 +558,7 @@ public class TestWebScriptServer implements ApplicationContextAware
         return retVal;
     }
 
-<<<<<<< .working
-    /**
-     * Create a Mock HTTP Servlet Request
-     * 
-     * @param method
-     * @param uri
-     * @return  mock http servlet request
-     * @throws UnsupportedEncodingException 
-     * @throws MalformedURLException 
-     */
-    private MockHttpServletRequest createRequest(String method, String uri)
-        throws UnsupportedEncodingException, MalformedURLException
-    {
-        // extract only path portions of URI, ignore host & port
-        URL url = new URL(new URL("http://localhost"), uri);
-        String path = url.getPath();
-        
-        if (!(path.startsWith("/alfresco/service") || path.startsWith("/a/s")))
-        {
-            path = "/alfresco/service" + path;
-        }
-        
-        MockHttpServletRequest req = new MockHttpServletRequest(method, uri);
-        req.setContextPath("/alfresco");
-        req.setServletPath("/service");
-
-        if (uri != null)
-        {
-            String queryString = url.getQuery();
-            if (queryString != null && queryString.length() > 0)
-            {
-                String[] args = queryString.split("&");
-                for (String arg : args)
-                {
-                    String[] parts = arg.split("=");
-                    req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1]) : null);
-                }
-                req.setQueryString(URLDecoder.decode(queryString, "UTF-8"));
-            }
-            String requestURI = path;
-            req.setRequestURI(URLDecoder.decode(requestURI));
-        }
-        
-        return req;
-    }
-=======
->>>>>>> .merge-right.r9795
+    
     /**
      * A Web Script Test Request
      */
