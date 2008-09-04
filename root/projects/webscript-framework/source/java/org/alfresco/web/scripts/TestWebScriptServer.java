@@ -405,7 +405,23 @@ public class TestWebScriptServer implements ApplicationContextAware
             bout.write(res.getContentAsByteArray());
             out.println();
         }
-        
+
+        else if (command[0].equals("post"))
+        {
+            String uri = (command.length > 1) ? command[1] : null;
+            String contentType = (command.length > 2) ? command[2] : null;
+            String body = "";
+            for (int i = 3; i < command.length; i++)
+            {
+                body += command[i] + " ";
+            }
+            MockHttpServletResponse res = submitRequest(command[0], uri, headers, body, contentType);
+            bout.write(("Response status: " + res.getStatus()).getBytes());
+            out.println();
+            bout.write(res.getContentAsByteArray());
+            out.println();
+        }
+
         else if (command[0].equals("post"))
         {
             String uri = (command.length > 1) ? command[1] : null;

@@ -33,6 +33,8 @@ package org.alfresco.web.scripts;
 public enum Format
 {
     HTML ("text/html"),
+    XHTML ("text/xhtml"),
+    TEXT ("text/plain"),
     JAVASCRIPT ("text/javascript"),
     XML ("text/xml"),
     ATOM ("application/atom+xml"),

@@ -39,6 +39,7 @@ public class FormatMap implements InitializingBean
     private FormatRegistry registry;
     private String agent;
     private Map<String, String> formats;
+    private Map<String, String> mimetypes;
     
 
     /**
@@ -70,14 +71,30 @@ public class FormatMap implements InitializingBean
     {
         this.formats = formats;
     }
+    
+    /**
+     * Sets the mimetypes
+     *  
+     * @param mimetypes
+     */
+    public void setMimetypes(Map<String, String> mimetypes)
+    {
+        this.mimetypes = mimetypes;
+    }
 
     /* (non-Javadoc)
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
     public void afterPropertiesSet() throws Exception
     {
-        // Add formats to format registry
-        registry.addFormats(agent, formats);
+        if (formats != null)
+        {
+            registry.addFormats(agent, formats);
+        }
+        if (mimetypes != null)
+        {
+            registry.addMimetypes(agent, mimetypes);
+        }
     }
     
 }

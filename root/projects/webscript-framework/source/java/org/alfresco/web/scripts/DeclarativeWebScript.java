@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +48,8 @@ public class DeclarativeWebScript extends AbstractWebScript
 
     // Script Context
     private String basePath;
-    private ScriptContent executeScript;
+    private Map<String, ScriptContent> scripts = new HashMap<String, ScriptContent>();
+    private ReentrantReadWriteLock scriptLock = new ReentrantReadWriteLock(); 
     
 
     /* (non-Javadoc)
@@ -58,12 +60,20 @@ public class DeclarativeWebScript extends AbstractWebScript
     {
         super.init(container, description);
 
-        // Test for "execute" script
+        // clear scripts to format map
+        this.scriptLock.writeLock().lock();
+        try
+        {
+            this.scripts.clear();
+        }
+        finally
+        {
+            this.scriptLock.writeLock().unlock();
+        }
+        
         basePath = getDescription().getId();
-        String scriptPath = basePath + ".js";
-        executeScript = container.getScriptProcessor().findScript(scriptPath);
     }
-
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScript#execute(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
      */
@@ -93,16 +103,17 @@ public class DeclarativeWebScript extends AbstractWebScript
             model.put("cache", cache);
             
             // execute script if it exists
-            if (executeScript != null)
+            ScriptContent script = getExecuteScript(req.getContentType());
+            if (script != null)
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Executing script " + executeScript.getPathDescription());
+                    logger.debug("Executing script " + script.getPathDescription());
                 
                 Map<String, Object> scriptModel = createScriptParameters(req, res, model);
                 // add return model allowing script to add items to template model
                 Map<String, Object> returnModel = new HashMap<String, Object>(8, 1.0f);
                 scriptModel.put("model", returnModel);
-                executeScript(executeScript, scriptModel);
+                executeScript(script, scriptModel);
                 mergeScriptModelIntoTemplateModel(returnModel, model);
             }
     
@@ -269,7 +280,6 @@ public class DeclarativeWebScript extends AbstractWebScript
         renderTemplate(templatePath, model, writer);
     }
 
-    
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
@@ -278,4 +288,81 @@ public class DeclarativeWebScript extends AbstractWebScript
     {
         return this.basePath;
     }
+
+    /**
+     * Find execute script for given request format
+     * 
+     * Note: This method caches the script to request format mapping
+     * 
+     * @param mimetype
+     * @return  execute script
+     */
+    private ScriptContent getExecuteScript(String mimetype)
+    {
+        ScriptContent script = null;
+        scriptLock.readLock().lock();
+
+        try
+        {
+            String key = (mimetype == null) ? "<UNKNOWN>" : mimetype;
+            script = scripts.get(key);
+            if (script == null)
+            {
+                // Upgrade read lock to write lock
+                scriptLock.readLock().unlock();
+                scriptLock.writeLock().lock();
+
+                try
+                {
+                    // Check again
+                    script = scripts.get(key);
+                    if (script == null)
+                    {
+                        // Locate script in web script store
+                        String format = getContainer().getFormatRegistry().getFormat(null, mimetype);
+                        if (format != null)
+                        {
+                            script = getContainer().getScriptProcessor().findScript(basePath + "." + format + ".js");
+                            if (script == null)
+                            {
+                                // generalize mimetype if possible
+                                String generalizedMimetype = getContainer().getFormatRegistry().generalizeMimetype(mimetype);
+                                if (generalizedMimetype != null)
+                                {
+                                    format = getContainer().getFormatRegistry().getFormat(null, generalizedMimetype);
+                                    if (format != null)
+                                    {
+                                        script = getContainer().getScriptProcessor().findScript(basePath + "." + format + ".js");
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // fall-back to default
+                        if (script == null)
+                        {
+                            script = getContainer().getScriptProcessor().findScript(basePath + ".js");
+                        }
+                        
+                        if (logger.isDebugEnabled())
+                            logger.debug("Caching script " + ((script == null) ? "null" : script.getPathDescription()) + " for web script " + basePath + " and request mimetype " + ((mimetype == null) ? "null" : mimetype));
+                        
+                        scripts.put(key, script);
+                    }
+                }
+                finally
+                {
+                    // Downgrade lock to read
+                    scriptLock.readLock().lock();
+                    scriptLock.writeLock().unlock();
+                }
+            }
+            return script;
+        }
+        finally
+        {
+            scriptLock.readLock().unlock();
+        }
+    }
+    
 }

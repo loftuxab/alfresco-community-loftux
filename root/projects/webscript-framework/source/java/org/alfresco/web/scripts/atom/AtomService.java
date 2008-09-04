@@ -28,15 +28,18 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.alfresco.web.scripts.Format;
+import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Content.Type;
 
 /**
  * Atom Model
  * 
  * @author davidc
  */
-public class AtomModel
+public class AtomService
 {
     private AbderaService abderaService;
     
@@ -78,6 +81,43 @@ public class AtomModel
     public Map<String, QName> getQNames()
     {
         return abderaService.getQNameExtensions();
+    }
+    
+    /**
+     * Establish mimetype of atom content
+     * 
+     * @param content  atom content
+     * @return  mimetype (or null, if it could not be established)
+     */
+    public String toMimeType(Entry entry)
+    {
+        if (entry == null || entry.getContentElement() == null)
+        {
+            return null;
+        }
+        
+        Content content = entry.getContentElement();
+        String mimetype = (content.getMimeType() == null) ? null : content.getMimeType().toString();
+        if (mimetype == null)
+        {
+            Content.Type type = content.getContentType();
+            if (type != null)
+            {
+                if (type == Type.HTML)
+                {
+                    mimetype = Format.HTML.mimetype();
+                }
+                else if (type == Type.XHTML)
+                {
+                    mimetype = Format.XHTML.mimetype();
+                }
+                else if (type == Type.TEXT)
+                {
+                    mimetype = Format.TEXT.mimetype();
+                }
+            }
+        }
+        return mimetype;
     }
     
 
