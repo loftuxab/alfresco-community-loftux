@@ -26,7 +26,7 @@ package org.alfresco.web.scripts;
 
 
 /**
- * Script / Template Model representing Repository Server meta-data
+ * Script / Template Model representing the server hosting the Web Script Framework
  * 
  * @author davidc
  */
@@ -38,6 +38,18 @@ public interface ServerModel
      * @return  container name
      */
     public String getContainerName();
+
+    /**
+     * Gets the Id of the server instance
+     * 
+     * @return  id
+     */
+    public String getId();
+    
+    /**
+     * Gets the Name of the server instance
+     */
+    public String getName();
     
     /**
      * Gets the major version number, e.g. <u>1</u>.2.3

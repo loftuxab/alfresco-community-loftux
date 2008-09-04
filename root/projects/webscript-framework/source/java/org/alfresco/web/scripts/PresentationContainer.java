@@ -95,6 +95,16 @@ public class PresentationContainer extends AbstractRuntimeContainer
             return getName();
         }
 
+        public String getId()
+        {
+            return UNKNOWN;
+        }
+
+        public String getName()
+        {
+            return UNKNOWN;
+        }
+
         public String getEdition()
         {
             return (props != null ? props.getProperty("version.edition") : UNKNOWN);
