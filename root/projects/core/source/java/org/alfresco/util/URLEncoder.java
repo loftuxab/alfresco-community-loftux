@@ -99,7 +99,7 @@ public final class URLEncoder
      * @param reserveUriChars  true => uri reserved characters are not encoded
      * @return The encoded string
      */
-    private static String encode(String s, boolean reserveUriChars)
+    private static String encode(final String s, final boolean reserveUriChars)
     {
         StringBuilder sb = null;      //create on demand
         char ch;
@@ -115,6 +115,18 @@ public final class URLEncoder
                 ch == '.' || ch == '!' ||
                 ch == '~' || ch == '*' ||
                 ch == '(' || ch == ')')
+            {
+                if (sb != null)
+                {
+                    sb.append(ch);
+                }
+            }
+            else if (reserveUriChars &&             // uri reserved
+                    (ch == ';' || ch == ','
+                     || ch == '/' || ch == '?'
+                     || ch == ':' || ch == '@'
+                     || ch == '&' || ch == '='
+                     || ch == '+' || ch == '$'))
             {
                 if (sb != null)
                 {
@@ -142,16 +154,7 @@ public final class URLEncoder
                 sb.append(hex[0xc0 | (ch >> 6)]);
                 sb.append(hex[0x80 | (ch & 0x3F)]);
             }
-            else if (reserveUriChars &&             // uri reserved
-                      (ch == ';' || ch == ','
-                       || ch == '/' || ch == '?'
-                       || ch == ':' || ch == '@'
-                       || ch == '&' || ch == '='
-                       || ch == '+' || ch == '$'))
-            {
-                sb.append((char)ch);
-            }
-            else if (ch <= 0x007f)                  // other ASCII including single quote ' and space
+            else                                        // 0x7FF < ch <= 0xFFFF
             {
                 if (sb == null)
                 {
