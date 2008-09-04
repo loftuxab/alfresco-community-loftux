@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.cmis.rest;
+package org.alfresco.cmis;
 
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +110,9 @@ public class CMISService implements ApplicationContextAware, ApplicationListener
     private TenantDeployerService tenantDeployerService;
     private ProcessorLifecycle lifecycle = new ProcessorLifecycle();
 
+    // CMIS supported version
+    private String cmisVersion = "[undefined]";
+    
     // default CMIS store and path
     private String defaultRootPath;
     private Map<String, NodeRef> defaultRootNodeRefs;
@@ -118,6 +121,16 @@ public class CMISService implements ApplicationContextAware, ApplicationListener
     private DataTypeDefinition nodeRefDataType;
     private DataTypeDefinition textDataType;
 
+    
+    /**
+     * Sets the supported version of the CMIS specification 
+     * 
+     * @param cmisVersion
+     */
+    public void setCMISSpecVersion(String cmisVersion)
+    {
+        this.cmisVersion = cmisVersion;
+    }
     
     /**
      * Sets the default root path
@@ -256,6 +269,16 @@ public class CMISService implements ApplicationContextAware, ApplicationListener
         defaultRootNodeRefs.remove(tenantDeployerService.getCurrentUserDomain());
     }
 
+    /**
+     * Gets the supported CMIS Version
+     * 
+     * @return  version of CMIS specification supported
+     */
+    public String getCMISVersion()
+    {
+        return cmisVersion;
+    }
+    
     /**
      * Gets the default root node path
      * 
