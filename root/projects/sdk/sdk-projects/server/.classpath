@@ -32,7 +32,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jstl-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jug-lgpl-2.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/devenv/junit.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/myfaces-api-1.1.5.jar"/>

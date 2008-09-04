@@ -24,18 +24,12 @@
  */
 package org.alfresco.web.scripts.bean;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
-import org.alfresco.web.scripts.Description;
 import org.alfresco.web.scripts.Path;
 import org.alfresco.web.scripts.Status;
-import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 

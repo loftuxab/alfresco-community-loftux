@@ -387,7 +387,7 @@ public class TestWebScriptServer implements ApplicationContextAware
             
             if (command.length > 1 && command[1].equals("show"))
             {
-                return lastCommand;
+                return lastCommand + "\n\n";
             }
             else
             {
