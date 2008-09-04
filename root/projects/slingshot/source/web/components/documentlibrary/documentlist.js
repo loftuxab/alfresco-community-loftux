@@ -1474,6 +1474,9 @@
       {
          var me = this;
          
+         // Fix "More Actions" hover style
+         Dom.addClass(elMore.firstChild, "highlighted");
+         
          // Get the pop-up div, sibling of the "More Actions" link
          var elMoreActions = Dom.getNextSibling(elMore);
          Dom.removeClass(elMoreActions, "hidden");
@@ -1486,6 +1489,7 @@
             // parameter passing for timer functions.
             Event.removeListener(elMoreActions, "mouseover");
             Event.removeListener(elMoreActions, "mouseout");
+            Dom.removeClass(elMore.firstChild, "highlighted");
             Dom.addClass(elMoreActions, "hidden");
             me.showingMoreActions = false;
             if (me.deferredActionsMenu !== null)
