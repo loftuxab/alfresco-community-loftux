@@ -43,184 +43,169 @@
 
    Alfresco.EventInfo.prototype =
    {
-		/**
-	    * EventInfo instance.
-	    *
-	    * @property panel
-	    * @type Alfresco.EventInfo
-	    */
-		panel: null,
-		
-		/**
-		 * A reference to the current event. 
-		 * !!CHANGE ME!!
-		 *
-		 * @property event
-		 * @type object
-		 */
-		event: null,
-		
-		/**
-         * Sets the current site for this component.
-         *
-         * @property siteId
-         * @type string
-         */
-        setSiteId: function(siteId)
-        {
-            this.siteId = siteId;
-			return this;
-        },
+      /**
+       * EventInfo instance.
+       *
+       * @property panel
+       * @type Alfresco.EventInfo
+       */
+      panel: null,
+      
+      /**
+       * A reference to the current event. 
+       * !!CHANGE ME!!
+       *
+       * @property event
+       * @type object
+       */
+      event: null,
+      
+      /**
+       * Sets the current site for this component.
+       *
+       * @property siteId
+       * @type string
+       */
+      setSiteId: function(siteId)
+      {
+         this.siteId = siteId;
+         return this;
+      },
 
-		/**
-		 * Fired by YUILoaderHelper when required component script files have
-		 * been loaded into the browser.
-		 *
-		 * @method onComponentsLoaded
-		 */
-   		componentsLoaded: function()
-      	{
-         	/* Shortcut for dummy instance */
-         	if (this.id === null)
-         	{
-            	return;
-         	}
-      	},
+      /**
+       * Fired by YUILoaderHelper when required component script files have
+       * been loaded into the browser.
+       *
+       * @method onComponentsLoaded
+       */
+         componentsLoaded: function()
+         {
+            /* Shortcut for dummy instance */
+            if (this.id === null)
+            {
+               return;
+            }
+         },
 
-		/**
-		 * Renders the event info panel. 
-		 *
-		 * @method show
-		 * @param event {object} JavaScript object representing an event
-		 */
-	   	show: function(event)
-      	{
-			Alfresco.util.Ajax.request(
-			{
-		      url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/info",
-				dataObj: { "htmlid" : this.id, "uri" : "/" + event.uri },
-				successCallback:
-				{
-					fn: this.templateLoaded,
-					scope: this
-				},
-		      failureMessage: "Could not load event info panel"
-		   	});
-		
-			this.event = event;
-      	},
+      /**
+       * Renders the event info panel. 
+       *
+       * @method show
+       * @param event {object} JavaScript object representing an event
+       */
+      show: function(event)
+      {
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/info",
+            dataObj: { "htmlid" : this.id, "uri" : "/" + event.uri },
+            successCallback:
+            {
+               fn: this.templateLoaded,
+               scope: this
+            },
+            failureMessage: "Could not load event info panel"
+         });
 
-		/**
-		 * Fired when the event info panel has loaded successfully.
-		 *
-		 * @method templateLoaded
-		 * @param response {object} DomEvent
-		 */
-      	templateLoaded: function(response)
-      	{
-			var div = document.getElementById("eventInfoPanel");
-         	div.innerHTML = response.serverResponse.responseText;
+         this.event = event;
+      },
 
-         	this.panel = new YAHOO.widget.Panel(div,
-         	{
-				modal: true,
-            	fixedcenter: true,
-            	visible: false,
-            	constraintoviewport: true
-         	});
+      /**
+       * Fired when the event info panel has loaded successfully.
+       *
+       * @method templateLoaded
+       * @param response {object} DomEvent
+       */
+      templateLoaded: function(response)
+      {
+         var div = document.getElementById("eventInfoPanel");
+         div.innerHTML = response.serverResponse.responseText;
 
-		 	this.panel.render(document.body);
-		
-		 	// Delete Button
-			var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick,
-	      	{
-	      		type: "push"
-	      	});
-	
-			// Edit Button
-			var editButton = Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick,
-			{
-				type: "push"
-			});
-			
-			// Cancel Button
-			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick,
-			{
-				type: "push"
-			});
-	
-			this.panel.show(); // Display the panel
-		},
-		
-		/**
-		 * Fired when the use selected the "Cancel" button.
-		 *
-		 * @method onCancelClick
-		 * @param e {object} DomEvent
-		 */
-		onCancelClick: function(e)
-		{
-			this.panel.hide();
-		},
-		
-		/**
-		 * Fired when the user selects the "Edit" button.
-		 *
-		 * @method onEventClick
-		 * @param e {object} DomEvent
-		 */
-		onEditClick: function(e)
-		{
-			this.panel.hide();
-			
-			var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-			eventDialog.setOptions({
-			   "siteId": this.siteId,
-			   "eventURI": "/" + this.event.uri
-			});
-			eventDialog.show();
-		},
-		
-		/**
-		 * Fired when the delete button is clicked. Kicks off a DELETE request
-		 * to the Alfresco repo to remove an event.
-		 *
-		 * @method onDeleteClick
-		 * @param e {object} DomEvent
-		 */
-		onDeleteClick: function(e)
-		{
-			Alfresco.util.Ajax.request(
-			{
-				method: Alfresco.util.Ajax.DELETE,
-		      	url: Alfresco.constants.PROXY_URI + this.event.uri,
-				successCallback:
-				{
-					fn: this.onDeleted,
-					scope: this
-				},
-		      	failureMessage: "Could not delete event"
-		   });
-		},
-		
-		/**
-		 * Called when an event is successfully deleted.
-		 *
-		 * @method onDeleted
-		 * @param e {object} DomEvent
-		 */
-		onDeleted: function(e)
-		{
-			this.panel.hide();
-			
-			YAHOO.Bubbling.fire('eventDeleted',
-			{
-				name: this.event.name, // so we know which event we are dealing with
-				from: this.event.from // grab the events for this date and remove the event
-			});			
-		}
+         this.panel = new YAHOO.widget.Panel(div,
+         {
+            modal: true,
+            fixedcenter: true,
+            visible: false,
+            constraintoviewport: true,
+            width: "35em"
+         });
+         this.panel.render(document.body);
+
+         // Buttons
+         Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
+         Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick);
+         Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
+
+         // Display the panel
+         this.panel.show();
+      },
+      
+      /**
+       * Fired when the use selected the "Cancel" button.
+       *
+       * @method onCancelClick
+       * @param e {object} DomEvent
+       */
+      onCancelClick: function(e)
+      {
+         this.panel.hide();
+      },
+      
+      /**
+       * Fired when the user selects the "Edit" button.
+       *
+       * @method onEventClick
+       * @param e {object} DomEvent
+       */
+      onEditClick: function(e)
+      {
+         this.panel.hide();
+         
+         var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
+         eventDialog.setOptions({
+            "siteId": this.siteId,
+            "eventURI": "/" + this.event.uri
+         });
+         eventDialog.show();
+      },
+      
+      /**
+       * Fired when the delete button is clicked. Kicks off a DELETE request
+       * to the Alfresco repo to remove an event.
+       *
+       * @method onDeleteClick
+       * @param e {object} DomEvent
+       */
+      onDeleteClick: function(e)
+      {
+         Alfresco.util.Ajax.request(
+         {
+            method: Alfresco.util.Ajax.DELETE,
+               url: Alfresco.constants.PROXY_URI + this.event.uri,
+            successCallback:
+            {
+               fn: this.onDeleted,
+               scope: this
+            },
+               failureMessage: "Could not delete event"
+         });
+      },
+      
+      /**
+       * Called when an event is successfully deleted.
+       *
+       * @method onDeleted
+       * @param e {object} DomEvent
+       */
+      onDeleted: function(e)
+      {
+         this.panel.hide();
+         
+         YAHOO.Bubbling.fire('eventDeleted',
+         {
+            name: this.event.name, // so we know which event we are dealing with
+            from: this.event.from // grab the events for this date and remove the event
+         });         
+      }
    };
 })();
-
-/* Dummy instance to load optional YUI components early */
-//new Alfresco.EventInfo(null);
