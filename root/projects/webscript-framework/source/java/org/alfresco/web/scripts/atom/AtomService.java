@@ -78,9 +78,9 @@ public class AtomService
      * 
      * @return  map of QNames by alias
      */
-    public Map<String, QName> getQNames()
+    public Map<String, QName> getNames()
     {
-        return abderaService.getQNames();
+        return abderaService.getNames();
     }
     
     /**

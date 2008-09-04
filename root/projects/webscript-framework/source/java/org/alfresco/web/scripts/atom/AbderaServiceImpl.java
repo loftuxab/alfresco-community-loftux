@@ -222,7 +222,7 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.atom.AbderaService#getQName(java.lang.String)
      */
-    public Map<String, QName> getQNames()
+    public Map<String, QName> getNames()
     {
         return Collections.unmodifiableMap(qNames);
     }

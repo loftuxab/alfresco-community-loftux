@@ -73,7 +73,7 @@ public abstract class AtomWebScript extends DeclarativeWebScript
         model.put("slug", req.getHeader("Slug"));
         model.put("type", req.getHeader("Content-Type"));
         Map<String,QName> qnames = new HashMap<String,QName>();
-        qnames.putAll(abderaService.getQNames());
+        qnames.putAll(abderaService.getNames());
         Map<String,QName> scriptQnames = (Map<String,QName>)req.getServiceMatch().getWebScript().getDescription().getExtensions().get("qnames");
         if (scriptQnames != null)
         {
