@@ -103,5 +103,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-identity-3.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-jpdl-3.2.2.jar" sourcepath="src/jbpm-jpdl-3.2.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/commons/commons-pool-1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-core-0.4.0-incubating.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-extensions-json-0.4.0-incubating.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-i18n-0.4.0-incubating.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/abdera/abdera-parser-0.4.0-incubating.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
