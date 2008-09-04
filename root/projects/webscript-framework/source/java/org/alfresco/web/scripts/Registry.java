@@ -52,6 +52,18 @@ public interface Registry
     public Path getUri(String uriPath);
     
     /**
+     * Gets a Web Script Family
+     * 
+     * NOTE:
+     * - To get all families, pass /
+     * - To get a specific family, pass /{familyName}
+     * 
+     * @param familyPath
+     * @return  web script path representing family
+     */
+    public Path getFamily(String familyPath);
+    
+    /**
      * Gets all Web Scripts
      * 
      * @return  web scripts

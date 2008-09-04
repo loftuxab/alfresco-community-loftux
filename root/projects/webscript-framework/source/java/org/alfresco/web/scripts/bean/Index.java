@@ -51,6 +51,7 @@ public class Index extends DeclarativeWebScript
         model.put("failures", getContainer().getRegistry().getFailures());
         model.put("rooturl", getContainer().getRegistry().getUri("/"));
         model.put("rootpackage", getContainer().getRegistry().getPackage("/"));
+        model.put("rootfamily", getContainer().getRegistry().getFamily("/"));
         return model;
     }
 

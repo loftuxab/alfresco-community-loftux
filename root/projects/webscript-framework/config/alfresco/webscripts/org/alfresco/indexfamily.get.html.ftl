@@ -1,23 +1,40 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head> 
-    <title>Index of CMIS Services</title> 
+    <title>Index of Web Scripts Family '${family.path}'</title> 
     <link rel="stylesheet" href="${url.context}/css/base.css" TYPE="text/css">
   </head>
   <body>
    <table>
      <tr>
         <td><img src="${url.context}/images/logo/AlfrescoLogo32.png" alt="Alfresco" /></td>
-        <td><nobr><span class="title">Index of CMIS Services</span></nobr></td>
+        <td><nobr><span class="title">Index of Web Scripts Family '${family.path}'</span></nobr></td>
      </tr>
-     <tr><td><td>${services?size} Services
+     <tr><td><td>${family.scripts?size} Web Scripts
     </table>
     <br>
     <table>
       <tr><td><a href="${url.serviceContext}/index">Back to Web Scripts Home</a>
+      <#if family.parent?exists>
+         <tr><td><a href="${url.serviceContext}/index/family${family.parent.path}">Up to ${family.parent.path}</a>
+      </#if>
     </table>
     <br>
-    <#list services as webscript>
+    <#if family.children?size &gt; 0>
+       <table>
+          <@recurseuri family=family/>
+       </table>
+       <br>
+    </#if>
+    <#macro recurseuri family>
+       <#list family.children as childpath>
+          <#if childpath.scripts?size &gt; 0>
+            <tr><td><a href="${url.serviceContext}/index/family${childpath.path}">${childpath.name}</a>
+          </#if>
+          <@recurseuri family=childpath/>
+       </#list>  
+    </#macro>
+    <#list family.scripts as webscript>
     <#assign desc = webscript.description>
     <span class="mainSubTitle">${desc.shortName}</span>
     <table>
