@@ -37,14 +37,14 @@ import javax.xml.namespace.QName;
 
 import org.alfresco.web.scripts.WebScriptException;
 import org.apache.abdera.Abdera;
+import org.apache.abdera.factory.ExtensionFactory;
+import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 
@@ -55,26 +55,14 @@ import org.springframework.beans.factory.InitializingBean;
  */
 public class AbderaServiceImpl implements AbderaService, InitializingBean
 {
-    // Logger
-    private static final Log logger = LogFactory.getLog(AbderaServiceImpl.class);
-    
     private Abdera abdera;
     private Parser parser;
+    private Factory factory;
     private List<String> writerNames;
     private Map<String,Writer> writers;
-    private Map<String, String> qNamesAsString;
     private Map<String, QName> qNames;
     
-    /**
-     * Set QNames
-     * 
-     * @param qNamesAsString  map of {namespaceuri}localname by alias
-     */
-    public void setQnames(Map<String, String> qNamesAsString)
-    {
-        this.qNamesAsString = qNamesAsString;
-    }
-    
+
     /**
      * Set available Writer names
      * 
@@ -93,7 +81,8 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     {
         // construct Abdera Service
         abdera = new Abdera();
-        parser = abdera.getParser();
+        factory = abdera.getFactory();
+        parser = factory.newParser();
         // TODO: parser options
         
         // construct writers
@@ -111,22 +100,9 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
                 writers.put(writerName, writer);
             }
         }
-
-        // construct QNames
-        Map<String, QName> buildQNames = new HashMap<String, QName>();
-        if (qNamesAsString != null)
-        {
-            for (Map.Entry<String, String> entry : qNamesAsString.entrySet())
-            {
-                String alias = entry.getKey();
-                QName qName = QName.valueOf(entry.getValue());
-                buildQNames.put(alias, qName);
-                
-                if (logger.isDebugEnabled())
-                    logger.debug("Registered QName '" + qName + "' as '" + alias + "'");
-            }
-        }
-        qNames = Collections.unmodifiableMap(buildQNames);
+        
+        // construct qnames
+        qNames = new HashMap<String, QName>();
     }
 
     /* (non-Javadoc)
@@ -146,27 +122,19 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.atom.AbderaService#getQNameExtensions()
-     */
-    public Map<String, QName> getQNameExtensions()
-    {
-        return qNames;
-    }
-
-    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.atom.AbderaService#newEntry()
      */
-    public Entry newEntry()
+    public Entry createEntry()
     {
-        return abdera.newEntry();
+        return factory.newEntry();
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.atom.AbderaService#newFeed()
      */
-    public Feed newFeed()
+    public Feed createFeed()
     {
-        return abdera.newFeed();
+        return factory.newFeed();
     }
 
     /* (non-Javadoc)
@@ -249,6 +217,34 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     public Writer getWriter(String name)
     {
         return writers.get(name);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#getQName(java.lang.String)
+     */
+    public Map<String, QName> getQNames()
+    {
+        return Collections.unmodifiableMap(qNames);
+    }
+
+    /**
+     * Register QName
+     * 
+     * @param alias
+     * @param qname
+     */
+    public void registerQName(String alias, String qname)
+    {
+        qNames.put(alias, QName.valueOf(qname));
+    }
+
+    /**
+     * Register Extension Factory
+     * @param extensionFactory
+     */
+    public void registerExtensionFactory(ExtensionFactory extensionFactory)
+    {
+        factory.registerExtension(extensionFactory);
     }
     
 }

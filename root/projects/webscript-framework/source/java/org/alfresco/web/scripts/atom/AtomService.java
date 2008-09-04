@@ -58,9 +58,9 @@ public class AtomService
      * 
      * @return  feed
      */
-    public Feed newFeed()
+    public Feed createFeed()
     {
-        return abderaService.newFeed();
+        return abderaService.createFeed();
     }
     
     /**
@@ -68,9 +68,9 @@ public class AtomService
      * 
      * @return  entry
      */
-    public Entry newEntry()
+    public Entry createEntry()
     {
-        return abderaService.newEntry();
+        return abderaService.createEntry();
     }
     
     /**
@@ -80,7 +80,19 @@ public class AtomService
      */
     public Map<String, QName> getQNames()
     {
-        return abderaService.getQNameExtensions();
+        return abderaService.getQNames();
+    }
+    
+    /**
+     * Creates a QName
+     * 
+     * @param uri
+     * @param localName
+     * @return  qname
+     */
+    public QName createQName(String uri, String localName)
+    {
+        return new QName(uri, localName);
     }
     
     /**

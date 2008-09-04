@@ -29,13 +29,11 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
-import org.alfresco.web.scripts.FormatWriterMethod;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 
 
@@ -75,13 +73,13 @@ public abstract class AtomWebScript extends DeclarativeWebScript
         model.put("slug", req.getHeader("Slug"));
         model.put("type", req.getHeader("Content-Type"));
         Map<String,QName> qnames = new HashMap<String,QName>();
-        qnames.putAll(abderaService.getQNameExtensions());
+        qnames.putAll(abderaService.getQNames());
         Map<String,QName> scriptQnames = (Map<String,QName>)req.getServiceMatch().getWebScript().getDescription().getExtensions().get("qnames");
         if (scriptQnames != null)
         {
             qnames.putAll(scriptQnames);
         }
-        model.put("qname", qnames);
+        model.put("qnames", qnames);
         return model;
     }
 

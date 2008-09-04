@@ -72,7 +72,7 @@ public class AtomFeedWebScript extends AtomWebScript
         }
         else
         {
-            feed = abderaService.newFeed();
+            feed = abderaService.createFeed();
         }
         
         model.put("feed", feed);

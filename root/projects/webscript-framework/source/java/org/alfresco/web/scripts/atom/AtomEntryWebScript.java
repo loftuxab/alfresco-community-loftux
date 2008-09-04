@@ -74,7 +74,7 @@ public class AtomEntryWebScript extends AtomWebScript
         }
         else
         {
-            entry = abderaService.newEntry();
+            entry = abderaService.createEntry();
             media = req.getContent();
         }
         
