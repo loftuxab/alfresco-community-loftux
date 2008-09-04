@@ -28,24 +28,17 @@
 package org.alfresco.mbeans;
 
 // server side
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-import java.util.ArrayList;
- 
-// classes to talk with MBeanServer on virtualization server
-import javax.management.Attribute;
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import java.util.Properties;
-import java.io.FileInputStream;
-import java.util.Map;
-import java.util.HashMap;
 
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationContext;
 
 public class VirtServerRegistry implements VirtServerRegistryMBean
@@ -352,7 +345,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
                                        );
     }
 
-    protected boolean verifyJmxRmiConnection()
+    public boolean verifyJmxRmiConnection()
     {
         // Typically the JMXServiceURL looks something like this:
         //  "service:jmx:rmi://ignored/jndi/rmi://localhost:50501/alfresco/jmxrmi"
@@ -426,17 +419,22 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
                   "virtualization server " + 
                   "(this may be a transient error.)");
 
-            // Close the connection asynchronously.
-            // This avoids having to wait for a network 
-            // timout if the remote server crashed. 
-
-            JMXConnectorCloser conn_closer = new JMXConnectorCloser( conn_ );
-            new Thread( conn_closer ).start();
-
-            conn_ = null; 
+            closeJmxRmiConnection();
 
             return false;
         }
+    }
+    
+    public void closeJmxRmiConnection()
+    {
+        // Close the connection asynchronously.
+        // This avoids having to wait for a network 
+        // timout if the remote server crashed. 
+
+        JMXConnectorCloser conn_closer = new JMXConnectorCloser( conn_ );
+        new Thread( conn_closer ).start();
+
+        conn_ = null;
     }
 
     // How to register w/o Spring (continued): 

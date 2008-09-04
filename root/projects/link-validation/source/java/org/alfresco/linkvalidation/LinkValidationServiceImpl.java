@@ -51,7 +51,6 @@ import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
-import org.alfresco.repo.admin.patch.impl.WCMFoldersPatch;
 import org.alfresco.repo.admin.RepoServerMgmt;
 import org.alfresco.repo.attributes.Attribute;
 import org.alfresco.repo.attributes.BooleanAttributeValue;
@@ -65,19 +64,19 @@ import org.alfresco.repo.avm.PurgeVersionTxnListener;
 import org.alfresco.repo.avm.util.RawServices;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.PropertyValue;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
-import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttrQueryGTE;
 import org.alfresco.service.cmr.attributes.AttrQueryLTE;
+import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.avm.AVMException;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.avmsync.AVMDifference;
 import org.alfresco.service.cmr.avmsync.AVMSyncService;
 import org.alfresco.service.cmr.remote.AVMRemote;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.MD5;
 import org.alfresco.util.NameMatcher;
@@ -202,6 +201,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     int local_read_timeout_     = 30000;
     int remote_read_timeout_    = 30000;
     int poll_interval_          = 5000;
+    
+    private Boolean virt_available = null; // null to ensure info/warn on startup
+    
+    int virt_retry_interval_ = 120000;
 
     String jsse_trust_store_file_;
     String jsse_trust_store_password_;
@@ -306,6 +309,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     {
         poll_interval_ = milliseconds;
     }
+    public void setRetryInterval( int milliseconds )
+    {
+        virt_retry_interval_ = milliseconds;
+    }
 
     /**
     *  Returns the poll interval (in milliseconds) used to check for new snapshots in staging.
@@ -351,11 +358,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     	sysAdminCache.put(KEY_SYSADMIN_LINKVALIDATION_DISABLED, new Boolean(disabled));
     }
     
-    @SuppressWarnings("unchecked")
     public boolean isLinkValidationDisabled()
     {
     	Boolean disabled = (Boolean)sysAdminCache.get(KEY_SYSADMIN_LINKVALIDATION_DISABLED);
-    	return (disabled == null ? false : disabled.booleanValue());
+    	return ((! isVirtServerAvailable()) || (disabled == null ? false : disabled.booleanValue()));
     }
 
 	// TODO - temporary workaround, can be removed when link validation is part of repo
@@ -397,6 +403,38 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     }
 
 
+    private boolean isVirtServerAvailable()
+    {
+        // check virtualization server registered and available
+        String virtServerJmxUrl = virtreg_.getVirtServerJmxUrl();
+        if (virtServerJmxUrl == null)
+        {
+            if ((virt_available == null || virt_available == true))
+            {
+                log.warn("LinkValidationService Update is not running (virtualization server not registered or started)");
+                virt_available = false;
+            }
+        }
+        else if (virtreg_.verifyJmxRmiConnection())
+        {
+            if (virt_available == null || virt_available == false)
+            {
+                log.info("LinkValidationService Update is running (connected to virtualization server)");
+                virt_available = true;
+            }
+        }
+        else
+        {
+            if (virt_available == null || virt_available == true)
+            {
+                log.warn("LinkValidationService Update is not running (cannot connect to virtualization server)");
+                virt_available = false;
+            }
+        }
+        
+        return virt_available;
+    }
+    
     //-------------------------------------------------------------------------
     /**
     *   Main thread to update href validation info in staging.
@@ -413,8 +451,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         try
         {
             springContext = RawServices.Instance().getContext();
-            WCMFoldersPatch  has_wcm =
-                (WCMFoldersPatch)  springContext.getBean("patch.wcmFolders");
+            springContext.getBean("patch.wcmFolders"); // ignore return
 
         }
         catch ( NoSuchBeanDefinitionException e)        // WCM is not installed
@@ -529,81 +566,88 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 if ( log.isInfoEnabled() )
                     log.info( "Purged all link validation data.");
             }
-            catch (Exception e)
+            catch (AVMNotFoundException e)
             {
                 if ( log.isInfoEnabled() )
                     log.info( "No link validation data to purge.");
             }
         }
-
+        
+        
+        boolean linkValidationFailure = false;
+        
+        // polling thread
         while ( true )
         {
             synchronized (this ) { if (Shutdown_)  { break;} }
 
-        	if (isLinkValidationDisabled())
-        	{
-        		if ( log.isDebugEnabled() )
-        			log.debug("Link validation (polling) not performed - currently disabled by system administrator");
-        	}
-        	else
-        	{      		
-	            if ( log.isDebugEnabled() )
-	                log.debug( "LinkValidationService polling webapps...");
-	
-	            final HrefValidationProgress progress = new HrefValidationProgress();
-	            progress_sleepy = progress;
-	
-	            try
-	            {
-	                RetryingTransactionHelper.RetryingTransactionCallback<Object>
-	                callback = new RetryingTransactionHelper.
-	                               RetryingTransactionCallback<Object>()
-	                               {
-	                                   public String execute() throws Throwable
-	                                   {
-	                                           updateHrefInfo( webappPath,
-	                                                           incremental,
-	                                                           validateExternal,
-	                                                           progress);
-	                                       return null;
-	                                   }
-	                               };
-	
-	                transaction_helper_.doInTransaction(callback);
-	            }
-	            catch (Exception e)
-	            {
-	                // Super-low level debug.
-	                //
-	                if ( true )
-	                {
-	                    if ( log.isDebugEnabled() )
-	                    {
-	                        // After all these years, there's still no easy
-	                        // method to print a stack trace into a string.
-	                        // Where is the love?  Where?
-	                    
-	                        StringWriter string_writer = new StringWriter();
-	                        PrintWriter print_writer   = new PrintWriter(string_writer);
-	                        e.printStackTrace(print_writer);
-	                    
-	                        log.debug( "Exception class:  " + e.getClass().getName() +
-	                                   ":  " + e.getMessage() +
-	                                   "\n" + string_writer.toString() );
-	                    }
-	                }
-	                else
-	                {
-	                    if ( log.isInfoEnabled() )
-	                        log.info("Could not validate links.  Retrying.  ( "       +
-	                                 e.getClass().getName() +  ":  " + e.getMessage() +
-	                                 " )");
-	                }
-	            }           
-        	}
+            if (isLinkValidationDisabled())
+            {
+                if ( log.isTraceEnabled() )
+                {
+                    log.trace("Link validation (polling) not performed - currently disabled");
+                }
+            }
+            else
+            {               
+                if ( log.isTraceEnabled() )
+                {
+                    log.trace("LinkValidationService is polling webapps...");
+                }
+    
+                final HrefValidationProgress progress = new HrefValidationProgress();
+                progress_sleepy = progress;
+    
+                try
+                {
+                    RetryingTransactionHelper.RetryingTransactionCallback<Object>
+                    callback = new RetryingTransactionHelper.
+                                   RetryingTransactionCallback<Object>()
+                                   {
+                                       public String execute() throws Throwable
+                                       {
+                                               updateHrefInfo( webappPath,
+                                                               incremental,
+                                                               validateExternal,
+                                                               progress);
+                                           return null;
+                                       }
+                                   };
+    
+                    transaction_helper_.doInTransaction(callback);
+                    
+                    linkValidationFailure = false;
+                }
+                catch (Throwable t)
+                {
+                    if (linkValidationFailure == false)
+                    {
+                        // log error once
+                        log.error("Could not validate links: ", t);
+                        linkValidationFailure = true;
+                    }
+                    
+                    if (log.isDebugEnabled())
+                    {
+                        // After all these years, there's still no easy
+                        // method to print a stack trace into a string.
+                        // Where is the love?  Where?
+                    
+                        StringWriter string_writer = new StringWriter();
+                        PrintWriter print_writer   = new PrintWriter(string_writer);
+                        t.printStackTrace(print_writer);
+                    
+                        log.debug("Could not validate links.  Exception class:  " + t.getClass().getName() +
+                                   ":  " + t.getMessage() +
+                                   "\n" + string_writer.toString());
+                        
+                        log.debug("Retry link validation in "+(linkValidationFailure == true ? virt_retry_interval_ : poll_interval_)+" msecs");
+                    }
+                }
+            }
 
             // Sleep regardless of whether the updateHrefInfo failed
-            try { Thread.sleep( poll_interval_ ); }
+            try { Thread.sleep( (linkValidationFailure == true || virt_available == null || virt_available == false) ? virt_retry_interval_ : poll_interval_ ); }
             catch (InterruptedException ie)
             {
                 /* nothing to do */
@@ -914,15 +958,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     attr_.removeAttribute( stem, stale);
 
                     if ( log.isDebugEnabled() )
-                        log.debug("Removed stale AttributeService key: " + key );
+                        log.debug("Removed stale attribute: " + key );
 
                 }
-                catch (Exception e )
+                catch (AVMNotFoundException e )
                 {
-                    if ( log.isErrorEnabled() )
-                        log.error(
-                        "Could not remove stale AttributeService key: " + key +
-                        "   " + e.getMessage());
+                    if ( log.isDebugEnabled() )
+                        log.debug("Could not remove stale attribute - not found / already purged: " + key);
                 }
             }
         }
@@ -1162,9 +1204,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                SSLException,
                                LinkValidationAbortedException
     {
-        if ( log.isDebugEnabled() )
-            log.debug("starting updateWebappHrefInfo:  " +
+        if ( log.isTraceEnabled() )
+        {
+            log.trace("starting updateWebappHrefInfo:  " +
                       webappPath + " (to version: " + update_to_version + ")");
+        }
 
 
         // Ensure the proper attribute service key is set up for this webapp
@@ -1187,10 +1231,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         ValidationPathParser p =
             new ValidationPathParser(avm_, webappPath );
 
-
-        String store           = p.getStore();
         String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
         String dns_name        = p.getDnsName();
 
 
@@ -1234,9 +1275,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 attr_.removeAttribute( webapp_attr_base, BASE_VERSION_ALIAS);
             }
-            catch (Exception e)
+            catch (AVMNotFoundException e)
             {
                 // Not harmful if there was nothing to throw away.
+                if ( log.isDebugEnabled() )
+                    log.debug("Could not remove 'schema info' attribute - not found / already purged: " + webapp_attr_base + "/" + BASE_VERSION_ALIAS);
             }
 
             if ( log.isDebugEnabled() )
@@ -1356,8 +1399,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         progress.incrementWebappUpdateCount();  // for monitoring progress
 
-        if ( log.isDebugEnabled() )
-            log.debug("done updateWebappHrefInfo: " + webappPath);
+        if ( log.isTraceEnabled() )
+        {
+            log.trace("done updateWebappHrefInfo: " + webappPath);
+        }
     }
 
 
@@ -1846,8 +1891,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     {
         if ( log.isDebugEnabled() )
             log.debug("getBrokenHrefManifest( hdiff )");
-
-        HrefManifest manifest = new HrefManifest();
 
         String src_webapp_url_base = href_diff.getSrcWebappUrlBase();
         String src_store           = href_diff.getSrcStore();
@@ -2377,12 +2420,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                         rel_href_md5
                                       );
 
-                boolean is_href_broken = true;
                 if (rsp != null)
                 {
                     int response_code = rsp.getIntValue();
-
-                    if ( response_code < 400 ) { is_href_broken = false; }
 
                     attr_.removeAttribute( href_attr + "/" +  HREF_TO_STATUS,
                                            rel_href_md5);
@@ -2406,7 +2446,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                         attr_.removeAttribute( href_attr  + "/" + HREF_TO_FDEP,
                                                rel_href_md5);
                     }
-                    catch (Exception xx)
+                    catch (AVMNotFoundException e)
                     {
                         // If you try to remove an attribute that does not exist,
                         // AttributeService throws an exception.  In this case,
@@ -2420,6 +2460,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                         //      [2]  An external href
                         //
                         // Neither are expected to have any file dependencies.
+                        
+                        if ( log.isDebugEnabled() )
+                            log.debug("Could not remove 'href_to_fdep' attribute - not found / already purged: " + href_attr  + "/" + HREF_TO_FDEP + "/" + rel_href_md5);
                     }
 
                     if ( old_fdep_attribute != null )
@@ -2608,9 +2651,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                                   stale_fdep_md5,
                                                   rel_url_md5);
                         }
-                        catch (Exception e) 
+                        catch (AVMNotFoundException e) 
                         { 
                             // Nothing to do (already purged)
+                            if ( log.isDebugEnabled() )
+                                log.debug("Could not remove 'file_to_hdep' attribute - not found / already purged: " + href_attr + "/" + FILE_TO_HDEP + "/" + stale_fdep_md5 + "/" + rel_url_md5);
                         }
                     }
                 }
@@ -2895,9 +2940,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             if ( log.isDebugEnabled() )
                 log.debug("Cleaning up after deleted files: " + deleted_file_md5);
 
-
-            attr_.removeAttribute(href_attr + "/" + SOURCE_TO_HREF,
-                                  deleted_file_md5);
+            try
+            {
+                attr_.removeAttribute(href_attr + "/" + SOURCE_TO_HREF,
+                                      deleted_file_md5);
+            }
+            catch (AVMNotFoundException e)
+            {
+                if ( log.isDebugEnabled() )
+                    log.debug("Could not remove 'source_to_href' attribute for deleted file - not found / already purged: " + href_attr + "/" + SOURCE_TO_HREF + "/" + deleted_file_md5);
+            }
 
             Attribute old_hdep_attribute =
                 attr_.getAttribute( href_attr    + "/" +
@@ -2913,12 +2965,28 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
                 if ( old_hdep_attribute.size() <= 1 ) 
                 {
-                    attr_.removeAttribute( href_attr   + "/" + FILE_TO_HDEP,
-                                           deleted_file_md5);
-
-                    // No hrefs depend on this, so md5 -> file isn't needed
-                    attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
-                                           deleted_file_md5);
+                    try
+                    {
+                        attr_.removeAttribute( href_attr   + "/" + FILE_TO_HDEP,
+                                               deleted_file_md5);
+                    }
+                    catch (AVMNotFoundException e)
+                    {
+                        if ( log.isDebugEnabled() )
+                            log.debug("Could not remove 'file_to_hdep' attribute for deleted file - not found / already purged: " + href_attr + "/" + MD5_TO_FILE + "/" + deleted_file_md5);
+                    }
+                
+                    try
+                    {
+                        // No hrefs depend on this, so md5 -> file isn't needed
+                        attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
+                                               deleted_file_md5);
+                    }
+                    catch (AVMNotFoundException e)
+                    {
+                        if ( log.isDebugEnabled() )
+                            log.debug("Could not remove 'md5_to_file' attribute for deleted file - not found / already purged: " + href_attr + "/" + MD5_TO_FILE + "/" + deleted_file_md5);
+                    }
                 }
                 else
                 {
@@ -2934,9 +3002,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
             else
             {
-                // No hrefs depend on this, so md5 -> file isn't needed
-                attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
-                                       deleted_file_md5);
+                try
+                {
+                    // No hrefs depend on this, so md5 -> file isn't needed
+                    attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
+                                           deleted_file_md5);
+                }
+                catch (AVMNotFoundException e)
+                {
+                    if ( log.isDebugEnabled() )
+                        log.debug("Could not remove 'md5_to_file' attr for deleted file - not found / already purged: " + href_attr + "/" + MD5_TO_FILE + "/" + deleted_file_md5);
+                }
             }
         }
 
@@ -3003,13 +3079,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         if  ( links == null ) {return;}
 
         HrefStatusMap  href_status_map = new HrefStatusMap();
-
-        int    dst_webapp_url_base_length = dst_webapp_url_base.length();
-
+        
         for ( Pair<String, Attribute> link : links  )
         {
-            String  response_code_str = link.getFirst();
-            int     response_code     = Integer.parseInt( response_code_str );
             Set<String> href_md5_set  = link.getSecond().keySet();
 
             for ( String href_md5 : href_md5_set )
@@ -3462,6 +3534,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     log.error("Error validating internal link: " +
                               se.getClass().getName() + " " + se.getMessage() );
 
+                if (se.getClass().getName().equals("java.net.ConnectException"))
+                {
+                    virtreg_.closeJmxRmiConnection();
+                }
                 throw se;
             }
             else
@@ -3486,6 +3562,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                               ssle.getClass().getName() +
                               "   " + ssle.getMessage() );
 
+                if (ssle.getClass().getName().equals("java.net.ConnectException"))
+                {
+                    virtreg_.closeJmxRmiConnection();
+                }
                 throw ssle;
             }
             else
@@ -3644,7 +3724,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // Create top level .href key if necessary
 
         String [] seg = dns_name.split("\\.");
-        String pth;
         for (int i= seg.length -1 ; i>=0; i--)
         {
             str.append("/" + seg[i] );
@@ -3858,7 +3937,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         String store           = p.getStore();
         String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
         String dns_name        = p.getDnsName();
 
         String status_gte = "" + statusGTE;
@@ -4090,9 +4168,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         ValidationPathParser p =
             new ValidationPathParser(avm_, path);
 
-        String store           = p.getStore();
         String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
         String dns_name        = p.getDnsName();
 
         // Example value:  ".href/mysite"
