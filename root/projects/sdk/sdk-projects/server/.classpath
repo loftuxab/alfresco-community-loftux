@@ -44,13 +44,13 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/servlet.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/spring-2.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/spring-2.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/spring-mock-2.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/standard.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/tlc124.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/tlddoc.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/tm-extractors-0.4_patched.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/wsdl4j-1.5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/wsdl4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/wss4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/yguard.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-beanutils-1.7.0.jar"/>

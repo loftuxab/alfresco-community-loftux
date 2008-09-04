@@ -1,0 +1,183 @@
+CMIS to Alfresco Mapping
+
+Issues:
+
+- GetRelationship permission on relationship
+- create permission missing  - createFolder, createDocument, createRelationship
+- permission on getAllowableActions??
+
+
+Key:
+
+wip   prototype implementation
+done  as defined in spec
+    * Todo: identify mapping
+    ! Potential issue
+    - Decision not to map to CMIS (only when optional in CMIS)
+
+
+Capabilities:
+
+      Multi-filing -> TRUE
+      Unfiling -> FALSE
+      Version-specific-filing -> FALSE
+      PWC-Updatable -> TRUE
+      Query-non-latest-versions -> FALSE  
+      Inner-join -> FALSE
+      Outer-join -> FALSE
+      Full-text-query -> Full-text + Properties
+
+
+Model Mapping:
+
+Note: Node Refs are serialized ${sys:store_protocol}://${sys:store_id}/${sys:node-uuid}
+
+Object properties:
+
+      OBJECT_ID  -> sys:referencable node ref
+    - URI
+      OBJECT_TYPE_ID   -> M2TypeDefinition.name (note: refer to Meta Model mapping)
+      CREATED_BY  -> cm:creator
+      CREATION_DATE  -> cm:created
+      LAST_MODIFIED_BY  -> cm:modifier
+      LAST_MODIFICATION_DATE  -> cm:modified
+    * CHANGE_TOKEN  -> 
+
+Document (inc. Object) properties:
+
+      NAME  -> cm:name
+      IS_IMMUTABLE  -> TRUE if cm:lockable.lockType == readonly || cm:versionable.auto-version == false
+      IS_LATEST_VERSION  -> TRUE  (FALSE if PWC)
+      IS_MAJOR_VERSION  -> VersionService().getCurrentVersion().getVersionType() == VersionType.MAJOR   (FALSE if PWC)
+      IS_LATEST_MAJOR_VERSION  -> IS_MAJOR_VERSION
+      VERSION_SERIES_IS_CHECKED_OUT  -> TRUE if cm:lockable.lockType == readonly
+      VERSON_SERIES_CHECKED_OUT_BY  -> cm:lockable.lockOwner
+      VERSION_SERIES_CHECKED_OUT_ID  -> if cm:lockable.lockType == readonly then COCI.getWorkingCopy
+      CHECKIN_COMMENT  -> VersionService().getCurrentVersion().getDescription()
+      CONTENT_STREAM_ALLOWED  -> cm:content property exists ? true : false
+      CONTENT_STREAM_LENGTH  -> cm:content.size
+      CONTENT_STREAM_MIMETYPE  -> cm:content.mimetype
+      CONTENT_STREAM_FILENAME  -> cm:name
+    - CONTENT_STREAM_URI
+
+  NOTE: We may need to duplicate IS_MAJOR & DESCRIPTION on cm:versionable for performance
+        reasons.
+
+Folder (inc. Object) properties:
+
+      NAME  -> cm:name
+      PARENT  -> primary parent node ref
+      ALLLOWED_CHILD_OBJECT_TYPES  -> M2ChildAssociationDefinition.targetClassName
+
+Relationship (inc. Object) properties:
+
+      OBJECT_TYPE_ID   -> M2AssociationDefinition.name (note: refer to Meta Model mapping)
+    - CREATED_BY
+    - CREATION_DATE
+    - LAST_MODIFIED_BY
+    - LAST_MODIFICATION_DATE
+      SOURCE_ID  -> AssociationRef.sourceRef node ref
+      TARGET_ID  -> AssociationRef.targetRef node ref
+  
+
+Meta Model Mapping:
+
+Base Object Types:
+
+      DOCUMENT_OBJECT_TYPE  -> cm:content type
+      FOLDER_OBJECT_TYPE  -> cm:folder type
+      RELATIONSHIP_OBJECT_TYPE  -> simulate (no natural mapping)
+
+    ! NOTE: This means any type outside the cm:content and cm:folder hierarchy
+            is not exposed via the CMIS interface.
+
+Object Type Definition:
+
+      ObjectTypeId  -> M2TypeDefinition.name - serialized as {uri}localName
+      ObjectTypeQueryName  -> M2TypeDefinition.name - serialized as prefix_localName
+         Note: For above base types, use name as defined in CMIS spec
+      ObjectTypeDisplayName  -> M2TypeDefinition.title
+      ParentTypeId  -> M2TypeDefinition.parentName - serialized as {uri}localName
+      RootTypeQueryName  -> as defined in CMIS spec
+      Description  -> M2TypeDefinition.description
+    * Queryable
+      Versionable  -> type has cm:versionable mandatory aspect ? true : false
+      ContentStreamAllowed  -> type == cm:content ? true : false
+    - Constraints
+
+Property Type Definition:
+
+      PropertyName  -> M2PropertyDefinition.name - serialized as prefix_localName
+      DisplayName  -> M2PropertyDefinition.title
+      Description  -> M2PropertyDefinition.description
+      PropertyType  -> M2PropertyDefinition.dataType (note: refer to Property Type mapping)
+      Cardinality  -> M2PropertyDefinition.isMultiValued
+    - MaximumLength
+    - SchemaURI
+    - Encoding
+      Choices  -> M2PropertyDefinition.constraints["list of values"], if any
+      OpenChoice  -> false
+      Required  -> M2PropertyDefinition.isMandatoryEnforced
+      DefaultValue  -> M2PropertyDefinition.defaultValue
+      Updatability  -> M2PropertyDefinition.isProtected
+    * Queryable
+    * Orderable
+
+Property Type Mapping:
+
+      String  -> d:text, d:mltext (server locale only?), d:category?
+      Decimal  -> d:float, d:double
+      Integer  -> d:int, d:long
+      Boolean  -> d:boolean
+      DateTime  -> d:date, d:datetime
+    - URI
+      ID  -> d:noderef
+      TypeID   -> QName
+  
+  Alfresco data types not mapped:
+  
+      d:any, d:content, d:qname, d:childassocref, d:assocref, d:path, d:locale,
+      d:version
+  
+    ! Note: Any Alfresco property whose data type is not mapped to CMIS MUST be 
+            excluded from CMIS type definitions
+
+
+Permissions:
+
+Document:
+
+      DeleteObject  -> DeleteNode
+      UpdateProperties  -> WriteProperties
+      CheckOut  -> CheckOut
+      CancelCheckout  -> CancelCheckOut
+      CheckIn  -> CheckIn (on PWC)
+      DeleteAllVersions  -> TRUE
+      AddDocumentToFolder  -> LinkChildren
+    * RemoveDocumentFromFolder
+      SetContentStream  -> WriteContent
+      DeleteContentStream  -> WriteProperties
+      GetAllVersions  -> TRUE
+      GetDocumentParents  -> TRUE
+      GetRelationships  -> TRUE
+      GetProperties  -> ReadProperties
+      GetContentStream  -> ReadContent
+    ! MoveObject  -> DeleteNode?
+
+Folder:
+
+      DeleteObject  -> DeleteNode
+      DeleteTree  -> DeleteNode
+      UpdateProperties  -> WriteProperties
+      GetChildren  -> ReadChildren
+      GetDescendants  -> ReadChildren
+      GetFolderParent  -> TRUE
+      GetProperties  -> ReadProperties
+      GetRelationships  -> TRUE
+    ! MoveObject  -> DeleteNode?
+Relationship:
+
+      DeleteObject  -> TRUE
+      UpdateProperties  -> N/A
+      GetProperties  -> N/A
+    ! GetRelationships

@@ -142,6 +142,6 @@ public interface AbderaService
      * 
      * @return  qnames
      */
-    public Map<String, QName> getQNames();
+    public Map<String, QName> getNames();
     
 }

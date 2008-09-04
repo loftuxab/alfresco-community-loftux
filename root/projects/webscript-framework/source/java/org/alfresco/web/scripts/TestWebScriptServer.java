@@ -234,7 +234,7 @@ public class TestWebScriptServer implements ApplicationContextAware
      * @throws IOException
      */
     public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers)
-    throws IOException
+        throws IOException
     {
         return submitRequest(method, uri, headers, null, null);
     }
@@ -252,7 +252,7 @@ public class TestWebScriptServer implements ApplicationContextAware
      * @return              response           
      * @throws IOException
      */
-    public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers, String body, String contentType)
+    public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers, byte[] body, String contentType)
         throws IOException
     {
         MockHttpServletRequest req = createRequest(method, uri);
@@ -267,9 +267,9 @@ public class TestWebScriptServer implements ApplicationContextAware
         }        
 
         // Set the body of the request
-        if (body != null && body.length() != 0)
+        if (body != null)
         {            
-            req.setContent(body.getBytes());
+            req.setContent(body);
         }
         
         // Set the content type
@@ -415,7 +415,7 @@ public class TestWebScriptServer implements ApplicationContextAware
             {
                 body += command[i] + " ";
             }
-            MockHttpServletResponse res = submitRequest(command[0], uri, headers, body, contentType);
+            MockHttpServletResponse res = submitRequest(command[0], uri, headers, body.getBytes(), contentType);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
