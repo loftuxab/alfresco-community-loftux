@@ -127,6 +127,7 @@
             <prop key="text/html">html</prop>
             <prop key="text/plain">text</prop>
             <prop key="text/xml">xml</prop>
+            <prop key="text/calendar">calendar</prop>
             <prop key="application/atom+xml">atom</prop>
             <prop key="application/atom+xml;type=entry">atomentry</prop>
             <prop key="application/atom+xml;type=feed">atomfeed</prop>

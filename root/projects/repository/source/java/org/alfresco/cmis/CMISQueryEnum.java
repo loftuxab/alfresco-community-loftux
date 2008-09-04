@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,24 +22,40 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.cmis.rest;
-
-
+package org.alfresco.cmis;
 
 /**
- * CMIS API Test Harness
+ * CMIS Join Enum
  * 
- * @author davidc
+ * @author andyh
  */
-public class CMISWithHeadersTest extends CMISTest
+public enum CMISQueryEnum implements EnumLabel
 {
+    NONE("none"),
+    METADATA_ONLY("metadataonly"),
+    FULLTEXT_ONLY("fulltextonly"),
+    BOTH("both");
     
-    @Override
-    protected void setUp()
-        throws Exception
+    
+    private String label;
+    
+    /**
+     * Construct
+     * 
+     * @param label
+     */
+    CMISQueryEnum(String label)
     {
-        super.setUp();
-        setArgsAsHeaders(true);
+        this.label = label;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.cmis.EnumLabel#label()
+     */
+    public String getLabel()
+    {
+        return label;
+    }
+
+    public static EnumFactory<CMISQueryEnum> FACTORY = new EnumFactory<CMISQueryEnum>(CMISQueryEnum.class, null, true);     
 }

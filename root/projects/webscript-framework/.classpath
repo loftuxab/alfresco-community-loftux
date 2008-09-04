@@ -26,12 +26,12 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/abdera/geronimo-activation_1.0.2_spec-1.1.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/json.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/devenv/junit.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.13.jar" sourcepath="/3rd Party/src/freemarker-2.3.13.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-httpclient-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/abdera/abdera-core-0.4.0-incubating.jar" sourcepath="/3rd Party/src/apache-abdera-0.4.0-incubating-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/abdera/abdera-extensions-json-0.4.0-incubating.jar" sourcepath="/3rd Party/src/apache-abdera-0.4.0-incubating-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/abdera/abdera-i18n-0.4.0-incubating.jar" sourcepath="/3rd Party/src/apache-abdera-0.4.0-incubating-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/abdera/abdera-parser-0.4.0-incubating.jar" sourcepath="/3rd Party/src/apache-abdera-0.4.0-incubating-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/junit.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

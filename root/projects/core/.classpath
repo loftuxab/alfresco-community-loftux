@@ -5,10 +5,10 @@
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/commons/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/quartz-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/dom4j-1.6.1.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/devenv/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/guessencoding-1.0.jar" sourcepath="/3rd Party/src/guessencoding-1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jug-lgpl-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/spring-2.0.6.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/junit.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
