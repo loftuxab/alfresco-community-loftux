@@ -40,20 +40,26 @@ public class WebScriptException extends AlfrescoRuntimeException
     private int status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 
-    public WebScriptException(int status, String msgId)
-    {
-        this(msgId);
-        this.status = status;
-    }
-
     public WebScriptException(String msgId)
     {
        super(msgId);
     }
 
+    public WebScriptException(int status, String msgId)
+    {
+        this(msgId);
+        this.status = status;
+    }
+    
     public WebScriptException(String msgId, Throwable cause)
     {
        super(msgId, cause);
+    }
+
+    public WebScriptException(int status, String msgId, Throwable cause)
+    {
+       super(msgId, cause);
+       this.status = status;
     }
 
     public WebScriptException(String msgId, Object ... args)
@@ -61,9 +67,21 @@ public class WebScriptException extends AlfrescoRuntimeException
         super(msgId, args);
     }
 
+    public WebScriptException(int status, String msgId, Object ... args)
+    {
+        super(msgId, args);
+        this.status = status;
+    }
+
     public WebScriptException(String msgId, Throwable cause, Object ... args)
     {
         super(msgId, args, cause);
+    }
+
+    public WebScriptException(int status, String msgId, Throwable cause, Object ... args)
+    {
+        super(msgId, args, cause);
+        this.status = status;
     }
 
     public int getStatus()
