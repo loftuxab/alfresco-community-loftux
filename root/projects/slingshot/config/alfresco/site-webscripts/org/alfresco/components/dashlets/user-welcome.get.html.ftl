@@ -9,21 +9,21 @@ new Alfresco.UserWelcome("${args.htmlid}");
          <div>${msg("text.userDashboard")}</div>
       </div>
       <div class="detail-list-item">
-         <h4>${msg("header.userProfile")}</h4>
-         <div>${msg("text.userProfile")}</div>
-         <div><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.userProfile")}</a></div>
-      </div>
-      <div class="detail-list-item">
          <h4>${msg("header.customiseDashboard")}</h4>
          <div>${msg("text.customiseDashboard")}</div>
          <div><a href="${url.context}/page/customise-user-dashboard">${msg("link.customiseDashboard")}</a></div>
+      </div>
+      <div class="detail-list-item">
+         <h4>${msg("header.userProfile")}</h4>
+         <div>${msg("text.userProfile")}</div>
+         <div><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.userProfile")}</a></div>
       </div>
       <#if sites?size &gt; 0>
          <div class="detail-list-item">
             <h4>${msg("header.mySites")}</h4>
             <div>${msg("text.mySites")}</div>
          <#list sites as site>
-            <div><a href="${url.context}/page/site/${site.shortName}/dashboard" class="site">${site.title}</a></div>
+            <div class="site"><a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a></div>
          </#list>
          </div>
       </#if>

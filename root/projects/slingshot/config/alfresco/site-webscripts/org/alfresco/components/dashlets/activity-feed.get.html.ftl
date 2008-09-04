@@ -1,5 +1,5 @@
 <div class="dashlet">
-   <div class="title">${title!"Activity Feed"}</div>
+   <div class="title">${title!msg("header.activity")}</div>
    <div class="body scrollableList">
 	<#if entries?exists && entries?size &gt; 0>
 		<#list entries as entry>
