@@ -98,18 +98,14 @@ public class FormatRegistry
      */
     public void addFormats(String agent, Map<String, String> formatsToAdd)
     {
-        // retrieve formats list for agent
         Map<String, String> formatsForAgent = formats; 
-        Map<String, String> mimetypesForAgent = mimetypes; 
         if (agent != null)
         {
             formatsForAgent = agentFormats.get(agent);
             if (formatsForAgent == null)
             {
                 formatsForAgent = new HashMap<String, String>();
-                mimetypesForAgent = new HashMap<String, String>();
                 agentFormats.put(agent, formatsForAgent);
-                agentMimetypes.put(agent, mimetypesForAgent);
             }
         }
         
@@ -117,18 +113,54 @@ public class FormatRegistry
         {
             if (logger.isWarnEnabled())
             {
-                String mimetype = formatsForAgent.get(entry.getKey());
-                if (mimetype != null)
+                String val = formatsForAgent.get(entry.getKey());
+                if (val != null)
                 {
-                    logger.warn("Replacing mime type '" + mimetype + "' with '" + entry.getValue() + "' for Web Script format '" + entry.getKey() + "' (agent: " + agent + ")");
+                    logger.warn("Replacing mimetype '" + val + "' with '" + entry.getValue() + "' for format '" + entry.getKey() + "' (agent: " + agent + ")");
                 }
             }
             
             formatsForAgent.put(entry.getKey(), entry.getValue());
-            mimetypesForAgent.put(entry.getValue(), entry.getKey());
-
+            
             if (logger.isDebugEnabled())
-                logger.debug("Registered format '" + entry.getKey() + "' for mime type '" + entry.getValue() + "' (agent: " + agent + ")");
+                logger.debug("Registered format '" + entry.getKey() + "' for mimetype '" + entry.getValue() + "' (agent: " + agent + ")");
+        }
+    }
+
+    /**
+     * Add mimetypes
+     * 
+     * @param agent
+     * @param mimetypesToAdd
+     */
+    public void addMimetypes(String agent, Map<String, String> mimetypesToAdd)
+    {
+        Map<String, String> mimetypesForAgent = mimetypes; 
+        if (agent != null)
+        {
+            mimetypesForAgent = agentMimetypes.get(agent);
+            if (mimetypesForAgent == null)
+            {
+                mimetypesForAgent = new HashMap<String, String>();
+                agentMimetypes.put(agent, mimetypesForAgent);
+            }
+        }
+        
+        for (Map.Entry<String, String> entry : mimetypesToAdd.entrySet())
+        {
+            if (logger.isWarnEnabled())
+            {
+                String val = mimetypesForAgent.get(entry.getKey());
+                if (val != null)
+                {
+                    logger.warn("Replacing format '" + val + "' with '" + entry.getValue() + "' for mimetype '" + entry.getKey() + "' (agent: " + agent + ")");
+                }
+            }
+            
+            mimetypesForAgent.put(entry.getKey(), entry.getValue());
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Registered mimetype '" + entry.getKey() + "' for format '" + entry.getValue() + "' (agent: " + agent + ")");
         }
     }
 
@@ -159,7 +191,7 @@ public class FormatRegistry
 
         return mimetype;
     }
-
+    
     /**
      * Gets the format for the specified user agent and mimetype
      * 
@@ -251,5 +283,5 @@ public class FormatRegistry
         }
         return generalizedMimetype;
     }
-
+    
 }

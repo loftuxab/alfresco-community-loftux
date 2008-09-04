@@ -316,6 +316,23 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         return content;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getContentType()
+     */
+    public String getContentType()
+    {
+        String contentType = req.getContentType();
+        if (contentType == null || contentType.length() == 0)
+        {
+            contentType = super.getContentType();
+        }
+        if (contentType != null && contentType.startsWith("multipart/form-data"))
+        {
+            contentType = "multipart/form-data";
+        }
+        return contentType;
+    }
+    
     /**
      * Get Server Scheme
      * 

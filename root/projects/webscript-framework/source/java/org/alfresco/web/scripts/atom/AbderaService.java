@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.abdera.Abdera;
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.parser.Parser;
@@ -76,6 +77,23 @@ public interface AbderaService
      * @return  entry
      */
     public Entry newEntry();
+
+    /**
+     * Parse Atom
+     * 
+     * @param doc
+     * @param base
+     * @return  entry or feed
+     */
+    public Element parse(InputStream doc, String base);
+
+    /**
+     * Parse Atom
+     * @param doc
+     * @param base
+     * @return  entry or feed
+     */
+    public Element parse(Reader doc, String base);
 
     /**
      * Parse Atom Feed

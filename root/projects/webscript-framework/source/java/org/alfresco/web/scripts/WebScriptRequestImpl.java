@@ -232,7 +232,7 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
                 if (reader != null)
                 {
                     if (logger.isDebugEnabled())
-                        logger.debug("Converting request (mimetype: " + contentType + ") to " + reader.getClass().getName());
+                        logger.debug("Converting request (mimetype: " + contentType + ") to " + reader.getDestinationClass().getName());
                     
                     requestContent = reader.read(this);
                 }

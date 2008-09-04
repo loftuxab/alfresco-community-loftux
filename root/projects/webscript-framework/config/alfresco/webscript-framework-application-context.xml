@@ -68,6 +68,9 @@
          <list>
            <bean class="org.alfresco.web.scripts.servlet.FormDataReader" />
            <bean class="org.alfresco.web.scripts.json.JSONReader" />
+           <bean class="org.alfresco.web.scripts.atom.AtomReader">
+              <property name="abderaService" ref="webscripts.abdera"/>
+           </bean>
            <bean class="org.alfresco.web.scripts.atom.AtomEntryReader">
               <property name="abderaService" ref="webscripts.abdera"/>
            </bean>
@@ -120,9 +123,22 @@
             <prop key="mediawiki">text/plain</prop>
             <prop key="portlet">text/html</prop>
             <prop key="fbml">text/html</prop>
-            <prop key="php">text/htm</prop>
+            <prop key="php">text/html</prop>
             <prop key="js">text/javascript</prop>
             <prop key="calendar">text/calendar</prop>
+         </props>
+      </property>
+      <property name="mimetypes">
+         <props>
+            <prop key="text/html">html</prop>
+            <prop key="text/plain">text</prop>
+            <prop key="text/xml">xml</prop>
+            <prop key="application/atom+xml">atom</prop>
+            <prop key="application/atom+xml;type=entry">atomentry</prop>
+            <prop key="application/atom+xml;type=feed">atomfeed</prop>
+            <prop key="application/rss+xml">rss</prop>
+            <prop key="application/json">json</prop>
+            <prop key="application/opensearchdescription+xml">opensearchdescription</prop>
          </props>
       </property>
    </bean>
@@ -191,7 +207,7 @@
               <bean class="org.alfresco.web.scripts.ScriptLogger"/>
            </entry>
            <entry key="atom">
-              <bean class="org.alfresco.web.scripts.atom.AtomModel">
+              <bean class="org.alfresco.web.scripts.atom.AtomService">
                  <property name="abderaService" ref="webscripts.abdera"/>
               </bean>
            </entry>

@@ -170,6 +170,34 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parse(java.io.InputStream, java.lang.String)
+     */
+    public Element parse(InputStream doc, String base)
+    {
+        Reader inputReader = new InputStreamReader(doc);
+        return parse(inputReader, base);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parse(java.io.Reader, java.lang.String)
+     */
+    public Element parse(Reader doc, String base)
+    {
+        Document<Element> entryDoc;
+        if (base != null && base.length() > 0)
+        {
+            entryDoc = parser.parse(doc, base);
+        }
+        else
+        {
+            entryDoc = parser.parse(doc);
+        }
+
+        Element root = entryDoc.getRoot();
+        return root;
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.atom.AbderaService#parseEntry(java.io.InputStream, java.lang.String)
      */
     public Entry parseEntry(InputStream doc, String base)
@@ -183,17 +211,7 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
      */
     public Entry parseEntry(Reader doc, String base)
     {
-        Document<Element> entryDoc;
-        if (base != null && base.length() > 0)
-        {
-            entryDoc = parser.parse(doc, base);
-        }
-        else
-        {
-            entryDoc = parser.parse(doc);
-        }
-
-        Element root = entryDoc.getRoot();
+        Element root = parse(doc, base);
         if (!Entry.class.isAssignableFrom(root.getClass()))
         {
             throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Expected Atom Entry, but recieved " + root.getClass());
@@ -216,18 +234,8 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
      */
     public Feed parseFeed(Reader doc, String base)
     {
-        Document<Element> feedDoc;
-        if (base != null && base.length() > 0)
-        {
-            feedDoc = parser.parse(doc, base);
-        }
-        else
-        {
-            feedDoc = parser.parse(doc);
-        }
-        
-        Element root = feedDoc.getRoot();
-        if (!Entry.class.isAssignableFrom(root.getClass()))
+        Element root = parse(doc, base);
+        if (!Feed.class.isAssignableFrom(root.getClass()))
         {
             throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Expected Atom Feed, but recieved " + root.getClass());
         }

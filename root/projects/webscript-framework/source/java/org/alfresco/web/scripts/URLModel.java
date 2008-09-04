@@ -50,6 +50,18 @@ public class URLModel
     }
 
     /**
+     * Gets the Server Path
+     * 
+     * e.g.  http://host:port
+     * 
+     * @return  server path
+     */
+    public String getServer()
+    {
+        return req.getServerPath();
+    }
+    
+    /**
      * Gets the Context Path
      * 
      * e.g. /alfresco
