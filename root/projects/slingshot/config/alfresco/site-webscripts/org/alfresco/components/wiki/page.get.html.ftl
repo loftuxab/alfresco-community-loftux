@@ -90,13 +90,15 @@
 			<div class="yui-g" style="background: #CCC;">
 			   <div class="yui-u first"><h2>${result.title!""}</h2></div>
 			   <div class="yui-u">
+			   	<#if versionhistory??>
 			      <div style="float:right">
-			      <select id="${args.htmlid}-selectVersion">
-			      <#list result.versionhistory as version>
-			         <option value="${version.versionId}">${version.version} <#if version_index = 0>(Latest)</#if></option>
-			      </#list>
-			      </select>
+				      <select id="${args.htmlid}-selectVersion">
+				      <#list result.versionhistory as version>
+				         <option value="${version.versionId}">${version.version} <#if version_index = 0>(Latest)</#if></option>
+				      </#list>
+				      </select>
 			      </div>
+			      </#if>
 			   </div>
 			</div>
 			<div id="#page">
