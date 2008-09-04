@@ -18,6 +18,11 @@
    background: url(images/add-event-16.png) no-repeat 10% 50%;
 }
 
+.toolbar div.first
+{
+   width: auto;
+}
+
 .toolbar .first div 
 {
    float: left;
