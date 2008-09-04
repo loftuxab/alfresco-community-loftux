@@ -210,38 +210,18 @@ public class TestWebScriptServer implements ApplicationContextAware
     }
     
     /**
-     * Submit a Web Script Request
+     * Submit a Web Script Request.
      * 
-     * @param method  http method
-     * @param uri  web script uri (relative to /alfresco/service)
-     * @return  response
-     * @throws IOException
-     */ 
-    public MockHttpServletResponse submitRequest(String method, String uri)
-        throws IOException
-    {
-        MockHttpServletRequest req = createRequest(method, uri);
-        MockHttpServletResponse res = new MockHttpServletResponse();
-        AbstractRuntime runtime = new WebScriptServletRuntime(container, null, req, res, getServerProperties());
-        runtime.executeScript();
-        return res;
-    }
-    
-    /**
-     * Submit a Web Script Request
-     * 
-     * @param method  http method
-     * @param uri  web script uri (relative to /alfresco/service)
-     * @param headers  headers
+     * @param req  request
      * @return  response
      * @throws IOException
      */
-    public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers)
+    public Response submitRequest(Request req)
         throws IOException
     {
-        return submitRequest(method, uri, headers, null, null);
+        return submitRequest(req.getMethod(), req.getUri(), req.getHeaders(), req.getBody(), req.getType());
     }
-        
+    
     /**
      * Submit a Web Script Request. 
      * <p>
@@ -255,10 +235,10 @@ public class TestWebScriptServer implements ApplicationContextAware
      * @return              response           
      * @throws IOException
      */
-    public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers, byte[] body, String contentType)
+    public Response submitRequest(String method, String uri, Map<String, String> headers, byte[] body, String contentType)
         throws IOException
     {
-        MockHttpServletRequest req = createRequest(method, uri);
+        MockHttpServletRequest req = createMockServletRequest(method, uri);
         
         // Set the headers
         if (headers != null)
@@ -285,9 +265,54 @@ public class TestWebScriptServer implements ApplicationContextAware
         MockHttpServletResponse res = new MockHttpServletResponse();
         AbstractRuntime runtime = new WebScriptServletRuntime(container, authenticatorFactory, req, res, getServerProperties());
         runtime.executeScript();
-        return res;
-    }    
+        return new MockHttpServletResponseResponse(res);
+    }
     
+    /**
+     * Create a Mock HTTP Servlet Request
+     * 
+     * @param method
+     * @param uri
+     * @return  mock http servlet request
+     * @throws UnsupportedEncodingException 
+     * @throws MalformedURLException 
+     */
+    private MockHttpServletRequest createMockServletRequest(String method, String uri)
+        throws UnsupportedEncodingException, MalformedURLException
+    {
+        // extract only path portions of URI, ignore host & port
+        URL url = new URL(new URL("http://localhost"), uri);
+        String path = url.getPath();
+        
+        if (!(path.startsWith("/alfresco/service") || path.startsWith("/a/s")))
+        {
+            path = "/alfresco/service" + path;
+        }
+        
+        MockHttpServletRequest req = new MockHttpServletRequest(method, uri);
+        req.setContextPath("/alfresco");
+        req.setServletPath("/service");
+
+        if (uri != null)
+        {
+            String queryString = url.getQuery();
+            if (queryString != null && queryString.length() > 0)
+            {
+                String[] args = queryString.split("&");
+                for (String arg : args)
+                {
+                    String[] parts = arg.split("=");
+                    req.addParameter(parts[0], (parts.length == 2) ? URLDecoder.decode(parts[1], "UTF-8") : null);
+                }
+                req.setQueryString(URLDecoder.decode(queryString, "UTF-8"));
+            }
+            String requestURI = path;
+            req.setRequestURI(URLDecoder.decode(requestURI, "UTF-8"));
+        }
+        
+        return req;
+    }
+
     /**
      * A Read-Eval-Print loop.
      */
@@ -402,7 +427,7 @@ public class TestWebScriptServer implements ApplicationContextAware
                  command[0].equals("delete"))
         {
             String uri = (command.length > 1) ? command[1] : null;
-            MockHttpServletResponse res = submitRequest(command[0], uri, headers);
+            Response res = submitRequest(command[0], uri, headers, null, null);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
@@ -418,7 +443,7 @@ public class TestWebScriptServer implements ApplicationContextAware
             {
                 body += command[i] + " ";
             }
-            MockHttpServletResponse res = submitRequest(command[0], uri, headers, body.getBytes(), contentType);
+            Response res = submitRequest(command[0], uri, headers, body.getBytes(), contentType);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
@@ -434,7 +459,7 @@ public class TestWebScriptServer implements ApplicationContextAware
             {
                 body += command[i] + " ";
             }
-            MockHttpServletResponse res = submitRequest(command[0], uri, headers, body, contentType);
+            Response res = submitRequest(command[0], uri, headers, body.getBytes(), contentType);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
@@ -459,7 +484,7 @@ public class TestWebScriptServer implements ApplicationContextAware
                 {
                     uri += "&alf:method=" + command[2];
                 }
-                MockHttpServletResponse res = submitRequest("post", uri, headers);
+                Response res = submitRequest("post", uri, headers, null, null);
                 bout.write(res.getContentAsByteArray());
                 out.println();
             }
@@ -469,7 +494,7 @@ public class TestWebScriptServer implements ApplicationContextAware
                 Map<String, String> tunnelheaders = new HashMap<String, String>();
                 tunnelheaders.putAll(headers);
                 tunnelheaders.put("X-HTTP-Method-Override", command[2]);
-                MockHttpServletResponse res = submitRequest("post", command[3], tunnelheaders);
+                Response res = submitRequest("post", command[3], tunnelheaders, null, null);
                 bout.write(res.getContentAsByteArray());
                 out.println();
             }
@@ -534,6 +559,7 @@ public class TestWebScriptServer implements ApplicationContextAware
         return retVal;
     }
 
+<<<<<<< .working
     /**
      * Create a Mock HTTP Servlet Request
      * 
@@ -577,6 +603,222 @@ public class TestWebScriptServer implements ApplicationContextAware
         }
         
         return req;
+    }
+=======
+>>>>>>> .merge-right.r9795
+    /**
+     * A Web Script Test Request
+     */
+    public static class Request
+    {
+        private String method;
+        private String uri;
+        private Map<String, String> args;
+        private Map<String, String> headers;
+        private byte[] body;
+        private String contentType;
+        
+        public Request(Request req)
+        {
+            this.method = req.method;
+            this.uri= req.uri;
+            this.args = req.args;
+            this.headers = req.headers;
+            this.body = req.body;
+            this.contentType = req.contentType;
+        }
+        
+        public Request(String method, String uri)
+        {
+            this.method = method;
+            this.uri = uri;
+        }
+        
+        public String getMethod()
+        {
+            return method;
+        }
+        
+        public String getUri()
+        {
+            return uri;
+        }
+        
+        public String getFullUri()
+        {
+            // calculate full uri
+            String fullUri = uri == null ? "" : uri;
+            if (args != null && args.size() > 0)
+            {
+                char prefix = (uri.indexOf('?') == -1) ? '?' : '&';
+                for (Map.Entry<String, String> arg : args.entrySet())
+                {
+                    fullUri += prefix + arg.getKey() + "=" + (arg.getValue() == null ? "" : arg.getValue());
+                    prefix = '&';
+                }
+            }
+            
+            return fullUri;
+        }
+        
+        public Request setArgs(Map<String, String> args)
+        {
+            this.args = args;
+            return this;
+        }
+        
+        public Map<String, String> getArgs()
+        {
+            return args;
+        }
+
+        public Request setHeaders(Map<String, String> headers)
+        {
+            this.headers = headers;
+            return this;
+        }
+        
+        public Map<String, String> getHeaders()
+        {
+            return headers;
+        }
+        
+        public Request setBody(byte[] body)
+        {
+            this.body = body;
+            return this;
+        }
+        
+        public byte[] getBody()
+        {
+            return body;
+        }
+        
+        public Request setType(String contentType)
+        {
+            this.contentType = contentType;
+            return this;
+        }
+        
+        public String getType()
+        {
+            return contentType;
+        }
+    }
+    
+    /**
+     * Test GET Request
+     */
+    public static class GetRequest extends Request
+    {
+        public GetRequest(String uri)
+        {
+            super("get", uri);
+        }
+    }
+
+    /**
+     * Test POST Request
+     */
+    public static class PostRequest extends Request
+    {
+        public PostRequest(String uri, String post, String contentType)
+        {
+            this(uri, post.getBytes(), contentType);
+        }
+
+        public PostRequest(String uri, byte[] post, String contentType)
+        {
+            super("post", uri);
+            setBody(post);
+            setType(contentType);
+        }
+    }
+
+    /**
+     * Test PUT Request
+     */
+    public static class PutRequest extends Request
+    {
+        public PutRequest(String uri, String put, String contentType)
+        {
+            this(uri, put.getBytes(), contentType);
+        }
+        
+        public PutRequest(String uri, byte[] put, String contentType)
+        {
+            super("put", uri);
+            setBody(put);
+            setType(contentType);
+        }
+    }
+
+    /**
+     * Test DELETE Request
+     */
+    public static class DeleteRequest extends Request
+    {
+        public DeleteRequest(String uri)
+        {
+            super("delete", uri);
+        }
+    }
+
+    /**
+     * A Web Script Test Response
+     */
+    public interface Response
+    {
+        public byte[] getContentAsByteArray();
+        
+        public String getContentAsString()
+            throws UnsupportedEncodingException;
+        
+        public String getHeader(String name);
+        
+        public String getContentType();
+        
+        public int getStatus();
+    }
+    
+    /**
+     * Test Response wrapping a MockHttpServletResponse
+     */
+    public static class MockHttpServletResponseResponse
+        implements Response
+    {
+        private MockHttpServletResponse res;
+        
+        public MockHttpServletResponseResponse(MockHttpServletResponse res)
+        {
+            this.res = res;
+        }
+
+        public byte[] getContentAsByteArray()
+        {
+            return res.getContentAsByteArray();
+        }
+
+        public String getContentAsString()
+            throws UnsupportedEncodingException
+        {
+            return res.getContentAsString();
+        }
+
+        public String getHeader(String name)
+        {
+            return (String)res.getHeader(name);
+        }
+        
+        public String getContentType()
+        {
+            return res.getContentType();
+        }
+        
+        public int getStatus()
+        {
+            return res.getStatus();
+        }
     }
 
 }

@@ -50,9 +50,9 @@ Document (inc. Object) properties:
       IS_LATEST_VERSION  -> TRUE  (FALSE if PWC)
       IS_MAJOR_VERSION  -> VersionService().getCurrentVersion().getVersionType() == VersionType.MAJOR   (FALSE if PWC)
       IS_LATEST_MAJOR_VERSION  -> IS_MAJOR_VERSION
-      VERSION_SERIES_IS_CHECKED_OUT  -> TRUE if cm:lockable.lockType == readonly
-      VERSON_SERIES_CHECKED_OUT_BY  -> cm:lockable.lockOwner
-      VERSION_SERIES_CHECKED_OUT_ID  -> if cm:lockable.lockType == readonly then COCI.getWorkingCopy
+      VERSION_SERIES_IS_CHECKED_OUT  -> TRUE if COCI.getWorkingCopy is not null
+      VERSON_SERIES_CHECKED_OUT_BY  ->  if COCI.getWorkingCopy is not null cm:lockable.lockOwner
+      VERSION_SERIES_CHECKED_OUT_ID  -> if COCI.getWorkingCopy is not null then COCI.getWorkingCopy
       CHECKIN_COMMENT  -> VersionService().getCurrentVersion().getDescription()
       CONTENT_STREAM_ALLOWED  -> true 
       CONTENT_STREAM_LENGTH  -> cm:content.size
