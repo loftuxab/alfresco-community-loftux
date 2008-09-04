@@ -739,6 +739,8 @@ public class TestWebScriptServer implements ApplicationContextAware
         
         public String getContentType();
         
+        public int getContentLength();
+        
         public int getStatus();
     }
     
@@ -775,7 +777,12 @@ public class TestWebScriptServer implements ApplicationContextAware
         {
             return res.getContentType();
         }
-        
+
+        public int getContentLength()
+        {
+            return res.getContentLength();
+        }
+
         public int getStatus()
         {
             return res.getStatus();
