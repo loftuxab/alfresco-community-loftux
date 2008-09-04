@@ -63,7 +63,7 @@ public class IndexPackage extends DeclarativeWebScript
         Path path = getContainer().getRegistry().getPackage(packagePath);
         if (path == null)
         {
-            throw new WebScriptException("Web Script Package '" + packagePath + "' not found");
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, "Web Script Package '" + packagePath + "' not found");
         }
         
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);

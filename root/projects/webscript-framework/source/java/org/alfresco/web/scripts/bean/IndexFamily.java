@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.cmis.rest;
+package org.alfresco.web.scripts.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -33,17 +33,18 @@ import java.util.Map;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Description;
+import org.alfresco.web.scripts.Path;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScript;
+import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 
-
 /**
- * Index of CMIS Scripts
+ * Index of Scripts within a Family
  * 
  * @author davidc
  */
-public class Index extends DeclarativeWebScript
+public class IndexFamily extends DeclarativeWebScript
 {
 
     /* (non-Javadoc)
@@ -52,22 +53,26 @@ public class Index extends DeclarativeWebScript
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
     {
-        List<WebScript> cmisScripts = new ArrayList<WebScript>();
-        
-        // scan through all web scripts looking for CMIS specific ones
-        Collection<WebScript> webscripts = getContainer().getRegistry().getWebScripts();
-        for (WebScript webscript : webscripts)
+        // extract web script package
+        String familyPath = req.getExtensionPath();
+        if (familyPath == null || familyPath.length() == 0)
         {
-            Description desc = webscript.getDescription();
-            Map<String, Serializable> extensions = desc.getExtensions();
-            if (extensions != null && extensions.get("cmis_version") != null)
-            {
-                cmisScripts.add(webscript);
-            }
+            familyPath = "/";
         }
-            
+        if (!familyPath.startsWith("/"))
+        {
+            familyPath = "/" + familyPath;
+        }
+        
+        // locate web script package
+        Path path = getContainer().getRegistry().getFamily(familyPath);
+        if (path == null)
+        {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, "Web Script Family '" + familyPath + "' not found");
+        }
+        
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);
-        model.put("services",  cmisScripts);
+        model.put("family",  path);
         return model;
     }
 

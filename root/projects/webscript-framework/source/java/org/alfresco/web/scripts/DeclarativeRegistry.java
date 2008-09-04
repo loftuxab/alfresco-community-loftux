@@ -83,6 +83,9 @@ public class DeclarativeRegistry
     // map of web script uris by path
     private Map<String, PathImpl> uriByPath = new TreeMap<String, PathImpl>();
 
+    // map of web script families by path
+    private Map<String, PathImpl> familyByPath = new TreeMap<String, PathImpl>();
+    
     // uri index for mapping a URI to a Web Script
     private UriIndex uriIndex;
     
@@ -185,6 +188,8 @@ public class DeclarativeRegistry
         packageByPath.put("/", new PathImpl("/"));
         uriByPath.clear();
         uriByPath.put("/", new PathImpl("/"));
+        familyByPath.clear();
+        familyByPath.put("/", new PathImpl("/"));
         
         // register services
         for (Store apiStore : searchPath.getStores())
@@ -318,6 +323,7 @@ public class DeclarativeRegistry
                     Path scriptPath = registerPackage(serviceImpl);
                     serviceDesc.setPackage(scriptPath);
                     registerURIs(serviceImpl);
+                    registerFamily(serviceImpl);
                 }
                 catch(WebScriptException e)
                 {
@@ -368,7 +374,34 @@ public class DeclarativeRegistry
         path.addScript(script);
         return path;
     }
-    
+
+    /**
+     * Register a Web Script Family
+     * 
+     * @param script
+     */
+    private void registerFamily(WebScript script)
+    {
+        Description desc = script.getDescription();
+        String family = desc.getFamily();
+        if (family != null && family.length() > 0)
+        {
+            PathImpl path = familyByPath.get("/");
+            String[] parts = family.split("/");
+            for (String part : parts)
+            {
+                PathImpl subpath = familyByPath.get(PathImpl.concatPath(path.getPath(), part));
+                if (subpath == null)
+                {
+                    subpath = path.createChildPath(part);
+                    familyByPath.put(subpath.getPath(), subpath);
+                }      
+                path = subpath;
+            }
+            path.addScript(script);
+        }
+    }
+
     /**
      * Register a Web Script URI
      * 
@@ -672,6 +705,14 @@ public class DeclarativeRegistry
     public Path getUri(String scriptUri)
     {
         return uriByPath.get(scriptUri);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Registry#getFamily(java.lang.String)
+     */
+    public Path getFamily(String scriptUri)
+    {
+        return familyByPath.get(scriptUri);
     }
 
     /* (non-Javadoc)

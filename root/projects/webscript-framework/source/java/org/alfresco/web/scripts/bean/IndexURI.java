@@ -63,7 +63,7 @@ public class IndexURI extends DeclarativeWebScript
         Path path = getContainer().getRegistry().getUri(uriPath);
         if (path == null)
         {
-            throw new WebScriptException("Web Script URI '" + uriPath + "' not found");
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, "Web Script URI '" + uriPath + "' not found");
         }
         
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);

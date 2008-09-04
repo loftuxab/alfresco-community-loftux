@@ -288,6 +288,7 @@
    <bean id="webscript.org.alfresco.index.get" class="org.alfresco.web.scripts.bean.Index" parent="webscript" singleton="false"/>
    <bean id="webscript.org.alfresco.indexall.get" class="org.alfresco.web.scripts.bean.IndexAll" parent="webscript" singleton="false"/>
    <alias name="webscript.org.alfresco.index.get" alias="webscript.org.alfresco.indexfailures.get"/>
+   <bean id="webscript.org.alfresco.indexfamily.get" class="org.alfresco.web.scripts.bean.IndexFamily" parent="webscript" singleton="false" />
    <bean id="webscript.org.alfresco.indexuri.get" class="org.alfresco.web.scripts.bean.IndexURI" parent="webscript" singleton="false" />
    <bean id="webscript.org.alfresco.indexpackage.get" class="org.alfresco.web.scripts.bean.IndexPackage" parent="webscript" singleton="false" />
    <bean id="webscript.org.alfresco.index.post" class="org.alfresco.web.scripts.bean.IndexUpdate" parent="webscript" singleton="false" >
