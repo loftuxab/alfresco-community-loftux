@@ -1,5 +1,5 @@
 <webscript>
-   <shortname>Activity Feed</shortname>
+   <shortname>Site Activities</shortname>
    <description>Lists recent activities for a given site.</description>
    <family>site-dashlet</family>
    <url>/components/dashlets/activityfeed</url>

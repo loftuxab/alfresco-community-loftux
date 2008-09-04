@@ -6,6 +6,7 @@ div.dashlet.user-welcome div.detail-list-item h4
 {
    color:#038603;
    padding-bottom: 0.5em;
+   padding-top:0.3em;
 }
 
 div.dashlet.user-welcome div.detail-list-item div
@@ -18,11 +19,17 @@ div.dashlet.user-welcome a
    color: #4F94C9
 }
 
-div.dashlet.user-welcome a.site
+div.dashlet.user-welcome div.detail-list-item div.site
 {
-   background-image: url(../images/site-16.png);
+   background-image: url(../images/site-24.png);
    background-repeat: no-repeat;
-   padding-left: 1.8em;
+   line-height: 2.2em;
+   padding-left: 3em;
+}
+
+div.dashlet.user-welcome div.site a
+{
+
 }
 
 

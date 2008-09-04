@@ -31,12 +31,12 @@
          <div class="detail-list-item">
             <h4>${msg("header.onlineHelp")}</h4>
             <div>${msg("text.onlineHelp")}</div>
-            <div><a href="#">${msg("link.onlineHelp")}</a></div>
+            <div><a href="http://www.alfresco.com/help/3/EUHelp">${msg("link.onlineHelp")}</a></div>
          </div>
          <div class="detail-list-item last">
             <h4>${msg("header.featureTour")}</h4>
             <div>${msg("text.featureTour")}</div>
-            <div><a href="#">${msg("link.featureTour")}</a></div>
+            <div><a href="http://www.alfresco.com/help/3/Tutorial">${msg("link.featureTour")}</a></div>
          </div>
       </#if>
    </div>                                                    
