@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.template;
+package org.alfresco.web.scripts;
 
 import java.util.List;
 
@@ -33,15 +33,13 @@ import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
 
 /**
- * @author David Caruana
- * 
  * Custom FreeMarker Template language method.
  * <p>
- * Encode URL for HTML.
+ * Encode a URL Path.
  * <p>
- * Usage: urlencode(String url)
+ * Usage: pathencode(String url)
  */
-public class UrlEncodeMethod extends BaseTemplateProcessorExtension implements TemplateMethodModelEx
+public class UrlEncodeMethod implements TemplateMethodModelEx
 {
     /**
      * @see freemarker.template.TemplateMethodModel#exec(java.util.List)
@@ -55,7 +53,7 @@ public class UrlEncodeMethod extends BaseTemplateProcessorExtension implements T
             Object arg0 = args.get(0);
             if (arg0 instanceof TemplateScalarModel)
             {
-                result = URLEncoder.encode(((TemplateScalarModel)arg0).getAsString());
+                result = URLEncoder.encodeUri(((TemplateScalarModel)arg0).getAsString());
             }
         }
         

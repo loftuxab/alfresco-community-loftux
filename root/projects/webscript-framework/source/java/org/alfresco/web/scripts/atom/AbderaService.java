@@ -34,6 +34,7 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Service;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
 
@@ -94,6 +95,24 @@ public interface AbderaService
      * @return  entry or feed
      */
     public Element parse(Reader doc, String base);
+
+    /**
+     * Parse APP Service
+     * 
+     * @param doc  document to parse
+     * @param base  (optional) base path for relative references
+     * @return  service
+     */
+    public Service parseService(InputStream doc, String base);
+
+    /**
+     * Parse APP Service
+     * 
+     * @param doc  document to parse
+     * @param base  (optional) base path for relative references
+     * @return  service
+     */
+    public Service parseService(Reader doc, String base);
 
     /**
      * Parse Atom Feed

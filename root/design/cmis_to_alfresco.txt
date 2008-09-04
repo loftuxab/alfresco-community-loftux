@@ -54,7 +54,7 @@ Document (inc. Object) properties:
       VERSON_SERIES_CHECKED_OUT_BY  -> cm:lockable.lockOwner
       VERSION_SERIES_CHECKED_OUT_ID  -> if cm:lockable.lockType == readonly then COCI.getWorkingCopy
       CHECKIN_COMMENT  -> VersionService().getCurrentVersion().getDescription()
-      CONTENT_STREAM_ALLOWED  -> cm:content property exists ? true : false
+      CONTENT_STREAM_ALLOWED  -> true 
       CONTENT_STREAM_LENGTH  -> cm:content.size
       CONTENT_STREAM_MIMETYPE  -> cm:content.mimetype
       CONTENT_STREAM_FILENAME  -> cm:name

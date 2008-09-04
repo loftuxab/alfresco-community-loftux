@@ -156,6 +156,8 @@ public abstract class AbstractRuntimeContainer
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
         params.put("date", new Date());
+        params.put("argreplace", new ArgReplaceMethod());
+        params.put("encodeuri", new UrlEncodeMethod());
         
         return Collections.unmodifiableMap(params);
     }

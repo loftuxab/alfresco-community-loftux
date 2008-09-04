@@ -43,6 +43,7 @@ import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Service;
 import org.apache.abdera.parser.Parser;
 import org.apache.abdera.writer.Writer;
 import org.springframework.beans.factory.InitializingBean;
@@ -166,6 +167,29 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parseService(java.io.InputStream, java.lang.String)
+     */
+    public Service parseService(InputStream doc, String base)
+    {
+        Reader inputReader = new InputStreamReader(doc);
+        return parseService(inputReader, base);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parseService(java.io.Reader, java.lang.String)
+     */
+    public Service parseService(Reader doc, String base)
+    {
+        Element root = parse(doc, base);
+        if (!Service.class.isAssignableFrom(root.getClass()))
+        {
+            throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Expected APP Service, but recieved " + root.getClass());
+        }
+        
+        return (Service)root;
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.atom.AbderaService#parseEntry(java.io.InputStream, java.lang.String)
      */
     public Entry parseEntry(InputStream doc, String base)
@@ -246,5 +270,5 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     {
         factory.registerExtension(extensionFactory);
     }
-    
+
 }
