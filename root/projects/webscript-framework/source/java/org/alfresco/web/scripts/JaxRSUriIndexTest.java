@@ -211,7 +211,16 @@ public class JaxRSUriIndexTest extends TestCase
         Map<String, String> values5 = i5.match("/a/bb/c");
         assertEquals(2, values5.size());
         assertEquals("b", values5.get("b"));
-        assertEquals("c", values5.get("c"));
+        assertEquals("c", values5.get("c"));        
+    }
+    
+    
+    public void testTemplateDotMatch()
+    {
+        UriTemplate i1 = new UriTemplate("/a/b/{b}/c");
+        Map<String, String> values1 = i1.match("/a/b/x/y/z.ext/c");
+        assertEquals(1, values1.size());
+        assertEquals("x/y/z.ext", values1.get("b"));
     }
     
     

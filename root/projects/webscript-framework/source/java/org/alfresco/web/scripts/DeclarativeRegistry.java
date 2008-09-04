@@ -245,12 +245,14 @@ public class DeclarativeRegistry
                     ApplicationContext applicationContext = getApplicationContext();
                     String kind = serviceDesc.getKind();
                     String serviceImplName = null;
+                    String descImplName = null;
                     if (kind == null)
                     {
                         // rely on default mapping of webscript id to service implementation
                         // NOTE: always fallback to vanilla Declarative Web Script
                         String beanName = "webscript." + id.replace('/', '.');
                         serviceImplName = (applicationContext.containsBean(beanName) ? beanName : defaultWebScript);
+                        descImplName = "webscriptdesc." + id.replace('/', '.');
                     }
                     else
                     {
@@ -260,10 +262,10 @@ public class DeclarativeRegistry
                             throw new WebScriptException("Web Script kind '" + kind + "' is unknown");
                         }
                         serviceImplName = "webscript." + kind;
+                        descImplName = "webscriptdesc." + kind;
                     }
                     
                     // extract service specific description extensions
-                    String descImplName = serviceImplName.replaceFirst("webscript\\.", "webscriptdesc.");
                     if (applicationContext.containsBean(descImplName) && applicationContext.isTypeMatch(descImplName, DescriptionExtension.class))
                     {
                         DescriptionExtension descriptionExtensions = (DescriptionExtension)applicationContext.getBean(descImplName);
