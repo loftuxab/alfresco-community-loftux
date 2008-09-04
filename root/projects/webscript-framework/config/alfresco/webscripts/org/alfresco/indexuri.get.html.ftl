@@ -1,25 +1,14 @@
+<#import "/org/alfresco/webscripts.lib.html.ftl" as wsLib/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head> 
-    <title>Index of Web Scripts URI '${uri.path}'</title> 
-    <link rel="stylesheet" href="${url.context}/css/main.css" TYPE="text/css">
-  </head>
+  <@wsLib.head>Index of Web Scripts URI '${uri.path}'</@wsLib.head>
   <body>
-   <table>
-     <tr>
-        <td><img src="${url.context}/images/logo/AlfrescoLogo32.png" alt="Alfresco" /></td>
-        <td><nobr><span class="title">Index of Web Scripts URI '${uri.path}'</span></nobr></td>
-     </tr>
-     <tr><td><td>${uri.scripts?size} Web Scripts
-    </table>
-    <br>
-    <table>
-      <tr><td><a href="${url.serviceContext}/index">Back to Web Scripts Home</a>
-      <#if uri.parent?exists>
-         <tr><td><a href="${url.serviceContext}/index/uri${uri.parent.path}">Up to ${uri.parent.path}</a>
-      </#if>
-    </table>
-    <br>
+   <div>
+   <@wsLib.indexheader size=uri.scripts?size>Index of Web Scripts URI '${uri.path}'</@wsLib.indexheader>
+    <br/>
+    <@wsLib.home/>
+    <@wsLib.parent path=uri pathname="uri"/>
+    <br/>
     <#if uri.children?size &gt; 0>
        <table>
           <@recurseuri uri=uri/>
@@ -55,5 +44,6 @@
     </table>
     <br>
     </#list>
+    </div>
   </body>
 </html>
