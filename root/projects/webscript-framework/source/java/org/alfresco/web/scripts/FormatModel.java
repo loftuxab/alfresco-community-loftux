@@ -22,77 +22,51 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.scripts.atom;
+package org.alfresco.web.scripts;
 
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
-import org.apache.abdera.model.Entry;
-import org.apache.abdera.model.Feed;
 
 /**
- * Atom Model
+ * Format Model
  * 
  * @author davidc
  */
-public class AtomModel
+public class FormatModel
 {
-    private AbderaService abderaService;
-    
-    /**
-     * Sets the Abdera Service
-     * 
-     * @param abderaService
-     */
-    public void setAbderaService(AbderaService abderaService)
-    {
-       this.abderaService = abderaService; 
-    }
-    
-    /**
-     * Construct an empty Feed
-     * 
-     * @return  feed
-     */
-    public Feed newFeed()
-    {
-        return abderaService.newFeed();
-    }
-    
-    /**
-     * Construct an empty Entry
-     * 
-     * @return  entry
-     */
-    public Entry newEntry()
-    {
-        return abderaService.newEntry();
-    }
-    
-    /**
-     * Gets pre-configured Atom Extensions (QNames)
-     * 
-     * @return  map of QNames by alias
-     */
-    public Map<String, QName> getQNames()
-    {
-        return abderaService.getQNameExtensions();
-    }
-    
+    private FormatRegistry registry;
+    private String format;
 
-//    TODO: To consider... 
-// 
-//    public Entry parseEntry(Content content)
-//    {
-//        // TODO:
-//        return null;
-//    }
-//    
-//    public Feed parseFeed(Content content)
-//    {
-//        // TODO:
-//        return null;
-//    }
+
+    /**
+     * Construct
+     * 
+     * @param registry  format registry
+     * @param name  format name
+     */
+    FormatModel(FormatRegistry registry, String name)
+    {
+        this.registry = registry;
+        this.format = name;
+    }
+
+    /**
+     * Gets the format name
+     * 
+     * @return  format name
+     */
+    public String getName()
+    {
+        return format;
+    }
+
+    /**
+     * Gets the format mime/content type
+     * 
+     * @return  mime/content type
+     */
+    public String getType()
+    {
+        String type = registry.getMimeType(null, format);
+        return (type == null) ? "" : type;
+    }
     
 }
