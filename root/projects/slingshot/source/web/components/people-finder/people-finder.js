@@ -106,6 +106,15 @@
          singleSelectMode: false,
          
          /**
+          * User Profile mode flag
+          * 
+          * @property userProfileMode
+          * @type boolean
+          * @default false
+          */
+         userProfileMode: false,
+         
+         /**
           * Number of characters required for a search.
           * 
           * @property minSearchTermLength
@@ -383,6 +392,7 @@
          var renderCellAddButton = function PeopleFinder_renderCellAddButton(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.setStyle(elCell.parentNode, "text-align", "right");
             
             var userName = oRecord.getData("userName");
             var desc = '<span id="' + me.id + '-select-' + userName + '"></span>';
@@ -392,7 +402,7 @@
             var button = new YAHOO.widget.Button(
             {
                type: "button",
-               label: me._msg("button.add") + " >>",
+               label: me._msg(me.options.userProfileMode ? "button.view-profile" : "button.add") + " >>",
                name: me.id + "-selectbutton-" + userName,
                container: me.id + '-select-' + userName,
                onclick:
@@ -419,7 +429,7 @@
             key: "person", label: "Description", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: 80
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: this.options.userProfileMode ? 200 : 80
          }];
 
          // DataTable definition

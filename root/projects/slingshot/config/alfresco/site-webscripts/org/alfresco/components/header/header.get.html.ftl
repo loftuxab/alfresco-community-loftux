@@ -24,14 +24,15 @@
          <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name?url}/dashboard">${msg("link.myDashboard")}</a></span>
          <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.myProfile")}</a></span>
          <span class="menu-item-icon sites"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
+         <span class="menu-item-icon people"><a href="${url.context}/page/people-finder">${msg("link.people")}</a></span>
       </div>
       </#if>
 
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
          <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
-         <#if (! isGuest)>
+         <#if !isGuest>
          <span class="menu-item-separator">|</span>
-         <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")} (${user.name?html})</a></span>
+         <span class="menu-item"><a href="${url.context}/logout" title="${msg("link.logout.tooltip", user.name?html)}">${msg("link.logout")}</a></span>
          <span class="menu-item-separator">|</span>
          <span class="menu-item">
             <span class="search-container">
