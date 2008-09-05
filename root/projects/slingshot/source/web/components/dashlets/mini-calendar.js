@@ -113,7 +113,7 @@
    		var html = "", item;
    		if (events && events.length > 0)
    		{
-   			var title = Alfresco.util.formatDate(date, "fullDate");
+   			var title = Alfresco.util.formatDate(date, "ddd, d mmm yyyy");
 				var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/calendar?date=" + theDate;
    			html += '<div class="detail-list-item">'
    			html += '<div class="icon"><img src="' + Alfresco.constants.URL_CONTEXT + '/components/calendar/images/calendar-16.png" alt="day" /></div>'
