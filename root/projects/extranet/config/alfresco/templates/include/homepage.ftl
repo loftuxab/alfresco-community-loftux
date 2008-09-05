@@ -58,24 +58,11 @@
 <!-- narrow column -->
 <div class="yui-b">
 
-	<!-- Login Component -->
-	<div class="roundbox">
-		<div class="inner1">
-			<div class="inner2">
-				<div class="inner3">
-					<div class="inner4">
-						<form class="login-form" action="/extranet/login">
-							<strong>New to the Community?</strong> Join Now for free access to Documentation, Webinars, White Papers, and more.
-							<ul class="form-holder">
-								<li><label>User Name:</label> <input type="text" class="text" name="username" /></li>
-								<li><label>Password:</label> <input type="password" class="text" name="password" /></li>
-								<li><input type="submit" class="button" value="Login" /> <a href="?pt=lostpassword">Lost your password?</a></li>
-							</ul>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
+	<!-- Download Button -->
+	<div>
+
+<a href="http://wiki.alfresco.com/wiki/Installing_Labs_3"><img src="images/download-button-labs.png" alt="Download Alfresco Labs" width="300" height="36" style="padding-bottom:10px;"/></a>
+
 	</div>
 	
 	<!-- Community Downloads -->
