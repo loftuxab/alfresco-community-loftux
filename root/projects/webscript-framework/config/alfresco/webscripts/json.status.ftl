@@ -9,12 +9,12 @@
   
   <#-- Exception details -->
   "message" : "${jsonUtils.encodeJSONString(status.message)}",  
-  "exception" : "<#if status.exception?exists>${jsonUtils.encodeJSONString(status.exception.class.name)}<#if status.exception.message?exists> - ${jsonUtils.encodeJSONString(status.exception.message)}</#if></#if>",
+  "exception" : "<#if status.exception??>${jsonUtils.encodeJSONString(status.exception.class.name)}<#if status.exception.message??> - ${jsonUtils.encodeJSONString(status.exception.message)}</#if></#if>",
   
   <#-- Exception call stack --> 
   "callstack" : 
   [ 
-  	  <#if status.exception?exists><@recursestack status.exception/></#if> 
+  	  <#if status.exception??>""<@recursestack exception=status.exception/></#if> 
   ],
   
   <#-- Server details and time stamp -->
@@ -22,19 +22,17 @@
   "time" : "${date?datetime}"
 }
 
-<#-- TODO ... need to remove the extra comma from the list below -->
-
 <#macro recursestack exception>
-   <#if exception.cause?exists>
+   <#if exception.cause??>
       <@recursestack exception=exception.cause/>
    </#if>
-   <#if exception.cause?exists == false>
-      ,"${jsonUtils.encodeJSONString(exception)}"
+   <#if !exception.cause??>
+      ,"${jsonUtils.encodeJSONString(exception?string)}"
       <#list exception.stackTrace as element>
-      ,"${jsonUtils.encodeJSONString(element)}"
-      </#list>  
+      ,"${jsonUtils.encodeJSONString(element?string)}"
+      </#list>
    <#else>
-      ,"${jsonUtils.encodeJSONString(exception)}"
-      ,"${jsonUtils.encodeJSONString(exception.stackTrace[0])}"
+      ,"${jsonUtils.encodeJSONString(exception?string)}"
+      ,"${jsonUtils.encodeJSONString(exception.stackTrace[0]?string)}"
    </#if>
 </#macro>

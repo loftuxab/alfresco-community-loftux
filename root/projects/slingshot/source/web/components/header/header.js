@@ -81,7 +81,6 @@
          this.defaultSearchText();
          
          // register the "enter" event on the search text field
-         //var zinput = document.getElementById(this.id + "-searchtext");
          var zinput = YAHOO.util.Dom.get(this.id + "-searchtext");
          var me = this;
          new YAHOO.util.KeyListener(zinput, 
@@ -157,41 +156,31 @@
       },
       
       /**
-       * Will trigger a search, either through page refresh or a bubble event
+       * Will trigger a search, via a page refresh to ensure the Back button works correctly
        */
       doSearch: function()
       {
          var searchTerm = YAHOO.util.Dom.get(this.id + "-searchtext").value;
-         var searchAll =  (this.options.searchType == "all");
-
-         if (this.searchExists)
+         if (searchTerm.length != 0)
          {
-            // fire a bubble event to issue a new search
-            // we only need to supply the term and whether in-site should be searched
-            var data = {
-                searchTerm: searchTerm,
-                searchAll: searchAll
-            }
-            YAHOO.Bubbling.fire("onSearch", data);
-         }
-         else
-         {
+            var searchAll =  (this.options.searchType == "all");
+            
             // redirect to the search page
             var url = Alfresco.constants.URL_CONTEXT + "page/";
-            if (this.options.siteId.length > 0)
+            if (this.options.siteId.length != 0)
             {
                url += "site/" + this.options.siteId + "/";
             }
-            url += "search?t=" + searchTerm;
-            if (this.options.siteId.length > 0)
+            url += "search?t=" + encodeURIComponent(searchTerm);
+            if (this.options.siteId.length != 0)
             {
                url += "&a=" + searchAll;
             }
-            window.location =  url;
+            window.location = url;
          }
       },
-
-	  _getToggleLabel: function(type)
+      
+	   _getToggleLabel: function(type)
       {
          if (type == 'all')
          {

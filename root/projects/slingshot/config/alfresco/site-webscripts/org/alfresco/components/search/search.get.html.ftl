@@ -4,7 +4,7 @@
       siteId: "${siteId}",
       siteName: "${siteName}",
       containerId: "",
-      initialSearchTerm: "${searchTerm?html}",
+      initialSearchTerm: "${searchTerm?js_string}",
       initialSearchAll: "${searchAll?string}"
    }).setMessages(
       ${messages}

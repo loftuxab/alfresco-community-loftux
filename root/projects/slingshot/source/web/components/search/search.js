@@ -219,7 +219,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["index", "nodeRef", "qnamePath", "type", "icon32", "name", "displayName", "title", "downloadUrl", "browseUrl", "site", "container", "tags"]
+             fields: ["index", "nodeRef", "type", "name", "displayName", "title", "browseUrl", "site", "container", "tags"]
          };
          
          // setup of the datatable.
@@ -265,24 +265,48 @@
           */
          renderCellThumbnail = function Search_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var name = oRecord.getData("name");
-            var extn = name.substring(name.lastIndexOf("."));
-
             oColumn.width = 100;
+            oColumn.height = 100;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.setStyle(elCell.parentNode, "height", oColumn.height + "px");
+            Dom.setStyle(elCell.parentNode, "text-align", "center");
             
             var url = me._getBrowseUrlForRecord(oRecord);
-            var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/generic-result.png'; //  oRecord.getData("icon32").substring(1);
+            var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/generic-result.png';
             
-            // use the preview image for the document
-            if (oRecord.getData("type") == "file")
+            // use the preview image for a document type
+            switch (oRecord.getData("type"))
             {
-               imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
-               imageUrl += "/content/thumbnails/doclib?c=queue&ph=true";
+               case "file":
+                  imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
+                  imageUrl += "/content/thumbnails/doclib?c=queue&ph=true";
+                  break;
+               
+               case "folder":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/folder.png';
+                  break;
+               
+               case "blogpost":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/blog-post.png';
+                  break;
+               
+               case "topicpost":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/topic-post.png';
+                  break;
+               
+               case "calendarevent":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/calendar-event.png';
+                  break;
+               
+               case "wikipage":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/wiki-page.png';
+                  break;
             }
             
             // Render the cell
-            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + extn + '" /></a></span>';
+            var name = oRecord.getData("displayName");
+            var htmlName = Alfresco.util.encodeHTML(name);
+            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
          };
 
          /**
@@ -296,40 +320,86 @@
           */
          renderCellDescription = function Search_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
+            // apply styles
+            Dom.setStyle(elCell.parentNode, "line-height", "1.5em");
+            
             // we currently render all results the same way
             var site = oRecord.getData("site");
             var url = me._getBrowseUrlForRecord(oRecord);
+            
             // title/link to view page
             var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
+            
+            // type information
+            desc += '<div class="details">';
+            desc += me._msg("message.type");
+            desc += ': ';
+            switch (oRecord.getData("type"))
+            {
+               case "file":
+                  desc += me._msg("label.document");
+                  break;
+               
+               case "folder":
+                  desc += me._msg("label.folder");
+                  break;
+               
+               case "blogpost":
+                  desc += me._msg("label.blogpost");
+                  break;
+               
+               case "topicpost":
+                  desc += me._msg("label.forumpost");
+                  break;
+               
+               case "calendarevent":
+                  desc += me._msg("label.calendarevent");
+                  break;
+               
+               case "wikipage":
+                  desc += me._msg("label.wikipage");
+                  break;
+               
+               default:
+                  desc += me._msg("label.unknown");
+            }
+            desc += '</div>';
+            
             // link to the site
             desc += '<div class="detail">';
             desc += me._msg("message.insite");
             desc += ': <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
             desc += '</div>';
-            desc += '<div class="details">';
-            desc += me._msg("message.tags");
-            desc += ': ';
+            
+            // tags (if any)
             var tags = oRecord.getData("tags");
-            for (var x=0; x < tags.length; x++)
+            if (tags.length != 0)
             {
-                desc += '<span id="' + me.id + '-searchByTag-' + Alfresco.util.encodeHTML(tags[x]) + '"><a class="search-tag">' + Alfresco.util.encodeHTML(tags[x]) + '</a> </span>';
+               desc += '<div class="details">';
+               desc += me._msg("message.tags");
+               desc += ': ';
+               for (var x=0; x < tags.length; x++)
+               {
+                   desc += '<span id="' + me.id + '-searchByTag-' + Alfresco.util.encodeHTML(tags[x]) + '"><a class="search-tag" href="#">' + Alfresco.util.encodeHTML(tags[x]) + '</a> </span>';
+               }
+               desc += '</div>';
             }
-            desc += '</div>';
+            
             elCell.innerHTML = desc;
          };
 
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 100
+            key: "image", label: me._msg("message.preview"), sortable: false, formatter: renderCellThumbnail, width: 100
          },
          {
-            key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
+            key: "summary", label: me._msg("message.desc"), sortable: false, formatter: renderCellDescription
          }];
 
          // show initial message
          this._setDefaultDataTableErrors();
-         if (this.options.initialSearchTerm.length < 1)
+         if (this.options.initialSearchTerm.length == 0)
          {
             YAHOO.widget.DataTable.MSG_EMPTY = "";
          }
@@ -511,6 +581,7 @@
                catch(e)
                {
                   this._setDefaultDataTableErrors();
+                  this.widgets.dataTable.render();
                }
             }
          }
