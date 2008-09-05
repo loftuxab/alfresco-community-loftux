@@ -8,7 +8,7 @@ function main()
 		var sites = eval('(' + result + ')');
       if(sites.length > 2)
       {
-         sites = [sites[0], sites[1], sites[2]];
+         sites = sites.slice(sites.length - 3);
       }
 
       // Prepare the model for the template
