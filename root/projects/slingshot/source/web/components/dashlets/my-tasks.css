@@ -1,3 +1,9 @@
+.my-tasks .toolbar .yui-button,
+.my-tasks .toolbar .yui-button span.first-child
+{
+   border: medium none;
+}
+
 .my-tasks .task-icon
 {
    float: left;
@@ -7,25 +13,6 @@
 .my-tasks .task-details
 {
    padding-left: 2.5em;
-}
-
-.my-tasks .toolbar a,
-.my-tasks .toolbar a:visited
-{
-   padding: 3px 4px;
-}
-
-.my-tasks .toolbar a:active,
-.my-tasks .toolbar a:hover
-{
-   text-decoration: none;
-}
-
-.my-tasks .toolbar a.active,
-.my-tasks .toolbar a.active:visited
-{
-   background-color: #d4e9f7;
-   color: #000;
 }
 
 .my-tasks .separator
