@@ -791,7 +791,7 @@
          Alfresco.logger.debug("DLCT_onPathChanged");
 
          // ensure path starts with leading slash if not the root node
-         if ((path != "") && (path.substring(0, 1) != "/"))
+         if ((path != "") && (path.charAt(0) != "/"))
          {
             path = "/" + path;
          }

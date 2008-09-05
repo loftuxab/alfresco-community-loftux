@@ -110,13 +110,15 @@
 .toolbar span.crumb
 {
    font-size: 100%;
+   line-height: 1.4em;
 }
 
 .toolbar span.folder
 {
    background-image: url(images/folder-closed-16.png);
+   background-position: left 50%;
    background-repeat: no-repeat;
-   padding-left: 20px;
+   padding: 2px 0 2px 20px;
 }
 
 .toolbar .rss-feed

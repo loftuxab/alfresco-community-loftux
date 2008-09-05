@@ -271,7 +271,7 @@
        */
       onNewFolder: function DLTB_onNewFolder(e, p_obj)
       {
-         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
+         var parentFolder = (this.currentPath.charAt(0) == "/") ? this.currentPath.substring(1) : this.currentPath;
          
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/site/{site}/{container}/{path}",
          {
@@ -465,7 +465,7 @@
             return;
          }
 
-         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
+         var parentFolder = (this.currentPath.charAt(0) == "/") ? this.currentPath.substring(1) : this.currentPath;
          var files = this.modules.docList.getSelectedFiles();
          
          if (!this.modules.copyTo)
@@ -501,7 +501,7 @@
             return;
          }
 
-         var parentFolder = (this.currentPath[0] == "/") ? this.currentPath.substring(1) : this.currentPath;
+         var parentFolder = (this.currentPath.charAt(0) == "/") ? this.currentPath.substring(1) : this.currentPath;
          var files = this.modules.docList.getSelectedFiles();
          
          if (!this.modules.moveTo)
