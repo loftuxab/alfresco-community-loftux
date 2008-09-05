@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>People Finder</title>
+   <description>People finder page</description>
+   <template-instance>people-finder</template-instance>
+   <authentication>user</authentication>
+</page>
