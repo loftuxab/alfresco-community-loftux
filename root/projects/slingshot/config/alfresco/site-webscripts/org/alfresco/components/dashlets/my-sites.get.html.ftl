@@ -28,7 +28,11 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
                      <span id="${args.htmlid}-delete-span-${site_index}" class="delete" title="${msg("link.deleteSite")}">&nbsp;</span>
                   </div>
                </div>
-               <#if site.description?exists && site.description != ""><div class="description">${site.description?html}</div></#if>
+            <#if site.description?exists && site.description != "">
+               <div class="description">${site.description?html}</div>
+            <#else>
+               <div class="clear"></div>
+            </#if>
             </div>
          </#list>
          <#else>
