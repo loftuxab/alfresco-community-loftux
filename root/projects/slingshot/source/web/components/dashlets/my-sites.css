@@ -1,20 +1,16 @@
-.my-sites .detail-list-item
-{
-   height: 2.2em;
-}
 .my-sites div.site
 {
    float: left;
    background-image: url(../images/site-24.png);
    background-repeat: no-repeat;
    line-height: 2.2em;
-   padding-left: 3em;
+   padding-left: 32px;
 }
 
 .my-sites div.actions
 {
    float: right;
-   line-height:2.2em;
+   line-height: 2.2em;
 }
 
 .my-sites div.actions span.delete
@@ -24,4 +20,9 @@
    background-position: center;
    padding: 1em;
    cursor: pointer;
+}
+
+.my-sites .description
+{
+   clear: left;
 }

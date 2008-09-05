@@ -30,6 +30,7 @@
 .dashlet .body
 {
 	background-color: #f5f9fc;
+	overflow-x: hidden;
    padding:1px 9px;
 }
 

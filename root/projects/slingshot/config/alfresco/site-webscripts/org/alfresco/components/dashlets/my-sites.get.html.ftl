@@ -20,14 +20,15 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
       <#if sites??>
          <#list sites as site>
             <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if (!site_has_next)>last</#if>">
-               <div class="site">
-                  <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a>
+               <div>
+                  <div class="site">
+                     <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a>
+                  </div>
+                  <div class="actions">
+                     <span id="${args.htmlid}-delete-span-${site_index}" class="delete" title="${msg("link.deleteSite")}">&nbsp;</span>
+                  </div>
                </div>
-               <div class="actions">
-                  <span id="${args.htmlid}-delete-span-${site_index}"
-                     class="delete"
-                     title="${msg("link.deleteSite")}">&nbsp;</span>
-               </div>
+               <#if site.description?exists && site.description != ""><div class="description">${site.description?html}</div></#if>
             </div>
          </#list>
          <#else>
