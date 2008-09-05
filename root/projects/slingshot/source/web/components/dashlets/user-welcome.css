@@ -1,12 +1,12 @@
 div.dashlet.user-welcome .body {
-   background-color:#FEFFFD;
+   background-color: #FEFFFD;
 }
 
 div.dashlet.user-welcome div.detail-list-item h4
 {
-   color:#038603;
+   color: #038603;
    padding-bottom: 0.5em;
-   padding-top:0.3em;
+   padding-top: 0.3em;
 }
 
 div.dashlet.user-welcome div.detail-list-item div
@@ -24,7 +24,7 @@ div.dashlet.user-welcome div.detail-list-item div.site
    background-image: url(../images/site-24.png);
    background-repeat: no-repeat;
    line-height: 2.2em;
-   padding-left: 3em;
+   padding-left: 32px;
 }
 
 div.dashlet.user-welcome div.site a
