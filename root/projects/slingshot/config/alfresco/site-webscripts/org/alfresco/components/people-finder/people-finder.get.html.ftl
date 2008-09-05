@@ -8,7 +8,7 @@
    );
 //]]></script>
 
-<div id="${args.htmlid}-body" class="people-finder">
+<div id="${args.htmlid}-body" class="people-finder list">
    <div class="title">${msg("title")}</div>
    
    <div class="finder-wrapper">
