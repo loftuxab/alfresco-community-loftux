@@ -28,8 +28,9 @@
             </div>
          </div>
          <div class="yui-g"> 
-            <div class="yui-u first"> 
+            <div class="yui-u first">
                <@region id="document-info" scope="template" protected=true />
+               <@region id="document-versions" scope="template" protected=true />
             </div>
             <div class="yui-u">
                <@region id="document-actions" scope="template" protected=true />
