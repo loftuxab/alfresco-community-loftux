@@ -3,7 +3,7 @@
 [#macro head]
 <head>
    <title>[#nested]</title> 
-   <link rel="stylesheet" href="${url.context}/css/base.css" type="text/css" />
+   <link rel="stylesheet" href="${url.context}/css/main.css" type="text/css" />
 </head>
 [/#macro]
 
