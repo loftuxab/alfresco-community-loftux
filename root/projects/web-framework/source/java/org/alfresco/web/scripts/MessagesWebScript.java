@@ -94,6 +94,8 @@ public class MessagesWebScript extends AbstractWebScript
             if (result == null)
             {
                 Writer writer = new StringBuilderWriter(8192);
+                writer.write("if (typeof Alfresco == \"undefined\" || !Alfresco) {var Alfresco = {};}\r\n");
+                writer.write("Alfresco.messages = Alfresco.messages || {global: null, scope: {}}\r\n");
                 writer.write("Alfresco.messages.global = ");
                 JSONWriter out = new JSONWriter(writer);
                 try

@@ -3,7 +3,7 @@
    Template "head" macro.
    Includes preloaded YUI assets and essential site-wide libraries.
 -->                                                                           
-<#assign DEBUG=false>
+<#assign DEBUG=true>
 
 <#macro header doctype="strict">
 <#if doctype = "strict">
@@ -51,8 +51,8 @@
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
    <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
    <script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></script>
-   <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
+   <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants.DEBUG = ${DEBUG?string};
