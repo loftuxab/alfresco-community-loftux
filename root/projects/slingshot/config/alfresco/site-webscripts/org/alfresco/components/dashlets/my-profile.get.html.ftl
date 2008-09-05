@@ -4,7 +4,6 @@
       <a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.viewFullProfile")}</a>
    </div>
    <div class="body profile">
-      
       <div class="photorow">
          <div class="photo">
             <#if user.properties.avatar??>
@@ -30,9 +29,8 @@
          <div class="fieldvalue">${user.properties["skype"]!""}</div>
       </div>
       <div class="row">
-         <div class="fieldlabelright">${msg("label.msn")}:</div>
-         <div class="fieldvalue">${user.properties["msn"]!""}</div>
-      </div>   
-    
+         <div class="fieldlabelright">${msg("label.im")}:</div>
+         <div class="fieldvalue">${user.properties["instantmsg"]!""}</div>
+      </div>
    </div>
 </div>
