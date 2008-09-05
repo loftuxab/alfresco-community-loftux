@@ -443,7 +443,7 @@
          while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath)));
          
          this.currentPath = bookmarkedPath || this.options.initialPath || "";
-         if ((this.currentPath.length > 0) && (this.currentPath[0] != "/"))
+         if ((this.currentPath.length > 0) && (this.currentPath.charAt(0) != "/"))
          {
             this.currentPath = "/" + this.currentPath;
          }

@@ -544,7 +544,7 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
    var template = Alfresco.constants.URI_TEMPLATES[templateId];
    
    // Page context end with trailing "/", so remove any leading one from the URI template
-   if (template[0] == "/")
+   if (template.charAt(0) == "/")
    {
       template = template.substring(1);
    }
@@ -2045,9 +2045,9 @@ Alfresco.thirdparty.dateFormat = function()
    				 ss:   pad(s),
    				 l:    pad(L, 3),
    				 L:    pad(L > 99 ? Math.round(L / 10) : L),
-   				 t:    H < 12 ? this.TIME_AM[0] : this.TIME_PM[0],
+   				 t:    H < 12 ? this.TIME_AM.charAt(0) : this.TIME_PM.charAt(0),
    				 tt:   H < 12 ? this.TIME_AM : this.TIME_PM,
-   				 T:    H < 12 ? this.TIME_AM[0].toUpperCase() : this.TIME_PM[0].toUpperCase(),
+   				 T:    H < 12 ? this.TIME_AM.charAt(0).toUpperCase() : this.TIME_PM.charAt(0).toUpperCase(),
    				 TT:   H < 12 ? this.TIME_AM.toUpperCase() : this.TIME_PM.toUpperCase(),
    				 Z:    (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
    				 o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4)

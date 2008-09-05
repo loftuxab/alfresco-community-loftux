@@ -437,7 +437,7 @@
          if ((obj !== null) && (obj.path !== null))
          {
             // ensure path starts with leading slash if not the root node
-            if ((obj.path != "") && (obj.path.substring(0, 1) != "/"))
+            if ((obj.path != "") && (obj.path.charAt(0) != "/"))
             {
                obj.path = "/" + obj.path;
             }
@@ -545,7 +545,7 @@
                destPath = obj.destination;
                
                // ensure path starts with leading slash if not the root node
-               if ((destPath != "") && (destPath.substring(0, 1) != "/"))
+               if ((destPath != "") && (destPath.charAt(0) != "/"))
                {
                   destPath = "/" + destPath;
                }
@@ -582,7 +582,7 @@
          if ((obj !== null) && (obj.path !== null))
          {
             // ensure path starts with leading slash if not the root node
-            if ((obj.parentPath != "") && (obj.parentPath.substring(0, 1) != "/"))
+            if ((obj.parentPath != "") && (obj.parentPath.charAt(0) != "/"))
             {
                obj.parentPath = "/" + obj.parentPath;
             }
@@ -607,7 +607,7 @@
             if (obj.path)
             {
                // ensure path starts with leading slash if not the root node
-               if ((obj.path != "") && (obj.path.substring(0, 1) != "/"))
+               if ((obj.path != "") && (obj.path.charAt(0) != "/"))
                {
                   obj.path = "/" + obj.path;
                }
@@ -658,7 +658,7 @@
                var dest = obj.destination;
 
                // ensure path starts with leading slash if not the root node
-               if ((dest != "") && (dest.substring(0, 1) != "/"))
+               if ((dest != "") && (dest.charAt(0) != "/"))
                {
                   dest = "/" + dest;
                }
