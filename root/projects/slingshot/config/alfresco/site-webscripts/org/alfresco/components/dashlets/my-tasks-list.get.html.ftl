@@ -7,7 +7,7 @@
 </#macro>
 <#if myTasks?exists && myTasks.tasks?size &gt; 0>
    <#list myTasks.tasks?sort_by("dueDate") as task>
-      <#assign overdue = ((task.dueDate != "") && (dateCompare(date?date, task.dueDate?date) == 1))>
+      <#assign overdue = ((task.dueDate != "") && (dateCompare(date?date, task.dueDate?date("yyyy-MM-dd")) == 1))>
       <div class="detail-list-item">
          <div class="task-icon">
             <span class="priority<#if overdue> overdue</#if>">${task.priority}</span>

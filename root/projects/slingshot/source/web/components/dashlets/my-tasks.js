@@ -130,40 +130,32 @@
       onReady: function MyTasks_onReady()
       {
          var me = this;
-         
-         // Hook events for filters
-         var fnFilterHandler = function MyTasks_fnFilterHandler(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
-            if (owner !== null)
-            {
-               var filter = owner.className;
-               me.onFilterChanged.call(me, filter);
-               args[1].stop = true;
-            }
-            return true;
-         }
-         YAHOO.Bubbling.addDefaultAction("task-filter", fnFilterHandler);
 
-         this.widgets.dueOnMenu = new YAHOO.widget.Menu(this.id + "-dueDate-menu",
+         // "All" filter
+         this.widgets.all = new YAHOO.widget.Button(this.id + "-all",
          {
-            context: [this.id + "-filter-dueOn", "tl", "bl"]
+            type: "checkbox",
+            value: "all",
+            checked: true
          });
-         this.widgets.dueOnMenu.render();
-
-         // Hook menu events for Due Date menu
-         var fnMenuHandler = function MyTasks_fnMenuHandler(layer, args)
+         this.widgets.all.on("checkedChange", this.onAllCheckedChanged, this, true);
+         
+         // Dropdown filter
+         this.widgets.dueOn = new YAHOO.widget.Button(this.id + "-dueOn",
          {
-            var owner = YAHOO.Bubbling.getOwnerByClassName(args[1].anchor, "yuimenuitem");
-            if (owner !== null)
+            type: "split",
+            menu: this.id + "-dueOn-menu"
+         });
+         this.widgets.dueOn.on("click", this.onDateFilterClicked, this, true);
+         this.widgets.dueOn.getMenu().subscribe("click", function (p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
             {
-               var dateFilter = owner.className;
-               me.onDateFilter.call(me, dateFilter);
-               args[1].stop = true;
+               me.widgets.dueOn.set("label", menuItem.cfg.getProperty("text"));
+               me.onDateFilterChanged.call(me, p_aArgs[1]);
             }
-            return true;
-         }
-         YAHOO.Bubbling.addDefaultAction("yuimenuitemlabel", fnMenuHandler);
+         });         
          
          // Hook events for task transitions
          var fnTaskHandler = function MyTasks_fnTaskHandler(layer, args)
@@ -184,7 +176,6 @@
          this.taskList = Dom.get(this.id + "-taskList");
          
          // Populate the task list
-         this.setActiveFilter("all");
          this.populateTaskList("all");
       },
       
@@ -241,30 +232,21 @@
        * Sets the active filter highlight in the UI
        * @method setActiveFilter
        * @param filter {string} The current filter
-       * @param dateFilter {string} The date filter subtype
        */
-      setActiveFilter: function MyTasks_setActiveFilter(filter, dateFilter)
+      setActiveFilter: function MyTasks_setActiveFilter(filter)
       {
-         var filters = YAHOO.util.Selector.query("a.task-filter", this.id);
-         var elFilter, parent;
-         for (var i = 0, j = filters.length; i < j; i++)
+         switch (filter)
          {
-            elFilter = filters[i];
-            parent = elFilter.parentNode;
-            if (Dom.hasClass(parent, filter))
-            {
-               if (filter == "dueOn")
-               {
-                  var dateMsg = this._msg("filter.due-on." + dateFilter);
-                  Dom.get(this.id + "-filter-dueOn").innerHTML = this._msg("filter.due-on", dateMsg);
-               }
-               Dom.addClass(elFilter, "active");
-            }
-            else
-            {
-               Dom.removeClass(elFilter, "active");
-            }
+            case "all":
+               Dom.removeClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
+               break;
+            
+            default:
+               this.widgets.all.set("checked", false);
+               Dom.addClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
+               break;
          }
+         
       },
       
       /**
@@ -278,57 +260,54 @@
 
 
       /**
+       * YUI WIDGET EVENT HANDLERS
+       * Handlers for standard events fired from YUI widgets, e.g. "click"
+       */
+
+      /**
+       * All tasks
+       * @method onAllCheckedChanged
+       * @param p_oEvent {object} Button event
+       */
+      onAllCheckedChanged: function MyTasks_onAllCheckedChanged(p_oEvent)
+      {
+         if (p_oEvent.newValue)
+         {
+            this.setActiveFilter("all");
+            this.populateTaskList("all");
+         }
+      },
+
+      /**
+       * Date button clicked event handler
+       * @method onDateFilterClicked
+       * @param p_oEvent {object} Dom event
+       */
+      onDateFilterClicked: function MyTasks_onDateFilterClicked(p_oEvent)
+      {
+         var filter = p_oEvent.target.value;
+         this.setActiveFilter(filter);
+         this.populateTaskList(filter);
+      },
+      
+      /**
+       * Date drop-down changed event handler
+       * @method onDateFilterChanged
+       * @param p_oMenuItem {object} Selected menu item
+       */
+      onDateFilterChanged: function MyTasks_onDateFilterChanged(p_oMenuItem)
+      {
+         var filter = p_oMenuItem.value;
+         this.widgets.dueOn.value = filter;
+         this.setActiveFilter(filter);
+         this.populateTaskList(filter);
+      },
+
+
+      /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR ACTIONS
        * Disconnected event handlers for action event notification
        */
-
-      /**
-       * Filter changed event handler
-       * @method onFilterChanged
-       * @param filter {string} Filter name
-       */
-      onFilterChanged: function MyTasks_onFilterChanged(filter)
-      {
-         switch (filter)
-         {
-            case "dueOn":
-               this.widgets.dueOnMenu.show();
-               break;
-
-            default:
-               this.setActiveFilter(filter);
-               this.populateTaskList(filter);
-               break;
-         }
-      },
-
-      /**
-       * Date filter changed event handler
-       * @method onDateFilter
-       * @param dateFilter {string} Date filter name
-       */
-      onDateFilter: function MyTasks_onDateFilter(dateFilter)
-      {
-         this.widgets.dueOnMenu.hide();
-         var filters = dateFilter.split(" ");
-         var filter;
-         
-         for (var i = 0, j = filters.length; i < j; i++)
-         {
-            filter = filters[i];
-            switch (filter)
-            {
-               // Deliberate falling through...
-               case "today":
-               case "tomorrow":
-               case "this-week":
-               case "next-week":
-                  this.setActiveFilter("dueOn", filter);
-                  this.populateTaskList(filter);
-                  break;
-            }
-         }
-      },
 
       /**
        * Task transition event handler

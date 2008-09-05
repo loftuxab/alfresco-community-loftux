@@ -14,36 +14,16 @@
 <div class="dashlet my-tasks">
    <div class="title">${msg("header")}</div>
    <div class="toolbar">
-      <span class="all"><a href="#" class="task-filter">${msg("filter.all")}</a></span>
-      <span class="separator">|</span>
-      <span class="dueOn">
-         <a href="#" class="task-filter">
-            <span id="${args.htmlid}-filter-dueOn">${msg("filter.due-on", msg("filter.due-on.today"))}</span>
-            <img src="${url.context}/yui/assets/skins/${theme}/menu-button-arrow.png" alt="expand" />
-         </a>
-      </span>
-      <span class="separator">|</span>
-      <span class="overdue"><a href="#" class="task-filter">${msg("filter.overdue")}</a></span>
-      <span class="separator">|</span>
-      <span class="no-due-date"><a href="#" class="task-filter">${msg("filter.no-due-date")}</a></span>
-      <div id="${args.htmlid}-dueDate-menu" class="yuimenu">
-         <div class="bd">
-            <ul class="first-of-type">
-               <li class="yuimenuitem today">
-                  <a class="yuimenuitemlabel" href="#">${msg("filter.due-on.today")}</a>
-               </li>
-               <li class="yuimenuitem tomorrow">
-                  <a class="yuimenuitemlabel" href="#">${msg("filter.due-on.tomorrow")}</a>
-               </li>
-               <li class="yuimenuitem this-week">
-                  <a class="yuimenuitemlabel" href="#">${msg("filter.due-on.this-week")}</a>
-               </li>
-               <li class="yuimenuitem next-week">
-                  <a class="yuimenuitemlabel" href="#">${msg("filter.due-on.next-week")}</a>
-               </li>
-            </ul>
-         </div>
-      </div>
+      <input id="${args.htmlid}-all" type="checkbox" name="all" value="${msg("filter.all")}" checked />
+      <input id="${args.htmlid}-dueOn" type="button" name="dueOn" value="${msg("filter.today")}" />
+      <select id="${args.htmlid}-dueOn-menu">
+         <option value="today">${msg("filter.today")}</option>
+         <option value="tomorrow">${msg("filter.tomorrow")}</option>
+         <option value="this-week">${msg("filter.this-week")}</option>                
+         <option value="next-week">${msg("filter.next-week")}</option>
+         <option value="overdue">${msg("filter.overdue")}</option>
+         <option value="no-due-date">${msg("filter.no-due-date")}</option>                
+      </select>
    </div>
    <div id="${args.htmlid}-taskList" class="body scrollableList">
    </div>
