@@ -113,6 +113,12 @@
             <source-id>user/${userid}/dashboard</source-id>
             <url>/components/dashlets/my-sites</url>
          </component>
+         <component>
+            <scope>page</scope>
+            <region-id>component-3-3</region-id>
+            <source-id>user/${userid}/dashboard</source-id>
+            <url>/components/dashlets/my-tasks</url>
+         </component>
       </components>
       <pages>
          <page id="user/${userid}/dashboard">
