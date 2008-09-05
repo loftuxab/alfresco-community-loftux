@@ -87,6 +87,11 @@
    background-image: url(images/select-none-16.png);
 }
 
+.toolbar .rss-feed
+{
+   padding: 0.5em;
+}
+
 
 /* Navigation Bar */
 
@@ -96,9 +101,9 @@
    border-bottom: 2px solid #c7ccce;
 }
 
-.toolbar .breadcrumb,
-.toolbar .rss-feed
+.toolbar .breadcrumb
 {
+   float: none !important;
    padding: 0.5em;
 }
 
