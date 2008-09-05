@@ -359,7 +359,8 @@
           */
          var renderCellDescription = function PeopleFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var name = oRecord.getData("userName");
+            var userName = oRecord.getData("userName");
+            var name = userName;
             var firstName = oRecord.getData("firstName");
             var lastName = oRecord.getData("lastName");
             if ((firstName !== undefined) || (lastName !== undefined))
@@ -371,9 +372,9 @@
             var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
             var organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
             var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
-               {
-                  userid: name
-               });
+            {
+               userid: userName
+            });
             desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + '>' + $html(name) + '</a></h3>';
             if (title.length != 0)
             {
