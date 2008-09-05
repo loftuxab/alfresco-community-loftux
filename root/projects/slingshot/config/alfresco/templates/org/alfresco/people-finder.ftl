@@ -3,30 +3,14 @@
 <script type="text/javascript">//<![CDATA[
 YAHOO.util.Event.onContentReady("bd", function()
 {
-   var Dom = YAHOO.util.Dom;
-   
    // Find the People Finder by name
    var peopleFinder = Alfresco.util.ComponentManager.findFirst("Alfresco.PeopleFinder");
    
    // Set the correct options for our use
    peopleFinder.setOptions(
    {
-      userProfileMode: true
+      peopleListMode: true
    });
-
-   YAHOO.Bubbling.on("personSelected", onPersonSelected, this);
-   
-   function onPersonSelected(layer, args)
-   {
-      var obj = args[1];
-      if (obj && obj.userName)
-      {
-         document.location.href = Alfresco.util.uriTemplate("userprofilepage",
-         {
-            userid: obj.userName
-         });
-      }
-   }
 });
 //]]></script>
 </@>

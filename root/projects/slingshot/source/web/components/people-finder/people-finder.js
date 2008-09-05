@@ -106,13 +106,13 @@
          singleSelectMode: false,
          
          /**
-          * User Profile mode flag
+          * People List mode flag
           * 
-          * @property userProfileMode
+          * @property peopleListMode
           * @type boolean
           * @default false
           */
-         userProfileMode: false,
+         peopleListMode: false,
          
          /**
           * Number of characters required for a search.
@@ -210,17 +210,21 @@
       onReady: function PeopleFinder_onReady()
       {  
          var me = this;
-
-         // Compact mode?
+         
+         // Compact mode, list mode or other?
          if (this.options.compactMode)
          {
             Dom.addClass(this.id + "-body", "compact");
+         }
+         else if (this.options.peopleListMode)
+         {
+            Dom.setStyle(this.id + "-results", "height", "auto");
          }
          else
          {
             Dom.setStyle(this.id + "-results", "height", "300px");
          }
-
+         
          // Search button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
 
@@ -355,7 +359,6 @@
           */
          var renderCellDescription = function PeopleFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            // Currently rendering all results the same way
             var name = oRecord.getData("userName");
             var firstName = oRecord.getData("firstName");
             var lastName = oRecord.getData("lastName");
@@ -364,18 +367,35 @@
                name = firstName ? firstName + " " : "";
                name += lastName ? lastName : "";
             }
-
+            
             var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
             var organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
-            desc = '<h3 class="itemname">' + $html(name) + '</a></h3>';
-            desc += '<div class="detail">' + $html(title) + '</div>';
-            if (me.options.compactMode && organisation != "")
+            var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
+               {
+                  userid: name
+               });
+            desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + '>' + $html(name) + '</a></h3>';
+            if (title.length != 0)
             {
-               desc += '<div class="detail">&nbsp;(' + $html(organisation) + ')</div>';
+               if (me.options.compactMode)
+               {
+                  desc += '<div class="detail">' + $html(title) + '</div>';
+               }
+               else
+               {
+                  desc += '<div class="detail"><span>' + me._msg("label.title") + ":</span> " + $html(title) + '</div>';
+               }
             }
-            else
+            if (organisation.length != 0)
             {
-               desc += '<div class="detail">' + $html(organisation) + '</div>';
+               if (me.options.compactMode)
+               {
+                  desc += '<div class="detail">&nbsp;(' + $html(organisation) + ')</div>';
+               }
+               else
+               {
+                  desc += '<div class="detail"><span>' + me._msg("label.company") + ":</span> " + $html(organisation) + '</div>';
+               }
             }
             elCell.innerHTML = desc;
          };
@@ -397,26 +417,29 @@
             var userName = oRecord.getData("userName");
             var desc = '<span id="' + me.id + '-select-' + userName + '"></span>';
             elCell.innerHTML = desc;
-
-            // create button
-            var button = new YAHOO.widget.Button(
-            {
-               type: "button",
-               label: me._msg(me.options.userProfileMode ? "button.view-profile" : "button.add") + " >>",
-               name: me.id + "-selectbutton-" + userName,
-               container: me.id + '-select-' + userName,
-               onclick:
-               {
-                  fn: me.onPersonSelect,
-                  obj: oRecord,
-                  scope: me
-               }
-            });
-            me.userSelectButtons[userName] = button;
             
-            if ((userName in me.selectedUsers) || (me.options.singleSelectMode && me.singleSelectedUser != ""))
+            // create button if require - it is not required in the plain people list mode
+            if (!me.options.peopleListMode)
             {
-               me.userSelectButtons[userName].set("disabled", true);
+               var button = new YAHOO.widget.Button(
+               {
+                  type: "button",
+                  label: me._msg("button.add") + " >>",
+                  name: me.id + "-selectbutton-" + userName,
+                  container: me.id + '-select-' + userName,
+                  onclick:
+                  {
+                     fn: me.onPersonSelect,
+                     obj: oRecord,
+                     scope: me
+                  }
+               });
+               me.userSelectButtons[userName] = button;
+               
+               if ((userName in me.selectedUsers) || (me.options.singleSelectMode && me.singleSelectedUser != ""))
+               {
+                  me.userSelectButtons[userName].set("disabled", true);
+               }
             }
          };
 
@@ -429,7 +452,7 @@
             key: "person", label: "Description", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: this.options.userProfileMode ? 200 : 80
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: 80
          }];
 
          // DataTable definition
