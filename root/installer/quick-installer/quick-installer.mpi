@@ -1054,6 +1054,7 @@ File ::549CBEF3-942E-44C0-AF25-62833770BD6A -name custom-activities-feed-context
 File ::46D2734A-056D-433A-90B9-DB2F3CCF9FBE -name custom-activities-SqlMapConfig.xml.sample -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
 File ::B038A868-D6E7-4C11-A4D5-D25E8AE0F312 -name custom-activities-feed-context.xml -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
 File ::FA413D46-E082-48F1-B55F-189E4593C2C2 -name custom-activities-SqlMapConfig.xml -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
+File ::8AF6A44A-F1B9-4553-B579-2932B7CFADDB -name remote-openoffice-context.xml.sample -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
 File ::33575C48-05DC-40DD-806D-B49FB075669F -type dir -name messages -parent C1B7B9FE-5A62-45F8-ADBA-113A2CCBAC27
 File ::F21EBDBA-2BD2-478A-B309-967D28F4C229 -name bpm-messages_fi_FI.properties -parent 33575C48-05DC-40DD-806D-B49FB075669F
 File ::E553119C-46FF-427F-800B-F30CA7AE5AF1 -name copy-service_fi_FI.properties -parent 33575C48-05DC-40DD-806D-B49FB075669F
@@ -2635,13 +2636,13 @@ File ::CDE494CF-3CD1-4AEC-84EC-4CC825CB12EE -name servlets-default.jar -parent F
 File ::3482A291-ED3A-42A8-A3F3-68E2A94B0857 -name servlets-invoker.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::B09E7BCE-6DFF-47CA-B32E-27F884D1B036 -name servlets-ssi.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::C0D43D8C-DB48-4CC6-9926-8E2E891507FE -name servlets-webdav.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
-File ::623821B0-AF4E-4377-977A-BE8176151122 -name spring-2.0.2.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::0AD192EB-4BB7-4615-9305-CCE30670900A -name tomcat-ajp.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::8D381491-B5DF-4518-A16B-68BA32548853 -name tomcat-apr.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::04C585B9-389A-4F34-9586-6E2115AF83F6 -name tomcat-coyote.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::72167256-D976-4551-92A4-344F610E2147 -name tomcat-http.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::49B06FED-C81A-4532-B5A3-69C340AAB641 -name tomcat-jkstatus-ant.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::651453C0-F6A1-4372-8765-C4FC55E79FEA -name tomcat-util.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
+File ::BB054C3E-773E-4C77-A5D6-E0BD584D587E -name spring-2.0.6.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::1DE86765-3E12-45CB-8525-FF69F67FDC85 -type dir -name webapps -parent 79384173-C0BB-4B4C-A81D-1CAC899F1BEC
 File ::11E611D0-A512-4BAF-ADF5-A360577EA622 -type dir -name host-manager -parent 1DE86765-3E12-45CB-8525-FF69F67FDC85
 File ::0A4133B7-9C29-4C30-8BFD-7E91173355FC -name host-manager.xml -parent 11E611D0-A512-4BAF-ADF5-A360577EA622
@@ -3799,7 +3800,7 @@ InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type actio
 InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
 InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -title {Delete File} -component DeleteFile -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
+InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding Samples} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
@@ -3824,7 +3825,7 @@ Condition 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293 -active Yes -parent 66C9CA4C-4EC7
 InstallComponent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -setup Install -type action -conditions {8C84F652-D836-4749-A91D-892366F14735 638BA725-B209-4B92-B603-09E568B32EEF} -title {Launch Application Checkbutton} -component AddWidget -command insert -active Yes -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 8C84F652-D836-4749-A91D-892366F14735 -active Yes -parent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C84F652-D836-4749-A91D-892366F14735
 Condition 638BA725-B209-4B92-B603-09E568B32EEF -active Yes -parent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -title {String Is Condition} -component StringIsCondition -TreeObject::id 638BA725-B209-4B92-B603-09E568B32EEF
-InstallComponent 11D931E9-F589-4F10-AEFF-734DE33E8488 -setup Install -type action -conditions {801A25C3-DE59-469C-88AD-41BF330BCD3F 33613CE2-AD68-4419-9786-8D72A8B04979} -title {Desktop Shortcut Checkbutton} -component AddWidget -command reorder -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
+InstallComponent 11D931E9-F589-4F10-AEFF-734DE33E8488 -setup Install -type action -conditions {801A25C3-DE59-469C-88AD-41BF330BCD3F 33613CE2-AD68-4419-9786-8D72A8B04979} -title {Desktop Shortcut Checkbutton} -component AddWidget -command insert -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 801A25C3-DE59-469C-88AD-41BF330BCD3F -active Yes -parent 11D931E9-F589-4F10-AEFF-734DE33E8488 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 801A25C3-DE59-469C-88AD-41BF330BCD3F
 Condition 33613CE2-AD68-4419-9786-8D72A8B04979 -active Yes -parent 11D931E9-F589-4F10-AEFF-734DE33E8488 -title {String Is Condition} -component StringIsCondition -TreeObject::id 33613CE2-AD68-4419-9786-8D72A8B04979
 InstallComponent 68676750-381F-4FAA-B0FD-1FB8359065F6 -setup Install -type action -conditions {F9A8D3B6-7571-439A-9C7C-FEC0EBA70DA4 6C27D27C-3483-438C-B510-C14E85951335 36C9B383-8DF0-4A65-922A-CF06624F256B} -title {Quick Launch Shortcut Checkbutton} -component AddWidget -command insert -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
@@ -3897,7 +3898,7 @@ Condition 28605D41-F3CF-4045-B4B9-1CE425EBDC03 -active Yes -parent 4489F0C1-C985
 InstallComponent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -setup Install -type action -conditions {4C5B630E-A819-4C8D-A223-F10643DC1CDA 0E2B711C-DEBF-49E5-A966-C2D5177AE431} -title {Launch Web Browser} -component LaunchWebBrowser -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 4C5B630E-A819-4C8D-A223-F10643DC1CDA -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 4C5B630E-A819-4C8D-A223-F10643DC1CDA
 Condition 0E2B711C-DEBF-49E5-A966-C2D5177AE431 -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 0E2B711C-DEBF-49E5-A966-C2D5177AE431
-InstallComponent 3615204F-29E3-473F-A769-A74E859BE866 -setup Install -type action -conditions 48130794-42B9-4D0A-9248-BAF8F2A1E9AF -title {Delete File} -component DeleteFile -command reorder -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
+InstallComponent 3615204F-29E3-473F-A769-A74E859BE866 -setup Install -type action -conditions 48130794-42B9-4D0A-9248-BAF8F2A1E9AF -title {Delete File} -component DeleteFile -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 48130794-42B9-4D0A-9248-BAF8F2A1E9AF -active Yes -parent 3615204F-29E3-473F-A769-A74E859BE866 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 48130794-42B9-4D0A-9248-BAF8F2A1E9AF
 InstallComponent 87C3E28A-76E2-4D8B-A4B0-1BC8B2DA298F -setup Install -type action -conditions {2EDB0A5C-4A6D-4E37-A0CC-1B75F5C645A8 A659B6E8-5FAA-43A2-B7FD-B6D180E57EA0} -title {Execute RegPaths} -component ExecuteExternalProgram -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 2EDB0A5C-4A6D-4E37-A0CC-1B75F5C645A8 -active Yes -parent 87C3E28A-76E2-4D8B-A4B0-1BC8B2DA298F -title {Platform Condition} -component PlatformCondition -TreeObject::id 2EDB0A5C-4A6D-4E37-A0CC-1B75F5C645A8
@@ -4210,7 +4211,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-30647800
+31312733
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4484,7 +4485,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-85127995
+96494274
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -5196,7 +5197,7 @@ ALF_DATA
 <%InstallDir%>
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,FileSize
-2267
+2236
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,Name
 {Program Files Linux}
