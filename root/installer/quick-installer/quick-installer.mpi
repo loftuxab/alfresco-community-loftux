@@ -3766,12 +3766,12 @@ InstallComponent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -setup Install -type actio
 Condition B612D657-48C1-421E-A810-D1FF82C768E2 -active Yes -parent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id B612D657-48C1-421E-A810-D1FF82C768E2
 InstallComponent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -setup Install -type action -conditions 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -title {Locate Java Runtime} -component LocateJavaRuntime -command insert -active Yes -parent 991553B3-06E2-412E-89E5-1829C782E086
 Condition 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -active Yes -parent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id 5A7AF50A-C33F-47B4-BAAD-0869D47D5901
-InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition A1AF4F54-A600-430D-AA51-39C5EA26D457 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id A1AF4F54-A600-430D-AA51-39C5EA26D457
 Condition 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {String Is Condition} -component StringIsCondition -TreeObject::id 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86
 InstallComponent B8BC4D70-2048-4DD5-B15B-76050F07566F -setup Install -type action -conditions 9C516685-6F30-4420-A108-8F51B16D3AB8 -title {Move Forward} -component MoveForward -command insert -active No -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
 Condition 9C516685-6F30-4420-A108-8F51B16D3AB8 -active Yes -parent B8BC4D70-2048-4DD5-B15B-76050F07566F -title {String Is Condition} -component StringIsCondition -TreeObject::id 9C516685-6F30-4420-A108-8F51B16D3AB8
-InstallComponent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -setup Install -type action -conditions 05F74B3F-2FC4-4C99-AC27-099896306EC9 -title {Execute Script} -component ExecuteScript -command insert -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
+InstallComponent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -setup Install -type action -conditions 05F74B3F-2FC4-4C99-AC27-099896306EC9 -title {Execute Script} -component ExecuteScript -command reorder -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
 Condition 05F74B3F-2FC4-4C99-AC27-099896306EC9 -active Yes -parent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -title {String Is Condition} -component StringIsCondition -TreeObject::id 05F74B3F-2FC4-4C99-AC27-099896306EC9
 InstallComponent 57EE088D-54C3-4C9F-8596-064B5255EE8A -setup Install -type pane -conditions {4A4E9BFB-63A5-43F8-8F53-B70CC0257653 E35F2477-2025-4C48-BE4A-BC2DB58EFD16} -title {Setup Type} -component SetupType -command insert -active Yes -parent StandardInstall
 Condition 4A4E9BFB-63A5-43F8-8F53-B70CC0257653 -active Yes -parent 57EE088D-54C3-4C9F-8596-064B5255EE8A -title {Script Condition} -component ScriptCondition -TreeObject::id 4A4E9BFB-63A5-43F8-8F53-B70CC0257653
@@ -6591,7 +6591,7 @@ F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,Caption
 {No Java (JDK) found}
 
 F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,Message
-{We were unable to find a Java (JDK) on this computer.  You will need to download a JDK using the link below.
+{We were unable to find a Java (JDK) on this computer.  You will need to download a JDK from http://java.sun.com/ using the link below.
 
 The download page has several options, you need to choose the basic JavaSE Developer Kit, without Java EE or Netbeans.  Usually, this is the first or second download option.}
 
