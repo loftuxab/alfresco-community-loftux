@@ -82,6 +82,7 @@
 		   {
 				var eventList = YAHOO.lang.JSON.parse(o.responseText);
 				var now = new Date();
+				now.setHours(0, 0, 0, 0);
 				
 				for (var key in eventList)
    			{
@@ -89,7 +90,7 @@
    				{
    					var dateParts = key.split("/");
    					var date = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0] - 1), dateParts[1]);
-   					if (date > now)
+   					if (date >= now)
    					{
       					html += this._dayRenderer(date, eventList);
    					}

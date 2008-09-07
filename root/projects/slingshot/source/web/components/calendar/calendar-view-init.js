@@ -826,6 +826,7 @@
          }
          
          var now = new Date(), dateParts, eventDate, div, atLeastOneEvent = false;
+         now.setHours(0, 0, 0, 0);
       
          for (var key in this.eventData)
          {
@@ -833,7 +834,7 @@
             {
                dateParts = key.split("/");
                eventDate = DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
-               if (eventDate > now)
+               if (eventDate >= now)
                {
                   atLeastOneEvent = true;
                   div = document.createElement("div");
