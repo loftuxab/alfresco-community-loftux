@@ -12,6 +12,7 @@
                <img class="photoimg" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
             </#if>
          </div>
+<#escape x as x?html>
          <div class="namelabel">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</div>
          <div class="fieldlabel">${user.properties["jobtitle"]!""}</div>
       </div>
@@ -34,3 +35,4 @@
       </div>
    </div>
 </div>
+</#escape>

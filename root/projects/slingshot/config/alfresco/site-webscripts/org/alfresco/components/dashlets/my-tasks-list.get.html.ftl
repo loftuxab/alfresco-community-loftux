@@ -13,7 +13,7 @@
             <span class="priority<#if overdue> overdue</#if>">${task.priority}</span>
          </div>
          <div class="task-details">
-            <h4>${task.description}<#if overdue> <span class="light">(${msg("status.overdue")})</span></#if></h4>
+            <h4>${task.description?html}<#if overdue> <span class="light">(${msg("status.overdue")})</span></#if></h4>
             <span class="task-status">${task.type}, ${task.status}</span>
             <div class="task-resources">
       <#list task.resources as resource>

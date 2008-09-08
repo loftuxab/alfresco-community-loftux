@@ -22,7 +22,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
             <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if (!site_has_next)>last</#if>">
                <div>
                   <div class="site">
-                     <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a>
+                     <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
                   </div>
                   <div class="actions">
                      <span id="${args.htmlid}-delete-span-${site_index}" class="delete" title="${msg("link.deleteSite")}">&nbsp;</span>
@@ -40,4 +40,3 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
       </#if>
    </div>
 </div>
-

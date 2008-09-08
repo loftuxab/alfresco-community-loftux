@@ -6,7 +6,7 @@
       <#if (sitemanager.person?exists)>
          <p>
             <span class="label">${msg("label.siteAdmin")}</span>
-            <a href="${url.context}/page/user/${sitemanager.person.userName}/dashboard">${sitemanager.person.firstName?html} ${sitemanager.person.lastName?html}</a>
+            <a href="${url.context}/page/user/${sitemanager.person.userName}/dashboard">${sitemanager.person.firstName?html} <#if sitemanager.person.lastName??>${sitemanager.person.lastName?html}</#if></a>
          </p>
       </#if>
       <p><span class="label">${msg("label.visibility")}</span>&nbsp;
