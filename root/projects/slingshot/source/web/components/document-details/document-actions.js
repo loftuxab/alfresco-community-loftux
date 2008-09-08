@@ -68,6 +68,8 @@
    
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
+      YAHOO.Bubbling.on("fileRenamed", this.onDetailsEdited, this);
+      YAHOO.Bubbling.on("folderRenamed", this.onDetailsEdited, this);
       
       return this;
    }
@@ -227,6 +229,37 @@
          
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
+      },
+      
+      /**
+       * Asset metadata.
+       *
+       * @method onActionDetails
+       * @param obj {object} Not used
+       */
+      onActionDetails: function DocumentActions_onActionDetails(obj)
+      {
+         if (!this.modules.details)
+         {
+            this.modules.details = new Alfresco.module.DoclibDetails(this.id + "-details");
+         }
+
+         this.modules.details.setOptions(
+         {
+            file: this.docData
+         }).showDialog();
+      },
+
+      /**
+       * Fired by Metadata edit dialog when new details have been successfully saved.
+       * Prompts a reload of the page, as we can't be sure exactly what metadata may have been editing by the system.
+       *
+       * @method onReady
+       */
+      onDetailsEdited: function DocumentDetails_onDetailsEdited(layer, args)
+      {
+         // Reload the page, rather than trying to replace edited metadata in-place
+         window.location.reload(true);
       },
       
       /**
