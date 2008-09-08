@@ -3,8 +3,8 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
    sites: [
    <#list sites as site>
       {
-         shortName: '${site.shortName}',
-         title: '${site.title}'
+         shortName: '${site.shortName?js_string}',
+         title: '${site.title?js_string}'
       }<#if (site_has_next)>,</#if>
    </#list>
    ]
