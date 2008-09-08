@@ -264,7 +264,13 @@
                      }
                   }
                }
-               
+
+               // Sort the sites by their title
+               items.sort(function (site1, site2)
+               {
+                  return (site1.title > site2.title) ? 1 : (site1.title < site2.title) ? -1 : 0;
+               });
+
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse = {
                   "items": items
@@ -297,7 +303,7 @@
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
-      
+
       _processMembership: function SiteFinder__processMembership(response)
       {
          if (response.json.error === undefined)
@@ -502,7 +508,7 @@
       
       /**
        * Join event handler
-       * 
+       *
        * @method doJoin
        * @param event {object} The event object
        * @param site {string} The shortName of the site to join
@@ -619,6 +625,8 @@
 
       /**
        * Resets the YUI DataTable errors to our custom messages
+       *
+       *
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
