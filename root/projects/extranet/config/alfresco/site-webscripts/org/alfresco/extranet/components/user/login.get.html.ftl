@@ -19,9 +19,13 @@ Please enter your credentials to log in:
 		<td></td>
 		<td><input type="submit" value="Login"/></td>
 	</tr>
+    <tr>
+        <td colspan="2" align="right"> <a href="?pt=lostpassword">Lost your password?</a></td>
+    </tr>
 </table>
 <input type="hidden" name="success" value="${successUrl}"/>
 <input type="hidden" name="failure" value="<@link pageType='login'/>"/>
+
 </form>
 
 <br/>
