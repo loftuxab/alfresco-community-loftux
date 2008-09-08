@@ -5,7 +5,7 @@
 		<#list entries as entry>
 	   <div class="detail-list-item">
    		<div>
-   		   <h4>${entry.title}</h4>
+   		   <h4>${entry.title?html}</h4>
    		   ${entry.summary}
    		</div>
 	   </div>
@@ -13,8 +13,8 @@
 	<#else>
 		${msg("label.noActivities")}
 	</#if>
-	</div><#-- end of body -->
-</div><#-- end of dashlet -->
+	</div>
+</div>
 <script type="text/javascript">//<![CDATA[
 (function()
 {

@@ -11,7 +11,7 @@
             <span>${msg("label.noItems")}</span>
          <#else>
             <#list docs.items?sort_by("modifiedOn") as doc>
-               <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser}/profile">${doc.modifiedBy}</a></#assign>
+               <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>
                <div class="detail-list-item">
                   <div>
                      <div class="icon">
