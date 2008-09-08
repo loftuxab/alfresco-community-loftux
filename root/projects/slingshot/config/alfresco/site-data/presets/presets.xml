@@ -103,6 +103,12 @@
           </component>
          <component>
             <scope>page</scope>
+            <region-id>component-2-4</region-id>
+            <source-id>user/${userid}/dashboard</source-id>
+            <url>/components/dashlets/cmisfeed</url>
+         </component>
+         <component>
+            <scope>page</scope>
             <region-id>component-3-1</region-id>
             <source-id>user/${userid}/dashboard</source-id>
             <url>/components/dashlets/my-profile</url>
