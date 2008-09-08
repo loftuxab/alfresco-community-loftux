@@ -18,7 +18,7 @@ if (json.status == 200)
 }
 
 // Find the manager for the site
-var sitemanagers = [{}];
+var sitemanagers = [];
 
 json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?rf=SiteManager");
 if (json.status == 200)
@@ -42,4 +42,4 @@ if (json.status == 200)
 
 // Prepare the model
 model.profile = profile;
-model.sitemanager = sitemanagers[0];
+model.sitemanagers = sitemanagers;

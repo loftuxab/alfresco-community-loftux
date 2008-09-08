@@ -197,6 +197,10 @@
          createSiteForm.setSubmitElements(this.widgets.okButton);
          createSiteForm.doBeforeFormSubmit = {
             fn: function(){
+
+               var formEl = YAHOO.util.Dom.get(this.id + "-form");
+               formEl.attributes.action.nodeValue = Alfresco.constants.URL_SERVICECONTEXT + "modules/create-site"; 
+
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
                this.widgets.panel.hide();
