@@ -47,6 +47,13 @@
    float: right;
 }
 
+.profile .reqcolumn
+{
+   float: right;
+   margin-right: -0.7em;
+   padding-top: 0.2em;
+}
+
 .profile .row
 {
    padding: 0.333em;
