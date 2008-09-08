@@ -13,7 +13,9 @@ function main()
 		// Create javascript objects from the server response
 		var sites = eval('(' + result + ')');
 
+      // Sort the sites by title
       sites.sort(sortByTitle);
+
       // Prepare the model for the template
 		model.sites = sites;
 	}
