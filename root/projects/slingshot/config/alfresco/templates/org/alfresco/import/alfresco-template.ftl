@@ -3,7 +3,7 @@
    Template "head" macro.
    Includes preloaded YUI assets and essential site-wide libraries.
 -->                                                                           
-<#assign DEBUG=true>
+<#assign DEBUG=false>
 
 <#macro header doctype="strict">
 <#if doctype = "strict">
