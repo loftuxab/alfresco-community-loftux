@@ -34,6 +34,11 @@
    padding:1px 9px;
 }
 
+.dashlet .body h3
+{
+   padding-top:0.6em;   
+}
+
 .dashlet .scrollableList
 {
    height: 208px;
