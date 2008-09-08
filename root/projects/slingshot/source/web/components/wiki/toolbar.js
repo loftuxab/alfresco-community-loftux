@@ -3,9 +3,16 @@
 */
 (function()
 {
-	Alfresco.WikiToolbar = function(containerId)
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
+
+   Alfresco.WikiToolbar = function(containerId)
    {
-	   this.name = "Alfresco.WikiToolbar";
+      this.name = "Alfresco.WikiToolbar";
       this.id = containerId;
 
       /* Load YUI Components */
@@ -14,33 +21,33 @@
       return this;
    };
 
-	Alfresco.WikiToolbar.prototype =
-	{
-	   /**
-   	  * Sets the current site for this component.
-   	  * 
-   	  * @property siteId
-   	  * @type string
-   	  */
-   	setSiteId: function(siteId)
-   	{
-   		this.siteId = siteId;
-   		return this;
-   	},
-   	
-   	/**
-   	  * The title of the current page.
-   	  * 
-   	  * @property siteId
-   	  * @type string
-   	  */
-   	setTitle: function(title)
-   	{
-   	   this.title = title;
-   	   return this;
-   	},
-   	
-   	/**
+   Alfresco.WikiToolbar.prototype =
+   {
+      /**
+        * Sets the current site for this component.
+        * 
+        * @property siteId
+        * @type string
+        */
+      setSiteId: function(siteId)
+      {
+         this.siteId = siteId;
+         return this;
+      },
+      
+      /**
+        * The title of the current page.
+        * 
+        * @property siteId
+        * @type string
+        */
+      setTitle: function(title)
+      {
+         this.title = title;
+         return this;
+      },
+      
+      /**
        * Set messages for this component.
        *
        * @method setMessages
@@ -52,226 +59,279 @@
          Alfresco.util.addMessages(obj, this.name);
          return this;
       },
-   		
-	   /**
-		 * Fired by YUILoaderHelper when required component script files have
-		 * been loaded into the browser.
-		 *
-		 * @method onComponentsLoaded
-		 */
-		componentsLoaded: function()
-		{
-			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
-		},
-		
-		/**
-   	 * Fired by YUI when parent element is available for scripting.
-   	 * Initialises components, including YUI widgets.
-   	 *
-   	 * @method init
-   	 */
-   	init: function()
-   	{
+         
+      /**
+       * Fired by YUILoaderHelper when required component script files have
+       * been loaded into the browser.
+       *
+       * @method onComponentsLoaded
+       */
+      componentsLoaded: function()
+      {
+         Event.onContentReady(this.id, this.init, this, true);
+      },
+      
+      /**
+       * Fired by YUI when parent element is available for scripting.
+       * Initialises components, including YUI widgets.
+       *
+       * @method init
+       */
+      init: function()
+      {
          // Create button
-   	   var createButton = Alfresco.util.createYUIButton(this, "create-button", null,
+         var createButton = Alfresco.util.createYUIButton(this, "create-button", null,
          {
-   	      type: "link"
-   	   });
+            type: "link"
+         });
 
          // Delete button
-         var opts = {
-            type: "push"
-         };
+         var opts = {};
    
          if (!this.title || this.title.length == 0)
          {
             opts["disabled"] = true;
          }
    
-	      var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
-	      var renameButton = Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
-	      
-	      // Labels
-	      var yes = Alfresco.util.message("button.yes", this.name);
-	      var no = Alfresco.util.message("button.no", this.name);
-	      var confirmText = Alfresco.util.message("panel.confirm.delete-msg", this.name);
-	      
-	      this.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
-	      {
-	         width: "300px",
+         var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
+         var renameButton = Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
+         
+         // Labels
+         var yes = Alfresco.util.message("button.yes", this.name);
+         var no = Alfresco.util.message("button.no", this.name);
+         var confirmText = Alfresco.util.message("panel.confirm.delete-msg", this.name);
+         
+         this.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
+         {
+            width: "20em",
             fixedcenter: true,
             visible: false,
             draggable: false,
             close: true,
-            text: confirmText,
-            icon: YAHOO.widget.SimpleDialog.ICON_HELP,
+            text: '<div class="yui-u"><br />' + confirmText + '<br /><br /></div>',
             constraintoviewport: true,
-            buttons: [ { text: yes, handler: { fn: this.onConfirm, scope: this }, isDefault: true },
-            			{ text: no,  handler: { fn: this.onCancel, scope: this } }]
-	      });
-	      
-	      var headerText = Alfresco.util.message("panel.confirm.header", this.name);
-	      this.deleteDialog.setHeader(headerText);
-	      this.deleteDialog.render(this.id + "-body");
-	      
-	      // Create the rename panel
-	      this.renamePanel = new YAHOO.widget.Panel(this.id + "-renamepanel", { width:"320px", visible:false, constraintoviewport:true } );
-	      this.renamePanel.render();
-	      
-	      var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,
-	      {
-	      	type: "submit"
-	      });
-	      
-	      var renameForm = new Alfresco.forms.Form(this.id + "-renamePageForm");
+            buttons: [
+            {
+               text: yes,
+               handler:
+               {
+                  fn: this.onConfirm,
+                  scope: this
+               }
+            },
+            {
+               text: no,
+               handler:
+               {
+                  fn: this.onCancel,
+                  scope: this
+               },
+               isDefault: true
+            }]
+         });
+         
+         var headerText = Alfresco.util.message("panel.confirm.header", this.name);
+         this.deleteDialog.setHeader(headerText);
+         this.deleteDialog.render(this.id + "-body");
+         
+         // Create the rename panel
+         this.renamePanel = new YAHOO.widget.Panel(this.id + "-renamepanel",
+         {
+            width: "320px",
+            visible: false,
+            constraintoviewport: true,
+            fixedcenter: true,
+            modal: true
+         });
+         this.renamePanel.render();
+         
+         var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,
+         {
+            type: "submit"
+         });
+         
+         var renameForm = new Alfresco.forms.Form(this.id + "-renamePageForm");
          renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.mandatory, null, "blur");
          renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.nodeName, null, "keyup");
-	      renameForm.setShowSubmitStateDynamically(true);
-	      renameForm.setSubmitElements(renameSaveButton);
-	      renameForm.ajaxSubmitMethod = Alfresco.util.Ajax.POST;
-	      renameForm.setAJAXSubmit(true,
+         renameForm.setShowSubmitStateDynamically(true);
+         renameForm.setSubmitElements(renameSaveButton);
+         renameForm.ajaxSubmitMethod = Alfresco.util.Ajax.POST;
+         renameForm.setAJAXSubmit(true,
          {
             successCallback:
             {
-	            fn: this.onPageRenamed,
-	            scope: this
+               fn: this.onPageRenamed,
+               scope: this
             },
             failureMessage: "Page rename failed"
          });        
-	      renameForm.setSubmitAsJSON(true);
-	      renameForm.init();
-	      
-	      // Listen for when an event has been updated
-		   YAHOO.Bubbling.on("deletePage", this.onDeletePage, this);
-	   },
+         renameForm.setSubmitAsJSON(true);
+         renameForm.init();
+         
+         // Listen for when an event has been updated
+         YAHOO.Bubbling.on("deletePage", this.onDeletePage, this);
+      },
 
-	   /**
-		 * Kicks off a page delete confirmation dialog.
-		 * Fired when a delete link is clicked - 
-		 * primarily the "delete" link on the listing page.
-		 *
-		 * @method onDeletePage
-		 * @param e {object} DomEvent
-		 */	   
-	   onDeletePage: function(e, args)
-	   {
-	      var title = args[1].title;
-	      if (title)
-	      {
-	         this.title = title;
-	         this.deleteDialog.show();
-	      }
-	   },
-	   
-	   /**
-		 * Fired when the user confirms that they want to delete a page. 
-		 * Kicks off a DELETE request to the Alfresco repo to remove an event.
-		 *
-		 * @method onConfirm
-		 * @param e {object} DomEvent
-		 */
-	   onConfirm: function(e)
-	   {
-	      Alfresco.util.Ajax.request(
-   		{
-   		   method: Alfresco.util.Ajax.DELETE,
-   		   url: Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + this.title,
-   		   successCallback:
-   		   {
-   			   fn: this.onPageDeleted,
-   				scope: this
-   			},
-   		   failureMessage: Alfresco.util.message("load.fail", this.name)
-   		});
-	   },
-	   
       /**
-   	 * Fired when the user decides not to delete a page.
-   	 * Hides the confirmation dialog.
-   	 *
-   	 * @method onCancel
-   	 * @param e {object} DomEvent
-   	 */
-	   onCancel: function(e)
-	   {
-	      this.deleteDialog.hide();
-	   },
-	   
-	   /**
+       * Kicks off a page delete confirmation dialog.
+       * Fired when a delete link is clicked - 
+       * primarily the "delete" link on the listing page.
+       *
+       * @method onDeletePage
+       * @param e {object} DomEvent
+       */      
+      onDeletePage: function(e, args)
+      {
+         var title = args[1].title;
+         if (title)
+         {
+            this.title = title;
+            this.deleteDialog.show();
+         }
+      },
+      
+      /**
+       * Fired when the user confirms that they want to delete a page. 
+       * Kicks off a DELETE request to the Alfresco repo to remove an event.
+       *
+       * @method onConfirm
+       * @param e {object} DomEvent
+       */
+      onConfirm: function(e)
+      {
+         Alfresco.util.Ajax.request(
+         {
+            method: Alfresco.util.Ajax.DELETE,
+            url: Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + this.title,
+            successCallback:
+            {
+               fn: this.onPageDeleted,
+               scope: this
+            },
+            failureMessage: Alfresco.util.message("load.fail", this.name)
+         });
+      },
+      
+      /**
+       * Fired when the user decides not to delete a page.
+       * Hides the confirmation dialog.
+       *
+       * @method onCancel
+       * @param e {object} DomEvent
+       */
+      onCancel: function(e)
+      {
+         this.deleteDialog.hide();
+      },
+      
+      /**
        * Callback handler then gets invoked when a page is 
-   	 * successfully deleted.
-   	 * 
-   	 * @method onPageDeleted
-   	 * @param e {object} DomEvent
-   	 */
-	   onPageDeleted: function(e)
-	   {
-	      this.deleteDialog.hide();
-	      // Redirect to the wiki landing page
+       * successfully deleted.
+       * 
+       * @method onPageDeleted
+       * @param e {object} DomEvent
+       */
+      onPageDeleted: function(e)
+      {
+         this.deleteDialog.hide();
+         // Redirect to the wiki landing page
          window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki";
-	   },
-	   
-	   /**
+      },
+      
+      /**
        * Event handler for the rename button in the toolbar.
        * Pops up the rename dialog.
-   	 *
-   	 * @method onRenameClick
-   	 * @param e {object} DomEvent
-   	 */
-	   onRenameClick: function(e)
-	   {
-         // Clear the text field any previously entered values
-         var newNameField = document.getElementById(this.id + "-newname");
-         if (newNameField)
-   	   {
-            newNameField.value = "";
-         }
-
+       *
+       * @method onRenameClick
+       * @param e {object} DomEvent
+       */
+      onRenameClick: function(e)
+      {
          this.renamePanel.show();
-	   },
+
+         // Clear the text field any previously entered values
+         var newNameField = document.getElementById(this.id + "-renameTo");
+         newNameField.value = "";
+         
+         // Fix Firefox caret issue
+         var formElement = Dom.get(this.id + "-renamePageForm");
+         Alfresco.util.caretFix(formElement);
+
+         // Register the ESC key to close the dialog
+         if (!this.escapeListener)
+         {
+            this.escapeListener = new YAHOO.util.KeyListener(document,
+            {
+               keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            },
+            {
+               fn: function(id, keyEvent)
+               {
+                  // Undo Firefox caret issue
+                  Alfresco.util.undoCaretFix(formElement);
+                  this.renamePanel.hide();
+               },
+               scope: this,
+               correctScope: true
+            });
+         }
+         this.escapeListener.enable();
+
+         // Set focus to fileName input
+         newNameField.focus();
+      },
 
       /**
-   	 * Event handler for save button on the page rename panel.
-   	 * Submits the (new) name of the page to the repo.
-   	 *
-   	 * @method onRenameSaveClick
-   	 * @param e {object} DomEvent
-   	 */	   
+       * Event handler for save button on the page rename panel.
+       * Submits the (new) name of the page to the repo.
+       *
+       * @method onRenameSaveClick
+       * @param e {object} DomEvent
+       */      
       onRenameSaveClick: function(e)
       {
-			var data = {};
-		
-			var newNameField = document.getElementById(this.id + "-newname");
-			if (newNameField)
-			{
-			   data["name"] = newNameField.value.replace(/\s+/g, "_");
-			}
-			
-			// Submit PUT request 
-			Alfresco.util.Ajax.request(
-			{
-				method: Alfresco.util.Ajax.POST,
-		      url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.siteId + "/" + encodeURIComponent(this.title),
-				requestContentType: Alfresco.util.Ajax.JSON,
-				dataObj: data,
-				successCallback:
-				{
-					fn: this.onPageRenamed,
-					scope: this
-				},
-		      failureMessage: "Page update failed"
-		   });
-		   
+         var data = {};
+      
+         var newNameField = document.getElementById(this.id + "-renameTo");
+         if (newNameField)
+         {
+            data["name"] = newNameField.value.replace(/\s+/g, "_");
+         }
+         
+         // Submit PUT request 
+         Alfresco.util.Ajax.request(
+         {
+            method: Alfresco.util.Ajax.POST,
+            url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.siteId + "/" + encodeURIComponent(this.title),
+            requestContentType: Alfresco.util.Ajax.JSON,
+            dataObj: data,
+            successCallback:
+            {
+               fn: this.onPageRenamed,
+               scope: this
+            },
+            failureMessage: "Page update failed"
+         });
+
+         // Undo Firefox caret issue
+         var formElement = Dom.get(this.id + "-renamePageForm");
+         Alfresco.util.undoCaretFix(formElement);
+         
+         if (this.escapeListener)
+         {
+            this.escapeListener.disable();
+         }
+
          this.renamePanel.hide();
       },
       
       /**
-   	 * Gets called when a page is successfully renamed.
-   	 * Sets the window location to the URL of the new page.
-   	 *
-   	 * @method onPageRenamed
-   	 * @param e {object} DomEvent
-   	 */      
+       * Gets called when a page is successfully renamed.
+       * Sets the window location to the URL of the new page.
+       *
+       * @method onPageRenamed
+       * @param e {object} DomEvent
+       */      
       onPageRenamed: function(e)
       {
          var response = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
@@ -280,7 +340,7 @@
             if (!YAHOO.lang.isUndefined(response.name))
             {
                // Change the location bar
-         	   window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
+               window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
             } 
             else
             {
@@ -303,18 +363,18 @@
            
          }
       },
-	   
+      
       /**
        * Event handler for the delete button in the toolbar.
        * Pops up the delete confirmation dialog.
-   	 *
-   	 * @method onDeleteClick
-   	 * @param e {object} DomEvent
-   	 */
-	   onDeleteClick: function(e)
-	   {
-	      this.deleteDialog.show();
-	   }
+       *
+       * @method onDeleteClick
+       * @param e {object} DomEvent
+       */
+      onDeleteClick: function(e)
+      {
+         this.deleteDialog.show();
+      }
    };
 
 })();   
