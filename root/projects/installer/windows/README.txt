@@ -1,8 +1,8 @@
-============================
-Alfresco Labs 3 Nile Release
-============================
+=========================
+Alfresco Labs 3 B Release
+=========================
 
-Welcome to the Alfresco Labs 3 Nile Release.
+Welcome to the Alfresco Labs 3 B Release.
 
 
 ===================

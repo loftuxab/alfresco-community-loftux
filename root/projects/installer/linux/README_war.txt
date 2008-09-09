@@ -1,8 +1,8 @@
-====================
-Alfresco 2.1 Release
-====================
+=========================
+Alfresco Labs 3 B Release
+=========================
 
-Welcome to the Alfresco 2.1  Release.
+Welcome to the Alfresco Labs 3 B Release.
 
 ===================
 Installing Alfresco
