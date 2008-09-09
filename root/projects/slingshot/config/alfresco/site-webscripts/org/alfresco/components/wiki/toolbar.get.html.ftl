@@ -18,19 +18,18 @@
    
    <div id="${args.htmlid}-renamepanel">
       <div class="hd">${msg("panel.rename.title")}</div>
-         <div class="bd">
-            <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${page.url.args["title"]!""}">
-               <div class="yui-ge">
-                  <div class="yui-u first">
-                     <input type="text" id="${args.htmlid}-renameTo" name="name" value="" size="30" tabindex="1" />
-                  </div>
-                  <div class="yui-u">
-                     <input type="submit" id="${args.htmlid}-rename-save-button" value="${msg("button.save")}" tabindex="2" />
-                  </div>
+      <div class="bd">
+         <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${page.url.args["title"]!""}">
+            <div class="yui-ge">
+               <div class="yui-u first">
+                  <input type="text" id="${args.htmlid}-renameTo" name="name" value="" size="30" tabindex="1" />
                </div>
-            </form>
-            <div class="bdft">${msg("panel.rename.footer")}</div>
-         </div>
+               <div class="yui-u">
+                  <input type="submit" id="${args.htmlid}-rename-save-button" value="${msg("button.save")}" tabindex="2" />
+               </div>
+            </div>
+         </form>
+         <div class="bdft">${msg("panel.rename.footer")}</div>
       </div>
    </div>   
 </div>
