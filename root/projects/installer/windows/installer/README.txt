@@ -1,8 +1,8 @@
-=======================
-Alfresco Labs 3 Preview
-=======================
+=========================
+Alfresco Labs 3 B Release
+=========================
 
-Welcome to the Alfresco Labs 3 Preview Release.
+Welcome to the Alfresco Labs 3 B Release.
 
 There are options in the Start menu for starting and stopping the Alfresco Server, as well as for starting the Alfresco clients.
 

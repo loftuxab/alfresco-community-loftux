@@ -1,8 +1,8 @@
-============
-Alfresco 2.1
-============
+=================
+Alfresco Labs 3 B
+=================
 
-Welcome to the Alfresco 2.1 Release.
+Welcome to the Alfresco Labs 3 B Release.
 
 This release uses HSQL as the default database.  Please see README_mysql.txt for details on changing it to use MySQL.  Instructions for other databases are provided on the Alfresco Wiki.
 
