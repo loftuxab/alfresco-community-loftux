@@ -26,11 +26,27 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.framework.model.Theme;
+
 /**
+ * Request level context object that wraps a HttpServletRequest to provide
+ * additional framework related general helper functions, request level object
+ * containment etc.
+ * 
+ * @see RequestContext
+ * 
  * @author muzquiano
+ * @author kevinr
  */
 public class HttpRequestContext extends ThreadLocalRequestContext
 {
+    private static final String SESSION_CURRENT_THEME    = "alfTheme";
+    private static final String SESSION_CURRENT_THEME_ID = "alfThemeId";
+    
+    /** The request encapsulated by this context object */
+    protected HttpServletRequest request;
+    
+    
     /**
      * Construction
      * 
@@ -57,27 +73,43 @@ public class HttpRequestContext extends ThreadLocalRequestContext
      */
     public String getDebugMode()
     {
-        if(getRequest() != null)
-        {
-            String debug = getRequest().getParameter("debug");
-            if(debug != null && debug.length() > 0)
-            {
-                return debug;
-            }
-        }
-        return null;
+        String debug = request.getParameter("debug");
+        return (debug != null && debug.length() != 0 ? debug : null);
     }
     
+    /**
+     * Returns the current Theme Id for the current user
+     */
     public String getThemeId()
     {
-        if(getRequest() != null)
-        {
-            return ThemeUtil.getCurrentThemeId(getRequest());
-        }
-        
-        return super.getThemeId();
+        return (String)request.getSession().getAttribute(SESSION_CURRENT_THEME_ID);
     }
     
+    /**
+     * Sets the current theme id
+     */
+    public void setThemeId(String themeId)
+    {
+        if (themeId != null)
+        {
+            request.getSession().setAttribute(SESSION_CURRENT_THEME_ID, themeId);
+        }
+    }
     
-    protected HttpServletRequest request;
+    /**
+     * Gets the current Theme object, or null if not set
+     */
+    public Theme getTheme()
+    {
+        Theme theme = (Theme)getValue(SESSION_CURRENT_THEME);
+        if (theme == null)
+        {
+            String themeId = getThemeId();
+            if (theme != null)
+            {
+                setValue(SESSION_CURRENT_THEME, getModel().getTheme(themeId));
+            }
+        }
+        return theme;
+    }
 }

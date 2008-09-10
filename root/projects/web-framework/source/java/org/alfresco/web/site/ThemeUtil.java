@@ -41,9 +41,6 @@ import org.alfresco.web.framework.model.Theme;
  */
 public class ThemeUtil
 {
-    
-    private static final String CURRENT_THEME_ID = "currentThemeId";
-
     /**
      * Gets the current theme id.
      * 
@@ -65,39 +62,7 @@ public class ThemeUtil
      */
     public static Theme getCurrentTheme(RequestContext context)
     {
-        String themeId = getCurrentThemeId(context);
-        if(themeId != null)
-        {
-            return (Theme) context.getModel().getTheme(themeId);
-        }
-        return null;
-    }
-    
-    /**
-     * Gets the current theme id.
-     * 
-     * @param request the request
-     * 
-     * @return the current theme id
-     */
-    public static String getCurrentThemeId(HttpServletRequest request)
-    {
-        return (String) request.getSession().getAttribute(CURRENT_THEME_ID);
-    }
-
-    /**
-     * Sets the current theme id.
-     * 
-     * @param request the request
-     * @param themeId the theme id
-     */
-    public static void setCurrentThemeId(HttpServletRequest request,
-            String themeId)
-    {
-        if (themeId != null)
-        {
-            request.getSession().setAttribute(CURRENT_THEME_ID, themeId);
-        }
+        return context.getTheme();
     }
 
     /**
@@ -107,33 +72,21 @@ public class ThemeUtil
      * @param context the context
      * @param request the request
      */
-    public static void applyTheme(RequestContext context,
-            HttpServletRequest request)
+    public static void applyTheme(RequestContext context, HttpServletRequest request)
     {
-        String themeId = getCurrentThemeId(request);
-        if(themeId == null)
+        String themeId = context.getThemeId();
+        if (themeId == null)
         {
         	themeId = FrameworkHelper.getConfig().getDefaultThemeId();
+            if (themeId == null)
+            {
+                themeId = WebFrameworkConstants.DEFAULT_THEME_ID;
+            }
+            
+            if (themeId != null)
+            {
+            	context.setThemeId(themeId);
+            }
         }
-        if(themeId == null)
-        {
-            themeId = WebFrameworkConstants.DEFAULT_THEME_ID;
-        }
-        if(themeId != null)
-        {
-        	setCurrentThemeId(request, themeId);
-            context.setThemeId(themeId);
-        }
-    }
-    
-    /**
-     * Clears the theme (from the session)
-     * 
-     * @param context
-     * @param request
-     */
-    public static void clearTheme(RequestContext context, HttpServletRequest request)
-    {
-        request.getSession().removeAttribute(CURRENT_THEME_ID);
     }
 }

@@ -26,6 +26,8 @@ package org.alfresco.web.framework;
 
 import java.util.Map;
 
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorProvider;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.cache.ModelObjectCache;
@@ -51,8 +53,9 @@ import org.apache.commons.logging.LogFactory;
  * as a thread local variable (methods are available on the RemoteStore).
  * 
  * @author muzquiano
+ * @author kevinr
  */
-public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
+public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister implements ConnectorProvider
 {
     private static Log logger = LogFactory.getLog(RemoteStoreModelObjectPersister.class);
     
@@ -217,24 +220,37 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     }
 
     /**
-     * Bind Connector to the remote store for the current thread
+     * Bind Connector Provider to the remote store for the current thread
      */
     private void bindConnector()
     {
+        remoteStore.bindConnectorProvider(this);
+    }
+    
+    /**
+     * Implementation of the contract to provide a Connector for our remote store.
+     * This allows lazy providing of the Connector object only if the remote store actually needs
+     * it. Otherwise aquiring the Connector when rarely used is an expensive overhead as most
+     * objects are cached by the persister in which case the remote store isn't actually called.
+     */
+    public Connector provide()
+    {
+        Connector conn = null;
         RequestContext rc = ThreadLocalRequestContext.getRequestContext();
         if (rc instanceof HttpRequestContext)
         {
             try
             {
-                remoteStore.bindConnector(FrameworkHelper.getConnector(rc, remoteStore.getEndpoint()));
+                conn = FrameworkHelper.getConnector(rc, remoteStore.getEndpoint());
             }
             catch (RemoteConfigException rce)
             {
                 throw new AlfrescoRuntimeException("Failed to bind connector to remote store.", rce);
             }
         }
+        return conn;
     }
-    
+
     /**
      * Gets the cache for a particular model persistence context
      * 
