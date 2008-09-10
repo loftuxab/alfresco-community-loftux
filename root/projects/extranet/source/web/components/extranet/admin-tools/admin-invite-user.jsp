@@ -15,8 +15,7 @@
 	AdminUtil admin = new AdminUtil(request);
     if( !admin.isAuthorizedAdmin())
 	{
-        //TODO: replace with redirect and error message
-		out.println("Access denied");
+		out.println(admin.getAccessDeniedMessage());
 		return;
 	}
 
@@ -113,6 +112,13 @@ window.open(Ink,"calendar","height=250,width=250,scrollbars=no")
 					&nbsp;(m/dd/yyyy)
 				</td>
 			</tr>
+            <tr>
+                <td>Send email?</td>
+                <td>
+                    yes: <input type="radio" name="<%=Constants.ADMIN_TOOLS_SEND_EMAIL%>" value="true" checked="checked"/><br/>
+                    no: <input type="radio" name="<%=Constants.ADMIN_TOOLS_SEND_EMAIL%>" value="false"/>
+                </td>
+            </tr>
 		</table>
 
 		<input type="hidden" name="<%=Constants.ADMIN_TOOLS_COMMAND%>" value="<%=Constants.ADMIN_TOOLS_COMMAND_INVITE_USER%>"/>

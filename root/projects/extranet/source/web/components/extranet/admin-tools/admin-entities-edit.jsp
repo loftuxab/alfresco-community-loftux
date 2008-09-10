@@ -14,8 +14,7 @@
 	AdminUtil admin = new AdminUtil(request);
     if( !admin.isAuthorizedAdmin())
 	{
-        //TODO: replace with redirect and error message
-		out.println("Access denied");
+		out.println(admin.getAccessDeniedMessage());
 		return;
 	}
 %>

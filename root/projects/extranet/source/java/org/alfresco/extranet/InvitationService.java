@@ -165,12 +165,16 @@ public class InvitationService
      * @param invitationType the type of the invitation
      * @param subscriptionStartDate date when subscription starts
      * @param subscriptionEndDate date when subscription ends
-     * 
+     *
+     * @param sendEmail
      * @return the database invited user
      */
-    public DatabaseInvitedUser inviteUser(String userId, String firstName, String lastName, String email, String whdUserId, String alfrescoUserId, String invitationType, Date subscriptionStartDate, Date subscriptionEndDate)
+    public DatabaseInvitedUser inviteUser(String userId, String firstName, String lastName, String email,
+                                          String whdUserId, String alfrescoUserId, String invitationType,
+                                          Date subscriptionStartDate, Date subscriptionEndDate, boolean sendEmail)
     {
-        return inviteUser(userId, firstName, null, lastName, email, whdUserId, alfrescoUserId, invitationType, subscriptionStartDate, subscriptionEndDate, DEFAULT_INVITATION_LENGTH);        
+        return inviteUser(userId, firstName, null, lastName, email, whdUserId, alfrescoUserId, invitationType,
+                subscriptionStartDate, subscriptionEndDate, DEFAULT_INVITATION_LENGTH, sendEmail);
     }
     
     /**
@@ -190,10 +194,15 @@ public class InvitationService
      * @param subscriptionStartDate date when subscription starts
      * @param subscriptionEndDate date when subscription ends
      * @param lengthOfInvitation the length of invitation
-     * 
+     *
+     * @param sendEmail
      * @return the database invited user
      */
-    public synchronized DatabaseInvitedUser inviteUser(String userId, String firstName, String middleName, String lastName, String email, String whdUserId, String alfrescoUserId, String invitationType, Date subscriptionStartDate, Date subscriptionEndDate, int lengthOfInvitation)
+    public synchronized DatabaseInvitedUser inviteUser(String userId, String firstName, String middleName,
+                                                       String lastName, String email, String whdUserId,
+                                                       String alfrescoUserId, String invitationType,
+                                                       Date subscriptionStartDate, Date subscriptionEndDate,
+                                                       int lengthOfInvitation, boolean sendEmail)
     {
         // clean up data
         userId = userId.trim();
@@ -267,11 +276,23 @@ public class InvitationService
         // invite the user
         invitedUser = this.databaseService.inviteUser(invitedUser);
         
-        // send out an email
-        this.mailService.inviteUser(invitedUser);
+        //  optionally send out an email
+        if( sendEmail )
+        {
+            sendEmail(invitedUser);
+        }
 
         // return the invited user
         return invitedUser;
+    }
+
+    /**
+     * sends and invitation email to the given user
+     * @param invitedUser the invited user
+     */
+    public synchronized void sendEmail(DatabaseInvitedUser invitedUser)
+    {
+        this.mailService.inviteUser(invitedUser);
     }
     
     /**
