@@ -65,15 +65,14 @@
           
           YAHOO.Bubbling.addDefaultAction('delete-link', function(layer, args)
           {
-             var href = args[1].target;
-             if (href)
+             var link = args[1].target;
+             if (link)
              {
-                var title;
-                // Search for the "alt" attribute as that has the page title
-                var node;
-                for (var i=0; i < href.attributes.length; i++)
+                var title, node;
+                // Search for the "title" attribute as that has the page title
+                for (var i = 0, ii = link.attributes.length; i < ii; i++)
                 {
-                   node = href.attributes[i];
+                   node = link.attributes[i];
                    if (node.nodeName.toLowerCase() === 'title')
                    {
                       title = node.nodeValue;
@@ -84,7 +83,8 @@
                 if (title)
                 {
                    // Trigger the delete dialog in the toolbar
-                   YAHOO.Bubbling.fire('deletePage', {
+                   YAHOO.Bubbling.fire('deletePage',
+                   {
                       title: title
                    });
                 }

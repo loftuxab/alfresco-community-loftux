@@ -45,6 +45,9 @@
 <div class="taglibrary">
    <div class="top_taglist tags_box">
       <ul id="${htmlid}-current-tags">
+   <#if tags?size == 0>
+         <li>&nbsp;</li>
+   <#else>
       <#list tags as tag>
          <li id="${htmlid}-onRemoveTag-${tag?html}">
             <a href="#" class="taglibrary-action">
@@ -53,6 +56,7 @@
             </a>
          </li>
       </#list>
+   </#if>
       </ul>
    </div>
    <br class="clear" />
@@ -65,6 +69,7 @@
        
       <#-- Following list contains the popular tags, loaded by AJAX on users request -->
       <ul id="${htmlid}-popular-tags">
+         <li></li>
       </ul>
    </div>
    <br class="clear" />
@@ -75,6 +80,7 @@
 <div class="taglibrary">
    <div class="top_taglist tags_box">
       <ul id="${htmlid}-current-tags">
+         <li>&nbsp;</li>
       </ul>
    </div>
    <br class="clear" />
@@ -85,6 +91,7 @@
    <div class="bottom_taglist tags_box">
       <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
       <ul id="${htmlid}-popular-tags">
+         <li>&nbsp;</li>
       </ul>
    </div>
    <br class="clear" />

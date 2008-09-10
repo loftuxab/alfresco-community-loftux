@@ -1,7 +1,7 @@
 .wikipage
 {
    margin: 0.5em;
-   border: 1px solid white;
+   border: 2px solid white;
    padding: 8px;
 }
 
@@ -24,10 +24,12 @@
    padding-bottom: 10px;
 }
 
-.spacer {
-	margin: 0 7px;
-	color: #ccc;
+.spacer
+{
+   border-right: 1px solid #bababa;
 	font-size: 11pt;
+	margin-right: 0.5em;
+	padding-right: 0.5em;
 }
 
 .attrLabel {

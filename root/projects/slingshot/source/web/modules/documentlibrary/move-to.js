@@ -455,7 +455,7 @@
                failureCount: failureCount
             });
             
-            for (var i = 0, j = data.json.totalResults; i < j; i++)
+            for (var i = 0, j = p_data.json.totalResults; i < j; i++)
             {
                result = p_data.json.results[i];
                

@@ -158,17 +158,29 @@
    padding-left: 2.5em; 
    background: url(images/folder-new-16.png) no-repeat 10% 50%;
 }
+.toolbar .new-folder .yui-button-disabled button
+{
+   background-image: url(images/folder-new-disabled-16.png);
+}
 
 .toolbar .file-upload button
 {
    padding-left: 2.5em; 
    background: url(images/upload-16.png) no-repeat 10% 50%;
 }
+.toolbar .file-upload .yui-button-disabled button
+{
+   background-image: url(images/upload-disabled-16.png);
+}
 
 .toolbar .folder-up button
 {
    padding-left: 2.5em; 
    background: url(images/up-arrow-16.png) no-repeat 10% 50%;
+}
+.toolbar .folder-up .yui-button-disabled button
+{
+   background-image: url(images/up-arrow-disabled-16.png);
 }
 
 

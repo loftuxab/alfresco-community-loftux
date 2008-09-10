@@ -1,7 +1,7 @@
 <div class="dashlet site-welcome">
    <div class="title">${msg("header.userWelcome")}</div>
    <div class="body">
-      <div class="detail-list-item">
+      <div class="detail-list-item-alt">
          <h4>${msg("header.siteDashboard")}</h4>
          <div>${msg("text.siteDashboard")}</div>
       </div>

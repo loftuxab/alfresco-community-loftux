@@ -236,6 +236,7 @@
          renderCellRole = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.setStyle(elCell, "overflow", "visible !important");
 
             // cell where to add the element
             var cell = new YAHOO.util.Element(elCell);

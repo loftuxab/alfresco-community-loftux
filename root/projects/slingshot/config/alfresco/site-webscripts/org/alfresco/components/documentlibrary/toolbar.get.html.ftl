@@ -33,7 +33,7 @@
    </div>
 
    <div id="${args.htmlid}-navBar" class="nav-bar">
-      <div class="folder-up hideable DocListTree"><button id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
+      <div class="folder-up hideable DocListTree"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
       <div class="separator hideable DocListTree">|</div>
       <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable DocListTree"></div>
       <div id="${args.htmlid}-description" class="description hideable DocListFilter DocListTags"></div>

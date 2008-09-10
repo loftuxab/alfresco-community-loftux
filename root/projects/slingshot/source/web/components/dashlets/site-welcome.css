@@ -1,15 +1,26 @@
-div.dashlet.site-welcome .body {
-   background-color:#FEFFFD;
-}
-
-div.dashlet.site-welcome div.detail-list-item h4
+div.dashlet.site-welcome .body
 {
-   color:#038603;
-   padding-bottom: 0.5em;
-   padding-top:0.3em;
+   background-color: #FEFFFD;
 }
 
-div.dashlet.site-welcome div.detail-list-item div
+div.dashlet.site-welcome div.detail-list-item-alt
+{
+   background-color: #fffbd4;
+   border-bottom: 1px dotted #bababa;
+   margin: 0 -9px;
+   padding: 2px 9px 9px;
+}
+
+div.dashlet.site-welcome div.detail-list-item h4,
+div.dashlet.site-welcome div.detail-list-item-alt h4
+{
+   color: #038603;
+   padding-bottom: 0.5em;
+   padding-top: 0.3em;
+}
+
+div.dashlet.site-welcome div.detail-list-item div,
+div.dashlet.site-welcome div.detail-list-item-alt div
 {
    padding-bottom: 0.5em;
 }

@@ -149,7 +149,13 @@ Alfresco.util.createImageEditor = function(id, options)
  				},
  				scope: this
  			},
- 		   failureMessage: "Could not retrieve version information"
+ 		   failureCallback:
+ 		   {
+ 		      fn: function(e)
+ 		      {
+ 		         return;
+ 		      }
+ 		   }
  		});
    });
 

@@ -827,7 +827,7 @@
                   {
                      desc += me._msg("details.tags.none");
                   }
-                  desc += '</span></div>';
+                  desc += '</span></div><div class="detail">&nbsp;</div>';
                }
             }
             else
@@ -1956,7 +1956,7 @@
       {
          var obj = args[1];
          // Should be a path in the arguments
-         if (obj && (obj.path !== null))
+         if (obj && (typeof obj.path !== "undefined"))
          {
             Alfresco.logger.debug("DL_onPathChanged: ", obj);
             if (!obj.doclistSourcedEvent)

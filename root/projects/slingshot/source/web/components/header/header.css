@@ -22,12 +22,13 @@
 
 .header span.menu-item-separator
 {
-   color: #a1a1a1;
-   padding: 0.5em;
+   border-right: 1px solid #a1a1a1;
+   padding: 0 0 0 0.2em;
 }
 
 .header span.menu-item
 {
+   padding-left: 0.5em;
    vertical-align: middle;
 }
 

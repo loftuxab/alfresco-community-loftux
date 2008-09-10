@@ -43,8 +43,7 @@
 
 .my-tasks .task-resources
 {
-   border-bottom: 1px solid #e6e6e6;
-   border-top: 1px solid #e6e6e6;
+   background-color: #fff;
    margin: 0.5em 0;
 }
 
@@ -55,7 +54,6 @@
 
 .my-tasks .resource-spacer
 {
-   border-bottom: 1px dashed #e6e6e6;
 }
 
 .my-tasks .task-resource-link

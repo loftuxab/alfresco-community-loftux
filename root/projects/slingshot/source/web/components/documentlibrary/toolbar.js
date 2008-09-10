@@ -782,7 +782,7 @@
       onPathChanged: function DLTB_onPathChanged(layer, args)
       {
          var obj = args[1];
-         if (obj && obj.path)
+         if (obj && (typeof obj.path !== "undefined"))
          {
             // Should be a path in the arguments
             this.currentPath = obj.path;
@@ -805,7 +805,7 @@
       onFilterChanged: function DLTB_onFilterChanged(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.filterId !== null))
+         if (obj && (typeof obj.filterId !== "undefined"))
          {
             if (this.currentFilter.filterOwner != obj.filterOwner)
             {

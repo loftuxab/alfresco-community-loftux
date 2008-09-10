@@ -5,6 +5,7 @@
 
 .tags li
 {
+   overflow-x: hidden;
    padding: 4px 0px 3px 20px;
 }
 

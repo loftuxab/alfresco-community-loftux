@@ -9,7 +9,7 @@
 </#if>
 //]]></script>
 
-<div id="${args.htmlid}">
+<div id="${args.htmlid}-body">
 <div id="eventInfoPanel"></div>
 <div id="calendar-view">
 
@@ -76,14 +76,14 @@
       <tr>
       <#assign days_in_week = msg("days.medium")?split(",") >
       <#list days_in_week as day>
-         <th align="center" width="14%">${day}</th>
+         <th align="center" style="width: 14%">${day}</th>
          </#list>
       </tr>
       <#list 0..5 as row><#-- ROW -->
       <tr>
          <#list 0..6 as column><#-- COLUMN -->
             <#assign id = (row?number * 7) + column>
-            <td width="14%" id="cal_month_t_${id}">
+            <td style="width: 14%" id="cal_month_t_${id}">
                <div class="boxOutline">
                   <div id="dh${id}" class="dayLabel"></div>
                </div>

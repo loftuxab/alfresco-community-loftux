@@ -11,6 +11,7 @@
 .treeview .ygtvitem
 {
    background-color: #ffffff;
+   overflow-x: hidden;
 }
 
 .treeview .ygtvlabel,

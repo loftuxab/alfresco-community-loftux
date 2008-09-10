@@ -17,12 +17,20 @@
 
 .path-nav .path-link
 {
-   font-size: 100%;
    color: #112d4a;
+   font-size: 100%;
+   line-height: 1.4em;
 }
 
-.path-nav img
+.path-nav span.folder
 {
-   padding: 0px 3px;
-   vertical-align: -4px;
+   background-image: url(../documentlibrary/images/folder-closed-16.png);
+   background-position: left 50%;
+   background-repeat: no-repeat;
+   padding: 2px 0 2px 20px;
+}
+
+.path-nav .separator
+{
+   padding: 0 0.5em;
 }

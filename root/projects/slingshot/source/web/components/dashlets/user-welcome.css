@@ -1,8 +1,18 @@
-div.dashlet.user-welcome .body {
+div.dashlet.user-welcome .body
+{
    background-color: #FEFFFD;
 }
 
-div.dashlet.user-welcome div.detail-list-item h4
+div.dashlet.user-welcome div.detail-list-item-alt
+{
+   background-color: #fffbd4;
+   border-bottom: 1px dotted #bababa;
+   margin: 0 -9px;
+   padding: 2px 9px 9px;
+}
+
+div.dashlet.user-welcome div.detail-list-item h4,
+div.dashlet.user-welcome div.detail-list-item-alt h4
 {
    color: #038603;
    padding-bottom: 0.5em;
@@ -10,6 +20,7 @@ div.dashlet.user-welcome div.detail-list-item h4
 }
 
 div.dashlet.user-welcome div.detail-list-item div
+div.dashlet.user-welcome div.detail-list-item-alt div
 {
    padding-bottom: 0.5em;
 }

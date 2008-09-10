@@ -16,7 +16,7 @@
 
    <div id="${args.htmlid}-rssFeed" class="rss-feed"><a href="${url.context}/proxy/alfresco/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">RSS feed</a></div>
    
-   <div id="${args.htmlid}-renamepanel">
+   <div id="${args.htmlid}-renamepanel" class="rename-panel">
       <div class="hd">${msg("panel.rename.title")}</div>
       <div class="bd">
          <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${page.url.args["title"]!""}">

@@ -286,6 +286,24 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
 
          // Display the panel
          this.panel.show();
+         
+         // Fix Firefox caret issue
+         Alfresco.util.caretFix(this.id + "-addEvent-form");
+
+         // Register the ESC key to close the dialog
+         var escapeListener = new YAHOO.util.KeyListener(document,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(id, keyEvent)
+            {
+               this.onCancelButtonClick();
+            },
+            scope: this,
+            correctScope: true
+         });
+         escapeListener.enable();
 
          // Set intial focus
          YAHOO.util.Dom.get(this.id + "-title").focus();

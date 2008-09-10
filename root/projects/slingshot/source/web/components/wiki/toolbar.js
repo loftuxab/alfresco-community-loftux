@@ -107,6 +107,7 @@
             fixedcenter: true,
             visible: false,
             draggable: false,
+            modal: true,
             close: true,
             text: '<div class="yui-u"><br />' + confirmText + '<br /><br /></div>',
             constraintoviewport: true,
@@ -132,18 +133,23 @@
          
          var headerText = Alfresco.util.message("panel.confirm.header", this.name);
          this.deleteDialog.setHeader(headerText);
-         this.deleteDialog.render(this.id + "-body");
+         this.deleteDialog.render(document.body);
          
          // Create the rename panel
-         this.renamePanel = new YAHOO.widget.Panel(this.id + "-renamepanel",
+         var renamePanel = Dom.get(this.id + "-renamepanel");
+         var clonedRenamePanel = renamePanel.cloneNode(true);
+         renamePanel.parentNode.removeChild(renamePanel);
+         
+         this.renamePanel = new YAHOO.widget.Panel(clonedRenamePanel,
          {
             width: "320px",
             visible: false,
+            draggable: false,
             constraintoviewport: true,
             fixedcenter: true,
             modal: true
          });
-         this.renamePanel.render();
+         this.renamePanel.render(document.body);
          
          var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,
          {
@@ -166,6 +172,7 @@
             failureMessage: "Page rename failed"
          });        
          renameForm.setSubmitAsJSON(true);
+         renameForm.applyTabFix();
          renameForm.init();
          
          // Listen for when an event has been updated
