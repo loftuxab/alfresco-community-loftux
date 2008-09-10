@@ -14,7 +14,7 @@
       </span>
       </#if>
       <#if userIsSiteManager>
-      <span class="navigation-separator">|</span>
+      <span class="navigation-separator">&nbsp;</span>
       <span class="navigation-item">
          <#assign linkClass><#if "customise-site" == activePage>class="active-page"</#if></#assign>
          <a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site" ${linkClass}>${msg("link.customiseSite")}</a>

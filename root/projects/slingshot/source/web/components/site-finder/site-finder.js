@@ -39,6 +39,11 @@
       Element = YAHOO.util.Element;
    
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * SiteFinder constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -370,9 +375,9 @@
             var isPublic = oRecord.getData("isPublic");
             
             // title/link to site page
-            var details = '<h3 class="sitename"><a href="' + url + '">' + title + '</a></h3>';
+            var details = '<h3 class="sitename"><a href="' + url + '">' + $html(title) + '</a></h3>';
             // description
-            details += '<div class="sitedescription">' + desc + '</div>';
+            details += '<div class="sitedescription">' + $html(desc) + '</div>';
             
             elCell.innerHTML = details;
          };

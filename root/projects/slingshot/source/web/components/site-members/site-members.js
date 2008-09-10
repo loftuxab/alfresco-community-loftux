@@ -400,6 +400,7 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
+            Dom.setStyle(elCell, "overflow", "visible !important");
             
             var currentRole = oRecord.getData("role");
             

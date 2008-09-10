@@ -313,10 +313,7 @@
                {
                   "node": node,
                   "fnLoadComplete": fnLoadComplete
-               },
-
-               // Timeout -- abort the transaction after 7 seconds
-               timeout: 7000
+               }
             };
 
             // Make the XHR call using Connection Manager's asyncRequest method

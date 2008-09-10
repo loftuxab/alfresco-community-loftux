@@ -34,17 +34,14 @@
 <#assign tabs =
 [
    { 
-      "id": "#page",
       "label": msg("tab.view"),
       "action": "view"
    },
    {
-      "id": "#edit",
       "label": msg("tab.edit"),
       "action": "edit"
    },
    {
-      "id": "#history",
       "label": msg("tab.details"),
       "action": "details"
    }
@@ -53,7 +50,7 @@
    <#if tab.action == action>
          <span class="tabSelected">${tab.label}</span>
    <#else>
-         <a href="?title=${page.url.args["title"]!""}&action=${tab.action}" class="tabLabel">${tab.label}</a>
+         <a href="?title=${page.url.args["title"]!""}&amp;action=${tab.action}" class="tabLabel">${tab.label}</a>
    </#if>
    <#if tab_has_next>
          <span class="separator">|</span>
@@ -65,29 +62,31 @@
 <div id="${args.htmlid}-wikipage" class="yui-navset">       
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 <#if action == "view">	    
-	        <div id="#page"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
+	        <div><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
 <#elseif action == "edit">	        
-	        <div id="#edit">
+	        <div>
 	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
+	               <fieldset>
 	            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
-	            <input type="hidden" name="context" value="${pageContext?html}" />
-               <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
+   	            <input type="hidden" name="context" value="${pageContext?html}" />
+                  <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
               
                <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
                
                <!-- Render the tag inputs -->
                <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
                <!-- end tags -->
-			      <div>
-	               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
-				      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
-	            </div>
+      			      <div>
+      	               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
+      				      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
+      	            </div>
+                  </fieldset>
 	            </form>
 			</div> 
 <#elseif action == "details">	    		
-			<div id="#history">
-			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%; height:400px; overflow-y:auto">
-			<div class="yui-g" style="background: #CCC;">
+			<div>
+   			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%; height:400px; overflow-y:auto">
+   			<div class="yui-g" style="background: #CCC;">
 			   <div class="yui-u first"><h2>${result.title!""}</h2></div>
 			   <div class="yui-u">
 			   	<#if versionhistory??>
@@ -101,7 +100,7 @@
 			      </#if>
 			   </div>
 			</div>
-			<div id="#page">
+			<div>
 			   <#-- PAGE CONTENT GOES HERE -->
 			   <#if result.pagetext??>${result.pagetext}</#if>
 			</div>

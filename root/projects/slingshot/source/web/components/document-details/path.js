@@ -147,7 +147,7 @@
          else
          {
             // Document Library root node
-            pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + Alfresco.util.message("path.documents", this.name) + '</a></span>';
+            pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
             
             var folders = path.substring(1, path.length).split("/");
             
@@ -160,8 +160,7 @@
             {
                pathUrl += folders[x];
                
-               pathHtml += '<img src="' + Alfresco.constants.URL_CONTEXT + '/components/documentlibrary/images/folder-closed-16.png" alt="folder" />';
-               pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
+               pathHtml += '<span class="path-link folder"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
                {
                   file: (y - x > 1) ? "" : "?file=" + docData.fileName
                });

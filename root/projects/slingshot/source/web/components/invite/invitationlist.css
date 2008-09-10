@@ -1,17 +1,14 @@
 .invitationlist
 {
 	border: 1px solid #bababa;
-}
-
-.invitationlist
-{
 	color: #000;
+	margin: 10px 0px;
 }
 
 .invitationlist .inviteelist
 {
    background-color: #f6fef5;
-   height: 280px;
+   height: 300px;
    overflow-y: auto;
    overflow-x: hidden;
    position: relative !important;
@@ -94,6 +91,7 @@
 .invitationlistwrapper
 {
 	background: transparent url(images/green-arrow.png) no-repeat left 15%;
+	margin: 10px 0;
 	padding-left: 50px;
 }
 

@@ -226,11 +226,8 @@
 }
 
 .nodeAttrLabel {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 100%;
-  line-height: 130%;
   color: #606060;
+  padding: 0.5em 0px;
 }
 .nodeAttrValue {
   font-family: Arial, sans-serif;
@@ -265,7 +262,7 @@
   background-color: #f8f8f8;
   border-top: 1px dashed #c6c6c6;
   border-bottom: 1px solid #c6c6c6;
-  padding: 1px;
+  padding: 4px;
 }
 .nodeFooter .tag {
   background:transparent url(../images/tag-16.png) no-repeat scroll 0px 50%;
@@ -275,5 +272,10 @@
 .replyTo {
   background:transparent url(../images/reply-to-discussion-16.png) no-repeat scroll 0px 50%;
   padding-left: 20px;
+}
+
+.spacer
+{
+   padding: 0.5em;
 }
 

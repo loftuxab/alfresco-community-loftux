@@ -1,6 +1,7 @@
 .people-finder
 {
    color: #000;
+   margin: 24px 10px 10px;
 }
 
 .people-finder.list
@@ -11,6 +12,7 @@
 .people-finder .finder-wrapper
 {
 	border: 1px solid #c0c0c0;
+	margin-top: 10px;
 }
 
 .people-finder .results table
@@ -59,8 +61,8 @@
 
 .people-finder .title
 {
-	font-weight: bold;
-	padding: 0.5em;
+   color: #008000;
+   font-size: 108%;
 }
 
 .people-finder .search-bar
