@@ -64,6 +64,17 @@ public class ThemeUtil
     {
         return context.getTheme();
     }
+    
+    /**
+     * Sets the current theme.
+     * 
+     * @param context the context
+     * @param themeId the theme id
+     */
+    public static void setCurrentThemeId(RequestContext context, String themeId)
+    {
+        context.setThemeId(themeId);
+    }
 
     /**
      * This method is called by the dispatcher servlet to "push" the
