@@ -33,6 +33,7 @@ import java.util.StringTokenizer;
 
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
+import org.alfresco.connector.ConnectorProvider;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
@@ -59,7 +60,7 @@ public class RemoteStore implements Store
     private String endpoint;
 
     private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();
-    private ThreadLocal<Connector> connector = new ThreadLocal<Connector>();
+    private ThreadLocal<ConnectorProvider> connProvider = new ThreadLocal<ConnectorProvider>();
     
     
     /**
@@ -71,13 +72,13 @@ public class RemoteStore implements Store
     }
     
     /**
-     * Binds this instance to the given Connector instance for the current thread
+     * Binds this instance to the given ConnectorProvider instance for the current thread
      * 
      * @param connector     Connector to bind for the current thread
      */
-    public void bindConnector(Connector connector)
+    public void bindConnectorProvider(ConnectorProvider provider)
     {
-        this.connector.set(connector);
+        this.connProvider.set(provider);
     }
 
     /**
@@ -86,7 +87,7 @@ public class RemoteStore implements Store
     public void unbind()
     {
         this.repositoryStoreId.remove();
-        this.connector.remove();
+        this.connProvider.remove();
     }
 
     /**
@@ -438,11 +439,16 @@ public class RemoteStore implements Store
      */
     private Connector getConnector() throws RemoteConfigException
     {
-        Connector con = connector.get();
-        if (con == null)
+        Connector conn = null;
+        ConnectorProvider provider = connProvider.get();
+        if (provider != null)
         {
-            con = this.connectorService.getConnector(this.endpoint);
+            conn = provider.provide();
         }
-        return con; 
+        if (conn == null)
+        {
+            conn = this.connectorService.getConnector(this.endpoint);
+        }
+        return conn; 
     }
 }

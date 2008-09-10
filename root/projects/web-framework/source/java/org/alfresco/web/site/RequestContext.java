@@ -35,6 +35,7 @@ import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
@@ -55,6 +56,13 @@ import org.apache.commons.logging.Log;
  */
 public interface RequestContext extends Serializable
 {
+    public static final String VALUE_HEAD_TAGS = "headTags";
+    public static final String VALUE_CREDENTIAL_VAULT = "credential_vault";
+    public static final String VALUE_IDENTITY_VAULT = "identity_vault";
+    
+    public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
+    
+    
     /**
      * Each request context instance is stamped with a unique id
      * @return The id of the request context
@@ -331,6 +339,11 @@ public interface RequestContext extends Serializable
      * Sets the current theme id
      */
     public void setThemeId(String themeId);
+    
+    /**
+     * @return the current Theme object or null if not set
+     */
+    public Theme getTheme();
         
     /**
      * Sets the current model
@@ -338,10 +351,4 @@ public interface RequestContext extends Serializable
      * @param model
      */
     public void setModel(Model model);
-    
-    public static final String VALUE_HEAD_TAGS = "headTags";
-    public static final String VALUE_CREDENTIAL_VAULT = "credential_vault";
-    public static final String VALUE_IDENTITY_VAULT = "identity_vault";
-    
-    public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
 }

@@ -61,7 +61,7 @@ public abstract class AbstractRequestContext implements RequestContext
     public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
     
     /*
-     * Increments every time a request ID is required
+     * Increments every time a request ID is required (debug)
      */
     protected static int idCounter = 0;
     
@@ -75,7 +75,6 @@ public abstract class AbstractRequestContext implements RequestContext
     protected User user;
     protected String id;
     protected String uri;
-    protected String themeId;
     protected Model model;
     
     
@@ -538,22 +537,6 @@ public abstract class AbstractRequestContext implements RequestContext
     public String getDebugMode()
     {
         return null;
-    }
-    
-    /**
-     * Returns the current theme id
-     */
-    public String getThemeId()
-    {
-        return themeId;
-    }
-    
-    /**
-     * Sets the current theme id
-     */
-    public void setThemeId(String themeId)
-    {
-        this.themeId = themeId;
     }
     
     @Override

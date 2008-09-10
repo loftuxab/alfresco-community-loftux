@@ -74,9 +74,11 @@ public abstract class AbstractWebScript implements WebScript
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
     private ReentrantReadWriteLock statusTemplateLock = new ReentrantReadWriteLock(); 
     
-    // Reusable utility classes
+    // Immutable utility classes
     private static final JSONUtils JSON_UTILS = new JSONUtils();
     private static final ScriptableUtils SCRIPTABLE_UTILS = new ScriptableUtils();
+    private static final DateCompareMethod DATE_COMPARE_METHOD = new DateCompareMethod();
+    
     
     //
     // Initialisation
@@ -264,10 +266,9 @@ public abstract class AbstractWebScript implements WebScript
         params.put("scripturl", new ScriptUrlMethod(req, res));
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
+        params.put("dateCompare", DATE_COMPARE_METHOD);
         MessageMethod message = new MessageMethod(this);
         params.put("message", message);     // for compatibility with repo webscripts
-        DateCompareMethod dateCompare = new DateCompareMethod();
-        params.put("dateCompare", dateCompare);
         params.put("msg", message);         // short form for presentation webscripts
         // add the webscript I18N resources as a JSON object
         params.put("messages", renderJSONResources(getResources()));
