@@ -29,7 +29,7 @@
       </#if>
 
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
-         <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
+         <span class="menu-item"><a href="http://www.alfresco.com/help/3/EUHelp" target="_new">${msg("link.help")}</a></span>
          <#if !isGuest>
          <span class="menu-item-separator">|</span>
          <span class="menu-item"><a href="${url.context}/logout" title="${msg("link.logout.tooltip", user.name?html)}">${msg("link.logout")}</a></span>
