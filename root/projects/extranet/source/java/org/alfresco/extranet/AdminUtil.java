@@ -2,6 +2,7 @@ package org.alfresco.extranet;
 
 import org.alfresco.web.site.exception.RequestContextException;
 import org.alfresco.extranet.database.DatabaseInvitedUser;
+import org.alfresco.extranet.mail.MailService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
@@ -32,6 +33,16 @@ public class AdminUtil {
     {
         org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
         return user != null && user.isAdmin();
+    }
+
+    public String getAccessDeniedMessage()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Access denied<br/><br/><a href=\"");
+        sb.append( request.getContextPath());
+        sb.append( "/?pt=login\">Login now</a>");
+
+        return sb.toString();
     }
 
 
@@ -77,6 +88,7 @@ public class AdminUtil {
 
             String subscriptionStart = nullAssert(request.getParameter(Constants.ADMIN_TOOLS_SUBSCRIPTION_START));
             String subscriptionEnd = nullAssert(request.getParameter(Constants.ADMIN_TOOLS_SUBSCRIPTION_END));
+            boolean sendEmail =  request.getParameter(Constants.ADMIN_TOOLS_SEND_EMAIL).equals("true");
 
             // we only handle enterprise and employee invitation types for the moment
             String invitationType = nullAssert(request.getParameter(Constants.ADMIN_TOOLS_INVITATION_TYPE));
@@ -109,7 +121,9 @@ public class AdminUtil {
 
 
                 // invite the user
-                DatabaseInvitedUser invitedUser = invitationService.inviteUser(userId, firstName, lastName, email, whdUserId, alfrescoUserId, Constants.ADMIN_TOOLS_INVITATION_ENTERPRISE, subscriptionStartDate, subscriptionEndDate);
+                DatabaseInvitedUser invitedUser = invitationService.inviteUser(userId, firstName, lastName, email,
+                        whdUserId, alfrescoUserId, Constants.ADMIN_TOOLS_INVITATION_ENTERPRISE, subscriptionStartDate,
+                        subscriptionEndDate, sendEmail);
                 if(invitedUser != null)
                 {
                     result = "Invitation was created!";

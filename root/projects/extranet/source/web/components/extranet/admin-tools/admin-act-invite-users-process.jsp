@@ -12,13 +12,14 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
-	// safety check
-	org.alfresco.connector.User user = org.alfresco.web.site.RequestUtil.getRequestContext(request).getUser();
-	if(user == null || !user.isAdmin())
-	{
-		out.println("Access denied");
-		return;
-	}
+    // safety check
+    AdminUtil admin = new AdminUtil(request);
+    if( !admin.isAuthorizedAdmin())
+    {
+        out.println(admin.getAccessDeniedMessage());
+        return;
+    }
+
 %>
 <%
 	// get services
@@ -73,7 +74,7 @@
 					}
 				
 					// invite the user
-					DatabaseInvitedUser invitedUser = invitationService.inviteUser(userName, firstName, lastName, email, whdUserId, alfrescoUserId, invitationType, subscriptionStartDate, subscriptionEndDate);
+					DatabaseInvitedUser invitedUser = invitationService.inviteUser(userName, firstName, lastName, email, whdUserId, alfrescoUserId, invitationType, subscriptionStartDate, subscriptionEndDate, true);
 					if(invitedUser != null)
 					{
 						invitedUsersMap.put(userName, invitedUser);

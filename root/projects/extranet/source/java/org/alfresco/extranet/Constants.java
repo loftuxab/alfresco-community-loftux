@@ -16,6 +16,7 @@ public class Constants {
     public static final String ADMIN_TOOLS_DISPATCH_TO_ENTITY_ADD = "admin-entities-add";
     public static final String ADMIN_TOOLS_DISPATCH_TO_ENTITY_EDIT = "admin-entities-edit";
     public static final String ADMIN_TOOLS_DISPATCH_TO_INVITE_USER = "admin-invite-user";
+    public static final String ADMIN_TOOLS_DISPATCH_TO_EMAIL_INVITE = "admin-email-invite";
 
     // parameter values that are used with the "comand" parameter name
     public static final String ADMIN_TOOLS_COMMAND_INVITE_USER = "inviteUser";
@@ -34,6 +35,9 @@ public class Constants {
     public static final String ADMIN_TOOLS_INVITATION_ENTERPRISE = "enterprise";
     public static final String ADMIN_TOOLS_INVITATION_EMPLOYEE = "employee";
     public static final String ADMIN_TOOLS_ENTITY_TYPE = "entity_type";
+    public static final String ADMIN_TOOLS_SEND_EMAIL = "sendEmail";
+    public static final String ADMIN_TOOLS_HASH = "hash";
 
     public static final String ADMIN_TOOLS_SELECTED_ID = "selectedId";
+    public static final String ADMIN_TOOLS_INVITED_USER_ID = "invitedUserId";
 }

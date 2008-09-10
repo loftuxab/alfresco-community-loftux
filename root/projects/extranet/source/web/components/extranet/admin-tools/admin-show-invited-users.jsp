@@ -7,6 +7,7 @@
 <%@ page import="org.alfresco.extranet.webhelpdesk.*" %>
 <%@ page import="org.springframework.context.ApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
+<%@ page import="org.omg.PortableInterceptor.AdapterManagerIdHelper" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" autoFlush="true"%>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
@@ -15,8 +16,7 @@
 	AdminUtil admin = new AdminUtil(request);
     if( !admin.isAuthorizedAdmin())
 	{
-        //TODO: replace with redirect and error message
-		out.println("Access denied");
+		out.println(admin.getAccessDeniedMessage());
 		return;
 	}
 %>
@@ -65,6 +65,9 @@
 			</td>
 			<td>
 				<a href="/extranet/?p=invitation-wizard&hash=<%=dbUser.getHash()%>">Process</a>
+			</td>
+            <td>
+				<a href="/extranet/?p=<%=Constants.ADMIN_TOOLS%>&<%=Constants.ADMIN_TOOLS_DISPATCH_TO%>=<%=Constants.ADMIN_TOOLS_DISPATCH_TO_EMAIL_INVITE%>&hash=<%=dbUser.getHash()%>">Email Invite</a>
 			</td>
 		</tr>
 <%
