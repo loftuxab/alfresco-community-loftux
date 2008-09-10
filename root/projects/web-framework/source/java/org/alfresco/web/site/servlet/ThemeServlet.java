@@ -69,7 +69,7 @@ public class ThemeServlet extends BaseServlet
         }
         if (themeId != null)
         {
-            ThemeUtil.setCurrentThemeId(request, themeId);
+            ThemeUtil.setCurrentThemeId(context, themeId);
             ThemeUtil.applyTheme(context, request);
         }
     }
