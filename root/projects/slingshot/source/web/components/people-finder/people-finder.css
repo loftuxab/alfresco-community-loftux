@@ -26,19 +26,19 @@
    display: none;
 }
 
-.people-finder .results table td
+.people-finder .yui-dt td
 {
    border-bottom: 1px dashed #D7D7D7;
    border-right: medium none;
 }
 
-.people-finder .results table .yui-dt-empty
+.people-finder .yui-dt-last td
 {
-   background-color: transparent;
    border-bottom: medium none;
 }
 
-.people-finder tr.yui-dt-odd, .people-finder tr.yui-dt-even
+.people-finder tr.yui-dt-odd,
+.people-finder tr.yui-dt-even
 {
    background-color: #ffffff;
    cursor: auto;
@@ -77,11 +77,6 @@
 .people-finder .search-bar div
 {
    float: left;
-}
-
-.people-finder .search-label
-{
-   padding: 0.5em 1em 0.5em 0.5em;
 }
 
 .people-finder .search-text

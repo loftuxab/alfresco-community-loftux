@@ -458,8 +458,7 @@
          }
          ];
 
-         YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' +
-            Alfresco.util.message("site-finder.enter-search-term", "Alfresco.SiteFinder") + '</span>';
+         YAHOO.widget.DataTable.MSG_EMPTY = '';
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
