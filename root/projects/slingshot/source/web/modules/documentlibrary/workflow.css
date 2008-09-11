@@ -19,6 +19,20 @@
 {   
 }
 
+.workflow .people-finder.list
+{
+}
+
+.workflow .people-finder
+{
+   margin: 0px;
+}
+
+.workflow .people-finder .finder-wrapper
+{
+   margin-top: 0px;
+}
+
 .workflow .people-selected
 {
    border: 1px solid #c0c0c0;

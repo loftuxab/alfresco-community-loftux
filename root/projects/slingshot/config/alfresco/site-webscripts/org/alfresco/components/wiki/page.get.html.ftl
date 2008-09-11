@@ -62,7 +62,7 @@
 <div id="${args.htmlid}-wikipage" class="yui-navset">       
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 <#if action == "view">	    
-	        <div><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
+	        <div id="${args.htmlid}-page"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
 <#elseif action == "edit">	        
 	        <div>
 	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
@@ -100,7 +100,7 @@
 			      </#if>
 			   </div>
 			</div>
-			<div>
+			<div id="${args.htmlid}-page">
 			   <#-- PAGE CONTENT GOES HERE -->
 			   <#if result.pagetext??>${result.pagetext}</#if>
 			</div>

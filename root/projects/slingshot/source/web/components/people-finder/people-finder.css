@@ -28,13 +28,14 @@
 
 .people-finder .results table td
 {
+   border-bottom: 1px dashed #D7D7D7;
    border-right: medium none;
-   border-top: 1px solid #f0f0f0;
 }
 
 .people-finder .results table .yui-dt-empty
 {
    background-color: transparent;
+   border-bottom: medium none;
 }
 
 .people-finder tr.yui-dt-odd, .people-finder tr.yui-dt-even

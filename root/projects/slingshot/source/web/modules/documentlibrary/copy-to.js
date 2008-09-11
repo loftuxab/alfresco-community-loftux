@@ -38,6 +38,11 @@
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
 
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
    Alfresco.module.DoclibCopyTo = function(htmlId)
    {
       // Mandatory properties
@@ -862,7 +867,7 @@
                element = document.createElement("div");
                Dom.addClass(element, i % 2 == 0 ? "even" : "odd");
                onclick = "YAHOO.Bubbling.fire('copyTo-siteChanged', {site: '" + site.shortName.replace(/[']/g, "\\'") + "'}); return false;";
-               element.innerHTML = '<a rel="' + site.shortName + '" href="#" onclick="' + onclick + '"><h4>' + site.title + '</h4>' + '<span>' + site.description + '</span></a>';
+               element.innerHTML = '<a rel="' + site.shortName + '" href="#" onclick="' + onclick + '"><h4>' + $html(site.title) + '</h4>' + '<span>' + $html(site.description) + '</span></a>';
                sitePicker.appendChild(element);
             }
             

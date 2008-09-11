@@ -10,14 +10,15 @@
 
 <div id="${args.htmlid}-body" class="site-finder">
 	
-	<div class="heading">${msg("site-finder.heading")}</div>
+	<div class="title">${msg("site-finder.heading")}</div>
 	
-	<div class="search-controls">
-	   <input id="${args.htmlid}-term" type="text" class="search-term" />
-	   <input id="${args.htmlid}-button" type="button" value="${msg("site-finder.search-button")}" />
-	</div>
-	
-	<#-- this div contains the site search results -->
-	<div id="${args.htmlid}-sites" class="site-list"></div>
+   <div class="finder-wrapper">
+      <div class="search-bar">
+         <div class="search-text"><input type="text" id="${args.htmlid}-term" class="search-term" /></div>
+         <div class="search-button"><button id="${args.htmlid}-button">${msg("site-finder.search-button")}</button></div>
+      </div>
+
+      <div id="${args.htmlid}-sites" class="results"></div>
+   </div>
 	
 </div>

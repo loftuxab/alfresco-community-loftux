@@ -9,8 +9,8 @@
 {
    background-color: #f6fef5;
    height: 300px;
-   overflow-y: auto;
    overflow-x: hidden;
+   overflow-y: auto;
    position: relative !important;
 }
 
@@ -103,7 +103,6 @@
 
 .invitationlistwrapper .title
 {
-	font-weight: bold;
 	padding: 0.5em;
 }
 

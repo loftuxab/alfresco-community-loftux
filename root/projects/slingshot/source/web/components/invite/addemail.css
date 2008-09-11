@@ -1,7 +1,5 @@
 .inviteusersbyemail
 {
-   background-color: #f6f9fc;
-   border: 1px solid #c0c0c0;
    margin-top: 15px;
 }
 
@@ -12,13 +10,15 @@
 
 .inviteusersbyemail .title
 {
-   color: #009300;
-   font-weight: bold;
+   color: #008000;
+   font-size: 108%;
    padding: 12px 0px 12px 8px;
 }
 
 .inviteusersbyemail .byemailbody
 {
+   background-color: #f6f9fc;
+   border: 1px solid #c0c0c0;
    padding: 0.5em 0.5em 1em;
 }
 

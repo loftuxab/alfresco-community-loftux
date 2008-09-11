@@ -107,7 +107,7 @@
 			   this._setupPageDetails();
 			}
 			
-			var pageText = document.getElementById("#page"); // Content area
+			var pageText = document.getElementById(this.id + "-page"); // Content area
 			if (pageText)
 			{
 				this.parser.URL = this._getAbsolutePath();
@@ -122,10 +122,7 @@
 		   // Add 'onchange' handler to dropdown
 		   YAHOO.util.Event.addListener(this.id + "-selectVersion", 'change', this.onSelectChange, null, this);
 		   
-		   var revertButton = Alfresco.util.createYUIButton(this, "revert-button", this.onRevert,
-   		{
-   			type: "push"
-   		});
+		   Alfresco.util.createYUIButton(this, "revert-button", this.onRevert);
    		
    		// Hide the revert button
    		var div  = Dom.get(this.id + "-revertPanel");
@@ -166,7 +163,7 @@
 		
 		_setupEditForm: function()
 		{
-		   var width = Dom.get(this.id + "-form").offsetWidth - 16;
+		   var width = Dom.get(this.id + "-form").offsetWidth - 256; //860
 		   this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
 		   this.tagLibrary.setOptions(
 		   {
@@ -291,7 +288,7 @@
 		
 		onVersionInfo: function(e)
 		{
-		   var page = Dom.get("#page");
+		   var page = Dom.get(this.id + "-page");
 		   page.innerHTML = this.parser.parse(e.serverResponse.responseText);
 		   
 		   var pagecontent = Dom.get(this.id + "-pagecontent");

@@ -5,14 +5,17 @@
    padding: 0px;
    border: 1px solid #bababa;
    background-color: white;
-   margin: 10px 0px 10px 0px;
+   margin: 20px 0px;
 }
 
 .dashlet .title
 {
-   padding: 5px 9px 5px 9px;
    background-color: #d7e0e7;
+   background-image: url(images/dashlet-title-bg.png);
+   background-repeat: repeat-x;
    border-bottom: 1px dotted #bababa;
+   color: #262d35;
+   padding: 5px 9px 5px 9px;
 }
 
 .dashlet .toolbar
@@ -29,7 +32,7 @@
 
 .dashlet .body
 {
-	background-color: #f5f9fc;
+	background-color: #F9FCFD;
 	overflow-x: hidden;
    padding: 0px 9px;
 }
@@ -37,6 +40,20 @@
 .dashlet .body h3
 {
    padding-top:0.6em;   
+}
+
+.dashlet .body a,
+.dashlet .body a:visited,
+.dashlet .body a:hover
+{
+   color: #4f94c9;
+   outline: none;
+   text-decoration: none;
+}
+
+.dashlet .body a:hover
+{
+   text-decoration: underline;
 }
 
 .dashlet .scrollableList
@@ -89,7 +106,16 @@
 }
 
 
-/* 3 column layout styling */
+.yui-g.grid,
+.yui-gb.grid,
+.yui-gc.grid,
+.yui-gd.grid
+{
+   margin: 0 10px;
+}
+
+
+/* 3 column layout */
 
 .yui-gb.grid .column1,
 .yui-gb.grid .column3
@@ -98,6 +124,12 @@
 }
 
 .yui-gb.grid .column2
+{
+   width: 48%;
+}
+
+/* 4 column layout */
+.yui-g.grid .yui-g .yui-u
 {
    width: 48%;
 }

@@ -9,7 +9,7 @@ Alfresco.gutter = function(myEditor) {
          
          createGutter: function() {
              this.gutter = new YAHOO.widget.Overlay('gutter1', {
-                 height: '425px',
+                 height: '384px',
                  width: '300px',
                  context: [myEditor.get('element_cont').get('element'), 'tl', 'tr'],
                  position: 'absolute',
@@ -93,14 +93,14 @@ Alfresco.util.createImageEditor = function(id, options)
  	   var libraryConfig = {
  	      type: 'push',
  	      label: 'Insert Library Image',
- 	      value: 'alfresco'
+ 	      value: 'alfresco-imagelib'
  	   };
 
  	   // Add the button to the "insertitem" group
  	   editor.toolbar.addButtonToGroup(libraryConfig, 'insertitem');
 
  	   // Handle the button's click
- 	   editor.toolbar.on('alfrescoClick', function(ev) {
+ 	   editor.toolbar.on('alfresco-imagelibClick', function(ev) {
  	      if (ev && ev.img)
  	      {
  	         var html = '<img src="' + ev.img + '" title="' + ev.title + '"/>';
@@ -121,7 +121,7 @@ Alfresco.util.createImageEditor = function(id, options)
              if (target.getAttribute('src')) {
                 var img = target.getAttribute('src'),
                 title = target.getAttribute('title');
-                this.toolbar.fireEvent('alfrescoClick', { type: 'alfrescoClick', img: img, title: title });
+                this.toolbar.fireEvent('alfresco-imagelibClick', { type: 'alfresco-imagelibClick', img: img, title: title });
              }
           }
  	   }, editor, true);

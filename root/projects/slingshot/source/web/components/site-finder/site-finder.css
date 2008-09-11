@@ -3,7 +3,7 @@
 	margin: 24px 10px 10px;
 }
 
-.site-finder .heading
+.site-finder .title
 {
    color: #008000;
    font-size: 108%;
@@ -49,7 +49,8 @@
 
 .site-finder .yui-dt td
 {
-   border: none;
+   border-bottom: 1px dashed #D7D7D7;
+   border-right: medium none;
 }
 
 .site-finder .yui-dt-first
@@ -64,7 +65,7 @@
 
 .site-finder tr.yui-dt-odd
 {
-   background-color: #fbfbfb;
+   background-color: #fff;
 }
 
 .site-finder h3
