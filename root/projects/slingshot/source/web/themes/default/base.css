@@ -45,22 +45,18 @@ body
     padding: 0;
 }
 
-a
+a,
+a:visited,
+a:hover
 {
-   color: black;
-   text-decoration: none;
+   color: #000;
    outline: none;
+   text-decoration: none;
 }
 
 a:hover
 {
-   color: black;
    text-decoration: underline;
-}
-
-a:visited
-{
-   color: black;
 }
 
 h1
@@ -268,9 +264,13 @@ hr
    padding: 6px 10px;
 }
 
-.page-title a:visited,
-.page-title a:hover,
-.page-title a
+.page-title a,
+.page-title a:visited
+{
+   color: #000;
+}
+
+.page-title a:hover
 {
    color: #fff;
 }
@@ -380,5 +380,13 @@ textarea
    border: 1px solid #C5D6E2;
    padding: 2px;
    font-weight: normal;
-   width: 15em;
+   width: 20em;
+}
+
+/* Richtext Editor Plug-ins */
+.yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
+{
+   background-position: 0 0 !important;
+   background-image: url(images/alfresco-imagelib.png) !important;
+   left: 6px;
 }

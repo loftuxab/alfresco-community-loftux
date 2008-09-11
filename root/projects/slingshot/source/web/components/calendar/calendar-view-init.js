@@ -710,7 +710,7 @@
          var label = Dom.get(this.id + "-dayLabel");
          label.innerHTML = Alfresco.util.formatDate(date, "dd mmm yyyy");
 
-         var WIDTH = 88; // 80px + 1px + 1px
+         var WIDTH = 88;
          var HEIGHT = 18;
          var DENOM = 1000 * 60 * 30; // 30 minute slots
 
