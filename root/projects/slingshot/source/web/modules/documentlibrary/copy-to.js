@@ -777,7 +777,7 @@
       {
          Alfresco.logger.debug("DLCT_onNodeClicked");
          var userAccess = node.data.userAccess;
-         if (userAccess.create)
+         if ((userAccess && userAccess.create) || (node.data.nodeRef == ""))
          {
             this.pathChanged(node.data.path);
             this._updateSelectedNode(node);
@@ -865,7 +865,10 @@
             {
                site = sites[i];
                element = document.createElement("div");
-               Dom.addClass(element, i % 2 == 0 ? "even" : "odd");
+               if (i == j - 1)
+               {
+                  Dom.addClass(element, "last");
+               }
                onclick = "YAHOO.Bubbling.fire('copyTo-siteChanged', {site: '" + site.shortName.replace(/[']/g, "\\'") + "'}); return false;";
                element.innerHTML = '<a rel="' + site.shortName + '" href="#" onclick="' + onclick + '"><h4>' + $html(site.title) + '</h4>' + '<span>' + $html(site.description) + '</span></a>';
                sitePicker.appendChild(element);
@@ -912,7 +915,10 @@
             {
                container = containers[i];
                element = document.createElement("div");
-               Dom.addClass(element, i % 2 == 0 ? "even" : "odd");
+               if (i == j - 1)
+               {
+                  Dom.addClass(element, "last");
+               }
                onclick = "YAHOO.Bubbling.fire('copyTo-containerChanged', {container: '" + container.name.replace(/[']/g, "\\'") + "'}); return false;";
                element.innerHTML = '<a rel="' + container.name + '" href="#" onclick="' + onclick + '"><h4>' + container.name + '</h4>' + '<span>' + container.description + '</span></a>';
                containerPicker.appendChild(element);
@@ -972,9 +978,6 @@
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
-         // Get root node for tree
-         var root = tree.getRoot();
-
          var rootLabel = (this.options.mode == DLCT.MODE_SITE ? "node.root-sites" : "node.root-repository" )
 
          // Add default top-level node
@@ -983,7 +986,7 @@
             label: this._msg(rootLabel),
             path: "",
             nodeRef: p_rootNodeRef
-         }, root, false);
+         }, tree.getRoot(), false);
 
          // Register tree-level listeners
          tree.subscribe("labelClick", this.onNodeClicked, this, true);

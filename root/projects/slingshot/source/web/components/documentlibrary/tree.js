@@ -649,7 +649,7 @@
          var obj = args[1];
          if (obj !== null)
          {
-            if (obj.nodeRef && obj.destination)
+            if (typeof obj.nodeRef !== "undefined" && typeof obj.destination !== "undefined")
             {
                var nodeSrc = null;
                var dest = obj.destination;
@@ -680,13 +680,13 @@
                   var nodeDest = this.widgets.treeview.getNodeByProperty("path", dest);
                   if (nodeDest)
                   {
-                     if (nodeDest.expanded)
-                     {
-                        this._sortNodeChildren(nodeDest);
-                     }
-                     else
+                     if (nodeDest.isLeaf)
                      {
                         nodeDest.isLeaf = false;
+                     }
+                     else if (nodeDest.expanded)
+                     {
+                        this._sortNodeChildren(nodeDest);
                      }
                   }
                   
