@@ -95,20 +95,32 @@
    width: 14em;
 }
 
+.copy-to .site-picker h4
+{
+   background-image: url(images/site-16.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
+}
+
+.copy-to .container-picker h4
+{
+   background-image: url(images/open-folder-16.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
+}
+
+.copy-to .site-picker .last a,
+.copy-to .container-picker .last a
+{
+   border-bottom: medium none;
+}
+
 .copy-to .site-picker a,
 .copy-to .container-picker a
 {
+   border-bottom: 1px dashed #d7d7d7;
    display: block;
-}
-.copy-to .site-picker .odd a,
-.copy-to .container-picker .odd a
-{
-   background-color: #edf5ff;
-}
-.copy-to .site-picker .even a,
-.copy-to .container-picker .even a
-{
-   background-color: #fff;
+   padding: 0.5em 1px;
 }
 .copy-to .site-picker a:active,
 .copy-to .site-picker a:hover,

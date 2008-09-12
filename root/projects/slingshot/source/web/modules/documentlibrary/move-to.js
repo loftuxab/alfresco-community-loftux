@@ -585,7 +585,7 @@
       {
          Alfresco.logger.debug("DLMT_onNodeClicked");
          var userAccess = node.data.userAccess;
-         if (userAccess.create)
+         if ((userAccess && userAccess.create) || (node.data.nodeRef == ""))
          {
             this.pathChanged(node.data.path);
             this._updateSelectedNode(node);
@@ -671,16 +671,13 @@
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
-         // Get root node for tree
-         var root = tree.getRoot();
-
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
          {
             label: Alfresco.util.message("node.root", this.name),
             path: "",
             nodeRef: ""
-         }, root, false);
+         }, tree.getRoot(), false);
 
          // Register tree-level listeners
          tree.subscribe("labelClick", this.onNodeClicked, this, true);
