@@ -84,6 +84,11 @@
    padding: 0.3em 1em 0.5em 0.5em;
 }
 
+.people-finder .search-text input
+{
+   width: 20em;
+}
+
 .people-finder .search-button button
 {
    padding-left: 2.5em; 
