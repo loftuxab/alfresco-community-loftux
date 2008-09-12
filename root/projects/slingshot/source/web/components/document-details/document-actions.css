@@ -23,6 +23,12 @@
    visibility: hidden;
 }
 
+.document-actions .doclist .action-set a,
+.document-actions .doclist .action-set a:visited
+{
+   border: 1px solid #fff;
+}
+
 .document-actions .doclist .action-set a:active,
 .document-actions .doclist .action-set a:hover
 {

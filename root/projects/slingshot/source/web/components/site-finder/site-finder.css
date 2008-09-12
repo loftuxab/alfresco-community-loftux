@@ -33,6 +33,11 @@
    padding: 0.3em 1em 0.5em 0.5em;
 }
 
+.site-finder .search-text input
+{
+   width: 20em;
+}
+
 .site-finder .search-button button
 {
    padding-left: 2.5em; 
