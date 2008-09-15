@@ -7,12 +7,36 @@
 {
    color: #333333;
    font-size: 131%;
-   padding: 1em 0em ;
+   padding-top: 1em;
 }
 
 .document-versions .info
 {
    line-height: 1.5em;
+}
+
+.document-versions .info.more
+{
+   cursor: pointer;
+   background-repeat:no-repeat;
+   background-position:left 0.4em;
+   padding-left: 1.2em;
+}
+
+.document-versions .info.more.expanded
+{
+   background-image:url(../images/expanded.png);
+
+}
+
+.document-versions .info.more.collapsed
+{
+   background-image:url(../images/collapsed.png);
+}
+
+.document-versions .moreInfo
+{
+   padding-left: 1.2em;
 }
 
 .document-versions .info-section
@@ -24,6 +48,7 @@
 .document-versions .info-sub-section
 {
    padding-bottom: 1.2em;
+   padding-top: 1.2em;
 }
 
 .document-versions .meta-heading
@@ -32,15 +57,45 @@
    color: #333333;
 }
 
+.document-versions .meta-section-label,
 .document-versions .meta-label
 {
-   font-size: 100%;
    color: #606060;
+   font-size: 100%;
    padding-right: 0.3em;
+}
+
+.document-versions .meta-section-label
+{
 }
 
 .document-versions .meta-value
 {
    font-size: 100%;
    color: #333333;
+}
+
+.document-versions .actions
+{
+   line-height:16px;
+   /* padding:0.3em 0 1em 0; */
+   padding: 0.6em 0.3em 1.2em;
+}
+
+.document-versions .actions span
+{
+   background-repeat: no-repeat;
+   background-position: left;
+   padding: 1em 1em 1em 24px;
+   cursor: pointer;
+}
+
+.document-versions .actions span.download
+{
+   background-image: url(../documentlibrary/images/download-16.png);
+}
+
+.document-versions .actions span.revert
+{
+   background-image: url(../images/revert.gif);
 }

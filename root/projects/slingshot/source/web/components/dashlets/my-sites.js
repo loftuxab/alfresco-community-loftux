@@ -38,7 +38,7 @@
     * @return {Alfresco.MySites} The new component instance
     * @constructor
     */
-   Alfresco.MySites = function MyS_constructor(htmlId)
+   Alfresco.MySites = function MS_constructor(htmlId)
    {
       this.name = "Alfresco.MySites";
       this.id = htmlId;
@@ -68,11 +68,7 @@
        * Object container for initialization options
        *
        * @property options
-       * @type {object} site object literal of the form:
-       * {
-       *    shortName: {string} the shortName of the site
-       *    title: {string} the title of the site
-       * }
+       * @type {object} object literal
        */
       options:
       {
@@ -93,7 +89,7 @@
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.DocumentList} returns 'this' for method chaining
        */
-      setOptions: function DL_setOptions(obj)
+      setOptions: function MS_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -104,7 +100,7 @@
        * been loaded into the browser.
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function()
+      onComponentsLoaded: function MS_onComponentsLoaded()
       {
          YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -113,7 +109,7 @@
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
-      onReady: function()
+      onReady: function MS_onReady()
       {
          // Listen on clicks for the create site link
          var createSiteLink = document.getElementById(this.id + "-createSite-button");
@@ -147,7 +143,7 @@
        * @method onCreateSiteLinkClick
        * @param event {domEvent} DOM event
        */
-      onCreateSiteLinkClick: function(event)
+      onCreateSiteLinkClick: function MS_onCreateSiteLinkClick(event)
       {
          // Create the CreateSite module if it doesnt exist
          if (this.createSite === null)
@@ -166,7 +162,7 @@
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onSiteDeleted: function CS_onSiteDeleted(layer, args)
+      onSiteDeleted: function MS_onSiteDeleted(layer, args)
       {
          // Hide the site in this component
          var site = args[1].site;

@@ -1477,7 +1477,7 @@ Alfresco.util.Ajax = function()
        * @private
        */
       _successHandlerPostExec: function(serverResponse)
-      {
+      {       
          // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
          var callback = config.successCallback;
@@ -1523,11 +1523,20 @@ Alfresco.util.Ajax = function()
        * @method request
        * @param serverResponse
        * @private
-       */
+       */                                                
       _failureHandler: function(serverResponse)
       {
          // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
+
+         // Our session has likely timed-out, so refresh to offer the login page
+         if (serverResponse.status == 401)
+         {
+            window.location.reload(true);
+            return;
+         }
+
+         // Invokde the callback
          var callback = config.failureCallback;
          if ((callback && typeof callback.fn == "function") || (config.failureMessage))
          {
