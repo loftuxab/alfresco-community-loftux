@@ -155,7 +155,7 @@
       },
 
       /**
-       * Fired any another component, DeleteSite, to let other components know
+       * Fired by another component, DeleteSite, to let other components know
        * that a site has been deleted.
        *
        * @method onSiteDeleted

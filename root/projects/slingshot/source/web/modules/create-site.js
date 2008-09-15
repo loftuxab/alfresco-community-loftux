@@ -65,7 +65,6 @@
 
    Alfresco.module.CreateSite.prototype =
    {
-
       /**
        * Object container for storing YUI widget instances.
        * 
@@ -73,7 +72,6 @@
        * @type object
        */
        widgets: {},
-
 
       /**
        * Set messages for this module.
@@ -110,7 +108,7 @@
        */
       show: function CS_show()
       {
-         if(this.widgets.panel)
+         if (this.widgets.panel)
          {
             /**
              * The panel gui has been showed before and its gui has already
@@ -242,8 +240,6 @@
          this._showPanel();
       },
 
-
-
       /**
        * Called when user clicks on the isPublic checkbox.
        *
@@ -253,7 +249,7 @@
        */
       onIsPublicChange: function CS_onIsPublicChange(type, args)
       {
-        this.widgets.isPublic.value = this.widgets.isPublicCheckbox.checked ? "true" : "false";
+         this.widgets.isPublic.value = this.widgets.isPublicCheckbox.checked ? "true" : "false";
       },
 
       /**
@@ -266,7 +262,7 @@
        */
       onCancelButtonClick: function CS_onCancelButtonClick(type, args)
       {
-        this.widgets.panel.hide();
+         this.widgets.panel.hide();
       },
 
       /**
@@ -361,7 +357,7 @@ Alfresco.module.getCreateSiteInstance = function()
 {
    var instanceId = "alfresco-createSite-instance";
    var instance = Alfresco.util.ComponentManager.find({id: instanceId});
-   if (instance !== undefined && instance.length > 0)
+   if (instance !== undefined && instance.length != 0)
    {
       instance = instance[0];
    }
