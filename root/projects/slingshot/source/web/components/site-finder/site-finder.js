@@ -737,21 +737,19 @@
 
       },
 
-       /**
-        * Fired by YUI:s DataTable when a row has been added to the data table list.
-        * Keeps track of added files.
-        *
-        * @method onRowDeleteEvent
-        * @param event {object} a DataTable "rowDelete" event
-        */
-       onRowDeleteEvent: function FU_onRowDeleteEvent(event)
-       {
-          if (this.widgets.dataTable.getRecordSet().getLength() === 0)
-          {
-             this.widgets.dataTable.showTableMessage(Alfresco.util.message("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
-          }
-       }
-
-
+      /**
+       * Fired by YUI:s DataTable when a row has been added to the data table list.
+       * Keeps track of added files.
+       *
+       * @method onRowDeleteEvent
+       * @param event {object} a DataTable "rowDelete" event
+       */
+      onRowDeleteEvent: function FU_onRowDeleteEvent(event)
+      {
+         if (this.widgets.dataTable.getRecordSet().getLength() === 0)
+         {
+            this.widgets.dataTable.showTableMessage(Alfresco.util.message("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
+         }
+      }
    };
 })();

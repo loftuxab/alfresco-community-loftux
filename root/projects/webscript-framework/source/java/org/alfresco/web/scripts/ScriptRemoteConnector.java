@@ -176,11 +176,14 @@ public class ScriptRemoteConnector
     /**
      * Invokes a URI on a remote service as DELETE request.
      * 
+     * NOTE: the name of the method is 'del' not 'delete' so as to not
+     * interfere with JavaScript Object.delete() method.
+     * 
      * @param uri    Uri to call on the endpoint
      * 
      * @return Response object from the call {@link Response}
      */
-    public Response delete(String uri)
+    public Response del(String uri)
     {
         ConnectorContext context = new ConnectorContext();
         context.setMethod(HttpMethod.DELETE);

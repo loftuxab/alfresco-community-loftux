@@ -34,7 +34,6 @@
  */
 (function()
 {
-
    /**
     * DeleteSite constructor.
     *
@@ -68,7 +67,6 @@
 
    Alfresco.module.DeleteSite.prototype =
    {
-
       localized: false,
 
       /**
@@ -99,7 +97,7 @@
       show: function FU_show(config)
       {
          var c = config;
-         if(this.localized)
+         if (this.localized)
          {
              this._showDialog(c);
          }
@@ -121,9 +119,7 @@
                failureMessage: "Could not load delete site messages"
             });
          }
-
       },
-
 
       /**
        * Called when the DeleteSite messages has been returned from the server.
@@ -166,14 +162,15 @@
                }]
          });
       },
-      _onDeleteClick: function(config)
+      
+      _onDeleteClick: function DS__onDeleteClick(config)
       {
          var me = this;
          var c = config;
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: Alfresco.util.message("title.deleteSite", this.name),
-            text: Alfresco.util.message("label.confirmDeleteSite", this.name, {"0": c.site.title}),
+            text: Alfresco.util.message("label.confirmDeleteSite", this.name),
             noEscape: true,            
             buttons: [
                {
@@ -204,22 +201,26 @@
             spanClass: "wait",
             displayTime: 0
          });
-
+         
+         // user has confirmed, perform the actual delete
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + config.site.shortName,
-            method: Alfresco.util.Ajax.DELETE,
+            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/delete-site",
+            dataObj: { shortName: config.site.shortName },
+            method: "POST",
+            requestContentType : "application/json",
+            responseContentType : "application/json",
             successCallback:
             {
                fn: function(response)
                {
                   feedbackMessage.destroy();
-                  if(response.json && response.json.success)
+                  if (response.json && response.json.success)
                   {
                      Alfresco.util.PopupManager.displayMessage({
                         text: Alfresco.util.message("message.siteDeleted", this.name)
                      });
-
+                     
                      // Tell other components that the site has been deleted
                      YAHOO.Bubbling.fire("siteDeleted",
                      {
@@ -253,12 +254,11 @@
 
 })();
 
-
 Alfresco.module.getDeleteSiteInstance = function()
 {
    var instanceId = "alfresco-deletesite-instance";
    var instance = Alfresco.util.ComponentManager.find({id: instanceId});
-   if (instance !== undefined && instance.length > 0)
+   if (instance !== undefined && instance.length != 0)
    {
       instance = instance[0];
    }

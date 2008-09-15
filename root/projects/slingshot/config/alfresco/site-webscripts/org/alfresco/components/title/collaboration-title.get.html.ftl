@@ -22,7 +22,7 @@
       </#if>
       <#assign siteDashboardUrl = page.url.context + "/page/site/" + page.url.templateArgs.site + "/dashboard">
       <#if userIsSiteManager && (page.url.uri == siteDashboardUrl || "customise-site-dashboard" == activePage) >
-      <span class="navigation-separator">|</span>
+      <span class="navigation-separator">&nbsp;</span>
       <span class="navigation-item">
          <#assign linkClass><#if "customise-site-dashboard" == activePage>class="active-page"</#if></#assign>
          <a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard" ${linkClass}>${msg("link.customiseDashboard")}</a>
