@@ -15,7 +15,8 @@ function main()
       var versionGroup = "newerVersion";
       for(var i = 0; i < versions.length; i++)
       {
-         if(versions[i].createdDate == nodeRef)
+         versions[i].downloadURL = "/api/node/content/" + versions[i].nodeRef.replace(":/", "") + "/" + versions[i].name + "?a=true";
+         if(versions[i].nodeRef == nodeRef)
          {
             versionGroup = "currentVersion";
             foundCurrent = true;
@@ -28,6 +29,8 @@ function main()
       }
 
       // Prepare the model for the template
+      model.nodeRef = nodeRef;
+      model.filename = versions.length > 0 ? versions[0].name : null;
       model.versions = versions;      
    }
 }

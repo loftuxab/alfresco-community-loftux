@@ -134,6 +134,7 @@
        */
       onMessagesLoaded: function DS_onMessagesLoaded(config)
       {
+         this.localized = true;
          this._showDialog(config);
       },
 

@@ -1,7 +1,7 @@
 <div id="${args.htmlid}-dialog" class="create-site">
    <div class="hd">${msg("header.createSite")}</div>
    <div class="bd">
-      <form id="${args.htmlid}-form" action="${url.serviceContext}/modules/create-site" method="POST">
+      <form id="${args.htmlid}-form" method="POST" action="">
          <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
          <div class="yui-g">
             <h2>${msg("section.info")}</h2>
