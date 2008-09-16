@@ -97,7 +97,6 @@ public class ExtranetPageMapper extends DefaultPageMapper
                 if(groupsMap.get("enterprise") != null)
                 {
                     // they are an enterprise user
-                    ThemeUtil.setCurrentThemeId((HttpServletRequest)request, "enterprise");
                     context.setThemeId("enterprise");
                 }
             }

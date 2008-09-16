@@ -105,9 +105,13 @@ public class HttpRequestContext extends ThreadLocalRequestContext
         if (theme == null)
         {
             String themeId = getThemeId();
-            if (theme != null)
+            if (themeId != null)
             {
-                setValue(SESSION_CURRENT_THEME, getModel().getTheme(themeId));
+                theme = getModel().getTheme(themeId);
+                if (theme != null)
+                {
+                    setValue(SESSION_CURRENT_THEME, theme);
+                }
             }
         }
         return theme;
