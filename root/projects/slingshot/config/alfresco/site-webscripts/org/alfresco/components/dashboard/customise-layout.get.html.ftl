@@ -26,6 +26,8 @@
    ).setMessages(${messages});
    //]]></script>
 
+   <div id="${args.htmlid}-hideCurrentLayout-div" style="display: none;"></div>
+
 
    <div id="${args.htmlid}-currentLayout-div" class="currentLayout">
 
@@ -52,10 +54,10 @@
       <div>
          <div class="text">${msg("label.layoutWarning")}</div>
 
-         <ul>
+         <ul id="${args.htmlid}-layout-ul">
          <#list layouts as layout>
-            <li id="${args.htmlid}-layout-li-${layout.templateId}" <#if (currentLayout.templateId == layout.templateId)>style="display: none;"</#if>>
-               <div class="layoutDescription">${layout.description}</div>               
+            <li id="${args.htmlid}-layout-li-${layout.templateId}">               
+               <div class="layoutDescription">${layout.description}</div>
                <div class="layoutBox">
                   <span>
                      <img id="${args.htmlid}-select-img-${layout.templateId}" class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png"/>

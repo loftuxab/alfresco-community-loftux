@@ -67,7 +67,7 @@
 /* Set width and height of the pages list */
 .customise-pages .pages ul
 {
-   height: 22em;
+   height: 6.7em;
    overflow-y: auto;
    overflow-x: hidden;
    position:relative; /* IE will take the YIU buttons out of the flow otherwise */
