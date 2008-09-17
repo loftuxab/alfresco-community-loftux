@@ -56,6 +56,7 @@ public class WebFrameworkConstants
     public static final String REGION_SCOPE_TEMPLATE = "template";
     public static final String REGION_SCOPE_PAGE     = "page";
     public static final String REGION_SCOPE_URI      = "uri";
+    public static final String REGION_SCOPE_THEME    = "theme";
     
     // Renderer Types
     public static final String RENDERER_TYPE_JSP = "jsp";
