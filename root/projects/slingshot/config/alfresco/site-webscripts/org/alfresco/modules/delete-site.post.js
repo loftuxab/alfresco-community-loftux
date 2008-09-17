@@ -11,7 +11,24 @@ function main()
    // Check if we got a positive result
    if (resJSON.success)
    {
-      // Yes we did - the client will refresh
+      // Yes we did - now remove sitestore model artifacts...
+      
+      // remove dashboard page instance
+      var dashboardURL = "site/" + reqJSON.shortName + "/dashboard";
+      var dashboardPage = sitedata.getPage(dashboardURL);
+      if (dashboardPage != null)
+      {
+         dashboardPage.remove();
+      }
+      
+      // remove component instances
+      var components = sitedata.findComponents("page", null, dashboardURL, null);
+      for (var i=0; i < components.length; i++)
+      {
+         components[i].remove();
+      }
+      
+      // the client will refresh on success
       model.success = true;
    }
    else
