@@ -123,16 +123,18 @@
             if(deleteSpan)
             {
                YAHOO.util.Event.addListener(deleteSpan, "click",
-                     function (event)
-                     {
-                        // Find the index of the site-delete link by looking at its id
-                        var id = event.target.id;
-                        var site = sites[new Number(id.substring(id.lastIndexOf("-") + 1))];
+                       function (event, obj)
+                       {
+                          // Find the site by its index
+                          var site = sites[obj.selectedSiteIndex];
 
-                        // Find the site through the index and display the delete dialog for the site
-                        Alfresco.module.getDeleteSiteInstance().show({site: site});
-                     },
-                     this, true);
+                          // Find the site through the index and display the delete dialog for the site
+                          Alfresco.module.getDeleteSiteInstance().show({site: site});
+                       },
+               {
+                  selectedSiteIndex: i,
+                  thisComponent: this
+               });
             }
          }
 

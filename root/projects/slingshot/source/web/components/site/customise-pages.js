@@ -160,8 +160,11 @@
          for (var pageId in this.options.pages)
          {
             // Save a reference to each remove image button and listen for click event
-            var removeLink = document.getElementById(this.id + "-remove-link-" + pageId);
-            YAHOO.util.Event.addListener(removeLink, "click", this.onRemoveButtonClick, this, true);
+            YAHOO.util.Event.addListener(this.id + "-remove-link-" + pageId, "click", this.onRemoveButtonClick,
+            {
+               selectedPageId: pageId,
+               componentScope: this
+            });
 
             // Save references and listen to clicks on each select button
             this.widgets.selectButtons[pageId] = Alfresco.util.createYUIButton(this, "select-button-" + pageId, this.onSelectButtonClick);
@@ -239,21 +242,17 @@
        * @method onRemoveButtonClick
        * @param event {object} an "click" event
        */
-      onRemoveButtonClick: function CP_onRemoveButtonClick(event)
+      onRemoveButtonClick: function CP_onRemoveButtonClick(event, obj)
       {
-         // Find out what layout that is chosen by looking at the clicked button's id
-         var buttonId = event.currentTarget.getAttribute("id");
-         var selectedPageId = buttonId.substring((this.id + "-remove-link-").length);
-
          // Remove the page from the current pages list and add it last to the available pages list
-         Dom.setStyle(this.id + "-currentPage-li-" + selectedPageId, "display", "none")
-         var page = Dom.get(this.id + "-page-li-" + selectedPageId);
+         Dom.setStyle(obj.thisComponent.id + "-currentPage-li-" + obj.selectedPageId, "display", "none")
+         var page = Dom.get(obj.thisComponent.id + "-page-li-" + obj.selectedPageId);
          var container = page.parentNode;
          container.appendChild(page);
          Alfresco.util.Anim.fadeIn(page);
 
          // Show or hide empty div labels
-         this._adjustEmptyMessages();
+         obj.thisComponent._adjustEmptyMessages();
       },
 
 

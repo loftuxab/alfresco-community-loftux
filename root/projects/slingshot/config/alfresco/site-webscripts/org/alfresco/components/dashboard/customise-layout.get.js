@@ -28,7 +28,7 @@ var layouts = [
    {templateId: "dashboard-1-column",             noOfColumns: 1, description: "<b>One</b> column"},
    {templateId: "dashboard-2-columns-wide-right", noOfColumns: 2, description: "<b>Two</b> columns: narrow left, wide right"},
    {templateId: "dashboard-2-columns-wide-left",  noOfColumns: 2, description: "<b>Two</b> columns: wide left, narrow right"},
-   {templateId: "dashboard-3-columns",            noOfColumns: 3, description: "<b>Three</b> column: narrow left, wide centre, narrow right"},
+   {templateId: "dashboard-3-columns",            noOfColumns: 3, description: "<b>Three</b> columns: narrow left, "},
    {templateId: "dashboard-4-columns",            noOfColumns: 4, description: "<b>Four</b> columns"}
 ];
 

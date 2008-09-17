@@ -7,7 +7,7 @@
 </#macro>
 
 <#macro _normalGrid columns class bindPrefix>
-   <div class="${class} grid">
+   <div class="${class} grid columnSize${columns?size}">
       <#list columns as column>
          <div class="yui-u<#if column_index == 0> first</#if> column${column_index + 1}">
             <#list 1..column.components as component>
@@ -19,7 +19,7 @@
 </#macro>
 
 <#macro _nestedGrid columns class bindPrefix>
-   <div class="${class} grid">
+   <div class="${class} grid columnSize${columns?size}">
       <#list columns as column>
          <#if (column_index % 2 == 0)>
             <div class="yui-g<#if column_index == 0> first</#if> column${column_index + 1}">

@@ -133,6 +133,10 @@
             return;
          }
 
+         this.widgets.layoutLiElements = [];
+         this.widgets.layoutUlElement = Dom.get(this.id +"-layout-ul");
+
+
          // Save reference to buttons so we can change label and such later
          this.widgets.changeButton = Alfresco.util.createYUIButton(this, "change-button", this.onChangeButtonClick);
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -141,23 +145,34 @@
          this.widgets.selectButtons = [];
          for (var layoutId in this.options.layouts)
          {
+            var layoutLi = Dom.get(this.id +"-layout-li-" + layoutId);
+            this.widgets.layoutLiElements[layoutId] = layoutLi;
+
+            // Create the button and change layout when its clicked
             this.widgets.selectButtons[layoutId] = Alfresco.util.createYUIButton(this, "select-button-" + layoutId, function (event, button)
             {
-               // Find out what layout that is chosen by lokking at the clicked button's id
+               // Find out what layout that is chosen by looking at the clicked button's id
                var id = button.get("id");
                var selectedLayoutId = id.substring((this.id + "-select-button-").length);
                this.onSelectLayoutClick(selectedLayoutId);
             });
 
+            // Add a listener to the image so we change layout when its clicked
             var selectLayoutLink = document.getElementById(this.id + "-select-img-" + layoutId);
-            YAHOO.util.Event.addListener(selectLayoutLink, "click", function (event)
+            YAHOO.util.Event.addListener(selectLayoutLink, "click", function (event, obj)
             {
-               // Find out what layout that is chosen by lokking at the clicked button's id
-               var id = event.target.id;
-               var selectedLayoutId = id.substring((this.id + "-select-img-").length);
-               this.onSelectLayoutClick(selectedLayoutId);
-            }, this, true);
+               obj.thisComponent.onSelectLayoutClick(obj.selectedLayoutId);
+            },
+            {
+               selectedLayoutId: layoutId,
+               thisComponent: this
+            });
 
+            // Remove layout/li-element from available layouts if its the current layout
+            if(this.options.currentLayout.templateId == layoutId)
+            {
+               this.widgets.layoutUlElement.removeChild(layoutLi);
+            }
          }
       },
 
@@ -180,15 +195,13 @@
          Dom.setStyle(layoutsDiv, "display", "none");
          for (var layoutId in this.options.layouts)
          {
-            var layoutLi = Dom.get(this.id + "-layout-li-" + layoutId);
+            //var layoutLi = Dom.get(this.id + "-layout-li-" + layoutId);
+            var layoutLi = this.widgets.layoutLiElements[layoutId];
             if(selectedLayoutId == layoutId)
             {
                // Set the current layout
                var selectedLayout = this.options.layouts[layoutId];
                this.options.currentLayout = selectedLayout;
-
-               // Hide the newly selected layout
-               Dom.setStyle(layoutLi, "display", "none");
 
                // Display the selected layout as the current one
                var descriptionSpan = Dom.get(this.id + "-currentLayoutDescription-span");
@@ -199,13 +212,25 @@
                // Send out event to let other component know that the layout has changed
                YAHOO.Bubbling.fire("onDashboardLayoutChanged", {dashboardLayout: selectedLayout});
             }
-            else
-            {
-               // Show the previous layout (should have been hidden)
-               Dom.setStyle(layoutLi, "display", "");
-            }
-            // Send out event to let other component know that the should hide themselves
+         }
 
+         /**
+          * Remove all children from the availabla layout list. We could have just
+          * used style="display:none" but that makes IE6 crash the layout in some combinations :-(
+          */
+         var lis = Dom.getChildren(this.widgets.layoutUlElement);
+         for(var i = 0; i < lis.length; i++)
+         {
+            this.widgets.layoutUlElement.removeChild(lis[i]);
+         }
+
+         // Add the available layouts to the list
+         for (var layoutId in this.options.layouts)
+         {
+            if(layoutId != selectedLayoutId)
+            {
+               this.widgets.layoutUlElement.appendChild(this.widgets.layoutLiElements[layoutId]);
+            }
          }
 
          // Send out event to let other component know that the should show themselves

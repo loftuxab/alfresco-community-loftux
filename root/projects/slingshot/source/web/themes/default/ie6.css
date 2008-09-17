@@ -34,6 +34,137 @@
    margin-top: -4px;
 }
 
+/**
+ * Re-apply the color for the popup bodies
+ */
+.yui-skin-default .yui-panel .bd
+{
+   color: #515D6B;
+   background-color: #F9FBFD;
+}
+
+/**
+ * Flash Upload needs some extra width on its popup to look good 
+ */
+.yui-panel-container .flash-upload
+{
+   width: 650px;
+}
+
+
+/**
+ * Fix for 1 column dashboard layout
+ */
+div.grid.columnSize1 div.yui-u.first
+{
+   width:100%;
+}
+
+/**
+ * Fix for 2/3 + 1/3 dashboard layout
+ */
+div.grid.columnSize2.yui-gc div.yui-u
+{
+   margin-left:1.99%;
+   width:32%;
+}
+
+div.grid.columnSize2.yui-gc div.yui-u.first
+{
+   margin-left: 0;
+   width:65%;
+}
+
+/**
+ * Fix for 1/3 + 2/3 dashboard layout
+ */
+
+div.grid.columnSize2.yui-gd div.yui-u
+{
+   margin-left:1.99%;
+   width:65%;
+}
+
+div.grid.columnSize2.yui-gd div.yui-u.first
+{
+   margin-left: 0;
+   width:32%;
+}
+
+/**
+ * Fix for 1/4 + 1/4 + 1/4 + 1/4 dashboard layout
+ */
+div.grid.columnSize4.yui-g div.yui-g
+{
+   margin-left:1.5%;
+   width: 49%;
+}
+
+div.grid.columnSize4.yui-g div.yui-g.first
+{
+   margin-left: 0;
+   width: 49%;
+}
+
+div.grid.columnSize4.yui-g div.yui-g div.yui-u {
+   margin-left: 1.5%;
+   width:47.5%;
+}
+
+div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
+{
+   margin-left: 0;   
+   width: 47.5%;
+}
+
+/**
+ * Customise layouts
+ */
+.customise-layout div.layouts ul
+{
+   width:62em;
+}
+
+/**
+ * Customise dashlets
+ */
+
+.customise-layout div.layouts ul
+{
+   overflow: hidden;
+   width:61em;   
+}
+
+.customise-dashlets div.used div.noOfColumns1
+{
+   width:28em;
+}
+
+.customise-dashlets div.used div.noOfColumns2
+{
+   width:48em;
+}
+
+.customise-dashlets div.used div.noOfColumns3
+{
+   width:68em;
+}
+
+.customise-dashlets div.used div.noOfColumns4
+{
+   width:88em;
+}
+
+.customise-dashlets div.available,
+.customise-dashlets div.used
+{
+   background-color: white;
+}
+
+.customisableDashlet
+{
+   overflow: hidden;
+}
 
 /**
  * Members / invite pages
