@@ -24,8 +24,6 @@
  */
 package org.alfresco.web.site;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -340,10 +338,10 @@ public final class RenderUtil
             rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
             rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID, regionScopeId);
             rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID, regionSourceId);
-
+            
             // determine the region renderer
             RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);
-
+            
             // render in either one of two ways
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
@@ -693,7 +691,13 @@ public final class RenderUtil
     }
 
     /**
-     * Return the "source" ID for the given scopeId for the supplied context
+     * Return the "source" ID for the given scope ID for the supplied context.
+     * 
+     * For 'global' scope this will simply return 'global',
+     * for 'template' it will return the current template ID,
+     * for 'page' it will return the current page ID,
+     * for 'uri' it will return the current page URI,
+     * for 'theme' it will return the current theme ID.
      * 
      * @param context   Current RequestContext
      * @param scopeId   {@link WebFrameworkConstants}
@@ -719,6 +723,10 @@ public final class RenderUtil
         else if (WebFrameworkConstants.REGION_SCOPE_URI.equalsIgnoreCase(scopeId))
         {
             sourceId = context.getUri();
+        }
+        else if (WebFrameworkConstants.REGION_SCOPE_THEME.equalsIgnoreCase(scopeId))
+        {
+            sourceId = context.getThemeId();
         }
         
         return sourceId;
@@ -755,14 +763,12 @@ public final class RenderUtil
         {
             obj = context.getUri();
         }
+        else if (WebFrameworkConstants.REGION_SCOPE_THEME.equalsIgnoreCase(scopeId))
+        {
+            obj = context.getModel().getTheme(sourceId);
+        }
         
         return obj;
-    }
-
-    public static void print(HttpServletResponse response, String str)
-            throws IOException
-    {
-        response.getWriter().print(str);
     }
 
     /**
@@ -770,12 +776,14 @@ public final class RenderUtil
      * output stream is trapped and returned as a string.  The provided
      * servlet context objects are wrapped and used to help build
      * the output string.
-     *
+     * 
      * @param context
      * @param request
      * @param response
      * @param descriptor
-     * @return
+     * 
+     * @return renderer output as a String
+     * 
      * @throws Exception
      */
     public static String processRenderer(RequestContext context,
@@ -979,42 +987,36 @@ public final class RenderUtil
         }
     }
 
-
-    // logic that I want to move somewhere else
-
     /**
      * Returns the renderer to use to render the given region
-     *
+     * 
      * Currently, this just resorts to using the system default but
      * the idea is that it could be overridden at various levels.
-     *
+     * 
      * For example, the Theme could change the default chrome for a region.
-     *
-     * Or, a specific region might be "forced" to another chrome.
-     *
+     * Or a specific region might be "forced" to another chrome.
      */
     public static RendererDescriptor getRegionRendererDescriptor(RequestContext context, TemplateInstance template, String regionId, String chromeId)
     {
         // if the chrome id is empty, see if there is an override
-        // this allows the template to "override" the chrome on a
-        // per-region basis
+        // this allows the template to "override" the chrome on a per-region basis
         if (chromeId == null)
         {
             chromeId = template.getCustomProperty("region-" + regionId + "-chrome");
         }
-
+        
         // see if a default chrome was specified
         if (chromeId == null)
         {
             chromeId = context.getConfig().getDefaultRegionChrome();
         }
-
+        
         // if there still isn't a chrome, then pick the system default
         if (chromeId == null)
         {
             chromeId = WebFrameworkConstants.DEFAULT_REGION_CHROME_ID;
         }
-
+        
         // load the chrome
         Chrome chrome = context.getModel().getChrome(chromeId);
         if (chrome != null)
@@ -1022,7 +1024,7 @@ public final class RenderUtil
             // return the renderer for this chrome
             return new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
         }
-
+        
         // assume it is a freemarker chrome
         return new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
     }
@@ -1042,20 +1044,20 @@ public final class RenderUtil
             RequestContext context, Component component, String chromeId)
     {
         RendererDescriptor descriptor = null;
-
+        
         // if the chrome id is empty, see if the component instance intself
         // the chrome that it would like to use
         if (chromeId == null)
         {
             chromeId = component.getChrome();
         }
-
+        
         // see if a default chrome was specified
         if (chromeId == null)
         {
             chromeId = context.getConfig().getDefaultComponentChrome();
         }
-
+        
         if (chromeId != null && chromeId.length() != 0)
         {
             // try to load the chrome
@@ -1070,10 +1072,9 @@ public final class RenderUtil
                 // assume it's a freemarker renderer for system chrome
                 descriptor = new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
             }
-
         }
+        
         // if no chrome specified, then we won't use any
-
         return descriptor;
     }
 
@@ -1094,9 +1095,9 @@ public final class RenderUtil
         {
             return "";
         }
-
+        
         RequestContext context = rendererContext.getRequestContext();
-
+        
         /**
          * Allow for the head tags to be generated once per request
          * If they're sought a second time, we can just throw down what
@@ -1108,7 +1109,7 @@ public final class RenderUtil
             StringBuilder buf = new StringBuilder(2048);
             buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
             buf.append(NEWLINE);
-
+            
             /**
              * This is a work in progress.  Still not sure what the best
              * way is to define a "global" include.
@@ -1143,13 +1144,13 @@ public final class RenderUtil
                 throw new RendererExecutionException("Unable to render global include for renderer: " +
                         renderer + " of type: " + rendererType, ex);
             }
-
+            
             // If the current renderer is rendering a TemplateInstance,
             // then we should additionally process downstream components
             if (rendererContext.getObject() instanceof TemplateInstance)
             {
 				TemplateInstance template = (TemplateInstance) rendererContext.getObject();
-
+				
                 Component component = null;
                 try
                 {
@@ -1198,7 +1199,7 @@ public final class RenderUtil
             headTags = buf.toString();
             context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);
         }
-
+        
         return headTags;
     }
 }

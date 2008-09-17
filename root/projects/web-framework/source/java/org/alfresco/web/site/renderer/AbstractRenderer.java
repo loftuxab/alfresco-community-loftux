@@ -29,7 +29,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -116,7 +115,7 @@ public abstract class AbstractRenderer implements Renderable
     {
         try
         {
-            RenderUtil.print(response, str);
+            response.getWriter().print(str);
         }
         catch(IOException ex)
         {
@@ -124,7 +123,7 @@ public abstract class AbstractRenderer implements Renderable
         }
     }
     
-
+    
     /** The renderer. */
     protected String renderer;
     
