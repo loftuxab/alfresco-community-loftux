@@ -13,7 +13,7 @@
    background-color: #d7e0e7;
    background-image: url(images/dashlet-title-bg.png);
    background-repeat: repeat-x;
-   border-bottom: 1px dotted #bababa;
+   border-bottom: 1px dashed #bababa;
    color: #262d35;
    padding: 5px 9px 5px 9px;
 }
@@ -34,12 +34,11 @@
 {
 	background-color: #F9FCFD;
 	overflow-x: hidden;
-   padding: 0px 9px;
 }
 
 .dashlet .body h3
 {
-   padding-top:0.6em;   
+   padding-top: 0.6em;   
 }
 
 .dashlet .body a,
@@ -59,10 +58,16 @@
 .dashlet .scrollableList
 {
    height: 208px;
-    padding: 9px;
+    padding: 9px 0px;
     overflow: auto;
 /* TODO: need to revisit this */
     margin-right: 1px;
+}
+
+.dashlet .body>div
+{
+   padding-left: 8px;
+   padding-right: 8px;
 }
 
 .dashlet .text-list-item
@@ -72,10 +77,9 @@
 
 .dashlet .detail-list-item
 {
+   border-bottom: 1px dashed #e9e9e9;
    clear: both;
-   padding-top: 7px;
-   padding-bottom: 7px;
-   border-bottom: 1px dotted #e9e9e9;
+   padding: 7px 9px;
 }
 
 .dashlet .detail-list-item.last

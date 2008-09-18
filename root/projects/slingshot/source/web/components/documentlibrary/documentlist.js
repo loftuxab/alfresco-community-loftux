@@ -74,6 +74,7 @@
       };
       this.afterDocListUpdate = [];
       this.doclistMetadata = {};
+      this.previewTooltips = [];
       
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -87,7 +88,6 @@
       // Specific event handlers
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
-      YAHOO.Bubbling.on("documentPreviewFailure", this.onDocumentPreviewFailure, this);
       YAHOO.Bubbling.on("fileRenamed", this.onFileRenamed, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
@@ -226,39 +226,13 @@
          highlightFile: null,
          
          /**
-          * Valid .swf preview mimetypes
-          * Stored as an object literal for quick "string in object" look-up
-          * @property previewMimetypes
-          * @type object
+          * Holds IDs to register preview tooltips with.
+          * 
+          * @property previewTooltips
+          * @type array
           */
-         previewMimetypes:
-         {
-            // Native PDF
-            "application/pdf": true,
-            // Microsoft Office 2003
-            "application/vnd.excel": true,
-            "application/vnd.powerpoint": true,
-            "application/msword": true,
-            // OpenOffice.org 2.0
-            "application/vnd.oasis.opendocument.text": true,
-            "application/vnd.oasis.opendocument.text-template": true,
-            "application/vnd.oasis.opendocument.text-web": true,
-            "application/vnd.oasis.opendocument.text-master": true,
-            "application/vnd.oasis.opendocument.graphics": true,
-            "application/vnd.oasis.opendocument.graphics-template": true,
-            "application/vnd.oasis.opendocument.presentation": true,
-            "application/vnd.oasis.opendocument.presentation-template": true,
-            "application/vnd.oasis.opendocument.spreadsheet": true,
-            "application/vnd.oasis.opendocument.spreadsheet-template": true,
-            "application/vnd.oasis.opendocument.chart": true,
-            "application/vnd.oasis.opendocument.formula": true,
-            "application/vnd.oasis.opendocument.image": true,
-            // OpenOffice.org 1.0 / StarOffice 6.0
-            "application/vnd.sun.xml.calc": true,
-            "application/vnd.sun.xml.draw": true,
-            "application/vnd.sun.xml.impress": true,
-            "application/vnd.sun.xml.writer": true
-         }
+         previewTooltips: null
+         
       },
       
       /**
@@ -516,18 +490,10 @@
 
 
          // Hide/Show Folders button
-         this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders,
-         {
-            type: "checkbox",
-            checked: this.options.showFolders
-         });
+         this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
 
          // Detailed/Simple List button
-         this.widgets.simpleView =  Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
-         {
-            type: "checkbox",
-            checked: this.options.simpleView
-         });
+         this.widgets.simpleView =  Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
 
          // File Select menu button
          this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "fileSelect-button", this.onFileSelect,
@@ -535,6 +501,19 @@
             type: "menu", 
             menu: "fileSelect-menu"
          });
+         
+         // Tooltip for thumbnail in Simple View
+         this.widgets.previewTooltip = new YAHOO.widget.Tooltip(this.id + "-previewTooltip",
+         {
+            width: "108px"
+         });
+         this.widgets.previewTooltip.contextTriggerEvent.subscribe(function(type, args)
+         {
+            var context = args[0];
+            var record = me.widgets.dataTable.getRecord(context.id);
+            this.cfg.setProperty("text", '<img src="' + generateThumbnailUrl(record) + '" />');
+         });
+         
 
          // DataSource definition
          var uriDocList = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
@@ -750,6 +729,9 @@
                {
                   var docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
                   elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="icon32"><a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/generic-file-32.png" alt="' + extn + '" /></a></span>';
+                  
+                  // Preview tooltip
+                  me.previewTooltips.push(elCell.parentNode.id);
                }
             }
             else
@@ -790,32 +772,32 @@
                 * Folders
                 */
                desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + oRecord.getData("fileName")) + '">';
-               desc += '<b>' + $html(oRecord.getData("displayName")) + '</b></a></h3>';
+               desc += $html(oRecord.getData("displayName")) + '</a></h3>';
 
                if (me.options.simpleView)
                {
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><b>' + me._msg("details.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                  desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
                }
                else
                {
                   /**
                    * Detailed View
                    */
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span class="item"><b>' + me._msg("details.modified.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
+                  desc += '<div class="detail"><span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                  desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
                   var description = oRecord.getData("description");
                   if (description == "")
                   {
                      description = me._msg("details.description.none");
                   }
-                  desc += '<div class="detail"><span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span></div>';
+                  desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $html(description) + '</span></div>';
                   /* Tags */
                   var tags = oRecord.getData("tags");
-                  desc += '<div class="detail"><span class="item tag-item"><b>' + me._msg("details.tags") + '</b> ';
+                  desc += '<div class="detail"><span class="item tag-item"><em>' + me._msg("details.tags") + '</em> ';
                   if (tags.length > 0)
                   {
                      for (var i = 0, j = tags.length; i < j; i++)
@@ -843,8 +825,8 @@
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><b>' + me._msg("details.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                  desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span></div>';
                }
                else
                {
@@ -863,11 +845,11 @@
                       * Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><b>' + me._msg("details.checked-out.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><b>' + me._msg("details.checked-out.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
-                     desc += '<span class="item"><b>' + me._msg("details.size") + '</b> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.checked-out.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.checked-out.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
+                     desc += '<span class="item"><em>' + me._msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
                      desc += '</div><div class="detail">';
-                     desc += '<span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $html(description) + '</span>';
                      desc += '</div>';
                   }
                   else
@@ -876,17 +858,17 @@
                       * Non-Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><b>' + me._msg("details.modified.on") + '</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><b>' + me._msg("details.modified.by") + '</b> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
-                     desc += '<span class="item"><b>' + me._msg("details.version") + '</b> ' + oRecord.getData("version") + '</span>';
-                     desc += '<span class="item"><b>' + me._msg("details.size") + '</b> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + oRecord.getData("modifiedBy") + '</a></span>';
+                     desc += '<span class="item"><em>' + me._msg("details.version") + '</em> ' + oRecord.getData("version") + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
                      desc += '</div><div class="detail">';
-                     desc += '<span class="item"><b>' + me._msg("details.description") + '</b> ' + $html(description) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $html(description) + '</span>';
                      desc += '</div>';
 
                      /* Tags */
                      var tags = oRecord.getData("tags");
-                     desc += '<div class="detail"><span class="item tag-item"><b>' + me._msg("details.tags") + '</b> ';
+                     desc += '<div class="detail"><span class="item tag-item"><em>' + me._msg("details.tags") + '</em> ';
                      if (tags.length > 0)
                      {
                         for (var i = 0, j = tags.length; i < j; i++)
@@ -917,7 +899,7 @@
          var renderCellActions = function DL_renderCellActions(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "border-left", "3px solid #fff");
+            //Dom.setStyle(elCell.parentNode, "border-left", "3px solid #fff");
 
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
          }
@@ -1015,6 +997,7 @@
          // Rendering complete event handler
          this.widgets.dataTable.subscribe("initEvent", function()
          {
+            // Need to highlight a file now the data is available?
             if (this.options.highlightFile)
             {
                YAHOO.Bubbling.fire("highlightFile",
@@ -1029,6 +1012,9 @@
                this.afterDocListUpdate[i].call(this);
             }
             this.afterDocListUpdate = [];
+            
+            // Register preview tooltips
+            this.widgets.previewTooltip.cfg.setProperty("context", this.previewTooltips);
             
          }, this, true);
          
@@ -1092,41 +1078,6 @@
          }
          YAHOO.Bubbling.addDefaultAction("tag-link", fnTagHandler);
 
-         // Hook preview clicks
-         var fnPreviewHandler = function DL_fnPreviewHandler(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
-            if (owner !== null)
-            {
-               var fileId = owner.id;
-               fileId = fileId.substring(fileId.lastIndexOf("yui-rec"));
-               var record = me.widgets.dataTable.getRecord(fileId);
-               // Show the preview, or just the content?
-               if (record.getData("mimetype") in (me.options.previewMimetypes))
-               {
-                  Alfresco.module.getDocumentPreviewInstance().show(
-                  {
-                      nodeRef: record.getData("nodeRef"),
-                      fileName: record.getData("fileName"),
-                      icon32: "/components/documentlibrary/images/generic-file-32.png"
-                   });
-               }
-               else
-               {
-                  YAHOO.Bubbling.fire("documentPreviewFailure",
-                  {
-                     error: 0,
-                     nodeRef: record.getData("nodeRef"),
-                     failureUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl")
-                  });
-               }
-               args[1].stop = true;
-            }
-      		 
-            return true;
-         }
-         YAHOO.Bubbling.addDefaultAction("preview-link", fnPreviewHandler);
-         
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
 
@@ -1284,7 +1235,7 @@
       onShowFolders: function DL_onShowFolders(e, p_obj)
       {
          this.options.showFolders = !this.options.showFolders;
-         p_obj.set("checked", this.options.showFolders);
+         p_obj.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
 
          YAHOO.Bubbling.fire("doclistRefresh");
          Event.preventDefault(e);
@@ -1300,7 +1251,7 @@
       onSimpleView: function DL_onSimpleView(e, p_obj)
       {
          this.options.simpleView = !this.options.simpleView;
-         p_obj.set("checked", this.options.simpleView);
+         p_obj.set("label", this._msg(this.options.simpleView ? "button.view.detailed" : "button.view.simple"));
 
          YAHOO.Bubbling.fire("doclistRefresh");
          Event.preventDefault(e);
@@ -2150,22 +2101,6 @@
 
 
       /**
-       * Document preview failed event handler
-       *
-       * @method onDocumentPreviewFailure
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onDocumentPreviewFailure: function DL_onDocumentPreviewFailure(layer, args)
-      {
-         var obj = args[1];
-         if ((obj !== null) && (obj.failureUrl !== null))
-         {
-            window.open(obj.failureUrl, "_blank");
-         }
-      },
-
-      /**
        * PRIVATE FUNCTIONS
        */
 
@@ -2223,6 +2158,9 @@
          
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
+         
+         // Reset preview tooltips array
+         this.previewTooltips = [];
          
          var successHandler = function DL__uDL_successHandler(sRequest, oResponse, oPayload)
          {

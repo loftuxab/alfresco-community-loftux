@@ -5,17 +5,17 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar">
+<div id="${args.htmlid}-body" class="toolbar flat-button">
    <div class="header">
       <div class="new-page"><a href="${page.url.context}/page/site/${page.url.templateArgs["site"]}/wiki-create" id="${args.htmlid}-create-button">${msg("button.create")}</a></div>
-      <div class="separator">|</div>
+      <div class="separator">&nbsp;</div>
       <div class="delete-page"><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
-      <div class="separator">|</div>
+      <div class="separator">&nbsp;</div>
       <div class="rename-page"><button id="${args.htmlid}-rename-button">${msg("button.rename")}</button></div>
    </div>
-
-   <div id="${args.htmlid}-rssFeed" class="rss-feed"><a href="${url.context}/proxy/alfresco/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">RSS feed</a></div>
    
+   <div class="rss-feed"><a id="${args.htmlid}-rssFeed-button" href="${url.context}/proxy/alfresco/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">RSS feed</a></div>
+
    <div id="${args.htmlid}-renamepanel" class="rename-panel">
       <div class="hd">${msg("panel.rename.title")}</div>
       <div class="bd">

@@ -11,7 +11,9 @@
 	   </div>
 		</#list>
 	<#else>
-		${msg("label.noActivities")}
+      <div class="detail-list-item">
+		   ${msg("label.noActivities")}
+		</div>
 	</#if>
 	</div>
 </div>

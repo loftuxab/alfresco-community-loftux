@@ -31,10 +31,9 @@
    padding-bottom: 1em;
 }
 
-.profile .title
+.profile h1
 {
-   font-size: 153.9%;
-   padding: 1em 0em 0em 1em;
+   padding: 1em 0 0 1em;
 }
 
 .profile .leftcolumn
@@ -167,8 +166,8 @@
 
 .profile .btn-edit button
 {
-   padding-left: 2.5em; 
-   background: url(images/edit.png) no-repeat 10% 50%;
+   background: transparent url(images/edit.png) no-repeat 12px 4px;
+   padding-left: 32px;
 }
 
 .profile .hidden

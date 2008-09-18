@@ -1,5 +1,7 @@
 <#assign activeSite = page.url.templateArgs.site!"">
 <#assign activePage = page.url.templateArgs.pageid!"dashboard">
+<#if activePage = "blog-postview"><#assign activePage="blog-postlist"></#if>
+<#if activePage = "discussions-topicview"><#assign activePage="discussions-topiclist"></#if>
 <#if activePage = "document-details"><#assign activePage="documentlibrary"></#if>
 <div class="site-navigation">
    <#assign linkClass><#if url.context + "/page/site/" + activeSite + "/dashboard" == page.url.uri>class="active-page"</#if></#assign>

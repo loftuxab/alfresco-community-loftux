@@ -187,14 +187,13 @@ hr
    padding: 0.3em;
 }
 
-.yui-skin-default .yui-panel .yui-gd .yui-u.first
-{
-   width: 28%;
-}
-
 .yui-skin-default .yui-panel .yui-gd .yui-u
 {
    width: 60%;
+}
+.yui-skin-default .yui-panel .yui-gd .yui-u.first
+{
+   width: 28%;
 }
 
 
@@ -263,7 +262,6 @@ hr
    border-top: 1px dotted #45637f;
    clear: left;
    color: white;
-   line-height: 2em;
    margin: 0px -10px;
    min-height: 2em;
    padding: 6px 10px;
@@ -341,7 +339,8 @@ span.navigation-item a:hover
 span.navigation-separator
 {
    border-right: 1px dotted #457A9C;
-   padding: 0px 0px 0px 10px;
+   margin-right: 6px;
+   padding-left: 8px;
    text-align: center;
 }
 
@@ -351,6 +350,16 @@ span.navigation-separator-alt
    padding: 0px 0px 0px 10px;
    text-align: center;
 }
+
+/* Standard toolbar separator */
+
+.toolbar .separator
+{
+   border-right: 1px dotted #457A9C;
+   margin: 4px 10px 0 0;
+   padding: 2px 0 0 4px;
+}
+
 
 em
 {
@@ -394,4 +403,64 @@ textarea
    background-position: 0 0 !important;
    background-image: url(images/alfresco-imagelib.png) !important;
    left: 6px;
+}
+
+/* Point the YUI button to the themed sprite */
+.yui-skin-default .yui-button
+{
+   background-image: url(images/sprite.png);
+}
+
+/* Override YUI Button styles for - flat button style */
+.yui-skin-default .flat-button .yui-button
+{
+   background: none;
+   border-color: transparent;
+}
+.yui-skin-default .flat-button .yui-button .first-child
+{
+   border-color: transparent;
+}
+
+.yui-skin-default .flat-button .yui-button-hover
+{
+   background: transparent url(images/sprite.png) repeat-x scroll 0 0;
+   border-color: #808080;
+   border-style: solid;
+   border-width: 1px 0;
+}
+.yui-skin-default .flat-button .yui-button-hover .first-child
+{
+   border-color: #808080;
+   border-style: solid;
+   border-width: 0 1px;
+}
+
+.yui-skin-default .flat-button .yui-radio-button-checked,
+.yui-skin-default .flat-button .yui-checkbox-button-checked
+{
+   background: #6ca5ce none;
+}
+
+.yui-skin-default .flat-button a:hover
+{
+   text-decoration: none;
+}
+
+
+/* Override YUI Button styles for - title button style */
+.yui-skin-default .title-button .yui-button
+{
+   background: transparent url(images/title-button-bg.png) repeat-x 0 0;
+   border-color: #286a99;
+}
+
+.yui-skin-default .title-button a:hover
+{
+   color: #000;
+}
+
+.yui-skin-default .title-button .yui-button .first-child
+{
+   border-color: #286A99;
 }

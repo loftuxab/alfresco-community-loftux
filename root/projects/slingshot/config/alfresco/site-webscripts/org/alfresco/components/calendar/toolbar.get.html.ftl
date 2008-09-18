@@ -5,20 +5,20 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar calendar-toolbar">
    <div class="yui-gf calendar-bar">
-      <div class="yui-u first">
+      <div class="yui-u first flat-button">
 <#if role = "SiteCollaborator" || role = "SiteManager">
          <div id="${args.htmlid}-viewButtons" class="addEvent">
             <button id="${args.htmlid}-addEvent-button" name="addEvent">${msg("button.add-event")}</button>
          </div>
-         <div class="separator">|</div>
+         <div class="separator">&nbsp;</div>
 </#if>
          <div class="ical-feed">
-            <a href="${page.url.context}/proxy/alfresco/calendar/eventList?site=${page.url.templateArgs["site"]}&amp;format=calendar" rel="_blank" id="${args.htmlid}-publishEvents-button">${msg("button.ical")}</a>
+            <a id="${args.htmlid}-publishEvents-button" href="${page.url.context}/proxy/alfresco/calendar/eventList?site=${page.url.templateArgs["site"]}&amp;format=calendar" rel="_blank">${msg("button.ical")}</a>
          </div>
       </div> 
       <div class="yui-u align-right">
          <button id="${args.htmlid}-today-button">${msg("button.today")}</button>
-         <span class="separator">|</span>
+         <span class="separator">&nbsp;</span>
          <button id="${args.htmlid}-prev-button">&lt; ${msg("button.previous")}</button>
          <span class="separator">&nbsp;</span>
          <div id="${args.htmlid}-navigation" class="yui-buttongroup inline">

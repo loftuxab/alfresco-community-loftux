@@ -93,8 +93,12 @@
             opts["disabled"] = true;
          }
    
-         var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
-         var renameButton = Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
+         Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
+         Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
+         Alfresco.util.createYUIButton(this, "rssFeed-button", null,
+         {
+            type: "link"
+         });
          
          // Labels
          var yes = Alfresco.util.message("button.yes", this.name);

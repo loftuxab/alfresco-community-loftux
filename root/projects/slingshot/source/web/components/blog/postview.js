@@ -294,22 +294,22 @@
          html += '<div class="published">';
          if (! data.isDraft)
          {
-            html += '<span class="nodeAttrLabel">' + this._msg("post.publishedOn") + ':</span>';
+            html += '<span class="nodeAttrLabel">' + this._msg("post.publishedOn") + ': </span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
-            html += '<span class="spacer"> | </span>';
+            html += '<span class="separator">&nbsp;</span>';
          }
  
-         html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ':</span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ': </span>';
          html += '<span class="nodeAttrValue">' + authorLink + '</span>';
 
          if (data.isPublished && data.postLink != undefined && data.postLink.length > 0)
          {
-            html += '<span class="spacer"> | </span>';
+            html += '<span class="separator">&nbsp;</span>';
             html += '<span class="nodeAttrLabel">' + this._msg("post.externalLink") + ': </span>';
             html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + this._msg("post.clickHere") + '</a></span>';
          }
          
-         html += '<span class="spacer"> | </span>';
+         html += '<span class="separator">&nbsp;</span>';
          html += '<span class="nodeAttrLabel tag">' + this._msg("post.tags") + ': </span>';
          if (data.tags.length > 0)
          {
@@ -642,8 +642,6 @@
           
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
       
       /** Called whenever the mouse exits a list item. */
@@ -651,8 +649,6 @@
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
 
    

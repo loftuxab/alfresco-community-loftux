@@ -147,24 +147,12 @@
        {
           var currentTarget = e.currentTarget;
           YAHOO.util.Dom.addClass(currentTarget, 'wikiPageSelected');
-          // Display the action panel for this page
-          var panel = YAHOO.util.Dom.getElementsByClassName('actionPanel', 'div', currentTarget)[0];
-          if (panel)
-          {
-             panel.style.visibility = "visible";
-          }
        },
        
        mouseOutHandler: function(e)
        {
           var currentTarget = e.currentTarget;
           YAHOO.util.Dom.removeClass(currentTarget, 'wikiPageSelected');
-          // Hide the action panel 
-          var panel = YAHOO.util.Dom.getElementsByClassName('actionPanel', 'div', currentTarget)[0];
-          if (panel)
-          {
-             panel.style.visibility = "hidden";
-          }
        }
       
       

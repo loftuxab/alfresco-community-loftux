@@ -301,7 +301,7 @@
          html += '<div class="published">';
          html += '<span class="nodeAttrLabel">' + this._msg("post.createdOn") + ': </span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
-         html += '<span class="spacer"> | </span>';
+         html += '<span class="separator">&nbsp;</span>';
          html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ': </span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.author) + '</span>';
          html += '<br />';
@@ -309,7 +309,7 @@
          {
             html += '<span class="nodeAttrLabel">' + this._msg("post.lastReplyBy") + ': </span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.lastReplyBy) + '</span>';                  
-            html += '<span class="spacer"> | </span>';
+            html += '<span class="separator">&nbsp;</span>';
             html += '<span class="nodeAttrLabel">' + this._msg("post.lastReplyOn") + ': </span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.lastReplyOn) + '</span>';
          }
@@ -329,7 +329,7 @@
          html += '<div class="nodeFooter">';
          html += '<span class="nodeAttrLabel replyTo">' + this._msg("replies.label") + ': </span>';
          html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
-         html += '<span class="spacer"> | </span>';
+         html += '<span class="separator">&nbsp;</span>';
              
          html += '<span class="nodeAttrLabel tag">' + this._msg("tags.label") +': </span>';
          if (data.tags.length > 0)
@@ -716,8 +716,6 @@
          
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
      
       /**
@@ -727,8 +725,6 @@
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
 
       /**

@@ -127,8 +127,8 @@
          {
             // Reset widget height to ensure correct rendering
             Dom.setStyle(Dom.get("divTopicListFilters"), "height", "auto");
-            // 6px breathing space for resize gripper
-            Dom.setStyle(Dom.get("divTopicListTopics"), "margin-left", 6 + width + "px");
+            // 8px breathing space for resize gripper
+            Dom.setStyle(Dom.get("divTopicListTopics"), "margin-left", 8 + width + "px");
          }
       }
    };

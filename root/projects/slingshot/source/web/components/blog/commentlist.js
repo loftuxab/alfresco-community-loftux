@@ -645,7 +645,7 @@
   
          // comment info and content
          html += '<div class="nodeContent"><div class="userLink">' + Alfresco.util.people.generateUserLink(data.author);
-         html += this._msg("comment.said") + ':';
+         html += ' ' + this._msg("comment.said") + ':';
          if (data.isUpdated)
          {
             html += '<span class="nodeStatus">(' + this._msg("comment.updated") + ')</span>';
@@ -681,8 +681,6 @@
           
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
       
       /** Called whenever the mouse exits a list item. */
@@ -690,8 +688,6 @@
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
 
    

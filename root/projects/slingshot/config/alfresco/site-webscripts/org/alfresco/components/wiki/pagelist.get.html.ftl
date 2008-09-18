@@ -3,18 +3,17 @@
       "${page.url.templateArgs["site"]!""}"
    );
 //]]></script>
-<div id="${args.htmlid}-pagelist" class="yui-navset"> 
+<div id="${args.htmlid}-pagelist" class="yui-navset pagelist"> 
 <#if pageList.pages?size &gt; 0>
 <#list pageList.pages as p>
    <div class="wikipage <#if p.tags??><#list p.tags as t>wp-${t}<#if t_has_next> </#if></#list></#if>">
    <div class="actionPanel">
-      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit">Edit</a></div>
-      <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details">Details</a></div>
+      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit">${msg("link.edit")}</a></div>
+      <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details">${msg("link.details")}</a></div>
       <div class="deletePage"><a href="#" class="delete-link" title="${p.name}">${msg("link.delete")}</a></div>
    </div>
    <div class="pageTitle"><a class="pageTitle" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}">${p.title}</a></div>
    <div class="publishedDetails">
-      <!-- http://localhost:8081/share/page/user/mikeh/profile -->
       <span class="attrLabel">${msg("label.creator")}</span> <span class="attrValue"><a href="${url.context}/user/${p.createdByUser?url}/profile">${p.createdBy}</a></span>
 		<span class="spacer">&nbsp;</span>
 		<span class="attrLabel">${msg("label.createDate")}</span> <span class="attrValue">${p.createdOn}</span>

@@ -27,13 +27,15 @@
    background-color: #f8f8f8;
    border-bottom: 1px dashed #c0c0c0;
    margin: 0 -10px;
-   padding: 0.5em;
+   padding: 4px 0.5em;
 }
 
 .doclist span.separator
 {
-   padding: 0 10px;
-   text-align: center;
+   border-right: 1px dotted #457A9C;
+   margin: 0 4px 0 0;
+   padding: 2px 0 0;
+   vertical-align: bottom;
 }
 
 
@@ -48,6 +50,7 @@
 .doclist .doclist-bar .paginator
 {
    float: left;
+   margin: 4px 0;
    text-align: center;
    width: 80%;
 }
@@ -127,25 +130,31 @@
 .doclist tr.yui-dt-odd.yui-dt-highlighted,
 .doclist tr.yui-dt-even.yui-dt-highlighted
 {
-   background-color: #e8f6ff;
+   background-color: #f4faff;
    cursor: auto;
+}
+.doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
+.doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
+{
+   border-left: 1px solid #c5e6e9;
 }
 
 .doclist .documents.yui-dt td
 {
+   border-bottom: 1px dashed #d9d9d9;
    border-right: medium none;
-   border-top: 1px solid #f0f0f0;
    vertical-align: top;
 }
 
 .doclist .documents.yui-dt td.yui-dt-last
 {
+   border-left: 1px solid #fff;
    vertical-align: middle;
 }
 
 .doclist .yui-dt-liner
 {
-   padding: 2px 4px;
+   padding: 4px;
 }
 
 .doclist .yui-dt-error
@@ -178,11 +187,7 @@
    cursor: pointer;
    display: block;
    min-height: 100px;
-}
-
-.doclist .documents a.preview-link
-{
-   cursor: pointer;
+   padding-top: 2px;
 }
 
 .doclist .documents .folder
@@ -203,7 +208,15 @@
 
 .doclist .documents h3.filename
 {
+   font-size: 123%;
+   font-weight: normal;
    float: left;
+   padding-bottom: 0.1em;
+}
+.doclist .documents
+{
+   color: #333333;
+   margin: 0 -10px 0 -8px;
 }
 .doclist .documents a
 {
@@ -230,6 +243,14 @@
 {
    clear: left;
    float: left;
+   line-height: 1.5em;
+}
+
+.doclist .documents .detail em
+{
+   color: #606060;
+   font-style: normal;
+   font-weight: normal;
 }
 
 .doclist .documents .detail span.item
@@ -290,9 +311,9 @@
 .doclist a.simple-link,
 .doclist a.show-more
 {
-   background-position: 3px 3px;
+   background-position: 4px 1px;
    background-repeat: no-repeat;
-   border: 1px solid #e8f6ff;
+   border: 1px solid #f4faff;
    display: block;
    min-height: 16px;
    padding: 2px 0 2px 24px;
@@ -337,6 +358,15 @@
 .doclist div.simple div
 {
    float: left;
+   line-height: 1em;
+}
+.doclist div.simple a.action-link,
+.doclist div.simple a.simple-link,
+.doclist div.simple a.show-more
+{
+   background-position: 4px 0;
+   min-height: 16px;
+   padding: 1px 0 0 24px;
 }
 .doclist div.simple a.action-link span,
 .doclist div.simple a.simple-link span
@@ -352,6 +382,7 @@
 {
    display: block;
 }
+
 
 /* Actions: Icons */
 .doclist .onActionShowMore a
@@ -430,4 +461,13 @@
    width: 1px;
    height: 1px; /* avoid scrollbars */
    visibility: hidden;
+}
+
+
+/* Preview Tooltip */
+.yui-tt .bd
+{
+   background-color: #f4faff !important;
+   border: 1px solid #333 !important;
+   padding: 4px 4px 1px !important;
 }

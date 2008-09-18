@@ -10,7 +10,7 @@
 //]]></script>
 
 <div class="postview-header">
-	<div class="back-nav">
+	<div class="navbar">
 		<span class="backLink">
 			<a href="${url.context}/page/site/${page.url.templateArgs.site}/blog-postlist">
 				${msg("header.back")}

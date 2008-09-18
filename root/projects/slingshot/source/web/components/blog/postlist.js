@@ -112,8 +112,7 @@
          /**
           * Initially used filter name and id.
           */         
-         initialFilter: {
-         },
+         initialFilter: {},
 
          /**
           * Number of items per page
@@ -228,20 +227,18 @@
          var me = this;
           
          // Create new post button
-         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createPost-button", this.onCreatePost,
-         {
-         });
+         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createPost-button", this.onCreatePost);
 
          // Configure blog button
-         this.widgets.configureBlog =  Alfresco.util.createYUIButton(this, "configureBlog-button", this.onConfigureBlog,
-         {
-         });
+         this.widgets.configureBlog =  Alfresco.util.createYUIButton(this, "configureBlog-button", this.onConfigureBlog);
 
          // Simple view button
-         this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
+         this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
+
+         // RSS Feed link button
+         this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
          {
-            type: "checkbox",
-            checked: this.options.simpleView
+            type: "link"
          });
 
          // YUI Paginator definition
@@ -364,13 +361,13 @@
                {
                   html += '<span class="nodeAttrLabel">' + me._msg("post.publishedOn") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
-                  html += '<span class="spacer"> | </span>';
+                  html += '<span class="separator">&nbsp;</span>';
                }
                html += '<span class="nodeAttrLabel">' + me._msg("post.author") + ': </span>';
                html += '<span class="nodeAttrValue">' + authorLink + '</span>';
                if (data.isPublished && data.postLink && data.postLink.length > 0)
                {
-                  html += '<span class="spacer"> | </span>';
+                  html += '<span class="separator">&nbsp;</span>';
                   html += '<span class="nodeAttrLabel">' + me._msg("post.externalLink") + ': </span>';
                   html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + me._msg("post.clickHere") + '</a></span>';
                }
@@ -385,9 +382,9 @@
                html += '<div class="nodeFooter">';
                html += '<span class="nodeAttrLabel replyTo">' + me._msg("post.replies") + ': </span>';
                html += '<span class="nodeAttrValue">(' + data.commentCount + ')</span>';
-               html += '<span class="spacer"> | </span>';
+               html += '<span class="separator">&nbsp;</span>';
                html += '<span class="nodeAttrValue"><a href="' + postViewUrl + '">' + me._msg("post.read") + '</a></span>';
-               html += '<span class="spacer"> | </span>';
+               html += '<span class="separator">&nbsp;</span>';
                
                html += '<span class="nodeAttrLabel tag">' + me._msg("post.tags") +': </span>';
                if (data.tags.length > 0)
@@ -536,16 +533,12 @@
        */
       _generateRSSFeedUrl: function BlogPostList__generateRSSFeedUrl()
       {
-         var divFeed = Dom.get(this.id + "-rssFeed");
-         if (divFeed)
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "service/components/blog/rss?site={site}&amp;container={container}",
          {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "service/components/blog/rss?site={site}&amp;container={container}",
-            {
-               site: this.options.siteId,
-               container: this.options.containerId
-            });
-            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("header.rssFeed") + '</a>';
-         }
+            site: this.options.siteId,
+            container: this.options.containerId
+         });
+         this.widgets.rssFeed.set("href", url);
       },
 
       /**
@@ -611,7 +604,7 @@
       onSimpleView: function BlogPostList_onSimpleView(e, p_obj)
       {
          this.options.simpleView = !this.options.simpleView;
-         p_obj.set("checked", this.options.simpleView);
+         p_obj.set("label", this._msg(this.options.simpleView ? "header.detailList" : "header.simpleList"));
 
          // refresh the list
          YAHOO.Bubbling.fire("blogpostlistRefresh");
@@ -992,8 +985,6 @@
          var target = oArgs.target;
          var elem = YAHOO.util.Dom.getElementsByClassName('post', null, target, null);
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBlock = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, target, null);
-         YAHOO.util.Dom.addClass(editBlock, 'showEditBlock');
       },
 
       /**
@@ -1008,8 +999,6 @@
          var target = oArgs.target;
          var elem = YAHOO.util.Dom.getElementsByClassName('post', null, target, null);
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBlock = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, target, null);
-         YAHOO.util.Dom.removeClass(editBlock, 'showEditBlock');
       },
       
       

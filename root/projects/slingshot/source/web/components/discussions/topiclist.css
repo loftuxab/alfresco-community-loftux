@@ -9,7 +9,7 @@
 .topiclist-header .toolbar
 {
    clear: both;
-   height: 2em;
+   min-height: 1.6em;
    margin: 0 -10px;
    padding: 0.5em;
    background-color: #e3eaec;
@@ -21,27 +21,21 @@
    float: left;
 }
 
-.topiclist-header .hidden {
+.topiclist-header .hidden
+{
    display: none;
 }
 
-.toolbar .createTopic button {
-   padding-left: 2.5em; 
-   background: url(../images/new-blog-16.png) no-repeat 10% 50%;
+.toolbar .createTopic button
+{
+   background: transparent url(../images/new-blog-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
 }
 
-.toolbar .rss-feed {
-   padding: 0.5em;
-}
-
-.toolbar .separator {
-   padding: 0.5em;
-}
-
-.toolbar .rss-feed a {
-   background-image : url(../images/feed-icon-16.png);
-   background-repeat : no-repeat;
-   padding-left : 20px;
+.toolbar .rss-feed a
+{
+   background: transparent url(../images/feed-icon-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
 }
 
 .topiclist-header .topiclist-infobar
@@ -54,16 +48,16 @@
   padding-right: 10px;
 }
 
-.topiclist-infobar .listTitle {
-  font-family: Helvetica, Trebuchet, sans-serif;
-  font-weight: normal;
+.topiclist-infobar .listTitle
+{
   font-size: 123.1%;
   color: #333333;
   float: left;
   padding: 4px 10px;
 }
 
-.topiclist-infobar .paginator {
+.topiclist-infobar .paginator
+{
   text-align: right;
 }
 
@@ -71,147 +65,171 @@
 /*******************
  * WYSIWYG CONTENT *
 ********************/
-.yuieditor strong {
+.yuieditor strong
+{
   font-weight: bold;
 }
-.yuieditor em {
+.yuieditor em
+{
   font-style: italic; 
 }
-.yuieditor ul, .yuieditor ol {
+.yuieditor ul, .yuieditor ol
+{
   padding-left: 40px;
 }
-.yuieditor ul li {
+.yuieditor ul li
+{
   list-style-type: disc; 
 }
-.yuieditor ol li {
+.yuieditor ol li
+{
   list-style-type: decimal; 
+}
+
+.topiclist
+{
+   margin: 0 -8px;
 }
 
 /* Data table */
 
-.topiclist table {
+.topiclist table
+{
 	width: 100%;
 	border: none !important;
 }
-.topiclist table thead {
+.topiclist table thead
+{
 	display: none;
 }
-.topiclist table td {
+.topiclist table td
+{
 	border: none !important;
 }
 
-.topiclist table .yui-dt-empty {
+.topiclist table .yui-dt-empty
+{
 	background-color: transparent;
 }
-.topiclist table .yui-dt-liner {
+.topiclist table .yui-dt-liner
+{
 	padding: 0px;
 }
 
-.topiclist .row-separator {
+.topiclist .row-separator
+{
    border-bottom: 1px solid #c6c6c6;
 }
 
-.topiclist tr.yui-dt-odd .node{
-  border-color:#EDF5FF;
+.topiclist tr.yui-dt-odd .node
+{
+  border-color: #EDF5FF;
 }
 
 /* Topic list elements */
 /********
  * NODE *
 *********/
-.node, .reply, .comment {
-  padding: 20px 10px;
+.node, .reply, .comment
+{
+  padding: 20px 1em;
   margin-left: 0px;
   margin-right: 0px;
-  border: 2px solid #fff;
   voice-family: "\"}\""; 
   voice-family:inherit;
   display: inline-block;
 }
-html>body .node, .reply, .comment {
+html>body .node, .reply, .comment
+{
   display: block;
 }
 .node table td,
 .reply table td,
-.comment table td {
+.comment table td
+{
   vertical-align: top;
 }
-.node.simple {
+.node.simple
+{
   padding: 5px;
 }
-.overNode {
-  background-color: #fffef5 !important;
-  border: 2px solid #5A7380 !important;
+.overNode
+{
+  background-color: #f4faff !important;
 }
-.node .published {
+.node .published
+{
   margin: 5px 0 10px 0;
 }
 
-.node .nodeTitle a {
-  font-family: Helvetica, Trebuchet, sans-serif;
-  font-weight: normal;
+.node .nodeTitle a
+{
   font-size: 131%;
   line-height: 130%;
   color: #2b6eb5;
 }
 
-.node .nodeStatus {
-  font-family: Trebuchet, sans-serif;
-  font-weight: normal;
+.node .nodeStatus
+{
   font-size: 131%;
   line-height: 130%;
   color: #669966;
 }
 
-.nodeAttrLabel {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 100%;
+.nodeAttrLabel
+{
   line-height: 130%;
   color: #606060;
 }
-.nodeAttrValue {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 100%;
+.nodeAttrValue
+{
   line-height: 130%;
   color: #333333;
 }
-.nodeAttrValue a {
+.nodeAttrValue a
+{
   color: #2b6eb5;
 }
-.node .userLink {
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-  font-size: 100%;
+.node .userLink
+{
   line-height: 150%;
   color: #999999;
 }
-.node .userLink a {
+.node .userLink a
+{
   color: #2b6eb5;
 }
-.nodeContent {
-  padding-right: 40px;
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 100%;
+.nodeContent
+{
   line-height: 150%;
   margin-right: 140px;
+  padding-right: 40px;
 }
 
-.nodeFooter {
+.nodeFooter
+{
   background-color: #f8f8f8;
   border-top: 1px dashed #c6c6c6;
   border-bottom: 1px solid #c6c6c6;
-  padding: 1px;
+  padding: 0.5em;
 }
-.nodeFooter .tag {
-  background:transparent url(../images/tag-16.png) no-repeat scroll 0px 50%;
+
+.nodeFooter .tag
+{
+  background: transparent url(../images/tag-16.png) no-repeat scroll 0 0;
   padding-left: 18px;
 }
 
-.replyTo {
-  background:transparent url(../images/reply-to-discussion-16.png) no-repeat scroll 0px 50%;
+.nodeFooter .separator
+{
+   border-right: 1px dotted #457A9C;
+   margin-right: 10px;
+   padding-left: 10px;
+}
+
+.nodeFooter .replyTo
+{
+  background: transparent url(../images/reply-to-discussion-16.png) no-repeat scroll 0 0;
   padding-left: 20px;
 }
 
@@ -219,46 +237,48 @@ html>body .node, .reply, .comment {
 /*************
  * EDIT BLOCK *
 **************/
-.nodeEdit {
-  margin: 10px 0 0 15px;
-  visibility: hidden;
-  width: 150px;
-  position: relative;
-  float: right;
-}
-.showEditBlock {
-  visibility: visible;
-}
-.nodeEdit div, .replyEdit div {
-  padding: 2px 19px;
-  margin-bottom: 4px;
-}
-.simple .nodeEdit {
-  width: 200px;
-  text-align: right;
-  margin: 4px;
-}
-.nodeEdit .action-link {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
-  font-size: 93%;
-  line-height: 150%;
-  color: #2B6EB5;
+.nodeEdit
+{
+   float: right;
+   margin: 10px 0 0 15px;
+   position: relative;
+   width: 6em;
 }
 
-.nodeEdit .onViewTopic {
+.nodeEdit div, .replyEdit div
+{
+   padding: 2px 19px;
+   margin-bottom: 4px;
+}
+.simple .nodeEdit
+{
+   width: 200px;
+   text-align: right;
+   margin: 4px;
+}
+.nodeEdit .action-link
+{
+   font-size: 93%;
+   line-height: 150%;
+   color: #2B6EB5;
+}
+
+.nodeEdit .onViewTopic
+{
   background: url(../images/view-discussion-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
   margin-right: 10px;
 }
-.nodeEdit .onAddReply {
+.nodeEdit .onAddReply
+{
   background: url(../images/reply-to-discussion-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
   margin-right: 10px;
 }
 .nodeEdit .onEditTopic,
 .nodeEdit .onEditReply,
-.nodeEdit .onEditComment {
+.nodeEdit .onEditComment
+{
   background:url(../images/edit-discussion-16.png) no-repeat scroll 0px 0px;
   padding-left: 20px;
   margin-right: 10px;
@@ -266,7 +286,8 @@ html>body .node, .reply, .comment {
 
 .nodeEdit .onDeleteTopic,
 .nodeEdit .onDeleteReply,
-.nodeEdit .onDeleteComment {
+.nodeEdit .onDeleteComment
+{
   background: url('../images/delete-discussion-16.png') no-repeat scroll 0px 0px;
   padding-left: 20px;
 }

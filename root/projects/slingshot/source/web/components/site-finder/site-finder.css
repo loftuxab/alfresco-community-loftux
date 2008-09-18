@@ -40,8 +40,8 @@
 
 .site-finder .search-button button
 {
-   padding-left: 2.5em; 
-   background: url(../images/search-16.png) no-repeat 10% 50%;
+   background: transparent url(../images/search-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
 }
 
 

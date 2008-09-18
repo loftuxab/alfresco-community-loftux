@@ -1,14 +1,8 @@
-div.dashlet.site-welcome .body
-{
-   background-color: #FEFFFD;
-}
-
 div.dashlet.site-welcome div.detail-list-item-alt
 {
-   background-color: #fffbd4;
-   border-bottom: 1px dotted #bababa;
-   margin: 0 -9px;
-   padding: 2px 9px 9px;
+   background-color: #fffbdd;
+   border-bottom: 1px solid #ddd6a0;
+   padding: 7px 9px 5px;
 }
 
 div.dashlet.site-welcome div.detail-list-item h4,
