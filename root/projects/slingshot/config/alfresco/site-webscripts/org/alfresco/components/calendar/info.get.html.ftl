@@ -19,8 +19,10 @@
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.tags")}:</div>
       <div class="yui-u">
-<#if result.tags??>
+<#if result.tags?? && result.tags?size &gt; 0>
    <#list result.tags as tag>${tag}<#if tag_has_next>&nbsp;</#if></#list>
+<#else>
+    ${msg("label.none")}
 </#if>
       </div>
    </div>

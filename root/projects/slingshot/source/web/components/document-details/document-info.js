@@ -130,7 +130,7 @@
          
          if (tags.length === 0)
          {
-            tagsHtml = Alfresco.util.message("document-info.notags", "Alfresco.DocumentInfo");
+            tagsHtml = Alfresco.util.message("label.none", this.name);
          }
          else
          {
@@ -144,7 +144,7 @@
          Dom.get(this.id + "-tags").innerHTML = tagsHtml;
          
          // render permissions values
-         var unknownPerm = Alfresco.util.message("document-info.unknown", "Alfresco.DocumentInfo");
+         var unknownPerm = Alfresco.util.message("document-info.unknown", this.name);
          var managerPerms = unknownPerm;
          var collaboratorPerms = unknownPerm;
          var consumerPerms = unknownPerm;
@@ -157,19 +157,19 @@
             var group = permParts[1];
             if (group.indexOf("_SiteManager") != -1)
             {
-               managerPerms = Alfresco.util.message("document-info.role." + permParts[2], "Alfresco.DocumentInfo");
+               managerPerms = Alfresco.util.message("document-info.role." + permParts[2], this.name);
             }
             else if (group.indexOf("_SiteCollaborator") != -1)
             {
-               collaboratorPerms = Alfresco.util.message("document-info.role." + permParts[2], "Alfresco.DocumentInfo");
+               collaboratorPerms = Alfresco.util.message("document-info.role." + permParts[2], this.name);
             }
             else if (group.indexOf("_SiteConsumer") != -1)
             {
-               consumerPerms = Alfresco.util.message("document-info.role." + permParts[2], "Alfresco.DocumentInfo");
+               consumerPerms = Alfresco.util.message("document-info.role." + permParts[2], this.name);
             }
             else if (group === "GROUP_EVERYONE")
             {
-               everyonePerms = Alfresco.util.message("document-info.role." + permParts[2], "Alfresco.DocumentInfo");
+               everyonePerms = Alfresco.util.message("document-info.role." + permParts[2], this.name);
             }
          }
          
@@ -188,7 +188,7 @@
        */
       _getMimetypeLabel: function DocumentInfo__getMimetypeLabel(mimetype)
       {
-         var label = Alfresco.util.message("document-info.unknown", "Alfresco.DocumentInfo");
+         var label = Alfresco.util.message("document-info.unknown", this.name);
          
          // TODO: Obviously this need to change!!! We need to transfer the mimetype config from the server
          

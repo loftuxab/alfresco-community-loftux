@@ -46,7 +46,7 @@
    <div class="top_taglist tags_box">
       <ul id="${htmlid}-current-tags">
    <#if tags?size == 0>
-         <li>&nbsp;</li>
+         <li>${msg("label.none")}</li>
    <#else>
       <#list tags as tag>
          <li id="${htmlid}-onRemoveTag-${tag?html}">
