@@ -123,11 +123,13 @@
 			   </div>
 			   <div class="yui-u">
 			      <div class="columnHeader">${msg("label.tags")}</div>
-			      <#if result.tags??>
+			      <#if result.tags?? && result.tags?size &gt; 0>
 			         <#list result.tags as tag>
 			            <div><span class="tagDetails">${tag}</span></div>
 			         </#list>
-			      </#if>
+               <#else>
+                  ${msg("label.none")}
+               </#if>
 			   </div>
 			   <div class="yui-u">
 			      <div class="columnHeader">${msg("label.linkedPages")}</div>
