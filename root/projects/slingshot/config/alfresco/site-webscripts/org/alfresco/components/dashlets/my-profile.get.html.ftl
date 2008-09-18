@@ -13,10 +13,10 @@
             </#if>
          </div>
 <#escape x as x?html>
-         <div class="namelabel">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</div>
+         <div class="namelabel"><a href="${url.context}/page/user/${user.name?url}/profile">${user.properties["firstName"]!""} ${user.properties["lastName"]!""}</a></div>
          <div class="fieldlabel">${user.properties["jobtitle"]!""}</div>
       </div>
-      <hr class="clear"/>
+      <div class="clear"></div>
       <div class="row">
          <div class="fieldlabelright">${msg("label.email")}:</div>
          <div class="fieldvalue"><#if user.properties["email"]??><a href="mailto:${user.properties["email"]!""}">${user.properties["email"]}</a></#if></div>

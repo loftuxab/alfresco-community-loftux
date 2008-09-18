@@ -224,19 +224,17 @@
          var me = this;
          
          // Create new post button
-         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic,
-         {
-         });
+         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic);
          
          // initialize rss feed link
+         this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null,
+         {
+            type: "link"
+         });
          this._generateRSSFeedUrl();
          
          // Simple view button
-         this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView,
-         {
-            type: "checkbox",
-            checked: this.options.simpleView
-         });
+         this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
          
          // YUI Paginator definition
          this.widgets.paginator = new YAHOO.widget.Paginator(
@@ -374,7 +372,7 @@
                html += '<div class="published">';
                html += '<span class="nodeAttrLabel">' + me._msg("post.createdOn") + ': </span>';
                html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
-               html += '<span class="spacer"> | </span>';
+               html += '<span class="separator">&nbsp;</span>';
                html += '<span class="nodeAttrLabel">' + me._msg("post.author") + ': </span>';
                html += '<span class="nodeAttrValue">' + authorLink + '</span>';
                html += '<br />';
@@ -382,7 +380,7 @@
                {
                   html += '<span class="nodeAttrLabel">' + me._msg("post.lastReplyBy") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.people.generateUserLink(data.lastReplyBy) + '</span>';                  
-                  html += '<span class="spacer"> | </span>';
+                  html += '<span class="separator">&nbsp;</span>';
                   html += '<span class="nodeAttrLabel">' + me._msg("post.lastReplyOn") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.lastReplyOn) + '</span>';
                }
@@ -404,10 +402,10 @@
                html += '<div class="nodeFooter">';
                html += '<span class="nodeAttrLabel replyTo">' + me._msg("replies.label") + ': </span>';
                html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
-               html += '<span class="spacer"> | </span>';
+               html += '<span class="separator">&nbsp;</span>';
                
                html += '<span class="nodeAttrValue"><a href="' + topicViewUrl + '">' + me._msg("action.read") + '</a></span>';
-               html += '<span class="spacer"> | </span>';
+               html += '<span class="separator">&nbsp;</span>';
                
                html += '<span class="nodeAttrLabel tag">' + me._msg("tags.label") +': </span>';
                if (data.tags.length > 0)
@@ -568,12 +566,8 @@
        */
       _generateRSSFeedUrl: function DiscussionsTopicList__generateRSSFeedUrl()
       {
-         var divFeed = Dom.get(this.id + "-rssFeed");
-         if (divFeed)
-         {
-            var url = Alfresco.constants.URL_CONTEXT + "service/components/discussions/rss?site=" + this.options.siteId;
-            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("header.rssFeed") + '</a>';
-         }
+         var url = Alfresco.constants.URL_CONTEXT + "service/components/discussions/rss?site=" + this.options.siteId;
+         this.widgets.rssFeed.set("href", url);
       },
       
       /**
@@ -596,7 +590,7 @@
       onSimpleView: function DiscussionsTopicList_onSimpleView(e, p_obj)
       {
          this.options.simpleView = !this.options.simpleView;
-         p_obj.set("checked", this.options.simpleView);
+         p_obj.set("label", this._msg(this.options.simpleView ? "header.detailList" : "header.simpleList"));
 
          // update the list
          YAHOO.Bubbling.fire("topiclistRefresh");
@@ -756,8 +750,6 @@
          var target = oArgs.target;
          var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBlock = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, target, null);
-         YAHOO.util.Dom.addClass(editBlock, 'showEditBlock');
       },
 
       /**
@@ -772,8 +764,6 @@
          var target = oArgs.target;
          var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBlock = YAHOO.util.Dom.getElementsByClassName('nodeEdit', null, target, null);
-         YAHOO.util.Dom.removeClass(editBlock, 'showEditBlock');
       },
       
       /**

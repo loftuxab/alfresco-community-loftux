@@ -127,9 +127,8 @@
          {
             // Reset widget height to ensure correct rendering
             Dom.setStyle(Dom.get("divPostListFilters"), "height", "auto");
-            // 6px breathing space for resize gripper
-            //Dom.setStyle(Dom.get("divPostListPosts"), "margin-left", 6 + width + "px");
-            Dom.setStyle(Dom.get("divPostListPosts"), "margin-left", width + "px");
+            // 8px breathing space for resize gripper
+            Dom.setStyle(Dom.get("divPostListPosts"), "margin-left", 8 + width + "px");
          }
       }
    };

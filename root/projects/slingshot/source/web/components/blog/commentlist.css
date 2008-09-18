@@ -4,40 +4,41 @@
 	margin-top: 20px;
 }
 
-.comment {
-	border-top: 2px dashed #b1b1b1;
-	border-bottom: 2px solid transparent;
-	border-right: 2px solid transparent;
-	border-left: 2px solid transparent;
-	margin: 0 20px;
-	padding: 10px;
-    display: inline-block;
+.comment
+{
+   border-top: 2px dashed #b1b1b1;
+   margin: 0 20px;
+   padding: 10px;
+   display: inline-block;
 }
 
 html>body .comment {
   display: block;
 }
 
-.comment.overNode {
-	border: 2px solid #5A7380;
+.comment.overNode
+{
+	background-color: #f4faff;
 }
-.commentsListTitle {
+.commentsListTitle
+{
+	background: transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
 	font-size: 116%;
-	background:transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
 	padding: 20px 0pt 20px 40px;
 }
-.comment.even {
-	background-color: #ffffff;
-}
-.comment.odd {
-	background-color: #fcfcf5;
-}
 
-.comment-list .hidden {
+.comment-list .hidden
+{
   display: none;
 }
 
-.editCommentForm {
+.comment .userLink a
+{
+   color: #2B6EB5;
+}
+
+.editCommentForm
+{
 	margin: 20px;
 	padding: 20px;
 	border-top: 1px solid #b1b1b1;

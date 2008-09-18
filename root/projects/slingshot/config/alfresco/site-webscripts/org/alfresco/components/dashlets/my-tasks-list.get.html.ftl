@@ -35,5 +35,7 @@
       </div>
    </#list>
 <#else>
+   <div class="detail-list-item">
       <span>${msg("label.no-tasks")}</span>
+   </div>
 </#if>

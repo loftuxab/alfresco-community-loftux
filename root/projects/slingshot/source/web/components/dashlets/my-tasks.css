@@ -1,9 +1,3 @@
-.my-tasks .toolbar .yui-button,
-.my-tasks .toolbar .yui-button span.first-child
-{
-   border: medium none;
-}
-
 .my-tasks .task-icon
 {
    float: left;

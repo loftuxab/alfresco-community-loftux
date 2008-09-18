@@ -77,6 +77,10 @@
          {
             Alfresco.util.createYUIButton(this, "addEvent-button", this.onButtonClick);
          }
+         Alfresco.util.createYUIButton(this, "publishEvents-button", null,
+         {
+            type: "link"
+         });
       
          Alfresco.util.createYUIButton(this, "next-button", this.onNextNav);
          Alfresco.util.createYUIButton(this, "prev-button", this.onPrevNav);

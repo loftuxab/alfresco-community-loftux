@@ -14,8 +14,8 @@
 
 .toolbar .addEvent button
 {
-   padding-left: 2.5em; 
-   background: url(images/add-event-16.png) no-repeat 10% 50%;
+   background: transparent url(images/add-event-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
 }
 
 .toolbar div.first
@@ -40,16 +40,10 @@ div.separator
    margin-top: 5px;
 }
 
-.toolbar .ical-feed
-{
-   margin-top: 5px;
-}
-
 .toolbar .ical-feed a
 {
-   background-image: url(../images/feed-icon-16-blue.png);
-   background-repeat: no-repeat;
-   padding-left: 20px;
+   background: transparent url(../images/feed-icon-16-blue.png) no-repeat 12px 4px;
+   padding-left: 32px;
 }
 
 .yui-skin-default .yui-navset .yui-nav,

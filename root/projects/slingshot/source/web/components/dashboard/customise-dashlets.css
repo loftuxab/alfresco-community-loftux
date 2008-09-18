@@ -7,6 +7,7 @@
 .customise-dashlets div.actions
 {
    clear: both;
+   margin: 0px 10px;
    padding-top: 1em;
    padding-bottom: 1em;
 }
@@ -21,16 +22,21 @@
 .customise-dashlets div.text,
 .customise-dashlets div.buttons
 {
-   width: 52em;
    margin-left: auto;
    margin-right: auto;
    padding-top: 1em;
+   width: 56em;
 }
 
 /* Left text */
 .customise-dashlets div.text
 {
    text-align: left;
+}
+
+.customise-dashlets div.text h3
+{
+   color: #009300;
 }
 
 /* Center buttons */
@@ -71,7 +77,7 @@
 .customise-dashlets ul.usedList
 {
    width: 17.5em;
-   height: 17.3em;
+   height: 14.6em;
    border: 1px solid #BFBFBF;
    padding-top:0.2em;
 }
@@ -80,7 +86,7 @@
 .customise-dashlets ul.availableList
 {
    width: 56em;
-   height: 17.3em;
+   height: 15.5em;
    overflow-y: auto;
    margin-left: auto;
    margin-right: auto;
@@ -109,7 +115,7 @@
 {
    width: 17em;
    float: left;
-   height: 3em;
+   height: 2.5em;
    text-align: left;
    border-style: none;
    border-width: 0;
@@ -162,11 +168,11 @@
    width:17em;
 }
 
-.customisableDashlet span {
-   position:relative;
-   top:-2.5em;
-   left:1em;  
-
+.customisableDashlet span
+{
+   position: relative;
+   top: -2.2em;
+   left: 1em;  
    opacity:1;
    filter:alpha(opacity=100);
 }

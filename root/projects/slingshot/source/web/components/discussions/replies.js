@@ -425,7 +425,7 @@
             html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + safeRef + '">' + this._msg("replies.hide") + '</a>'
             html += '</span>';
          }
-         html += '<span class="spacer"> | </span>';
+         html += '<span class="separator">&nbsp;</span>';
          html += '<span class="nodeAttrLabel">' + this._msg("post.postedOn") + ': ' + '</span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
          html += '</div>';
@@ -906,8 +906,6 @@
          
          var elem = args[1].target;
          YAHOO.util.Dom.addClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem, null );
-         YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
       
       /** Called whenever the mouse exits a list item. */
@@ -915,8 +913,6 @@
       {
          var elem = args[1].target;
          YAHOO.util.Dom.removeClass(elem, 'overNode');
-         var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
-         YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
 
       /**

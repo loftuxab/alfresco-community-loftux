@@ -4,17 +4,12 @@
    visibility: hidden;
 }
 
-.toolbar .separator
-{
-   padding: 0.5em;
-}
-
 .toolbar .header-bar,
 .toolbar .nav-bar
 {
    clear: both;
-   min-height: 2em;
-   padding: 0.5em;
+   min-height: 1.6em;
+   padding: 4px 0.5em 9px;
 }
 
 .toolbar div.hideable
@@ -87,11 +82,6 @@
    background-image: url(images/select-none-16.png);
 }
 
-.toolbar .rss-feed
-{
-   padding: 0.5em;
-}
-
 
 /* Navigation Bar */
 
@@ -99,18 +89,24 @@
 {
    background-color: #e9edef;
    border-bottom: 2px solid #c7ccce;
+   padding-bottom: 8px;
 }
 
 .toolbar .breadcrumb
 {
    float: none !important;
-   padding: 0.5em;
+   padding: 0.3em 0.5em 0;
 }
 
 .toolbar span.crumb
 {
    font-size: 100%;
    line-height: 1.4em;
+}
+
+.toolbar span.crumb.first
+{
+   padding-left: 0.5em;
 }
 
 .toolbar span.folder
@@ -121,16 +117,16 @@
    padding: 2px 0 2px 20px;
 }
 
+.toolbar span.crumb .separator
+{
+   border: medium none;
+   padding: 0.5em 0 0.5em 0.5em;
+}
+
+
 .toolbar .rss-feed
 {
    float: right;
-}
-
-.toolbar .rss-feed a
-{
-   background-image: url(images/feed-icon-16.png);
-   background-repeat: no-repeat;
-   padding-left: 20px;
 }
 
 .toolbar .description
@@ -155,8 +151,8 @@
 
 .toolbar .new-folder button
 {
-   padding-left: 2.5em; 
-   background: url(images/folder-new-16.png) no-repeat 10% 50%;
+   background: transparent url(images/folder-new-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
 }
 .toolbar .new-folder .yui-button-disabled button
 {
@@ -165,18 +161,24 @@
 
 .toolbar .file-upload button
 {
-   padding-left: 2.5em; 
-   background: url(images/upload-16.png) no-repeat 10% 50%;
+   background: transparent url(images/upload-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
 }
 .toolbar .file-upload .yui-button-disabled button
 {
    background-image: url(images/upload-disabled-16.png);
 }
 
+.toolbar .rss-feed a
+{
+   background: transparent url(images/feed-icon-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+
 .toolbar .folder-up button
 {
-   padding-left: 2.5em; 
-   background: url(images/up-arrow-16.png) no-repeat 10% 50%;
+   background: transparent url(images/up-arrow-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
 }
 .toolbar .folder-up .yui-button-disabled button
 {

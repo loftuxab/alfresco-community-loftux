@@ -19,7 +19,7 @@
       </div>
       </#if>
       <div class="viewcolumn">
-         <div class="title"><#if editable>${msg("label.myprofile")}<#else>${displayname?html} ${msg("label.profile")}</#if></div>
+         <h1><#if editable>${msg("label.myprofile")}<#else>${displayname?html} ${msg("label.profile")}</#if></h1>
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photorow">
             <div class="photo">

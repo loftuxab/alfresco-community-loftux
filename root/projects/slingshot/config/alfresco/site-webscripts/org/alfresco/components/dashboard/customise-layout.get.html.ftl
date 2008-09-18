@@ -37,8 +37,8 @@
       <hr/>
 
       <div>
-         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon"
-              src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png"/>
+         <br />
+         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png"/>
          <div id="${args.htmlid}-changeButtonWrapper-div" class="buttons">
             <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}"/>
          </div>
@@ -48,7 +48,7 @@
 
    <div id="${args.htmlid}-layouts-div" class="layouts" style="display: none;">
 
-      <h2>${msg("section.selectNewLayout")}</h2>
+      <h2 class="instructions">${msg("section.selectNewLayout")}</h2>
       <hr/>
 
       <div>

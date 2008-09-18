@@ -777,7 +777,7 @@
       {
          Alfresco.logger.debug("DLCT_onNodeClicked");
          var userAccess = node.data.userAccess;
-         if ((userAccess && userAccess.create) || (node.data.nodeRef == ""))
+         if ((userAccess && userAccess.create) || (node.data.nodeRef == "") || (node.data.nodeRef == "alfresco://company/home"))
          {
             this.pathChanged(node.data.path);
             this._updateSelectedNode(node);

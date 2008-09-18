@@ -8,11 +8,13 @@
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
    </div>
-   <div class="body scrollableList" id="${args.htmlid}-scrollableList">
-   <#if wikipage?exists>
-      ${wikipage}
-   <#else>
-		${msg("label.noConfig")}
-	</#if>
+   <div class="body scrollableList">
+      <div id="${args.htmlid}-scrollableList">
+<#if wikipage?exists>
+         ${wikipage}
+<#else>
+		   ${msg("label.noConfig")}
+</#if>
+      </div>
 	</div><#-- end of body -->
 </div><#-- end of dashlet -->

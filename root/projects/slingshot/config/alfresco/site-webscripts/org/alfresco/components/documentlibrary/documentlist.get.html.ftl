@@ -25,7 +25,7 @@
    );
 //]]></script>
 <div id="${args.htmlid}-body" class="doclist">
-   <div id="${args.htmlid}-doclistBar" class="yui-gc doclist-bar">
+   <div id="${args.htmlid}-doclistBar" class="yui-gc doclist-bar flat-button">
       <div class="yui-u first">
          <div class="file-select">
             <button id="${args.htmlid}-fileSelect-button" name="doclist-fileSelect-button">${msg("menu.select")}</button>
@@ -45,7 +45,7 @@
       </div>
       <div class="yui-u align-right">
          <button id="${args.htmlid}-showFolders-button" name="doclist-showFolders-button">${msg("button.folders.show")}</button>
-         <span class="separator">|</span>
+         <span class="separator">&nbsp;</span>
          <button id="${args.htmlid}-simpleView-button" name="doclist-simpleView-button">${msg("button.view.simple")}</button>
       </div>
    </div>

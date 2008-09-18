@@ -239,6 +239,12 @@
             disabled: true
          });
          this.widgets.selectedItems.getMenu().beforeShowEvent.fire();
+         
+         // RSS Feed link button
+         this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
+         {
+            type: "link"
+         });
 
          // Folder Up Navigation button
          this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp,
@@ -958,9 +964,13 @@
          {
             var eCrumb = new Element(document.createElement("span"));
             eCrumb.addClass("crumb");
-            if (i > 0)
+            if (i == 0)
             {
-               eCrumb.addClass("folder")
+               eCrumb.addClass("first");
+            }
+            else
+            {
+               eCrumb.addClass("folder");
             }
 
             // Last crumb shouldn't be rendered as a link
@@ -987,7 +997,7 @@
                eCrumb.appendChild(eLink);
                eCrumb.appendChild(new Element(document.createElement("span"),
                {
-                  innerHTML: " &gt; ",
+                  innerHTML: "&gt;",
                   className: "separator"
                }));
             }
@@ -1036,8 +1046,7 @@
        */
       _generateRSSFeedUrl: function DLTB__generateRSSFeedUrl()
       {
-         var divFeed = Dom.get(this.id + "-rssFeed");
-         if (divFeed && this.modules.docList)
+         if (this.widgets.rssFeed && this.modules.docList)
          {
             var params = YAHOO.lang.substitute("{type}/site/{site}/{container}{path}",
             {
@@ -1054,8 +1063,7 @@
             }
             params += "&format=rss";
             
-            var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/" + params;
-            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("link.rss-feed") + '</a>';
+            this.widgets.rssFeed.set("href", Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/" + params);
          }
          
       },
