@@ -1,7 +1,7 @@
 <script type="text/javascript">//<![CDATA[
-	new Alfresco.WikiFilter("${args.htmlid}").setSelected(
+/*	new Alfresco.WikiFilter("${args.htmlid}").setSelected(
 		"${page.url.args["filter"]!"main"}"
-	);
+	);*/
 //]]></script>
 <div id="${args.htmlid}-body" class="filter wiki-filter">
    <h2>${msg("header.pages")}</h2>
