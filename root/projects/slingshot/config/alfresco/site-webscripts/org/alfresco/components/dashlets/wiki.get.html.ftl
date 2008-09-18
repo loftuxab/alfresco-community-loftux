@@ -4,7 +4,7 @@
    ).setSiteId("${page.url.templateArgs.site!""}");
 //]]></script>
 <div class="dashlet">
-   <div class="title" id="${args.htmlid}-title">${pageTitle!msg("label.header")}</div>
+   <div class="title" id="${args.htmlid}-title">Wiki - ${pageTitle!msg("label.header")}</div>
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
    </div>
