@@ -180,7 +180,7 @@
          var context = Dom.get(id);
 
          // TODO: do something with the tag name for all tags
-         if (tagname === "All Tags")
+         if (tagname === Alfresco.util.message("label.all-tags", this.name))
          {
             var divs = Dom.getElementsByClassName('eventDeselect', 'div', context);
             for (var i=0; i < divs.length; i++)
