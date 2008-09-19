@@ -27,4 +27,23 @@
       <param>goodbye</param>
    </config>
 
+   <config evaluator="string-compare" condition="Remote">
+      <remote>
+
+         <!-- Test Endpoint -->
+	     <endpoint>
+	        <id>alfresco-test</id>
+	        <name>Alfresco - test access</name>
+	        <description>Test account access to Alfresco</description>
+	        <connector-id>alfresco</connector-id>
+	        <endpoint-url>http://localhost:8080/alfresco/s</endpoint-url>
+	        <identity>declared</identity>
+	        <username>admin</username>
+	        <password>admin</password>
+	        <unsecure>true</unsecure>
+	     </endpoint>
+	
+	  </remote>
+    </config>
+
 </alfresco-config>

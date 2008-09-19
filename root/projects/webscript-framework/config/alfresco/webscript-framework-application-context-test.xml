@@ -5,7 +5,18 @@
 
    <!--              -->   
    <!--  Test Server -->
-   <!--              -->   
+   <!--              -->
+      
+   <bean id="web.configsource" class="org.alfresco.config.source.UrlConfigSource">
+      <constructor-arg>
+         <list>
+            <value>classpath:alfresco/webscript-framework-config.xml</value>
+            <value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
+            <value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
+            <value>classpath:alfresco/webscript-framework-config-test.xml</value>
+         </list>
+      </constructor-arg>
+   </bean>
 
    <bean id="webscripts.test" class="org.alfresco.web.scripts.TestWebScriptServer">
       <property name="container" ref="webscripts.container" />
