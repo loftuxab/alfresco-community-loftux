@@ -19,7 +19,10 @@
    {
       this.name = "Alfresco.CalendarToolbar";
       this.id = containerId;
-
+      this.navButtonGroup = null;
+	  this.nextButton = null;
+      this.prevButton = null;
+      this.todayButton = null;
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
 
@@ -82,11 +85,13 @@
             type: "link"
          });
       
-         Alfresco.util.createYUIButton(this, "next-button", this.onNextNav);
-         Alfresco.util.createYUIButton(this, "prev-button", this.onPrevNav);
-         Alfresco.util.createYUIButton(this, "today-button", this.onTodayNav);
-         var navButtonGroup = new YAHOO.widget.ButtonGroup(this.id + "-navigation");
-         navButtonGroup.on("checkedButtonChange", this.onNavigation, navButtonGroup, this);
+         this.nextButton = Alfresco.util.createYUIButton(this, "next-button", this.onNextNav);
+         this.prevButton = Alfresco.util.createYUIButton(this, "prev-button", this.onPrevNav);
+         this.todayButton = Alfresco.util.createYUIButton(this, "today-button", this.onTodayNav);
+		 
+		 
+         this.navButtonGroup = new YAHOO.widget.ButtonGroup(this.id + "-navigation");
+         this.navButtonGroup.on("checkedButtonChange", this.onNavigation, this.navButtonGroup, this);
       },
 
       onNextNav: function(e)
@@ -106,7 +111,20 @@
 
       onNavigation: function(e)
       {
-         YAHOO.Bubbling.fire("viewChanged",
+        var selectedButton = this.navButtonGroup.getButtons()[e.newValue.index];
+        // disable buttons for agenda view only
+    	if ( selectedButton.get('label') === Alfresco.util.message('label.agenda','Alfresco.CalendarView') ) {
+    		this.todayButton.set('disabled',true);
+            this.nextButton.set('disabled',true);
+            this.prevButton.set('disabled',true);	
+		}
+		else {
+    		this.todayButton.set('disabled',false);
+            this.nextButton.set('disabled',false);
+            this.prevButton.set('disabled',false);				
+		}
+
+		YAHOO.Bubbling.fire("viewChanged",
          {
             activeView: e.newValue.index
          })
