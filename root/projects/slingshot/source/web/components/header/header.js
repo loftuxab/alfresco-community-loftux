@@ -94,13 +94,21 @@
          }, 
          "keydown").enable();
 
-         var oMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu");
-         oMenu.render();
-         oMenu.owner = this;
-         oMenu.subscribe("show", oMenu.focus);
+         var searchMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu");
+         searchMenu.render();
+         searchMenu.owner = this;
+         searchMenu.subscribe("show", searchMenu.focus);
 
-         YAHOO.util.Event.addListener(this.id + "-search-tbutton", "click", this.openToggleSearchMenu, null, oMenu);
+         YAHOO.util.Event.addListener(this.id + "-search-tbutton", "click", this.openToggleSearchMenu, null, searchMenu);
          YAHOO.util.Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
+
+         var sitesMenu = new YAHOO.widget.Menu(this.id + "-sitestogglemenu");
+         sitesMenu.render();
+         sitesMenu.owner = this;
+         sitesMenu.subscribe("show", searchMenu.focus);
+
+         YAHOO.util.Event.addListener(this.id + "-sites-tbutton", "click", this.openToggleSitesMenu, null, sitesMenu);
+         YAHOO.util.Dom.removeClass(this.id + "-sitestogglemenu", "hidden");
       },
       
       focusSearchText: function ()
@@ -191,7 +199,24 @@
             return this._msg("header.search.searchsite", this.options.siteTitle);
          }
       },
-      
+
+
+      openToggleSitesMenu: function()
+      {
+         this.show();
+         var coord = YAHOO.util.Dom.getXY(this.owner.id + "-sites-tbutton");
+         coord[0] -= (YAHOO.util.Dom.get(this.owner.id + "-sitestogglemenu").offsetWidth - YAHOO.util.Dom.get(this.owner.id + "-sites-tbutton").offsetWidth);
+         coord[1] += YAHOO.util.Dom.get(this.owner.id + "-sites-tbutton").offsetHeight;
+         YAHOO.util.Dom.setXY(this.id, coord);
+      },
+
+
+      showCreateSite: function()
+      {
+         Alfresco.module.getCreateSiteInstance().show();
+      },
+
+
       /**
        * Gets a custom message
        *

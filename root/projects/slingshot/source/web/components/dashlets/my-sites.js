@@ -147,13 +147,7 @@
        */
       onCreateSiteLinkClick: function MS_onCreateSiteLinkClick(event)
       {
-         // Create the CreateSite module if it doesnt exist
-         if (this.createSite === null)
-         {
-            this.createSite = Alfresco.module.getCreateSiteInstance(); //new Alfresco.module.CreateSite(this.id + "-createSite");
-         }
-         // and show it
-         this.createSite.show();
+         Alfresco.module.getCreateSiteInstance().show();         
       },
 
       /**

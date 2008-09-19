@@ -22,7 +22,8 @@
    cursor: pointer;
 }
 
-.my-sites .description
+.my-sites div.description
 {
    clear: left;
+   margin-left: 32px;
 }

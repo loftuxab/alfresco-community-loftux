@@ -23,7 +23,10 @@
       <div class="personal-menu">
          <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name?url}/dashboard">${msg("link.myDashboard")}</a></span>
          <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.myProfile")}</a></span>
-         <span class="menu-item-icon sites"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
+         <span class="menu-item-icon sites">
+            <a href="${url.context}/page/site-finder">${msg("link.sites")}</a>
+            <span id="${args.htmlid}-sites-tbutton" class="sites-menu-icon">&nbsp;</span>
+         </span>
          <span class="menu-item-icon people"><a href="${url.context}/page/people-finder">${msg("link.people")}</a></span>
       </div>
       </#if>
@@ -45,14 +48,33 @@
       </div>
    </div>
 
-   <#if !isGuest>
-   <div id="${args.htmlid}-searchtogglemenu" class="searchtoggle hidden">
+   <div id="${args.htmlid}-sitestogglemenu" class="hidden">
       <div class="bd">
          <ul>
-            <li class="searchtoggleitem">
-               <a class="searchtoggleitemlabel<#if siteActive == 'false'> disabled</#if>" href="<#if siteActive == 'false'>#<#else>javascript:thisHeader.doToggleSearchType('site')</#if>">${msg("header.search.searchsite", page.url.templateArgs.site!"")}</a>
+            <li>
+               <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>
             </li>
-            <li class="searchtoggleitem"><a class="searchtoggleitemlabel" href="javascript:thisHeader.doToggleSearchType('all')">${msg("header.search.searchall")}</a></li>
+         </ul>
+         <ul>
+            <#if !isGuest>
+            <li>
+               <a href="javascript:thisHeader.showCreateSite();">${msg("header.sites.createSite")}</a>
+            </li>
+            </#if>
+         </ul>
+      </div>
+   </div>
+
+   <#if !isGuest>
+   <div id="${args.htmlid}-searchtogglemenu" class="hidden">
+      <div class="bd">
+         <ul>
+            <li>
+               <a class="<#if siteActive == 'false'> disabled</#if>" href="<#if siteActive == 'false'>#<#else>javascript:thisHeader.doToggleSearchType('site')</#if>">${msg("header.search.searchsite", page.url.templateArgs.site!"")}</a>
+            </li>
+            <li>
+               <a href="javascript:thisHeader.doToggleSearchType('all')">${msg("header.search.searchall")}</a>
+            </li>
          </ul>            
       </div>
    </div>	
