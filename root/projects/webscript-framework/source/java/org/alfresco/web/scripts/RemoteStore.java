@@ -28,7 +28,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.alfresco.connector.Connector;
@@ -306,8 +308,23 @@ public class RemoteStore implements Store
      */
     public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
     {
-        // TODO: implement getDocumentPaths()
-        throw new AlfrescoRuntimeException("getDocumentPaths() not supported by remote store.");
+        Map<String, String> args = new HashMap<String, String>(1, 1.0f);
+        args.put("m", documentPattern);
+        Response res = callGet(buildEncodeCall("listpattern", path, args));
+        if (Status.STATUS_OK == res.getStatus().getCode())
+        {
+            List<String> list = new ArrayList<String>(32);
+            StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
+            while (t.hasMoreTokens())
+            {
+                list.add(t.nextToken().substring(path.length()));
+            }
+            return list.toArray(new String[list.size()]);
+        }
+        else
+        {
+            return new String[0];
+        }
     }
 
     /* (non-Javadoc)
@@ -352,7 +369,7 @@ public class RemoteStore implements Store
         return this.path;
     }
 
-
+    
     /**
      * Helper to build and encode a remote store call
      * 
@@ -362,6 +379,20 @@ public class RemoteStore implements Store
      * @return encoded URL to execute
      */
     private String buildEncodeCall(String method, String documentPath)
+    {
+        return buildEncodeCall(method, documentPath, null);
+    }
+    
+    /**
+     * Helper to build and encode a remote store call
+     * 
+     * @param method        Remote store method name
+     * @param documentPath  Document path to encode, can be empty but not null
+     * @param args          Args map to apply to URL call, can be null or empty
+     * 
+     * @return encoded URL to execute
+     */
+    private String buildEncodeCall(String method, String documentPath, Map<String, String> args)
     {
         // TODO: Have this method take into account the currently bound
         // store id.  The store id could be an avm store id but it could
@@ -384,7 +415,21 @@ public class RemoteStore implements Store
         {
             buf.append('/').append(URLEncoder.encode(t.nextToken()));
         }
-
+        
+        if (args != null && args.size() != 0)
+        {
+            buf.append('?');
+            int count = 0;
+            for (Map.Entry<String, String> entry : args.entrySet())
+            {
+                if (count++ != 0)
+                {
+                    buf.append('&');
+                }
+                buf.append(entry.getKey()).append('=').append(URLEncoder.encode(entry.getValue()));
+            }
+        }
+        
         return buf.toString();
     }
 
