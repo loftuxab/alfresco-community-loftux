@@ -112,16 +112,6 @@
 	color: #999;
 }
 
-.header .search-icon
-{
-   background: url(../images/search.gif) no-repeat left bottom;
-   cursor: pointer;
-   position: absolute;
-   padding-left: 12px;
-   padding-top: 2px;
-   right: 24px;
-}
-
 .header .search-site-icon
 {
    background-image: url(../images/select_arrow.gif);
@@ -135,12 +125,28 @@
    top: 2px;
 }
 
+.header .sites-menu-icon
+{
+   background-image:url(../images/expanded.png);
+   background-position:left center;
+   background-repeat:no-repeat;
+   cursor:pointer;
+   padding-left:8px;
+   position:relative;
+   top:1px;
+}
+
+.header .sites-menu-icon:hover
+{
+   background-color: #B3D4FF;
+}
+
 /* IE6 fix */
 * html .header .search-icon {position: fixed;}
 * html .header .search-site-icon {position: fixed;}
 /* */
 
-.header .searchtoggleitemlabel.disabled
+.header .yuimenu .yuimenuitemlabel.disabled
 {
 	color: #ccc;
 	cursor: default;
@@ -151,47 +157,40 @@
    display: none;
 }
 
-.header .searchtoggle
+.header .yuimenu
 {
 	visibility: hidden;
 	position: relative;
 }
 
-.header div.toggle-search
-{
-	min-width: 250px;
-	display: inline;
-	border: 1px solid #C5D6E2;
-	padding: 2px;
-	padding-right: 20px;
-	cursor: pointer;
-	background: url(../images/search.gif) no-repeat center right;
-}
 
-.header .searchtoggle .bd
+.header .yuimenu .bd
 {    
 	zoom: normal;
 	border: 1px thin #84B4D5;
 	background-color: #EBEFF1;
-	padding: 4px;
+	padding: 0;
 }
 
-.header .bd .searchtoggle .searchtoggleitemlabel
+.header .yuimenu ul
 {
-	color: #fff;
-	cursor: pointer;
-	padding: 4px;
-	padding-right: 10px;	
-	padding-left: 10px;		
+   padding:0;
 }
 
-.header .bd .searchtoggle .searchtoggleitemlabel.disabled:hover
+
+.header .yuimenu .yuimenuitemlabel
+{
+	cursor: pointer;
+	padding: 4px 15px;
+}
+
+.header .yuimenu .yuimenuitemlabel.disabled:hover
 {
 	color: #eee;
 	cursor: default;
 }
 
-.header .bd .searchtoggle .searchtoggleitemlabel.disabled .searchtoggleitem.selected
+.header .yuimenu .yuimenuitemlabel.disabled .menuitem.selected
 {
 	background-color: transparent;
 }

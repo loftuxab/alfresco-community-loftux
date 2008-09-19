@@ -400,7 +400,9 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
-            Dom.setStyle(elCell, "overflow", "visible !important");
+            //Dom.setStyle(elCell, "overflow", "visible !important");
+            Dom.addClass(elCell, "overflow");
+            
             
             var currentRole = oRecord.getData("role");
             
@@ -699,7 +701,7 @@
                {
                   fn: failure,
                   scope: this
-               },
+               }
             });
          }
       },

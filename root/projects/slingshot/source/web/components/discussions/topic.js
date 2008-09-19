@@ -176,6 +176,7 @@
          // Hook action events.
          var fnActionHandlerDiv = function DiscussionsTopic_fnActionHandlerDiv(layer, args)
          {
+
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {

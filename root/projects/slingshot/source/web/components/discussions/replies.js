@@ -659,7 +659,7 @@
             {
                fn: this.onFormSubmitFailure,
                scope: this
-            },
+            }
          });
          replyForm.setSubmitAsJSON(true);
          replyForm.doBeforeFormSubmit =

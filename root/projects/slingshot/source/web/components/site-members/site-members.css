@@ -78,3 +78,8 @@
    color: #333333;
 }
 
+/* Use a class since IE6 crashes if setStyle is use to se overflow with !important */
+.site-members .overflow
+{
+   overflow: visible !important;
+}
