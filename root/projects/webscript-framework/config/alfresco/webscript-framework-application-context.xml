@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans-2.0.dtd'>
 
 <beans>
 
@@ -206,6 +206,12 @@
                  <property name="abderaService" ref="webscripts.abdera"/>
               </bean>
            </entry>
+           <entry key="jsonUtils">
+              <bean class="org.alfresco.web.scripts.json.JSONUtils"/>
+           </entry>
+           <entry key="stringUtils">
+              <bean class="org.alfresco.web.scripts.ScriptableUtils"/>
+           </entry>
          </map>
       </property>
       <property name="templateObjects">
@@ -215,6 +221,15 @@
            </entry>
            <entry key="encodeuri">
               <bean class="org.alfresco.web.scripts.UrlEncodeMethod"/>
+           </entry>
+           <entry key="dateCompare">
+              <bean class="org.alfresco.web.scripts.DateCompareMethod"/>
+           </entry>
+           <entry key="jsonUtils">
+              <bean class="org.alfresco.web.scripts.json.JSONUtils"/>
+           </entry>
+           <entry key="stringUtils">
+              <bean class="org.alfresco.web.scripts.ScriptableUtils"/>
            </entry>
          </map>
       </property>
@@ -238,6 +253,16 @@
       <property name="registry" ref="webscripts.registry" />
       <property name="templateProcessor" ref="webscripts.web.templateprocessor" />
       <property name="scriptProcessor" ref="webscripts.web.scriptprocessor" />
+      <property name="scriptObjects">
+         <map merge="true">
+           <entry key="remote">
+              <bean class="org.alfresco.web.scripts.ScriptRemote">
+                 <property name="connectorService" ref="connector.service"/>
+                 <property name="configService" ref="web.config"/>
+              </bean>
+           </entry>         
+         </map>
+      </property>
    </bean>
 
  
@@ -287,7 +312,7 @@
    <bean id="webscriptdesc" abstract="true"/>
 
    <!--  Declarative Web Script Implementation -->
-   <bean id="webscript.default" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebScript" singleton="false"/>
+   <bean id="webscript.default" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebScript" scope="prototype"/>
 
 
    <!--            -->
@@ -295,34 +320,34 @@
    <!--            -->
 
    <!--  Index -->
-   <bean id="webscript.org.alfresco.index.get" class="org.alfresco.web.scripts.bean.Index" parent="webscript" singleton="false"/>
-   <bean id="webscript.org.alfresco.indexall.get" class="org.alfresco.web.scripts.bean.IndexAll" parent="webscript" singleton="false"/>
+   <bean id="webscript.org.alfresco.index.get" class="org.alfresco.web.scripts.bean.Index" parent="webscript" scope="prototype"/>
+   <bean id="webscript.org.alfresco.indexall.get" class="org.alfresco.web.scripts.bean.IndexAll" parent="webscript" scope="prototype"/>
    <alias name="webscript.org.alfresco.index.get" alias="webscript.org.alfresco.indexfailures.get"/>
-   <bean id="webscript.org.alfresco.indexfamily.get" class="org.alfresco.web.scripts.bean.IndexFamily" parent="webscript" singleton="false" />
-   <bean id="webscript.org.alfresco.indexuri.get" class="org.alfresco.web.scripts.bean.IndexURI" parent="webscript" singleton="false" />
-   <bean id="webscript.org.alfresco.indexpackage.get" class="org.alfresco.web.scripts.bean.IndexPackage" parent="webscript" singleton="false" />
-   <bean id="webscript.org.alfresco.index.post" class="org.alfresco.web.scripts.bean.IndexUpdate" parent="webscript" singleton="false" >
+   <bean id="webscript.org.alfresco.indexfamily.get" class="org.alfresco.web.scripts.bean.IndexFamily" parent="webscript" scope="prototype" />
+   <bean id="webscript.org.alfresco.indexuri.get" class="org.alfresco.web.scripts.bean.IndexURI" parent="webscript" scope="prototype" />
+   <bean id="webscript.org.alfresco.indexpackage.get" class="org.alfresco.web.scripts.bean.IndexPackage" parent="webscript" scope="prototype" />
+   <bean id="webscript.org.alfresco.index.post" class="org.alfresco.web.scripts.bean.IndexUpdate" parent="webscript" scope="prototype" >
       <property name="facebookService" ref="facebook.service"/>
    </bean>
 
    <!--  Get Description Document -->
-   <bean id="webscript.org.alfresco.scriptdescription.get" class="org.alfresco.web.scripts.bean.ServiceDescription" parent="webscript" singleton="false" />
+   <bean id="webscript.org.alfresco.scriptdescription.get" class="org.alfresco.web.scripts.bean.ServiceDescription" parent="webscript" scope="prototype" />
 
    <!--  Get Web Script -->
-   <bean id="webscript.org.alfresco.scriptdump.get" class="org.alfresco.web.scripts.bean.ServiceDump" parent="webscript" singleton="false" />
+   <bean id="webscript.org.alfresco.scriptdump.get" class="org.alfresco.web.scripts.bean.ServiceDump" parent="webscript" scope="prototype" />
 
    <!--  Install -->
-   <bean id="webscript.org.alfresco.scriptinstall.post" class="org.alfresco.web.scripts.bean.ServiceInstall" parent="webscript" singleton="false" />
+   <bean id="webscript.org.alfresco.scriptinstall.post" class="org.alfresco.web.scripts.bean.ServiceInstall" parent="webscript" scope="prototype" />
    
    <!--  Javascript APIs -->
    
    <!--  Switch on debugger by setting log4j.logger.org.alfresco.web.scripts.AlfrescoScriptDebugger to DEBUG -->
    <bean id="scriptDebugger" class="org.alfresco.web.scripts.AlfrescoScriptDebugger" init-method="start"/>
    
-   <bean id="webscript.org.alfresco.jsdebugger.get" class="org.alfresco.web.scripts.bean.JavascriptDebugger" parent="webscript" singleton="false">
+   <bean id="webscript.org.alfresco.jsdebugger.get" class="org.alfresco.web.scripts.bean.JavascriptDebugger" parent="webscript" scope="prototype">
       <property name="debugger" ref="scriptDebugger" />
    </bean>
-   <bean id="webscript.org.alfresco.jsdebugger.post" class="org.alfresco.web.scripts.bean.JavascriptDebuggerPost" parent="webscript" singleton="false">
+   <bean id="webscript.org.alfresco.jsdebugger.post" class="org.alfresco.web.scripts.bean.JavascriptDebuggerPost" parent="webscript" scope="prototype">
       <property name="debugger" ref="scriptDebugger" />
    </bean>
    

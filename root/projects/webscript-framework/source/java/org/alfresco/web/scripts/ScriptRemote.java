@@ -33,8 +33,6 @@ import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Root-scope class that provides useful functions for working with endpoints,
@@ -48,22 +46,26 @@ import org.mozilla.javascript.Scriptable;
  */
 public class ScriptRemote
 {
-    private static final String CONNECTOR_SERVICE_ID = "connector.service";
-
     private static final Log logger = LogFactory.getLog(ScriptRemote.class);
 
     private ConfigService configService;
-    private Container container;
+    private ConnectorService connectorService;
+
 
     /**
-     * Instantiates a new script remote.
-     * 
-     * @param configService the config service
+     * @param configService
      */
-    protected ScriptRemote(Container container)
+    public void setConfigService(ConfigService configService)
     {
-        this.container = container;
         this.configService = configService;
+    }
+    
+    /**
+     * @param connectorService
+     */
+    public void setConnectorService(ConnectorService connectorService)
+    {
+        this.connectorService = connectorService;
     }
 
     /**
@@ -130,30 +132,12 @@ public class ScriptRemote
                     
                     // Note - we can only properly do this if the container
                     // provides us with a reference to the application context
-                    if(this.container instanceof AbstractRuntimeContainer)
-                    {
-                        ConnectorService connectorService = (ConnectorService) ((AbstractRuntimeContainer)container).getApplicationContext().getBean(CONNECTOR_SERVICE_ID);
-                        if(connectorService != null)
-                        {
-                            Connector connector = connectorService.getConnector(endpointId);
-                            remoteConnector = new ScriptRemoteConnector(connector);
-                        }
-                        else
-                        {
-                            throw new RemoteConfigException("Unable to locate ConnectorService for Spring bean id: " + CONNECTOR_SERVICE_ID);
-                        }
-                    }
-                    else
-                    {
-                        throw new RemoteConfigException("The container is not an AbstractRuntimeContainer, unable to fetch ApplicationContext");
-                    }
-                    
+                    Connector connector = connectorService.getConnector(endpointId);
+                    remoteConnector = new ScriptRemoteConnector(connector);
                 }
                 catch (RemoteConfigException rce)
                 {
-                    logger.error(
-                            "Unable to open connection to endpoint: " + endpointId,
-                            rce);
+                    logger.error("Unable to open connection to endpoint: " + endpointId,rce);
                 }
             }
         }
@@ -184,18 +168,17 @@ public class ScriptRemote
      * 
      * @return
      */
-    public Scriptable getEndpointIds()
+    public String[] getEndpointIds()
     {
-        Scriptable scriptable = null;
+        String[] endpointIds = null;
         
         RemoteConfigElement remoteConfig = getRemoteConfig();
         if(remoteConfig != null)
         {
-            String[] endpointIds = remoteConfig.getEndpointIds();
-            scriptable = toScriptableArray(null, endpointIds);
+            endpointIds = remoteConfig.getEndpointIds();
         }
         
-        return scriptable;
+        return endpointIds;
     }
     
     /**
@@ -260,26 +243,6 @@ public class ScriptRemote
 
         return persistent;
     }    
-    
-    /**
-     * Converts a given array to a Scriptable array that can be traversed
-     * by the script and Freemarker engines
-     * 
-     * @param scope the scope
-     * @param elements the elements
-     * 
-     * @return the scriptable
-     */
-    protected static Scriptable toScriptableArray(Scriptable scope, String[] elements)
-    {
-        Object[] array = new Object[elements.length];
-        for (int i = 0; i < elements.length; i++)
-        {
-            array[i] = elements[i];
-        }
-        
-        return Context.getCurrentContext().newArray(scope, array);
-    }
     
     /**
      * @return RemoteConfigElement

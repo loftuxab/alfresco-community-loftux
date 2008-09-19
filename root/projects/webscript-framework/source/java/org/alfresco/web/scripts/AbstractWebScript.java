@@ -44,7 +44,6 @@ import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.util.StringBuilderWriter;
-import org.alfresco.web.scripts.json.JSONUtils;
 import org.alfresco.web.scripts.json.JSONWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,11 +72,6 @@ public abstract class AbstractWebScript implements WebScript
     // Status Template cache
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
     private ReentrantReadWriteLock statusTemplateLock = new ReentrantReadWriteLock(); 
-    
-    // Immutable utility classes
-    private static final JSONUtils JSON_UTILS = new JSONUtils();
-    private static final ScriptableUtils SCRIPTABLE_UTILS = new ScriptableUtils();
-    private static final DateCompareMethod DATE_COMPARE_METHOD = new DateCompareMethod();
     
     
     //
@@ -198,18 +192,6 @@ public abstract class AbstractWebScript implements WebScript
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
         
-        // add the json utilities
-        params.put("jsonUtils", JSON_UTILS);
-        
-        // add the string utilities
-        params.put("stringUtils", SCRIPTABLE_UTILS);
-        
-        // add remote object
-        if (this.container instanceof PresentationContainer)
-        {
-            params.put("remote", new ScriptRemote(this.container));
-        }
-        
         // add request mimetype parameters
         FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
         if (reader != null)
@@ -255,18 +237,11 @@ public abstract class AbstractWebScript implements WebScript
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
         
-        // add the json utilities
-        params.put("jsonUtils", JSON_UTILS);
-        
-        // add the string utilities
-        params.put("stringUtils", SCRIPTABLE_UTILS);
-        
         // populate model with template methods
         params.put("absurl", new AbsoluteUrlMethod(req.getServerPath()));
         params.put("scripturl", new ScriptUrlMethod(req, res));
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
-        params.put("dateCompare", DATE_COMPARE_METHOD);
         MessageMethod message = new MessageMethod(this);
         params.put("message", message);     // for compatibility with repo webscripts
         params.put("msg", message);         // short form for presentation webscripts
