@@ -206,7 +206,7 @@ public class ClassPathStore implements Store
             documentPattern = "*";
         }
         
-        StringBuffer pattern = new StringBuffer();
+        final StringBuilder pattern = new StringBuilder(128);
         pattern.append("classpath*:").append(classPath)
                .append(path)
                .append((includeSubPaths ? "**/" : ""))

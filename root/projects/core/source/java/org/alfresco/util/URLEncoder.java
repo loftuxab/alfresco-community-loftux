@@ -93,10 +93,10 @@ public final class URLEncoder
      *        to a sequence of 2 or 3 bytes, using the UTF-8 algorithm;
      *        secondly each of these bytes is encoded as "%xx".
      * </ul>
-     *
-     * @param s     The non-null string to be encoded
      * 
+     * @param s     The non-null string to be encoded
      * @param reserveUriChars  true => uri reserved characters are not encoded
+     * 
      * @return The encoded string
      */
     private static String encode(final String s, final boolean reserveUriChars)
@@ -121,12 +121,12 @@ public final class URLEncoder
                     sb.append(ch);
                 }
             }
-            else if (reserveUriChars &&             // uri reserved
-                    (ch == ';' || ch == ','
-                     || ch == '/' || ch == '?'
-                     || ch == ':' || ch == '@'
-                     || ch == '&' || ch == '='
-                     || ch == '+' || ch == '$'))
+            else if (reserveUriChars &&                 // uri reserved
+                     (ch == ';' || ch == ',' ||
+                      ch == '/' || ch == '?' ||
+                      ch == ':' || ch == '@' ||
+                      ch == '&' || ch == '=' ||
+                      ch == '+' || ch == '$'))
             {
                 if (sb != null)
                 {
@@ -170,7 +170,7 @@ public final class URLEncoder
         return (sb != null ? sb.toString() : s);
     }
     
-    /*
+    /**
      * @See org.alfresco.util.URLEncoder.encodeUriComponent(s)
      */
     public static String encode(String s)
@@ -243,19 +243,4 @@ public final class URLEncoder
     {
         return encode(s, true);
     }
-    
-//    public static void main(String[] args)
-//    {
-//        System.out.println("'" + encodeUri("//") + "'");
-//        System.out.println("'" + encodeUri("/a") + "'");
-//        System.out.println("'" + encodeUri("a") + "'");
-//        System.out.println("'" + encodeUri("a/") + "'");
-//        System.out.println("'" + encodeUri("/a/b c") + "'");
-//        System.out.println("'" + encodeUri("/a/b c/") + "'");
-//        System.out.println("'" + encodeUri("/a/b c/a?") + "'");
-//        System.out.println("'" + encodeUri("/a/b c/a?a=1") + "'");
-//        System.out.println("'" + encodeUri("/a/b c/a?a=1&a=al fresco&b=fdfdf&") + "'");
-//        System.out.println("'" + encode("/a/b c/a?a=1&a=al fresco&b=fdfdf&") + "'");
-//    }
-    
 }

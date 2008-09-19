@@ -145,5 +145,16 @@ public class TestRemoteStore extends TestCase
       // test list fails with 404 when path does not exist
       res = remote.call("/remotestore/list/shouldnotexist");
       assertEquals(404, res.getStatus().getCode());
+      
+      // test listpattern on files we made earlier
+      res = remote.call("/remotestore/listpattern/" + randdir + "?m=*.nomatch");
+      assertEquals(200, res.getStatus().getCode());
+      t = new StringTokenizer(res.getResponse(), "\n");
+      assertTrue(t.countTokens() == 0);
+      
+      res = remote.call("/remotestore/listpattern/" + randdir + "?m=*.txt");
+      assertEquals(200, res.getStatus().getCode());
+      t = new StringTokenizer(res.getResponse(), "\n");
+      assertTrue(t.countTokens() == 2);
    }
 }
