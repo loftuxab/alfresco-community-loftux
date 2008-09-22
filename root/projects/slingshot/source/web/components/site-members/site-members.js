@@ -70,7 +70,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
    
       return this;
-   }
+   };
    
    Alfresco.SiteMembers.prototype =
    {
@@ -247,7 +247,8 @@
                       lastName.toLowerCase().indexOf(lowerSearchTerm) != -1)
                   {
                      // create object to represent member
-                     var member = {
+                     var member =
+                     {
                         "userName": memberData.person.userName,
                         "firstName": firstName,
                         "lastName": lastName,
@@ -257,17 +258,17 @@
                      // add optional metadata
                      if (memberData.person.avatar !== undefined)
                      {
-                        member["avatar"] = memberData.person.avatar;
+                        member.avatar = memberData.person.avatar;
                      }
                      
                      if (memberData.person.jobtitle !== undefined)
                      {
-                        member["jobtitle"] = memberData.person.jobtitle;
+                        member.jobtitle = memberData.person.jobtitle;
                      }
                      
                      if (memberData.person.organization !== undefined)
                      {
-                        member["organization"] = memberData.person.organization;
+                        member.organization = memberData.person.organization;
                      }
                      
                      // add member to list
@@ -282,7 +283,7 @@
             }
             
             return updatedResponse;
-         }
+         };
          
          // determine if current user is a site administrator
          if (me.options.currentUserRole !== undefined &&
@@ -299,17 +300,15 @@
          
          // register the "enter" event on the search text field
          var searchInput = Dom.get(this.id + "-term");
-         new YAHOO.util.KeyListener(searchInput, { keys:13 }, 
+         var escapeListener = new YAHOO.util.KeyListener(searchInput, { keys:13 }, 
          {
             fn: function() 
             {
-               me.doSearch()
+               me.doSearch();
             },
-            scope:this,
-            correctScope:true
-         }, 
-         "keydown" 
-         ).enable();
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -358,7 +357,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellDescription = function SiteMembers_renderCellDescription(elCell, oRecord, oColumn, oData)
+         var renderCellDescription = function SiteMembers_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // Currently rendering all results the same way
             var userName = oRecord.getData("userName");
@@ -374,7 +373,7 @@
             var url = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
             var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
             var organization = oRecord.getData("organization") ? oRecord.getData("organization") : "";
-            desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
+            var desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
             if (title.length > 0)
             {
                desc += '<div><span class="attr-name">' + me._msg('title') + ': </span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
@@ -396,13 +395,11 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellRoleSelect = function SiteMembers_renderCellRoleSelect(elCell, oRecord, oColumn, oData)
+         var renderCellRoleSelect = function SiteMembers_renderCellRoleSelect(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
-            //Dom.setStyle(elCell, "overflow", "visible !important");
             Dom.addClass(elCell, "overflow");
-            
             
             var currentRole = oRecord.getData("role");
             
@@ -468,7 +465,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellUninvite = function InvitationList_renderCellUninvite(elCell, oRecord, oColumn, oData)
+         var renderCellUninvite = function InvitationList_renderCellUninvite(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
@@ -539,17 +536,17 @@
             }
             else if (oResponse.results)
             {
-               if (oResponse.results.length == 0)
+               if (oResponse.results.length === 0)
                {
                   YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' + 
                      me._msg("message.empty") + '</span>';
                }
-               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
+               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko > 0) ? 3 : 5;
             }
             
             // Must return true to have the "Searching..." message replaced by the error message
             return true;
-         }
+         };
       },
       
       /**
@@ -602,7 +599,7 @@
          {
             // remove the message
             this.widgets.feedbackMessage.destroy();
-         }
+         };
           
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
