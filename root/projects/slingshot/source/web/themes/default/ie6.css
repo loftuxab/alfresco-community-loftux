@@ -10,6 +10,10 @@
    padding-bottom: 4px;
 }
 
+.header .menu-wrapper {
+   padding:17px 0 14px;
+}
+
 .header div.util-menu
 {
    margin-top: -1px;
@@ -26,7 +30,8 @@
  */
 .page-title
 {
-   padding-bottom: 2em;
+   height: 2.2em;
+   line-height: 2.2em;   /*padding-bottom: 2em;*/
 }
 
 .page-title div.title
@@ -182,4 +187,12 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 .toolbar .nav-bar
 {
    padding-bottom: 2em;
+}
+
+/**
+ * Profile
+ */
+.toolbar.userprofile
+{
+   height: 1.2em;
 }

@@ -1,5 +1,6 @@
 .profile
 {
+   clear: both;
 }
 
 .profile .separator
@@ -51,6 +52,7 @@
    float: right;
    margin-right: -0.7em;
    padding-top: 0.2em;
+   width: 1.5em;
 }
 
 .profile .row
@@ -62,7 +64,7 @@
 {
    height: 2em;
    padding: 0.5em;
-   width: 54em;
+   width: 57em;
 }
 
 .profile .photorow
@@ -148,7 +150,7 @@
 
 .profile textarea
 {
-   width: 43em;
+   width: 45em;
 }
 
 .profile .check
