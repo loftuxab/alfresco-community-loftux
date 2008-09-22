@@ -1,32 +1,41 @@
 /********
  * FORM *
 *********/
-.editBlogPostForm {
+.editBlogPostForm
+{
   margin: 4px;
   border: thin solid #000;
   padding: 4px;
   background-color: #FAFAFA;
 }
-.editBlogPostForm label {
+
+.editBlogPostForm label
+{
   width: 100px;
   float: left;
   text-align: right;
   clear: left;
   margin: 5px 15px 7px 0;
 }
-.editBlogPostForm input, .editBlogPostForm textarea {
+
+.editBlogPostForm input, .editBlogPostForm textarea
+{
   margin-bottom: 15px;
 }
-.editBlogPostForm .yui-editor-container {
+
+.editBlogPostForm .yui-editor-container
+{
   margin: 0px 0px 10px 114px;
 }
 
-.editBlogPostForm .nodeFormAction {
+.editBlogPostForm .nodeFormAction
+{
   margin: 25px 0 10px 115px;
 }
 
 /* Tag lib */
-.editBlogPostForm .taglibrary {
+.editBlogPostForm .taglibrary
+{
   margin-bottom : 10px;
   margin-left : 115px;	
 }
@@ -35,23 +44,34 @@
 /*******************
  * WYSIWYG CONTENT *
 ********************/
-.yuieditor strong {
+
+.yuieditor strong
+{
   font-weight: bold;
 }
-.yuieditor em {
+
+.yuieditor em
+{
   font-style: italic; 
 }
-.yuieditor ul, .yuieditor ol {
+
+.yuieditor ul, .yuieditor ol
+{
   padding-left: 40px;
 }
-.yuieditor ul li {
+
+.yuieditor ul li
+{
   list-style-type: disc; 
 }
-.yuieditor ol li {
+
+.yuieditor ol li
+{
   list-style-type: decimal; 
 }
 
-.hidden {
+.hidden
+{
   display: none;
 }
 

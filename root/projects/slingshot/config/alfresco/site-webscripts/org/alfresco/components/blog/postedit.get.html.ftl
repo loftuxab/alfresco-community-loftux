@@ -21,7 +21,7 @@
    <h1>${msg("createPost")}</h1>
 </#if>
 
-<div id="${args.htmlid}-container" class="editBlogPostForm hidden">
+<div id="${args.htmlid}-div" class="editBlogPostForm hidden">
    <form id="${args.htmlid}-form" method="post" action="">
       <div>
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
@@ -31,7 +31,7 @@
                
          <!-- title -->
          <label>${msg("title")}:</label>
-         <input type="text" id="${args.htmlid}-title" name="title" size="180" value="" />
+         <input type="text" id="${args.htmlid}-title" name="title" value="" />
 
          <!-- content -->
          <label>${msg("text")}:</label>
