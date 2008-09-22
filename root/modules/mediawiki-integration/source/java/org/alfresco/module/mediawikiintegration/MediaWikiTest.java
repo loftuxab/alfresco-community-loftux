@@ -24,23 +24,18 @@
  */
 package org.alfresco.module.mediawikiintegration;
 
-import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.jscript.ClasspathScriptLocation;
+import org.alfresco.module.mediawikiintegration.action.MediaWikiActionExecuter;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.ScriptLocation;
-import org.alfresco.service.cmr.repository.ScriptService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
@@ -48,11 +43,13 @@ import org.alfresco.util.BaseSpringTest;
 /**
  * @author Roy Wetherall
  */
+@SuppressWarnings("unused")
 public class MediaWikiTest extends BaseSpringTest
 {    
-    private NodeService nodeService;
+    private NodeService nodeService;    
     private ContentService contentService;
     private MediaWikiService mediaWikiService;
+    private ActionService actionService;
     
     private StoreRef storeRef;
     private NodeRef rootNode;
@@ -69,6 +66,7 @@ public class MediaWikiTest extends BaseSpringTest
         this.nodeService = (NodeService)this.applicationContext.getBean("NodeService");
         this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
         this.mediaWikiService = (MediaWikiService)this.applicationContext.getBean("mediaWikiService");
+        this.actionService = (ActionService)this.applicationContext.getBean("ActionService");
         
         // Create nodes used in the tests
         this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "mediaWikiTest_" + System.currentTimeMillis());
@@ -91,6 +89,25 @@ public class MediaWikiTest extends BaseSpringTest
         assertNotNull(mediaWikiNodeRef);    
         
         setComplete();
+    }
+    
+    public void testCreateSitePage()
+    {
+        NodeRef folder = this.nodeService.createNode(this.rootNode, ContentModel.ASSOC_CHILDREN, ContentModel.ASSOC_CHILDREN, ContentModel.TYPE_FOLDER).getChildRef();
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_NAME, "mywiki");
+        NodeRef mediaWikiNodeRef = this.nodeService.createNode(
+                folder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "mywiki"), 
+                Constants.TYPE_MEDIAWIKI,
+                properties).getChildRef();
+        
+        Action action = actionService.createAction(MediaWikiActionExecuter.NAME);
+        action.setParameterValue(MediaWikiActionExecuter.PARAM_MEDIAWIKI_ACTION, "createSitePage");
+        action.setParameterValue(MediaWikiActionExecuter.PARAM_PAGE_TITLE, "myTestSite");
+        //action.setParameterValue(MediaWikiActionExecuter.PARAM_BODY, "This is a test .. .this is a test .. if you can see this jump up and down!!!");
+        actionService.executeAction(action, mediaWikiNodeRef, false, false);
     }
 
 }

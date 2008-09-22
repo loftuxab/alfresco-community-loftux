@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 /**
- * 
+ * Content data implementation
  * 
  * @author Roy Wetherall
  */
@@ -69,6 +69,7 @@ public class ContentData implements ScriptObject
     /** Indicates that the content data is dirty and there are unsaved changes */
     private boolean isDirty;
     
+    /** Updated content string and location awaiting update */
     private String updatedContentString;
     private String updatedContentLocation;
     

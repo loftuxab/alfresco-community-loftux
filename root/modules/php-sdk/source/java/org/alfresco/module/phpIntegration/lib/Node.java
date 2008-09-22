@@ -31,8 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
+import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -41,6 +43,7 @@ import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.version.VersionService;
@@ -77,6 +80,9 @@ public class Node implements ScriptObject
     
     /** Version service */
     protected VersionService versionService;
+    
+    /** Template service */
+    protected TemplateService templateService;
     
     /** Session object */
     protected Session session;
@@ -163,6 +169,7 @@ public class Node implements ScriptObject
         // Set the node service
         this.nodeService = session.getServiceRegistry().getNodeService();
         this.versionService = session.getServiceRegistry().getVersionService();
+        this.templateService = session.getServiceRegistry().getTemplateService();
         
         // Add the node to the session
         this.session.addNode(this);
@@ -1395,6 +1402,88 @@ public class Node implements ScriptObject
     public int hashCode()
     {
         return id.hashCode();
+    }
+    
+    /**
+     * 
+     * @param template
+     * @return
+     */
+    public String processTemplate(ScriptNode template)
+    {
+        return processTemplate(template.getContent(), null, null);
+    }
+    
+    /**
+     * 
+     * @param template
+     * @param args
+     * @return
+     */
+    public String processTemplate(ScriptNode template, Map<String, Object> args)
+    {
+        return processTemplate(template.getContent(), null, args);
+    }
+    
+    /**
+     * 
+     * @param template
+     * @return
+     */
+    public String processTemplate(String template)
+    {
+        return processTemplate(template, null, null);
+    }
+    
+    /**
+     * 
+     * @param template
+     * @param args
+     * @return
+     */
+    public String processTemplate(String template, Map<String, Object> args)
+    {
+        return processTemplate(template, null, args);
+    }
+    
+    /**
+     * 
+     * @param template
+     * @param templateRef
+     * @param args
+     * @return
+     */
+    private String processTemplate(String template, NodeRef templateRef, Map<String, Object> args)
+    {
+        NodeRef person = null;
+        NodeRef companyHome = null;
+        NodeRef userHome = null;        
+        
+        Map<String, Object> model = templateService.buildDefaultModel(person, companyHome, userHome, templateRef, null);
+                
+        // add the current node as either the document/space as appropriate
+        DictionaryService dd = this.getSession().getServiceRegistry().getDictionaryService();
+        boolean isDocument = Boolean.valueOf(dd.isSubClass(QName.createQName(getType()), ContentModel.TYPE_CONTENT));
+        if (isDocument == true)
+        {
+            model.put("document", getNodeRef());
+            model.put("space", getPrimaryParent());
+        }
+        else
+        {
+            model.put("space", getNodeRef());
+        }
+        
+        // add the supplied args to the 'args' root object
+        if (args != null)
+        {            
+            // TODO the values may need converting to the correct types ...
+            // add the args to the model as the 'args' root object
+            model.put("args", args);
+        }
+        
+        // execute template
+        return templateService.processTemplateString(null, template, model);
     }
     
 }
