@@ -1069,12 +1069,10 @@
             }
             params += "&format=rss";
             
-            this.widgets.rssFeed.set("href", Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/" + params);
+            this.widgets.rssFeed.set("href", Alfresco.constants.PROXY_RSS_URI + "slingshot/doclib/doclist/" + params);
          }
-         
       },
       
-
       /**
        * Gets a custom message
        *
@@ -1087,6 +1085,5 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.DocListToolbar", Array.prototype.slice.call(arguments).slice(1));
       }
-   
    };
 })();

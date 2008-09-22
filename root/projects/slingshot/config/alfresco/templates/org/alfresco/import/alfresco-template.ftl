@@ -57,6 +57,7 @@
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants.DEBUG = ${DEBUG?string};
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
+      Alfresco.constants.PROXY_RSS_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco-rss/";
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
       Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
