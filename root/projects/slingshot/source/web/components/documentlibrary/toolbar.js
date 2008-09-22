@@ -82,7 +82,7 @@
       YAHOO.Bubbling.on("userAccess", this.onUserAccess, this);
 
       return this;
-   }
+   };
    
    Alfresco.DocListToolbar.prototype =
    {
@@ -214,9 +214,6 @@
        */
       onReady: function DLTB_onReady()
       {
-         // Reference to self used by inline functions
-         var me = this;
-         
          // New Folder button: user needs "create" access
          this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder,
          {
@@ -277,8 +274,6 @@
        */
       onNewFolder: function DLTB_onNewFolder(e, p_obj)
       {
-         var parentFolder = (this.currentPath.charAt(0) == "/") ? this.currentPath.substring(1) : this.currentPath;
-         
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/site/{site}/{container}/{path}",
          {
             site: this.options.siteId,
@@ -294,7 +289,7 @@
             // Name: valid filename
             p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
             p_form.setShowSubmitStateDynamically(true, false);
-         }
+         };
          
          if (!this.modules.createFolder)
          {
@@ -335,7 +330,7 @@
             {
                actionUrl: actionUrl,
                clearForm: true
-            })
+            });
          }
          this.modules.createFolder.show();
       },
@@ -368,7 +363,7 @@
                fn: this.onFileUploadComplete,
                scope: this
             }
-         }
+         };
          this.fileUpload.show(multiUploadConfig);
          Event.preventDefault(e);
       },
@@ -389,7 +384,7 @@
             {
                site: this.options.siteId,
                container: this.options.containerId,
-               browseURL: location.pathname + (location.hash || "")
+               browseURL: window.location.pathname + (window.location.hash || "")
             },
             successCallback: null,
             successMessage: null,
@@ -411,7 +406,7 @@
                   config.dataObj.type = "file-added";
                   config.dataObj.fileName = file.fileName;
                   config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + file.nodeRef.replace(":/", "") + "/" + encodeURIComponent(file.fileName);
-                  config.dataObj.browseURL = location.pathname + "?file=" + config.dataObj.fileName + (location.hash || "");
+                  config.dataObj.browseURL = window.location.pathname + "?file=" + config.dataObj.fileName + (window.location.hash || "");
                   try
                   {
                      Alfresco.util.Ajax.jsonRequest(config);
@@ -471,7 +466,6 @@
             return;
          }
 
-         var parentFolder = (this.currentPath.charAt(0) == "/") ? this.currentPath.substring(1) : this.currentPath;
          var files = this.modules.docList.getSelectedFiles();
          
          if (!this.modules.copyTo)
@@ -490,7 +484,7 @@
             {
                path: this.currentPath,
                files: files
-            })
+            });
          }
          this.modules.copyTo.showDialog();
       },
@@ -507,7 +501,6 @@
             return;
          }
 
-         var parentFolder = (this.currentPath.charAt(0) == "/") ? this.currentPath.substring(1) : this.currentPath;
          var files = this.modules.docList.getSelectedFiles();
          
          if (!this.modules.moveTo)
@@ -527,7 +520,7 @@
             {
                path: this.currentPath,
                files: files
-            })
+            });
          }
          this.modules.moveTo.showDialog();
       },
@@ -636,7 +629,7 @@
             {
                text: this._msg("message.multiple-delete.success", successCount)
             });
-         }
+         };
          
          // Construct the data object for the genericAction call
          this.modules.actions.genericAction(
@@ -702,7 +695,7 @@
             this.modules.workflow.setOptions(
             {
                files: files
-            })
+            });
          }
          this.modules.workflow.showDialog();
       },
@@ -735,7 +728,7 @@
             this.modules.permissions.setOptions(
             {
                files: files
-            })
+            });
          }
          this.modules.permissions.showDialog();
       },
@@ -797,7 +790,7 @@
             
             // Enable/disable the Folder Up button
             var paths = this.currentPath.split("/");
-            this.widgets["folderUp"].set("disabled", paths.length < 2);
+            this.widgets.folderUp.set("disabled", paths.length < 2);
          }
       },
 
@@ -838,7 +831,7 @@
                filterId: obj.filterId,
                filterOwner: obj.filterOwner,
                filterData: obj.filterData
-            }
+            };
             
             this._generateDescription();
             this._generateRSSFeedUrl();
@@ -854,9 +847,13 @@
        */
       onDeactivateAllControls: function DLTB_onDeactivateAllControls(layer, args)
       {
+         var widget;
          for (widget in this.widgets)
          {
-            this.widgets[widget].set("disabled", true)
+            if (this.widgets.hasOwnProperty(widget))
+            {
+               this.widgets[widget].set("disabled", true);
+            }
          }
       },
 
@@ -872,22 +869,25 @@
          var obj = args[1];
          if ((obj !== null) && (obj.userAccess !== null))
          {
-            var widget, widgetPermissions;
+            var widget, widgetPermissions, index;
             for (index in this.widgets)
             {
-               widget = this.widgets[index];
-               if (widget.get("srcelement").className != "no-access-check")
+               if (this.widgets.hasOwnProperty(index))
                {
-                  widget.set("disabled", false)
-                  if (widget.get("value") != "")
+                  widget = this.widgets[index];
+                  if (widget.get("srcelement").className != "no-access-check")
                   {
-                     widgetPermissions = widget.get("value").split(",");
-                     for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
+                     widget.set("disabled", false);
+                     if (widget.get("value") !== "")
                      {
-                        if (!obj.userAccess[widgetPermissions[i]])
+                        widgetPermissions = widget.get("value").split(",");
+                        for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
                         {
-                           widget.set("disabled", true)
-                           break;
+                           if (!obj.userAccess[widgetPermissions[i]])
+                           {
+                              widget.set("disabled", true);
+                              break;
+                           }
                         }
                      }
                   }
@@ -911,27 +911,33 @@
             var files = this.modules.docList.getSelectedFiles();
             
             // Work out what the user has permission to do
-            var finalAccess = {}, userAccess;
+            var finalAccess = {}, userAccess, access;
             for (var i = 0, ii = files.length; i < ii; i++)
             {
                userAccess = files[i].permissions.userAccess;
                for (access in userAccess)
                {
-                  finalAccess[access] = (finalAccess[access] === undefined ? userAccess[access] : finalAccess[access] && userAccess[access]);
+                  if (userAccess.hasOwnProperty(access))
+                  {
+                     finalAccess[access] = (finalAccess[access] === undefined ? userAccess[access] : finalAccess[access] && userAccess[access]);
+                  }
                }
             }
             
-            var menuItems = this.widgets["selectedItems"].getMenu().getItems();
-            var menuItem, accessRequired;
+            var menuItems = this.widgets.selectedItems.getMenu().getItems();
+            var menuItem, accessRequired, index;
             for (index in menuItems)
             {
-               menuItem = menuItems[index];
-               accessRequired = menuItem.element.firstChild.rel;
+               if (menuItems.hasOwnProperty(index))
+               {
+                  menuItem = menuItems[index];
+                  accessRequired = menuItem.element.firstChild.rel;
 
-               menuItem.cfg.setProperty("disabled", (accessRequired == "") || finalAccess[accessRequired] ? false : true);
+                  menuItem.cfg.setProperty("disabled", (accessRequired === "") || finalAccess[accessRequired] ? false : true);
+               }
             }
             
-            this.widgets["selectedItems"].set("disabled", (files.length == 0));
+            this.widgets.selectedItems.set("disabled", (files.length === 0));
          }
       },
    
@@ -964,7 +970,7 @@
          {
             var eCrumb = new Element(document.createElement("span"));
             eCrumb.addClass("crumb");
-            if (i == 0)
+            if (i === 0)
             {
                eCrumb.addClass("first");
             }

@@ -70,7 +70,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["treeview"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["treeview", "json"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
@@ -82,7 +82,7 @@
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
 
       return this;
-   }
+   };
    
    Alfresco.DocListTree.prototype =
    {
@@ -247,7 +247,7 @@
             {
                success: function DLT_lND_success(oResponse)
                {
-                  var results = eval("(" + oResponse.responseText + ")");
+                  var results = YAHOO.lang.JSON.parse(oResponse.responseText);
 
                   if (results.items)
                   {
@@ -434,7 +434,7 @@
          if ((obj !== null) && (obj.path !== null))
          {
             // ensure path starts with leading slash if not the root node
-            if ((obj.path != "") && (obj.path.charAt(0) != "/"))
+            if ((obj.path !== "") && (obj.path.charAt(0) != "/"))
             {
                obj.path = "/" + obj.path;
             }
@@ -482,7 +482,7 @@
             var expandPath = "";
             for (var i = 0; i < paths.length; i++)
             {
-               if (paths[i] != "")
+               if (paths[i] !== "")
                {
                   // Push the path onto the list of paths to be expanded
                   expandPath += "/" + paths[i];
@@ -542,7 +542,7 @@
                destPath = obj.destination;
                
                // ensure path starts with leading slash if not the root node
-               if ((destPath != "") && (destPath.charAt(0) != "/"))
+               if ((destPath !== "") && (destPath.charAt(0) != "/"))
                {
                   destPath = "/" + destPath;
                }
@@ -579,7 +579,7 @@
          if ((obj !== null) && (obj.path !== null))
          {
             // ensure path starts with leading slash if not the root node
-            if ((obj.parentPath != "") && (obj.parentPath.charAt(0) != "/"))
+            if ((obj.parentPath !== "") && (obj.parentPath.charAt(0) != "/"))
             {
                obj.parentPath = "/" + obj.parentPath;
             }
@@ -604,7 +604,7 @@
             if (obj.path)
             {
                // ensure path starts with leading slash if not the root node
-               if ((obj.path != "") && (obj.path.charAt(0) != "/"))
+               if ((obj.path !== "") && (obj.path.charAt(0) != "/"))
                {
                   obj.path = "/" + obj.path;
                }
@@ -621,7 +621,7 @@
                // Node found, so delete it
                this.widgets.treeview.removeNode(node);
                // Have all the parent child nodes been removed now?
-               if (parentNode != null)
+               if (parentNode !== null)
                {
                   if (!parentNode.hasChildren())
                   {
@@ -655,7 +655,7 @@
                var dest = obj.destination;
 
                // ensure path starts with leading slash if not the root node
-               if ((dest != "") && (dest.charAt(0) != "/"))
+               if ((dest !== "") && (dest.charAt(0) != "/"))
                {
                   dest = "/" + dest;
                }
@@ -669,7 +669,7 @@
                   // Node found, so delete it
                   this.widgets.treeview.removeNode(nodeSrc, true);
                   // Have all the parent child nodes been removed now?
-                  if (parentNode != null)
+                  if (parentNode !== null)
                   {
                      if (!parentNode.hasChildren())
                      {
@@ -726,7 +726,7 @@
              * If this is the first filterChanged event and it's not a path then we
              * need to kick off the the expansion process by expanding the root node.
              */
-            if ((this.currentFilter.filterOwner == null) && (obj.filterId != "path"))
+            if ((this.currentFilter.filterOwner === null) && (obj.filterId != "path"))
             {
                var node = this.widgets.treeview.getNodeByProperty("path", "");
                if (node !== null)
@@ -856,7 +856,7 @@
                               tempNode.isLeaf = true;
                            }
                            
-                           if (kids.length == 0)
+                           if (kids.length === 0)
                            {
                               var parentNode = oResponse.argument.node;
                               parentNode.isLeaf = false;

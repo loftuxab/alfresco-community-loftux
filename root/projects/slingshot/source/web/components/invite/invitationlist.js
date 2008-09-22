@@ -65,7 +65,7 @@
       YAHOO.Bubbling.on("personSelected", this.onAddInvite, this);
    
       return this;
-   }
+   };
    
    Alfresco.InvitationList.prototype =
    {
@@ -88,7 +88,7 @@
          /**
           * Available roles for the site.
           */
-         roles: [],
+         roles: []
       },
 
       /**
@@ -185,7 +185,7 @@
             me.removeInvitee.call(me, args[1].anchor);
             args[1].stop = true;
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("remove-item-button", fnRemoveInviteeHandler);
          
          // show the component now, this avoids painting issues of the dropdown button
@@ -211,7 +211,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellDescription = function InvitationList_renderCellDescription(elCell, oRecord, oColumn, oData)
+         var renderCellDescription = function InvitationList_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // we currently render all results the same way
             var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName");
@@ -233,10 +233,10 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellRole = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
+         var renderCellRole = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            Dom.setStyle(elCell, "overflow", "visible !important");
+            Dom.setStyle(elCell, "overflow", "visible");
 
             // cell where to add the element
             var cell = new YAHOO.util.Element(elCell);
@@ -296,7 +296,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellRemoveButton = function InvitationList_renderCellRemoveButton(elCell, oRecord, oColumn, oData)
+         var renderCellRemoveButton = function InvitationList_renderCellRemoveButton(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
@@ -332,7 +332,7 @@
        */
       getRoleLabel: function(record)
       {
-         if (record.getData("role") != undefined)
+         if (record.getData("role") !== undefined)
          {
             return this._msg('role.' + record.getData("role"));
          }
@@ -386,7 +386,7 @@
       onSelectAllRoles: function DL_onFileSelect(sType, aArgs, p_obj)
       {
          var value = aArgs[1].value;
-         if (value == "")
+         if (value === "")
          {
             return;
          }
@@ -394,7 +394,7 @@
          this._setAllRolesImpl(value);
          this._enableDisableInviteButton();
          var eventTarget = aArgs[1];
-         Event.preventDefault(domEvent);
+         Event.preventDefault(eventTarget);
       },
       
       /**
@@ -414,7 +414,7 @@
          this._enableDisableInviteButton();
          
          var eventTarget = aArgs[1];
-         Event.preventDefault(domEvent);
+         Event.preventDefault(eventTarget);
       },
       
       /**
@@ -454,7 +454,7 @@
          for (var x=0; x < recordSet.getLength(); x++)
          {
             var record = recordSet.getRecord(x);
-            if (record.getData("role") == undefined)
+            if (record.getData("role") === undefined)
             {
                return false;
             }

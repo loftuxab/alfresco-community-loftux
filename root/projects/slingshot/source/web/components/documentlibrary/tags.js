@@ -75,7 +75,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
-   }
+   };
    
    Alfresco.DocListTags.prototype =
    {
@@ -173,7 +173,7 @@
       onReady: function DLTg_onReady()
       {
          var me = this;
-         
+
          YAHOO.Bubbling.addDefaultAction('tag-link', function(layer, args)
          {
             var link = args[1].target;
@@ -189,7 +189,7 @@
             }
             return true;
          });
-         
+
          // Kick-off tag population
          if (this.options.siteId && this.options.containerId)
          {
@@ -366,5 +366,5 @@
          }
          return this.id + "-tagId-" + id;
       }
-   }
+   };
 })();
