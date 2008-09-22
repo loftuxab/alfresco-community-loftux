@@ -67,7 +67,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
    
    Alfresco.SentInvites.prototype =
    {
@@ -214,7 +214,7 @@
             }
             
             return updatedResponse;
-         }
+         };
          
          // Setup the DataTable
          this._setupDataTable();
@@ -234,7 +234,7 @@
          {
             me.onSearchClick.call(me, keyEvent, null);
             return false;
-         }
+         };
 
          // Enter key listener
          var enterListener = new YAHOO.util.KeyListener(searchText,
@@ -381,13 +381,14 @@
             elCell.innerHTML = desc;
 
             // create button
+            var buttonLabel;
             if (oRecord.getData("invitationStatus") == 'pending')
             {
-               var buttonLabel = me._msg("button.cancel") + " >>";
+               buttonLabel = me._msg("button.cancel") + " >>";
             }
             else
             {
-               var buttonLabel = me._msg("button.clear") + " >>";
+               buttonLabel = me._msg("button.clear") + " >>";
             }
             
             var button = new YAHOO.widget.Button(
@@ -475,7 +476,7 @@
              
             // remove the record from the list
             var index = this.widgets.dataTable.getRecordIndex(record);
-            if (index != null)
+            if (index !== null)
             {
                this.widgets.dataTable.deleteRow(index);
             }
@@ -488,7 +489,7 @@
             this.widgets.feedbackMessage.destroy();
 
             this.actionButtons[record.getData('invitee').userName].set('disabled', true);
-         }
+         };
          
          // get the url to call
          var url = Alfresco.constants.PROXY_URI + "api/invite/cancel";
@@ -514,7 +515,7 @@
             {
                fn: failure,
                scope: this
-            },
+            }
          });
          
       },
@@ -592,7 +593,7 @@
          {
             this._setDefaultDataTableErrors();
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-         }
+         };
          
          var failureHandler = function SentInvites__pS_failureHandler(sRequest, oResponse)
          {
@@ -614,7 +615,7 @@
                   this._setDefaultDataTableErrors();
                }
             }
-         }
+         };
          
          this.searchTerm = searchTerm;
          this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),

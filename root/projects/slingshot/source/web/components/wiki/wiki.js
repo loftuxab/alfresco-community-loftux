@@ -138,13 +138,14 @@
 		   var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/page/{site}/{title}",
          {
             site: this.options.siteId,
-            title: this.options.pageTitle,
+            title: this.options.pageTitle
          });
 		   
 		   var div = Dom.get(this.id + "-pagecontent");
-   		var obj = {
+   		var obj =
+   		{
    		   "pagecontent": div.innerHTML
-   	   }
+   	   };
    		   
 		   Alfresco.util.Ajax.request(
 			{
@@ -239,7 +240,7 @@
                }
             },
             scope: this
-         }
+         };
          
          form.init();   		
    		

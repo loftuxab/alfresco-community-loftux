@@ -50,7 +50,7 @@
       YAHOO.Bubbling.on("topicDataChanged", this.onTopicDataChanged, this);
             
       return this;
-   }
+   };
    
    Alfresco.TopicReplies.prototype =
    {
@@ -178,7 +178,7 @@
                }
             }
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("reply-action-link", fnActionHandlerDiv);
 
          // Hook the show/hide link
@@ -201,7 +201,7 @@
                }
             }
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("showHideChildren", fnShowHideChildrenHandler);
 
          // initialize the mouse over listener
@@ -257,7 +257,7 @@
          var loadRepliesDataSuccess = function TopicReplies_loadRepliesDataSuccess(response)
          {
             // set the loaded data
-            var data = response.json.items
+            var data = response.json.items;
             this.repliesData = data;
             
             // render the ui
@@ -346,8 +346,8 @@
          // edit and view divs, the child replies div including the add reply div.
          var safeRef = this.toSafeRef(data.nodeRef);
          var html = '';
-         html += '<div class="reply" id="reply-' + safeRef + '">'
-         html += '</div>'
+         html += '<div class="reply" id="reply-' + safeRef + '">';
+         html += '</div>';
          html += '<div id="reply-edit-form-' + safeRef + '" class="hidden"></div>';
          html += '<div id="reply-add-form-' + safeRef + '" class="indented hidden"></div>';
          html += '<div class="indented" id="replies-of-' + safeRef + '"></div>';
@@ -359,7 +359,7 @@
          this.renderReplyView(viewElem, data);
          
          // render the children if they got already loaded
-         if (data.children != undefined)
+         if (data.children !== undefined)
          {
             var repliesElem = Dom.get('replies-of-' + safeRef);
             for (var x=0; x < data.children.length; x++)
@@ -384,12 +384,12 @@
          var html = '';
                   
          // render the actions
-         html += '<div class="nodeEdit">'
+         html += '<div class="nodeEdit">';
          if (data.permissions.reply)
          {
             html += '<div class="onAddReply" id="' + this.id + '-onAddReply-' + safeRef + '">';
             html += '<a href="#" class="reply-action-link">' + this._msg("action.reply") + '</a>';
-            html += '</div>'
+            html += '</div>';
          }
         
          if (data.permissions.edit)
@@ -418,11 +418,11 @@
          // footer part
          html += '<div class="nodeFooter">';
          html += '<span class="nodeAttrLabel replyTo">' + this._msg("replies") + ': </span>';
-         html += '<span class="nodeAttrValue">(' + (data.children != undefined ? data.children.length : 0) + ') </span>';
+         html += '<span class="nodeAttrValue">(' + (data.children !== undefined ? data.children.length : 0) + ') </span>';
          if (data.replyCount > 0)
          {
             html += '<span class="nodeAttrValue">';
-            html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + safeRef + '">' + this._msg("replies.hide") + '</a>'
+            html += '<a href="#" class="showHideChildren" id="' + this.id + '-showHideChildren-' + safeRef + '">' + this._msg("replies.hide") + '</a>';
             html += '</span>';
          }
          html += '<span class="separator">&nbsp;</span>';
@@ -528,7 +528,7 @@
          
          // insert the form at the right location
          var safeRef = this.toSafeRef(obj.nodeRef);
-         var insertDiv = null;
+         var formDiv = null;
          if (obj.isEdit)
          {
             formDiv = Dom.get('reply-edit-form-' + safeRef);
@@ -547,7 +547,7 @@
          var actionUrl = '';
          var formTitle = '';
          var content = '';
-         var submitButtonLabel = ''
+         var submitButtonLabel = '';
          var viewDiv = null;
          if (obj.isEdit)
          {
@@ -569,7 +569,7 @@
             
             // for root replies we don't have a parent data object and therefore can
             // tell whom to reply to
-            if (data != null)
+            if (data !== null)
             {
                formTitle = this._msg('form.replyToTitle', Alfresco.util.people.generateUserLink(data.author));
             }
@@ -596,13 +596,14 @@
          Dom.get(formId + "-content").value = content;
          
          // store edit related data.
-         this.editData = {
+         this.editData =
+         {
             nodeRef: obj.nodeRef,
             isEdit: obj.isEdit,
             formId: formId,
             viewDiv: viewDiv,
             formDiv: formDiv
-         }
+         };
          
          // register the form logic        
          this._registerEditForm(obj.nodeRef, formId, obj.isEdit);
@@ -621,7 +622,8 @@
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content', {
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content',
+         {
             height: '250px',
             width: '538px',
             focusAtStart: true,
@@ -682,7 +684,7 @@
                });
             },
             scope: this
-         }
+         };
          replyForm.init();
          
          // now show the form
@@ -699,12 +701,14 @@
       {
          // remove wait message
          this.widgets.feedbackMessage.destroy();
+         
+         var data, parentElem;
           
          // in case of an edit reply, simply update the data/ui
          if (obj.isEdit)
          {
             // update the data object for the reply
-            var data = this.findReplyDataObject(obj.nodeRef);
+            data = this.findReplyDataObject(obj.nodeRef);
             YAHOO.lang.augmentObject(data, response.json.item, true);
             
             // rerender the ui
@@ -720,22 +724,22 @@
                this.repliesData.push(response.json.item);
                
                // render the new reply
-               var parentElem = Dom.get(this.id + '-replies-root');
+               parentElem = Dom.get(this.id + '-replies-root');
                this.renderReply(parentElem, response.json.item, true);
             }
             else
             {
                // add the data object
-               var data = this.findReplyDataObject(obj.nodeRef);
+               data = this.findReplyDataObject(obj.nodeRef);
                // make sure the children array exists
-               if (data.children == undefined)
+               if (data.children === undefined)
                {
-                  data.children = new Array();
+                  data.children = [];
                }
                data.children.push(response.json.item);
                
                // render the new reply
-               var parentElem = Dom.get('replies-of-' + this.toSafeRef(obj.nodeRef));
+               parentElem = Dom.get('replies-of-' + this.toSafeRef(obj.nodeRef));
                this.renderReply(parentElem, response.json.item, true);
                
                // rerender the parent reply, which will update the reply count
@@ -795,7 +799,7 @@
                return arr[x];
             }
             // check the children recursively
-            else if (arr[x].children != undefined)
+            else if (arr[x].children !== undefined)
             {
                var result = this._findReplyDataObjectImpl(arr[x].children, nodeRef);
                if (result !== null)
@@ -844,13 +848,13 @@
        */
       _hideOpenForms: function TopicReplies__hideOpenForms()
       {
-         if (this.editData.formDiv != null)
+         if (this.editData.formDiv !== null)
          {
             Dom.addClass(this.editData.formDiv, "hidden");
             this.editData.formDiv.innerHTML = '';
             this.editData.formDiv = null;
          }
-         if (this.editData.viewDiv != null)
+         if (this.editData.viewDiv !== null)
          {
             Dom.removeClass(this.editData.viewDiv, "hidden");
             this.editData.viewDiv = null;
@@ -863,7 +867,7 @@
       _showForm: function TopicReplies__showForm()
       {
          // hide the view element if any
-         if (this.editData.viewDiv != null)
+         if (this.editData.viewDiv !== null)
          {
             Dom.addClass(this.editData.viewDiv, "hidden");
          }
@@ -880,7 +884,7 @@
          var yPos = Dom.getY(el);
          if (YAHOO.env.ua.ie > 0)
          {
-            yPos = yPos - (document.body.clientHeight / 3)
+            yPos = yPos - (document.body.clientHeight / 3);
          }
          else
          {
@@ -895,7 +899,7 @@
       onReplyElementMouseEntered: function TopicReplies_onReplyElementMouseEntered(layer, args)
       {
          // only highlight if there are actions on the specific element
-         nodeRef = args[1].target.id.substring(('reply-').length);
+         var nodeRef = args[1].target.id.substring(('reply-').length);
          nodeRef = this.toNodeRef(nodeRef);
          var data = this.findReplyDataObject(nodeRef);
          var permissions = data.permissions;
