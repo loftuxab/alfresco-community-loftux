@@ -64,7 +64,7 @@
     	<property name="contentService" ref="ContentService" />    	
     	<property name="authorityService" ref="AuthorityService" />    	
     	<property name="permissionService" ref="PermissionService" />
-    </bean>
+    </bean>    
     
     <bean id="org_alfresco_module_MediaWikiIntegration_MediaWikiSpace" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
     	<property name="extensionName">
@@ -76,6 +76,47 @@
     	<property name="nodeType">
     		<value>{http://www.alfresco.org/model/mediawikiintegration/1.0}mediaWiki</value>
     	</property>   	
+    </bean>
+    
+    <bean id="mediaWikiSitePageManager" class="org.alfresco.module.mediawikiintegration.MediaWikiSitePageManager" init-method="init">    
+    	<property name="policyComponent" ref="policyComponent"/>
+    	<property name="nodeService" ref="NodeService" />  	
+    	<property name="actionService" ref="ActionService" />   
+    	<property name="templateService" ref="TemplateService" />     	       	
+    </bean>
+    
+    <bean id="mediawiki-action-executer" class="org.alfresco.module.mediawikiintegration.action.MediaWikiActionExecuter" parent="action-executer">
+      <property name="publicAction">
+         <value>false</value>
+      </property>
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
+        <property name="authenticationService">
+            <ref bean="AuthenticationService" />
+        </property>
+        <property name="configService">
+        	<ref bean="web.config"/>
+        </property>
+    </bean> 
+    
+    <!-- Bootstrap Template-->
+    <bean id="mediawiki.bootstrapTemplate" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+        <property name="moduleId" value="org.alfresco.module.mediawikiintegration" />
+        <property name="name" value="bootstrapSitePageTemplate" />
+        <property name="description" value="Site page template" />
+        <property name="sinceVersion" value="1.1" />
+        <property name="appliesFromVersion" value="1.0" />
+        <!-- Data properties -->
+        <property name="importer" ref="spacesBootstrap"/>
+        <property name="bootstrapViews">
+            <list>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.content.childname}</prop>
+                    <prop key="location">alfresco/module/org.alfresco.module.mediawikiintegration/template/template-import.xml</prop>
+                </props>
+            </list>
+        </property>
     </bean>
     
 </beans>

@@ -27,6 +27,8 @@
  // Register the various event hooks
 $wgHooks['ArticleSave'][] = 'alfArticleSave';
 $wgHooks['TitleMoveComplete'][] = 'alfTitleMoveComplete';
+$wgHooks['UnknownAction'][] = 'alfCustomActions';
+$wgHooks['PersonalUrls'][] = 'NoLogout';
 
 /**
  * Hook function called before content is saved.  At this point we can extract information about the article
@@ -73,6 +75,35 @@ function alfTitleMoveComplete(&$title, &$newtitle, &$user, $pageid, $redirid)
 	//}
 	
 	// Do summert :D
+}
+
+function alfCustomActions($action, $article)
+{
+	if ($action == "createPage")
+	{		
+		$pageContent = "";
+		if (isset($_REQUEST["pageContent"]) == true)
+		{
+			$pageContent = $_REQUEST["pageContent"];
+		}
+		
+		// Create the new page with the given title		
+		$editor = new EditPage( $article );
+		$editor->save = true;
+		$editor->textbox1 = urldecode($pageContent);
+		$editor->attemptSave();
+		
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+function NoLogout(&$personal_urls, $title) 
+{
+	$personal_urls['logout'] = null;
 }
  
 ?>

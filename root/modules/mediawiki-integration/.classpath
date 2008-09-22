@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/PHP SDK"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Blog Integration"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

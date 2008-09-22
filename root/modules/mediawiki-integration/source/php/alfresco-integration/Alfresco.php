@@ -61,15 +61,9 @@
 	{
 	 	$alfWikiSpaceNodeRef = $_SESSION["mediaWikiSpace"];	
 	}
-	else
-	{
-	 	// Error!!!!!
-	 	throw new Exception("WikiSpace not present");
-	}
 	
 	// Create the repository object
-	$alfURL = "http://localhost:8080/alfresco/api";
-	$alfRepository = new Repository($alfURL);
+	$alfRepository = new Repository();
 	
 	// Set the other global values
 	$alfTicket = null;
@@ -87,6 +81,9 @@
 		
 		// Get the ticket from the request
 		$alfTicket = $passedTicket;
+		
+		// Put the ticket into the session for later use
+		$_SESSION["alfTicket"] = $alfTicket;
 	}	
 	else if (isset($_SESSION["alfTicket"]) == true)
 	{
@@ -94,18 +91,46 @@
 		$alfTicket = $_SESSION["alfTicket"];
 	} 
 	
-	// Set global values if we have a ticket
-	if ($alfTicket != null)
+	// If we don't have a ticket redirect to the login page somehow
+	if ($alfTicket == null)
 	{	
-		// Create an alfresco session that can be used
-		$alfSession = $alfRepository->createSession($alfTicket);
-	 
-		// Create a reference to the media wiki node
+		// Redirect to the login page
+		header( "Location: extensions/alfresco-integration/login/AlfrescoLogin.php" );
+		exit;	
+	}
+	
+	// Create an alfresco session that can be used
+	$alfSession = $alfRepository->createSession($alfTicket);
+ 
+	// Create a reference to the media wiki node
+	if ($alfWikiSpaceNodeRef != null)
+	{
 		$alfMediaWikiNode = $alfSession->getNodeFromString($alfWikiSpaceNodeRef);
+	}
+	else
+	{
+		// Use the default wiki node
+		$nodes = $alfSession->query(new SpacesStore($alfSession), "TYPE:\"mw:mediaWiki\"");	
+		if (sizeof($nodes) == 0)
+		{
+			// Redirect to the login page, since we can't find the mediaWiki space (probably means incorrect permissions)
+			header( "Location: extensions/alfresco-integration/login/AlfrescoLogin.php" );
+			exit;	
+		}	
+		$alfMediaWikiNode = $nodes[0];
+		$alfWikiSpaceNodeRef = $alfMediaWikiNode->__toString();
+	}
+
+	// Validate the ticket (checks you have correct permissions on the wiki space and that the ticket is valid)
+	if (MediaWikiSpace::validate($alfRepository, $alfWikiSpaceNodeRef, "", $alfTicket) == false)
+	{
+		// Redirect to the login page, since the ticket is knacked or you don't have permissions
+		header( "Location: extensions/alfresco-integration/login/AlfrescoLogin.php" );
+		exit;	
 	}
 	
 	// Set the configuration values
-	eval(MediaWikiSpace::getEvaluationString($alfRepository, $alfWikiSpaceNodeRef));
+	eval(MediaWikiSpace::getEvaluationString($alfRepository, $alfWikiSpaceNodeRef));	
 
 	// Make sure the setup is not included later
 	define(MW_NO_SETUP, true);
@@ -113,7 +138,7 @@
 	
 	// Check to see if we should be doing an 'auto' login
 	if ($doLogin == true)
-	{
+	{		
 		// Authenticate the mediawiki user
 		$u = User::newFromName($passedUser);
 		if (is_null($u) == false && User::isUsableName($u->getName()) == true)
@@ -157,4 +182,5 @@
 			$wgUser->setCookies();
 		}
 	}
+	
 ?>
