@@ -133,6 +133,7 @@
          </div>
       </div>
       <div class="drow">
+         <div class="reqcolumn">&nbsp;</div>         
          <div class="leftcolumn">
             <span class="label">${msg("label.title")}:</span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-jobtitle" value="<#if profile.jobTitle??>${profile.jobTitle?html}</#if>" /></span>
