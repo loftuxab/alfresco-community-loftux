@@ -155,7 +155,7 @@
        * @method onReady
        */
       onReady: function BlogPostEdit_onReady()
-      { 
+      {
          if (this.options.editMode)
          {
             // load the blog post data prior to initializing the form
@@ -330,7 +330,7 @@
          // cancel button
          this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
-         
+
          // instantiate the simple editor we use for the form
          this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
             height: '300px',
@@ -341,7 +341,7 @@
             toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
          this.widgets.editor._render();
-         
+
          // create the form that does the validation/submit
          this.widgets.postForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.postForm.setShowSubmitStateDynamically(true, false);
@@ -397,7 +397,7 @@
          this.widgets.postForm.init();
          
          // finally display the form
-         var containerElem = YAHOO.util.Dom.get(this.id + "-container");
+         var containerElem = YAHOO.util.Dom.get(this.id + "-div");
          Dom.removeClass(containerElem, "hidden");
       },
       
