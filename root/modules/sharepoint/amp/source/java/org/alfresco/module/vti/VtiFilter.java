@@ -135,7 +135,7 @@ public class VtiFilter implements Filter
             httpResponse.setHeader("Cache-Control", "no-cache");
             httpResponse.setHeader("Allow", "GET, POST, OPTIONS, HEAD, MKCOL, PUT, PROPFIND, PROPPATCH, DELETE, MOVE, COPY, GETLIB, LOCK, UNLOCK");
         }
-        else if (METHOD_HEAD.equals(httpMethod) || METHOD_GET.equals(httpMethod))
+        else if (METHOD_HEAD.equals(httpMethod) || METHOD_GET.equals(httpMethod) || METHOD_PUT.equals(httpMethod))
         {
             if (logger.isDebugEnabled())
             {
@@ -320,7 +320,7 @@ public class VtiFilter implements Filter
             logger.debug("Request accepted");
         }
         // Chain other filters
-        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null)
+        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null && !uri.startsWith(alfrescoContext + "/history/a"))
         {
         response.getOutputStream().flush();
         }
@@ -333,8 +333,6 @@ public class VtiFilter implements Filter
 
         private String name;
         private String ticket;
-
-
 
         public VtiUser(String name, String ticket)
         {

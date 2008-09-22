@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -41,6 +42,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.util.AbstractLifecycleBean;
 import org.alfresco.util.Pair;
@@ -63,6 +65,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     private PermissionService permissionService;
     private SearchService searchService;
     private NamespaceService namespaceService;
+    private PersonService personService;
 
     private AuthenticationComponent authenticationComponent;
 
@@ -223,8 +226,28 @@ public class VtiPathHelper extends AbstractLifecycleBean
         return urlPath;
     }
 
+    public String getUserHomeLocation()
+    {
+        NodeRef currentUser = personService.getPerson(authenticationComponent.getCurrentUserName());
+        
+        if (currentUser == null)
+        {
+            throw new AuthenticationException("No user have been authorized.");
+        }
+        
+        NodeRef homeSpace = (NodeRef) nodeService.getProperty(currentUser, ContentModel.PROP_HOMEFOLDER);
+        
+        if (homeSpace == null)
+        {
+            throw new RuntimeException("No home space was found.");
+        }
+        
+        return toUrlPath(fileFolderService.getFileInfo(homeSpace));        
+    }
+
 	@Override
-	protected void onBootstrap(ApplicationEvent event) {
+	protected void onBootstrap(ApplicationEvent event) 
+	{
 		rootNodeRef = AuthenticationUtil.runAs(new RunAsWork<NodeRef>() 
 		{
             public NodeRef doWork() throws Exception
@@ -275,4 +298,9 @@ public class VtiPathHelper extends AbstractLifecycleBean
         return storePath;
     }
 
+    public void setPersonService(PersonService personService)
+    {
+        this.personService = personService;
+    }
+    
 }

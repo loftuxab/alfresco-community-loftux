@@ -188,7 +188,7 @@ public class VtiServletContainer
             } 
         }
         
-        if (httpMethod.equals(VtiFilter.METHOD_GET) && httpRequest.getHeader("If") != null)
+        if ((httpMethod.equals(VtiFilter.METHOD_GET) || (httpMethod.equals(VtiFilter.METHOD_PUT))) && httpRequest.getHeader("If") != null)
         {
             for (ServletPattern servletPattern : exactMatchServlets) 
             {         

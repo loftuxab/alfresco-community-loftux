@@ -64,6 +64,28 @@ public class DocMetaInfo
     private String sourcecontrollockexpires;
     private String sourcecontrolcookie;
     private String sourcecontrolversion;
+    private String author;
+    private String modifiedBy;
+
+    public String getAuthor()
+    {
+        return author;
+    }
+
+    public void setAuthor(String author)
+    {
+        this.author = author;
+    }
+
+    public String getModifiedBy()
+    {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy)
+    {
+        this.modifiedBy = modifiedBy;
+    }
 
     public DocMetaInfo(boolean folder)
     {

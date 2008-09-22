@@ -277,6 +277,11 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         {
             dwsUrl = parentDwsUrl + "/" + dwsUrl;
         }
+        else
+        {
+            // this means that no path was provided then lets create new dws in user's home space
+            dwsUrl = pathHelper.getUserHomeLocation() + "/" + dwsUrl;            
+        }
 
         FileInfo dwsFileInfo = pathHelper.resolvePathFileInfo(dwsUrl);
 
