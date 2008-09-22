@@ -53,6 +53,7 @@ import org.dom4j.DocumentException;
  * context state.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class StoreModelObjectPersister extends AbstractModelObjectPersister
 {

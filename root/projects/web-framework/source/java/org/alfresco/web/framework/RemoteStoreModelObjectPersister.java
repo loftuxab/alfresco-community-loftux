@@ -261,8 +261,12 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     @Override
     protected ModelObjectCache getCache(ModelPersistenceContext context)
     {
+        String key = getId();
         String storeId = (String)context.getValue(ModelPersistenceContext.REPO_STOREID);
-        String key = new StringBuilder(100).append(storeId).append(':').append(getId()).toString();
+        if (storeId != null)
+        {
+            key = new StringBuilder(100).append(storeId).append(':').append(getId()).toString();
+        }
         
         ModelObjectCache cache = objectCaches.get(key);
         if (cache == null)

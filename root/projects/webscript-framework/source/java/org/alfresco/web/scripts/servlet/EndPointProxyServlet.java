@@ -38,9 +38,12 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.Credentials;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
+import org.alfresco.connector.SimpleCredentials;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.Base64;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.IdentityType;
@@ -163,6 +166,50 @@ public class EndPointProxyServlet extends HttpServlet
             {
                 // build an unauthenticated/predeclared authentication connector
                 connector = this.connectorService.getConnector(endpointId);
+            }
+            else if (descriptor.getBasicAuth())
+            {
+                // check for HTTP authorisation request (i.e. RSS feeds etc.)
+                String authorization = req.getHeader("Authorization");
+                if (authorization == null || authorization.length() == 0)
+                {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
+                            "No USER_ID found in session and requested endpoint requires authentication.");
+                    res.setHeader("WWW-Authenticate", "Basic realm=\"Alfresco\"");
+                    
+                    // no further processing as authentication is required but not provided
+                    // the browser will now prompt the user for appropriate credentials
+                    return;
+                }
+                else
+                {
+                    // user has provided authentication details with the request
+                    String[] authParts = authorization.split(" ");
+                    if (!authParts[0].equalsIgnoreCase("basic"))
+                    {
+                        throw new AlfrescoRuntimeException("Authorization '" + authParts[0] + "' not supported.");
+                    }
+                    
+                    String[] values = new String(Base64.decode(authParts[1])).split(":");
+                    if (values.length == 2)
+                    {
+                        if (logger.isDebugEnabled())
+                            logger.debug("Authenticating (BASIC HTTP) user " + values[0]);
+                        
+                        // assume username and password passed as the parts and
+                        // build an unauthenticated authentication connector then
+                        // apply the supplied credentials to it
+                        connector = this.connectorService.getConnector(endpointId, values[0], req.getSession(true));
+                        Credentials credentials = new SimpleCredentials(endpointId);
+                        credentials.setProperty(Credentials.CREDENTIAL_USERNAME, values[0]);
+                        credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, values[1]);
+                        connector.setCredentials(credentials);
+                    }
+                    else
+                    {
+                        throw new AlfrescoRuntimeException("Authorization request did not provide user/pass.");
+                    }
+                }
             }
             else
             {

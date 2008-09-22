@@ -47,7 +47,7 @@ function main()
    
    var url = '/api/blog/site/' + site + '/' + container + "/posts?contentLength=512";
    
-   var connector = remote.connect("alfresco");
+   var connector = remote.connect("alfresco-rss");
    var result = connector.get(url);
    if (result.status != status.STATUS_OK)
    {

@@ -236,8 +236,7 @@ public class XMLUtil
     public static Document parse(InputStream stream) throws DocumentException,
             IOException
     {
-        String xml = DataUtil.copyToString(stream, true);
-        return parse(xml);
+        return parse(DataUtil.copyToString(stream, true));
     }
 
     /**

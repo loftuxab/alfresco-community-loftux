@@ -325,6 +325,7 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         private static final String NAME = "name";
         private static final String UNSECURE = "unsecure";
         private static final String PERSISTENT = "persistent";
+        private static final String BASIC_AUTH = "basic-auth";
 
         /**
          * Instantiates a new remote endpoint descriptor.
@@ -390,6 +391,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         public boolean getPersistent()
         {
             return Boolean.parseBoolean(getStringProperty(PERSISTENT));
+        }
+        
+        public boolean getBasicAuth()
+        {
+            return Boolean.parseBoolean(getStringProperty(BASIC_AUTH));
         }
     }
 
