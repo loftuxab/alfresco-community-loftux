@@ -105,6 +105,10 @@ public class DispatcherServlet extends BaseServlet
             Timer.start(request, "service");
         }
         
+        // apply language from browser locale setting
+        setLanguageFromRequestHeader(request);
+        
+        // no caching for generated page data
         setNoCacheHeaders(response);
         
         // set response content type and charset

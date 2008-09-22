@@ -139,21 +139,50 @@ public abstract class AbstractWebScript implements WebScript
             result = this.resources.get(locale);
             if (result == null && this.resources.containsKey(locale) == false)
             {
-                // TODO: add locale resolution support (from java ResourceBundle code path?)
-                //       i.e. <descid><locale>.propeties
-                //            mywebscript_en_US.properties
-                //       for now we just get the default .properties file
-                String resourcePath = getDescription().getId() + ".properties";
+                // TODO: add improved locale resolution support (from java ResourceBundle code path?)
+                //       i.e. <descid><locale>.properties = mywebscript_en_US.properties
+                // For now we perform the following technique:
+                //  1. lookup <descid><language_country_variant>.properties if fail then
+                //  2. lookup <descid><language_country>.properties if fail then
+                //  3. lookup <descid><language>.properties if fail then
+                //  4. lookup <descid>.properties
                 try
                 {
+                    String webscriptId = getDescription().getId();
+                    String resourcePath = webscriptId + '_' + locale.toString() + ".properties";
                     if (container.getSearchPath().hasDocument(resourcePath))
                     {
                         result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                    }
+                    else
+                    {
+                        resourcePath = webscriptId + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".properties";
+                        if (container.getSearchPath().hasDocument(resourcePath))
+                        {
+                            result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                        }
+                        else
+                        {
+                            resourcePath = webscriptId + '_' + locale.getLanguage() + ".properties";
+                            if (container.getSearchPath().hasDocument(resourcePath))
+                            {
+                                result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                            }
+                            else
+                            {
+                                resourcePath = webscriptId + ".properties";
+                                if (container.getSearchPath().hasDocument(resourcePath))
+                                {
+                                    result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                                }
+                            }
+                        }
                     }
                 }
                 catch (IOException resErr)
                 {
                     // no resources available if this occurs
+                    logger.error(resErr);
                 }
                 
                 // push the resources into the cache - null value is acceptable if none found
