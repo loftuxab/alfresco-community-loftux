@@ -63,6 +63,8 @@ public enum VtiProperty
     FILE_SOURCECONTROLLOCKEXPIRES ("vti_sourcecontrollockexpires"),
     FILE_SOURCECONTROLCOOKIE ("vti_sourcecontrolcookie"),
     FILE_SOURCECONTROLVERSION ("vti_sourcecontrolversion"),
+    FILE_AUTHOR("vti_author"),
+    FILE_MODIFIEDBY("vti_modifiedby"),
     // SERVICE
 
     SERVICE_CASESENSITIVEURLS ("vti_casesensitiveurls"),

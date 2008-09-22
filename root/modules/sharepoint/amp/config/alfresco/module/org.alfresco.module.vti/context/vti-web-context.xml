@@ -164,6 +164,7 @@
 		<property name="fileFolderService" ref="FileFolderService" />
 		<property name="checkOutCheckInService" ref="CheckoutCheckinService" />
 		<property name="authenticationService" ref="AuthenticationService" />
+                <property name="contentService" ref="ContentService" />
 	</bean>
 	
 	<bean id="soap" class="org.springframework.ws.transport.http.MessageDispatcherServlet">

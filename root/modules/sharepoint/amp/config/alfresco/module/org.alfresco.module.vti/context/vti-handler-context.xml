@@ -67,6 +67,7 @@
         <property name="nodeService" ref="NodeService" />
         <property name="fileFolderService" ref="FileFolderService" />
         <property name="permissionService" ref="PermissionService" />
+        <property name="personService" ref="PersonService" />
     </bean>
 
     <bean id="handlerExceptionAdvice" class="org.alfresco.module.vti.handler.alfresco.AlfrescoVtiMethodHandlerThrowsAdvice" />

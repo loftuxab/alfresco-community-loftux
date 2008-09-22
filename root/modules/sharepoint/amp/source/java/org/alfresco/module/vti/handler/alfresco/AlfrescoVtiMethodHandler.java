@@ -370,6 +370,11 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
 
     public String[] decomposeURL(String url, String alfrescoContext)
     {       
+        if (url.equalsIgnoreCase(alfrescoContext))
+        {
+            // no path was provided then returned the fileUrl to user's home space
+            return new String[]{alfrescoContext, pathHelper.getUserHomeLocation()};
+        }
         return new String[]{alfrescoContext.length() == 0? "/": alfrescoContext, url.length() > alfrescoContext.length() ? url.substring(alfrescoContext.length() + 1) : ""};
     }
 
@@ -1086,6 +1091,8 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
             }
 
             docMetaInfo.setTitle((String) originalProps.get(ContentModel.PROP_TITLE));
+            docMetaInfo.setAuthor((String) originalProps.get(ContentModel.PROP_CREATOR));
+            docMetaInfo.setModifiedBy((String) originalProps.get(ContentModel.PROP_MODIFIER));
 
             Version currentVersion = versionService.getCurrentVersion(originalFileInfo.getNodeRef());
             if (currentVersion != null)

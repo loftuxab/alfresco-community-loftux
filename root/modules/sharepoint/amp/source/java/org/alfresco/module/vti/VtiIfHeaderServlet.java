@@ -45,6 +45,8 @@ import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AuthenticationService;
@@ -74,6 +76,13 @@ public class VtiIfHeaderServlet extends HttpServlet
     
     private AuthenticationService authenticationService;
     
+    private ContentService contentService;
+    
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
@@ -160,5 +169,65 @@ public class VtiIfHeaderServlet extends HttpServlet
         
         is.close();
         os.close();
+    }
+    
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+    {     
+        String if_header_value = req.getHeader("If");
+        String guid = null;       
+        
+        if (if_header_value != null && if_header_value.length() > 0)
+        {
+            int begin = if_header_value.indexOf(":");
+            int end = if_header_value.indexOf("@");
+            if (begin != -1 && end != -1)
+            {
+                guid = if_header_value.substring(begin + 1, end);
+            }
+        }
+        
+        if (guid == null)
+        {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return; 
+        }
+        
+        NodeRef nodeRef = new NodeRef("workspace", "SpacesStore", guid.toLowerCase());        
+        NodeRef workingCopyNodeRef = checkOutCheckInService.getWorkingCopy(nodeRef);        
+
+        // original document writer
+        ContentWriter writer = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+        
+        if (workingCopyNodeRef != null)
+        {        
+            String workingCopyOwner = nodeService.getProperty(workingCopyNodeRef, ContentModel.PROP_WORKING_COPY_OWNER).toString();
+            if (workingCopyOwner.equals(authenticationService.getCurrentUserName()))
+            {
+                // working copy writer
+                writer = contentService.getWriter(workingCopyNodeRef, ContentModel.PROP_CONTENT, true);
+            }            
+        }
+        // updates changes on the server
+        writer.putContent(req.getInputStream());
+        
+        // original document properties
+        Map<QName, Serializable> props = nodeService.getProperties(nodeRef);
+        
+        if (workingCopyNodeRef != null)
+        {        
+            String workingCopyOwner = nodeService.getProperty(workingCopyNodeRef, ContentModel.PROP_WORKING_COPY_OWNER).toString();
+            if (workingCopyOwner.equals(authenticationService.getCurrentUserName()))
+            {
+                // working copy properties
+                props = nodeService.getProperties(workingCopyNodeRef);
+            }            
+        }
+        Date lastModified = (Date) props.get(ContentModel.PROP_MODIFIED);
+        resp.setHeader("Repl-uid", "rid{" + guid + "}");
+        resp.setHeader("ResourceTag", "rt:" + guid + "@" + VtiPropfindMethod.convertDateToVersion(lastModified));
+        resp.setContentType(writer.getMimetype());
+        
+        resp.getOutputStream().close();     
     }
 }

@@ -138,6 +138,8 @@ public abstract class AbstractVtiMethod implements VtiMethod
             response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLVERSION, VtiType.STRING, VtiConstraint.R, "V" + docMetaInfo.getSourcecontrolversion());
             response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLLOCKEXPIRES, VtiType.TIME, VtiConstraint.R, docMetaInfo.getSourcecontrollockexpires());
             response.writeMetaDictionary(VtiProperty.FILE_THICKETSUPPORTINGFILE, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getThicketsupportingfile());
+            response.writeMetaDictionary(VtiProperty.FILE_MODIFIEDBY, VtiType.STRING, VtiConstraint.R, docMetaInfo.getModifiedBy());
+            response.writeMetaDictionary(VtiProperty.FILE_AUTHOR, VtiType.STRING, VtiConstraint.R, docMetaInfo.getAuthor());
         }
 
     }
