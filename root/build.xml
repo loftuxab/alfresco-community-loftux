@@ -203,6 +203,9 @@
          <pathelement location="${dir.project.3rdparty.lib}/quartz-1.6.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/resolver.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/rhino-js-1.6R7.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/saaj-api-1.3.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/saaj-impl-1.3.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/saaj.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/saxpath.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/shale-test-1.0.4.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-2.0.6.jar" />
