@@ -165,6 +165,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/guessencoding-1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/hibernate-3.2.1-patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/hrtlib.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/hsqldb.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/htmlparser-1.6.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/ibatis-2.3.0.677.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/icu4j-2.3.0.677.jar" />
