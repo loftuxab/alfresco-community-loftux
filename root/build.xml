@@ -242,6 +242,9 @@
          <!-- FileFolder Tests -->
          <exclude name="**/org/alfresco/repo/model/filefolder/**/*Test.java" />
          <include name="**/org/alfresco/repo/model/filefolder/FileFolderTestSuite.java" />
+         <!-- Version Tests -->
+         <exclude name="**/org/alfresco/repo/version/**/*Test.java" />
+         <include name="**/org/alfresco/repo/version/VersionTestSuite.java" />
          <!-- All other tests -->
          <include name="**/*Test.java" />
          <!-- include the updated indexer tests -->
