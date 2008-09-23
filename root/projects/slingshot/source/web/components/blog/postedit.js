@@ -543,7 +543,7 @@
             {
                action : "publish"
             },
-            successMessage: this._msg("message.publishedExternal.success"),
+            successMessage: this._msg("message.publishExternal.success"),
             successCallback:
             {
                fn: onPublished,
@@ -604,7 +604,7 @@
             {
                action : "update"
             },
-            successMessage: this._msg("message.updatedExternal.success"),
+            successMessage: this._msg("message.updateExternal.success"),
             successCallback:
             {
                fn: onUpdated,
