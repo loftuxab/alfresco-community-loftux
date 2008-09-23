@@ -40,6 +40,7 @@
       <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
    </servlet>
 
+   <!-- The Web Framework Dispatcher Servlet -->
    <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
@@ -102,13 +103,13 @@
    </servlet-mapping>
    
    <session-config>
-      <session-timeout>20</session-timeout>
+      <session-timeout>30</session-timeout>
    </session-config>
 
-    <!-- welcome file list precedence order is index.jsp, then index.html -->
-    <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
+   <!-- welcome file list precedence order is index.jsp, then index.html -->
+   <welcome-file-list>
+      <welcome-file>index.jsp</welcome-file>
+      <welcome-file>index.html</welcome-file>
+   </welcome-file-list>
 
 </web-app>
