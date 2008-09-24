@@ -53,9 +53,9 @@ tr.notifications-rowB {
 				${object.key}
 			</td>
 			<td>
-				<a href="https://issues.alfresco.com/browse/${object.key}" target="_blank">
+				<!--a href="https://issues.alfresco.com/browse/${object.key}" target="_blank" -->
 				${object.summary}
-				</a>
+				<!--/a-->
 			</td>
 			<td nowrap>
 				${object.created.get(2)}/${object.created.get(5)}

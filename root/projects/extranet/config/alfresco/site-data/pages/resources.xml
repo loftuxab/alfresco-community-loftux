@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <title>Resources</title>
+  <template-instance>application</template-instance>
+  <authentication>none</authentication>  
+</page>
