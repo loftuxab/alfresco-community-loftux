@@ -216,6 +216,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/tm-extractors-0.4_patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/truezip.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/wsdl4j-1.6.2.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/wss4j.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/wstx-asl-3.2.4.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xercesImpl-2.8.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xml-apis.jar" />
