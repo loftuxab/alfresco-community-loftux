@@ -1,7 +1,7 @@
 <div class="dashlet">
    <div class="title">${msg("header.siteProfile")}</div>
    <div class="body">
-      <div>
+      <div class="msg">
          <h3><#if (profile.title != "")>${msg("text.welcome", profile.title)?html}<#else>${msg("text.welcome", profile.shortName)?html}</#if></h3>
 <#if (profile.description != "")>
          <p>${profile.description?html}</p>

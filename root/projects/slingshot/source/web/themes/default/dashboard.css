@@ -36,11 +36,6 @@
 	overflow-x: hidden;
 }
 
-.dashlet .body h3
-{
-   padding-top: 0.6em;   
-}
-
 .dashlet .body a,
 .dashlet .body a:visited,
 .dashlet .body a:hover
@@ -57,8 +52,8 @@
 
 .dashlet .scrollableList
 {
-   height: 208px;
-    padding: 9px 0px;
+    height: 208px;
+    padding: 8px 0px;
     overflow: auto;
 /* TODO: need to revisit this */
     margin-right: 1px;
@@ -68,6 +63,12 @@
 {
    padding-left: 8px;
    padding-right: 8px;
+}
+
+.dashlet .msg
+{
+   padding-bottom: 8px;
+   padding-top: 8px;
 }
 
 .dashlet .text-list-item
