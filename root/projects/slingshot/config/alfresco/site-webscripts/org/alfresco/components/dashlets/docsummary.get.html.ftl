@@ -8,7 +8,7 @@
          <span class="error">${docs.message}</span>
       <#else>
          <#if docs.items?size == 0>
-            <span>${msg("label.noItems")}</span>
+            <div>${msg("label.noItems")}</div>
          <#else>
             <#list docs.items as doc>
                <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>
