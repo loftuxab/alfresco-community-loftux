@@ -412,7 +412,7 @@
          }
          html += '</div>';
             
-         html += '<div class="content yuieditor">' + data.content + '</div>';
+         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
          html += '</div>';
          
          // footer part
@@ -558,7 +558,7 @@
             });
             formTitle = this._msg('form.updateTitle');
             submitButtonLabel = this._msg('action.update');
-            content = data.content;
+            content = Alfresco.util.stripUnsafeHTMLTags(data.content);
          }
          else
          {

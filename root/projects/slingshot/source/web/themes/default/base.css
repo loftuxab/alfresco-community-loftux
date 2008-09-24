@@ -360,10 +360,34 @@ span.navigation-separator-alt
    padding: 2px 0 0 4px;
 }
 
+strong
+{
+	font-weight: bold;
+}
+
 
 em
 {
 	font-style: italic;
+}
+
+
+.rich-content ul,
+.rich-content ol
+{
+   padding: 1em;
+}
+
+.rich-content ul li
+{
+   list-style-type: disc;
+   list-style-position:inside;
+}
+
+.rich-content ol li
+{
+   list-style-type: decimal;
+   list-style-position:inside;
 }
 
 .draggable

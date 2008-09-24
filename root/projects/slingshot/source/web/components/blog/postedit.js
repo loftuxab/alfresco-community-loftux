@@ -265,7 +265,7 @@
          var content = '';
          if (this.options.editMode)
          {
-            content = this.blogPostData.content;
+            content = Alfresco.util.stripUnsafeHTMLTags(this.blogPostData.content);
          }
          Dom.get(this.id + '-content').value = content;
          

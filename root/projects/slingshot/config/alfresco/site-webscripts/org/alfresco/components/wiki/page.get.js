@@ -5,8 +5,10 @@ if (title)
 {
    var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title;
   	var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + page.url.args.title + "?context=" + escape(context);
-  	
-  	model.result = doGetCall(uri);
+
+   var result = doGetCall(uri);
+   result.pagetext = stringUtils.stripUnsafeHTML(result.pagetext);
+   model.result = result;
 }
 else
 {

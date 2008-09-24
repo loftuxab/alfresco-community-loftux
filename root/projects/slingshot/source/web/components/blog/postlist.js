@@ -436,7 +436,7 @@
                if (contentElem.length == 1)
                {
                   //var contentElem = Dom.get('postlist-temporary-id');
-                  contentElem[0].innerHTML = data.content
+                  contentElem[0].innerHTML = Alfresco.util.stripUnsafeHTMLTags(data.content);
                }
             }
             
