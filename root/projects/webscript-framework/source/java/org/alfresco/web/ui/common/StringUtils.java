@@ -47,6 +47,10 @@ public class StringUtils
     private static final Set<String> safeTags = new HashSet<String>();
     static
     {
+        safeTags.add("em");
+        safeTags.add("/em");
+        safeTags.add("strong");
+        safeTags.add("/strong");
         safeTags.add("p");
         safeTags.add("/p");
         safeTags.add("b");
@@ -303,7 +307,7 @@ public class StringUtils
                     case '&': enc = "&amp;"; break;
                     case '<': enc = "&lt;"; break;
                     case '>': enc = "&gt;"; break;
-    
+
                     default:
                         if (((int)chars[i]) >= 0x80)
                         {

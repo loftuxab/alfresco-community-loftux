@@ -262,6 +262,89 @@ Alfresco.util.encodeHTML.text = document.createTextNode("");
 Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
 
 /**
+ * Removes all potentially non safe tags from s (tags that are not listed in safeTags).
+ * Normally the freemarker ?html encoding shall be used on the content from the repository but
+ * components like blog, forum/discussion, wiki and comments requires some basic html tags to handle formatting.
+ * Matches the functionality in org.alfresco.web.ui.common.StringUtils.java
+ *
+ * @method Alfresco.util.stripUnsafeHTMLTags
+ * @param text {string} The string to remove potentially dangerous tags from
+ * @return {string} Safe HTML string
+ * @static
+ */
+Alfresco.util.stripUnsafeHTMLTags = function(s)
+{
+   var me = arguments.callee;
+   s = s.replace("onclick", "$");
+   s = s.replace("onmouseover", "$");
+   s = s.replace("onmouseout", "$");
+   s = s.replace("onmousemove", "$");
+   s = s.replace("onfocus", "$");
+   s = s.replace("onblur", "$");
+   var buf = [];
+   var length = s.length;
+   for (var i = 0; i < length; i++)
+   {
+      if (s.charAt(i) == '<')
+      {
+         // found a tag?
+         var endMatchIndex = -1;
+         var endTagIndex = -1;
+         if (i < length - 2)
+         {
+            for (var x = (i + 1); x < length; x++)
+            {
+               if (s.charAt(x) == ' ' && endMatchIndex == -1)
+               {
+                  // keep track of the match point for comparing tags in the safeTags set
+                  endMatchIndex = x;
+               }
+               else if (s.charAt(x) == '>')
+               {
+                  endTagIndex = x;
+                  break;
+               }
+               else if (s.charAt(x) == '<')
+               {
+                  // found another angle bracket - not a tag def so we can safely output to here
+                  break;
+               }
+            }
+         }
+         if (endTagIndex != -1)
+         {
+            // found end of the tag to match
+            var tag = s.substring(i + 1, endTagIndex).toLowerCase();
+            var matchTag = tag;
+            if (endMatchIndex != -1)
+            {
+               matchTag = s.substring(i + 1, endMatchIndex).toLowerCase();
+            }
+            if(matchTag.charAt(0) == '/')
+            {
+               // Remove the '/' since it was an endtag
+               matchTag = matchTag.substring(1);
+            }
+            if (me.safeTags[matchTag])
+            {
+               // safe tag - append to buffer
+               buf.push('<');
+               buf.push(tag);
+               buf.push('>');
+            }
+            // inc counter to skip past whole tag
+            i = endTagIndex;
+            continue;
+         }
+      }
+      buf.push(s.charAt(i));
+   }
+   return buf.join("");
+}
+
+Alfresco.util.stripUnsafeHTMLTags.safeTags = {"strong":"strong", "em":"em", "p":"p", "b":"b", "i":"i", "br":"br", "ul":"ul", "ol":"ol", "li":"li", "h1":"h1", "h2":"h2", "h3":"h3", "h4":"h4", "h5":"h5", "h6":"h6", "span":"span", "a":"a", "img":"img", "font":"font"};
+
+/**
  * Wrapper to create a YUI Button with common attributes.
  * All supplied object parameters are passed to the button constructor
  * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});

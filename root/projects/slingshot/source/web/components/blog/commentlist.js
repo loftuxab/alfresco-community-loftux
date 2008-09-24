@@ -480,7 +480,7 @@
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
          Dom.get(formId + "-itemTitle").setAttribute("value", this.options.itemTitle);
          Dom.get(formId + "-browseItemUrl").setAttribute("value", this.options.itemUrl);
-         Dom.get(formId + "-content").value = data.content;
+         Dom.get(formId + "-content").value = Alfresco.util.stripUnsafeHTMLTags(data.content);
          
          // show the form and hide the view
          Dom.addClass(viewDiv, "hidden");
@@ -651,7 +651,7 @@
             html += '<span class="nodeStatus">(' + this._msg("comment.updated") + ')</span>';
          }
          html += '</div>'
-         html += '<div class="content yuieditor">' + data.content + '</div>'
+         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>'
          html += '</div>';
 
          // footer

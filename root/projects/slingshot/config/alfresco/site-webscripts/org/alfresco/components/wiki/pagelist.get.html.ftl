@@ -22,7 +22,7 @@
 		<span class="spacer">&nbsp;</span><br/>
 		<span class="attrLabel">${msg("label.modifiedDate")}</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>
-	<#assign pageCopy>${p.text!""}</#assign>
+	<#assign pageCopy>${(p.text!"")?replace("</?[^>]+>", " ", "ir")}</#assign>
    <div class="pageCopy"><#if pageCopy?length &lt; 1000>${pageCopy}<#else>${pageCopy?substring(0, 1000)}...</#if></div>
    <#-- Display tags, if any -->
    <div class="pageTags">

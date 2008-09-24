@@ -16,6 +16,7 @@
       ${messages}
    );
 //]]></script>
+<#-- Note, since result.pagetext has already been stripped by the page.get.js script -->
 <div class="yui-g wikipage-bar">
    <div class="wikipage-header">
       <div class="back-nav">
@@ -62,7 +63,7 @@
 <div id="${args.htmlid}-wikipage" class="yui-navset">       
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 <#if action == "view">	    
-	        <div id="${args.htmlid}-page"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
+	        <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
 <#elseif action == "edit">	        
 	        <div>
 	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
