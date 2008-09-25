@@ -24,14 +24,17 @@
  */
 package org.alfresco.web.scripts.atom;
 
+import java.io.StringReader;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
 
 import org.alfresco.web.scripts.Format;
 import org.apache.abdera.model.Content;
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Content.Type;
 
 /**
@@ -131,20 +134,93 @@ public class AtomService
         }
         return mimetype;
     }
-    
 
-//    TODO: To consider... 
-// 
-//    public Entry parseEntry(Content content)
-//    {
-//        // TODO:
-//        return null;
-//    }
-//    
-//    public Feed parseFeed(Content content)
-//    {
-//        // TODO:
-//        return null;
-//    }
+    /**
+     * Parse an Atom element
+     * 
+     * @param entry
+     * @return
+     */
+    public Element toAtom(org.alfresco.util.Content atom)
+    {
+        return abderaService.parse(atom.getInputStream(), null);
+    }
+
+    /**
+     * Parse an Atom element
+     * 
+     * @param entry
+     * @return
+     */
+    public Element toAtom(String atom)
+    {
+        return abderaService.parse(new StringReader(atom), null);
+    }
+    
+    /**
+     * Parse an Atom Service
+     * 
+     * @param entry
+     * @return
+     */
+    public Service toService(org.alfresco.util.Content entry)
+    {
+        return abderaService.parseService(entry.getInputStream(), null);
+    }
+
+    /**
+     * Parse an Atom Service
+     * 
+     * @param entry
+     * @return
+     */
+    public Service toService(String entry)
+    {
+        return abderaService.parseService(new StringReader(entry), null);
+    }
+    
+    /**
+     * Parse an Atom Entry
+     * 
+     * @param entry
+     * @return
+     */
+    public Entry toEntry(org.alfresco.util.Content entry)
+    {
+        return abderaService.parseEntry(entry.getInputStream(), null);
+    }
+
+    /**
+     * Parse an Atom Entry
+     * 
+     * @param entry
+     * @return
+     */
+    public Entry toEntry(String entry)
+    {
+        return abderaService.parseEntry(new StringReader(entry), null);
+    }
+
+    /**
+     * Parse an Atom Feed
+     * 
+     * @param feed
+     * @return
+     */
+    public Feed toFeed(org.alfresco.util.Content feed)
+    {
+        return abderaService.parseFeed(feed.getInputStream(), null);
+    }
+
+    /**
+     * Parse an Atom Feed
+     * 
+     * @param feed
+     * @return
+     */
+    public Feed toFeed(String feed)
+    {
+        return abderaService.parseFeed(new StringReader(feed), null);
+    }
     
 }

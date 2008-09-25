@@ -100,7 +100,7 @@ public class CMISRepositoryInfo extends ElementWrapper
         return null;
     }
     
-    public String getProdutName()
+    public String getProductName()
     {
         Element child = getFirstChild(CMISConstants.PRODUCT_NAME);
         if (child != null)
@@ -110,7 +110,7 @@ public class CMISRepositoryInfo extends ElementWrapper
         return null;
     }
 
-    public String getProdutVersion()
+    public String getProductVersion()
     {
         Element child = getFirstChild(CMISConstants.PRODUCT_VERSION);
         if (child != null)
@@ -123,6 +123,16 @@ public class CMISRepositoryInfo extends ElementWrapper
     public String getVersionsSupported()
     {
         Element child = getFirstChild(CMISConstants.VERSIONS_SUPPORTED);
+        if (child != null)
+        {
+            return child.getText();
+        }
+        return null;
+    }
+    
+    public String getRootFolderId()
+    {
+        Element child = getFirstChild(CMISConstants.ROOT_FOLDER_ID);
         if (child != null)
         {
             return child.getText();

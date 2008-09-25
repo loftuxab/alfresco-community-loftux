@@ -83,9 +83,9 @@ public class AtomReader implements FormatReader<Element>
         Content content = req.getContent();
         if (content == null)
         {
-            throw new WebScriptException("Failed to convert request to Atom Entry");
+            throw new WebScriptException("Failed to convert request to Atom");
         }
-        return abderaService.parseEntry(req.getContent().getInputStream(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        return abderaService.parse(req.getContent().getInputStream(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
     }
     
     /* (non-Javadoc)

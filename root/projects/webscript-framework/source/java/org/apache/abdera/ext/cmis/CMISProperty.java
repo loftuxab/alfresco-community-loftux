@@ -29,6 +29,7 @@ import java.util.Date;
 
 import javax.xml.namespace.QName;
 
+import org.alfresco.util.ISO8601DateFormat;
 import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.ElementWrapper;
@@ -155,8 +156,8 @@ public abstract class CMISProperty extends ElementWrapper
      */
     public Date getDateValue()
     {
-        // TODO: 
-        return null;
+        // TODO: Use mechanism is reliant on Alfresco code
+        return ISO8601DateFormat.parse(getValue());
     }
 
     

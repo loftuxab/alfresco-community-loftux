@@ -60,7 +60,12 @@ public class ScriptableUtils
     {
         return URLEncoder.encode(s);
     }
-    
+
+    public String urlEncodeComponent(String s)
+    {
+        return URLEncoder.encodeUri(s);
+    }
+
     public String urlDecode(String s)
     {
         return URLDecoder.decode(s);

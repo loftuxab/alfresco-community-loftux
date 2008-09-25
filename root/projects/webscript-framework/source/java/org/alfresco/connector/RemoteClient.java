@@ -426,13 +426,15 @@ public class RemoteClient extends AbstractClient
     private URL buildURL(String uri) throws MalformedURLException
     {
         URL url;
+        // TODO: DC - check support for abs urls
+        String resolvedUri = uri.startsWith(endpoint) ? uri : endpoint + uri;
         if (getTicket() == null)
         {
-            url = new URL(endpoint + uri);
+            url = new URL(resolvedUri);
         }
         else
         {
-            url = new URL(endpoint + uri +
+            url = new URL(resolvedUri +
                     (uri.lastIndexOf('?') == -1 ? ("?"+getTicketName()+"="+getTicket()) : ("&"+getTicketName()+"="+getTicket())));
         }
         return url;

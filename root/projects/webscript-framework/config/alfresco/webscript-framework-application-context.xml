@@ -37,6 +37,22 @@
       </property>
    </bean>
    
+   <bean id="webscripts.cmis.atom.extension" class="org.alfresco.web.scripts.atom.AbderaExtension">
+      <property name="abderaService" ref="webscripts.abdera"/>
+      <property name="defaultNamespace"><value>http://www.cmis.org/2008/05</value></property>
+      <property name="QNames">
+         <props>
+            <prop key="cmis_object">object</prop>
+            <prop key="cmis_repositoryInfo">repositoryInfo</prop>
+         </props>
+      </property>
+      <property name="extensionFactories">
+         <list>
+           <bean class="org.apache.abdera.ext.cmis.CMISExtensionFactory"/>
+         </list>
+      </property>
+   </bean>
+   
 
    <!--                      -->
    <!--  Formats / Mimetypes -->
@@ -230,6 +246,11 @@
            </entry>
            <entry key="stringUtils">
               <bean class="org.alfresco.web.scripts.ScriptableUtils"/>
+           </entry>
+           <entry key="atom">
+              <bean class="org.alfresco.web.scripts.atom.AtomService">
+                 <property name="abderaService" ref="webscripts.abdera"/>
+              </bean>
            </entry>
          </map>
       </property>
