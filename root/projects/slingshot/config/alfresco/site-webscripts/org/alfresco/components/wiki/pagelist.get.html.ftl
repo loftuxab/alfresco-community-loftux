@@ -32,6 +32,6 @@
    </div><#-- End of wikipage -->
 </#list>
 <#else>
-${msg("lable.noPages")}
+${msg("label.noPages")}
 </#if>
 </div>
