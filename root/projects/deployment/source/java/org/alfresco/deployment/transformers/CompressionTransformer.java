@@ -22,27 +22,41 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
+package org.alfresco.deployment.transformers;
 
-package org.alfresco.deployment;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
-import java.io.Serializable;
+import org.alfresco.deployment.DeploymentTransportInputFilter;
+import org.alfresco.deployment.DeploymentTransportOutputFilter;
 
-import org.alfresco.deployment.impl.server.Deployment;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * Interface of classes that can be run post deployment.
+ * Sample payload transformer for remote communication with the File System Receiver (FSR) 
  * 
- * @see SampleRunnable
- * @see ProgramRunnable
+ * Compresses the outgoing stream using ZLIB
  * 
- * @author britt
+ * Uncompresses the incoming stream using ZLIB
+ * 
+ * @author mrogers
  */
-public interface FSDeploymentRunnable extends Runnable, Serializable
-{
-    /**
-     * An initialization method.
-     * 
-     * @param deployment The deployment that has just been committed.
-     */
-    public void init(Deployment deployment);
+public class CompressionTransformer implements DeploymentTransportInputFilter, DeploymentTransportOutputFilter {
+	
+    @SuppressWarnings("unused")
+	private static Log log = LogFactory.getLog(CompressionTransformer.class);
+    
+    // This is the outgoing - compression transformation
+	public OutputStream addFilter(OutputStream out, String path) {
+		return new DeflaterOutputStream(out);
+	}
+
+    // This is the incomming  - de-compression transformation
+	public InputStream addFilter(InputStream in, String path) {
+		return new InflaterInputStream(in);
+	}
 }

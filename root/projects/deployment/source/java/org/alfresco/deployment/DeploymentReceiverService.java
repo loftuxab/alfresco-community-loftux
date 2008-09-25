@@ -30,7 +30,8 @@ import java.util.List;
 
 
 /**
- * Interface for Filesystem Deployment Receiver.
+ * Public Interface for File System Deployment Receiver (FSR)
+ * 
  * @author britt
  */
 public interface DeploymentReceiverService

@@ -129,6 +129,18 @@ public class Configuration
                 throw new DeploymentException("No password specification for target " +
                                               targetName);
             }
+            String autoFixStr = (String)targetEntry.get("autoFix");
+            boolean autoFix = true;
+            if (autoFixStr == null)
+            {
+                logger.warn("autoFix defaulted to true for target: " + targetName);
+            }
+            else
+            {
+            	autoFix = Boolean.valueOf(autoFixStr).booleanValue();
+            }
+            
+            
             List<FSDeploymentRunnable> runnables = (List<FSDeploymentRunnable>)targetEntry.get("runnables");
             if (runnables == null)
             {
@@ -142,12 +154,16 @@ public class Configuration
             	rootFile.mkdirs(); 
             }
             
-            fTargets.put(targetName, new Target(targetName,
-                                                root,
-                                                fMetaDataDirectory + File.separator + targetName + ".md",
-                                                runnables,
-                                                user,
-                                                password));
+            Target newTarget = new Target(targetName,
+                    root,
+                    fMetaDataDirectory + File.separator + targetName + ".md",
+                    runnables,
+                    user,
+                    password);
+            newTarget.setAutoFix(autoFix);
+            
+            fTargets.put(targetName, newTarget);
+
         }
     }
     

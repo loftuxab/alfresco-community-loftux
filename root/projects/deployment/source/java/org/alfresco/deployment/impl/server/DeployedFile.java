@@ -46,19 +46,25 @@ public class DeployedFile implements Serializable
     
     private String fGUID;
     
+    private boolean fCreate;
+    
     public DeployedFile(FileType type,
                         String preLocation,
                         String path,
-                        String guid)
+                        String guid,
+                        boolean create)
     {
         fType = type;
         fPreLocation = preLocation;
         fPath = path;
         fGUID = guid;
+        fCreate = create;
     }
 
     /**
-     * @return the FinalPath
+     * Get the path
+     * 
+     * @return the path 
      */
     public String getPath()
     {
@@ -66,6 +72,8 @@ public class DeployedFile implements Serializable
     }
 
     /**
+     * Get the GUID which uniquely identifies this file
+     * 
      * @return the GUID
      */
     public String getGuid()
@@ -74,6 +82,19 @@ public class DeployedFile implements Serializable
     }
     
     /**
+     * Was this a new file or directory create 
+     * 
+     * @return true this is a new file or directory
+     */
+    public boolean isCreate()
+    {
+        return fCreate;
+    }
+
+    
+    /**
+     * The pre-location is where the file is stored temporarily prior to commit.
+     * 
      * @return the PreLocation
      */
     public String getPreLocation()
@@ -82,10 +103,31 @@ public class DeployedFile implements Serializable
     }
     
     /**
+     * Get the type
+     * 
      * @return the Type
      */
     public FileType getType()
     {
         return fType;
+    }
+    
+    @Override
+    public boolean equals(Object o)
+    {
+    	if(! (o instanceof DeployedFile))
+    	{
+    		return false;
+    	}
+    	DeployedFile other = (DeployedFile)o;
+    	
+        return this.getGuid().equals(other.getGuid());
+    		
+    }
+   
+    @Override 
+    public int hashCode() 
+    {
+    	return fGUID.hashCode();
     }
 }

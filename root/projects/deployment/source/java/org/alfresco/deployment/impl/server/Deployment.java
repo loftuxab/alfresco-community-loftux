@@ -28,12 +28,14 @@ package org.alfresco.deployment.impl.server;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -49,6 +51,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * This is a record of an ongoing deployment.
+ * 
  * @author britt
  */
 public class Deployment implements Iterable<DeployedFile>, Serializable
@@ -66,6 +69,11 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      * Flag for whether this deployment is in a state to be timed out.
      */
     private boolean fCanBeStale;
+    
+    /**
+     * has a meta data error been detected in this deployment - regardless of whether it has been corrected.
+     */
+    private boolean metaError = false;
 
     /**
      * The deployment target string.
@@ -83,11 +91,6 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     private String fLogDir;
 
     /**
-     * The path to the persistent storage of this Deployment.
-     */
-    private String fDepFile;
-
-    /**
      * The underlying file output stream.  Used for forcing to disk.
      */
     private transient FileOutputStream fFileOut;
@@ -98,19 +101,14 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     private transient ObjectOutputStream fOut;
 
     /**
-     * The object input stream for reading in the log.
-     */
-    private transient ObjectInputStream fIn;
-
-    /**
      * The state of this deployment with regards to the transaction.
      */
     private DeploymentState fState;
 
     /**
-     * Keeps track of any open output files.
+     * Keeps track of any open output streams.
      */
-    private transient Map<OutputStream, DeployedFile> fOutputFiles;
+    private transient Map<OutputStream, DeployedFile> fOutputStreams;
 
     public Deployment(Target target,
                       String logDir)
@@ -119,7 +117,6 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fTarget = target;
         fLogDir = logDir;
         fLogFile = logDir + File.separatorChar + "log";
-        fDepFile = logDir + File.separatorChar + "deployment";
         fLastActivity = System.currentTimeMillis();
         File lDir = new File(logDir);
         lDir.mkdir();
@@ -127,8 +124,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fOut = new ObjectOutputStream(fFileOut);
         fCanBeStale = true;
         fState = DeploymentState.WORKING;
-        fOutputFiles = new HashMap<OutputStream, DeployedFile>();
-        save();
+        fOutputStreams =  Collections.synchronizedMap(new HashMap<OutputStream, DeployedFile>());
     }
 
     /**
@@ -136,28 +132,32 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      * @param out
      * @param file
      */
-    public void addOutputFile(OutputStream out, DeployedFile file)
+    public void addOutputStream(OutputStream out, DeployedFile file)
     {
-        fOutputFiles.put(out, file);
+        fOutputStreams.put(out, file);
     }
 
     /**
      * Get the deployed file record for the output stream.
      * @param out
-     * @return
+     * @return the file being transmitted
      */
-    public DeployedFile getOutputFile(OutputStream out)
+    public DeployedFile getDeployedFile(OutputStream out)
     {
-        return fOutputFiles.get(out);
+    	return fOutputStreams.get(out);
     }
 
-    public void closeOutputFile(OutputStream out)
+    /**
+     * close the output stream
+     * @param out
+     * @throws IOException
+     */
+    public void closeOutputStream(OutputStream out)
         throws IOException
     {
         out.flush();
-        ((FileOutputStream)out).getChannel().force(true);
         out.close();
-        if (fOutputFiles.remove(out) == null)
+        if (fOutputStreams.remove(out) == null)
         {
             throw new DeploymentException("Closed unknown file.");
         }
@@ -171,43 +171,36 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void add(DeployedFile file)
         throws IOException
     {
-        fOut.writeObject(file);
-        fLastActivity = System.currentTimeMillis();
+    	synchronized (this) 
+    	{
+    		fOut.writeObject(file);
+    		fLastActivity = System.currentTimeMillis();
+    	}
     }
 
     /**
-     * Signal that the pre-commit phase of this deployment is finished.
+     * Prepare this deployment.
      * @throws IOException
      */
-    public void finishWork()
+    public void prepare()
         throws IOException
     {
         fOut.flush();
         fFileOut.getChannel().force(true);
         fOut.close();
-        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fCanBeStale = false;
         fTarget.cloneMetaData(this);
-        fIn.close();
-        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fState = DeploymentState.PREPARING;
-        save();
     }
 
+    /**
+     * Signal that the prepare phase of this deployment is finished.
+     * And commit is now in progress.
+     */
     public void finishPrepare()
         throws IOException
     {
-        fIn.close();
-        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fState = DeploymentState.COMMITTING;
-        save();
-    }
-
-    public void resetLog()
-        throws IOException
-    {
-        fIn.close();
-        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
     }
 
     /**
@@ -219,13 +212,16 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fOut.flush();
         fFileOut.getChannel().force(true);
         fOut.close();
-        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fCanBeStale = false;
         fState = DeploymentState.ABORTING;
-        for (OutputStream out : fOutputFiles.keySet())
+        for (OutputStream out : fOutputStreams.keySet())
         {
+        	out.flush();
             out.close();
         }
+        fOutputStreams.clear();
+        
+        //TODO Need to gather reader threads here
         for (DeployedFile file : this)
         {
             if (file.getType() == FileType.FILE)
@@ -234,7 +230,6 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
                 toDelete.delete();
             }
         }
-        fIn.close();
         File logDir = new File(fLogDir);
         Deleter.Delete(logDir);
     }
@@ -253,21 +248,11 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      */
     public void finishCommit()
     {
-        try
-        {
-            fIn.close();
-            fIn = new ObjectInputStream(new FileInputStream(fLogFile));
             fTarget.commitMetaData(this);
-            fIn.close();
-            fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+
             fTarget.runPostCommit(this);
             File logDir = new File(fLogDir);
             Deleter.Delete(logDir);
-        }
-        catch (IOException e)
-        {
-            // Do Nothing.
-        }
     }
 
     /**
@@ -275,17 +260,9 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      */
     public void rollback()
     {
-        try
-        {
+
             fTarget.rollbackMetaData();
-            fIn.close();
             Deleter.Delete(fLogDir);
-        }
-        catch (IOException e)
-        {
-        	logger.error("Exception in rollback", e);
-            // Do nothing.
-        }
     }
 
     /**
@@ -296,15 +273,6 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public File getFileForPath(String path)
     {
         return fTarget.getFileForPath(path);
-    }
-
-    /**
-     * Report a deployed file during the commit phase.
-     * @param file
-     */
-    public void update(DeployedFile file)
-    {
-        fTarget.update(file);
     }
 
     /**
@@ -349,7 +317,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         DeployedFile file = new DeployedFile(FileType.SETGUID,
                                              null,
                                              path,
-                                             guid);
+                                             guid,
+                                             false);
         fOut.writeObject(file);
     }
 
@@ -362,32 +331,35 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         return fState;
     }
 
-    /**
-     * Save this record to its persistent location.
-     * @throws IOException
-     */
-    private void save()
-        throws IOException
-    {
-        // TODO rename, save, delete?
-        FileOutputStream fout = new FileOutputStream(fDepFile);
-        ObjectOutputStream out = new ObjectOutputStream(fout);
-        out.writeObject(this);
-        out.flush();
-        fout.getChannel().force(true);
-    }
+    public void setMetaError(boolean metaError) {
+		this.metaError = metaError;
+	}
 
-    /**
+	public boolean isMetaError() {
+		return metaError;
+	}
+
+	/**
      * Iterator for reading back the log.
      * @author britt
      */
     private class DeployedFileIterator implements Iterator<DeployedFile>
     {
-        private DeployedFile fNext;
+        private DeployedFile fNext = null;
+        
+        private ObjectInputStream fIn;
 
         public DeployedFileIterator()
         {
-            fNext = null;
+        	try {
+				fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+			} catch (FileNotFoundException e) {
+				throw new DeploymentException("FileNotFound. logFile:" + fLogFile, e);
+			} catch (IOException e) {
+			    throw new DeploymentException("I/O error.", e);
+			}
+            
+            fNext = getNext();
         }
 
         /* (non-Javadoc)
@@ -395,30 +367,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
          */
         public boolean hasNext()
         {
-            if (fNext != null)
-            {
-                return true;
-            }
-            try
-            {
-                try
-                {
-                    fNext = (DeployedFile)fIn.readObject();
-                }
-                catch (EOFException eofe)
-                {
-                    return false;
-                }
-                return true;
-            }
-            catch (IOException e)
-            {
-                throw new DeploymentException("I/O error.", e);
-            }
-            catch (ClassNotFoundException nfe)
-            {
-                throw new DeploymentException("Catastrophic Failure.", nfe);
-            }
+        	return fNext != null;
         }
 
         /* (non-Javadoc)
@@ -427,8 +376,10 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         public DeployedFile next()
         {
             DeployedFile next = fNext;
-            fNext = null;
-            return next;
+            
+            fNext = getNext();
+            
+            return next;    
         }
 
         /* (non-Javadoc)
@@ -437,6 +388,42 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         public void remove()
         {
             throw new RuntimeException("Not Implemented.");
+        }
+        
+        private DeployedFile getNext() 
+        {
+           try
+           {
+        	   DeployedFile next = (DeployedFile)fIn.readObject();
+               return next;
+           }
+           catch (EOFException eofe)
+           {
+                return null;
+
+           }
+           catch (IOException e)
+           {
+                throw new DeploymentException("I/O error.", e);
+           }
+           catch (ClassNotFoundException nfe)
+           {
+                throw new DeploymentException("Unable to read deployed file:" + nfe.toString(), nfe);
+           }
+        }
+        
+        public void finalize() {
+        	try {
+        		if(fIn != null)
+        		{
+        			fIn.close();
+        			fIn = null;
+        		}
+        	}
+        	catch (Throwable t)
+        	{
+        		logger.error("Unable to finalize", t);
+        	}
         }
     }
 }

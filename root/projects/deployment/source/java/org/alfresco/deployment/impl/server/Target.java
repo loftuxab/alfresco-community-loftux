@@ -33,8 +33,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -44,7 +46,8 @@ import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
 import org.alfresco.deployment.util.Path;
 import org.alfresco.util.Deleter;
-import org.alfresco.util.GUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This represents a target for a deployment.
@@ -56,6 +59,13 @@ public class Target implements Serializable
     private static final String MD_NAME = ".md.";
     private static final String CLONE = "clone";
     private static final String OLD = "old";
+    
+    /**
+     * Is this target busy ?
+     */
+    private boolean busy = false;
+    
+    private static Log logger = LogFactory.getLog(Target.class);
 
     /**
      * The name of the target.
@@ -81,6 +91,11 @@ public class Target implements Serializable
      * The password for authenticating to this target.
      */
     private String fPassword;
+    
+    /**
+     * autoFix - does meta validation auto fix data
+     */
+    private boolean autoFix = true;
 
     /**
      * Runnables that will be invoked after commit.
@@ -106,14 +121,7 @@ public class Target implements Serializable
         fRunnables = runnables;
         fUser = user;
         fPassword = password;
-        // On initial server bringup, there will be no metadata directory.
-        // If so then we churn through the current contents and generate
-        // initial metadata.
-        File meta = new File(fMetaDataDirectory);
-        if (meta.exists())
-        {
-            return;
-        }
+    
         initialize();
     }
 
@@ -122,43 +130,145 @@ public class Target implements Serializable
      */
     private void initialize()
     {
-        File metadata = new File(fMetaDataDirectory);
-        metadata.mkdir();
+        File meta = new File(fMetaDataDirectory);
+        if (!meta.exists())
+        {
+        	logger.info("Initialised empty metadata for target:" + fTargetName);
+        	meta.mkdir();
+            DirectoryMetaData md = new DirectoryMetaData();
+            putDirectory(fMetaDataDirectory + File.separatorChar + MD_NAME, md);
+        } 
+        
         File root = new File(fRootDirectory);
-        root.mkdir();
-        recursiveInitialize(fMetaDataDirectory, fRootDirectory);
+        if(!root.exists())
+        {
+        	root.mkdir();
+    	}
+        
     }
-
+    
     /**
-     * Recursively set up fresh metadata.
-     * @param metaDir
-     * @param dataDir
+     * Validate the metadata
+     *
+     * 1) Checks whether files and directories have been deleted from the destination filesystem. 
+     * 2) Checks whether metadata can be read from disk (metadata may be corrupt or otherwise unreadable).
+     * 3) Checks whether files and directories are of correct type (a file may have replaced a dir 
+     * and vice versa)
+     * 
+     * @param fixit if true then the validator will attempt to fix the problem
+     * 
+     * @return true meta data has had an error (the problem may have been fixed if fixit==true)
      */
-    private void recursiveInitialize(String metaDir, String dataDir)
+    public boolean validateMetaData() 
     {
-        DirectoryMetaData md = new DirectoryMetaData();
-        File dFile = new File(dataDir);
-        File[] listing = dFile.listFiles();
-        for (File child : listing)
-        {
-            FileDescriptor desc = new FileDescriptor(child.getName(),
-                                                     child.isDirectory() ? FileType.DIR : FileType.FILE,
-                                                     GUID.generate());
-            md.add(desc);
-        }
-        putDirectory(metaDir + File.separatorChar + MD_NAME, md);
-        for (File child : listing)
-        {
-            if (child.isDirectory())
-            {
-                String newMetaDir = metaDir + File.separatorChar + child.getName();
-                File nmDir = new File(newMetaDir);
-                nmDir.mkdir();
-                recursiveInitialize(newMetaDir, dataDir + File.separatorChar + child.getName());
-            }
-        }
+		File dir = new File(fRootDirectory);
+        return validateMetaData(fMetaDataDirectory , dir, isAutoFix());
     }
+    
+    /**
+     * recursive validate method
+     * 
+     * @param metaDir
+     * @param destDir
+     * @return error this metaData is invalid (problem may have been fixed if fixit=true)
+     * 
+     */
+    private boolean validateMetaData(String metaDir, File destDir, boolean fixit)
+    {
+    	boolean error = false; // success unless changed
+    	
+    	String metaFileName = metaDir + File.separatorChar + MD_NAME;
+    	
+    	try 
+    	{
+    		DirectoryMetaData meta = getDirectory(metaFileName);
 
+    		File[] srcList = destDir.listFiles();
+    		Map<String, File> srcMap = new HashMap<String, File>(srcList.length);
+    		for(int i = 0; i < srcList.length; i++)
+    		{
+    			srcMap.put(srcList[i].getName(), srcList[i]);
+    		}
+    		
+    		Set<FileDescriptor> metaList = meta.getListing();
+    		
+    		Set<FileDescriptor>  toRemove = new HashSet<FileDescriptor>();
+    		
+    		boolean modified = false;
+
+    		for(FileDescriptor descriptor : metaList)
+    		{
+    			// if fd in srcList
+    			File child = srcMap.get(descriptor.getName());
+    			if (child != null) // we have a child
+    			{
+    				if(child.isDirectory() != (descriptor.getType() == FileType.DIR)) 
+    				{
+    					error = true;
+    					logger.warn("mismatch on file file or directory for path:" + descriptor.getName());
+    					// Child is a directory - should be a file or vice versa.
+    					if(fixit) 
+    					{
+    						toRemove.add(descriptor);
+    						modified = true;
+    					}
+    				}
+    				
+    				if (child.isDirectory())
+    				{
+    					boolean val = validateMetaData(metaDir +  File.separatorChar + descriptor.getName(), child, fixit);	
+    					error = val || error;
+    					if(val)  // did child have an error ?
+    					{
+    						if(fixit)
+    						{
+    							// Need to invalidate the GUID of child directory and its parents
+        						descriptor.setGuid("None");
+        						modified = true;
+    						}
+    					}
+    				}    	
+    			}	
+    			else  // missing file or dir
+    		    {
+    				error = true;
+    				logger.warn("missing file or directory for path:" + descriptor.getName());
+    				if(fixit)
+    				{
+    					toRemove.add(descriptor);
+    					modified = true;
+    				}
+    		    }
+    		}
+    		if(modified) 
+    		{
+    			for(FileDescriptor desc : toRemove)
+    			{
+    				meta.remove(desc);
+    			}
+    			logger.warn("autofix: replaced metadata for dir:" + metaDir);
+    		    putDirectory(metaFileName, meta);	
+    		}
+    	}
+    	catch (DeploymentException de)
+    	{
+    		// metadata is unreadable.
+
+    		error = true; // failure
+    		if(fixit)
+    		{
+    			logger.warn("metadata is unreadable.  Replaced metadata for metaDir:" + metaDir, de);
+    			putDirectory(metaFileName, new DirectoryMetaData());
+    			
+    		}
+    		else
+    		{
+        		logger.error("metadata is unreadable. metaDir:" + metaDir, de);
+    		}
+    	}
+    	return error;
+    }
+   
     /**
      * Get the target name.
      * @return
@@ -256,115 +366,107 @@ public class Target implements Serializable
     }
 
     /**
-     * Clone all the metadata files for the commit phase of a deployment.
+     * Clone and update all the metadata files for the commit phase of a deployment.
+     * @param deployment the deployment
      */
     public void cloneMetaData(Deployment deployment)
     {
-        Set<String> toClone = new HashSet<String>();
+    	String currentmd = null;
+       	DirectoryMetaData md = null;
+    	
         for (DeployedFile file : deployment)
         {
-            Path path = new Path(file.getPath());
-            if (file.getType() == FileType.DIR)
-            {
-                String pathString = fMetaDataDirectory + File.separatorChar + path.toString() + File.separatorChar + MD_NAME;
-                toClone.add(pathString);
-            }
-            Path parent = path.getParent();
-            String parentString = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME;
-            toClone.add(parentString);
-        }
-        for (String path : toClone)
-        {
-            File file = new File(path);
-            File dir = new File(file.getParent());     
-            
-            //Path filePath = new Path(path);
-            //File dir = new File(filePath.getParent().toString());
-            
-            dir.mkdirs();
-            DirectoryMetaData md = null;
-            if (!file.exists())
-            {
-                md = new DirectoryMetaData();
-            }
-            else
-            {
-                md = getDirectory(path);
-            }
-            String cloneName = path + CLONE;
-            putDirectory(cloneName, md);
-        }
-    }
+        	Path path = new Path(file.getPath());
+        	Path parent = path.getParent();
+        	String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME + CLONE;
 
-    /**
-     * Update cloned metadata file with the information given.
-     * @param file
-     */
-    public void update(DeployedFile file)
-    {
-        Path path = new Path(file.getPath());
-        Path parent = path.getParent();
-        String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME + CLONE;
-        DirectoryMetaData md = getDirectory(mdName);
-        switch (file.getType())
-        {
-            case FILE :
-            {
-                FileDescriptor fd =
-                    new FileDescriptor(path.getBaseName(),
+        	if(! mdName.equals(currentmd))
+        	{
+        		if(md != null)
+        		{   
+        			// save the old directory before we replace it with a new one.
+        			putDirectory(currentmd, md);
+        		} 
+        		
+        		File metaFile = new File(mdName);
+        		File parentDir = new File(metaFile.getParent());
+        		
+                parentDir.mkdirs();
+
+                if (!metaFile.exists())
+                {
+                    md = new DirectoryMetaData();
+                }
+                else
+                {
+                    md = getDirectory(mdName);
+                }      		
+            	currentmd = mdName;
+        	}
+       	
+        	switch (file.getType())
+        	{
+            	case FILE :
+            	{
+            		FileDescriptor fd =
+            			new FileDescriptor(path.getBaseName(),
                                        FileType.FILE,
                                        file.getGuid());
-                md.remove(fd);
-                md.add(fd);
-                break;
-            }
-            case DIR :
-            {
-                FileDescriptor fd =
-                    new FileDescriptor(path.getBaseName(),
+            		md.remove(fd);
+            		md.add(fd);
+            		break;
+            	}
+            	case DIR :
+            	{
+            		FileDescriptor fd =
+            			new FileDescriptor(path.getBaseName(),
                                        FileType.DIR,
                                        file.getGuid());
-                md.remove(fd);
-                md.add(fd);
-                String newDirPath = fMetaDataDirectory + File.separatorChar + path.toString();
-                File newDir = new File(newDirPath);
-                newDir.mkdir();
-                DirectoryMetaData newMD = new DirectoryMetaData();
-                putDirectory(newDirPath + File.separatorChar + MD_NAME + CLONE, newMD);
-                break;
-            }
-            case DELETED :
-            {
-                FileDescriptor toRemove = new FileDescriptor(path.getBaseName(),
+            		md.remove(fd);
+            		md.add(fd);
+            		String newDirPath = fMetaDataDirectory + File.separatorChar + path.toString();
+            		File newDir = new File(newDirPath);
+            		newDir.mkdir();
+            		DirectoryMetaData newMD = new DirectoryMetaData();
+            		putDirectory(newDirPath + File.separatorChar + MD_NAME + CLONE, newMD);
+            		break;
+            	}
+            	case DELETED :
+            	{
+            		FileDescriptor toRemove = new FileDescriptor(path.getBaseName(),
                                                              FileType.DELETED,
                                                              null);
-                md.remove(toRemove);
-                md.add(toRemove);
-                break;
-            }
-            case SETGUID :
-            {
-                FileDescriptor toModify = new FileDescriptor(path.getBaseName(),
+            		md.remove(toRemove);
+            		//md.add(toRemove);
+            		break;
+            	}
+            	case SETGUID :
+            	{
+            		FileDescriptor toModify = new FileDescriptor(path.getBaseName(),
                                                              null,
                                                              null);
-                SortedSet<FileDescriptor> tail = md.getListing().tailSet(toModify);
-                if (tail.size() != 0)
-                {
-                    toModify = tail.first();
-                    if (toModify.getName().equals(path.getBaseName()))
-                    {
-                        toModify.setGuid(file.getGuid());
-                        break;
-                    }
-                }
-                throw new DeploymentException("Trying to set guid on non existent file " + path);
-            }
-            default :
-            {
-                throw new DeploymentException("Configuration Error: unknown FileType " + file.getType());
-            }
+            		SortedSet<FileDescriptor> tail = md.getListing().tailSet(toModify);
+            		if (tail.size() != 0)
+            		{
+            			toModify = tail.first();
+            			if (toModify.getName().equals(path.getBaseName()))
+            			{
+            				toModify.setGuid(file.getGuid());
+            				break;
+            			}
+            		}
+            		throw new DeploymentException("Trying to set guid on non existent file " + path);
+            	}
+            	default :
+            	{
+            		throw new DeploymentException("Configuration Error: unknown FileType " + file.getType());
+            	}
+        	} // end of switch
         }
-        putDirectory(mdName, md);
+		if(md != null)
+		{
+			putDirectory(currentmd, md);
+		}
     }
 
     /**
@@ -409,7 +511,7 @@ public class Target implements Serializable
         }
         catch (IOException ioe)
         {
-            throw new DeploymentException("Could not write metadata file " + path, ioe);
+            throw new DeploymentException("Could not write metadata path:" + path, ioe);
         }
     }
 
@@ -422,7 +524,7 @@ public class Target implements Serializable
     }
 
     /**
-     * Commit changed metadata.
+     * Commit cloned metadata.
      */
     public void commitMetaData(Deployment deployment)
     {
@@ -446,33 +548,37 @@ public class Target implements Serializable
             {
                 throw new DeploymentException("Could not rename meta data file " + path);
             }
-            DirectoryMetaData md = getDirectory(path + CLONE);
-            List<FileDescriptor> toDelete = new ArrayList<FileDescriptor>();
-            SortedSet<FileDescriptor> mdListing = md.getListing();
-            for (FileDescriptor file : mdListing)
-            {
-                if (file.getType() == FileType.DELETED)
-                {
-                    toDelete.add(file);
-                }
-                else if (file.getType() == FileType.DIR)
-                {
-                    continue;
-                }
-                File mdDir = new File(path + File.separatorChar + file.getName());
-                if (mdDir.exists())
-                {
-                    Deleter.Delete(mdDir);
-                }
-            }
-            for (FileDescriptor file : toDelete)
-            {
-                md.remove(file);
-            }
-            putDirectory(path, md);
-            old.delete();
+            
             File clone = new File(path + CLONE);
-            clone.delete();
+            clone.renameTo(original);
+            
+//            DirectoryMetaData md = getDirectory(path + CLONE);
+//            List<FileDescriptor> toDelete = new ArrayList<FileDescriptor>();
+//            SortedSet<FileDescriptor> mdListing = md.getListing();
+//            for (FileDescriptor file : mdListing)
+//            {
+//                if (file.getType() == FileType.DELETED)
+//                {
+//                    toDelete.add(file);
+//                }
+//                else if (file.getType() == FileType.DIR)
+//                {
+//                    continue;
+//                }
+//                File mdDir = new File(path + File.separatorChar + file.getName());
+//                if (mdDir.exists())
+//                {
+//                    Deleter.Delete(mdDir);
+//                }
+//            }
+//            for (FileDescriptor file : toDelete)
+//            {
+//                md.remove(file);
+//            }
+//            putDirectory(path, md);
+              old.delete();
+//            File clone = new File(path + CLONE);
+//            clone.delete();
         }
     }
 
@@ -509,6 +615,11 @@ public class Target implements Serializable
         }
     }
 
+    /**
+     * run post commit programs
+     * @param deployment the deployment that has just completed.
+     */
+    
     public void runPostCommit(Deployment deployment)
     {
         if (fRunnables != null && fRunnables.size() > 0)
@@ -517,15 +628,37 @@ public class Target implements Serializable
             {
                 try
                 {
-                    deployment.resetLog();
                     runnable.init(deployment);
                     runnable.run();
                 }
-                catch (IOException e)
+                catch (Throwable t)
                 {
-                    // Do Nothing for Now.
+                	logger.error("Error from postCommit event t:" + t.toString(), t);
                 }
             }
         }
     }
+
+    /**
+     * set that this target is busy
+     */
+	public void setBusy(boolean busy) {
+		this.busy = busy;
+	}
+
+	public boolean isBusy() {
+		return busy;
+	}
+
+	/**
+	 * tell this target to autofix data during validation
+	 * @param autoFix
+	 */
+	public void setAutoFix(boolean autoFix) {
+		this.autoFix = autoFix;
+	}
+
+	public boolean isAutoFix() {
+		return autoFix;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,26 +23,39 @@
  * http://www.alfresco.com/legal/licensing
  */
 
+
 package org.alfresco.deployment;
 
-import java.io.Serializable;
-
-import org.alfresco.deployment.impl.server.Deployment;
+import java.io.InputStream;
 
 /**
- * Interface of classes that can be run post deployment.
+ * This interface is used for payload transformation of messages received by a file 
+ * system receiver.
  * 
- * @see SampleRunnable
- * @see ProgramRunnable
+ * The transformers are called just before or just after content is sent over the network 
+ * to an FSR, but in all cases before the deployment is committed.
  * 
- * @author britt
+ * Implementors will typically create a java.io.FilterOutputStream to wrap the given stream.
+ * 
+ * @see java.io.FilterInputStream
+ * @see org.alfresco.deployment.transformers.ZipCompressionTransformer
+ * @see org.alfresco.deployment.DeploymentTransportOutputFilter
+ * 
+ * @author mrogers
+ *
  */
-public interface FSDeploymentRunnable extends Runnable, Serializable
+public interface DeploymentTransportInputFilter 
 {
-    /**
-     * An initialization method.
-     * 
-     * @param deployment The deployment that has just been committed.
-     */
-    public void init(Deployment deployment);
+	/**
+	 * Add a filter to transform the payload of a deployment.
+	 * 
+	 * The inputStream is received on the File System Receiver
+	 * 
+	 * If this transformation is not required then simply return <i>in</i>. Do not return null.
+	 * 
+	 * @param in the input stream being filtered.
+	 * @param path the path of the file
+	 * @return the filtered input stream
+	 */
+	public InputStream addFilter(InputStream in, String path); 
 }

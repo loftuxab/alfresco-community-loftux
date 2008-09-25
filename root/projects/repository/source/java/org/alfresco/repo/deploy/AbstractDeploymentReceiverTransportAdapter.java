@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,27 +22,34 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
+package org.alfresco.repo.deploy;
 
-package org.alfresco.deployment;
+import java.util.List;
 
-import java.io.Serializable;
-
-import org.alfresco.deployment.impl.server.Deployment;
+import org.alfresco.deployment.DeploymentTransportOutputFilter;
 
 /**
- * Interface of classes that can be run post deployment.
- * 
- * @see SampleRunnable
- * @see ProgramRunnable
- * 
- * @author britt
+ * Abstract Transport Adapter.
+ *
  */
-public interface FSDeploymentRunnable extends Runnable, Serializable
-{
-    /**
-     * An initialization method.
-     * 
-     * @param deployment The deployment that has just been committed.
-     */
-    public void init(Deployment deployment);
+public abstract class AbstractDeploymentReceiverTransportAdapter  {
+	 
+	List<DeploymentTransportOutputFilter> transformers;
+	 
+	/**
+	 * Get the content transformers for this transport - if the transport does not support
+	 * content transformation then simply return null;
+	 * @return the content transformers or null if there are no transformers.
+	 */
+	public List<DeploymentTransportOutputFilter>getTransformers() {
+		return transformers;
+	}
+	/**
+	 * Set the content transformers for this transport - if the transport does not support
+	 * content transformation then simply set null or do not call this method.
+	 */	
+	public void setTransformers( List<DeploymentTransportOutputFilter> transformers) {
+	    this.transformers = transformers;
+	}
+
 }
