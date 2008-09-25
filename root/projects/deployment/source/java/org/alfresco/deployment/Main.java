@@ -48,8 +48,6 @@ public class Main
             System.exit(1);
         }
         
-
-        logger.info("Alfresco File System Receiver Starting");
         @SuppressWarnings("unused")
         FileSystemXmlApplicationContext context =
             new FileSystemXmlApplicationContext(args[0]);

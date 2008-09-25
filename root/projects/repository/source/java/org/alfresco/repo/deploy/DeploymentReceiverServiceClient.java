@@ -23,7 +23,7 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.impl.client;
+package org.alfresco.repo.deploy;
 
 import java.io.OutputStream;
 import java.util.List;
@@ -33,8 +33,11 @@ import org.alfresco.deployment.DeploymentReceiverTransport;
 import org.alfresco.deployment.FileDescriptor;
 
 /**
- * Client side implementation of DeploymentReceiverService based on
- * a DeploymentReceiverTransport instance.
+ * Client side implementation of DeploymentReceiverService which decorates a 
+ * DeploymentReceiverTransport instance.
+ * 
+ * This class adds code to the send and finishSend methods.
+ * 
  * @author britt
  */
 public class DeploymentReceiverServiceClient implements

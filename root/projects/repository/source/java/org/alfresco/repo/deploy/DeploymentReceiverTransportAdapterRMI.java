@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,27 +22,32 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
+package org.alfresco.repo.deploy;
 
-package org.alfresco.deployment;
-
-import java.io.Serializable;
-
-import org.alfresco.deployment.impl.server.Deployment;
+import org.alfresco.deployment.DeploymentReceiverTransport;
+import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 /**
- * Interface of classes that can be run post deployment.
+ * Transport adapter to connect to the FSR using RMI protocol.
  * 
- * @see SampleRunnable
- * @see ProgramRunnable
- * 
- * @author britt
+ * @author mrogers
+ *
  */
-public interface FSDeploymentRunnable extends Runnable, Serializable
-{
-    /**
-     * An initialization method.
-     * 
-     * @param deployment The deployment that has just been committed.
-     */
-    public void init(Deployment deployment);
+public class DeploymentReceiverTransportAdapterRMI extends AbstractDeploymentReceiverTransportAdapter implements DeploymentReceiverTransportAdapter {
+
+	public DeploymentReceiverTransport getTransport(String hostName,
+			int port, int version, String srcPath) 
+	{
+		
+       	// Code to use RMI transport 
+        RmiProxyFactoryBean factory = new RmiProxyFactoryBean();
+        factory.setRefreshStubOnConnectFailure(true);
+        factory.setServiceInterface(DeploymentReceiverTransport.class);
+        factory.setServiceUrl("rmi://" + hostName + ":" + port + "/deployment");
+        factory.afterPropertiesSet();
+        DeploymentReceiverTransport transport = (DeploymentReceiverTransport)factory.getObject();
+        
+		return transport;
+	}
+
 }

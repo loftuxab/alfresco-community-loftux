@@ -27,6 +27,7 @@ package org.alfresco.deployment.impl.server;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,10 @@ import org.alfresco.deployment.DeploymentReceiverService;
 import org.alfresco.deployment.DeploymentReceiverTransport;
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.util.GUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 /**
  * The server side implementation the remote interface.
@@ -48,11 +52,15 @@ public class DeploymentReceiverTransportImpl implements
      * The DeploymentReceiverService.
      */
     private DeploymentReceiverService fService;
+    
+    private static Log logger = LogFactory.getLog(DeploymentReceiverTransportImpl.class);
 
     /**
      * The table of OutputStreams.
      */
     private Map<String, OutputStream> fOutputs;
+    
+    private AtomicInteger handleGenerator = new AtomicInteger(1);
     
     public DeploymentReceiverTransportImpl()
     {
@@ -64,33 +72,29 @@ public class DeploymentReceiverTransportImpl implements
         fService = service;
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.deployment.DeploymentReceiverTransport#finishSend(java.lang.String, java.lang.String)
-     */
-    public void finishSend(String ticket, String outputToken)
-    {
-        OutputStream out = fOutputs.get(outputToken);
-        if (out == null)
-        {
-            fService.abort(ticket);
-            throw new DeploymentException("Invalid output token. Aborted.");
-        }
-        fOutputs.remove(outputToken);
-        fService.finishSend(ticket, out);
-    }
 
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverTransport#getSendToken(java.lang.String, java.lang.String, java.lang.String)
      */
     public String getSendToken(String ticket, String path, String guid)
     {
-        OutputStream out = fService.send(ticket, path, guid);
-        String handle = GUID.generate();
-        synchronized (this)
-        {
-            fOutputs.put(handle, out);
+    	try 
+    	{
+    		OutputStream out = fService.send(ticket, path, guid);
+    		String handle = getNextHandle(ticket);
+    		synchronized (this)
+    		{
+    			fOutputs.put(handle, out);
+    		}
+    		return handle;
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in getSendToken ticket:{1} path:{2}, guid:{3}");
+    		Object[] objs = { ticket, path, guid };
+    	    logger.error(f.format(objs), e);
+    		throw e;
         }
-        return handle;
     }
 
     /* (non-Javadoc)
@@ -110,9 +114,45 @@ public class DeploymentReceiverTransportImpl implements
         }
         catch (IOException e)
         {
-            fService.abort(ticket);
-            throw new DeploymentException("Failed write. Aborted.");
+        	try {
+        		fService.abort(ticket);
+        	}
+        	catch (Exception err)
+        	{
+        		logger.error(err);
+        	}
+           	MessageFormat f = new MessageFormat("unable to write ticket:{1}, outputToken:{2}, data:{3}, offset:{4}, len:{5}");
+        	Object[] objs = { ticket, outputToken, data, offset, count };
+        	logger.error(f.format(objs), e);
+
+            throw new DeploymentException("Failed write. ", e);
         }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.deployment.DeploymentReceiverTransport#finishSend(java.lang.String, java.lang.String)
+     */
+    public void finishSend(String ticket, String outputToken)
+    {
+    	try 
+    	{
+        OutputStream out = fOutputs.get(outputToken);
+        if (out == null)
+        {
+            fService.abort(ticket);
+            throw new DeploymentException("Invalid output token. Aborted.");
+        }
+        fOutputs.remove(outputToken);
+        fService.finishSend(ticket, out);
+    	}   
+    	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in finishSend ticket:{1}, outputToken:{2}");
+    		Object[] objs = { ticket, outputToken };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -120,7 +160,18 @@ public class DeploymentReceiverTransportImpl implements
      */
     public void abort(String ticket)
     {
-        fService.abort(ticket);
+    	try 
+    	{
+    		fService.abort(ticket);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in abort ticket:{1}");
+    		Object[] objs = { ticket };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -128,7 +179,18 @@ public class DeploymentReceiverTransportImpl implements
      */
     public String begin(String target, String user, String password)
     {
-        return fService.begin(target, user, password);
+    	try 
+    	{
+    		return fService.begin(target, user, password);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in begin user:{1}, password:{2}");
+    		Object[] objs = { user, "****" };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -136,7 +198,18 @@ public class DeploymentReceiverTransportImpl implements
      */
     public void commit(String ticket)
     {
-        fService.commit(ticket);
+    	try 
+    	{
+    		fService.commit(ticket);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in commit ticket:{1}");
+    		Object[] objs = { ticket };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -144,7 +217,18 @@ public class DeploymentReceiverTransportImpl implements
      */
     public void delete(String ticket, String path)
     {
-        fService.delete(ticket, path);
+    	try 
+    	{
+    		fService.delete(ticket, path);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in delete ticket:{1}, path:{2}");
+    		Object[] objs = { ticket, path };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -160,7 +244,18 @@ public class DeploymentReceiverTransportImpl implements
      */
     public List<FileDescriptor> getListing(String ticket, String path)
     {
-        return fService.getListing(ticket, path);
+    	try
+    	{
+    		return fService.getListing(ticket, path);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in getListing ticket:{1}, path:{2}");
+    		Object[] objs = { ticket, path};
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -168,7 +263,17 @@ public class DeploymentReceiverTransportImpl implements
      */
     public void mkdir(String ticket, String path, String guid)
     {
-        fService.mkdir(ticket, path, guid);
+    	try {
+    		fService.mkdir(ticket, path, guid);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in mkdir ticket:{1}, path:{2}, guid:{3}");
+    		Object[] objs = { ticket, path, guid };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     /* (non-Javadoc)
@@ -184,11 +289,38 @@ public class DeploymentReceiverTransportImpl implements
      */
     public void shutDown(String user, String password)
     {
-        fService.shutDown(user, password);
+    	try
+    	{
+    		fService.shutDown(user, password);
+    	}
+       	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in shutDown user:{1}, password:{2}");
+    		Object[] objs = { user, "****"};
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+
     }
 
     public void setGuid(String ticket, String path, String guid)
     {
-        fService.setGuid(ticket, path, guid);
+    	try 
+    	{
+    		fService.setGuid(ticket, path, guid);
+    	} 
+    	catch (RuntimeException e) 
+    	{
+    		MessageFormat f = new MessageFormat("error in setGuid ticket:{1}, path:{2}, guid:{3}");
+    		Object[] objs = { ticket, path, guid };
+    	    logger.error(f.format(objs), e);
+    		throw e;
+        }
+    }
+    
+    private String getNextHandle(String ticket)
+    {
+    	int handle = handleGenerator.incrementAndGet();    	
+    	return String.valueOf(handle) + ":" + ticket;
     }
 }

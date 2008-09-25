@@ -23,7 +23,7 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.impl.client;
+package org.alfresco.repo.deploy;
 
 import java.io.IOException;
 import java.io.OutputStream;

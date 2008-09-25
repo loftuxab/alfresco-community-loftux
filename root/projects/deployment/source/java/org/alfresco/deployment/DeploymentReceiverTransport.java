@@ -26,7 +26,11 @@
 package org.alfresco.deployment;
 
 /**
- * This is the interface that is implemented for the client.
+ * This is the interface that is implemented for the transport between client 
+ * and server of the File System Receiver (FSR)
+ * 
+ * The methods in this interface are concerned with the transport of OutputStreams
+ * 
  * @author britt
  */
 public interface DeploymentReceiverTransport extends DeploymentReceiverService
@@ -35,13 +39,14 @@ public interface DeploymentReceiverTransport extends DeploymentReceiverService
      * Get an OutputStream token.
      * @param ticket
      * @param path
-     * @return
+     * @param guid
+     * @return the token to identify this file.
      */
     public String getSendToken(String ticket, String path, String guid);
     
     /**
      * Tell the deployment receiver that a send is finished.
-     * @param ticket
+     * @param ticket 
      * @param outputToken
      */
     public void finishSend(String ticket, String outputToken);

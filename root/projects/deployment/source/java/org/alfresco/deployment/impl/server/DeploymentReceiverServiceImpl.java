@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,12 +31,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import org.alfresco.deployment.DeploymentReceiverService;
+import org.alfresco.deployment.DeploymentTransportInputFilter;
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.config.Configuration;
@@ -51,7 +59,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Server implementation.
+ * This is the implementation of the Alfresco File System Receiver
+ * 
  * @author britt
  */
 public class DeploymentReceiverServiceImpl implements DeploymentReceiverService, Runnable, 
@@ -69,17 +78,20 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     
     private boolean fDone;
     
-    private Map<String, Deployment> fDeployments;
+    private ConcurrentLinkedQueue<Target> validateQueue = new ConcurrentLinkedQueue<Target>();
     
-    private Map<String, Boolean> fTargetBusy;
+    private Map<String, Deployment> fDeployments;
+        
+    private static ReaderManagement fReaders = new ReaderManagement();
     
     private static Log logger = LogFactory.getLog(DeploymentReceiverServiceImpl.class);
+    
+    private boolean errorOnOverwrite = false;
     
     public DeploymentReceiverServiceImpl()
     {
         fDone = false;
         fDeployments = new HashMap<String, Deployment>();
-        fTargetBusy = new HashMap<String, Boolean>();
     }
 
     public void setConfiguration(Configuration config)
@@ -97,15 +109,19 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         for (String target : fConfiguration.getTargetNames())
         {
         	logger.debug("configuration target:" + target);
-            fTargetBusy.put(target, false);
+            validateQueue.add(fConfiguration.getTarget(target));
         }
         fThread = new Thread(this);
+        fThread.setName("FSR Keep Alive");
         fThread.start();   
     }
     
     public void shutDown()
     {
     	logger.info("Shutting down Implementation");
+    	
+    	// TODO consider what should be behaviour if one or more deployments are in progress 
+    	// wait for the deployment to complete or abort?
         fDone = true;
         synchronized (this)
         {
@@ -130,8 +146,9 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-        	logger.warn("Could not abort, timed out or invalid token ticket:" + ticket);
-            throw new DeploymentException("Deployment timed out or invalid token.");  
+        	logger.debug("Could not abort: invalid token ticket:" + ticket);
+        	// We are most likely to get here because we are aborting an already aborted ticket
+        	return;
         }
         if (deployment.getState() != DeploymentState.WORKING)
         {
@@ -140,14 +157,25 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         try
         {
             deployment.abort();
-            Target target = deployment.getTarget();
-            fTargetBusy.put(target.getName(), false);
-            fDeployments.remove(ticket);
         }
         catch (IOException e)
         {
         	logger.error("Error while aborting ticket:" + ticket, e);
-            throw new DeploymentException("Traumatic failure. Could not abort cleanly.");
+            throw new DeploymentException("Could not abort.", e);
+        }
+        finally 
+        {
+            Target target = deployment.getTarget();
+            synchronized(target) {
+            	target.setBusy(false);
+            }
+            
+            if(deployment.isMetaError())
+            {
+            	validateQueue.add(target);
+            }
+            
+            fDeployments.remove(ticket);
         }
     }
 
@@ -176,14 +204,14 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         	 throw new DeploymentException("Root directory does not exist. rootDirectory:" + target.getRootDirectory()); 
         }
         
-        synchronized (this)
+        synchronized (target) 
         {
-            if (fTargetBusy.get(targetName))
+            if (target.isBusy())
             {
                 throw new DeploymentException("Deployment in progress to " + targetName);
             }
             String ticket = GUID.generate();
-            logger.debug("begin deploy, target:" + targetName + "ticket:" + ticket);
+            logger.debug("begin deploy, target:" + targetName + ", ticket:" + ticket);
             
             try
             {
@@ -197,7 +225,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             	logger.error("Could not create logfile", e);
                 throw new DeploymentException("Could not create logfile; Deployment cannot continue", e);
             }
-            fTargetBusy.put(targetName, true);
+            target.setBusy(true);
             return ticket;
         }
     }
@@ -210,90 +238,105 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-        	String msg = "Could not commit because deployment timed out or invalid token ticket:" + ticket;
+        	String msg = "Could not commit because invalid ticket:" + ticket;
         	logger.error(msg);
             throw new DeploymentException(msg);
         }
         logger.debug("commit ticket:" + ticket);
         try
         {
-            deployment.finishWork();
-            // First phase.  Perform all mkdirs and file sends by renaming any
-            // existing file/directory to *.alf, and by simply renaming any deleted
-            // files/directories to *.alf.
-            for (DeployedFile file : deployment)
+        	LinkedBlockingQueue<DeployedFile> commitQueue = new LinkedBlockingQueue<DeployedFile>();
+            
+        	// Parallel processing here to reduce the overall time taken for commit. 
+        	CommitThread commitThreads[] = 
+        	{
+                    new CommitMetaClonerThread(deployment),
+                    new CommitWriterThread(deployment, commitQueue),
+                    new CommitWriterThread(deployment, commitQueue),
+                    new CommitWriterThread(deployment, commitQueue)
+        	};
+        			
+            logger.debug("starting deployment.");
+
+            try 
             {
-                deployment.update(file);
-                String path = file.getPath();
-                switch (file.getType())
+            	for(int i = 0; i < commitThreads.length; i++)
+            	{
+            		commitThreads[i].start();	
+            	}
+            
+                // Rename any existing soon to be overwritten files and directories with *.alf.
+                // Copy in new files and directories into their final locations.
+                for (DeployedFile file : deployment)
                 {
-                    case DIR :
+
+                    String path = file.getPath();
+                    switch (file.getType())
                     {
-                        File f = deployment.getFileForPath(path);
-                        if (f.exists())
+                        case DIR :
                         {
-                            File dest = new File(f.getAbsolutePath() + ".alf");
-                            f.renameTo(dest);
-                            f = deployment.getFileForPath(path);;
+                            File f = deployment.getFileForPath(path);
+                            if (f.exists())
+                            {
+                                File dest = new File(f.getAbsolutePath() + ".alf");
+                                f.renameTo(dest);
+                                f = deployment.getFileForPath(path);
+                            }
+                            f.mkdir();
+                            break;
                         }
-                        f.mkdir();
-                        break;
-                    }
-                    case FILE :
-                    {
-                    	logger.debug("add file:" + path);
-                        // If file already exists then rename it
-                    	File f = deployment.getFileForPath(path);
-                        if (f.exists())
+                        case FILE :
                         {
-                            File dest = new File(f.getAbsolutePath() + ".alf");
-                            f.renameTo(dest);
-                            f = deployment.getFileForPath(path);
+                    	    commitQueue.add(file);
+                            break;
                         }
-                        FileOutputStream out = new FileOutputStream(f);
-                        InputStream in = new FileInputStream(file.getPreLocation());
-                        byte[] buff = new byte[8192];
-                        int read = 0;
-                        while ((read = in.read(buff)) != -1)
+                        case DELETED :
                         {
-                            out.write(buff, 0, read);
+                    	    commitQueue.add(file);
+                            break;
                         }
-                        in.close();
-                        out.flush();
-                        out.getChannel().force(true);
-                        out.close();
-                        break;
-                    }
-                    case DELETED :
-                    {
-                    	logger.debug("delete file:" + path);
-                    	// prepare the file for deletion by renaming it
-                        File f = deployment.getFileForPath(path);
-                        if (f.exists())
+                        case SETGUID :
                         {
-                            File dest = new File(f.getAbsolutePath() + ".alf");
-                            f.renameTo(dest);
+                            // Do nothing.
+                            break;
                         }
-                        break;
-                    }
-                    case SETGUID :
-                    {
-                        // Do nothing.
-                        break;
-                    }
-                    default :
-                    {
-                    	logger.error("Internal error: unknown file type: " + file.getType());
-                        throw new DeploymentException("Internal error: unknown file type: " + file.getType());
+                        default :
+                        {
+                    	    logger.error("Internal error: unknown file type: " + file.getType());
+                            throw new DeploymentException("Internal error: unknown file type: " + file.getType());
+                        }
                     }
                 }
+            } 
+            finally 
+            {
+            	for(int i = 0; i < commitThreads.length; i++)
+            	{
+            		commitThreads[i].setFinish();	
+            	}
             }
+            
+            for(int i = 0; i < commitThreads.length; i++)
+            {
+                commitThreads[i].join();
+                if(commitThreads[i].getException() != null){
+                	throw commitThreads[i].getException();
+                }
+            }
+            
             if (INJECT_PREPARE_FAILURE)
             {
                 throw new DeploymentException("Injected Prepare Failure");
             }
-            // Phase 2 : Go through the log again and remove all .alf entries
+            
+            // here we could still roll back
+            
             deployment.finishPrepare();
+     
+            // Now we are past the point of no return and must go forward.
+            logger.debug("committed - clean up");
+            
+            // Phase 2 : Go through the log again and remove all .alf entries
             for (DeployedFile file : deployment)
             {
                 if (file.getType() == FileType.FILE)
@@ -310,7 +353,10 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             }
             File preLocation = new File(fConfiguration.getDataDirectory() + File.separatorChar + ticket);
             preLocation.delete();
+            
+            // commit meta-data and run post commit actions
             deployment.finishCommit();
+
             logger.debug("commited successfully ticket:" + ticket);
         }
         catch (Exception e)
@@ -323,8 +369,16 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         finally
         {
+        	Target target = deployment.getTarget();
+            synchronized(target) {
+            	target.setBusy(false);
+            }
+            
+            if(deployment.isMetaError())
+            {
+            	validateQueue.add(target);
+            }
             fDeployments.remove(ticket);
-            fTargetBusy.put(deployment.getTarget().getName(), false);
         }
     }
 
@@ -345,7 +399,6 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                 case WORKING :
                 case PREPARING :
                 {
-                    deployment.resetLog();
                     for (DeployedFile file : deployment)
                     {
                         String path = deployment.getFileForPath(file.getPath()).getAbsolutePath();
@@ -369,7 +422,6 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                 // already be gone.
                 case COMMITTING :
                 {
-                    deployment.resetLog();
                     for (DeployedFile file : deployment)
                     {
                         if (file.getType() == FileType.FILE)
@@ -396,32 +448,51 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         catch (Exception e)
         {
         	logger.error("Recovery failed for " + ticket, e);
-            throw new DeploymentException("Recovery failed for " + ticket, e);
+            throw new DeploymentException("Recovery failed for ticket:" + ticket, e);
         }
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#delete(java.lang.String, java.lang.String)
      */
-    public synchronized void delete(String token, String path)
+    public synchronized void delete(String ticket, String path)
     {
-        Deployment deployment = fDeployments.get(token);
+        Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-            throw new DeploymentException("Deployment Timed Out.");
+           	String msg = "Could not delete because invalid ticket:" + ticket;
+            throw new DeploymentException(msg);
         }
         try
         {
+        	File f = deployment.getFileForPath(path);
+        	boolean exists = f.exists();
+        	
+            if (!exists) {
+            	deployment.setMetaError(true);
+        		logger.warn("unable to delete, does not exist, path:" + f.getAbsolutePath());
+            	if(isErrorOnOverwrite())
+            	{
+            		throw new DeploymentException("unable to delete, does not exist, path:" + f.getAbsolutePath());
+            	}
+            }
+            
             DeployedFile file = new DeployedFile(FileType.DELETED, 
                                                  null,
                                                  path,
-                                                 null);
+                                                 null,
+                                                 false);
             deployment.add(file);
         }
         catch (IOException e)
         {
-        	logger.error("Could not update log. Aborted.", e);
-            abort(token);
+        	logger.debug("Could not update log. Aborted.", e);
+        	try {
+        		abort(ticket);
+        	} catch (Exception err) {
+        		// exception thrown in abort
+        		logger.error(err);
+        	}
             throw new DeploymentException("Could not update log.", e);
         }
     }
@@ -429,7 +500,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#finishSend(java.lang.String, java.io.OutputStream)
      */
-    public synchronized void finishSend(String token, OutputStream out)
+    public void finishSend(String token, OutputStream out)
     {
         Deployment deployment = fDeployments.get(token);
         if (deployment == null)
@@ -438,15 +509,16 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         try
         {
-            DeployedFile file = deployment.getOutputFile(out);
-            deployment.closeOutputFile(out);
+            DeployedFile file = deployment.getDeployedFile(out);
+            deployment.closeOutputStream(out);
+            fReaders.closeCopyThread(file);
             deployment.add(file);
         }
         catch (IOException e)
         {
             // TODO Do cleanup.
           	logger.error("finishSend",  e);
-            throw new DeploymentException("I/O error closing sent file and logging.");
+            throw new DeploymentException("FinishSend I/O error.", e);
         }
     }
 
@@ -458,16 +530,41 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-            throw new DeploymentException("Deployment timed out or invalid ticket.");
+            throw new DeploymentException("getListing invalid ticket. ticket:" + ticket);
         }
         try
         {
-            return new ArrayList<FileDescriptor>(deployment.getListing(path));
+        	/**
+        	 * get the listing
+        	 * could have meta and a dir exists - good this is what we expect
+        	 * could have meta data but no dir - external person has deleted the dir - what to do here ?
+        	 * could have a dir but no meta data - exception will get thrown - create empty metadata ?
+        	 */
+        	File f = deployment.getFileForPath(path);
+        	boolean exists = f.exists();
+        	Set<FileDescriptor> list = deployment.getListing(path);
+        	
+        	if(!exists)
+        	{
+        		// here got some meta data, but directory is missing, parent metadata is corrupt
+            	// create dir, return create empty meta data ?
+            	throw new DeploymentException("Directory is missing, path:" + f.getAbsolutePath());
+            }
+        	
+            return new ArrayList<FileDescriptor>(list);
+            
         }
         catch (Exception e)
         {
-            abort(ticket);
-            throw new DeploymentException("Could not get listing for " + path + ". Aborted.", e);
+        	// TODO do we create metadata here and try to recover ?
+        	try 
+        	{
+        		abort(ticket);
+        	} catch (Exception err) {
+        		// exception thrown in abort
+        		logger.error(err);
+        	}
+            throw new DeploymentException("Could not get listing for path:" + path, e);
         }
     }
 
@@ -479,28 +576,48 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-            throw new DeploymentException("Deployment timed out or invalid token.");
+            throw new DeploymentException("mkdir invalid ticket. ticket:" + ticket);
         }
+        
+        // TODO - Check whether dir already exists, it could simply be missing from meta data
+    	File f = deployment.getFileForPath(path);
+    	boolean exists = f.exists();
+    	
+        if (exists) 
+        {
+        	deployment.setMetaError(true);
+    		logger.warn("writing to pre-existing directory, path:" + f.getAbsolutePath());
+        	if(isErrorOnOverwrite())
+        	{
+        		throw new DeploymentException("directory already exists, path:" + f.getAbsolutePath());
+        	}
+        }
+        // create a new directory
         DeployedFile file = new DeployedFile(FileType.DIR,
                                              null,
                                              path,
-                                             guid);
+                                             guid,
+                                             !exists);
         try
         {
             deployment.add(file);
         }
         catch (IOException e)
         {
-            abort(ticket);
-          	logger.error("Unable to mkdir path:" + path, e);
-            throw new DeploymentException("Could not log mkdir of " + path + ". Aborted.");
+        	try {
+        		abort(ticket);
+        	} catch (Exception err) {
+        		// exception thrown in abort
+        		logger.error(err);
+        	}
+            throw new DeploymentException("Could not log mkdir of " + path + " error: " + e.toString(), e);
         }
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#send(java.lang.String, java.lang.String, java.lang.String)
      */
-    public synchronized OutputStream send(String ticket, String path, String guid)
+    public OutputStream send(String ticket, String path, String guid)
     {
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
@@ -510,19 +627,49 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         try
         {
             String preLocation = fConfiguration.getDataDirectory() + File.separator + guid;
+            
+            PipedOutputStream pos = new PipedOutputStream();
+            PipedInputStream pis = new PipedInputStream();
+            pis.connect(pos);
+             
+            // add input filters here
+            InputStream is = pis;
+            if(transformers != null && transformers.size() > 0) 
+            {
+            	for (DeploymentTransportInputFilter transformer : transformers)
+            	{
+            		is = transformer.addFilter(is, path);
+            	}
+            }
+
+            // Open the destination file
             OutputStream out = new FileOutputStream(preLocation);
+            
+        	File f = deployment.getFileForPath(path);
+        	boolean exists = f.exists();
+        	       
             DeployedFile file = new DeployedFile(FileType.FILE,
                                                  preLocation,
                                                  path,
-                                                 guid);
-            deployment.addOutputFile(out, file);
-            return out;
+                                                 guid,
+                                                 !exists);
+            
+            deployment.addOutputStream(pos, file);
+
+            // Need to kick off a reader thread to process input 
+            fReaders.addCopyThread(is, out, file);
+            
+            return pos;
         }
         catch (IOException e)
         {
-            abort(ticket);
-        	logger.error("Could not open path for writing path :" + path, e);
-            throw new DeploymentException("Could Not Open " + path + " for write.", e);
+        	try {
+        		abort(ticket);
+        	} catch (Exception err) {
+        		// exception thrown in abort
+        		logger.error(err);
+        	}
+            throw new DeploymentException("Unable to open " + path + " for write.", e);
         }
     }
 
@@ -531,27 +678,76 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
      */
     public synchronized void shutDown(String user, String password)
     {
+    	// TODO how to check user and password given that there may be multiple targets each with their own ?
+    	
+    	shutDown();   	
         fContext.close();
-        logger.info("Shut down");
-        System.exit(0);
+
     }
 
-    /* (non-Javadoc)
+    /** 
+     * This is the keep-alive thread of the FSR.
+     * When fDone = true this thread exits and the JVM will terminate.
+     * 
+     * And since we have to have a thread - may as well use it to process our event queues.
+     * 
      * @see java.lang.Runnable#run()
      */
     public void run()
     {
+    	logger.info("Alfresco File System Receiver Started");
         while (!fDone)
-        {
+        {     
+            // process validation queue
+            Target toValidate = validateQueue.poll();
+            if(toValidate != null)
+            {
+            	try 
+            	{
+            		boolean lockHeld = false;
+            		synchronized(toValidate){
+            			if(toValidate.isBusy())
+            			{
+            				// do no validation there is a deployment in progress
+            				logger.warn("target is busy. Not validating target:" + toValidate.getName());
+            			}
+            			else
+            			{
+            				toValidate.setBusy(true);
+            				lockHeld = true;
+            			}
+            		}
+            		if(lockHeld)
+            		{
+            			try 
+            			{
+            				logger.info("Validation starting for target:" + toValidate.getName() );
+            				toValidate.validateMetaData();
+            				logger.info("Validation finished");
+            			} 
+            			finally 
+            			{
+            				toValidate.setBusy(false);
+            			}
+            		}
+            	}
+            	catch (Exception e)
+            	{
+            		logger.error("Unable to validate", e);
+            	}
+            }
+            
             try
             {
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             }
             catch (InterruptedException e)
             {
-                // Do Nothing.
+                // Finished Sleeping - fDone may have been set if we are shutting down.
             }
+    
         }
+        logger.info("Alfresco File System Receiver Stopped");
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
@@ -559,12 +755,12 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         fContext = (ConfigurableApplicationContext)applicationContext;
     }
 
-    public synchronized void setGuid(String ticket, String path, String guid)
+    public void setGuid(String ticket, String path, String guid)
     {
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
-            throw new DeploymentException("Deployment timed out or invalid ticket.");
+            throw new DeploymentException("Deployment invalid ticket.");
         }
         try
         {
@@ -572,8 +768,208 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (Exception e)
         {
-            abort(ticket);
+        	try {
+        		abort(ticket);
+        	} catch (Exception err) {
+        		// exception thrown in abort
+        		logger.error(err);
+        	}
             throw new DeploymentException("Could not set guid on " + path, e);
         }
     }
+    
+    /**
+     * The transformers to apply to the incoming messages
+     */
+	List<DeploymentTransportInputFilter> transformers;
+	 
+	/**
+	 * Get the content transformers for this transport - if the transport does not support
+	 * content transformation then simply return null;
+	 * @return the content transformers or null if there are no transformers.
+	 */
+	public List<DeploymentTransportInputFilter>getTransformers() {
+		return transformers;
+	}
+	
+	public void setTransformers( List<DeploymentTransportInputFilter> transformers) {
+	    this.transformers = transformers;
+	}
+
+	/**
+	 * Should there be an error if the FSR attempts to create a file or directory 
+	 * that already exists ?   Otherwise the FSR will issue a warning and carry on.
+	 * 
+	 * @param errorOnOverwrite true an error will occur and deployment will stop, false 
+	 * a warning will occur and deployment will continue
+	 */
+	public void setErrorOnOverwrite(boolean errorOnOverwrite) {
+		this.errorOnOverwrite = errorOnOverwrite;
+	}
+
+	public boolean isErrorOnOverwrite() {
+		return errorOnOverwrite;
+	}
+	
+	/**
+	 * Part of the commit process.
+	 */
+	private class CommitWriterThread extends CommitThread {
+		
+		private LinkedBlockingQueue<DeployedFile> queue;
+		private Deployment deployment; 
+		
+		CommitWriterThread(Deployment deployment, LinkedBlockingQueue<DeployedFile> queue) 
+		{
+			this.deployment = deployment;
+			this.queue = queue;
+		}
+		
+		/**
+		 * 
+		 */
+		public void run() 
+		{           
+			while(getException() == null) 
+			{
+	            DeployedFile file = null;
+				try {
+					file = queue.poll(3, TimeUnit.SECONDS);
+				} 
+				catch (InterruptedException e1) 
+				{
+					logger.debug("interrupted");
+				}
+				
+	            if(file == null) 
+	            {
+	            	if(isFinish()) 
+	            	{
+	            			logger.debug("committer thread finished normally");
+	            			break;
+	            	}
+	        	}
+	            else
+	            {
+	            	try 
+	            	{
+	            		String path = file.getPath();
+	            		switch (file.getType())
+	            		{
+	                        case FILE :
+	                        {
+	                        	logger.debug("add file:" + path);
+	                        	// If file already exists then rename it
+	                        	File f = deployment.getFileForPath(path);
+	                        	if (f.exists())
+	                        	{
+	                        		File dest = new File(f.getAbsolutePath() + ".alf");
+	                        		f.renameTo(dest);
+	                        		f = deployment.getFileForPath(path);
+	                        	}
+	                        	// copy the file from the preLocation to its final target location
+	                           	FileOutputStream out = new FileOutputStream(f);
+	                        	FileInputStream in = new FileInputStream(file.getPreLocation());
+	                       
+	                        	FileChannel outChannel = out.getChannel(); 
+	                        	FileChannel inChannel = in.getChannel();
+	                        		
+	                        	// Chunk size is required to use NIO on large files
+	                            int chunkSize = 1 * (1024 * 1024);
+	                            long size = inChannel.size();
+	                            long position = 0;
+	                            while (position < size) {
+	                               position += inChannel.transferTo(position, chunkSize, outChannel);
+	                            }
+	                        	in.close();
+	                        	out.flush();
+	                        	out.close();
+	                        		
+	                        	break;
+	                        }
+	                        case DELETED :
+	                        {
+	                        	logger.debug("delete file:" + path);
+	                        	// prepare the file for deletion by renaming it
+	                        	File f = deployment.getFileForPath(path);
+	                        	if (f.exists())
+	                        	{
+	                        		File dest = new File(f.getAbsolutePath() + ".alf");
+	                        		f.renameTo(dest);
+	                        	}
+	                        	break;
+	                        }
+	                    }
+	            	} 
+	            	catch (Exception e) 
+	            	{
+	            		logger.debug("exception in committer thread", e);
+	            		setException(e);
+	            	}
+	            }
+			}
+		}		
+	}
+	
+	/**
+	 * Part of the commit process.
+	 */
+	private class CommitMetaClonerThread extends CommitThread {
+		
+		private Deployment deployment; 
+		
+		CommitMetaClonerThread(Deployment deployment) 
+		{
+			this.deployment = deployment;
+		}
+		
+		/**
+		 * run the metadata cloner
+		 */
+		public void run() 
+		{
+			try 
+			{
+	        	// Clone metadata etc
+	            deployment.prepare();
+	            logger.debug("metadata cloned and prepared");
+			} 
+		    catch (Exception e)
+			{
+		    	setException(e);
+			}
+		}
+	}
+	/**
+	 * Used by the commit method
+	 */
+	private abstract class CommitThread extends Thread {
+		
+		private Exception exception;
+		
+		private boolean stop = false;
+		
+		public boolean isFinish()
+		{
+			return stop;
+		}
+		
+		/** 
+		 * Called to stop this thread
+		 */
+		public void setFinish() 
+		{
+			stop = true;
+		}
+		
+		public Exception getException()
+		{
+			return exception;
+		}
+		
+		public void setException(Exception e)
+		{
+			this.exception = e;
+		}
+	}
 }
