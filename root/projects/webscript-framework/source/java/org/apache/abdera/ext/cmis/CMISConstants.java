@@ -70,6 +70,7 @@ public interface CMISConstants
     public static final QName PRODUCT_NAME = new QName(CMIS_200805_NS, "productName");
     public static final QName PRODUCT_VERSION = new QName(CMIS_200805_NS, "productVersion");
     public static final QName VERSIONS_SUPPORTED = new QName(CMIS_200805_NS, "cmisVersionsSupported");
+    public static final QName ROOT_FOLDER_ID = new QName(CMIS_200805_NS, "rootFolderId");
     
     // CMIS Capabilities
     public static final QName CAPABILITIES = new QName(CMIS_200805_NS, "capabilities");
@@ -115,6 +116,10 @@ public interface CMISConstants
     public static final String PROP_OBJECT_ID  = "ObjectId";
     public static final String PROP_BASETYPE = "BaseType";
     public static final String PROP_OBJECT_TYPE_ID = "ObjectTypeId";
+    public static final String PROP_CREATED_BY = "CreatedBy";
+    public static final String PROP_CREATION_DATE = "CreationDate";
+    public static final String PROP_LAST_MODIFIED_BY = "LastModifiedBy";
+    public static final String PROP_LAST_MODIFICATION_DATE = "LastModificationDate";
     public static final String PROP_IS_IMMUTABLE = "IsImmutable";
     public static final String PROP_IS_LATEST_VERSION = "IsLatestVersion";
     public static final String PROP_IS_MAJOR_VERSION = "IsMajorVersion";
@@ -125,6 +130,11 @@ public interface CMISConstants
     public static final String PROP_VERSION_SERIES_CHECKED_OUT_BY = "VersionSeriesCheckedOutBy";
     public static final String PROP_VERSION_SERIES_CHECKED_OUT_ID = "VersionSeriesCheckedOutId";
     public static final String PROP_CHECKIN_COMMENT = "CheckinComment";
+    public static final String PROP_CONTENT_STREAM_LENGTH = "ContentStreamLength";
+    public static final String PROP_CONTENT_STREAM_MIMETYPE = "ContentStreamMimetype";
+    public static final String PROP_CONTENT_STREAM_FILENAME = "ContentStreamFilename";
+    public static final String PROP_CONTENT_STREAM_URI = "ContentStreamURI";
+    
 
     // CMIS Property Types
     public static final String PROP_TYPE_STRING = "string";

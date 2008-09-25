@@ -116,6 +116,46 @@ public class CMISObject extends ExtensibleElementWrapper
     }
 
     /**
+     * Created By
+     * 
+     * @return  created by property
+     */
+    public CMISProperty getCreatedBy()
+    {
+        return getProperties().find(CMISConstants.PROP_CREATED_BY);
+    }
+
+    /**
+     * Creation Date
+     * 
+     * @return  creation date property
+     */
+    public CMISProperty getCreationDate()
+    {
+        return getProperties().find(CMISConstants.PROP_CREATION_DATE);
+    }
+
+    /**
+     * Last Modified By
+     * 
+     * @return  last modified by property
+     */
+    public CMISProperty getLastModifiedBy()
+    {
+        return getProperties().find(CMISConstants.PROP_LAST_MODIFIED_BY);
+    }
+
+    /**
+     * Last Modified Date
+     * 
+     * @return  last modified date property
+     */
+    public CMISProperty getLastModificationDate()
+    {
+        return getProperties().find(CMISConstants.PROP_LAST_MODIFICATION_DATE);
+    }
+
+    /**
      * Is immutable?
      * 
      * @return  isImmutable property
@@ -214,4 +254,45 @@ public class CMISObject extends ExtensibleElementWrapper
     {
         return getProperties().find(CMISConstants.PROP_CHECKIN_COMMENT);
     }
+    
+    /**
+     * Content Stream Length
+     * 
+     * @return  content stream length property
+     */
+    public CMISProperty getContentStreamLength()
+    {
+        return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_LENGTH);
+    }
+
+    /**
+     * Content Stream Mimetype
+     * 
+     * @return  content stream mimetype property
+     */
+    public CMISProperty getContentStreamMimeType()
+    {
+        return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_MIMETYPE);
+    }
+
+    /**
+     * Content Stream Filename
+     * 
+     * @return  content stream filename property
+     */
+    public CMISProperty getContentStreamFilename()
+    {
+        return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_FILENAME);
+    }
+
+    /**
+     * Content Stream URI
+     * 
+     * @return  content stream uri property
+     */
+    public CMISProperty getContentStreamURI()
+    {
+        return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_URI);
+    }
+
 }
