@@ -36,7 +36,6 @@ import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
-import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.alfresco.web.site.renderer.RendererContextHelper;
 import org.apache.commons.logging.Log;
@@ -58,7 +57,6 @@ import org.apache.commons.logging.Log;
 public abstract class AbstractRequestContext implements RequestContext
 {
     public static final String VALUE_HEAD_TAGS = "headTags";    
-    public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
     
     /*
      * Increments every time a request ID is required (debug)
@@ -70,7 +68,6 @@ public abstract class AbstractRequestContext implements RequestContext
     protected TemplateInstance currentTemplate;
     protected Content currentObject;
     protected String currentFormatId;
-    protected IFileSystem fileSystem;
     protected String storeId;
     protected User user;
     protected String id;
@@ -400,30 +397,6 @@ public abstract class AbstractRequestContext implements RequestContext
     }
 
     /**
-     * Returns the File System implementation which points to the
-     * "root" of the current web application.  This allows the framework
-     * to inspect the contents of the current web application and
-     * provision them as useful elements to the end user.
-     *  
-     * @return The file system implementation
-     */
-    public IFileSystem getFileSystem()
-    {
-        return this.fileSystem;
-    }
-
-    /**
-     * Sets the File System implementation to serve as the "root" of
-     * the current web application.
-     * 
-     * @param fileSystem
-     */
-    public void setFileSystem(IFileSystem fileSystem)
-    {
-        this.fileSystem = fileSystem;
-    }
-
-    /**
      * Returns the model.  The model allows object model manipulation
      * and persistence.  Models are intended to be pluggable so that
      * multiple implementations could be supported.
@@ -529,16 +502,7 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         return RendererContextHelper.current(this);
     }
-    
-    /**
-     * Returns the debug mode of the current request
-     * If not in debug mode, this will return null
-     */
-    public String getDebugMode()
-    {
-        return null;
-    }
-    
+        
     @Override
     public String toString()
     {

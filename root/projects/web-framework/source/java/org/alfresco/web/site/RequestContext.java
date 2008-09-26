@@ -36,7 +36,6 @@ import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
-import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
 
@@ -242,24 +241,6 @@ public interface RequestContext extends Serializable
     public void setFormatId(String formatId);
 
     /**
-     * Returns the File System implementation which points to the
-     * "root" of the current web application.  This allows the framework
-     * to inspect the contents of the current web application and
-     * provision them as useful elements to the end user.
-     *  
-     * @return The file system implementation
-     */
-    public IFileSystem getFileSystem();
-
-    /**
-     * Sets the File System implementation to serve as the "root" of
-     * the current web application.
-     * 
-     * @param fileSystem
-     */
-    public void setFileSystem(IFileSystem fileSystem);
-
-    /**
      * Returns the model.  The model allows object model manipulation
      * and persistence.
      * 
@@ -323,13 +304,7 @@ public interface RequestContext extends Serializable
      * @return The Render Context instance
      */
     public RendererContext getRenderContext();
-    
-    /**
-     * Returns the debug mode of the current request
-     * If not in debug mode, this will return null
-     */
-    public String getDebugMode();
-    
+        
     /**
      * Returns the current theme id
      */

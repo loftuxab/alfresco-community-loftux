@@ -48,8 +48,8 @@
    </servlet>
    
    <servlet>
-      <servlet-name>cacheControlServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
+      <servlet-name>frameworkControlServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.FrameworkControlServlet</servlet-class>
    </servlet>
    
    <servlet>
@@ -98,8 +98,8 @@
    </servlet-mapping>
    
    <servlet-mapping>
-      <servlet-name>cacheControlServlet</servlet-name>
-      <url-pattern>/cache</url-pattern>
+      <servlet-name>frameworkControlServlet</servlet-name>
+      <url-pattern>/control/*</url-pattern>
    </servlet-mapping>
    
    <session-config>

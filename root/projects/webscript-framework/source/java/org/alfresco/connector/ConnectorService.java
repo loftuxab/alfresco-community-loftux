@@ -119,6 +119,11 @@ public class ConnectorService implements ApplicationListener
      * require authentication or have "declared" authentication as part
      * of the endpoint config should be used.  
      * 
+     * This Connector also will not manage connector session state.
+     * 
+     * Thus, it is generally less preferred to use these connectors
+     * over those provided by getConnector(endpointId, session)
+     *  
      * @param endpointId the endpoint id
      * 
      * @return the connector
@@ -135,6 +140,33 @@ public class ConnectorService implements ApplicationListener
     }
     
     /**
+     * Retrieves a Connector to a given endpoint.
+     * <p>
+     * This Connector has no given user context and will not pass any
+     * authentication credentials. Therefore only endpoints that do not
+     * require authentication or have "declared" authentication as part
+     * of the endpoint config should be used.
+     *
+     * Cookie and token state will be session bound and reusable on
+     * subsequent invocations. 
+     * 
+     * @param endpointId the endpoint id
+     * @param session the HTTP session
+     * 
+     * @return the connector
+     */    
+    public Connector getConnector(String endpointId, HttpSession session)
+        throws RemoteConfigException
+    {
+        if (endpointId == null)
+        {
+            throw new IllegalArgumentException("EndpointId cannot be null.");
+        }
+        
+        return getConnector(endpointId, (String)null, session);
+    }    
+    
+    /**
      * Retrieves a Connector for the given endpoint that is scoped
      * to the given user.
      * <p>
@@ -146,7 +178,7 @@ public class ConnectorService implements ApplicationListener
      * subsequent invocations. 
      * 
      * @param endpointId    the endpoint id
-     * @param userId        the user id
+     * @param userId        the user id (optional)
      * @param session       the session
      * 
      * @return the connector
@@ -158,17 +190,17 @@ public class ConnectorService implements ApplicationListener
         {
             throw new IllegalArgumentException("EndpointId cannot be null.");
         }
-        if (userId == null)
-        {
-            throw new IllegalArgumentException("UserId cannot be null.");
-        }
         if (session == null)
         {
             throw new IllegalArgumentException("HttpSession cannot be null.");
         }
         
         // set credentials
-        Credentials credentials = this.getCredentialVault(session, userId).retrieve(endpointId);
+        Credentials credentials = null;
+        if(userId != null)
+        {
+            credentials = this.getCredentialVault(session, userId).retrieve(endpointId);
+        }        
         
         // get connector session and build user context
         ConnectorSession connectorSession = this.getConnectorSession(session, endpointId);

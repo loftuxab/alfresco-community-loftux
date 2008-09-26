@@ -28,6 +28,7 @@ import org.alfresco.connector.User;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.Content;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
@@ -46,6 +47,7 @@ public final class ScriptRequestContext extends ScriptBase
     private ScriptModelObject scriptTemplateObject = null;
     private ScriptModelObject scriptThemeObject = null;
     private ScriptUser scriptUser = null;
+    private ScriptLinkBuilder scriptLinkBuilder = null;
     
     
     /**
@@ -75,6 +77,21 @@ public final class ScriptRequestContext extends ScriptBase
     // --------------------------------------------------------------
     // JavaScript Properties
     
+    /**
+     * Gets the id of the content instance
+     * 
+     * If a content instance is not bound, null is returned.
+     */
+    public String getContentId()
+    {
+        return context.getCurrentObjectId();
+    }
+    
+    /**
+     * Gets the content instance.
+     * 
+     * @return the content instance
+     */
     public ScriptContentObject getContent()
     {
         if (scriptContentObject == null)
@@ -89,16 +106,41 @@ public final class ScriptRequestContext extends ScriptBase
         return scriptContentObject;
     }
     
+    /**
+     * Gets the format id.
+     * 
+     * @return the format id
+     */
     public String getFormatId()
     {
         return context.getFormatId();
     }
     
+    /**
+     * Gets the id.
+     * 
+     * @return the id
+     */
     public String getId()
     {
         return context.getId();
     }
     
+    /**
+     * Gets the id of the page
+     * 
+     * @return the id
+     */
+    public String getPageId()
+    {
+        return context.getPageId();
+    }    
+    
+    /**
+     * Gets the page.
+     * 
+     * @return the page
+     */
     public ScriptModelObject getPage()
     {
         if (scriptPageObject == null)
@@ -113,6 +155,21 @@ public final class ScriptRequestContext extends ScriptBase
         return scriptPageObject;
     }
     
+    /**
+     * Gets the id of the template
+     * 
+     * @return the id
+     */
+    public String getTemplateId()
+    {
+        return context.getTemplateId();
+    }    
+    
+    /**
+     * Gets the template.
+     * 
+     * @return the template
+     */
     public ScriptModelObject getTemplate()
     {
         if (scriptTemplateObject == null)
@@ -127,11 +184,21 @@ public final class ScriptRequestContext extends ScriptBase
         return scriptTemplateObject;
     }
     
+    /**
+     * Gets the theme id.
+     * 
+     * @return the theme id
+     */
     public String getThemeId()
     {
         return context.getThemeId();
     }
     
+    /**
+     * Gets the theme.
+     * 
+     * @return the theme
+     */
     public ScriptModelObject getTheme()
     {
         if (scriptThemeObject == null)
@@ -146,6 +213,11 @@ public final class ScriptRequestContext extends ScriptBase
         return scriptThemeObject;
     }
     
+    /**
+     * Gets the user.
+     * 
+     * @return the user
+     */
     public ScriptUser getUser()
     {
         if (scriptUser == null)
@@ -158,5 +230,30 @@ public final class ScriptRequestContext extends ScriptBase
         }
         
         return scriptUser;
-    }   
+    } 
+    
+    /**
+     * Returns whether the current user is authenticated
+     * If there is no curren tuesr, this will return false.
+     * 
+     * @return whether the user is authenticated
+     */
+    public boolean getAuthenticated()
+    {
+        return AuthenticationUtil.isAuthenticated(getHttpServletRequest());           
+    }
+    
+    /**
+     * Gets the link builder helper object
+     * 
+     * @return the link builder
+     */
+    public ScriptLinkBuilder getLinkBuilder()
+    {
+        if (scriptLinkBuilder == null)
+        {
+            scriptLinkBuilder = new ScriptLinkBuilder(context);         
+        }
+        return scriptLinkBuilder;
+    }
 }

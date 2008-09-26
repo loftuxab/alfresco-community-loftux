@@ -165,7 +165,7 @@ public class EndPointProxyServlet extends HttpServlet
                      descriptor.getIdentity() == IdentityType.DECLARED)
             {
                 // build an unauthenticated/predeclared authentication connector
-                connector = this.connectorService.getConnector(endpointId);
+                connector = this.connectorService.getConnector(endpointId, req.getSession());                
             }
             else if (descriptor.getBasicAuth())
             {

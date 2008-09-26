@@ -185,7 +185,7 @@ public final class RendererFactory
      * @param context the context
      * @param templateType the template type
      * 
-     * @return the renderer isntance
+     * @return the renderer instance
      * 
      * @throws RendererNotFoundException
      */

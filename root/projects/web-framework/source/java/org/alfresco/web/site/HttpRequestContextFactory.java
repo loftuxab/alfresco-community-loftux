@@ -24,11 +24,9 @@
  */
 package org.alfresco.web.site;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Enumeration;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,8 +37,6 @@ import org.alfresco.web.framework.exception.WebFrameworkServiceException;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.alfresco.web.site.exception.UserFactoryException;
-import org.alfresco.web.site.filesystem.FileSystemManager;
-import org.alfresco.web.site.filesystem.IFileSystem;
 
 /**
  * Produces HttpRequestContext instances for HttpServletRequest request
@@ -91,11 +87,7 @@ public class HttpRequestContextFactory implements RequestContextFactory
             
             // Bind the model into the requestcontext
             initModel(context, (HttpServletRequest) request);
-            
-            // Initialize the file system
-            String rootPath = context.getConfig().getFileSystemDescriptor("local").getRootPath();
-            initFileSystem(context, (HttpServletRequest)request, rootPath);
-            
+
             /**
              * Execute the configured page mapper
              * 
@@ -119,26 +111,6 @@ public class HttpRequestContextFactory implements RequestContextFactory
         }
         
         return context;
-    }
-
-    /**
-     * Creates a FileSystem that points to the local web application root.
-     * 
-     * @param context
-     * @param request
-     * @param rootPath
-     */
-    public void initFileSystem(RequestContext context,
-            HttpServletRequest request, String rootPath)
-    {
-        ServletContext servletContext = request.getSession().getServletContext();
-        String realPath = servletContext.getRealPath(rootPath);
-
-        // the file system manager takes care to make sure that if this
-        // file system has already been loaded, it will be reused
-        File dir = new File(realPath);
-        IFileSystem fileSystem = FileSystemManager.getLocalFileSystem(dir);
-        context.setFileSystem(fileSystem);
     }
     
     /**

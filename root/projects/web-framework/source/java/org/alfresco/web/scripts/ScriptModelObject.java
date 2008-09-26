@@ -122,23 +122,51 @@ public final class ScriptModelObject extends ScriptBase
     // --------------------------------------------------------------
     // JavaScript Properties
     
+    /**
+     * Gets the id.
+     * 
+     * @return the id
+     */
     public String getId()
     {
         return modelObject.getId();
     }
     
-    // allows for the id to be changed
-    // this is essential for dynamic website
+    /**
+     * Sets the id.
+     * 
+     * @param id the new id
+     */
     public void setId(String id)
     {
         ModelHelper.resetId(modelObject, id);        
     }
     
+    /**
+     * Gets the type id for the underlying model object
+     * 
+     * @return the type id
+     */
+    public String getTypeId()
+    {
+        return this.modelObject.getTypeId();
+    }    
+    
+    /**
+     * Gets the title.
+     * 
+     * @return the title
+     */
     public String getTitle()
     {
         return modelObject.getTitle();
     }
     
+    /**
+     * Sets the title.
+     * 
+     * @param value the new title
+     */
     public void setTitle(Serializable value)
     {
         if(value != null)
@@ -151,11 +179,21 @@ public final class ScriptModelObject extends ScriptBase
         }
     }
     
+    /**
+     * Gets the description.
+     * 
+     * @return the description
+     */
     public String getDescription()
     {
         return modelObject.getDescription();
     }
     
+    /**
+     * Sets the description.
+     * 
+     * @param value the new description
+     */
     public void setDescription(Serializable value)
     {
         if(value != null)
@@ -168,16 +206,31 @@ public final class ScriptModelObject extends ScriptBase
         }
     }
     
+    /**
+     * Gets the timestamp.
+     * 
+     * @return the timestamp
+     */
     public long getTimestamp()
     {
         return modelObject.getModificationTime();
     }
     
+    /**
+     * Gets the persister id.
+     * 
+     * @return the persister id
+     */
     public String getPersisterId()
     {
         return modelObject.getPersisterId();
     }
     
+    /**
+     * Gets the storage path.
+     * 
+     * @return the storage path
+     */
     public String getStoragePath()
     {
         return modelObject.getStoragePath();
@@ -212,6 +265,9 @@ public final class ScriptModelObject extends ScriptBase
         context.getModel().removeObject(modelObject);
     }
     
+    /**
+     * Deletes the object
+     */
     public void delete()
     {
         remove();
@@ -228,7 +284,8 @@ public final class ScriptModelObject extends ScriptBase
     }
     
     /**
-     * Touch.
+     * Touches the object.
+     * This set its timestamp to the current time.
      */
     public void touch()
     {
