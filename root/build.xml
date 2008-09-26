@@ -205,7 +205,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/odmg-3.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/pdfbox-0.7.3.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/PDFRenderer.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/poi-3.0.2.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/poi-3.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/portlet-api-lib.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/quartz-1.6.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/resolver.jar" />
