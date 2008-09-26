@@ -2,7 +2,7 @@
 <#assign DISPLAY_ITEMS = 5>
 <#assign target="_new">
 
-<div class="dashlet">
+<div class="dashlet cmis">
    <div class="title">${msg("label.title")}</div>
    <div class="body scrollableList" id="${args.htmlid}-scrollableList">
    

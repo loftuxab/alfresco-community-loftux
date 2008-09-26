@@ -381,14 +381,25 @@
             failureCallback: {
                fn: function()
                {
+                  // Hide spinner
+                  this.widgets.feedbackMessage.destroy();
+
                   // Enable the buttons again
                   this.widgets.saveButton.set("disabled", false);
                   this.widgets.cancelButton.set("disabled", false);
-
                },
                scope: this
             }
-         });         
+         });
+
+         // Display a spinning save message to the user
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.saving", this.name),
+            spanClass: "wait",
+            displayTime: 0
+         });
+         
       },
 
       /**

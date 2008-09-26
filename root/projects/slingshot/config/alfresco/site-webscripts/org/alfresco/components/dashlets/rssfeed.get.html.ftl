@@ -8,7 +8,7 @@
       "limit": "<#if limit?number != DISPLAY_ITEMS>${limit}<#else>all</#if>"      
    });
 //]]></script>
-<div class="dashlet">
+<div class="dashlet rssfeed">
    <div class="title">${title!msg("label.header")}</div>
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-configFeed-link">${msg("label.configure")}</a>

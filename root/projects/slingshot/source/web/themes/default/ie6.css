@@ -24,6 +24,27 @@
    margin-left: -4px;
 }
 
+/* These messages/dialogs was getting full width if none was specified */
+
+.yui-skin-default #prompt
+{
+   width: 400px;
+}
+
+.yui-skin-default #message
+{
+   width: 400px;
+}
+/**
+ * Dashlets
+ */
+
+/* Some dashlets with css float in the body lost their border */
+div.dashlet .body .clear
+{
+   clear: both;
+   height: 1px;
+}
 
 /**
  * Page title and navigation
@@ -189,6 +210,14 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    padding-bottom: 2em;
 }
 
+.doclist a.action-link,
+.doclist a.simple-link,
+.doclist a.show-more
+{
+   height:16px;
+   width: 1px;
+}
+
 /**
  * Profile
  */
@@ -196,3 +225,18 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 {
    height: 1.2em;
 }
+
+/**
+ * Padding to some of the dashetls
+ */
+
+div.dashlet.site-profile div.body,
+div.dashlet.wiki div.body,
+div.dashlet.cmis div.body div,
+div.dashlet.rssfeed div.body,
+div.dashlet.calendar div.body
+{                          
+   padding-left:8px;
+   padding-right:8px;
+}
+

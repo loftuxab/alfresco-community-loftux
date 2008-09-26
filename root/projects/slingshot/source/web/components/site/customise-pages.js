@@ -163,7 +163,7 @@
             YAHOO.util.Event.addListener(this.id + "-remove-link-" + pageId, "click", this.onRemoveButtonClick,
             {
                selectedPageId: pageId,
-               componentScope: this
+               thisComponent: this
             });
 
             // Save references and listen to clicks on each select button
@@ -305,6 +305,9 @@
             failureCallback: {
                fn: function()
                {
+                  // Hide spinner
+                  this.widgets.feedbackMessage.destroy();
+                  
                   // Enable the buttons again
                   this.widgets.saveButton.set("disabled", false);
                   this.widgets.cancelButton.set("disabled", false);
@@ -312,6 +315,15 @@
                scope: this
             }
          });
+
+         // Display a spinning save message to the user 
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.saving", this.name),
+            spanClass: "wait",
+            displayTime: 0
+         });
+
       },
 
       /**
