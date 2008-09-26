@@ -50,13 +50,8 @@
       			<page-instance-id>slingshot-logout</page-instance-id>
       		</page-type>
          </application-defaults>
-         
-         <!-- persister config - override delay in seconds between checks -->
-			<persisters>
-			   <cache-check-delay>600</cache-check-delay>
-			</persisters>
 			
-			<!-- object model - override to set default store ID to remote stores -->
+			<!-- object model - override to set default store ID to remote store -->
 			<model-type>
 				<id>chrome</id>
 				<version>1.0</version>

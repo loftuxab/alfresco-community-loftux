@@ -67,10 +67,12 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
      * 
      * @param typeId the type id
      * @param store the store
+     * @param cache             true to cache model objects, false to look them up fresh every time
+     * @param cacheCheckDelay   delay in seconds between checking last modified date of cached items 
      */
-    public RemoteStoreModelObjectPersister(String typeId, Store store, int delay)
+    public RemoteStoreModelObjectPersister(String typeId, Store store, boolean cache, int delay)
     {
-        super(typeId, store, delay);
+        super(typeId, store, cache, delay);
         
         if (store instanceof RemoteStore == false)
         {

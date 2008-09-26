@@ -66,6 +66,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected String defaultSiteConfiguration = null;
     
     protected Integer persisterCacheCheckDelay = null;
+    protected Boolean persisterCacheEnabled = null;
 
     protected String rootPath;
 
@@ -203,7 +204,13 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         {
             combinedElement.persisterCacheCheckDelay = configElement.persisterCacheCheckDelay;
         }
-
+        
+        combinedElement.persisterCacheEnabled = this.persisterCacheEnabled;
+        if(configElement.persisterCacheEnabled != null)
+        {
+            combinedElement.persisterCacheEnabled = configElement.persisterCacheEnabled;
+        }
+        
         return combinedElement;
     }
 
@@ -447,6 +454,18 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         else
         {
             return 0;
+        }
+    }
+    
+    public boolean getPersisterCacheEnabled()
+    {
+        if (persisterCacheEnabled != null)
+        {
+            return persisterCacheEnabled.booleanValue();
+        }
+        else
+        {
+            return true;
         }
     }
 
@@ -766,6 +785,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         private static final String VERSION = "version";
         private static final String SEARCH_PATH_ID = "search-path-id";
         private static final String DEFAULT_STORE_ID = "default-store-id";
+        private static final String CACHE_ENABLED = "cache-enabled";
         private static final String CACHE_CHECK_DELAY = "cache-check-delay";
 
         TypeDescriptor(Element el)
@@ -800,6 +820,16 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         public String getDefaultStoreId() 
         {
             return getStringProperty(DEFAULT_STORE_ID);
+        }
+        public Boolean getCacheEnabled()
+        {
+            Boolean enabled = null;
+            String value = getStringProperty(CACHE_ENABLED);
+            if (value != null && value.length() != 0)
+            {
+                enabled = Boolean.parseBoolean(value);
+            }
+            return enabled;
         }
         public Integer getCacheCheckDelay()
         {
@@ -1061,6 +1091,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         Element persisterElement = elem.element("persisters");
         if (persisterElement != null)
         {
+            if (persisterElement.element("cache-enabled") != null)
+            {
+                configElement.persisterCacheEnabled = Boolean.valueOf(
+                        persisterElement.elementTextTrim("cache-enabled"));
+            }
             if (persisterElement.element("cache-check-delay") != null)
             {
                 configElement.persisterCacheCheckDelay = Integer.valueOf(

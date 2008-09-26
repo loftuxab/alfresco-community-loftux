@@ -63,6 +63,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
     
     protected String id;
+    protected final boolean cache;
     protected final long delay;
     protected final Store store;
     protected final Map<String, ModelObjectCache> objectCaches;
@@ -73,11 +74,13 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      * 
      * @param store             the store
      * @param objectTypeId      the object type id
+     * @param cache             true to cache model objects, false to look them up fresh every time
      * @param cacheCheckDelay   delay in seconds between checking last modified date of cached items 
      */
-    public StoreModelObjectPersister(String objectTypeId, Store store, int cacheCheckDelay)
+    public StoreModelObjectPersister(String objectTypeId, Store store, boolean cache, int cacheCheckDelay)
     {
         super(objectTypeId);
+        this.cache = cache;
         this.delay = (cacheCheckDelay * 1000L);
         this.store = store;
         this.id = "Store_" + this.store.getBasePath() + "_" + this.objectTypeId;
@@ -99,7 +102,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         throws ModelObjectPersisterException    
     {
         ModelObject modelObject = null;
-        if(objectId != null)
+        if (objectId != null)
         {
             String path = idToPath(objectId);
             modelObject = getObjectByPath(context, path);
@@ -437,7 +440,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public long getTimestamp(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
-        if(objectId == null)
+        if (objectId == null)
         {
             throw new ModelObjectPersisterException("Cannot check timestamp for null object id");
         }
@@ -463,7 +466,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         {
             return this.store.lastModified(path);
         }
-        catch(IOException ioe)
+        catch (IOException ioe)
         {
             throw new ModelObjectPersisterException("Unable to check timestamp for object path: " + path, ioe);
         }    
@@ -514,7 +517,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     protected ModelObject cacheGet(ModelPersistenceContext context, String path)
     {
-        return getCache(context).get(path);
+        return this.cache ? getCache(context).get(path) : null;
     }
     
     /**
@@ -525,8 +528,11 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     protected void cachePut(ModelPersistenceContext context, ModelObject obj)
     {
-        String path = idToPath(obj.getId());
-        cachePut(context, path, obj);
+        if (this.cache)
+        {
+            String path = idToPath(obj.getId());
+            cachePut(context, path, obj);
+        }
     }
     
     /**
@@ -538,10 +544,13 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     protected void cachePut(ModelPersistenceContext context, String path, ModelObject obj)
     {
-        if(logger.isDebugEnabled())
-            logger.debug("Put into cache: " + path);
-        
-        getCache(context).put(path, obj);
+        if (this.cache)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Put into cache: " + path);
+            
+            getCache(context).put(path, obj);
+        }
     }
 
     /**
@@ -552,10 +561,13 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     protected void cacheRemove(ModelPersistenceContext context, String path)
     {
-        if(logger.isDebugEnabled())
-            logger.debug("Remove from cache: " + path);
-        
-        getCache(context).remove(path);
+         if (this.cache)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Remove from cache: " + path);
+            
+            getCache(context).remove(path);
+        }
     }
 
     @Override
