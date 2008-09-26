@@ -32,5 +32,6 @@ new Alfresco.UserWelcome("${args.htmlid}");
          <div>${msg("text.createSite")}</div>
          <div><a id="${args.htmlid}-createSite-button" href="#">${msg("link.createSite")}</a></div>
       </div>
+      <div class="clear"></div>
    </div>
 </div>

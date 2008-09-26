@@ -5,7 +5,7 @@
    <div class="title">${msg("header.docSummary")}</div>
    <div class="body scrollableList">
       <#if docs.message?exists>
-         <span class="error">${docs.message}</span>
+         <div class="error">${docs.message}</div>
       <#else>
          <#if docs.items?size == 0>
             <div>${msg("label.noItems")}</div>

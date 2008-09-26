@@ -1,4 +1,4 @@
-<div class="dashlet">
+<div class="dashlet site-profile">
    <div class="title">${msg("header.siteProfile")}</div>
    <div class="body">
       <div class="msg">
@@ -22,5 +22,6 @@
 </#if>
          </p>
       </div>
+      <div class="clear"></div>
    </div>
 </div>

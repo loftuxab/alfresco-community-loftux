@@ -25,18 +25,18 @@
 
 .editBlogPostForm .yui-editor-container
 {
-  margin: 0px 0px 10px 114px;
+  margin: 0 0 10px 114px;
 }
 
 .editBlogPostForm .nodeFormAction
 {
-  margin: 25px 0 10px 115px;
+  margin: 0 0 10px 115px;
 }
 
 /* Tag lib */
 .editBlogPostForm .taglibrary
 {
-  margin-bottom : 10px;
+  margin-bottom : 0px;
   margin-left : 115px;	
 }
 

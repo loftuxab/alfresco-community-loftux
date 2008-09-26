@@ -21,7 +21,7 @@
             <h4>${msg("header.customiseSite")}</h4>
             <div>${msg("text.customiseSite")}</div>
             <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site">${msg("link.customiseSite")}</a></div>
-         </div>         
+         </div>
       <#else>
          <div class="detail-list-item">
             <h4>${msg("header.siteMembers")}</h4>
@@ -39,5 +39,6 @@
             <div><a href="http://www.alfresco.com/help/3/Tutorial" target="_new">${msg("link.featureTour")}</a></div>
          </div>
       </#if>
+      <div class="clear"></div>
    </div>                                                    
 </div>
