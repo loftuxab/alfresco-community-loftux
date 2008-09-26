@@ -25,6 +25,8 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +51,9 @@ public class DeclarativeWebScript extends AbstractWebScript
     // Script Context
     private String basePath;
     private Map<String, ScriptContent> scripts = new HashMap<String, ScriptContent>();
-    private ReentrantReadWriteLock scriptLock = new ReentrantReadWriteLock(); 
+    private ReentrantReadWriteLock scriptLock = new ReentrantReadWriteLock();
+    
+    private static final ScriptContent NULLSENTINEL = new NullScriptContent();
     
 
     /* (non-Javadoc)
@@ -311,7 +315,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                 // Upgrade read lock to write lock
                 scriptLock.readLock().unlock();
                 scriptLock.writeLock().lock();
-
+                
                 try
                 {
                     // Check again
@@ -338,7 +342,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                             }
                         }
                         
-                        // fall-back to default
+                        // fall-back to default script
                         if (script == null)
                         {
                             script = getContainer().getScriptProcessor().findScript(basePath + ".js");
@@ -347,7 +351,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                         if (logger.isDebugEnabled())
                             logger.debug("Caching script " + ((script == null) ? "null" : script.getPathDescription()) + " for web script " + basePath + " and request mimetype " + ((mimetype == null) ? "null" : mimetype));
                         
-                        scripts.put(key, script);
+                        scripts.put(key, script != null ? script : NULLSENTINEL);
                     }
                 }
                 finally
@@ -357,7 +361,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                     scriptLock.writeLock().unlock();
                 }
             }
-            return script;
+            return script != NULLSENTINEL ? script : null;
         }
         finally
         {
@@ -365,4 +369,37 @@ public class DeclarativeWebScript extends AbstractWebScript
         }
     }
     
+    
+    /**
+     * Sentinel object used when a cached ScriptContent value of 'null' is placed in the mimetype->script cache. 
+     * 
+     * @author Kevin Roast
+     */
+    private static class NullScriptContent implements ScriptContent
+    {
+        public InputStream getInputStream()
+        {
+            return null;
+        }
+
+        public String getPath()
+        {
+            return null;
+        }
+
+        public String getPathDescription()
+        {
+            return null;
+        }
+
+        public Reader getReader()
+        {
+            return null;
+        }
+
+        public boolean isSecure()
+        {
+            return false;
+        }
+    }
 }
