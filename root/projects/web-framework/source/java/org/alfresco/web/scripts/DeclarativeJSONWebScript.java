@@ -46,9 +46,6 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
 {
     protected static final Log logger = LogFactory.getLog(DeclarativeJSONWebScript.class);
 
-    protected String basePath;
-    protected ScriptContent executeScript;
-
     /**
      * Instantiates a new declarative json web script.
      */
@@ -56,22 +53,6 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     {
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.scripts.AbstractWebScript#init(org.alfresco.web.scripts.WebScriptRegistry)
-     */
-    @Override
-    public void init(Container container, Description description)
-    {
-        super.init(container, description);
-
-        // Test for "execute" script
-        basePath = getDescription().getId();
-        String scriptPath = basePath + ".js";
-        executeScript = container.getScriptProcessor().findScript(scriptPath);
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -107,10 +88,11 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
             model.put("cache", cache);
 
             // execute script if it exists
+            ScriptDetails executeScript = getExecuteScript(req.getContentType());
             if (executeScript != null)
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Executing script " + executeScript.getPathDescription());
+                    logger.debug("Executing script " + executeScript.getContent().getPathDescription());
 
                 Map<String, Object> scriptModel = createScriptParameters(req,
                         res, model);
@@ -118,7 +100,7 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
                 // model
                 Map<String, Object> returnModel = new HashMap<String, Object>(8, 1.0f);
                 scriptModel.put("model", returnModel);
-                executeScript(executeScript, scriptModel);
+                executeScript(executeScript.getContent(), scriptModel);
                 mergeScriptModelIntoTemplateModel(returnModel, model);
             }
 
@@ -306,7 +288,7 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
              * Otherwise, process as before
              */
             format = (format == null) ? "" : format;
-            String templatePath = basePath + "." + format + ".ftl";
+            String templatePath = getDescription().getId() + "." + format + ".ftl";
 
             if (logger.isDebugEnabled())
                 logger.debug("Rendering template '" + templatePath + "'");

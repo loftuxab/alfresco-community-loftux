@@ -1,0 +1,1 @@
+model.entry = entry;

@@ -59,7 +59,9 @@
    <!--                      -->
 
    <!--  Format Registry -->
-   <bean id="webscripts.formatregistry" class="org.alfresco.web.scripts.FormatRegistry" />
+   <bean id="webscripts.formatregistry" class="org.alfresco.web.scripts.FormatRegistry">
+   	  <property name="defaultReader"><bean class="org.alfresco.web.scripts.RequestReader"/></property>
+   </bean>
 
    <!--  Format Map -->
    <bean id="webscripts.formatmap" class="org.alfresco.web.scripts.FormatMap" abstract="true">
@@ -280,7 +282,7 @@
               <bean class="org.alfresco.web.scripts.ScriptRemote">
                  <property name="connectorService" ref="connector.service"/>
                  <property name="configService" ref="web.config"/>
-              </bean>
+   </bean>
            </entry>         
          </map>
       </property>

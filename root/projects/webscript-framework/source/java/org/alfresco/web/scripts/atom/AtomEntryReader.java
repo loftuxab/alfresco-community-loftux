@@ -92,20 +92,8 @@ public class AtomEntryReader implements FormatReader<Entry>
     public Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res)
     {
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("entry", req.parseContent());
+        params.put("entry", read(req));
         params.put("slug", req.getHeader("Slug"));
         return params;
     }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.FormatReader#createTemplateParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
-     */
-    public Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res)
-    {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("entry", req.parseContent());
-        params.put("slug", req.getHeader("Slug"));
-        return params;
-    }
-
 }

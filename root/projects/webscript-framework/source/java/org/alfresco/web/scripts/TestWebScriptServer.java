@@ -430,7 +430,6 @@ public class TestWebScriptServer implements ApplicationContextAware
         }
         
         else if (command[0].equals("get") ||
-                 command[0].equals("put") ||
                  command[0].equals("delete"))
         {
             String uri = (command.length > 1) ? command[1] : null;

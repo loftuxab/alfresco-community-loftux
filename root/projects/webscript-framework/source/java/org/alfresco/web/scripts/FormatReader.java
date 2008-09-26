@@ -65,14 +65,4 @@ public interface FormatReader<Type>
      * @return  map of script objects indexed by name
      */
     public Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res);
-    
-    /**
-     * Create template parameters specific to source mimetype
-     * 
-     * @param req  web script request
-     * @param res  web script response
-     * @return  map of template objects indexed by name
-     */
-    public Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res);
-
 }

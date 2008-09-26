@@ -76,16 +76,9 @@ public class FormDataReader implements FormatReader<FormData>
     public Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res)
     {
         Map<String, Object> params = new HashMap<String, Object>();
+        // Because form data is 'special', the request may have already parsed
+        // it, so ask the request for the cached content
         params.put("formdata", req.parseContent());
         return params;
     }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.FormatReader#createTemplateParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
-     */
-    public Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res)
-    {
-        return Collections.emptyMap();
-    }
-
 }
