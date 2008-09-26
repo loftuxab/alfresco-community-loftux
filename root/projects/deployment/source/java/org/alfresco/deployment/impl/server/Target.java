@@ -378,28 +378,32 @@ public class Target implements Serializable
         {
         	Path path = new Path(file.getPath());
         	Path parent = path.getParent();
-        	String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME + CLONE;
+        	String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME;        	
 
         	if(! mdName.equals(currentmd))
         	{
         		if(md != null)
         		{   
-        			// save the old directory before we replace it with a new one.
-        			putDirectory(currentmd, md);
+        			// save the previous directory before we replace it with a new one.
+        			putDirectory(currentmd + CLONE, md);
         		} 
         		
         		File metaFile = new File(mdName);
+        		File cloneFile = new File(mdName + CLONE);
         		File parentDir = new File(metaFile.getParent());
         		
-                parentDir.mkdirs();
-
-                if (!metaFile.exists())
+        		if(cloneFile.exists())
+        		{
+        			 md = getDirectory(cloneFile.getPath());
+        		}
+        		else if (metaFile.exists())
                 {
-                    md = new DirectoryMetaData();
+                    md = getDirectory(metaFile.getPath());
                 }
                 else
                 {
-                    md = getDirectory(mdName);
+                    parentDir.mkdirs();
+                	md = new DirectoryMetaData();
                 }      		
             	currentmd = mdName;
         	}
@@ -437,7 +441,6 @@ public class Target implements Serializable
                                                              FileType.DELETED,
                                                              null);
             		md.remove(toRemove);
-            		//md.add(toRemove);
             		break;
             	}
             	case SETGUID :
@@ -463,9 +466,11 @@ public class Target implements Serializable
             	}
         	} // end of switch
         }
+        
+        // Now write the last directory
 		if(md != null)
 		{
-			putDirectory(currentmd, md);
+			putDirectory(currentmd + CLONE, md);
 		}
     }
 
@@ -551,34 +556,7 @@ public class Target implements Serializable
             
             File clone = new File(path + CLONE);
             clone.renameTo(original);
-            
-//            DirectoryMetaData md = getDirectory(path + CLONE);
-//            List<FileDescriptor> toDelete = new ArrayList<FileDescriptor>();
-//            SortedSet<FileDescriptor> mdListing = md.getListing();
-//            for (FileDescriptor file : mdListing)
-//            {
-//                if (file.getType() == FileType.DELETED)
-//                {
-//                    toDelete.add(file);
-//                }
-//                else if (file.getType() == FileType.DIR)
-//                {
-//                    continue;
-//                }
-//                File mdDir = new File(path + File.separatorChar + file.getName());
-//                if (mdDir.exists())
-//                {
-//                    Deleter.Delete(mdDir);
-//                }
-//            }
-//            for (FileDescriptor file : toDelete)
-//            {
-//                md.remove(file);
-//            }
-//            putDirectory(path, md);
-              old.delete();
-//            File clone = new File(path + CLONE);
-//            clone.delete();
+            old.delete();
         }
     }
 
