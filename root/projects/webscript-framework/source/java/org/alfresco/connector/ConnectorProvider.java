@@ -26,6 +26,10 @@ package org.alfresco.connector;
 
 /**
  * Contract to be implemented by any object that can provide a Connector to another object.
+ * <p>
+ * Connectors are quite expensive to instantiate and obtain. Therefore this contract is
+ * generally used where you want to lazily provide a connector in a situation where it is
+ * not know if a connector is actually required (maybe due to caching etc.) until runtime.
  * 
  * @author Kevin Roast
  */

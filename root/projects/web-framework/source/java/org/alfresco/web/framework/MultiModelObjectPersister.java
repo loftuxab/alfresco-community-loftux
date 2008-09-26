@@ -59,7 +59,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         this.service = service;
         this.persisters = persisters;
         
-        if(logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
             logger.debug("MultiModelObjectPersister loaded with persisters: " + persisters);
     }
     

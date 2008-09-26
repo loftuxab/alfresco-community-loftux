@@ -111,8 +111,12 @@
 
 			<!-- persister config -->
 			<persisters>
+			   <!-- setting to enable the model object caching -->
+			   <!-- same setting can be overriden below on a per model-type basis -->
+			   <cache-enabled>true</cache-enabled>
+			   
 			   <!-- delay in seconds between checking store caches are dirty -->
-			   <!-- can be overriden below on a per model-type basis -->
+			   <!-- same setting can be overriden below on a per model-type basis -->
 			   <cache-check-delay>60</cache-check-delay>
 			</persisters>
 
@@ -126,7 +130,9 @@
 				<class>org.alfresco.web.framework.model.Chrome</class>
 				<search-path-id>webframework.searchpath.chrome</search-path-id>
 				<default-store-id>webframework.localstore.chrome</default-store-id>
-				<!-- store cache check override example -->
+				<!-- store model object caching override example -->
+				<!--<cache-enabled>false</cache-enabled>-->
+				<!-- store cache dirty check override example -->
 				<!--<cache-check-delay>10</cache-check-delay>-->
 			</model-type>
 			<model-type>

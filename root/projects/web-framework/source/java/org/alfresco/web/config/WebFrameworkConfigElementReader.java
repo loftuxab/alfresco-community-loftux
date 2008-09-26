@@ -30,7 +30,7 @@ import org.dom4j.Element;
 
 /**
  * Responsible for loading Web Framework configuration settings from
- * the web-site-config*.xml files that are loaded via the configuration
+ * the web-framework-config*.xml files that are loaded via the configuration
  * service.
  * 
  * @author muzquiano
@@ -50,7 +50,7 @@ public class WebFrameworkConfigElementReader implements ConfigElementReader
    public ConfigElement parse(Element elem)
    {
 	   ConfigElement configElement = null;
-	   if(elem != null)
+	   if (elem != null)
 	   {
 		   configElement = WebFrameworkConfigElement.newInstance(elem);
 	   }

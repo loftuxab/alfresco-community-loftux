@@ -162,24 +162,27 @@ public abstract class AbstractWebScript implements WebScript
                 // TODO: add improved locale resolution support (from java ResourceBundle code path?)
                 //       i.e. <descid><locale>.properties = mywebscript_en_US.properties
                 // For now we perform the following technique:
-                //  1. lookup <descid><language_country_variant>.properties if fail then
-                //  2. lookup <descid><language_country>.properties if fail then
-                //  3. lookup <descid><language>.properties if fail then
-                //  4. lookup <descid>.properties
+                //  1. lookup <descid><language_country>.properties if fail then
+                //  2. lookup <descid><language>.properties if fail then
+                //  3. lookup <descid>.properties
                 try
                 {
                     String webscriptId = getDescription().getId();
-                    String resourcePath = webscriptId + '_' + locale.toString() + ".properties";
-                    if (container.getSearchPath().hasDocument(resourcePath))
+                    String localePath = webscriptId + '_' + locale.toString() + ".properties";
+                    if (container.getSearchPath().hasDocument(localePath))
                     {
-                        result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                        result = new PropertyResourceBundle(container.getSearchPath().getDocument(localePath));
                     }
                     else
                     {
-                        resourcePath = webscriptId + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".properties";
-                        if (container.getSearchPath().hasDocument(resourcePath))
+                        // it's quite likely that the first contructed path will be the same as locale.toString()
+                        String resourcePath = webscriptId + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".properties";
+                        if (resourcePath.equals(localePath) == false)
                         {
-                            result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                            if (container.getSearchPath().hasDocument(resourcePath))
+                            {
+                                result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                            }
                         }
                         else
                         {
@@ -611,7 +614,8 @@ public abstract class AbstractWebScript implements WebScript
                         }
                         
                         if (logger.isDebugEnabled())
-                            logger.debug("Caching template " + statusTemplate.path + " for web script " + scriptId + " and status " + statusCode + " (format: " + format + ")");
+                            logger.debug("Caching template " + statusTemplate.path + " for web script " + scriptId +
+                                         " and status " +statusCode + " (format: " + format + ")");
                         
                         statusTemplates.put(key, statusTemplate);
                     }
@@ -797,6 +801,7 @@ public abstract class AbstractWebScript implements WebScript
         return this.basePath;
     }
     
+    
     /**
 	 * The combination of a ScriptContent and a request MIME type. Records the
 	 * most specific request MIME type expected by a script (according to its
@@ -804,11 +809,13 @@ public abstract class AbstractWebScript implements WebScript
 	 * of parsing should be done on the request (i.e. what kind of FormatReader
 	 * should be invoked to get extra script parameters).
 	 */    
-    protected static class ScriptDetails {
+    protected static class ScriptDetails
+    {
 		private final ScriptContent content;
 		private final String requestType;
 
-		private ScriptDetails(ScriptContent content, String requestType) {
+		private ScriptDetails(ScriptContent content, String requestType)
+        {
 			this.content = content;
 			this.requestType = requestType;
 		}
@@ -816,17 +823,18 @@ public abstract class AbstractWebScript implements WebScript
 		/**
 		 * @return the content
 		 */
-		public ScriptContent getContent() {
+		public ScriptContent getContent()
+        {
 			return content;
 		}
 
 		/**
 		 * @return the requestType
 		 */
-		public String getRequestType() {
+		public String getRequestType()
+        {
 			return requestType;
 		}
-
 	}
 
 

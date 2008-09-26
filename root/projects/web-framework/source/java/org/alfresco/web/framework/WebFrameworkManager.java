@@ -259,7 +259,14 @@ public class WebFrameworkManager implements ApplicationContextAware
             Store defaultStore = (Store) getApplicationContext().getBean(descriptor.getDefaultStoreId());
             boolean addedDefaultStore = false;
             
-            // cache check delay settings (can override default per store)
+            // cache enabled setting (can override default per store)
+            boolean cache = wfConfig.getPersisterCacheEnabled();
+            if (descriptor.getCacheEnabled() != null)
+            {
+                cache = descriptor.getCacheEnabled();
+            }
+            
+            // cache check delay setting (can override default per store)
             int delay = wfConfig.getPersisterCacheCheckDelay();
             if (descriptor.getCacheCheckDelay() != null)
             {
@@ -280,11 +287,11 @@ public class WebFrameworkManager implements ApplicationContextAware
                 ModelObjectPersister persister = null;
                 if (store instanceof RemoteStore)
                 {
-                    persister = new RemoteStoreModelObjectPersister(typeIds[i], store, delay);
+                    persister = new RemoteStoreModelObjectPersister(typeIds[i], store, cache, delay);
                 }
                 else
                 {
-                    persister = new StoreModelObjectPersister(typeIds[i], store, delay);
+                    persister = new StoreModelObjectPersister(typeIds[i], store, cache, delay);
                 }
                 persisters.put(persister.getId(), persister);
                 
