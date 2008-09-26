@@ -25,12 +25,9 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,37 +43,7 @@ import org.apache.commons.logging.LogFactory;
 public class DeclarativeWebScript extends AbstractWebScript 
 {
     // Logger
-    private static final Log logger = LogFactory.getLog(DeclarativeWebScript.class);
-
-    // Script Context
-    private String basePath;
-    private Map<String, ScriptContent> scripts = new HashMap<String, ScriptContent>();
-    private ReentrantReadWriteLock scriptLock = new ReentrantReadWriteLock();
-    
-    private static final ScriptContent NULLSENTINEL = new NullScriptContent();
-    
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.AbstractWebScript#init(org.alfresco.web.scripts.WebScriptRegistry)
-     */
-    @Override
-    public void init(Container container, Description description)
-    {
-        super.init(container, description);
-
-        // clear scripts to format map
-        this.scriptLock.writeLock().lock();
-        try
-        {
-            this.scripts.clear();
-        }
-        finally
-        {
-            this.scriptLock.writeLock().unlock();
-        }
-        
-        basePath = getDescription().getId();
-    }
+    private static final Log logger = LogFactory.getLog(DeclarativeWebScript.class);  
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScript#execute(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
@@ -107,17 +74,18 @@ public class DeclarativeWebScript extends AbstractWebScript
             model.put("cache", cache);
             
             // execute script if it exists
-            ScriptContent script = getExecuteScript(req.getContentType());
+            ScriptDetails script = getExecuteScript(req.getContentType());
             if (script != null)
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Executing script " + script.getPathDescription());
+                    logger.debug("Executing script " + script.getContent().getPathDescription());
                 
                 Map<String, Object> scriptModel = createScriptParameters(req, res, model);
+                                                
                 // add return model allowing script to add items to template model
                 Map<String, Object> returnModel = new HashMap<String, Object>(8, 1.0f);
                 scriptModel.put("model", returnModel);
-                executeScript(script, scriptModel);
+                executeScript(script.getContent(), scriptModel);
                 mergeScriptModelIntoTemplateModel(returnModel, model);
             }
     
@@ -276,130 +244,12 @@ public class DeclarativeWebScript extends AbstractWebScript
     final protected void renderFormatTemplate(String format, Map<String, Object> model, Writer writer)
     {
         format = (format == null) ? "" : format;
-        String templatePath = basePath + "." + format + ".ftl";
+        String templatePath = getDescription().getId() + "." + format + ".ftl";
 
         if (logger.isDebugEnabled())
             logger.debug("Rendering template '" + templatePath + "'");
 
         renderTemplate(templatePath, model, writer);
     }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return this.basePath;
-    }
-
-    /**
-     * Find execute script for given request format
-     * 
-     * Note: This method caches the script to request format mapping
-     * 
-     * @param mimetype
-     * @return  execute script
-     */
-    private ScriptContent getExecuteScript(String mimetype)
-    {
-        ScriptContent script = null;
-        scriptLock.readLock().lock();
-
-        try
-        {
-            String key = (mimetype == null) ? "<UNKNOWN>" : mimetype;
-            script = scripts.get(key);
-            if (script == null)
-            {
-                // Upgrade read lock to write lock
-                scriptLock.readLock().unlock();
-                scriptLock.writeLock().lock();
-                
-                try
-                {
-                    // Check again
-                    script = scripts.get(key);
-                    if (script == null)
-                    {
-                        // Locate script in web script store
-                        String format = getContainer().getFormatRegistry().getFormat(null, mimetype);
-                        if (format != null)
-                        {
-                            script = getContainer().getScriptProcessor().findScript(basePath + "." + format + ".js");
-                            if (script == null)
-                            {
-                                // generalize mimetype if possible
-                                String generalizedMimetype = getContainer().getFormatRegistry().generalizeMimetype(mimetype);
-                                if (generalizedMimetype != null)
-                                {
-                                    format = getContainer().getFormatRegistry().getFormat(null, generalizedMimetype);
-                                    if (format != null)
-                                    {
-                                        script = getContainer().getScriptProcessor().findScript(basePath + "." + format + ".js");
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // fall-back to default script
-                        if (script == null)
-                        {
-                            script = getContainer().getScriptProcessor().findScript(basePath + ".js");
-                        }
-                        
-                        if (logger.isDebugEnabled())
-                            logger.debug("Caching script " + ((script == null) ? "null" : script.getPathDescription()) + " for web script " + basePath + " and request mimetype " + ((mimetype == null) ? "null" : mimetype));
-                        
-                        scripts.put(key, script != null ? script : NULLSENTINEL);
-                    }
-                }
-                finally
-                {
-                    // Downgrade lock to read
-                    scriptLock.readLock().lock();
-                    scriptLock.writeLock().unlock();
-                }
-            }
-            return script != NULLSENTINEL ? script : null;
-        }
-        finally
-        {
-            scriptLock.readLock().unlock();
-        }
-    }
     
-    
-    /**
-     * Sentinel object used when a cached ScriptContent value of 'null' is placed in the mimetype->script cache. 
-     * 
-     * @author Kevin Roast
-     */
-    private static class NullScriptContent implements ScriptContent
-    {
-        public InputStream getInputStream()
-        {
-            return null;
-        }
-
-        public String getPath()
-        {
-            return null;
-        }
-
-        public String getPathDescription()
-        {
-            return null;
-        }
-
-        public Reader getReader()
-        {
-            return null;
-        }
-
-        public boolean isSecure()
-        {
-            return false;
-        }
-    }
 }

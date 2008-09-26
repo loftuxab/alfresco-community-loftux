@@ -45,6 +45,7 @@ public class FormatRegistry
     private Map<String, Map<String, String>> agentFormats;
     private Map<String, Map<String, String>> agentMimetypes;
     private Map<String, FormatReader<Object>> readers;
+    private FormatReader<Object> defaultReader;
     private Map<String, FormatWriter<Object>> writers;
 
 
@@ -61,6 +62,16 @@ public class FormatRegistry
         writers = new HashMap<String, FormatWriter<Object>>();
     }
 
+    /**
+     * Set default Reader
+     * 
+     * @param defaultReader
+     */
+    public void setDefaultReader(FormatReader<Object> defaultReader)
+    {
+    	this.defaultReader = defaultReader;
+    }
+    
     /**
      * Add a reader
      * 
@@ -228,6 +239,11 @@ public class FormatRegistry
      */
     public FormatReader<Object> getReader(String mimetype)
     {
+    	if (mimetype == null)
+    	{
+    		return defaultReader;
+    	}
+    	
         // TODO: lookup by sorted mimetype list (most specific -> least specific)
         FormatReader<Object> reader = readers.get(mimetype); 
         if (reader == null)

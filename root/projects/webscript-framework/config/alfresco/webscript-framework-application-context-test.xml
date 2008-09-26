@@ -31,5 +31,19 @@
          </bean>
       </property>
    </bean>
-
+      
+   <!--  Register a bogus format without a FormatReader for unit testing purposes -->
+   <bean id="webscripts.formats.bogus" parent="webscripts.formatmap">
+      <property name="formats">
+         <props>
+            <prop key="bogus">application/bogus</prop>
+         </props>
+      </property>
+      <property name="mimetypes">
+         <props>
+            <prop key="application/bogus">bogus</prop>
+         </props>
+      </property>
+   </bean>
+   
 </beans>

@@ -73,7 +73,14 @@ public abstract class AbstractWebScript implements WebScript
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
     private ReentrantReadWriteLock statusTemplateLock = new ReentrantReadWriteLock(); 
     
+    // Script Context
+    private String basePath;
+    private Map<String, ScriptDetails> scripts = new HashMap<String, ScriptDetails>();
+    private ReentrantReadWriteLock scriptLock = new ReentrantReadWriteLock(); 
     
+    // The entry we use to 'remember' nulls in the cache
+    private static final ScriptDetails NULLSENTINEL = new ScriptDetails(null, null);    
+
     //
     // Initialisation
     //
@@ -93,6 +100,8 @@ public abstract class AbstractWebScript implements WebScript
     	
         this.container = container;
         this.description = description;
+        this.basePath = description.getId();
+        
         this.statusTemplateLock.writeLock().lock();
         try
         {
@@ -108,6 +117,17 @@ public abstract class AbstractWebScript implements WebScript
         
         // init the resources for the default locale
         getResources();
+        
+        // clear scripts to format map
+        this.scriptLock.writeLock().lock();
+        try
+        {
+            this.scripts.clear();
+        }
+        finally
+        {
+            this.scriptLock.writeLock().unlock();
+        }        
     }
 
     /**
@@ -199,6 +219,104 @@ public abstract class AbstractWebScript implements WebScript
     //
 
     /**
+	 * Find execute script for given request format
+	 * 
+	 * Note: This method caches the script to request format mapping
+	 * 
+	 * @param mimetype
+	 * @return  execute script
+	 */
+	protected ScriptDetails getExecuteScript(String mimetype) {
+		ScriptDetails script = null;
+	    scriptLock.readLock().lock();
+	
+	    try
+	    {
+	        String key = (mimetype == null) ? "<UNKNOWN>" : mimetype;
+	        script = scripts.get(key);
+	        if (script == null)
+	        {
+	            // Upgrade read lock to write lock
+	            scriptLock.readLock().unlock();
+	            scriptLock.writeLock().lock();
+	
+	            try
+	            {
+	                // Check again
+	                script = scripts.get(key);
+	                if (script == null)
+	                {
+	                	ScriptContent scriptContent = null;
+	                	FormatRegistry formatRegistry = getContainer().getFormatRegistry();
+	                	
+	                    // Locate script in web script store
+	                	String generalizedMimetype = mimetype;
+	                    String format = formatRegistry.getFormat(null, generalizedMimetype);
+	                    
+	                    if (format != null)
+                        {
+                            scriptContent = getContainer().getScriptProcessor().findScript(
+                                    basePath + "." + format + ".js");
+                        }
+	                    
+                        if (scriptContent == null)
+                        {
+                            generalizedMimetype = formatRegistry.generalizeMimetype(generalizedMimetype);
+                            if (generalizedMimetype != null)
+                            {
+                                format = formatRegistry.getFormat(null, generalizedMimetype);
+                                if (format != null)
+                                {
+                                    scriptContent = getContainer().getScriptProcessor().findScript(
+                                            basePath + "." + format + ".js");
+                                }
+                            }
+
+                        }
+	                    
+	                    // fall-back to default
+						if (scriptContent == null)
+						{
+							scriptContent = getContainer().getScriptProcessor().findScript(basePath + ".js");
+
+							// TODO: Special case. Because multipart form data
+                            // is parsed for free, we still allow non type
+                            // specific scripts to see the parsed form data
+							generalizedMimetype = Format.FORMDATA.mimetype().equals(mimetype) ? mimetype : null;
+						}
+	                    
+	                    if (scriptContent != null)
+						{
+	                    	// Validate that there is actually a reader registered to handle this format
+	                    	if (formatRegistry.getReader(generalizedMimetype) == null)
+	                    	{
+	                    		throw new WebScriptException("No reader registered for \"" + generalizedMimetype + "\"");
+	                    	}
+							script = new ScriptDetails(scriptContent, generalizedMimetype);
+						}
+	                    
+	                    if (logger.isDebugEnabled())
+                            logger.debug("Caching script " + ((script == null) ? "null" : script.getContent().getPathDescription()) + " for web script " + basePath + " and request mimetype " + ((mimetype == null) ? "null" : mimetype));
+                        
+                        scripts.put(key, script != null ? script : NULLSENTINEL);	                    
+	                }
+	            }
+	            finally
+	            {
+	                // Downgrade lock to read
+	                scriptLock.readLock().lock();
+	                scriptLock.writeLock().unlock();
+	            }
+	        }
+	        return script != NULLSENTINEL ? script : null;
+	    }
+	    finally
+	    {
+	        scriptLock.readLock().unlock();
+	    }
+	}
+
+	/**
      * Create a model for script usage
      *  
      * @param req  web script request
@@ -221,12 +339,16 @@ public abstract class AbstractWebScript implements WebScript
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
         
-        // add request mimetype parameters
-        FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
-        if (reader != null)
-        {
-            params.putAll(reader.createScriptParameters(req, res));
-        }
+        // If there is a request type specific script (e.g. *.json.js), parse
+		// the request according to its MIME type and add request specific
+		// parameters. Use the FormatReader for the generalised mime type
+		// corresponding to the script - not necessarily the request mime type
+		ScriptDetails script = getExecuteScript(req.getContentType());
+		if (script != null)
+		{
+			FormatReader<Object> reader = container.getFormatRegistry().getReader(script.getRequestType());
+			params.putAll(reader.createScriptParameters(req, res));
+		}
         
         // add context & runtime parameters
         params.putAll(req.getRuntime().getScriptParameters());
@@ -274,15 +396,9 @@ public abstract class AbstractWebScript implements WebScript
         MessageMethod message = new MessageMethod(this);
         params.put("message", message);     // for compatibility with repo webscripts
         params.put("msg", message);         // short form for presentation webscripts
+        
         // add the webscript I18N resources as a JSON object
         params.put("messages", renderJSONResources(getResources()));
-
-        // add request mimetype parameters
-        FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
-        if (reader != null)
-        {
-            params.putAll(reader.createTemplateParameters(req, res));
-        }
 
         // add context & runtime parameters
         params.putAll(req.getRuntime().getTemplateParameters());
@@ -672,8 +788,49 @@ public abstract class AbstractWebScript implements WebScript
         return buf.toString();
     }
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return this.basePath;
+    }
     
     /**
+	 * The combination of a ScriptContent and a request MIME type. Records the
+	 * most specific request MIME type expected by a script (according to its
+	 * naming convention, e.g. *.json.js or *.js). Used to determine what kind
+	 * of parsing should be done on the request (i.e. what kind of FormatReader
+	 * should be invoked to get extra script parameters).
+	 */    
+    protected static class ScriptDetails {
+		private final ScriptContent content;
+		private final String requestType;
+
+		private ScriptDetails(ScriptContent content, String requestType) {
+			this.content = content;
+			this.requestType = requestType;
+		}
+
+		/**
+		 * @return the content
+		 */
+		public ScriptContent getContent() {
+			return content;
+		}
+
+		/**
+		 * @return the requestType
+		 */
+		public String getRequestType() {
+			return requestType;
+		}
+
+	}
+
+
+	/**
      * Status Template
      */
     private class StatusTemplate

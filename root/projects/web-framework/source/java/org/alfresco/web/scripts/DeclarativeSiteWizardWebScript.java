@@ -104,7 +104,7 @@ public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
         // boolean isEnd = wizard.isCurrentPageEnd();
         if (currentPageId != null && !isStart)
         {
-            String newScriptPath = basePath + "-" + currentPageId + ".js";
+            String newScriptPath = getDescription().getId() + "-" + currentPageId + ".js";
             ScriptContent theScript = getContainer().getScriptProcessor().findScript(
                     newScriptPath);
             super.executeScript(theScript, model);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,81 +22,55 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.scripts.json;
+package org.alfresco.web.scripts;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.util.Content;
-import org.alfresco.web.scripts.Format;
-import org.alfresco.web.scripts.FormatReader;
-import org.alfresco.web.scripts.WebScriptException;
-import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 
 /**
- * Convert application/json to org.json.JSONObject or org.json.JSONArray
+ * Convert request stream to class org.alfresco.util.Content
  * 
- * @author Roy Wetherall
- */
-public class JSONReader implements FormatReader<Object>
+ * @author davidc
+ */ 
+public class RequestReader implements FormatReader<Content>
 {
-    /**
-     * @see org.alfresco.web.scripts.FormatReader#getDestinationClass()
-     */
-    public Class<? extends Object> getDestinationClass()
-    {
-        return Object.class;
-    }
-
-    /**
+    
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.FormatReader#getSourceMimetype()
      */
     public String getSourceMimetype()
     {
-        return Format.JSON.mimetype();
-    }
-
-    /**
-     * @see org.alfresco.web.scripts.FormatReader#read(org.alfresco.web.scripts.WebScriptRequest)
-     */
-    public Object read(WebScriptRequest req)
-    {
-        Content content = req.getContent();
-        if (content == null)
-        {
-            throw new WebScriptException("Failed to convert request to JSON");
-        }
-        
-        Object result = null;
-        try
-        {
-            String jsonString = content.getContent();
-            if (jsonString.startsWith("[") == true)
-            {
-                result = new JSONArray(jsonString);
-            }
-            else
-            {    
-                result = new JSONObject(jsonString);
-            }
-        }
-        catch (Exception exception)
-        {
-            throw new WebScriptException("Failed to convert request to JSON", exception);
-        }        
-        return result;
+        return "*/*";
     }
     
-    /**
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.FormatReader#getDestinationClass()
+     */
+    public Class<Content> getDestinationClass()
+    {
+        return Content.class;
+    }
+ 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.FormatReader#read(org.alfresco.web.scripts.WebScriptRequest)
+     */
+    public Content read(WebScriptRequest req)
+    {
+    	return req.getContent();
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.FormatReader#createScriptParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
      */
     public Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res)
     {
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("json", read(req));
+        params.put("requestbody", read(req));
         return params;
     }
+
 }
