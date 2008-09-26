@@ -95,13 +95,6 @@ public class ComponentTag extends TagBase
             String chromeId = getChrome();
             boolean isChromeless = isChromeless();
 
-            // if debug mode is on, we select a specific "debug" chrome
-            if (RequestContext.DEBUG_MODE_VALUE_COMPONENTS.equals(context.getDebugMode()))
-            {
-                chromeId = WebFrameworkConstants.DEBUG_COMPONENT_CHROME_ID;
-                isChromeless = false;
-            }
-            
             if (!isChromeless)
             {
                 PresentationUtil.renderComponent(context, request, response, componentId, chromeId);

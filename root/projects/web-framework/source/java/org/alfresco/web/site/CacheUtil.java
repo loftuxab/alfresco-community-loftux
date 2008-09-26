@@ -24,9 +24,6 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.web.site.filesystem.CachedFileSystem;
-import org.alfresco.web.site.filesystem.IFileSystem;
-
 /**
  * Utility class that allows for easy invalidation of the cache.
  * 
@@ -41,23 +38,6 @@ import org.alfresco.web.site.filesystem.IFileSystem;
 public class CacheUtil
 {
     /**
-     * Invalidate file system cache.
-     * 
-     * @param context the context
-     */
-    public static void invalidateFileSystemCache(RequestContext context)
-    {
-        IFileSystem fileSystem = context.getFileSystem();
-        if (fileSystem instanceof CachedFileSystem)
-        {
-            CachedFileSystem cachedFileSystem = (CachedFileSystem) fileSystem;
-            cachedFileSystem.refresh();
-            
-            FrameworkHelper.getLogger().info("Invalidated File System Cache");
-        }
-    }
-
-    /**
      * Invalidate model object service object cache.
      * 
      * @param context the context
@@ -69,18 +49,4 @@ public class CacheUtil
 
         FrameworkHelper.getLogger().info("Invalidated Object Cache");
     }
-
-    /**
-     * Checks if is file system cache enabled.
-     * 
-     * @param context the context
-     * 
-     * @return true, if is file system cache enabled
-     */
-    public static boolean isFileSystemCacheEnabled(RequestContext context)
-    {
-        IFileSystem fileSystem = context.getFileSystem();
-        return (fileSystem instanceof CachedFileSystem);
-    }
-
 }

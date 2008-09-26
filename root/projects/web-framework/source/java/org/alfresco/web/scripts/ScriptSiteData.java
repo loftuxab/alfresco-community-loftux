@@ -35,10 +35,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.model.Chrome;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
+import org.alfresco.web.framework.model.ContentAssociation;
 import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.PageAssociation;
+import org.alfresco.web.framework.model.PageType;
 import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.model.TemplateType;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.HttpRequestContext;
@@ -61,10 +67,7 @@ import org.mozilla.javascript.Scriptable;
 public final class ScriptSiteData extends ScriptBase
 {
     private static final String WEBSCRIPTS_REGISTRY = "webframework.webscripts.registry";
-    
-    protected ScriptFileSystem rootFileSystem;
 
-    
     /**
      * Constructs a new ScriptSite object around the provided request context
      * 
@@ -110,26 +113,26 @@ public final class ScriptSiteData extends ScriptBase
         ModelObject modelObject = context.getSiteConfiguration();
         return ScriptHelper.toScriptModelObject(context, modelObject);
     }
-    
-    /**
-     * Provides access to the web application file system abstraction.
-     * This is file system mounted to the root of the web application.
-     * 
-     * @return  The File System abstraction
-     */
-    public ScriptFileSystem getFileSystem()
-    {
-        if (rootFileSystem == null)
-        {
-            rootFileSystem = new ScriptFileSystem(
-                    getRequestContext().getFileSystem());
-        }
-        return rootFileSystem;
-    }
-    
+        
     // --------------------------------------------------------------
     // JavaScript Functions
 
+    /**
+     * @return  An array of all objects of the given type
+     */
+    public Object[] getObjects(String objectTypeId)
+    {
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findObjects(objectTypeId));
+    }
+    
+    /**
+     * @return  An array of all Chrome instances in the web application
+     */
+    public Object[] getChrome()
+    {
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findChrome());
+    }
+    
     /**
      * @return  An array of all Component instances in the web application
      */
@@ -201,9 +204,35 @@ public final class ScriptSiteData extends ScriptBase
     {
         return ScriptHelper.toScriptModelObjectArray(context, getModel().findTemplateTypes());
     }
-
+    
     /**
-     * @return A map of all Component instances.  The map is keyed on
+     * @return  An array of all Theme instances in the web application
+     */    
+    public Object[] getThemes()
+    {
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findThemes());
+    }
+        
+    /**
+     * @return A map of all instances of the given type.  The map is keyed 
+     *          on object id
+     */
+    public Scriptable getObjectsMap(String objectTypeId)
+    {
+        return ScriptHelper.toScriptableMap(context, getModel().findObjects(objectTypeId));
+    }    
+    
+    /**
+     * @return A map of all Chrome instances.  The map is keyed
+     *          on object id
+     */
+    public Scriptable getChromeMap()
+    {
+        return ScriptHelper.toScriptableMap(context, getModel().findChrome());
+    }    
+    
+    /**
+     * @return A map of all Component instances.  The map is keyed
      *          on object id
      */
     public Scriptable getComponentsMap()
@@ -212,7 +241,7 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all ComponentType instances.  The map is keyed on
+     * @return A map of all ComponentType instances.  The map is keyed
      *          on object id
      */    
     public Scriptable getComponentTypesMap()
@@ -221,7 +250,7 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all Configuration instances.  The map is keyed on
+     * @return A map of all Configuration instances.  The map is keyed
      *          on object id
      */    
     public Scriptable getConfigurationsMap()
@@ -230,7 +259,7 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all Content Association instances.  The map is keyed on
+     * @return A map of all Content Association instances.  The map is keyed
      *          on object id
      */    
     public Scriptable getContentAssociationsMap()
@@ -239,7 +268,7 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all Page instances.  The map is keyed on
+     * @return A map of all Page instances.  The map is keyed
      *          on object id
      */    
     public Scriptable getPagesMap()
@@ -248,7 +277,7 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all PageAssociation instances.  The map is keyed on
+     * @return A map of all PageAssociation instances.  The map is keyed
      *          on object id
      */    
     public Scriptable getPageAssociationsMap()
@@ -257,7 +286,7 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all Template instances.  The map is keyed on
+     * @return A map of all Template instances.  The map is keyed
      *          on object id
      */
     public Scriptable getTemplatesMap()
@@ -266,14 +295,62 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * @return A map of all TemplateType instances.  The map is keyed on
+     * @return A map of all TemplateType instances.  The map is keyed
      *          on object id
      */    
     public Scriptable getTemplateTypesMap()
     {
         return ScriptHelper.toScriptableMap(context, getModel().findTemplateTypes());
     }
+    
+    /**
+     * @return A map of all Theme instances.  The map is keyed on
+     *          on object id
+     */    
+    public Scriptable getThemesMap()
+    {
+        return ScriptHelper.toScriptableMap(context, getModel().findThemes());
+    }    
 
+    /**
+     * Creates a new object for the given type id
+     * 
+     * @param objectTypeId
+     * @return A ScriptModelObject representing the new instance
+     */
+    public ScriptModelObject newObject(String objectTypeId)
+    {
+        ModelObject modelObject = getModel().newObject(objectTypeId);
+        return ScriptHelper.toScriptModelObject(context, modelObject);
+    }
+
+    /**
+     * Creates a new object for the given type id
+     * 
+     * @param objectTypeId
+     * @param objectId
+     * @return A ScriptModelObject representing the new instance
+     */
+    public ScriptModelObject newObject(String objectTypeId, String objectId)
+    {
+        ModelObject modelObject = getModel().newObject(objectTypeId, objectId);
+        return ScriptHelper.toScriptModelObject(context, modelObject);
+    }
+    
+    /**
+     * Creates a new Chrome instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     * 
+     * @return A ScriptModelObject representing the new instance
+     */
+    public ScriptModelObject newChrome()
+    {
+        Chrome chrome = (Chrome) getModel().newChrome();
+        return ScriptHelper.toScriptModelObject(context, chrome);
+    }    
+    
     /**
      * Creates a new Component instance.
      * 
@@ -406,6 +483,20 @@ public final class ScriptSiteData extends ScriptBase
         configuration.setSourceId(sourceId);
         return ScriptHelper.toScriptModelObject(context, configuration);
     }
+    
+    /**
+     * Creates a new ContentAssociation instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     *
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newContentAssociation()
+    {
+        ContentAssociation association = (ContentAssociation) getModel().newContentAssociation();
+        return ScriptHelper.toScriptModelObject(context, association);
+    }    
 
     /**
      * Creates a new Page instance.
@@ -454,6 +545,34 @@ public final class ScriptSiteData extends ScriptBase
         page.setTitle(title);
         page.setDescription(description);
         return ScriptHelper.toScriptModelObject(context, page);
+    }
+    
+    /**
+     * Creates a new PageAssociation instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     *
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newPageAssociation()
+    {
+        PageAssociation association = (PageAssociation) getModel().newPageAssociation();
+        return ScriptHelper.toScriptModelObject(context, association);
+    }
+
+    /**
+     * Creates a new PageType instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     *
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newPageType(String objectId)
+    {
+        PageType pageType = (PageType) getModel().newPageType(objectId);
+        return ScriptHelper.toScriptModelObject(context, pageType);
     }
     
     /**
@@ -516,6 +635,38 @@ public final class ScriptSiteData extends ScriptBase
     }
     
     /**
+     * Creates a new TemplateType instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     * 
+     * @param objectId   The id of the TemplateType 
+     *  
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newTemplateType(String objectId)
+    {
+        TemplateType templateType = (TemplateType) getModel().newTemplateType(objectId);
+        return ScriptHelper.toScriptModelObject(context, templateType);
+    }
+
+    /**
+     * Creates a new Theme instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     * 
+     * @param objectId   The id of the Theme 
+     *  
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newTheme(String objectId)
+    {
+        Theme theme = (Theme) getModel().newTheme(objectId);
+        return ScriptHelper.toScriptModelObject(context, theme);
+    }    
+    
+    /**
      * Creates model objects based on a given preset id. The preset is looked up and
      * processed by the PresetManager bean. The various objects found in the preset
      * will be generated using the supplied name/value map of tokens.
@@ -555,7 +706,7 @@ public final class ScriptSiteData extends ScriptBase
     }
     
     /**
-     * Searchs for webscript components with the given family name.
+     * Searches for webscript components with the given family name.
      * 
      * @param family        the family
      * 
@@ -614,6 +765,33 @@ public final class ScriptSiteData extends ScriptBase
                 sourceId, destId, associationType);
         return ScriptHelper.toScriptModelObjectArray(context, objects);
     }
+    
+    /**
+     * Searches for child pages of the given page.
+     * 
+     * This is a shortcut method - the alternative is to look up associations directly and then look up
+     * their corresponding page objects
+     * 
+     * @param sourceId
+     * @return
+     */
+    public Object[] findChildPages(String sourceId)
+    {
+        Map<String, ModelObject> pageAssociations = getModel().findPageAssociations(
+                sourceId, null, "child");
+
+        int count = 0;
+        Page[] pages = new Page[pageAssociations.size()];
+        Iterator it = pageAssociations.values().iterator();
+        while(it.hasNext())
+        {
+            PageAssociation pageAssociation = (PageAssociation) it.next();
+            pages[count] = pageAssociation.getDestPage(context);
+            count++;
+        }
+        
+        return ScriptHelper.toScriptModelObjectArray(context, pages);
+    }    
 
     /**
      * Searches for ContentAssociation instances within the Web Application that 
@@ -1002,6 +1180,16 @@ public final class ScriptSiteData extends ScriptBase
         ModelObject obj = getModel().getTheme(objectId);
         return ScriptHelper.toScriptModelObject(context, obj);
     }
+    
+    /**
+     * Constructs a GUID
+     * 
+     * @return
+     */
+    public String newGUID()
+    {
+        return new org.alfresco.tools.ObjectGUID().toString();
+    }       
     
     private static ScriptProcessor getScriptProcessor()
     {

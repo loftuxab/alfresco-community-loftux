@@ -68,16 +68,6 @@ public class HttpRequestContext extends ThreadLocalRequestContext
     }
     
     /**
-     * Returns the debug mode of the current request
-     * If not in debug mode, this will return null
-     */
-    public String getDebugMode()
-    {
-        String debug = request.getParameter("debug");
-        return (debug != null && debug.length() != 0 ? debug : null);
-    }
-    
-    /**
      * Returns the current Theme Id for the current user
      */
     public String getThemeId()

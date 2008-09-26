@@ -24,8 +24,6 @@
  */
 package org.alfresco.web.site;
 
-import java.util.StringTokenizer;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 

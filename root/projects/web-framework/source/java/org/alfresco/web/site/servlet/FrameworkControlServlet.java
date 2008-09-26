@@ -25,6 +25,8 @@
 package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,19 +38,29 @@ import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.exception.RequestContextException;
 
 /**
- * A servlet that can be used to invalidate the cache
+ * A general control servlet for administering and controlling
+ * the application framework.
  * 
+ * Services include:
+ * 
+ * Cache invalidation:
+ * 
+ *   /<application>/control/cache/invalidate
+ *     -> invalidates cached data for the current session
+ *   
  * @author muzquiano
  */
-public class CacheControlServlet extends BaseServlet
+public class FrameworkControlServlet extends BaseServlet
 {
+    private static final String MODE_CACHE_COMMAND_INVALIDATE = "invalidate";
+    private static final String MODE_CACHE = "cache";
+
     public void init() throws ServletException
     {
         super.init();
     }
 
-    protected void service(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
         // get the request context
         RequestContext context = null;
@@ -61,20 +73,40 @@ public class CacheControlServlet extends BaseServlet
             throw new ServletException("Unable to retrieve request context from request", rce);
         }
 
-        // the command
-        String command = (String) request.getParameter("command");
-        if ("invalidateAll".equalsIgnoreCase(command))
+        String uri = request.getRequestURI();
+        
+        // skip server context path and build the path to the resource we are looking for
+        uri = uri.substring(request.getContextPath().length());
+        
+        // validate and return the resource path - stripping the servlet context
+        StringTokenizer t = new StringTokenizer(uri, "/");
+        String servletName = t.nextToken();
+        if (!t.hasMoreTokens())
         {
-            // invalidate the file system cache, if it exists
-            CacheUtil.invalidateFileSystemCache(context);
-
-            // invalidate the model service object cache
-            CacheUtil.invalidateModelObjectServiceCache(context);
+            throw new ServletException("Invalid URL: " + uri);
         }
-        if ("invalidate".equalsIgnoreCase(command))
+        String mode = t.nextToken();
+        if( !t.hasMoreTokens())
         {
-            // invalidate a single object
-            // TODO
+            throw new ServletException("Invalid URL: " + uri);
+        }
+        String command = t.nextToken();
+        
+        // load additional arguments, if any
+        ArrayList<String> args = new ArrayList<String>();
+        if(t.hasMoreTokens())
+        {
+            args.add(t.nextToken());            
+        }
+                
+        // CACHE
+        if(MODE_CACHE.equalsIgnoreCase(mode))
+        {
+            if(MODE_CACHE_COMMAND_INVALIDATE.equalsIgnoreCase(command))
+            {
+                // invalidate the model service object cache
+                CacheUtil.invalidateModelObjectServiceCache(context);
+            }
         }
     }
 }
