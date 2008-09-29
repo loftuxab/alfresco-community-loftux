@@ -3,7 +3,8 @@
    float: left;
    background-image: url(../images/site-24.png);
    background-repeat: no-repeat;
-   line-height: 2.2em;
+   background-position:0 2px;
+   line-height: 2em;
    padding-left: 32px;
 }
 

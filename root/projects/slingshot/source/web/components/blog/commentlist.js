@@ -279,11 +279,11 @@
          // update the list name
          if (comments.length > 0)
          {
-            titleDiv.innerHTML = comments.length + " Comments";
+            titleDiv.innerHTML =  Alfresco.util.message("label.comments", this.name, {"0": comments.length, "1": response.json.total});
          }
          else
          {
-            titleDiv.innerHTML = "No comments so far";
+            titleDiv.innerHTML = Alfresco.util.message("label.noComments", this.name);
          }
          
          // Update the list elements

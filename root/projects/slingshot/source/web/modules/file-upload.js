@@ -78,7 +78,9 @@
       Alfresco.util.ComponentManager.register(this);
 
       // Create the appropriate uploader component
-      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
+      // Since Flash player 10 the OS's browse dialog can only be triggered by an actual user mouse interaction
+      // This is due to Flash Players new security rules which breaks the YUI uploader component in its current state
+      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45) && !Alfresco.util.hasRequiredFlashPlayer(10, 0, 0);
       if(this.hasRequiredFlashPlayer)        
       {
          this.uploader = Alfresco.module.getFlashUploadInstance();
