@@ -34,7 +34,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +74,9 @@ public class RemoteClient extends AbstractClient
     private static final String CHARSETEQUALS = "charset=";
     private static final int BUFFERSIZE = 4096;
     
+    private static final int CONNECT_TIMEOUT = 1000;
+    private static final int READ_TIMEOUT = 30000;
+    
     private String defaultEncoding;
     private String ticket;
     private String ticketName = "alf_ticket";
@@ -82,6 +87,10 @@ public class RemoteClient extends AbstractClient
     private String password;
     
     private Map<String, String> requestProperties;
+    
+    // special http error codes used internally to detect specific error
+    public static final int SC_REMOTE_CONN_TIMEOUT = 499;
+    public static final int SC_REMOTE_CONN_NOHOST  = 498;
 
 
     /**
@@ -490,7 +499,10 @@ public class RemoteClient extends AbstractClient
         HttpURLConnection connection = null;
         try
         {
+            // open the URL connection and apply timeouts
             connection = (HttpURLConnection)url.openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT);
+            connection.setReadTimeout(READ_TIMEOUT);
             
             // proxy over any headers from the request stream to proxied request
             if (res != null)
@@ -676,9 +688,51 @@ public class RemoteClient extends AbstractClient
             // if we get here call was successful
             return encoding;
         }
+        catch (SocketTimeoutException timeErr)
+        {
+            // caught a socket timeout IO exception - apply internal error code
+            status.setCode(SC_REMOTE_CONN_TIMEOUT);
+            status.setException(timeErr);
+            status.setMessage(timeErr.getMessage());
+            if (res != null)
+            {
+                // externally just return a generic 500 server error
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, timeErr.getMessage());
+            }            
+            
+            throw timeErr;
+        }
+        catch (UnknownHostException hostErr)
+        {
+            // caught an unknown host IO exception - apply internal error code
+            status.setCode(SC_REMOTE_CONN_NOHOST);
+            status.setException(hostErr);
+            status.setMessage(hostErr.getMessage());
+            if (res != null)
+            {
+                // externally just return a generic 500 server error
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, hostErr.getMessage());
+            }            
+            
+            throw hostErr;
+        }
+        catch (ConnectException connErr)
+        {
+            // caught a no host IO exception - apply internal error code
+            status.setCode(SC_REMOTE_CONN_NOHOST);
+            status.setException(connErr);
+            status.setMessage(connErr.getMessage());
+            if (res != null)
+            {
+                // externally just return a generic 500 server error
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, connErr.getMessage());
+            }            
+            
+            throw connErr;
+        }
         catch (IOException ioErr)
         {
-            // caught an connection/IO exception - generic error code as won't get one returned
+            // caught a general IO exception - apply generic error code so one gets returned
             status.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             status.setException(ioErr);
             status.setMessage(ioErr.getMessage());

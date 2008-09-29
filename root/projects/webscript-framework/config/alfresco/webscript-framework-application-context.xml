@@ -278,17 +278,17 @@
       <property name="scriptProcessor" ref="webscripts.web.scriptprocessor" />
       <property name="scriptObjects">
          <map merge="true">
-           <entry key="remote">
-              <bean class="org.alfresco.web.scripts.ScriptRemote">
-                 <property name="connectorService" ref="connector.service"/>
-                 <property name="configService" ref="web.config"/>
-   </bean>
-           </entry>         
+            <entry key="remote">
+               <bean class="org.alfresco.web.scripts.ScriptRemote">
+                  <property name="connectorService" ref="connector.service"/>
+                  <property name="configService" ref="web.config"/>
+               </bean>
+            </entry>         
          </map>
       </property>
    </bean>
 
- 
+
    <!--                      -->
    <!--  Web Script Registry -->
    <!--                      -->
