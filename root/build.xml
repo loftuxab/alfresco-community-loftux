@@ -45,6 +45,9 @@
          <fileset dir="${dir.modules}">
             <include name="**/${dir.name.lib}/*.jar" />
          </fileset>
+         <fileset dir="${dir.modules}">
+            <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
+         </fileset>
       </path>
 
       <path id="classpath.unit.test">
