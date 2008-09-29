@@ -530,6 +530,7 @@ public class DeclarativeRegistry
             
             // retrieve authentication
             RequiredAuthentication reqAuth = RequiredAuthentication.none;
+            String runAs = null;
             Element authElement = rootElement.element("authentication");
             if (authElement != null)
             {
@@ -545,7 +546,17 @@ public class DeclarativeRegistry
                 catch(IllegalArgumentException e)
                 {
                     throw new WebScriptException("Authentication '" + reqAuthStr + "' is not a valid value");
-                }                
+                }
+                String runAsStr = authElement.attributeValue("runas");
+                if (runAsStr != null) {
+                    runAsStr = runAsStr.trim();
+                    if (runAsStr.length() > 0) {
+                        if (!store.isSecure()) {
+                            throw new WebScriptException("runas user declared for script in insecure store");                            
+                        }
+                        runAs = runAsStr;
+                    }
+                }
             }
             
             // retrieve transaction
@@ -672,6 +683,7 @@ public class DeclarativeRegistry
             serviceDesc.setDescription(description);
             serviceDesc.setFamily(family);
             serviceDesc.setRequiredAuthentication(reqAuth);
+            serviceDesc.setRunAs(runAs);
             serviceDesc.setRequiredTransaction(reqTrx);
             serviceDesc.setRequiredCache(cache);
             serviceDesc.setMethod(method);

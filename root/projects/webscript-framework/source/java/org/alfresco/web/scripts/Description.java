@@ -174,6 +174,14 @@ public interface Description
      * @return  the required authentication level 
      */
     public RequiredAuthentication getRequiredAuthentication();
+    
+    /**
+     * Gets the ID of the user that the service should be run as or <code>null</code> if the service is to be run as the
+     * authenticated user.
+     * 
+     * @return a user name or <code>null</code> if not applicable
+     */
+    public String getRunAs();
 
     /**
      * Gets the required transaction level 

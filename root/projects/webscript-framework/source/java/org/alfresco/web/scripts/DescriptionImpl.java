@@ -47,6 +47,7 @@ public class DescriptionImpl implements Description
     private String description;
     private String family;
     private RequiredAuthentication requiredAuthentication;
+    private String runAs;
     private RequiredTransaction requiredTransaction;
     private RequiredCache requiredCache;
     private FormatStyle formatStyle;
@@ -242,6 +243,25 @@ public class DescriptionImpl implements Description
     public RequiredAuthentication getRequiredAuthentication()
     {
         return this.requiredAuthentication;
+    }
+
+    /**
+     * Sets the ID of the user that the service should be run as. If not set, the service run as the authenticated user.
+     * 
+     * @param runAs
+     *            a user name
+     */
+    public void setRunAs(String runAs)
+    {
+        this.runAs = runAs;
+    }        
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getRunAs()
+     */
+    public String getRunAs()
+    {
+        return this.runAs;
     }
 
     /**

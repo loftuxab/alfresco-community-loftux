@@ -88,6 +88,14 @@ public class LocalFileSystemStore implements Store
     }
     
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#isSecure()
+     */
+    public boolean isSecure()
+    {
+        return false;
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#exists()
      */
     public boolean exists()
