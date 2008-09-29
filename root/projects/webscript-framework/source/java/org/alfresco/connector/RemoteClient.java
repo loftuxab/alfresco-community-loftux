@@ -539,7 +539,7 @@ public class RemoteClient extends AbstractClient
             
             // prepare to write the connection result to the output stream
             // at this point - if the remote server returned an error status code
-            // this call will trigger an IOException which is handled below            
+            // this call will trigger an IOException which is handled below
             boolean caughtError = false;            
             String errorMessage = null;            
             InputStream input;
@@ -560,11 +560,14 @@ public class RemoteClient extends AbstractClient
                 caughtError = true;
                 
                 if (logger.isDebugEnabled())
-                    logger.debug(" --- Caught error code: " + connection.getResponseCode() + " - " + errorMessage);
+                    logger.debug(" --- Caught error: " + errorMessage);
             }
+            
+            // get the response code - this can throw IO exception if unable to connect
+            int responseCode = connection.getResponseCode();
             if (res != null)
             {
-                res.setStatus(connection.getResponseCode());
+                res.setStatus(responseCode);
             }
             
             // walk over headers that are returned from the connection
@@ -614,7 +617,7 @@ public class RemoteClient extends AbstractClient
                 traceBuf.append('\n');
             }
             boolean responseCommit = false;
-            if (connection.getResponseCode() != HttpServletResponse.SC_NOT_MODIFIED)
+            if (responseCode != HttpServletResponse.SC_NOT_MODIFIED)
             {
                 if (input != null)
                 {
@@ -664,27 +667,27 @@ public class RemoteClient extends AbstractClient
             }
             
             // record status code
-            status.setCode(connection.getResponseCode());
+            status.setCode(responseCode);
             if (res != null && caughtError && !responseCommit)
             {
-                res.sendError(connection.getResponseCode(), errorMessage);
+                res.sendError(responseCode, errorMessage);
             }
             
             // if we get here call was successful
             return encoding;
         }
-        catch (ConnectException conErr)
+        catch (IOException ioErr)
         {
-            // caught a connection exception - generic error code as won't get one returned
+            // caught an connection/IO exception - generic error code as won't get one returned
             status.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            status.setException(conErr);
-            status.setMessage(conErr.getMessage());
+            status.setException(ioErr);
+            status.setMessage(ioErr.getMessage());
             if (res != null)
             {
-                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, conErr.getMessage());
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ioErr.getMessage());
             }            
             
-            throw conErr;
+            throw ioErr;
         }
         finally
         {
