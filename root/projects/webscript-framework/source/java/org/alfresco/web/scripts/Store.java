@@ -57,6 +57,15 @@ public interface Store
     public String getBasePath();
     
     /**
+     * Returns true if this store is considered secure - i.e. on the app-server classpath. Scripts in secure stores can
+     * be run under the identity of a declared user (via the runas attribute) rather than the authenticated user.
+     * 
+     * @return true if this store is considered secure
+     */
+    public boolean isSecure();
+    
+    
+    /**
      * Gets the paths of given document pattern within given path/sub-paths in this store
      * 
      * @param path             start path

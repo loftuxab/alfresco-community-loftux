@@ -158,6 +158,15 @@ public class ClassPathStore implements Store
         return "classpath:" + classPath;
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#isSecure()
+     */
+    public boolean isSecure()
+    {
+        return true;
+    }
+
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getAllDocumentPaths()
      */

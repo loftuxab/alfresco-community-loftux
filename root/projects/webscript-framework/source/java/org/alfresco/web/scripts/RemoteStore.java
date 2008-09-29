@@ -79,8 +79,7 @@ public class RemoteStore implements Store
     
     private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();
     private ThreadLocal<ConnectorProvider> connProvider = new ThreadLocal<ConnectorProvider>();
-    
-    
+        
     /**
      * Binds this instance to the given repository store id for the current thread
      */
@@ -197,6 +196,14 @@ public class RemoteStore implements Store
                          api + "' path prefix '" + path + "'.");
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#isSecure()
+     */
+    public boolean isSecure()
+    {
+        return false;
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#exists()
      */
