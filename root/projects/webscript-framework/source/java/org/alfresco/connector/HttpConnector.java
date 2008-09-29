@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +51,11 @@ public class HttpConnector extends AbstractConnector
 {
     private static Log logger = LogFactory.getLog(HttpConnector.class);
     
+    private static final int RECONNECT_TIMEOUT = 10000;
+    
+    private static ConcurrentMap<String, Long> endpointTimeouts = new ConcurrentHashMap<String, Long>();
+    
+    
     /**
      * Instantiates a new http connector.
      * 
@@ -58,53 +65,92 @@ public class HttpConnector extends AbstractConnector
     public HttpConnector(ConnectorDescriptor descriptor, String endpoint)
     {
         super(descriptor, endpoint);
+        endpointTimeouts.putIfAbsent(endpoint, 0L);
     }
 
 
     public Response call(String uri, ConnectorContext context)
     {
-        RemoteClient remoteClient = initRemoteClient(context);
-                
-        // call client and process response
-        Response response = remoteClient.call(uri);
-        processResponse(response);
-        
-        return response;        
+        Response response;
+        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        {
+            RemoteClient remoteClient = initRemoteClient(context);
+            
+            // call client and process response
+            response = remoteClient.call(uri);
+            processResponse(response);
+        }
+        else
+        {
+            ResponseStatus status = new ResponseStatus();
+            status.setCode(ResponseStatus.STATUS_INTERNAL_SERVER_ERROR);
+            response = new Response(status);
+        }
+        return response;
     }
 
     public Response call(String uri, ConnectorContext context, InputStream in)
     {
-        RemoteClient remoteClient = initRemoteClient(context);
-        
-        // call client and process response
-        Response response = remoteClient.call(uri, in);
-        processResponse(response);
-        
+        Response response;
+        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        {
+            RemoteClient remoteClient = initRemoteClient(context);
+            
+            // call client and process response
+            response = remoteClient.call(uri, in);
+            processResponse(response);
+        }
+        else
+        {
+            ResponseStatus status = new ResponseStatus();
+            status.setCode(ResponseStatus.STATUS_INTERNAL_SERVER_ERROR);
+            response = new Response(status);
+        }
         return response;
     }
 
     public Response call(String uri, ConnectorContext context, InputStream in, OutputStream out)
     {
-        RemoteClient remoteClient = initRemoteClient(context);
-        
-        // call client and process response
-        Response response = remoteClient.call(uri, in, out);
-        processResponse(response);
+        Response response;
+        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        {
+            RemoteClient remoteClient = initRemoteClient(context);
+            
+            // call client and process response
+            response = remoteClient.call(uri, in, out);
+            processResponse(response);
+        }
+        else
+        {
+            ResponseStatus status = new ResponseStatus();
+            status.setCode(ResponseStatus.STATUS_INTERNAL_SERVER_ERROR);
+            response = new Response(status);
+        }
         
         return response;
     }
     
     public Response call(String uri, ConnectorContext context, HttpServletRequest req, HttpServletResponse res)
     {
-        RemoteClient remoteClient = initRemoteClient(context);
-                
-        // call client and process response
-        Response response = remoteClient.call(uri, req, res);
-        processResponse(response);
+        Response response;
+        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        {
+            RemoteClient remoteClient = initRemoteClient(context);
+                    
+            // call client and process response
+            response = remoteClient.call(uri, req, res);
+            processResponse(response);
+        }
+        else
+        {
+            ResponseStatus status = new ResponseStatus();
+            status.setCode(ResponseStatus.STATUS_INTERNAL_SERVER_ERROR);
+            response = new Response(status);
+        }
         
         return response;        
     }
-       
+    
     /**
      * Stamps headers onto the remote client
      * 
@@ -126,7 +172,7 @@ public class HttpConnector extends AbstractConnector
             String[] keys = getConnectorSession().getCookieNames();
             if (keys.length != 0)
             {
-                StringBuilder builder = new StringBuilder(256);
+                StringBuilder builder = new StringBuilder(128);
                 
                 for (int i = 0; i < keys.length; i++)
                 {
@@ -135,10 +181,10 @@ public class HttpConnector extends AbstractConnector
                     
                     if (builder.length() != 0)
                     {
-                        builder.append(";");
+                        builder.append(';');
                     }
                     builder.append(cookieName);
-                    builder.append("=");
+                    builder.append('=');
                     builder.append(cookieValue);
                 }
                 
@@ -182,33 +228,45 @@ public class HttpConnector extends AbstractConnector
      */
     protected void processResponse(Response response)
     {
-        Map<String, String> headers = response.getStatus().getHeaders();
-        Iterator<String> it = headers.keySet().iterator();
-        while (it.hasNext())
+        if (RemoteClient.SC_REMOTE_CONN_NOHOST == response.getStatus().getCode() ||
+            RemoteClient.SC_REMOTE_CONN_TIMEOUT == response.getStatus().getCode())
         {
-            String headerName = it.next();
-            if (headerName.toLowerCase().equals("set-cookie"))
+            // If special error codes were returned, don't check the remote connection
+            // again for a short time. This is to ensure we don't continually
+            // connect+timeout potentially 100's of times in a row therefore slowing
+            // the server statup etc. if an endpoint is not currently available.
+            this.endpointTimeouts.put(this.endpoint, System.currentTimeMillis());
+        }
+        else
+        {
+            Map<String, String> headers = response.getStatus().getHeaders();
+            Iterator<String> it = headers.keySet().iterator();
+            while (it.hasNext())
             {
-                String headerValue = headers.get(headerName);
-                
-                int z = headerValue.indexOf("=");
-                if (z != -1)
+                String headerName = it.next();
+                if (headerName.toLowerCase().equals("set-cookie"))
                 {
-                    String cookieName = headerValue.substring(0,z);
-                    String cookieValue = headerValue.substring(z+1, headerValue.length());
-                    int y = cookieValue.indexOf(";");
-                    if (y != -1)
-                    {
-                        cookieValue = cookieValue.substring(0,y);
-                    }
-
-                    // store cookie back
-                    if (logger.isDebugEnabled())
-                        logger.debug("Connector found set-cookie: " + cookieName + " = " + cookieValue);
+                    String headerValue = headers.get(headerName);
                     
-                    if (getConnectorSession() != null)
+                    int z = headerValue.indexOf('=');
+                    if (z != -1)
                     {
-                        getConnectorSession().setCookie(cookieName, cookieValue);
+                        String cookieName = headerValue.substring(0, z);
+                        String cookieValue = headerValue.substring(z + 1, headerValue.length());
+                        int y = cookieValue.indexOf(';');
+                        if (y != -1)
+                        {
+                            cookieValue = cookieValue.substring(0, y);
+                        }
+                        
+                        // store cookie back
+                        if (logger.isDebugEnabled())
+                            logger.debug("Connector found set-cookie: " + cookieName + " = " + cookieValue);
+                        
+                        if (getConnectorSession() != null)
+                        {
+                            getConnectorSession().setCookie(cookieName, cookieValue);
+                        }
                     }
                 }
             }
