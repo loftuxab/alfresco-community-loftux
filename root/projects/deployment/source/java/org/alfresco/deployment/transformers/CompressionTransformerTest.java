@@ -36,14 +36,14 @@ import java.util.Random;
  * @author mrogers
  * @see org.alfresco.deployment.transformers.CompressionTransformer
  */
-public class TestCompressionTransformer extends TestCase {
+public class CompressionTransformerTest extends TestCase {
 	
     private Random randomNumber = new Random( System.currentTimeMillis() );
 
 	/**
 	 * @param name
 	 */
-	public TestCompressionTransformer(String name) {
+	public CompressionTransformerTest(String name) {
 		super(name);
 	}
 

@@ -36,13 +36,13 @@ import java.io.*;
  * @author mrogers
  * @see org.alfresco.deployment.transformers.CompressionTransformer
  */
-public class TestSampleEncryptionTransformer extends TestCase {
+public class SampleEncryptionTransformerTest extends TestCase {
 	
 
 	/**
 	 * @param name
 	 */
-	public TestSampleEncryptionTransformer(String name) {
+	public SampleEncryptionTransformerTest(String name) {
 		super(name);
 	}
 
