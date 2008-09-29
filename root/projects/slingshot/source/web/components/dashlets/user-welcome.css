@@ -28,6 +28,7 @@ div.dashlet.user-welcome div.detail-list-item div.site
 {
    background-image: url(../images/site-24.png);
    background-repeat: no-repeat;
+   background-position: 0 2px;
    line-height: 2.2em;
    padding-bottom: 0;
    padding-left: 32px;

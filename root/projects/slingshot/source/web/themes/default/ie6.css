@@ -35,6 +35,25 @@
 {
    width: 400px;
 }
+
+/**
+ * Buttons
+ *
+ * Border property "transparent" doesnt work in IE6.
+ * Set it to use a background color instead.  
+ */
+.yui-skin-default .flat-button .yui-button .first-child,
+.yui-skin-default .flat-button .yui-button
+{
+   border-color: #E3EAEC;   
+}
+
+.yui-skin-default .flat-button .yui-button.yui-button-hover .first-child,
+.yui-skin-default .flat-button .yui-button.yui-button-hover
+{
+   border-color: #808080;
+}
+
 /**
  * Dashlets
  */
@@ -240,3 +259,8 @@ div.dashlet.calendar div.body
    padding-right:8px;
 }
 
+.toolbar,
+.pagelist
+{
+   margin: 0;
+}

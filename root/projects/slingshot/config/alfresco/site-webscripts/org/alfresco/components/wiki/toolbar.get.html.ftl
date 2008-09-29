@@ -15,7 +15,7 @@
    </div>
    
    <div class="rss-feed"><a id="${args.htmlid}-rssFeed-button" href="${url.context}/proxy/alfresco-rss/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">${msg("message.rssfeed")}</a></div>
-
+   <div class="clear"></div>
    <div id="${args.htmlid}-renamepanel" class="rename-panel">
       <div class="hd">${msg("panel.rename.title")}</div>
       <div class="bd">
