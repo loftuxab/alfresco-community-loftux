@@ -66,10 +66,14 @@
    	init: function()
    	{
          this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
-		   this.tagLibrary.setOptions({ siteId: this.siteId });
+		   this.tagLibrary.setOptions(
+		   {
+		      siteId: this.siteId
+		   });
          this.tagLibrary.initialize();
 
-         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent', {
+         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
+         {
             height: '300px',
             width: '538px',
             dompath: false, // Turns on the bar at the bottom
@@ -81,7 +85,10 @@
          this.pageEditor.render();
 
          var saveButtonId = this.id + "-save-button";
-         var saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
+         var saveButton = new YAHOO.widget.Button(saveButtonId,
+         {
+            type: "submit"
+         });
 
       	var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", null,
       	{

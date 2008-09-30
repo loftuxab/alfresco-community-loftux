@@ -4,6 +4,7 @@
 
       <form id="${args.htmlid}-addEvent-form" action="${url.context}/proxy/alfresco/calendar/create" method="POST">
          <input type="hidden" name="site" value="${args["site"]!""}" />
+         <input type="hidden" name="page" value="calendar" />
          <input type="hidden" id="${args.htmlid}-from" name="from" value="${event.from!""}" />
          <input type="hidden" id="${args.htmlid}-to" name="to" value="${event.to!""}" />
 

@@ -108,30 +108,31 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        *
        * @method show
        */
-       show: function()
-       {
-          var args = {
-            "htmlid": this.id,
-            "site": this.options.siteId
+      show: function()
+      {
+         var args =
+         {
+            htmlid: this.id,
+            site: this.options.siteId
          }
          
          if (this.options.eventURI)
          {
-            args['uri'] = this.options.eventURI;
+            args.uri = this.options.eventURI;
          }
          
          Alfresco.util.Ajax.request(
-          {
-             url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
             dataObj: args,
             successCallback:
             {
                fn: this.templateLoaded,
                scope: this
             },
-              failureMessage: "Could not load add event form"
+            failureMessage: "Could not load add event form"
          });
-         },
+      },
 
       /**
        * Fired when the event create form has loaded successfully.

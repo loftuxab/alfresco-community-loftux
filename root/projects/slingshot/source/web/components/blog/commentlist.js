@@ -85,17 +85,20 @@
          itemNodeRef: null,
          
          /**
-          * Title of the item to comment about.
-          * TODO: This is used for activity feed and should not be necessary here
+          * Title of the item to comment about for activites service.
           */
-         itemTitle: null,
+         activityTitle: null,
          
          /**
-          * Url of the item to comment about.
-          * TODO: This is used for activity feed and should not be necessary here
+          * Page for activities link.
           */
-         itemUrl: null,
-         
+         activityPage: null,
+
+         /**
+          * Params for activities link.
+          */
+         activityPageParams: null,
+
          /**
           * Width to use for comment editor
           */
@@ -213,11 +216,12 @@
       onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemTitle !== null) && (obj.itemUrl !== null))
+         if ((obj !== null) && (obj.nodeRef !== null) && (obj.title !== null) && (obj.page !== null))
          {
-            this.options.itemNodeRef = obj.itemNodeRef;
-            this.options.itemTitle = obj.itemTitle;
-            this.options.itemUrl = obj.itemUrl;
+            this.options.itemNodeRef = obj.nodeRef;
+            this.options.activityTitle = obj.title;
+            this.options.activityPage = obj.page;
+            this.options.activityPageParams = obj.pageParams;
             this._loadCommentsList();
          }
       },
@@ -227,7 +231,7 @@
        */
       refreshComments: function CommentList_onFilterChanged(layer, args)
       {
-         if (this.options.itemNodeRef && this.options.itemTitle && this.options.itemUrl)
+         if (this.options.itemNodeRef && this.options.activityTitle)
          {
             this._loadCommentsList();
          }
@@ -302,7 +306,8 @@
          this.commentsData = comments;
          
          // inform the create comment component of whether the user can create a comment
-         var eventData = {
+         var eventData =
+         {
             canCreateComment: response.json.nodePermissions.create
          }
          YAHOO.Bubbling.fire("setCanCreateComment", eventData);
@@ -386,13 +391,14 @@
          };
 
          // put together the request url to delete the comment
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "/api/comment/node/{nodeRef}/?site={site}&container={container}&itemTitle={itemTitle}&browseItemUrl={browseItemUrl}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/comment/node/{nodeRef}/?site={site}&itemTitle={itemTitle}&page={page}&pageParams={pageParams}",
          {
             site: this.options.siteId,
             container: this.options.containerId,
             nodeRef: data.nodeRef.replace(":/", ""),
-            itemTitle: this.options.itemTitle,
-            browseItemUrl: Alfresco.util.encodeHTML(this.options.itemUrl)
+            itemTitle: this.options.activityTitle,
+            page: this.options.activityPage,
+            pageParams: YAHOO.lang.JSON.stringify(this.options.activityPageParams)
          });
          
          // execute ajax request
@@ -478,8 +484,9 @@
          Dom.get(formId + "-form").setAttribute("action", actionUrl);
          Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
-         Dom.get(formId + "-itemTitle").setAttribute("value", this.options.itemTitle);
-         Dom.get(formId + "-browseItemUrl").setAttribute("value", this.options.itemUrl);
+         Dom.get(formId + "-itemTitle").setAttribute("value", this.options.activityTitle);
+         Dom.get(formId + "-page").setAttribute("value", this.options.activityPage);
+         Dom.get(formId + "-pageParams").setAttribute("value", YAHOO.lang.JSON.stringify(this.options.activityPageParams));
          Dom.get(formId + "-content").value = Alfresco.util.stripUnsafeHTMLTags(data.content);
          
          // show the form and hide the view
@@ -487,7 +494,8 @@
          Dom.removeClass(editDiv, "hidden");
 
          // store the edit data locally
-         this.editData = {
+         this.editData =
+         {
             viewDiv: viewDiv,
             editDiv: editDiv,
             row: row,

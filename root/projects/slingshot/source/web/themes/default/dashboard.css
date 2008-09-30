@@ -18,6 +18,27 @@
    padding: 5px 9px 5px 9px;
 }
 
+.dashlet .feed
+{
+   background-image: url(images/feed-icon-16.png);
+   background-repeat: no-repeat;
+   float: right;
+   height: 16px;
+   left: -8px;
+   position: relative;
+   top: -22px;
+   width: 16px;
+}
+.dashlet .feed a,
+.dashlet .feed a:active,
+.dashlet .feed a:hover
+{
+   display: block;
+   height: 16px;
+   text-decoration: none;
+   width: 16px;
+}
+
 .dashlet .toolbar
 {
    background-color: #f6f6f6;
@@ -81,6 +102,12 @@
    border-bottom: 1px dashed #e9e9e9;
    clear: both;
    padding: 7px 9px;
+}
+
+.dashlet .detail-list-item.first
+{
+   float: none;
+   padding-top: 0;
 }
 
 .dashlet .detail-list-item.last

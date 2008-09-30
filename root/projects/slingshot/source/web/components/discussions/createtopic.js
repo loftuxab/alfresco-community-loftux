@@ -175,13 +175,6 @@
          Dom.get(this.id + "-form").setAttribute("action", actionUrl);
          Dom.get(this.id + "-site").setAttribute("value", this.options.siteId);
          Dom.get(this.id + "-container").setAttribute("value", this.options.containerId);
-         // construct the browseUrl. {post.name} gets replaced on the server
-         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-topicview?container={container}&topicId={post.name}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
-         });
-         Dom.get(this.id + "-browseTopicUrl").setAttribute("value", browseUrl);
              
          // and finally register the form handling
          this._registerCreateTopicForm();

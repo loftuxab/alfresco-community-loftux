@@ -109,8 +109,12 @@
 		
 		_dayRenderer: function(date, eventData)
 		{
-		   var theDate = Alfresco.util.formatDate(date, "m/d/yyyy");
-   		var events = eventData[theDate];
+		   var theStupidDate = Alfresco.util.formatDate(date, "m/d/yyyy");
+		   var theDate = Alfresco.util.toISO8601(date,
+		   {
+		      selector: "date"
+		   });
+   		var events = eventData[theStupidDate];
    		var html = "", item;
    		if (events && events.length > 0)
    		{

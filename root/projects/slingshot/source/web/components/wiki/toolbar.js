@@ -213,7 +213,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + this.title,
+            url: Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + this.title + "?page=wiki",
             successCallback:
             {
                fn: this.onPageDeleted,

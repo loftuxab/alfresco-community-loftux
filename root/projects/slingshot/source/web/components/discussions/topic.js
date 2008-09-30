@@ -424,7 +424,7 @@
          };
          
          // construct the url to call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}?page=discussions-topicview",
          {
             site : this.options.siteId,
             container: this.options.containerId,
@@ -535,13 +535,6 @@
          Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
          Dom.get(formId + "-title").setAttribute("value", data.title);
-         // construct the browseUrl. {post.name} gets replaced on the server
-         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/discussions-topicview?container={container}&topicId={post.name}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
-         });
-         Dom.get(formId + "-browseTopicUrl").setAttribute("value", browseUrl);
          Dom.get(formId + "-content").value = Alfresco.util.stripUnsafeHTMLTags(data.content);
 
          // and finally register the form handling

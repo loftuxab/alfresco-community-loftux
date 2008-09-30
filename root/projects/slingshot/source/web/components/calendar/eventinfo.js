@@ -98,7 +98,11 @@
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/info",
-            dataObj: { "htmlid" : this.id, "uri" : "/" + event.uri },
+            dataObj:
+            { 
+               "htmlid": this.id,
+               "uri": "/" + event.uri
+            },
             successCallback:
             {
                fn: this.templateLoaded,
@@ -162,7 +166,8 @@
          this.panel.hide();
          
          var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-         eventDialog.setOptions({
+         eventDialog.setOptions(
+         {
             "siteId": this.siteId,
             "eventURI": "/" + this.event.uri
          });
@@ -181,13 +186,13 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-               url: Alfresco.constants.PROXY_URI + this.event.uri,
+            url: Alfresco.constants.PROXY_URI + this.event.uri + "?page=calendar",
             successCallback:
             {
                fn: this.onDeleted,
                scope: this
             },
-               failureMessage: "Could not delete event"
+            failureMessage: "Could not delete event"
          });
       },
       

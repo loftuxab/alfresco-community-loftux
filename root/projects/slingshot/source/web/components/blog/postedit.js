@@ -237,14 +237,6 @@
          Dom.get(this.id + '-site').setAttribute("value", this.options.siteId);
          Dom.get(this.id + '-container').setAttribute("value", this.options.containerId);
                   
-         // browsePostUrl
-         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "/site/${site}/blog-postview?container=${container}&amp;postId={post.name}", // post.name will be replaced by the rest api
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
-         });
-         Dom.get(this.id + '-browsePostUrl').setAttribute("value", browseUrl);
-         
          // draft
          var draft = true;
          if (this.options.editMode)

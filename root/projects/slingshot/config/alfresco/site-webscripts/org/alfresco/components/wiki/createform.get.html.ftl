@@ -18,10 +18,11 @@
       <h1>${msg("header.create")}</h1>
       <#-- The "action" attribute is set dynamically upon form submission -->
       <form id="${args.htmlid}-form" action="" method="post">
-      <div class="leftcolumn" style="margin-top: 10px; margin-bottom: 10px;">
+         <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
+         <div class="leftcolumn" style="margin-top: 10px; margin-bottom: 10px;">
             <span class="label">${msg("label.title")}:</span>
             <span class="input"><input type="text" maxlength="256" size="75" id="${args.htmlid}-pageTitle" name="pageTitle"/></span>
-      </div>
+         </div>
       
          <span class="label">${msg("label.text")}:</span>
          <textarea class="yuieditor" name="pagecontent" id="${args.htmlid}-pagecontent" cols="180" rows="10"></textarea>

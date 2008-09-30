@@ -2,7 +2,7 @@
    new Alfresco.Activities("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      mode: "user"
+      mode: "site"
    }).setMessages(
       ${messages}
    );
