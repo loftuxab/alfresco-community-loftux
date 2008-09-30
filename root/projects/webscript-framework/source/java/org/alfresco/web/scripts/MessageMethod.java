@@ -24,12 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
-import org.alfresco.i18n.I18NUtil;
 
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateMethodModelEx;
@@ -49,17 +44,16 @@ import freemarker.template.TemplateScalarModel;
  * <p>
  * Usage: message(String id)
  */
-public class MessageMethod implements TemplateMethodModelEx
+public final class MessageMethod extends AbstractMessageHelper implements TemplateMethodModelEx
 {
-    private WebScript webscript;
-    
+    /**
+     * Constructor
+     * 
+     * @param webscript
+     */
     public MessageMethod(WebScript webscript)
     {
-        if (webscript == null)
-        {
-            throw new IllegalArgumentException("WebScript must be provided to constructor.");
-        }
-        this.webscript = webscript;
+        super(webscript);
     }
     
     /**
@@ -84,26 +78,7 @@ public class MessageMethod implements TemplateMethodModelEx
                 if (argSize == 1)
                 {
                     // shortcut for no additional msg params
-                    ResourceBundle resources = webscript.getResources();
-                    if (resources != null)
-                    {
-                        try
-                        {
-                            result = resources.getString(id);
-                        }
-                        catch (MissingResourceException mre)
-                        {
-                            // key not present
-                        }
-                    }
-                    if (result == null)
-                    {
-                        result = I18NUtil.getMessage(id);
-                    }
-                    if (result == null)
-                    {
-                    	result = id;
-                    }
+                    result = resolveMessage(id);
                 }
                 else
                 {
@@ -131,31 +106,7 @@ public class MessageMethod implements TemplateMethodModelEx
                         }
                     }
                     
-                    String msg = null;
-                    ResourceBundle resources = webscript.getResources();
-                    if (resources != null)
-                    {
-                        try
-                        {
-                            msg = resources.getString(id);
-                        }
-                        catch (MissingResourceException mre)
-                        {
-                            // key not present
-                        }
-                    }
-                    if (msg == null)
-                    {
-                        msg = I18NUtil.getMessage(id);
-                    }
-                    if (msg != null)
-                    {
-                        result = MessageFormat.format(msg, params);
-                    }
-                    else
-                    {
-                    	result = id;
-                    }
+                    result = resolveMessage(id, params);
                 }
             }
         }

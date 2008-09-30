@@ -330,7 +330,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     protected Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(16, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(32, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
@@ -341,6 +341,8 @@ public abstract class AbstractWebScript implements WebScript
         params.put("headersM", createHeadersM(req));
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
+        ScriptMessage message = new ScriptMessage(this);
+        params.put("msg", message);
         
         // If there is a request type specific script (e.g. *.json.js), parse
 		// the request according to its MIME type and add request specific
@@ -379,7 +381,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(32, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(64, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
