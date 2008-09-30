@@ -229,7 +229,8 @@ public abstract class AbstractWebScript implements WebScript
 	 * @param mimetype
 	 * @return  execute script
 	 */
-	protected ScriptDetails getExecuteScript(String mimetype) {
+	protected ScriptDetails getExecuteScript(String mimetype)
+    {
 		ScriptDetails script = null;
 	    scriptLock.readLock().lock();
 	
@@ -399,7 +400,7 @@ public abstract class AbstractWebScript implements WebScript
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
         MessageMethod message = new MessageMethod(this);
-        params.put("message", message);     // for compatibility with repo webscripts
+        params.put("message", message);     // for compatibility with repo templates
         params.put("msg", message);         // short form for presentation webscripts
         
         // add the webscript I18N resources as a JSON object
@@ -724,12 +725,11 @@ public abstract class AbstractWebScript implements WebScript
             if (input != null)
             {
                 // if config file found, read contents into buffer
-                StringBuffer fileContents = new StringBuffer(1024);
-                InputStreamReader isr = new InputStreamReader(input);
-                BufferedReader reader = new BufferedReader(isr);
+                StringBuilder fileContents = new StringBuilder(1024);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input), 1024);
                 char[] buf = new char[1024];
-                int read=0;
-                while((read=reader.read(buf)) != -1)
+                int read;
+                while ((read=reader.read(buf)) != -1)
                 {
                     fileContents.append(buf, 0, read);
                 }

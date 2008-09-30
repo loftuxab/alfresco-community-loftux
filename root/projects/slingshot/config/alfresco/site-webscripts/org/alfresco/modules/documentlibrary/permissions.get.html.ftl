@@ -23,7 +23,7 @@
 <#list groupNames as group>
          <div class="yui-gd">
             <div class="yui-u first right"><label>${msg("group." + group)} ${msg("label.have")}</label></div>
-            <div class="yui-u">
+            <div class="yui-u flat-button">
                <button id="${args.htmlid}-${group?lower_case}" value="${permissionGroups[group_index]}" class="site-group"></button>
                <select id="${args.htmlid}-${group?lower_case}-select">
    <#list siteRoles as siteRole>

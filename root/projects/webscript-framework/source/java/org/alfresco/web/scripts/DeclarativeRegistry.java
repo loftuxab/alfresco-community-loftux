@@ -543,16 +543,19 @@ public class DeclarativeRegistry
                 {
                     reqAuth = RequiredAuthentication.valueOf(reqAuthStr);
                 }
-                catch(IllegalArgumentException e)
+                catch (IllegalArgumentException e)
                 {
                     throw new WebScriptException("Authentication '" + reqAuthStr + "' is not a valid value");
                 }
                 String runAsStr = authElement.attributeValue("runas");
-                if (runAsStr != null) {
+                if (runAsStr != null)
+                {
                     runAsStr = runAsStr.trim();
-                    if (runAsStr.length() > 0) {
-                        if (!store.isSecure()) {
-                            throw new WebScriptException("runas user declared for script in insecure store");                            
+                    if (runAsStr.length() != 0)
+                    {
+                        if (!store.isSecure())
+                        {
+                            throw new WebScriptException("runas user declared for script in insecure store");
                         }
                         runAs = runAsStr;
                     }
@@ -573,7 +576,7 @@ public class DeclarativeRegistry
                 {
                     reqTrx = RequiredTransaction.valueOf(reqTrxStr);
                 }
-                catch(IllegalArgumentException e)
+                catch (IllegalArgumentException e)
                 {
                     throw new WebScriptException("Transaction '" + reqTrxStr + "' is not a valid value");
                 }
@@ -600,7 +603,7 @@ public class DeclarativeRegistry
                     {
                         formatStyle = FormatStyle.valueOf(formatStyleStr);
                     }
-                    catch(IllegalArgumentException e)
+                    catch (IllegalArgumentException e)
                     {
                         throw new WebScriptException("Format Style '" + formatStyle + "' is not a valid value");
                     }
@@ -693,11 +696,11 @@ public class DeclarativeRegistry
             serviceDesc.setFormatStyle(formatStyle);
             return serviceDesc;
         }
-        catch(DocumentException e)
+        catch (DocumentException e)
         {
             throw new WebScriptException("Failed to parse web script description document " + serviceDescPath, e);
         }
-        catch(WebScriptException e)
+        catch (WebScriptException e)
         {
             throw new WebScriptException("Failed to parse web script description document " + serviceDescPath, e);
         }
