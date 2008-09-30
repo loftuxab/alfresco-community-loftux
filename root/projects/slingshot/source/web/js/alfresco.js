@@ -224,6 +224,46 @@ Alfresco.util.formatDate = function(date)
 }
 
 /**
+ * Convert an ISO8601 date string into a JavaScript native Date object
+ *
+ * @method Alfresco.util.fromISO8601
+ * @param date {string} ISO8601 formatted date string
+ * @return {Date|null} JavaScript native Date object
+ * @static
+ */
+Alfresco.util.fromISO8601 = function(date)
+{
+   try
+   {
+      return Alfresco.thirdparty.fromISO8601.apply(this, arguments);
+   }
+   catch(e)
+   {
+      return null;
+   }
+}
+
+/**
+ * Convert a JavaScript native Date object into an ISO8601 date string
+ *
+ * @method Alfresco.util.toISO8601
+ * @param date {Date} JavaScript native Date object
+ * @return {string} ISO8601 formatted date string
+ * @static
+ */
+Alfresco.util.toISO8601 = function(date)
+{
+   try
+   {
+      return Alfresco.thirdparty.toISO8601.apply(this, arguments);
+   }
+   catch(e)
+   {
+      return "";
+   }
+}
+
+/**
  * Decodes an HTML-encoded string
  * Replaces &lt; &gt; and &amp; entities with their character equivalents
  *
@@ -1399,12 +1439,12 @@ Alfresco.util.Ajax = function()
                if (c.method.toUpperCase() === this.GET)
                {
                   // Encode the dataObj and put it in the url
-                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj, false);
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, false);
                }
                else
                {
                   // Enccode the dataObj and put it in the body
-                  c.dataStr = this._toParamString(c.dataObj, true);
+                  c.dataStr = this.jsonToParamString(c.dataObj, true);
                }
             }
          }
@@ -1477,7 +1517,7 @@ Alfresco.util.Ajax = function()
        * @param encode	indicates whether the parameter values should be encoded or not
        * @private
        */
-      _toParamString: function(obj, encode)
+      jsonToParamString: function(obj, encode)
       {
          var params = "";
          var first = true;
@@ -2193,6 +2233,7 @@ Alfresco.thirdparty.dateFormat.i18n =
  *    BSD license (http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE)
  *
  * @method Alfresco.thirdparty.fromISO8601
+ * @param formattedString {string} ISO8601-formatted date string
  * @return {Date|null}
  * @static
  */
@@ -2235,26 +2276,29 @@ Alfresco.thirdparty.fromISO8601 = function()
       	var match = isoRegExp.exec(formattedString);
       	var result = null;
 
-      	if(match)
+      	if (match)
       	{
       		match.shift();
-      		if(match[1]){match[1]--;} // Javascript Date months are 0-based
-      		if(match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
+      		if (match[1]){match[1]--;} // Javascript Date months are 0-based
+      		if (match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
 
       		result = new Date(match[0]||1970, match[1]||0, match[2]||1, match[3]||0, match[4]||0, match[5]||0, match[6]||0);
 
       		var offset = 0;
       		var zoneSign = match[7] && match[7].charAt(0);
-      		if(zoneSign != 'Z')
+      		if (zoneSign != 'Z')
       		{
       			offset = ((match[8] || 0) * 60) + (Number(match[9]) || 0);
-      			if(zoneSign != '-'){ offset *= -1; }
+      			if (zoneSign != '-')
+      			{
+      			   offset *= -1;
+      			}
       		}
-      		if(zoneSign)
+      		if (zoneSign)
       		{
       			offset -= result.getTimezoneOffset();
       		}
-      		if(offset)
+      		if (offset)
       		{
       			result.setTime(result.getTime() + offset * 60000);
       		}
@@ -2265,4 +2309,78 @@ Alfresco.thirdparty.fromISO8601 = function()
    }();
    
    return fromISOString.apply(arguments.callee, arguments);
+}
+
+/**
+ * Converts a JavaScript native Date object into a ISO8601-formatted string
+ *
+ * Original code:
+ *    dojo.date.stamp.toISOString
+ *    Copyright (c) 2005-2008, The Dojo Foundation
+ *    All rights reserved.
+ *    BSD license (http://trac.dojotoolkit.org/browser/dojo/trunk/LICENSE)
+ *
+ * @method Alfresco.thirdparty.toISO8601
+ * @param dateObject {Date} JavaScript Date object
+ * @param options {object} Optional conversion options
+ *    zulu = true|false
+ *    selector = "time|date"
+ *    milliseconds = true|false
+ * @return {string}
+ * @static
+ */
+Alfresco.thirdparty.toISO8601 = function()
+{
+   var toISOString = function()
+   {
+      //	summary:
+      //		Format a Date object as a string according a subset of the ISO-8601 standard
+      //
+      //	description:
+      //		When options.selector is omitted, output follows [RFC3339](http://www.ietf.org/rfc/rfc3339.txt)
+      //		The local time zone is included as an offset from GMT, except when selector=='time' (time without a date)
+      //		Does not check bounds.  Only years between 100 and 9999 are supported.
+      //
+      //	dateObject:
+      //		A Date object
+   	var _ = function(n){ return (n < 10) ? "0" + n : n; };
+
+      return function(dateObject, options)
+      {
+      	options = options || {};
+      	var formattedDate = [];
+      	var getter = options.zulu ? "getUTC" : "get";
+      	var date = "";
+      	if (options.selector != "time")
+      	{
+      		var year = dateObject[getter+"FullYear"]();
+      		date = ["0000".substr((year+"").length)+year, _(dateObject[getter+"Month"]()+1), _(dateObject[getter+"Date"]())].join('-');
+      	}
+      	formattedDate.push(date);
+      	if (options.selector != "date")
+      	{
+      		var time = [_(dateObject[getter+"Hours"]()), _(dateObject[getter+"Minutes"]()), _(dateObject[getter+"Seconds"]())].join(':');
+      		var millis = dateObject[getter+"Milliseconds"]();
+      		if (options.milliseconds)
+      		{
+      			time += "."+ (millis < 100 ? "0" : "") + _(millis);
+      		}
+      		if (options.zulu)
+      		{
+      			time += "Z";
+      		}
+      		else if(options.selector != "time")
+      		{
+      			var timezoneOffset = dateObject.getTimezoneOffset();
+      			var absOffset = Math.abs(timezoneOffset);
+      			time += (timezoneOffset > 0 ? "-" : "+") + 
+      				_(Math.floor(absOffset/60)) + ":" + _(absOffset%60);
+      		}
+      		formattedDate.push(time);
+      	}
+      	return formattedDate.join('T'); // String
+      }
+   }();
+
+   return toISOString.apply(arguments.callee, arguments);
 }
