@@ -81,7 +81,7 @@
          <div class="usedActions">&nbsp;</div>
          <#list columns as column>
             <div class="column" id="${args.htmlid}-column-div-${column_index + 1}" <#if (column_index >= currentLayout.noOfColumns)>style="display: none;"</#if>>
-            <h3 class="padded">Column ${column_index + 1}</h3>
+            <h3 class="padded">${msg("header.column", column_index + 1)}</h3>
             <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
                <#list column as dashlet>
                   <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">

@@ -1,7 +1,7 @@
 <#assign activePage = page.url.templateArgs.pageid!"customise-user-dashboard">
 <div class="page-title"><!-- ${activePage} -->
    <div class="title">
-      <h1>${user.properties["firstName"]?html} <#if user.properties["lastName"]??>${user.properties["lastName"]?html}</#if> <span class="light">${msg("header.dashboard")}</span></h1>
+      <h1><span class="light">${msg("header.dashboardPrefix")}</span> ${user.properties["firstName"]?html} <#if user.properties["lastName"]??>${user.properties["lastName"]?html}</#if> <span class="light">${msg("header.dashboardSuffix")}</span></h1>
    </div>
    <div class="links title-button">
       <#assign linkClass><#if "customise-user-dashboard" == activePage>class="active-page"</#if></#assign>
@@ -9,7 +9,7 @@
          <span class="first-child">
             <a href="${url.context}/page/customise-user-dashboard" ${linkClass}>${msg("link.customiseDashboard")}</a>
          </span>
-      </span>
+      </span>          
 
    </div>
 </div>
