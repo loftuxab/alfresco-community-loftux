@@ -53,7 +53,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
  */
 public class ISO8601DateFormat
 {
-    
     /**
      * Format date into ISO format
      * 
@@ -66,7 +65,7 @@ public class ISO8601DateFormat
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(isoDate);
         
-        StringBuffer formatted = new StringBuffer();
+        StringBuilder formatted = new StringBuilder(28);
         padInt(formatted, calendar.get(Calendar.YEAR), 4);
         formatted.append('-');
         padInt(formatted, calendar.get(Calendar.MONTH) + 1, 2);
@@ -80,7 +79,7 @@ public class ISO8601DateFormat
         padInt(formatted, calendar.get(Calendar.SECOND), 2);
         formatted.append('.');
         padInt(formatted, calendar.get(Calendar.MILLISECOND), 3);
-
+        
         TimeZone tz = calendar.getTimeZone();
         int offset = tz.getOffset(calendar.getTimeInMillis());
         if (offset != 0)
@@ -210,7 +209,7 @@ public class ISO8601DateFormat
     /**
      * Helper to zero pad a number to specified length 
      */
-    private static void padInt(StringBuffer buffer, int value, int length)
+    private static void padInt(StringBuilder buffer, int value, int length)
     {
         String strValue = Integer.toString(value);
         for (int i = length - strValue.length(); i > 0; i--)
@@ -219,5 +218,4 @@ public class ISO8601DateFormat
         }
         buffer.append(strValue);
     }
-    
 }

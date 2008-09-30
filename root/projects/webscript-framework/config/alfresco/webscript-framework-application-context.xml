@@ -243,6 +243,9 @@
            <entry key="dateCompare">
               <bean class="org.alfresco.web.scripts.DateCompareMethod"/>
            </entry>
+           <entry key="xmldate">
+              <bean class="org.alfresco.web.scripts.ISO8601DateFormatMethod"/>
+           </entry>
            <entry key="jsonUtils">
               <bean class="org.alfresco.web.scripts.json.JSONUtils"/>
            </entry>
@@ -257,6 +260,7 @@
          </map>
       </property>
    </bean>
+
 
    <!--                                               -->
    <!--  Web Script Presentation (Web Tier) Container -->
