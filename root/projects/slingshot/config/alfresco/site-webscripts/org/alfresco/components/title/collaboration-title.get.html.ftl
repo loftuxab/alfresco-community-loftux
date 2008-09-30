@@ -2,8 +2,9 @@
 <div class="page-title">
    <div class="title">
       <h1>
+         <span class="light">${msg("header.sitePrefix")}</span>
          <#if (profile.title != "")>${profile.title}<#else>${profile.shortName}</#if>
-         <span class="light">${msg("header.site")}</span>
+         <span class="light">${msg("header.siteSuffix")}</span>
       </h1>
    </div>
    <div class="links title-button">

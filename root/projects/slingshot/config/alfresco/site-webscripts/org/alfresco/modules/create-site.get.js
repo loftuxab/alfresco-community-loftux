@@ -1,2 +1,2 @@
-var sitePresets = [{id: "site-dashboard", name: "Collaboration Site"}];
+var sitePresets = [{id: "site-dashboard", name: msg.get("title.collaborationSite")}];
 model.sitePresets = sitePresets;
