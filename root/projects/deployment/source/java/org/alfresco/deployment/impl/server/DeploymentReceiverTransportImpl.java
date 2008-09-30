@@ -90,7 +90,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in getSendToken ticket:{1} path:{2}, guid:{3}");
+    		MessageFormat f = new MessageFormat("error in getSendToken ticket:{0} path:{1}, guid:{2}");
     		Object[] objs = { ticket, path, guid };
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -121,7 +121,7 @@ public class DeploymentReceiverTransportImpl implements
         	{
         		logger.error(err);
         	}
-           	MessageFormat f = new MessageFormat("unable to write ticket:{1}, outputToken:{2}, data:{3}, offset:{4}, len:{5}");
+           	MessageFormat f = new MessageFormat("unable to write ticket:{0}, outputToken:{1}, data:{2}, offset:{3}, len:{4}");
         	Object[] objs = { ticket, outputToken, data, offset, count };
         	logger.error(f.format(objs), e);
 
@@ -147,7 +147,7 @@ public class DeploymentReceiverTransportImpl implements
     	}   
     	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in finishSend ticket:{1}, outputToken:{2}");
+    		MessageFormat f = new MessageFormat("error in finishSend ticket:{0}, outputToken:{1}");
     		Object[] objs = { ticket, outputToken };
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -185,7 +185,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in begin user:{1}, password:{2}");
+    		MessageFormat f = new MessageFormat("error in begin user:{0}, password:{1}");
     		Object[] objs = { user, "****" };
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -204,7 +204,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in commit ticket:{1}");
+    		MessageFormat f = new MessageFormat("error in commit ticket:{0}");
     		Object[] objs = { ticket };
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -223,7 +223,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in delete ticket:{1}, path:{2}");
+    		MessageFormat f = new MessageFormat("error in delete ticket:{0}, path:{1}");
     		Object[] objs = { ticket, path };
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -250,7 +250,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in getListing ticket:{1}, path:{2}");
+    		MessageFormat f = new MessageFormat("error in getListing ticket:{0}, path:{1}");
     		Object[] objs = { ticket, path};
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -268,7 +268,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in mkdir ticket:{1}, path:{2}, guid:{3}");
+    		MessageFormat f = new MessageFormat("error in mkdir ticket:{0}, path:{1}, guid:{2}");
     		Object[] objs = { ticket, path, guid };
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -295,7 +295,7 @@ public class DeploymentReceiverTransportImpl implements
     	}
        	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in shutDown user:{1}, password:{2}");
+    		MessageFormat f = new MessageFormat("error in shutDown user:{0}, password:{1}");
     		Object[] objs = { user, "****"};
     	    logger.error(f.format(objs), e);
     		throw e;
@@ -311,7 +311,7 @@ public class DeploymentReceiverTransportImpl implements
     	} 
     	catch (RuntimeException e) 
     	{
-    		MessageFormat f = new MessageFormat("error in setGuid ticket:{1}, path:{2}, guid:{3}");
+    		MessageFormat f = new MessageFormat("error in setGuid ticket:{0}, path:{1}, guid:{2}");
     		Object[] objs = { ticket, path, guid };
     	    logger.error(f.format(objs), e);
     		throw e;

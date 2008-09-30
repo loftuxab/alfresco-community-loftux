@@ -120,8 +120,6 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     {
     	logger.info("Shutting down Implementation");
     	
-    	// TODO consider what should be behaviour if one or more deployments are in progress 
-    	// wait for the deployment to complete or abort?
         fDone = true;
         synchronized (this)
         {
@@ -221,7 +219,6 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             }
             catch (IOException e)
             {
-                // TODO How to we recover from this?
             	logger.error("Could not create logfile", e);
                 throw new DeploymentException("Could not create logfile; Deployment cannot continue", e);
             }
@@ -579,7 +576,6 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             throw new DeploymentException("mkdir invalid ticket. ticket:" + ticket);
         }
         
-        // TODO - Check whether dir already exists, it could simply be missing from meta data
     	File f = deployment.getFileForPath(path);
     	boolean exists = f.exists();
     	

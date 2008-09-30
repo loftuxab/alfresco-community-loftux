@@ -25,21 +25,20 @@
 
 package org.alfresco.deployment.impl.server;
 
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.Vector;
 
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
@@ -59,6 +58,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     private static final long serialVersionUID = 4752110479673700145L;
     
     private static Log logger = LogFactory.getLog(Deployment.class);
+    
+    private List<DeployedFile> deployedFiles = new Vector<DeployedFile>();
 
     /**
      * Timestamp of last time this deployment was talked to.
@@ -90,15 +91,15 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      */
     private String fLogDir;
 
-    /**
-     * The underlying file output stream.  Used for forcing to disk.
-     */
-    private transient FileOutputStream fFileOut;
-
-    /**
-     * The object output stream to which deployed files are written.
-     */
-    private transient ObjectOutputStream fOut;
+//    /**
+//     * The underlying file output stream.  Used for forcing to disk.
+//     */
+//    private transient FileOutputStream fFileOut;
+//
+//    /**
+//     * The object output stream to which deployed files are written.
+//     */
+//    private transient ObjectOutputStream fOut;
 
     /**
      * The state of this deployment with regards to the transaction.
@@ -118,10 +119,10 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fLogDir = logDir;
         fLogFile = logDir + File.separatorChar + "log";
         fLastActivity = System.currentTimeMillis();
-        File lDir = new File(logDir);
-        lDir.mkdir();
-        fFileOut = new FileOutputStream(fLogFile);
-        fOut = new ObjectOutputStream(fFileOut);
+//        File lDir = new File(logDir);
+//        lDir.mkdir();
+//        fFileOut = new FileOutputStream(fLogFile);
+//        fOut = new ObjectOutputStream(fFileOut);
         fCanBeStale = true;
         fState = DeploymentState.WORKING;
         fOutputStreams =  Collections.synchronizedMap(new HashMap<OutputStream, DeployedFile>());
@@ -173,7 +174,9 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
     	synchronized (this) 
     	{
-    		fOut.writeObject(file);
+    		deployedFiles.add(file);
+    		
+//   		fOut.writeObject(file);
     		fLastActivity = System.currentTimeMillis();
     	}
     }
@@ -185,9 +188,9 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void prepare()
         throws IOException
     {
-        fOut.flush();
-        fFileOut.getChannel().force(true);
-        fOut.close();
+//        fOut.flush();
+//        fFileOut.getChannel().force(true);
+//        fOut.close();
         fCanBeStale = false;
         fTarget.cloneMetaData(this);
         fState = DeploymentState.PREPARING;
@@ -209,9 +212,9 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void abort()
         throws IOException
     {
-        fOut.flush();
-        fFileOut.getChannel().force(true);
-        fOut.close();
+//        fOut.flush();
+//        fFileOut.getChannel().force(true);
+//        fOut.close();
         fCanBeStale = false;
         fState = DeploymentState.ABORTING;
         for (OutputStream out : fOutputStreams.keySet())
@@ -308,7 +311,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      */
     public Iterator<DeployedFile> iterator()
     {
-        return new DeployedFileIterator();
+    	return deployedFiles.iterator();
+        //return new DeployedFileIterator();
     }
 
     public void setGuid(String path, String guid)
@@ -319,7 +323,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
                                              path,
                                              guid,
                                              false);
-        fOut.writeObject(file);
+        //fOut.writeObject(file);
+        deployedFiles.add(file);
     }
 
     /**
@@ -339,91 +344,91 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
 		return metaError;
 	}
 
-	/**
-     * Iterator for reading back the log.
-     * @author britt
-     */
-    private class DeployedFileIterator implements Iterator<DeployedFile>
-    {
-        private DeployedFile fNext = null;
-        
-        private ObjectInputStream fIn;
-
-        public DeployedFileIterator()
-        {
-        	try {
-				fIn = new ObjectInputStream(new FileInputStream(fLogFile));
-			} catch (FileNotFoundException e) {
-				throw new DeploymentException("FileNotFound. logFile:" + fLogFile, e);
-			} catch (IOException e) {
-			    throw new DeploymentException("I/O error.", e);
-			}
-            
-            fNext = getNext();
-        }
-
-        /* (non-Javadoc)
-         * @see java.util.Iterator#hasNext()
-         */
-        public boolean hasNext()
-        {
-        	return fNext != null;
-        }
-
-        /* (non-Javadoc)
-         * @see java.util.Iterator#next()
-         */
-        public DeployedFile next()
-        {
-            DeployedFile next = fNext;
-            
-            fNext = getNext();
-            
-            return next;    
-        }
-
-        /* (non-Javadoc)
-         * @see java.util.Iterator#remove()
-         */
-        public void remove()
-        {
-            throw new RuntimeException("Not Implemented.");
-        }
-        
-        private DeployedFile getNext() 
-        {
-           try
-           {
-        	   DeployedFile next = (DeployedFile)fIn.readObject();
-               return next;
-           }
-           catch (EOFException eofe)
-           {
-                return null;
-
-           }
-           catch (IOException e)
-           {
-                throw new DeploymentException("I/O error.", e);
-           }
-           catch (ClassNotFoundException nfe)
-           {
-                throw new DeploymentException("Unable to read deployed file:" + nfe.toString(), nfe);
-           }
-        }
-        
-        public void finalize() {
-        	try {
-        		if(fIn != null)
-        		{
-        			fIn.close();
-        			fIn = null;
-        		}
-        	}
-        	catch (Throwable t)
-        	{
-        		logger.error("Unable to finalize", t);
-        	}
-        }
-    }
+//	/**
+//     * Iterator for reading back the log.
+//     * @author britt
+//     */
+//    private class DeployedFileIterator implements Iterator<DeployedFile>
+//    {
+//        private DeployedFile fNext = null;
+//        
+//        private ObjectInputStream fIn;
+//
+//        public DeployedFileIterator()
+//        {
+//        	try {
+//				fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+//			} catch (FileNotFoundException e) {
+//				throw new DeploymentException("FileNotFound. logFile:" + fLogFile, e);
+//			} catch (IOException e) {
+//			    throw new DeploymentException("I/O error.", e);
+//			}
+//            
+//            fNext = getNext();
+//        }
+//
+//        /* (non-Javadoc)
+//         * @see java.util.Iterator#hasNext()
+//         */
+//        public boolean hasNext()
+//        {
+//        	return fNext != null;
+//        }
+//
+//        /* (non-Javadoc)
+//         * @see java.util.Iterator#next()
+//         */
+//        public DeployedFile next()
+//        {
+//            DeployedFile next = fNext;
+//            
+//            fNext = getNext();
+//            
+//            return next;    
+//        }
+//
+//        /* (non-Javadoc)
+//         * @see java.util.Iterator#remove()
+//         */
+//        public void remove()
+//        {
+//            throw new RuntimeException("Not Implemented.");
+//        }
+//        
+//        private DeployedFile getNext() 
+//        {
+//           try
+//           {
+//        	   DeployedFile next = (DeployedFile)fIn.readObject();
+//               return next;
+//           }
+//           catch (EOFException eofe)
+//           {
+//                return null;
+//
+//           }
+//           catch (IOException e)
+//           {
+//                throw new DeploymentException("I/O error.", e);
+//           }
+//           catch (ClassNotFoundException nfe)
+//           {
+//                throw new DeploymentException("Unable to read deployed file:" + nfe.toString(), nfe);
+//           }
+//        }
+//        
+//        public void finalize() {
+//        	try {
+//        		if(fIn != null)
+//        		{
+//        			fIn.close();
+//        			fIn = null;
+//        		}
+//        	}
+//        	catch (Throwable t)
+//        	{
+//        		logger.error("Unable to finalize", t);
+//        	}
+//        }
+//    }
 }
