@@ -70,15 +70,17 @@ function specialize(item, activity, summary)
 function getActivities()
 {
    // Call the correct repo script depending on the mode
-   var format = args["format"], mode = args["mode"], site = args["site"], connector, result = {status: 0};
+   var mode = args["mode"], site = args["site"], connector, result = {status: 0};
 
-   if (format == "html")
+   if (format.name == "html")
    {
       connector = remote.connect("alfresco");
    }
    else
    {
+      // TODO: Use alfresco-rss when that code path works
       connector = remote.connect("alfresco-rss");
+      connector = remote.connect("alfresco");
    }
 
    if (mode == "site")
