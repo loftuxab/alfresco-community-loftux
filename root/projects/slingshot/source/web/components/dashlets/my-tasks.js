@@ -155,7 +155,8 @@
                me.widgets.dueOn.set("label", menuItem.cfg.getProperty("text"));
                me.onDateFilterChanged.call(me, p_aArgs[1]);
             }
-         });         
+         });
+         this.widgets.dueOn.value = "today";
          
          // Hook events for task transitions
          var fnTaskHandler = function MyTasks_fnTaskHandler(layer, args)
@@ -285,7 +286,7 @@
        */
       onDateFilterClicked: function MyTasks_onDateFilterClicked(p_oEvent)
       {
-         var filter = p_oEvent.target.value;
+         var filter =  this.widgets.dueOn.value;
          this.setActiveFilter(filter);
          this.populateTaskList(filter);
       },
