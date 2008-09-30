@@ -128,15 +128,20 @@
             YAHOO.Bubbling.fire("documentDetailsAvailable", docData);
             
             // fire event to show comments for document
-            var itemUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/document-details?nodeRef={nodeRef}",
+            var itemUrl = YAHOO.lang.substitute("site/{site}/document-details?nodeRef={nodeRef}",
             {
                site: this.options.siteId,
                nodeRef: this.options.nodeRef
             });
-            var eventData = { 
-               itemNodeRef: this.options.nodeRef,
-               itemTitle: docData.displayName,
-               itemUrl: itemUrl
+            var eventData =
+            { 
+               nodeRef: this.options.nodeRef,
+               title: docData.displayName,
+               page: "document-details",
+               pageParams:
+               {
+                  nodeRef: this.options.nodeRef
+               }
             }
             
             YAHOO.Bubbling.fire("setCommentedNode", eventData);

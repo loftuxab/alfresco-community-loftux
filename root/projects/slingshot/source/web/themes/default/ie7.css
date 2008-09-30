@@ -16,6 +16,15 @@
 
 
 /**
+ * Dashlets / position:relative and overflow:auto bug
+ */
+.dashlet .scrollableList
+{
+   position: relative;
+}
+
+
+/**
  * Document Library
  */
 .toolbar .selected-items hr

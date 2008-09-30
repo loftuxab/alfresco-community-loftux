@@ -170,6 +170,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    width: 47.5%;
 }
 
+
 /**
  * Customise pages
  */
@@ -187,6 +188,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 {
    width:62em;
 }
+
 
 /**
  * Customise dashlets
@@ -227,6 +229,20 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 .customisableDashlet
 {
    overflow: hidden;
+}
+
+
+/**
+ * Dashlets / position:relative and overflow:auto bug
+ */
+.dashlet .scrollableList
+{
+   position: relative;
+}
+
+.activities div.ruler
+{
+   background-color: #f9fcfd;
 }
 
 /**

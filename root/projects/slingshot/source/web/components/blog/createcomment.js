@@ -31,7 +31,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "editor"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["event", "json", "editor"], this.onComponentsLoaded, this);
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
@@ -72,17 +72,20 @@
          itemNodeRef: null,
          
          /**
-          * Title of the item to comment about.
-          * TODO: This is used for activity feed and should not be necessary here
+          * Title of the item to comment about for activites service.
           */
-         itemTitle: null,
+         activityTitle: null,
          
          /**
-          * Url of the item to comment about.
-          * TODO: This is used for activity feed and should not be necessary here
+          * Page for activities link.
           */
-         itemUrl: null,
-         
+         activityPage: null,
+
+         /**
+          * Params for activities link.
+          */
+         activityPageParams: null,
+
          /**
           * Width to use for comment editor
           */
@@ -158,11 +161,12 @@
       onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.itemNodeRef !== null) && (obj.itemUrl !== null) && (obj.itemTitle !== null))
+         if ((obj !== null) && (obj.nodeRef !== null) && (obj.title !== null) && (obj.page !== null))
          {
-            this.options.itemNodeRef = obj.itemNodeRef;
-            this.options.itemUrl = obj.itemUrl;
-            this.options.itemTitle = obj.itemTitle;
+            this.options.itemNodeRef = obj.nodeRef;
+            this.options.activityTitle = obj.title;
+            this.options.activityPage = obj.page;
+            this.options.activityPageParams = obj.pageParams;
             this.initializeCreateCommentForm();
          }
       },
@@ -186,7 +190,7 @@
       initializeCreateCommentForm: function CreateComment_initializeCreateCommentForm()
       {
          // only continue if the user is allowed to create a comment
-         if (! this.options.canCreateComment)
+         if (!this.options.canCreateComment)
          {
             return;
          }
@@ -208,24 +212,22 @@
          form.setAttribute("action", actionUrl);
 
          // nodeRef            
-         var nodeRefElem = Dom.get(this.id + '-nodeRef');
-         nodeRefElem.setAttribute("value", this.options.itemNodeRef);
+         Dom.get(this.id + '-nodeRef').setAttribute("value", this.options.itemNodeRef);
          
          // site
-         var siteElem = Dom.get(this.id + '-site');
-         siteElem.setAttribute("value", this.options.siteId);
+         Dom.get(this.id + '-site').setAttribute("value", this.options.siteId);
          
          // container
-         var containerElem = Dom.get(this.id + '-container');
-         containerElem.setAttribute("value", this.options.containerId);
+         Dom.get(this.id + '-container').setAttribute("value", this.options.containerId);
          
          // itemTitle
-         var itemTitleElem = Dom.get(this.id + '-itemTitle');
-         itemTitleElem.setAttribute("value", this.options.itemTitle);
-         
-         // browseItemUrl
-         var browseItemUrlElem = Dom.get(this.id + '-browseItemUrl');
-         browseItemUrlElem.setAttribute("value", this.options.itemUrl);
+         Dom.get(this.id + '-itemTitle').setAttribute("value", this.options.activityTitle);
+
+         // page
+         Dom.get(this.id + '-page').setAttribute("value", this.options.activityPage);
+
+         // pageParams
+         Dom.get(this.id + '-pageParams').setAttribute("value", YAHOO.lang.JSON.stringify(this.options.activityPageParams));
          
          // register the behaviour with the form and display it finally
          this.registerCreateCommentForm();
@@ -241,7 +243,8 @@
          this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
          
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
+         {
             height: this.options.height + 'px',
             width: this.options.width + 'px',
             dompath: false, //Turns on the bar at the bottom
@@ -264,8 +267,12 @@
                scope: this
             },
             failureMessage: this._msg("message.createcomment.failure"),
-            failureCallback: {
-               fn: function() { this.enableInputs(); },
+            failureCallback:
+            {
+               fn: function()
+               {
+                  this.enableInputs();
+               },
                scope: this
             }
          });

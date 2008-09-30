@@ -1,11 +1,11 @@
 <script type="text/javascript">//<![CDATA[
    var view = new Alfresco.CalendarView("${args.htmlid}").setSiteId(
-   "${page.url.templateArgs.site!""}"
+      "${page.url.templateArgs.site!""}"
    ).setMessages(
       ${messages}
    );
 <#if page.url.args["date"]?exists>
-   view.currentDate = new Date("${page.url.args["date"]}");
+   view.currentDate = Alfresco.util.fromISO8601("${page.url.args["date"]}");
 </#if>
 //]]></script>
 

@@ -587,12 +587,6 @@
          Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
          Dom.get(formId + "-submit").setAttribute("value", submitButtonLabel);
-         var browseUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postview?topicId={topicId}",
-         {
-            site: this.options.siteId,
-            topicId: this.options.topicId
-         });
-         Dom.get(formId + "-browseTopicUrl").setAttribute("value", browseUrl);
          Dom.get(formId + "-content").value = content;
          
          // store edit related data.

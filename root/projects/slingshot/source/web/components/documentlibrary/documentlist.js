@@ -1542,6 +1542,17 @@
          {
             success:
             {
+               activity:
+               {
+                  siteId: this.options.siteId,
+                  activityType: "file-deleted",
+                  page: "documentlibrary",
+                  activityData:
+                  {
+                     fileName: fileName,
+                     path: this.currentPath
+                  }
+               },
                event:
                {
                   name: fileType == "folder" ? "folderDeleted" : "fileDeleted",

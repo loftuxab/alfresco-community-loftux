@@ -257,16 +257,15 @@
        */
       sendCommentedNodeEvent: function BlogPostView_sendCommentedNodeEvent()
       {
-         // construct the itemUrl
-         var itemUrl = YAHOO.lang.substitute(Alfresco.constants.URL_PAGECONTEXT + "site/{site}/blog-postview?postId={itemName}",
+         var eventData =
          {
-            site: this.options.siteId,
-            itemName: this.blogPostData.name
-         });
-         var eventData = {
-            itemNodeRef: this.blogPostData.nodeRef,
-            itemTitle: this.blogPostData.title,
-            itemUrl: itemUrl
+            nodeRef: this.blogPostData.nodeRef,
+            title: this.blogPostData.title,
+            page: "blog-postview",
+            pageParams:
+            {
+               postId: this.blogPostData.name
+            }
          }
          YAHOO.Bubbling.fire("setCommentedNode", eventData);
       },

@@ -699,7 +699,7 @@
          };
           
          // construct the url to call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}?page=discussions-topicview",
          {
             site: this.options.siteId,
             container: this.options.containerId,

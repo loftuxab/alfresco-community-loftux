@@ -138,6 +138,10 @@
        * <pre>function(data, obj) where data is an object literal containing config, json, serverResponse</pre>
        * @param action.success.callback.scope {object} Success callback function scope
        * @param action.success.callback.obj {object} Success callback function object passed to callback
+       * @param action.success.activity.siteId {string} Site associated with activity
+       * @param action.success.activity.activityType {string} Activity type to post
+       * @param action.success.activity.page {string} Page to generate activity link to
+       * @param action.success.activity.activityData {object} Metadata for activity type
        * @param action.failure.event.name {string} Bubbling event to fire on failure
        * @param action.failure.event.obj {object} Bubbling event failure parameter object
        * @param action.failure.message {string} Timed message to display on failure
@@ -169,12 +173,18 @@
          var overrideConfig = action.config;
          var wait = action.wait;
          var configObj = null;
+         var doclibActions = this;
 
          var fnCallback = function DLA_genericAction_callback(data, obj)
          {
             // Check for notification event
             if (obj)
             {
+               // Activity specified?
+               if (obj.activity !== undefined)
+               {
+                  doclibActions.postActivity(obj.activity.siteId, obj.activity.activityType, obj.activity.page, obj.activity.activityData);
+               }
                // Event specified?
                if (obj.event && obj.event.name)
                {
@@ -270,6 +280,46 @@
          });
 
          return this._runAction(config, overrideConfig);
+      },
+      
+      /**
+       * ACTION: Post Activity
+       * Posts a Document Library activity
+       *
+       * @method postActivity
+       * @param siteId {string} site
+       * @param containerId {string} container
+       * @param activityType {string} org.alfresco.documentlibrary.{activityType}
+       * @param page {string} page to link to from activity
+       * @param data {object} data attached to activity
+       */
+      postActivity: function DLA_postActivity(siteId, activityType, page, data)
+      {
+         var config =
+         {
+            method: "POST",
+            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/activity",
+            successCallback: null,
+            successMessage: null,
+            failureCallback: null,
+            failureMessage: null,
+            object: null
+         };
+         
+         config.dataObj = YAHOO.lang.merge(
+         {
+            site: siteId,
+            type: activityType,
+            page: page
+         }, data);
+
+         try
+         {
+            Alfresco.util.Ajax.jsonRequest(config);
+         }
+         catch (e)
+         {
+         }
       }
    };
 })();

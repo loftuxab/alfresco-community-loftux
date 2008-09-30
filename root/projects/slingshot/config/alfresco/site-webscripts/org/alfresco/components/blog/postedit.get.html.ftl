@@ -26,7 +26,7 @@
       <div>
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
          <input type="hidden" id="${args.htmlid}-container" name="container" value="" />
-         <input type="hidden" id="${args.htmlid}-browsePostUrl" name="browsePostUrl" value="" />
+         <input type="hidden" id="${args.htmlid}-page" name="page" value="blog-postview" />
          <input type="hidden" id="${args.htmlid}-draft" name="draft" value=""/>
                
          <!-- title -->

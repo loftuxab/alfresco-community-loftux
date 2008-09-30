@@ -191,6 +191,7 @@
 {
    max-height: 15em;
    overflow-y: auto;
+   text-align: left;
 }
 
 .toolbar-file-list span

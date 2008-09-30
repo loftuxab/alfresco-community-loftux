@@ -14,7 +14,7 @@
       <div>
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
          <input type="hidden" id="${args.htmlid}-container" name="container" value="" />
-         <input type="hidden" id="${args.htmlid}-browseTopicUrl" name="browseTopicUrl" value="" />
+         <input type="hidden" id="${args.htmlid}-page" name="page" value="discussions-topicview" />
          
          <label>${msg("topicTitle")}:</label>
          <input type="text" id="${args.htmlid}-title" name="title" size="80" value=""/>

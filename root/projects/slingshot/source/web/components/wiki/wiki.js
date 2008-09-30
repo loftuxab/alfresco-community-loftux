@@ -144,7 +144,8 @@
 		   var div = Dom.get(this.id + "-pagecontent");
    		var obj =
    		{
-   		   "pagecontent": div.innerHTML
+   		   pagecontent: div.innerHTML,
+   		   page: "wiki-page"
    	   };
    		   
 		   Alfresco.util.Ajax.request(

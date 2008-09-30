@@ -8,7 +8,7 @@
          <div>
             <input type="hidden" id="${args.htmlid}-site"name="site" value="" />
             <input type="hidden" id="${args.htmlid}-container"name="container" value="" />
-            <input type="hidden" id="${args.htmlid}-browseTopicUrl" name="browseTopicUrl" value="" />
+            <input type="hidden" id="${args.htmlid}-page" name="page" value="discussions-topicview" />
             <textarea id="${args.htmlid}-content" rows="8" cols="80" name="content" class="yuieditor"></textarea>
             <div class="nodeFormAction">
                <input type="submit" id="${args.htmlid}-submit" />

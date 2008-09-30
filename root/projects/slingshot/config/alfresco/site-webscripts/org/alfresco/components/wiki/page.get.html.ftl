@@ -70,6 +70,7 @@
 	               <fieldset>
 	            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
    	            <input type="hidden" name="context" value="${pageContext?html}" />
+   	            <input type="hidden" name="page" value="wiki-page" />
                   <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
               
                <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>

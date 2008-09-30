@@ -114,11 +114,11 @@
          /**
           * Number of multi-file uploads before grouping the Activity Post
           *
-          * @property groupUploadsAt
+          * @property groupActivitiesAt
           * @type int
           * @default 5
           */
-         groupUploadsAt: 5
+         groupActivitiesAt: 5
       },
       
       /**
@@ -376,58 +376,32 @@
        */
       onFileUploadComplete: function DLTB_onFileUploadComplete(complete)
       {
-         var config =
-         {
-            method: "POST",
-            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/activity",
-            dataObj:
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               browseURL: window.location.pathname + (window.location.hash || "")
-            },
-            successCallback: null,
-            successMessage: null,
-            failureCallback: null,
-            failureMessage: null,
-            object: null
-         };
-
-         var success = complete.successful.length;
+         var success = complete.successful.length, activityData, file;
          if (success > 0)
          {
-            if (success < this.options.groupUploadsAt)
+            if (success < this.options.groupActivitiesAt)
             {
                // Below cutoff for grouping Activities into one
-               var file;
                for (var i = 0; i < success; i++)
                {
                   file = complete.successful[i];
-                  config.dataObj.type = "file-added";
-                  config.dataObj.fileName = file.fileName;
-                  config.dataObj.contentURL = Alfresco.constants.PROXY_URI + "api/node/content/" + file.nodeRef.replace(":/", "") + "/" + encodeURIComponent(file.fileName);
-                  config.dataObj.browseURL = window.location.pathname + "?file=" + config.dataObj.fileName + (window.location.hash || "");
-                  try
+                  activityData =
                   {
-                     Alfresco.util.Ajax.jsonRequest(config);
-                  }
-                  catch (e)
-                  {
-                  }
+                     fileName: file.fileName,
+                     nodeRef: file.nodeRef
+                  };
+                  this.modules.actions.postActivity(this.options.siteId, "file-added", "document-details", activityData);
                }
             }
             else
             {
                // grouped into one message
-               config.dataObj.type = "files-added";
-               config.dataObj.fileCount = success;
-               try
+               activityData =
                {
-                  Alfresco.util.Ajax.jsonRequest(config);
-               }
-               catch (e)
-               {
-               }
+                  fileCount: success,
+                  path: this.currentPath
+               };
+               this.modules.actions.postActivity(this.options.siteId, "files-added", "documentlibrary", activityData);
             }
          }
       },
@@ -622,6 +596,35 @@
                      multiple: true,
                      nodeRef: result.nodeRef
                   });
+               }
+            }
+
+            // Activities
+            var activityData, file;
+            if (successCount > 0)
+            {
+               if (successCount < this.options.groupActivitiesAt)
+               {
+                  // Below cutoff for grouping Activities into one
+                  for (var i = 0; i < successCount; i++)
+                  {
+                     activityData =
+                     {
+                        fileName: data.json.results[i].id,
+                        path: this.currentPath
+                     };
+                     this.modules.actions.postActivity(this.options.siteId, "file-deleted", "documentlibrary", activityData);
+                  }
+               }
+               else
+               {
+                  // grouped into one message
+                  activityData =
+                  {
+                     fileCount: successCount,
+                     path: this.currentPath
+                  };
+                  this.modules.actions.postActivity(this.options.siteId, "files-deleted", "documentlibrary", activityData);
                }
             }
 
