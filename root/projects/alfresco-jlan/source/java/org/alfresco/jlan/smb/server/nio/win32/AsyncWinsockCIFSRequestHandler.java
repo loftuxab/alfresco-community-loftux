@@ -26,21 +26,20 @@
 package org.alfresco.jlan.smb.server.nio.win32;
 
 import java.io.IOException;
-import java.nio.channels.CancelledKeyException;
-import java.nio.channels.SelectionKey;
-import java.util.Iterator;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.NetBIOSName;
-import org.alfresco.jlan.netbios.win32.NetBIOSSelectionKey;
-import org.alfresco.jlan.netbios.win32.NetBIOSSelector;
 import org.alfresco.jlan.netbios.win32.NetBIOSSocket;
+import org.alfresco.jlan.netbios.win32.Win32NetBIOS;
+import org.alfresco.jlan.netbios.win32.Winsock2;
 import org.alfresco.jlan.netbios.win32.WinsockNetBIOSException;
 import org.alfresco.jlan.server.SrvSessionQueue;
-import org.alfresco.jlan.server.thread.ThreadRequest;
 import org.alfresco.jlan.server.thread.ThreadRequestPool;
 import org.alfresco.jlan.smb.server.SMBSrvSession;
+import org.alfresco.jlan.smb.server.nio.AsynchronousWritesHandler;
 import org.alfresco.jlan.smb.server.nio.RequestHandler;
 import org.alfresco.jlan.smb.server.win32.WinsockNetBIOSPacketHandler;
 
@@ -64,11 +63,12 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 	
 	// Selector used to monitor a group of socket channels for incoming requests
 	
-	private NetBIOSSelector m_nbSelector;
+//	private NetBIOSSelector m_nbSelector;
 	
 	// Thread that the request handler runs in
 	
 	private Thread m_thread;
+	private int m_threadId;
 	
 	// Thread pool for processing requests
 	
@@ -77,17 +77,24 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 	// Queue of sessions that are pending setup with the selector
 	
 	private SrvSessionQueue m_sessQueue;
-	
-	// Loopback connection socket used to wakeup the selector, client and server side sockets
-	
-	private NetBIOSSocket m_wakeupSockClient;
-	private NetBIOSSocket m_wakeupSockSrv;
-	
-	private byte[] m_wakeupBuf = new byte[1];
-	
-	// Client socket session timeout
+
+	// Client socket timeout
 	
 	private int m_clientSocketTimeout;
+	
+	// Socket event to session mapping
+	
+	private Hashtable<Integer, SMBSrvSession> m_eventTable;
+	
+	// Socket event arrays
+	//
+	// The first element in the active array is used to wakeup the main request handler thread.
+	
+	private int[] m_win32ActiveEvents;
+	private int m_activeEventsLen;
+	
+	private int[] m_requeueEvents;
+	private int m_requeueLen;
 	
 	// shutdown request flag
 	
@@ -121,11 +128,24 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		// Create the session queue
 		
 		m_sessQueue = new SrvSessionQueue();
+
+		// Allocate the active event array, and requeue array
+		
+		m_win32ActiveEvents   = new int[maxSess];
+		m_requeueEvents       = new int[maxSess];
+		
+		// Create the event to CIFS session mapping table
+		
+		m_eventTable = new Hashtable<Integer, SMBSrvSession>( maxSess);
+		
+		// Unique id for the thread
+		
+		m_threadId = ++_handlerId;
 		
 		// Start the request handler in a seperate thread
 		
 		m_thread = new Thread( this);
-		m_thread.setName( "AsyncWinsockRequestHandler_" + ++_handlerId);
+		m_thread.setName( "AsyncWinsockRequestHandler_" + m_threadId);
 		m_thread.setDaemon( false);
 		
 		m_thread.start();
@@ -137,13 +157,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 	 * @return int
 	 */
 	public final int getCurrentSessionCount() {
-		
-		int sessCnt = 0;
-	
-		if ( m_nbSelector != null)
-			sessCnt = m_nbSelector.keys().size();
-		
-		return sessCnt;
+		return m_eventTable.size();
 	}
 	
 	/**
@@ -187,8 +201,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		
 		// Wakeup the main thread to process the new session queue
 		
-		if ( m_nbSelector != null)
-			wakeupSelector();
+		wakeupRequestHandler();
 	}
 	
 	/**
@@ -211,44 +224,38 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		
 		m_shutdown = false;
 		
-		// Create the selector
-			
-		m_nbSelector = new NetBIOSSelector();
-
-		// Create a loopback connection to the workstation name for unblocking the select call
+		// Create the wakeup event
 		
 		try {
-			NetBIOSName wksName = new NetBIOSName( m_srvName);
-			wksName.setType( NetBIOSName.WorkStation);
 			
-			m_wakeupSockClient = NetBIOSSocket.connectSocket( m_srvLANA, wksName);
+			// Create the event used to wakeup the request handler thread to add/remove sessions
+			
+			m_win32ActiveEvents[0] = Win32NetBIOS.Win32CreateEvent();
+			m_activeEventsLen++;
 		}
 		catch ( Exception ex) {
 			
 			// DEBUG
 			
 			if ( Debug.EnableError && hasDebug()) {
-				Debug.println( "[SMB] Failed to connect wakeup socket");
-				Debug.println( ex);
+				Debug.println( "[SMB] Failed to initialize wakeup event " + m_thread.getName());
+				Debug.println(ex);
 			}
-			
-			// Do not run
+				
+			// Force the request handler to shut down
 			
 			m_shutdown = true;
 		}
 		
 		// Loop until shutdown
 		
-		Vector<ThreadRequest> reqList = new Vector<ThreadRequest>();
-		byte[] wakeupBuf = new byte[8];
+		int eventIdx = -1;
 		
 		while ( m_shutdown == false) {
 			
 			// Check if there are any sessions registered
 
-			int sessCnt = 0;
-			
-			if ( m_nbSelector.keys().size() == 0) {
+			if ( m_activeEventsLen == 1 && m_eventTable.size() == 0) {
 
 				// Indicate that this request handler has no active sessions
 				
@@ -258,40 +265,26 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 				
 				if ( Debug.EnableInfo && hasDebug())
 					Debug.println( "[SMB] Request handler " + m_thread.getName() + " waiting for session ...");
+			}				
+
+			// Wait for a wakeup event or socket event
+			
+			try {
 				
-				// Wait for a session to be added to the handler
-				
-				try {
-					m_sessQueue.waitWhileEmpty();
-				}
-				catch ( InterruptedException ex) {
-				}
+				eventIdx = Win32NetBIOS.WinsockWaitForMultipleEvents( m_activeEventsLen, m_win32ActiveEvents, false, Winsock2.WSA_INFINITE, false);
 			}
-			else {
+			catch ( WinsockNetBIOSException ex) {
 				
-				// Wait for client requests
+				// DEBUG
 				
-				try {
-					sessCnt = m_nbSelector.select();
+				if ( Debug.EnableDbg && hasDebug()) {
+					Debug.println("[SMB] Error waiting for event");
+					Debug.println( ex);
 				}
-				catch ( CancelledKeyException ex) {
-					
-					// DEBUG
-					
-					if ( Debug.EnableError && hasDebug() && m_shutdown == false) {
-						Debug.println( "[SMB] Request handler error waiting for events");
-						Debug.println(ex);
-					}
-				}
-				catch ( IOException ex) {
-					
-					// DEBUG
-					
-					if ( Debug.EnableError && hasDebug()) {
-						Debug.println( "[SMB] Request handler error waiting for events");
-						Debug.println(ex);
-					}
-				}
+				
+				// Set the event index, might as well process the session queue
+				
+				eventIdx = 0;
 			}
 			
 			// Check if the shutdown flag has been set
@@ -299,120 +292,75 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 			if ( m_shutdown == true)
 				continue;
 			
-			// Check if there are any events to process
+			// Determine if the triggered event is wakeup or socket event
 			
-			if ( sessCnt > 0) {
+			if ( eventIdx == 0) {
 			
 				// DEBUG
 				
-//				if ( Debug.EnableInfo && hasDebug() && sessCnt > 1)
-//					Debug.println( "[SMB] Request handler " + m_thread.getName() + " session events, sessCnt=" + sessCnt + "/" + m_nbSelector.keys().size());
+//				if ( Debug.EnableInfo && hasDebug())
+//					Debug.println( "[SMB] Wakeup event, active=" + m_activeEventsLen);
 
-				// Clear the thread request list
+				// Reset the wakeup event
 				
-				reqList.clear();
+				Win32NetBIOS.Win32ResetEvent( m_win32ActiveEvents[ 0]);
 				
-				// Iterate the selected keys
+				// Requeue socket events
 				
-				Iterator<NetBIOSSelectionKey> keysIter = m_nbSelector.selectedKeys().iterator();
-				long timeNow = System.currentTimeMillis();
+				if ( m_requeueLen > 0) {
 				
-				while ( keysIter.hasNext()) {
+					// DEBUG
 					
-					// Get the current selection key and check if has an incoming request
+//					if ( Debug.EnableDbg && hasDebug())
+//						Debug.println("[SMB] Requeue events to active list, requeueLen=" + m_requeueLen);
 					
-					NetBIOSSelectionKey selKey = keysIter.next();
+					// Requeue socket events to the active event list
 					
-					if ( selKey.isReadable()) {
-
-						// Check if the key has an associated session, if not then it is a wakeup socket event
+					synchronized ( m_requeueEvents) {
 						
-						if ( selKey.attachment() != null) {
+						// Copy the events to the active list
+						
+						for ( int i = 0; i < m_requeueLen; i++) {
 							
-							// Switch off read events for this channel until the current processing is complete
+							// Get the event id of the event being requeued
 							
-							selKey.interestOps( selKey.interestOps() & ~NetBIOSSelectionKey.OP_READ);
+							Integer eventId = new Integer( m_requeueEvents[ i]);
+							SMBSrvSession sess = m_eventTable.get( eventId);
+						
+							// Get the socket via the sessions packet handler
+						
+							WinsockNetBIOSPacketHandler winsockPktHandler = (WinsockNetBIOSPacketHandler) sess.getPacketHandler();
+							NetBIOSSocket nbSocket = winsockPktHandler.getSocket();
 							
-							// Get the associated session and queue a request to the thread pool to read and process the CIFS request
-							
-							SMBSrvSession sess = (SMBSrvSession) selKey.attachment();
-							reqList.add(  new AsyncWinsockCIFSThreadRequest( sess, selKey, this));
-	
-							// Update the last I/O time for the session
-							
-							sess.setLastIOTime( timeNow);
-							
-							// Remove the selection key from the selected list
-							
-							keysIter.remove();
-	
-							// Check if there are enough thread requests to be queued
-							
-							if ( reqList.size() >= 5) {
-								
-								// Queue the requests to the thread pool
-								
-								m_threadPool.queueRequests( reqList);
-								reqList.clear();
-							}
-						}
-						else {
-							
+							// Reset the events to trigger on
+
 							try {
 								
-								// Remove the wakeup socket from the triggered list
+								// Process any pending events for the socket
 								
-								keysIter.remove();
+								processSocketEvent( m_requeueEvents [ i]);
+
+								int evtEnum = Win32NetBIOS.WinsockEnumNetworkEvents( nbSocket.getSocket(), 0);
+								if ( evtEnum != 0)
+									Debug.println("[SMB] Requeue event, evtEnum=0x" + Integer.toHexString( evtEnum));
 								
-								// Clear the wakeup buffer
+								// Reset the events to be reported for the socket
 								
-								int rxCnt = selKey.socket().read( wakeupBuf, 0, wakeupBuf.length);
-								
-								// DEBUG
-								
-//								if ( Debug.EnableInfo && hasDebug())
-//									Debug.println( "[SMB] Clearing out wakeup socket, read " + rxCnt + " bytes");
+								Win32NetBIOS.WinsockEventSelect( nbSocket.getSocket(), m_requeueEvents[ i], Winsock2.FD_READ | Winsock2.FD_WRITE | Winsock2.FD_CLOSE);
 							}
-							catch ( WinsockNetBIOSException ex) {
-								
-								// DEBUG
-								
-								if ( Debug.EnableError && hasDebug()) {
-									Debug.println( "[SMB] Error clearing out wakeup buffer");
-									Debug.println( ex);
-								}
+							catch ( Exception ex) {
+								Debug.println("[SMB] Error re-enabling FD_READ events sess=" + sess.getUniqueId());
+								Debug.println(ex);
 							}
 						}
-					}
-					else if ( selKey.isValid() == false) {
 						
-						// Remove the selection key from the selected list
-
-						keysIter.remove();
+						// Reset the requeue list
 						
-						// DEBUG
-						
-						if ( Debug.EnableInfo && hasDebug())
-							Debug.println( "[SMB] Winsock NetBIOS Selection key not valid, sess=" + selKey.attachment());
+						m_requeueLen = 0;
 					}
 				}
 				
-				// Queue the thread requests
-				
-				if ( reqList.size() > 0) {
-					
-					// Queue the requests to the thread pool
-					
-					m_threadPool.queueRequests( reqList);
-					reqList.clear();
-				}
-			}
-			
-			// Check if there are any new sessions that need to be registered with the selector
-			
-			if ( m_sessQueue.numberOfSessions() > 0) {
-				
-				// Register the new sessions with the selector
+				// Register the new sessions
 				
 				while ( m_sessQueue.numberOfSessions() > 0) {
 					
@@ -431,76 +379,110 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 						
 						if ( sess.getPacketHandler() instanceof WinsockNetBIOSPacketHandler) {
 							
-							// Get the channel packet handler and register the NetBIOS socket with the selector
+							// Get the channel packet handler and create a socket event for the new session
 							
 							WinsockNetBIOSPacketHandler winsockPktHandler = (WinsockNetBIOSPacketHandler) sess.getPacketHandler();
 							NetBIOSSocket nbSocket = winsockPktHandler.getSocket();
 							
 							try {
+
+								// Create a socket event for the new session
 								
-								// Register the NetBIOS socket with the selector
+								int sockEvent = Win32NetBIOS.WinsockCreateEvent();
+								
+								// Set the socket buffer sizes
+								
+								Win32NetBIOS.setSocketReceiveBufferSize(nbSocket.getSocket(), 128000);
+								Win32NetBIOS.setSocketSendBufferSize(nbSocket.getSocket(), 256000);
+								
+								// Enable the required socket events for the session socket
 								
 								nbSocket.configureBlocking( false);
-								nbSocket.register( m_nbSelector, NetBIOSSelectionKey.OP_READ, sess);
+								Win32NetBIOS.WinsockEventSelect( nbSocket.getSocket(), sockEvent, Winsock2.FD_READ | Winsock2.FD_WRITE | Winsock2.FD_CLOSE);
+								
+								// Add the event/session mapping
+								
+								m_eventTable.put( new Integer( sockEvent), sess);
+								
+								// Add the socket event to the active event list
+								
+								m_win32ActiveEvents[ m_activeEventsLen++] = sockEvent;
 							}
 							catch ( IOException ex) {
 								
 								// DEBUG
 								
-								if ( Debug.EnableError && hasDebug())
-									Debug.println( "[SMB] Failed to register NetBIOS session socket with selector, " + ex.getMessage());
+								if ( Debug.EnableError && hasDebug()) {
+									Debug.println( "[SMB] Failed to initialize socket event for new session");
+									Debug.println( ex);
+								}
 							}
 						}
 					}
 				}
 			}
+			else {
+
+				// Process the socket event
+				
+				processSocketEvent( m_win32ActiveEvents[ eventIdx]);
+			}
 		}
+			
+		// Close all sessions and events
 		
-		// Close all sessions
-		
-		if ( m_nbSelector != null) {
+		if ( m_eventTable.size() > 0) {
 			
-			// Enumerate the selector keys to get the session list
+			// Enumerate the event ids
 			
-			Iterator<Integer> selKeys = m_nbSelector.keys().iterator();
+			Enumeration<Integer> eventIds = m_eventTable.keys();
 			
-			while ( selKeys.hasNext()) {
+			while ( eventIds.hasMoreElements()) {
 				
-				// Get the current session via the selection key
+				// Get the current session via the associated event id
 				
-				NetBIOSSelectionKey curKey = m_nbSelector.getSelectionKey( selKeys.next());
-				if ( curKey != null) {
+				Integer eventId = eventIds.nextElement();
+				SMBSrvSession sess = m_eventTable.get( eventId);
+				
+				if ( sess != null) {
 					
-					// Get the session from the seletion key
-				
-					SMBSrvSession sess = (SMBSrvSession) curKey.attachment();
-				
+					// DEBUG
+					
+					if ( Debug.EnableDbg && hasDebug())
+						Debug.println("[SMB] Closing session " + sess.getUniqueId() + ", event=" + eventId);
+						
+					// Release the socket event
+					
+					try {
+						Win32NetBIOS.WinsockCloseEvent( eventId.intValue());
+					}
+					catch ( Exception ex) {
+						Debug.println(ex);
+					}
+					
 					// Close the session
-				
-					if ( sess != null)
+
+					try {
 						sess.closeSession();
+					}
+					catch ( Exception ex) {
+						Debug.println(ex);
+					}
 				}
 			}
-			
-			// Close the wakeup sockets, client and server side
-			
-			try {
-				m_wakeupSockSrv.closeSocket();
-			}
-			catch (Exception ex) {
-			}
-
-			try {
-				m_wakeupSockClient.closeSocket();
-			}
-			catch (Exception ex) {
-			}
-			
-			// Close the selector
-			
-			m_nbSelector.close();
 		}
 
+		// Close the wakeup event
+		
+		if ( m_win32ActiveEvents[0] != 0) {
+			try {
+				Win32NetBIOS.Win32CloseEvent( m_win32ActiveEvents[0]);
+			}
+			catch ( Exception ex) {
+				Debug.println(ex);
+			}
+		}
+		
 		// DEBUG
 		
 		if ( Debug.EnableInfo && hasDebug())
@@ -517,79 +499,9 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		if ( m_thread != null) {
 			m_shutdown = true;
 			
-			try {
-				
-				// Wakeup the thread, might be waiting on the session queue
-				
-				m_thread.interrupt();
-				
-				// Wakeup the selector, if valid
-				
-				if ( m_nbSelector != null)
-					wakeupSelector();
-			}
-			catch (Exception ex) {
-			}
-		}
-	}
-	
-	/**
-	 * Set the server side wakeup socket
-	 * 
-	 * @param srvSock NetBIOSSocket
-	 */
-	protected final void setServerSideWakeupSocket( NetBIOSSocket srvSock) {
-		
-		// Check if the wakeup socket has already been set
-		
-		if ( m_wakeupSockSrv != null)
-			throw new RuntimeException( "Server-side wakeup socket already set for Winsock request handler");
-		
-		// Set the server-side of the wakeup socket, required for select
-		
-		m_wakeupSockSrv = srvSock;
-		
-		try {
-			
-			// Register the server-side of the loopback connection with the selector
-			
-			m_wakeupSockSrv.configureBlocking( false);
-			m_wakeupSockSrv.register( m_nbSelector, NetBIOSSelectionKey.OP_READ, null);
-			
-			// Wakeup the main thread to start listening for socket events
-			
-			synchronized ( m_sessQueue) {
-				m_sessQueue.notify();
-			}
-		}
-		catch (IOException ex) {
-			
-			// DEBUG
-			
-			if ( Debug.EnableError && hasDebug()) {
-				Debug.println("[SMB] Failed to register wakeup socket with selector");
-				Debug.println( ex);
-			}
-		}
-	}
-	
-	/**
-	 * Wake up the selector thread by writing to the loopback connection socket
-	 */
-	protected final void wakeupSelector() {
-		if ( m_wakeupSockClient != null) {
-			try {
-				m_wakeupSockClient.write( m_wakeupBuf, 0, m_wakeupBuf.length);
-			}
-			catch ( WinsockNetBIOSException ex) {
-				
-				// DEBUg
-				
-				if ( Debug.EnableError && hasDebug()) {
-					Debug.println( "[SMB] Error waking up request handler select");
-					Debug.println(ex);
-				}
-			}
+			// Wakeup the request handler thread
+
+			wakeupRequestHandler();
 		}
 	}
 	
@@ -604,23 +516,22 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		
 		int idleCnt = 0;
 		
-		if ( m_nbSelector != null && m_nbSelector.keys().size() > 0) {
+		if ( m_eventTable.size() > 0) {
 
 			// Time to check
 			
 			long checkTime = System.currentTimeMillis() - (long) m_clientSocketTimeout;
 			
-			// Enumerate the selector keys to get the session list
+			// Enumerate the session list
 			
-			Iterator<Integer> selKeys = m_nbSelector.keys().iterator();
+			Enumeration<SMBSrvSession> enumSess = m_eventTable.elements();
 			Vector<SMBSrvSession> idleSessList = null;
 			
-			while ( selKeys.hasNext()) {
+			while ( enumSess.hasMoreElements()) {
 				
-				// Get the current session via the selection key
+				// Get the current session
 				
-				NetBIOSSelectionKey curKey = m_nbSelector.getSelectionKey( selKeys.next());
-				SMBSrvSession sess = (SMBSrvSession) curKey.attachment();
+				SMBSrvSession sess = enumSess.nextElement();
 				
 				// Check the time of the last I/O request on this session
 				
@@ -665,5 +576,242 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 		// Return the count of idle sessions that were queued for removal
 		
 		return idleCnt;
+	}
+	
+	/**
+	 * Wakeup the main thread
+	 */
+	protected void wakeupRequestHandler() {
+		
+		// Set the wakeup event
+		
+		if ( Win32NetBIOS.Win32SetEvent( m_win32ActiveEvents[0]) == false) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Failed to wakeup request handler, " + m_thread.getName());
+		}
+	}
+	
+	/**
+	 * Requeue a socket event to the active list
+	 * 
+	 * @param sockEvent int
+	 * @param sockPtr int
+	 */
+	protected void requeueSocketEvent( int sockEvent, int sockPtr) {
+		
+		// Reset the event status
+		
+		Win32NetBIOS.WinsockResetEvent( sockEvent);
+/**		
+		// Re-enable read events for the socket
+		
+		try {
+			Win32NetBIOS.WinsockEventSelect( sockPtr, sockEvent, Winsock2.FD_READ | Winsock2.FD_WRITE | Winsock2.FD_CLOSE);
+		}
+		catch ( WinsockNetBIOSException ex) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug()) {
+				Debug.println("[SMB] Error setting FD_READ socket event flag");
+				Debug.println(ex);
+			}
+		}
+**/		
+		// Add to the requeue list
+		
+		synchronized ( m_requeueEvents) {
+			m_requeueEvents[ m_requeueLen++] = sockEvent;
+		}
+		
+		// Wakeup the main request handler thread
+		
+		// Set the wakeup event
+		
+		if ( Win32NetBIOS.Win32SetEvent( m_win32ActiveEvents[0]) == false) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Failed to wakeup request handler (requeue), " + m_thread.getName());
+		}
+	}
+
+	/**
+	 * Process the socket event
+	 * 
+	 * @param eventIdx int
+	 */
+	private void processSocketEvent( int eventId) {
+		
+		// Get the associated sessions, and socket, for the event
+		
+		Integer eventIdKey = new Integer( eventId);
+		SMBSrvSession sess = m_eventTable.get( eventIdKey);
+		
+		// Get the socket via the sessions packet handler
+		
+		WinsockNetBIOSPacketHandler winsockPktHandler = (WinsockNetBIOSPacketHandler) sess.getPacketHandler();
+		NetBIOSSocket nbSocket = winsockPktHandler.getSocket();
+		
+		int triggeredEvent = 0;
+		
+		try {
+			
+			// Find out the event that triggered, check for socket errors
+			
+			triggeredEvent = Win32NetBIOS.WinsockEnumNetworkEvents( nbSocket.getSocket(), 0);
+		}
+		catch ( WinsockNetBIOSException ex) {
+
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug()) {
+				Debug.println("[SMB] Socket error event, sess=" + sess.getUniqueId() + ", eventId=" + eventId);
+				Debug.println(ex);
+			}
+			
+			// Close the socket
+			
+			triggeredEvent = Winsock2.FD_CLOSE;
+		}
+			
+		// DEBUG
+		
+//		if ( Debug.EnableDbg && hasDebug())
+//			Debug.println("[SMB] Triggered id=" + eventId + ", sess=" + sess.getUniqueId() + ", event=0x" + Integer.toHexString( triggeredEvent));
+		
+		// Check if any events are pending on the socket
+		
+		if ( triggeredEvent == 0)
+			return;
+		
+		// Socket closed
+		
+		if (( triggeredEvent & Winsock2.FD_CLOSE) != 0) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Close session event, sess=" + sess.getUniqueId());
+			
+			// Find the socket event within the list
+			
+			int eventIdx = 0;
+			
+			while ( m_win32ActiveEvents[ eventIdx] != eventId && eventIdx < m_activeEventsLen)
+				eventIdx++;
+			
+			if ( eventIdx == m_activeEventsLen)
+				return;
+			
+			// Remove the socket event from the active list, and shorten the list
+			
+			m_win32ActiveEvents [ eventIdx] = m_win32ActiveEvents[ m_activeEventsLen--];
+			
+			// Close the session
+			
+			sess.hangupSession( "Client closed socket");
+			
+			// Close the event
+			
+			try {
+				Win32NetBIOS.WinsockCloseEvent( eventIdKey.intValue());
+			}
+			catch ( WinsockNetBIOSException ex) {
+				
+				// DEBUG
+				
+				if ( Debug.EnableDbg && hasDebug()) {
+					Debug.println("[SMB] Error closing socket event");
+					Debug.println(ex);
+				}
+			}
+			
+			// Remove the event/session mapping
+			
+			m_eventTable.remove( eventId);
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Removed session " + sess.getUniqueId());
+		}
+		
+		// Check for a read event, incoming data on the socket
+		
+		if (( triggeredEvent & Winsock2.FD_READ) != 0) {
+
+			// DEBUG
+			
+//			if ( Debug.EnableDbg && hasDebug())
+//				Debug.println("[SMB] Read event, sess=" + sess.getUniqueId());
+			
+			// Clear the event
+			
+			Win32NetBIOS.WinsockResetEvent( eventIdKey.intValue());
+			
+			// Remove the read event for the socket
+/**
+			try {
+				Win32NetBIOS.WinsockEventSelect( nbSocket.getSocket(), eventId, Winsock2.FD_WRITE | Winsock2.FD_CLOSE);
+			}
+			catch ( WinsockNetBIOSException ex) {
+				
+				// DEBUG
+				
+				if ( Debug.EnableDbg && hasDebug()) {
+					Debug.println("[SMB] Error clearing FD_READ socket event flag");
+					Debug.println(ex);
+				}
+			}
+**/			
+			// Check if the session is already processing the incoming request
+			
+			if ( sess.hasReadInProgress() == false) {
+				
+				// Update the last I/O time for the session
+				
+				sess.setLastIOTime( System.currentTimeMillis());
+				
+				// Queue the session to the thread pool for processing
+				
+				AsyncWinsockCIFSReadRequest threadReq = new AsyncWinsockCIFSReadRequest( sess, eventIdKey.intValue(), this);
+				m_threadPool.queueRequest( threadReq);
+			}
+		}
+		
+		// Check for a write event, socket has buffer space for outgoing data
+		
+		if (( triggeredEvent & Winsock2.FD_WRITE) != 0) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Write event, sess=" + sess.getUniqueId());
+			
+			// Clear the event
+			
+			Win32NetBIOS.WinsockResetEvent( eventIdKey.intValue());
+			
+			// Check if the packet handler has any queued writes
+			
+			AsynchronousWritesHandler writesHandler = (AsynchronousWritesHandler) winsockPktHandler;
+			if ( writesHandler.getQueuedWriteCount() > 0) {
+				
+				// DEBUG
+				
+				if ( Debug.EnableDbg && hasDebug())
+					Debug.println("[SMB] Submit queued writes for processing, sess=" + sess.getUniqueId());
+
+				// Queue the packet handler to the thread pool for processing
+				
+				AsyncWinsockCIFSWriteRequest threadReq = new AsyncWinsockCIFSWriteRequest(sess, eventIdKey.intValue(), this);
+				m_threadPool.queueRequest( threadReq);
+			}
+		}
 	}
 }

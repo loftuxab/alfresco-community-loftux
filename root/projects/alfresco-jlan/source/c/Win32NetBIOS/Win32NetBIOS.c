@@ -43,10 +43,15 @@
 
 #define ReceiveErrorMask 0x80000000
 
+// Define the socket write status to indicate that the socket would block
+
+#define SocketWouldBlock -2
+
 // Internal functions
 
 void parseMultiSz(const wchar_t*, wchar_t*);
 void throwWinsockException(JNIEnv* jnienv, int winsockErr, const char* msg);
+void throwException(JNIEnv* jnienv, int stsCode, const char* msg);
 
 // Event triggered when the Winsock interface is closed down
 
@@ -75,7 +80,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_AddName
 
 	ncb.ncb_command  = NCBADDNAME;
 	ncb.ncb_lana_num = (unsigned char) lana;
-	
+
 	memcpy(ncb.ncb_name, nameBuf, NCBNAMSZ);
 
 	(*jnienv)->ReleaseByteArrayElements(jnienv, name, nameBuf, 0);
@@ -119,7 +124,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_AddGrou
 
 	ncb.ncb_command  = NCBADDGRNAME;
 	ncb.ncb_lana_num = (unsigned char) lana;
-	
+
 	memcpy(ncb.ncb_name, nameBuf, NCBNAMSZ);
 
 	(*jnienv)->ReleaseByteArrayElements(jnienv, name, nameBuf, 0);
@@ -165,7 +170,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_FindNam
 
 	ncb.ncb_command  = NCBFINDNAME;
 	ncb.ncb_lana_num = (unsigned char) lana;
-	
+
 	memcpy(ncb.ncb_callname, namePtr, NCBNAMSZ);
 	(*jnienv)->ReleaseByteArrayElements(jnienv, name, namePtr, 0);
 
@@ -198,7 +203,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_FindNam
  */
 JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_DeleteName
   (JNIEnv* jnienv, jclass jthis, jint lana, jbyteArray name) {
-	return -1; 	
+	return -1;
 }
 
 /*
@@ -212,53 +217,53 @@ JNIEXPORT jintArray JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_La
 	jsize numLANAs;
 	jintArray lanaArray;
 	int i;
-	
+
 	/*
 	 * Allocate an NCB and LANA enum structure
 	 */
-	
+
 	NCB ncb;
 	LANA_ENUM lanaEnum;
 
 	memset(&ncb, 0, sizeof(ncb));
-	
+
 	/*
 	 * Build the LANA Enum request
 	 */
-	
+
 	ncb.ncb_command = NCBENUM;
 	ncb.ncb_buffer  = (PUCHAR) &lanaEnum;
 	ncb.ncb_length  = sizeof(lanaEnum);
-	
+
 	/*
 	 * Enumerate the available LANAs
 	 */
-	
+
 	Netbios(&ncb);
-	
+
 	/*
 	 * Build a Java int[] with the LANA numbers
 	 */
-	
+
 	if ( ncb.ncb_retcode == NRC_GOODRET)
 		numLANAs = (jsize) lanaEnum.length;
-		
+
 	lanaArray = (*jnienv)->NewIntArray(jnienv, numLANAs);
-	
+
 	if ( numLANAs > 0) {
 		jint* pArray = (*jnienv)->GetIntArrayElements(jnienv, lanaArray, 0);
-		
+
 		for ( i = 0; i < numLANAs; i++) {
 			pArray[i] = lanaEnum.lana[i];
 		}
 
 		(*jnienv)->ReleaseIntArrayElements(jnienv, lanaArray, pArray, 0);
 	}
-	
+
 	/*
 	 * Return the LANA list
 	 */
-	
+
 	return lanaArray;
 }
 
@@ -364,7 +369,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Listen
 		 * Return the callers name, if available
 		 */
 
-		if ( ncb.ncb_callname[0] != '\0') { 
+		if ( ncb.ncb_callname[0] != '\0') {
 			pBuffer = (*jnienv)->GetByteArrayElements(jnienv, callerName, 0);
 			memcpy(pBuffer, ncb.ncb_callname, NCBNAMSZ);
 			(*jnienv)->ReleaseByteArrayElements(jnienv, callerName, pBuffer, 0);
@@ -652,7 +657,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Receive
 
 	ncb.ncb_command  = NCBDGRECVBC;
 	ncb.ncb_lana_num = (unsigned char) lana;
-	ncb.ncb_num      = (unsigned char) nameNum;	
+	ncb.ncb_num      = (unsigned char) nameNum;
 	ncb.ncb_rto = 0;
 	ncb.ncb_sto = 0;
 
@@ -1076,7 +1081,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_CreateD
 * Signature: (I[B)I
 */
 JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_BindSocket
-	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray nbname)
+	(JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray nbname, jboolean fastAddName)
 {
 	jbyte* namePtr = (*jnienv)->GetByteArrayElements(jnienv, nbname, 0);
 	int sts = 0;
@@ -1089,7 +1094,13 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_BindSoc
 	 */
 
 	memset(&localNbAddr, 0, sizeof(SOCKADDR_NB));
-	SET_NETBIOS_SOCKADDR(&localNbAddr, NETBIOS_UNIQUE_NAME, namePtr, namePtr[15]);
+
+	if ( fastAddName == 0) {
+		SET_NETBIOS_SOCKADDR(&localNbAddr, NETBIOS_UNIQUE_NAME, namePtr, namePtr[15]);
+	}
+	else {
+		SET_NETBIOS_SOCKADDR(&localNbAddr, NETBIOS_TYPE_QUICK_UNIQUE, namePtr, namePtr[15]);
+	}
 
 	(*jnienv)->ReleaseByteArrayElements(jnienv, nbname, namePtr, 0);
 
@@ -1234,9 +1245,9 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SendSoc
 		if ( wsts == WSAEWOULDBLOCK) {
 
 			/*
-			 * Indicate no data sent, try again
+			 * Return a status value to indicate the data could not be sent without the socket blocking
 			 */
-			return 0;
+			return SocketWouldBlock;
 		}
 		else
 			throwWinsockException(jnienv, wsts, "SendSocket");
@@ -1341,7 +1352,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SendSoc
 
 	pName = (*jnienv)->GetByteArrayElements(jnienv, jtoName, 0);
 	SET_NETBIOS_SOCKADDR(&groupAddr, NETBIOS_GROUP_NAME, pName, pName[15]);
-	
+
 	(*jnienv)->ReleaseByteArrayElements(jnienv, jtoName, pName, 0);
 
 	/*
@@ -1388,14 +1399,14 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SetNonB
 	/*
 	 * Set the blocking/non-blocking mode
 	 */
-	
+
 	if ( nonBlocking == 0)
 		sockMode = 1;
 
 	/*
 	 * Set the socket non-blocking I/O mode
 	 */
-	
+
 	sts = ioctlsocket( sock, FIONBIO, (u_long*) &sockMode);
 	if ( sts == SOCKET_ERROR)
 		throwWinsockException(jnienv, WSAGetLastError(), "SetNonBlockingSocket");
@@ -1403,7 +1414,7 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SetNonB
 	/*
 	 * Return the new non-blocking mode
 	 */
-	
+
 	return sockMode;
 }
 
@@ -1486,6 +1497,346 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_GetMaxi
 }
 
 /*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    Win32CreateEvent
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Win32CreateEvent
+  (JNIEnv* jnienv, jclass jthis)
+{
+	/*
+	 * Create a new Win32 event
+	 */
+
+	jint eventHandle = (jint) CreateEvent( NULL, FALSE, FALSE, NULL);
+
+	if ( eventHandle == (jint) INVALID_HANDLE_VALUE)
+		throwException( jnienv, GetLastError(), "CreateEvent");
+
+	/*
+	 * Return the new event handle
+	 */
+
+	return eventHandle;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    Win32CloseEvent
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Win32CloseEvent
+  (JNIEnv* jnienv, jclass jthis, jint eventHandle)
+{
+	/*
+	 * Close a Win32 event
+	 */
+
+	if ( CloseHandle((HANDLE) eventHandle) == 0) {
+
+		/*
+		 * Error closing the event handle
+		 */
+
+		throwException( jnienv, GetLastError(), "CloseEvent");
+	}
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    Win32SetEvent
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Win32SetEvent
+  (JNIEnv* jnienv, jclass jthis, jint eventHandle)
+{
+	/*
+	 * Set a Win32 event state to signalled
+	 */
+
+	if ( SetEvent((HANDLE) eventHandle) != 0)
+		return TRUE;
+	return FALSE;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    Win32ResetEvent
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Win32ResetEvent
+  (JNIEnv* jinenv, jclass jthis, jint eventHandle)
+{
+	/*
+	 * Reset a Win32 event state to unsignalled
+	 */
+
+	if ( ResetEvent((HANDLE) eventHandle) != 0)
+		return TRUE;
+	return FALSE;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockCreateEvent
+ * Signature: ()J
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockCreateEvent
+  (JNIEnv* jnienv, jclass jthis)
+{
+	/*
+	 * Create a Winsock event
+	 */
+
+	jint eventHandle = (jint) WSACreateEvent();
+	if ( eventHandle == (jint) WSA_INVALID_EVENT)
+		throwWinsockException( jnienv, WSAGetLastError(), "WinsockCreateEvent");
+
+	/*
+	 * Return the event handle
+	 */
+
+	return eventHandle;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockSetEvent
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockSetEvent
+  (JNIEnv* jnienv, jclass jthis, jint eventHandle)
+{
+	/*
+	 * Set a Winsock event state to signalled
+	 */
+
+	if ( WSASetEvent((HANDLE) eventHandle) != 0)
+		return TRUE;
+	return FALSE;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockResetEvent
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockResetEvent
+  (JNIEnv* jnienv, jclass jthis, jint eventHandle)
+{
+	/*
+	 * Reset a Winsock event state to unsignalled
+	 */
+
+	if ( WSAResetEvent((HANDLE) eventHandle) != 0)
+		return TRUE;
+	return FALSE;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockCloseEvent
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockCloseEvent
+  (JNIEnv* jnienv, jclass jthis, jint eventHandle)
+{
+	/*
+	 * Close a Winsock event handle
+	 */
+
+	if ( WSACloseEvent((HANDLE) eventHandle) == 0)
+		throwWinsockException( jnienv, WSAGetLastError(), "WinsockCloseEvent");
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockWaitForMultipleEvents
+ * Signature: (I[IZIZ)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockWaitForMultipleEvents
+  (JNIEnv* jnienv, jclass jthis, jint eventCnt, jintArray jevents, jboolean waitAll, jint timeout, jboolean alertable)
+{
+	jint* pEvents = NULL;
+	jint eventId = 0;
+
+	/*
+	 * Access the list of events
+	 */
+
+	pEvents = (*jnienv)->GetIntArrayElements( jnienv, jevents, 0);
+
+	/*
+	 * Wait for an event to be triggered
+	 */
+
+	do {
+
+		/*
+		 * Wait for an event
+		 */
+
+		eventId = WSAWaitForMultipleEvents( eventCnt, (HANDLE*) pEvents, waitAll, timeout, alertable);
+
+	} while ( eventId == WSA_WAIT_IO_COMPLETION);
+
+	/*
+	 * Release the input array
+	 */
+
+	(*jnienv)->ReleaseIntArrayElements(jnienv, jevents, pEvents, 0);
+
+	/*
+	 * Check if an event signalled or error occurred
+	 */
+
+	if ( eventId == WSA_WAIT_FAILED)
+		throwWinsockException( jnienv, WSAGetLastError(), "WinsockWaitForMultipleEvents");
+
+	/*
+	 * Return the index of the event that triggered
+	 */
+
+	return eventId;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockEventSelect
+ * Signature: (III)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockEventSelect
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr, jint eventHandle, jint eventMask)
+{
+	if ( WSAEventSelect( sockPtr, (HANDLE) eventHandle, eventMask) == SOCKET_ERROR)
+		throwWinsockException( jnienv, WSAGetLastError(), "WinsockEventSelect");
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    WinsockEnumNetworkEvents
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_WinsockEnumNetworkEvents
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr, jint eventHandle)
+{
+	WSANETWORKEVENTS netEvents;
+	jint eventMask = 0;
+	int idx = 0;
+
+	/*
+	 * Get the event data for the socket
+	 */
+
+	if ( WSAEnumNetworkEvents( sockPtr, (HANDLE) eventHandle, &netEvents) == 0) {
+
+		/*
+		 * Get the network event mask for the socket
+		 */
+
+		eventMask = netEvents.lNetworkEvents;
+
+		/*
+		 * Check if there are any errors, report the first found via an exception
+		 */
+
+		for ( idx = 0; idx < FD_MAX_EVENTS; idx++) {
+			if (( eventMask & ( 1 << idx)) != 0 && netEvents.iErrorCode[idx] != 0)
+				throwWinsockException( jnienv, netEvents.iErrorCode[ idx], "EnumSocketError");
+		}
+	}
+	else
+		throwWinsockException( jnienv, WSAGetLastError(), "WinsockEnumNetworkEvents");
+
+	/*
+	 * Return the triggered event(s) mask
+	 */
+
+	return eventMask;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    getSocketReceiveBufferSize
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_getSocketReceiveBufferSize
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr)
+{
+	int bufSize = 0;
+	int optLen = sizeof( bufSize);
+
+	/*
+	 * Get the NetBIOS socket receive buffer size
+	 */
+	if ( getsockopt( sockPtr, SOL_SOCKET, SO_RCVBUF, (char*) &bufSize, &optLen) == SOCKET_ERROR)
+		throwWinsockException( jnienv, WSAGetLastError(), "getSocketReceiveBufferSize");
+
+	/*
+	 * Return the buffer size
+	 */
+
+	return bufSize;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    setSocketReceiveBufferSize
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_setSocketReceiveBufferSize
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr, jint bufSize)
+{
+	int optLen = sizeof( bufSize);
+
+	/*
+	 * Set the NetBIOS socket receive buffer size
+	 */
+	if ( setsockopt( sockPtr, SOL_SOCKET, SO_RCVBUF, (char*) &bufSize, optLen) == SOCKET_ERROR)
+		throwWinsockException( jnienv, WSAGetLastError(), "setSocketReceiveBufferSize");
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    getSocketSendBufferSize
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_getSocketSendBufferSize
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr)
+{
+	int bufSize = 0;
+	int optLen = sizeof( bufSize);
+
+	/*
+	 * Get the NetBIOS socket send buffer size
+	 */
+	if ( getsockopt( sockPtr, SOL_SOCKET, SO_SNDBUF, (char*) &bufSize, &optLen) == SOCKET_ERROR)
+		throwWinsockException( jnienv, WSAGetLastError(), "getSocketSendBufferSize");
+
+	/*
+	 * Return the buffer size
+	 */
+	return bufSize;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    setSocketSendBufferSize
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_setSocketSendBufferSize
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr, jint bufSize)
+{
+	int optLen = sizeof( bufSize);
+
+	/*
+	 * Set the NetBIOS socket send buffer size
+	 */
+	if ( setsockopt( sockPtr, SOL_SOCKET, SO_SNDBUF, (char*) &bufSize, optLen) == SOCKET_ERROR)
+		throwWinsockException( jnienv, WSAGetLastError(), "setSocketSendBufferSize");
+}
+
+/*
 * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
 * Method:    waitForNetworkAddressChange
 * Signature: ()V
@@ -1541,8 +1892,37 @@ void throwWinsockException(JNIEnv* jnienv, int winsockErr, const char* msg) {
 	/*
 	 * Create the Winsock NetBIOS exception object
 	 */
-	
+
 	exceptionClass = (*jnienv)->FindClass(jnienv, "org/alfresco/jlan/netbios/win32/WinsockNetBIOSException");
+	if ( exceptionClass == NULL)
+		return;
+
+	/*
+	 * Throw the Java exception
+	 */
+
+	(*jnienv)->ThrowNew( jnienv, exceptionClass, msgbuf);
+}
+
+/**
+ * Create an Exception with the specified status message
+ */
+void throwException(JNIEnv* jnienv, int stsCode, const char* msg) {
+
+	char msgbuf[64];
+	jclass exceptionClass = NULL;
+
+	/*
+	 * Create the error message using the status code
+	 */
+
+	sprintf_s(msgbuf, sizeof( msgbuf), "%u:%s", stsCode, msg);
+
+	/*
+	 * Create the exception object
+	 */
+
+	exceptionClass = (*jnienv)->FindClass(jnienv, "java/lang/Exception");
 	if ( exceptionClass == NULL)
 		return;
 

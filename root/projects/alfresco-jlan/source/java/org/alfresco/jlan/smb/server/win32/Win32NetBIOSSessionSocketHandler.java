@@ -407,6 +407,10 @@ public class Win32NetBIOSSessionSocketHandler extends SessionHandlerBase impleme
 	 */
 	public void closeSessionHandler(NetworkServer server) {
 
+		// Set the shutdown flag
+		
+		setShutdown( true);
+		
 		// Reset the LANA, if valid, to wake the main session listener thread
 
 		if ( isLANAValid())
@@ -716,7 +720,7 @@ public class Win32NetBIOSSessionSocketHandler extends SessionHandlerBase impleme
 					// Create a packet handler for the session
 
 					SMBServer smbServer = (SMBServer) getServer();
-					PacketHandler pktHandler = new WinsockNetBIOSPacketHandler(m_lana, sessSock, smbServer.getPacketPool());
+					PacketHandler pktHandler = new WinsockNetBIOSPacketHandler(m_lana, sessSock, smbServer.getPacketPool(), false);
 
 					// Create a server session for the new request, and set the session id.
 

@@ -57,7 +57,7 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 	//
 	// Number of session socket channels each request handler thread monitors
 	
-	public static final int SessionSocketsPerHandler	= 250;
+	public static final int SessionSocketsPerHandler	= 50; // 250;
 	
 	// List of session handlers that are waiting for incoming requests
 	

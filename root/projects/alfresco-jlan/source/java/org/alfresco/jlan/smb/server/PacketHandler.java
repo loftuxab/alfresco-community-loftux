@@ -50,6 +50,10 @@ public abstract class PacketHandler {
 
 	private CIFSPacketPool m_packetPool;
 
+	// Debug output enable
+	
+	private boolean m_debug;
+	
 	/**
 	 * Class constructor
 	 * 
@@ -157,6 +161,24 @@ public abstract class PacketHandler {
 		return m_packetPool;
 	}
 
+	/**
+	 * Check if debug output is enabled
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasDebug() {
+		return m_debug;
+	}
+	
+	/**
+	 * Set/clear the debug enable flag
+	 * 
+	 * @param ena boolean
+	 */
+	public final void setDebug( boolean ena) {
+		m_debug = ena;
+	}
+	
 	/**
 	 * Return the count of available bytes in the receive input stream
 	 * 

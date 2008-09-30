@@ -498,30 +498,6 @@ public class AsyncWinsockCifsConnectionsHandler implements CifsConnectionsHandle
 	
 							queueSessionToHandler( sess);
 						}
-						else {
-							
-							// Connection to the workstation name, this is used for the NetBIOS selector wakeup
-
-							AsyncWinsockCIFSRequestHandler reqHandler = m_requestHandlers.firstElement();
-
-							if ( reqHandler != null) {
-								
-								// DEBUG
-								
-								if ( Debug.EnableInfo && hasDebug())
-									Debug.println( "[SMB] Winsock wakeup connection");
-									
-								// Set the server-side wakeup socket for the request handler
-								
-								reqHandler.setServerSideWakeupSocket( clientSock);
-							}
-							else if ( Debug.EnableInfo && hasDebug()) {
-								
-								// DEBUG
-								
-								Debug.println("[SMB] Connection to " + m_wksNbName + ", but no active request handler");
-							}
-						}
 					}
 					catch ( IOException ex) {
 						

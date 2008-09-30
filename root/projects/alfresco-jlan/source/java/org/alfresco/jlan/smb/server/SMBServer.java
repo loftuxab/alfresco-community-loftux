@@ -481,8 +481,10 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 			}
 
 			// Create the CIFS connections handler
+			//
+			// Note: The older thread per session/socket handler is used for Win32 NetBIOS connections
 
-			if ( getCIFSConfiguration().hasDisableNIOCode()) {
+			if ( getCIFSConfiguration().hasDisableNIOCode() || getCIFSConfiguration().hasWin32NetBIOS()) {
 				
 				// Use the older threaded connections handler (thread per session model)
 			

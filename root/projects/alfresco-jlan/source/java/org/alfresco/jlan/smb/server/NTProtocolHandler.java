@@ -5742,6 +5742,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		int endPos = prms.getPosition();
 		smbPkt.setParameter(1, endPos - RFCNetBIOSProtocol.HEADER_LEN);
 
+		// Set the status
+		
+		smbPkt.setLongErrorCode( SMBStatus.NTSuccess);
+		
 		// Check if there is a chained request
 
 		if ( smbPkt.hasAndXCommand()) {
