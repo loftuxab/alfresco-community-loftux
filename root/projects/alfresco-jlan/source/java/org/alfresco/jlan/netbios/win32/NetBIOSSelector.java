@@ -129,7 +129,7 @@ public class NetBIOSSelector {
 	 * @param socket NetBIOSSocket
 	 * @return NetBIOSSelectionKey
 	 */
-	protected final NetBIOSSelectionKey deregisterSocket( NetBIOSSocket socket)
+	public final NetBIOSSelectionKey deregisterSocket( NetBIOSSocket socket)
 		throws IOException {
 		
 		// Remove the selection key for the specified socket

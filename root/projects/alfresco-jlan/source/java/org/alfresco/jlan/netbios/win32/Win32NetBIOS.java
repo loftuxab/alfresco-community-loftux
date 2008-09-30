@@ -561,7 +561,21 @@ public class Win32NetBIOS {
 	 * @param name byte[]
 	 * @exception WinsockNetBIOSException If a Winsock error occurs
 	 */
-	protected static native int BindSocket(int sockPtr, byte[] name)
+	protected static int BindSocket(int sockPtr, byte[] name)
+		throws WinsockNetBIOSException
+	{
+		return BindSocket( sockPtr, name, false);
+	}
+
+	/**
+	 * Bind a NetBIOS socket to a name to listen for incoming sessions
+	 * 
+	 * @param sockPtr int
+	 * @param name byte[]
+	 * @param fastAddName boolean
+	 * @exception WinsockNetBIOSException If a Winsock error occurs
+	 */
+	protected static native int BindSocket(int sockPtr, byte[] name, boolean fastAddName)
 		throws WinsockNetBIOSException;
 
 	/**
@@ -656,6 +670,150 @@ public class Win32NetBIOS {
 	 * @return int
 	 */
 	protected static native int GetMaximumSocketsPerSelect();
+
+	/**
+	 * Create a Win32 event
+	 * 
+	 * @return int
+	 * @throws Exception
+	 */
+	public static native int Win32CreateEvent()
+		throws Exception;
+	
+	/**
+	 * Close a Win32 event
+	 * 
+	 * @param eventHandle int
+	 * @throws Exception
+	 */
+	public static native void Win32CloseEvent( int eventHandle)
+		throws Exception;
+	
+	/**
+	 * Set a Win32 event
+	 * 
+	 * @param eventHandle int
+	 * @return boolean
+	 */
+	public static native boolean Win32SetEvent( int eventHandle);
+	
+	/**
+	 * Reset a Win32 event
+	 * 
+	 *  @param eventHandle int
+	 *  @return boolean
+	 */
+	public static native boolean Win32ResetEvent( int eventHandle);
+	
+	/**
+	 * Create a Winsock event
+	 * 
+	 * @return int
+	 * @throws WinsockNetBIOSException
+	 */
+	public static native int WinsockCreateEvent()
+		throws WinsockNetBIOSException;
+	
+	/**
+	 * Set a Winsock event
+	 * 
+	 * @param eventHandle int
+	 * @return boolean
+	 */
+	public static native boolean WinsockSetEvent( int eventHandle);
+	
+	/**
+	 * Reset a Winsock event
+	 * 
+	 * @param eventHandle int
+	 * @return boolean
+	 */
+	public static native boolean WinsockResetEvent( int eventHandle);
+
+	/**
+	 * Close a Winsock event
+	 * 
+	 *  @param eventHandle int
+	 *  @exception WinsockNetBIOSException
+	 */
+	public static native void WinsockCloseEvent( int eventHandle)
+		throws WinsockNetBIOSException;
+
+	/**
+	 * Wait for Winsock events
+	 * 
+	 * @param eventCnt int
+	 * @param events int[]
+	 * @param waitAll boolean
+	 * @param timeout int
+	 * @param alertable boolean
+	 * @return int
+	 * @throws WinsockNetBIOSException
+	 */
+	public static native int WinsockWaitForMultipleEvents( int eventCnt, int[] events, boolean waitAll, int timeout, boolean alertable)
+		throws WinsockNetBIOSException;
+	
+	/**
+	 * Set Winsock events for a socket
+	 * 
+	 * @param sockPtr int
+	 * @param eventHandle int
+	 * @param eventMask int
+	 * @throws WinsockNetBIOSException
+	 */
+	public static native void WinsockEventSelect( int sockPtr, int eventHandle, int eventMask)
+		throws WinsockNetBIOSException;
+	
+	/**
+	 * Get the list of socket events that have triggered for a particular socket
+	 * 
+	 * @param sockPtr int
+	 * @param eventHandle int
+	 * @return int
+	 * @throws WinsockNetBIOSException
+	 */
+	public static native int WinsockEnumNetworkEvents( int sockPtr, int eventHandle)
+		throws WinsockNetBIOSException;
+
+	/**
+	 * Get the current receive buffer size for the socket
+	 * 
+	 * @param sockPtr int
+	 * @return int
+	 * @throws winsockNetBIOSException
+	 */
+	public static native int getSocketReceiveBufferSize( int sockPtr)
+		throws WinsockNetBIOSException;
+	
+	/**
+	 * Set the socket receive buffer size
+	 * 
+	 * @param sockPtr int
+	 * @param bufSize int
+	 * @throws WinsockNetBIOSException
+	 */
+	public static native void setSocketReceiveBufferSize( int sockPtr, int bufSize)
+		throws WinsockNetBIOSException;
+	
+	/**
+	 * Get the current send buffer size for the socket
+	 * 
+	 * @param sockPtr int
+	 * @return int
+	 * @throws winsockNetBIOSException
+	 */
+	public static native int getSocketSendBufferSize( int sockPtr)
+		throws WinsockNetBIOSException;
+	
+	/**
+	 * Set the socket send buffer size
+	 * 
+	 * @param sockPtr int
+	 * @param bufSize int
+	 * @throws WinsockNetBIOSException
+	 */
+	public static native void setSocketSendBufferSize( int sockPtr, int bufSize)
+		throws WinsockNetBIOSException;
 	
 	/**
 	 * Wait for a network address change event, block until a change occurs or the Winsock NetBIOS

@@ -178,9 +178,9 @@ public class AsyncWinsockNetBIOSSessionHandler extends SessionHandlerBase {
 	public PacketHandler createPacketHandler( NetBIOSSocket clientSock)
 		throws IOException {
 		
-		// Create a Winsock NetBIOS packet handler
+		// Create a Winsock NetBIOS packet handler, async mode enabled
 		
-		return new WinsockNetBIOSPacketHandler( m_lana, clientSock, getSMBServer().getPacketPool());
+		return new WinsockNetBIOSPacketHandler( m_lana, clientSock, getSMBServer().getPacketPool(), true);
 	}
 	
 	/**

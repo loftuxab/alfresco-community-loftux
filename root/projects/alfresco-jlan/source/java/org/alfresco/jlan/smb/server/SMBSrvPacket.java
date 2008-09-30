@@ -141,6 +141,10 @@ public class SMBSrvPacket {
 	
 	private SMBSrvPacket m_assocPkt;
 	
+	// Packet is queued for sending via asynchronous I/O
+	
+	private boolean m_asyncQueued;
+	
 	/**
 	 * Default constructor
 	 */
@@ -790,6 +794,9 @@ public class SMBSrvPacket {
 			break;
 		case PacketType.LogoffAndX:
 			pktType = "LOGOFF_ANDX";
+			break;
+		case PacketType.ReadAndX:
+			pktType = "READ_ANDX";
 			break;
 		default:
 			pktType = "0x" + Integer.toHexString(getCommand());
@@ -1758,6 +1765,24 @@ public class SMBSrvPacket {
 	 */
 	public static final int calculateHeaderLength( int numParams) {
 		return HeaderLength + ( numParams * 2) + RFCNetBIOSProtocol.HEADER_LEN;
+	}
+	
+	/**
+	 * Determine if the packet is queued for sending via asynchronous I/O
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isQueuedForAsyncIO() {
+		return m_asyncQueued;
+	}
+	
+	/**
+	 * Set/clear the asynchronous I/O flag
+	 * 
+	 * @param asyncIO boolean
+	 */
+	public final void setQueuedForAsyncIO( boolean asyncIO) {
+		m_asyncQueued = asyncIO;
 	}
 	
 	/**

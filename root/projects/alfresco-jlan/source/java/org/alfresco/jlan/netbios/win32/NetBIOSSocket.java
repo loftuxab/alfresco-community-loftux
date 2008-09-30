@@ -40,6 +40,10 @@ import org.alfresco.jlan.netbios.NetBIOSName;
  */
 public class NetBIOSSocket {
 
+	// Status value to indicate that a write could not be don as it would block the socket
+	
+	public static final int SocketWouldBlock	= -2;
+	
 	// Flag to indicate if the NetBIOS socket interface has been initialized
 
 	private static boolean _nbSocketInit;
@@ -144,6 +148,24 @@ public class NetBIOSSocket {
 	 */
 	public static final NetBIOSSocket createListenerSocket(int lana, NetBIOSName nbName)
 		throws WinsockNetBIOSException, NetBIOSSocketException {
+		
+		// Create the listener socket, check for duplicate names when registering
+		
+		return NetBIOSSocket.createListenerSocket(lana, nbName, false);
+	}
+	
+	/**
+	 * Create a NetBIOS socket to listen for incoming sessions on the specified LANA
+	 * 
+	 * @param lana int
+	 * @param nbName NetBIOSName
+	 * @param fastAddName boolean
+	 * @return NetBIOSSocket
+	 * @exception NetBIOSSocketException
+	 * @exception WinsockNetBIOSException
+	 */
+	public static final NetBIOSSocket createListenerSocket(int lana, NetBIOSName nbName, boolean fastAddName)
+		throws WinsockNetBIOSException, NetBIOSSocketException {
 
 		// Initialize the Winsock NetBIOS interface
 
@@ -157,7 +179,7 @@ public class NetBIOSSocket {
 
 		// Bind the socket to a NetBIOS name
 
-		if ( Win32NetBIOS.BindSocket(sockPtr, nbName.getNetBIOSName()) != 0)
+		if ( Win32NetBIOS.BindSocket(sockPtr, nbName.getNetBIOSName(), fastAddName) != 0)
 			throw new NetBIOSSocketException("Failed to bind NetBIOS socket");
 
 		// Return the NetBIOS socket

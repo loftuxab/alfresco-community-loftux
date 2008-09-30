@@ -187,6 +187,10 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 	private Hashtable m_setupObjects;
 
+	// Flag to indicate an asynchronous read has been queued/is being processed
+	
+	private boolean m_asyncRead;
+	
 	/**
 	 * Class constructor.
 	 * 
@@ -1920,5 +1924,23 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	 */
 	public static final SMBSrvSession createSession(PacketHandler handler, SMBServer server, int sessId) {
 		return m_factory.createSession(handler, server, sessId);
+	}
+	
+	/**
+	 * Check if an asynchronous read is queued/being processed by this session
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasReadInProgress() {
+		return m_asyncRead;
+	}
+	
+	/**
+	 * Set/clear the read in progress flag
+	 * 
+	 * @param inProgress boolean
+	 */
+	public final void setReadInProgress(boolean inProgress) {
+		m_asyncRead = inProgress;
 	}
 }

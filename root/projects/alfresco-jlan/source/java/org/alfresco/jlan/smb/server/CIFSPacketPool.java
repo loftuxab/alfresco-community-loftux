@@ -144,6 +144,13 @@ public class CIFSPacketPool {
 	 */
 	public final void releasePacket( SMBSrvPacket smbPkt) {
 		
+		// TEST
+		//
+		// Check if the packet is queued for async I/O
+		
+		if ( smbPkt.isQueuedForAsyncIO())
+			Debug.println("*** Packet queued for async I/O, pkt=" + smbPkt);
+		
 		// Release the buffer from the CIFS packet back to the pool
 		
 		m_bufferPool.releaseBuffer( smbPkt.getBuffer());
