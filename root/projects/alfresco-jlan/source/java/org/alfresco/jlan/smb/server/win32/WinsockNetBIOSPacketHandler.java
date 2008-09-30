@@ -153,9 +153,7 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler implements Asynch
 
 			// Read a packet of data
 
-			synchronized ( m_sessSock) {
-				rxlen = m_sessSock.read(pkt.getBuffer(), 4, pkt.getBufferLength() - 4);
-			}
+			rxlen = m_sessSock.read(pkt.getBuffer(), 4, pkt.getBufferLength() - 4);
 
 			// Check if the buffer is not big enough to receive the entire packet, extend the buffer
 			// and read the remaining part of the packet
@@ -197,9 +195,7 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler implements Asynch
 					
 					// Read the remaining data
 
-					synchronized ( m_sessSock) {
-						rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen, pkt.getBufferLength() - rxlen);
-					}
+					rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen, pkt.getBufferLength() - rxlen);
 					
 					// Update the total received length
 					
@@ -280,9 +276,7 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler implements Asynch
 			
 			// Write the packet
 		
-			synchronized ( m_sessSock) {
-				txlen = m_sessSock.write(pkt.getBuffer(), pos, wrlen);
-			}
+			txlen = m_sessSock.write(pkt.getBuffer(), pos, wrlen);
 			
 			// Check if asynchronous mode is enabled and the socket would block, in this case we queue the response
 			// to be sent when the socket signals that it is writeable
