@@ -18,15 +18,15 @@ new Alfresco.UserWelcome("${args.htmlid}");
          <div>${msg("text.userProfile")}</div>
          <div><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.userProfile")}</a></div>
       </div>
-      <#if sites?size &gt; 0>
-         <div class="detail-list-item">
-            <h4>${msg("header.mySites")}</h4>
-            <div>${msg("text.mySites")}</div>
-         <#list sites as site>
-            <div class="site"><a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a></div>
-         </#list>
-         </div>
-      </#if>
+<#if sites?size &gt; 0>
+      <div class="detail-list-item">
+         <h4>${msg("header.mySites")}</h4>
+         <div>${msg("text.mySites")}</div>
+   <#list sites as site>
+         <div class="site"><a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a></div>
+   </#list>
+      </div>
+</#if>
       <div class="detail-list-item last">
          <h4>${msg("header.createSite")}</h4>
          <div>${msg("text.createSite")}</div>

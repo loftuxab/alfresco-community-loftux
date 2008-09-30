@@ -3,7 +3,7 @@
    <div class="body scrollableList">
 <#if (memberships?size > 0)>
    <#list memberships as m>
-      <div class="detail-list-item  <#if (!m_has_next)>last</#if>">
+      <div class="detail-list-item <#if m_index = 0>first<#elseif !m_has_next>last</#if>">
          <div class="avatar">
             <img src="${url.context}<#if m.avatar??>/proxy/alfresco/api/node/${m.avatar?replace(':/','')}/content/thumbnails/avatar?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="Avatar" />
          </div>
@@ -14,7 +14,7 @@
       </div>
    </#list>
 <#else>
-      <div>
+      <div class="detail-list-item first last">
          <h3>${msg("label.noMembers")}</h3>
       </div>
 </#if>
