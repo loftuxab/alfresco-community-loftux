@@ -144,7 +144,8 @@ hr
 }
 
 .yui-skin-default .yui-panel .hd,
-.yui-skin-default .yui-panel .bdft
+.yui-skin-default .yui-panel .bdft,
+.yui-skin-default .yui-panel .ft 
 {
    color: #515D6B;
    background: #E3EBEC;
@@ -168,7 +169,17 @@ hr
    border-top: 1px solid #C4C5C5;
 }
 
+.yui-skin-default .yui-panel .ft
+{
+   border-top:1px solid #C4C5C5;
+   padding: 5px;
+}
 
+.yui-skin-default .yui-panel .ft span.button-group
+{
+   text-align: center;
+   vertical-align: middle;
+}
 .yui-skin-default .yui-panel .bd
 {
    color: #515D6B;
@@ -249,6 +260,7 @@ hr
 
 .yui-skin-default #prompt .ft
 {
+   border-top: none;
    border-left: 1px solid #c4c5c5;
    border-right: 1px solid #c4c5c5;
    background-color: #e3ebec;

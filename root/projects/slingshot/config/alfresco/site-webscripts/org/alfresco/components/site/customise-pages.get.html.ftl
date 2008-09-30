@@ -76,6 +76,7 @@
                   <div class="pageTitle"><h3>${page.title}</h3></div>
                   <div class="pageDescription">${page.description}</div>
                </div>
+               <div class="clear"></div>
                </li>
             </#list>
          </ul>
