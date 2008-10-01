@@ -2,7 +2,7 @@
    <div id="${args.htmlid}-title" class="hd"></div>
    <div class="bd">
       <div id="${args.htmlid}-wrapper" class="wrapper">
-         <div class="mode">
+         <div class="mode flat-button">
             <h3>${msg("header.destination-type")}</h3>
             <div id="${args.htmlid}-modeGroup" class="yui-buttongroup">
                <input type="radio" id="${args.htmlid}-site" name="site" value="${msg("button.site")}" checked="checked" />
