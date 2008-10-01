@@ -50,21 +50,18 @@
     	init: function()
     	{
 			/* 
-		 	* Separate the (initial) rendering of the calendar from the data loading.
-		 	* If for some reason the data fails to load, the calendar will still display.
-		 	*/
-			//var cal = new YAHOO.widget.Calendar("calendar");
-			//cal.render();
-		
+		 	 * Separate the (initial) rendering of the calendar from the data loading.
+		 	 * If for some reason the data fails to load, the calendar will still display.
+		 	 */
 			var uriEvents = Alfresco.constants.PROXY_URI + "calendar/eventList?site=" + this.siteId;
-		
+		   
 			var callback = 
 			{
 				success: this.onSuccess,
 				failure: this.onFailure,
 				scope: this
 			};
-		
+		   
 			YAHOO.util.Connect.asyncRequest('GET', uriEvents, callback);
 		},
 

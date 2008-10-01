@@ -13,7 +13,7 @@
          <div class="separator">&nbsp;</div>
 </#if>
          <div class="ical-feed">
-            <a id="${args.htmlid}-publishEvents-button" href="${page.url.context}/proxy/alfresco/calendar/eventList?site=${page.url.templateArgs["site"]}&amp;format=calendar" rel="_blank">${msg("button.ical")}</a>
+            <a id="${args.htmlid}-publishEvents-button" href="${page.url.context}/proxy/alfresco-rss/calendar/eventList?site=${page.url.templateArgs["site"]}&amp;format=calendar" rel="_blank">${msg("button.ical")}</a>
          </div>
       </div> 
       <div class="yui-u align-right">
