@@ -49,7 +49,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/standard.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/tlc124.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/tlddoc.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/tm-extractors-0.4_patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/tm-extractors-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/wsdl4j-1.6.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/wss4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/yguard.jar"/>
@@ -73,7 +73,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-juh-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-jurt-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/mysql-connector-java-5.0.3-bin.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/poi-3.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/poi-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-ridl-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-sandbox-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-unoil-2.0.3.jar"/>
