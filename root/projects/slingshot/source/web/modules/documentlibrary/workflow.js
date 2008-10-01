@@ -352,7 +352,8 @@
          var renderCellPerson = function DLW_renderCellPerson(elCell, oRecord, oColumn, oData)
          {
             var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName");
-            var desc = '<h3 class="name">' + $html(name) + '</h3>';
+            var userName = "(" + oRecord.getData("userName") + ")";
+            var desc = '<h3 class="name">' + $html(name) + ' <span class="lighter">' + $html(userName) + '</span></h3>';
             elCell.innerHTML = desc;
          };
 

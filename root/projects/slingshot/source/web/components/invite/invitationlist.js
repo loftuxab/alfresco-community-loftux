@@ -39,6 +39,11 @@
       Element = YAHOO.util.Element;
     
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * InvitationList constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -215,13 +220,9 @@
          {
             // we currently render all results the same way
             var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName");
+            var userName = "(" + oRecord.getData("userName") + ")";
             var email = oRecord.getData("email");
-            var desc = "";
-            desc = '<h3 class="itemname">' + Alfresco.util.encodeHTML(name) + '</h3>';
-            desc += '<div class="detail">';
-            desc += Alfresco.util.encodeHTML(email);
-            desc += '</div>';
-            elCell.innerHTML = desc;
+            elCell.innerHTML = '<h3 class="itemname">' + $html(name) + ' <span class="lighter">' + $html(userName) + '</span></h3><div class="detail">' + $html(email) + '</div>';
          };
 
          /**
