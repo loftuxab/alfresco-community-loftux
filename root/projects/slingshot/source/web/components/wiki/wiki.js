@@ -165,7 +165,8 @@
 		
 		_setupEditForm: function()
 		{
-		   var width = Dom.get(this.id + "-form").offsetWidth - 256; //860
+		   var width = Dom.get(this.id + "-form").offsetWidth - 316; //860
+		   var height = YAHOO.env.ua.ie > 0 ? document.body.clientHeight : document.height;
 		   this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
 		   this.tagLibrary.setOptions(
 		   {
@@ -179,7 +180,7 @@
                 
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
          {
-            height: Math.max(document.height - 450, 300) + 'px',
+            height: Math.min(height - 450, 300) + 'px',
             width: width + 'px',
             dompath: false, // Turns on the bar at the bottom
             animate: false, // Animates the opening, closing and moving of Editor windows

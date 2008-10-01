@@ -74,8 +74,8 @@
 
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
          {
-            height: '300px',
-            width: '538px',
+            height: "300px",
+            width: "600px",
             dompath: false, // Turns on the bar at the bottom
             animate: false, // Animates the opening, closing and moving of Editor windows
             markup: "xhtml",
