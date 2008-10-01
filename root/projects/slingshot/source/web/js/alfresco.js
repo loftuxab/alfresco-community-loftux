@@ -640,8 +640,8 @@ Alfresco.util.parseJSON = function(jsonStr)
          title: "Failure",
          text: "Can't parse response as json: '" + jsonStr + "'"
       });
-      throw error;
    }
+   return null;
 }
 
 /**
