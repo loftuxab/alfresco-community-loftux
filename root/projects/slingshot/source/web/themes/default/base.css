@@ -73,7 +73,9 @@ h2
 }
 
 h1 .light,
-h2 .light
+h1 .lighter,
+h2 .light,
+h2 .lighter
 {
    color: #C7DBEB;
 }
@@ -90,7 +92,9 @@ h4
 }
 
 h3 .light,
-h4 .light
+h3 .lighter,
+h4 .light,
+h4 .lighter
 {
    color: #a2a2a2;
 }
@@ -130,6 +134,12 @@ hr
 
 .light
 {
+   font-weight: normal;
+}
+
+.lighter
+{
+   font-size: 93%;
    font-weight: normal;
 }
 

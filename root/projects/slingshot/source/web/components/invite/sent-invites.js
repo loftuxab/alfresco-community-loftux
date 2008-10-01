@@ -321,17 +321,19 @@
             var name = person.userName;
             var firstName = person.firstName;
             var lastName = person.lastName;
+            var linkExtra = "";
             if ((firstName !== undefined) || (lastName !== undefined))
             {
                name = firstName ? firstName + " " : "";
                name += lastName ? lastName : "";
+               linkExtra =  ' <span class="lighter">(' + $html(person.userName) + ')</span>';
             }
             var link = Alfresco.util.uriTemplate("userpage",
             {
                userid: person.userName,
                pageid: "profile"
-            });   
-            return '<a href="' + link + '">' + Alfresco.util.encodeHTML(name) + '</a>';
+            });
+            return '<a href="' + link + '">' + $html(name) + '</a>' + linkExtra;
          };
 
          /**
