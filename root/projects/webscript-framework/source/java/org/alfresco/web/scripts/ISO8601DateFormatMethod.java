@@ -31,17 +31,21 @@ import org.alfresco.util.ISO8601DateFormat;
 import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateScalarModel;
 
 /**
  * NOTE: sourced from org.alfresco.repo.template.ISO8601DateFormatMethod.
  * 
  * @author David Caruana
+ * @author Kevin Roast
  * 
  * Custom FreeMarker Template language method.
  * <p>
- * Render Date to ISO8601 format.
+ * Render Date to ISO8601 format.<br>
+ * Or parse ISO6801 format string date to a Date object.
  * <p>
  * Usage: xmldate(Date date)
+ *        xmldate(String date)
  */
 public class ISO8601DateFormatMethod implements TemplateMethodModelEx
 {
@@ -50,7 +54,7 @@ public class ISO8601DateFormatMethod implements TemplateMethodModelEx
      */
     public Object exec(List args) throws TemplateModelException
     {
-        String result = "";
+        Object result = null;
         
         if (args.size() == 1)
         {
@@ -59,8 +63,12 @@ public class ISO8601DateFormatMethod implements TemplateMethodModelEx
             {
                 result = ISO8601DateFormat.format(((TemplateDateModel)arg0).getAsDate());
             }
+            else if (arg0 instanceof TemplateScalarModel)
+            {
+                result = ISO8601DateFormat.parse(((TemplateScalarModel)arg0).getAsString());
+            }
         }
         
-        return result;
+        return result != null ? result : "";
     }
 }
