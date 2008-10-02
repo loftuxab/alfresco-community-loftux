@@ -311,7 +311,7 @@
          this.widgets.editor.clearEditorDoc();
             
          // reload the comments list
-         YAHOO.Bubbling.fire("refreshComments", {});
+         YAHOO.Bubbling.fire("refreshComments", {reason: "created"});
          
          this.enableInputs();
       },

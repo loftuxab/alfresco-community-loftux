@@ -174,7 +174,7 @@
             noEscape: true,            
             buttons: [
                {
-                  text: Alfresco.util.message("button.ok", this.name),
+                  text: Alfresco.util.message("button.yes", this.name),
                   handler: function DS_delete()
                   {
                      this.destroy();
@@ -183,7 +183,7 @@
                   isDefault: true
                },
                {
-                  text: Alfresco.util.message("button.cancel", this.name),
+                  text: Alfresco.util.message("button.no", this.name),
                   handler: function DL_cancel()
                   {
                      this.destroy();
