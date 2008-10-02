@@ -44,7 +44,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "editor", "element", "dom"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["event", "editor", "element", "dom", "datatable"], this.onComponentsLoaded, this);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
@@ -107,7 +107,15 @@
          /**
           * Height to use for comment editor
           */
-         height: 180
+         height: 180,
+
+         /**
+          * Number of items per page
+          *
+          * @property pageSize
+          * @type int
+          */
+         pageSize: 10
       },
       
       /**
@@ -116,7 +124,7 @@
        * @property widgets
        * @type object
        */
-      widgets: null,
+      widgets: {},
       
       /**
        * Object containing data about the currently edited
@@ -137,7 +145,7 @@
        * @see _setBusy/_releaseBusy
        */
       busy: false,
-      
+
       /**
        * Set multiple initialization options at once.
        * 
@@ -183,7 +191,22 @@
       onReady: function CommentList_onReady()
       { 
          var me = this;
-         
+         // YUI Paginator definition
+         var paginator = new YAHOO.widget.Paginator(
+         {
+            containers: [this.id + "-paginator"],
+            rowsPerPage: this.options.pageSize,
+            initialPage: 1,
+            template: this._msg("pagination.template"),
+            pageReportTemplate: this._msg("pagination.template.page-report")
+         });
+         paginator.subscribe('changeRequest', this.onPaginatorChange, this, true);
+         paginator.set('recordOffset', 0);
+         paginator.set('totalRecords', 0);
+         paginator.render();
+         this.widgets.paginator = paginator;
+
+
          // Hook action events for the comments
          var fnActionHandlerDiv = function CommentList_fnActionHandlerDiv(layer, args)
          {
@@ -208,7 +231,17 @@
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onCommentElementMouseEntered, this.onCommentElementMouseExited, this);
       },      
-      
+
+      /**
+       * Called by the paginator when a user has clicked on next or prev.
+       * Dispatches a call to the server and reloads the comment list.
+       *
+       * @method onPaginatorChange
+       * @param state {object} An object describing the required page changing
+       */
+      onPaginatorChange : function CommentList_onPaginatorChange(state) {
+         this._loadCommentsList(state.recordOffset);
+      },
       
       /**
        * Called by another component to set the node for which comments should be displayed
@@ -222,7 +255,7 @@
             this.options.activityTitle = obj.title;
             this.options.activityPage = obj.page;
             this.options.activityPageParams = obj.pageParams;
-            this._loadCommentsList();
+            this._loadCommentsList(0);
          }
       },
     
@@ -233,25 +266,53 @@
       {
          if (this.options.itemNodeRef && this.options.activityTitle)
          {
-            this._loadCommentsList();
+            var p = this.widgets.paginator;
+            var obj = args[1];
+
+            // Find appropriate index
+            var startIndex = 0;
+            var tr = p.getTotalRecords();
+            var ps = this.options.pageSize;
+            if(obj.reason == "deleted")
+            {
+               // Make sure we dont use n invalid startIndex now that one is removed
+               var newTotalPages = Math.floor((tr - 1) / ps) + (((tr - 1) % ps) > 0 ? 1 : 0);
+               var currentPage = p.getCurrentPage();
+               if(newTotalPages < currentPage)
+               {
+                  // the deletion was done of the last comment in the current page
+                  currentPage = currentPage > 1 ? currentPage - 1 : 1;
+               }
+               var record = p.getPageRecords(currentPage);
+               startIndex = record ? record[0] : 0;
+            }
+            if(obj.reason == "created")
+            {
+               startIndex = Math.floor(tr/ps) * ps;
+            }                        
+            this._loadCommentsList(startIndex);
          }
       },
-      
+            
       /**
        * Loads the comments for the provided nodeRef and refreshes the ui
        */
-      _loadCommentsList: function CommentList__loadCommentsList()
-      {   
+      _loadCommentsList: function CommentList__loadCommentsList(startIndex)
+      {
          // construct the url to call
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{nodeRef}/comments",
          {
             nodeRef: this.options.itemNodeRef.replace(":/", "")
          });
-         
+
          // execute ajax request
          Alfresco.util.Ajax.request(
          {
             url: url,
+            dataObj: {
+               startIndex: startIndex,
+               pageSize: this.options.pageSize
+            },
             successCallback:
             {
                fn: this.loadCommentsSuccess,
@@ -279,7 +340,7 @@
          
          // temporarily hide the container node
          bodyDiv.setAttribute("style", "display:none");
-         
+
          // update the list name
          if (comments.length > 0)
          {
@@ -311,6 +372,31 @@
             canCreateComment: response.json.nodePermissions.create
          }
          YAHOO.Bubbling.fire("setCanCreateComment", eventData);
+
+         this._updatePaginator(response.json.startIndex, response.json.total);
+      },
+
+      /**
+       * Called by loadCommentsSuccess when it has rendered the comments.
+       * Since this componenent listens for the event "setCommentedNode" that can be displayed
+       * before this component has created its own widgets and paginator it must wait until the paginator
+       * has been created and then update it.
+       *
+       * @method updatePaginator
+       * @param page {int} The page of comments in the paging list that is displayed
+       * @param total {int} The totla number of comments in the paging
+       */
+      _updatePaginator: function BlogComment__updatePaginator(page, total)
+      {
+         if(this.widgets && this.widgets.paginator)
+         {
+            this.widgets.paginator.set('recordOffset', page);
+            this.widgets.paginator.set('totalRecords', total);
+         }
+         else
+         {
+            YAHOO.lang.later(100, this, this._updatePaginator, [page, total]);
+         }
       },
 
       /**
@@ -380,7 +466,7 @@
             this._releaseBusy();
             
             // reload the comments list
-            YAHOO.Bubbling.fire("refreshComments", {});
+            YAHOO.Bubbling.fire("refreshComments", {reason: "deleted"});
          };
          
          // ajax request success handler

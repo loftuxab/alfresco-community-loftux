@@ -32,6 +32,16 @@ html>body .comment {
   display: none;
 }
 
+.comment-list .align-right
+{
+   text-align: right;
+}
+
+.comment-list .yui-pg-container
+{
+   padding:20px 25px 20px 0;
+}
+
 .comment .userLink a
 {
    color: #2B6EB5;

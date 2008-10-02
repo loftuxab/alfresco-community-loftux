@@ -1474,7 +1474,7 @@ Alfresco.util.Ajax = function()
          c.url = encodeURI(c.url);
          
          // Do we need to tunnel the HTTP method if the client can't support it (Adobe AIR)
-         if (YAHOO.env.ua.air > 0)
+         if (YAHOO.env.ua.air != 0)
          {
             // Check for unsupported HTTP methods
             if (c.method.toUpperCase() == "PUT" || c.method.toUpperCase() == "DELETE")

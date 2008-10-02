@@ -437,7 +437,19 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
 
                var elem = Dom.get(prettyId);
                elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
-               elem.focus();         
+               elem.focus();
+
+               if(prettyId == "fd")
+               {
+                  // If a new fromDate was selected
+                  var toDate = new Date(Alfresco.util.formatDate(Dom.get("td").value, "yyyy/mm/dd"));
+                  if(YAHOO.widget.DateMath.before(toDate, selectedDate))
+                  {                     
+                     //...adjust the toDate if toDate is earlier than the new fromDate
+                     var tdEl = Dom.get("td");
+                     tdEl.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
+                  }
+               }
             }
 
             oCalendarMenu.hide();
