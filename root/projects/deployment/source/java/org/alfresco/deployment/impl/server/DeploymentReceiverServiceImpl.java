@@ -674,11 +674,11 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
      */
     public synchronized void shutDown(String user, String password)
     {
-    	// TODO how to check user and password given that there may be multiple targets each with their own ?
+    	// TODO - how to check user password given that we may have multiple targets each with their own details
+    	shutDown();
     	
-    	shutDown();   	
-        fContext.close();
-
+    	fContext.close();
+        //System.exit(0);
     }
 
     /** 

@@ -88,6 +88,48 @@ public class RuntimeExecBeansTest extends TestCase
         }
     }
     
+//    /**
+//     * Checks that the encoding setting feeds through to the streams.
+//     */
+//    public void testStreamReading() throws Exception
+//    {
+//        String manglingCharsetName = "UTF-16";
+//
+//        File dir = new File(DIR);
+//        dir.mkdir();
+//        assertTrue("Directory not created", dir.exists());
+//        
+//        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+//        try
+//        {
+//            RuntimeExec dirRootExec = (RuntimeExec) ctx.getBean("commandListRootDir");
+//            assertNotNull(dirRootExec);
+//            // Execute it
+//            ExecutionResult result = dirRootExec.execute();
+//            
+//            // Get the error stream
+//            String defaultStdOut = result.getStdOut();
+//            
+//            // Change the encoding
+//            dirRootExec.setCharset(manglingCharsetName);
+//            result = dirRootExec.execute();
+//            String mangledStdOut = result.getStdOut();
+//            // The two error strings must not be the same
+//            assertNotSame("Differently encoded strings should differ", defaultStdOut, mangledStdOut);
+//            
+//            // Now convert the Shift-JIS string and ensure it's the same as originally expected
+//            Charset defaultCharset = Charset.defaultCharset();
+//            byte[] mangledBytes = mangledStdOut.getBytes(manglingCharsetName);
+//            String convertedStrOut = new String(mangledBytes, defaultCharset.name());
+//            // Check, catering for any mangled characters
+//            assertTrue("Expected to be able to convert value back to default charset.", convertedStrOut.contains(defaultStdOut));
+//        }
+//        finally
+//        {
+//            ctx.close();
+//        }
+//    }
+//    
     public void testExecOfNeverEndingProcess()
     {
         File dir = new File(DIR);

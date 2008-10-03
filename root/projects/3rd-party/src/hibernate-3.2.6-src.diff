@@ -1,0 +1,477 @@
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\AmalgamatedCleanupAction.java hibernate-3.2.6-patched\src\org\hibernate\action\AmalgamatedCleanupAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\AmalgamatedCleanupAction.java	Thu Jan 01 00:00:00 1970
++++ hibernate-3.2.6-patched\src\org\hibernate\action\AmalgamatedCleanupAction.java	Mon Feb 25 17:00:49 2008
+@@ -0,0 +1,139 @@
++package org.hibernate.action;
++
++import java.io.Serializable;
++import java.util.ArrayList;
++import java.util.HashSet;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Set;
++
++import org.hibernate.HibernateException;
++import org.hibernate.engine.SessionImplementor;
++
++public class AmalgamatedCleanupAction implements Executable, Serializable
++{
++    private final SessionImplementor session;
++
++    private final Set affectedEntityNames = new HashSet();
++
++    private final Set affectedCollectionRoles = new HashSet();
++
++    private final Set spaces = new HashSet();
++
++    public AmalgamatedCleanupAction(SessionImplementor session)
++    {
++        super();
++        this.session = session;
++    }
++
++    public void addExecutable(Executable executable)
++    {
++        if (executable instanceof EntityAction)
++        {
++            EntityAction entityAction = (EntityAction) executable;
++            String entityName = entityAction.getEntityName();
++            if (!affectedEntityNames.contains(entityName))
++            {
++                affectedEntityNames.add(entityName);
++                Serializable[] toAdd = entityAction.getPropertySpaces();
++                for(int i = 0; i < toAdd.length; i++)
++                {
++                    spaces.add(toAdd[i]);
++                }
++            }
++        }
++        else if (executable instanceof CollectionAction)
++        {
++            CollectionAction collectionAction = (CollectionAction) executable;
++            String collectionRole = collectionAction.getCollectionRole();
++            if(!affectedCollectionRoles.contains(collectionRole))
++            {
++                affectedCollectionRoles.add(collectionRole);
++                Serializable[] toAdd = collectionAction.getPropertySpaces();
++                for(int i = 0; i < toAdd.length; i++)
++                {
++                    spaces.add(toAdd[i]);
++                }
++            }
++        }
++        else
++        {
++            // Invalid or ignore ??
++        }
++    }
++
++    public void afterTransactionCompletion(boolean success) throws HibernateException
++    {
++        evictEntityRegions();
++        evictCollectionRegions();
++    }
++
++    public void beforeExecutions() throws HibernateException
++    {
++        // nothing to do
++    }
++
++    public void execute() throws HibernateException
++    {
++        // nothing to do
++    }
++
++    public Serializable[] getPropertySpaces()
++    {
++        Serializable[] answer = new Serializable[spaces.size()];
++        int position = 0;
++        for(Iterator it = spaces.iterator(); it.hasNext(); /**/)
++        {
++            Serializable s = (Serializable) it.next();
++            answer[position++] = s;
++        }
++        return answer;
++        
++    }
++
++    public boolean hasAfterTransactionCompletion()
++    {
++        return true;
++    }
++
++    public boolean hasCache()
++    {
++        return true;
++    }
++
++    public boolean hasPostCommitEventListeners()
++    {
++        return false;
++    }
++
++    public boolean isBulkAction()
++    {
++        return true;
++    }
++
++    private void evictEntityRegions()
++    {
++        if (affectedEntityNames != null)
++        {
++            Iterator itr = affectedEntityNames.iterator();
++            while (itr.hasNext())
++            {
++                final String entityName = (String) itr.next();
++                session.getFactory().evictEntity(entityName);
++            }
++        }
++    }
++
++    private void evictCollectionRegions()
++    {
++        if (affectedCollectionRoles != null)
++        {
++            Iterator itr = affectedCollectionRoles.iterator();
++            while (itr.hasNext())
++            {
++                final String roleName = (String) itr.next();
++                session.getFactory().evictCollection(roleName);
++            }
++        }
++    }
++}
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\BulkOperationCleanupAction.java hibernate-3.2.6-patched\src\org\hibernate\action\BulkOperationCleanupAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\BulkOperationCleanupAction.java	Thu Mar 29 14:36:34 2007
++++ hibernate-3.2.6-patched\src\org\hibernate\action\BulkOperationCleanupAction.java	Thu Aug 21 10:29:12 2008
+@@ -148,4 +148,20 @@
+ 			}
+ 		}
+ 	}
++
++    public boolean hasCache()
++    {
++        return true;
++    }
++
++    public boolean hasPostCommitEventListeners()
++    {
++        return false;
++    }
++    
++    public boolean isBulkAction()
++    {
++        return true;
++    }
++    
+ }
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\CollectionAction.java hibernate-3.2.6-patched\src\org\hibernate\action\CollectionAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\CollectionAction.java	Wed Mar 22 08:58:00 2006
++++ hibernate-3.2.6-patched\src\org\hibernate\action\CollectionAction.java	Thu Aug 21 10:29:12 2008
+@@ -67,6 +67,16 @@
+ 		return persister.hasCache();
+ 	}
+ 
++    public boolean hasCache()
++    {
++        return persister.hasCache();
++    }
++    
++    public boolean hasPostCommitEventListeners()
++    {
++        return false;
++    }
++
+ 	public Serializable[] getPropertySpaces() {
+ 		return persister.getCollectionSpaces();
+ 	}
+@@ -142,6 +152,16 @@
+ 					.compare( key, action.key, session.getEntityMode() );
+ 		}
+ 	}
++    
++    public boolean isBulkAction()
++    {
++        return false;
++    }
++    
++    public String getCollectionRole()
++    {
++        return collectionRole;
++    }
+ }
+ 
+ 
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\EntityAction.java hibernate-3.2.6-patched\src\org\hibernate\action\EntityAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\EntityAction.java	Wed Apr 11 09:25:14 2007
++++ hibernate-3.2.6-patched\src\org\hibernate\action\EntityAction.java	Thu Aug 21 12:01:09 2008
+@@ -42,7 +42,12 @@
+ 		this.persister = persister;
+ 	}
+ 
+-	protected abstract boolean hasPostCommitEventListeners();
++        public boolean hasCache()
++        {
++            return persister.hasCache();
++        }
++     
++ 	public abstract boolean hasPostCommitEventListeners();
+ 
+ 	/**
+ 	 * entity name accessor
+@@ -132,5 +137,11 @@
+ 		ois.defaultReadObject();
+ 		persister = session.getFactory().getEntityPersister( entityName );
+ 	}
++
++ 	public boolean isBulkAction()
++     	{
++       		return false;
++     	}
++     
+ }
+ 
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\EntityDeleteAction.java hibernate-3.2.6-patched\src\org\hibernate\action\EntityDeleteAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\EntityDeleteAction.java	Fri Oct 19 19:06:52 2007
++++ hibernate-3.2.6-patched\src\org\hibernate\action\EntityDeleteAction.java	Thu Aug 21 10:29:12 2008
+@@ -163,7 +163,7 @@
+ 		postCommitDelete();
+ 	}
+ 
+-	protected boolean hasPostCommitEventListeners() {
++	public boolean hasPostCommitEventListeners() {
+ 		return getSession().getListeners().getPostCommitDeleteEventListeners().length>0;
+ 	}
+ 
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\EntityIdentityInsertAction.java hibernate-3.2.6-patched\src\org\hibernate\action\EntityIdentityInsertAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\EntityIdentityInsertAction.java	Fri Oct 19 19:06:52 2007
++++ hibernate-3.2.6-patched\src\org\hibernate\action\EntityIdentityInsertAction.java	Thu Aug 21 10:29:12 2008
+@@ -141,7 +141,7 @@
+ 		return hasPostCommitEventListeners();
+ 	}
+ 
+-	protected boolean hasPostCommitEventListeners() {
++	public boolean hasPostCommitEventListeners() {
+ 		return getSession().getListeners().getPostCommitInsertEventListeners().length>0;
+ 	}
+ 	
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\EntityInsertAction.java hibernate-3.2.6-patched\src\org\hibernate\action\EntityInsertAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\EntityInsertAction.java	Fri Oct 19 19:06:52 2007
++++ hibernate-3.2.6-patched\src\org\hibernate\action\EntityInsertAction.java	Thu Aug 21 10:29:12 2008
+@@ -184,7 +184,7 @@
+ 		postCommitInsert();
+ 	}
+ 
+-	protected boolean hasPostCommitEventListeners() {
++	public boolean hasPostCommitEventListeners() {
+ 		return getSession().getListeners().getPostCommitInsertEventListeners().length>0;
+ 	}
+ 	
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\EntityUpdateAction.java hibernate-3.2.6-patched\src\org\hibernate\action\EntityUpdateAction.java
+--- hibernate-3.2.6\src\org\hibernate\action\EntityUpdateAction.java	Fri Oct 19 19:06:52 2007
++++ hibernate-3.2.6-patched\src\org\hibernate\action\EntityUpdateAction.java	Thu Aug 21 10:29:12 2008
+@@ -251,7 +251,7 @@
+ 		postCommitUpdate();
+ 	}
+ 
+-	protected boolean hasPostCommitEventListeners() {
++	public boolean hasPostCommitEventListeners() {
+ 		return getSession().getListeners().getPostCommitUpdateEventListeners().length>0;
+ 	}
+ 	
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\action\Executable.java hibernate-3.2.6-patched\src\org\hibernate\action\Executable.java
+--- hibernate-3.2.6\src\org\hibernate\action\Executable.java	Fri Apr 29 10:26:12 2005
++++ hibernate-3.2.6-patched\src\org\hibernate\action\Executable.java	Thu Aug 21 10:29:12 2008
+@@ -6,13 +6,13 @@
+ import java.io.Serializable;
+ 
+ /**
+- * An operation which may be scheduled for later execution.
+- * Usually, the operation is a database insert/update/delete,
++ * An operation which may be scheduled for later execution. Usually, the operation is a database insert/update/delete,
+  * together with required second-level cache management.
+  * 
+  * @author Gavin King
+  */
+-public interface Executable {
++public interface Executable
++{
+ 	/**
+ 	 * Called before executing any actions
+ 	 */
+@@ -21,13 +22,14 @@
+ 	 * Execute this action
+ 	 */
+ 	public void execute() throws HibernateException;
++
+ 	/**
+-	 * Do we need to retain this instance until after the
+-	 * transaction completes?
+-	 * @return false if this class defines a no-op
+-	 * <tt>hasAfterTransactionCompletion()</tt>
++     * Do we need to retain this instance until after the transaction completes?
++     * 
++     * @return false if this class defines a no-op <tt>hasAfterTransactionCompletion()</tt>
+ 	 */
+ 	public boolean hasAfterTransactionCompletion();
++
+ 	/**
+ 	 * Called after the transaction completes
+ 	 */
+@@ -36,4 +39,10 @@
+ 	 * What spaces (tables) are affected by this action?
+ 	 */
+ 	public Serializable[] getPropertySpaces();
++
++    public boolean hasCache();
++
++    public boolean hasPostCommitEventListeners();
++    
++    public boolean isBulkAction();
+ }
+diff -w -B -r -N -u hibernate-3.2.6\src\org\hibernate\engine\ActionQueue.java hibernate-3.2.6-patched\src\org\hibernate\engine\ActionQueue.java
+--- hibernate-3.2.6\src\org\hibernate\engine\ActionQueue.java	Sat Feb 02 23:57:08 2008
++++ hibernate-3.2.6-patched\src\org\hibernate\engine\ActionQueue.java	Thu Aug 21 13:27:32 2008
+@@ -40,6 +40,7 @@
+ 
+ import org.hibernate.AssertionFailure;
+ import org.hibernate.HibernateException;
++import org.hibernate.action.AmalgamatedCleanupAction;
+ import org.hibernate.action.BulkOperationCleanupAction;
+ import org.hibernate.action.CollectionRecreateAction;
+ import org.hibernate.action.CollectionRemoveAction;
+@@ -62,6 +63,8 @@
+  * @author Steve Ebersole
+  */
+ public class ActionQueue {
++        private static volatile int MAX_EXECUTIONS_SIZE = 20000;
++
+ 
+ 	private static final Log log = LogFactory.getLog( ActionQueue.class );
+ 	private static final int INIT_QUEUE_LIST_SIZE = 5;
+@@ -84,6 +87,8 @@
+ 
+ 	private ArrayList executions;
+ 
++        AmalgamatedCleanupAction finalExecutable = null;
++
+ 	/**
+ 	 * Constructs an action queue bound to the given session.
+ 	 *
+@@ -94,6 +99,16 @@
+ 		init();
+ 	}
+ 
++        public static int getMAX_EXECUTIONS_SIZE()
++        {
++                return MAX_EXECUTIONS_SIZE;
++        }
++
++        public static void setMAX_EXECUTIONS_SIZE(int max_executions_size)
++        {
++                MAX_EXECUTIONS_SIZE = max_executions_size;
++        }
++
+ 	private void init() {
+ 		insertions = new ArrayList( INIT_QUEUE_LIST_SIZE );
+ 		deletions = new ArrayList( INIT_QUEUE_LIST_SIZE );
+@@ -146,7 +161,7 @@
+ 
+ 	public void addAction(BulkOperationCleanupAction cleanupAction) {
+ 		// Add these directly to the executions queue
+-		executions.add( cleanupAction );
++		addExecution(cleanupAction);
+ 	}
+ 
+ 	/**
+@@ -212,6 +227,34 @@
+ 			}
+ 		}
+ 		executions.clear();
++
++		if (finalExecutable != null)
++               	{
++            		try
++            		{
++                		try
++                		{
++                    			finalExecutable.afterTransactionCompletion(success);
++                		}
++                		finally
++                		{
++                    			if (invalidateQueryCache)
++                    			{
++                        			session.getFactory().getUpdateTimestampsCache().invalidate(finalExecutable.getPropertySpaces());
++                    			}
++                    			finalExecutable = null;
++                		}
++            		}
++            		catch (CacheException ce)
++            		{
++                		log.error("could not release a cache lock", ce);
++                		// continue loop
++            		}
++            		catch (Exception e)
++            		{
++                		throw new AssertionFailure("Exception releasing cache locks", e);
++            		}
++        	}
+ 	}
+ 
+ 	/**
+@@ -269,7 +312,7 @@
+ 	public void execute(Executable executable) {
+ 		final boolean lockQueryCache = session.getFactory().getSettings().isQueryCacheEnabled();
+ 		if ( executable.hasAfterTransactionCompletion() || lockQueryCache ) {
+-			executions.add( executable );
++			addExecution(executable);
+ 		}
+ 		if ( lockQueryCache ) {
+ 			session.getFactory()
+@@ -278,6 +321,46 @@
+ 		}
+ 		executable.execute();
+ 	}
++
++        private void addExecution(Executable executable)
++    	{
++        	if (finalExecutable == null)
++        	{
++            		executions.add(executable);
++            		if (executions.size() > MAX_EXECUTIONS_SIZE)
++            		{
++                		// Merge as much as possible into a bulk action
++                		finalExecutable = new AmalgamatedCleanupAction(session);
++                		ArrayList newExecutions = new ArrayList(executions.size());
++                		for (int i = 0; i < executions.size(); i++)
++                		{
++                    			Executable current = (Executable) executions.get(i);
++                    			if (current.isBulkAction() || current.hasPostCommitEventListeners())
++                    			{
++                        			newExecutions.add(current);
++                    			}
++                    			else
++                    			{
++                        			finalExecutable.addExecutable(current);
++                    			}
++                		}
++                		executions = newExecutions;
++            		}
++        	}
++        	else
++        	{
++            		if (executable.hasPostCommitEventListeners())
++            		{
++                		executions.add(executable);
++            		}
++            		else
++            		{
++                		finalExecutable.addExecutable(executable);
++            		}
++        	}
++
++    	}
++
+ 
+ 	private void prepareActions(List queue) throws HibernateException {
+ 		int size = queue.size();
