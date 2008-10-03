@@ -62,6 +62,7 @@
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-pool-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jooconverter-2.1.0.jar" sourcepath="src/jooconverter-2.1.0-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2.6-patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/quartz-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.7.3.jar" sourcepath="src/pdfbox-0.7.3-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-nodep-2.2_beta1.jar"/>
@@ -89,7 +90,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/facebook_070716.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bliki-3.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2.1-patched.jar" sourcepath="src/hibernate-3.2.1-patched-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-httpclient-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibatis-2.3.0.677.jar"/>
