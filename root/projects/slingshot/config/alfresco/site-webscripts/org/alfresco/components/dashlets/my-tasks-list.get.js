@@ -9,5 +9,7 @@ function getMyTasks()
 		// Create javascript objects from the server response
 		return eval('(' + result + ')');
 	}
+	
+   status.setCode(result.status, result.response);
 	return null;
 }
