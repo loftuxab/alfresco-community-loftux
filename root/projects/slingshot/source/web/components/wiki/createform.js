@@ -13,6 +13,9 @@
 	   this.name = "Alfresco.WikiCreateForm";
       this.id = containerId;
 
+      // Initialise prototype properties
+      this.widgets = {};
+
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor"], this.componentsLoaded, this);
 
@@ -21,6 +24,14 @@
    
 	Alfresco.WikiCreateForm.prototype =
 	{
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets: null,
+
 	   /**
    	  * Sets the current site for this component.
    	  * 
@@ -72,7 +83,7 @@
 		   });
          this.tagLibrary.initialize();
 
-         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
+         this.widgets.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
          {
             height: "300px",
             width: "600px",
@@ -81,16 +92,14 @@
             markup: "xhtml",
             siteId: this.siteId
          });
+         this.widgets.pageEditor.render();
 
-         this.pageEditor.render();
-
-         var saveButtonId = this.id + "-save-button";
-         var saveButton = new YAHOO.widget.Button(saveButtonId,
+         this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button",
          {
             type: "submit"
          });
 
-      	var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", null,
+      	Alfresco.util.createYUIButton(this, "cancel-button", null,
       	{
       		type: "link"
       	});
@@ -100,7 +109,7 @@
          form.addValidation(this.id + "-pageTitle", Alfresco.forms.validation.mandatory, null, "blur");
          form.addValidation(this.id + "-pageTitle", Alfresco.forms.validation.nodeName, null, "keyup");
   	      form.setShowSubmitStateDynamically(true);
-         form.setSubmitElements(saveButton);
+         form.setSubmitElements(this.widgets.saveButton);
          form.setAJAXSubmit(true,
          {
             successCallback:
@@ -117,8 +126,10 @@
          {
             fn: function(form, obj)
             {
+               // Disable save button to prevent double-submission
+               this.widgets.saveButton.set("disabled", true);
                // Put the HTML back into the text area
-               this.pageEditor.saveHTML();
+               this.widgets.pageEditor.saveHTML();
                // Update the tags set in the form
                this.tagLibrary.updateForm(this.id + "-form", "tags");
 
