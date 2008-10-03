@@ -20,11 +20,18 @@ html>body .comment {
 {
 	background-color: #f4faff;
 }
-.commentsListTitle
+.comment-list .commentsListTitle
 {
-	background: transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
+   float: left;
+   background: transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
 	font-size: 116%;
 	padding: 20px 0pt 20px 40px;
+}
+
+.comment-list .paginator
+{
+   float: right;
+   margin: 0;
 }
 
 .comment-list .hidden
