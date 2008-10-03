@@ -887,19 +887,16 @@
          }
          else if (this.state === this.STATE_FINISHED)
          {
-            // Tell the document list to refresh itself if present
-            // and if a single mode was used to highlight the file 
+            // Tell the document list to refresh itself if present and to
+            // highlight the uploaded file (if multi upload was used display the first file)
             var fileName = null;
-            if (this.showConfig.mode === this.MODE_SINGLE_UPLOAD || this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+            for (var i in this.fileStore)
             {
-               for (var i in this.fileStore)
+               var f = this.fileStore[i];
+               if (f && f.state === this.STATE_SUCCESS)
                {
-                  var f = this.fileStore[i];
-                  if (f && f.state === this.STATE_SUCCESS)
-                  {
-                     fileName = f.fileName;
-                     break;
-                  }
+                  fileName = f.fileName;
+                  break;
                }
             }
             if(fileName)

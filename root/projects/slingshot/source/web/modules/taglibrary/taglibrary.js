@@ -390,12 +390,12 @@
          // get the text of the input field
          var inputField = YAHOO.util.Dom.get(this.id + "-tag-input-field");
          var text = inputField.value;
-         
+
          // extract all full words and add them as tags
          // take all full words in the string
          var tags = [];
          var tag = null;
-         var regexp = /(\w+)/gi;
+         var regexp = /([^\s^,^&^\/]+)/gi;
          while ((tag = regexp.exec(text)))
          {
             tags.push(tag[1]);
