@@ -194,7 +194,7 @@ Alfresco.util.createImageEditor = function(id, options)
                      nodeRef = item.nodeRef.replace(":/", "");
                      img = document.createElement("img");
                      img.setAttribute("src", Alfresco.constants.PROXY_URI + "api/node/" + nodeRef + "/content/thumbnails/doclib?c=queue&ph=true");
-                     img.setAttribute("longdesc", Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRef);
+                     img.setAttribute("longdesc", Alfresco.constants.PROXY_URI_RELATIVE + "api/node/content/" + nodeRef + "/" + $html(item.title));
                      img.setAttribute("title", $html(item.title));
                      div.appendChild(img);
                   }

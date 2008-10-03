@@ -36,6 +36,7 @@
 #gutter1 img
 {
    border: 1px dashed #808080;
+   cursor: pointer;
    height: 50px;
    margin: 2px 4px;
    width: 50px;
