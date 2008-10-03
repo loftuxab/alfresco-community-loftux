@@ -198,7 +198,9 @@
             rowsPerPage: this.options.pageSize,
             initialPage: 1,
             template: this._msg("pagination.template"),
-            pageReportTemplate: this._msg("pagination.template.page-report")
+            pageReportTemplate: this._msg("pagination.template.page-report"),
+            previousPageLinkLabel : this._msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel     : this._msg("pagination.nextPageLinkLabel")
          });
          paginator.subscribe('changeRequest', this.onPaginatorChange, this, true);
          paginator.set('recordOffset', 0);

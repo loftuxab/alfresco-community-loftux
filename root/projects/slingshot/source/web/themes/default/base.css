@@ -511,3 +511,11 @@ textarea
 {
    border-color: #286A99;
 }
+
+/* Paginator link styling */
+
+.yui-skin-default .yui-pg-container a.yui-pg-next,
+.yui-skin-default .yui-pg-container a.yui-pg-previous
+{
+   color:#2B6EB5;
+}
