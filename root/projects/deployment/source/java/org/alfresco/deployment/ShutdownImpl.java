@@ -1,8 +1,5 @@
 package org.alfresco.deployment;
 
-import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.deployment.impl.client.DeploymentReceiverServiceClient;
-import org.springframework.remoting.rmi.RmiProxyFactoryBean;
 
 /**
  * Class to shutdown this instance of the deployment server.
@@ -16,44 +13,47 @@ public class ShutdownImpl {
     private String hostName = "localhost";
 	
     public void init() {
-	   String user = "admin";
-	   String password = "admin";
-	 		
-	   // lookup service
-	   DeploymentReceiverService service = getReceiver();
-	   
-	   try {
-		   // Do the shutdown
-		   service.shutDown(user, password);
-	   
-		   // how to dispose of the service ?
-		   service = null;
-	   
-	   }  catch (Exception e) {
-		   // Do nothing - the remote service should have terminated
-		   service=null;
-	   }
-	   
+// TODO: Review Deployment shutdown
+//	   String user = "admin";
+//	   String password = "admin";
+//	 		
+//	   // lookup service
+//	   DeploymentReceiverService service = getReceiver();
+//	   
+//	   try {
+//		   // Do the shutdown
+//		   service.shutDown(user, password);
+//	   
+//		   // how to dispose of the service ?
+//		   service = null;
+//	   
+//	   }  catch (Exception e) {
+//		   // Do nothing - the remote service should have terminated
+//		   service=null;
+//	   }
+//	   
    }
    
    private DeploymentReceiverService getReceiver()
    {
-       try
-       {
-           RmiProxyFactoryBean factory = new RmiProxyFactoryBean();
-           factory.setRefreshStubOnConnectFailure(true);
-           factory.setServiceInterface(DeploymentReceiverTransport.class);
-           factory.setServiceUrl("rmi://" + hostName + ":" + registryPort + "/" + serviceName);
-           factory.afterPropertiesSet();
-           DeploymentReceiverTransport transport = (DeploymentReceiverTransport)factory.getObject();
-           DeploymentReceiverServiceClient service = new DeploymentReceiverServiceClient();
-           service.setDeploymentReceiverTransport(transport);
-           return service;
-       }
-       catch (Exception e)
-       {
-           throw new DeploymentException("Could not connect to " + hostName + " at " + registryPort, e);
-       }
+       return null;
+// TODO: Review Deployment shutdown
+//       try
+//       {
+//           RmiProxyFactoryBean factory = new RmiProxyFactoryBean();
+//           factory.setRefreshStubOnConnectFailure(true);
+//           factory.setServiceInterface(DeploymentReceiverTransport.class);
+//           factory.setServiceUrl("rmi://" + hostName + ":" + registryPort + "/" + serviceName);
+//           factory.afterPropertiesSet();
+//           DeploymentReceiverTransport transport = (DeploymentReceiverTransport)factory.getObject();
+//           DeploymentReceiverServiceClient service = new DeploymentReceiverServiceClient();
+//           service.setDeploymentReceiverTransport(transport);
+//           return service;
+//       }
+//       catch (Exception e)
+//       {
+//           throw new DeploymentException("Could not connect to " + hostName + " at " + registryPort, e);
+//       }
    }
 
     public void setRegistryPort(int servicePort) 
