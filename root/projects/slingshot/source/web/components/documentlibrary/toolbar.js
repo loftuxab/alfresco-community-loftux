@@ -235,7 +235,6 @@
             menu: "selectedItems-menu",
             disabled: true
          });
-         this.widgets.selectedItems.getMenu().beforeShowEvent.fire();
          
          // RSS Feed link button
          this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
