@@ -173,7 +173,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-stax-api_1.0_spec-1.0.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-ws-metadata_2.0_spec-1.1.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/guessencoding-1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/hibernate-3.2.1-patched.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/hibernate-3.2.6-patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/hrtlib.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/hsqldb.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/htmlparser-1.6.jar" />
