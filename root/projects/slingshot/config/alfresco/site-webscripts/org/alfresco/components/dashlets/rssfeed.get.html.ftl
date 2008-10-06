@@ -19,7 +19,7 @@
 		   <#if item_index &lt; limit?number><@feedLib.renderItem item=item target=target/><#else><#break></#if>
 		</#list>
 	<#else>
-		${msg("label.noItems")}
+      <div>${msg("label.noItems")}</div>      
 	</#if>
 	</div><#-- end of body -->
 </div><#-- end of dashlet -->
