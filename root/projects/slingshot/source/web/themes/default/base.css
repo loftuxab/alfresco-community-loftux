@@ -50,7 +50,6 @@ a:visited,
 a:hover
 {
    color: #000;
-   outline: none;
    text-decoration: none;
 }
 
@@ -316,7 +315,7 @@ hr
    display: inline;
 }
 
-div.site-navigation
+.site-navigation
 {
    background-color: #73B4DA;
    background-image: url(../../components/images/navigation-bg.png);

@@ -40,37 +40,13 @@
    Alfresco.CalendarComponent = function Calendar_constructor()
    {
       // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
             
       return this;
    };
    
    Alfresco.CalendarComponent.prototype =
    {
-      /**
-       * Minimum Filter Panel width.
-       * 
-       * @property MIN_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      MIN_FILTER_PANEL_WIDTH: 190,
-
-      /**
-       * Default Filter Panel width.
-       * 
-       * @property DEFAULT_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      DEFAULT_FILTER_PANEL_WIDTH: 210,
-
-      /**
-       * Maximum Filter Panel width.
-       * 
-       * @property MAX_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      MAX_FILTER_PANEL_WIDTH: 400,
-      
       /**
        * Object container for storing YUI widget instances.
        * 
@@ -98,6 +74,7 @@
        */
       onReady: function Calendar_onReady()
       {
+         return;
          var Dom = YAHOO.util.Dom;
          
          // Horizontal Resizer
@@ -113,7 +90,14 @@
          }, this, true);
          
          // Initial size
-         this.widgets.horizResize.resize(null, null, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         if (YAHOO.env.ua.ie > 0)
+         {
+            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         }
+         else
+         {
+            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         }
       },
    
       /**
@@ -128,9 +112,12 @@
          if (typeof width != 'undefined')
          {
             // Reset widget height to ensure correct rendering
-            Dom.setStyle(Dom.get("divCalendarFilters"), "height", "auto");
+            if (YAHOO.env.ua.ie == 0)
+            {
+               Dom.setStyle("divCalendarFilters", "height", "auto");
+            }
             // 6px breathing space for resize gripper
-            Dom.setStyle(Dom.get("divCalendarEvents"), "margin-left", 6 + width + "px");
+            Dom.setStyle("divCalendarEvents", "margin-left", 8 + width + "px");
          }
       }
    };

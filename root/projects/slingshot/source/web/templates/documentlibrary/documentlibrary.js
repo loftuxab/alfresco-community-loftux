@@ -116,7 +116,14 @@
          }, this, true);
          
          // Initial size
-         this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         if (YAHOO.env.ua.ie > 0)
+         {
+            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         }
+         else
+         {
+            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
+         }
       },
    
       /**
@@ -131,9 +138,12 @@
          if (typeof width != 'undefined')
          {
             // Reset widget height to ensure correct rendering
-            Dom.setStyle(Dom.get("divDocLibraryFilters"), "height", "auto");
+            if (YAHOO.env.ua.ie == 0)
+            {
+               Dom.setStyle("divDocLibraryFilters", "height", "auto");
+            }
             // 8px breathing space for resize gripper
-            Dom.setStyle(Dom.get("divDocLibraryDocs"), "margin-left", 8 + width + "px");
+            Dom.setStyle("divDocLibraryDocs", "margin-left", 8 + width + "px");
          }
       }
    };

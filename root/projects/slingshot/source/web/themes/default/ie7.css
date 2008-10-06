@@ -16,6 +16,16 @@
 
 
 /**
+ * Page title and navigation
+ */
+.site-navigation
+{
+   margin-top: -1px;
+   padding-top: 6px;
+}
+
+
+/**
  * Dashlets / position:relative and overflow:auto bug
  */
 .dashlet .scrollableList
@@ -38,4 +48,13 @@
 .workflow .people-selected
 {
    height: 206px;
+}
+
+
+/**
+ * Calendar
+ */
+.calendar-bar .align-right
+{
+   width: 68% !important;
 }

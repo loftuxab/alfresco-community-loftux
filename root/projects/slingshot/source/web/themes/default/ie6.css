@@ -87,6 +87,12 @@ div.dashlet .body .clear
    margin-top: -4px;
 }
 
+.site-navigation
+{
+   margin-top: -1px;
+   padding-top: 6px;
+}
+
 /**
  * Re-apply the color for the popup bodies
  */
@@ -268,8 +274,24 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 .doclist a.show-more
 {
    height:16px;
+   white-space: nowrap;
    width: 1px;
 }
+
+.copy-to .path .treeview
+{
+   width: 16em;
+}
+
+
+/**
+ * Calendar
+ */
+.calendar-bar .align-right
+{
+   width: 68% !important;
+}
+
 
 /**
  * Profile
