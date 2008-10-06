@@ -18,7 +18,7 @@ new Alfresco.UserWelcome("${args.htmlid}");
          <div>${msg("text.userProfile")}</div>
          <div><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.userProfile")}</a></div>
       </div>
-<#if sites?size &gt; 0>
+<#if sites?? && sites?size &gt; 0>
       <div class="detail-list-item">
          <h4>${msg("header.mySites")}</h4>
          <div>${msg("text.mySites")}</div>
