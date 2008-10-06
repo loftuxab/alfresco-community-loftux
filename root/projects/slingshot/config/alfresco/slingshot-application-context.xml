@@ -167,6 +167,6 @@
    
    
    <!-- import app-context extensions -->
-   <import resource="classpath*:alfresco/extension/custom-slingshot-application-context.xml"/>
+   <import resource="classpath*:alfresco/web-extension/custom-slingshot-application-context.xml"/>
    
 </beans>

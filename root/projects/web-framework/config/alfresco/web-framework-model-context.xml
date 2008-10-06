@@ -36,7 +36,7 @@
    </bean>
    <bean id="webframework.classpathstore.chrome.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/chrome</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/chrome</value></property>
    </bean>
    
    <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
@@ -63,7 +63,7 @@
    </bean>
    <bean id="webframework.classpathstore.component.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/components</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/components</value></property>
    </bean>
    
    <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
@@ -90,7 +90,7 @@
    </bean>
    <bean id="webframework.classpathstore.componenttype.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/component-types</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/component-types</value></property>
    </bean>
    
    <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
@@ -117,7 +117,7 @@
    </bean>
    <bean id="webframework.classpathstore.configuration.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/configurations</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/configurations</value></property>
    </bean>
    
    <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
@@ -144,7 +144,7 @@
    </bean>
    <bean id="webframework.classpathstore.contentassociation.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/content-associations</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/content-associations</value></property>
    </bean>
    
    <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
@@ -171,7 +171,7 @@
    </bean>
    <bean id="webframework.classpathstore.page.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/pages</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/pages</value></property>
    </bean>
    
    <bean id="webframework.searchpath.page" class="org.alfresco.web.scripts.SearchPath">
@@ -198,7 +198,7 @@
    </bean>
    <bean id="webframework.classpathstore.pageassociation.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/page-associations</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/page-associations</value></property>
    </bean>
    
    <bean id="webframework.searchpath.pageassociation" class="org.alfresco.web.scripts.SearchPath">
@@ -225,7 +225,7 @@
    </bean>
    <bean id="webframework.classpathstore.pagetype.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/page-types</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/page-types</value></property>
    </bean>
    
    <bean id="webframework.searchpath.pagetype" class="org.alfresco.web.scripts.SearchPath">
@@ -252,7 +252,7 @@
    </bean>
    <bean id="webframework.classpathstore.templateinstance.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/template-instances</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/template-instances</value></property>
    </bean>
    
    <bean id="webframework.searchpath.templateinstance" class="org.alfresco.web.scripts.SearchPath">
@@ -279,7 +279,7 @@
    </bean>
    <bean id="webframework.classpathstore.templatetype.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/template-types</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/template-types</value></property>
    </bean>
    
    <bean id="webframework.searchpath.templatetype" class="org.alfresco.web.scripts.SearchPath">
@@ -306,7 +306,7 @@
    </bean>
    <bean id="webframework.classpathstore.theme.custom" parent="webframework.classpathstore">
       <property name="mustExist"><value>false</value></property>   
-      <property name="classPath"><value>alfresco/extension/site-data/theme</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/theme</value></property>
    </bean>
    
    <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">

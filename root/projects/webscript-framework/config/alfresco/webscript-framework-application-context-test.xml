@@ -11,7 +11,7 @@
       <constructor-arg>
          <list>
             <value>classpath:alfresco/webscript-framework-config.xml</value>
-            <value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
+            <value>classpath:alfresco/web-extension/webscript-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
             <value>classpath:alfresco/webscript-framework-config-test.xml</value>
          </list>
