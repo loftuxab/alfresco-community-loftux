@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * A class that keeps track of the VM shutdown status.  It can be
- * used by threads either as a singleton to check if the
+ * used by threads as a singleton to check if the
  * VM shutdown status has been activated.
  * <p>
  * <b>NOTE: </b> In order to prevent a proliferation of shutdown hooks,
