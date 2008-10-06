@@ -230,6 +230,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 .customise-dashlets div.used
 {
    background-color: white;
+   border: none;
 }
 
 .customisableDashlet
@@ -278,11 +279,16 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    width: 1px;
 }
 
+/* When folder names are too long the layou is destroyed */
+#divDocLibraryFilters
+{
+   overflow-x: hidden;
+}
+
 .copy-to .path .treeview
 {
    width: 16em;
 }
-
 
 /**
  * Calendar
@@ -320,3 +326,4 @@ div.dashlet.calendar div.body
 {
    margin: 0;
 }
+
