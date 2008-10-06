@@ -359,7 +359,7 @@ public class RemoteStore implements Store
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
             {
-                list.add(t.nextToken().substring(path.length()));
+                list.add(t.nextToken().substring(this.path.length()));
             }
             return list.toArray(new String[list.size()]);
         }
@@ -388,7 +388,7 @@ public class RemoteStore implements Store
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
             {
-                list.add(t.nextToken().substring(path.length()));
+                list.add(t.nextToken().substring(this.path.length()));
             }
             return list.toArray(new String[list.size()]);
         }
