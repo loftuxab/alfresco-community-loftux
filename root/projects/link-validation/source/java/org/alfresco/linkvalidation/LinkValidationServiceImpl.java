@@ -66,6 +66,7 @@ import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
 import org.alfresco.service.cmr.attributes.AttrQueryGTE;
@@ -156,7 +157,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     static private final int Schema_version_  = 2;
 
     // Shutdown flag for service
-    private static boolean Shutdown_ = false;
+    private boolean shutdown = false;
 
     static String HREF               = ".href";    // top level href key
     static String SCHEMA_VERSION     = "schema";   // vers # of  info schema
@@ -382,8 +383,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // not just local;  otherwise, the class could get tossed before
         // the thread using the class is done executing.
 
-        Shutdown_ = false;
+        shutdown = false;
         validation_update_thread_ = new Thread(this);
+        validation_update_thread_.setDaemon(true);
         validation_update_thread_.start();
     }
     //-------------------------------------------------------------------------
@@ -394,7 +396,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     public synchronized void onShutdown() 
     {
-        Shutdown_ = true;
+        shutdown = true;
         if ( validation_update_thread_ != null)
         {
             try { validation_update_thread_.interrupt(); }
@@ -579,7 +581,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // polling thread
         while ( true )
         {
-            synchronized (this ) { if (Shutdown_)  { break;} }
+            synchronized (this)
+            {
+                if (shutdown)
+                {
+                    break;
+                }
+            }
 
             if (isLinkValidationDisabled())
             {
@@ -600,20 +608,25 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     
                 try
                 {
-                    RetryingTransactionHelper.RetryingTransactionCallback<Object>
-                    callback = new RetryingTransactionHelper.
-                                   RetryingTransactionCallback<Object>()
-                                   {
-                                       public String execute() throws Throwable
-                                       {
-                                               updateHrefInfo( webappPath,
-                                                               incremental,
-                                                               validateExternal,
-                                                               progress);
-                                           return null;
-                                       }
-                                   };
-    
+                    RetryingTransactionCallback<Object> callback = new RetryingTransactionCallback<Object>()
+                    {
+                        public String execute() throws Throwable
+                        {
+                            updateHrefInfo(
+                                    webappPath,
+                                    incremental,
+                                    validateExternal,
+                                    progress);
+                            return null;
+                        }
+                    };
+                    synchronized (this)
+                    {
+                        if (shutdown)
+                        {
+                            break;
+                        }
+                    }
                     transaction_helper_.doInTransaction(callback);
                     
                     linkValidationFailure = false;
