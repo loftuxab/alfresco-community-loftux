@@ -13,7 +13,7 @@
          <list>
             <!-- Web Script Framework -->
             <value>classpath:alfresco/webscript-framework-config.xml</value>
-            <value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
+            <value>classpath:alfresco/web-extension/webscript-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
             
             <!--  Start TEST dependencies -->
@@ -26,7 +26,7 @@
             <value>classpath:alfresco/web-framework-config.xml</value>
             <value>classpath:alfresco/web-framework-config-remote.xml</value>
             <value>classpath:alfresco/web-framework-config-application.xml</value>
-            <value>classpath:alfresco/extension/web-framework-config-custom.xml</value>
+            <value>classpath:alfresco/web-extension/web-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
          </list>
       </constructor-arg>
@@ -51,7 +51,7 @@
    
    <bean id="webframework.store.webscripts.custom" class="org.alfresco.web.scripts.ClassPathStore">
       <property name="mustExist"><value>false</value></property>
-      <property name="classPath"><value>alfresco/extension/site-webscripts</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-webscripts</value></property>
    </bean>
    
    <bean id="webframework.remotestore.webscripts" parent="webframework.remotestore">
@@ -160,7 +160,7 @@
    
    <bean id="webframework.classpathstore.presets.custom" class="org.alfresco.web.scripts.ClassPathStore">
       <property name="mustExist"><value>false</value></property>
-      <property name="classPath"><value>alfresco/extension/site-data/presets</value></property>
+      <property name="classPath"><value>alfresco/web-extension/site-data/presets</value></property>
    </bean>
    
    <bean id="webframework.remotestore.presets" parent="webframework.remotestore">
