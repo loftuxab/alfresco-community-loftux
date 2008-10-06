@@ -184,7 +184,7 @@ public abstract class AbstractWebScript implements WebScript
                                 result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
                             }
                         }
-                        else
+                        if (result == null)
                         {
                             resourcePath = webscriptId + '_' + locale.getLanguage() + ".properties";
                             if (container.getSearchPath().hasDocument(resourcePath))
