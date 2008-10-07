@@ -235,6 +235,9 @@
             menu: "selectedItems-menu",
             disabled: true
          });
+         // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
+         this.widgets.selectedItems.getMenu().lazyLoad = false;
+         this.widgets.selectedItems.getMenu().initEvent.fire();
          
          // RSS Feed link button
          this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
@@ -880,7 +883,7 @@
                   if (widget.get("srcelement").className != "no-access-check")
                   {
                      widget.set("disabled", false);
-                     if (widget.get("value") !== "")
+                     if (widget.get("value") !== null)
                      {
                         widgetPermissions = widget.get("value").split(",");
                         for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
@@ -910,13 +913,16 @@
       {
          if (this.modules.docList)
          {
-            var files = this.modules.docList.getSelectedFiles();
+            var files = this.modules.docList.getSelectedFiles(), fileTypes = [], file;
             
             // Work out what the user has permission to do
             var finalAccess = {}, userAccess, access;
             for (var i = 0, ii = files.length; i < ii; i++)
             {
-               userAccess = files[i].permissions.userAccess;
+               file = files[i];
+               
+               // Required user access level
+               userAccess = file.permissions.userAccess;
                for (access in userAccess)
                {
                   if (userAccess.hasOwnProperty(access))
@@ -924,19 +930,39 @@
                      finalAccess[access] = (finalAccess[access] === undefined ? userAccess[access] : finalAccess[access] && userAccess[access]);
                   }
                }
+               
+               // Make a note of all selected file types Using a hybrid array/object so we can use both array.length and "x in object"
+               if (!(file.type in fileTypes))
+               {
+                  fileTypes[file.type] = true;
+                  fileTypes.push(file.type);
+               }
             }
             
-            var menuItems = this.widgets.selectedItems.getMenu().getItems();
-            var menuItem, accessRequired, index;
+            var menuItems = this.widgets.selectedItems.getMenu().getItems(), menuItem, index, accessRequired, typeRequired, disabled;
             for (index in menuItems)
             {
                if (menuItems.hasOwnProperty(index))
                {
                   menuItem = menuItems[index];
-                  accessRequired = menuItem.element.firstChild.rel;
 
-                  menuItem.cfg.setProperty("disabled", (accessRequired === "") || finalAccess[accessRequired] ? false : true);
+                  // Check permissions required
+                  accessRequired = menuItem.element.firstChild.rel;
+                  disabled = (accessRequired === "") || finalAccess[accessRequired] ? false : true;
+
+                  // Check filetype required
+                  typeRequired = menuItem.element.firstChild.type;
+                  if (typeRequired !== "")
+                  {
+                     if (fileTypes.length > 1 || !(typeRequired in fileTypes))
+                     {
+                        disabled = true;
+                     }
+                  }
+
+                  menuItem.cfg.setProperty("disabled", disabled);
                }
+               
             }
             
             this.widgets.selectedItems.set("disabled", (files.length === 0));
