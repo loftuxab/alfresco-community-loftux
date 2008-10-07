@@ -23,18 +23,12 @@
 
 .postview-header .backLink
 {
-   padding-left: 5px;
+   background-image:url(../images/back-arrow.png);
+   background-repeat:no-repeat;
+   color:#333333;
+   padding:0 5px 0 19px;
+   font-size: 108%;
 }
-
-.postview-header .backLink
-{
-  background: transparent url(../images/forward-arrow-16.png) no-repeat scroll 100% 0px;
-  color: #333333;
-  font-size: 108%;
-  padding-right: 20px;
-}
-
-
 
 /****************
  * NODE DETAIL *

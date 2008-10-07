@@ -86,9 +86,9 @@
          siteId: "",
 
          /**
-          * Title of the site
+          * Title/name of the site
           */
-         siteTitle: "",
+         siteName: "",
 
          /**
           * ContainerId representing root container
@@ -550,7 +550,7 @@
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
           
          // update the ui to show that a search is on-going
-         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("search.info.searching");
+         YAHOO.widget.DataTable.MSG_EMPTY = "";
          this.widgets.dataTable.render();
          
          function successHandler(sRequest, oResponse, oPayload)
@@ -603,7 +603,7 @@
       {
          // update the search results field
          var searchFor = '<b>' + Alfresco.util.encodeHTML(this.searchTerm) + '</b>';
-         var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + this.options.siteId + '</b>'));
+         var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + this.options.siteName+ '</b>'));
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
          {
