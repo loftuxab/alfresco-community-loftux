@@ -8,9 +8,6 @@
 	   this.name = "Alfresco.WikiList";
       this.id = containerId;
 
-      this.$parser = new Alfresco.WikiParser();
-      this.$parser.URL = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=";
-         
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
       return this;
@@ -29,6 +26,10 @@
    	setSiteId: function(siteId)
    	{
    		this.siteId = siteId;
+
+         this.$parser = new Alfresco.WikiParser();
+         this.$parser.URL = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=";
+
    		return this;
    	},
    	
