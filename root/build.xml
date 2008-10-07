@@ -260,6 +260,9 @@
          <!-- Version Tests -->
          <exclude name="**/org/alfresco/repo/version/**/*Test.java" />
          <include name="**/org/alfresco/repo/version/VersionTestSuite.java" />
+         <!-- AVM Tests -->
+         <exclude name="**/org/alfresco/repo/avm/**/*Test.java" />
+         <include name="**/org/alfresco/repo/avm/AVMTestSuite.java" />
          <!-- All other tests -->
          <include name="**/*Test.java" />
          <!-- include the updated indexer tests -->
