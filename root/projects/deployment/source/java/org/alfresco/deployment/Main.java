@@ -47,9 +47,19 @@ public class Main
             System.err.println("Usage: org.alfresco.deployment.Main application-context.xml");
             System.exit(1);
         }
-        
-        @SuppressWarnings("unused")
-        FileSystemXmlApplicationContext context =
-            new FileSystemXmlApplicationContext(args[0]);
+
+        try 
+        {
+        	logger.info("Alfresco File System Receiver Starting");
+        	@SuppressWarnings("unused")
+        	FileSystemXmlApplicationContext context =
+        		new FileSystemXmlApplicationContext(args[0]);
+        }
+        catch (Exception e)
+        {
+        	logger.error("Unable to start file system receiver", e);
+        	System.err.println("Unable to start file system receiver");
+        	e.printStackTrace();
+        }
     }
 }

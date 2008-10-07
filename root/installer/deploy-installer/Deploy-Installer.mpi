@@ -153,7 +153,7 @@ ProjectID
 CB2C8E57-4826-4821-B9A1-7191DEB3B6CD
 
 ProjectVersion
-1.2.9.0
+1.2.8.0
 
 RMIPORT
 44100
@@ -189,7 +189,7 @@ UpgradeApplicationID
 {}
 
 Version
-2.2
+3.0
 
 ViewReadme
 Yes
@@ -239,12 +239,17 @@ File ::5A5F76C5-7F49-4F69-B473-95096A76F43F -name W:/V21/root/projects/installer
 File ::A07BFF00-FA26-415F-93CB-3C9003EAD050 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/jug-lgpl-2.0.0.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::C7D50BBF-E90A-4F6D-8C87-71D2E1434A7D -name W:/HEAD/root/projects/deployment/build/assemble/commons-logging-1.1.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::31BE5475-0845-4E03-837B-C41BDE5DDE2F -name W:/HEAD/root/projects/deployment/build/assemble/spring-2.0.6.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::DA8CA081-6BF7-4A85-8606-533A9D3199CA -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/shutdown-context.xml -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::A7F375FF-8C37-43E2-B948-1362422257B8 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/log4j.properties -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::E08CBB53-49A4-4BFD-A113-6B7AA6BF6D27 -name C:/work/alfresco/HEAD/root/projects/deployment/build/assemble/log4j-1.2.15.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 FileGroup ::03791E78-4713-45B0-8559-C66EA67DB28A -setup Install -active Yes -platforms Windows -name {Windows scripts} -parent FileGroups
 File ::D6EBA3BA-8849-4530-AF11-6B6B1BD0A40D -name W:/V21/root/projects/deployment/build/assemble/deploy_start.bat -location ../../projects/deployment/build/assemble -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 File ::E1A99665-AF17-41BF-A38B-31FA8EA7631E -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 03791E78-4713-45B0-8559-C66EA67DB28A
+File ::B6805DD0-98F6-4DA6-B614-FCF98E46B36E -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/deploy_stop.bat -location ../../projects/deployment/build/assemble -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 FileGroup ::C3FE0508-0773-40D6-97C4-1FE52205D032 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc TarArchive} -name {Linux scripts} -parent FileGroups
 File ::AB5D0DE2-7EE0-48D2-918E-7C6FBDA170E4 -name W:/V21/root/projects/deployment/build/assemble/deploy_start.sh -location ../../projects/deployment/build/assemble -parent C3FE0508-0773-40D6-97C4-1FE52205D032
 File ::3732B8FA-85C7-4A5B-AE7F-5E51AB3765F5 -name W:/V21/root/installer/resources/AlfrescoLogo32.gif -location ../resources -parent C3FE0508-0773-40D6-97C4-1FE52205D032
+File ::00F58278-BEE8-4ED2-8165-EBE3A1BFFE25 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/deploy_stop.sh -location ../../projects/deployment/build/assemble -parent C3FE0508-0773-40D6-97C4-1FE52205D032
 Component ::A92DA43F-C102-49A4-89FB-F2A2B18949D1 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Default Component} -parent Components
 SetupType ::F6005EED-F116-409B-82E7-662D4A7065E8 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Typical -parent SetupTypes
 SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
@@ -384,7 +389,7 @@ array set Properties {
 <%InstallDir%>
 
 03791E78-4713-45B0-8559-C66EA67DB28A,FileSize
-2224
+3378
 
 03791E78-4713-45B0-8559-C66EA67DB28A,Name
 {Windows scripts}
@@ -935,7 +940,7 @@ Finish
 <%InstallDir%>
 
 9C895371-373A-4923-840C-4F98632E4A99,FileSize
-2848051
+3204248
 
 9C895371-373A-4923-840C-4F98632E4A99,Name
 {Program Files}
