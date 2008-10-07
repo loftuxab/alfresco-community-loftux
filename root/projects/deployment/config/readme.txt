@@ -31,17 +31,14 @@ Setting up the Alfresco File System Receiver
       conflict with any other services.
       
 3. Configure application-context.xml. Open the file in a text editor and modify
-   the Target Configuration section. You'll want to modify this section:
-   
+   the Target Configuration section. 
+
+   You'll want to modify this section:
     <entry key="default">
         <map>
             <entry key="root"><value>target</value></entry>
             <entry key="user"><value>admin</value></entry>
             <entry key="password"><value>admin</value></entry>
-            <entry key="runnable"><value>org.alfresco.deployment.SampleRunnable</value></entry>
-            <!-- 
-            <entry key="program"><value>/path/to/program</value></entry>
-             -->
         </map>
     </entry>
 
@@ -54,24 +51,28 @@ Setting up the Alfresco File System Receiver
     your choosing. (Note: The user name and password does not need to be an os or alfresco
     user and password.)
     
-    Optionally replace the key="runnable" with a custom java class implementing
-    the org.alfresco.deployment.FSDeploymentRunnable interface. This will run after each 
-    successful deployment. For example:
+4. Define your custom runnables
+   If you have any custom runnables, use the configuration of the sampleProgramRunnable as a template.
+   
+   Define your runnable bean
+   <bean id="myBean" class="xxx.Myclass">
+         <property name="exampleProperty">
+         	<value>Hello World</value>
+         </property>
+    </bean>
+     
+    add your runnable beans to the target, like so
+     
+                     <entry key="runnables">
+                         <list>
+                             <ref bean="sampleRunnable"/>
+                             <ref bean="myBean"/>
+                             <ref bean="superBean"/>
+                         </list>
+                     </entry>
 
-    <entry key="runnable"><value>uk.co.your.NotifyMe</value></entry>
-
-    or
-    
-    Optionally uncomment and replace the key="program" entry with the path to an arbitrary 
-    program to run after each successful deployment. For example:
-    
-            <entry key="program"><value>/opt/bin/notify.pl</value></entry>
-            
-    Leave only one of "runnable" or "program" uncommented. By default a "runnable" is
-    looked for and executed. If that is not found then "program" is looked for and
-    executed.
-
-4. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
+  
+5. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
    content to be owned by.
    
    
