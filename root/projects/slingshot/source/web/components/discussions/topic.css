@@ -15,10 +15,11 @@
 
 .topicview-header .backLink a
 {
-   background: transparent url(../images/forward-arrow-16.png) no-repeat scroll 100% 0px;
-   color: #333333;
+   background-image:url(../images/back-arrow.png);
+   background-repeat:no-repeat;
+   color:#333333;
+   padding:0 5px 0 19px;
    font-size: 108%;
-   padding-right: 20px;
 }
 
 .topicview-header .listTitle
