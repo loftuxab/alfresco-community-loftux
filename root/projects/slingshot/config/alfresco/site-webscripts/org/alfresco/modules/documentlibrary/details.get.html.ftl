@@ -23,8 +23,8 @@
             <div class="yui-u"><input id="${args.htmlid}-name" type="text" name="properties.name" tabindex="1" />&nbsp;*</div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first"><label for="${args.htmlid}-title">${msg("label.title")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="properties.title" tabindex="2" /></div>
+            <div class="yui-u first"><label for="${args.htmlid}-fileTitle">${msg("label.title")}:</label></div>
+            <div class="yui-u"><input id="${args.htmlid}-fileTitle" type="text" name="properties.title" tabindex="2" /></div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>

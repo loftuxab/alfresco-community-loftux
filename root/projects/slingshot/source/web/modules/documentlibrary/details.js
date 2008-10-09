@@ -393,7 +393,7 @@
 
          // Item details
          Dom.get(this.id + "-name").value = file.fileName ? file.fileName : "";
-         Dom.get(this.id + "-title").value = file.title ? file.title : "";
+         Dom.get(this.id + "-fileTitle").value = file.title ? file.title : "";
          Dom.get(this.id + "-description").value = file.description ? file.description : "";
          Dom.get(this.id + "-tags").value = file.tags.join(" ");
          if (file.type == "document")
