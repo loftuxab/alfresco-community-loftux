@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,6 +40,8 @@ import java.util.regex.Pattern;
  */
 public final class JNDIConstants 
 {
+    public final static String DIR_DEFAULT_WWW_APPBASE = "/" + JNDIConstants.DIR_DEFAULT_WWW + "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
+    
     /**
      * Directory used for virtualized web content.
      * Typically, this directory is a transparent overlay 
