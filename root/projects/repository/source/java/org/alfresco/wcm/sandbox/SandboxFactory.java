@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,19 +22,16 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.bean.wcm;
+package org.alfresco.wcm.sandbox;
 
 import java.util.List;
 import java.util.Map;
-
-import javax.faces.context.FacesContext;
 
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.model.WCMAppModel;
 import org.alfresco.repo.avm.AVMNodeConverter;
 import org.alfresco.repo.domain.PropertyValue;
-import org.alfresco.sandbox.SandboxConstants;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.avm.AVMService;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -45,20 +42,39 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.DNSNameMangler;
 import org.alfresco.util.GUID;
-import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.Repository;
-import org.alfresco.web.bean.repository.User;
+import org.alfresco.wcm.util.WCMUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Helper factory to create AVM sandbox structures.
+ * Helper factory to create WCM sandbox structures
  * 
  * @author Kevin Roast
+ * @author janv
  */
-public final class SandboxFactory
+public final class SandboxFactory extends WCMUtil
 {
    private static Log logger = LogFactory.getLog(SandboxFactory.class);
+   
+   /** Services */
+   private PermissionService permissionService;
+   private AVMService avmService;
+   private NodeService nodeService;
+   
+   public void setNodeService(NodeService nodeService)
+   {
+       this.nodeService = nodeService;
+   }
+   
+   public void setPermissionService(PermissionService permissionService)
+   {
+       this.permissionService = permissionService;
+   }
+   
+   public void setAvmService(AVMService avmService)
+   {
+       this.avmService = avmService;
+   }
    
    /**
     * Private constructor
@@ -83,24 +99,23 @@ public final class SandboxFactory
     * @param webProjectNodeRef   The noderef for the webproject.
     * @param branchStoreId       The ID of the store to branch this staging store from.
     */
-   public static SandboxInfo createStagingSandbox(String storeId, 
-                                                  NodeRef webProjectNodeRef,
-                                                  String branchStoreId)
+   public SandboxInfo createStagingSandbox(String storeId, 
+                                           NodeRef webProjectNodeRef,
+                                           String branchStoreId)
    {
-      ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-      AVMService avmService = services.getAVMService();
-      PermissionService permissionService = services.getPermissionService();
-      
       // create the 'staging' store for the website
-      String stagingStoreName = AVMUtil.buildStagingStoreName(storeId);
+      String stagingStoreName = WCMUtil.buildStagingStoreName(storeId);
       avmService.createStore(stagingStoreName);
+      
       if (logger.isDebugEnabled())
+      {
          logger.debug("Created staging sandbox store: " + stagingStoreName);
+      }
       
       // we can either branch from an existing staging store or create a new structure
       if (branchStoreId != null)
       {
-         String branchStorePath = AVMUtil.buildStagingStoreName(branchStoreId) + ":/" +
+         String branchStorePath = WCMUtil.buildStagingStoreName(branchStoreId) + ":/" +
                                   JNDIConstants.DIR_DEFAULT_WWW;
          avmService.createBranch(-1, branchStorePath,
                                  stagingStoreName + ":/", JNDIConstants.DIR_DEFAULT_WWW);
@@ -109,14 +124,13 @@ public final class SandboxFactory
       {
          // create the system directories 'www' and 'avm_webapps'
          avmService.createDirectory(stagingStoreName + ":/", JNDIConstants.DIR_DEFAULT_WWW);
-         avmService.createDirectory(AVMUtil.buildStoreRootPath(stagingStoreName), 
+         avmService.createDirectory(WCMUtil.buildStoreRootPath(stagingStoreName), 
                                     JNDIConstants.DIR_DEFAULT_APPBASE);
       }
       
       
-      
       // set staging area permissions
-      SandboxFactory.setStagingPermissions(storeId, webProjectNodeRef);
+      setStagingPermissions(storeId, webProjectNodeRef);
       
       // Add permissions for layers
       
@@ -135,24 +149,24 @@ public final class SandboxFactory
       avmService.createSnapshot(stagingStoreName, null, null);
       
       
-      
-      
-      
       // create the 'preview' store for the website
-      String previewStoreName = AVMUtil.buildStagingPreviewStoreName(storeId);
+      String previewStoreName = WCMUtil.buildStagingPreviewStoreName(storeId);
       avmService.createStore(previewStoreName);
+      
       if (logger.isDebugEnabled())
+      {
          logger.debug("Created staging preview sandbox store: " + previewStoreName +
                       " above " + stagingStoreName);
+      }
       
       // create a layered directory pointing to 'www' in the staging area
-      avmService.createLayeredDirectory(AVMUtil.buildStoreRootPath(stagingStoreName), 
+      avmService.createLayeredDirectory(WCMUtil.buildStoreRootPath(stagingStoreName), 
                                         previewStoreName + ":/", 
                                         JNDIConstants.DIR_DEFAULT_WWW);
       
     
       // apply READ permissions for all users
-      //dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(previewStoreName));
+      //dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(previewStoreName));
       //permissionService.setPermission(dirRef, PermissionService.ALL_AUTHORITIES, PermissionService.READ, true);
       
       // tag the store with the store type
@@ -172,6 +186,7 @@ public final class SandboxFactory
       
       // tag all related stores to indicate that they are part of a single sandbox
       final QName sandboxIdProp = QName.createQName(SandboxConstants.PROP_SANDBOXID + GUID.generate());
+      
       avmService.setStoreProperty(stagingStoreName,
                                   sandboxIdProp,
                                   new PropertyValue(DataTypeDefinition.TEXT, null));
@@ -188,20 +203,16 @@ public final class SandboxFactory
       return new SandboxInfo( new String[] { stagingStoreName, previewStoreName } );
    }
 
-   public static void setStagingPermissions(String storeId, 
-           NodeRef webProjectNodeRef)
+   protected void setStagingPermissions(String storeId, NodeRef webProjectNodeRef)
    {
-      ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-      PermissionService permissionService = services.getPermissionService();
-      NodeService nodeService = services.getNodeService();
-      
-      String storeName = AVMUtil.buildStagingStoreName(storeId);
-      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(storeName));
+      String storeName = WCMUtil.buildStagingStoreName(storeId);
+      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(storeName));
        
       // Apply sepcific user permissions as set on the web project
       // All these will be masked out
       List<ChildAssociationRef> userInfoRefs = nodeService.getChildAssocs(
                webProjectNodeRef, WCMAppModel.ASSOC_WEBUSER, RegexQNamePattern.MATCH_ALL);
+      
       for (ChildAssociationRef ref : userInfoRefs)
       {
          NodeRef userInfoRef = ref.getChildRef();
@@ -212,37 +223,30 @@ public final class SandboxFactory
       }
    }
    
-   public static void setStagingPermissionMasks(String storeId)
+   public void setStagingPermissionMasks(String storeId)
    {
-      FacesContext context = FacesContext.getCurrentInstance();
-      ServiceRegistry services = Repository.getServiceRegistry(context);
-      PermissionService permissionService = services.getPermissionService();
+      String storeName = WCMUtil.buildStagingStoreName(storeId);
+      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(storeName));
       
-      String storeName = AVMUtil.buildStagingStoreName(storeId);
-      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(storeName));
-      
-      // apply READ permissions for all users
-      permissionService.setPermission(dirRef, PermissionService.ALL_AUTHORITIES, PermissionService.READ, true);
-
       // Set store permission masks
-      String currentUser = Application.getCurrentUser(context).getUserName();
+      String currentUser = AuthenticationUtil.getCurrentUserName();
       permissionService.setPermission(dirRef.getStoreRef(), currentUser, PermissionService.CHANGE_PERMISSIONS, true);
       permissionService.setPermission(dirRef.getStoreRef(), currentUser, PermissionService.READ_PERMISSIONS, true);
       permissionService.setPermission(dirRef.getStoreRef(), PermissionService.ALL_AUTHORITIES, PermissionService.READ, true);
+      
+      // apply READ permissions for all users
+      permissionService.setPermission(dirRef, PermissionService.ALL_AUTHORITIES, PermissionService.READ, true);
    }
    
-   public static void updateStagingAreaManagers(String storeId, 
-           NodeRef webProjectNodeRef, final List<String> managers)
+   public void updateStagingAreaManagers(String storeId, NodeRef webProjectNodeRef, final List<String> managers)
    {
        // The stores have the mask set in updateSandboxManagers
-       String storeName = AVMUtil.buildStagingStoreName(storeId);
-       ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-       PermissionService permissionService = services.getPermissionService();
+       String storeName = WCMUtil.buildStagingStoreName(storeId);
     
-       NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(storeName));
+       NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(storeName));
        for (String manager : managers)
        {
-           permissionService.setPermission(dirRef, manager, AVMUtil.ROLE_CONTENT_MANAGER, true);
+           permissionService.setPermission(dirRef, manager, WCMUtil.ROLE_CONTENT_MANAGER, true);
            
            // give the manager change permissions permission in the staging area store
            permissionService.setPermission(dirRef.getStoreRef(), manager, 
@@ -252,47 +256,12 @@ public final class SandboxFactory
        }
    }
    
-   public static boolean isContentManager(String storeId)
-   {
-	   FacesContext context = FacesContext.getCurrentInstance();
-       ServiceRegistry services = Repository.getServiceRegistry(context);
-       AVMService avmService = services.getAVMService();
-       
-       String storeName =  extractStagingAreaName(storeId);
-       PropertyValue pValue = avmService.getStoreProperty(storeName, SandboxConstants.PROP_WEB_PROJECT_NODE_REF);
-       
-       if (pValue != null)
-       {
-           NodeRef webProjectNodeRef = (NodeRef) pValue.getValue(DataTypeDefinition.NODE_REF);
-
-           User currentUser = Application.getCurrentUser(context);
-           String currentUserRole = WebProject.getWebProjectUserRole(webProjectNodeRef, currentUser);
-           return AVMUtil.ROLE_CONTENT_MANAGER.equals(currentUserRole);
-       }
-       else
-       {
-           return false;
-       }
-   }
-   
-   private static String extractStagingAreaName(String name)
-   {
-       int index = name.indexOf("--");
-       if (index == -1)
-       {
-           return name;
-       }
-       return name.substring(0, index);
-   }
-   
-   public static void addStagingAreaUser(String storeId, String authority, String role)
+   public void addStagingAreaUser(String storeId, String authority, String role)
    {
        // The stores have the mask set in updateSandboxManagers
-       String storeName = AVMUtil.buildStagingStoreName(storeId);
-       ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-       PermissionService permissionService = services.getPermissionService();
+       String storeName = WCMUtil.buildStagingStoreName(storeId);
     
-       NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(storeName));
+       NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(storeName));
        permissionService.setPermission(dirRef, authority, role, true);
    }
    
@@ -315,18 +284,14 @@ public final class SandboxFactory
     * @param role       Role permission for the user
     * @return           Summary information regarding the sandbox
     */
-   public static SandboxInfo createUserSandbox(String storeId, 
-                                               List<String> managers,
-                                               String username, 
-                                               String role)
+   public SandboxInfo createUserSandbox(String storeId, 
+                                        List<String> managers,
+                                        String username, 
+                                        String role)
    {
-      ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-      AVMService avmService = services.getAVMService();
-      PermissionService permissionService = services.getPermissionService();
-      
       // create the user 'main' store
-      String userStoreName    = AVMUtil.buildUserMainStoreName(storeId, username);
-      String previewStoreName = AVMUtil.buildUserPreviewStoreName(storeId, username);
+      String userStoreName    = WCMUtil.buildUserMainStoreName(storeId, username);
+      String previewStoreName = WCMUtil.buildUserPreviewStoreName(storeId, username);
       
       if (avmService.getStore(userStoreName) != null)
       {
@@ -338,26 +303,28 @@ public final class SandboxFactory
       }
       
       avmService.createStore(userStoreName);
-      String stagingStoreName = AVMUtil.buildStagingStoreName(storeId);
+      String stagingStoreName = WCMUtil.buildStagingStoreName(storeId);
       if (logger.isDebugEnabled())
          logger.debug("Created user sandbox store: " + userStoreName +
                       " above staging store " + stagingStoreName);
       
       // create a layered directory pointing to 'www' in the staging area
-      avmService.createLayeredDirectory(AVMUtil.buildStoreRootPath(stagingStoreName), 
+      avmService.createLayeredDirectory(WCMUtil.buildStoreRootPath(stagingStoreName), 
                                         userStoreName + ":/", 
                                         JNDIConstants.DIR_DEFAULT_WWW);
-      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(userStoreName));
+      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(userStoreName));
       
       // Apply access mask to the store (ACls are applie to the staging area)
       
       // apply the user role permissions to the sandbox
+      String currentUser = AuthenticationUtil.getCurrentUserName();
+      permissionService.setPermission(dirRef.getStoreRef(), currentUser, WCMUtil.ROLE_CONTENT_MANAGER, true);
       permissionService.setPermission(dirRef.getStoreRef(), username, PermissionService.ALL_PERMISSIONS, true);
       permissionService.setPermission(dirRef.getStoreRef(), PermissionService.ALL_AUTHORITIES, PermissionService.READ, true);
       // apply the manager role permission for each manager in the web project
       for (String manager : managers)
       {
-         permissionService.setPermission(dirRef.getStoreRef(), manager, AVMUtil.ROLE_CONTENT_MANAGER, true);
+         permissionService.setPermission(dirRef.getStoreRef(), manager, WCMUtil.ROLE_CONTENT_MANAGER, true);
       }
       
       // tag the store with the store type
@@ -387,25 +354,29 @@ public final class SandboxFactory
       
       // create the user 'preview' store
       avmService.createStore(previewStoreName);
+      
       if (logger.isDebugEnabled())
+      {
          logger.debug("Created user preview sandbox store: " + previewStoreName +
                       " above " + userStoreName);
+      }
       
       // create a layered directory pointing to 'www' in the user 'main' store
-      avmService.createLayeredDirectory(AVMUtil.buildStoreRootPath(userStoreName), 
+      avmService.createLayeredDirectory(WCMUtil.buildStoreRootPath(userStoreName), 
                                         previewStoreName + ":/", 
                                         JNDIConstants.DIR_DEFAULT_WWW);
-      dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(previewStoreName));
+      dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(previewStoreName));
       
       // Apply access mask to the store (ACls are applied to the staging area)
       
       // apply the user role permissions to the sandbox
+      permissionService.setPermission(dirRef.getStoreRef(), currentUser, WCMUtil.ROLE_CONTENT_MANAGER, true);
       permissionService.setPermission(dirRef.getStoreRef(), username, PermissionService.ALL_PERMISSIONS, true);
       permissionService.setPermission(dirRef.getStoreRef(), PermissionService.ALL_AUTHORITIES, PermissionService.READ, true);
       // apply the manager role permission for each manager in the web project
       for (String manager : managers)
       {
-         permissionService.setPermission(dirRef.getStoreRef(), manager, AVMUtil.ROLE_CONTENT_MANAGER, true);
+         permissionService.setPermission(dirRef.getStoreRef(), manager, WCMUtil.ROLE_CONTENT_MANAGER, true);
       }
       
       // tag the store with the store type
@@ -461,24 +432,23 @@ public final class SandboxFactory
     * @param storeId The id of the store to create a sandbox for
     * @return Information about the sandbox
     */
-   public static SandboxInfo createWorkflowSandbox(final String storeId)
+   public SandboxInfo createWorkflowSandbox(final String storeId)
    {
-      final ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-      final AVMService avmService = services.getAVMService();
-      
-      final String stagingStoreName = AVMUtil.buildStagingStoreName(storeId);
+      final String stagingStoreName = WCMUtil.buildStagingStoreName(storeId);
 
       // create the workflow 'main' store
-      final String packageName = AVMUtil.STORE_WORKFLOW + "-" + GUID.generate();
-      final String mainStoreName = 
-         AVMUtil.buildWorkflowMainStoreName(storeId, packageName);
+      final String packageName = WCMUtil.STORE_WORKFLOW + "-" + GUID.generate();
+      final String mainStoreName = WCMUtil.buildWorkflowMainStoreName(storeId, packageName);
       
       avmService.createStore(mainStoreName);
+      
       if (logger.isDebugEnabled())
+      {
          logger.debug("Created workflow sandbox store: " + mainStoreName);
+      }
          
       // create a layered directory pointing to 'www' in the staging area
-      avmService.createLayeredDirectory(AVMUtil.buildStoreRootPath(stagingStoreName), 
+      avmService.createLayeredDirectory(WCMUtil.buildStoreRootPath(stagingStoreName), 
                                         mainStoreName + ":/", 
                                         JNDIConstants.DIR_DEFAULT_WWW);
          
@@ -509,14 +479,17 @@ public final class SandboxFactory
       avmService.createSnapshot(mainStoreName, null, null);
          
       // create the workflow 'preview' store
-      final String previewStoreName = 
-         AVMUtil.buildWorkflowPreviewStoreName(storeId, packageName);
+      final String previewStoreName = WCMUtil.buildWorkflowPreviewStoreName(storeId, packageName);
+      
       avmService.createStore(previewStoreName);
+      
       if (logger.isDebugEnabled())
+      {
          logger.debug("Created workflow sandbox preview store: " + previewStoreName);
+      }
          
       // create a layered directory pointing to 'www' in the workflow 'main' store
-      avmService.createLayeredDirectory(AVMUtil.buildStoreRootPath(mainStoreName), 
+      avmService.createLayeredDirectory(WCMUtil.buildStoreRootPath(mainStoreName), 
                                         previewStoreName + ":/", 
                                         JNDIConstants.DIR_DEFAULT_WWW);
          
@@ -572,29 +545,25 @@ public final class SandboxFactory
     * @param managers   The list of authorities who have ContentManager role in the web project
     * @param username   Username of the user sandbox to update
     */
-   public static void updateSandboxManagers(
-         final String storeId, final List<String> managers, final String username)
+   public void updateSandboxManagers(final String storeId, final List<String> managers, final String username)
    {
-      final ServiceRegistry services = Repository.getServiceRegistry(FacesContext.getCurrentInstance());
-      final PermissionService permissionService = services.getPermissionService();
-      
-      final String userStoreName    = AVMUtil.buildUserMainStoreName(storeId, username);
-      final String previewStoreName = AVMUtil.buildUserPreviewStoreName(storeId, username);
+      final String userStoreName    = WCMUtil.buildUserMainStoreName(storeId, username);
+      final String previewStoreName = WCMUtil.buildUserPreviewStoreName(storeId, username);
       
       // Apply masks to the stores
       
       // apply the manager role permission to the user main sandbox for each manager
-      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(userStoreName));
+      NodeRef dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(userStoreName));
       for (String manager : managers)
       {
-         permissionService.setPermission(dirRef.getStoreRef(), manager, AVMUtil.ROLE_CONTENT_MANAGER, true);
+         permissionService.setPermission(dirRef.getStoreRef(), manager, WCMUtil.ROLE_CONTENT_MANAGER, true);
       }
       
       // apply the manager role permission to the user preview sandbox for each manager
-      dirRef = AVMNodeConverter.ToNodeRef(-1, AVMUtil.buildStoreRootPath(previewStoreName));
+      dirRef = AVMNodeConverter.ToNodeRef(-1, WCMUtil.buildStoreRootPath(previewStoreName));
       for (String manager : managers)
       {
-         permissionService.setPermission(dirRef.getStoreRef(), manager, AVMUtil.ROLE_CONTENT_MANAGER, true);
+         permissionService.setPermission(dirRef.getStoreRef(), manager, WCMUtil.ROLE_CONTENT_MANAGER, true);
       }
    }
    
@@ -606,7 +575,7 @@ public final class SandboxFactory
     */
    private static void tagStoreDNSPath(AVMService avmService, String store, String... components)
    {
-      String path = AVMUtil.buildSandboxRootPath(store);
+      String path = WCMUtil.buildSandboxRootPath(store);
       // DNS name mangle the property name - can only contain value DNS characters!
       String dnsProp = SandboxConstants.PROP_DNS + DNSNameMangler.MakeDNSName(components);
       avmService.setStoreProperty(store, QName.createQName(null, dnsProp),
