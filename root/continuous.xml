@@ -15,7 +15,7 @@
    <target name="bootstrap-wcm-test" depends="init" >
    	  <!-- enable wcm for unit tests -->
    	  <echo message="enable wcm for tests" />
-      <copy file="${file.name.wcm.bootstrap}" todir="${dir.project.repository}/${dir.name.source}/${dir.name.test.resources}" />
+      <copy file="${file.name.wcm.bootstrap}" todir="${dir.project.repository}/${dir.name.source}/${dir.name.test.resources}/alfresco/extension" />
    </target>
 
    <target name="init-test" 
