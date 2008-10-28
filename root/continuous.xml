@@ -11,11 +11,18 @@
            depends="alfresco.init">
       <property file="continuous.properties"/>
    </target>
+	
+   <target name="bootstrap-wcm-test" depends="init" >
+   	  <!-- enable wcm for unit tests -->
+   	  <echo message="enable wcm for tests" />
+      <copy file="${file.name.wcm.bootstrap}" todir="${dir.project.repository}/${dir.name.source}/${dir.name.test.resources}" />
+   </target>
 
    <target name="init-test" 
-           depends="init">
+           depends="init,bootstrap-wcm-test">
       <mkdir dir="${dir.continuous.dist}" />
    </target>
+
 
    <!-- ********************** -->
    <!-- ** Cleaning targets ** -->
