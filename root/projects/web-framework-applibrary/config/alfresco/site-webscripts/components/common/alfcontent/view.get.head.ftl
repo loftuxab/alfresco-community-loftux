@@ -1,0 +1,22 @@
+<style type="text/css">
+
+.profile-label
+{
+	font-size: 12px;
+	font-family: Verdana;
+	font-weight: bold;
+	color: black;
+	padding: 4px;
+}
+.profile-name
+{
+	font-size: 12px;
+	font-family: Verdana;
+	color: black;
+	padding: 4px;
+}
+A.profile-name
+{
+	text-decoration: none;
+}
+</style>

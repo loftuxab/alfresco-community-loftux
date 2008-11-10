@@ -1,0 +1,5 @@
+<webscript kind="webstudio">
+  <shortname>Audio</shortname>
+  <description>Plays Audio</description>
+  <url>/component/common/audio/edit</url>
+</webscript>
