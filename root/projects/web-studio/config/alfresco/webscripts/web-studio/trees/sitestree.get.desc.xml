@@ -1,0 +1,8 @@
+<webscript kind="webstudio">
+  <shortname>Sites Tree</shortname>
+  <description>Sites Tree</description>
+  <url>/tree/sites</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

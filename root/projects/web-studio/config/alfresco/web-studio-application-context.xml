@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+   <bean id="webframework.configsource"
+         class="org.alfresco.config.source.UrlConfigSource">
+      <constructor-arg>
+         <list>
+            <!-- Web Script Framework -->
+            <value>classpath:alfresco/webscript-framework-config.xml</value>
+            <value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
+            <value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
+            
+            <!--  Start TEST dependencies -->
+            <!--  These is included because some of the tests require it  -->
+            <!--  These should be removed -->
+            <value>classpath:alfresco/webscript-framework-config-test.xml</value>
+            <!--  End TEST dependencies -->
+            
+            <!-- Web Framework -->
+            <value>classpath:alfresco/web-framework-config.xml</value>
+            <value>classpath:alfresco/web-framework-config-remote.xml</value>
+            <value>classpath:alfresco/web-framework-config-web-studio.xml</value>
+            <value>classpath:alfresco/web-framework-config-application.xml</value>
+
+            <!-- Web Studio -->
+            <value>classpath:alfresco/web-studio-config.xml</value>
+
+            <value>classpath:alfresco/extension/web-framework-config-custom.xml</value>
+            <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
+                        
+         </list>
+      </constructor-arg>
+   </bean>
+
+
+   <!-- 
+      Web Script Declarations      
+   -->
+   <bean id="webscript.webstudio" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWebScript" singleton="false" />
+   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWizardWebScript" singleton="false" />
+
+
+   <!-- Override: Remote Store Context for Web Studio -->
+   <bean id="webframework.context.remotestore" class="org.alfresco.web.studio.WebStudioRemoteStoreContext" />
+
+
+   <!--
+      Allow Web Scripts to be loaded from remote store
+   -->
+   <bean id="webframework.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.remotestore.webscripts" />
+            <ref bean="webframework.store.webscripts.custom" />
+            <ref bean="webframework.store.webscripts" />
+            <ref bean="webscripts.store" />
+         </list>
+      </property>
+   </bean>
+
+
+   <!--
+      Allow Templates to be loaded from remote store
+   -->
+   <bean id="webframework.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.remotestore.templates" />
+            <ref bean="webframework.remotestore.webscripts" />
+            <ref bean="webframework.store.templates.custom" />
+            <ref bean="webframework.store.webscripts.custom" />
+            <ref bean="webframework.store.templates" />
+            <ref bean="webframework.store.webscripts" />
+            <ref bean="webframework.store.system-templates" />
+         </list>
+      </property>
+   </bean>   
+   
+   
+   <!-- 
+      Disable caching and update delays for template processor
+   -->
+   <bean id="webframework.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
+      <property name="searchPath" ref="webframework.searchpath" />
+      <property name="updateDelay"><value>0</value></property>
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+   </bean>
+   <bean id="webframework.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
+      <property name="searchPath" ref="webframework.templates.searchpath" />
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+      <property name="updateDelay"><value>0</value></property>
+   </bean>
+   
+   
+   <!--
+      Web Framework Renderers (for Web Studio)
+      
+      These override the default renderers and perform a little bit of DOM manipulation when the objects
+      are rendered within the browser.
+   -->
+   <bean id="webframework.renderer.template" class="org.alfresco.web.studio.bean.WebStudioTemplateInstanceRenderer" />
+   <bean id="webframework.renderer.component" class="org.alfresco.web.studio.bean.WebStudioComponentRenderer" />
+   <bean id="webframework.renderer.region" class="org.alfresco.web.studio.bean.WebStudioRegionRenderer" />   
+
+
+   <!--
+      Web Studio Client State Provider
+   -->
+   <bean id="webstudio.clientStateProvider" class="org.alfresco.web.studio.client.DefaultWebStudioStateProvider" />
+   
+</beans>
+
