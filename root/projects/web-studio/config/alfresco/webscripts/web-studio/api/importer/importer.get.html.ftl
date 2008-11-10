@@ -1,0 +1,4 @@
+{
+	"status" : "${status}",
+	"message" : "${message}"
+}

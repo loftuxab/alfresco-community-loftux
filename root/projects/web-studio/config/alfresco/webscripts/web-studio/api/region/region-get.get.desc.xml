@@ -1,0 +1,8 @@
+<webscript kind="webstudio">
+  <shortname>Fault a Region</shortname>
+  <description>Fault a Region</description>
+  <url>/api/region/get</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

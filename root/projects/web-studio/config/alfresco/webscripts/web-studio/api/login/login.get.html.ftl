@@ -1,0 +1,1 @@
+<#if success>AUTHENTICATED</#if>
