@@ -25,18 +25,19 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.framework.exception.RendererExecutionException;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
-import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.exception.RequestContextException;
-import org.alfresco.web.site.renderer.RendererContext;
-import org.alfresco.web.site.renderer.RendererContextHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,22 +49,21 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
 {
     private static Log logger = LogFactory.getLog(PresentationContainer.class);
     
-    private ThreadLocal<RendererContext> rendererContext = new ThreadLocal<RendererContext>();
+    private ThreadLocal<RenderContext> renderContext = new ThreadLocal<RenderContext>();    
     
-    
-    protected void bindRendererContext(RendererContext context)
+    protected void bindRenderContext(RenderContext context)
     {
-        rendererContext.set(context);
+        renderContext.set(context);
     }
 
-    protected void unbindRendererContext()
+    protected void unbindRenderContext()
     {
-        rendererContext.remove();
+        renderContext.remove();
     }
 
-    protected RendererContext getRendererContext()
+    protected RenderContext getRenderContext()
     {
-        return rendererContext.get();
+        return renderContext.get();
     }
 
     @Override
@@ -74,10 +74,10 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         params.putAll(super.getScriptParameters());
         
         // Bind in Web Script Model elements
-        RendererContext rendererContext = getRendererContext();
+        RenderContext context = getRenderContext();
 
         // populate the root script properties
-        ProcessorModelHelper.populateScriptModel(rendererContext, params);
+        ProcessorModelHelper.populateScriptModel(context, params);
 
         /**
          * Override the "remote" object with a slightly better 
@@ -91,7 +91,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
          * 
          * All while in the context of the current user
          */
-        WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(rendererContext.getRequestContext());
+        WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
         params.put("remote", remote);
         
         return params;
@@ -105,17 +105,21 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         params.putAll(super.getTemplateParameters());
         
         // Bind in Template Model elements
-        RendererContext rendererContext = getRendererContext();
+        RenderContext context = getRenderContext();
         
         // populate the root template properties
         try
         {
-            ProcessorModelHelper.populateTemplateModel(rendererContext, params);
+            ProcessorModelHelper.populateTemplateModel(context, params);
         }
         catch(RendererExecutionException ree)
         {
             // This exception is only thrown when processing
             // template objects, thus it shouldn't occur for web scripts
+        }
+        catch(UnsupportedEncodingException uee)
+        {
+        	// TODO: how to handle this?
         }
         
         return params;
@@ -142,8 +146,8 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         // In this case, we do not have a RendererContext instance.
         boolean handleBinding = false;
         
-        RendererContext rendererContext = getRendererContext();
-        if (rendererContext == null)
+        RenderContext context = getRenderContext();
+        if (context == null)
         {
             try
             {
@@ -154,10 +158,8 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
                         HttpServletRequest request = ((org.alfresco.web.scripts.servlet.WebScriptServletRequest) scriptReq).getHttpServletRequest();
                         HttpServletResponse response = ((org.alfresco.web.scripts.servlet.WebScriptServletResponse) scriptRes).getHttpServletResponse();
                         
-                        RequestContext context = RequestUtil.getRequestContext(request);
-                        
-                        // bind into a new renderer context
-                        rendererContext = RendererContextHelper.bind(context, request, response);
+                        RequestContext requestContext = RequestUtil.getRequestContext(request);
+                        context = RenderHelper.provideRenderContext(requestContext, request, response);
                         
                         // flag that we will manually handle the bindings
                         handleBinding = true;
@@ -177,7 +179,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         // manually handle binding?
         if (handleBinding)
         {
-            bindRendererContext(rendererContext);
+            bindRenderContext(context);
         }
         
         try
@@ -190,7 +192,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
             // manually handle binding?
             if (handleBinding)
             {
-                unbindRendererContext();
+                unbindRenderContext();
             }
         }
     }

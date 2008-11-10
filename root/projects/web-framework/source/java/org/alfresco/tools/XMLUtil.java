@@ -165,6 +165,10 @@ public class XMLUtil
      */
     public static List getChildren(Element element, String name)
     {
+    	if(name == null)
+    	{
+    		return element.elements();
+    	}
         return element.elements(name);
     }
 

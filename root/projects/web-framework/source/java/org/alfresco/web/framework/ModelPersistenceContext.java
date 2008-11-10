@@ -50,6 +50,7 @@ import java.util.Set;
 public final class ModelPersistenceContext
 {
     public static String REPO_STOREID = "REPO_STOREID";
+    public static String REPO_WEBAPPID = "REPO_WEBAPPID";
     
     private final String userId;
     private final Map<String, Object> values = new HashMap<String, Object>(4, 1.0f);

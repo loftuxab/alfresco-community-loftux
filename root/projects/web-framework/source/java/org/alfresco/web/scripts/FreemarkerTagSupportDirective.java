@@ -24,13 +24,11 @@
  */
 package org.alfresco.web.scripts;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.alfresco.tools.TagUtil;
-import org.alfresco.web.framework.model.Page;
-import org.alfresco.web.site.HttpRequestContext;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderContextRequest;
 import org.alfresco.web.site.exception.TagExecutionException;
 
 import freemarker.template.TemplateDirectiveModel;
@@ -43,19 +41,19 @@ import freemarker.template.TemplateDirectiveModel;
  * constructing using a single piece of code - a tag.  The directives then
  * provide another entry point into the same tag logic.
  * 
- * @author Michael Uzquiano
+ * @author muzquiano
  */
 public abstract class FreemarkerTagSupportDirective implements TemplateDirectiveModel
 {
     /** The context. */
-    private final RequestContext context;
+    private final RenderContext context;
 
     /**
      * Instantiates a new freemarker tag support directive.
      * 
      * @param context the context
      */
-    public FreemarkerTagSupportDirective(RequestContext context)
+    public FreemarkerTagSupportDirective(RenderContext context)
     {
         this.context = context;
     }
@@ -84,16 +82,10 @@ public abstract class FreemarkerTagSupportDirective implements TemplateDirective
     public String executeTag(Tag tag, String bodyContent)
         throws TagExecutionException
     {
-        // render the component into dummy objects
-        // currently, we can only do this for HttpRequestContext instances
-        String output = null;
-        if (context instanceof HttpRequestContext)
-        {
-            HttpServletRequest request = (HttpServletRequest)((HttpRequestContext)context).getRequest();
+    	// generate a request that packages up the render context
+    	RenderContextRequest request = new RenderContextRequest(context);
             
-            // execute the tag
-            output = TagUtil.execute(tag, request, bodyContent);
-        }
-        return output;
+        // execute the tag
+        return TagUtil.execute(tag, request, bodyContent);
     }
 }

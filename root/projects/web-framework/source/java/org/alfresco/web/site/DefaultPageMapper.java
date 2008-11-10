@@ -58,7 +58,7 @@ public class DefaultPageMapper extends AbstractPageMapper
     /* (non-Javadoc)
      * @see org.alfresco.web.site.AbstractPageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
      */
-    public void execute(RequestContext context, ServletRequest request)
+    public void executeMapper(RequestContext context, ServletRequest request)
         throws PageMapperException
     {
         /**

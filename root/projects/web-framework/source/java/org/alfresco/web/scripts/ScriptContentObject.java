@@ -61,7 +61,7 @@ public final class ScriptContentObject extends ScriptBase
     /**
      * Instantiates a new script content.
      * 
-     * @param context the context
+     * @param context the request context
      * @param content the content
      */
     public ScriptContentObject(RequestContext context, Content content)

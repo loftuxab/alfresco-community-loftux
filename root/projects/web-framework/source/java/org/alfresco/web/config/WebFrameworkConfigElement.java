@@ -26,6 +26,7 @@ package org.alfresco.web.config;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.element.ConfigElementAdapter;
@@ -36,7 +37,7 @@ import org.dom4j.Element;
  */
 public class WebFrameworkConfigElement extends ConfigElementAdapter implements WebFrameworkConfigProperties
 {
-    public static final String CONFIG_ELEMENT_ID = "web-framework";
+	public static final String CONFIG_ELEMENT_ID = "web-framework";
 
     protected HashMap<String, FormatDescriptor> formats = null;
     protected HashMap<String, PageMapperDescriptor> pageMappers = null;
@@ -44,17 +45,15 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected HashMap<String, RequestContextDescriptor> requestContexts = null;
     protected HashMap<String, ErrorHandlerDescriptor> errorHandlers = null;
     protected HashMap<String, SystemPageDescriptor> systemPages = null;
-    protected HashMap<String, FileSystemDescriptor> fileSystems = null;
     protected HashMap<String, TagLibraryDescriptor> tagLibraries = null;
     protected HashMap<String, UserFactoryDescriptor> userFactories = null;
-    protected HashMap<String, RendererDescriptor> renderers = null;
     protected HashMap<String, String> pageTypes = null;
     protected HashMap<String, TypeDescriptor> types = null;
     protected HashMap<String, ContentLoaderDescriptor> contentLoaders = null;
 
     protected boolean isTimerEnabled = false;
+    
     protected String defaultFormatId = null;
-    protected String defaultFileSystemId = null;
     protected String defaultPageMapperId = null;
     protected String defaultLinkBuilderId = null;
     protected String defaultRequestContextId = null;
@@ -69,6 +68,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected Boolean persisterCacheEnabled = null;
 
     protected String rootPath;
+    
+    protected String webStudioMode = null;
+    protected String webStudioLocation = null;
+    protected boolean webStudioEnabled = false;
+    
 
     /**
      * Default Constructor
@@ -83,10 +87,8 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         requestContexts = new HashMap<String, RequestContextDescriptor>();
         errorHandlers = new HashMap<String, ErrorHandlerDescriptor>();
         systemPages = new HashMap<String, SystemPageDescriptor>();
-        fileSystems = new HashMap<String, FileSystemDescriptor>();
         tagLibraries = new HashMap<String, TagLibraryDescriptor>();
         userFactories = new HashMap<String, UserFactoryDescriptor>();
-        renderers = new HashMap<String, RendererDescriptor>();
         pageTypes = new HashMap<String, String>();
         types = new HashMap<String, TypeDescriptor>();
         contentLoaders = new HashMap<String, ContentLoaderDescriptor>();
@@ -111,10 +113,8 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.requestContexts.putAll(this.requestContexts);
         combinedElement.errorHandlers.putAll(this.errorHandlers);
         combinedElement.systemPages.putAll(this.systemPages);
-        combinedElement.fileSystems.putAll(this.fileSystems);
         combinedElement.tagLibraries.putAll(this.tagLibraries);
         combinedElement.userFactories.putAll(this.userFactories);
-        combinedElement.renderers.putAll(this.renderers);
         combinedElement.types.putAll(this.types);
         combinedElement.contentLoaders.putAll(this.contentLoaders);
         combinedElement.pageTypes.putAll(this.pageTypes);
@@ -126,10 +126,8 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.requestContexts.putAll(configElement.requestContexts);
         combinedElement.errorHandlers.putAll(configElement.errorHandlers);
         combinedElement.systemPages.putAll(configElement.systemPages);
-        combinedElement.fileSystems.putAll(configElement.fileSystems);
         combinedElement.tagLibraries.putAll(configElement.tagLibraries);
         combinedElement.userFactories.putAll(configElement.userFactories);
-        combinedElement.renderers.putAll(configElement.renderers);
         combinedElement.types.putAll(configElement.types);
         combinedElement.contentLoaders.putAll(configElement.contentLoaders);
         combinedElement.pageTypes.putAll(configElement.pageTypes);
@@ -144,11 +142,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if(configElement.defaultFormatId != null)
         {
             combinedElement.defaultFormatId = configElement.defaultFormatId;
-        }
-        combinedElement.defaultFileSystemId = this.defaultFileSystemId;
-        if(configElement.defaultFileSystemId != null)
-        {
-            combinedElement.defaultFileSystemId = configElement.defaultFileSystemId;
         }
         combinedElement.defaultPageMapperId = this.defaultPageMapperId;
         if(configElement.defaultPageMapperId != null)
@@ -209,6 +202,23 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if(configElement.persisterCacheEnabled != null)
         {
             combinedElement.persisterCacheEnabled = configElement.persisterCacheEnabled;
+        }
+        
+        
+        combinedElement.webStudioMode = this.webStudioMode;
+        if(configElement.webStudioMode != null)
+        {
+        	combinedElement.webStudioMode = configElement.webStudioMode;
+        }
+        combinedElement.webStudioLocation = this.webStudioLocation;
+        if(configElement.webStudioLocation != null)
+        {
+        	combinedElement.webStudioLocation = configElement.webStudioLocation;
+        }
+        combinedElement.webStudioEnabled = this.webStudioEnabled;
+        if(configElement.webStudioEnabled)
+        {
+        	combinedElement.webStudioEnabled = configElement.webStudioEnabled;
         }
         
         return combinedElement;
@@ -274,16 +284,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         return (SystemPageDescriptor) this.systemPages.get(id);
     }
 
-    // file systems
-    public String[] getFileSystemIds()
-    {
-        return this.fileSystems.keySet().toArray(new String[this.fileSystems.size()]);
-    }
-    public FileSystemDescriptor getFileSystemDescriptor(String id)
-    {
-        return (FileSystemDescriptor) this.fileSystems.get(id);
-    }
-
     // tag libraries
     public String[] getTagLibraryIds()
     {
@@ -302,16 +302,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     public UserFactoryDescriptor getUserFactoryDescriptor(String id)
     {
         return (UserFactoryDescriptor) this.userFactories.get(id);
-    }
-
-    // renderers
-    public String[] getRendererIds()
-    {
-        return this.renderers.keySet().toArray(new String[this.renderers.size()]);
-    }
-    public RendererDescriptor getRendererDescriptor(String id)
-    {
-        return (RendererDescriptor) this.renderers.get(id);
     }
 
     // types (model files)
@@ -356,7 +346,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     {
         return this.defaultRegionChrome;
     }
-    
+        
     public String getDefaultComponentChrome()
     {
         return this.defaultComponentChrome;
@@ -435,16 +425,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultUserFactoryId;
     }
-    
-    public String getDefaultFileSystemId()
-    {
-        if(this.defaultFileSystemId == null)
-        {
-            return "local";
-        }
-        return this.defaultFileSystemId;
-    }
-    
+        
     public int getPersisterCacheCheckDelay()
     {
         if (persisterCacheCheckDelay != null)
@@ -468,6 +449,22 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             return true;
         }
     }
+    
+    public String getWebStudioMode()
+    {
+    	return this.webStudioMode;
+    }
+    
+    public String getWebStudioLocation()
+    {
+    	return this.webStudioLocation;
+    }
+    
+    public boolean isWebStudioEnabled()
+    {
+    	return this.webStudioEnabled;    	
+    }
+    
 
 
     /**
@@ -478,7 +475,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     {
         private static final String ID = "id";
 
-        HashMap<String, Object> map;
+        HashMap<String, String> map;
 
         Descriptor(Element el)
         {
@@ -494,11 +491,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         {
             if(this.map == null)
             {
-                this.map = new HashMap<String, Object>();
+                this.map = new HashMap<String, String>();
             }
 
             String key = el.getName();
-            Object value = (Object) el.getTextTrim();
+            String value = (String) el.getTextTrim();
             if(value != null)
             {
                 this.map.put(key, value);
@@ -509,7 +506,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         {
             if(this.map == null)
             {
-                this.map = new HashMap<String, Object>();
+                this.map = new HashMap<String, String>();
             }
 
             return (Object) this.map.get(key);
@@ -528,6 +525,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         public String getStringProperty(String key)
         {
             return (String) get(key);
+        }
+        
+        public Map<String, String> map()
+        {
+        	return this.map;
         }
     }
 
@@ -628,81 +630,41 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
     public static class ErrorHandlerDescriptor extends Descriptor
     {
-        private static final String RENDERER_TYPE = "renderer-type";
-        private static final String RENDERER = "renderer";
+        private static final String PROCESSOR_ID = "processor-id";
+        private static final String JSP_PATH = "jsp-path";
 
         ErrorHandlerDescriptor(Element el)
         {
             super(el);
         }
 
-        public String getRendererType() 
+        public String getJspPath() 
         {
-            return getStringProperty(RENDERER_TYPE);
+            return getStringProperty(JSP_PATH);
         }
-        public String getRenderer() 
+        public String getProcessorId() 
         {
-            return getStringProperty(RENDERER);
+            return getStringProperty(PROCESSOR_ID);
         }
     }
 
     public static class SystemPageDescriptor extends Descriptor
     {
-        private static final String RENDERER_TYPE = "renderer-type";
-        private static final String RENDERER = "renderer";
+        private static final String PROCESSOR_ID = "processor-id";
+        private static final String JSP_PATH = "jsp-path";
 
         SystemPageDescriptor(Element el)
         {
             super(el);
         }
 
-        public String getRendererType() 
+        public String getJspPath() 
         {
-            return getStringProperty(RENDERER_TYPE);
+            return getStringProperty(JSP_PATH);
         }
-        public String getRenderer() 
+        public String getProcessorId() 
         {
-            return getStringProperty(RENDERER);
-        }
-    }
-
-    public static class FileSystemDescriptor extends Descriptor
-    {
-        private static final String ROOT_PATH = "root-path";
-        private static final String USE_CACHE = "use-cache";
-        private static final String CLAZZ = "class";
-        private static final String DESCRIPTION = "description";
-        private static final String NAME = "name";
-        private static final String STORE = "store";
-
-        FileSystemDescriptor(Element el)
-        {
-            super(el);
-        }
-
-        public String getImplementationClass() 
-        {
-            return getStringProperty(CLAZZ);
-        }
-        public String getDescription() 
-        {
-            return getStringProperty(DESCRIPTION);
-        }
-        public String getName() 
-        {
-            return getStringProperty(NAME);
-        }
-        public String getRootPath() 
-        {
-            return getStringProperty(ROOT_PATH);
-        }
-        public String getUseCache() 
-        {
-            return getStringProperty(USE_CACHE);
-        }
-        public String getStore()
-        {
-            return getStringProperty(STORE);
+            return getStringProperty(PROCESSOR_ID);
         }
     }
 
@@ -750,32 +712,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             return getStringProperty(NAME);
         }    	    	
     }
-
-    public static class RendererDescriptor extends Descriptor
-    {
-        private static final String CLAZZ = "class";
-        private static final String DESCRIPTION = "description";
-        private static final String NAME = "name";
-
-        RendererDescriptor(Element el)
-        {
-            super(el);
-        }
-
-        public String getImplementationClass() 
-        {
-            return getStringProperty(CLAZZ);
-        }
-        public String getDescription() 
-        {
-            return getStringProperty(DESCRIPTION);
-        }
-        public String getName() 
-        {
-            return getStringProperty(NAME);
-        }    	    	
-    }
-
+    
     public static class TypeDescriptor extends Descriptor
     {
         private static final String CLAZZ = "class";
@@ -872,8 +809,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             return getStringProperty(ENDPOINT);
         }
     }
-    
-
 
     protected static WebFrameworkConfigElement newInstance(Element elem)
     {
@@ -934,15 +869,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             configElement.systemPages.put(descriptor.getId(), descriptor);
         }
 
-        // file systems
-        List fileSystems= elem.elements("file-system");
-        for(int i = 0; i < fileSystems.size(); i++)
-        {
-            Element el = (Element) fileSystems.get(i);
-            FileSystemDescriptor descriptor = new FileSystemDescriptor(el);
-            configElement.fileSystems.put(descriptor.getId(), descriptor);
-        }
-
         // tag libraries
         List tagLibraries= elem.elements("tag-library");
         for(int i = 0; i < tagLibraries.size(); i++)
@@ -961,15 +887,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             configElement.userFactories.put(descriptor.getId(), descriptor);
         }
 
-        // renderers
-        List renderers = elem.elements("renderer");
-        for(int i = 0; i < renderers.size(); i++)
-        {
-            Element el = (Element) renderers.get(i);
-            RendererDescriptor descriptor = new RendererDescriptor(el);
-            configElement.renderers.put(descriptor.getId(), descriptor);
-        }
-
         // framework defaults
         Element frameworkDefaults = elem.element("framework-defaults");
         if(frameworkDefaults != null)
@@ -978,11 +895,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             if(_requestContext != null)
             {
                 configElement.defaultRequestContextId = _requestContext;
-            }
-            String _fileSystem = frameworkDefaults.elementTextTrim("file-system");
-            if(_fileSystem != null)
-            {
-                configElement.defaultFileSystemId = _fileSystem;
             }
             String _format = frameworkDefaults.elementTextTrim("format");
             if(_format != null)
@@ -1086,7 +998,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             ContentLoaderDescriptor descriptor = new ContentLoaderDescriptor(el);
             configElement.contentLoaders.put(descriptor.getId(), descriptor);
         }
+
         
+        //////////////////////////////////////////////////////
+        // Persisters
+        //////////////////////////////////////////////////////
         
         Element persisterElement = elem.element("persisters");
         if (persisterElement != null)
@@ -1102,6 +1018,31 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
                         persisterElement.elementTextTrim("cache-check-delay"));
             }
         }
+        
+        
+        //////////////////////////////////////////////////////
+        // Web Studio
+        //////////////////////////////////////////////////////
+
+        Element webStudio = elem.element("web-studio");
+        if(webStudio != null)
+        {
+        	String _webStudioMode = webStudio.elementTextTrim("mode");
+            if(_webStudioMode != null)
+            {
+                configElement.webStudioMode = _webStudioMode;
+                if("enabled".equalsIgnoreCase(_webStudioMode))
+                {
+                	configElement.webStudioEnabled = true;
+                }
+            }
+            String _webStudioLocation = webStudio.elementTextTrim("location");
+            if(_webStudioLocation != null)
+            {
+            	configElement.webStudioLocation = _webStudioLocation;
+            }
+        }
+        
         
         return configElement;
     }

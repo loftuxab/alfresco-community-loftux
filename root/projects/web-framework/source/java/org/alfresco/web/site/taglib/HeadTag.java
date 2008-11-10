@@ -24,11 +24,13 @@
  */
 package org.alfresco.web.site.taglib;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.site.RenderUtil;
-import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.renderer.RendererContext;
+import org.alfresco.web.framework.exception.RendererExecutionException;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderUtil;
 
 /**
  * This tag is meant to be used during the processing of Template Instances.
@@ -42,15 +44,19 @@ public class HeadTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-        RendererContext rendererContext = this.getRequestContext().getRenderContext();
+    	RenderContext context = getRenderContext();
 
         try
         {
-            print(RenderUtil.processHeader(rendererContext));
+            print(RenderUtil.renderTemplateHeaderAsString(context));
         }
         catch(RendererExecutionException ree)
         {
             throw new JspException("Unable to process downstream component head files", ree);
+        }
+        catch(UnsupportedEncodingException uee)
+        {
+        	throw new JspException("Unsupported encoding exception", uee);
         }
         
         return SKIP_BODY;

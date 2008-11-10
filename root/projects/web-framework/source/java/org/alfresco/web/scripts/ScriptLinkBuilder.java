@@ -33,7 +33,7 @@ public final class ScriptLinkBuilder extends ScriptBase
     /**
      * Constructs a new ScriptLinkBuilder object.
      * 
-     * @param context   The RequestContext instance for the current request
+     * @param context   The request context instance for the current request
      */
     public ScriptLinkBuilder(RequestContext context)
     {
@@ -48,7 +48,7 @@ public final class ScriptLinkBuilder extends ScriptBase
     {
         if (this.properties == null)
         {
-            this.properties = new ScriptableWrappedMap(context.map());
+            this.properties = new ScriptableWrappedMap(context.getValuesMap());
         }
         
         return this.properties;

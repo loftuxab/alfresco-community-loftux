@@ -29,8 +29,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
@@ -45,7 +45,7 @@ public class LocalWebScriptContext
     String ScriptUrl;
     
     // Web Framework Elements
-    RendererContext RendererContext;
+    RenderContext RenderContext;
     ModelObject Object;
     RequestContext RequestContext;
 }

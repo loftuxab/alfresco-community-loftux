@@ -1,10 +1,10 @@
-<%@ page import="org.alfresco.web.framework.model.*"%>
-<%@ page import="org.alfresco.web.site.*" %>
+<%@ page import="org.alfresco.web.framework.render.*"%>
 <%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
-	RequestContext context = RequestUtil.getRequestContext(request);
+	RenderContext context = RenderUtil.getContext(request);
+
 	String objectId = (String) request.getAttribute("error-objectId");
 	Throwable t = (Throwable) request.getAttribute("error");
 	if(t != null)

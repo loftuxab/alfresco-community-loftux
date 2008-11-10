@@ -24,12 +24,11 @@
  */
 package org.alfresco.web.site.taglib;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.site.PresentationUtil;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.PresentationUtil;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderFocus;
 import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
@@ -75,9 +74,7 @@ public class ComponentTag extends TagBase
 
     public int doStartTag() throws JspException
     {
-        HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();
-        HttpServletResponse response = (HttpServletResponse) getPageContext().getResponse();
-        RequestContext context = getRequestContext();
+        RenderContext context = getRenderContext();
         
         String componentId = this.component;
         
@@ -85,23 +82,23 @@ public class ComponentTag extends TagBase
         // this will apply if we're rendering in a region
         if (componentId == null)
         {
-            componentId = (String) context.getRenderContext().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
+            componentId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
         }
         
         // now render the component
         try
         {
-            // get overriden chrome id
+            // get overridden chrome id
             String chromeId = getChrome();
             boolean isChromeless = isChromeless();
 
             if (!isChromeless)
             {
-                PresentationUtil.renderComponent(context, request, response, componentId, chromeId);
+            	PresentationUtil.renderComponent(context, RenderFocus.BODY, componentId, chromeId);
             }
             else
             {
-                PresentationUtil.renderChromelessComponent(context, request, response, componentId);
+                PresentationUtil.renderChromelessComponent(context, RenderFocus.BODY, componentId);
             }
         }
         catch (Throwable t)

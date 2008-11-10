@@ -24,8 +24,8 @@
  */
 package org.alfresco.web.framework.model;
 
-import org.alfresco.web.framework.AbstractModelObject;
 import org.alfresco.web.framework.ModelPersisterInfo;
+import org.alfresco.web.framework.render.AbstractRenderableModelObject;
 import org.dom4j.Document;
 
 /**
@@ -33,12 +33,10 @@ import org.dom4j.Document;
  * 
  * @author muzquiano
  */
-public class TemplateType extends AbstractModelObject
+public class TemplateType extends AbstractRenderableModelObject
 {
     public static String TYPE_ID = "template-type";
     public static String PROP_URI = "uri";
-    public static String PROP_RENDERER = "renderer";
-    public static String PROP_RENDERER_TYPE = "renderer-type";    
     
     /**
      * Instantiates a new template type for a given XML document
@@ -70,52 +68,11 @@ public class TemplateType extends AbstractModelObject
         setProperty(PROP_URI, uri);
     }
 
-    /**
-     * Sets the renderer.
-     * 
-     * @param renderer the new renderer
-     */
-    public void setRenderer(String renderer)
-    {
-        setProperty(PROP_RENDERER, renderer);
-    }
-
-    /**
-     * Gets the renderer.
-     * 
-     * @return the renderer
-     */
-    public String getRenderer()
-    {
-        return getProperty(PROP_RENDERER);
-    }
-
-    /**
-     * Sets the renderer type.
-     * 
-     * @param rendererType the new renderer type
-     */
-    public void setRendererType(String rendererType)
-    {
-        setProperty(PROP_RENDERER_TYPE, rendererType);
-    }
-
-    /**
-     * Gets the renderer type.
-     * 
-     * @return the renderer type
-     */
-    public String getRendererType()
-    {
-        return getProperty(PROP_RENDERER_TYPE);
-    }
-
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.AbstractModelObject#getTypeName()
      */
     public String getTypeId() 
     {
         return TYPE_ID;
-    }
-    
+    }    
 }

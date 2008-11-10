@@ -24,20 +24,25 @@
  */
 package org.alfresco.web.site;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
+import org.alfresco.util.Content;
+import org.alfresco.util.InputStreamContent;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
-import org.alfresco.web.site.renderer.RendererContext;
-import org.alfresco.web.site.renderer.RendererContextHelper;
+import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.scripts.WebScriptException;
 import org.apache.commons.logging.Log;
 
 /**
@@ -56,17 +61,22 @@ import org.apache.commons.logging.Log;
  */
 public abstract class AbstractRequestContext implements RequestContext
 {
-    public static final String VALUE_HEAD_TAGS = "headTags";    
-    
+    public static final String VALUE_HEAD_TAGS = "headTags";
+
+    protected static final String SESSION_CURRENT_THEME    = "alfTheme";
+    protected static final String SESSION_CURRENT_THEME_ID = "alfThemeId";
+        
     /*
      * Increments every time a request ID is required (debug)
      */
     protected static int idCounter = 0;
     
-    protected Map<String, Serializable> map;
+    protected Map<String, Serializable> valuesMap;
+    protected Map<String, Serializable> parametersMap;
+    
     protected Page currentPage;
     protected TemplateInstance currentTemplate;
-    protected Content currentObject;
+    protected org.alfresco.web.site.Content currentObject;
     protected String currentFormatId;
     protected String storeId;
     protected User user;
@@ -74,15 +84,28 @@ public abstract class AbstractRequestContext implements RequestContext
     protected String uri;
     protected Model model;
     
+    protected Map<String, Component> components = null;
+    
+    /** The request encapsulated by this context object */
+    protected HttpServletRequest request;
+    
+    /** The content in the request body **/
+    private Content content;        
     
     /**
      * Constructs a new Request Context.  In general, you should not
      * have to construct these by hand.  They are constructed by
      * the framework via a RequestContextFactory.
      */
-    protected AbstractRequestContext()
+    protected AbstractRequestContext(HttpServletRequest request)
     {
-        this.map = new HashMap<String, Serializable>(16, 1.0f);
+    	// initialize maps
+        this.valuesMap = new HashMap<String, Serializable>(16, 1.0f);
+        this.parametersMap = new HashMap<String, Serializable>(16, 1.0f);
+        this.components = new HashMap<String, Component>(16, 1.0f);
+        
+        // set request
+        this.request = request;
     }
     
     /**
@@ -148,88 +171,6 @@ public abstract class AbstractRequestContext implements RequestContext
         }
         
         return title;
-    }
-
-    /**
-     * Sets a custom value onto the request context
-     * 
-     * @param key
-     * @param value
-     */
-    public void setValue(String key, Serializable value)
-    {
-        if (key == null)
-        {
-            throw new IllegalArgumentException("Key is mandatory.");
-        }
-        map.put(key, value);
-    }
-
-    /**
-     * Retrieves a custom value from the request context
-     * 
-     * @param key
-     * @return
-     */
-    public Serializable getValue(String key)
-    {
-        if (key == null)
-        {
-            throw new IllegalArgumentException("Key is mandatory.");
-        }
-        return map.get(key);
-    }
-
-    /**
-     * Removes a custom value from the request context
-     * 
-     * @param key
-     */
-    public void removeValue(String key)
-    {
-        if (key == null)
-        {
-            throw new IllegalArgumentException("Key is mandatory.");
-        }
-        map.remove(key);
-    }
-    
-    /**
-     * Returns true if a custom value exists in the request context for the given key
-     * 
-     * @param key
-     * 
-     * @return true if a custom value exists in the request context for the given key
-     */
-    public boolean hasValue(String key)
-    {
-        if (key == null)
-        {
-            throw new IllegalArgumentException("Key is mandatory.");
-        }
-        return map.containsKey(key);
-    }
-
-    /**
-     * Returns an Iterator over the keys of the custom key/value pairs
-     * stored on this RequestContext instance
-     * 
-     * @return An iterator of String keys
-     */
-    public Iterator keys()
-    {
-        return map.keySet().iterator();
-    }
-    
-    /**
-     * Returns the underlying map of the custom key/values pairs
-     * stored on this RequestContext instance. Use with caution!
-     * 
-     * @return the underlying map of custom key/value pairs.
-     */
-    public Map<String, Serializable> map()
-    {
-        return map;
     }
 
     /**
@@ -328,6 +269,17 @@ public abstract class AbstractRequestContext implements RequestContext
     }
     
     /**
+     * Sets the current executing template.
+     * 
+     * @return
+     */
+    public void setTemplate(TemplateInstance currentTemplate)
+    {
+    	this.currentTemplate = currentTemplate;    	
+    }
+    
+    
+    /**
      * Returns the id of the currently executing template.
      * If no template is set, this will return null.
      * 
@@ -363,7 +315,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @param content
      */
-    public void setCurrentObject(Content content)
+    public void setCurrentObject(org.alfresco.web.site.Content content)
     {
         this.currentObject = content;
     }
@@ -371,7 +323,7 @@ public abstract class AbstractRequestContext implements RequestContext
     /**
      * Returns the current object
      */
-    public Content getCurrentObject()
+    public org.alfresco.web.site.Content getCurrentObject()
     {
     	return this.currentObject;
     }
@@ -490,22 +442,190 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         return FrameworkHelper.getCredentialVault(this, this.getUserId());
     }
-
-    /**
-     * Returns the render context for the currently rendering
-     * object.  The render context is scoped to the currently
-     * rendering object.
-     * 
-     * @return The Render Data instance
+            
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#setValue(java.lang.String, java.io.Serializable)
      */
-    public RendererContext getRenderContext()
+    public void setValue(String key, Serializable value)
     {
-        return RendererContextHelper.current(this);
+    	this.valuesMap.put(key, value);    	
     }
-        
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getValue(java.lang.String)
+     */
+    public Serializable getValue(String key)
+    {
+    	return this.valuesMap.get(key);    	
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#removeValue(java.lang.String)
+     */
+    public void removeValue(String key)
+    {
+    	this.valuesMap.remove(key);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#hasValue(java.lang.String)
+     */
+    public boolean hasValue(String key)
+    {
+    	return (this.valuesMap.get(key) != null);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getValuesMap()
+     */
+    public Map<String, Serializable> getValuesMap()
+    {
+    	return this.valuesMap;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getParameter(java.lang.String)
+     */
+    public Serializable getParameter(String key)
+    {
+    	return this.parametersMap.get(key);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#hasParameter(java.lang.String)
+     */
+    public boolean hasParameter(String key)
+    {
+    	return (this.parametersMap.get(key) != null);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getParameters()
+     */
+    public Map<String, Serializable> getParameters()
+    {
+    	return this.parametersMap;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getRenderingComponents()
+     */
+    public Component[] getRenderingComponents()
+    {
+        if (this.components.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return this.components.values().toArray(new Component[this.components.size()]);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#setRenderingComponent(org.alfresco.web.framework.model.Component)
+     */
+    public void setRenderingComponent(Component component)
+    {
+        this.components.put(component.getId(), component);        
+    }
+    
+    /**
+     * Returns the HTTP Servlet Request bound to this request
+     * 
+     * @return
+     */
+    public HttpServletRequest getRequest()
+    {
+        return request;
+    }
+    
+    /**
+     * Returns the current Theme Id for the current user
+     */
+    public String getThemeId()
+    {
+        return (String)request.getSession().getAttribute(SESSION_CURRENT_THEME_ID);
+    }
+    
+    /**
+     * Sets the current theme id
+     */
+    public void setThemeId(String themeId)
+    {
+        if (themeId != null)
+        {
+            request.getSession().setAttribute(SESSION_CURRENT_THEME_ID, themeId);
+        }
+    }
+    
+    /**
+     * Gets the current Theme object, or null if not set
+     */
+    public Theme getTheme()
+    {
+        Theme theme = (Theme)getValue(SESSION_CURRENT_THEME);
+        if (theme == null)
+        {
+            String themeId = getThemeId();
+            if (themeId != null)
+            {
+                theme = getModel().getTheme(themeId);
+                if (theme != null)
+                {
+                    setValue(SESSION_CURRENT_THEME, theme);
+                }
+            }
+        }
+        return theme;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getRequestContentType()
+     */
+    public String getRequestContentType()
+    {
+        String contentType = this.getRequest().getContentType();
+        if (contentType != null && contentType.startsWith("multipart/form-data"))
+        {
+            contentType = "multipart/form-data";
+        }
+        return contentType;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getRequestMethod()
+     */
+    public String getRequestMethod()
+    {
+    	return this.getRequest().getMethod();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#getRequestContent()
+     */
+    public synchronized org.alfresco.util.Content getRequestContent()
+    {
+        // ensure we only try to read the content once - as this method may be called several times
+        // but the underlying inputstream itself can only be processed a single time
+        if (content == null)
+        {
+            try
+            {
+                content = new InputStreamContent(getRequest().getInputStream(), getRequest().getContentType(), getRequest().getCharacterEncoding());
+            }
+            catch(IOException e)
+            {
+                throw new WebScriptException("Failed to retrieve request content", e);
+            }
+        }
+        return content;
+    }
+    
+
     @Override
     public String toString()
     {
-        return map.toString();
-    }
+        return "RequestContext-" + getId();
+    }    
 }

@@ -24,10 +24,15 @@
  */
 package org.alfresco.web.framework.model;
 
+import java.util.Map;
+
 import org.alfresco.web.framework.AbstractModelObject;
 import org.alfresco.web.framework.ModelHelper;
 import org.alfresco.web.framework.ModelPersisterInfo;
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.framework.render.RenderUtil;
+import org.alfresco.web.framework.resource.ModelObjectResourceProvider;
+import org.alfresco.web.framework.resource.Resource;
+import org.alfresco.web.framework.resource.ResourceProvider;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.dom4j.Document;
@@ -37,7 +42,7 @@ import org.dom4j.Document;
  * 
  * @author muzquiano
  */
-public class Component extends AbstractModelObject
+public class Component extends AbstractModelObject implements ResourceProvider
 {
     public static String TYPE_ID = "component";
     public static String PROP_REGION_ID = "region-id";
@@ -53,6 +58,8 @@ public class Component extends AbstractModelObject
     private String scope = null;
     private String sourceId = null;
     private String componentTypeId = null;
+    
+    protected ResourceProvider resourceContainer = null;
     
     /**
      * Instantiates a new component for a given XML document.
@@ -237,13 +244,13 @@ public class Component extends AbstractModelObject
     /**
      * Gets the source object.
      * 
-     * @param context the context
+     * @param context request context
      * 
      * @return the object
      */
     public Object getSourceObject(RequestContext context)
     {
-        return RenderUtil.getComponentBindingSourceObject(context, this);
+        return RenderUtil.determineComponentBindingSourceObject(context, this);
     }
 
     /**
@@ -308,5 +315,72 @@ public class Component extends AbstractModelObject
                 setGUID(id);                
             }
         }
-    }
+    }    
+    
+    // resource provider methods
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceContainer#getResource(java.lang.String)
+     */
+    public Resource getResource(String id)
+	{
+    	return getResourceContainer().getResource(id);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceContainer#getResources()
+	 */
+	public Resource[] getResources()
+	{
+		return getResourceContainer().getResources();
+	}    
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceContainer#getResourcesMap()
+	 */
+	public Map<String, Resource> getResourcesMap()
+	{
+		return getResourceContainer().getResourcesMap();
+	}    
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String)
+	 */
+	public Resource addResource(String id)
+	{
+		return getResourceContainer().addResource(id);		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String, java.lang.String)
+	 */
+	public Resource addResource(String id, String type)
+	{
+		return getResourceContainer().addResource(id, type);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#updateResource(java.lang.String, org.alfresco.web.framework.resource.Resource)
+	 */
+	public void updateResource(String id, Resource resource)
+	{
+		getResourceContainer().updateResource(id, resource);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#removeResource(java.lang.String)
+	 */
+	public void removeResource(String id)
+	{
+		getResourceContainer().removeResource(id);		
+	}
+		
+	protected synchronized ResourceProvider getResourceContainer()
+	{
+		if(this.resourceContainer == null)
+		{
+			this.resourceContainer = new ModelObjectResourceProvider(this);
+		}
+		return this.resourceContainer;
+	}
 }

@@ -24,35 +24,71 @@
  */
 package org.alfresco.web.site.servlet;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.StringTokenizer;
 
-import org.alfresco.web.site.PresentationUtil;
-import org.alfresco.web.site.RequestContext;
+import javax.servlet.ServletException;
+
+import org.alfresco.web.framework.render.PresentationUtil;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderFocus;
 import org.alfresco.web.site.exception.RequestDispatchException;
 
 /**
+ * Responsible for dispatching a region.
+ * 
+ * Constructs the request context as per usual construction pattern
+ * so as to provide context during component execution.
+ * 
+ * URLs are expected to be invoked as shown:
+ * 
+ * /r/<regionId>/<scopeId>/<sourceId> 
+ * 
+ * Most commonly, these are:
+ * 
+ *   regionId 		-> the id of the region (i.e. 'footer')
+ *   scopeId        -> the scope of the region (i.e. 'page')
+ *   templateId     -> the id of the template instance (i.e. 'home')
+ *   
+ * The region is executed, along with its chrome.
+ * If a component is contained in the region, it is also executed.
+ * 
  * @author muzquiano
  */
 public class RegionDispatcherServlet extends DispatcherServlet
 {
-    public void init() throws ServletException
+	public void init() throws ServletException
     {
         super.init();
     }
 
-    // this servlet just dispatches regions
-    protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws RequestDispatchException
+    /**
+     * Dispatch region
+     * 
+     * @throws RequestDispatchException
+     */
+    protected void dispatch(RenderContext context)
+        throws RequestDispatchException
     {
-        this.setNoCacheHeaders(response);
-
-        String regionId = (String) request.getParameter("regionId");
-        String regionScopeId = (String) request.getParameter("regionScopeId");
-        String templateId = (String) context.getTemplate().getId();
-
-        PresentationUtil.renderRegion(context, request, response, templateId,
+        String uri = context.getRequest().getRequestURI();
+        
+        // skip server context path and build the path to the resource we are looking for
+        uri = uri.substring(context.getRequest().getContextPath().length());
+        
+        // validate and return the resource path - stripping the servlet context
+        StringTokenizer t = new StringTokenizer(uri, "/");
+        String servletName = t.nextToken();
+        if (!t.hasMoreTokens())
+        {
+            throw new RequestDispatchException("Invalid URL: " + uri);
+        }
+        
+        // determine the region binding properties
+        String regionId = t.nextToken();
+        String regionScopeId = t.nextToken();
+        String templateId = t.nextToken();
+        
+        // render the region
+        PresentationUtil.renderRegion(context, RenderFocus.BODY, templateId,
                 regionId, regionScopeId);
     }
 }

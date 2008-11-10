@@ -135,15 +135,15 @@ public class ContentAssociation extends AbstractModelObject
     // Helpers
 
     /**
-     * Gets the page.
+     * Gets the template.
      * 
      * @param context the context
      * 
      * @return the page
      */
-    public Page getPage(RequestContext context)
+    public TemplateInstance getTemplate(RequestContext context)
     {
-        return context.getModel().getPage(getDestId());
+        return context.getModel().getTemplate(getDestId());
     }
 
     /* (non-Javadoc)

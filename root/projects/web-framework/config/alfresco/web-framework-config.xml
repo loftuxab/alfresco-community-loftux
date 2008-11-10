@@ -13,10 +13,10 @@
 
 			<!-- Request Context Factory Implementations -->
 			<request-context>
-				<id>http</id>
-				<name>HttpRequestContextFactory</name>
-				<description>HttpRequestContextFactory</description>
-				<class>org.alfresco.web.site.HttpRequestContextFactory</class>
+				<id>default</id>
+				<name>DefaultRequestContextFactory</name>
+				<description>DefaultRequestContextFactory</description>
+				<class>org.alfresco.web.site.DefaultRequestContextFactory</class>
 				<store></store>
 			</request-context>
 
@@ -35,16 +35,6 @@
 				<description>Default Link Builder</description>
 				<class>org.alfresco.web.site.DefaultLinkBuilder</class>
 			</link-builder>
-
-			<!-- File System Implementation (LOCAL) -->
-			<file-system>
-				<id>local</id>
-				<name>Local File System</name>
-				<description>Local File System</description>
-				<class>org.alfresco.web.site.filesystem.LocalFileSystem</class>
-				<use-cache>true</use-cache>
-				<root-path>/</root-path>
-			</file-system>
 
 			<!-- Formats -->
 			<format>
@@ -83,7 +73,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.Chrome</class>
 				<search-path-id>webframework.searchpath.chrome</search-path-id>
-				<default-store-id>webframework.localstore.chrome</default-store-id>
+				<default-store-id>webframework.remotestore.chrome</default-store-id>
 				<!-- store model object caching override example -->
 				<!--<cache-enabled>false</cache-enabled>-->
 				<!-- store cache dirty check override example -->
@@ -97,7 +87,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.Component</class>
 				<search-path-id>webframework.searchpath.component</search-path-id>
-				<default-store-id>webframework.localstore.component</default-store-id>
+				<default-store-id>webframework.remotestore.component</default-store-id>
 			</model-type>
 			<model-type>
 				<id>component-type</id>
@@ -107,7 +97,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.ComponentType</class>
 				<search-path-id>webframework.searchpath.componenttype</search-path-id>
-				<default-store-id>webframework.localstore.componenttype</default-store-id>
+				<default-store-id>webframework.remotestore.componenttype</default-store-id>
 			</model-type>
 			<model-type>
 				<id>configuration</id>
@@ -117,7 +107,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.Configuration</class>
 				<search-path-id>webframework.searchpath.configuration</search-path-id>
-				<default-store-id>webframework.localstore.configuration</default-store-id>
+				<default-store-id>webframework.remotestore.configuration</default-store-id>
 			</model-type>
 			<model-type>
 				<id>content-association</id>
@@ -127,7 +117,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.ContentAssociation</class>
 				<search-path-id>webframework.searchpath.contentassociation</search-path-id>
-				<default-store-id>webframework.localstore.contentassociation</default-store-id>
+				<default-store-id>webframework.remotestore.contentassociation</default-store-id>
 			</model-type>
 			<model-type>
 				<id>page</id>
@@ -137,7 +127,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.Page</class>
 				<search-path-id>webframework.searchpath.page</search-path-id>
-				<default-store-id>webframework.localstore.page</default-store-id>
+				<default-store-id>webframework.remotestore.page</default-store-id>
 			</model-type>
 			<model-type>
 				<id>page-type</id>
@@ -147,7 +137,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.PageType</class>
 				<search-path-id>webframework.searchpath.pagetype</search-path-id>
-				<default-store-id>webframework.localstore.pagetype</default-store-id>
+				<default-store-id>webframework.remotestore.pagetype</default-store-id>
 			</model-type>
 			<model-type>
 				<id>page-association</id>
@@ -157,7 +147,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.PageAssociation</class>
 				<search-path-id>webframework.searchpath.pageassociation</search-path-id>
-				<default-store-id>webframework.localstore.pageassociation</default-store-id>
+				<default-store-id>webframework.remotestore.pageassociation</default-store-id>
 			</model-type>
 			<model-type>
 				<id>template-instance</id>
@@ -167,7 +157,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.TemplateInstance</class>
 				<search-path-id>webframework.searchpath.templateinstance</search-path-id>
-				<default-store-id>webframework.localstore.templateinstance</default-store-id>
+				<default-store-id>webframework.remotestore.templateinstance</default-store-id>
 			</model-type>
 			<model-type>
 				<id>template-type</id>
@@ -177,7 +167,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.TemplateType</class>
 				<search-path-id>webframework.searchpath.templatetype</search-path-id>
-				<default-store-id>webframework.localstore.templatetype</default-store-id>
+				<default-store-id>webframework.remotestore.templatetype</default-store-id>
 			</model-type>
 			<model-type>
 				<id>theme</id>
@@ -187,7 +177,7 @@
 				<namespace></namespace>
 				<class>org.alfresco.web.framework.model.Theme</class>
 				<search-path-id>webframework.searchpath.theme</search-path-id>
-				<default-store-id>webframework.localstore.theme</default-store-id>
+				<default-store-id>webframework.remotestore.theme</default-store-id>
 			</model-type>
 
 			<!-- Add in the ALF tag library -->
@@ -211,35 +201,6 @@
 				<class>org.alfresco.web.site.AlfrescoUserFactory</class>
 			</user-factory>
 
-			<!-- Default Renderers (JSP, Java, WebScript, Freemarker) -->
-			<renderer>
-				<id>jsp</id>
-				<name>JSP Renderer</name>
-				<description>JSP Renderer</description>
-				<class>org.alfresco.web.site.renderer.JSPRenderer</class>
-			</renderer>
-			<renderer>
-				<id>java</id>
-				<name>Java Class Renderer</name>
-				<description>Java Class Renderer</description>
-				<class>org.alfresco.web.site.renderer.JavaClassRenderer</class>
-			</renderer>
-			<renderer>
-				<id>webscript</id>
-				<name>Web Script Renderer</name>
-				<description>Web Script Renderer</description>
-				<class>org.alfresco.web.scripts.WebScriptRenderer</class>
-				<container-bean>webframework.webscripts.container</container-bean>
-			</renderer>
-			<renderer>
-				<id>freemarker</id>
-				<name>Freemarker Renderer</name>
-				<description>Freemarker Renderer</description>
-				<class>org.alfresco.web.scripts.FreemarkerRenderer</class>
-				<template-processor-bean>webframework.templateprocessor</template-processor-bean>
-				<script-processor-bean>webframework.scriptprocessor</script-processor-bean>
-			</renderer>
-
 			<!-- Content Loaders -->
 			<content-loader>
 				<id>alfresco</id>
@@ -252,56 +213,55 @@
 			<!-- Error Handler Pages -->
 			<error-handler>
 				<id>page-error</id>
-				<renderer>/core/page-error.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/page-error.jsp</jsp-path>				
 			</error-handler>
 			<error-handler>
 				<id>component-error</id>
-				<renderer>/core/component-error.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/component-error.jsp</jsp-path>				
 			</error-handler>
 			<error-handler>
 				<id>region-error</id>
-				<renderer>/core/region-error.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/region-error.jsp</jsp-path>				
 			</error-handler>
 			<error-handler>
 				<id>region-nocomponent</id>
-				<renderer>/core/region-nocomponent.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/region-nocomponent.jsp</jsp-path>				
 			</error-handler>
 			<error-handler>
 				<id>template-error</id>
-				<renderer>/core/template-error.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/template-error.jsp</jsp-path>				
 			</error-handler>
 
 			<!-- System Pages -->
 			<system-page>
 				<id>page-getting-started</id>
-				<renderer>/core/page-gettingstarted.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/page-gettingstarted.jsp</jsp-path>				
 			</system-page>
 			<system-page>
 				<id>page-unconfigured</id>
-				<renderer>/core/page-unconfigured.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>>
+				<jsp-path>/core/page-unconfigured.jsp</jsp-path>
 			</system-page>
 			<system-page>
 				<id>page-content-not-loaded</id>
-				<renderer>/core/content-not-loaded.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/content-not-loaded.jsp</jsp-path>				
 			</system-page>
 			<system-page>
 				<id>page-content-association-missing</id>
-				<renderer>/core/content-association-missing.jsp</renderer>
-				<renderer-type>jsp</renderer-type>
+				<processor-id>jsp</processor-id>
+				<jsp-path>/core/content-association-missing.jsp</jsp-path>				
 			</system-page>
 
 			<!-- Defaults -->
 			<framework-defaults>
-				<request-context>http</request-context>
-				<file-system>local</file-system>
+				<request-context>default</request-context>
 				<format>default</format>
 				<page-mapper>default</page-mapper>
 				<link-builder>default</link-builder>
@@ -323,7 +283,7 @@
 
 		</web-framework>
 
-	</config>
+	</config>	
 	
    <config evaluator="string-compare" condition="UriTemplate">
       <!-- ordered list of URI Template mappings for application urls -->

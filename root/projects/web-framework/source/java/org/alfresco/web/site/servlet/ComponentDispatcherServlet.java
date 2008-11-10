@@ -27,11 +27,11 @@ package org.alfresco.web.site.servlet;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.PresentationUtil;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.PresentationUtil;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderFocus;
+import org.alfresco.web.framework.render.RenderMode;
 import org.alfresco.web.site.exception.RequestDispatchException;
 
 /**
@@ -40,41 +40,100 @@ import org.alfresco.web.site.exception.RequestDispatchException;
  * Constructs the request context as per usual construction pattern
  * so as to provide context during component execution.
  * 
+ * A component can be any kind of Web Framework component
+ * (Web Script, JSP, JavaBean, etc)
+ * 
+ * URLs are expected to be invoked as shown:
+ * 
+ * /c/<componentId>					-> runs the view mode for component
+ * /c/view/<componentId>			-> runs the view mode for component
+ * /c/view/header/<componentId>		-> runs the view mode for component (and processes the 'header')
+ * /c/edit/<componentId>       		-> runs the edit mode for component
+ * /c/edit/header/<componentId>     -> runs the edit mode for component (and processes the 'header')
+ * 
+ * The component is then executed and its output streamed back.
+ * 
  * @author muzquiano
  */
 public class ComponentDispatcherServlet extends DispatcherServlet
 {
-    public void init() throws ServletException
+	public void init() throws ServletException
     {
         super.init();
     }
 
-    // this servlet just dispatches components
-    protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws RequestDispatchException
+    /**
+     * Dispatch component
+     * 
+     * @throws RequestDispatchException
+     */
+    protected void dispatch(RenderContext context)
+        throws RequestDispatchException
     {
-        this.setNoCacheHeaders(response);
-
-        // allow for the component id to be specified on a parameter
-        String componentId = (String) request.getParameter("componentId");
-        if(componentId == null)
+        String uri = context.getRequest().getRequestURI();
+        
+        // skip server context path and build the path to the resource we are looking for
+        uri = uri.substring(context.getRequest().getContextPath().length());
+        
+        // validate and return the resource path - stripping the servlet context
+        StringTokenizer t = new StringTokenizer(uri, "/");
+        String servletName = t.nextToken();
+        if (!t.hasMoreTokens())
         {
-            // or allow for it to be passed in like this
-            // /dynamic-website/component/componentId
-            String requestURI = request.getRequestURI().substring(request.getContextPath().length());
-            try
-            {
-                StringTokenizer t = new StringTokenizer(requestURI, "/");
-                t.nextToken();        // skip servlet name
-                componentId = (String) t.nextToken();
-            }
-            catch(Exception ex)
-            {
-                // invalid string
-            }
+            throw new RequestDispatchException("Invalid URL: " + uri);
         }
 
-        PresentationUtil.renderComponent(context, request, response,
-                componentId);
+        // render mode and render focus
+        RenderMode renderMode = null;
+        RenderFocus renderFocus = null;
+                
+        String componentId = t.nextToken();
+        
+        // was this the render mode?
+        try
+        {
+        	renderMode = RenderMode.fromString(componentId);
+        }
+        catch(IllegalArgumentException iae) 
+        { 
+        	// this means it wasn't an enum type
+        }
+        
+        // if we received the render mode, advance the token
+        if(renderMode != null)
+        {
+        	componentId = t.nextToken();
+        	
+        	try
+        	{
+        		renderFocus = RenderFocus.fromString(componentId);
+        	}
+        	catch(IllegalArgumentException iae)
+        	{
+        		// this means it wasn't an enum type
+        	}
+        	
+        	// advance the token if we found a render focus
+        	if(renderFocus != null)
+        	{
+        		componentId = t.nextToken();
+        	}
+        }
+        
+        // some defaults
+        if(renderMode == null)
+        {
+        	renderMode = RenderMode.VIEW;
+        }
+        if(renderFocus == null)
+        {
+        	renderFocus = RenderFocus.BODY;
+        }
+        
+        // set the render mode
+        context.setRenderMode(renderMode);
+
+        // do the render of the component
+        PresentationUtil.renderComponent(context, renderFocus, componentId);        
     }
 }

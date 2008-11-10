@@ -27,7 +27,7 @@ package org.alfresco.web.scripts;
 import java.io.IOException;
 import java.util.Map;
 
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.site.taglib.ComponentTag;
 
 import freemarker.core.Environment;
@@ -50,7 +50,7 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
      * 
      * @param context the context
      */
-    public ComponentFreemarkerTagDirective(RequestContext context)
+    public ComponentFreemarkerTagDirective(RenderContext context)
     {
         super(context);
     }

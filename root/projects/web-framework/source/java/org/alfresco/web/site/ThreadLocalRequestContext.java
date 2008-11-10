@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * An abstract Request Context implementation that is responsible for holding the value
  * of the Request Context for the current thread. It supplies a static instance getter
@@ -40,8 +42,10 @@ public abstract class ThreadLocalRequestContext extends AbstractRequestContext
     /**
      * Override the default constructor to set the RequestContext value for the current thread
      */
-    protected ThreadLocalRequestContext()
+    protected ThreadLocalRequestContext(HttpServletRequest request)
     {
+    	super(request);
+    	
         ThreadLocalRequestContext.instance.set(this);
     }
     

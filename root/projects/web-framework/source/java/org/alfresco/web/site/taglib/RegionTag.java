@@ -24,13 +24,11 @@
  */
 package org.alfresco.web.site.taglib;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.framework.model.Chrome;
-import org.alfresco.web.site.PresentationUtil;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.PresentationUtil;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderFocus;
 import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
@@ -101,20 +99,18 @@ public class RegionTag extends TagBase
 
     public int doStartTag() throws JspException
     {
-        HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();
-        HttpServletResponse response = (HttpServletResponse) getPageContext().getResponse();
-        RequestContext context = getRequestContext();
+    	RenderContext context = getRenderContext();
 
         try
         {
             String chromeId = getChrome();
             if(!isChromeless())
             {
-                PresentationUtil.renderRegion(context, request, response, context.getTemplate().getId(), getName(), getScope(), chromeId);
+                PresentationUtil.renderRegion(context, RenderFocus.BODY, context.getTemplate().getId(), getName(), getScope(), chromeId);
             }
             else
             {
-                PresentationUtil.renderChromelessRegion(context, request, response, context.getTemplate().getId(), getName(), getScope());
+                PresentationUtil.renderChromelessRegion(context, RenderFocus.BODY, context.getTemplate().getId(), getName(), getScope());
             }            
         }
         catch (Throwable t)

@@ -41,7 +41,8 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
     private Map<String, String> parameters;
     private HttpServletRequest request;
     private ServerProperties serverProperties;
-
+    private LocalWebScriptContext context;
+        
     /**
      * Instantiates a new local web script request.
      * 
@@ -52,12 +53,13 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      * @param request the request
      */
     public LocalWebScriptRequest(Runtime runtime, String scriptUrl,
-            Match match, Map<String, String> parameters, ServerProperties serverProps, HttpServletRequest request)
+            Match match, Map<String, String> parameters, ServerProperties serverProps, HttpServletRequest request, LocalWebScriptContext context)
     {
         super(runtime, scriptUrl, match);
         this.parameters = parameters;
         this.serverProperties = serverProps;
         this.request = request;
+        this.context = context;
     }
     
     /**
@@ -69,7 +71,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
     {
         return this.request;
     }
-    
+        
     /*
      * (non-Javadoc)
      * 
@@ -77,8 +79,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getParameterNames()
     {
-        return this.parameters.keySet().toArray(
-                new String[this.parameters.size()]);
+    	return this.parameters.keySet().toArray(new String[this.parameters.size()]);        	
     }
 
     /*
@@ -88,7 +89,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String getParameter(String name)
     {
-        return this.parameters.get(name);
+    	return this.parameters.get(name);
     }
 
     /*
@@ -98,8 +99,8 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getParameterValues(String name)
     {
-        return this.parameters.values().toArray(
-                new String[this.parameters.size()]);
+    	return this.parameters.values().toArray(
+    			new String[this.parameters.size()]);
     }
 
     /* (non-Javadoc)
@@ -123,7 +124,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getHeaderNames()
     {
-        return new String[] {};
+    	return new String[] { };
     }
 
     /* (non-Javadoc)
@@ -131,7 +132,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String getHeader(String name)
     {
-        return null;
+    	return null;
     }
 
     /* (non-Javadoc)
@@ -139,7 +140,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getHeaderValues(String name)
     {
-        return null;
+    	return null;
     }
 
     /* (non-Javadoc)

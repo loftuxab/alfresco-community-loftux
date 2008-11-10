@@ -148,6 +148,7 @@ public class PresetsManager
                     }
                     catch (DocumentException de)
                     {
+                    	de.printStackTrace();
                         throw new AlfrescoRuntimeException("Error processing presets XML file: " +
                                 file + " in store: " + store.toString(), de);
                     }
@@ -360,7 +361,8 @@ public class PresetsManager
             for (Entry<String, String> entry : tokens.entrySet())
             {
                 String key = "${" + entry.getKey() + "}";
-                s = s.replace(key, entry.getValue());
+                String value = entry.getValue();
+                s = s.replace(key, value);
             }
         }
         

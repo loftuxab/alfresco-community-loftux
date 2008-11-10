@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -114,6 +115,11 @@ public class Timer
         request.removeAttribute(TIMER_KEY);
     }
     
+    public static void start(RenderContext context, String blockId)
+    {
+    	start(context.getRequest(), blockId);
+    }
+    
     /**
      * Begins timing for a specific block.  If timing has been captured
      * previously for this block id, it will be added upon
@@ -140,6 +146,11 @@ public class Timer
             Long l = new Long(System.nanoTime());
             t.startTimes.put(blockId, l);
         }
+    }
+    
+    public static void stop(RenderContext context, String blockId)
+    {
+    	stop(context.getRequest(), blockId);
     }
     
     public static void stop(ServletRequest request, String blockId)

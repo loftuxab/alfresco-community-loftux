@@ -24,8 +24,13 @@
  */
 package org.alfresco.web.framework.model;
 
-import org.alfresco.web.framework.AbstractModelObject;
+import java.util.Map;
+
 import org.alfresco.web.framework.ModelPersisterInfo;
+import org.alfresco.web.framework.render.AbstractRenderableModelObject;
+import org.alfresco.web.framework.resource.ModelObjectResourceProvider;
+import org.alfresco.web.framework.resource.Resource;
+import org.alfresco.web.framework.resource.ResourceProvider;
 import org.dom4j.Document;
 
 /**
@@ -33,12 +38,12 @@ import org.dom4j.Document;
  * 
  * @author muzquiano
  */
-public class ComponentType extends AbstractModelObject
+public class ComponentType extends AbstractRenderableModelObject implements ResourceProvider
 {
     public static String TYPE_ID = "component-type";
     public static String PROP_URI = "uri";
-    public static String PROP_RENDERER = "renderer";
-    public static String PROP_RENDERER_TYPE = "renderer-type";
+    
+    protected ResourceProvider resourceContainer = null;
     
     /**
      * Instantiates a new component type for the given XML document.
@@ -70,46 +75,6 @@ public class ComponentType extends AbstractModelObject
         setProperty(PROP_URI, uri);
     }
 
-    /**
-     * Sets the renderer.
-     * 
-     * @param renderer the new renderer
-     */
-    public void setRenderer(String renderer)
-    {
-        setProperty(PROP_RENDERER, renderer);
-    }
-
-    /**
-     * Gets the renderer.
-     * 
-     * @return the renderer
-     */
-    public String getRenderer()
-    {
-        return getProperty(PROP_RENDERER);
-    }
-
-    /**
-     * Sets the renderer type.
-     * 
-     * @param rendererType the new renderer type
-     */
-    public void setRendererType(String rendererType)
-    {
-        setProperty(PROP_RENDERER_TYPE, rendererType);
-    }
-
-    /**
-     * Gets the renderer type.
-     * 
-     * @return the renderer type
-     */
-    public String getRendererType()
-    {
-        return getProperty(PROP_RENDERER_TYPE);
-    }
-
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.AbstractModelObject#getTypeName()
      */
@@ -117,4 +82,71 @@ public class ComponentType extends AbstractModelObject
     {
         return TYPE_ID;
     }
+
+    // resource provider methods
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceContainer#getResource(java.lang.String)
+     */
+    public Resource getResource(String id)
+	{
+    	return getResourceContainer().getResource(id);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceContainer#getResources()
+	 */
+	public Resource[] getResources()
+	{
+		return getResourceContainer().getResources();
+	}    
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceContainer#getResourcesMap()
+	 */
+	public Map<String, Resource> getResourcesMap()
+	{
+		return getResourceContainer().getResourcesMap();
+	}    
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String)
+	 */
+	public Resource addResource(String id)
+	{
+		return getResourceContainer().addResource(id);		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String, java.lang.String)
+	 */
+	public Resource addResource(String id, String type)
+	{
+		return getResourceContainer().addResource(id, type);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#updateResource(java.lang.String, org.alfresco.web.framework.resource.Resource)
+	 */
+	public void updateResource(String id, Resource resource)
+	{
+		getResourceContainer().updateResource(id, resource);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.web.framework.resource.ResourceProvider#removeResource(java.lang.String)
+	 */
+	public void removeResource(String id)
+	{
+		getResourceContainer().removeResource(id);		
+	}
+ 
+	protected synchronized ResourceProvider getResourceContainer()
+	{
+		if(this.resourceContainer == null)
+		{
+			this.resourceContainer = new ModelObjectResourceProvider(this);
+		}
+		return this.resourceContainer;
+	}	
 }

@@ -26,11 +26,9 @@ package org.alfresco.web.config;
 
 import org.alfresco.web.config.WebFrameworkConfigElement.ContentLoaderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.ErrorHandlerDescriptor;
-import org.alfresco.web.config.WebFrameworkConfigElement.FileSystemDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.FormatDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.LinkBuilderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.PageMapperDescriptor;
-import org.alfresco.web.config.WebFrameworkConfigElement.RendererDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.RequestContextDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.SystemPageDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.TagLibraryDescriptor;
@@ -65,10 +63,6 @@ public interface WebFrameworkConfigProperties
     // system pages
     public String[] getSystemPageIds();
     public SystemPageDescriptor getSystemPageDescriptor(String id);
-
-    // file systems
-    public String[] getFileSystemIds();
-    public FileSystemDescriptor getFileSystemDescriptor(String id);
     
     // tag libraries
     public String[] getTagLibraryIds();
@@ -78,10 +72,6 @@ public interface WebFrameworkConfigProperties
     public String[] getUserFactoryIds();
     public UserFactoryDescriptor getUserFactoryDescriptor(String id);
     
-    // renderers
-    public String[] getRendererIds();
-    public RendererDescriptor getRendererDescriptor(String id);
-
     // debug
     public boolean isTimerEnabled();
 
@@ -99,7 +89,6 @@ public interface WebFrameworkConfigProperties
     public String getDefaultLinkBuilderId();
     public String getDefaultRequestContextId();
     public String getDefaultUserFactoryId();
-    public String getDefaultFileSystemId();
     
     // types (model files)
     public String[] getTypeIds();
@@ -109,10 +98,9 @@ public interface WebFrameworkConfigProperties
     // content loaders
     public String[] getContentLoaderIds();
     public ContentLoaderDescriptor getContentLoaderDescriptor(String id);
-    
 
-/*
-    public String getDefaultServletUri();
-    public String getDynamicWebsiteServletUri();
-*/
+    // web studio settings
+    public boolean isWebStudioEnabled();
+    public String getWebStudioMode();
+    public String getWebStudioLocation();    
 }

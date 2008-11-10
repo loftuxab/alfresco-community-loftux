@@ -27,7 +27,6 @@ package org.alfresco.web.scripts;
 import org.alfresco.connector.User;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThreadLocalRequestContext;
 import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
@@ -51,7 +50,7 @@ public final class ScriptUser extends ScriptBase
      * Instantiates a new ScriptUser object which wraps a given request
      * context and framework user object.
      * 
-     * @param context the context
+     * @param context the render context
      * @param user the user
      */
     public ScriptUser(RequestContext context, User user)
@@ -312,9 +311,9 @@ public final class ScriptUser extends ScriptBase
     {
         try
         {
-            RequestContext context = ThreadLocalRequestContext.getRequestContext();
-            User user = FrameworkHelper.getUserFactory().loadUser(context, userId);
-            return new ScriptUser(context, user);
+            //RequestContext context = ThreadLocalRequestContext.getRequestContext();
+            User user = FrameworkHelper.getUserFactory().loadUser(this.context, userId);
+            return new ScriptUser(this.context, user);
         }
         catch (UserFactoryException err)
         {

@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.config.ServerProperties;
-import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.uri.UriUtils;
 
@@ -45,6 +44,7 @@ public class LocalWebScriptRuntime extends AbstractRuntime
     private ServerProperties serverProperties;
     private LocalWebScriptContext context;
     private Writer out;
+    private String method;
 
     public LocalWebScriptRuntime(
             Writer out, RuntimeContainer container, ServerProperties serverProps, LocalWebScriptContext context) 
@@ -54,8 +54,14 @@ public class LocalWebScriptRuntime extends AbstractRuntime
         this.out = out;
         this.serverProperties = serverProps;
         this.context = context;
+        this.method = "GET";
     }
-
+    
+    public LocalWebScriptContext getLocalContext()
+    {
+    	return context;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -89,20 +95,16 @@ public class LocalWebScriptRuntime extends AbstractRuntime
         }
 
         // add the html binding id
-        String htmlBindingId = (String)context.RendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+        String htmlBindingId = (String) context.RenderContext.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
         if (htmlBindingId != null)
         {
             properties.put(ProcessorModelHelper.PROP_HTMLID, htmlBindingId);
         }
         
         // try to determine the http servlet request and bind it in if we can
-        HttpServletRequest request = null;
-        if(context.RequestContext instanceof HttpRequestContext)
-        {
-            request = ((HttpRequestContext)context.RequestContext).getRequest();
-        }
-
-        return new LocalWebScriptRequest(this, scriptUrl, match, properties, serverProperties, request);
+        HttpServletRequest request = context.RenderContext.getRequest();
+        
+        return new LocalWebScriptRequest(this, scriptUrl, match, properties, serverProperties, request, context);
     }
 
     @Override
@@ -114,12 +116,17 @@ public class LocalWebScriptRuntime extends AbstractRuntime
     @Override
     protected String getScriptMethod()
     {
-        return "GET";
+        return method;
     }
 
     @Override
     protected Authenticator createAuthenticator()
     {
         return null;
+    }
+    
+    public void setScriptMethod(String method)
+    {
+    	this.method = method;
     }
 }
