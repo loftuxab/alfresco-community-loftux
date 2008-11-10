@@ -35,5 +35,12 @@ package org.alfresco.connector;
  */
 public interface ConnectorProvider
 {
-    public Connector provide();
+	/**
+	 * Builds a Connector object mounted against the given endpoint
+	 * 
+	 * @param endpoint
+	 * 
+	 * @return the connector object
+	 */
+    public Connector provide(String endpoint);
 }

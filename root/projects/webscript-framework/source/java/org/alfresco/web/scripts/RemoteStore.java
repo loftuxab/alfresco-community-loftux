@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
@@ -60,8 +60,11 @@ import freemarker.cache.TemplateLoader;
  */
 public class RemoteStore implements Store
 {
-    private static Log logger = LogFactory.getLog(RemoteStore.class);
+	private static Log logger = LogFactory.getLog(RemoteStore.class);
     
+    public static final String DEFAULT_API = "/remotestore";
+    public static final String DEFAULT_ENDPOINT_ID = "alfresco";
+	
     private static final String API_LISTPATTERN = "listpattern";
     private static final String API_LISTALL = "listall";
     private static final String API_GET = "get";
@@ -72,94 +75,15 @@ public class RemoteStore implements Store
     private static final String API_HAS = "has";
     
     private ConnectorService connectorService;
-    private String defaultRepositoryStoreId;
-    private String api;
+    private RemoteStoreContext context;
+    private ConnectorProvider connectorProvider;
+    
+    private String storeId;
+    private String endpoint;    
     private String path;
-    private String endpoint;
-    
-    private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();
-    private ThreadLocal<ConnectorProvider> connProvider = new ThreadLocal<ConnectorProvider>();
+    private String api;
+    private String webappId;
         
-    /**
-     * Binds this instance to the given repository store id for the current thread
-     */
-    public void bindRepositoryStoreId(String repositoryStoreId)
-    {
-        this.repositoryStoreId.set(repositoryStoreId);
-    }
-    
-    /**
-     * Binds this instance to the given ConnectorProvider instance for the current thread
-     * 
-     * @param connector     Connector to bind for the current thread
-     */
-    public void bindConnectorProvider(ConnectorProvider provider)
-    {
-        this.connProvider.set(provider);
-    }
-
-    /**
-     * Unbinds this instance from any thread local values
-     */
-    public void unbind()
-    {
-        this.repositoryStoreId.remove();
-        this.connProvider.remove();
-    }
-
-    /**
-     * @return repository store id currently bound to this instance for the current thread
-     */
-    public String getRepositoryStoreId()
-    {
-        String storeId = this.repositoryStoreId.get();
-        if (storeId == null)
-        {
-            storeId = this.defaultRepositoryStoreId;
-        }
-        return storeId;
-    }
-
-    /**
-     * @param api       the WebScript API path to set for the remote store i.e. "/remotestore"
-     */
-    public void setApi(String api)
-    {
-        this.api = api;
-    }
-
-    /**
-     * @param path      the path prefix to set for the remote store i.e. "/site-data/components"
-     */
-    public void setPath(String path)
-    {
-        this.path = path;
-    }
-
-    /**
-     * @param endpoint  the endpoint ID to use when calling the remote API
-     */
-    public void setEndpoint(String endpoint)
-    {
-        this.endpoint = endpoint;
-    }
-    
-    /**
-     * @return the endpoint ID being used when calling the remote API
-     */
-    public String getEndpoint()
-    {
-        return this.endpoint;
-    }
-
-    /**
-     * @param repoStoreId   the default repostory store ID to use - overriden by thread local setting
-     */
-    public void setDefaultRepositoryStoreId(String repoStoreId)
-    {
-        this.defaultRepositoryStoreId = repoStoreId;
-    }
-
     /**
      * @param service   The ConnectorService bean
      */
@@ -167,8 +91,198 @@ public class RemoteStore implements Store
     {
         this.connectorService = service;
     }
+    
+    /**
+     * Gets the connector service.
+     * 
+     * @return the connector service
+     */
+    public ConnectorService getConnectorService()
+    {
+    	return this.connectorService;
+    }
+    
+    /**
+     * Sets the remote store context
+     */
+    public void setStoreContext(RemoteStoreContext context)
+    {
+    	this.context = context;
+    }
 
+    /**
+     * Returns the remote store context
+     */
+    public RemoteStoreContext getStoreContext()
+    {       
+    	return this.context;
+    }
+    
+    /**
+     * Sets the connector provider
+     */
+    public void setConnectorProvider(ConnectorProvider connectorProvider)
+    {
+    	this.connectorProvider = connectorProvider;
+    }
+    
+    public ConnectorProvider getConnectorProvider()
+    {
+    	return this.connectorProvider;
+    }
+    
 
+    /**
+     * @param api the WebScript API path to set for the remote store i.e. "/remotestore"
+     */
+    public void setApi(String api)
+    {
+    	this.api = api;
+    }
+    
+    /**
+     * Gets the api.
+     * 
+     * @return the api
+     */
+    public String getApi()
+    {
+    	return this.api;
+    }
+        
+    /**
+     * Sets the base path to send to the remote store
+     * 
+     * @param path 
+     */
+    public void setPath(String path)
+    {
+    	this.path = path;
+    }
+            
+    /**
+     * @param endpoint the endpoint ID to use when calling the remote API
+     */
+    public void setEndpoint(String endpoint)
+    {
+    	this.endpoint = endpoint;
+    }
+    
+    /**
+     * Gets the endpoint.
+     * 
+     * @return the endpoint
+     */
+    public String getEndpoint()
+    {
+    	return this.endpoint;
+    }
+    
+    /**
+     * Sets the store's web application id to bind to within the designated store
+     * This is meaningful for WCM Web Project stores.
+     * 
+     * @param webappId
+     */
+    public void setWebappId(String webappId)
+    {
+    	this.webappId = webappId;
+    }
+    
+    /**
+     * Gets the store's web application id binding
+     * This is meaningful for WCM Web Project stores.
+     * 
+     * @return
+     */
+    public String getWebappId()
+    {
+    	String value = this.webappId;
+    	
+    	if(value == null && getStoreContext() != null)
+    	{
+    		value = getStoreContext().getWebappId();
+    	}
+    	
+    	return value;
+    }
+        
+    /**
+     * Allows for specification of default or fallback store id to use
+     * when binding to a remote store.  This can be overridden by providing
+     * an implementation of a RemoteStoreContextProvider in the Spring
+     * Bean configuration.
+     * 
+     * @param storeId   the default store id
+     */
+    public void setStoreId(String storeId)
+    {
+    	this.storeId = storeId;
+    }
+    
+    /**
+     * Gets the store id.
+     * 
+     * @return the store id
+     */
+    public String getStoreId()
+    {
+    	String value = this.storeId;
+    	
+    	if(value == null && getStoreContext() != null)
+    	{
+    		value = getStoreContext().getStoreId();
+    	}
+    	
+    	return value;
+    }
+    
+    /**
+     * Store path calculation
+     * 
+     * If we have a store context, then we can check to see if a base path should be inserted ahead of the
+     * path that we believe we're directing to.
+     * 
+     * Use case - consider writing a file /alfresco/site-data/components/component.xml
+     * 
+     * If we're writing to sitestore, then the file is stored relative to the store root.
+     * 
+     * In the case of a WCM web project, however, we may want to persist to one of several web applications.
+     * If we have a webappId (retrieved from the context), then we prepend: /WEB-INF/classes
+     * 
+     * The new location is: /WEB-INF/classes/alfresco/site-data/components/component.xml
+     * 
+     * This allows us to operate against both straight up AVM stores as well as WCM Web Project AVM stores.
+     * 
+     * @return
+     */
+    public String getStorePath()
+    {
+    	String value = this.path;
+    	
+    	if(getStoreContext() != null)
+    	{
+    		if(getStoreContext().getStoreBasePath() != null)
+    		{
+    			value = getStoreContext().getStoreBasePath();
+    			if(!value.endsWith("/"))
+    			{
+    				value += "/";
+    			}
+    			if(this.path.startsWith("/"))
+    			{
+    				value += this.path.substring(1);
+    			}
+    			else
+    			{
+    				value += this.path;
+    			}
+    		}
+    	}
+    	
+    	return value;
+    }
+        
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#init()
      */
@@ -178,22 +292,24 @@ public class RemoteStore implements Store
         {
             throw new IllegalArgumentException("ConnectorService reference is mandatory for RemoteStore.");
         }
-        if (this.endpoint == null || this.endpoint.length() == 0)
+        if (this.getEndpoint() == null || getEndpoint().length() == 0)
         {
             throw new IllegalArgumentException("Endpoint ID is mandatory for RemoteStore.");
         }
-        if (this.api == null || this.api.length() == 0)
+        if (this.getApi() == null || this.getApi().length() == 0)
         {
             throw new IllegalArgumentException("API name is mandatory for RemoteStore.");
         }
-        if (this.path == null)
+        if (this.getStorePath() == null)
         {
             throw new IllegalArgumentException("Path prefix is mandatory for RemoteStore.");
         }
-        
+    	
         if (logger.isDebugEnabled())
-            logger.debug("RemoteStore initialised with endpoint id '" + endpoint + "' API path '" +
-                         api + "' path prefix '" + path + "'.");
+        {
+            logger.debug("RemoteStore initialised with endpoint id '" + this.getEndpoint() + "' API path '" +
+                         this.getApi() + "' path prefix '" + this.getStorePath() + "'.");
+        }
     }
 
     /* (non-Javadoc)
@@ -258,7 +374,7 @@ public class RemoteStore implements Store
         else
         {
             throw new IOException("Unable to get lastModified date of document path: " + documentPath +
-                    " in remote store: " + endpoint +
+                    " in remote store: " + this.getEndpoint() +
                     " due to error: " + res.getStatus().getMessage());
         }
     }
@@ -277,7 +393,7 @@ public class RemoteStore implements Store
         if (Status.STATUS_OK != res.getStatus().getCode())
         {
             throw new IOException("Unable to update document path: " + documentPath +
-                    " in remote store: " + endpoint +
+                    " in remote store: " + this.getEndpoint() +
                     " due to error: " + res.getStatus().getMessage());
         }
     }
@@ -310,7 +426,7 @@ public class RemoteStore implements Store
         if (Status.STATUS_OK != res.getStatus().getCode())
         {
             throw new IOException("Unable to create document path: " + documentPath +
-                    " in remote store: " + endpoint +
+                    " in remote store: " + this.getEndpoint() +
                     " due to error: " + res.getStatus().getMessage());
         }
     }
@@ -338,7 +454,7 @@ public class RemoteStore implements Store
         else
         {
             throw new IOException("Unable to retrieve document path: " + path +
-                    " in remote store: " + endpoint +
+                    " in remote store: " + this.getEndpoint() +
                     " due to error: " + res.getStatus().getMessage());
         }
     }
@@ -359,7 +475,24 @@ public class RemoteStore implements Store
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
             {
-                list.add(t.nextToken().substring(this.path.length()));
+            	// avm remote store path
+            	// this is always the full path starting from www/avm_webapps...etc
+            	String fullPath = t.nextToken();
+            	
+            	// this path defines the path which we wish to consider as the root of the store
+            	// this may be: /WEB-INF/classes/alfresco or /alfresco, depending on configuration
+            	String storePath = this.getStorePath();
+            	
+            	// truncate the full path so that it starts from our storePath
+            	// this is what will be expected from all downstream loaders
+            	int x = fullPath.indexOf(storePath);
+            	if(x > -1)
+            	{
+            		fullPath = fullPath.substring(x + storePath.length());
+            	}
+            	list.add(fullPath);
+            	
+            	//list.add(t.nextToken().substring(this.getStorePath().length()));
             }
             return list.toArray(new String[list.size()]);
         }
@@ -388,7 +521,24 @@ public class RemoteStore implements Store
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
             {
-                list.add(t.nextToken().substring(this.path.length()));
+            	// avm remote store path
+            	// this is always the full path starting from www/avm_webapps...etc            	
+            	String fullPath = t.nextToken();
+            	
+            	// this path defines the path which we wish to consider as the root of the store
+            	// this may be: /WEB-INF/classes/alfresco or /alfresco, depending on configuration
+            	String storePath = this.getStorePath();
+            	
+            	// truncate the full path so that it starts from our storePath
+            	// this is what will be expected from all downstream loaders
+            	int x = fullPath.indexOf(storePath);
+            	if(x > -1)
+            	{
+            		fullPath = fullPath.substring(x + storePath.length());
+            	}
+            	list.add(fullPath);
+            	
+                //list.add(t.nextToken().substring(path.length()));
             }
             return list.toArray(new String[list.size()]);
         }
@@ -436,7 +586,7 @@ public class RemoteStore implements Store
      */
     public String getBasePath()
     {
-        return this.path;
+    	return getStorePath();
     }
 
 
@@ -470,22 +620,46 @@ public class RemoteStore implements Store
         
         // TODO: Do we need to separate out the concept of a store id
         // from an AVM store Id?  Are they different?  AVM stores currently
-        // assume a certain path structure to accomodate web projects.
+        // assume a certain path structure to accommodate web projects.
         // Ideally, this could all be handled via configuration and still
         // use a single remote store implementation.
         
         StringBuilder buf = new StringBuilder(128);
         
-        buf.append(this.api);
+        buf.append(this.getApi());
         buf.append('/');
         buf.append(method);
-        buf.append(this.path);
         
-        for (StringTokenizer t = new StringTokenizer(documentPath, "/"); t.hasMoreTokens(); /**/)
+        // encode store path into url
+        String fullPath = this.getStorePath() + "/" + documentPath;        
+        for (StringTokenizer t = new StringTokenizer(fullPath, "/"); t.hasMoreTokens(); /**/)
         {
             buf.append('/').append(URLEncoder.encode(t.nextToken()));
         }
+
+        // Append in the store id
+        String storeId = this.getStoreId();
+        if(storeId != null)
+        {
+    		if (args == null)
+    		{
+    			args = new HashMap<String, String>(1, 1.0f);
+    		}
+   			args.put("s", storeId);
+        }
         
+        // Append in the webapp id (if applicable)
+        String webappId = this.getWebappId();
+        if(webappId != null)
+        {
+    		if (args == null)
+    		{
+    			args = new HashMap<String, String>(1, 1.0f);
+    		}
+   			args.put("w", webappId);        	
+        }
+                
+        // append in any request parameters
         if (args != null && args.size() != 0)
         {
             buf.append('?');
@@ -563,15 +737,17 @@ public class RemoteStore implements Store
      */
     private Connector getConnector() throws RemoteConfigException
     {
-        Connector conn = null;
-        ConnectorProvider provider = this.connProvider.get();
-        if (provider != null)
-        {
-            conn = provider.provide();
-        }
+    	Connector conn = null;
+    
+    	if(getConnectorProvider() != null)
+    	{
+    		conn = getConnectorProvider().provide(this.getEndpoint());
+    	}
+        
         if (conn == null)
         {
-            conn = this.connectorService.getConnector(this.endpoint);
+        	// grab an unauthenticated connector
+            conn = this.connectorService.getConnector(this.getEndpoint());
         }
         return conn; 
     }
@@ -582,7 +758,7 @@ public class RemoteStore implements Store
      * 
      * @author Kevin Roast
      */
-    private class RemoteStoreScriptLoader implements ScriptLoader
+    protected class RemoteStoreScriptLoader implements ScriptLoader
     {
         /**
          * @see org.alfresco.web.scripts.ScriptLoader#getScript(java.lang.String)
@@ -715,7 +891,7 @@ public class RemoteStore implements Store
          */
         public String getPath()
         {
-            return path + '/' + this.scriptPath;
+            return getStorePath() + '/' + this.scriptPath;
         }
 
         /**
@@ -723,7 +899,7 @@ public class RemoteStore implements Store
          */
         public String getPathDescription()
         {
-            return path + '/' + this.scriptPath + " loaded from endpoint: " + endpoint;
+            return getStorePath() + '/' + this.scriptPath + " loaded from endpoint: " + getEndpoint();
         }
         
         /**
