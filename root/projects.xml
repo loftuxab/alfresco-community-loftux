@@ -3047,5 +3047,133 @@
                          projectdir="${dir.project.extranet}"/>
    </target>
    
+   
+   <!-- ***************************** -->
+   <!-- ** Web Studio Project ** -->
+   <!-- ***************************** -->
+   
+   <target name="incremental-webstudio" 
+           depends="package-webstudio" />
+      
+   <target name="build-webstudio" 
+           depends="clean-webstudio, 
+                    incremental-webstudio" />
+   
+   <target name="clean-webstudio" 
+           depends="init">
+      <clean projectdir="${dir.project.webstudio}" />
+   </target>
+   
+   <target name="compile-webstudio" 
+           depends="init">
+           
+      <!-- TODO: remove this and add dependency from /lib to thirdparty -->
+      <path id="classpath.compile">
+         <fileset dir="${dir.project.3rdparty.lib}">
+            <include name="**/*.jar" />
+         </fileset>
+         <fileset dir="${dir.projects}">
+            <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
+         </fileset>
+         <fileset dir="${dir.project.webstudio}">
+            <include name="**/${dir.name.lib}/*.jar" />
+         </fileset>
+         <fileset dir="${dir.modules}">
+            <include name="**/${dir.name.lib}/*.jar" />
+         </fileset>
+         <fileset dir="${dir.modules}">
+            <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
+         </fileset>
+      </path>
+           
+      <compile-java projectdir="${dir.project.webstudio}" />
+   </target>
+   
+   <target name="package-webstudio" 
+           depends="package-webstudio-war" />
+   
+   <target name="package-webstudio-jar"
+           depends="compile-webstudio">
+      <mkdir dir="${dir.project.webstudio.dist}" />
+      <jar jarfile="${dir.project.webstudio.dist}/${file.name.jar.webstudio}" 
+           basedir="${dir.project.webstudio.classes}" />
+   </target>
+
+   <target name="package-webstudio-war" 
+           depends="assemble-webstudio-war">
+      <war warfile="${dir.project.webstudio.dist}/${file.name.war.webstudio}" 
+           webxml="${dir.project.webstudio.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webstudio.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-webstudio-war" 
+           depends="package-webstudio-jar">
+      <mkdir dir="${dir.project.webstudio.assemble}" />
+      
+      <!-- copy all required files from webscript and web framework projects -->
+      <copy todir="${dir.project.webstudio.assemble}">
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webstudio.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      
+      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
+         <fileset dir="${dir.project.webstudio.config}" excludes="**/extension/**" />
+      </copy>
+
+      <!-- copy all required files from project: web-framework-applibrary -->
+      <copy todir="${dir.project.webstudio.assemble}">
+         <fileset dir="${dir.projects}/web-framework-applibrary/source/web" excludes="WEB-INF/web.xml" />
+      </copy>
+      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.projects}/web-framework-applibrary/config" excludes="**/extension/**" />
+      </copy>
+
+
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.webstudio.dist}" 
+                  includes="${file.name.jar.webstudio}" />
+      </copy>
+      
+      <!-- Auto Expand EXTJS and YUI into the Assembly -->
+      <!-- TOOD: Remove YUI -->
+      <unzip src="${file.zip.webstudio.yui}"
+             dest="${dir.project.webstudio.assemble}" />
+      
+      <!-- placeholder site-webscripts and templates folders are required -->
+      <mkdir dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-webscripts" />
+      <mkdir dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/templates" />
+   </target>  
+   
+   <target name="test-webstudio" 
+           depends="compile-webstudio">
+      <run-tests projectdir="${dir.project.webstudio}" />
+   </target>
+   
+   <target name="generate-javadocs-webstudio" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Studio" 
+                         windowtitle="Alfresco Web Studio" 
+                         projectdir="${dir.project.webstudio}"/>
+   </target>
+   
+   
 
 </project>
