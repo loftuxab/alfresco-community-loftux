@@ -137,7 +137,7 @@ public class FormData implements Serializable
      * 
      * @return  map (name, value) of parameters
      */
-    /*package*/ Map<String, String[]> getParameters()
+    /*package*/ public Map<String, String[]> getParameters()
     {
         if (parameters == null)
         {
