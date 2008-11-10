@@ -89,8 +89,8 @@ public class SlingshotPageMapper extends AbstractPageMapper
     /**
      * Process a page request.
      */
-    public void execute(RequestContext context, ServletRequest request)
-    	throws PageMapperException
+    public void executeMapper(RequestContext context,
+        ServletRequest request) throws PageMapperException
     {
     	if (request instanceof HttpServletRequest == false)
     	{
