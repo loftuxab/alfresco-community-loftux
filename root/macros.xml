@@ -97,7 +97,7 @@
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.docs}/${dir.name.java}" />
          <javadoc maxmemory="${mem.size.max}" author="true" version="true" 
                   sourcepath="@{projectdir}/${dir.name.source}/${dir.name.generated}" 
-                  destdir="@{projectdir}/${dir.name.build}/${dir.name.docs}/${dir.name.java}" 
+                  destdir="@{projectdir}/${dir.name.build}/${dir.name.docs}/${dir.name.java}/generated" 
                   packagenames="${javadoc.packages.include}"
                   excludepackagenames="${javadoc.packages.exclude}" 
                   bottom="${javadoc.copyright}"
