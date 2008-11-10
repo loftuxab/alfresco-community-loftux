@@ -13,6 +13,24 @@
       </property>
    </bean>
    
+   <!-- Configure the remote store for Slingshot -->
+   <!-- Point to a specific store on the Alfresco instance -->
+   <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
+      <property name="endpoint">
+         <value>alfresco</value>
+      </property>
+      <property name="api">
+         <value>/remotestore</value>
+      </property>
+      <property name="storeId">
+         <value>sitestore</value>
+      </property>
+      <property name="connectorService" ref="connector.service" />
+      <property name="storeContext" ref="webframework.context.remotestore"/>
+      <property name="connectorProvider" ref="webframework.connector.provider" />      
+   </bean>
+   
+   
    <!-- uncomment this section (or override bean def in custom app context) for remote component deploy -->
    <!-- Override WebScripts searchpath - to include remote store -->
    <!--
@@ -50,7 +68,7 @@
          <list>
          	<ref bean="webframework.remotestore.chrome" />
          	<ref bean="webframework.classpathstore.chrome.custom" />
-			   <ref bean="webframework.classpathstore.chrome" />
+                <ref bean="webframework.classpathstore.chrome" />
          </list>
       </property>
    </bean>
@@ -60,7 +78,7 @@
          <list>
          	<ref bean="webframework.remotestore.component" />
          	<ref bean="webframework.classpathstore.component.custom" />
-			   <ref bean="webframework.classpathstore.component" />
+                <ref bean="webframework.classpathstore.component" />
          </list>
       </property>
    </bean>
@@ -70,7 +88,7 @@
          <list>
          	<ref bean="webframework.remotestore.componenttype" />
          	<ref bean="webframework.classpathstore.componenttype.custom" />
-			   <ref bean="webframework.classpathstore.componenttype" />
+                <ref bean="webframework.classpathstore.componenttype" />
          </list>
       </property>
    </bean>
@@ -80,7 +98,7 @@
          <list>
          	<ref bean="webframework.remotestore.configuration" />
          	<ref bean="webframework.classpathstore.configuration.custom" />
-			   <ref bean="webframework.classpathstore.configuration" />
+                <ref bean="webframework.classpathstore.configuration" />
          </list>
       </property>
    </bean>
@@ -90,7 +108,7 @@
          <list>
          	<ref bean="webframework.remotestore.contentassociation" />
          	<ref bean="webframework.classpathstore.contentassociation.custom" />
-			   <ref bean="webframework.classpathstore.contentassociation" />
+                <ref bean="webframework.classpathstore.contentassociation" />
          </list>
       </property>
    </bean>
@@ -100,7 +118,7 @@
          <list>
          	<ref bean="webframework.remotestore.page" />
          	<ref bean="webframework.classpathstore.page.custom" />
-			   <ref bean="webframework.classpathstore.page" />
+                <ref bean="webframework.classpathstore.page" />
          </list>
       </property>
    </bean>
@@ -110,7 +128,7 @@
          <list>
          	<ref bean="webframework.remotestore.pageassociation" />
          	<ref bean="webframework.classpathstore.pageassociation.custom" />
-			   <ref bean="webframework.classpathstore.pageassociation" />
+                <ref bean="webframework.classpathstore.pageassociation" />
          </list>
       </property>
    </bean>
@@ -140,7 +158,7 @@
          <list>
 	         <ref bean="webframework.remotestore.templatetype" />
 	         <ref bean="webframework.classpathstore.templatetype.custom" />
-			   <ref bean="webframework.classpathstore.templatetype" />
+                 <ref bean="webframework.classpathstore.templatetype" />
          </list>
       </property>
    </bean>
@@ -148,9 +166,9 @@
    <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-			   <ref bean="webframework.remotestore.theme" />
-			   <ref bean="webframework.classpathstore.theme.custom" />
-            <ref bean="webframework.classpathstore.theme" />
+                 <ref bean="webframework.remotestore.theme" />
+                 <ref bean="webframework.classpathstore.theme.custom" />
+                 <ref bean="webframework.classpathstore.theme" />
          </list>
       </property>
    </bean>
@@ -158,13 +176,15 @@
    <bean id="webframework.presets.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.presets" />
-            <ref bean="webframework.classpathstore.presets.custom" />
-            <ref bean="webframework.classpathstore.presets" />
+                 <ref bean="webframework.remotestore.presets" />
+                 <ref bean="webframework.classpathstore.presets.custom" />
+                 <ref bean="webframework.classpathstore.presets" />
          </list>
       </property>
    </bean>
    
+   <!-- Slingshot "no-component" processor -->
+   <bean id="webframework.processor.nocomponent" class="org.alfresco.web.site.EmptyRegionRenderer" />   
    
    <!-- import app-context extensions -->
    <import resource="classpath*:alfresco/web-extension/custom-slingshot-application-context.xml"/>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,71 +20,37 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing
+ * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.site;
 
-import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.renderer.Renderable;
-import org.alfresco.web.site.renderer.RendererContext;
+import org.alfresco.web.framework.exception.RendererExecutionException;
+import org.alfresco.web.framework.render.AbstractProcessor;
+import org.alfresco.web.framework.render.ProcessorContext;
 
 /**
- * Java renderer class to render empty regions for Slingshot.
+ * Processor class which renders a null result.
+ * 
+ * Used by Slingshot to render vacant "empty" regions when there are no bound components.
  * 
  * @author Kevin Roast
  */
-public class EmptyRegionRenderer implements Renderable
+public class EmptyRegionRenderer extends AbstractProcessor
 {
+    
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#execute(org.alfresco.web.site.renderer.RendererContext)
+     * @see org.alfresco.web.framework.render.AbstractProcessor#executeHeader(org.alfresco.web.framework.render.ProcessorContext)
      */
-    public void execute(RendererContext rendererContext) throws RendererExecutionException
-    {
-        // null result - for slingshot empty regions are just that, empty.
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#getRenderer()
-     */
-    public String getRenderer()
-    {
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#getRendererType()
-     */
-    public String getRendererType()
-    {
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#head(org.alfresco.web.site.renderer.RendererContext)
-     */
-    public String head(RendererContext rendererContext) throws RendererExecutionException
-    {
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#init(org.alfresco.web.site.renderer.RendererContext)
-     */
-    public void init(RendererContext rendererContext)
+    public void executeHeader(ProcessorContext pc)
+        throws RendererExecutionException
     {
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#setRenderer(java.lang.String)
+     * @see org.alfresco.web.framework.render.AbstractProcessor#executeBody(org.alfresco.web.framework.render.ProcessorContext)
      */
-    public void setRenderer(String renderer)
-    {
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#setRendererType(java.lang.String)
-     */
-    public void setRendererType(String rendererType)
+    public void executeBody(ProcessorContext pc)
+        throws RendererExecutionException
     {
     }
 }

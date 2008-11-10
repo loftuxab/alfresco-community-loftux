@@ -163,13 +163,12 @@
 				<default-store-id>webframework.remotestore.theme</default-store-id>
 			</model-type>
          
-         <!-- Error Handler Pages -->
-         <error-handler>
-            <id>region-nocomponent</id>
-            <renderer>org.alfresco.web.site.EmptyRegionRenderer</renderer>
-            <renderer-type>java</renderer-type>
-         </error-handler>
-         
+         	<!-- Error Handler Pages -->
+			<error-handler>
+				<id>region-nocomponent</id>
+				<processor-id>nocomponent</processor-id>			
+			</error-handler>
+                  
       </web-framework>
 
    </config>

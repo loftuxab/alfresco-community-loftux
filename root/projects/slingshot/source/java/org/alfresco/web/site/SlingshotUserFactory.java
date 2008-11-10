@@ -63,7 +63,7 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
      */
     public void saveUser(AlfrescoUser user) throws UserFactoryException
     {
-        HttpRequestContext context = (HttpRequestContext)ThreadLocalRequestContext.getRequestContext();
+        RequestContext context = (RequestContext)ThreadLocalRequestContext.getRequestContext();
         if (!context.getUserId().equals(user.getId()))
         {
             throw new UserFactoryException("Unable to persist user with different Id that current Id.");
