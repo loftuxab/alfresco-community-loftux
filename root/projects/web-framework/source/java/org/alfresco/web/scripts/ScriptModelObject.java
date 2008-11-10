@@ -53,6 +53,10 @@ import org.mozilla.javascript.Scriptable;
  * 
  * will no-op and do nothing.
  * 
+ * The following is available for working with resources:
+ * 
+ * var resources = myObject.resources;
+ * 
  * @author muzquiano
  */
 public final class ScriptModelObject extends ScriptBase
@@ -60,11 +64,12 @@ public final class ScriptModelObject extends ScriptBase
     // unmodifiable "system" properties
     private static final long serialVersionUID = -3378946227712939601L;
     private final ModelObject modelObject;
+    private final ScriptResources resources;
     
     /**
      * Instantiates a new script model object.
      * 
-     * @param context the context
+     * @param context the request context
      * @param modelObject the model object
      */
     public ScriptModelObject(RequestContext context, ModelObject modelObject)
@@ -73,6 +78,9 @@ public final class ScriptModelObject extends ScriptBase
         
         // store a reference to the model object
         this.modelObject = modelObject;
+        
+        // initialize the resources container
+        this.resources = new ScriptResources(context, this.modelObject);
     }
     
     /* (non-Javadoc)
@@ -236,6 +244,11 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getStoragePath();
     }
     
+    public ScriptResources getResources()
+    {
+    	return this.resources;    	
+    }
+    
     
     // --------------------------------------------------------------
     // JavaScript Functions
@@ -354,4 +367,32 @@ public final class ScriptModelObject extends ScriptBase
     {
         return this.modelObject;
     }
+    
+    /**
+     * Creates a clone of this model object
+     */
+    public ScriptModelObject clone()
+    {
+    	String objectTypeId = this.getModelObject().getTypeId();
+    	String objectId = this.getModelObject().getId();
+    	
+        ModelObject obj = getModel().clone(objectTypeId, objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+
+    /**
+     * Creates a clone of this model object
+     * The provided is to set as the new id of the object
+     */
+    public ScriptModelObject clone(String newObjectId)
+    {
+    	ParameterCheck.mandatory("newObjectId", newObjectId);
+
+    	String objectTypeId = this.getModelObject().getTypeId();
+    	String objectId = this.getModelObject().getId();
+    	
+        ModelObject obj = getModel().clone(objectTypeId, objectId, newObjectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
 }

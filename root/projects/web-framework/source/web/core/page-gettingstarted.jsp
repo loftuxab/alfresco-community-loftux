@@ -1,8 +1,10 @@
+<%@ page import="org.alfresco.web.framework.render.*" %>
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
-	RequestContext context = RequestUtil.getRequestContext(request);
+	RenderContext context = RenderUtil.getContext(request);
+
 	String bgImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/images/logo/AlfrescoFadedBG.png");
 	String logoImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/images/logo/AlfrescoLogo200.png");
 %>
@@ -18,11 +20,11 @@
 		<td valign="center" align="middle">
 			<img src="<%=logoImageUrl%>"/>
 			<br/>
-			<b>Web Framework 3.0</b>
+			<b><%=FrameworkHelper.getFrameworkTitle()%> <%=FrameworkHelper.getFrameworkVersion()%></b>
 			<br/>
 			<br/>
 			<br/>
-			The Web Framework has been installed at this location.
+			<%=FrameworkHelper.getFrameworkTitle()%> has been installed at this location.
 			<br/>
 			A home page has not been defined.
 			<br/>

@@ -38,4 +38,9 @@ public class RequestDispatchException extends Exception
     {
         super(message, ex);
     }
+    
+    public RequestDispatchException(Exception ex)
+    {
+    	super(ex);
+    }
 }

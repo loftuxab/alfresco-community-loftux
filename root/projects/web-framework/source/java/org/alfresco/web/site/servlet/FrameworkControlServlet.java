@@ -26,13 +26,19 @@ package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.scripts.Container;
+import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.site.CacheUtil;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.exception.RequestContextException;
@@ -54,6 +60,10 @@ public class FrameworkControlServlet extends BaseServlet
 {
     private static final String MODE_CACHE_COMMAND_INVALIDATE = "invalidate";
     private static final String MODE_CACHE = "cache";
+    
+    private static final String MODE_WEBSCRIPTS = "webscripts";
+    private static final String MODE_WEBSCRIPTS_COMMAND_RESET = "reset";
+    
 
     public void init() throws ServletException
     {
@@ -108,5 +118,35 @@ public class FrameworkControlServlet extends BaseServlet
                 CacheUtil.invalidateModelObjectServiceCache(context);
             }
         }
+        
+        // WEBSCRIPTS
+        if(MODE_WEBSCRIPTS.equalsIgnoreCase(mode))
+        {
+        	if(MODE_WEBSCRIPTS_COMMAND_RESET.equalsIgnoreCase(command))
+        	{
+        		resetWebScripts();
+        	}
+        }
+    }
+    
+    protected void resetWebScripts()
+    {
+		Container container = (Container) FrameworkHelper.getApplicationContext().getBean("webframework.webscripts.container");
+		if(container != null)
+		{
+            int previousCount = container.getRegistry().getWebScripts().size();
+            int previousFailures = container.getRegistry().getFailures().size();
+            
+			container.reset();
+			
+			// debug out
+			FrameworkHelper.getLogger().info("Reset Web Scripts Registry; registered " + container.getRegistry().getWebScripts().size() + " Web Scripts.  Previously, there were " + previousCount + ".");
+			
+			int newFailures = container.getRegistry().getFailures().size();
+            if (newFailures != 0 || previousFailures != 0)
+            {
+            	FrameworkHelper.getLogger().info("Warning: found " + newFailures + " broken Web Scripts.  Previously, there were " + previousFailures + ".");
+            }
+		}    	
     }
 }

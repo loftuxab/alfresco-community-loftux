@@ -1,15 +1,12 @@
-<%@ page import="org.alfresco.web.framework.model.*"%>
+<%@ page import="org.alfresco.web.framework.render.*"%>
 <%@ page import="org.alfresco.web.site.*"%>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
-	// get the request context
-	RequestContext context = RequestUtil.getRequestContext(request);
+	RenderContext context = RenderUtil.getContext(request);
 
-	String backgroundImageUrl = "/images/logo/AlfrescoFadedBG.png";
-	backgroundImageUrl = URLUtil.browser(context, backgroundImageUrl);
-	
+	String backgroundImageUrl = URLUtil.browser(context, "/images/logo/AlfrescoFadedBG.png");
 	String homePageUrl = URLUtil.browser(context, "/");
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">

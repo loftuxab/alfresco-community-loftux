@@ -61,13 +61,13 @@ public class LocalWebScriptResponse extends WebScriptResponseImpl
         {
             // And build up the request URL - may be used by webscript responses to build further urls
             StringBuffer buf = new StringBuffer(128);
-            buf.append(context.RendererContext.getRequest().getRequestURI());
+            buf.append(context.RenderContext.getRequest().getRequestURI());
             boolean first = true;
             for (Map.Entry<String, String> entry : context.Tokens.entrySet())
             {
                 String key = entry.getKey();
-                if (!WebScriptRenderer.PARAM_WEBSCRIPT_URL.equals(key) &&
-                    !WebScriptRenderer.PARAM_WEBSCRIPT_ID.equals(key))
+                if (!WebScriptProcessor.PARAM_WEBSCRIPT_URL.equals(key) &&
+                    !WebScriptProcessor.PARAM_WEBSCRIPT_ID.equals(key))
                 {
                     String value = entry.getValue();                
                     buf.append(first ? '?' : '&').append(key).append('=').append(URLEncoder.encode(value));
@@ -77,9 +77,9 @@ public class LocalWebScriptResponse extends WebScriptResponseImpl
             scriptUrlPrefix = buf.toString();
         }
         return scriptUrlPrefix + (context.Tokens.size() != 0 ? '&' : '?') +
-               WebScriptRenderer.PARAM_WEBSCRIPT_URL + "=" +
+               WebScriptProcessor.PARAM_WEBSCRIPT_URL + "=" +
                URLEncoder.encode(url) + "&" +
-               WebScriptRenderer.PARAM_WEBSCRIPT_ID + "=" + context.Object.getId();
+               WebScriptProcessor.PARAM_WEBSCRIPT_ID + "=" + context.Object.getId();
     }
 
     public String getEncodeScriptUrlFunction(String name)

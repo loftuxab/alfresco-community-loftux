@@ -48,8 +48,40 @@ public class WebUtil
      */
     public static Map getQueryStringMap(HttpServletRequest request)
     {
+    	String queryString = request.getQueryString();
+    	return getQueryStringMap(queryString);
+    }
+
+    /**
+     * Creates a Map of query string key and value parameters from the
+     * given query string.
+     * 
+     * Values are decoded using the default encoding.
+     * 
+     * @param queryString the query string
+     * 
+     * @return the query string map
+     */    
+    public static Map getQueryStringMap(String queryString)
+    {
+    	return getQueryStringMap(queryString, EncodingUtil.DEFAULT_ENCODING);    	
+    }
+
+    /**
+     * Creates a Map of query string key and value parameters from the
+     * given query string.
+     * 
+     * Values are decoded using the specified encoding.
+     * If the specified encoding is null, not decoding is applied.
+     * 
+     * @param queryString the query string
+     * 
+     * @return the query string map
+     */    
+    public static Map getQueryStringMap(String queryString, String encoding)
+    {
         HashMap map = new HashMap(24, 1.0f);
-        String queryString = request.getQueryString();
+        
         if (queryString != null)
         {
             StringTokenizer tokenizer = new StringTokenizer(queryString, "&");
@@ -61,12 +93,18 @@ public class WebUtil
                 {
                     String key = combo.substring(0, c);
                     String value = combo.substring(c + 1, combo.length());
+                    
+                    if(encoding != null)
+                    {
+                    	value = EncodingUtil.decode(value, encoding);
+                    }
+                    
                     map.put(key, value);
                 }
             }
         }
-        return map;
-
+        
+        return map;    	
     }
 
     /**

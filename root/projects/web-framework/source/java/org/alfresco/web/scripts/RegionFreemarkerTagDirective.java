@@ -30,7 +30,7 @@ import java.util.Map;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 
 import org.alfresco.util.StringBuilderWriter;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.site.taglib.RegionTag;
 
 import freemarker.core.Environment;
@@ -48,7 +48,7 @@ import freemarker.template.TemplateScalarModel;
  */
 public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
 {
-    public RegionFreemarkerTagDirective(RequestContext context)
+    public RegionFreemarkerTagDirective(RenderContext context)
     {
         super(context);
     }

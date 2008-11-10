@@ -26,18 +26,15 @@ package org.alfresco.web.scripts;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.alfresco.web.config.WebFrameworkConfigElement;
-import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.Model;
 import org.alfresco.web.site.RequestContext;
 
 /**
  * Base class for all Web Framework Root-Scope and Script Model objects
  * 
- * This class can accept a binding to a RequestContext (for convenience).
- * The RequestContext object is the primary interface to the request
+ * This class can accept a binding to a RenderContext (for convenience).
+ * The RenderContext object is the primary interface to the request
  * for the Java API.
  * 
  * @author muzquiano
@@ -73,24 +70,6 @@ public abstract class ScriptBase implements Serializable
         return context;
     }
     
-    
-    /**
-     * Returns the HttpServletRequest bound to the RequestContext.
-     * 
-     * If the RequestContext was not produced from an Http request, then null
-     * will be returned. 
-     * 
-     * @return the http servlet request
-     */
-    protected HttpServletRequest getHttpServletRequest()
-    {
-        if (context instanceof HttpRequestContext)
-        {
-            return ((HttpRequestContext) context).getRequest();
-        }
-        return null;
-    }        
-
     /**
      * Retrieves a model object from the underlying store and hands it back
      * wrapped as a ScriptModelObject.  If the model object cannot be found,

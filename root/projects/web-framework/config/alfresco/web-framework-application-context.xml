@@ -25,6 +25,7 @@
             <!-- Web Framework -->
             <value>classpath:alfresco/web-framework-config.xml</value>
             <value>classpath:alfresco/web-framework-config-remote.xml</value>
+            <value>classpath:alfresco/web-framework-config-web-studio.xml</value>
             <value>classpath:alfresco/web-framework-config-application.xml</value>
             <value>classpath:alfresco/web-extension/web-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
@@ -39,7 +40,54 @@
          <ref bean="webframework.configsource" />
       </constructor-arg>
    </bean>
+   
+   
+   
+   
+   <!--                                                     -->
+   <!-- Configuration of Abstract Store Implementations     -->
+   <!--                                                     -->
 
+   <!-- Remote Store Abstract -->
+   <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
+      <property name="endpoint">
+         <value>alfresco</value>
+      </property>
+      <property name="api">
+         <value>/remotestore</value>
+      </property>
+      <property name="connectorService" ref="connector.service" />
+      <property name="storeContext" ref="webframework.context.remotestore"/>
+      <property name="connectorProvider" ref="webframework.connector.provider" />      
+   </bean>
+
+   <!-- Local Store Abstract (disabled) -->   
+   <!--
+   <bean id="webframework.localstore" class="org.alfresco.web.scripts.LocalFileSystemStore" abstract="true" init-method="init">
+      <property name="root">
+         <value>./WEB-INF/classes/alfresco</value>
+      </property>
+   </bean>
+   -->
+   
+   <!-- ClassPath Store Abstract -->
+   <bean id="webframework.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" init-method="init" />   
+   
+
+
+
+   <!--                                                     -->
+   <!-- Additional Configuration for Remote Store           -->
+   <!--                                                     -->
+
+   <!-- Remote Store Context for Web Framework -->
+   <bean id="webframework.context.remotestore" class="org.alfresco.web.framework.WebFrameworkRemoteStoreContext" />
+
+   <!-- Remote Store Connector Provider -->   
+   <bean id="webframework.connector.provider" class="org.alfresco.web.framework.WebFrameworkConnectorProvider" />
+
+
+   
 
    <!--                                                     -->
    <!-- Configuration of the Web Script Runtime / Container -->
@@ -55,12 +103,13 @@
    </bean>
    
    <bean id="webframework.remotestore.webscripts" parent="webframework.remotestore">
-      <property name="path"><value>/site-webscripts</value></property>
+      <property name="path"><value>alfresco/site-webscripts</value></property>
    </bean>
    
    <bean id="webframework.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
+            <!-- <ref bean="webframework.remotestore.webscripts" /> -->
             <ref bean="webframework.store.webscripts.custom" />
             <ref bean="webframework.store.webscripts" />
             <ref bean="webscripts.store" />
@@ -105,22 +154,39 @@
       <property name="classPath"><value>alfresco/templates</value></property>
    </bean>
    
+   <bean id="webframework.store.templates.custom" class="org.alfresco.web.scripts.ClassPathStore">
+      <property name="mustExist"><value>false</value></property>
+      <property name="classPath"><value>alfresco/extension/templates</value></property>
+   </bean>
+   
    <bean id="webframework.store.system-templates" class="org.alfresco.web.scripts.ClassPathStore">
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/system-templates</value></property>
    </bean>
    
+   <bean id="webframework.remotestore.templates" parent="webframework.remotestore">
+      <property name="path"><value>alfresco/templates</value></property>
+   </bean>      
+   
    <bean id="webframework.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
+            <!-- <ref bean="webframework.remotestore.templates" /> -->
+            <!-- <ref bean="webframework.remotestore.webscripts" /> -->
+            <ref bean="webframework.store.templates.custom" />
             <ref bean="webframework.store.webscripts.custom" />
-            <ref bean="webframework.store.system-templates" />
-            <ref bean="webframework.store.templates" />
+            <ref bean="webframework.store.templates" />            
             <ref bean="webframework.store.webscripts" />
+            <ref bean="webframework.store.system-templates" />            
          </list>
       </property>
    </bean>
+
    
+   <!--                                                     -->
+   <!-- Configuration of the Script and Template Processors -->
+   <!--                                                     -->
+
    <bean id="webframework.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
       <property name="searchPath" ref="webframework.templates.searchpath" />
       <property name="defaultEncoding"><value>UTF-8</value></property>
@@ -164,7 +230,7 @@
    </bean>
    
    <bean id="webframework.remotestore.presets" parent="webframework.remotestore">
-      <property name="path"><value>/site-data/presets</value></property>
+      <property name="path"><value>alfresco/site-data/presets</value></property>
    </bean>
    
    <bean id="webframework.presets.searchpath" class="org.alfresco.web.scripts.SearchPath">
@@ -186,4 +252,28 @@
       </property>
    </bean>
    
+   
+   <!-- Web Framework - Freemarker and JSP processors -->
+   <bean id="webframework.processor.webscript" class="org.alfresco.web.scripts.WebScriptProcessor">
+      <property name="containerBean" ref="webframework.webscripts.container" />
+      <property name="templateProcessor" ref="webframework.templateprocessor" />
+      <property name="registry" ref="webframework.webscripts.registry" />
+   </bean>
+   <bean id="webframework.processor.freemarker" class="org.alfresco.web.scripts.FreemarkerProcessor">
+      <property name="templateProcessor" ref="webframework.templateprocessor" />
+      <property name="scriptProcessor" ref="webframework.scriptprocessor" />
+      <property name="templateStore" ref="webframework.store.templates" />
+   </bean>
+   <bean id="webframework.processor.jsp" class="org.alfresco.web.framework.render.bean.JSPProcessor" />
+
+   <!-- Web Framework - Model Object Renderers -->
+   <bean id="webframework.renderer.chrome" class="org.alfresco.web.framework.render.bean.ChromeRenderer" />
+   <bean id="webframework.renderer.component" class="org.alfresco.web.framework.render.bean.ComponentRenderer" />
+   <bean id="webframework.renderer.page" class="org.alfresco.web.framework.render.bean.PageRenderer" />
+   <bean id="webframework.renderer.region" class="org.alfresco.web.framework.render.bean.RegionRenderer" />   
+   <bean id="webframework.renderer.template" class="org.alfresco.web.framework.render.bean.TemplateInstanceRenderer" />
+   
+   <!-- RendererContext Provider Implementation -->
+   <bean id="webframework.rendercontext.provider" class="org.alfresco.web.framework.render.bean.DefaultRenderContextProvider" />
+      
 </beans>

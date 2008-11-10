@@ -51,7 +51,7 @@
       <servlet-class>org.alfresco.web.site.servlet.FrameworkControlServlet</servlet-class>
    </servlet>
    
-   <!--
+   <!-- Component Dispatcher Servlet -->
    <servlet>
       <servlet-name>componentDispatcherServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.ComponentDispatcherServlet</servlet-class>
@@ -60,9 +60,12 @@
    <servlet-mapping>
       <servlet-name>componentDispatcherServlet</servlet-name>
       <url-pattern>/component/*</url-pattern>
-   </servlet-mapping>
-   -->
+   </servlet-mapping>   
 
+   <servlet-mapping>
+      <servlet-name>componentDispatcherServlet</servlet-name>
+      <url-pattern>/c/*</url-pattern>
+   </servlet-mapping>   
 
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>

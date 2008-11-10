@@ -1,16 +1,15 @@
-<%@ page import="org.alfresco.web.framework.model.*"%>
+<%@ page import="org.alfresco.web.framework.render.*"%>
 <%@ page import="org.alfresco.web.site.*"%>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%
-	// get the request context
-	RequestContext context = RequestUtil.getRequestContext(request);
+	RenderContext context = RenderUtil.getContext(request);
 
-	String backgroundImageUrl = "/images/logo/AlfrescoFadedBG.png";
-	backgroundImageUrl = URLUtil.browser(context, backgroundImageUrl);
-	
+	String backgroundImageUrl = URLUtil.browser(context, "/images/logo/AlfrescoFadedBG.png");	
 	String homePageUrl = URLUtil.browser(context, "/");
+	
+	Content object = context.getCurrentObject();
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -28,7 +27,8 @@
 <table width="100%" height="100%" border="0" style="background-image:url('<%=backgroundImageUrl%>'); background-repeat:no-repeat;">
 	<tr>
 		<td align="center" valign="center" height="100%">
-			This content is not associated to a page.
+		
+			The content being viewed is not associated to a display page.
 			<br/>
 			<br/>
 			<a href="javascript:window.history.back()">Go back to previous page</a>

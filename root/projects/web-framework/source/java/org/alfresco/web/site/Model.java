@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,6 +46,8 @@ import org.alfresco.web.framework.model.PageType;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.TemplateType;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.framework.resource.Resource;
+import org.alfresco.web.framework.resource.ResourceProvider;
 
 /**
  * Default implementation of the model.
@@ -620,7 +623,10 @@ public class Model
     {
         // build property map
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
-        addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
+        if(sourceId != null)
+        {
+        	addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
+        }
 
         // do the lookup
         return findObjects(Configuration.TYPE_ID, propertyConstraintMap);
@@ -650,8 +656,13 @@ public class Model
     {
         // build property map
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
-        addPropertyConstraint(propertyConstraintMap,
-                PageAssociation.PROP_SOURCE_ID, sourceId);
+        
+        // source id is an optional parameter
+        if(sourceId != null)
+        {
+        	addPropertyConstraint(propertyConstraintMap,
+        			PageAssociation.PROP_SOURCE_ID, sourceId);
+        }
         
         // dest id is an optional parameter
         if(destId != null)
@@ -1016,11 +1027,13 @@ public class Model
      */
     public void unassociatePage(String pageAssociationId)
     {
-        removeObject(Page.TYPE_ID, pageAssociationId);
+        removeObject(PageAssociation.TYPE_ID, pageAssociationId);
     }
 
     /**
      * Associates content to a given presentation object.
+     * 
+     * Normally, this is used to associate a content id to a template id.
      * 
      * @param sourceId the source id
      * @param destId the dest id
@@ -1305,4 +1318,69 @@ public class Model
             propertyConstraintMap.put(propertyName, propertyValue);
         }
     }
+    
+    /**
+     * Clones a given model object
+     * 
+     * @param objectTypeId the object type id
+     * @param objectId the object id
+     * 
+     * @return the page
+     */
+    public ModelObject clone(String objectTypeId, String objectId)
+    {
+    	return clone(objectTypeId, objectId, null);    	
+    }
+
+    /**
+     * Clones a given model object
+     * 
+     * @param objectTypeId the object type id
+     * @param objectId the object id
+     * @param newId the id to set to the new object
+     * 
+     * @return the page
+     */    
+    public ModelObject clone(String objectTypeId, String objectId, String newObjectId)
+    {
+    	ModelObject newObject = this.newObject(objectTypeId);
+    	
+    	ModelObject object = getObject(objectTypeId, objectId);
+    	
+    	// copy in properties
+    	Map<String, Serializable> properties = object.getProperties();
+    	Iterator propIt = properties.keySet().iterator();
+    	while(propIt.hasNext())
+    	{
+    		String propertyName = (String) propIt.next();
+    		Object propertyValue = properties.get(propertyName);
+    		
+    		newObject.setProperty(propertyName, (String)propertyValue);
+    	}
+    	
+    	// copy in resources
+    	if(object instanceof ResourceProvider)
+    	{
+    		ResourceProvider source = (ResourceProvider) object;
+    		ResourceProvider dest = (ResourceProvider) newObject;
+
+    		Resource[] resources = source.getResources();
+    		for(int i = 0; i < resources.length; i++)
+    		{
+    			String id = resources[i].getId();
+    			
+    			Resource newResource = dest.addResource(id);
+    			
+    			String[] attributeNames = resources[i].getAttributeNames();
+    			for(int x = 0; x < attributeNames.length; x++)
+    			{
+    				String attributeValue = resources[i].getAttribute(attributeNames[i]);
+    				newResource.setAttribute(attributeNames[i], attributeValue);
+    			}
+    		}
+    	}
+    	
+    	return newObject;
+    }
+    
 }

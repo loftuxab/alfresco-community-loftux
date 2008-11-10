@@ -433,7 +433,7 @@ public abstract class AbstractModelObject implements ModelObject
         }
         
         // do the remove
-        Element properties = getDocument().getRootElement().element("properties");
+        Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
         if(properties != null)
         {
             Element el = properties.element(propertyName);

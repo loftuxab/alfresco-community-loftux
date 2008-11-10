@@ -24,12 +24,11 @@
  */
 package org.alfresco.web.site.taglib;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.site.RenderUtil;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderFocus;
+import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
@@ -39,14 +38,12 @@ public class ComponentIncludeTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-        HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();
-        HttpServletResponse response = (HttpServletResponse) getPageContext().getResponse();
-        RequestContext context = getRequestContext();
+    	RenderContext context = getRenderContext();
 
-        String componentId = (String) context.getRenderContext().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);        
+        String componentId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);        
         try
         {
-            RenderUtil.renderRawComponent(context, request, response, componentId);
+            RenderUtil.renderRawComponent(context, RenderFocus.BODY, componentId);
         }
         catch (Throwable t)
         {

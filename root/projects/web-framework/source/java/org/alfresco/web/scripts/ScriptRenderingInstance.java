@@ -25,9 +25,13 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Map;
 
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.site.renderer.RendererContext;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * Wraps the renderer instance and provisions properties about the currently
@@ -42,19 +46,18 @@ import org.alfresco.web.site.renderer.RendererContext;
  */
 public final class ScriptRenderingInstance extends ScriptBase
 {
-    protected RendererContext rendererContext;
-    
+	protected RenderContext renderContext = null;
+	
     /**
      * Instantiates a new script renderer instance.
      * 
-     * @param rendererContext the renderer context
+     * @param context the render context
      */
-    public ScriptRenderingInstance(RendererContext rendererContext)
+    public ScriptRenderingInstance(RenderContext context)
     {
-        super(rendererContext.getRequestContext());
+        super(context);
         
-        // store a reference to the renderer context
-        this.rendererContext = rendererContext;
+        this.renderContext = context;
     }
 
     /* (non-Javadoc)
@@ -65,7 +68,7 @@ public final class ScriptRenderingInstance extends ScriptBase
         if (this.properties == null)
         {
             this.properties = new ScriptableLinkedHashMap<String, Serializable>(
-                    this.rendererContext.getObject().getProperties());
+                    this.renderContext.getObject().getProperties());
         }
         
         return this.properties;
@@ -82,7 +85,7 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     public ScriptModelObject getObject()
     {
-        return new ScriptModelObject(getRequestContext(), this.rendererContext.getObject());
+        return new ScriptModelObject(this.renderContext, this.renderContext.getObject());
     }
     
     /**
@@ -92,7 +95,7 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     public String getId()
     {
-        return this.rendererContext.getId();
+        return this.context.getId();
     }
 
     /**
@@ -102,6 +105,49 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     public String getHtmlId()
     {
-        return (String) rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+        return (String) context.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
     }
+    
+    /**
+     * Returns the names of request parameters
+     * 
+     * @return array of names (String)
+     */
+    public String[] getParameterNames()
+    {
+    	Map map = this.renderContext.getRequest().getParameterMap();    	
+    	String[] names = new String[map.size()];
+    	
+    	int i = 0;
+    	Iterator it = map.keySet().iterator();
+    	while(it.hasNext())
+    	{
+    		names[i] = (String) it.next();
+    		i++;
+    	}
+    	
+    	return names;    	
+    }
+    
+    /**
+     * Returns the value of a request parameter
+     * 
+     * @param name
+     * @return
+     */
+    public Object getParameter(String name)
+    {
+    	return (String) this.renderContext.getRequest().getParameter(name);
+    }
+    
+    /**
+     * Returns a scriptable map of name/value pairs
+     * 
+     * @return
+     */
+    public Scriptable getParameters()
+    {
+    	Map map = this.renderContext.getRequest().getParameterMap();
+        return ScriptHelper.toScriptableMap(map);
+    }      
 }

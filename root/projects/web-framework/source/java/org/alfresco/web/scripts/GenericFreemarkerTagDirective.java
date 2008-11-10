@@ -33,7 +33,7 @@ import javax.servlet.jsp.tagext.Tag;
 
 import org.alfresco.util.ReflectionHelper;
 import org.alfresco.util.StringBuilderWriter;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.framework.render.RenderContext;
 
 import freemarker.core.Environment;
 import freemarker.template.TemplateDirectiveBody;
@@ -54,7 +54,7 @@ public final class GenericFreemarkerTagDirective extends FreemarkerTagSupportDir
     private final String tagName;
     private final String tagClassName;
     
-    public GenericFreemarkerTagDirective(RequestContext context, String tagName, String tagClassName)
+    public GenericFreemarkerTagDirective(RenderContext context, String tagName, String tagClassName)
     {
         super(context);
         this.tagName = tagName;

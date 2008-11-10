@@ -36,15 +36,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.connector.User;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.model.ContentAssociation;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.PageType;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.framework.render.PresentationUtil;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderFocus;
+import org.alfresco.web.framework.render.RenderHelper;
+import org.alfresco.web.framework.render.RenderUtil;
+import org.alfresco.web.framework.render.bean.DefaultRenderContext;
 import org.alfresco.web.site.Content;
 import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.PresentationUtil;
-import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.Timer;
@@ -135,17 +140,17 @@ public class DispatcherServlet extends BaseServlet
         // stamp any theme information onto the request
         ThemeUtil.applyTheme(context, request);
         
+        // create the top render context
+        RenderContext renderContext = RenderHelper.provideRenderContext(context, request, response);        
+        
         // dispatch to render the page
         try
         {
             if (Timer.isTimerEnabled())
                 Timer.start(request, "dispatch");
-            
-            // a quick test to ensure that the context is set up correctly
-            ensureDispatchState(context, request, response);
-            
+
             // dispatch to page processing code
-            dispatch(context, request, response);
+            dispatch(renderContext);
             
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "dispatch");
@@ -209,56 +214,20 @@ public class DispatcherServlet extends BaseServlet
     }
     
     /**
-     * Ensure the currently available context and request state are ready for dispatch.
-     * This method will set the page to a system default if no valid page is requested.
-     */
-    protected void ensureDispatchState(
-            RequestContext context, HttpServletRequest request, HttpServletResponse response)
-    {
-        if (isDebugEnabled())
-        {
-            if (context.getSiteConfiguration() == null)
-            {
-                debug(context, "No site configuration - performing reset");
-                
-                // effectively, do a reset
-                context.setPage(null);
-                context.setCurrentObject(null);
-            }
-        }
-        
-        // if we have absolutely nothing to dispatch to, then check to
-        // see if there is a root-page declared to which we can go
-        if (context.getPage() == null && context.getCurrentObjectId() == null)
-        {
-            // if the site configuration exists...
-            if (context.getSiteConfiguration() != null)
-            {
-                // check if a root page exists to which we can forward
-                Page rootPage = context.getRootPage();
-                if (rootPage != null)
-                {
-                    if (isDebugEnabled())
-                        debug(context, "Set root page as current page");
-                    
-                    context.setPage(rootPage);
-                }            
-            }
-        }
-    }
-    
-    /**
      * Dispatch to the page based on the given context and request.
      * 
      * @throws RequestDispatchException
      */
-    protected void dispatch(RequestContext context, HttpServletRequest request, HttpServletResponse response)
+    protected void dispatch(RenderContext context)
         throws RequestDispatchException
     {
         String formatId = context.getFormatId();
         String objectId = context.getCurrentObjectId();
         String pageId = context.getPageId();
         Page page = context.getPage();
+        
+        HttpServletRequest request = context.getRequest();
+        HttpServletResponse response = context.getResponse();
         
         if (page != null)
         {
@@ -308,7 +277,8 @@ public class DispatcherServlet extends BaseServlet
                                 // set redirect url for use on login page template
                                 context.setValue(ALF_REDIRECT_URL, redirectUrl);
                                 
-                                dispatchPage(context, request, response, loginPage, formatId);
+                                context.setPage(loginPage);
+                                dispatchPage(context, formatId);
                                 return;
                             }
                         }
@@ -338,9 +308,15 @@ public class DispatcherServlet extends BaseServlet
                 debug(context, "No Page or Object determined");
             
             // Go to the getting started page
-            RenderUtil.renderSystemPage(context, request, response, 
-                    WebFrameworkConstants.SYSTEM_PAGE_GETTING_STARTED,
-                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_GETTING_STARTED);
+            try
+            {
+            	RenderUtil.renderSystemPage(context, 
+                    WebFrameworkConstants.SYSTEM_PAGE_GETTING_STARTED);
+            }
+            catch(RendererExecutionException ree)
+            {
+            	throw new RequestDispatchException(ree);
+            }
         }
         else
         {
@@ -357,7 +333,7 @@ public class DispatcherServlet extends BaseServlet
                 // destination page if the destination page is specified
                 
                 // we're dispatching to the current page
-                dispatchPage(context, request, response, context.getPage(), formatId);
+                dispatchPage(context, formatId);
             }
             else
             {
@@ -365,20 +341,17 @@ public class DispatcherServlet extends BaseServlet
                 if (isDebugEnabled())
                     debug(context, "Dispatching to Content Object: " + objectId);
                 
-                dispatchContent(context, request, response, objectId, formatId);
+                dispatchContent(context, objectId, formatId);
             }
         }
     }
 
-    protected void dispatchJsp(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
-            String dispatchPage) throws RequestDispatchException
+    protected void dispatchJsp(DefaultRenderContext renderContext, String dispatchPage) throws RequestDispatchException
     {
-        PresentationUtil.renderJspPage(context, request, response, dispatchPage);
+    	PresentationUtil.renderJspPage(renderContext, dispatchPage);
     }
 
-    protected void dispatchContent(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
+    protected void dispatchContent(RenderContext context,
             String contentId, String formatId) throws RequestDispatchException
     {
     	// get the current object
@@ -394,45 +367,71 @@ public class DispatcherServlet extends BaseServlet
     	{
     		// something wiped out while trying to load the content
     		// we want to display a friendly page to communicate this
-            RenderUtil.renderSystemPage(context, request, response, 
-                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_NOT_LOADED,
-                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_CONTENT_NOT_LOADED);
+    		try
+    		{
+    			RenderUtil.renderSystemPage(context, 
+                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_NOT_LOADED);
+    		}
+    		catch(RendererExecutionException ree)
+    		{
+    			throw new RequestDispatchException(ree);
+    		}
     	}
     	else
     	{    	
-    		// otherwise, we dispatch to the associated content page
+    		// otherwise, we dispatch to the associated content template
 	    	String sourceId = object.getTypeId();
 	    	if (isDebugEnabled())
 	            debug(context, "Content - Object Source Id: " + sourceId);
 	    	
-	    	// Look up which page to use to display this contnet
+	    	// Look up which template to use to display this content
 	    	// this must also take into account the current format
             Map<String, ModelObject> objects = context.getModel().findContentAssociations(sourceId, null, null, null);
             if(objects.size() > 0)
             {
                 ContentAssociation association = (ContentAssociation) objects.values().iterator().next();
-                Page page = association.getPage(context);
-	            if (page != null)
+                TemplateInstance templateInstance = association.getTemplate(context);
+	            if (templateInstance != null)
 	            {
 	                if (isDebugEnabled())
-	                    debug(context, "Content - Dispatching to Page: " + page.getId());
+	                    debug(context, "Content - Dispatching to Template Instance: " + templateInstance.getId());
 	
-	                // dispatch to content page
-	                context.setPage(page);
-	                dispatchPage(context, request, response, context.getPage(), formatId);
+	                // set the current template
+	                context.setTemplate(templateInstance);
+	                
+	                // render content
+	                PresentationUtil.renderContent(context, RenderFocus.BODY);
+	            }
+	            else
+	            {
+	            	// there was an associated content display template instance
+	            	// however, it appears to be missing or unloadable
+		        	try
+		        	{
+		        		RenderUtil.renderSystemPage(context, 
+		                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
+		        	}
+		        	catch(RendererExecutionException ree)
+		        	{
+		        		throw new RequestDispatchException(ree);
+		        	}	            	
 	            }
 	        }
 	        else
 	        {
-	        	// we couldn't find a content association page
-	        	// we should dispatch to a generic system page
+	        	// we couldn't find a content association template
 	        	
 	            // Render a friendly page to show that we could not find
 	        	// a content association to a page
-	            RenderUtil.renderSystemPage(context, request, response, 
-	                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING,
-	                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
-	        	
+	        	try
+	        	{
+	        		RenderUtil.renderSystemPage(context, 
+	                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
+	        	}
+	        	catch(RendererExecutionException ree)
+	        	{
+	        		throw new RequestDispatchException(ree);
+	        	}	        	
 	        }
         }
     }
@@ -443,10 +442,12 @@ public class DispatcherServlet extends BaseServlet
      * @throws RequestDispatchException
      */
     protected void dispatchPage(
-            RequestContext context, HttpServletRequest request, HttpServletResponse response,
-            Page page, String formatId)
+            RenderContext context,
+            String formatId)
         throws RequestDispatchException
     {
+    	Page page = context.getPage();
+    	
         if (isDebugEnabled())
             debug(context, "Template ID: " + page.getTemplateId());
         
@@ -456,16 +457,22 @@ public class DispatcherServlet extends BaseServlet
             if (isDebugEnabled())
                 debug(context, "Rendering Page with template: " + currentTemplate.getId());
             
-            PresentationUtil.renderPage(context, request, response, page.getId());
+           	PresentationUtil.renderPage(context, RenderFocus.BODY);
         }
         else
         {
             if (isDebugEnabled())
                 debug(context, "Unable to render Page - template was not found");
             
-            RenderUtil.renderSystemPage(context, request, response, 
-                    WebFrameworkConstants.SYSTEM_PAGE_UNCONFIGURED,
-                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_UNCONFIGURED);
+            try
+            {
+            	RenderUtil.renderSystemPage(context, 
+                    WebFrameworkConstants.SYSTEM_PAGE_UNCONFIGURED);
+            }
+            catch(RendererExecutionException ree)
+            {
+            	throw new RequestDispatchException(ree);
+            }
         }
     }
     

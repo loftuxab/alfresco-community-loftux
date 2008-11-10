@@ -26,18 +26,10 @@ package org.alfresco.web.framework;
 
 import java.util.Map;
 
-import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorProvider;
-import org.alfresco.connector.exception.RemoteConfigException;
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.cache.ModelObjectCache;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.scripts.RemoteStore;
 import org.alfresco.web.scripts.Store;
-import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.HttpRequestContext;
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThreadLocalRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * @author muzquiano
  * @author kevinr
  */
-public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister implements ConnectorProvider
+public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
 {
     private static Log logger = LogFactory.getLog(RemoteStoreModelObjectPersister.class);
     
@@ -89,19 +81,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     public ModelObject getObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
-        ModelObject obj = null;
-        try
-        {
-            bindConnector();
-            bindRepositoryStoreId(context);
-            obj = super.getObject(context, objectId);
-        }
-        finally
-        {
-            remoteStore.unbind();
-        }
-        
-        return obj;
+        return super.getObject(context, objectId);
     }
     
     /* (non-Javadoc)
@@ -111,19 +91,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     public synchronized boolean saveObject(ModelPersistenceContext context, ModelObject modelObject)
         throws ModelObjectPersisterException    
     {
-        boolean saved = false;
-        try
-        {
-            bindConnector();
-            bindRepositoryStoreId(context);
-            saved = super.saveObject(context, modelObject);
-        }
-        finally
-        {
-            remoteStore.unbind();
-        }
-        
-        return saved;
+        return super.saveObject(context, modelObject);
     }
         
     /* (non-Javadoc)
@@ -133,19 +101,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     public boolean removeObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
-        boolean removed = false;
-        try
-        {
-            bindConnector();
-            bindRepositoryStoreId(context);
-            removed = super.removeObject(context, objectId);
-        }
-        finally
-        {
-            remoteStore.unbind();
-        }
-        
-        return removed;
+    	return super.removeObject(context, objectId);
     }
     
     /* (non-Javadoc)
@@ -155,19 +111,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     public ModelObject newObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
-        ModelObject obj = null;
-        try
-        {
-            bindConnector();
-            bindRepositoryStoreId(context);
-            obj = super.newObject(context, objectId);
-        }
-        finally
-        {
-            remoteStore.unbind();
-        }
-        
-        return obj;
+    	return super.newObject(context, objectId);
     }
         
     /* (non-Javadoc)
@@ -176,19 +120,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     @Override
     public boolean hasObject(ModelPersistenceContext context, String objectId)
     {
-        boolean hasObject = false;
-        try
-        {
-            bindConnector();
-            bindRepositoryStoreId(context);
-            hasObject = super.hasObject(context, objectId);
-        }
-        finally
-        {
-            remoteStore.unbind();
-        }
-        
-        return hasObject;
+    	return super.hasObject(context, objectId);
     }  
     
     /* (non-Javadoc)
@@ -198,61 +130,9 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister i
     public Map<String, ModelObject> getAllObjects(ModelPersistenceContext context)
         throws ModelObjectPersisterException
     {
-        Map<String, ModelObject> objects;
-        try
-        {
-            bindConnector();
-            bindRepositoryStoreId(context);
-            objects = super.getAllObjects(context);
-        }
-        finally
-        {
-            remoteStore.unbind();
-        }
-        
-        return objects;     
-    }
-
-    /**
-     * Bind Repository Store ID override to the current thread
-     */
-    private void bindRepositoryStoreId(ModelPersistenceContext context)
-    {
-        remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
-    }
-
-    /**
-     * Bind Connector Provider to the remote store for the current thread
-     */
-    private void bindConnector()
-    {
-        remoteStore.bindConnectorProvider(this);
+    	return super.getAllObjects(context);
     }
     
-    /**
-     * Implementation of the contract to provide a Connector for our remote store.
-     * This allows lazy providing of the Connector object only if the remote store actually needs
-     * it. Otherwise aquiring the Connector when rarely used is an expensive overhead as most
-     * objects are cached by the persister in which case the remote store isn't actually called.
-     */
-    public Connector provide()
-    {
-        Connector conn = null;
-        RequestContext rc = ThreadLocalRequestContext.getRequestContext();
-        if (rc instanceof HttpRequestContext)
-        {
-            try
-            {
-                conn = FrameworkHelper.getConnector(rc, remoteStore.getEndpoint());
-            }
-            catch (RemoteConfigException rce)
-            {
-                throw new AlfrescoRuntimeException("Failed to bind connector to remote store.", rce);
-            }
-        }
-        return conn;
-    }
-
     /**
      * Gets the cache for a particular model persistence context
      * 

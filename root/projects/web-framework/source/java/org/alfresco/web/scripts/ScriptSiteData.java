@@ -47,7 +47,6 @@ import org.alfresco.web.framework.model.TemplateType;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.mozilla.javascript.Scriptable;
@@ -71,7 +70,7 @@ public final class ScriptSiteData extends ScriptBase
     /**
      * Constructs a new ScriptSite object around the provided request context
      * 
-     * @param context   The RequestContext instance for the current request
+     * @param context   The RenderContext instance for the current request
      */
     public ScriptSiteData(RequestContext context)
     {
@@ -780,19 +779,64 @@ public final class ScriptSiteData extends ScriptBase
         Map<String, ModelObject> pageAssociations = getModel().findPageAssociations(
                 sourceId, null, "child");
 
-        int count = 0;
-        Page[] pages = new Page[pageAssociations.size()];
+        ArrayList<Page> list = new ArrayList<Page>(16);
+        
         Iterator it = pageAssociations.values().iterator();
         while(it.hasNext())
         {
             PageAssociation pageAssociation = (PageAssociation) it.next();
-            pages[count] = pageAssociation.getDestPage(context);
-            count++;
+            Page page = pageAssociation.getDestPage(context);
+            if(page != null)
+            {
+            	list.add(page);
+            }
+            else
+            {
+            	// debug to framework logger
+            	FrameworkHelper.getLogger().debug("Unable to find page object for page association id: " + pageAssociation.getId());
+            }
         }
         
+        Page[] pages = list.toArray(new Page[list.size()]);
         return ScriptHelper.toScriptModelObjectArray(context, pages);
     }    
 
+    /**
+     * Searches for parent pages of the given page.
+     * 
+     * This is a shortcut method - the alternative is to look up associations directly and then look up
+     * their corresponding page objects
+     * 
+     * @param sourceId
+     * @return
+     */
+    public Object[] findParentPages(String pageId)
+    {
+        Map<String, ModelObject> pageAssociations = getModel().findPageAssociations(
+                null, pageId, "child");
+
+        ArrayList<Page> list = new ArrayList<Page>(16);
+        
+        Iterator it = pageAssociations.values().iterator();
+        while(it.hasNext())
+        {
+            PageAssociation pageAssociation = (PageAssociation) it.next();
+            Page page = pageAssociation.getSourcePage(context);
+            if(page != null)
+            {
+            	list.add(page);
+            }
+            else
+            {
+            	// debug to framework logger
+            	FrameworkHelper.getLogger().debug("Unable to find page object for page association id: " + pageAssociation.getId());
+            }
+        }
+        
+        Page[] pages = list.toArray(new Page[list.size()]);
+        return ScriptHelper.toScriptModelObjectArray(context, pages);
+    }    
+    
     /**
      * Searches for ContentAssociation instances within the Web Application that 
      * match the specified constraints.  If a constraint is set to null, 
@@ -870,7 +914,7 @@ public final class ScriptSiteData extends ScriptBase
 
     /**
      * Provides a map of ScriptModelObjects that wrap Template instances.
-     * The map is keyed by Template object id.
+     * The map is keyed by format id.
      * 
      * @param pageId  The value of the "pageId" property of the instance 
      * 
@@ -1032,31 +1076,31 @@ public final class ScriptSiteData extends ScriptBase
         getModel().unassociatePage(sourceId, destId);
     }
 
-    public void associateContent(String contentId, String pageId,
+    public void associateContent(String contentId, String templateId,
             String formatId)
     {
-        getModel().associateContent(contentId, pageId, "content",
+        getModel().associateContent(contentId, templateId, "content",
                 formatId);
     }
 
-    public void unassociateContent(String contentId, String pageId,
+    public void unassociateContent(String contentId, String templateId,
             String formatId)
     {
-        getModel().unassociateContent(contentId, pageId, "content",
+        getModel().unassociateContent(contentId, templateId, "content",
                 formatId);
     }
 
-    public void associateContentType(String contentTypeId, String pageId,
+    public void associateContentType(String contentTypeId, String templateId,
             String formatId)
     {
-        getModel().associateContent(contentTypeId, pageId,
+        getModel().associateContent(contentTypeId, templateId,
                 "content-type", formatId);
     }
 
-    public void unassociateContentType(String contentTypeId, String pageId,
+    public void unassociateContentType(String contentTypeId, String templateId,
             String formatId)
     {
-        getModel().unassociateContent(contentTypeId, pageId,
+        getModel().unassociateContent(contentTypeId, templateId,
                 "content-type", formatId);
     }
 
@@ -1083,7 +1127,7 @@ public final class ScriptSiteData extends ScriptBase
     
     public void logout()
     {
-        AuthenticationUtil.logout(((HttpRequestContext)getRequestContext()).getRequest());
+        AuthenticationUtil.logout(getRequestContext().getRequest());
     }
     
     /**
@@ -1091,7 +1135,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public void reloadUser()
     {
-        HttpServletRequest request = ((HttpRequestContext)context).getRequest();
+        HttpServletRequest request = getRequestContext().getRequest();
         try
         {
             FrameworkHelper.getUserFactory().faultUser(context, request, true);
@@ -1106,7 +1150,7 @@ public final class ScriptSiteData extends ScriptBase
     // returns the credential vault for the current user
     public ScriptCredentialVault getCredentialVault()
     {
-        return new ScriptCredentialVault(getRequestContext());
+        return new ScriptCredentialVault(this.context);
     }
     
     public ScriptModelObject getChrome(String objectId)

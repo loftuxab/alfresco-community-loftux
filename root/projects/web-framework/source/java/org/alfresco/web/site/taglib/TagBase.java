@@ -31,8 +31,9 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTagSupport;
-import javax.servlet.jsp.tagext.TagSupport;
 
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderContextRequest;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.exception.RequestContextException;
@@ -42,17 +43,11 @@ import org.alfresco.web.site.exception.RequestContextException;
  */
 public abstract class TagBase extends BodyTagSupport implements Serializable
 {
-    private PageContext pageContext = null;
+    private PageContext pageContext = null; 
 
     public void setPageContext(PageContext pageContext)
     {
         this.pageContext = pageContext;
-        TagSupport a;
-    }
-
-    public int doEndTag() throws JspException
-    {
-        return EVAL_PAGE;
     }
 
     protected PageContext getPageContext()
@@ -60,6 +55,17 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
         return this.pageContext;
     }
 
+    public int doEndTag() throws JspException
+    {
+        return EVAL_PAGE;
+    }
+        	
+    /**
+     * Gets the request context bound to the current request
+     * 
+     * @return
+     * @throws JspException
+     */
     protected RequestContext getRequestContext()
         throws JspException
     {
@@ -77,6 +83,13 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
         
         return context;
     }
+    
+    protected RenderContext getRenderContext()
+    	throws JspException
+	{
+    	HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();    	
+    	return (RenderContext) request.getAttribute(RenderContextRequest.ATTRIB_RENDER_CONTEXT);
+	}
 
     protected JspWriter getOut()
     {

@@ -2,5 +2,10 @@
 <template-type>
 	<title>Freemarker Template Type</title>
 	<description>A reusable Freemarker Template Type</description>
-	<renderer-type>freemarker</renderer-type>
+
+	<!-- Define the rendering processors for this template type -->	
+    <processor mode="view">
+       <id>freemarker</id>
+    </processor>
+    
 </template-type>

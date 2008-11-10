@@ -25,18 +25,19 @@
 package org.alfresco.web.site;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
-import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
 
 /**
@@ -60,7 +61,6 @@ public interface RequestContext extends Serializable
     public static final String VALUE_IDENTITY_VAULT = "identity_vault";
     
     public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
-    
     
     /**
      * Each request context instance is stamped with a unique id
@@ -91,7 +91,7 @@ public interface RequestContext extends Serializable
     public String getPageTitle();
 
     /**
-     * Sets a custom value onto the request context
+     * Sets a custom attribute onto the request context
      * 
      * @param key
      * @param value
@@ -120,14 +120,6 @@ public interface RequestContext extends Serializable
      * @return true if a custom value exists in the request context
      */
     public boolean hasValue(String key);
-
-    /**
-     * Returns an Iterator over the keys of the custom key/value pairs
-     * stored on this RequestContext instance
-     * 
-     * @return An iterator of String keys
-     */
-    public Iterator<String> keys();
     
     /**
      * Returns the underlying map of the custom key/values pairs
@@ -135,8 +127,31 @@ public interface RequestContext extends Serializable
      * 
      * @return the underlying map of custom key/value pairs.
      */
-    public Map<String, Serializable> map();
+    public Map<String, Serializable> getValuesMap();
+    
+    /**
+     * Retrieves a parameter from the request context
+     * 
+     * @param key
+     * @return
+     */
+    public Serializable getParameter(String key);
 
+    /**
+     * Returns true if a parameter exists in the request context
+     * 
+     * @param key
+     * @return true if a custom value exists in the request context
+     */
+    public boolean hasParameter(String key);
+    
+    /**
+     * Returns a map of parameters
+     * 
+     * @return the underlying map of parameters
+     */
+    public Map<String, Serializable> getParameters();
+    
     /**
      * Sets the currently executing uri.
      */
@@ -194,6 +209,13 @@ public interface RequestContext extends Serializable
      * @return
      */
     public TemplateInstance getTemplate();
+
+    /**
+     * Sets the current executing template.
+     * 
+     * @return
+     */
+    public void setTemplate(TemplateInstance currentTemplate);
     
     /**
      * Returns the id of the currently executing template.
@@ -217,14 +239,14 @@ public interface RequestContext extends Serializable
      * 
      * @return The current object
      */
-    public Content getCurrentObject();
+    public org.alfresco.web.site.Content getCurrentObject();
     
     /**
      * Sets the id of the current object
      * 
      * @param objectId
      */
-    public void setCurrentObject(Content content);
+    public void setCurrentObject(org.alfresco.web.site.Content content);
 
     /**
      * Returns the current format id
@@ -248,6 +270,13 @@ public interface RequestContext extends Serializable
      */
     public Model getModel();
 
+    /**
+     * Sets the current model
+     * 
+     * @param model
+     */
+    public void setModel(Model model);
+    
     /**
      * Returns the configuration for the framework.
      * 
@@ -295,15 +324,6 @@ public interface RequestContext extends Serializable
      * @return
      */
     public CredentialVault getCredentialVault();
-
-    /**
-     * Returns the render context for the currently rendering
-     * object.  The render context is scoped to the currently
-     * rendering object
-     * 
-     * @return The Render Context instance
-     */
-    public RendererContext getRenderContext();
         
     /**
      * Returns the current theme id
@@ -319,11 +339,52 @@ public interface RequestContext extends Serializable
      * @return the current Theme object or null if not set
      */
     public Theme getTheme();
-        
+
     /**
-     * Sets the current model
+     * Returns the components that were bound to this and any of its parent context
+     * during the rendering.  This is useful to determine what other components
+     * are configured on the current page.
      * 
-     * @param model
+     * If no rendering components are set, null will be returned
+     * 
+     * @return  An array of Component objects
      */
-    public void setModel(Model model);
+    public Component[] getRenderingComponents();
+    
+    /**
+     * Indicates that the given component is being rendered as part of
+     * the rendering execution for this and any parent rendering context.
+     *  
+     * @param component The component that is being rendered
+     */
+    public void setRenderingComponent(Component component);
+    
+    /**
+     * Returns the content type of the incoming request
+     * 
+     * @return content type
+     */
+    public String getRequestContentType();
+    
+    /**
+     * Returns the method of the incoming request
+     * 
+     * @return request method
+     */
+    public String getRequestMethod();
+    
+    /**
+     * Returns the body of the incoming POST content
+     * This is applicable for multipart form requests
+     * 
+     * @return content
+     */
+    public org.alfresco.util.Content getRequestContent();
+    
+    /**
+     * Returns the HTTP Servlet Request bound to this request
+     * 
+     * @return
+     */
+    public HttpServletRequest getRequest();
 }

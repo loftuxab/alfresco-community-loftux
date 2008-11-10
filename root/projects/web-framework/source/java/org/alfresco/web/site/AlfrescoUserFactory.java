@@ -132,7 +132,7 @@ public class AlfrescoUserFactory extends UserFactory
             
             // get a connector whose connector session is bound to the current session
             Connector connector = FrameworkHelper.getConnector(
-                    ((HttpRequestContext)context).getRequest().getSession(), currentUserId, ALFRESCO_ENDPOINT_ID);
+                    context.getRequest().getSession(), currentUserId, ALFRESCO_ENDPOINT_ID);
             
             // build the REST URL to retrieve user details
             String uri = "/webframework/content/metadata?user=" + URLEncoder.encode(userId);

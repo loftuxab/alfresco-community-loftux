@@ -26,8 +26,11 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract class for use in building custom page mappers.
@@ -40,6 +43,8 @@ import org.alfresco.web.site.exception.PageMapperException;
  */
 public abstract class AbstractPageMapper implements PageMapper
 {
+	public static Log logger = LogFactory.getLog(PageMapper.class);
+	
     /**
      * Empty constructor - for instantiation via reflection 
      */
@@ -50,8 +55,65 @@ public abstract class AbstractPageMapper implements PageMapper
     /* (non-Javadoc)
      * @see org.alfresco.web.site.PageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
      */
-    public abstract void execute(RequestContext context,
-            ServletRequest request) throws PageMapperException;
+    public void execute(RequestContext context, ServletRequest request)
+    	throws PageMapperException
+	{
+    	executeMapper(context, request);
+    	
+    	// run some additional cleanup logic
+    	postExecute(context, request);
+	}
+               
+    /**
+     * Execute the mapper.
+     * 
+     * @param context the context
+     * @param request the request
+     * 
+     * @throws PageMapperException the page mapper exception
+     */
+    public abstract void executeMapper(RequestContext context,
+    	ServletRequest request) throws PageMapperException;
+    
+    /**
+     * Handles clean up cases
+     * 
+     * @param context the context
+     * @param request the request
+     * 
+     * @throws PageMapperException the page mapper exception
+     */
+    public void postExecute(RequestContext context, ServletRequest request)
+    	throws PageMapperException
+	{
+        if (context.getSiteConfiguration() == null)
+        {
+        	if(logger.isDebugEnabled())
+        		debug(context, "No site configuration - performing reset");
+
+            context.setPage(null);
+            context.setCurrentObject(null);
+        }
+        
+        // if we have absolutely nothing to dispatch to, then check to
+        // see if there is a root-page declared to which we can go
+        if (context.getPage() == null && context.getCurrentObjectId() == null)
+        {
+            // if the site configuration exists...
+            if (context.getSiteConfiguration() != null)
+            {
+                // check if a root page exists to which we can forward
+                Page rootPage = context.getRootPage();
+                if (rootPage != null)
+                {
+                    if (logger.isDebugEnabled())
+                        debug(context, "Set root page as current page");
+                    
+                    context.setPage(rootPage);
+                }            
+            }
+        }	
+	}
     
     /**
      * Gets the page id for a given page type.
@@ -84,4 +146,12 @@ public abstract class AbstractPageMapper implements PageMapper
     {
     	return ContentLoaderUtil.loadContent(context, objectId);
     }    
+    
+    /**
+     * Helper method for debugging
+     */
+    protected void debug(RequestContext context, String value)
+    {
+        logger.debug("PageMapper [" + context.getId() + "] " + value);
+    }   
 }

@@ -12,14 +12,9 @@ public class URLUtil
      */
     public static String browser(RequestContext context, String relativeUrl)
     {
-        if (context != null && context instanceof HttpRequestContext)
-        {
-            HttpServletRequest request = ((HttpRequestContext) context).getRequest();
-            return browser(request, relativeUrl);
-        }
-        return null;
+        return browser(context.getRequest(), relativeUrl);
     }
-
+    
     public static String browser(HttpServletRequest request, String relativeUrl)
     {
         if (relativeUrl == null)

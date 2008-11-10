@@ -1,3 +1,3 @@
 <div id="${htmlid}">
-<@component/>
+<@regionInclude/>
 </div>

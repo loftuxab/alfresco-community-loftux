@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,15 +33,14 @@ import java.util.Map;
 import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
 import org.alfresco.i18n.I18NUtil;
+import org.alfresco.web.framework.exception.RendererExecutionException;
+import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.HttpRequestContext;
-import org.alfresco.web.site.RenderUtil;
-import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
@@ -63,6 +63,9 @@ public final class ProcessorModelHelper
     public static final String MODEL_DESCRIPTION = "description";
     public static final String MODEL_TITLE = "title";
     public static final String MODEL_ID = "id";
+    public static final String MODEL_FORM = "form";
+    public static final String MODEL_FORMDATA = "formdata";
+    public static final String MODEL_APP = "app";
     public static final String PROP_HTMLID = "htmlid";
     
     /**
@@ -97,24 +100,24 @@ public final class ProcessorModelHelper
     /**
      * Populates the common model for all processors
      * 
-     * @param rendererContext   current context
+     * @param context   render context
      * @param model     to populate
      */
-    private static void populateModel(RendererContext rendererContext, Map<String, Object> model)
+    private static void populateModel(RenderContext context, Map<String, Object> model)
     {
-        RequestContext context = rendererContext.getRequestContext();
-        
-        // information about the current page being rendererd
+        // information about the current page being rendered
         if (context.getPage() != null)
         {
             // "page" model object
             Page page = context.getPage();
             Map<String, Object> pageModel = new HashMap<String, Object>(8, 1.0f);
-            if (context instanceof HttpRequestContext)
+            
+            URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
+            if(urlHelper != null)
             {
-                URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
-                pageModel.put(MODEL_URL, urlHelper);
+            	pageModel.put(MODEL_URL, urlHelper);
             }
+
             pageModel.put(MODEL_ID, page.getId());
             pageModel.put(MODEL_TITLE, page.getTitle());
             pageModel.put(MODEL_DESCRIPTION, page.getDescription());
@@ -169,8 +172,8 @@ public final class ProcessorModelHelper
         ScriptSiteData scriptSiteData = new ScriptSiteData(context); 
         model.put(MODEL_SITEDATA, scriptSiteData);
         
-        ScriptRequestContext scriptRequestContext = new ScriptRequestContext(context);
-        model.put(MODEL_CONTEXT, scriptRequestContext);
+        ScriptRenderContext scriptRenderContext = new ScriptRenderContext(context);
+        model.put(MODEL_CONTEXT, scriptRenderContext);
         
         if (context.getCurrentObject() != null)
         {
@@ -178,9 +181,15 @@ public final class ProcessorModelHelper
             model.put(MODEL_CONTENT, scriptContent);
         }
         
-        ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(rendererContext);
+        ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(context);
         model.put(MODEL_INSTANCE, scriptRenderer);
         
+        
+        // add in the application reference
+        ScriptWebApplication scriptWebApplication = new ScriptWebApplication(context);
+        model.put(MODEL_APP, scriptWebApplication);
+        
+        // add in the user
         if (context.getUser() != null)
         {
             ScriptUser scriptUser = new ScriptUser(context, context.getUser());
@@ -192,23 +201,37 @@ public final class ProcessorModelHelper
         // in either case, the configuration is set up ahead of time
         // our job here is to make sure that freemarker has everything
         // it needs for the component or template to process
-        if (rendererContext != null)
+        if (context != null)
         {
-            String htmlBindingId = (String) rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+            String htmlBindingId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
             if (htmlBindingId != null && htmlBindingId.length() != 0)
             {
                 model.put(PROP_HTMLID, htmlBindingId);
             }
         }
+
+        // if we're rendering a component, then provide a "form" object
+        if(context != null && context.getObject() instanceof Component)
+        {
+        	// add form
+        	ScriptForm form = new ScriptForm(context);
+        	model.put(MODEL_FORM, form);
+        	
+        	if("POST".equalsIgnoreCase(context.getRequestMethod()))
+        	{
+            	ScriptFormData formData = new ScriptFormData(context);
+            	model.put(MODEL_FORMDATA, formData);
+        	}
+        }        
     }
     
     /**
      * Populate the model for script processor.
      * 
-     * @param rendererContext   current context
+     * @param context   render context
      * @param model     to populate
      */
-    public static void populateScriptModel(RendererContext rendererContext, Map<String, Object> model)
+    public static void populateScriptModel(RenderContext context, Map<String, Object> model)
     {
         if (model == null)
         {
@@ -216,9 +239,9 @@ public final class ProcessorModelHelper
         }
         
         // common population
-        populateModel(rendererContext, model);
+        populateModel(context, model);
         
-        if (rendererContext.getObject() instanceof TemplateInstance)
+        if (context.getObject() instanceof TemplateInstance)
         {
             // add in the config service accessor
             model.put(MODEL_CONFIG, new ScriptConfigModel(FrameworkHelper.getConfigService(), null));
@@ -228,41 +251,54 @@ public final class ProcessorModelHelper
     /**
      * Populate the model for template processor.
      * 
-     * @param rendererContext   current context
+     * @param context   render context
      * @param model     to populate
      */
-    public static void populateTemplateModel(RendererContext rendererContext, Map<String, Object> model)
-        throws RendererExecutionException
+    public static void populateTemplateModel(RenderContext context, Map<String, Object> model)
+        throws RendererExecutionException, UnsupportedEncodingException
     {
         if (model == null)
         {
             throw new IllegalArgumentException("Model is mandatory.");
         }
         
-        RequestContext context = rendererContext.getRequestContext();
-
         // common population
-        populateModel(rendererContext, model);
+        populateModel(context, model);
 
         /**
          * We add in the "url" object if we're processing against a TemplateInstance
          * 
          * If we're processing against a Web Script, it will already be there
          */
-        if (rendererContext.getObject() instanceof TemplateInstance)
+        if (context.getObject() instanceof TemplateInstance)
         {
-            if (context instanceof HttpRequestContext)
+            // provide the URL helper for the template
+            URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
+            if(urlHelper != null)
             {
-                // provide the URL helper for the template
-                URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
-                model.put(MODEL_URL, urlHelper);
+            	model.put(MODEL_URL, urlHelper);
             }
-            
+        	
             // add in the ${head} tag
-            model.put(MODEL_HEAD, RenderUtil.processHeader(rendererContext));
+            model.put(MODEL_HEAD, RenderUtil.renderTemplateHeaderAsString(context));
             
             // add in the config service accessor
             model.put(MODEL_CONFIG, new TemplateConfigModel(FrameworkHelper.getConfigService(), null));
+        }
+        
+        // TODO: adding this in because Components rendered in HEADER focus
+        // need to have access to URL... is this right?
+        if(context.getObject() instanceof Component)
+        {
+        	if(model.get(MODEL_URL) == null)
+        	{
+                // provide the URL helper for the template
+                URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
+                if(urlHelper != null)
+                {
+                	model.put(MODEL_URL, urlHelper);
+                }        		
+        	}
         }
         
         /**
@@ -280,19 +316,20 @@ public final class ProcessorModelHelper
         model.put("region", new RegionFreemarkerTagDirective(context));
         model.put("component", new ComponentFreemarkerTagDirective(context));
         
+        // add in <@resource/> directive
+       	model.put("res", new ResourceFreemarkerTagDirective(context));
+        
         addDirective(context, model, "componentInclude", "org.alfresco.web.site.taglib.ComponentIncludeTag");
+        addDirective(context, model, "regionInclude", "org.alfresco.web.site.taglib.RegionIncludeTag");
         
         // content specific
         addDirective(context, model, "anchor", "org.alfresco.web.site.taglib.ObjectAnchorTag");
         addDirective(context, model, "edit", "org.alfresco.web.site.taglib.ObjectEditTag");
         addDirective(context, model, "print", "org.alfresco.web.site.taglib.ObjectPrintTag");
         addDirective(context, model, "link", "org.alfresco.web.site.taglib.ObjectLinkTag");
-        
-        // temporary: add floating menu
-        //addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");        
     }
     
-    private static void addDirective(RequestContext context, Map<String, Object> model, String name, String className)
+    private static void addDirective(RenderContext context, Map<String, Object> model, String name, String className)
     {
         GenericFreemarkerTagDirective directive = new GenericFreemarkerTagDirective(context, name, className);
         model.put(name, directive);

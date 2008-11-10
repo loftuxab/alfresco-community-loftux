@@ -1,0 +1,41 @@
+<alfresco-config>
+
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="web-framework" class="org.alfresco.web.config.WebFrameworkConfigElementReader"/>
+	  </element-readers>
+   </plug-ins>
+
+	<config evaluator="string-compare" condition="WebFramework">
+
+		<!--  Web Framework Settings -->
+		<web-framework>
+
+			<!-- Web Studio Settings -->
+			<web-studio>
+				<mode>disabled</mode>
+				<location>${contextPath}/proxy/alfresco-web-studio</location>
+			</web-studio>
+
+		</web-framework>
+
+	</config>
+	
+	<config evaluator="string-compare" condition="Remote">
+
+		<remote>
+		
+			<endpoint>
+				<id>alfresco-web-studio</id>
+				<name>Alfresco Web Studio</name>
+				<description>Alfresco Web Studio</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://localhost:8080/surface</endpoint-url>
+				<identity>none</identity>
+			</endpoint>
+		
+		</remote>
+				
+	</config>		
+
+</alfresco-config>

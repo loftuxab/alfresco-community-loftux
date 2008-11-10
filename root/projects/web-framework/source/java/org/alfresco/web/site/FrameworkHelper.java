@@ -59,6 +59,9 @@ public final class FrameworkHelper
     private static final String CONNECTOR_SERVICE_ID = "connector.service";
     private static final String PRESETS_MANAGER_ID = "webframework.presets.manager";
     
+    private static final String FRAMEWORK_TITLE = "Alfresco Surf";
+    private static final String FRAMEWORK_VERSION = "3.0";
+    
     private static Log logger = LogFactory.getLog(FrameworkHelper.class);
     
     private static ApplicationContext applicationContext = null;
@@ -261,7 +264,7 @@ public final class FrameworkHelper
     public static Connector getConnector(RequestContext context, String endpointId)
         throws RemoteConfigException
     {
-        HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+        HttpSession httpSession = context.getRequest().getSession();
         return getConnector(httpSession, context.getUserId(), endpointId);
     }
     
@@ -293,14 +296,14 @@ public final class FrameworkHelper
     
     public static CredentialVault getCredentialVault(RequestContext context, String userId)
     {
-        HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+        HttpSession httpSession = context.getRequest().getSession();
         
         return getCredentialVault(httpSession, userId);
     }
     
     public static ConnectorSession getConnectorSession(RequestContext context, String endpointId)
     {
-        HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+        HttpSession httpSession = context.getRequest().getSession();
         return getConnectorSession(httpSession, endpointId);
     }
 
@@ -313,7 +316,7 @@ public final class FrameworkHelper
     {
         try
         {
-            HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+            HttpSession httpSession = context.getRequest().getSession();
             
             String[] endpointIds = FrameworkHelper.getRemoteConfig().getEndpointIds();
             for (int i = 0; i < endpointIds.length; i++)
@@ -325,5 +328,15 @@ public final class FrameworkHelper
         {
             logger.error("Unable to remove connector sessions", ex);
         }
+    }
+    
+    public static String getFrameworkTitle()
+    {
+    	return FRAMEWORK_TITLE;
+    }
+    
+    public static String getFrameworkVersion()
+    {
+    	return FRAMEWORK_VERSION;
     }
 }

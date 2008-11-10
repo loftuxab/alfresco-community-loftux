@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import java.io.IOException;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -134,16 +136,9 @@ public class RequestUtil
      */
     public static void include(HttpServletRequest request,
             HttpServletResponse response, String dispatchPath)
-            throws ServletException
+            throws ServletException, IOException
     {
-        try
-        {
-            request.getRequestDispatcher(dispatchPath).include(request, response);
-        }
-        catch (Throwable ex)
-        {
-            throw new ServletException(ex);
-        }
+    	request.getRequestDispatcher(dispatchPath).include(request, response);
     }
 
     /**
@@ -160,17 +155,10 @@ public class RequestUtil
      */    
     public static void include(ServletContext context, ServletRequest request,
             ServletResponse response, String dispatchPath)
-            throws ServletException
+            throws ServletException, IOException
     {
-        try
-        {
-            RequestDispatcher disp = context.getRequestDispatcher(dispatchPath);
-            disp.include(request, response);
-        }
-        catch (Throwable ex)
-        {
-            throw new ServletException(ex);
-        }
+        RequestDispatcher disp = context.getRequestDispatcher(dispatchPath);
+        disp.include(request, response);
     }
 
     /**

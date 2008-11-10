@@ -1,10 +1,9 @@
-<%@ page import="org.alfresco.web.framework.model.*"%>
-<%@ page import="org.alfresco.web.site.*" %>
+<%@ page import="org.alfresco.web.framework.render.*"%>
 <%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
-	RequestContext context = RequestUtil.getRequestContext(request);
+	RenderContext context = RenderUtil.getContext(request);
 	
 	int statusCode = context.getCurrentObject().getStatusCode();
 	String statusMessage = context.getCurrentObject().getStatusMessage();
@@ -63,7 +62,10 @@ function toggle(id)
 					PrintWriter pw = new PrintWriter(out);
 
 					Throwable ex = t;
-					ex.fillInStackTrace();
+					if(ex != null)
+					{
+						ex.fillInStackTrace();
+					}
 					while(ex != null)
 					{
 						ex.printStackTrace(pw);
