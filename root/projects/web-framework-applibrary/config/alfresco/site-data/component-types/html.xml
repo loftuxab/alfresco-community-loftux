@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<title>HTML Component</title>
+	
+	<!-- Define UI processors -->
+	<processor mode="view">
+	    <id>html-view</id>
+	</processor>
+	<processor mode="edit">
+	    <id>html-edit</id>
+	</processor>
+	
+</component-type>
