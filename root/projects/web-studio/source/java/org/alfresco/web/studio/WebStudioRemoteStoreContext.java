@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing
+ * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.studio;
 
@@ -44,7 +44,7 @@ public class WebStudioRemoteStoreContext extends WebFrameworkRemoteStoreContext
 	}
 			
 	/* (non-Javadoc)
-	 * @see org.alfresco.web.scripts.RemoteStoreContextProvider#getStoreId()
+	 * @see org.alfresco.web.framework.WebFrameworkRemoteStoreContext#getStoreId()
 	 */
 	public String getStoreId()
 	{
@@ -56,7 +56,7 @@ public class WebStudioRemoteStoreContext extends WebFrameworkRemoteStoreContext
 		{
 			HttpServletRequest request = context.getRequest();
 			
-			// set the storeId
+			// get the storeId
 			storeId = WebStudioUtil.getCurrentStore(request);				
 		}
 		
@@ -69,4 +69,32 @@ public class WebStudioRemoteStoreContext extends WebFrameworkRemoteStoreContext
 		
 		return storeId;
 	}		
+	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.WebFrameworkRemoteStoreContext#getWebappId()
+     */
+    public String getWebappId()
+    {
+        String webappId = null;
+        
+        // retrieve the request context
+        RequestContext context = ThreadLocalRequestContext.getRequestContext();
+        if(context != null)
+        {
+            HttpServletRequest request = context.getRequest();
+            
+            // get the webappId
+            webappId = WebStudioUtil.getCurrentWebapp(request);               
+        }
+        
+        // if we didn't find a webappId on the Web Studio context
+        // then we'll try to draw one from the Web Framework context
+        if(webappId == null)
+        {
+            webappId = super.getWebappId();
+        }
+        
+        return webappId;
+    }
+	
 }
