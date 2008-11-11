@@ -912,11 +912,7 @@
 						</table>				
 					</div>
 					<div id="load-web-site-body" style="display: none">
-						<!--
-						Web Site Name
-						<input type="text" id="AlfrescoWebStudioSandboxTemplate_SearchText" maxlength="256" style="width:200px" class="sandbox-input"/>
-						<input type="button" value="Search" id="AlfrescoWebStudioSandboxTemplate_SearchButton" class="sandbox-button" />
-						-->
+						<br/>
 						<div id="load-web-site-search-results" style="height: 132px; overflow: auto"></div>
 						<input type="button" value="Load" id="AlfrescoWebStudioSandboxTemplate_Load" class="sandbox-button" />
 						<input id="load-web-site-selected" type="hidden"/>

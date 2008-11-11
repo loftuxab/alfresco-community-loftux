@@ -6,8 +6,12 @@ wizard.addElementFormatKeyPair("webproject", "emptyText", "Please select a Web S
 wizard.addElementFormatKeyPair("webproject", "title", "Web Site");
 
 // fetch selection values
-var json = doGetCall("/api/wcm/webproject/list");
+//var json = doGetCall("/api/wcm/webproject/list");
+// NEW METHOD
+var json = doGetCall("/api/wcm/webprojects");
 for(var i = 0; i < json.results.length; i++)
 {
-	wizard.addElementSelectionValue("webproject", json.results[i].name, json.results[i].name);
+	var id = json.results[i].webprojectref;
+	var title = json.results[i].title;
+	wizard.addElementSelectionValue("webproject", id, title);
 }

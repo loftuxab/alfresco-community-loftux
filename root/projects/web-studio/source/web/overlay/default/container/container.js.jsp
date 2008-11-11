@@ -483,12 +483,13 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 {
 	var webSiteName = this.sandboxDialog.ToolCreateWebSiteName.el.value;
 	var webSiteBasedOn = this.sandboxDialog.ToolCreateWebSiteBasedOn.el.value;
-	
-	// TODO: a very basic assumption
-	var webSiteId = webSiteName;
 	var webSiteDescription = webSiteName;
-
-	if(webSiteName && webSiteBasedOn)
+	
+	// TODO: figure a nice, easy DNS name for this web project
+	// We use some voodoo assumptions here...
+	var webSiteId = webSiteName.split(' ').join('');
+	
+	if(webSiteName && webSiteBasedOn && webSiteId)
 	{
 		// call web studio to tell it to create the web project
 		var url = WebStudio.ws.studio("/api/site/create", { id: webSiteId, name: webSiteName, description: webSiteDescription, basedOn: webSiteBasedOn } );
@@ -499,12 +500,12 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 				var data = Json.evaluate(oResponse.responseText);
 					
 				// set up the context
-				WebStudio.context.webProjectId = data.webProjectId;
-				WebStudio.context.sandboxId = data.sandboxId;
-				WebStudio.context.storeId = data.storeId;
+				WebStudio.context.webProjectId = webSiteId;
+				WebStudio.context.sandboxId = webSiteId;
+				WebStudio.context.storeId = webSiteId;
 				
 				// do another call to set the context
-				this.setContext(data.webProjectId, data.sandboxId, data.storeId);
+				//this.setContext(WebStudio.context.webProjectId, WebStudio.context.sandboxId, WebStudio.context.storeId);
 									
 				// refresh the page
 				this.refreshBrowser();
@@ -530,18 +531,21 @@ WebStudio.Application.prototype.webSiteLoadHandler = function(e)
 	{
 		// call over and fetch metadata about this web project
 		// we must determine it's web project id, its staging sandbox id and its store id
-		var url = WebStudio.ws.repo("/api/wcm/webproject", { id: selectedWebSiteId } );
+
+		var webProjectRef = selectedWebSiteId; // dns name
+		var url = WebStudio.ws.repo("/api/wcm/webproject/" + webProjectRef);
 	
 		var callback = {
 	
 			success: (function(oResponse) {
 				
 				var data = Json.evaluate(oResponse.responseText);
+				var webProjectId = data.webprojectref;
+								
+				// TODO: look up sandboxes, here we assume the staging store name
 				
-				// retrieve values
-				var webProjectId = data.id;
-				var sandboxId = data.stagingSandboxId;
-				var storeId = data.stagingStoreId;
+				var sandboxId = data.webprojectref
+				var storeId = data.webprojectref
 				
 				var _onComplete = (function() {
 

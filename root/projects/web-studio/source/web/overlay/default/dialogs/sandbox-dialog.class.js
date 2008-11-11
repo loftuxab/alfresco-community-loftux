@@ -154,8 +154,11 @@ WebStudio.SandboxDialog.prototype.updateCreateWebSiteBasedOn = function()
 WebStudio.SandboxDialog.prototype.updateLoadWebSiteSearchResults = function(text)
 {
 	// populate the web projects
-	var url = WebStudio.ws.repo("/api/wcm/webproject/list" );
+	//var url = WebStudio.ws.repo("/api/wcm/webproject/list" );
 	
+	// NEW METHOD
+	
+	var url = WebStudio.ws.repo("/api/wcm/webprojects" );
 	var callback = {
 	
 		success: (function(oResponse) {
@@ -166,21 +169,13 @@ WebStudio.SandboxDialog.prototype.updateLoadWebSiteSearchResults = function(text
 				return false;
 			}
 			
-			var html = "<table width='100%' border='0' class='sandbox-table'>";
-			html += "<tr><td></td><td><B>Web Site Name</B></td><td><B>Description</B></td></tr>";
+			var html = "<table width='100%' id='loadWebProjectSearchResultsEl'>";
+			html += "<tr><td></td><td nowrap><B>Web Site</B></td><td width='100%'><B>Title</B></td></tr>";
 
-			for (var i = 0; i < data.results.length; i++) 
+			for (var i = 0; i < data.length; i++) 
 			{
-				var id = data.results[i].name;
-				var title = data.results[i].name;
-				
-				/*
-				html += "<tr>";
-				html += "<td><input type=\"checkbox\" onClick=\"javascript:WebStudio.app.sandboxDialog.ToolLoadWebSiteSelectedId.el.value = '" + id + "';\" /></td>";
-				html += "<td>" + id + "</td>";
-				html += "<td>" + title + "</td>";
-				html += "</tr>";
-				*/
+				var id = data[i].webprojectref;
+				var title = data[i].title;
 
 				html += "<tr>";
 				html += "<td><input type=\"radio\" name=\"sandboxSelectionId\" onClick=\"javascript:WebStudio.app.sandboxDialog.ToolLoadWebSiteSelectedId.el.value = '" + id + "';\" /></td>";
@@ -192,7 +187,8 @@ WebStudio.SandboxDialog.prototype.updateLoadWebSiteSearchResults = function(text
 			
 			html + "</table>";
 			
-			this.ToolLoadWebSiteSearchResults.el.setHTML(html);			
+			this.ToolLoadWebSiteSearchResults.el.setHTML(html);
+			$('loadWebProjectSearchResultsEl').addClass('sandbox-table');			
 
 		}).bind(this)
 		,

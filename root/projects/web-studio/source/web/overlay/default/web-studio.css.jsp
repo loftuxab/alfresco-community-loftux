@@ -663,6 +663,11 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
    padding: 10px;
 }
 
+.sandbox-table TD
+{
+	border-spacing:10px;
+}
+
 .sandbox-button
 {
    background-color: #f0f0f0;

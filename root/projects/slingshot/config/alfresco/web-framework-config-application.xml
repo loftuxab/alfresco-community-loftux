@@ -50,7 +50,7 @@
       			<page-instance-id>slingshot-logout</page-instance-id>
       		</page-type>
          </application-defaults>
-			
+         			
 			<!-- object model - override to set default store ID to remote store -->
 			<model-type>
 				<id>chrome</id>
