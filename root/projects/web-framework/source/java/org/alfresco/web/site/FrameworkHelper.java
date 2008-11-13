@@ -88,13 +88,13 @@ public final class FrameworkHelper
      * requests.
      */
     public synchronized static void initFramework(ServletContext servletContext, ApplicationContext context)
-    	throws FrameworkInitializationException
+        throws FrameworkInitializationException
     {
         if (!isInitialized())
         {
-        	// Store the application context
-        	applicationContext = context;
-        	
+            // Store the application context
+            applicationContext = context;
+            
             
             // Get the WebFramework spring bean services
             webFrameworkManager = (WebFrameworkManager)applicationContext.getBean(WEBFRAMEWORK_MANAGER_ID);
@@ -112,7 +112,7 @@ public final class FrameworkHelper
             
             // store the real path to the servlet context
             realPath = servletContext.getRealPath("/");
-            if(realPath != null && realPath.endsWith(java.io.File.separator))
+            if (realPath != null && realPath.endsWith(java.io.File.separator))
             {
                 realPath = realPath.substring(0, realPath.length() - 1);
             }
@@ -204,7 +204,7 @@ public final class FrameworkHelper
     public static String getRealPath(String path)
     {
         String newPath = path;
-        if(realPath != null)
+        if (realPath != null)
         {
             newPath = realPath + path;
             
@@ -222,22 +222,22 @@ public final class FrameworkHelper
     
     public static RemoteConfigElement getRemoteConfig()
     {
-    	return remoteConfig;
+        return remoteConfig;
     }
     
     public static WebFrameworkConfigElement getConfig()
     {
-    	return webFrameworkConfig;
+        return webFrameworkConfig;
     }
     
     public static ConfigService getConfigService()
     {
-    	return configService;
+        return configService;
     }
     
     public static ApplicationContext getApplicationContext()
     {
-    	return applicationContext;
+        return applicationContext;
     }
     
     public static ConnectorService getConnectorService()
@@ -252,7 +252,7 @@ public final class FrameworkHelper
     
     public static EndpointDescriptor getEndpoint(String endpointId)
     {
-    	return getRemoteConfig().getEndpointDescriptor(endpointId);
+        return getRemoteConfig().getEndpointDescriptor(endpointId);
     }
     
     public static Connector getConnector(String endpointId)
@@ -286,7 +286,7 @@ public final class FrameworkHelper
         {
             vault = getConnectorService().getCredentialVault(httpSession, userId);
         }
-        catch(RemoteConfigException rce)
+        catch (RemoteConfigException rce)
         {
             logger.error("Unable to retrieve credential vault for user: " + userId, rce);
         }
@@ -332,11 +332,11 @@ public final class FrameworkHelper
     
     public static String getFrameworkTitle()
     {
-    	return FRAMEWORK_TITLE;
+        return FRAMEWORK_TITLE;
     }
     
     public static String getFrameworkVersion()
     {
-    	return FRAMEWORK_VERSION;
+        return FRAMEWORK_VERSION;
     }
 }

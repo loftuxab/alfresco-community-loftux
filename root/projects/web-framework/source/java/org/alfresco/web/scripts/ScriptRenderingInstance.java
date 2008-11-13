@@ -46,8 +46,8 @@ import org.mozilla.javascript.Scriptable;
  */
 public final class ScriptRenderingInstance extends ScriptBase
 {
-	protected RenderContext renderContext = null;
-	
+    protected RenderContext renderContext = null;
+    
     /**
      * Instantiates a new script renderer instance.
      * 
@@ -115,18 +115,18 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     public String[] getParameterNames()
     {
-    	Map map = this.renderContext.getRequest().getParameterMap();    	
-    	String[] names = new String[map.size()];
-    	
-    	int i = 0;
-    	Iterator it = map.keySet().iterator();
-    	while(it.hasNext())
-    	{
-    		names[i] = (String) it.next();
-    		i++;
-    	}
-    	
-    	return names;    	
+        Map map = this.renderContext.getRequest().getParameterMap();        
+        String[] names = new String[map.size()];
+        
+        int i = 0;
+        Iterator it = map.keySet().iterator();
+        while(it.hasNext())
+        {
+            names[i] = (String) it.next();
+            i++;
+        }
+        
+        return names;        
     }
     
     /**
@@ -137,7 +137,7 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     public Object getParameter(String name)
     {
-    	return (String) this.renderContext.getRequest().getParameter(name);
+        return (String) this.renderContext.getRequest().getParameter(name);
     }
     
     /**
@@ -147,7 +147,7 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     public Scriptable getParameters()
     {
-    	Map map = this.renderContext.getRequest().getParameterMap();
+        Map map = this.renderContext.getRequest().getParameterMap();
         return ScriptHelper.toScriptableMap(map);
     }      
 }

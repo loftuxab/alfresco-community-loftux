@@ -94,7 +94,7 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
                 context = RequestUtil.getRequestContext(request);
             }
         }
-        catch(RequestContextException rce)
+        catch (RequestContextException rce)
         {
             logger.debug("Unable to retrieve the RequestContext instance from the current request");
             logger.debug(rce);

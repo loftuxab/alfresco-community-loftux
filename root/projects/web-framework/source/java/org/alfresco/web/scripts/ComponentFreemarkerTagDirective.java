@@ -70,7 +70,7 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
          * Receive the "componentId" parameter and set it onto the tag
          */
         TemplateModel idValue = (TemplateModel)params.get("componentId");
-        if(idValue != null)
+        if (idValue != null)
         {
             if (idValue instanceof TemplateScalarModel == false)
             {
@@ -84,7 +84,7 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
          * Receive the "chrome" parameter and set it onto the tag
          */
         TemplateModel chromeValue = (TemplateModel)params.get("chrome");
-        if(chromeValue != null)
+        if (chromeValue != null)
         {        
             if (chromeValue instanceof TemplateScalarModel == false)
             {
@@ -118,7 +118,7 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
             String output = executeTag(tag);
             env.getOut().write(output);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new TemplateException("Unable to process tag and commit output", ex, env);
         }

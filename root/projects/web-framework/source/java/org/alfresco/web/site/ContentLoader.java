@@ -38,33 +38,33 @@ import org.alfresco.web.site.exception.ContentLoaderException;
  */
 public interface ContentLoader
 {
-	
-	/**
-	 * Can handle.
-	 * 
-	 * @param objectId the object id
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean canHandle(String objectId);
-	
-	/**
-	 * Load.
-	 * 
-	 * @param context the context
-	 * @param objectId the object id
-	 * 
-	 * @return the content
-	 * 
-	 * @throws ContentLoaderException the content loader exception
-	 */
-	public Content load(RequestContext context, String objectId)
-		throws ContentLoaderException;
-	
-	/**
-	 * Returns the endpoint from which this content loader loads.
-	 * 
-	 * @return The endpoint id
-	 */
-	public String getEndpointId();
+    
+    /**
+     * Can handle.
+     * 
+     * @param objectId the object id
+     * 
+     * @return true, if successful
+     */
+    public boolean canHandle(String objectId);
+    
+    /**
+     * Load.
+     * 
+     * @param context the context
+     * @param objectId the object id
+     * 
+     * @return the content
+     * 
+     * @throws ContentLoaderException the content loader exception
+     */
+    public Content load(RequestContext context, String objectId)
+        throws ContentLoaderException;
+    
+    /**
+     * Returns the endpoint from which this content loader loads.
+     * 
+     * @return The endpoint id
+     */
+    public String getEndpointId();
 }

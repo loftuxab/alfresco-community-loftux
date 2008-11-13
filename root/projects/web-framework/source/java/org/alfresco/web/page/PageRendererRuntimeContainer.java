@@ -71,7 +71,7 @@ public class PageRendererRuntimeContainer extends PresentationContainer
          EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
          if (descriptor != null)
          {
-        	endpoint = descriptor.getEndpointUrl();
+            endpoint = descriptor.getEndpointUrl();
          }
          else
          {

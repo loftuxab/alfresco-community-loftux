@@ -48,8 +48,8 @@ public class WebUtil
      */
     public static Map getQueryStringMap(HttpServletRequest request)
     {
-    	String queryString = request.getQueryString();
-    	return getQueryStringMap(queryString);
+        String queryString = request.getQueryString();
+        return getQueryStringMap(queryString);
     }
 
     /**
@@ -64,7 +64,7 @@ public class WebUtil
      */    
     public static Map getQueryStringMap(String queryString)
     {
-    	return getQueryStringMap(queryString, EncodingUtil.DEFAULT_ENCODING);    	
+        return getQueryStringMap(queryString, EncodingUtil.DEFAULT_ENCODING);        
     }
 
     /**
@@ -94,9 +94,9 @@ public class WebUtil
                     String key = combo.substring(0, c);
                     String value = combo.substring(c + 1, combo.length());
                     
-                    if(encoding != null)
+                    if (encoding != null)
                     {
-                    	value = EncodingUtil.decode(value, encoding);
+                        value = EncodingUtil.decode(value, encoding);
                     }
                     
                     map.put(key, value);
@@ -104,7 +104,7 @@ public class WebUtil
             }
         }
         
-        return map;    	
+        return map;        
     }
 
     /**

@@ -122,38 +122,38 @@ public class WebSiteConfigElement extends GenericConfigElement
                  * If this is one of our defined "merge" nodes,
                  * then allow the children to be merged together
                  */
-                if(isMergeChildElement(ce.getName()))
+                if (isMergeChildElement(ce.getName()))
                 {
                     /**
                      * Find the existing child on the combined object
                      */
-                	int combinedIndex = -1;
-                	ConfigElement combinedChild = null;
-                	for(int c = 0; c < combined.children.size(); c++)
-                	{
-                		ConfigElement _child = (ConfigElement) combined.children.get(c);
-                		if(_child.getName().equals(ce.getName()))
-                		{
-                			combinedChild = _child;
-                			combinedIndex = c;
-                		}
-                	}
-                	
+                    int combinedIndex = -1;
+                    ConfigElement combinedChild = null;
+                    for(int c = 0; c < combined.children.size(); c++)
+                    {
+                        ConfigElement _child = (ConfigElement) combined.children.get(c);
+                        if (_child.getName().equals(ce.getName()))
+                        {
+                            combinedChild = _child;
+                            combinedIndex = c;
+                        }
+                    }
+                    
                     /**
                      * get all of the "merge-node" children and place them into 
                      * the combinedChild children
                      */
-                	ConfigElement newCombinedChild = combinedChild.combine(ce);
-                	
+                    ConfigElement newCombinedChild = combinedChild.combine(ce);
+                    
                     /**
                      * Replace the combined child with the new one
                      */
-                	combined.children.remove(combinedIndex);
-                	combined.children.add(combinedIndex, newCombinedChild);
+                    combined.children.remove(combinedIndex);
+                    combined.children.add(combinedIndex, newCombinedChild);
                 }
                 else
                 {
-                	combined.addChild(ce);
+                    combined.addChild(ce);
                 }
             }
         }

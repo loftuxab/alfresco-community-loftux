@@ -125,7 +125,7 @@ public final class ModelHelper
                 }
                 catch (IllegalAccessException iae)
                 {
-                	throw new AlfrescoRuntimeException("Unable to inspect properties on model object class: " +
+                    throw new AlfrescoRuntimeException("Unable to inspect properties on model object class: " +
                             modelClass.getName());
                 }
             }

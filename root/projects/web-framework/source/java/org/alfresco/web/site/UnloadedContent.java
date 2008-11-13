@@ -35,47 +35,47 @@ import java.util.Map;
  */
 public class UnloadedContent extends AbstractContent 
 {
-	
-	/**
-	 * Instantiates a new unloaded content.
-	 * 
-	 * @param endpointId the endpoint id
-	 * @param id the id
-	 */
-	public UnloadedContent(String endpointId, String id)
-	{
-		super(endpointId, id);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.AbstractContent#isLoaded()
-	 */
-	public boolean isLoaded()
-	{
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getTypeId()
-	 */
-	public String getTypeId()
-	{
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getProperty(java.lang.String)
-	 */
-	public Object getProperty(String propertyName)
-	{
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getProperties()
-	 */
-	public Map<String, Serializable> getProperties()
-	{
-		return null;
-	}	
+    
+    /**
+     * Instantiates a new unloaded content.
+     * 
+     * @param endpointId the endpoint id
+     * @param id the id
+     */
+    public UnloadedContent(String endpointId, String id)
+    {
+        super(endpointId, id);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractContent#isLoaded()
+     */
+    public boolean isLoaded()
+    {
+        return false;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getTypeId()
+     */
+    public String getTypeId()
+    {
+        return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getProperty(java.lang.String)
+     */
+    public Object getProperty(String propertyName)
+    {
+        return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getProperties()
+     */
+    public Map<String, Serializable> getProperties()
+    {
+        return null;
+    }    
 }

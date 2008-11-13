@@ -40,52 +40,52 @@ import org.alfresco.web.site.exception.RequestContextException;
  */
 public interface ResourceResolver 
 {
-	/**
-	 * Returns the download URI for the given resource
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public String getDownloadURI(HttpServletRequest request);
+    /**
+     * Returns the download URI for the given resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getDownloadURI(HttpServletRequest request);
 
-	/**
-	 * Returns the proxied download URI for the given resource
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public String getProxiedDownloadURI(HttpServletRequest request);
-	
-	/**
-	 * Returns the metadata URI for the given resource
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public String getMetadataURI(HttpServletRequest request);
+    /**
+     * Returns the proxied download URI for the given resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getProxiedDownloadURI(HttpServletRequest request);
+    
+    /**
+     * Returns the metadata URI for the given resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getMetadataURI(HttpServletRequest request);
 
-	/**
-	 * Returns the metadata URI for the given resource
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public String getProxiedMetadataURI(HttpServletRequest request);
-	
-	/**
-	 * Retrieves the container-formatted metadata for the 
-	 * current resource
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public String getMetadata(HttpServletRequest request);
-	
-	/**
-	 * Retrieves the raw metadata for the current resource
-	 * 
-	 * @param request
-	 * @return
-	 */
-	public String getRawMetadata(HttpServletRequest request);
+    /**
+     * Returns the metadata URI for the given resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getProxiedMetadataURI(HttpServletRequest request);
+    
+    /**
+     * Retrieves the container-formatted metadata for the 
+     * current resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getMetadata(HttpServletRequest request);
+    
+    /**
+     * Retrieves the raw metadata for the current resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getRawMetadata(HttpServletRequest request);
 }

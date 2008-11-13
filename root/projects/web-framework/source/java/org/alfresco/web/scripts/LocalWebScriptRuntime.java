@@ -59,7 +59,7 @@ public class LocalWebScriptRuntime extends AbstractRuntime
     
     public LocalWebScriptContext getLocalContext()
     {
-    	return context;
+        return context;
     }
     
     /*
@@ -127,6 +127,6 @@ public class LocalWebScriptRuntime extends AbstractRuntime
     
     public void setScriptMethod(String method)
     {
-    	this.method = method;
+        this.method = method;
     }
 }

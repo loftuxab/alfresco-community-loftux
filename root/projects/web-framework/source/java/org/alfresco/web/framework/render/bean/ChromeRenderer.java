@@ -40,26 +40,26 @@ import org.alfresco.web.site.Timer;
  */
 public class ChromeRenderer extends AbstractRenderer
 {
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.Renderer#init()
-	 */
-	public void init()
-		throws RendererInitializationException
-	{
-		super.init();
-		
-		// additional initialization (if necessary)
-	}
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.Renderer#init()
+     */
+    public void init()
+        throws RendererInitializationException
+    {
+        super.init();
+        
+        // additional initialization (if necessary)
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#body(org.alfresco.web.framework.render.RendererContext)
      */
     public void body(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	Chrome chrome = (Chrome) parentContext.getObject();
-    	
-    	// create a new render context (for the chrome)
+        throws RendererExecutionException
+    {
+        Chrome chrome = (Chrome) parentContext.getObject();
+        
+        // create a new render context (for the chrome)
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext, chrome);
         try
@@ -74,10 +74,10 @@ public class ChromeRenderer extends AbstractRenderer
         finally
         {
             // release the render context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "ChromeRenderer-" + chrome.getId());
-        }    	
-	}	
+        }        
+    }    
 }

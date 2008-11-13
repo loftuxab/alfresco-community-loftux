@@ -28,7 +28,7 @@ package org.alfresco.web.framework.exception;
  * @author muzquiano
  */
 public class ComponentRendererExecutionException
-	extends RendererExecutionException
+    extends RendererExecutionException
 {
     public ComponentRendererExecutionException(String message)
     {

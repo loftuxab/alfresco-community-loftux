@@ -36,43 +36,35 @@ import org.alfresco.web.site.RequestContext;
  * Defines a render response context
  * 
  * @author Uzquiano
- *
  */
 public interface RenderContext extends RequestContext 
 {
-	public int SCOPE_ANY = 0;
-	public int SCOPE_RENDERING = 1;
-	public int SCOPE_REQUEST = 2;
-	
-	public RenderMode getRenderMode();
-	public void setRenderMode(RenderMode renderMode);
-		
-	// we do not need to define this method as it is now defined on request context
-	//public HttpServletRequest getRequest();
-	public void setRequest(HttpServletRequest request);
-	
-	public HttpServletResponse getResponse();
-	public void setResponse(HttpServletResponse response);
-	
-	public ModelObject getObject();
-	public void setObject(ModelObject modelObject);
-	
-	public String getRenderId();
-	
-	public void setPassiveMode(boolean passiveMode);
-	public boolean isPassiveMode();
-	
-	/*
-	public Component[] getRenderingComponents();
-	public void setRenderingComponents(Component[] components);
-	*/
-	
-	public RenderContextProvider getProvider();
-	
-	public void release();
-	
+    public int SCOPE_ANY = 0;
+    public int SCOPE_RENDERING = 1;
+    public int SCOPE_REQUEST = 2;
+
+    public RenderMode getRenderMode();
+    public void setRenderMode(RenderMode renderMode);
+
+    public void setRequest(HttpServletRequest request);
+
+    public HttpServletResponse getResponse();
+    public void setResponse(HttpServletResponse response);
+
+    public ModelObject getObject();
+    public void setObject(ModelObject modelObject);
+
+    public String getRenderId();
+
+    public void setPassiveMode(boolean passiveMode);
+    public boolean isPassiveMode();
+
+    public RenderContextProvider getProvider();
+
+    public void release();
+
     public void setValue(String key, Serializable value, int scope);
     public Serializable getValue(String key, int scope);
     public void removeValue(String key, int scope);
-    public boolean hasValue(String key, int scope);	
+    public boolean hasValue(String key, int scope);    
 }

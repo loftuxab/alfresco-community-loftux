@@ -45,226 +45,226 @@ import org.apache.commons.logging.Log;
  */
 public class WrappedRequestContext implements RequestContext
 {
-	private RequestContext context;
-	
-	public WrappedRequestContext(RequestContext context)
-	{
-		this.context = context;
-	}
-	
-	public RequestContext getOriginalContext()
-	{
-		return this.context;
-	}
+    final private RequestContext context;
+    
+    public WrappedRequestContext(RequestContext context)
+    {
+        this.context = context;
+    }
+    
+    public RequestContext getOriginalContext()
+    {
+        return this.context;
+    }
 
     public String getId()
     {
-    	return this.context.getId();
+        return this.context.getId();
     }
     
     public Configuration getSiteConfiguration()
     {
-    	return this.context.getSiteConfiguration();
+        return this.context.getSiteConfiguration();
     }
     
     public String getWebsiteTitle()
     {
-    	return this.context.getWebsiteTitle();
+        return this.context.getWebsiteTitle();
     }
 
     public String getPageTitle()
     {
-    	return this.context.getPageTitle();
+        return this.context.getPageTitle();
     }
 
     public String getUri()
     {
-    	return this.context.getUri();
+        return this.context.getUri();
     }
 
     public void setUri(String uri)
     {
-    	this.context.setUri(uri);
+        this.context.setUri(uri);
     }
 
     public Page getPage()
     {
-    	return this.context.getPage();
+        return this.context.getPage();
     }
 
     public void setPage(Page page)
     {
-    	this.context.setPage(page);
+        this.context.setPage(page);
     }
     
     public String getPageId()
     {
-    	return this.context.getPageId();
+        return this.context.getPageId();
     }
 
     public LinkBuilder getLinkBuilder()
     {
-    	return this.context.getLinkBuilder();
+        return this.context.getLinkBuilder();
     }
     
     public Page getRootPage()
     {
-    	return this.context.getRootPage();
+        return this.context.getRootPage();
     }
 
     public TemplateInstance getTemplate()
     {
-    	return this.context.getTemplate();
+        return this.context.getTemplate();
     }
     
     public void setTemplate(TemplateInstance currentTemplate)
     {
-    	this.context.setTemplate(currentTemplate);
+        this.context.setTemplate(currentTemplate);
     }
     
     public String getTemplateId()
     {
-    	return this.context.getTemplateId();
+        return this.context.getTemplateId();
     }
     
     public String getCurrentObjectId()
     {
-    	return this.context.getCurrentObjectId();
+        return this.context.getCurrentObjectId();
     }
 
     public void setCurrentObject(org.alfresco.web.site.Content content)
     {
-    	this.context.setCurrentObject(content);
+        this.context.setCurrentObject(content);
     }
     
     public org.alfresco.web.site.Content getCurrentObject()
     {
-    	return this.context.getCurrentObject();
+        return this.context.getCurrentObject();
     }
 
     public String getFormatId()
     {
-    	return this.context.getFormatId();
+        return this.context.getFormatId();
     }
 
     public void setFormatId(String formatId)
     {
-    	this.context.setFormatId(formatId);
+        this.context.setFormatId(formatId);
     }
 
     public Model getModel()
     {
-    	return this.context.getModel();
+        return this.context.getModel();
     }
     
     public void setModel(Model model)
     {
-    	this.context.setModel(model);
+        this.context.setModel(model);
     }
     
     public WebFrameworkConfigElement getConfig()
     {
-    	return this.context.getConfig();
+        return this.context.getConfig();
     }
 
     public RemoteConfigElement getRemoteConfig()
     {
-    	return this.context.getRemoteConfig();
+        return this.context.getRemoteConfig();
     }
 
     public Log getLogger()
     { 
-    	return this.context.getLogger();
+        return this.context.getLogger();
     }
 
     public void setUser(User user)
     {
-    	this.context.setUser(user);
+        this.context.setUser(user);
     }
 
     public User getUser()
     {
-    	return this.context.getUser();
+        return this.context.getUser();
     }
     
     public String getUserId()
     {
-    	return this.context.getUserId();
+        return this.context.getUserId();
     }
 
     public CredentialVault getCredentialVault()
     {
-    	return this.context.getCredentialVault();
+        return this.context.getCredentialVault();
     }
     
     public String getThemeId()
     {
-    	return this.context.getThemeId();
+        return this.context.getThemeId();
     }
     
     public void setThemeId(String themeId)
     {
-    	this.context.setThemeId(themeId);
+        this.context.setThemeId(themeId);
     }
     
     public Theme getTheme()
     {
-    	return this.context.getTheme();
+        return this.context.getTheme();
     }
     
     public String getRequestContentType()
     {
-    	return this.context.getRequestContentType();
+        return this.context.getRequestContentType();
     }
     
     public String getRequestMethod()
     {
-    	return this.context.getRequestMethod();
+        return this.context.getRequestMethod();
     }
     
     public org.alfresco.util.Content getRequestContent()
     {
-    	return this.context.getRequestContent();
+        return this.context.getRequestContent();
     }   
     
     public void setValue(String key, Serializable value)
     {
-    	this.context.setValue(key, value);
+        this.context.setValue(key, value);
     }
 
     public Serializable getValue(String key)
     {
-    	return this.context.getValue(key);
+        return this.context.getValue(key);
     }
 
     public void removeValue(String key)
     {
-    	this.context.removeValue(key);
+        this.context.removeValue(key);
     }
     
     public boolean hasValue(String key)
     {
-    	return this.context.hasValue(key);
+        return this.context.hasValue(key);
     }
     
     public Map<String, Serializable> getValuesMap()
     {
-    	return this.context.getValuesMap();
+        return this.context.getValuesMap();
     }
     
     public Serializable getParameter(String key)
     {
-    	return this.context.getParameter(key);
+        return this.context.getParameter(key);
     }
 
     public boolean hasParameter(String key)
     {
-    	return this.context.hasParameter(key);
+        return this.context.hasParameter(key);
     }
     
     public Map<String, Serializable> getParameters()
     {
-    	return this.context.getParameters();
+        return this.context.getParameters();
     }
     
     /* (non-Javadoc)
@@ -272,7 +272,7 @@ public class WrappedRequestContext implements RequestContext
      */
     public Component[] getRenderingComponents()
     {
-    	return this.context.getRenderingComponents();
+        return this.context.getRenderingComponents();
     }
     
     /* (non-Javadoc)
@@ -280,7 +280,7 @@ public class WrappedRequestContext implements RequestContext
      */
     public void setRenderingComponent(Component component)
     {
-    	this.context.setRenderingComponent(component);        
+        this.context.setRenderingComponent(component);        
     }
     
     /* (non-Javadoc)
@@ -288,7 +288,7 @@ public class WrappedRequestContext implements RequestContext
      */
     public HttpServletRequest getRequest()
     {
-    	return this.context.getRequest();
+        return this.context.getRequest();
     }
     
         
@@ -296,5 +296,5 @@ public class WrappedRequestContext implements RequestContext
     public String toString()
     {
         return "Wrapped" + this.context.toString();
-    }	
+    }    
 }

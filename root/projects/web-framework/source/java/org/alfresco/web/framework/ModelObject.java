@@ -41,11 +41,11 @@ public interface ModelObject extends Serializable
      */
     public ModelPersisterInfo getKey();
     
-	/**
-	 * Returns the id of the model object.
-	 * 
-	 * @return The id
-	 */
+    /**
+     * Returns the id of the model object.
+     * 
+     * @return The id
+     */
     public String getId();
     
     /**

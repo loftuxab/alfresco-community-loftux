@@ -39,9 +39,9 @@ import org.alfresco.web.framework.render.RenderContext;
  */
 public final class ScriptForm extends ScriptBase
 {
-	protected Map<String, FormBinding> bindings;
-	protected RenderContext renderContext;
-		
+    protected Map<String, FormBinding> bindings;
+    protected RenderContext renderContext;
+        
     /**
      * Instantiates a new script form.
      * 
@@ -49,10 +49,10 @@ public final class ScriptForm extends ScriptBase
      */
     public ScriptForm(RenderContext context)
     {
-    	super(context);
-    	
-    	this.renderContext = context;    	
-    	this.bindings = new HashMap<String, FormBinding>(16, 1.0f);
+        super(context);
+        
+        this.renderContext = context;        
+        this.bindings = new HashMap<String, FormBinding>(16, 1.0f);
     }
 
     /* (non-Javadoc)
@@ -60,7 +60,7 @@ public final class ScriptForm extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-    	return null;
+        return null;
     }
     
     // --------------------------------------------------------------
@@ -76,7 +76,7 @@ public final class ScriptForm extends ScriptBase
      */
     public void bind(String title, Object value)
     {
-    	bind(title, value, null);
+        bind(title, value, null);
     }
 
     /**
@@ -90,15 +90,15 @@ public final class ScriptForm extends ScriptBase
      */
     public FormBinding bind(String id, Object value, Object nullValue)
     {
-    	if(value == null)
-    	{
-    		value = nullValue;
-    	}
-    	
-    	FormBinding binding = new FormBinding(id, value);
-    	bindings.put(id, binding);
-    	
-    	return binding;
+        if (value == null)
+        {
+            value = nullValue;
+        }
+        
+        FormBinding binding = new FormBinding(id, value);
+        bindings.put(id, binding);
+        
+        return binding;
     }
     
     /**
@@ -110,7 +110,7 @@ public final class ScriptForm extends ScriptBase
      */
     public FormBinding getBinding(String id)
     {
-    	return (FormBinding) bindings.get(id);
+        return (FormBinding) bindings.get(id);
     }
     
     /**
@@ -126,10 +126,10 @@ public final class ScriptForm extends ScriptBase
         Iterator it = bindings.keySet().iterator();
         while(it.hasNext())
         {
-        	String key = (String) it.next();
-        	FormBinding binding = (FormBinding) bindings.get(key);
-        	array[i] = binding;
-        	i++;
+            String key = (String) it.next();
+            FormBinding binding = (FormBinding) bindings.get(key);
+            array[i] = binding;
+            i++;
         }
 
         return array;
@@ -142,75 +142,75 @@ public final class ScriptForm extends ScriptBase
      */
     public String[] getBindingIds()
     {
-    	return bindings.keySet().toArray(new String[bindings.keySet().size()]);
+        return bindings.keySet().toArray(new String[bindings.keySet().size()]);
     }    
 
     public class FormBinding implements Serializable
     {
-	    private String id;   	
-	    private Object value;
-    	
-    	/**
-	     * Instantiates a new form binding.
-	     * 
-	     * @param id the id
-	     */
-	    public FormBinding(String id)
-    	{
-    		this.id = id;
-    	}
-    	
-    	/**
-	     * Instantiates a new form binding.
-	     * 
-	     * @param id the id
-	     * @param value the value
-	     */
-	    public FormBinding(String id, Object value)
-    	{
-    		this(id);
+        private String id;       
+        private Object value;
+        
+        /**
+         * Instantiates a new form binding.
+         * 
+         * @param id the id
+         */
+        public FormBinding(String id)
+        {
+            this.id = id;
+        }
+        
+        /**
+         * Instantiates a new form binding.
+         * 
+         * @param id the id
+         * @param value the value
+         */
+        public FormBinding(String id, Object value)
+        {
+            this(id);
 
-    		this.value = value;    		
-    	}
-    	
-    	/**
-	     * Sets the value.
-	     * 
-	     * @param value the new value
-	     */
-	    public void setValue(Object value)
-    	{
-    		this.value = value;
-    	}
-	    
-	    public Object getValue()
-	    {
-	    	return this.value;
-	    }
-	    
-	    public String getId()
-	    {
-	    	return ScriptForm.prefix(renderContext, id);
-	    }	    
+            this.value = value;            
+        }
+        
+        /**
+         * Sets the value.
+         * 
+         * @param value the new value
+         */
+        public void setValue(Object value)
+        {
+            this.value = value;
+        }
+        
+        public Object getValue()
+        {
+            return this.value;
+        }
+        
+        public String getId()
+        {
+            return ScriptForm.prefix(renderContext, id);
+        }        
     }
     
     protected static String getPrefix(RenderContext context)
     {
-    	return "form_" + context.getObject().getId() + "___";
+        return "form_" + context.getObject().getId() + "___";
     }
     
-	protected static String prefix(RenderContext context, String id)
-	{
-		return getPrefix(context) + id;
-	}
-	
-	protected static String unprefix(String prefixedId)
-	{
-		int x = prefixedId.indexOf("___");
-		if(x > -1)
-		{
-			return prefixedId.substring(x+3);
-		}
-		return null;
-	}    
+    protected static String prefix(RenderContext context, String id)
+    {
+        return getPrefix(context) + id;
+    }
+    
+    protected static String unprefix(String prefixedId)
+    {
+        int x = prefixedId.indexOf("___");
+        if (x > -1)
+        {
+            return prefixedId.substring(x+3);
+        }
+        return null;
+    }    
 }

@@ -51,32 +51,32 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public class ComponentRenderer extends AbstractRenderer
 {
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.Renderer#init()
-	 */
-	public void init()
-		throws RendererInitializationException
-	{
-		super.init();
-		
-		// additional initialization (if necessary)
-	}
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.Renderer#init()
+     */
+    public void init()
+        throws RendererInitializationException
+    {
+        super.init();
+        
+        // additional initialization (if necessary)
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#header(org.alfresco.web.framework.render.RenderContext)
      */
     public void header(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	super.header(parentContext);
-    	
-    	Component component = (Component) parentContext.getObject();
+        throws RendererExecutionException
+    {
+        super.header(parentContext);
+        
+        Component component = (Component) parentContext.getObject();
 
         // values from the render context
-    	String componentId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
-    	String componentChromeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_CHROME_ID);
-    	    	
-    	// create a new render context (for the chrome)
+        String componentId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
+        String componentChromeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_CHROME_ID);
+                
+        // create a new render context (for the chrome)
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext);
         try
@@ -85,9 +85,9 @@ public class ComponentRenderer extends AbstractRenderer
             if (Timer.isTimerEnabled())
                 Timer.start(context, "ComponentRenderer-Header-" + component.getId());
 
-        	// call thru to renderRawComponent
-        	// this is what the component chrome does anyway
-        	RenderUtil.renderRawComponent(context, RenderFocus.HEADER, componentId);
+            // call thru to renderRawComponent
+            // this is what the component chrome does anyway
+            RenderUtil.renderRawComponent(context, RenderFocus.HEADER, componentId);
         }
         catch (Exception ex)
         {
@@ -96,27 +96,27 @@ public class ComponentRenderer extends AbstractRenderer
         finally
         {
             // release the render context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "ComponentRenderer-Header-" + component.getId());
-        }	
-	}
-	
-	
+        }    
+    }
+    
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#body(org.alfresco.web.framework.render.RendererContext)
      */
     public void body(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	Component component = (Component) parentContext.getObject();
+        throws RendererExecutionException
+    {
+        Component component = (Component) parentContext.getObject();
 
         // values from the render context
-    	String componentId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
-    	String componentChromeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_CHROME_ID);
-    	    	
-    	// create a new render context (for the chrome)
+        String componentId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
+        String componentChromeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_CHROME_ID);
+                
+        // create a new render context (for the chrome)
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext);
         try
@@ -126,23 +126,23 @@ public class ComponentRenderer extends AbstractRenderer
                 Timer.start(context, "ComponentRenderer-Body-" + component.getId());
 
             // fetch the appropriate chrome instance
-            Chrome chrome = RenderUtil.determineComponentChrome(context, component, componentChromeId);
+            Chrome chrome = RenderUtil.getComponentChrome(context, component, componentChromeId);
             
             // if we have chrome, render it
-            if(chrome != null)
+            if (chrome != null)
             {            
-	            // bind the render context to this chrome
-	            RenderHelper.mergeRenderContext(context, chrome);
-	                      
-	            // loads the "chrome renderer" bean and executes it
-	            Renderer renderer = RenderHelper.getRenderer(RendererType.CHROME);
-	            renderer.render(context, RenderFocus.BODY);
+                // bind the render context to this chrome
+                RenderHelper.mergeRenderContext(context, chrome);
+                          
+                // loads the "chrome renderer" bean and executes it
+                Renderer renderer = RenderHelper.getRenderer(RendererType.CHROME);
+                renderer.render(context, RenderFocus.BODY);
             }
             else
             {
-            	// call thru to renderRawComponent
-            	// this is what the component chrome does anyway
-            	RenderUtil.renderRawComponent(context, RenderFocus.BODY, componentId);
+                // call thru to renderRawComponent
+                // this is what the component chrome does anyway
+                RenderUtil.renderRawComponent(context, RenderFocus.BODY, componentId);
             }
             
             // post process call
@@ -155,18 +155,18 @@ public class ComponentRenderer extends AbstractRenderer
         finally
         {
             // release the render context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "ComponentRenderer-Body-" + component.getId());
-        }	
-	}
+        }    
+    }
     
-	/**
-	 * Post-processing of components
-	 */
+    /**
+     * Post-processing of components
+     */
     public void postProcess(RenderContext context)
-    	throws IOException
+        throws IOException
     {
     }
     

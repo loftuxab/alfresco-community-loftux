@@ -57,7 +57,7 @@ public class LocalFileSystemStore implements Store
     
     protected File getRootDir()
     {
-        if(rootDir == null && FrameworkHelper.isInitialized())
+        if (rootDir == null && FrameworkHelper.isInitialized())
         {
             this.rootDir = new File(getBasePath());
         }
@@ -100,7 +100,7 @@ public class LocalFileSystemStore implements Store
      */
     public boolean exists()
     {
-        if(getRootDir() == null)
+        if (getRootDir() == null)
         {
             return true;
         }
@@ -122,7 +122,7 @@ public class LocalFileSystemStore implements Store
     public long lastModified(String documentPath) throws IOException
     {
         File file = new File(toAbsolutePath(documentPath));
-        if(file == null)
+        if (file == null)
         {
             throw new IOException("Unable to locate file to check modification time: " + documentPath);
         }
@@ -136,7 +136,7 @@ public class LocalFileSystemStore implements Store
     public void updateDocument(String documentPath, String content) throws IOException
     {
         File file = new File(toAbsolutePath(documentPath));
-        if(file == null)
+        if (file == null)
         {
             throw new IOException("Unable to locate file for update: " + documentPath);
         }
@@ -153,7 +153,7 @@ public class LocalFileSystemStore implements Store
         throws IOException
     {
         File file = new File(toAbsolutePath(documentPath));
-        if(file == null)
+        if (file == null)
         {
             throw new IOException("Update to remove document failed, file not found: " + documentPath);
         }
@@ -167,7 +167,7 @@ public class LocalFileSystemStore implements Store
     public void createDocument(String documentPath, String content) throws IOException
     {
         // check whether a file already exists
-        if(hasDocument(documentPath))
+        if (hasDocument(documentPath))
         {
             throw new IOException("Unable to create document, already exists: " + documentPath);
         }
@@ -185,7 +185,7 @@ public class LocalFileSystemStore implements Store
     public InputStream getDocument(String documentPath) throws IOException
     {
         File file = new File(toAbsolutePath(documentPath));
-        if(file == null)
+        if (file == null)
         {
             throw new IOException("Unable to get input stream from document: " + documentPath);
         }
@@ -263,7 +263,7 @@ public class LocalFileSystemStore implements Store
     public String getBasePath()
     {
         String fullPath = this.path;
-        if(this.root != null && root.startsWith("."))
+        if (this.root != null && root.startsWith("."))
         {
             // make relative to the web app real path
             fullPath = FrameworkHelper.getRealPath(this.root.substring(1)) + this.path;
@@ -279,13 +279,13 @@ public class LocalFileSystemStore implements Store
     protected void gatherAbsolutePaths(String absPath, List<String> list)
     {
         File file = new File(absPath);
-        if(file.exists())
+        if (file.exists())
         {
-            if(file.isFile())
+            if (file.isFile())
             {
                 list.add(absPath);
             }
-            else if(file.isDirectory())
+            else if (file.isDirectory())
             {
                 // get all of the children
                 String[] childDocumentPaths = file.list();

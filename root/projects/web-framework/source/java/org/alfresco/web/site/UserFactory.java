@@ -91,7 +91,7 @@ public abstract class UserFactory
         User user = null;
         
         // do we want to force a user fault?
-        if(force)
+        if (force)
         {
             // remove the user object from session
             request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
@@ -116,7 +116,7 @@ public abstract class UserFactory
                 else
                 {
                     // unable to load the user
-                    request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);                	
+                    request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);                    
                 }
             }
         }

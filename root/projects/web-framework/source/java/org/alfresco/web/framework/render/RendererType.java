@@ -30,40 +30,23 @@ package org.alfresco.web.framework.render;
  * @author muzquiano
  */
 public enum RendererType 
-{	
-	PAGE("page"),
-	TEMPLATE("template"),
-	CHROME("chrome"),
-	REGION("region"),
-	COMPONENT("component");
-	
-	private final String typeId;
-	
-	private RendererType(String typeId)
-	{
-		this.typeId = typeId;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return this.typeId;
-	}
-	
-	public static RendererType fromString(String typeId)
-	{
-		if("template-instance".equals(typeId))
-		{
-			return RendererType.TEMPLATE;
-		}
-		
-		for(RendererType e: values())
-		{
-			if(e.typeId.equals(typeId))
-			{
-				return e;
-			}
-		}
-		return null;
-	}	
+{    
+    PAGE("page"),
+    TEMPLATE("template"),
+    CHROME("chrome"),
+    REGION("region"),
+    COMPONENT("component");
+    
+    private final String typeId;
+    
+    private RendererType(String typeId)
+    {
+        this.typeId = typeId;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.typeId;
+    }
 }

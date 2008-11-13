@@ -70,7 +70,7 @@ public class Theme extends AbstractModelObject
     public String getPageId(String pageTypeId)
     {
         Element pageTypesEl = document.getRootElement().element("page-types");
-        if(pageTypesEl != null)
+        if (pageTypesEl != null)
         {
             List pageTypes = pageTypesEl.elements("page-type");
             for(int i = 0; i < pageTypes.size(); i++)
@@ -78,7 +78,7 @@ public class Theme extends AbstractModelObject
                 Element pageType = (Element) pageTypes.get(i);
                 
                 String id = pageType.elementText("id");
-                if(id != null && id.equals(pageTypeId))
+                if (id != null && id.equals(pageTypeId))
                 {
                     return pageType.elementText("page-instance-id");
                 }
@@ -97,7 +97,7 @@ public class Theme extends AbstractModelObject
     public void setDefaultPageId(String pageTypeId, String pageId)
     {
         Element pageTypesEl = document.getRootElement().element("page-types");
-        if(pageTypesEl == null)
+        if (pageTypesEl == null)
         {
             pageTypesEl = document.getRootElement().addElement("page-types");
         }
@@ -110,13 +110,13 @@ public class Theme extends AbstractModelObject
             Element pageType = (Element) pageTypes.get(i);
             
             String id = pageType.elementText("id");
-            if(id != null && id.equals(pageTypeId))
+            if (id != null && id.equals(pageTypeId))
             {
                 theElement = pageType;
             }
         }
         
-        if(theElement != null)
+        if (theElement != null)
         {
             theElement = pageTypesEl.addElement("page-type");
         }
@@ -142,7 +142,7 @@ public class Theme extends AbstractModelObject
         String componentId = null;
         
         Element defaults = document.getRootElement().element("defaults");
-        if(defaults != null)
+        if (defaults != null)
         {
             List components = defaults.elements("component");
             for(int i = 0; i < components.size(); i++)
@@ -150,7 +150,7 @@ public class Theme extends AbstractModelObject
                 Element component = (Element) components.get(i);
                 
                 String _regionId = (String) component.elementText("region-id");
-                if(_regionId != null && _regionId.equals(regionId))
+                if (_regionId != null && _regionId.equals(regionId))
                 {
                     componentId = component.elementText("component-id");
                 }
@@ -168,7 +168,7 @@ public class Theme extends AbstractModelObject
     public void removeDefaultComponentId(String regionId)
     {
         Element defaults = document.getRootElement().element("defaults");
-        if(defaults != null)
+        if (defaults != null)
         {
             Element toRemove = null;
             
@@ -178,7 +178,7 @@ public class Theme extends AbstractModelObject
                 Element component = (Element) components.get(i);
                 
                 String _regionId = (String) component.elementText("region-id");
-                if(_regionId != null && _regionId.equals(regionId))
+                if (_regionId != null && _regionId.equals(regionId))
                 {
                     toRemove = component;
                 }
@@ -204,11 +204,11 @@ public class Theme extends AbstractModelObject
         
         // set the component
         Element defaults = document.getRootElement().element("defaults");
-        if(defaults == null)
+        if (defaults == null)
         {
             defaults = document.getRootElement().addElement("defaults");
         }
-        if(defaults != null)
+        if (defaults != null)
         {
             Element component = defaults.addElement("component");
             component.addElement("region-id", regionId);
@@ -229,7 +229,7 @@ public class Theme extends AbstractModelObject
         Component component = null;
         
         String id = getDefaultComponentId(regionId);
-        if(id != null)
+        if (id != null)
         {
             component = context.getModel().getComponent(id);
         }

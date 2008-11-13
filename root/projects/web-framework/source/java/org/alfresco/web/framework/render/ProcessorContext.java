@@ -30,101 +30,100 @@ import java.util.Map;
 /**
  * @author muzquiano
  */
-public class ProcessorContext 
+final public class ProcessorContext 
 {
-	private RenderContext context;
-	private Map<String, ProcessorDescriptor> descriptors = null;
-	
-	public ProcessorContext(RenderContext context)
-	{
-		this.context = context;
-		this.descriptors = new HashMap<String, ProcessorDescriptor>(8, 1.0f);
-	}
-	
-	public RenderContext getRenderContext()
-	{
-		return this.context;
-	}
+    final private RenderContext context;
+    final private Map<String, ProcessorDescriptor> descriptors = new HashMap<String, ProcessorDescriptor>(8, 1.0f);
+    
+    public ProcessorContext(RenderContext context)
+    {
+        this.context = context;
+    }
+    
+    public RenderContext getRenderContext()
+    {
+        return this.context;
+    }
 
-	public ProcessorDescriptor getDescriptor(RenderMode renderMode)
-	{
-		return getDescriptor(renderMode.toString());
-	}
-	
-	public ProcessorDescriptor getDescriptor(String renderMode)
-	{
-		return (ProcessorDescriptor) this.descriptors.get(renderMode);
-	}
-	
-	public void putDescriptor(String renderMode, ProcessorDescriptor descriptor)
-	{
-		this.descriptors.put(renderMode, descriptor);
-	}
-		
-	public void removeDescriptor(String renderMode)
-	{
-		this.descriptors.remove(renderMode);
-	}
-	
-	public ProcessorDescriptor addDescriptor(String renderMode)
-	{
-		ProcessorDescriptor processorDescriptor = new ProcessorDescriptor();
-		putDescriptor(renderMode, processorDescriptor);
-		
-		return processorDescriptor;
-	}
-	
-	public void addDescriptor(String renderMode, Map<String, String> properties)
-	{
-		ProcessorDescriptor descriptor = new ProcessorDescriptor(properties);
-		putDescriptor(renderMode, descriptor);		
-	}
-	
-	public void load(Renderable renderable)
-	{
-		String[] renderModes = renderable.getRenderModes();
-		
-		for(int i = 0; i < renderModes.length; i++)
-		{
-			Map<String, String> properties = renderable.getProcessorProperties(renderModes[i]);
-			ProcessorDescriptor descriptor = new ProcessorDescriptor(properties);
-			
-			putDescriptor(renderModes[i], descriptor);
-		}
-	}
+    public ProcessorDescriptor getDescriptor(RenderMode renderMode)
+    {
+        return getDescriptor(renderMode.toString());
+    }
+    
+    public ProcessorDescriptor getDescriptor(String renderMode)
+    {
+        return (ProcessorDescriptor) this.descriptors.get(renderMode);
+    }
+    
+    public void putDescriptor(String renderMode, ProcessorDescriptor descriptor)
+    {
+        this.descriptors.put(renderMode, descriptor);
+    }
+        
+    public void removeDescriptor(String renderMode)
+    {
+        this.descriptors.remove(renderMode);
+    }
+    
+    public ProcessorDescriptor addDescriptor(String renderMode)
+    {
+        ProcessorDescriptor processorDescriptor = new ProcessorDescriptor();
+        putDescriptor(renderMode, processorDescriptor);
+        
+        return processorDescriptor;
+    }
+    
+    public void addDescriptor(String renderMode, Map<String, String> properties)
+    {
+        ProcessorDescriptor descriptor = new ProcessorDescriptor(properties);
+        putDescriptor(renderMode, descriptor);        
+    }
+    
+    public void load(Renderable renderable)
+    {
+        String[] renderModes = renderable.getRenderModes();
+        
+        for (int i = 0; i < renderModes.length; i++)
+        {
+            Map<String, String> properties = renderable.getProcessorProperties(renderModes[i]);
+            ProcessorDescriptor descriptor = new ProcessorDescriptor(properties);
+            
+            putDescriptor(renderModes[i], descriptor);
+        }
+    }
 
-	public static class ProcessorDescriptor
-	{
-		public Map<String, String> properties = null;
-		
-		public ProcessorDescriptor()
-		{
-			this.properties = new HashMap<String, String>(16, 1.0f);
-		}
-		
-		public ProcessorDescriptor(Map<String, String> properties)
-		{
-			this.properties = properties;
-		}
-		
-		public void put(String key, String value)
-		{
-			this.properties.put(key, value);
-		}
-		
-		public String get(String key)
-		{
-			return (String) this.properties.get(key);
-		}
-		
-		public void remove(String key)
-		{
-			this.properties.remove(key);
-		}
-		
-		public Map<String, String> map()
-		{
-			return this.properties;
-		}
-	}
+    public static class ProcessorDescriptor
+    {
+        public Map<String, String> properties = null;
+        
+        public ProcessorDescriptor()
+        {
+            this.properties = new HashMap<String, String>(4, 1.0f);
+        }
+        
+        public ProcessorDescriptor(Map<String, String> properties)
+        {
+            this.properties = properties;
+        }
+        
+        public void put(String key, String value)
+        {
+            this.properties.put(key, value);
+        }
+        
+        public String get(String key)
+        {
+            return (String) this.properties.get(key);
+        }
+        
+        public void remove(String key)
+        {
+            this.properties.remove(key);
+        }
+        
+        public Map<String, String> map()
+        {
+            return this.properties;
+        }
+    }
 }

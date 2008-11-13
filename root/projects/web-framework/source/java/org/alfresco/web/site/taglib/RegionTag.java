@@ -99,12 +99,12 @@ public class RegionTag extends TagBase
 
     public int doStartTag() throws JspException
     {
-    	RenderContext context = getRenderContext();
+        RenderContext context = getRenderContext();
 
         try
         {
             String chromeId = getChrome();
-            if(!isChromeless())
+            if (!isChromeless())
             {
                 PresentationUtil.renderRegion(context, RenderFocus.BODY, context.getTemplate().getId(), getName(), getScope(), chromeId);
             }

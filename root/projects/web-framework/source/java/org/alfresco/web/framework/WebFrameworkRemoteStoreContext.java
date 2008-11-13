@@ -36,62 +36,56 @@ import org.alfresco.web.site.ThreadLocalRequestContext;
  */
 public class WebFrameworkRemoteStoreContext extends RemoteStoreContextImpl
 {
-	public WebFrameworkRemoteStoreContext()
-	{
-		super();
-	}
-				
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.scripts.RemoteStoreContextProvider#getStoreId()
-	 */
-	public String getStoreId()
-	{
-		String storeId = null;
-		
-		// retrieve the request context
-		RequestContext context = ThreadLocalRequestContext.getRequestContext();
-		if(context != null)
-		{
-			// pull back request-context model store id 
-			storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
-		}
-		
-		return storeId;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.scripts.RemoteStoreContextImpl#getWebappId()
-	 */
-	public String getWebappId()
-	{
-		String webappId = null;
-		
-		// retrieve the request context
-		RequestContext context = ThreadLocalRequestContext.getRequestContext();
-		if(context != null)
-		{
-			// pull back request-context model store id 
-			webappId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_WEBAPPID);
-		}
-		
-		return webappId;
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.scripts.RemoteStoreContext#getStoreBasePath()
-	 */
-	public String getStoreBasePath()
-	{
-	    String basePath = null;
-	    
-	    String webapp = getWebappId();
-	    if(webapp != null)
-	    {
-	        // if we have a WCM webapp in our context, then we should default to a WEB-INF base path
-	        basePath = "/WEB-INF/classes";
-	    }
-	    
-	    return basePath;
-	}		
-		
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.RemoteStoreContextProvider#getStoreId()
+     */
+    public String getStoreId()
+    {
+        String storeId = null;
+        
+        // retrieve the request context
+        RequestContext context = ThreadLocalRequestContext.getRequestContext();
+        if (context != null)
+        {
+            // pull back request-context model store id 
+            storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
+        }
+        
+        return storeId;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.RemoteStoreContextImpl#getWebappId()
+     */
+    public String getWebappId()
+    {
+        String webappId = null;
+        
+        // retrieve the request context
+        RequestContext context = ThreadLocalRequestContext.getRequestContext();
+        if (context != null)
+        {
+            // pull back request-context model store id 
+            webappId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_WEBAPPID);
+        }
+        
+        return webappId;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.RemoteStoreContext#getStoreBasePath()
+     */
+    public String getStoreBasePath()
+    {
+        String basePath = null;
+        
+        String webapp = getWebappId();
+        if (webapp != null)
+        {
+            // if we have a WCM webapp in our context, then we should default to a WEB-INF base path
+            basePath = "/WEB-INF/classes";
+        }
+        
+        return basePath;
+    }
 }

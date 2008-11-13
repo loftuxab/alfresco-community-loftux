@@ -79,7 +79,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getParameterNames()
     {
-    	return this.parameters.keySet().toArray(new String[this.parameters.size()]);        	
+        return this.parameters.keySet().toArray(new String[this.parameters.size()]);            
     }
 
     /*
@@ -89,7 +89,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String getParameter(String name)
     {
-    	return this.parameters.get(name);
+        return this.parameters.get(name);
     }
 
     /*
@@ -99,8 +99,8 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getParameterValues(String name)
     {
-    	return this.parameters.values().toArray(
-    			new String[this.parameters.size()]);
+        return this.parameters.values().toArray(
+                new String[this.parameters.size()]);
     }
 
     /* (non-Javadoc)
@@ -124,7 +124,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getHeaderNames()
     {
-    	return new String[] { };
+        return new String[] { };
     }
 
     /* (non-Javadoc)
@@ -132,7 +132,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String getHeader(String name)
     {
-    	return null;
+        return null;
     }
 
     /* (non-Javadoc)
@@ -140,7 +140,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
      */
     public String[] getHeaderValues(String name)
     {
-    	return null;
+        return null;
     }
 
     /* (non-Javadoc)

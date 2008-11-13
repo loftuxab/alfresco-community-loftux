@@ -59,7 +59,7 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
     {
         return EVAL_PAGE;
     }
-        	
+            
     /**
      * Gets the request context bound to the current request
      * 
@@ -76,7 +76,7 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
         {
             context = RequestUtil.getRequestContext(request);
         }
-        catch(RequestContextException rce)
+        catch (RequestContextException rce)
         {
             throw new JspException("Unable to retrieve request context from request", rce);
         }
@@ -85,11 +85,11 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
     }
     
     protected RenderContext getRenderContext()
-    	throws JspException
-	{
-    	HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();    	
-    	return (RenderContext) request.getAttribute(RenderContextRequest.ATTRIB_RENDER_CONTEXT);
-	}
+        throws JspException
+    {
+        HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();        
+        return (RenderContext) request.getAttribute(RenderContextRequest.ATTRIB_RENDER_CONTEXT);
+    }
 
     protected JspWriter getOut()
     {

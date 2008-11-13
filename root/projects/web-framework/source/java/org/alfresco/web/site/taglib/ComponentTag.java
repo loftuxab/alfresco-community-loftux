@@ -94,7 +94,7 @@ public class ComponentTag extends TagBase
 
             if (!isChromeless)
             {
-            	PresentationUtil.renderComponent(context, RenderFocus.BODY, componentId, chromeId);
+                PresentationUtil.renderComponent(context, RenderFocus.BODY, componentId, chromeId);
             }
             else
             {

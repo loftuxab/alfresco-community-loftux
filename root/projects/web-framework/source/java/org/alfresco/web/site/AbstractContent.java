@@ -34,105 +34,105 @@ import org.apache.commons.logging.LogFactory;
  * @author muzquiano
  */
 public abstract class AbstractContent implements Content
-{	
-	protected static Log logger = LogFactory.getLog(Content.class);
-	protected String id;
-	protected String endpointId;
-	protected long timestamp;
-	protected int statusCode;
-	protected String statusMessage;
-	protected Throwable statusException;
-	
-	/**
-	 * Instantiates a new abstract content.
-	 * 
-	 * @param endpointId the endpoint id
-	 * @param id the id
-	 */
-	public AbstractContent(String endpointId, String id)
-	{
-		this.id = id;
-		this.timestamp = System.currentTimeMillis();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getId()
-	 */
-	public String getId()
-	{
-		return this.id;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getTimestamp()
-	 */
-	public long getTimestamp()
-	{
-		return this.timestamp;
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getEndpointId()
-	 */
-	public String getEndpointId()
-	{
-		return this.endpointId;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#isLoaded()
-	 */
-	public boolean isLoaded()
-	{
-		return true;
-	}
+{    
+    protected static Log logger = LogFactory.getLog(Content.class);
+    protected String id;
+    protected String endpointId;
+    protected long timestamp;
+    protected int statusCode;
+    protected String statusMessage;
+    protected Throwable statusException;
+    
+    /**
+     * Instantiates a new abstract content.
+     * 
+     * @param endpointId the endpoint id
+     * @param id the id
+     */
+    public AbstractContent(String endpointId, String id)
+    {
+        this.id = id;
+        this.timestamp = System.currentTimeMillis();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getId()
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getTimestamp()
+     */
+    public long getTimestamp()
+    {
+        return this.timestamp;
+    }
+        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getEndpointId()
+     */
+    public String getEndpointId()
+    {
+        return this.endpointId;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#isLoaded()
+     */
+    public boolean isLoaded()
+    {
+        return true;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#setStatusCode(int)
-	 */
-	public void setStatusCode(int statusCode)
-	{
-		this.statusCode = statusCode;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getStatusCode()
-	 */
-	public int getStatusCode()
-	{
-		return this.statusCode;
-	}
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#setStatusCode(int)
+     */
+    public void setStatusCode(int statusCode)
+    {
+        this.statusCode = statusCode;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getStatusCode()
+     */
+    public int getStatusCode()
+    {
+        return this.statusCode;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#setStatusMessage(java.lang.String)
-	 */
-	public void setStatusMessage(String statusMessage)
-	{
-		this.statusMessage = statusMessage;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getStatusMessage()
-	 */
-	public String getStatusMessage()
-	{
-		return this.statusMessage;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#setStatusException(java.lang.Throwable)
-	 */
-	public void setStatusException(Throwable statusException)
-	{
-		this.statusException = statusException;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.Content#getStatusException()
-	 */
-	public Throwable getStatusException()
-	{
-		return this.statusException;
-	}
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#setStatusMessage(java.lang.String)
+     */
+    public void setStatusMessage(String statusMessage)
+    {
+        this.statusMessage = statusMessage;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getStatusMessage()
+     */
+    public String getStatusMessage()
+    {
+        return this.statusMessage;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#setStatusException(java.lang.Throwable)
+     */
+    public void setStatusException(Throwable statusException)
+    {
+        this.statusException = statusException;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Content#getStatusException()
+     */
+    public Throwable getStatusException()
+    {
+        return this.statusException;
+    }
+    
 }

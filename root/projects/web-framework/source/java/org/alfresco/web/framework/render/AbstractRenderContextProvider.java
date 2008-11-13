@@ -37,47 +37,46 @@ import org.alfresco.web.site.RequestContext;
  * @author muzquiano
  */
 public abstract class AbstractRenderContextProvider implements RenderContextProvider
-{		
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#merge(org.alfresco.web.framework.render.RenderContext, org.alfresco.web.framework.ModelObject)
-	 */
-	public abstract void merge(RenderContext renderContext, ModelObject modelObject);
+{        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#merge(org.alfresco.web.framework.render.RenderContext, org.alfresco.web.framework.ModelObject)
+     */
+    public abstract void merge(RenderContext renderContext, ModelObject modelObject);
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#release(org.alfresco.web.framework.render.RenderContext)
-	 */
-	public abstract void release(RenderContext renderContext);
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#release(org.alfresco.web.framework.render.RenderContext)
+     */
+    public abstract void release(RenderContext renderContext);
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	public abstract RenderContext provide(RequestContext context,  HttpServletRequest request, HttpServletResponse response);
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    public abstract RenderContext provide(RequestContext context,  HttpServletRequest request, HttpServletResponse response);
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.framework.render.RenderMode)
-	 */
-	public RenderContext provide(RequestContext context,  HttpServletRequest request, HttpServletResponse response, RenderMode renderMode)
-	{
-		RenderContext renderContext = provide(context, request, response);
-		renderContext.setRenderMode(renderMode);
-		
-		return renderContext;		
-	}
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.framework.render.RenderMode)
+     */
+    public RenderContext provide(RequestContext context,  HttpServletRequest request, HttpServletResponse response, RenderMode renderMode)
+    {
+        RenderContext renderContext = provide(context, request, response);
+        renderContext.setRenderMode(renderMode);
+        
+        return renderContext;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.framework.render.RenderContext)
-	 */
-	public abstract RenderContext provide(RenderContext renderContext);
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.framework.render.RenderContext, org.alfresco.web.framework.ModelObject)
-	 */
-	public RenderContext provide(RenderContext renderContext, ModelObject modelObject)
-	{
-		RenderContext newRenderContext = provide(renderContext);		
-		merge(newRenderContext, modelObject);
-		
-		return newRenderContext;
-	}	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.framework.render.RenderContext)
+     */
+    public abstract RenderContext provide(RenderContext renderContext);
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.framework.render.RenderContext, org.alfresco.web.framework.ModelObject)
+     */
+    public RenderContext provide(RenderContext renderContext, ModelObject modelObject)
+    {
+        RenderContext newRenderContext = provide(renderContext);        
+        merge(newRenderContext, modelObject);
+        
+        return newRenderContext;
+    }
 }

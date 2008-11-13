@@ -52,33 +52,33 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public class RegionRenderer extends AbstractRenderer
 {
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.Renderer#init()
-	 */
-	public void init()
-		throws RendererInitializationException
-	{
-		super.init();
-		
-		// additional initialization (if necessary)
-	}
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.Renderer#init()
+     */
+    public void init()
+        throws RendererInitializationException
+    {
+        super.init();
+        
+        // additional initialization (if necessary)
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#header(org.alfresco.web.framework.render.RenderContext)
      */
     public void header(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	super.header(parentContext);
-    	
-    	TemplateInstance template = (TemplateInstance) parentContext.getObject();
+        throws RendererExecutionException
+    {
+        super.header(parentContext);
+        
+        TemplateInstance template = (TemplateInstance) parentContext.getObject();
 
         // values from the render context
         String regionId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
         String regionScopeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
         String regionChromeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_CHROME_ID);
         
-    	// create a new render context (for the chrome)
+        // create a new render context (for the chrome)
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext);
         try
@@ -87,10 +87,10 @@ public class RegionRenderer extends AbstractRenderer
             if (Timer.isTimerEnabled())
                 Timer.start(context, "RegionRenderer-" + template.getId() + "-" + regionId + "-" + regionScopeId);
             
-        	// call thru directly to renderRegionComponents
-        	// this is what the regionInclude tag in the region chrome
-        	// would do anyway
-        	RenderUtil.renderRegionComponents(context);
+            // call thru directly to renderRegionComponents
+            // this is what the regionInclude tag in the region chrome
+            // would do anyway
+            RenderUtil.renderRegionComponents(context);
         }
         catch (Exception ex)
         {
@@ -99,28 +99,28 @@ public class RegionRenderer extends AbstractRenderer
         finally
         {
             // release the render context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "RegionRenderer-" + template.getId() + "-" + regionId + "-" + regionScopeId);
-        }	
-	}	
-	
-	
+        }    
+    }    
+    
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#body(org.alfresco.web.framework.render.RendererContext)
      */
     public void body(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	TemplateInstance template = (TemplateInstance) parentContext.getObject();
+        throws RendererExecutionException
+    {
+        TemplateInstance template = (TemplateInstance) parentContext.getObject();
 
         // values from the render context
         String regionId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
         String regionScopeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
         String regionChromeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_CHROME_ID);
         
-    	// create a new render context (for the chrome)
+        // create a new render context (for the chrome)
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext);
         try
@@ -130,24 +130,24 @@ public class RegionRenderer extends AbstractRenderer
                 Timer.start(context, "RegionRenderer-" + template.getId() + "-" + regionId + "-" + regionScopeId);
             
             // fetch the appropriate chrome instance
-            Chrome chrome = RenderUtil.determineRegionChrome(context, template, regionId, regionChromeId);
+            Chrome chrome = RenderUtil.getRegionChrome(context, template, regionId, regionChromeId);
             
             // if we have chrome, process it
-            if(chrome != null)
+            if (chrome != null)
             {
-	            // bind the render context to this chrome
-	            RenderHelper.mergeRenderContext(context, chrome);
-	                      
-	            // loads the "chrome renderer" bean and executes it
-	            Renderer renderer = RenderHelper.getRenderer(RendererType.CHROME);
-	            renderer.render(context, RenderFocus.BODY);
+                // bind the render context to this chrome
+                RenderHelper.mergeRenderContext(context, chrome);
+                          
+                // loads the "chrome renderer" bean and executes it
+                Renderer renderer = RenderHelper.getRenderer(RendererType.CHROME);
+                renderer.render(context, RenderFocus.BODY);
             }
             else
             {
-            	// call thru directly to renderRegionComponents
-            	// this is what the regionInclude tag in the region chrome
-            	// would do anyway
-            	RenderUtil.renderRegionComponents(context);
+                // call thru directly to renderRegionComponents
+                // this is what the regionInclude tag in the region chrome
+                // would do anyway
+                RenderUtil.renderRegionComponents(context);
             }
             
             // post process call
@@ -160,18 +160,18 @@ public class RegionRenderer extends AbstractRenderer
         finally
         {
             // release the render context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "RegionRenderer-" + template.getId() + "-" + regionId + "-" + regionScopeId);
-        }	
-	}	
+        }    
+    }    
     
-	/**
-	 * Post-processing of regions
-	 */
+    /**
+     * Post-processing of regions
+     */
     public void postProcess(RenderContext context)
-    	throws IOException
+        throws IOException
     {
     }
 }

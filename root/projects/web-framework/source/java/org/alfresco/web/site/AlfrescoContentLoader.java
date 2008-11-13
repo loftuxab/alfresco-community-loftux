@@ -40,89 +40,89 @@ import org.json.JSONObject;
  */
 public class AlfrescoContentLoader extends AbstractContentLoader
 {
-	public AlfrescoContentLoader(String endpointId)
-	{
-		super(endpointId);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.ContentLoader#canHandle(java.lang.String)
-	 */
-	public boolean canHandle(String objectId)
-	{
-		return (objectId.startsWith("workspace://"));
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.ContentLoader#load(java.lang.String)
-	 */
-	public Content load(RequestContext context, String objectId)
-		throws ContentLoaderException
-	{
-		Content content = null;
-		
-		// grab a connector
-		Connector connector = null;
-		try
-		{
-			if(context != null && context.getUserId() != null)
-			{
-				// create a connector that uses these credentials
-				connector = FrameworkHelper.getConnector(context, getEndpointId());
-			}
-			else
-			{
-				// create an unauthenticated connector
-				connector = FrameworkHelper.getConnector(getEndpointId());
-			}
-		}
-		catch(RemoteConfigException rce)
-		{
-			throw new ContentLoaderException("Unable to acquire connector to endpoint id: " + endpointId, rce);
-		}
+    public AlfrescoContentLoader(String endpointId)
+    {
+        super(endpointId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.ContentLoader#canHandle(java.lang.String)
+     */
+    public boolean canHandle(String objectId)
+    {
+        return (objectId.startsWith("workspace://"));
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.ContentLoader#load(java.lang.String)
+     */
+    public Content load(RequestContext context, String objectId)
+        throws ContentLoaderException
+    {
+        Content content = null;
+        
+        // grab a connector
+        Connector connector = null;
+        try
+        {
+            if (context != null && context.getUserId() != null)
+            {
+                // create a connector that uses these credentials
+                connector = FrameworkHelper.getConnector(context, getEndpointId());
+            }
+            else
+            {
+                // create an unauthenticated connector
+                connector = FrameworkHelper.getConnector(getEndpointId());
+            }
+        }
+        catch (RemoteConfigException rce)
+        {
+            throw new ContentLoaderException("Unable to acquire connector to endpoint id: " + endpointId, rce);
+        }
 
-		// fetch the object
-		String uri = "/webframework/content/metadata?id=" + objectId;
-		Response response = connector.call(uri);
-		
-		// if we got back an OK code
-		if(response.getStatus().getCode() == Status.STATUS_OK)
-		{
-			// convert to JSON and create content object				
-			String responseString = response.getResponse();
-			try
-			{
-				JSONObject jsonObject = new JSONObject(responseString);
-				content = new AlfrescoContent(getEndpointId(), objectId, jsonObject);
-			}
-			catch(JSONException je)
-			{
-				// something happened while trying to parse the JSON			
-				content = new UnloadedContent(getEndpointId(), objectId);
-				content.setStatusMessage("Unable to parse JSON for object with id: " + objectId);
-				content.setStatusException(je);
-			}        		
-		}
-		
-		// if content is null, then we had a non-ok code
-		// this is likely because the object doesn't exist or because
-		// we were unauthorized to access it
-		if(content == null)
-		{
-			content = new UnloadedContent(getEndpointId(), objectId);
-		}
-		
-		// populate status items
-		content.setStatusCode(response.getStatus().getCode());
-		if(content.getStatusMessage() == null)
-		{
-			content.setStatusMessage(response.getStatus().getMessage());
-		}
-		if(content.getStatusException() == null)
-		{
-			content.setStatusException(response.getStatus().getException());
-		}
+        // fetch the object
+        String uri = "/webframework/content/metadata?id=" + objectId;
+        Response response = connector.call(uri);
+        
+        // if we got back an OK code
+        if (response.getStatus().getCode() == Status.STATUS_OK)
+        {
+            // convert to JSON and create content object                
+            String responseString = response.getResponse();
+            try
+            {
+                JSONObject jsonObject = new JSONObject(responseString);
+                content = new AlfrescoContent(getEndpointId(), objectId, jsonObject);
+            }
+            catch (JSONException je)
+            {
+                // something happened while trying to parse the JSON            
+                content = new UnloadedContent(getEndpointId(), objectId);
+                content.setStatusMessage("Unable to parse JSON for object with id: " + objectId);
+                content.setStatusException(je);
+            }                
+        }
+        
+        // if content is null, then we had a non-ok code
+        // this is likely because the object doesn't exist or because
+        // we were unauthorized to access it
+        if (content == null)
+        {
+            content = new UnloadedContent(getEndpointId(), objectId);
+        }
+        
+        // populate status items
+        content.setStatusCode(response.getStatus().getCode());
+        if (content.getStatusMessage() == null)
+        {
+            content.setStatusMessage(response.getStatus().getMessage());
+        }
+        if (content.getStatusException() == null)
+        {
+            content.setStatusException(response.getStatus().getException());
+        }
         
         return content;
-	}
+    }
 }

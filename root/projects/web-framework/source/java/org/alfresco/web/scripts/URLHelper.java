@@ -36,7 +36,7 @@ public final class URLHelper implements Serializable
         this.uri = req.getRequestURI();
         String uriNoContext = req.getRequestURI().substring(this.context.length());
         StringTokenizer t = new StringTokenizer(uriNoContext, "/");
-        if(t.hasMoreTokens())
+        if (t.hasMoreTokens())
         {
             this.pageContext = this.context + "/" + t.nextToken();
         }

@@ -54,27 +54,27 @@ import org.alfresco.web.site.RequestUtil;
  * @author muzquiano
  */
 public class FakeJspPageContext
-	extends PageContext
+    extends PageContext
 {
     
     /** The exception. */
     protected Exception exception;
-	
-	/** The values. */
-	protected Map<String, Object> values;
-	
-	/** The context. */
-	protected ServletContext context;
-	
-	/** The request. */
-	protected HttpServletRequest request;
-	
-	/** The response. */
-	protected HttpServletResponse response;
-	
-	/** The out. */
-	protected JspWriter out;
-	
+    
+    /** The values. */
+    protected Map<String, Object> values;
+    
+    /** The context. */
+    protected ServletContext context;
+    
+    /** The request. */
+    protected HttpServletRequest request;
+    
+    /** The response. */
+    protected HttpServletResponse response;
+    
+    /** The out. */
+    protected JspWriter out;
+    
     /**
      * Instantiates a new fake jsp page context
      * 
@@ -85,10 +85,10 @@ public class FakeJspPageContext
      */
     public FakeJspPageContext(ServletContext context, HttpServletRequest request, HttpServletResponse response, JspWriter out)
     {
-    	this.context = context;
-    	this.request = request;
-    	this.response = response;
-    	this.out = out;
+        this.context = context;
+        this.request = request;
+        this.response = response;
+        this.out = out;
     }
 
     /* (non-Javadoc)
@@ -96,7 +96,7 @@ public class FakeJspPageContext
      */
     public ServletRequest getRequest()
     {
-    	return this.request;
+        return this.request;
     }
 
     /* (non-Javadoc)
@@ -104,7 +104,7 @@ public class FakeJspPageContext
      */
     public ServletResponse getResponse()
     {
-    	return this.response;
+        return this.response;
     }
 
     /* (non-Javadoc)
@@ -112,7 +112,7 @@ public class FakeJspPageContext
      */
     public ServletContext getServletContext()
     {
-    	return this.context;
+        return this.context;
     }
 
     /* (non-Javadoc)
@@ -136,7 +136,7 @@ public class FakeJspPageContext
      */
     public HttpSession getSession()
     {
-    	return this.request.getSession();
+        return this.request.getSession();
     }
 
     /* (non-Javadoc)
@@ -164,7 +164,7 @@ public class FakeJspPageContext
      */
     public Object getAttribute(String name)
     {
-    	return findAttribute(name);
+        return findAttribute(name);
     }
 
     /* (non-Javadoc)
@@ -197,7 +197,7 @@ public class FakeJspPageContext
      */
     public void setAttribute(String name, Object obj)
     {
-    	setValue(name, obj);
+        setValue(name, obj);
     }
 
     /* (non-Javadoc)
@@ -242,7 +242,7 @@ public class FakeJspPageContext
                 getServletContext().removeAttribute(name);
                 break;
             case REQUEST_SCOPE:
-            	getRequest().removeAttribute(name);
+                getRequest().removeAttribute(name);
                 break;
             case SESSION_SCOPE:
                 if (getSession() != null)
@@ -266,7 +266,7 @@ public class FakeJspPageContext
             case REQUEST_SCOPE:
                 return getRequest().getAttributeNames();
             case SESSION_SCOPE:
-            	return getSession().getAttributeNames();
+                return getSession().getAttributeNames();
             case PAGE_SCOPE:
                 return getValueNames();
         }
@@ -299,7 +299,7 @@ public class FakeJspPageContext
      */
     public void forward(String url) throws ServletException, IOException
     {
-    	RequestUtil.forward(getServletContext(), getRequest(), getResponse(), url);    	
+        RequestUtil.forward(getServletContext(), getRequest(), getResponse(), url);        
     }
 
     /* (non-Javadoc)
@@ -307,7 +307,7 @@ public class FakeJspPageContext
      */
     public void include(String url) throws ServletException, IOException
     {
-    	include(url, true);
+        include(url, true);
     }
 
     /* (non-Javadoc)
@@ -316,8 +316,8 @@ public class FakeJspPageContext
     public void include(String url, boolean b) throws ServletException,
             IOException
     {
-    	RequestUtil.include(getServletContext(), getRequest(), getResponse(), url);
-    	
+        RequestUtil.include(getServletContext(), getRequest(), getResponse(), url);
+        
         // make sure everything is flushed before doing an include -- important for included JSP files
         flushOut();
     }
@@ -330,7 +330,7 @@ public class FakeJspPageContext
      */
     public void flushOut() throws java.io.IOException
     {
-    	out.flush();
+        out.flush();
     }
 
     /* (non-Javadoc)
@@ -363,7 +363,7 @@ public class FakeJspPageContext
      */
     public void handlePageException(Throwable t)
     {
-    	// TODO?
+        // TODO?
     }
 
     /* (non-Javadoc)
@@ -379,7 +379,7 @@ public class FakeJspPageContext
      */
     public Exception getException()
     {
-    	return exception;
+        return exception;
     }
 
     /* (non-Javadoc)
@@ -411,9 +411,9 @@ public class FakeJspPageContext
      */
     protected Object getValue(String key)
     {
-    	if(values == null)
-    		values = new HashMap<String, Object>();
-    	return values.get(key);
+        if (values == null)
+            values = new HashMap<String, Object>();
+        return values.get(key);
     }
     
     /**
@@ -426,9 +426,9 @@ public class FakeJspPageContext
      */
     protected void setValue(String key, Object value)
     {
-    	if(values == null)
-    		values = new HashMap<String, Object>();
-    	values.put(key, value);
+        if (values == null)
+            values = new HashMap<String, Object>();
+        values.put(key, value);
     }
     
     /**
@@ -439,9 +439,9 @@ public class FakeJspPageContext
      */
     protected void removeValue(String key)
     {
-    	if(values == null)
-    		values = new HashMap<String, Object>();
-    	values.remove(key);
+        if (values == null)
+            values = new HashMap<String, Object>();
+        values.remove(key);
     }
     
     /**
@@ -451,15 +451,15 @@ public class FakeJspPageContext
      */
     protected Enumeration getValueNames()
     {
-    	ArrayList<Object> array = new ArrayList<Object>();
+        ArrayList<Object> array = new ArrayList<Object>();
 
-    	Iterator it = values.keySet().iterator();
-    	while(it.hasNext())
-    	{
-    		array.add(it.next());
-    	}
+        Iterator it = values.keySet().iterator();
+        while(it.hasNext())
+        {
+            array.add(it.next());
+        }
 
-    	return java.util.Collections.enumeration(array);
+        return java.util.Collections.enumeration(array);
     }
 
 

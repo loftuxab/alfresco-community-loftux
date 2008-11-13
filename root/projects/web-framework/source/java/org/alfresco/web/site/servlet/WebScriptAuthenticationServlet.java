@@ -73,20 +73,20 @@ public class WebScriptAuthenticationServlet extends HttpServlet
          }
          else
          {
-        	 // retrieve the endpoint details
-        	 EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
-        	 if(descriptor == null)
-        	 {
-        		 throw new ServletException("Unable to find endpoint for endpoint id: " + endpointId);
-        	 }
-        	 
-        	 // get the endpoint url
-        	 String endpointUrl = descriptor.getEndpointUrl();
-        	 
-        	 // make a direct call to login api to retrieve a ticket for the user credentials
-        	 RemoteClient remote = new RemoteClient(endpointUrl);
-        	 Response response = remote.call("/api/login?u=" + username + "&pw=" + password);
-        	 if (response.getStatus().getCode() == HttpServletResponse.SC_OK)
+             // retrieve the endpoint details
+             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
+             if (descriptor == null)
+             {
+                 throw new ServletException("Unable to find endpoint for endpoint id: " + endpointId);
+             }
+             
+             // get the endpoint url
+             String endpointUrl = descriptor.getEndpointUrl();
+             
+             // make a direct call to login api to retrieve a ticket for the user credentials
+             RemoteClient remote = new RemoteClient(endpointUrl);
+             Response response = remote.call("/api/login?u=" + username + "&pw=" + password);
+             if (response.getStatus().getCode() == HttpServletResponse.SC_OK)
              {
                boolean gotTicket = false;
                String ticketXML = response.getResponse();

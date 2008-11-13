@@ -70,41 +70,41 @@ public final class ScriptWebApplication extends ScriptBase
      * Returns the root web application context
      */
     public String getContext()
-    {    	
-		StringBuilder builder = new StringBuilder(512);
-		
-		// append the path to the application server hosted web application
-		// on the production tier, this will be the correct context
-		HttpServletRequest request = this.context.getRequest();		
-		builder.append(request.getContextPath());
+    {        
+        StringBuilder builder = new StringBuilder(512);
+        
+        // append the path to the application server hosted web application
+        // on the production tier, this will be the correct context
+        HttpServletRequest request = this.context.getRequest();        
+        builder.append(request.getContextPath());
 
-		// on the preview tier, we'll plug in a passthru to the AVM remote store
-		if(FrameworkHelper.getConfig().isWebStudioEnabled())
-		{
-			// assume proxy to alfresco
-			builder.append("/proxy/alfresco");
-			
-			// remote store
-			builder.append("/remotestore/get");
-			
-			// throw down the store id (if applicable)
-	    	String storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
-	    	if(storeId != null)
-	    	{
-	    		builder.append("/s/");
-	    		builder.append(storeId);
-	    	}
-	    	
-	    	// throw down the webapp id (if applicable)
-	    	String webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
-	    	if(webappId != null)
-	    	{
-	    		builder.append("/w/");
-	    		builder.append(webappId);
-	    	}	    	
-		}
-		
-    	return builder.toString();
+        // on the preview tier, we'll plug in a passthru to the AVM remote store
+        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        {
+            // assume proxy to alfresco
+            builder.append("/proxy/alfresco");
+            
+            // remote store
+            builder.append("/remotestore/get");
+            
+            // throw down the store id (if applicable)
+            String storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
+            if (storeId != null)
+            {
+                builder.append("/s/");
+                builder.append(storeId);
+            }
+            
+            // throw down the webapp id (if applicable)
+            String webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
+            if (webappId != null)
+            {
+                builder.append("/w/");
+                builder.append(webappId);
+            }            
+        }
+        
+        return builder.toString();
     }        
     
 }

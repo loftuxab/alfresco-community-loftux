@@ -113,9 +113,9 @@ public final class ProcessorModelHelper
             Map<String, Object> pageModel = new HashMap<String, Object>(8, 1.0f);
             
             URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
-            if(urlHelper != null)
+            if (urlHelper != null)
             {
-            	pageModel.put(MODEL_URL, urlHelper);
+                pageModel.put(MODEL_URL, urlHelper);
             }
 
             pageModel.put(MODEL_ID, page.getId());
@@ -184,8 +184,8 @@ public final class ProcessorModelHelper
         ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(context);
         model.put(MODEL_INSTANCE, scriptRenderer);
         
-        
         // add in the application reference
+        // TODO: can we share an instance of this?
         ScriptWebApplication scriptWebApplication = new ScriptWebApplication(context);
         model.put(MODEL_APP, scriptWebApplication);
         
@@ -211,17 +211,17 @@ public final class ProcessorModelHelper
         }
 
         // if we're rendering a component, then provide a "form" object
-        if(context != null && context.getObject() instanceof Component)
+        if (context != null && context.getObject() instanceof Component)
         {
-        	// add form
-        	ScriptForm form = new ScriptForm(context);
-        	model.put(MODEL_FORM, form);
-        	
-        	if("POST".equalsIgnoreCase(context.getRequestMethod()))
-        	{
-            	ScriptFormData formData = new ScriptFormData(context);
-            	model.put(MODEL_FORMDATA, formData);
-        	}
+            // add form
+            ScriptForm form = new ScriptForm(context);
+            model.put(MODEL_FORM, form);
+            
+            if ("POST".equalsIgnoreCase(context.getRequestMethod()))
+            {
+                ScriptFormData formData = new ScriptFormData(context);
+                model.put(MODEL_FORMDATA, formData);
+            }
         }        
     }
     
@@ -274,11 +274,11 @@ public final class ProcessorModelHelper
         {
             // provide the URL helper for the template
             URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
-            if(urlHelper != null)
+            if (urlHelper != null)
             {
-            	model.put(MODEL_URL, urlHelper);
+                model.put(MODEL_URL, urlHelper);
             }
-        	
+            
             // add in the ${head} tag
             model.put(MODEL_HEAD, RenderUtil.renderTemplateHeaderAsString(context));
             
@@ -288,17 +288,17 @@ public final class ProcessorModelHelper
         
         // TODO: adding this in because Components rendered in HEADER focus
         // need to have access to URL... is this right?
-        if(context.getObject() instanceof Component)
+        if (context.getObject() instanceof Component)
         {
-        	if(model.get(MODEL_URL) == null)
-        	{
+            if (model.get(MODEL_URL) == null)
+            {
                 // provide the URL helper for the template
                 URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
-                if(urlHelper != null)
+                if (urlHelper != null)
                 {
-                	model.put(MODEL_URL, urlHelper);
-                }        		
-        	}
+                    model.put(MODEL_URL, urlHelper);
+                }                
+            }
         }
         
         /**
@@ -317,7 +317,7 @@ public final class ProcessorModelHelper
         model.put("component", new ComponentFreemarkerTagDirective(context));
         
         // add in <@resource/> directive
-       	model.put("res", new ResourceFreemarkerTagDirective(context));
+        model.put("res", new ResourceFreemarkerTagDirective(context));
         
         addDirective(context, model, "componentInclude", "org.alfresco.web.site.taglib.ComponentIncludeTag");
         addDirective(context, model, "regionInclude", "org.alfresco.web.site.taglib.RegionIncludeTag");

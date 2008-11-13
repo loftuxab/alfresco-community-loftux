@@ -39,126 +39,126 @@ import org.json.JSONObject;
  */
 public abstract class AbstractAlfrescoResourceResolver extends AbstractResourceResolver 
 {
-	public AbstractAlfrescoResourceResolver(Resource resource)
-	{
-		super(resource);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadata(HttpServletRequest request)
-	{
-		String metadata = this.getRawMetadata(request);
-		
-		// output
-		String result = null;
-		
-		// convert to JSON to work with it
-		JSONObject source = null;
-		try
-		{
-			source = new JSONObject(metadata);
-			
-			JSONObject dest = new JSONObject();
-			serialize(source, dest, true);
-			
-			result = dest.toString();
-		}
-		catch(JSONException jsonEx)
-		{
-			jsonEx.printStackTrace();
-		}		
-		
-		return result;
-	}	
+    public AbstractAlfrescoResourceResolver(Resource resource)
+    {
+        super(resource);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadata(HttpServletRequest request)
+    {
+        String metadata = this.getRawMetadata(request);
+        
+        // output
+        String result = null;
+        
+        // convert to JSON to work with it
+        JSONObject source = null;
+        try
+        {
+            source = new JSONObject(metadata);
+            
+            JSONObject dest = new JSONObject();
+            serialize(source, dest, true);
+            
+            result = dest.toString();
+        }
+        catch (JSONException jsonEx)
+        {
+            jsonEx.printStackTrace();
+        }        
+        
+        return result;
+    }    
 
-	protected void copy(JSONObject source, JSONObject dest, String name)
-		throws JSONException
-	{
-		copy(source, dest, name, name);
-	}
-	
-	protected void copy(JSONObject source, JSONObject dest, String sourceName, String destName)
-		throws JSONException
-	{
-		if(source.has(sourceName))
-		{
-			Object obj = source.get(sourceName);
-			if(obj != null)
-			{
-				dest.put(destName, obj);
-			}
-		}
-	}
-	
-	protected void serialize(JSONObject source, JSONObject dest, boolean includeChildren)
-		throws JSONException
-	{
-		// core properties
-		copy(source, dest, "nodeRef", "id");
-		copy(source, dest, "name", "title");
-		copy(source, dest, "type");
-		copy(source, dest, "size");
-		copy(source, dest, "url");
-				
-		// construct the path
-		String path = source.get("displayPath") + "/" + source.get("name");
-		dest.put("path", path);
+    protected void copy(JSONObject source, JSONObject dest, String name)
+        throws JSONException
+    {
+        copy(source, dest, name, name);
+    }
+    
+    protected void copy(JSONObject source, JSONObject dest, String sourceName, String destName)
+        throws JSONException
+    {
+        if (source.has(sourceName))
+        {
+            Object obj = source.get(sourceName);
+            if (obj != null)
+            {
+                dest.put(destName, obj);
+            }
+        }
+    }
+    
+    protected void serialize(JSONObject source, JSONObject dest, boolean includeChildren)
+        throws JSONException
+    {
+        // core properties
+        copy(source, dest, "nodeRef", "id");
+        copy(source, dest, "name", "title");
+        copy(source, dest, "type");
+        copy(source, dest, "size");
+        copy(source, dest, "url");
+                
+        // construct the path
+        String path = source.get("displayPath") + "/" + source.get("name");
+        dest.put("path", path);
 
-		// booleans
-		copy(source, dest, "isContainer");
-		copy(source, dest, "isDocument", "isItem");
-		copy(source, dest, "isLocked");
-		copy(source, dest, "isCategory");
-		
-		// file specific properties
-		copy(source, dest, "mimetype");
-				
-		// toss in properties
-		if(source.has("properties") && (source.get("properties") != null))
-		{
-			JSONObject destProps = new JSONObject();
-			dest.put("properties", destProps);
-			
-			JSONObject sourceProps = source.getJSONObject("properties");
-			Iterator keys = sourceProps.keys();
-			while(keys.hasNext())
-			{
-				String key = (String) keys.next();
-				String value = (String) sourceProps.get(key);
-				destProps.put(key, value);					
-			}
-			
-			// copy in system properties
-			dest.put("modified", sourceProps.get("{http://www.alfresco.org/model/content/1.0}modified"));
-			dest.put("modifier", sourceProps.get("{http://www.alfresco.org/model/content/1.0}modifier"));
-			dest.put("created", sourceProps.get("{http://www.alfresco.org/model/content/1.0}created"));
-			dest.put("creator", sourceProps.get("{http://www.alfresco.org/model/content/1.0}creator"));
-			
-			// description
-			if(sourceProps.has("{http://www.alfresco.org/model/content/1.0}description"))
-			{
-				dest.put("description", sourceProps.get("{http://www.alfresco.org/model/content/1.0}description"));
-			}
-		}
+        // booleans
+        copy(source, dest, "isContainer");
+        copy(source, dest, "isDocument", "isItem");
+        copy(source, dest, "isLocked");
+        copy(source, dest, "isCategory");
+        
+        // file specific properties
+        copy(source, dest, "mimetype");
+                
+        // toss in properties
+        if (source.has("properties") && (source.get("properties") != null))
+        {
+            JSONObject destProps = new JSONObject();
+            dest.put("properties", destProps);
+            
+            JSONObject sourceProps = source.getJSONObject("properties");
+            Iterator keys = sourceProps.keys();
+            while(keys.hasNext())
+            {
+                String key = (String) keys.next();
+                String value = (String) sourceProps.get(key);
+                destProps.put(key, value);                    
+            }
+            
+            // copy in system properties
+            dest.put("modified", sourceProps.get("{http://www.alfresco.org/model/content/1.0}modified"));
+            dest.put("modifier", sourceProps.get("{http://www.alfresco.org/model/content/1.0}modifier"));
+            dest.put("created", sourceProps.get("{http://www.alfresco.org/model/content/1.0}created"));
+            dest.put("creator", sourceProps.get("{http://www.alfresco.org/model/content/1.0}creator"));
+            
+            // description
+            if (sourceProps.has("{http://www.alfresco.org/model/content/1.0}description"))
+            {
+                dest.put("description", sourceProps.get("{http://www.alfresco.org/model/content/1.0}description"));
+            }
+        }
 
-		// toss in children
-		if(source.has("children") && source.get("children") != null)
-		{
-			JSONArray destChildren = new JSONArray();
-			dest.put("children", destChildren);
-			
-			JSONArray sourceChildren = source.getJSONArray("children");
-			for(int i = 0; i < sourceChildren.length(); i++)
-			{
-				JSONObject sourceChild = sourceChildren.getJSONObject(i);
-				
-				JSONObject destChild = new JSONObject();
-				serialize(sourceChild, destChild, false);
-				
-				destChildren.put(destChild);
-			}
-		}					
-	}	
+        // toss in children
+        if (source.has("children") && source.get("children") != null)
+        {
+            JSONArray destChildren = new JSONArray();
+            dest.put("children", destChildren);
+            
+            JSONArray sourceChildren = source.getJSONArray("children");
+            for(int i = 0; i < sourceChildren.length(); i++)
+            {
+                JSONObject sourceChild = sourceChildren.getJSONObject(i);
+                
+                JSONObject destChild = new JSONObject();
+                serialize(sourceChild, destChild, false);
+                
+                destChildren.put(destChild);
+            }
+        }                    
+    }    
 }

@@ -58,7 +58,7 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         {
               buffer.append("&o=" + objectId);
         }
-        if(params != null)
+        if (params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {
@@ -91,7 +91,7 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         {
               buffer.append("&o=" + objectId);
         }
-        if(params != null)
+        if (params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {
@@ -120,7 +120,7 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         buffer.append("?f=" + formatId);
         buffer.append("&o=" + objectId);
         
-        if(params != null)
+        if (params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {

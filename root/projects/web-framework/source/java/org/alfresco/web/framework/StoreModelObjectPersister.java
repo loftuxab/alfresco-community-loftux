@@ -286,7 +286,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     {
         boolean removed = false;
         
-        if(objectId != null)
+        if (objectId != null)
         {
             String path = this.idToPath(objectId);
             removed = removeObjectByPath(context, path);
@@ -319,7 +319,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 // remove from cache
                 cacheRemove(context, path);
             }
-            catch(IOException ex)
+            catch (IOException ex)
             {
                 throw new ModelObjectPersisterException("Unable to remove object for path: " + path);
             }
@@ -334,7 +334,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public ModelObject newObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
-        if(objectId == null)
+        if (objectId == null)
         {
             throw new ModelObjectPersisterException("Cannot create object with null object id");
         }
@@ -388,7 +388,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     {
         boolean has = false;
         
-        if(objectId != null)
+        if (objectId != null)
         {
             String path = this.idToPath(objectId);
             has = hasObjectByPath(context, path);

@@ -55,15 +55,15 @@ public class JSPProcessor extends AbstractProcessor
      * @see org.alfresco.web.framework.render.AbstractProcessor#executeHeader(org.alfresco.web.framework.render.ProcessorContext)
      */
     public void executeHeader(ProcessorContext pc)
-    	throws RendererExecutionException
-	{
-    	// get render context and processor properties
-    	RenderContext context = pc.getRenderContext();
-    	String jspPath = this.getProperty(pc, "jsp-path");
-    	    	
+        throws RendererExecutionException
+    {
+        // get render context and processor properties
+        RenderContext context = pc.getRenderContext();
+        String jspPath = this.getProperty(pc, "jsp-path");
+                
         try
         {
-            if(jspPath != null)
+            if (jspPath != null)
             {
                 int x = jspPath.lastIndexOf('.');
                 if (x != -1)
@@ -77,7 +77,7 @@ public class JSPProcessor extends AbstractProcessor
                 URL resource = servletContext.getResource(jspPath);
     
                 // if it exists, execute it
-                if(resource != null)
+                if (resource != null)
                 {
                     RequestUtil.include(context.getRequest(), 
                             context.getResponse(), jspPath);
@@ -88,18 +88,18 @@ public class JSPProcessor extends AbstractProcessor
         {
             throw new RendererExecutionException("Unable to execute 'header' JSP Include: " + jspPath, ex);
         }
-	}
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractProcessor#executeBody(org.alfresco.web.framework.render.ProcessorContext)
      */
     public void executeBody(ProcessorContext pc)
-		throws RendererExecutionException
-	{
-    	// get render context and processor properties
-    	RenderContext context = pc.getRenderContext();
-    	String jspPath = this.getProperty(pc, "jsp-path");
-    	
+        throws RendererExecutionException
+    {
+        // get render context and processor properties
+        RenderContext context = pc.getRenderContext();
+        String jspPath = this.getProperty(pc, "jsp-path");
+        
         try
         {
             // Place the JSP file path onto the render data.
@@ -128,21 +128,21 @@ public class JSPProcessor extends AbstractProcessor
     }
     
     protected void doInclude(RenderContext context, String jspPath)
-    	throws ServletException, IOException
+        throws ServletException, IOException
     {
-    	RenderContextRequest request = new RenderContextRequest(context);
+        RenderContextRequest request = new RenderContextRequest(context);
         
         RequestDispatcher dispatcher = request.getRequestDispatcher(jspPath);
         
         // if we're dispatching a template, we'll do a forward
-        if(context.getObject() != null && context.getObject() instanceof TemplateInstance)
+        if (context.getObject() != null && context.getObject() instanceof TemplateInstance)
         {
-        	dispatcher.forward(request, context.getResponse());
+            dispatcher.forward(request, context.getResponse());
         }
         else
         {
-        	// otherwise, we'll do an include
-        	dispatcher.include(request, context.getResponse());
+            // otherwise, we'll do an include
+            dispatcher.include(request, context.getResponse());
         }
     }
 }

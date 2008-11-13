@@ -165,10 +165,10 @@ public class XMLUtil
      */
     public static List getChildren(Element element, String name)
     {
-    	if(name == null)
-    	{
-    		return element.elements();
-    	}
+        if (name == null)
+        {
+            return element.elements();
+        }
         return element.elements(name);
     }
 
@@ -296,7 +296,7 @@ public class XMLUtil
          * If the XML wasn't created already, we'll serialize the
          * standard way.
          */
-        if(xml == null)
+        if (xml == null)
         {
             xml = document.asXML();
         }

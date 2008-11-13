@@ -30,16 +30,16 @@ import org.springframework.context.ApplicationContext;
 
 public interface Processor 
 {
-	/**
-	 * Initialisation hook point.
-	 * 
-	 * This will be called exactly once when the processor is instantiated.
-	 * It does not have access to request time information.
-	 * 
-	 * @param applicationContext the application context
-	 */
+    /**
+     * Initialisation hook point.
+     * 
+     * This will be called exactly once when the processor is instantiated.
+     * It does not have access to request time information.
+     * 
+     * @param applicationContext the application context
+     */
     public void init(ApplicationContext applicationContext)
-    	throws ProcessorExecutionException;
+        throws ProcessorExecutionException;
     
     /**
      * Executes the given focus of the processor output using the
@@ -51,7 +51,7 @@ public interface Processor
      * @throws RendererExecutionException
      */
     public void execute(ProcessorContext processorContext, RenderFocus focus)
-    	throws RendererExecutionException;
+        throws RendererExecutionException;
     
     /**
      * Executes the "body" of the processor output using the given
@@ -62,7 +62,7 @@ public interface Processor
      * @throws RendererExecutionException
      */
     public void executeBody(ProcessorContext processorContext)
-    	throws RendererExecutionException;
+        throws RendererExecutionException;
 
     /**
      * Executes the "header" of the processor output using the given
@@ -73,7 +73,7 @@ public interface Processor
      * @throws RendererExecutionException
      */
     public void executeHeader(ProcessorContext processorContext)
-    	throws RendererExecutionException;
+        throws RendererExecutionException;
 
     /**
      * Executes the "footer" of the processor output using the given
@@ -84,6 +84,6 @@ public interface Processor
      * @throws RendererExecutionException
      */
     public void executeFooter(ProcessorContext processorContext)
-    	throws RendererExecutionException;
+        throws RendererExecutionException;
     
 }

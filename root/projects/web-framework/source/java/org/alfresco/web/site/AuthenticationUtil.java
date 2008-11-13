@@ -46,7 +46,7 @@ public class AuthenticationUtil
     
     public static void login(HttpServletRequest request, String userId)
     {
-    	login(request, null, userId);
+        login(request, null, userId);
     }
 
     public static void login(HttpServletRequest request, HttpServletResponse response, String userId)
@@ -63,21 +63,21 @@ public class AuthenticationUtil
         request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
         
         // set login time cookie
-        if(response != null)
+        if (response != null)
         {
-	        long timeInSeconds = System.currentTimeMillis() / 1000L;
-	        Cookie cookie = getLoginCookie(request);
-	        if (cookie == null)
-	        {
-	            cookie = new Cookie(COOKIE_ALFLOGIN, Long.toString(timeInSeconds));
-	        }
-	        else
-	        {
-	            cookie.setValue(Long.toString(timeInSeconds));
-	        }
-	        cookie.setPath(request.getContextPath());
-	        cookie.setMaxAge(60*60*24*7);
-	        response.addCookie(cookie);
+            long timeInSeconds = System.currentTimeMillis() / 1000L;
+            Cookie cookie = getLoginCookie(request);
+            if (cookie == null)
+            {
+                cookie = new Cookie(COOKIE_ALFLOGIN, Long.toString(timeInSeconds));
+            }
+            else
+            {
+                cookie.setValue(Long.toString(timeInSeconds));
+            }
+            cookie.setPath(request.getContextPath());
+            cookie.setMaxAge(60*60*24*7);
+            response.addCookie(cookie);
         }
     }
     
@@ -87,7 +87,7 @@ public class AuthenticationUtil
         String userId = (String) request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
         
         // return whether is non-null
-        return (userId != null);    	
+        return (userId != null);        
     }
 
     /**

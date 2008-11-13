@@ -82,8 +82,8 @@ public abstract class FreemarkerTagSupportDirective implements TemplateDirective
     public String executeTag(Tag tag, String bodyContent)
         throws TagExecutionException
     {
-    	// generate a request that packages up the render context
-    	RenderContextRequest request = new RenderContextRequest(context);
+        // generate a request that packages up the render context
+        RenderContextRequest request = new RenderContextRequest(context);
             
         // execute the tag
         return TagUtil.execute(tag, request, bodyContent);

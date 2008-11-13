@@ -38,7 +38,7 @@ public class ComponentIncludeTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-    	RenderContext context = getRenderContext();
+        RenderContext context = getRenderContext();
 
         String componentId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);        
         try

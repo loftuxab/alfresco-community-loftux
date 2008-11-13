@@ -45,13 +45,13 @@ public class SiteUtil
         Page rootPage = null;
         
         // check the site configuration
-        if(siteConfiguration != null)
+        if (siteConfiguration != null)
         {
             String rootPageId = siteConfiguration.getProperty("root-page");
-            if(rootPageId != null)
+            if (rootPageId != null)
             {
                 Page page = context.getModel().getPage(rootPageId);
-                if(page != null)
+                if (page != null)
                 {
                     rootPage = page;
                 }

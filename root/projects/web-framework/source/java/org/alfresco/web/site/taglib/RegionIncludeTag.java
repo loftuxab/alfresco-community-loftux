@@ -36,11 +36,11 @@ public class RegionIncludeTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-    	RenderContext context = getRenderContext();
+        RenderContext context = getRenderContext();
         
         try
         {
-        	RenderUtil.renderRegionComponents(context);
+            RenderUtil.renderRegionComponents(context);
         }
         catch (Throwable t)
         {

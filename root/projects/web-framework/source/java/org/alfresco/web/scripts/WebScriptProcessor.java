@@ -48,7 +48,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
-// TODO: Auto-generated Javadoc
 /**
  * The WebScriptRenderer is an implementation of Renderable which describes
  * a rendering engine that the Web Framework can use to execute a web script.
@@ -67,7 +66,6 @@ import org.springframework.context.ApplicationContext;
  */
 public class WebScriptProcessor extends AbstractProcessor
 {
-    
     /** The Constant PARAM_WEBSCRIPT_ID. */
     static final String PARAM_WEBSCRIPT_ID  = "_wsId";
     
@@ -106,7 +104,7 @@ public class WebScriptProcessor extends AbstractProcessor
      */
     public void setRegistry(Registry registry)
     {
-    	this.registry = registry;
+        this.registry = registry;
     }
     
     /**
@@ -116,7 +114,7 @@ public class WebScriptProcessor extends AbstractProcessor
      */
     public Registry getRegistry()
     {
-    	return this.registry;
+        return this.registry;
     }
     
     /**
@@ -126,7 +124,7 @@ public class WebScriptProcessor extends AbstractProcessor
      */
     public void setTemplateProcessor(TemplateProcessor templateProcessor)
     {
-    	this.templateProcessor = templateProcessor;
+        this.templateProcessor = templateProcessor;
     }
     
     /**
@@ -136,7 +134,7 @@ public class WebScriptProcessor extends AbstractProcessor
      */
     public TemplateProcessor getTemplateProcessor()
     {
-    	return this.templateProcessor;
+        return this.templateProcessor;
     }
     
     /**
@@ -146,7 +144,7 @@ public class WebScriptProcessor extends AbstractProcessor
      */
     public void setContainerBean(LocalWebScriptRuntimeContainer containerBean)
     {
-    	this.webScriptContainer = containerBean;
+        this.webScriptContainer = containerBean;
     }
     
     /**
@@ -156,18 +154,18 @@ public class WebScriptProcessor extends AbstractProcessor
      */
     public LocalWebScriptRuntimeContainer getContainerBean()
     {
-    	return this.webScriptContainer;
+        return this.webScriptContainer;
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractProcessor#executeHeader(org.alfresco.web.framework.render.ProcessorContext)
      */
     public void executeHeader(ProcessorContext pc)
-    	throws RendererExecutionException
-	{
-    	// get render context and processor properties
-    	RenderContext context = pc.getRenderContext();
-    	String uri = this.getProperty(pc, "uri");
+        throws RendererExecutionException
+    {
+        // get render context and processor properties
+        RenderContext context = pc.getRenderContext();
+        String url = this.getProperty(pc, "uri");
         
         /**
          * If the ModelObject being rendered is a component, then we will
@@ -186,16 +184,6 @@ public class WebScriptProcessor extends AbstractProcessor
             // Get the component and its URL.  Do a token replacement
             // on the URL right away and remove the query string
             Component component = (Component) context.getObject();
-            
-            /*
-            String url = (String) context.getValue("component-url");
-            if(url == null)
-            {
-            	url = component.getURL();
-            }
-            */
-            
-            String url = uri;
             
             url = UriUtils.replaceUriTokens(url, args);
             if (url.lastIndexOf('?') != -1)
@@ -222,39 +210,22 @@ public class WebScriptProcessor extends AbstractProcessor
                      */
                     if (templateProcessor.hasTemplate(path))
                     {
-                    	try
-                    	{
-	                        Map<String, Object> model = new HashMap<String, Object>(32);
-	                        ProcessorModelHelper.populateTemplateModel(context, model);
-	                        
-	                        // commit to output stream
-	                        templateProcessor.process(path, model, context.getResponse().getWriter());                        	                        
-                    	}
-                    	catch(UnsupportedEncodingException uee)
-                    	{
-                    		throw new RendererExecutionException(uee);
-                    	}
-                    	catch(IOException ioe)
-                    	{
-                    		throw new RendererExecutionException(ioe);
-                    	}
-                        
-                        /*
-                        StringBuilderWriter out = new StringBuilderWriter(512);
-                        templateProcessor.process(path, model, out);
-                        
-                        String result = out.toString();
-                        if (result != null && result.length() > 0)
+                        try
                         {
-                            String headerText = out.toString();
+                            Map<String, Object> model = new HashMap<String, Object>(32);
+                            ProcessorModelHelper.populateTemplateModel(context, model);
                             
-                            // output wrapping comment blocks if debug enabled
-                            if (logger.isDebugEnabled())
-                            {
-                            	headerText = super.executeHeader(processorContext) + headerText;
-                            }
+                            // commit to output stream
+                            templateProcessor.process(path, model, context.getResponse().getWriter());                                                    
                         }
-                        */
+                        catch (UnsupportedEncodingException uee)
+                        {
+                            throw new RendererExecutionException(uee);
+                        }
+                        catch (IOException ioe)
+                        {
+                            throw new RendererExecutionException(ioe);
+                        }
                     }
                 }
             }
@@ -265,12 +236,12 @@ public class WebScriptProcessor extends AbstractProcessor
      * @see org.alfresco.web.framework.render.AbstractProcessor#doExecuteBody()
      */
     public void executeBody(ProcessorContext pc)
-		throws RendererExecutionException    
+        throws RendererExecutionException    
     {
-    	// get render context and processor properties
-    	RenderContext context = pc.getRenderContext();
-    	String uri = this.getProperty(pc, "uri");
-    	
+        // get render context and processor properties
+        RenderContext context = pc.getRenderContext();
+        String uri = this.getProperty(pc, "uri");
+        
         // Construct a "context" object that the Web Script engine will utilise
         LocalWebScriptContext webScriptContext = new LocalWebScriptContext();
         
@@ -332,9 +303,9 @@ public class WebScriptProcessor extends AbstractProcessor
                     webScriptContainer, serverProperties, webScriptContext);
             
             // set the method onto the runtime
-            if(context.getRequest().getMethod() != null)
+            if (context.getRequest().getMethod() != null)
             {
-            	runtime.setScriptMethod(context.getRequest().getMethod());
+                runtime.setScriptMethod(context.getRequest().getMethod());
             }
             
             /**

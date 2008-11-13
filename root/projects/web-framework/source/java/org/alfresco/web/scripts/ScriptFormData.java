@@ -46,9 +46,9 @@ import org.alfresco.web.framework.render.RenderContext;
  */
 public final class ScriptFormData extends ScriptBase
 {
-	protected Map<String, FormField> fields;
-	protected RenderContext renderContext;
-	
+    protected Map<String, FormField> fields;
+    protected RenderContext renderContext;
+    
     /**
      * Instantiates a new script form.
      * 
@@ -56,12 +56,12 @@ public final class ScriptFormData extends ScriptBase
      */
     public ScriptFormData(RenderContext context)
     {
-    	super(context);
-    	
-    	this.renderContext = context;
-    	
-    	// load for this renderer instance
-    	this.load(ScriptForm.getPrefix(this.renderContext));
+        super(context);
+        
+        this.renderContext = context;
+        
+        // load for this renderer instance
+        this.load(ScriptForm.getPrefix(this.renderContext));
     }
     
     /* (non-Javadoc)
@@ -69,7 +69,7 @@ public final class ScriptFormData extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-    	return null;
+        return null;
     }
     
     // --------------------------------------------------------------
@@ -84,7 +84,7 @@ public final class ScriptFormData extends ScriptBase
      */
     public FormField getField(String id)
     {
-    	return (FormField) fields.get(id);
+        return (FormField) fields.get(id);
     }
     
     /**
@@ -100,10 +100,10 @@ public final class ScriptFormData extends ScriptBase
         Iterator it = fields.keySet().iterator();
         while(it.hasNext())
         {
-        	String key = (String) it.next();
-        	FormField field = (FormField) fields.get(key);
-        	array[i] = field;
-        	i++;
+            String key = (String) it.next();
+            FormField field = (FormField) fields.get(key);
+            array[i] = field;
+            i++;
         }
 
         return array;
@@ -116,7 +116,7 @@ public final class ScriptFormData extends ScriptBase
      */
     public String[] getFieldIds()
     {
-    	return fields.keySet().toArray(new String[fields.keySet().size()]);
+        return fields.keySet().toArray(new String[fields.keySet().size()]);
     }
     
     
@@ -125,31 +125,31 @@ public final class ScriptFormData extends ScriptBase
      */
     public void load(String prefix)
     {
-    	this.fields = new HashMap<String, FormField>(16, 1.0f);
-    	
-    	try
-    	{
-    		// attempt to look at multipart form post
-    		String content = this.context.getRequestContent().getContent();
-    		if(content != null && content.length() > 0)
-    		{
-    			// if we have a multipart form post, then convert the values
-    			Map multiPartMap = WebUtil.getQueryStringMap(content);
-    			processMapIntoFields(multiPartMap, prefix);
-    		} 	
-    		
-    		// attempt to look at request parameters
-    		// if the post was received using urlencoding, the parameters
-    		// will have already been parsed and populated by the servlet
-    		// engine
-    		Map requestParametersMap = this.renderContext.getRequest().getParameterMap();
-    		processMapIntoFields(requestParametersMap, prefix);
-    		
-    	}
-    	catch(IOException ioe)
-    	{
-    		// allow this to fail silently, it means we can't load
-    	}
+        this.fields = new HashMap<String, FormField>(16, 1.0f);
+        
+        try
+        {
+            // attempt to look at multipart form post
+            String content = this.context.getRequestContent().getContent();
+            if (content != null && content.length() > 0)
+            {
+                // if we have a multipart form post, then convert the values
+                Map multiPartMap = WebUtil.getQueryStringMap(content);
+                processMapIntoFields(multiPartMap, prefix);
+            }     
+            
+            // attempt to look at request parameters
+            // if the post was received using urlencoding, the parameters
+            // will have already been parsed and populated by the servlet
+            // engine
+            Map requestParametersMap = this.renderContext.getRequest().getParameterMap();
+            processMapIntoFields(requestParametersMap, prefix);
+            
+        }
+        catch (IOException ioe)
+        {
+            // allow this to fail silently, it means we can't load
+        }
     }
     
     /**
@@ -161,77 +161,77 @@ public final class ScriptFormData extends ScriptBase
      */
     protected void processMapIntoFields(Map map, String prefix)
     {
-    	if(map != null)
-    	{
-			Iterator it = map.keySet().iterator();
-			while(it.hasNext())
-			{
-				String prefixedId = (String) it.next();
-				
-				// if the prefix is null
-				// or if the prefixed id starts with our prefix
-				if( (prefix == null) ||
-				    (prefix != null && prefixedId.startsWith(prefix)) )
-				{
-					Object value = map.get(prefixedId);
-					if(value instanceof String)
-					{
-						// register the form field
-						FormField field = new FormField(prefixedId, value);
-						this.fields.put(prefixedId, field);
-					}
-				}
-			}
-    	}
+        if (map != null)
+        {
+            Iterator it = map.keySet().iterator();
+            while(it.hasNext())
+            {
+                String prefixedId = (String) it.next();
+                
+                // if the prefix is null
+                // or if the prefixed id starts with our prefix
+                if ( (prefix == null) ||
+                    (prefix != null && prefixedId.startsWith(prefix)) )
+                {
+                    Object value = map.get(prefixedId);
+                    if (value instanceof String)
+                    {
+                        // register the form field
+                        FormField field = new FormField(prefixedId, value);
+                        this.fields.put(prefixedId, field);
+                    }
+                }
+            }
+        }
     }
     
 
     public class FormField implements Serializable
     {
-	    private String id;   	
-	    private Object value;
-    	
-    	/**
-	     * Instantiates a new form field.
-	     * 
-	     * @param id the id
-	     */
-	    public FormField(String id)
-    	{
-    		this.id = id;
-    	}
-    	
-    	/**
-	     * Instantiates a new form field.
-	     * 
-	     * @param id the id
-	     * @param value the value
-	     */
-	    public FormField(String id, Object value)
-    	{
-    		this(id);
+        private String id;       
+        private Object value;
+        
+        /**
+         * Instantiates a new form field.
+         * 
+         * @param id the id
+         */
+        public FormField(String id)
+        {
+            this.id = id;
+        }
+        
+        /**
+         * Instantiates a new form field.
+         * 
+         * @param id the id
+         * @param value the value
+         */
+        public FormField(String id, Object value)
+        {
+            this(id);
 
-    		this.value = value;    		
-    	}
-    	
-    	/**
-	     * Sets the value.
-	     * 
-	     * @param value the new value
-	     */
-	    public void setValue(Object value)
-    	{
-    		this.value = value;
-    	}
-	    
-	    public Object getValue()
-	    {
-	    	return this.value;
-	    }
-	    
-	    public String getId()
-	    {
-	    	return ScriptForm.unprefix(id);
-	    }	    
+            this.value = value;            
+        }
+        
+        /**
+         * Sets the value.
+         * 
+         * @param value the new value
+         */
+        public void setValue(Object value)
+        {
+            this.value = value;
+        }
+        
+        public Object getValue()
+        {
+            return this.value;
+        }
+        
+        public String getId()
+        {
+            return ScriptForm.unprefix(id);
+        }        
     }
 }

@@ -42,31 +42,28 @@ import org.alfresco.web.site.Timer;
  */
 public class TemplateInstanceRenderer extends AbstractRenderer
 {
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.Renderer#init()
-	 */
-	public void init()
-		throws RendererInitializationException
-	{
-		super.init();
-		
-		// additional initialization (if necessary)
-	}
-	
-	private void calculateComponentDependencies(RenderContext parentContext)
-		throws RendererExecutionException
-	{
-		TemplateInstance template = (TemplateInstance) parentContext.getObject();
-		
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.Renderer#init()
+     */
+    public void init()
+        throws RendererInitializationException
+    {
+        super.init();
+        
+        // additional initialization (if necessary)
+    }
+    
+    private void calculateComponentDependencies(RenderContext parentContext)
+        throws RendererExecutionException
+    {
+        TemplateInstance template = (TemplateInstance) parentContext.getObject();
+        
         // We need to preprocess the template to calculate the component dependencies
         // - component dependencies are resolved only when they have all executed.
         // First pass is very fast as template pages themselves have very little implicit content and
         // any associated behaviour logic is executed only once, with the result stored for the 2nd pass.
         // The critical performance path is in executing the WebScript components - which is only
         // performed during the second pass of the template - once component references are all resolved.
-
-        // bind the rendering to this template
-        // pre-process
         RenderContext preContext = RenderHelper.provideRenderContext(parentContext, template);
         try
         {
@@ -87,15 +84,15 @@ public class TemplateInstanceRenderer extends AbstractRenderer
         {
             if (Timer.isTimerEnabled())
                 Timer.stop(preContext, "TemplateInstanceRenderer1-" + template.getId());
-        	
-        	// TODO: is this necessary?  think not
+            
+            // TODO: is this necessary?  think not
             // switch out of passive mode
-        	preContext.setPassiveMode(false);
+            preContext.setPassiveMode(false);
             
             // release the render context
-        	preContext.release();
-        }	
-	}
+            preContext.release();
+        }    
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#header(org.alfresco.web.framework.render.RenderContext)
@@ -103,48 +100,48 @@ public class TemplateInstanceRenderer extends AbstractRenderer
     public void header(RenderContext parentContext)
         throws RendererExecutionException
     {
-    	TemplateInstance template = (TemplateInstance) parentContext.getObject();
-    	if(template != null)
-    	{    	
-	    	// FIRST PASS - calculate component dependencies
-	    	calculateComponentDependencies(parentContext);
-	
-	    	// SECOND PASS - render output of components        
-	        Component component = null;
-	        Component[] components = parentContext.getRenderingComponents();
-	        if (components != null)
-	        {
-	            for (int i = 0; i < components.length; i++)
-	            {
-	                component = components[i];
-	                
-	                RenderUtil.renderComponent(parentContext, RenderFocus.HEADER, component.getId());
-	                print(parentContext, RenderUtil.NEWLINE);
-	            }
-	        }
-    	}
+        TemplateInstance template = (TemplateInstance) parentContext.getObject();
+        if (template != null)
+        {        
+            // FIRST PASS - calculate component dependencies
+            calculateComponentDependencies(parentContext);
+    
+            // SECOND PASS - render output of components        
+            Component component = null;
+            Component[] components = parentContext.getRenderingComponents();
+            if (components != null)
+            {
+                for (int i = 0; i < components.length; i++)
+                {
+                    component = components[i];
+                    
+                    RenderUtil.renderComponent(parentContext, RenderFocus.HEADER, component.getId());
+                    print(parentContext, RenderUtil.NEWLINE);
+                }
+            }
+        }
         
         postHeaderProcess(parentContext);
     }
-	
-	/**
-	 * Renders the current template
-	 */
+    
+    /**
+     * Renders the current template
+     */
     public void body(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	TemplateInstance template = (TemplateInstance) parentContext.getObject();
-
-    	// FIRST PASS - calculate component dependencies
-    	calculateComponentDependencies(parentContext);
-                
+        throws RendererExecutionException
+    {
+        TemplateInstance template = (TemplateInstance) parentContext.getObject();
+        
+        // FIRST PASS - calculate component dependencies
+        calculateComponentDependencies(parentContext);
+        
         // SECOND PASS - render output of template
         RenderContext context = RenderHelper.provideRenderContext(parentContext, template);
         try
         {
             if (Timer.isTimerEnabled())
                 Timer.start(context, "TemplateInstanceRenderer2-" + template.getId());
-        	
+            
             // get the template processor and process it
             // this commits the template output to output stream
             RenderHelper.processTemplate(context, RenderFocus.BODY, template);
@@ -154,14 +151,13 @@ public class TemplateInstanceRenderer extends AbstractRenderer
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "TemplateInstanceRenderer2-" + template.getId());
 
-        	// release the render context
-        	context.release();            
+            // release the render context
+            context.release();            
         }
-	}
-        
-    public void postHeaderProcess(RenderContext context)
-    	throws RendererExecutionException
-    {
     }
     
+    public void postHeaderProcess(RenderContext context)
+        throws RendererExecutionException
+    {
+    }
 }

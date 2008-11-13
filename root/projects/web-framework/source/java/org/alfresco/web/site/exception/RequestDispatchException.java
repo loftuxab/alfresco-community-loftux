@@ -41,6 +41,6 @@ public class RequestDispatchException extends Exception
     
     public RequestDispatchException(Exception ex)
     {
-    	super(ex);
+        super(ex);
     }
 }

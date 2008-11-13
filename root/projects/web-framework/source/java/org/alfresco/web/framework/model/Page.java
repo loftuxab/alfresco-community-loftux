@@ -63,7 +63,7 @@ public class Page extends AbstractModelObject
         super(id, key, document);
         
         // default page type
-        if(getPageTypeId() == null)
+        if (getPageTypeId() == null)
         {
             setPageTypeId(DEFAULT_PAGE_TYPE_ID);
         }
@@ -152,7 +152,7 @@ public class Page extends AbstractModelObject
      */
     public void setTemplateId(String templateId, String formatId)
     {
-        if(formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
+        if (formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
         {
             formatId = null;
         }
@@ -175,7 +175,7 @@ public class Page extends AbstractModelObject
      */
     public void removeTemplateId(String formatId)
     {
-        if(formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
+        if (formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
         {
             formatId = null;
         }
@@ -336,7 +336,7 @@ public class Page extends AbstractModelObject
     public PageType getPageType(RequestContext context)
     {
         String pageTypeId = getPageTypeId();
-        if(pageTypeId != null)
+        if (pageTypeId != null)
         {
             return context.getModel().getPageType(pageTypeId);
         }

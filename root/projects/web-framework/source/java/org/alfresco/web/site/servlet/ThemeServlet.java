@@ -56,7 +56,7 @@ public class ThemeServlet extends BaseServlet
         {
             context = RequestUtil.getRequestContext(request);
         }
-        catch(RequestContextException rce)
+        catch (RequestContextException rce)
         {
             throw new ServletException("Unable to retrieve request context from request", rce);
         }

@@ -42,7 +42,7 @@ public class DefaultUserFactory extends UserFactory
      */
     public boolean authenticate(HttpServletRequest request, String username, String password)
     {
-    	return false;
+        return false;
     }
 
     /* (non-Javadoc)

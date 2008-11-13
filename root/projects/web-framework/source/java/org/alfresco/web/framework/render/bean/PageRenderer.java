@@ -48,29 +48,29 @@ import org.alfresco.web.site.Timer;
  */
 public class PageRenderer extends AbstractRenderer
 {
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.Renderer#init()
-	 */
-	public void init()
-		throws RendererInitializationException
-	{
-		super.init();
-		
-		// additional initialization (if necessary)
-	}
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.Renderer#init()
+     */
+    public void init()
+        throws RendererInitializationException
+    {
+        super.init();
+        
+        // additional initialization (if necessary)
+    }
 
-	/**
-	 * Renders the current page
-	 */
+    /**
+     * Renders the current page
+     */
     public void body(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
-    	// get the page
-    	Page page = (Page) parentContext.getObject();
-    	if(page == null)
-    	{
-    		throw new PageRendererExecutionException("Unable to render page: null");
-    	}
+        throws RendererExecutionException
+    {
+        // get the page
+        Page page = (Page) parentContext.getObject();
+        if (page == null)
+        {
+            throw new PageRendererExecutionException("Unable to render page: null");
+        }
 
         // look up the page template
         TemplateInstance template = page.getTemplate(parentContext);
@@ -94,27 +94,27 @@ public class PageRenderer extends AbstractRenderer
         }
         finally
         {
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "PageRendererBody-" + page.getId());
         }        
-	}
+    }
 
     /**
      * Renders the header for the page
      */
     public void header(RenderContext context)
-    	throws RendererExecutionException
-	{
-	}
+        throws RendererExecutionException
+    {
+    }
 
     /**
      * Renders the footer for the page
      */
     public void footer(RenderContext context)
-		throws RendererExecutionException
-	{
-	}
+        throws RendererExecutionException
+    {
+    }
     
 }
