@@ -61,7 +61,7 @@ public final class ScriptCredentialVault extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
             this.properties = new ScriptableLinkedHashMap<String, Serializable>();
             
@@ -112,7 +112,7 @@ public final class ScriptCredentialVault extends ScriptBase
     public ScriptCredentials newCredentials(String endpointId)
     {
         ScriptCredentials scriptCredentials = (ScriptCredentials) getProperties().get(endpointId);
-        if(scriptCredentials == null)
+        if (scriptCredentials == null)
         {
             Credentials creds = this.vault.newCredentials(endpointId);
             this.vault.save();
@@ -171,7 +171,7 @@ public final class ScriptCredentialVault extends ScriptBase
                 String propertyKey = (String) it2.next();
                 Object propertyValue = scriptCredentials.getProperties().get(propertyKey);
                 
-                if(propertyValue != null)
+                if (propertyValue != null)
                 {
                     creds.setProperty(propertyKey, propertyValue);
                 }

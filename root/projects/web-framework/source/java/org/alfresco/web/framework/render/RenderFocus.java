@@ -31,33 +31,21 @@ package org.alfresco.web.framework.render;
  */
 public enum RenderFocus 
 {
-	HEADER("header"),
-	BODY("body"),
-	FOOTER("footer"),
-	ALL("all");
-	
-	private final String focus;
-	
-	private RenderFocus(String focus)
-	{
-		this.focus = focus;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return this.focus;
-	}
-	
-	public static RenderFocus fromString(String focus)
-	{
-		for(RenderFocus e: values())
-		{
-			if(e.focus.equals(focus))
-			{
-				return e;
-			}
-		}
-		return null;
-	}
+    HEADER("header"),
+    BODY("body"),
+    FOOTER("footer"),
+    ALL("all");
+    
+    private final String focus;
+    
+    private RenderFocus(String focus)
+    {
+        this.focus = focus;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.focus;
+    }
 }

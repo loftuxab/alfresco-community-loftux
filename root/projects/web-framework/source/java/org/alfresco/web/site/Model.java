@@ -623,9 +623,9 @@ public class Model
     {
         // build property map
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
-        if(sourceId != null)
+        if (sourceId != null)
         {
-        	addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
+            addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
         }
 
         // do the lookup
@@ -658,14 +658,14 @@ public class Model
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
         
         // source id is an optional parameter
-        if(sourceId != null)
+        if (sourceId != null)
         {
-        	addPropertyConstraint(propertyConstraintMap,
-        			PageAssociation.PROP_SOURCE_ID, sourceId);
+            addPropertyConstraint(propertyConstraintMap,
+                    PageAssociation.PROP_SOURCE_ID, sourceId);
         }
         
         // dest id is an optional parameter
-        if(destId != null)
+        if (destId != null)
         {
             addPropertyConstraint(propertyConstraintMap,
                     PageAssociation.PROP_DEST_ID, destId);
@@ -689,15 +689,15 @@ public class Model
                 String sortOrder = entry.getValue().getProperty(PageAssociation.PROP_ORDER_ID);
                 String sortOrder1 = entry1.getValue().getProperty(PageAssociation.PROP_ORDER_ID);
                 
-                if(sortOrder == null && sortOrder1 == null)
+                if (sortOrder == null && sortOrder1 == null)
                 {
                     return 0;
                 }
-                if(sortOrder == null)
+                if (sortOrder == null)
                 {
                     return -1;
                 }
-                if(sortOrder1 == null)
+                if (sortOrder1 == null)
                 {
                     return 1;
                 }
@@ -1329,7 +1329,7 @@ public class Model
      */
     public ModelObject clone(String objectTypeId, String objectId)
     {
-    	return clone(objectTypeId, objectId, null);    	
+        return clone(objectTypeId, objectId, null);        
     }
 
     /**
@@ -1343,44 +1343,44 @@ public class Model
      */    
     public ModelObject clone(String objectTypeId, String objectId, String newObjectId)
     {
-    	ModelObject newObject = this.newObject(objectTypeId);
-    	
-    	ModelObject object = getObject(objectTypeId, objectId);
-    	
-    	// copy in properties
-    	Map<String, Serializable> properties = object.getProperties();
-    	Iterator propIt = properties.keySet().iterator();
-    	while(propIt.hasNext())
-    	{
-    		String propertyName = (String) propIt.next();
-    		Object propertyValue = properties.get(propertyName);
-    		
-    		newObject.setProperty(propertyName, (String)propertyValue);
-    	}
-    	
-    	// copy in resources
-    	if(object instanceof ResourceProvider)
-    	{
-    		ResourceProvider source = (ResourceProvider) object;
-    		ResourceProvider dest = (ResourceProvider) newObject;
+        ModelObject newObject = this.newObject(objectTypeId);
+        
+        ModelObject object = getObject(objectTypeId, objectId);
+        
+        // copy in properties
+        Map<String, Serializable> properties = object.getProperties();
+        Iterator propIt = properties.keySet().iterator();
+        while(propIt.hasNext())
+        {
+            String propertyName = (String) propIt.next();
+            Object propertyValue = properties.get(propertyName);
+            
+            newObject.setProperty(propertyName, (String)propertyValue);
+        }
+        
+        // copy in resources
+        if (object instanceof ResourceProvider)
+        {
+            ResourceProvider source = (ResourceProvider) object;
+            ResourceProvider dest = (ResourceProvider) newObject;
 
-    		Resource[] resources = source.getResources();
-    		for(int i = 0; i < resources.length; i++)
-    		{
-    			String id = resources[i].getId();
-    			
-    			Resource newResource = dest.addResource(id);
-    			
-    			String[] attributeNames = resources[i].getAttributeNames();
-    			for(int x = 0; x < attributeNames.length; x++)
-    			{
-    				String attributeValue = resources[i].getAttribute(attributeNames[i]);
-    				newResource.setAttribute(attributeNames[i], attributeValue);
-    			}
-    		}
-    	}
-    	
-    	return newObject;
+            Resource[] resources = source.getResources();
+            for(int i = 0; i < resources.length; i++)
+            {
+                String id = resources[i].getId();
+                
+                Resource newResource = dest.addResource(id);
+                
+                String[] attributeNames = resources[i].getAttributeNames();
+                for(int x = 0; x < attributeNames.length; x++)
+                {
+                    String attributeValue = resources[i].getAttribute(attributeNames[i]);
+                    newResource.setAttribute(attributeNames[i], attributeValue);
+                }
+            }
+        }
+        
+        return newObject;
     }
     
 }

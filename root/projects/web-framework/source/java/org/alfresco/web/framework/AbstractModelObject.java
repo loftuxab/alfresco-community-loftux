@@ -362,8 +362,8 @@ public abstract class AbstractModelObject implements ModelObject
         {
             getDocument().getRootElement().remove(el);
 
-        	// update the cache
-        	getModelProperties().remove(propertyName);            
+            // update the cache
+            getModelProperties().remove(propertyName);            
         }
     }
 
@@ -434,15 +434,15 @@ public abstract class AbstractModelObject implements ModelObject
         
         // do the remove
         Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
-        if(properties != null)
+        if (properties != null)
         {
             Element el = properties.element(propertyName);
             if (el != null)
             {
-            	properties.remove(el);
-            	
-            	// update the cache
-            	getCustomProperties().remove(propertyName);
+                properties.remove(el);
+                
+                // update the cache
+                getCustomProperties().remove(propertyName);
             }
         }
     }
@@ -463,25 +463,25 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public final Map<String, Serializable> getModelProperties()
     {
-    	if (this.modelProperties == null)
-    	{
-    		this.modelProperties = new HashMap<String, Serializable>(8, 1.0f);
-    		
-    		List elements = getDocument().getRootElement().elements();
-	        for (int i = 0; i < elements.size(); i++)
-	        {
-	            Element el = (Element) elements.get(i);
-	            String elementName = el.getName();
-	            if (elementName != null)
-	            {
-	                if (!CONTAINER_PROPERTIES.equals(elementName))
-	                {
-	                    String elementValue = el.getStringValue();
-	                    this.modelProperties.put(elementName, elementValue);
-	                }
-	            }
-	        }
-    	}
+        if (this.modelProperties == null)
+        {
+            this.modelProperties = new HashMap<String, Serializable>(8, 1.0f);
+            
+            List elements = getDocument().getRootElement().elements();
+            for (int i = 0; i < elements.size(); i++)
+            {
+                Element el = (Element) elements.get(i);
+                String elementName = el.getName();
+                if (elementName != null)
+                {
+                    if (!CONTAINER_PROPERTIES.equals(elementName))
+                    {
+                        String elementValue = el.getStringValue();
+                        this.modelProperties.put(elementName, elementValue);
+                    }
+                }
+            }
+        }
         return this.modelProperties;
     }
 
@@ -490,22 +490,22 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public final Map<String, Serializable> getCustomProperties()
     {
-    	if (this.customProperties == null)
-    	{
-    		this.customProperties = new HashMap<String, Serializable>(4, 1.0f);
-    		
-    		Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
-	        if (properties != null)
-	        {
-	            List<Element> elements = properties.elements();
-	            for (int i = 0; i < elements.size(); i++)
-	            {
-	                Element el = elements.get(i);
-	                this.customProperties.put(el.getName(), el.getTextTrim());
-	            }
-	        }     
-    	}
-    	return this.customProperties;
+        if (this.customProperties == null)
+        {
+            this.customProperties = new HashMap<String, Serializable>(4, 1.0f);
+            
+            Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
+            if (properties != null)
+            {
+                List<Element> elements = properties.elements();
+                for (int i = 0; i < elements.size(); i++)
+                {
+                    Element el = elements.get(i);
+                    this.customProperties.put(el.getName(), el.getTextTrim());
+                }
+            }     
+        }
+        return this.customProperties;
     }
     
 

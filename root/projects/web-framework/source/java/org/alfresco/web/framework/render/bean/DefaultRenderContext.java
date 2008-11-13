@@ -45,123 +45,103 @@ import org.alfresco.web.site.WrappedRequestContext;
  */
 public class DefaultRenderContext extends AbstractRenderContext
 {
-	protected Map<String, Serializable> ourValuesMap;
-	protected Map<String, Serializable> normalizedValuesMap;
-	
-	public DefaultRenderContext(RenderContextProvider provider, RequestContext context)
-	{
-		super(provider, context);
-		
-		if(context instanceof RenderContext)
-		{
-			RenderContext renderContext = (RenderContext) context;
-			
-			this.setRenderMode(renderContext.getRenderMode());
-			this.setObject(renderContext.getObject());
-			this.setPassiveMode(renderContext.isPassiveMode());			
-		}
-		else
-		{
-			this.setRenderMode(RenderMode.VIEW);			
-		}
-		
-		this.ourValuesMap = new HashMap<String, Serializable>(16, 1.0f);
-	}            
-	
+    protected Map<String, Serializable> ourValuesMap;
+    protected Map<String, Serializable> normalizedValuesMap;
+    
+    public DefaultRenderContext(RenderContextProvider provider, RequestContext context)
+    {
+        super(provider, context);
+        
+        if (context instanceof RenderContext)
+        {
+            RenderContext renderContext = (RenderContext) context;
+            
+            this.setRenderMode(renderContext.getRenderMode());
+            this.setObject(renderContext.getObject());
+            this.setPassiveMode(renderContext.isPassiveMode());            
+        }
+        else
+        {
+            this.setRenderMode(RenderMode.VIEW);            
+        }
+        
+        this.ourValuesMap = new HashMap<String, Serializable>(4, 1.0f);
+    }
+    
     public void setValue(String key, Serializable value)
     {
-    	this.ourValuesMap.put(key, value);
+        this.ourValuesMap.put(key, value);
 
-    	// remove from our normalized depth map as well
-    	if(this.normalizedValuesMap != null)
-    	{
-    		this.normalizedValuesMap.remove(key);
-    	}    	
+        // remove from our normalized depth map as well
+        if (this.normalizedValuesMap != null)
+        {
+            this.normalizedValuesMap.remove(key);
+        }        
     }
 
     public Serializable getValue(String key)
     {
-    	Serializable value = (Serializable) this.ourValuesMap.get(key);
-    	if(value == null)
-    	{
-    		// check if a wrapped context has the value
-    		value = this.getOriginalContext().getValue(key);
-    	}
-    	return value;
+        Serializable value = (Serializable) this.ourValuesMap.get(key);
+        if (value == null)
+        {
+            // check if a wrapped context has the value
+            value = this.getOriginalContext().getValue(key);
+        }
+        return value;
     }
 
     public void removeValue(String key)
     {
-    	this.ourValuesMap.remove(key);
-    	
-    	// remove from our normalized depth map as well
-    	if(this.normalizedValuesMap != null)
-    	{
-    		this.normalizedValuesMap.remove(key);
-    	}
+        this.ourValuesMap.remove(key);
+        
+        // remove from our normalized depth map as well
+        if (this.normalizedValuesMap != null)
+        {
+            this.normalizedValuesMap.remove(key);
+        }
     }
     
     public boolean hasValue(String key)
     {
-    	return this.ourValuesMap.containsKey(key);
+        return this.ourValuesMap.containsKey(key);
     }
     
     public synchronized Map<String, Serializable> getValuesMap()
     {
-    	if(this.normalizedValuesMap == null)
-    	{
-    		this.normalizedValuesMap = new HashMap<String, Serializable>(16, 1.0f);
-    		
-    		RequestContext rc = (RequestContext) this;
-    		
-    		// build the stack
-    		Stack<RequestContext> stack = new Stack<RequestContext>();
-    		boolean build = true;
-    		while(build)
-    		{
-    			stack.push(rc);
-    			
-    			if(rc instanceof WrappedRequestContext)
-    			{
-    				rc = ((WrappedRequestContext)rc).getOriginalContext();
-    			}
-    			else
-    			{
-    				build = false;
-    			}
-    		}
-    		
-    		// pop out the stack and populate variables
-    		while(stack.size() > 0)
-    		{
-    			rc = (RequestContext) stack.peek();
-    			this.normalizedValuesMap.putAll(rc.getValuesMap());
-    			
-    			stack.pop();
-    		}
-    	}
-    	
-    	return this.normalizedValuesMap;
+        if (this.normalizedValuesMap == null)
+        {
+            this.normalizedValuesMap = new HashMap<String, Serializable>(16, 1.0f);
+            
+            RequestContext rc = (RequestContext) this;
+            
+            // build the stack
+            Stack<RequestContext> stack = new Stack<RequestContext>();
+            boolean build = true;
+            while (build)
+            {
+                stack.push(rc);
+                
+                if (rc instanceof WrappedRequestContext)
+                {
+                    rc = ((WrappedRequestContext)rc).getOriginalContext();
+                }
+                else
+                {
+                    build = false;
+                }
+            }
+            
+            // pop out the stack and populate variables
+            while (stack.size() != 0)
+            {
+                rc = (RequestContext) stack.peek();
+                this.normalizedValuesMap.putAll(rc.getValuesMap());
+                
+                stack.pop();
+            }
+        }
+        
+        return this.normalizedValuesMap;
     }
-    
-    // TODO: Provide for namespaced parameters
-    
-    /*
-    public Serializable getParameter(String key)
-    {
-    	return this.context.getParameter(key);
-    }
-
-    public boolean hasParameter(String key)
-    {
-    	return this.context.hasParameter(key);
-    }
-    
-    public Map<String, Serializable> getParameters()
-    {
-    	return this.context.getParameters();
-    }
-    */
-
 }
-	
+    

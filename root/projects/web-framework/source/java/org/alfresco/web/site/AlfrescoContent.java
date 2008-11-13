@@ -115,7 +115,7 @@ public class AlfrescoContent extends AbstractContent
                     }
                     if (value != null)
                     {  
-                        if(value instanceof org.json.JSONArray)
+                        if (value instanceof org.json.JSONArray)
                         {
                         }
                         else

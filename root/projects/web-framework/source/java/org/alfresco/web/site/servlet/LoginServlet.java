@@ -50,17 +50,17 @@ public class LoginServlet extends BaseServlet
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-    	String username = (String) request.getParameter("username");
-    	String password = (String) request.getParameter("password");
-    	String successPage = (String) request.getParameter("success");
-    	String failurePage = (String) request.getParameter("failure");
-    	
-    	// See if we can load the user with this identity
-    	boolean success = false;
-    	try
-    	{
-	    	UserFactory userFactory = FrameworkHelper.getUserFactory();
-	    	
+        String username = (String) request.getParameter("username");
+        String password = (String) request.getParameter("password");
+        String successPage = (String) request.getParameter("success");
+        String failurePage = (String) request.getParameter("failure");
+        
+        // See if we can load the user with this identity
+        boolean success = false;
+        try
+        {
+            UserFactory userFactory = FrameworkHelper.getUserFactory();
+            
             // see if we can authenticate the user
             boolean authenticated = userFactory.authenticate(request, username, password);
             if (authenticated)
@@ -71,36 +71,36 @@ public class LoginServlet extends BaseServlet
                 
                 // mark the fact that we succeeded
                 success = true;
-    	    }
-    	}
-    	catch (Throwable err)
-    	{
-    		throw new ServletException(err);
-    	}
-    	
+            }
+        }
+        catch (Throwable err)
+        {
+            throw new ServletException(err);
+        }
+        
         // If they succeeded in logging in, redirect to the success page
         // Otherwise, redirect to the failure page
         if (success)
         {
-        	if (successPage != null)
-        	{
-        		response.sendRedirect(successPage);
-        	}
-        	else
-        	{
-        		response.sendRedirect(request.getContextPath());
-        	}
+            if (successPage != null)
+            {
+                response.sendRedirect(successPage);
+            }
+            else
+            {
+                response.sendRedirect(request.getContextPath());
+            }
         }
         else
         {
-        	if (failurePage != null)
-        	{
-        		response.sendRedirect(failurePage);
-        	}
-        	else
-        	{
-        		response.sendRedirect(request.getContextPath());
-        	}
+            if (failurePage != null)
+            {
+                response.sendRedirect(failurePage);
+            }
+            else
+            {
+                response.sendRedirect(request.getContextPath());
+            }
         }        
     }
 }

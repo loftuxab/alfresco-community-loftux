@@ -49,11 +49,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
 {
-    private static Log logger = LogFactory.getLog(RemoteStoreModelObjectPersister.class);
-    
-    protected final RemoteStore remoteStore;
-    
-    
     /**
      * Instantiates a new store model object persister.
      * 
@@ -70,67 +65,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
         {
             throw new IllegalArgumentException("Store must be a RemoteStore instance.");
         }
-        this.remoteStore = (RemoteStore)store;
         this.id = "RemoteStore_" + store.getBasePath() + "_" + this.objectTypeId; 
-    }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#getObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
-     */
-    @Override
-    public ModelObject getObject(ModelPersistenceContext context, String objectId)
-        throws ModelObjectPersisterException    
-    {
-        return super.getObject(context, objectId);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#saveObject(org.alfresco.web.framework.ModelPersistenceContext, org.alfresco.web.framework.ModelObject)
-     */
-    @Override
-    public synchronized boolean saveObject(ModelPersistenceContext context, ModelObject modelObject)
-        throws ModelObjectPersisterException    
-    {
-        return super.saveObject(context, modelObject);
-    }
-        
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#removeObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
-     */
-    @Override
-    public boolean removeObject(ModelPersistenceContext context, String objectId)
-        throws ModelObjectPersisterException    
-    {
-    	return super.removeObject(context, objectId);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#newObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
-     */
-    @Override
-    public ModelObject newObject(ModelPersistenceContext context, String objectId)
-        throws ModelObjectPersisterException
-    {
-    	return super.newObject(context, objectId);
-    }
-        
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#hasObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
-     */
-    @Override
-    public boolean hasObject(ModelPersistenceContext context, String objectId)
-    {
-    	return super.hasObject(context, objectId);
-    }  
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#getAllObjects(org.alfresco.web.framework.ModelPersistenceContext)
-     */
-    @Override
-    public Map<String, ModelObject> getAllObjects(ModelPersistenceContext context)
-        throws ModelObjectPersisterException
-    {
-    	return super.getAllObjects(context);
     }
     
     /**

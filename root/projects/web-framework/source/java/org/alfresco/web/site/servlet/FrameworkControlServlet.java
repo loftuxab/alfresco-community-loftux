@@ -78,7 +78,7 @@ public class FrameworkControlServlet extends BaseServlet
         {
             context = RequestUtil.getRequestContext(request);
         }
-        catch(RequestContextException rce)
+        catch (RequestContextException rce)
         {
             throw new ServletException("Unable to retrieve request context from request", rce);
         }
@@ -96,7 +96,7 @@ public class FrameworkControlServlet extends BaseServlet
             throw new ServletException("Invalid URL: " + uri);
         }
         String mode = t.nextToken();
-        if( !t.hasMoreTokens())
+        if ( !t.hasMoreTokens())
         {
             throw new ServletException("Invalid URL: " + uri);
         }
@@ -104,15 +104,15 @@ public class FrameworkControlServlet extends BaseServlet
         
         // load additional arguments, if any
         ArrayList<String> args = new ArrayList<String>();
-        if(t.hasMoreTokens())
+        if (t.hasMoreTokens())
         {
             args.add(t.nextToken());            
         }
                 
         // CACHE
-        if(MODE_CACHE.equalsIgnoreCase(mode))
+        if (MODE_CACHE.equalsIgnoreCase(mode))
         {
-            if(MODE_CACHE_COMMAND_INVALIDATE.equalsIgnoreCase(command))
+            if (MODE_CACHE_COMMAND_INVALIDATE.equalsIgnoreCase(command))
             {
                 // invalidate the model service object cache
                 CacheUtil.invalidateModelObjectServiceCache(context);
@@ -120,33 +120,33 @@ public class FrameworkControlServlet extends BaseServlet
         }
         
         // WEBSCRIPTS
-        if(MODE_WEBSCRIPTS.equalsIgnoreCase(mode))
+        if (MODE_WEBSCRIPTS.equalsIgnoreCase(mode))
         {
-        	if(MODE_WEBSCRIPTS_COMMAND_RESET.equalsIgnoreCase(command))
-        	{
-        		resetWebScripts();
-        	}
+            if (MODE_WEBSCRIPTS_COMMAND_RESET.equalsIgnoreCase(command))
+            {
+                resetWebScripts();
+            }
         }
     }
     
     protected void resetWebScripts()
     {
-		Container container = (Container) FrameworkHelper.getApplicationContext().getBean("webframework.webscripts.container");
-		if(container != null)
-		{
+        Container container = (Container) FrameworkHelper.getApplicationContext().getBean("webframework.webscripts.container");
+        if (container != null)
+        {
             int previousCount = container.getRegistry().getWebScripts().size();
             int previousFailures = container.getRegistry().getFailures().size();
             
-			container.reset();
-			
-			// debug out
-			FrameworkHelper.getLogger().info("Reset Web Scripts Registry; registered " + container.getRegistry().getWebScripts().size() + " Web Scripts.  Previously, there were " + previousCount + ".");
-			
-			int newFailures = container.getRegistry().getFailures().size();
+            container.reset();
+            
+            // debug out
+            FrameworkHelper.getLogger().info("Reset Web Scripts Registry; registered " + container.getRegistry().getWebScripts().size() + " Web Scripts.  Previously, there were " + previousCount + ".");
+            
+            int newFailures = container.getRegistry().getFailures().size();
             if (newFailures != 0 || previousFailures != 0)
             {
-            	FrameworkHelper.getLogger().info("Warning: found " + newFailures + " broken Web Scripts.  Previously, there were " + previousFailures + ".");
+                FrameworkHelper.getLogger().info("Warning: found " + newFailures + " broken Web Scripts.  Previously, there were " + previousFailures + ".");
             }
-		}    	
+        }        
     }
 }

@@ -177,7 +177,7 @@ public final class ScriptModelObject extends ScriptBase
      */
     public void setTitle(Serializable value)
     {
-        if(value != null)
+        if (value != null)
         {
             getProperties().put("title", value);
         }
@@ -204,7 +204,7 @@ public final class ScriptModelObject extends ScriptBase
      */
     public void setDescription(Serializable value)
     {
-        if(value != null)
+        if (value != null)
         {
             getProperties().put("description", value);
         }
@@ -246,7 +246,7 @@ public final class ScriptModelObject extends ScriptBase
     
     public ScriptResources getResources()
     {
-    	return this.resources;    	
+        return this.resources;        
     }
     
     
@@ -373,9 +373,9 @@ public final class ScriptModelObject extends ScriptBase
      */
     public ScriptModelObject clone()
     {
-    	String objectTypeId = this.getModelObject().getTypeId();
-    	String objectId = this.getModelObject().getId();
-    	
+        String objectTypeId = this.getModelObject().getTypeId();
+        String objectId = this.getModelObject().getId();
+        
         ModelObject obj = getModel().clone(objectTypeId, objectId);
         return ScriptHelper.toScriptModelObject(context, obj);
     }
@@ -386,11 +386,11 @@ public final class ScriptModelObject extends ScriptBase
      */
     public ScriptModelObject clone(String newObjectId)
     {
-    	ParameterCheck.mandatory("newObjectId", newObjectId);
+        ParameterCheck.mandatory("newObjectId", newObjectId);
 
-    	String objectTypeId = this.getModelObject().getTypeId();
-    	String objectId = this.getModelObject().getId();
-    	
+        String objectTypeId = this.getModelObject().getTypeId();
+        String objectId = this.getModelObject().getId();
+        
         ModelObject obj = getModel().clone(objectTypeId, objectId, newObjectId);
         return ScriptHelper.toScriptModelObject(context, obj);
     }

@@ -99,7 +99,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     protected AbstractRequestContext(HttpServletRequest request)
     {
-    	// initialize maps
+        // initialize maps
         this.valuesMap = new HashMap<String, Serializable>(16, 1.0f);
         this.parametersMap = new HashMap<String, Serializable>(16, 1.0f);
         this.components = new HashMap<String, Component>(16, 1.0f);
@@ -147,7 +147,7 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         String title = "Web Application";
         
-        if(getSiteConfiguration() != null)
+        if (getSiteConfiguration() != null)
         {
             title = getSiteConfiguration().getTitle();
         }
@@ -275,7 +275,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public void setTemplate(TemplateInstance currentTemplate)
     {
-    	this.currentTemplate = currentTemplate;    	
+        this.currentTemplate = currentTemplate;        
     }
     
     
@@ -302,11 +302,11 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public String getCurrentObjectId()
     {
-    	String id = null;    	
-    	if (getCurrentObject() != null)
-    	{
-    		id = getCurrentObject().getId();
-    	}
+        String id = null;        
+        if (getCurrentObject() != null)
+        {
+            id = getCurrentObject().getId();
+        }
         return id;
     }
 
@@ -325,7 +325,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public org.alfresco.web.site.Content getCurrentObject()
     {
-    	return this.currentObject;
+        return this.currentObject;
     }
 
     /**
@@ -376,7 +376,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */    
     public WebFrameworkConfigElement getConfig()
     {
-    	return FrameworkHelper.getConfig();
+        return FrameworkHelper.getConfig();
     }
 
     /**
@@ -386,7 +386,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public RemoteConfigElement getRemoteConfig()
     {
-    	return FrameworkHelper.getRemoteConfig();
+        return FrameworkHelper.getRemoteConfig();
     }
 
     /**
@@ -425,12 +425,12 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public String getUserId()
     {
-    	String userId = null;
-    	if(getUser() != null)
-    	{
-    		userId = getUser().getId();
-    	}
-    	return userId;
+        String userId = null;
+        if (getUser() != null)
+        {
+            userId = getUser().getId();
+        }
+        return userId;
     }
 
     /**
@@ -448,7 +448,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public void setValue(String key, Serializable value)
     {
-    	this.valuesMap.put(key, value);    	
+        this.valuesMap.put(key, value);
     }
 
     /* (non-Javadoc)
@@ -456,7 +456,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Serializable getValue(String key)
     {
-    	return this.valuesMap.get(key);    	
+        return this.valuesMap.get(key);
     }
 
     /* (non-Javadoc)
@@ -464,7 +464,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public void removeValue(String key)
     {
-    	this.valuesMap.remove(key);
+        this.valuesMap.remove(key);
     }
     
     /* (non-Javadoc)
@@ -472,7 +472,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public boolean hasValue(String key)
     {
-    	return (this.valuesMap.get(key) != null);
+        return (this.valuesMap.get(key) != null);
     }
     
     /* (non-Javadoc)
@@ -480,7 +480,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Map<String, Serializable> getValuesMap()
     {
-    	return this.valuesMap;
+        return this.valuesMap;
     }
     
     /* (non-Javadoc)
@@ -488,7 +488,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Serializable getParameter(String key)
     {
-    	return this.parametersMap.get(key);
+        return this.parametersMap.get(key);
     }
 
     /* (non-Javadoc)
@@ -496,7 +496,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public boolean hasParameter(String key)
     {
-    	return (this.parametersMap.get(key) != null);
+        return (this.parametersMap.get(key) != null);
     }
     
     /* (non-Javadoc)
@@ -504,7 +504,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Map<String, Serializable> getParameters()
     {
-    	return this.parametersMap;
+        return this.parametersMap;
     }
     
     /* (non-Javadoc)
@@ -598,7 +598,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public String getRequestMethod()
     {
-    	return this.getRequest().getMethod();
+        return this.getRequest().getMethod();
     }
     
     /* (non-Javadoc)
@@ -614,7 +614,7 @@ public abstract class AbstractRequestContext implements RequestContext
             {
                 content = new InputStreamContent(getRequest().getInputStream(), getRequest().getContentType(), getRequest().getCharacterEncoding());
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 throw new WebScriptException("Failed to retrieve request content", e);
             }

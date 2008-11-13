@@ -31,33 +31,21 @@ package org.alfresco.web.framework.render;
  */
 public enum RenderMode 
 {
-	VIEW("view"),
-	EDIT("edit"),
-	HELP("help"),
-	ADMIN("admin");
-	
-	private final String mode;
-	
-	private RenderMode(String mode)
-	{
-		this.mode = mode;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return this.mode;
-	}
-	
-	public static RenderMode fromString(String mode)
-	{
-		for(RenderMode e: values())
-		{
-			if(e.mode.equals(mode))
-			{
-				return e;
-			}
-		}
-		return null;
-	}
+    VIEW("view"),
+    EDIT("edit"),
+    HELP("help"),
+    ADMIN("admin");
+    
+    private final String mode;
+    
+    private RenderMode(String mode)
+    {
+        this.mode = mode;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.mode;
+    }
 }

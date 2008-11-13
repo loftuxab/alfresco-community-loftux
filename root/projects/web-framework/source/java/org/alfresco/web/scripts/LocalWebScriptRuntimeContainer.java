@@ -112,14 +112,14 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         {
             ProcessorModelHelper.populateTemplateModel(context, params);
         }
-        catch(RendererExecutionException ree)
+        catch (RendererExecutionException ree)
         {
             // This exception is only thrown when processing
             // template objects, thus it shouldn't occur for web scripts
         }
-        catch(UnsupportedEncodingException uee)
+        catch (UnsupportedEncodingException uee)
         {
-        	// TODO: how to handle this?
+            // TODO: how to handle this?
         }
         
         return params;

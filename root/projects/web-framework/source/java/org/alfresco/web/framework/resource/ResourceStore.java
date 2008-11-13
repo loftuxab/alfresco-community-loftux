@@ -33,58 +33,58 @@ package org.alfresco.web.framework.resource;
  */
 public interface ResourceStore 
 {
-	/**
-	 * Returns the names of attributes on the given resource
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public String[] getAttributeNames(String id);
-	
-	/**
-	 * Returns the given attribute for the given resource
-	 * 
-	 * @param id
-	 * @param name
-	 * 
-	 * @return value
-	 */
-	public String getAttribute(String id, String name);
-	
-	/**
-	 * Sets an attribute for a given resource
-	 * 
-	 * @param id
-	 * @param name
-	 * @param value
-	 */
-	public void setAttribute(String id, String name, String value);
-	
-	/**
-	 * Removes an attribute with the given name for the given
-	 * resource
-	 * 
-	 * @param id
-	 * @param name
-	 */
-	public void removeAttribute(String id, String name);
-	
-	/**
-	 * Gets the resource data value
-	 * 
-	 * @param id
-	 * 
-	 * @return the value
-	 */
-	public String getValue(String id);
-	
-	/**
-	 * Sets the resource data value
-	 * 
-	 * @param id
-	 * @param value
-	 * 
-	 * @return the value
-	 */
-	public void setValue(String id, String value);	
+    /**
+     * Returns the names of attributes on the given resource
+     * 
+     * @param id
+     * @return
+     */
+    public String[] getAttributeNames(String id);
+    
+    /**
+     * Returns the given attribute for the given resource
+     * 
+     * @param id
+     * @param name
+     * 
+     * @return value
+     */
+    public String getAttribute(String id, String name);
+    
+    /**
+     * Sets an attribute for a given resource
+     * 
+     * @param id
+     * @param name
+     * @param value
+     */
+    public void setAttribute(String id, String name, String value);
+    
+    /**
+     * Removes an attribute with the given name for the given
+     * resource
+     * 
+     * @param id
+     * @param name
+     */
+    public void removeAttribute(String id, String name);
+    
+    /**
+     * Gets the resource data value
+     * 
+     * @param id
+     * 
+     * @return the value
+     */
+    public String getValue(String id);
+    
+    /**
+     * Sets the resource data value
+     * 
+     * @param id
+     * @param value
+     * 
+     * @return the value
+     */
+    public void setValue(String id, String value);    
 }

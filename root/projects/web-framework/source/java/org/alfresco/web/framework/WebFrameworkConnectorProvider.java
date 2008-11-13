@@ -52,16 +52,16 @@ public class WebFrameworkConnectorProvider implements ConnectorProvider
         Connector conn = null;
         RequestContext rc = ThreadLocalRequestContext.getRequestContext();
 
-        if(rc != null)
+        if (rc != null)
         {
-	    	try
-	        {
-	            conn = FrameworkHelper.getConnector(rc, endpoint);
-	        }
-	        catch (RemoteConfigException rce)
-	        {
-	            throw new AlfrescoRuntimeException("Failed to bind connector to remote store.", rce);
-	        }
+            try
+            {
+                conn = FrameworkHelper.getConnector(rc, endpoint);
+            }
+            catch (RemoteConfigException rce)
+            {
+                throw new AlfrescoRuntimeException("Failed to bind connector to remote store.", rce);
+            }
         }
 
         return conn;

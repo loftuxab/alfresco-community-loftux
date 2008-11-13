@@ -148,7 +148,7 @@ public class PresetsManager
                     }
                     catch (DocumentException de)
                     {
-                    	de.printStackTrace();
+                        de.printStackTrace();
                         throw new AlfrescoRuntimeException("Error processing presets XML file: " +
                                 file + " in store: " + store.toString(), de);
                     }

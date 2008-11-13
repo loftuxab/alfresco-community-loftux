@@ -67,7 +67,7 @@ public class PresentationUtil
     public static void renderPage(RenderContext context) 
             throws RequestDispatchException
     {
-    	renderPage(context, RenderFocus.BODY);
+        renderPage(context, RenderFocus.BODY);
     }
 
     /**
@@ -77,7 +77,7 @@ public class PresentationUtil
      * @param renderFocus
      */
     public static void renderPage(RenderContext context, 
-    		RenderFocus renderFocus) 
+            RenderFocus renderFocus) 
             throws RequestDispatchException
     {
         try
@@ -92,7 +92,7 @@ public class PresentationUtil
     }
     
     public static void renderChromelessRegion(RenderContext context,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String templateId, 
             String regionId, 
             String regionScopeId) 
@@ -102,7 +102,7 @@ public class PresentationUtil
     }
 
     public static void renderRegion(RenderContext context,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String templateId,
             String regionId,
             String regionScopeId) 
@@ -112,11 +112,11 @@ public class PresentationUtil
     }
     
     public static void renderRegion(RenderContext context,
-    		RenderFocus renderFocus,
-    		String templateId, 
-    		String regionId, 
-    		String regionScopeId, 
-    		String overrideChromeId) 
+            RenderFocus renderFocus,
+            String templateId, 
+            String regionId, 
+            String regionScopeId, 
+            String overrideChromeId) 
             throws RequestDispatchException 
     {
         try
@@ -132,7 +132,7 @@ public class PresentationUtil
     }    
 
     public static void renderChromelessComponent(RenderContext context,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String componentId) throws RequestDispatchException
     {
         try
@@ -148,14 +148,14 @@ public class PresentationUtil
     
 
     public static void renderComponent(RenderContext context,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String componentId) throws RequestDispatchException
     {
         renderComponent(context, renderFocus, componentId, null);
     }
 
     public static void renderComponent(RenderContext context,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String componentId,
             String chromeId) throws RequestDispatchException
     {
@@ -177,7 +177,7 @@ public class PresentationUtil
     public static void renderContent(RenderContext context) 
             throws RequestDispatchException
     {
-    	renderContent(context, RenderFocus.BODY);
+        renderContent(context, RenderFocus.BODY);
     }
     
     /**
@@ -188,7 +188,7 @@ public class PresentationUtil
      * @param renderFocus
      */
     public static void renderContent(RenderContext context, 
-    		RenderFocus renderFocus) 
+            RenderFocus renderFocus) 
             throws RequestDispatchException
     {
         try
@@ -263,8 +263,8 @@ public class PresentationUtil
         context.getLogger().error(t);
         try
         {
-        	String regionSourceId = RenderUtil.determineSourceId(context, regionScopeId);
-        	
+            String regionSourceId = RenderUtil.getSourceId(context, regionScopeId);
+            
             context.getRequest().setAttribute("error", t);
             context.getRequest().setAttribute("error-templateId", templateId);
             context.getRequest().setAttribute("error-regionId", regionId);

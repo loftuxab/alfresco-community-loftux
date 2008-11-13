@@ -35,29 +35,29 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public class RenderContextRequest extends HttpServletRequestWrapper
 {
-	public static final String ATTRIB_RENDER_CONTEXT = "renderContext";
-	protected RenderContext renderContext;
-	
-	public RenderContextRequest(RenderContext context)
-	{
-		super(context.getRequest());
+    public static final String ATTRIB_RENDER_CONTEXT = "renderContext";
+    protected RenderContext renderContext;
+    
+    public RenderContextRequest(RenderContext context)
+    {
+        super(context.getRequest());
 
-		renderContext = context;
-	}
-	
-	public Object getAttribute(String key)
-	{
-		Object value = null;
-		
-		if(ATTRIB_RENDER_CONTEXT.equalsIgnoreCase(key))
-		{
-			value = this.renderContext;
-		}
-		else
-		{
-			value = super.getAttribute(key);
-		}
-		
-		return value;
-	}
+        renderContext = context;
+    }
+    
+    public Object getAttribute(String key)
+    {
+        Object value = null;
+        
+        if (ATTRIB_RENDER_CONTEXT.equalsIgnoreCase(key))
+        {
+            value = this.renderContext;
+        }
+        else
+        {
+            value = super.getAttribute(key);
+        }
+        
+        return value;
+    }
 }

@@ -60,7 +60,7 @@ public class WebFrameworkScriptRemote
      */
     public WebFrameworkScriptRemote(RequestContext context)
     {
-    	this.context = context;
+        this.context = context;
     }
     
     /**
@@ -70,7 +70,7 @@ public class WebFrameworkScriptRemote
      */
     private RequestContext getRequestContext()
     {
-    	return this.context;
+        return this.context;
     }
         
     /**
@@ -81,19 +81,19 @@ public class WebFrameworkScriptRemote
      */
     public ScriptRemoteConnector connect()
     {
-    	ScriptRemoteConnector remoteConnector = null;
-    	
-    	// Check whether a remote configuration has been provided
-    	RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
-        if(remoteConfig != null)
+        ScriptRemoteConnector remoteConnector = null;
+        
+        // Check whether a remote configuration has been provided
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        if (remoteConfig != null)
         {
-        	// See if we have a default endpoint id
-        	String defaultEndpointId = remoteConfig.getDefaultEndpointId();
-        	if(defaultEndpointId != null)
-        	{
-        		// Construct for this endpoint id
+            // See if we have a default endpoint id
+            String defaultEndpointId = remoteConfig.getDefaultEndpointId();
+            if (defaultEndpointId != null)
+            {
+                // Construct for this endpoint id
                 remoteConnector = connect(defaultEndpointId);
-        	}
+            }
         }
         
         return remoteConnector;
@@ -109,58 +109,58 @@ public class WebFrameworkScriptRemote
      */
     public ScriptRemoteConnector connect(String endpointId)
     {
-    	ScriptRemoteConnector remoteConnector = null;
-    	
-    	// Check whether a remote configuration has been provided    	
-    	RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        ScriptRemoteConnector remoteConnector = null;
+        
+        // Check whether a remote configuration has been provided        
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
         if (remoteConfig != null)
-        {        	
-        	// check whether we have a descriptor for this endpoint
-    		EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
-    		if (descriptor == null)
-    		{
-    			logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
-    		}
-    		else
-    		{
-    			// construct a connector to this endpoint
-    			try
-    			{
-    				// config service
-    				ConfigService configService = FrameworkHelper.getConfigService();
-    				
-    				// the vault
-    				CredentialVault vault = getRequestContext().getCredentialVault();
-    				
-    				if(logger.isDebugEnabled())
-    					logger.debug("Found credential vault: " + vault);
+        {            
+            // check whether we have a descriptor for this endpoint
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
+            if (descriptor == null)
+            {
+                logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
+            }
+            else
+            {
+                // construct a connector to this endpoint
+                try
+                {
+                    // config service
+                    ConfigService configService = FrameworkHelper.getConfigService();
+                    
+                    // the vault
+                    CredentialVault vault = getRequestContext().getCredentialVault();
+                    
+                    if (logger.isDebugEnabled())
+                        logger.debug("Found credential vault: " + vault);
 
-    				// check whether we have a current user
-    				User user = getRequestContext().getUser();
-    				if (user == null || vault == null)
-    				{
-    					if(logger.isDebugEnabled())
-    						logger.debug("No user was found, creating unauthenticated connector");
+                    // check whether we have a current user
+                    User user = getRequestContext().getUser();
+                    if (user == null || vault == null)
+                    {
+                        if (logger.isDebugEnabled())
+                            logger.debug("No user was found, creating unauthenticated connector");
 
-    					// return the non-credential'ed connector to this endpoint
+                        // return the non-credential'ed connector to this endpoint
                         Connector connector = FrameworkHelper.getConnector(endpointId);                       
                         remoteConnector = new ScriptRemoteConnector(connector);
-    				}
-    				else
-    				{
-    					if(logger.isDebugEnabled())
-    						logger.debug("User '" + user.getId() + "' was found, creating authenticated connector");
+                    }
+                    else
+                    {
+                        if (logger.isDebugEnabled())
+                            logger.debug("User '" + user.getId() + "' was found, creating authenticated connector");
 
-    					// return the credential'ed connector to this endpoint
+                        // return the credential'ed connector to this endpoint
                         Connector connector = FrameworkHelper.getConnector(context, endpointId);                        
                         remoteConnector = new ScriptRemoteConnector(connector);
-    				}
-    			}
-    			catch (RemoteConfigException rce)
-    			{
-    				logger.error("Unable to open connection to endpoint: " + endpointId, rce);
-    			}
-    		}
+                    }
+                }
+                catch (RemoteConfigException rce)
+                {
+                    logger.error("Unable to open connection to endpoint: " + endpointId, rce);
+                }
+            }
         }
         
         return remoteConnector;
@@ -182,7 +182,7 @@ public class WebFrameworkScriptRemote
      */
     public Response call(String uri)
     {
-    	return this.connect().call(uri);
+        return this.connect().call(uri);
     }
     
     /**

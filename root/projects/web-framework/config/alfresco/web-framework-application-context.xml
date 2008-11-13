@@ -175,9 +175,9 @@
             <!-- <ref bean="webframework.remotestore.webscripts" /> -->
             <ref bean="webframework.store.templates.custom" />
             <ref bean="webframework.store.webscripts.custom" />
-            <ref bean="webframework.store.templates" />            
+            <ref bean="webframework.store.templates" />
             <ref bean="webframework.store.webscripts" />
-            <ref bean="webframework.store.system-templates" />            
+            <ref bean="webframework.store.system-templates" />
          </list>
       </property>
    </bean>
@@ -201,7 +201,7 @@
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
-
+ 
    <!--  I18N resources and messages Web Script -->
    <bean id="webscript.org.alfresco.web.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" singleton="false" />
 
@@ -242,6 +242,7 @@
       </property>
    </bean>
    
+   
    <!-- Presets manager - should be configured to walk a search path for preset definition files -->
    <bean id="webframework.presets.manager" class="org.alfresco.web.framework.PresetsManager">
       <property name="searchPath" ref="webframework.presets.searchpath" />
@@ -259,11 +260,13 @@
       <property name="templateProcessor" ref="webframework.templateprocessor" />
       <property name="registry" ref="webframework.webscripts.registry" />
    </bean>
+   
    <bean id="webframework.processor.freemarker" class="org.alfresco.web.scripts.FreemarkerProcessor">
       <property name="templateProcessor" ref="webframework.templateprocessor" />
       <property name="scriptProcessor" ref="webframework.scriptprocessor" />
       <property name="templateStore" ref="webframework.store.templates" />
    </bean>
+   
    <bean id="webframework.processor.jsp" class="org.alfresco.web.framework.render.bean.JSPProcessor" />
 
    <!-- Web Framework - Model Object Renderers -->

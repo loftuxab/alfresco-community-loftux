@@ -106,7 +106,7 @@ public class AlfrescoUserFactory extends UserFactory
             // many things might have happened
             // an invalid ticket or perhaps a connectivity issue
             // at any rate, we cannot authenticate
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Exception in AlfrescoUserFactory.authenticate()", ex);
         }
         

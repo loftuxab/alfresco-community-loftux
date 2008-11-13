@@ -38,14 +38,14 @@ import java.util.Map;
  */
 public interface Renderable 
 {
-	/*
+    /*
 
-	JSP EXAMPLE:
+    JSP EXAMPLE:
 
     <processor mode="view">
        <id>jsp</id>
        <url>/abc/view.jsp</url>
-    </processor>	
+    </processor>    
     <processor mode="edit">
        <id>jsp</id>
        <url>/abc/edit.jsp</url>
@@ -62,30 +62,30 @@ public interface Renderable
        <uri>${mode.view.uri}/edit</uri>
     </processor>
 
-	 */
-	
-	/**
-	 * The list of defined render modes
-	 * 
-	 * @return an array of render modes
-	 */
-	public String[] getRenderModes();
+     */
+    
+    /**
+     * The list of defined render modes
+     * 
+     * @return an array of render modes
+     */
+    public String[] getRenderModes();
 
-	/**
-	 * Gets the default 'view' processor id
-	 * 
-	 * @return the processor id
-	 */
-	public String getProcessorId();
-	
-	/**
-	 * Gets the processor id
-	 * 
-	 * @param renderMode
-	 * 
-	 * @return the processor id
-	 */
-	public String getProcessorId(String renderMode);
+    /**
+     * Gets the default 'view' processor id
+     * 
+     * @return the processor id
+     */
+    public String getProcessorId();
+    
+    /**
+     * Gets the processor id
+     * 
+     * @param renderMode
+     * 
+     * @return the processor id
+     */
+    public String getProcessorId(String renderMode);
 
     /**
      * Gets a default 'view' processor property
@@ -95,7 +95,7 @@ public interface Renderable
      * @return the processor property value
      */
     public String getProcessorProperty(String propertyName);
-	
+    
     /**
      * Gets a processor property
      * 

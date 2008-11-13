@@ -34,34 +34,34 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class URIResourceResolver extends AbstractResourceResolver 
 {
-	public URIResourceResolver(Resource resource)
-	{
-		super(resource);
-	}
+    public URIResourceResolver(Resource resource)
+    {
+        super(resource);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getDownloadURI(HttpServletRequest request)
-	{
-		return this.resource.getValue();
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadataURI(HttpServletRequest request)
-	{
-		// there is no way to interrogate the asset
-		return null;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadata(HttpServletRequest request)
-	{
-		// NOT IMPLEMENTED, return null
-		return null;
-	}		
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getDownloadURI(HttpServletRequest request)
+    {
+        return this.resource.getValue();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadataURI(HttpServletRequest request)
+    {
+        // there is no way to interrogate the asset
+        return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadata(HttpServletRequest request)
+    {
+        // NOT IMPLEMENTED, return null
+        return null;
+    }        
 }

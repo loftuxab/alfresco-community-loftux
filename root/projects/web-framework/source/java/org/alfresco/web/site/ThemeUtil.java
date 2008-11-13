@@ -88,7 +88,7 @@ public class ThemeUtil
         String themeId = context.getThemeId();
         if (themeId == null)
         {
-        	themeId = FrameworkHelper.getConfig().getDefaultThemeId();
+            themeId = FrameworkHelper.getConfig().getDefaultThemeId();
             if (themeId == null)
             {
                 themeId = WebFrameworkConstants.DEFAULT_THEME_ID;
@@ -96,7 +96,7 @@ public class ThemeUtil
             
             if (themeId != null)
             {
-            	context.setThemeId(themeId);
+                context.setThemeId(themeId);
             }
         }
     }

@@ -43,8 +43,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractPageMapper implements PageMapper
 {
-	public static Log logger = LogFactory.getLog(PageMapper.class);
-	
+    public static Log logger = LogFactory.getLog(PageMapper.class);
+    
     /**
      * Empty constructor - for instantiation via reflection 
      */
@@ -56,14 +56,14 @@ public abstract class AbstractPageMapper implements PageMapper
      * @see org.alfresco.web.site.PageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
      */
     public void execute(RequestContext context, ServletRequest request)
-    	throws PageMapperException
-	{
-    	executeMapper(context, request);
-    	
-    	// run some additional cleanup logic
-    	postExecute(context, request);
-	}
-               
+        throws PageMapperException
+    {
+        executeMapper(context, request);
+        
+        // run some additional cleanup logic
+        postExecute(context, request);
+    }
+    
     /**
      * Execute the mapper.
      * 
@@ -73,7 +73,7 @@ public abstract class AbstractPageMapper implements PageMapper
      * @throws PageMapperException the page mapper exception
      */
     public abstract void executeMapper(RequestContext context,
-    	ServletRequest request) throws PageMapperException;
+        ServletRequest request) throws PageMapperException;
     
     /**
      * Handles clean up cases
@@ -84,12 +84,12 @@ public abstract class AbstractPageMapper implements PageMapper
      * @throws PageMapperException the page mapper exception
      */
     public void postExecute(RequestContext context, ServletRequest request)
-    	throws PageMapperException
-	{
+        throws PageMapperException
+    {
         if (context.getSiteConfiguration() == null)
         {
-        	if(logger.isDebugEnabled())
-        		debug(context, "No site configuration - performing reset");
+            if (logger.isDebugEnabled())
+                debug(context, "No site configuration - performing reset");
 
             context.setPage(null);
             context.setCurrentObject(null);
@@ -112,8 +112,8 @@ public abstract class AbstractPageMapper implements PageMapper
                     context.setPage(rootPage);
                 }            
             }
-        }	
-	}
+        }    
+    }
     
     /**
      * Gets the page id for a given page type.
@@ -142,9 +142,9 @@ public abstract class AbstractPageMapper implements PageMapper
      * @return
      */
     protected Content loadContent(RequestContext context, String objectId)
-    	throws ContentLoaderException
+        throws ContentLoaderException
     {
-    	return ContentLoaderUtil.loadContent(context, objectId);
+        return ContentLoaderUtil.loadContent(context, objectId);
     }    
     
     /**

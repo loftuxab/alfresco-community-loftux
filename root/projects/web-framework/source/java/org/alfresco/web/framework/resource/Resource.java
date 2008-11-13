@@ -36,132 +36,132 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface Resource extends Serializable
 {
-	public static final String ATTR_ENDPOINT = "endpoint";
-	public static final String ATTR_ID = "id";
-	public static final String ATTR_TYPE = "type";
-	
-	/**
-	 * Returns the id of the resource
-	 * 
-	 * @return the id
-	 */
-	public String getId();
-	
-	/**
-	 * Returns the type of the resource
-	 * 
-	 * @return the type
-	 */
-	public String getType();
-	
-	/**
-	 * Sets the type of the resource
-	 * 
-	 * @param type
-	 */
-	public void setType(String type);
-	
-	/**
-	 * Returns the endpoint of the resource
-	 * 
-	 * @return the endpoint
-	 */
-	public String getEndpoint();
-	
-	/**
-	 * Sets the endpoint of the resource
-	 * 
-	 * @param endpoint
-	 */
-	public void setEndpoint(String endpoint);
-	
-	/**
-	 * Returns the names of attributes
-	 * 
-	 * @return
-	 */
-	public String[] getAttributeNames();
-	
-	/**
-	 * Returns the attribute value for the given attribute name
-	 * 
-	 * @param name
-	 * 
-	 * @return value
-	 */
-	public String getAttribute(String name);
-	
-	/**
-	 * Sets an attribute
-	 * 
-	 * @param name
-	 * @param value
-	 */
-	public void setAttribute(String name, String value);
-	
-	/**
-	 * Removes an attribute
-	 * 
-	 * @param name
-	 */
-	public void removeAttribute(String name);
-	
-	/**
-	 * Gets the resource value
-	 * 
-	 * @return the value
-	 */
-	public String getValue();
-	
-	/**
-	 * Sets the resource value
-	 */
-	public void setValue(String value);
-	
-	/**
-	 * Provides the URI required to retrieve the content stream
-	 *  
-	 * @return
-	 */
-	public String getDownloadURI(HttpServletRequest request);
+    public static final String ATTR_ENDPOINT = "endpoint";
+    public static final String ATTR_ID = "id";
+    public static final String ATTR_TYPE = "type";
+    
+    /**
+     * Returns the id of the resource
+     * 
+     * @return the id
+     */
+    public String getId();
+    
+    /**
+     * Returns the type of the resource
+     * 
+     * @return the type
+     */
+    public String getType();
+    
+    /**
+     * Sets the type of the resource
+     * 
+     * @param type
+     */
+    public void setType(String type);
+    
+    /**
+     * Returns the endpoint of the resource
+     * 
+     * @return the endpoint
+     */
+    public String getEndpoint();
+    
+    /**
+     * Sets the endpoint of the resource
+     * 
+     * @param endpoint
+     */
+    public void setEndpoint(String endpoint);
+    
+    /**
+     * Returns the names of attributes
+     * 
+     * @return
+     */
+    public String[] getAttributeNames();
+    
+    /**
+     * Returns the attribute value for the given attribute name
+     * 
+     * @param name
+     * 
+     * @return value
+     */
+    public String getAttribute(String name);
+    
+    /**
+     * Sets an attribute
+     * 
+     * @param name
+     * @param value
+     */
+    public void setAttribute(String name, String value);
+    
+    /**
+     * Removes an attribute
+     * 
+     * @param name
+     */
+    public void removeAttribute(String name);
+    
+    /**
+     * Gets the resource value
+     * 
+     * @return the value
+     */
+    public String getValue();
+    
+    /**
+     * Sets the resource value
+     */
+    public void setValue(String value);
+    
+    /**
+     * Provides the URI required to retrieve the content stream
+     *  
+     * @return
+     */
+    public String getDownloadURI(HttpServletRequest request);
 
-	/**
-	 * Provides the Proxied URI required to retrieve the content stream
-	 *  
-	 * @return
-	 */
-	public String getProxiedDownloadURI(HttpServletRequest request);
-	
-	/**
-	 * Provides the URI required to access the metadata of the resource
-	 * 
-	 * @return
-	 */
-	public String getMetadataURI(HttpServletRequest request);
+    /**
+     * Provides the Proxied URI required to retrieve the content stream
+     *  
+     * @return
+     */
+    public String getProxiedDownloadURI(HttpServletRequest request);
+    
+    /**
+     * Provides the URI required to access the metadata of the resource
+     * 
+     * @return
+     */
+    public String getMetadataURI(HttpServletRequest request);
 
-	/**
-	 * Provides the URI required to access the metadata of the resource
-	 * 
-	 * @return
-	 */
-	public String getProxiedMetadataURI(HttpServletRequest request);
-	
-	/**
-	 * Fetches the raw metadata from the remote storage location
-	 * 
-	 * @param request
-	 * 
-	 * @return
-	 */
-	public String getRawMetadata(HttpServletRequest request);
+    /**
+     * Provides the URI required to access the metadata of the resource
+     * 
+     * @return
+     */
+    public String getProxiedMetadataURI(HttpServletRequest request);
+    
+    /**
+     * Fetches the raw metadata from the remote storage location
+     * 
+     * @param request
+     * 
+     * @return
+     */
+    public String getRawMetadata(HttpServletRequest request);
 
-	/**
-	 * Fetches the common-container formatted metadata from 
-	 * the remote storage location
-	 * 
-	 * @param request
-	 * 
-	 * @return
-	 */
-	public String getMetadata(HttpServletRequest request);	
+    /**
+     * Fetches the common-container formatted metadata from 
+     * the remote storage location
+     * 
+     * @param request
+     * 
+     * @return
+     */
+    public String getMetadata(HttpServletRequest request);    
 }

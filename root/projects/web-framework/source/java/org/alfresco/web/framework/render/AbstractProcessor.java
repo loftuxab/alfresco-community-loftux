@@ -32,71 +32,71 @@ import org.springframework.context.ApplicationContext;
 
 public abstract class AbstractProcessor implements Processor 
 {
-	protected ApplicationContext applicationContext = null;
-	
+    protected ApplicationContext applicationContext = null;
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Dispatcher#init(org.alfresco.web.framework.render.DispatcherContext)
      */
     public void init(ApplicationContext applicationContext)
-    	throws ProcessorExecutionException
+        throws ProcessorExecutionException
     {
-    	this.applicationContext = applicationContext;
-    	
-    	if(FrameworkHelper.getLogger().isDebugEnabled())
-    	{
-    		FrameworkHelper.getLogger().debug("Dispatcher [" + this.getClass().getName() + "] init");
-    	}
+        this.applicationContext = applicationContext;
+        
+        if (FrameworkHelper.getLogger().isDebugEnabled())
+        {
+            FrameworkHelper.getLogger().debug("Dispatcher [" + this.getClass().getName() + "] init");
+        }
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Processor#execute(org.alfresco.web.framework.render.ProcessorContext, org.alfresco.web.framework.render.RenderFocus)
      */
     public void execute(ProcessorContext processorContext, RenderFocus focus)
-		throws RendererExecutionException
-	{    
-		if(focus== null || focus == RenderFocus.BODY)
-		{
-			executeBody(processorContext);
-		}
-		else if(focus == RenderFocus.ALL)
-		{
-			executeHeader(processorContext);
-			executeBody(processorContext);
-			executeFooter(processorContext);
-		}
-		else if(focus == RenderFocus.HEADER)
-		{
-			executeHeader(processorContext);
-		}
-		else if(focus == RenderFocus.FOOTER)
-		{
-			executeFooter(processorContext);
-		}    	
-	}
+        throws RendererExecutionException
+    {    
+        if (focus == null || focus == RenderFocus.BODY)
+        {
+            executeBody(processorContext);
+        }
+        else if (focus == RenderFocus.ALL)
+        {
+            executeHeader(processorContext);
+            executeBody(processorContext);
+            executeFooter(processorContext);
+        }
+        else if (focus == RenderFocus.HEADER)
+        {
+            executeHeader(processorContext);
+        }
+        else if (focus == RenderFocus.FOOTER)
+        {
+            executeFooter(processorContext);
+        }        
+    }
         
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Processor#executeHeader(org.alfresco.web.framework.render.ProcessorContext)
      */
     public void executeHeader(ProcessorContext processorContext)
-    	throws RendererExecutionException
-	{
-    	// nothing
-	}
+        throws RendererExecutionException
+    {
+        // nothing
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Processor#executeBody(org.alfresco.web.framework.render.ProcessorContext)
      */
     public abstract void executeBody(ProcessorContext processorContext)
-		throws RendererExecutionException;
+        throws RendererExecutionException;
     
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Processor#executeFooter(org.alfresco.web.framework.render.ProcessorContext)
      */
     public void executeFooter(ProcessorContext processorContext)
-    	throws RendererExecutionException
-	{
-    	// nothing
-	}
+        throws RendererExecutionException
+    {
+        // nothing
+    }
     
 
     /**
@@ -113,15 +113,15 @@ public abstract class AbstractProcessor implements Processor
      */
     protected ProcessorDescriptor getRenderingDescriptor(ProcessorContext processorContext)
     {
-    	RenderContext context = processorContext.getRenderContext();
-    	RenderMode renderMode = context.getRenderMode();
-    	
-    	return getRenderingDescriptor(processorContext, renderMode);
+        RenderContext context = processorContext.getRenderContext();
+        RenderMode renderMode = context.getRenderMode();
+        
+        return getRenderingDescriptor(processorContext, renderMode);
     }
 
     protected ProcessorDescriptor getRenderingDescriptor(ProcessorContext processorContext, RenderMode renderMode)
     {
-    	return processorContext.getDescriptor(renderMode);
+        return processorContext.getDescriptor(renderMode);
     }
     
     /**
@@ -135,26 +135,26 @@ public abstract class AbstractProcessor implements Processor
      */
     protected String getProperty(ProcessorContext processorContext, String propertyName)
     {
-    	ProcessorDescriptor descriptor = getRenderingDescriptor(processorContext);
-    	String value = descriptor.get(propertyName);
-    	
-    	// allow for simple variable substitution
-    	// ${mode.view.uri} = uri property value where mode="view"
-    	if(value != null)
-    	{
-    		String modeViewUri = getScalarProperty(processorContext, "uri", RenderMode.VIEW);
-    		if(value.indexOf("${mode.view.uri}") > -1)
-    		{
-    			value = value.replace("${mode.view.uri}", modeViewUri);
-    		}
-    	}
-    	
-    	return value;
+        ProcessorDescriptor descriptor = getRenderingDescriptor(processorContext);
+        String value = descriptor.get(propertyName);
+        
+        // allow for simple variable substitution
+        // ${mode.view.uri} = uri property value where mode="view"
+        if (value != null)
+        {
+            String modeViewUri = getScalarProperty(processorContext, "uri", RenderMode.VIEW);
+            if (value.indexOf("${mode.view.uri}") != -1)
+            {
+                value = value.replace("${mode.view.uri}", modeViewUri);
+            }
+        }
+        
+        return value;
     }
 
     private String getScalarProperty(ProcessorContext processorContext, String propertyName, RenderMode renderMode)
     {
-    	ProcessorDescriptor descriptor = getRenderingDescriptor(processorContext, renderMode);
-    	return descriptor.get(propertyName);
+        ProcessorDescriptor descriptor = getRenderingDescriptor(processorContext, renderMode);
+        return descriptor.get(propertyName);
     }    
 }

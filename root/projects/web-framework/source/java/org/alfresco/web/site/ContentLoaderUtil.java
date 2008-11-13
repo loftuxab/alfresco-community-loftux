@@ -36,84 +36,84 @@ import org.alfresco.web.site.exception.ContentLoaderException;
  */
 public class ContentLoaderUtil 
 {
-	protected static Map<String, ContentLoader> loaderCache;
-	
-	/**
-	 * Considers a piece of content and walks through all of the available
-	 * Content Loaders to find one that can load this content.
-	 * 
-	 * The Content Loaders are cached to help speed up performance.
-	 * 
-	 * With this method, the endpoint is assumed to be the default
-	 * endpoint.
-	 * 
-	 * @param context the context
-	 * @param objectId the object id
-	 * 
-	 * @return the content
-	 * 
-	 * @throws ContentLoaderException the content loader exception
-	 */
-	public synchronized static Content loadContent(RequestContext context, String objectId)
-		throws ContentLoaderException
-	{
-		String endpointId = context.getRemoteConfig().getDefaultEndpointId();
-		return _loadContent(context, objectId, endpointId);
-	}
+    protected static Map<String, ContentLoader> loaderCache;
+    
+    /**
+     * Considers a piece of content and walks through all of the available
+     * Content Loaders to find one that can load this content.
+     * 
+     * The Content Loaders are cached to help speed up performance.
+     * 
+     * With this method, the endpoint is assumed to be the default
+     * endpoint.
+     * 
+     * @param context the context
+     * @param objectId the object id
+     * 
+     * @return the content
+     * 
+     * @throws ContentLoaderException the content loader exception
+     */
+    public synchronized static Content loadContent(RequestContext context, String objectId)
+        throws ContentLoaderException
+    {
+        String endpointId = context.getRemoteConfig().getDefaultEndpointId();
+        return _loadContent(context, objectId, endpointId);
+    }
 
-	public synchronized static Content loadContent(RequestContext context, String objectId, String endpointId)
-		throws ContentLoaderException
-	{
-		return _loadContent(context, objectId, endpointId);
-	}
+    public synchronized static Content loadContent(RequestContext context, String objectId, String endpointId)
+        throws ContentLoaderException
+    {
+        return _loadContent(context, objectId, endpointId);
+    }
 
-	private synchronized static Content _loadContent(RequestContext context, String objectId, String endpointId)
-		throws ContentLoaderException
-	{
-		if(loaderCache == null)
-		{
-			loaderCache = new HashMap<String, ContentLoader>(10, 1.0f);
-		}
-		
-		Content content = null;
-		
-		String[] ids = context.getConfig().getContentLoaderIds();
-		int i = 0;
-		while( (i < ids.length) && (content == null))
-		{
-			ContentLoaderDescriptor descriptor = (ContentLoaderDescriptor) context.getConfig().getContentLoaderDescriptor(ids[i]);
-			if(descriptor != null)
-			{
-				String loaderClassName = (String) descriptor.getImplementationClass();
-				ContentLoader loader = (ContentLoader) loaderCache.get(loaderClassName);
-				if(loader == null)
-				{
-					Class[] argTypes = new Class[] { String.class };
-					Object[] args = new Object[] { endpointId };
-					loader = (ContentLoader) ReflectionHelper.newObject(loaderClassName, argTypes, args);   				
-					if(loader == null)
-					{
-						throw new ContentLoaderException("Unable to instantiate loader for class: " + loaderClassName);
-					}
-					
-					loaderCache.put(loaderClassName, loader);
-				}
-	
-				// first check whether this loader is working against the same endpoint
-				if(endpointId != null && endpointId.equals(loader.getEndpointId()))
-				{
-					// check whether the loader can handle this object
-					if(loader.canHandle(objectId))
-					{
-						content = loader.load(context, objectId);
-					}
-				}
-			}
-			
-			// iterate through loop
-			i++;
-		}
-		
-		return content;
-	}		
+    private synchronized static Content _loadContent(RequestContext context, String objectId, String endpointId)
+        throws ContentLoaderException
+    {
+        if (loaderCache == null)
+        {
+            loaderCache = new HashMap<String, ContentLoader>(10, 1.0f);
+        }
+        
+        Content content = null;
+        
+        String[] ids = context.getConfig().getContentLoaderIds();
+        int i = 0;
+        while( (i < ids.length) && (content == null))
+        {
+            ContentLoaderDescriptor descriptor = (ContentLoaderDescriptor) context.getConfig().getContentLoaderDescriptor(ids[i]);
+            if (descriptor != null)
+            {
+                String loaderClassName = (String) descriptor.getImplementationClass();
+                ContentLoader loader = (ContentLoader) loaderCache.get(loaderClassName);
+                if (loader == null)
+                {
+                    Class[] argTypes = new Class[] { String.class };
+                    Object[] args = new Object[] { endpointId };
+                    loader = (ContentLoader) ReflectionHelper.newObject(loaderClassName, argTypes, args);                   
+                    if (loader == null)
+                    {
+                        throw new ContentLoaderException("Unable to instantiate loader for class: " + loaderClassName);
+                    }
+                    
+                    loaderCache.put(loaderClassName, loader);
+                }
+    
+                // first check whether this loader is working against the same endpoint
+                if (endpointId != null && endpointId.equals(loader.getEndpointId()))
+                {
+                    // check whether the loader can handle this object
+                    if (loader.canHandle(objectId))
+                    {
+                        content = loader.load(context, objectId);
+                    }
+                }
+            }
+            
+            // iterate through loop
+            i++;
+        }
+        
+        return content;
+    }        
 }

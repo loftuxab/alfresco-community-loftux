@@ -322,7 +322,7 @@ public class WebFrameworkManager implements ApplicationContextAware
             // debug
             if (!addedDefaultStore)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Unable to add default store persister for object type id: " + typeIds[i]);                                             
             }
         }

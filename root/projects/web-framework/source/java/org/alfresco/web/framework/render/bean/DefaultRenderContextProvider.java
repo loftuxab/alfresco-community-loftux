@@ -46,65 +46,65 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public final class DefaultRenderContextProvider extends AbstractRenderContextProvider
 {
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.AbstractRenderContextProvider#release(org.alfresco.web.framework.render.RenderContext)
-	 */
-	public void release(RenderContext renderContext)
-	{
-		// nothing to do
-	}
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.AbstractRenderContextProvider#release(org.alfresco.web.framework.render.RenderContext)
+     */
+    public void release(RenderContext renderContext)
+    {
+        // nothing to do
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-	 */
-	public RenderContext provide(RequestContext requestContext,  HttpServletRequest request, HttpServletResponse response)
-	{
-		// create a render context
-		RenderContext renderContext = new DefaultRenderContext(this, requestContext);
-		
-		// short-circuit through to original request and response for now
-		renderContext.setRequest(request);
-		renderContext.setResponse(response);
-		
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    public RenderContext provide(RequestContext requestContext,  HttpServletRequest request, HttpServletResponse response)
+    {
+        // create a render context
+        RenderContext renderContext = new DefaultRenderContext(this, requestContext);
+        
+        // short-circuit through to original request and response for now
+        renderContext.setRequest(request);
+        renderContext.setResponse(response);
+        
         // set to VIEW mode
-		renderContext.setRenderMode(RenderMode.VIEW);		
-		
-		return renderContext;		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.framework.render.RenderContext)
-	 */
-	public RenderContext provide(RenderContext renderContext)
-	{		
-		// create a render context
-		RenderContext newRenderContext = new DefaultRenderContext(this, renderContext);
-		
-		// short-circuit through to original request and response for now
+        renderContext.setRenderMode(RenderMode.VIEW);        
+        
+        return renderContext;        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContextProvider#provide(org.alfresco.web.framework.render.RenderContext)
+     */
+    public RenderContext provide(RenderContext renderContext)
+    {        
+        // create a render context
+        RenderContext newRenderContext = new DefaultRenderContext(this, renderContext);
+        
+        // short-circuit through to original request and response for now
         newRenderContext.setRequest(renderContext.getRequest());
         newRenderContext.setResponse(renderContext.getResponse());
         
         // set to VIEW mode if not otherwise set
-        if(newRenderContext.getRenderMode() == null)
+        if (newRenderContext.getRenderMode() == null)
         {
-        	newRenderContext.setRenderMode(RenderMode.VIEW);
+            newRenderContext.setRenderMode(RenderMode.VIEW);
         }
         
-        return newRenderContext;                				
-	}
+        return newRenderContext;
+    }
 
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.AbstractRenderContextProvider#merge(org.alfresco.web.framework.render.RenderContext, org.alfresco.web.framework.ModelObject)
-	 */
-	public void merge(RenderContext renderContext, ModelObject modelObject)
-	{
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.AbstractRenderContextProvider#merge(org.alfresco.web.framework.render.RenderContext, org.alfresco.web.framework.ModelObject)
+     */
+    public void merge(RenderContext renderContext, ModelObject modelObject)
+    {
         if (modelObject != null)
         {
-        	renderContext.setObject(modelObject);
+            renderContext.setObject(modelObject);
             mergeObject(renderContext, modelObject);
-        }		
-	}
+        }        
+    }
             
     /**
      * Merge object properties into a render context.
@@ -142,7 +142,7 @@ public final class DefaultRenderContextProvider extends AbstractRenderContextPro
         context.setValue(WebFrameworkConstants.RENDER_DATA_PAGE_TYPE_ID, page.getPageTypeId());
         
         // set htmlid
-        context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.determineValidHtmlId(page.getId()));
+        context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.validHtmlId(page.getId()));
     }
     
     
@@ -159,7 +159,7 @@ public final class DefaultRenderContextProvider extends AbstractRenderContextPro
         context.setValue(WebFrameworkConstants.RENDER_DATA_TEMPLATE_TYPE_ID, template.getTemplateType());
 
         // set htmlid
-        context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.determineValidHtmlId(template.getId()));        
+        context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.validHtmlId(template.getId()));        
     }
 
     /**
@@ -177,6 +177,6 @@ public final class DefaultRenderContextProvider extends AbstractRenderContextPro
         context.setValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_SCOPE_ID, component.getScope());
         
         // set htmlid
-        context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.determineValidHtmlId(component.getId()));                
+        context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.validHtmlId(component.getId()));                
     }
 }

@@ -44,19 +44,19 @@ public class HeadTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-    	RenderContext context = getRenderContext();
+        RenderContext context = getRenderContext();
 
         try
         {
             print(RenderUtil.renderTemplateHeaderAsString(context));
         }
-        catch(RendererExecutionException ree)
+        catch (RendererExecutionException ree)
         {
             throw new JspException("Unable to process downstream component head files", ree);
         }
-        catch(UnsupportedEncodingException uee)
+        catch (UnsupportedEncodingException uee)
         {
-        	throw new JspException("Unsupported encoding exception", uee);
+            throw new JspException("Unsupported encoding exception", uee);
         }
         
         return SKIP_BODY;

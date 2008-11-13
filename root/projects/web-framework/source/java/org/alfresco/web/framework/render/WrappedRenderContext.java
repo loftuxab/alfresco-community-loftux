@@ -42,115 +42,115 @@ import org.alfresco.web.site.WrappedRequestContext;
  * 
  * @author muzquiano
  */
-public class WrappedRenderContext
-	extends WrappedRequestContext
-	implements RenderContext, Serializable
+final public class WrappedRenderContext
+    extends WrappedRequestContext
+    implements RenderContext, Serializable
 {
-	protected RenderContext renderContext = null;
-	protected WrappedHttpServletRequest _request = null;
-	protected FakeHttpServletResponse _response = null;
-	
-	public WrappedRenderContext(RenderContext context)
-	{
-		super(context);
-		
-		this.renderContext = context;
-		
-    	// wrap the request
-    	HttpServletRequest request = renderContext.getRequest();
+    final private RenderContext renderContext;
+    final private WrappedHttpServletRequest _request;
+    final private FakeHttpServletResponse _response;
+    
+    public WrappedRenderContext(RenderContext context)
+    {
+        super(context);
+        
+        this.renderContext = context;
+        
+        // wrap the request
+        HttpServletRequest request = renderContext.getRequest();
         _request = new WrappedHttpServletRequest(request);
         
         // fake the response object
         _response = new FakeHttpServletResponse();
-	}
-	
-	public String getContentAsString()
-		throws UnsupportedEncodingException
-	{
-		return _response.getContentAsString();
-	}
+    }
+    
+    public String getContentAsString()
+        throws UnsupportedEncodingException
+    {
+        return _response.getContentAsString();
+    }
 
-	public RenderMode getRenderMode()
-	{
-		return this.renderContext.getRenderMode();
-	}
-	
-	public void setRenderMode(RenderMode renderMode)
-	{
-		this.renderContext.setRenderMode(renderMode);
-	}
-		
-	public HttpServletRequest getRequest()
-	{
-		return this._request;
-	}
-	
-	public void setRequest(HttpServletRequest request)
-	{
-	}
-	
-	public HttpServletResponse getResponse()
-	{
-		return this._response;		
-	}
-	
-	public void setResponse(HttpServletResponse response)
-	{
-	}
-	
-	public ModelObject getObject()
-	{
-		return this.renderContext.getObject();
-	}
-	
-	public void setObject(ModelObject modelObject)
-	{
-		this.renderContext.setObject(modelObject);
-	}
-	
-	public String getRenderId()
-	{
-		return "Wrapped" + this.renderContext.getRenderId();
-	}
-	
-	public void setPassiveMode(boolean passiveMode)
-	{
-		this.renderContext.setPassiveMode(passiveMode);
-	}
-	
-	public boolean isPassiveMode()
-	{
-		return this.renderContext.isPassiveMode();
-	}
-		
-	public RenderContextProvider getProvider()
-	{
-		return this.renderContext.getProvider();
-	}
-	
-	public void release()
-	{
-		this.renderContext.release();
-	}
-	
+    public RenderMode getRenderMode()
+    {
+        return this.renderContext.getRenderMode();
+    }
+    
+    public void setRenderMode(RenderMode renderMode)
+    {
+        this.renderContext.setRenderMode(renderMode);
+    }
+        
+    public HttpServletRequest getRequest()
+    {
+        return this._request;
+    }
+    
+    public void setRequest(HttpServletRequest request)
+    {
+    }
+    
+    public HttpServletResponse getResponse()
+    {
+        return this._response;        
+    }
+    
+    public void setResponse(HttpServletResponse response)
+    {
+    }
+    
+    public ModelObject getObject()
+    {
+        return this.renderContext.getObject();
+    }
+    
+    public void setObject(ModelObject modelObject)
+    {
+        this.renderContext.setObject(modelObject);
+    }
+    
+    public String getRenderId()
+    {
+        return "Wrapped" + this.renderContext.getRenderId();
+    }
+    
+    public void setPassiveMode(boolean passiveMode)
+    {
+        this.renderContext.setPassiveMode(passiveMode);
+    }
+    
+    public boolean isPassiveMode()
+    {
+        return this.renderContext.isPassiveMode();
+    }
+        
+    public RenderContextProvider getProvider()
+    {
+        return this.renderContext.getProvider();
+    }
+    
+    public void release()
+    {
+        this.renderContext.release();
+    }
+    
     public void setValue(String key, Serializable value, int scope)
     {
-    	this.renderContext.setValue(key, value, scope);
+        this.renderContext.setValue(key, value, scope);
     }
     
     public Serializable getValue(String key, int scope)
     {
-    	return this.renderContext.getValue(key, scope);
+        return this.renderContext.getValue(key, scope);
     }
     
     public void removeValue(String key, int scope)
     {
-    	this.renderContext.removeValue(key, scope);
+        this.renderContext.removeValue(key, scope);
     }
     
     public boolean hasValue(String key, int scope)
     {
-    	return this.renderContext.hasValue(key, scope);
+        return this.renderContext.hasValue(key, scope);
     }
 }
-	
+    

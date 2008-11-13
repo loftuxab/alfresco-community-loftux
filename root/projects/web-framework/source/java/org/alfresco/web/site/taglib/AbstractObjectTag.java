@@ -93,9 +93,9 @@ public abstract class AbstractObjectTag extends TagBase
     protected String link(RequestContext context, String pageTypeId, String pageId, String objectId, String formatId)
     {
         // page types
-        if(pageTypeId != null)
+        if (pageTypeId != null)
         {
-            if(objectId != null)
+            if (objectId != null)
             {
                 return context.getLinkBuilder().pageType(context, pageTypeId, formatId, objectId);
             }
@@ -106,9 +106,9 @@ public abstract class AbstractObjectTag extends TagBase
         }
         
         // pages
-        if(pageId != null)
+        if (pageId != null)
         {
-            if(objectId != null)
+            if (objectId != null)
             {
                 return context.getLinkBuilder().page(context, pageId, formatId, objectId);
             }
@@ -119,7 +119,7 @@ public abstract class AbstractObjectTag extends TagBase
         }
         
         // objects
-        if(objectId != null)
+        if (objectId != null)
         {
             return context.getLinkBuilder().object(context, objectId, formatId);
         }

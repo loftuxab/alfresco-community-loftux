@@ -199,7 +199,7 @@ public class RemoteStore implements Store
     {
     	String value = this.webappId;
     	
-    	if(value == null && getStoreContext() != null)
+    	if (value == null && getStoreContext() != null)
     	{
     		value = getStoreContext().getWebappId();
     	}
@@ -229,7 +229,7 @@ public class RemoteStore implements Store
     {
     	String value = this.storeId;
     	
-    	if(value == null && getStoreContext() != null)
+    	if (value == null && getStoreContext() != null)
     	{
     		value = getStoreContext().getStoreId();
     	}
@@ -260,16 +260,16 @@ public class RemoteStore implements Store
     {
     	String value = this.path;
     	
-    	if(getStoreContext() != null)
+    	if (getStoreContext() != null)
     	{
-    		if(getStoreContext().getStoreBasePath() != null)
+    		if (getStoreContext().getStoreBasePath() != null)
     		{
     			value = getStoreContext().getStoreBasePath();
-    			if(!value.endsWith("/"))
+    			if (!value.endsWith("/"))
     			{
     				value += "/";
     			}
-    			if(this.path.startsWith("/"))
+    			if (this.path.startsWith("/"))
     			{
     				value += this.path.substring(1);
     			}
@@ -471,6 +471,10 @@ public class RemoteStore implements Store
         
         if (Status.STATUS_OK == res.getStatus().getCode())
         {
+            // this path defines the path which we wish to consider as the root of the store
+            // this may be: /WEB-INF/classes/alfresco or /alfresco, depending on configuration
+            String storePath = this.getStorePath();
+            
             List<String> list = new ArrayList<String>(128);
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
@@ -479,20 +483,14 @@ public class RemoteStore implements Store
             	// this is always the full path starting from www/avm_webapps...etc
             	String fullPath = t.nextToken();
             	
-            	// this path defines the path which we wish to consider as the root of the store
-            	// this may be: /WEB-INF/classes/alfresco or /alfresco, depending on configuration
-            	String storePath = this.getStorePath();
-            	
             	// truncate the full path so that it starts from our storePath
             	// this is what will be expected from all downstream loaders
             	int x = fullPath.indexOf(storePath);
-            	if(x > -1)
+            	if (x != -1)
             	{
             		fullPath = fullPath.substring(x + storePath.length());
             	}
             	list.add(fullPath);
-            	
-            	//list.add(t.nextToken().substring(this.getStorePath().length()));
             }
             return list.toArray(new String[list.size()]);
         }
@@ -517,6 +515,10 @@ public class RemoteStore implements Store
         
         if (Status.STATUS_OK == res.getStatus().getCode())
         {
+            // this path defines the path which we wish to consider as the root of the store
+            // this may be: /WEB-INF/classes/alfresco or /alfresco, depending on configuration
+            String storePath = this.getStorePath();
+            
             List<String> list = new ArrayList<String>(32);
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
@@ -525,20 +527,14 @@ public class RemoteStore implements Store
             	// this is always the full path starting from www/avm_webapps...etc            	
             	String fullPath = t.nextToken();
             	
-            	// this path defines the path which we wish to consider as the root of the store
-            	// this may be: /WEB-INF/classes/alfresco or /alfresco, depending on configuration
-            	String storePath = this.getStorePath();
-            	
             	// truncate the full path so that it starts from our storePath
             	// this is what will be expected from all downstream loaders
             	int x = fullPath.indexOf(storePath);
-            	if(x > -1)
+            	if (x != -1)
             	{
             		fullPath = fullPath.substring(x + storePath.length());
             	}
             	list.add(fullPath);
-            	
-                //list.add(t.nextToken().substring(path.length()));
             }
             return list.toArray(new String[list.size()]);
         }
@@ -614,16 +610,6 @@ public class RemoteStore implements Store
      */
     private String buildEncodeCall(String method, String documentPath, Map<String, String> args)
     {
-        // TODO: Have this method take into account the currently bound
-        // store id.  The store id could be an avm store id but it could
-        // also potentially be any store in the repository
-        
-        // TODO: Do we need to separate out the concept of a store id
-        // from an AVM store Id?  Are they different?  AVM stores currently
-        // assume a certain path structure to accommodate web projects.
-        // Ideally, this could all be handled via configuration and still
-        // use a single remote store implementation.
-        
         StringBuilder buf = new StringBuilder(128);
         
         buf.append(this.getApi());
@@ -636,10 +622,10 @@ public class RemoteStore implements Store
         {
             buf.append('/').append(URLEncoder.encode(t.nextToken()));
         }
-
+        
         // Append in the store id
         String storeId = this.getStoreId();
-        if(storeId != null)
+        if (storeId != null)
         {
     		if (args == null)
     		{
@@ -650,7 +636,7 @@ public class RemoteStore implements Store
         
         // Append in the webapp id (if applicable)
         String webappId = this.getWebappId();
-        if(webappId != null)
+        if (webappId != null)
         {
     		if (args == null)
     		{
@@ -738,8 +724,8 @@ public class RemoteStore implements Store
     private Connector getConnector() throws RemoteConfigException
     {
     	Connector conn = null;
-    
-    	if(getConnectorProvider() != null)
+    	
+    	if (getConnectorProvider() != null)
     	{
     		conn = getConnectorProvider().provide(this.getEndpoint());
     	}

@@ -46,13 +46,15 @@ import org.springframework.context.ApplicationContext;
 public class FreemarkerProcessor extends AbstractProcessor
 {
     private static final String SCRIPT_RESULTS = "freemarkerRendererScriptResults";
+    
     private PresentationTemplateProcessor templateProcessor;
     private PresentationScriptProcessor scriptProcessor;
     private Store templateStore;
     
+    
     public void init(ApplicationContext applicationContext)
     {
-    	this.templateStore.init();
+        this.templateStore.init();
     }
     
     /**
@@ -62,7 +64,7 @@ public class FreemarkerProcessor extends AbstractProcessor
      */
     public void setTemplateProcessor(PresentationTemplateProcessor templateProcessor)
     {
-    	this.templateProcessor = templateProcessor;
+        this.templateProcessor = templateProcessor;
     }
     
     /**
@@ -72,7 +74,7 @@ public class FreemarkerProcessor extends AbstractProcessor
      */
     public PresentationTemplateProcessor getTemplateProcessor()
     {
-    	return this.templateProcessor;
+        return this.templateProcessor;
     }
     
     /**
@@ -82,7 +84,7 @@ public class FreemarkerProcessor extends AbstractProcessor
      */
     public void setScriptProcessor(PresentationScriptProcessor scriptProcessor)
     {
-    	this.scriptProcessor = scriptProcessor;
+        this.scriptProcessor = scriptProcessor;
     }
     
     /**
@@ -92,7 +94,7 @@ public class FreemarkerProcessor extends AbstractProcessor
      */
     public PresentationScriptProcessor getScriptProcessor()
     {
-    	return this.scriptProcessor;
+        return this.scriptProcessor;
     }
     
     /**
@@ -102,7 +104,7 @@ public class FreemarkerProcessor extends AbstractProcessor
      */
     public void setTemplateStore(Store templateStore)
     {
-    	this.templateStore = templateStore;
+        this.templateStore = templateStore;
     }
     
     /**
@@ -112,42 +114,40 @@ public class FreemarkerProcessor extends AbstractProcessor
      */
     public Store getTemplateStore()
     {
-    	return this.templateStore;
+        return this.templateStore;
     }
     
     public void executeHeader(ProcessorContext pc)
         throws RendererExecutionException
     {
-    	RenderContext context = pc.getRenderContext();
-    	String uri = this.getProperty(pc, "uri");
+        RenderContext context = pc.getRenderContext();
+        String uri = this.getProperty(pc, "uri");
         
         // the current format
         String format = context.getFormatId();
         
-        /**
-         * Attempt to execute the templates associated .head. file, if it has one
-         */
+        // Attempt to execute the templates associated .head. file, if it has one
         
         // path to the template (switches on format)        
         String templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");            
         if (templateProcessor.hasTemplate(templateName))
         {
-        	try
-        	{
-	            // build the model
-	            Map<String, Object> model = new HashMap<String, Object>(32);
-	            ProcessorModelHelper.populateTemplateModel(context, model);
-	            
-	            templateProcessor.process(templateName, model, context.getResponse().getWriter());
-        	}
-        	catch(UnsupportedEncodingException uee)
-        	{
-        		throw new RendererExecutionException(uee);
-        	}
-        	catch(IOException ioe)
-        	{
-        		throw new RendererExecutionException(ioe);
-        	}
+            try
+            {
+                // build the model
+                Map<String, Object> model = new HashMap<String, Object>(32);
+                ProcessorModelHelper.populateTemplateModel(context, model);
+                
+                templateProcessor.process(templateName, model, context.getResponse().getWriter());
+            }
+            catch (UnsupportedEncodingException uee)
+            {
+                throw new RendererExecutionException(uee);
+            }
+            catch (IOException ioe)
+            {
+                throw new RendererExecutionException(ioe);
+            }
         }
     }
  
@@ -161,8 +161,8 @@ public class FreemarkerProcessor extends AbstractProcessor
     public void executeBody(ProcessorContext pc)
             throws RendererExecutionException
     {
-    	RenderContext context = pc.getRenderContext();
-    	String uri = this.getProperty(pc, "uri");
+        RenderContext context = pc.getRenderContext();
+        String uri = this.getProperty(pc, "uri");
         
         // the current format
         String format = context.getFormatId();
@@ -238,7 +238,7 @@ public class FreemarkerProcessor extends AbstractProcessor
             // process the template
             templateProcessor.process(templateName, templateModel, context.getResponse().getWriter());
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
         }

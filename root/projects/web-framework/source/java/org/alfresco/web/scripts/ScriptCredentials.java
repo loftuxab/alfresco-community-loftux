@@ -58,13 +58,13 @@ public final class ScriptCredentials extends ScriptBase
      */
     protected ScriptableMap<String, Serializable> buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
             this.properties = new ScriptableLinkedHashMap<String, Serializable>();
             
             // show either persistent credentials
             // or non-persistent credentials (when persistentOnly = false)
-            if(!isHidden())
+            if (!isHidden())
             {            
                 // put credentials properties onto the map
                 String[] keys = this.credentials.getPropertyKeys();

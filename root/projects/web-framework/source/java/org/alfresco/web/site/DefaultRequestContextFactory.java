@@ -50,8 +50,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefaultRequestContextFactory implements RequestContextFactory
 {
-	private static Log logger = LogFactory.getLog(DefaultRequestContextFactory.class);
-	
+    private static Log logger = LogFactory.getLog(DefaultRequestContextFactory.class);
+    
     /**
      * Produces a new RequestContext instance for a given request. Always returns
      * a RequestContext instance - or an exception is thrown.
@@ -65,7 +65,7 @@ public class DefaultRequestContextFactory implements RequestContextFactory
     {
         if (!(request instanceof HttpServletRequest))
         {
-            throw new RequestContextException("HttpRequestContextFactory can only produce HttpRequestContext instances for HttpServletRequest requests");
+            throw new RequestContextException("DefaultRequestContextFactory can only produce RequestContext instances for an HttpServletRequest request.");
         }
 
         RequestContext context;
@@ -129,65 +129,64 @@ public class DefaultRequestContextFactory implements RequestContextFactory
      * @throws WebFrameworkServiceException
      */
     public void initEnvironment(RequestContext context, HttpServletRequest request)
-    	throws WebFrameworkServiceException
-	{
+        throws WebFrameworkServiceException
+    {
         // Was a store id set by request parameter?
         String repositoryStoreId = request.getParameter(WebFrameworkConstants.STORE_ID_REQUEST_PARAM_NAME);
-        if(repositoryStoreId == null)
+        if (repositoryStoreId == null)
         {
-        	// if we didn't get an explicitly fed store id, we can attempt
-        	// to infer one from the virtualization server name
-        	String serverName = request.getServerName();
-        	if(serverName != null && serverName.indexOf("--") > -1)
-        	{
-        		// could be a virtual server host name...
-        		String realPath = request.getSession().getServletContext().getRealPath("/");
-        		if(realPath != null && realPath.indexOf("--") > -1)
-        		{
-        			// let's assume it is a virtual store id since it mapped
-        			// down to a likely real path (mounted disk)
-        			int x1 = realPath.indexOf(File.separator);
-        			if(x1 > -1)
-        			{
-        				int x2 = realPath.indexOf(File.separator, x1+1);
-        				if(x2 > -1)
-        				{
-        					repositoryStoreId = (String) realPath.substring(x1, x2);
-        				}
-        			}
-        		}
-        	}
+            // if we didn't get an explicitly fed store id, we can attempt
+            // to infer one from the virtualization server name
+            String serverName = request.getServerName();
+            if (serverName != null && serverName.indexOf("--") > -1)
+            {
+                // could be a virtual server host name...
+                String realPath = request.getSession().getServletContext().getRealPath("/");
+                if (realPath != null && realPath.indexOf("--") > -1)
+                {
+                    // let's assume it is a virtual store id since it mapped
+                    // down to a likely real path (mounted disk)
+                    int x1 = realPath.indexOf(File.separator);
+                    if (x1 > -1)
+                    {
+                        int x2 = realPath.indexOf(File.separator, x1+1);
+                        if (x2 > -1)
+                        {
+                            repositoryStoreId = (String) realPath.substring(x1, x2);
+                        }
+                    }
+                }
+            }
         }
-        if(repositoryStoreId == null)
+        if (repositoryStoreId == null)
         {
-        	// Otherwise, check to see if we have one in session
-        	if(request.getSession(false) != null)
-        	{
-        		repositoryStoreId = (String) request.getSession(false).getAttribute(WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME);
-        	}
+            // Otherwise, check to see if we have one in session
+            if (request.getSession(false) != null)
+            {
+                repositoryStoreId = (String)request.getSession().getAttribute(WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME);
+            }
         }
-        if(repositoryStoreId != null)
+        if (repositoryStoreId != null)
         {
-        	context.setValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME, repositoryStoreId);
+            context.setValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME, repositoryStoreId);
         }
         
-
         // Was a web application id set by request parameter?
         String repositoryWebappId = request.getParameter(WebFrameworkConstants.WEBAPP_ID_REQUEST_PARAM_NAME);
-        if(repositoryWebappId == null)
+        if (repositoryWebappId == null)
         {
-        	// Otherwise, check to see if we have one in session
-        	if(request.getSession(false) != null)
-        	{
-        		repositoryWebappId = (String) request.getSession(false).getAttribute(WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME);
-        	}        	
+            // Otherwise, check to see if we have one in session
+            if (request.getSession(false) != null)
+            {
+                repositoryWebappId = (String)request.getSession().getAttribute(WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME);
+            }            
         }
-        if(repositoryWebappId != null)
+        if (repositoryWebappId != null)
         {
-        	context.setValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME, repositoryWebappId);
+            context.setValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME, repositoryWebappId);
         }
-	
-	}
+    
+    }
     
     /**
      * Initializes the model and places it onto the request context
@@ -203,23 +202,23 @@ public class DefaultRequestContextFactory implements RequestContextFactory
         ModelPersistenceContext mpc = new ModelPersistenceContext(userId);
         
         // Bind to a Store ID
-        String storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
-        if(storeId != null)
+        String storeId = (String)context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
+        if (storeId != null)
         {
-        	if(logger.isDebugEnabled())
-        		logger.debug("RequestContext [" + context.getId() + "] using store: " + storeId);
-        	
-        	mpc.putValue(ModelPersistenceContext.REPO_STOREID, storeId);
+            if (logger.isDebugEnabled())
+                logger.debug("RequestContext [" + context.getId() + "] using store: " + storeId);
+            
+            mpc.putValue(ModelPersistenceContext.REPO_STOREID, storeId);
         }
         
         // Bind to a Webapp ID
-        String webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
-        if(webappId != null)
+        String webappId = (String)context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
+        if (webappId != null)
         {
-        	if(logger.isDebugEnabled())
-        		logger.debug("RequestContext [" + context.getId() + "] using webapp: " + webappId);
-        	
-        	mpc.putValue(ModelPersistenceContext.REPO_WEBAPPID, webappId);
+            if (logger.isDebugEnabled())
+                logger.debug("RequestContext [" + context.getId() + "] using webapp: " + webappId);
+            
+            mpc.putValue(ModelPersistenceContext.REPO_WEBAPPID, webappId);
         }
         
         // retrieve the model object service which is scoped to this user
@@ -232,5 +231,5 @@ public class DefaultRequestContextFactory implements RequestContextFactory
         
         // place onto request context
         context.setModel(model);
-    }    
+    }
 }

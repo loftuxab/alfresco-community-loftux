@@ -61,55 +61,55 @@ public class ResourceFreemarkerTagDirective extends FreemarkerTagSupportDirectiv
         TemplateModel idValue = (TemplateModel)params.get("id");
         if (idValue != null)
         {
-        	if (idValue instanceof TemplateScalarModel)
-        	{
-        		String resourceId = ((TemplateScalarModel)idValue).getAsString();
-        		tag.setId(resourceId);
-        	}
+            if (idValue instanceof TemplateScalarModel)
+            {
+                String resourceId = ((TemplateScalarModel)idValue).getAsString();
+                tag.setId(resourceId);
+            }
         }
         
         // Resource target
         TemplateModel targetValue = (TemplateModel)params.get("target");
         if (targetValue != null)
         {
-        	if (targetValue instanceof TemplateScalarModel)
-        	{
+            if (targetValue instanceof TemplateScalarModel)
+            {
                 String target = ((TemplateScalarModel)targetValue).getAsString();
                 tag.setTarget(target);
-        	}
+            }
         }
 
         // Resource type
         TemplateModel typeValue = (TemplateModel)params.get("type");
         if (typeValue != null)
         {
-        	if (typeValue instanceof TemplateScalarModel)
-        	{
+            if (typeValue instanceof TemplateScalarModel)
+            {
                 String type = ((TemplateScalarModel)typeValue).getAsString();
                 tag.setType(type);
-        	}
+            }
         }
 
         // Resource target
         TemplateModel endpointValue = (TemplateModel)params.get("endpoint");
         if (endpointValue != null)
         {
-        	if (endpointValue instanceof TemplateScalarModel)
-        	{
+            if (endpointValue instanceof TemplateScalarModel)
+            {
                 String endpoint = ((TemplateScalarModel)endpointValue).getAsString();
                 tag.setEndpoint(endpoint);
-        	}
+            }
         }
 
         // Resource target
         TemplateModel valueValue = (TemplateModel)params.get("value");
         if (valueValue != null)
         {
-        	if (valueValue instanceof TemplateScalarModel)
-        	{
+            if (valueValue instanceof TemplateScalarModel)
+            {
                 String value = ((TemplateScalarModel)valueValue).getAsString();
                 tag.setValue(value);
-        	}
+            }
         }
         
         // copy in body content (if there is any)

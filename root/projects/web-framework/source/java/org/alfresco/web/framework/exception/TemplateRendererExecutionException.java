@@ -28,7 +28,7 @@ package org.alfresco.web.framework.exception;
  * @author muzquiano
  */
 public class TemplateRendererExecutionException
-	extends RendererExecutionException
+    extends RendererExecutionException
 {
     public TemplateRendererExecutionException(String message)
     {

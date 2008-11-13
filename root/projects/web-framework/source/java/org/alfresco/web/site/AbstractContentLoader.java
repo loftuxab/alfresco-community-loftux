@@ -32,23 +32,23 @@ package org.alfresco.web.site;
  */
 public abstract class AbstractContentLoader implements ContentLoader
 {
-	protected String endpointId;
-	
-	/**
-	 * Instantiates a new abstract content loader.
-	 * 
-	 * @param endpointId the endpoint id
-	 */
-	public AbstractContentLoader(String endpointId)
-	{
-		this.endpointId = endpointId;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.ContentLoader#getEndpointId()
-	 */
-	public String getEndpointId()
-	{
-		return this.endpointId;
-	}
+    protected String endpointId;
+    
+    /**
+     * Instantiates a new abstract content loader.
+     * 
+     * @param endpointId the endpoint id
+     */
+    public AbstractContentLoader(String endpointId)
+    {
+        this.endpointId = endpointId;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.ContentLoader#getEndpointId()
+     */
+    public String getEndpointId()
+    {
+        return this.endpointId;
+    }
 }

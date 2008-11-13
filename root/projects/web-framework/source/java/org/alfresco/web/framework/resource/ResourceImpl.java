@@ -31,89 +31,89 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ResourceImpl extends AbstractResource 
 {
-	protected ResourceResolver resolver = null;
+    protected ResourceResolver resolver = null;
 
-	public ResourceImpl(ResourceStore store, String id)
-	{
-		super(store, id);
-		
-		this.init(getType());		
-	}
-	
-	public ResourceImpl(ResourceStore store, String id, String type)
-	{
-		super(store, id);
-		
-		this.init(type);
+    public ResourceImpl(ResourceStore store, String id)
+    {
+        super(store, id);
+        
+        this.init(getType());        
+    }
+    
+    public ResourceImpl(ResourceStore store, String id, String type)
+    {
+        super(store, id);
+        
+        this.init(type);
 
-	}
-	
-	protected void init(String type)
-	{
-		if("site".equals(type))
-		{
-			resolver = new AlfrescoSiteResourceResolver(this);
-		}
-		else if("space".equals(type))
-		{
-			resolver = new AlfrescoSpaceResourceResolver(this);
-		}
-		else if("webapp".equals(type))
-		{
-			resolver = new AlfrescoWebProjectResourceResolver(this);
-		}
-		else
-		{
-			resolver = new URIResourceResolver(this);
-		}
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getDownloadURI(HttpServletRequest request)
-	{
-		return resolver.getDownloadURI(request);
-	}
+    }
+    
+    protected void init(String type)
+    {
+        if ("site".equals(type))
+        {
+            resolver = new AlfrescoSiteResourceResolver(this);
+        }
+        else if ("space".equals(type))
+        {
+            resolver = new AlfrescoSpaceResourceResolver(this);
+        }
+        else if ("webapp".equals(type))
+        {
+            resolver = new AlfrescoWebProjectResourceResolver(this);
+        }
+        else
+        {
+            resolver = new URIResourceResolver(this);
+        }
+    }
+        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getDownloadURI(HttpServletRequest request)
+    {
+        return resolver.getDownloadURI(request);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getProxiedDownloadURI(HttpServletRequest request)
-	{
-		return resolver.getProxiedDownloadURI(request);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadataURI(HttpServletRequest request)
-	{
-		return resolver.getMetadataURI(request);
-	}		
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getProxiedDownloadURI(HttpServletRequest request)
+    {
+        return resolver.getProxiedDownloadURI(request);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadataURI(HttpServletRequest request)
+    {
+        return resolver.getMetadataURI(request);
+    }        
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getProxiedMetadataURI(HttpServletRequest request)
-	{
-		return resolver.getProxiedMetadataURI(request);
-	}		
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#rawMetadata(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getRawMetadata(HttpServletRequest request)
-	{
-		return resolver.getRawMetadata(request);
-	}
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getProxiedMetadataURI(HttpServletRequest request)
+    {
+        return resolver.getProxiedMetadataURI(request);
+    }        
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#rawMetadata(javax.servlet.http.HttpServletRequest)
+     */
+    public String getRawMetadata(HttpServletRequest request)
+    {
+        return resolver.getRawMetadata(request);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#metadata(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadata(HttpServletRequest request)
-	{
-		return resolver.getMetadata(request);
-	}
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#metadata(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadata(HttpServletRequest request)
+    {
+        return resolver.getMetadata(request);
+    }
+    
 }

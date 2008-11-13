@@ -45,7 +45,7 @@ import org.alfresco.web.site.exception.RequestDispatchException;
  * 
  * Most commonly, these are:
  * 
- *   regionId 		-> the id of the region (i.e. 'footer')
+ *   regionId         -> the id of the region (i.e. 'footer')
  *   scopeId        -> the scope of the region (i.e. 'page')
  *   templateId     -> the id of the template instance (i.e. 'home')
  *   
@@ -56,7 +56,7 @@ import org.alfresco.web.site.exception.RequestDispatchException;
  */
 public class RegionDispatcherServlet extends DispatcherServlet
 {
-	public void init() throws ServletException
+    public void init() throws ServletException
     {
         super.init();
     }

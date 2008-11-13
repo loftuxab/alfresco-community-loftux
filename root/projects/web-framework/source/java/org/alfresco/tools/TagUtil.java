@@ -143,7 +143,7 @@ public class TagUtil
             int startTagReturn = tag.doStartTag();
             if (tag instanceof BodyTagSupport)
             {
-                if(startTagReturn == tag.EVAL_BODY_INCLUDE)
+                if (startTagReturn == tag.EVAL_BODY_INCLUDE)
                 {   
                     BodyTagSupport support = ((BodyTagSupport)tag);
                     

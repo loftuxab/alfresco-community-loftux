@@ -64,14 +64,14 @@ public class RequestContextFactoryBuilder
         String requestContextId = FrameworkHelper.getConfig().getDefaultRequestContextId();
         if (requestContextId != null)
         {
-	        // see if another class name was configured
+            // see if another class name was configured
             RequestContextDescriptor desc = FrameworkHelper.getConfig().getRequestContextDescriptor(requestContextId);
             if (desc != null)
             {
-    	        String _className = desc.getImplementationClass();
-    	        if (_className != null)
+                String _className = desc.getImplementationClass();
+                if (_className != null)
                 {
-    	            className = _className;
+                    className = _className;
                 }
             }
         }

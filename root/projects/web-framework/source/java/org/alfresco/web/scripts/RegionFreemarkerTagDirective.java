@@ -96,7 +96,7 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
         // Region chrome
         // Allows region directives to explicitly specify which chrome they want to use
         TemplateModel chromeValue = (TemplateModel)params.get("chrome");
-        if(chromeValue != null)
+        if (chromeValue != null)
         {
             if (chromeValue instanceof TemplateScalarModel == false)
             {

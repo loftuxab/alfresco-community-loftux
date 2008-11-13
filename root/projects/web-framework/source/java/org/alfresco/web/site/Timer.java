@@ -97,7 +97,7 @@ public class Timer
     public static void bindTimer(ServletRequest request, boolean forceNew)
     {
         Timer t = (Timer) request.getAttribute(TIMER_KEY);
-        if(t == null || forceNew)
+        if (t == null || forceNew)
         {
             t = new Timer();
             request.setAttribute(TIMER_KEY, t);
@@ -117,7 +117,7 @@ public class Timer
     
     public static void start(RenderContext context, String blockId)
     {
-    	start(context.getRequest(), blockId);
+        start(context.getRequest(), blockId);
     }
     
     /**
@@ -129,16 +129,16 @@ public class Timer
      */
     public static void start(ServletRequest request, String blockId)
     {
-        if(blockId == null)
+        if (blockId == null)
         {
             return;
         }
         
         Timer t = (Timer) request.getAttribute(TIMER_KEY);
-        if(t != null)
+        if (t != null)
         {
             // check if this timer has not already been started
-            if(t.startTimes.get(blockId) == null)
+            if (t.startTimes.get(blockId) == null)
             {
                 t.keys.add(blockId);
             }
@@ -150,7 +150,7 @@ public class Timer
     
     public static void stop(RenderContext context, String blockId)
     {
-    	stop(context.getRequest(), blockId);
+        stop(context.getRequest(), blockId);
     }
     
     public static void stop(ServletRequest request, String blockId)
@@ -158,18 +158,18 @@ public class Timer
         long endTime = System.nanoTime();
 
         Timer t = (Timer) request.getAttribute(TIMER_KEY);
-        if(t != null)
+        if (t != null)
         {
             // start time
             Long startTime = (Long) t.startTimes.get(blockId);
-            if(startTime != null)
+            if (startTime != null)
             {
                 // execution time
                 long executionTime = endTime - startTime.longValue();
                 
                 // add to total time
                 Long totalTime = (Long) t.totalTimes.get(blockId);
-                if(totalTime == null)
+                if (totalTime == null)
                 {
                     totalTime = new Long(executionTime);
                 }
@@ -193,15 +193,15 @@ public class Timer
     public static void report(ServletRequest request, String blockId)
     {
         Timer t = (Timer) request.getAttribute(TIMER_KEY);
-        if(t != null)
+        if (t != null)
         {
             Long l = (Long) t.totalTimes.get(blockId);
-            if(l != null)
+            if (l != null)
             {
                 long value = (long) l.longValue();
                 String label = "ns";
                 
-                if(Timer.showMilliseconds())
+                if (Timer.showMilliseconds())
                 {
                     value = (long)(value / 1000000);
                     label = "ms";
@@ -210,7 +210,7 @@ public class Timer
                 try
                 {
                     RequestContext context = RequestUtil.getRequestContext(request);
-                    if(context == null)
+                    if (context == null)
                     {
                         print("[" + blockId + "] took " + value + " " + label);
                     }
@@ -219,7 +219,7 @@ public class Timer
                         print("[" + context.getId() + ":" + blockId + "] took " + value + " " + label);
                     }
                 }
-                catch(RequestContextException rce)
+                catch (RequestContextException rce)
                 {
                     logger.debug("Unable to generate report line - RequestContextException", rce);
                 }
@@ -230,7 +230,7 @@ public class Timer
     public static void reportAll(ServletRequest request)
     {
         Timer t = (Timer) request.getAttribute(TIMER_KEY);
-        if(t != null)
+        if (t != null)
         {
             // report timing blocks in order they were received
             Iterator it = t.keys.iterator();

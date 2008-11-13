@@ -33,60 +33,60 @@ import java.util.Map;
  */
 public interface ResourceProvider 
 {
-	/**
-	 * Looks up a resource with the given id
-	 * 
-	 * @param id
-	 * @return
-	 */
-	public Resource getResource(String id);
-	
-	/**
-	 * Returns the set of all resources
-	 * 
-	 * @return
-	 */
-	public Resource[] getResources();
-	
-	/**
-	 * Returns the map of resources
-	 * 
-	 * @return
-	 */
-	public Map<String, Resource> getResourcesMap();
-	
-	/**
-	 * Adds a resource with the given id
-	 * 
-	 * @param id
-	 * 
-	 * @return resource
-	 */
-	public Resource addResource(String id);
+    /**
+     * Looks up a resource with the given id
+     * 
+     * @param id
+     * @return
+     */
+    public Resource getResource(String id);
+    
+    /**
+     * Returns the set of all resources
+     * 
+     * @return
+     */
+    public Resource[] getResources();
+    
+    /**
+     * Returns the map of resources
+     * 
+     * @return
+     */
+    public Map<String, Resource> getResourcesMap();
+    
+    /**
+     * Adds a resource with the given id
+     * 
+     * @param id
+     * 
+     * @return resource
+     */
+    public Resource addResource(String id);
 
-	/**
-	 * Adds a resource with the given id and type
-	 * 
-	 * @param id
-	 * @param type
-	 * 
-	 * @return resource
-	 */	
-	public Resource addResource(String id, String type);
-	
-	/**
-	 * Updates a resource for the given id
-	 * 
-	 * @param id
-	 * @param resource
-	 */
-	public void updateResource(String id, Resource resource);
-	
-	/**
-	 * Removes a resource with the given id
-	 * 
-	 * @param id
-	 */
-	public void removeResource(String id);
-	
+    /**
+     * Adds a resource with the given id and type
+     * 
+     * @param id
+     * @param type
+     * 
+     * @return resource
+     */    
+    public Resource addResource(String id, String type);
+    
+    /**
+     * Updates a resource for the given id
+     * 
+     * @param id
+     * @param resource
+     */
+    public void updateResource(String id, Resource resource);
+    
+    /**
+     * Removes a resource with the given id
+     * 
+     * @param id
+     */
+    public void removeResource(String id);
+    
 }

@@ -786,14 +786,14 @@ public final class ScriptSiteData extends ScriptBase
         {
             PageAssociation pageAssociation = (PageAssociation) it.next();
             Page page = pageAssociation.getDestPage(context);
-            if(page != null)
+            if (page != null)
             {
-            	list.add(page);
+                list.add(page);
             }
             else
             {
-            	// debug to framework logger
-            	FrameworkHelper.getLogger().debug("Unable to find page object for page association id: " + pageAssociation.getId());
+                // debug to framework logger
+                FrameworkHelper.getLogger().debug("Unable to find page object for page association id: " + pageAssociation.getId());
             }
         }
         
@@ -822,14 +822,14 @@ public final class ScriptSiteData extends ScriptBase
         {
             PageAssociation pageAssociation = (PageAssociation) it.next();
             Page page = pageAssociation.getSourcePage(context);
-            if(page != null)
+            if (page != null)
             {
-            	list.add(page);
+                list.add(page);
             }
             else
             {
-            	// debug to framework logger
-            	FrameworkHelper.getLogger().debug("Unable to find page object for page association id: " + pageAssociation.getId());
+                // debug to framework logger
+                FrameworkHelper.getLogger().debug("Unable to find page object for page association id: " + pageAssociation.getId());
             }
         }
         
@@ -956,7 +956,7 @@ public final class ScriptSiteData extends ScriptBase
         ScriptModelObject scriptModelObject = null;
         
         Map<String, ModelObject> objects = getModel().findConfigurations(sourceId);
-        if(objects.size() > 0)
+        if (objects.size() > 0)
         {
             ModelObject object = (ModelObject) objects.values().iterator().next();
             scriptModelObject = ScriptHelper.toScriptModelObject(context, object);
@@ -1140,7 +1140,7 @@ public final class ScriptSiteData extends ScriptBase
         {
             FrameworkHelper.getUserFactory().faultUser(context, request, true);
         }
-        catch(UserFactoryException ufe)
+        catch (UserFactoryException ufe)
         {
             FrameworkHelper.getLogger().warn("Unable to reload current user into session");
         }

@@ -37,102 +37,102 @@ import org.alfresco.web.site.exception.RequestContextException;
  * @author muzquiano
  */
 public abstract class AbstractResource implements Resource
-{	
-	protected ResourceStore store = null;
-	protected String id = null;
-	
-	public AbstractResource(ResourceStore store, String id)
-	{
-		this.store = store;
-		this.id = id;
-	
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getId()
-	 */
-	public String getId()
-	{
-		return this.id;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getType()
-	 */
-	public String getType()
-	{
-		return this.getAttribute(ATTR_TYPE);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#setType(java.lang.String)
-	 */
-	public void setType(String type)
-	{
-		this.setAttribute(ATTR_TYPE, type);
-	}
-			
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#setEndpoint(java.lang.String)
-	 */
-	public void setEndpoint(String endpoint)
-	{
-		setAttribute(ATTR_ENDPOINT, endpoint);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getEndpoint()
-	 */
-	public String getEndpoint()
-	{
-		return getAttribute(ATTR_ENDPOINT);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getAttributeNames()
-	 */
-	public String[] getAttributeNames()
-	{
-		return this.store.getAttributeNames(id);
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getAttribute(java.lang.String)
-	 */
-	public String getAttribute(String name)
-	{
-		return this.store.getAttribute(this.id, name);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#setAttribute(java.lang.String, java.lang.String)
-	 */
-	public void setAttribute(String name, String value)
-	{
-		this.store.setAttribute(this.id, name, value);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#removeAttribute(java.lang.String)
-	 */
-	public void removeAttribute(String name)
-	{
-		this.store.removeAttribute(this.id, name);		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#getValue()
-	 */
-	public String getValue()
-	{
-		return this.store.getValue(this.id);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.Resource#setValue(java.lang.String)
-	 */
-	public void setValue(String value)
-	{
-		this.store.setValue(this.id, value);
-	}
+{    
+    protected ResourceStore store = null;
+    protected String id = null;
+    
+    public AbstractResource(ResourceStore store, String id)
+    {
+        this.store = store;
+        this.id = id;
+    
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getId()
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getType()
+     */
+    public String getType()
+    {
+        return this.getAttribute(ATTR_TYPE);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#setType(java.lang.String)
+     */
+    public void setType(String type)
+    {
+        this.setAttribute(ATTR_TYPE, type);
+    }
+            
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#setEndpoint(java.lang.String)
+     */
+    public void setEndpoint(String endpoint)
+    {
+        setAttribute(ATTR_ENDPOINT, endpoint);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getEndpoint()
+     */
+    public String getEndpoint()
+    {
+        return getAttribute(ATTR_ENDPOINT);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getAttributeNames()
+     */
+    public String[] getAttributeNames()
+    {
+        return this.store.getAttributeNames(id);
+    }
+        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getAttribute(java.lang.String)
+     */
+    public String getAttribute(String name)
+    {
+        return this.store.getAttribute(this.id, name);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#setAttribute(java.lang.String, java.lang.String)
+     */
+    public void setAttribute(String name, String value)
+    {
+        this.store.setAttribute(this.id, name, value);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#removeAttribute(java.lang.String)
+     */
+    public void removeAttribute(String name)
+    {
+        this.store.removeAttribute(this.id, name);        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getValue()
+     */
+    public String getValue()
+    {
+        return this.store.getValue(this.id);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#setValue(java.lang.String)
+     */
+    public void setValue(String value)
+    {
+        this.store.setValue(this.id, value);
+    }
 }

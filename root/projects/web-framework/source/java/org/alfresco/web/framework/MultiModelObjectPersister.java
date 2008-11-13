@@ -178,7 +178,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
                 
                 removed = persister.removeObject(context, objectId);
                 
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("removeObject remove from persister '" + persisterId + "' returned: " + removed);
                 
                 break;

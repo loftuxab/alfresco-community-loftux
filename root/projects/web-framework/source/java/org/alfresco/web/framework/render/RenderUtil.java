@@ -57,9 +57,9 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public final class RenderUtil
 {
-	public static final String NEWLINE = "\r\n";
-	
-	
+    public static final String NEWLINE = "\r\n";
+    
+    
     /**
      * Entry point for the rendering of a JSP page.
      *
@@ -71,15 +71,15 @@ public final class RenderUtil
     public static void renderJspPage(RenderContext parentContext,
             String dispatchPath) throws JspRenderException
     {    
-    	// bind new render context
-    	RenderContext context = RenderHelper.provideRenderContext(parentContext);
+        // bind new render context
+        RenderContext context = RenderHelper.provideRenderContext(parentContext);
         try
         {
-        	// start a timer
+            // start a timer
             if (Timer.isTimerEnabled())
                 Timer.start(context, "RenderJspPage-" + dispatchPath);
-        	
-        	RequestUtil.include(context.getRequest(), context.getResponse(), dispatchPath);
+            
+            RequestUtil.include(context.getRequest(), context.getResponse(), dispatchPath);
         }
         catch (Exception ex)
         {
@@ -88,7 +88,7 @@ public final class RenderUtil
         finally
         {
             // release the rendering context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context.getRequest(), "RenderJspPage-" + dispatchPath);
@@ -104,10 +104,10 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     public static void renderPage(RenderContext parentContext,
-    		RenderFocus renderFocus)
+            RenderFocus renderFocus)
             throws RendererExecutionException
     {
-    	Page page = parentContext.getPage();
+        Page page = parentContext.getPage();
         if (page == null)
         {
             throw new PageRendererExecutionException(
@@ -126,9 +126,9 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     protected static void startPageRenderer(RenderContext parentContext, 
-    		RenderFocus renderFocus,
-    		Page page)
-    	throws RendererExecutionException
+            RenderFocus renderFocus,
+            Page page)
+        throws RendererExecutionException
     {
         // provision a page-bound render context
         // execute the renderer
@@ -138,14 +138,14 @@ public final class RenderUtil
             // start a timer
             if (Timer.isTimerEnabled())
                 Timer.start(context, "ProcessPageRenderer-" + page.getId());
-        	
+            
             // loads the "page renderer" bean and executes it
             Renderer renderer = RenderHelper.getRenderer(RendererType.PAGE);
             renderer.render(context, renderFocus);
         }
         finally
         {
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(parentContext, "ProcessPageRenderer-" + page.getId());
@@ -161,11 +161,11 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     public static void renderContent(RenderContext parentContext,
-    		RenderFocus renderFocus)
+            RenderFocus renderFocus)
             throws RendererExecutionException
     {
-    	TemplateInstance template = parentContext.getTemplate();
-    	
+        TemplateInstance template = parentContext.getTemplate();
+        
         // provision a template-bound render context
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext, template);
@@ -181,7 +181,7 @@ public final class RenderUtil
         }
         finally
         {
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "RenderContent-" + template.getId());
@@ -202,15 +202,15 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     public static void renderRegion(RenderContext parentContext,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String templateId, 
             String regionId, 
             String regionScopeId, 
             String overrideChromeId)
             throws RendererExecutionException
     {
-    	TemplateInstance template = (TemplateInstance) parentContext.getModel().getTemplate(templateId);    	
-    	startRegionRenderer(parentContext, renderFocus, template, regionId, regionScopeId, overrideChromeId);
+        TemplateInstance template = (TemplateInstance) parentContext.getModel().getTemplate(templateId);        
+        startRegionRenderer(parentContext, renderFocus, template, regionId, regionScopeId, overrideChromeId);
     }
     
     /**
@@ -226,7 +226,7 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     protected static void startRegionRenderer(RenderContext parentContext,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             TemplateInstance template, 
             String regionId, 
             String regionScopeId,
@@ -243,8 +243,8 @@ public final class RenderUtil
                 Timer.start(context, "ProcessRegionRenderer-" + template.getId());
             
             // this must be bound in manually here
-        	// set up region binding info onto render context
-            String regionSourceId = determineSourceId(context, regionScopeId);            
+            // set up region binding info onto render context
+            String regionSourceId = getSourceId(context, regionScopeId);            
             context.setValue(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
             context.setValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID, regionScopeId);
             context.setValue(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID, regionSourceId);
@@ -252,29 +252,29 @@ public final class RenderUtil
             // figure out if a component is bound to this region
             // bind in the html id
             Component component = getComponentBoundToRegion(context, regionId, regionScopeId, regionSourceId);
-            if(component != null)
+            if (component != null)
             {
-            	// bind in the region's htmlid from bound component
-            	context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.determineValidHtmlId(component.getId()));
+                // bind in the region's htmlid from bound component
+                context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.validHtmlId(component.getId()));
             }
             else
             {
-            	// bind in the region's htmlid by hand       
-            	context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, "unbound-region-" + RenderUtil.determineValidHtmlId(regionId));
+                // bind in the region's htmlid by hand       
+                context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, "unbound-region-" + RenderUtil.validHtmlId(regionId));
             }
             
-            if(overrideChromeId != null)
+            if (overrideChromeId != null)
             {
-            	context.setValue(WebFrameworkConstants.RENDER_DATA_REGION_CHROME_ID, overrideChromeId);
+                context.setValue(WebFrameworkConstants.RENDER_DATA_REGION_CHROME_ID, overrideChromeId);
             }
-        	
+            
             // loads the "region renderer" bean and executes it
             Renderer renderer = RenderHelper.getRenderer(RendererType.REGION);
             renderer.render(context, renderFocus);
         }
         finally
         {
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(parentContext, "ProcessRegionRenderer-" + template.getId());
@@ -289,14 +289,14 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     public static void renderRegionComponents(RenderContext parentContext)
-    	throws RendererExecutionException
-	{
+        throws RendererExecutionException
+    {
         // values from the render context
         String regionId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
         String regionScopeId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
         String regionSourceId = (String) parentContext.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID);
-    	
-    	// create a new render context (for the component)
+        
+        // create a new render context (for the component)
         // execute the renderer
         RenderContext context = RenderHelper.provideRenderContext(parentContext);
         try
@@ -313,26 +313,26 @@ public final class RenderUtil
             {
                 // if we are in passive mode, then we won't bother to execute the renderer.
                 // rather, we will notify the template that this component is bound to it
-            	if(context.isPassiveMode())
+                if (context.isPassiveMode())
                 {
                     // don't render the component, just inform the current context what our component is
                     context.setRenderingComponent(component);
                 }
                 else
                 {
-                	// merge component into render context
-                	RenderHelper.mergeRenderContext(context, component);
-                	
-                	// get the 'component' renderer bean
-                	Renderer renderer = RenderHelper.getRenderer(RendererType.COMPONENT);
-                	renderer.body(context);
+                    // merge component into render context
+                    RenderHelper.mergeRenderContext(context, component);
+                    
+                    // get the 'component' renderer bean
+                    Renderer renderer = RenderHelper.getRenderer(RendererType.COMPONENT);
+                    renderer.body(context);
                 }
             }
             else
             {
-            	// stamp an htmlid onto the renderer context
-            	context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, "unbound-region-" + regionId);
-            	
+                // stamp an htmlid onto the renderer context
+                context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, "unbound-region-" + regionId);
+                
                 // if we couldn't get a component, then redirect to a region "no-component" renderer
                 RenderUtil.renderErrorHandlerPage(context,
                         WebFrameworkConstants.DISPATCHER_HANDLER_REGION_NO_COMPONENT);
@@ -341,12 +341,12 @@ public final class RenderUtil
         finally
         {
             // release the render context
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "RenderRegionComponents-" + regionId + "-" + regionScopeId);
-        }    	
-	}
+        }        
+    }
     
     /**
      * Entry point for the rendering a single identified component
@@ -359,10 +359,10 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     public static void renderComponent(RenderContext parentContext,
-    		RenderFocus renderFocus,
+            RenderFocus renderFocus,
             String componentId) throws RendererExecutionException
     {
-    	renderComponent(parentContext, renderFocus, componentId, null);
+        renderComponent(parentContext, renderFocus, componentId, null);
     }
 
     /**
@@ -376,10 +376,10 @@ public final class RenderUtil
      * @throws RendererExecutionException
      */
     public static void renderComponent(RenderContext parentContext,
-    		RenderFocus renderFocus,
-    		String componentId, 
-    		String overrideChromeId)
-		throws RendererExecutionException
+            RenderFocus renderFocus,
+            String componentId, 
+            String overrideChromeId)
+        throws RendererExecutionException
     {
         Component component = parentContext.getModel().getComponent(componentId);
         if (component == null)
@@ -393,10 +393,10 @@ public final class RenderUtil
     
     
     protected static void startComponentRenderer(RenderContext parentContext,
-    		RenderFocus renderFocus, 
-    		Component component, 
-    		String overrideChromeId)
-    	throws RendererExecutionException
+            RenderFocus renderFocus, 
+            Component component, 
+            String overrideChromeId)
+        throws RendererExecutionException
     {
         // provision a template-bound render context
         // execute the renderer
@@ -407,9 +407,9 @@ public final class RenderUtil
             if (Timer.isTimerEnabled())
                 Timer.start(context, "ProcessComponentRenderer-" + component.getId());
             
-            if(overrideChromeId != null)
+            if (overrideChromeId != null)
             {
-            	context.setValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_CHROME_ID, overrideChromeId);
+                context.setValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_CHROME_ID, overrideChromeId);
             }
 
             // loads the "component renderer" bean and executes it
@@ -418,26 +418,26 @@ public final class RenderUtil
         }
         finally
         {
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(parentContext, "ProcessComponentRenderer-" + component.getId());
         }
     }
-    	
+        
     public static void renderRawComponent(RenderContext parentContext,
-    		RenderFocus renderFocus,
-    		String componentId)
-    	throws RendererExecutionException
-	{
-    	Component component = parentContext.getModel().getComponent(componentId);
-    	renderRawComponent(parentContext, renderFocus, component);	
-	}
+            RenderFocus renderFocus,
+            String componentId)
+        throws RendererExecutionException
+    {
+        Component component = parentContext.getModel().getComponent(componentId);
+        renderRawComponent(parentContext, renderFocus, component);    
+    }
 
     public static void renderRawComponent(RenderContext parentContext,
-    		RenderFocus renderFocus,
-    		Component component)
-    	throws RendererExecutionException
+            RenderFocus renderFocus,
+            Component component)
+        throws RendererExecutionException
     {
         // provision a component-bound render context
         // execute the renderer
@@ -452,7 +452,7 @@ public final class RenderUtil
         }
         finally
         {
-        	context.release();
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(parentContext, "RenderRawComponent-" + component.getId());
@@ -618,7 +618,7 @@ public final class RenderUtil
      * 
      * @return the source ID
      */
-    public static String determineSourceId(RequestContext context, String scopeId)
+    public static String getSourceId(RequestContext context, String scopeId)
     {
         String sourceId = null;
         
@@ -654,7 +654,7 @@ public final class RenderUtil
      * @param component
      * @return
      */
-    public static Object determineComponentBindingSourceObject(RequestContext context, Component component)
+    public static Object getComponentBindingSourceObject(RequestContext context, Component component)
     {
         Object obj = null;
         
@@ -689,10 +689,11 @@ public final class RenderUtil
      * Returns the Chrome instance to utilize while rendering the given
      * region on the given template.
      */
-    public static Chrome determineRegionChrome(RenderContext context, TemplateInstance template, String regionId, String chromeId)
+    public static Chrome getRegionChrome(
+            RenderContext context, TemplateInstance template, String regionId, String chromeId)
     {
-    	Chrome chrome = null;
-    	
+        Chrome chrome = null;
+        
         // if the chrome id is empty, see if there is an override
         // this allows the template to "override" the chrome on a per-region basis
         if (chromeId == null)
@@ -708,7 +709,7 @@ public final class RenderUtil
                 
         if (chromeId != null && chromeId.length() != 0)
         {
-        	chrome = context.getModel().getChrome(chromeId);
+            chrome = context.getModel().getChrome(chromeId);
         }
         
         return chrome;
@@ -718,10 +719,10 @@ public final class RenderUtil
      * Returns the Chrome instance to utilize while rendering the given
      * component.
      */
-    public static Chrome determineComponentChrome(
+    public static Chrome getComponentChrome(
             RenderContext context, Component component, String chromeId)
     {
-    	Chrome chrome = null;
+        Chrome chrome = null;
         
         // if the chrome id is empty, see if the component instance intself
         // the chrome that it would like to use
@@ -756,9 +757,9 @@ public final class RenderUtil
      * @return the component
      */
     public static Component getComponentBoundToRegion(RenderContext context,
-    		String regionId,
-    		String regionScopeId,
-    		String regionSourceId)
+            String regionId,
+            String regionScopeId,
+            String regionSourceId)
     {
         Component component = context.getModel().getComponent(regionScopeId, regionId, regionSourceId);
         if (component == null || WebFrameworkConstants.REGION_SCOPE_THEME.equals(regionScopeId))
@@ -771,7 +772,7 @@ public final class RenderUtil
             }
         }
         
-        return component;    	
+        return component;        
     }
     
     /**
@@ -787,38 +788,38 @@ public final class RenderUtil
      * @param defaultErrorHandlerPageRenderer
      */
     public static void renderErrorHandlerPage(RenderContext parentContext, String errorHandlerPageId)
-    		throws RendererExecutionException
+            throws RendererExecutionException
     {
         // bind the rendering to this page
         RenderContext context = RenderHelper.provideRenderContext(parentContext);
 
         try
         {
-	    	// start a timer
-	        if (Timer.isTimerEnabled())
-	            Timer.start(parentContext, "RenderErrorHandlerPage-" + errorHandlerPageId);
-	
-	        // get the error handler descriptor from config
-	        ErrorHandlerDescriptor descriptor = context.getConfig().getErrorHandlerDescriptor(errorHandlerPageId);
-	        
-	        // get descriptor properties and processor id
-	        String processorId = descriptor.getProcessorId();
-	        Map<String,String> descriptorProperties = descriptor.map();
-	
-	        // create the processor
-	        Processor processor = RenderHelper.getProcessorById(processorId);
-	        
-	        // load processor context
-	        ProcessorContext processorContext = new ProcessorContext(context);
-	        processorContext.addDescriptor(RenderMode.VIEW.toString(), descriptorProperties);
-	        
-	        // execute processor
-	        processor.executeBody(processorContext);
+            // start a timer
+            if (Timer.isTimerEnabled())
+                Timer.start(parentContext, "RenderErrorHandlerPage-" + errorHandlerPageId);
+    
+            // get the error handler descriptor from config
+            ErrorHandlerDescriptor descriptor = context.getConfig().getErrorHandlerDescriptor(errorHandlerPageId);
+            
+            // get descriptor properties and processor id
+            String processorId = descriptor.getProcessorId();
+            Map<String,String> descriptorProperties = descriptor.map();
+    
+            // create the processor
+            Processor processor = RenderHelper.getProcessorById(processorId);
+            
+            // load processor context
+            ProcessorContext processorContext = new ProcessorContext(context);
+            processorContext.addDescriptor(RenderMode.VIEW.toString(), descriptorProperties);
+            
+            // execute processor
+            processor.executeBody(processorContext);
         }
         finally
         {
-        	// release the render context
-        	context.release();
+            // release the render context
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "RenderErrorHandlerPage-" + errorHandlerPageId);
@@ -842,31 +843,31 @@ public final class RenderUtil
 
         try
         {
-	    	// start a timer
-	        if (Timer.isTimerEnabled())
-	            Timer.start(parentContext, "RenderSystemPage-" + systemPageId);
-	
-	        // get the system page descriptor from config
-	        SystemPageDescriptor descriptor = context.getConfig().getSystemPageDescriptor(systemPageId);
-	        
-	        // get descriptor properties and processor id
-	        String processorId = descriptor.getProcessorId();
-	        Map<String,String> descriptorProperties = descriptor.map();
-	
-	        // create the processor
-	        Processor processor = RenderHelper.getProcessorById(processorId);
-	        
-	        // load processor context
-	        ProcessorContext processorContext = new ProcessorContext(context);
-	        processorContext.addDescriptor(RenderMode.VIEW.toString(), descriptorProperties);
-	        
-	        // execute processor
-	        processor.executeBody(processorContext);
+            // start a timer
+            if (Timer.isTimerEnabled())
+                Timer.start(parentContext, "RenderSystemPage-" + systemPageId);
+    
+            // get the system page descriptor from config
+            SystemPageDescriptor descriptor = context.getConfig().getSystemPageDescriptor(systemPageId);
+            
+            // get descriptor properties and processor id
+            String processorId = descriptor.getProcessorId();
+            Map<String,String> descriptorProperties = descriptor.map();
+    
+            // create the processor
+            Processor processor = RenderHelper.getProcessorById(processorId);
+            
+            // load processor context
+            ProcessorContext processorContext = new ProcessorContext(context);
+            processorContext.addDescriptor(RenderMode.VIEW.toString(), descriptorProperties);
+            
+            // execute processor
+            processor.executeBody(processorContext);
         }
         finally
         {
-        	// release the render context
-        	context.release();
+            // release the render context
+            context.release();
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "RenderSystemPage-" + systemPageId);
@@ -885,62 +886,62 @@ public final class RenderUtil
         throws RendererExecutionException, UnsupportedEncodingException
     {
         // if we're in passive mode, just return empty string
-    	if(parentContext.isPassiveMode())
-    	{
-    		return "";
-    	}
-
+        if (parentContext.isPassiveMode())
+        {
+            return "";
+        }
+        
         String headTags = (String) parentContext.getValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, RenderContext.SCOPE_REQUEST);
         if (headTags == null)
         {
-	        // produce a new render context
-	        RenderContext context = RenderHelper.provideRenderContext(parentContext);
-	        try
-	        {
-		    	// start a timer
-		        if (Timer.isTimerEnabled())
-		            Timer.start(parentContext, "RenderTemplateHeaderAsString");
+            // produce a new render context
+            RenderContext context = RenderHelper.provideRenderContext(parentContext);
+            try
+            {
+                // start a timer
+                if (Timer.isTimerEnabled())
+                    Timer.start(parentContext, "RenderTemplateHeaderAsString");
 
-		        // start building the buffer
-	        	StringBuilder buf = new StringBuilder(2048);
-	            buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
-	            buf.append(NEWLINE);
-	        	
-		        // wrap so that we can capture output
-		        context = RenderHelper.wrapRenderContext(context);
-		        
-		        // get the 'template' renderer bean
-		        // execute the renderer for 'header'
-		        Renderer renderer = RenderHelper.getRenderer(RendererType.TEMPLATE);
-		        renderer.header(context);
-			        
-		        // get head tags from captured output
-		        headTags = ((WrappedRenderContext)context).getContentAsString();
-			        
-		        // build buffer
-		        buf.append(headTags);
-		        buf.append(NEWLINE);
-		        buf.append(NEWLINE);
-	        }
-	        finally
-	        {
-	        	// release the render context
-	        	context.release();
-	
-	            if (Timer.isTimerEnabled())
-	                Timer.stop(context, "RenderTemplateHeaderAsString");
-	        }
-		      
-	        if(headTags != null)
-	        {
-		        // store back		        
-		        context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);		        		        
-        	}
+                // start building the buffer
+                StringBuilder buf = new StringBuilder(2048);
+                buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
+                buf.append(NEWLINE);
+                
+                // wrap so that we can capture output
+                context = RenderHelper.wrapRenderContext(context);
+                
+                // get the 'template' renderer bean
+                // execute the renderer for 'header'
+                Renderer renderer = RenderHelper.getRenderer(RendererType.TEMPLATE);
+                renderer.header(context);
+                    
+                // get head tags from captured output
+                headTags = ((WrappedRenderContext)context).getContentAsString();
+                    
+                // build buffer
+                buf.append(headTags);
+                buf.append(NEWLINE);
+                buf.append(NEWLINE);
+            }
+            finally
+            {
+                // release the render context
+                context.release();
+    
+                if (Timer.isTimerEnabled())
+                    Timer.stop(context, "RenderTemplateHeaderAsString");
+            }
+              
+            if (headTags != null)
+            {
+                // store back                
+                context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);                                
+            }
         }
         
-        if(headTags == null)
+        if (headTags == null)
         {
-        	headTags = "";
+            headTags = "";
         }
         
         return headTags;
@@ -959,7 +960,7 @@ public final class RenderUtil
      * 
      * @return the string
      */
-    public static String determineValidHtmlId(String id)
+    public static String validHtmlId(String id)
     {
         int len = id.length();
         StringBuilder buf = new StringBuilder(len + (len>>1) + 8);
@@ -1045,7 +1046,7 @@ public final class RenderUtil
      */
     public static RenderContext getContext(HttpServletRequest request)
     {
-    	return (RenderContext) request.getAttribute(RenderContextRequest.ATTRIB_RENDER_CONTEXT);    	
+        return (RenderContext) request.getAttribute(RenderContextRequest.ATTRIB_RENDER_CONTEXT);        
     }
     
 }            

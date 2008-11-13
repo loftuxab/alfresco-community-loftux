@@ -42,106 +42,106 @@ import org.alfresco.web.site.exception.RequestContextException;
  */
 public abstract class AbstractResourceResolver implements ResourceResolver 
 {
-	protected Resource resource;
-	
-	public AbstractResourceResolver(Resource resource)
-	{
-		this.resource = resource;
-	}
+    protected Resource resource;
+    
+    public AbstractResourceResolver(Resource resource)
+    {
+        this.resource = resource;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getProxiedDownloadURI(HttpServletRequest request)
-	{
-		String url = "/proxy/{endpoint}" + getDownloadURI(request); 		
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getProxiedDownloadURI(HttpServletRequest request)
+    {
+        String url = "/proxy/{endpoint}" + getDownloadURI(request);         
 
-		String ep = this.resource.getEndpoint();
-		if(ep == null)
-		{
-			ep = "alfresco";
-		}
-		url = url.replace("{endpoint}", ep);
-		
-		return url;
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getProxiedMetadataURI(HttpServletRequest request)
-	{
-		String url = "/proxy/{endpoint}" + getMetadataURI(request);
+        String ep = this.resource.getEndpoint();
+        if (ep == null)
+        {
+            ep = "alfresco";
+        }
+        url = url.replace("{endpoint}", ep);
+        
+        return url;
+    }
+        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getProxiedMetadataURI(HttpServletRequest request)
+    {
+        String url = "/proxy/{endpoint}" + getMetadataURI(request);
 
-		String ep = this.resource.getEndpoint();
-		if(ep == null)
-		{
-			ep = "alfresco";
-		}
-		url = url.replace("{endpoint}", ep);
-		
-		return url;
-	}	
-	
-	// helper method
-	protected static String toNodeRefString(String nodeString)
-	{
-		// nodestrings look like
-		// workspace/SpacesStore/abcdefah-123123 etc
-		
-		String storeType = null;
-		String storeId = null;
-		String nodeId = null;
-		
-		StringTokenizer tokenizer = new StringTokenizer(nodeString, "/");
-		storeType = tokenizer.nextToken();
-		storeId = tokenizer.nextToken();
-		nodeId = tokenizer.nextToken();
-		
-		return storeType + "://" + storeId + "/" + nodeId;		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getRawMetadata(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getRawMetadata(HttpServletRequest request)
-	{
-		String metadata = null;
-		
-		RequestContext requestContext = null;
-		try
-		{
-			requestContext = RequestUtil.getRequestContext(request);
-			
-			WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(requestContext);			
-			ScriptRemoteConnector connector = remote.connect(this.resource.getEndpoint());
-			
-			Response response = connector.get(this.getMetadataURI(request));
-			
-			return response.getResponse();
-			
-		}
-		catch(RequestContextException rce)
-		{
-			// TODO: handle
-		}
+        String ep = this.resource.getEndpoint();
+        if (ep == null)
+        {
+            ep = "alfresco";
+        }
+        url = url.replace("{endpoint}", ep);
+        
+        return url;
+    }    
+    
+    // helper method
+    protected static String toNodeRefString(String nodeString)
+    {
+        // nodestrings look like
+        // workspace/SpacesStore/abcdefah-123123 etc
+        
+        String storeType = null;
+        String storeId = null;
+        String nodeId = null;
+        
+        StringTokenizer tokenizer = new StringTokenizer(nodeString, "/");
+        storeType = tokenizer.nextToken();
+        storeId = tokenizer.nextToken();
+        nodeId = tokenizer.nextToken();
+        
+        return storeType + "://" + storeId + "/" + nodeId;        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getRawMetadata(javax.servlet.http.HttpServletRequest)
+     */
+    public String getRawMetadata(HttpServletRequest request)
+    {
+        String metadata = null;
+        
+        RequestContext requestContext = null;
+        try
+        {
+            requestContext = RequestUtil.getRequestContext(request);
+            
+            WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(requestContext);            
+            ScriptRemoteConnector connector = remote.connect(this.resource.getEndpoint());
+            
+            Response response = connector.get(this.getMetadataURI(request));
+            
+            return response.getResponse();
+            
+        }
+        catch (RequestContextException rce)
+        {
+            // TODO: handle
+        }
 
-		return metadata;
-	}
+        return metadata;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
-	 */
-	public abstract String getMetadata(HttpServletRequest request);
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public abstract String getDownloadURI(HttpServletRequest request);
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
+     */
+    public abstract String getMetadata(HttpServletRequest request);
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public abstract String getDownloadURI(HttpServletRequest request);
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public abstract String getMetadataURI(HttpServletRequest request);
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public abstract String getMetadataURI(HttpServletRequest request);
+    
 }

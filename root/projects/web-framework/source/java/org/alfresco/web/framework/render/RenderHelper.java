@@ -43,20 +43,20 @@ import org.alfresco.web.site.RequestContext;
 public class RenderHelper 
 {
     private static final String COMPONENTTYPE_WEBSCRIPT = "webscript";
-	private static final String WEBFRAMEWORK_RENDERCONTEXT_PROVIDER = "webframework.rendercontext.provider";
-	private static final String PREFIX_WEBFRAMEWORK_PROCESSOR = "webframework.processor.";
-	private static final String PREFIX_WEBFRAMEWORK_RENDERER = "webframework.renderer.";
+    private static final String WEBFRAMEWORK_RENDERCONTEXT_PROVIDER = "webframework.rendercontext.provider";
+    private static final String PREFIX_WEBFRAMEWORK_PROCESSOR = "webframework.processor.";
+    private static final String PREFIX_WEBFRAMEWORK_RENDERER = "webframework.renderer.";
 
-	/**
-	 * Gets a renderer for the given renderer type
-	 * (i.e. page, template, component, etc)
-	 * 
-	 * @param rendererType
-	 * @return renderer
-	 */
+    /**
+     * Gets a renderer for the given renderer type
+     * (i.e. page, template, component, etc)
+     * 
+     * @param rendererType
+     * @return renderer
+     */
     public static Renderer getRenderer(RendererType rendererType)
     {
-    	return getRenderer(rendererType.toString().toLowerCase());
+        return getRenderer(rendererType.toString());
     }
     
     /**
@@ -68,44 +68,44 @@ public class RenderHelper
      */
     public static Renderer getRenderer(ModelObject modelObject)
     {
-    	Renderer renderer = null;
-    	if(modelObject instanceof TemplateInstance)
-    	{
-    		renderer = getRenderer(RendererType.TEMPLATE);
-    	}
-    	if(renderer == null)
-    	{
-    		renderer = getRenderer(modelObject.getTypeId());
-    	}
-    	
-    	return renderer;
+        Renderer renderer = null;
+        if (modelObject instanceof TemplateInstance)
+        {
+            renderer = getRenderer(RendererType.TEMPLATE);
+        }
+        if (renderer == null)
+        {
+            renderer = getRenderer(modelObject.getTypeId());
+        }
+        
+        return renderer;
     }
     
-	/**
-	 * Gets a renderer for the given id
-	 * 
-	 * @param id
-	 * @return renderer
-	 */
-	public static Renderer getRenderer(String id)
+    /**
+     * Gets a renderer for the given id
+     * 
+     * @param id
+     * @return renderer
+     */
+    public static Renderer getRenderer(String id)
     {
-    	String rendererId = PREFIX_WEBFRAMEWORK_RENDERER + id;
+        String rendererId = PREFIX_WEBFRAMEWORK_RENDERER + id;
 
-    	return (Renderer) FrameworkHelper.getApplicationContext().getBean(rendererId);
+        return (Renderer) FrameworkHelper.getApplicationContext().getBean(rendererId);
     }
     
-	/**
-	 * Returns a processor for the given id (i.e. jsp, webscript, etc)
-	 * 
-	 * @param id
-	 * @return processor
-	 */
+    /**
+     * Returns a processor for the given id (i.e. jsp, webscript, etc)
+     * 
+     * @param id
+     * @return processor
+     */
     public static Processor getProcessorById(String id)
-	{
-    	String processorId = PREFIX_WEBFRAMEWORK_PROCESSOR + id;
-    	
-    	return (Processor) FrameworkHelper.getApplicationContext().getBean(processorId);
-	}
+    {
+        String processorId = PREFIX_WEBFRAMEWORK_PROCESSOR + id;
+        
+        return (Processor) FrameworkHelper.getApplicationContext().getBean(processorId);
+    }
 
     /**
      * Returns a processor for a renderable in the VIEW render mode
@@ -115,7 +115,7 @@ public class RenderHelper
      */
     public static Processor getProcessor(Renderable renderable)
     {
-    	return getProcessor(renderable, RenderMode.VIEW);    	
+        return getProcessor(renderable, RenderMode.VIEW);        
     }
     
     /**
@@ -127,8 +127,8 @@ public class RenderHelper
      */
     public static Processor getProcessor(Renderable renderable, RenderMode renderMode)
     {
-    	String processorId = (String) renderable.getProcessorId(renderMode.toString());    	
-    	return getProcessorById(processorId);
+        String processorId = renderable.getProcessorId(renderMode.toString());        
+        return getProcessorById(processorId);
     }
     
     /**
@@ -138,7 +138,7 @@ public class RenderHelper
      */
     public static RenderContextProvider getRenderContextProvider()
     {
-    	return (RenderContextProvider) FrameworkHelper.getApplicationContext().getBean(WEBFRAMEWORK_RENDERCONTEXT_PROVIDER);
+        return (RenderContextProvider) FrameworkHelper.getApplicationContext().getBean(WEBFRAMEWORK_RENDERCONTEXT_PROVIDER);
     }
     
     /**
@@ -152,7 +152,7 @@ public class RenderHelper
      */
     public static RenderContext provideRenderContext(RequestContext context, HttpServletRequest request, HttpServletResponse response)
     {
-    	return getRenderContextProvider().provide(context, request, response, RenderMode.VIEW);
+        return getRenderContextProvider().provide(context, request, response, RenderMode.VIEW);
     }
         
     /**
@@ -167,7 +167,7 @@ public class RenderHelper
      */
     public static RenderContext provideRenderContext(RequestContext context, HttpServletRequest request, HttpServletResponse response, RenderMode renderMode)
     {
-    	return getRenderContextProvider().provide(context, request, response, renderMode);
+        return getRenderContextProvider().provide(context, request, response, renderMode);
     }
     
     /**
@@ -179,7 +179,7 @@ public class RenderHelper
      */
     public static RenderContext provideRenderContext(RenderContext renderContext)
     {
-    	return getRenderContextProvider().provide(renderContext);
+        return getRenderContextProvider().provide(renderContext);
     }
 
     /**
@@ -194,7 +194,7 @@ public class RenderHelper
      */
     public static RenderContext provideRenderContext(RenderContext renderContext, ModelObject modelObject)
     {
-    	return getRenderContextProvider().provide(renderContext, modelObject);
+        return getRenderContextProvider().provide(renderContext, modelObject);
     }
     
     /**
@@ -205,7 +205,7 @@ public class RenderHelper
      */
     public static void mergeRenderContext(RenderContext renderContext, ModelObject modelObject)
     {
-    	getRenderContextProvider().merge(renderContext, modelObject);
+        getRenderContextProvider().merge(renderContext, modelObject);
     }
     
     /**
@@ -215,7 +215,7 @@ public class RenderHelper
      */
     public static void releaseRenderContext(RenderContext renderContext)
     {
-    	getRenderContextProvider().release(renderContext);
+        getRenderContextProvider().release(renderContext);
     }
     
     /**
@@ -227,11 +227,11 @@ public class RenderHelper
      */
     /*
     public static void renderModelObject(RenderContext renderContext)
-		throws RendererExecutionException
-	{
-    	renderModelObject(renderContext, RenderFocus.BODY);
-	}
-	*/
+        throws RendererExecutionException
+    {
+        renderModelObject(renderContext, RenderFocus.BODY);
+    }
+    */
     
     /**
      * Renders the specific focus for the given model object
@@ -241,61 +241,61 @@ public class RenderHelper
      * @throws RendererExecutionException
      */
     public static void renderModelObject(RenderContext renderContext, RenderFocus renderFocus)
-    	throws RendererExecutionException
+        throws RendererExecutionException
     {
-    	ModelObject modelObject = renderContext.getObject();
-    	if(modelObject != null)
-    	{
-    		Renderer renderer = (Renderer) RenderHelper.getRenderer(modelObject);
-    		renderer.render(renderContext, renderFocus);
-    	}
+        ModelObject modelObject = renderContext.getObject();
+        if (modelObject != null)
+        {
+            Renderer renderer = (Renderer) RenderHelper.getRenderer(modelObject);
+            renderer.render(renderContext, renderFocus);
+        }
     }
     
     public static String renderModelObjectAsString(RenderContext renderContext)
-    	throws RendererExecutionException, UnsupportedEncodingException
-	{
-    	return renderModelObjectAsString(renderContext, RenderFocus.BODY);
-	}
+        throws RendererExecutionException, UnsupportedEncodingException
+    {
+        return renderModelObjectAsString(renderContext, RenderFocus.BODY);
+    }
     
     public static String renderModelObjectAsString(RenderContext renderContext, RenderFocus renderFocus)
-    	throws RendererExecutionException, UnsupportedEncodingException
+        throws RendererExecutionException, UnsupportedEncodingException
     {
-    	renderContext = wrapRenderContext(renderContext);
-    	
-    	renderModelObject(renderContext, renderFocus);
-    	
-    	return ((WrappedRenderContext)renderContext).getContentAsString();
+        renderContext = wrapRenderContext(renderContext);
+        
+        renderModelObject(renderContext, renderFocus);
+        
+        return ((WrappedRenderContext)renderContext).getContentAsString();
     }
     
     public static RenderContext wrapRenderContext(RenderContext renderContext)
     {
-    	return new WrappedRenderContext(renderContext);
+        return new WrappedRenderContext(renderContext);
     }
         
     public static void processRenderable(RenderContext context, RenderFocus renderFocus, Renderable renderable)
-    	throws RendererExecutionException
+        throws RendererExecutionException
     {
-    	// get the processor
-    	Processor processor = RenderHelper.getProcessor(renderable);
-    	if(processor != null)
-    	{
-    		// build a processor context
-    		ProcessorContext processorContext = new ProcessorContext(context);
-    		
-    		// load from renderable data
-    		processorContext.load(renderable);
-    		
-    		// execute the processor
-    		processor.execute(processorContext, renderFocus);
-    	}    	
+        // get the processor
+        Processor processor = RenderHelper.getProcessor(renderable);
+        if (processor != null)
+        {
+            // build a processor context
+            ProcessorContext processorContext = new ProcessorContext(context);
+            
+            // load from renderable data
+            processorContext.load(renderable);
+            
+            // execute the processor
+            processor.execute(processorContext, renderFocus);
+        }        
     }
     
     public static void processComponent(RenderContext context, RenderFocus renderFocus, Component component)
-		throws RendererExecutionException
-	{
-    	ComponentType renderable = null;
-    	
-    	// special case for web scripts
+        throws RendererExecutionException
+    {
+        ComponentType renderable = null;
+        
+        // special case for web scripts
         String uri = component.getURL();
         if (uri == null)
         {
@@ -307,7 +307,7 @@ public class RenderHelper
         }
         if (uri != null && uri.length() != 0)
         {
-        	renderable = context.getModel().getComponentType(COMPONENTTYPE_WEBSCRIPT);
+            renderable = context.getModel().getComponentType(COMPONENTTYPE_WEBSCRIPT);
         }
         String componentTypeId = component.getComponentTypeId();
         if (componentTypeId != null)
@@ -319,40 +319,40 @@ public class RenderHelper
                 uri = componentTypeId;
             }
         }
-        if(renderable == null)
+        if (renderable == null)
         {
-        	renderable = component.getComponentType(context);
+            renderable = component.getComponentType(context);
         }
         
-		// get the processor
-		Processor processor = RenderHelper.getProcessor(renderable);
-		if(processor != null)
-		{
-			// build a processor context
-			ProcessorContext processorContext = new ProcessorContext(context);
-			
-			// load from renderable data
-			processorContext.load(renderable);
-			
-			// apply any overrides from special cases
-			if(uri != null)
-			{
-				ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW.toString());
-				viewDescriptor.put("uri", uri);
-			}
-			
-			// execute the processor
-			processor.execute(processorContext, renderFocus);
-		}    	
-	}
+        // get the processor
+        Processor processor = RenderHelper.getProcessor(renderable);
+        if (processor != null)
+        {
+            // build a processor context
+            ProcessorContext processorContext = new ProcessorContext(context);
+            
+            // load from renderable data
+            processorContext.load(renderable);
+            
+            // apply any overrides from special cases
+            if (uri != null)
+            {
+                ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW.toString());
+                viewDescriptor.put("uri", uri);
+            }
+            
+            // execute the processor
+            processor.execute(processorContext, renderFocus);
+        }        
+    }
 
     public static void processTemplate(RenderContext context, RenderFocus renderFocus, TemplateInstance template)
-		throws RendererExecutionException
-	{
-    	TemplateType renderable = null;
-    	
-    	// special case for web scripts
-    	String uri = null;
+        throws RendererExecutionException
+    {
+        TemplateType renderable = null;
+        
+        // special case for web scripts
+        String uri = null;
         String templateTypeId = template.getTemplateType();
         if (templateTypeId != null)
         {
@@ -363,30 +363,30 @@ public class RenderHelper
                 uri = templateTypeId;
             }
         }
-        if(renderable == null)
+        if (renderable == null)
         {
-        	renderable = template.getTemplateType(context);
+            renderable = template.getTemplateType(context);
         }
-    	
-		// get the processor
-		Processor processor = RenderHelper.getProcessor(renderable);
-		if(processor != null)
-		{
-			// build a processor context
-			ProcessorContext processorContext = new ProcessorContext(context);
-			
-			// load from renderable data
-			processorContext.load(renderable);
-			
-			// apply any overrides from special cases
-			if(uri != null)
-			{
-				ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW.toString());
-				viewDescriptor.put("uri", uri);
-			}
-			
-			// execute the processor
-			processor.execute(processorContext, renderFocus);
-		}    	
-	}
+        
+        // get the processor
+        Processor processor = RenderHelper.getProcessor(renderable);
+        if (processor != null)
+        {
+            // build a processor context
+            ProcessorContext processorContext = new ProcessorContext(context);
+            
+            // load from renderable data
+            processorContext.load(renderable);
+            
+            // apply any overrides from special cases
+            if (uri != null)
+            {
+                ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW.toString());
+                viewDescriptor.put("uri", uri);
+            }
+            
+            // execute the processor
+            processor.execute(processorContext, renderFocus);
+        }        
+    }
 }

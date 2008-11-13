@@ -138,7 +138,7 @@ public class RequestUtil
             HttpServletResponse response, String dispatchPath)
             throws ServletException, IOException
     {
-    	request.getRequestDispatcher(dispatchPath).include(request, response);
+        request.getRequestDispatcher(dispatchPath).include(request, response);
     }
 
     /**

@@ -44,8 +44,8 @@ public abstract class ThreadLocalRequestContext extends AbstractRequestContext
      */
     protected ThreadLocalRequestContext(HttpServletRequest request)
     {
-    	super(request);
-    	
+        super(request);
+        
         ThreadLocalRequestContext.instance.set(this);
     }
     

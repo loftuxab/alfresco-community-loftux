@@ -34,97 +34,97 @@ import java.util.Map;
  * @author muzquiano
  */
 public interface Content
-{	
-	/**
-	 * Gets the id.
-	 * 
-	 * @return the id
-	 */
-	public String getId();
-	
-	/**
-	 * Gets the type id
-	 * 
-	 * @return
-	 */
-	public String getTypeId();
-	
-	/**
-	 * Gets the timestamp.
-	 * 
-	 * @return the timestamp
-	 */
-	public long getTimestamp();
-	
-	/**
-	 * Gets the property.
-	 * 
-	 * @param propertyName the property name
-	 * 
-	 * @return the property
-	 */
-	public Object getProperty(String propertyName);
-	
-	/**
-	 * Gets the properties.
-	 * 
-	 * @return the properties
-	 */
-	public Map<String, Serializable> getProperties();
-	
-	/**
-	 * Returns the endpoint id from which the content was retrieved
-	 * 
-	 * @return
-	 */
-	public String getEndpointId();
-	
-	/**
-	 * Returns whether the content was successfully loaded
-	 * 
-	 * @return
-	 */
-	public boolean isLoaded();
+{    
+    /**
+     * Gets the id.
+     * 
+     * @return the id
+     */
+    public String getId();
+    
+    /**
+     * Gets the type id
+     * 
+     * @return
+     */
+    public String getTypeId();
+    
+    /**
+     * Gets the timestamp.
+     * 
+     * @return the timestamp
+     */
+    public long getTimestamp();
+    
+    /**
+     * Gets the property.
+     * 
+     * @param propertyName the property name
+     * 
+     * @return the property
+     */
+    public Object getProperty(String propertyName);
+    
+    /**
+     * Gets the properties.
+     * 
+     * @return the properties
+     */
+    public Map<String, Serializable> getProperties();
+    
+    /**
+     * Returns the endpoint id from which the content was retrieved
+     * 
+     * @return
+     */
+    public String getEndpointId();
+    
+    /**
+     * Returns whether the content was successfully loaded
+     * 
+     * @return
+     */
+    public boolean isLoaded();
 
-	/**
-	 * Sets the status code
-	 * 
-	 * @param statusCode
-	 */
-	public void setStatusCode(int statusCode);
-	
-	/**
-	 * Returns the status code associated with the load
-	 * 
-	 * @return
-	 */
-	public int getStatusCode();
+    /**
+     * Sets the status code
+     * 
+     * @param statusCode
+     */
+    public void setStatusCode(int statusCode);
+    
+    /**
+     * Returns the status code associated with the load
+     * 
+     * @return
+     */
+    public int getStatusCode();
 
-	/**
-	 * Sets the status message
-	 * 
-	 * @param statusMessage
-	 */
-	public void setStatusMessage(String statusMessage);
-	
-	/**
-	 * Returns the status message associated with the load
-	 * 
-	 * @return
-	 */
-	public String getStatusMessage();
-	
-	/**
-	 * Sets the status exception
-	 * 
-	 * @param statusException
-	 */
-	public void setStatusException(Throwable statusException);
-	
-	/**
-	 * Returns the status exception associated with the load
-	 * 
-	 * @return
-	 */
-	public Throwable getStatusException();
+    /**
+     * Sets the status message
+     * 
+     * @param statusMessage
+     */
+    public void setStatusMessage(String statusMessage);
+    
+    /**
+     * Returns the status message associated with the load
+     * 
+     * @return
+     */
+    public String getStatusMessage();
+    
+    /**
+     * Sets the status exception
+     * 
+     * @param statusException
+     */
+    public void setStatusException(Throwable statusException);
+    
+    /**
+     * Returns the status exception associated with the load
+     * 
+     * @return
+     */
+    public Throwable getStatusException();
 }

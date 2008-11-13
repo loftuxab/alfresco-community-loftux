@@ -45,9 +45,7 @@ import org.alfresco.web.site.WrappedRequestContext;
  * 
  * @author muzquiano
  */
-public abstract class AbstractRenderContext 
-	extends WrappedRequestContext
-	implements RenderContext, Serializable
+public abstract class AbstractRenderContext extends WrappedRequestContext implements RenderContext, Serializable
 {
     // the provider
     protected RenderContextProvider provider;
@@ -65,13 +63,17 @@ public abstract class AbstractRenderContext
      */
     protected static int idCounter = 0;
     
-    // TODO: why do we need this?
-    //private Map<String, Component> components = null;
-
+    
+    /**
+     * Constructor
+     * 
+     * @param provider
+     * @param requestContext
+     */
     public AbstractRenderContext(RenderContextProvider provider, RequestContext requestContext)
     {
-    	super(requestContext);
-    	this.provider = provider;
+        super(requestContext);
+        this.provider = provider;
     }
 
     // methods from RenderContext
@@ -81,7 +83,7 @@ public abstract class AbstractRenderContext
      */
     public RenderMode getRenderMode()
     {
-    	return this.mode;
+        return this.mode;
     }
     
     /* (non-Javadoc)
@@ -89,7 +91,7 @@ public abstract class AbstractRenderContext
      */
     public void setRenderMode(RenderMode mode)
     {
-    	this.mode = mode;
+        this.mode = mode;
     }
         
     /* (non-Javadoc)
@@ -161,7 +163,7 @@ public abstract class AbstractRenderContext
      */
     public String getId()
     {
-        if(this.object != null)
+        if (this.object != null)
         {
             return this.object.getTypeId() + "___" + this.object.getId();
         }
@@ -173,7 +175,7 @@ public abstract class AbstractRenderContext
      */
     public RenderContextProvider getProvider()
     {
-    	return this.provider;
+        return this.provider;
     }
     
     /* (non-Javadoc)
@@ -181,7 +183,7 @@ public abstract class AbstractRenderContext
      */
     public void release()
     {
-    	this.provider.release(this);
+        this.provider.release(this);
     }
         
     @Override
@@ -190,35 +192,35 @@ public abstract class AbstractRenderContext
         return "RenderContext-" + getId();
     }    
     
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContext#setPassiveMode(boolean)
-	 */
-	public void setPassiveMode(boolean passiveMode)
-	{
-		this.passiveMode = passiveMode;		
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.render.RenderContext#isPassiveMode()
-	 */
-	public boolean isPassiveMode()
-	{
-		return passiveMode;		
-	}
-	
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContext#setPassiveMode(boolean)
+     */
+    public void setPassiveMode(boolean passiveMode)
+    {
+        this.passiveMode = passiveMode;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.RenderContext#isPassiveMode()
+     */
+    public boolean isPassiveMode()
+    {
+        return this.passiveMode;
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#setValue(java.lang.String, java.io.Serializable, int)
      */
     public void setValue(String key, Serializable value, int scope)
-    {    	
-    	if(scope == RenderContext.SCOPE_REQUEST)
-    	{
-    		this.getOriginalContext().setValue(key, value);
-    	}
-    	else
-    	{
-    		this.setValue(key, value);
-    	}
+    {        
+        if (scope == RenderContext.SCOPE_REQUEST)
+        {
+            this.getOriginalContext().setValue(key, value);
+        }
+        else
+        {
+            this.setValue(key, value);
+        }
     }
     
     /* (non-Javadoc)
@@ -226,18 +228,18 @@ public abstract class AbstractRenderContext
      */
     public Serializable getValue(String key, int scope)
     {
-    	Serializable value = null;
-    	
-    	if(scope == RenderContext.SCOPE_REQUEST)
-    	{
-    		value = this.getOriginalContext().getValue(key);
-    	}
-    	else
-    	{
-    		value = this.getValue(key);
-    	}
-    	
-    	return value;
+        Serializable value = null;
+        
+        if (scope == RenderContext.SCOPE_REQUEST)
+        {
+            value = this.getOriginalContext().getValue(key);
+        }
+        else
+        {
+            value = this.getValue(key);
+        }
+        
+        return value;
     }
     
     /* (non-Javadoc)
@@ -245,14 +247,14 @@ public abstract class AbstractRenderContext
      */
     public void removeValue(String key, int scope)
     {
-    	if(scope == RenderContext.SCOPE_REQUEST)
-    	{
-    		this.getOriginalContext().removeValue(key);
-    	}
-    	else
-    	{
-    		this.removeValue(key);
-    	}    	
+        if (scope == RenderContext.SCOPE_REQUEST)
+        {
+            this.getOriginalContext().removeValue(key);
+        }
+        else
+        {
+            this.removeValue(key);
+        }        
     }
     
     /* (non-Javadoc)
@@ -260,20 +262,18 @@ public abstract class AbstractRenderContext
      */
     public boolean hasValue(String key, int scope)
     {
-    	boolean has = false;
-    	
-    	if(scope == RenderContext.SCOPE_REQUEST)
-    	{
-    		has = this.getOriginalContext().hasValue(key);
-    	}
-    	else
-    	{
-    		has = this.hasValue(key);
-    	}    	
-    	
-    	return has;
+        boolean has = false;
+        
+        if (scope == RenderContext.SCOPE_REQUEST)
+        {
+            has = this.getOriginalContext().hasValue(key);
+        }
+        else
+        {
+            has = this.hasValue(key);
+        }        
+        
+        return has;
     }
-	
-    
 }
-	
+    

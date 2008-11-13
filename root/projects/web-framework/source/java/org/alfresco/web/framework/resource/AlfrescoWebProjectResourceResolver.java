@@ -40,147 +40,147 @@ import org.alfresco.web.site.exception.RequestContextException;
  */
 public class AlfrescoWebProjectResourceResolver extends AbstractAlfrescoResourceResolver 
 {
-	public AlfrescoWebProjectResourceResolver(Resource resource)
-	{
-		super(resource);
-	}
+    public AlfrescoWebProjectResourceResolver(Resource resource)
+    {
+        super(resource);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getDownloadURI(HttpServletRequest request)
-	{
-		StringBuilder builder = new StringBuilder(512);
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getDownloadURI(HttpServletRequest request)
+    {
+        StringBuilder builder = new StringBuilder(512);
 
-		if(FrameworkHelper.getConfig().isWebStudioEnabled())
-		{
-			builder.append("/remotestore/get");
-			
-			String value = this.resource.getValue();
-			if(value != null)
-			{
-				if(!value.startsWith("/"))
-				{
-					value = "/" + value;
-				}
-				
-				builder.append(value);
-			}
-			
-			// append store
-			RequestContext requestContext = null;
-			try
-			{
-				requestContext = RequestUtil.getRequestContext(request);
+        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        {
+            builder.append("/remotestore/get");
+            
+            String value = this.resource.getValue();
+            if (value != null)
+            {
+                if (!value.startsWith("/"))
+                {
+                    value = "/" + value;
+                }
+                
+                builder.append(value);
+            }
+            
+            // append store
+            RequestContext requestContext = null;
+            try
+            {
+                requestContext = RequestUtil.getRequestContext(request);
 
-				ModelPersistenceContext mpc = requestContext.getModel().getObjectManager().getContext();
-				String storeId = (String) mpc.getValue(ModelPersistenceContext.REPO_STOREID);
-				
-				// append the store id
-				builder.append("?s=" + storeId);
-				
-				String webappId = (String) mpc.getValue(ModelPersistenceContext.REPO_WEBAPPID);
-				if(webappId != null)
-				{
-					builder.append("&w=" + webappId);
-				}
-			}
-			catch(RequestContextException rce)
-			{
-				rce.printStackTrace();
-				return null;
-			}
-		}
-		else
-		{
-			builder.append(this.resource.getValue());
-		}
-		
-		return builder.toString();
-	}
-			
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadataURI(HttpServletRequest request)
-	{
-		StringBuilder builder = new StringBuilder(512);
-		if(FrameworkHelper.getConfig().isWebStudioEnabled())
-		{
-			RequestContext context = null;
-			try
-			{
-				context = RequestUtil.getRequestContext(request);
-			}
-			catch(RequestContextException rce)
-			{
-				rce.printStackTrace();
-				return null;
-			}
-		
-			if(context != null)
-			{
-				String webappId = "ROOT";
-				String path = this.resource.getValue();
-			
-				String storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
-				if(storeId != null)
-				{				
-					builder.append("/webframework/avm/metadata/");
-					builder.append(storeId);
-					builder.append("/");
-					builder.append(webappId);
-					builder.append("/");
-					builder.append(path);
-				}
-			}
-		}
-		
-		return builder.toString();
-	}	
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getProxiedDownloadURI(HttpServletRequest request)
-	{
-		String url = getDownloadURI(request);
-		
-		if(FrameworkHelper.getConfig().isWebStudioEnabled())
-		{
-			url = "/proxy/{endpoint}" + url;
-			
-			String ep = this.resource.getEndpoint();
-			if(ep == null)
-			{
-				ep = "alfresco";
-			}
-			url = url.replace("{endpoint}", ep);
-		}
-		
-		return url;
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getProxiedMetadataURI(HttpServletRequest request)
-	{
-		String url = getMetadataURI(request);
-		
-		if(FrameworkHelper.getConfig().isWebStudioEnabled())
-		{
-			url = "/proxy/{endpoint}" + url;
-			
-			String ep = this.resource.getEndpoint();
-			if(ep == null)
-			{
-				ep = "alfresco";
-			}
-			url = url.replace("{endpoint}", ep);
-		}
-		
-		return url;
-	}	
-	
+                ModelPersistenceContext mpc = requestContext.getModel().getObjectManager().getContext();
+                String storeId = (String) mpc.getValue(ModelPersistenceContext.REPO_STOREID);
+                
+                // append the store id
+                builder.append("?s=" + storeId);
+                
+                String webappId = (String) mpc.getValue(ModelPersistenceContext.REPO_WEBAPPID);
+                if (webappId != null)
+                {
+                    builder.append("&w=" + webappId);
+                }
+            }
+            catch (RequestContextException rce)
+            {
+                rce.printStackTrace();
+                return null;
+            }
+        }
+        else
+        {
+            builder.append(this.resource.getValue());
+        }
+        
+        return builder.toString();
+    }
+            
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadataURI(HttpServletRequest request)
+    {
+        StringBuilder builder = new StringBuilder(512);
+        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        {
+            RequestContext context = null;
+            try
+            {
+                context = RequestUtil.getRequestContext(request);
+            }
+            catch (RequestContextException rce)
+            {
+                rce.printStackTrace();
+                return null;
+            }
+        
+            if (context != null)
+            {
+                String webappId = "ROOT";
+                String path = this.resource.getValue();
+            
+                String storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
+                if (storeId != null)
+                {                
+                    builder.append("/webframework/avm/metadata/");
+                    builder.append(storeId);
+                    builder.append("/");
+                    builder.append(webappId);
+                    builder.append("/");
+                    builder.append(path);
+                }
+            }
+        }
+        
+        return builder.toString();
+    }    
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getProxiedDownloadURI(HttpServletRequest request)
+    {
+        String url = getDownloadURI(request);
+        
+        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        {
+            url = "/proxy/{endpoint}" + url;
+            
+            String ep = this.resource.getEndpoint();
+            if (ep == null)
+            {
+                ep = "alfresco";
+            }
+            url = url.replace("{endpoint}", ep);
+        }
+        
+        return url;
+    }
+        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getProxiedMetadataURI(HttpServletRequest request)
+    {
+        String url = getMetadataURI(request);
+        
+        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        {
+            url = "/proxy/{endpoint}" + url;
+            
+            String ep = this.resource.getEndpoint();
+            if (ep == null)
+            {
+                ep = "alfresco";
+            }
+            url = url.replace("{endpoint}", ep);
+        }
+        
+        return url;
+    }    
+    
 }

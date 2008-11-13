@@ -127,7 +127,7 @@ public final class GenericFreemarkerTagDirective extends FreemarkerTagSupportDir
             String output = executeTag(tag, bodyContentString);
             env.getOut().write(output);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new TemplateException("Unable to process tag and commit output", ex, env);
         }        

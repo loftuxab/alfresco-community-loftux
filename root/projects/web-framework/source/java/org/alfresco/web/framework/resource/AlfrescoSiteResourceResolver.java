@@ -34,34 +34,34 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class AlfrescoSiteResourceResolver extends AbstractAlfrescoResourceResolver 
 {
-	public AlfrescoSiteResourceResolver(Resource resource)
-	{
-		super(resource);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getDownloadURI(HttpServletRequest request)
-	{
-		String url ="/api/node/{value}/content";
-		
-		url = url.replace("{endpoint}", this.resource.getEndpoint());
-		url = url.replace("{value}", this.resource.getValue());
-		
-		return url;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
-	 */
-	public String getMetadataURI(HttpServletRequest request)
-	{
-		String url = "/webframework/content/metadata?id={nodeRef}";
+    public AlfrescoSiteResourceResolver(Resource resource)
+    {
+        super(resource);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getDownloadURI(HttpServletRequest request)
+    {
+        String url ="/api/node/{value}/content";
+        
+        url = url.replace("{endpoint}", this.resource.getEndpoint());
+        url = url.replace("{value}", this.resource.getValue());
+        
+        return url;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
+     */
+    public String getMetadataURI(HttpServletRequest request)
+    {
+        String url = "/webframework/content/metadata?id={nodeRef}";
 
-		String nodeRef = toNodeRefString(this.resource.getValue());		
-		url = url.replace("{rodeRef}", nodeRef);
-		
-		return url;
-	}			
+        String nodeRef = toNodeRefString(this.resource.getValue());        
+        url = url.replace("{rodeRef}", nodeRef);
+        
+        return url;
+    }            
 }
