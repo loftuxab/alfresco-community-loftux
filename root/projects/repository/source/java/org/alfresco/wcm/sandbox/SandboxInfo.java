@@ -24,23 +24,43 @@
  */
 package org.alfresco.wcm.sandbox;
 
-import java.io.Serializable;
+import java.util.Date;
+
+import org.alfresco.service.namespace.QName;
 
 /**
 *  Provides information about a WCM sandbox created by SandboxFactory.
 */
-public final class SandboxInfo implements Serializable
+public interface SandboxInfo
 {
-    private static final long serialVersionUID = 3615436375385857404L;
-    
-    String [] store_names_;
-    public SandboxInfo(String [] store_names)
-    {
-        store_names_ = store_names;
-    }
-
     /**
-    *  A list of names of the stores within this sandbox.
+     * Get the name
+     * 
+     * @return  String  name
+     */
+    public String getName();
+    
+    /**
+     *  The sandbox store id
+     */
+    public String getSandboxId();
+    
+    /**
+     *  The web project store id
+     */
+    public String getWebProjectId();
+    
+    /**
+     *  The sandbox type ... for now a QName, based on existing SandboxConstants
+     */
+    public QName getSandboxType();
+    
+    public Date getCreatedDate();
+
+    public String getCreator();
+    
+    /**
+    *  A list of ids of the stores within this sandbox.
     *  The "main" store should come first in this list;
     *  any other stores should appear in the order that 
     *  they are overlaid on "main" (e.g.: any "preview" 
@@ -48,10 +68,10 @@ public final class SandboxInfo implements Serializable
     *  <p>
     *  Note: all sandboxes must have a "main" layer.
     */
-    public String [] getStoreNames()    { return store_names_; }
+    public String[] getStoreNames();
 
     /**
-    *  The name of the "main" store within this sandbox.
+    *  The id of the "main" store within this sandbox.
     */
-    public String    getMainStoreName() { return store_names_[0]; }
+    public String getMainStoreName();
 }
