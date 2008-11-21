@@ -25,13 +25,18 @@
 package org.alfresco.util;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.alfresco.config.source.FileConfigSource;
+import org.alfresco.config.xml.XMLConfigService;
 
 import junit.framework.TestCase;
 
 /**
  * Base class for all JUnit tests
  * 
- * @author gavinc
+ * @author gavinc, Neil McErlean
  */
 public abstract class BaseTest extends TestCase
 {
@@ -47,4 +52,39 @@ public abstract class BaseTest extends TestCase
    {
       return this.resourcesDir;
    }
+
+    protected void assertFileIsValid(String fullFileName)
+    {
+        File f = new File(fullFileName);
+        assertTrue("Required file missing: " + fullFileName, f.exists());
+        assertTrue("Required file not readable: " + fullFileName, f.canRead());
+    }
+    
+    protected XMLConfigService initXMLConfigService(String xmlConfigFile)
+    {
+        String fullFileName = getResourcesDir() + xmlConfigFile;
+        assertFileIsValid(fullFileName);
+    
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(
+                fullFileName));
+        svc.initConfig();
+        return svc;
+    }
+    
+    protected XMLConfigService initXMLConfigService(String xmlConfigFile, String overridingXmlConfigFile)
+    {
+        String mainConfigFile = getResourcesDir() + xmlConfigFile;
+        String overridingConfigFile = getResourcesDir()
+                + overridingXmlConfigFile;
+        assertFileIsValid(mainConfigFile);
+        assertFileIsValid(overridingConfigFile);
+    
+        List<String> configFiles = new ArrayList<String>();
+        configFiles.add(mainConfigFile);
+        configFiles.add(overridingConfigFile);
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(
+                configFiles));
+        svc.initConfig();
+        return svc;
+    }
 }
