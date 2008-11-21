@@ -303,7 +303,8 @@
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-webframework,
-                    incremental-slingshot" />
+                    incremental-slingshot,
+                    incremental-webstudio" />
 
    <target name="build-modules"
            description="Performs a clean build of all modules"

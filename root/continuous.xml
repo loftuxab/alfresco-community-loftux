@@ -208,7 +208,17 @@
            description="Creates the distibution files for WCM"
            depends="assemble-virtual,
                     distribute-wcm-windows,
-                    distribute-wcm-linux" />
+                    distribute-wcm-linux,
+                    distribute-webstudio" />
+
+
+   <target name="distribute-webstudio">
+      <copy todir="${dir.continuous.dist}">
+         <fileset dir="${dir.project.webstudio.dist}"
+                  includes="${file.name.war.webstudio}" />
+      </copy>
+   </target>
+
 
    <target name="distribute-wcm-windows">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
@@ -407,6 +417,9 @@
          <fileset dir="${dir.project.slingshot.dist}"
                   includes="${file.name.war.slingshot}" />
       </copy>
+      <!-- Copy any required common libs -->
+      <copy todir="${dir.continuous.assemble.tomcat}/lib"
+            file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
          <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
@@ -1104,7 +1117,7 @@
             file="${dir.project.sdk.projects.server}/.classpath" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/remote" 
             file="${dir.project.sdk.projects.remote}/.project" />
-      <copy todir="${dir.continuous.assemble.sdk}/lib/remote" 
+      <copy todir="${dir.continuous.assemble.sdk}/lib/remote"
             file="${dir.project.sdk.projects.remote}/.classpath" />
 
       <!-- Sample Projects -->

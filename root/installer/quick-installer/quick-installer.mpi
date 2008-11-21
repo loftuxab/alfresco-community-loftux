@@ -1055,6 +1055,7 @@ File ::46D2734A-056D-433A-90B9-DB2F3CCF9FBE -name custom-activities-SqlMapConfig
 File ::B038A868-D6E7-4C11-A4D5-D25E8AE0F312 -name custom-activities-feed-context.xml -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
 File ::FA413D46-E082-48F1-B55F-189E4593C2C2 -name custom-activities-SqlMapConfig.xml -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
 File ::8AF6A44A-F1B9-4553-B579-2932B7CFADDB -name remote-openoffice-context.xml.sample -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
+File ::3F8FBA06-47AA-4F10-881E-984A2CA066F5 -name unsecured-public-services-security-context.xml.sample -parent 864EAD08-C746-4806-A493-59C0D9D2E8F2
 File ::33575C48-05DC-40DD-806D-B49FB075669F -type dir -name messages -parent C1B7B9FE-5A62-45F8-ADBA-113A2CCBAC27
 File ::F21EBDBA-2BD2-478A-B309-967D28F4C229 -name bpm-messages_fi_FI.properties -parent 33575C48-05DC-40DD-806D-B49FB075669F
 File ::E553119C-46FF-427F-800B-F30CA7AE5AF1 -name copy-service_fi_FI.properties -parent 33575C48-05DC-40DD-806D-B49FB075669F
@@ -1072,6 +1073,8 @@ File ::E74DC0D7-1506-4974-885C-799242030688 -type dir -name webapps -parent AE69
 File ::6A78CD46-C63E-4C64-A079-5B890FEB1EA1 -name alfresco.war -parent E74DC0D7-1506-4974-885C-799242030688
 File ::274E6826-4EB5-4880-95AC-38DD9551EC99 -name share.war -parent E74DC0D7-1506-4974-885C-799242030688
 File ::3F09105A-AC45-41DB-A806-786D6A9961D1 -type dir -name work -parent AE69A27B-3474-4077-9DB9-A31662628C82
+File ::CCC89A23-B450-4F3F-B15A-4AC2869CCCC5 -type dir -name lib -parent AE69A27B-3474-4077-9DB9-A31662628C82
+File ::6FC5D55D-9258-48A5-8ACA-191816F2207A -name commons-el.jar -parent CCC89A23-B450-4F3F-B15A-4AC2869CCCC5
 File ::AE0710F6-0F0D-4065-AE8A-E9072DAF4B9E -directory <%InstallDir%>/bin -name W:/HEAD/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::0F024A76-5F8D-45B2-9FD6-B1FED65DF756 -name W:/HEAD/root/projects/installer/windows/README.txt -location ../../projects/installer/windows/installer -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::09B268EE-C341-4587-80D3-1DF532DA173F -directory <%InstallDir%>/tomcat/common/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
@@ -2630,7 +2633,6 @@ File ::59419FE0-12EB-4AC8-BF54-A0A46B984ED6 -name catalina-optional.jar -parent 
 File ::1A9CB64C-57FE-44D5-B8EB-E3594014CF5C -name catalina-storeconfig.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::AB00C990-8D11-4546-93C1-995183B1424C -name catalina.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::BEB9400D-07D1-4A4E-A26B-4F2B51F244ED -name commons-modeler-2.0.1.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
-File ::3CE95C6E-6140-41C1-B734-C4C49C98A177 -name hibernate-3.2.1-patched.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::C758CBA7-102F-49D2-892D-F450CDEE0951 -name servlets-cgi.renametojar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::CDE494CF-3CD1-4AEC-84EC-4CC825CB12EE -name servlets-default.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::3482A291-ED3A-42A8-A3F3-68E2A94B0857 -name servlets-invoker.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
@@ -2643,6 +2645,7 @@ File ::72167256-D976-4551-92A4-344F610E2147 -name tomcat-http.jar -parent F970F1
 File ::49B06FED-C81A-4532-B5A3-69C340AAB641 -name tomcat-jkstatus-ant.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::651453C0-F6A1-4372-8765-C4FC55E79FEA -name tomcat-util.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::BB054C3E-773E-4C77-A5D6-E0BD584D587E -name spring-2.0.6.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
+File ::E1457F93-F0C3-4F46-BF3F-70F469E91D3A -name hibernate-3.2.6-patched.jar -parent F970F1D3-2A67-4ACC-9C61-671C9C123515
 File ::1DE86765-3E12-45CB-8525-FF69F67FDC85 -type dir -name webapps -parent 79384173-C0BB-4B4C-A81D-1CAC899F1BEC
 File ::11E611D0-A512-4BAF-ADF5-A360577EA622 -type dir -name host-manager -parent 1DE86765-3E12-45CB-8525-FF69F67FDC85
 File ::0A4133B7-9C29-4C30-8BFD-7E91173355FC -name host-manager.xml -parent 11E611D0-A512-4BAF-ADF5-A360577EA622
@@ -3672,6 +3675,7 @@ File ::D8F8A07A-77E6-40EA-B4C5-C2227F7499DD -type dir -name tmp -parent 05945FDF
 File ::1A1CE54A-A1E3-44F8-9C2E-DEF22ED95D27 -type dir -name prop-base -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
 File ::B5B798A7-4C2D-4B64-A1DC-FB4DDE422751 -type dir -name props -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
 File ::064CF832-7814-4900-A00B-F1BE42A94F19 -type dir -name text-base -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
+File ::271BE93D-6331-44DD-846F-5D89E3E6C322 -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/build/dist/studio.war -location ../../build/dist -parent 33087B4E-DFD2-42AB-A812-338D015C210B
 FileGroup ::B2ED123B-F320-4F2D-A38A-7091403BDEB7 -setup Install -alias {Java File} -active Yes -platforms {Windows ZipArchive} -name {Java File} -parent FileGroups
 File ::7C7CC5EC-84E6-4572-A398-45D02DFE9959 -directory <%InstallDir%> -name W:/resources/jdk-i586-p.exe -location ../../../../ALF-BINARIES/installer/win32 -parent B2ED123B-F320-4F2D-A38A-7091403BDEB7
 FileGroup ::E181E06B-BC95-4065-80E8-8614EE6074B7 -setup Install -alias {OpenOffice File} -active No -platforms {Windows ZipArchive} -name {OpenOffice File} -parent FileGroups
@@ -3766,12 +3770,12 @@ InstallComponent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -setup Install -type actio
 Condition B612D657-48C1-421E-A810-D1FF82C768E2 -active Yes -parent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id B612D657-48C1-421E-A810-D1FF82C768E2
 InstallComponent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -setup Install -type action -conditions 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -title {Locate Java Runtime} -component LocateJavaRuntime -command insert -active Yes -parent 991553B3-06E2-412E-89E5-1829C782E086
 Condition 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -active Yes -parent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id 5A7AF50A-C33F-47B4-BAAD-0869D47D5901
-InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
+InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition A1AF4F54-A600-430D-AA51-39C5EA26D457 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id A1AF4F54-A600-430D-AA51-39C5EA26D457
 Condition 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {String Is Condition} -component StringIsCondition -TreeObject::id 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86
 InstallComponent B8BC4D70-2048-4DD5-B15B-76050F07566F -setup Install -type action -conditions 9C516685-6F30-4420-A108-8F51B16D3AB8 -title {Move Forward} -component MoveForward -command insert -active No -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
 Condition 9C516685-6F30-4420-A108-8F51B16D3AB8 -active Yes -parent B8BC4D70-2048-4DD5-B15B-76050F07566F -title {String Is Condition} -component StringIsCondition -TreeObject::id 9C516685-6F30-4420-A108-8F51B16D3AB8
-InstallComponent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -setup Install -type action -conditions 05F74B3F-2FC4-4C99-AC27-099896306EC9 -title {Execute Script} -component ExecuteScript -command reorder -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
+InstallComponent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -setup Install -type action -conditions 05F74B3F-2FC4-4C99-AC27-099896306EC9 -title {Execute Script} -component ExecuteScript -command insert -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
 Condition 05F74B3F-2FC4-4C99-AC27-099896306EC9 -active Yes -parent 3BB22315-C35F-4437-A6E9-5E18B74DA487 -title {String Is Condition} -component StringIsCondition -TreeObject::id 05F74B3F-2FC4-4C99-AC27-099896306EC9
 InstallComponent 57EE088D-54C3-4C9F-8596-064B5255EE8A -setup Install -type pane -conditions {4A4E9BFB-63A5-43F8-8F53-B70CC0257653 E35F2477-2025-4C48-BE4A-BC2DB58EFD16} -title {Setup Type} -component SetupType -command insert -active Yes -parent StandardInstall
 Condition 4A4E9BFB-63A5-43F8-8F53-B70CC0257653 -active Yes -parent 57EE088D-54C3-4C9F-8596-064B5255EE8A -title {Script Condition} -component ScriptCondition -TreeObject::id 4A4E9BFB-63A5-43F8-8F53-B70CC0257653
@@ -3797,7 +3801,7 @@ InstallComponent C106AE81-88CA-44E9-8B7C-37C6579863FF -setup Install -type actio
 InstallComponent 8172F70F-8736-44D8-879E-694FF48D4E0A -setup Install -type action -conditions D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -active Yes -parent 8172F70F-8736-44D8-879E-694FF48D4E0A -title {File Exists Condition} -component FileExistsCondition -TreeObject::id D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
 InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
@@ -3812,7 +3816,7 @@ Condition 5019D322-283D-49A4-9FF6-CB74EEB5F0BA -active Yes -parent 3E64C4C8-6089
 InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB} -title {Configure MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
 Condition 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3
 Condition 87245761-D5F3-470A-9E78-B56E97ADD1AF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 87245761-D5F3-470A-9E78-B56E97ADD1AF
 InstallComponent 8486C21D-3367-4AFE-BF4E-6CDB5F670858 -setup Install -type pane -conditions B6592AC2-4C85-49CA-BBA7-CD5A2CA80995 -title {Check Port} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
@@ -4109,7 +4113,7 @@ CreateQuickLaunchShortcut
 {Unable to locate OpenOffice program}
 
 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3,Filename
-<%ALF_OO%>/program/soffice.exe
+<%ALF_OO%>/program/soffice.bin
 
 2521C09F-C692-49D8-BD76-C69BFFEF1F24,Conditions
 {0 conditions}
@@ -4211,7 +4215,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-31312733
+46836237
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4220,7 +4224,7 @@ WCM
 <%InstallDir%>
 
 332AF528-112D-43AC-B934-361D5E8E8AD6,FileSize
-8423872
+8441280
 
 332AF528-112D-43AC-B934-361D5E8E8AD6,Name
 {Program Files Win}
@@ -4244,7 +4248,7 @@ Yes
 Yes
 
 350E9DA1-539D-4270-834E-96641B5D4D3B,Value
-{<%Dir <%InstallDir%>/OpenOfficePortable/App/openoffice platfom%>}
+{<%Dir <%InstallDir%>/openoffice/OpenOffice.org 3/ platfom%>}
 
 350E9DA1-539D-4270-834E-96641B5D4D3B,VirtualText
 ALF_OO
@@ -4485,7 +4489,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-96494274
+97180183
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -5981,7 +5985,7 @@ FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,FileSize
-1350820
+1366433
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Name
 Samples
