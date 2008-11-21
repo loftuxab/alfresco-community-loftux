@@ -263,6 +263,9 @@
          <!-- AVM Tests -->
          <exclude name="**/org/alfresco/repo/avm/**/*Test.java" />
          <include name="**/org/alfresco/repo/avm/AVMTestSuite.java" />
+         <!-- WCM Tests -->
+         <exclude name="**/org/alfresco/wcm/**/*Test.java" />
+         <include name="**/org/alfresco/wcm/WCMTestSuite.java" />
          <!-- All other tests -->
          <include name="**/*Test.java" />
          <!-- include the updated indexer tests -->
