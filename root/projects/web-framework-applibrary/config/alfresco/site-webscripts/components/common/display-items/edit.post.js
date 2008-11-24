@@ -1,10 +1,3 @@
-<import resource="/include/support.js">
+<import resource="/components/common/js/component.js">
 
-var object = instance.object;
-
-for each(field in formdata.fields)
-{
-	object.setProperty(field.id, field.value);
-}
-
-object.save();
+WebStudio.Component.persist();

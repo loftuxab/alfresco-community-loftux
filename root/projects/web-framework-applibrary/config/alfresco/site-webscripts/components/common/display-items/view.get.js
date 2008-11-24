@@ -1,17 +1,16 @@
 <import resource="/components/common/js/mimetypes.js">
+<import resource="/components/common/js/component.js">
 
-var source = instance.object.resources.get("source");
-if(source == null)
+var sourceContent = WebStudio.Component.getSourceContent();
+if(sourceContent == null)
 {
 	model.ready = false;
 	
 }
 else
 {
-	model.metadata = source.metadata;
-
-	model.container = eval('(' + model.metadata + ')');
-
+	// load the JSON object
+	model.container = WebStudio.Component.getSourceContentData();
 
 	// property: view
 	var view = instance.object.properties["view"];
@@ -28,7 +27,6 @@ else
 		iconSize = "72";
 	}
 
-
 	// set up mimetype icons
 	var mimetypes = new WebStudio.Mimetypes();
 	for(var i = 0; i < model.container.children.length; i++)
@@ -37,7 +35,7 @@ else
 
 		var mimetype = child.mimetype;
 		var filename = child.title;
-
+		
 		var iconUrl = mimetypes.getIcon(filename, mimetype, iconSize);
 		child.iconUrl = iconUrl;
 	}
@@ -46,9 +44,7 @@ else
 	for(var i = 0; i < model.container.children.length; i++)
 	{
 		var child = model.container.children[i];
-
-		var linkUrl = context.linkBuilder.object(child.id);
-		child.linkUrl = linkUrl;
+		child.linkUrl = context.linkBuilder.object(child.id);
 	}
 	
 	model.ready = true;

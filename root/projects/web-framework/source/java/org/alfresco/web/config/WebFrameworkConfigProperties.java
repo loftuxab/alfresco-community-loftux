@@ -24,12 +24,12 @@
  */
 package org.alfresco.web.config;
 
-import org.alfresco.web.config.WebFrameworkConfigElement.ContentLoaderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.ErrorHandlerDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.FormatDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.LinkBuilderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.PageMapperDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.RequestContextDescriptor;
+import org.alfresco.web.config.WebFrameworkConfigElement.ResourceLoaderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.SystemPageDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.TagLibraryDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.TypeDescriptor;
@@ -40,7 +40,7 @@ import org.alfresco.web.config.WebFrameworkConfigElement.UserFactoryDescriptor;
  */
 public interface WebFrameworkConfigProperties
 {
-    // formats
+	// formats
     public String[] getFormatIds();
     public FormatDescriptor getFormatDescriptor(String id);
     
@@ -95,9 +95,9 @@ public interface WebFrameworkConfigProperties
     public TypeDescriptor getTypeDescriptor(String id);
     public String getRootPath();
     
-    // content loaders
-    public String[] getContentLoaderIds();
-    public ContentLoaderDescriptor getContentLoaderDescriptor(String id);
+    // resource loaders
+    public String[] getResourceLoaderIds();
+    public ResourceLoaderDescriptor getResourceLoaderDescriptor(String id);
 
     // web studio settings
     public boolean isWebStudioEnabled();

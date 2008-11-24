@@ -27,11 +27,12 @@ package org.alfresco.web.site;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.framework.exception.ContentLoaderException;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.scripts.ProcessorModelHelper;
 import org.alfresco.web.scripts.URLHelper;
-import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
 
 /**
@@ -117,22 +118,22 @@ public class DefaultPageMapper extends AbstractPageMapper
         String objectId = (String) request.getParameter("o");
         if (objectId != null && objectId.length() != 0)
         {
-            Content content = null;
-            try
-            {
-                content = loadContent(context, objectId);
-                if (content != null)
-                {
-                    context.setCurrentObject(content);
-                }
-            }
-            catch (ContentLoaderException cle)
-            {
-                // if this gets thrown, then something pretty nasty happened
-                // perhaps a content loader wasn't able to be instantiated
-                // at any rate, we want to throw this back (at this point)
-                throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
-            }
+        	ResourceContent content = null;
+        	try
+        	{
+        		content = loadContent(context, objectId);
+	        	if(content != null)
+	        	{
+	        		context.setCurrentObject(content);
+	        	}
+        	}
+    		catch(ContentLoaderException cle)
+    		{
+    			// if this gets thrown, then something pretty nasty happened
+    			// perhaps a content loader wasn't able to be instantiated
+    			// at any rate, we want to throw this back (at this point)
+    			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
+    		}
         }
 
         /**
@@ -149,7 +150,7 @@ public class DefaultPageMapper extends AbstractPageMapper
          * bound into the request context.
          */
         String pageTypeId = (String) request.getParameter("pt");
-        if (pageTypeId != null && pageTypeId.length() != 0)
+        if(pageTypeId != null && pageTypeId.length() != 0)
         {
             String pageId = null;
 
@@ -158,7 +159,7 @@ public class DefaultPageMapper extends AbstractPageMapper
              */
             String themeId = (String) context.getThemeId();
             Theme theme = context.getModel().getTheme(themeId);
-            if (theme != null)
+            if(theme != null)
             {
                 pageId = theme.getPageId(pageTypeId);
             }
@@ -166,7 +167,7 @@ public class DefaultPageMapper extends AbstractPageMapper
             /**
              * Consider whether a system default has been set up
              */
-            if (pageId == null)
+            if(pageId == null)
             {
                 pageId = (String) getPageId(context, pageTypeId);
             }
@@ -174,7 +175,7 @@ public class DefaultPageMapper extends AbstractPageMapper
             /**
              * Worst case, pick a generic page
              */           
-            if (pageId == null)
+            if(pageId == null)
             {
                 pageId = (String) getPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
             }
@@ -182,10 +183,10 @@ public class DefaultPageMapper extends AbstractPageMapper
             /**
              * Bind the page into the context
              */
-            if (pageId != null)
+            if(pageId != null)
             {
                 Page page = context.getModel().getPage(pageId);
-                if (page != null)
+                if(page != null)
                 {
                     context.setPage(page);
                 }
@@ -196,7 +197,7 @@ public class DefaultPageMapper extends AbstractPageMapper
          * Extract the page id and set it onto the context
          */
         String pageId = (String) request.getParameter("p");
-        if (pageId != null && pageId.length() != 0)
+        if(pageId != null && pageId.length() != 0)
         {
             Page page = context.getModel().getPage(pageId);
             if (page != null)

@@ -27,20 +27,20 @@ package org.alfresco.web.studio.client;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Manufactures or retrieves client state to the server side
- * elements of Web Studio
+ * Manufactures or retrieves client state to the server side elements
+ * of Web Studio
  * 
  * @author muzquiano
  */
-public interface WebStudioStateProvider 
+public interface WebStudioStateProvider
 {
-	/**
-	 * Provides the state management object for the active
-	 * session of Web Studio
-	 * 
-	 * @param request
-	 * 
-	 * @return state object
-	 */
-	public WebStudioStateBean provide(HttpServletRequest request);
+    /**
+     * Provides the state management object for the active session of
+     * Web Studio
+     * 
+     * @param request
+     * 
+     * @return state object
+     */
+    public WebStudioStateBean provide(HttpServletRequest request);
 }

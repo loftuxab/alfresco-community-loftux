@@ -6,6 +6,12 @@ wizard.addElementFormat("templateName", "Name", "textfield", 290);
 wizard.addElement("templateDescription", templateDescription);
 wizard.addElementFormat("templateDescription", "Description", "textarea", 290);
 
+wizard.addElement("templateHeight", templateHeight);
+wizard.addElementFormat("templateHeight", "Height", "textfield", 5);
+
+wizard.addElement("templateWidth", templateWidth);
+wizard.addElementFormat("templateWidth", "Width", "textfield", 5);
+
 wizard.addHiddenElement("templateTypeId", "dynamic");
 
 wizard.addElement("templateLayoutType", templateLayoutType);

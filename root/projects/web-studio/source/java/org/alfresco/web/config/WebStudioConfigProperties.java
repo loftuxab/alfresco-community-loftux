@@ -32,20 +32,49 @@ import org.alfresco.web.config.WebStudioConfigElement.ApplicationDescriptor;
  */
 public interface WebStudioConfigProperties
 {
-    public boolean isInContextEnabled();
-    public String getWebStudioServletUri();
-    
-    // javascript settings
-    public boolean isJavascriptCompressionEnabled();
-    public boolean isJavascriptCachingEnabled();
-    
-    // css settings
-    public boolean isCSSCompressionEnabled();
-    public boolean isCSSCachingEnabled();
-	
-	public String[] getApplicationIds();
-	public ApplicationDescriptor getApplication(String id);
-	
-	public String[] getAppletIds();
-	public AppletDescriptor getApplet(String id);
+    /**
+     * Whether the current Web Studio instance is in developer mode
+     * 
+     * @return
+     */
+    public boolean isDeveloperMode();
+
+    /**
+     * Allows the developer mode switch to be toggled
+     * 
+     * @param developerMode
+     */
+    public void setDeveloperMode(boolean developerMode);
+
+    /**
+     * Returns an array of application ids for Web Studio
+     * 
+     * @return string array
+     */
+    public String[] getApplicationIds();
+
+    /**
+     * Returns the application descriptor for the given application id
+     * 
+     * @param id
+     * 
+     * @return application descriptor
+     */
+    public ApplicationDescriptor getApplication(String id);
+
+    /**
+     * Returns an array of applet ids for Web Studio
+     * 
+     * @return string array
+     */
+    public String[] getAppletIds();
+
+    /**
+     * Returns the applet descriptor for the given application id
+     * 
+     * @param id
+     * 
+     * @return applet descriptor
+     */
+    public AppletDescriptor getApplet(String id);
 }

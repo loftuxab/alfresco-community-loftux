@@ -1,7 +1,7 @@
 <#import "dynamic-tables.ftl" as tablesTemplate />
 <#import "dynamic-absolute.ftl" as absoluteTemplate />
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
    <head>
       <title>${page.title}</title>
       ${head}
@@ -30,4 +30,5 @@
 </#if>
 
    </body>
+   
 </html>

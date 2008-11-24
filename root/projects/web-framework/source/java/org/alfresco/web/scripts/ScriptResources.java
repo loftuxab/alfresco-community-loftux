@@ -64,7 +64,7 @@ public final class ScriptResources extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-        return null;
+    	return null;
     }
     
     
@@ -88,53 +88,53 @@ public final class ScriptResources extends ScriptBase
     
     public ScriptResource get(String id)
     {
-        ScriptResource scriptResource = null;
-        
-        if (modelObject instanceof ResourceProvider)
-        {
-            ResourceProvider provider = (ResourceProvider) modelObject;                        
-            
-            // now add
-            Resource resource = provider.getResource(id);
-            if (resource != null)
-            {
-                scriptResource = new ScriptResource(context, resource);
-            }
-        }
-        
-        return scriptResource;        
+    	ScriptResource scriptResource = null;
+    	
+    	if(modelObject instanceof ResourceProvider)
+    	{
+    		ResourceProvider provider = (ResourceProvider) modelObject;                		
+    		
+    		// now add
+    		Resource resource = provider.getResource(id);
+    		if(resource != null)
+    		{
+    			scriptResource = new ScriptResource(context, resource);
+    		}
+    	}
+    	
+    	return scriptResource;    	
     }
     
     public void remove(String id)
     {
-        if (modelObject instanceof ResourceProvider)
-        {
-            ResourceProvider provider = (ResourceProvider) modelObject;                        
-            provider.removeResource(id);
-        }
+    	if(modelObject instanceof ResourceProvider)
+    	{
+    		ResourceProvider provider = (ResourceProvider) modelObject;                		
+    		provider.removeResource(id);
+    	}
     }
     
     public ScriptResource add(String id)
     {
-        return add(id, null);
+    	return add(id, null);
     }
 
     public ScriptResource add(String id, String type)
     {
-        ScriptResource scriptResource = null;
-        
-        if (modelObject instanceof ResourceProvider)
-        {
-            ResourceProvider provider = (ResourceProvider) modelObject;                        
-            
-            // now add
-            Resource resource = provider.addResource(id, type);
-            if (resource != null)
-            {
-                scriptResource = new ScriptResource(context, resource);
-            }
-        }
-        
-        return scriptResource;
+    	ScriptResource scriptResource = null;
+    	
+    	if(modelObject instanceof ResourceProvider)
+    	{
+    		ResourceProvider provider = (ResourceProvider) modelObject;                		
+    		
+    		// now add
+    		Resource resource = provider.addResource(id, type);
+    		if(resource != null)
+    		{
+    			scriptResource = new ScriptResource(context, resource);
+    		}
+    	}
+    	
+    	return scriptResource;
     }
 }

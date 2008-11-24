@@ -1,6 +1,6 @@
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.CTADialog = function(index) 
@@ -17,7 +17,7 @@ WebStudio.CTADialog = function(index)
 	this.events = {};	
 	this.nodes = {};
 	this.droppables = [];
-}
+};
 
 WebStudio.CTADialog.prototype = new WebStudio.AbstractTemplater('WebStudio.CTADialog');
 
@@ -39,10 +39,10 @@ WebStudio.CTADialog.prototype.activate = function()
 				var url = WebStudio.ws.studio("/wizard/content/associations/add");
 				w.start(url, 'content-associations');
 
-				w.onComplete = (function() 
+				w.onComplete = function() 
 				{
-					this.initDataTable();					
-				}).bind(dialog);
+					dialog.initDataTable();					
+				};
 			 
 			}
 		}
@@ -51,13 +51,13 @@ WebStudio.CTADialog.prototype.activate = function()
 	this.cRemoveButton = new YAHOO.widget.Button("removeassociationbutton", {
 
 		onclick: { 
-			fn: (function() {
+			fn: function() {
 			
-				var rowIds = this.cDataTable.getSelectedRows();
-				if(rowIds != null && rowIds.length > 0)
+				var rowIds = dialog.cDataTable.getSelectedRows();
+				if(rowIds && rowIds.length > 0)
 				{
 					var rowId = rowIds[0];
-					var record = this.cDataTable.getRecord(rowId);
+					var record = dialog.cDataTable.getRecord(rowId);
 					
 					var sourceId = record.getData("source-id");
 					var destId = record.getData("dest-id");
@@ -73,25 +73,25 @@ WebStudio.CTADialog.prototype.activate = function()
 						templateId: destId,
 						formatId: formatId
 					});
-					w.onComplete = (function() 
+					w.onComplete = function() 
 					{
-						this.initDataTable();					
-					}).bind(dialog);
+						dialog.initDataTable();					
+					};
 					
 					var url = WebStudio.ws.studio("/wizard/content/associations/remove");
 					w.start(url, 'content-associations');
-				}	
-								 
-			}).bind(dialog)
-		}
-		
+				}									 
+			}
+		}		
 	});
 	
 	this.initDataTable();
-}
+};
 
 WebStudio.CTADialog.prototype.initDataTable = function()
 {
+	var _this = this;
+	
 	if(this.cDataTable)
 	{
 		this.cDataTable.destroy();
@@ -103,7 +103,7 @@ WebStudio.CTADialog.prototype.initDataTable = function()
 	var myAjax = new Ajax(url, 
 	{
 		method: 'get',
-		onComplete: (function(response)
+		onComplete: function(response)
 		{
 			var data = Json.evaluate(response);
 			
@@ -122,8 +122,9 @@ WebStudio.CTADialog.prototype.initDataTable = function()
 		           { key:"format-id", label: "Format", sortable:true, resizeable:true }
 			];
 			
-			this.cDataTable = new YAHOO.widget.DataTable("ContentTypeAssociationsPanelDataTable", 
-				myColumnDefs, myDataSource,
+			_this.cDataTable = new YAHOO.widget.DataTable("ContentTypeAssociationsPanelDataTable", 
+				myColumnDefs, 
+				myDataSource,
 				{
 					selectionMode: "single",
 					draggableColumns: true 
@@ -131,60 +132,67 @@ WebStudio.CTADialog.prototype.initDataTable = function()
 			);
 			
 			// Hide the id column
-			this.cDataTable.hideColumn("id");
+			_this.cDataTable.hideColumn("id");
 			
 			// Hide the association type column
-			this.cDataTable.hideColumn("assoc-type");
+			_this.cDataTable.hideColumn("assoc-type");
 			
 			// Set column widths
-			this.cDataTable.setColumnWidth("source-id", 300);
-			this.cDataTable.setColumnWidth("dest-id", 200);
+			_this.cDataTable.setColumnWidth("source-id", 300);
+			_this.cDataTable.setColumnWidth("dest-id", 200);
 									
 	        // Subscribe to events for row selection
-	        this.cDataTable.subscribe("rowMouseoverEvent", this.cDataTable.onEventHighlightRow);
-	        this.cDataTable.subscribe("rowMouseoutEvent", this.cDataTable.onEventUnhighlightRow);
-	        this.cDataTable.subscribe("rowClickEvent", this.cDataTable.onEventSelectRow);
+	        _this.cDataTable.subscribe("rowMouseoverEvent", _this.cDataTable.onEventHighlightRow);
+	        _this.cDataTable.subscribe("rowMouseoutEvent", _this.cDataTable.onEventUnhighlightRow);
+	        _this.cDataTable.subscribe("rowClickEvent", _this.cDataTable.onEventSelectRow);
 			
 	        // Programmatically select the first row
-	        //this.cDataTable.selectRow(standardSelectDataTable.getTrEl(0));
+	        //_this.cDataTable.selectRow(standardSelectDataTable.getTrEl(0));
 
 	        // Programmatically bring focus to the instance so arrow selection works immediately
-	        //this.cDataTable.focus();
+	        //_this.cDataTable.focus();
 	        
-	        if(this.modal)
+	        if(_this.modal)
 	        {
-	        	this.modal.center();
-	        	this.modal.show();
+	        	_this.modal.center();
+	        	_this.modal.show();
 	        }
-				
-		}).bind(this)
+		}
 
 	}).request();
-}
+};
 
 WebStudio.CTADialog.prototype.popup = function() 
 {	
 	if(!this.modal)
 	{
-		this.modal = new YAHOO.widget.Panel("ContentTypeAssociationsPanel", {
+		var options = {
 			fixedcenter: true,
 			close: true, 
 			draggable: false, 
 			modal: true,
 			visible: false,
-			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5} 			
-		});
-		
+			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}		
+		};
+
+		if(window.ie)
+		{
+			// HACK to fix an IE issue
+			options["width"] = "640px";
+		}
+
+		this.modal = new YAHOO.widget.Panel("ContentTypeAssociationsPanel", options);
+
 		this.modal.render(document.body);
 	}
 	else
 	{
 		this.initDataTable();
 	}
-}
+};
 
 WebStudio.CTADialog.prototype.popout = function()
 {	
 	this.modal.destroy();
 	this.modal.hide();
-}
+};

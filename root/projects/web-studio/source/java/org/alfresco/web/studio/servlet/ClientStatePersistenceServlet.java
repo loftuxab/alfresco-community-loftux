@@ -47,20 +47,20 @@ import org.json.JSONObject;
  */
 public class ClientStatePersistenceServlet extends BaseServlet
 {
-	public static final String PARAM_CONFIG = "config";
-	public static final String RESULT_STATUS_OK = "ok";
-	public static final String RESULT_STATUS = "status";
-	
-	public static final String OBJECT_TYPE_APPLET = "applet";
-	public static final String OBJECT_TYPE_APPLICATION = "application";
-	
-	public static final String COMMAND_ENABLE = "enable";
-	public static final String COMMAND_DISABLE = "disable";
-	public static final String COMMAND_PUT = "put";
-	public static final String COMMAND_GET = "get";
-	public static final String COMMAND_REMOVE = "remove";
-	public static final String COMMAND_DEPS = "deps";
-	
+    public static final String PARAM_CONFIG = "config";
+    public static final String RESULT_STATUS_OK = "ok";
+    public static final String RESULT_STATUS = "status";
+
+    public static final String OBJECT_TYPE_APPLET = "applet";
+    public static final String OBJECT_TYPE_APPLICATION = "application";
+
+    public static final String COMMAND_ENABLE = "enable";
+    public static final String COMMAND_DISABLE = "disable";
+    public static final String COMMAND_PUT = "put";
+    public static final String COMMAND_GET = "get";
+    public static final String COMMAND_REMOVE = "remove";
+    public static final String COMMAND_DEPS = "deps";
+
     public void init() throws ServletException
     {
         super.init();
@@ -70,192 +70,195 @@ public class ClientStatePersistenceServlet extends BaseServlet
             HttpServletResponse response) throws ServletException, IOException
     {
         String uri = request.getRequestURI();
-        
-        // skip server context path and build the path to the resource we are looking for
+
+        // skip server context path and build the path to the resource
+        // we are looking for
         uri = uri.substring(request.getContextPath().length());
-        
-        // validate and return the resource path - stripping the servlet context
+
+        // validate and return the resource path - stripping the
+        // servlet context
         StringTokenizer t = new StringTokenizer(uri, "/");
         String servletName = t.nextToken();
         if (!t.hasMoreTokens())
         {
             throw new ServletException("Invalid URL: " + uri);
         }
-        
+
         // the type of thing we're looking at (application, applet)
         String objectType = t.nextToken();
-        
+
         // the id of the thing
         String objectId = t.nextToken();
-        
+
         // the command (put, get, remove, deps)
         String command = t.nextToken();
-        
+
         // get the web studio state for the connecting browser
         WebStudioStateProvider provider = WebStudio.getWebStudioStateProvider();
         WebStudioStateBean state = provider.provide(request);
-        
+
         // determine what we're acting upon
-    	BrowserStateBean bean = null;    	
-    	if(OBJECT_TYPE_APPLICATION.equals(objectType))
-    	{
-    		bean = state.getApplicationState(objectId);
-    	}
-    	else if(OBJECT_TYPE_APPLET.equals(objectType))
-    	{
-    		bean = state.getAppletState(objectId);
-    	}
-    	
-    	if(bean != null)
-    	{
-    		// JSON return
-    		boolean processed = false;
-    		JSONObject json = new JSONObject();
-    		
-    		try
-    		{
-	    		// remove command    		
-		        if(COMMAND_REMOVE.equals(command))
-		        {
-		        	if(t.hasMoreTokens())
-		        	{
-		        		// remove a single property		        		
-		        		String key = (String) t.nextToken();
-		        		bean.remove(key);
-		        		
-		        		// update status
-		        		json.put(RESULT_STATUS, RESULT_STATUS_OK);
-		        		processed = true;
-		        	}
-		        	else
-		        	{
-		        		// remove all properties		        		
-		        		bean.removeProperties();
+        BrowserStateBean bean = null;
+        if (OBJECT_TYPE_APPLICATION.equals(objectType))
+        {
+            bean = state.getApplicationState(objectId);
+        }
+        else if (OBJECT_TYPE_APPLET.equals(objectType))
+        {
+            bean = state.getAppletState(objectId);
+        }
 
-		        		// update status
-		        		json.put(RESULT_STATUS, RESULT_STATUS_OK);
-		        		processed = true;
-		        	}
-		        }
-		        
-		        // puts a single property
-		        if(COMMAND_PUT.equals(command))
-		        {
-		        	if(t.hasMoreTokens())
-		        	{
-		        		String key = (String) t.nextToken();
-		        		if(t.hasMoreTokens())
-		        		{
-		        			String value = t.nextToken();
-		        			bean.put(key, value);
-		        			
-			        		// update status
-			        		json.put(RESULT_STATUS, RESULT_STATUS_OK);
-			        		processed = true;
-		        		}
-		        	}
-		        }
-	    	
-	    		// gets properties
-		        if(COMMAND_GET.equals(command))
-		        {
-		        	if(t.hasMoreTokens())
-		        	{
-		        		// get a single property
-		        		String key = (String) t.nextToken();
-	        			String value = bean.get(key);
-	        			
-		        		// update status
-		        		json.put(RESULT_STATUS, RESULT_STATUS_OK);
-		        		json.put(key, value);
-		        		processed = true;
-		        	}
-		        	else
-		        	{
-		        		Map<String, String> properties = bean.getProperties();
-		        		Iterator it = properties.keySet().iterator();
-		        		while(it.hasNext())
-		        		{
-		        			String key = (String) it.next();
-		        			String value = (String) properties.get(key);
-		        			
-		        			json.put(key, value);
-		        		}
-		        		
-		        		json.put(RESULT_STATUS, RESULT_STATUS_OK);
-		        		processed = true;
-		        	}
-		        }
-		        
-		        if(COMMAND_ENABLE.equals(command))
-		        {
-		        	bean.enable();
-		        	json.put(RESULT_STATUS, RESULT_STATUS_OK);
-		        	processed = true;
-		        }
-    		
-		        if(COMMAND_DISABLE.equals(command))
-		        {
-		        	bean.disable();
-		        	json.put(RESULT_STATUS, RESULT_STATUS_OK);
-		        	processed = true;
-		        }
-		        
-		        if(COMMAND_DEPS.equals(command))
-		        {
-		            JSONObject config = null;
-		            
-		            String options = request.getParameter(PARAM_CONFIG);
-		            if(options != null)
-		            {
-	            		config = new JSONObject(options);
-	            		
-	            		// clear existing dependencies
-	            		bean.clearDependencies();
-	            		
-	            		// add in js files
-	            		JSONArray jsArray = config.getJSONArray("js");
-	            		for(int i = 0; i < jsArray.length(); i++)
-	            		{
-	            			String file = jsArray.getString(i);
-	            			bean.addJsFile(file);
-	            		}
-	            		
-	            		// add in css files
-	            		JSONArray cssArray = config.getJSONArray("css");
-	            		for(int i = 0; i < cssArray.length(); i++)
-	            		{
-	            			String file = cssArray.getString(i);
-	            			bean.addCssFile(file);
-	            		}
+        if (bean != null)
+        {
+            // JSON return
+            boolean processed = false;
+            JSONObject json = new JSONObject();
 
-	            		// add in dom files
-	            		JSONArray domArray = config.getJSONArray("dom");
-	            		for(int i = 0; i < domArray.length(); i++)
-	            		{
-	            			String file = domArray.getString(i);
-	            			bean.addDomFile(file);
-	            		}
-	            		
-	            		json.put(RESULT_STATUS, RESULT_STATUS_OK);
-	            		processed = true;
-	            	}
-		        }
-		        
-		        // write out the json
-		        if(processed)
-		        {
-		        	response.getWriter().println(json.toString());
-		        }
-		        else
-		        {
-		        	response.getWriter().println("Unable to execute command: " + command);
-		        }
-    		}
-        	catch(JSONException jsonException)
-        	{
-        		throw new ServletException(jsonException);
-        	}
-    	}
+            try
+            {
+                // remove command
+                if (COMMAND_REMOVE.equals(command))
+                {
+                    if (t.hasMoreTokens())
+                    {
+                        // remove a single property
+                        String key = (String) t.nextToken();
+                        bean.remove(key);
+
+                        // update status
+                        json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                        processed = true;
+                    }
+                    else
+                    {
+                        // remove all properties
+                        bean.removeProperties();
+
+                        // update status
+                        json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                        processed = true;
+                    }
+                }
+
+                // puts a single property
+                if (COMMAND_PUT.equals(command))
+                {
+                    if (t.hasMoreTokens())
+                    {
+                        String key = (String) t.nextToken();
+                        if (t.hasMoreTokens())
+                        {
+                            String value = t.nextToken();
+                            bean.put(key, value);
+
+                            // update status
+                            json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                            processed = true;
+                        }
+                    }
+                }
+
+                // gets properties
+                if (COMMAND_GET.equals(command))
+                {
+                    if (t.hasMoreTokens())
+                    {
+                        // get a single property
+                        String key = (String) t.nextToken();
+                        String value = bean.get(key);
+
+                        // update status
+                        json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                        json.put(key, value);
+                        processed = true;
+                    }
+                    else
+                    {
+                        Map<String, String> properties = bean.getProperties();
+                        Iterator it = properties.keySet().iterator();
+                        while (it.hasNext())
+                        {
+                            String key = (String) it.next();
+                            String value = (String) properties.get(key);
+
+                            json.put(key, value);
+                        }
+
+                        json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                        processed = true;
+                    }
+                }
+
+                if (COMMAND_ENABLE.equals(command))
+                {
+                    bean.enable();
+                    json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                    processed = true;
+                }
+
+                if (COMMAND_DISABLE.equals(command))
+                {
+                    bean.disable();
+                    json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                    processed = true;
+                }
+
+                if (COMMAND_DEPS.equals(command))
+                {
+                    JSONObject config = null;
+
+                    String options = request.getParameter(PARAM_CONFIG);
+                    if (options != null)
+                    {
+                        config = new JSONObject(options);
+
+                        // clear existing dependencies
+                        bean.clearDependencies();
+
+                        // add in js files
+                        JSONArray jsArray = config.getJSONArray("js");
+                        for (int i = 0; i < jsArray.length(); i++)
+                        {
+                            String file = jsArray.getString(i);
+                            bean.addJsFile(file);
+                        }
+
+                        // add in css files
+                        JSONArray cssArray = config.getJSONArray("css");
+                        for (int i = 0; i < cssArray.length(); i++)
+                        {
+                            String file = cssArray.getString(i);
+                            bean.addCssFile(file);
+                        }
+
+                        // add in dom files
+                        JSONArray domArray = config.getJSONArray("dom");
+                        for (int i = 0; i < domArray.length(); i++)
+                        {
+                            String file = domArray.getString(i);
+                            bean.addDomFile(file);
+                        }
+
+                        json.put(RESULT_STATUS, RESULT_STATUS_OK);
+                        processed = true;
+                    }
+                }
+
+                // write out the json
+                if (processed)
+                {
+                    response.getWriter().println(json.toString());
+                }
+                else
+                {
+                    response.getWriter().println(
+                            "Unable to execute command: " + command);
+                }
+            }
+            catch (JSONException jsonException)
+            {
+                throw new ServletException(jsonException);
+            }
+        }
     }
 }

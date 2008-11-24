@@ -139,6 +139,35 @@ public final class ProcessorModelHelper
             
             model.put(MODEL_PAGE, pageModel);
         }
+        else
+        {
+        	// if we don't have a page, then we're processing a template directly
+        	// this can happen if we've arrived at the template via a content-based dispatch
+        	// for instance, we might be viewing the display template for an article in the default format
+        	if(context.getTemplate() != null)
+        	{        	
+        		TemplateInstance template = context.getTemplate();
+        		
+	        	// still make available a "page" model object
+	            Map<String, Object> pageModel = new HashMap<String, Object>(8, 1.0f);
+	            
+	            URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
+	            if(urlHelper != null)
+	            {
+	            	pageModel.put(MODEL_URL, urlHelper);
+	            }
+	
+	            // stock the "page" model with attributes from the template
+	            pageModel.put(MODEL_ID, template.getId());
+	            pageModel.put(MODEL_TITLE, template.getTitle());
+	            pageModel.put(MODEL_DESCRIPTION, template.getDescription());
+	            pageModel.put(MODEL_THEME, context.getThemeId());
+	            
+                pageModel.put(MODEL_PROPERTIES, Collections.EMPTY_MAP);
+	            
+	            model.put(MODEL_PAGE, pageModel);
+        	}        	
+        }
         
         // things from the current template
         // use ${template.properties["abc"]}

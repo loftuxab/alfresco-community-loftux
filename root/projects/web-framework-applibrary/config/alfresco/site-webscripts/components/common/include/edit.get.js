@@ -1,15 +1,7 @@
-<import resource="/include/support.js">
+<import resource="/components/common/js/component.js">
 
-var properties = instance.object.properties;
-var source = instance.object.resources.get("source");
+// bind core properties and source
+WebStudio.Component.bind();
 
-model.title = form.bind("title", properties["title"], "");
-model.description = form.bind("description", properties["description"], "");
-model.container = form.bind("container", properties["container"], "");
-
-// source
-model["sourceType"] = form.bind("sourceType", source.type, "");
-model["sourceValue"] = form.bind("sourceValue", source.value, "");
-model["sourceEndpoint"] = form.bind("sourceEndpoint", source.endpoint, "");
-
-
+// bind custom properties
+WebStudio.Component.bindProperty("container");

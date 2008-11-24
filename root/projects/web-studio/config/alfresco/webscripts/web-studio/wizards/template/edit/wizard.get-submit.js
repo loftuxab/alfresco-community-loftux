@@ -9,6 +9,8 @@ if(template != null)
 	template.setProperty("title", templateName);
 	template.setProperty("description", templateDescription);
     template.setProperty("template-layout-type", templateLayoutType);
+    template.setProperty("height", templateHeight);
+    template.setProperty("width", templateWidth);    
     	
 	// do saves
 	save(template);

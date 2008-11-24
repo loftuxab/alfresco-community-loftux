@@ -31,7 +31,7 @@
 
 	// Include YUI Fonts and YUI Reset
 	yuiInclude(request, buffer, "/yui/fonts", "fonts.css");
-	yuiInclude(request, buffer, "/yui/reset", "reset.css");
+	//yuiInclude(request, buffer, "/yui/reset", "reset.css");
 	
 	// Include YUI Core CSS Elements
 	//yuiInclude(request, buffer, "/yui/button/assets", "button-core.css");
@@ -65,7 +65,7 @@
 
 	// Include Web Studio Additional Core Components
 	OverlayUtil.include(request, buffer, "/overlay/default/components/alf-window-progress.css.jsp");
-	OverlayUtil.include(request, buffer, "/overlay/default/components/datatable.css.jsp");
+	//OverlayUtil.include(request, buffer, "/overlay/default/components/datatable.css.jsp");
 	OverlayUtil.include(request, buffer, "/overlay/default/components/messagebox.css.jsp");
 	OverlayUtil.include(request, buffer, "/overlay/default/components/site-config-form.css.jsp");
 	

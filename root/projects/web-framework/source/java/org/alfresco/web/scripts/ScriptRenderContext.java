@@ -30,8 +30,8 @@ import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.site.AuthenticationUtil;
-import org.alfresco.web.site.Content;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
@@ -105,7 +105,7 @@ public final class ScriptRenderContext extends ScriptBase
     {
         if (scriptContentObject == null)
         {
-            Content content = context.getCurrentObject();
+            ResourceContent content = context.getCurrentObject();
             if (content != null)
             {
                 scriptContentObject = new ScriptContentObject(context, content);

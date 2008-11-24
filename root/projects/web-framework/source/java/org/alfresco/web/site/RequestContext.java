@@ -38,6 +38,7 @@ import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.apache.commons.logging.Log;
 
 /**
@@ -239,14 +240,14 @@ public interface RequestContext extends Serializable
      * 
      * @return The current object
      */
-    public org.alfresco.web.site.Content getCurrentObject();
+    public ResourceContent getCurrentObject();
     
     /**
-     * Sets the id of the current object
+     * Sets the current object
      * 
-     * @param objectId
+     * @param object
      */
-    public void setCurrentObject(org.alfresco.web.site.Content content);
+    public void setCurrentObject(ResourceContent object);
 
     /**
      * Returns the current format id

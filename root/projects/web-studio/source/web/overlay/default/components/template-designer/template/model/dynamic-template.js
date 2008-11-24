@@ -24,7 +24,7 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.init = function(parent)
 	
 	// CSS for menu div.
 	this.setMenuCSS("TemplateTableMenu");	
-}
+};
 
 /**
  * Specifies the configuration of the context menu
@@ -61,20 +61,21 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.getMenuItemsConfig = functio
 	}
 	
 	return menuItems;
-}
+};
 
 /**
  * Context Menu
  * Event Handler
  */ 
 WebStudio.Templates.Model.DynamicTemplate.prototype.addTemplateRows = function(eventType, eventArgs, parmsObj) 
-{         	
+{         
+	var _this = this;	
    
     var target = YAHOO.util.Event.getTarget(eventArgs[0]);
     
     var e = eventArgs[0];
 
-    e.stopPropagation();
+    WebStudio.util.stopPropagation(e);    
 
     //var templateId = parmsObj[0];
     var templateId = this.getId();
@@ -89,11 +90,10 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.addTemplateRows = function(e
     });                 
     
     w.start(WebStudio.ws.studio("/wizard/template/tablelayoutmanager"), 'tablelayoutmanager');
-    w.onComplete = (function() 
+    w.onComplete = function() 
     {
-        this.templateDesigner.refresh();     
-    }).bind(this);
-                         
+        _this.templateDesigner.refresh();     
+    };                     
 };
 
 /**
@@ -104,15 +104,18 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.addTemplateRows = function(e
 WebStudio.Templates.Model.DynamicTemplate.prototype.deleteTemplateRows = function(eventType, eventArgs, parmsObj) 
 {         
 	var templateId = this.getId();
-
-}
+	
+	// TODO: incomplete method?
+};
 
 /**
  * Context Menu
  * Event Handler
  */
 WebStudio.Templates.Model.DynamicTemplate.prototype.editTemplateRowSizes = function(eventType, eventArgs, parmsObj) 
-{                 
+{     
+	var _this = this;
+	            
     // Current target.
     var target = YAHOO.util.Event.getTarget(eventArgs[0]);
     
@@ -120,7 +123,7 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.editTemplateRowSizes = funct
     var e = eventArgs[0];
 
     // Stop event propagation.
-    e.stopPropagation();
+    WebStudio.util.stopPropagation(e);    
 
     // Get the template id
     //var templateId = parmsObj[0];
@@ -136,12 +139,10 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.editTemplateRowSizes = funct
     });                 
     
     w.start(WebStudio.ws.studio("/wizard/template/tablelayoutmanager"), 'tablelayoutmanager');
-    w.onComplete = (function() 
-    {
-        this.templateDesigner.refresh();     
-    }).bind(this);
-    
-}
+    w.onComplete = function() {
+        _this.templateDesigner.refresh();     
+    };  
+};
 
 /**
  * Renders the template to a given container
@@ -157,43 +158,72 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.render = function(container)
 	this.container = container;	 
 
 	// root div
-	var root = document.createElement('div');        
+	var root = document.createElement('div');
 	root.setAttribute("id", this.getId());
-	
-	// Set CSS.
-    YAHOO.util.Dom.addClass(root, 'yui-skin-sam');
-    YAHOO.util.Dom.addClass(root, this.getMenuCSS());   	
-	
-    // set as root element for this object.
+
+	// set as root element for this object.
 	this.setElement(root);
 	
 	// Add into DOM element.
-	root.injectInside(this.container);
-	
+	WebStudio.util.injectInside(this.container, root);
+				   
 	// title element
 	var titleElement = document.createElement('div');
 	titleElement.setAttribute("id", "template_div_" + this.getId());	
 	YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());	
-	titleElement.setHTML("Template: " + this.getTitle());
-	titleElement.injectInside(root);	
+	WebStudio.util.pushHTML(titleElement, "Template: " + this.getTitle());
 	
+	WebStudio.util.injectInside(root, titleElement);	
+
 	// register mouse events for given element.
 	this.setupEvents(titleElement);
 	
 	// Template Table.
 	var table = document.createElement('table');
-	table.setAttribute("id", "templateTable")
-	YAHOO.util.Dom.addClass(table, this.getCSS());
-		
+	YAHOO.util.Dom.addClass(table, this.getCSS());	
+	table.setAttribute("id", "templateTable");	
+	table.setAttribute("cellspacing", "5px");		
+	table.setAttribute("cellpadding", "5px");	
+
+	// Template Table.
+	var tableBody = document.createElement('tbody');
+	tableBody.setAttribute("id", "templateTableBody");
+	
 	// Add to DOM.
-    table.injectInside(root);
+	WebStudio.util.injectInside(root, table);
+
+	WebStudio.util.injectInside(table, tableBody);
 	
 	// register mouse events, for root element.
 	this.setupEvents();
-	
-	// render child objects
-	this.renderChildren(table);	
-}
+
+	if(this.getChildCount() > 0)
+	{
+		// render child objects		
+		this.renderChildren(tableBody);		
+	}
+	else
+	{
+		// To ensure that the entire template region is active,
+		// - even if there are no rows -
+		// let's increase the size of the title element to
+		// have it cover 100% of the template area.
+		
+		var tr = document.createElement("tr");
+		
+		var td = document.createElement("td");
+		td.setAttribute("id", "empty_template_td_" + this.getId());
+		YAHOO.util.Dom.addClass(td, this.getCSS());	
+		
+		this.setElement(td);
+		this.setupEvents(td);
+		
+		WebStudio.util.pushHTML(td, "&nbsp;&nbsp;");
+		
+		WebStudio.util.injectInside(tr, td);
+		WebStudio.util.injectInside(tableBody, tr);
+	}
+};
 
 
 //////////////////////////////////////
@@ -203,4 +233,4 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.render = function(container)
 WebStudio.Templates.Model.DynamicTemplate.prototype.addRow = function(rowObject)
 {
 	this.addChild(rowObject);
-}
+};

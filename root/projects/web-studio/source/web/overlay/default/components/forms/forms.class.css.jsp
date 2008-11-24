@@ -33,12 +33,3 @@
 	text-align:left;
 	width:120px;
 }
-
-/*
-.yui-skin-sam .yuimenu .bd
-{
-	max-height: 100px;
-	overflow-y: auto;
-	overflow-x: hidden;
-}
-*/

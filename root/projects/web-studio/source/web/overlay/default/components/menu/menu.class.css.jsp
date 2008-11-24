@@ -4,10 +4,10 @@
 
 /* CSS Document */
 
-div#AlfrescoApplicationRootMenuTemplate.AMHorizontalHolder {
+div#AlfrescoApplicationRootMenuTemplate .AMHorizontalHolder {
 	height:1px;
 }
-div#AlfrescoApplicationRootMenuDefault.AMHorizontalHolder {
+div#AlfrescoApplicationRootMenuDefault .AMHorizontalHolder {
 	position:absolute;
 	width:100%;
 	height:25px;

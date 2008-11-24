@@ -1,8 +1,10 @@
-var source = instance.object.resources.get("source");
+<import resource="/components/common/js/component.js">
+
+var source = WebStudio.Component.getSource();
 if(source == null)
 {
-	model.isAudio = false;
 	model.ready = false;
+	
 }
 else
 {

@@ -85,7 +85,11 @@ div.collabNodeActions {
 				<#assign count=0>
 				<#list container.children as c>
 					<#assign count=count+1>
-					<#assign curl="${c.linkUrl}">
+					
+					<#if c.linkUrl?exists>
+						<#assign curl="${c.linkUrl}">
+					</#if>
+					
 					<#assign iconUrl="${c.iconUrl}">
 					<#assign detailsUrl="#">
 					<#assign detailsIconUrl="${url.context}/images/common/icons/view_properties.gif">
@@ -95,12 +99,21 @@ div.collabNodeActions {
 						<table width="100%" cellpadding="2" cellspacing="2" border="0">
 						<tr>
 							<td valign="top" nowrap>
-								<a href="${curl}" target="new">
+								<#if curl?exists>
+									<a href="${curl}" target="new">
+										<img src="${iconUrl}" border="0" alt="${c.title?html}" title="${c.title?html}">
+									</a>
+								<#else>
 									<img src="${iconUrl}" border="0" alt="${c.title?html}" title="${c.title?html}">
-								</a>
+								</#if>
 							</td>
 							<td valign="top" width="100%" style="padding-left: 3px">
-								<a class="collabNodeLink" href="${curl}" target="new">${c.title?html}</a>
+							
+								<#if curl?exists>
+									<a class="collabNodeLink" href="${curl}" target="new">${c.title?html}</a>
+								<#else>
+									${c.title?html}
+								</#if>
 								<span class="metaData"><#if c.description?exists>${c.description?html}</#if></span>
 								<br/>
 								<span class="metaTitle">Modified:</span>&nbsp;<span class="metaData">${c.modified}</span>&nbsp;

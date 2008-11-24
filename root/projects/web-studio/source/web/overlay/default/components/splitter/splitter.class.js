@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.Splitter = function() 
@@ -36,7 +35,7 @@ WebStudio.Splitter = function()
 			selector : "div[id=AlfSplitterContainer]",
 			remove : true
 		}
-	}
+	};
 	return this;
 };
 
@@ -133,17 +132,22 @@ WebStudio.Splitter.prototype.onDividerMouseDown = function(e)
 WebStudio.Splitter.prototype.onMouseMove = function(e) 
 {
 	e = new Event(e);
-	if (!this.active) return;
+	if (!this.active)
+	{
+		return;
+	}
 	var x = e.client.x;
 
 	var dx = x - this.oldX;
 	var newFirstWidth = this.oldOffsetWidth + dx;
-	if (newFirstWidth < this.minLeftWidth) {
+	if (newFirstWidth < this.minLeftWidth) 
+	{
 		newFirstWidth = this.minLeftWidth;
 	}
 	var newSecondWidth = this.container.offsetWidth - newFirstWidth - this.dividerSize;
 
-	if (newSecondWidth < this.minRightWidth) {
+	if (newSecondWidth < this.minRightWidth) 
+	{
 		newSecondWidth = this.minRightWidth;
 		newFirstWidth = this.container.offsetWidth - newSecondWidth - this.dividerSize;
 	}
@@ -161,7 +165,8 @@ WebStudio.Splitter.prototype.onMouseMove = function(e)
 
 WebStudio.Splitter.prototype.onMouseUp = function() 
 {
-	if (this.firstCover && this.secondCover && this.active) {
+	if (this.firstCover && this.secondCover && this.active) 
+	{
 		this.firstCover.parentNode.removeChild(this.firstCover);
 		this.secondCover.parentNode.removeChild(this.secondCover);
 	}
@@ -198,7 +203,7 @@ WebStudio.Splitter.prototype.setPanelsSize = function (firstPanelSize)
 WebStudio.Splitter.prototype.hidePanel = function (first) 
 {
 	var fPanel = first ? this.firstPanel : this.secondPanel;
-	var sPanel = first ? this.secondPanel : this.firstPanel
+	var sPanel = first ? this.secondPanel : this.firstPanel;
 	this.firstPanelSize = this.firstPanel.offsetWidth;
 	fPanel.setStyle('width', 0);
 	this.divider.setStyles({
@@ -209,12 +214,16 @@ WebStudio.Splitter.prototype.hidePanel = function (first)
 		left : 0,
 		width : this.container.offsetWidth
 	});
+	
+	this.hiddenDivider = true;
 };
 
 WebStudio.Splitter.prototype.showPanels = function () 
 {
 	this.setPanelsSize(this.firstPanelSize);
 	this.divider.setStyle('width', this.dividerSize);
+	
+	this.hiddenDivider = false;
 };
 
 WebStudio.Splitter.prototype.setHeight = function (height) 
@@ -235,13 +244,18 @@ WebStudio.Splitter.prototype.getHeight = function()
 WebStudio.Splitter.prototype.setWidth = function (width) 
 {
 	width = Math.max(1, width);
+	
 	var newSecondWidth = width - this.firstPanel.offsetWidth - this.dividerSize;
-	newSecondWidth = Math.max(1, newSecondWidth);
+	
+	// if the docking panel was hidden, utilize the full screen	
+	if(this.hiddenDivider)
+	{	
+		newSecondWidth = width - this.firstPanel.offsetWidth;
+	}
 
-	this.container.setStyle('width', width - 5);
-	this.generalLayer.setStyle('width', width - 5);
-	this.injectObject.setStyle('width', width - 5);
-
+	this.container.setStyle('width', width);
+	this.generalLayer.setStyle('width', width);
+	this.injectObject.setStyle('width', width);
 
 	this.secondPanel.setStyle('width', newSecondWidth);
 };
@@ -249,12 +263,13 @@ WebStudio.Splitter.prototype.setWidth = function (width)
 WebStudio.Splitter.prototype.blockSelection = function(object) 
 {
 	object = $(object);
-	if (typeof(object) == 'object') {
+	if (typeof(object) == 'object') 
+	{
 		object.onselectstart = function(event) {
-			var event = new Event(event);
+			event = new Event(event);
 			event.preventDefault();
 			return false;
-		}
+		};
 		object.setStyles({
 			'-moz-user-select': 'none',
 			'-khtml-user-select': 'none',
@@ -265,16 +280,18 @@ WebStudio.Splitter.prototype.blockSelection = function(object)
 
 WebStudio.Splitter.prototype.unblockSelection = function(object) {
 	object = $(object);
-	if (typeof(object) == 'object') {
+	if (typeof(object) == 'object') 
+	{
 		object.onselectstart = null;
 		object.setStyles({
 			'-moz-user-select': '',
 			'-khtml-user-select': '',
 			'user-select': ''
-		})
+		});
 	}
 };
 
-WebStudio.Splitter.prototype.onPanelsResize = function (firstPanelSize, seconPanelSize) { //external method
-
+WebStudio.Splitter.prototype.onPanelsResize = function (firstPanelSize, seconPanelSize) 
+{
+	//external method
 };

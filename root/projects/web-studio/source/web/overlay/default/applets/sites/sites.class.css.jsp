@@ -6,7 +6,7 @@
 	display:block;
 	height:22px;
 	padding-left:20px;
-	background-image:url(<%=rootPath%>/images/trees/sitestree/site.gif);
+	background-image:url(<%=rootPath%>/images/trees/sitestree/site-16.png);
 	background-repeat:no-repeat;
 	background-position:2px 0px;
 }

@@ -4,53 +4,58 @@ var templateId = args["templateId"];
 var rowId = args["rowId"];
 var panelId = args["panelId"];
 
-
-logger.log("about to delete a panel: " + templateId + " " + rowId + " " + panelId);
-
-
 var object = sitedata.getObject("template-instance", templateId);
 
 if(object != null) 
 {
     var templateConfig = null;
-    
-    templateConfig = object.getProperty("config");
-    
-    var templateLayoutType = object.getProperty("template-layout-type");   
 
+    // Get template config json.
+    templateConfig = object.getProperty("config");
+
+    // Create javascript object.
     templateConfig = eval('(' + templateConfig + ')');        
   
+    // Get rows array.
     var rowsArray = templateConfig.rows;
         
     var rowFound = false;  
             
+    // Look for row containing column we are going to remove.
     for(var rowIndx=0;rowIndx<rowsArray.length && !(rowFound);rowIndx++)
     {        
-        if(rowsArray[rowIndx].id.match(rowId))
+    	// Found our row.
+        if(rowsArray[rowIndx].id == (rowId))
         {
             rowFound = true;                              
                 
             var panelsArray = rowsArray[rowIndx].panels;
                 
-            var tempPanelsArray = new Array();
-                
+            // Look for our column.
             for(var panelIndx=0;panelIndx<panelsArray.length;panelIndx++)
             {                                
-                // let's look loop through the panels, ignoring the one that should be removed.
-                if(!panelsArray[panelIndx].id.match(panelId))
+            	// Found our column.
+                if(panelsArray[panelIndx].id == (panelId))
                 {   
-                    tempPanelsArray.push(panelsArray[panelIndx]);                                  
+                	// Remove object from array.
+                	panelsArray.splice(panelIndx, 1);                   
                 }                                                                        
             }
             
-            rowsArray[rowIndx].panels = tempPanelsArray;            
+            // Add updated columns/panels array 
+            // back to the rows array.
+            rowsArray[rowIndx].panels = panelsArray;            
                 
+            // Add rows array back to templateConfig object.
             templateConfig.rows = rowsArray;
                             
+            // Prepare for sending.
             var tempString = templateConfig.toJSONString();
-                                                
+                                   
+            // Set
             object.properties["config"] = tempString;
 
+            // Save
             object.save();                
         }                       
     }

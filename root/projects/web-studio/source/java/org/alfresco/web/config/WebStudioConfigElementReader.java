@@ -30,30 +30,30 @@ import org.dom4j.Element;
 
 /**
  * Responsible for loading Web Framework configuration settings from
- * the web-site-config*.xml files that are loaded via the configuration
- * service.
+ * the web-site-config*.xml files that are loaded via the
+ * configuration service.
  * 
  * @author muzquiano
  */
 public class WebStudioConfigElementReader implements ConfigElementReader
-{   
-   /**
-    * Called from the configuration service to handle the loading of the
-    * Web Framework configuration XML.
-    * 
-    * @param element the element
-    * 
-    * @return the config element
-    * 
-    * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
-    */
-   public ConfigElement parse(Element elem)
-   {
-	   ConfigElement configElement = null;
-	   if(elem != null)
-	   {
-		   configElement = WebStudioConfigElement.newInstance(elem);
-	   }
-	   return configElement;
-   }
+{
+    /**
+     * Called from the configuration service to handle the loading of
+     * the Web Framework configuration XML.
+     * 
+     * @param element the element
+     * 
+     * @return the config element
+     * 
+     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
+     */
+    public ConfigElement parse(Element elem)
+    {
+        ConfigElement configElement = null;
+        if (elem != null)
+        {
+            configElement = WebStudioConfigElement.newInstance(elem);
+        }
+        return configElement;
+    }
 }

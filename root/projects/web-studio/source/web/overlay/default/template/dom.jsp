@@ -204,7 +204,9 @@
 								<tbody>
 									<tr class="alf-form-row" align="left">
 										<td class="alf-form-label" valign="top" align="left"></td>
-										<td class="alf-form-field-container" align="left"><input type="text" class="alf-form-field"/></td>
+										<td class="alf-form-field-container" align="left">
+											<input type="text" class="alf-form-field"/>
+										</td>
 									</tr>
 								</tbody>
 	 						</table>
@@ -218,11 +220,6 @@
 									</tr>
 								</tbody>
 							</table>
-							<div id="AlfFormFieldGrid" style="width:100%;height:10px">
-								<!--<div id="gridTemplate" style="width:100%;"></div> -->
-								<div id="gridToolbar" style="width:100%;" class="yui-skin-sam"></div>
-								<div id="gridDataTable"></div>
-							</div>
 							<table id="AlfFormCombo" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
@@ -590,7 +587,7 @@
 	<!-- Reusable Menu -->
 	<div id="ALVMenuTemplate" class="AMHorizontalHolder">
 		<div class="AMRoot">
-			<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+			<table height="21" cellpadding="0" cellspacing="0" border="0">
 				<tr>
 					<td width="1px;" class="AMItemLeft">&nbsp;</td>
 					<td class="AMItemCenter" valign="left">
@@ -602,7 +599,7 @@
 			</table>
 		</div>
 		<div class="AMRoot">
-			<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+			<table height="21" cellpadding="0" cellspacing="0" border="0">
 				<tr>
 					<td width="1px;" class="AMItemLeft">&nbsp;</td>
 					<td class="AMItemCenter" valign="left">
@@ -614,7 +611,7 @@
 			</table>
 		</div>
 		<div class="AMRoot">
-			<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+			<table height="21" cellpadding="0" cellspacing="0" border="0">
 				<tr>
 					<td width="1px;" class="AMItemLeft">&nbsp;</td>
 					<td class="AMItemCenter" valign="left">
@@ -626,7 +623,7 @@
 			</table>
 		</div>
 		<div class="AMRoot">
-			<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+			<table height="21" cellpadding="0" cellspacing="0" border="0">
 				<tr>
 					<td width="1px;" class="AMItemLeft">&nbsp;</td>
 					<td class="AMItemCenter" valign="left">
@@ -654,7 +651,7 @@
 		<div id="ATVMenuNavigation">
 			<div id="ATVMenuTemplateNavigation" class="AMHorizontalHolder">
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -666,7 +663,7 @@
 					</table>
 				</div>
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -678,7 +675,7 @@
 					</table>
 				</div>
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -690,7 +687,7 @@
 					</table>
 				</div>
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -709,7 +706,7 @@
 		<div id="ATVMenuWebComponents">
 			<div id="ATVMenuTemplateWebComponents" class="AMHorizontalHolder">
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -728,7 +725,7 @@
 		<div id="ATVMenuWebContent">
 			<div id="ATVMenuTemplateWebContent" class="AMHorizontalHolder">
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -740,7 +737,7 @@
 					</table>
 				</div>
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -752,7 +749,7 @@
 					</table>
 				</div>
 				<div class="AMRoot">
-					<table height="21" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table height="21" cellpadding="0" cellspacing="0" border="0">
 						<tr>
 							<td width="1px;" class="AMItemLeft">&nbsp;</td>
 							<td class="AMItemCenter" valign="middle">
@@ -859,21 +856,22 @@
 						</table>				
 					</div>
 					<div id="create-web-site-body" style="display: none">
-						<table width="100%" class="sandbox-table">
+						<table width="100%" class="sandbox-table" cellpadding="0" cellspacing="0">
 							<tr>
 								<td style="padding-right: 1px black solid" valign="top">
 								
-									<table width="100%" style="padding-top: 5px; padding-left: 20px">
+									<table width="100%" style="padding-top: 5px; padding-left: 10px">
 									
 										<tr>
-											<td>
+											<td colspan="2" align="left">
 												Web Site Name
 											</td>
-											<td align="right" style="padding-right: 20px">
+										</tr>
+										<tr>
+											<td colspan="2" align="right" style="padding-right: 20px">
 												<input type="text" id="AlfrescoWebStudioSandboxTemplate_WebSiteName" maxlength="256" style="width:200px" class="sandbox-input"/>
 											</td>
 										</tr>
-										<tr><td colspan="2"><br/></td></tr>
 										<tr>
 											<td colspan="2" align="left">
 												Based on the following:
@@ -894,7 +892,7 @@
 									</table>
 								</td>
 								<td>
-									<img id="AlfrescoWebStudioSandboxTemplate_Image" src="abc" width="160px" height="120px"/>
+									<img id="AlfrescoWebStudioSandboxTemplate_Image" src="" width="160px" height="120px"/>
 								</td>
 							</tr>
 						</table>
@@ -912,12 +910,11 @@
 						</table>				
 					</div>
 					<div id="load-web-site-body" style="display: none">
-						<br/>
-						<div id="load-web-site-search-results" style="height: 132px; overflow: auto"></div>
-						<input type="button" value="Load" id="AlfrescoWebStudioSandboxTemplate_Load" class="sandbox-button" />
+						<div id="load-web-site-search-results" style="height: 132px; overflow: auto; border: 1px gray solid"></div>
+						<input type="button" value="Load" id="AlfrescoWebStudioSandboxTemplate_Load" class="sandbox-button" style="margin-top: 8px"/>
 						<input id="load-web-site-selected" type="hidden"/>
 					</div>
-					<div style="padding-top:8px">
+					<div style="padding-top:4px">
 						<span class="sandbox-copyright">
 							&copy; 2005-2008 Alfresco Software Inc. All rights reserved.
 						</span>

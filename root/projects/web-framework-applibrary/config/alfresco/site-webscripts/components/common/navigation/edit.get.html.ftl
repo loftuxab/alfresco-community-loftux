@@ -1,41 +1,54 @@
+<#import "/components/include/component-editor.ftl" as editor />
+
 <table class="AlfrescoComponentEditor">
+
+  <@editor.properties />
+    
+  <@editor.spacer />
+
+  <!-- Custom Properties -->
   <tr>
-    <td>Title</td>
-    <td><input type="text" size="40" name="${title.id}" value="${title.value}"></td>
-  </tr>
-  <tr>
-    <td>Description</td>
+    <td>Style</td>
     <td>
-    	<textarea rows="3" size="40" name="${description.id}">${description.value}</textarea>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <hr/>
+    	<select name="${style.id}">
+    	    <option value="gray" <#if style.value == "gray">selected</#if> >Gray</option>
+    	    <option value="tabbed" <#if style.value == "tabbed">selected</#if> >Tabbed</option>
+    	</select>
     </td>
   </tr>
   <tr>
     <td>Orientation</td>
     <td>
-    	<select name="${renderer.id}">
-    	    <option value="horizontal" <#if renderer.value == "horizontal">selected</#if> >Horizontal</option>
-    	    <option value="vertical" <#if renderer.value == "horizontal">selected</#if> >Vertical</option>
+    	<select name="${orientation.id}">
+    	    <option value="horizontal" <#if orientation.value == "horizontal">selected</#if> >Horizontal</option>
+    	    <option value="vertical" <#if orientation.value == "vertical">selected</#if> >Vertical</option>
     	</select>
     </td>
   </tr>
   <tr>
-    <td>Background Color</td>
+    <td>Mount page</td>
     <td>
-    	<input type="text" size="40" id="${backgroundColor.id}" name="${backgroundColor.id}" value="${backgroundColor.value}">
+    	<select name="${startingPage.id}">
+    	    <option value="siteroot" <#if startingPage.value == "siteroot">selected</#if> >The Site's Root Page</option>
+    	    <option value="currentpage" <#if startingPage.value == "currentpage">selected</#if> >The Current Page</option>
+    	</select>
     </td>
   </tr>
   <tr>
-    <td>Root Node</td>
+    <td>Top Page</td>
     <td>
-    	<select name="${rootNode.id}">
-    	    <option value="siteroot" <#if renderer.value == "siteroot">selected</#if> >Site Root Page</option>
-    	    <option value="currentpage" <#if renderer.value == "currentpage">selected</#if> >Current Page</option>
+    	<select name="${topPage.id}">
+    	    <option value="show" <#if topPage.value == "show">selected</#if> >Show Top Page</option>
+    	    <option value="hide" <#if topPage.value == "hide">selected</#if> >Hide Top Page</option>
     	</select>
+    </td>
+  </tr>
+  <tr>
+    <td>Children and Siblings</td>
+    <td>
+    	<input type="radio" name="${childSiblings.id}" value="showSiblings" <#if childSiblings.value == "showSiblings">checked</#if> >Show Siblings
+    	<input type="radio" name="${childSiblings.id}" value="showChildren" <#if childSiblings.value == "showChildren">checked</#if> >Show Children
+    	<input type="radio" name="${childSiblings.id}" value="none" <#if childSiblings.value == "none">checked</#if> >None
     </td>
   </tr>
 </table>

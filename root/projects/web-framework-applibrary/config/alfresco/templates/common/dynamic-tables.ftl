@@ -2,27 +2,40 @@
 
    <#if templateConfig.rows?exists>   
 
-      <table border="0" cellpadding="0" cellspacing="0">
+      <table border="0" cellpadding="0" cellspacing="0" <#if templateConfig.width?exists && templateConfig.width?length &gt; 0> width="${templateConfig.width}%"</#if> >
 
       <#list templateConfig.rows as row>
       
-         <tr id="${row.id}" height="${row.height}" style="height: ${row.height}">
+         <tr id="${row.id}">
          
-         <#list row.panels as col>
+         <td>
          
-            <td id="${col.id}" height="${col.height}" width="${col.width}" style="height: ${col.height}; width: ${col.width}; vertical-align: top">
-            
-            	<#if col.regions?exists>
-			<#list col.regions as r>
+            <table width="100%" cellspacing="0" cellpadding="0">
 
-				<@region id="${r.name}" scope="${r.scope}" />
+            <tr valign="top">
 
-			</#list>
-		</#if>
-            
-            </td>
-            
-         </#list>
+            <#list row.panels as col>
+         
+               <td id="${col.id}" width="${col.width}%" style="vertical-align: top">
+
+                  <#if col.regions?exists>
+	             <#list col.regions as r>
+	          
+	          <div id="${r.name}" <#if r.height?exists && r.height?length &gt; 0>height="${r.height}%"</#if> >
+                     <@region id="${r.name}" scope="${r.scope}"/>
+                  </div>
+                  
+		     </#list>
+		  </#if>
+	       </td>
+	       
+            </#list>
+         
+         </tr>
+         
+         </table>
+         
+         </td>
          
          </tr>
       

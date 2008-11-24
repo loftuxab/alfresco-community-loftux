@@ -31,7 +31,7 @@ import java.util.Map;
  * 
  * @author muzquiano
  */
-public interface ResourceProvider 
+public interface ResourceProvider
 {
     /**
      * Looks up a resource with the given id
@@ -40,21 +40,21 @@ public interface ResourceProvider
      * @return
      */
     public Resource getResource(String id);
-    
+
     /**
      * Returns the set of all resources
      * 
      * @return
      */
     public Resource[] getResources();
-    
+
     /**
      * Returns the map of resources
      * 
      * @return
      */
     public Map<String, Resource> getResourcesMap();
-    
+
     /**
      * Adds a resource with the given id
      * 
@@ -71,9 +71,9 @@ public interface ResourceProvider
      * @param type
      * 
      * @return resource
-     */    
+     */
     public Resource addResource(String id, String type);
-    
+
     /**
      * Updates a resource for the given id
      * 
@@ -81,12 +81,12 @@ public interface ResourceProvider
      * @param resource
      */
     public void updateResource(String id, Resource resource);
-    
+
     /**
      * Removes a resource with the given id
      * 
      * @param id
      */
     public void removeResource(String id);
-    
+
 }

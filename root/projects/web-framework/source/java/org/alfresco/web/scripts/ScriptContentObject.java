@@ -26,7 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.io.Serializable;
 
-import org.alfresco.web.site.Content;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -44,7 +44,6 @@ import org.alfresco.web.site.RequestContext;
  * var endpointId = content.endpointId;
  * var timestamp = content.timestamp;
  * var isLoaded = content.isLoaded;
- * var statusCode = content.statusCode;
  * var statusMessage = content.statusMessage;
  * 
  * Properties of the content itself are stored on an associative
@@ -56,7 +55,8 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptContentObject extends ScriptBase
 {
-    protected Content content;
+    protected ResourceContent content;
+    protected ScriptResource scriptResource;
     
     /**
      * Instantiates a new script content.
@@ -64,7 +64,7 @@ public final class ScriptContentObject extends ScriptBase
      * @param context the request context
      * @param content the content
      */
-    public ScriptContentObject(RequestContext context, Content content)
+    public ScriptContentObject(RequestContext context, ResourceContent content)
     {
         super(context);
         
@@ -115,7 +115,7 @@ public final class ScriptContentObject extends ScriptBase
     
     public String getEndpointId()
     {
-        return this.content.getEndpointId();
+        return this.content.getResource().getEndpoint();
     }
     
     public boolean getIsLoaded()
@@ -123,15 +123,32 @@ public final class ScriptContentObject extends ScriptBase
         return this.content.isLoaded();
     }
 
-    public int getStatusCode()
-    {
-        return this.content.getStatusCode();
-    }
-
     public String getStatusMessage()
     {
-        return this.content.getStatusMessage();
+    	String message = null;
+    	
+    	if(this.content.getLoaderException() != null)
+    	{
+    		message = this.content.getLoaderException().getMessage();
+    	}
+        
+    	return message;
     } 
+    
+    public String getJson()
+    {
+    	return this.content.getJSON();
+    }
+    
+    public ScriptResource getResource()
+    {
+    	if(this.scriptResource == null)
+    	{
+    		this.scriptResource = new ScriptResource(context, this.content.getResource());    		
+    	}
+    	
+    	return this.scriptResource;
+    }
     
     // --------------------------------------------------------------
     // JavaScript Functions

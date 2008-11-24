@@ -24,6 +24,7 @@
 	overflow:visible;
 	margin-top:1px;
 	margin-left:3px;
+
 }
 
 .AlfrescoTemplatesView #ALVMenu .AMRoot.RolloverItemRoot .AMItemLeft{

@@ -244,29 +244,37 @@ WebStudio.Mimetypes.prototype.getIconByMimetype = function(mimetype)
 {
 	var core = "default";
 	
-	var i = mimetype.indexOf("/");
-	if(i == -1)
+	if(mimetype != null)
 	{
-		return core;
+		var i = mimetype.indexOf("/");
+		if(i == -1)
+		{
+			return core;
+		}
+
+		var car = mimetype.substring(0, i);
+
+		if(car == "image")
+		{
+			core = "other_image";
+		}
+		else if(car == "video")
+		{
+			core = "other_movie";
+		}
+		else if(car == "audio")
+		{
+			core = "other_music2";
+		}
+		else if(car == "text")
+		{
+			core = "text";		
+		}
 	}
-	
-	var car = mimetype.substring(0, i);
-	
-	if(car == "image")
+	else
 	{
-		core = "other_image";
-	}
-	else if(car == "video")
-	{
-		core = "other_movie";
-	}
-	else if(car == "audio")
-	{
-		core = "other_music2";
-	}
-	else if(car == "text")
-	{
-		core = "text";		
+		// assume it is a folder
+		core = "folder";
 	}
 	
 	return core;

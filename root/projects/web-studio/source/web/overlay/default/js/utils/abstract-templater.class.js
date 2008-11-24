@@ -1,6 +1,6 @@
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.AbstractTemplater = function(constructor) 
@@ -10,7 +10,7 @@ WebStudio.AbstractTemplater = function(constructor)
 	this.defaultContainer = document.body;
 	this.injectObject = document.body;
 	
-	this.dmPrefix = 'Unknown Soro Component report: '; //debug messages prefix
+	this.dmPrefix = 'Unknown Component report: '; //debug messages prefix
 	this.dmErrorTemplate = '<font color="red">$</font>'; //template for error messages
 	this.dmSuccessTemplate = '<font color="green">$</font>'; //template for success messages
 	this.dmMessageTemplate = '$'; //template for default messages
@@ -33,7 +33,7 @@ WebStudio.AbstractTemplater = function(constructor)
 	this.isHide = false;
 	
 	this._init();	
-}
+};
 
 WebStudio.AbstractTemplater.prototype = {
 
@@ -41,16 +41,6 @@ WebStudio.AbstractTemplater.prototype = {
 		this._replacerLayer = new Element('div', {
 			styles: {display: 'none'}
 		});
-
-		/*
-		if (Fx)
-		{
-			if (!Fx.Morph)
-			{
-				Alf.initializeCSSMorph();
-			}
-		}
-		*/		
 	},
 	setWidth: function(value) {
 		this.generalLayer.setStyle('width', value);
@@ -63,8 +53,8 @@ WebStudio.AbstractTemplater.prototype = {
 	getWidth: function() {
 		return this.generalLayer.getCoordinates().width;
 	},
-	setHeight: function(int) {
-		this.generalLayer.setStyle('height', int);
+	setHeight: function(value) {
+		this.generalLayer.setStyle('height', value);
 		if (this.resize)
 		{
 			this.resize();
@@ -166,7 +156,8 @@ WebStudio.AbstractTemplater.prototype = {
 		this._brothers[this.ID] = undefined;
 	},
 	hide: function() {
-		if(this.isShow){
+		if(this.isShow)
+		{
 			this.generalLayer.remove();
 			this.isHide = true;
 			this.isShow = false;
@@ -175,7 +166,8 @@ WebStudio.AbstractTemplater.prototype = {
 	},
 	show: function() {
 		if(this.isHide)
-		{	this.generalLayer.injectInside(this.injectObject);
+		{	
+			this.generalLayer.injectInside(this.injectObject);
 			this.isHide = false;
 			this.isShow = true;
 		}
@@ -192,16 +184,19 @@ WebStudio.AbstractTemplater.prototype = {
 	fireEvent: function(_type, _args) {
 		var type = _type.toLowerCase();
 		var args = _args;
+		
+		var _this = this;
+		
 		this._tempResult = true;
 		if (this.events[type]) 
 		{
-			$each(this.events[type], (function(item, index) {
+			$each(this.events[type], function(item, index) {
 				var result = item.attempt(args);
-				if (result == false)
+				if (result === false)
 				{
-					this._tempResult = false;
+					_this._tempResult = false;
 				}
-			}).bind(this));
+			});
 		}
 		return this._tempResult;
 	},
@@ -244,14 +239,17 @@ WebStudio.AbstractTemplater.prototype = {
 		this.addEvent(type, index, func, bind, true);
 	},
 	removeEvents: function(_type) {
+	
+		var _this = this;
+		
 		var type = _type.toLowerCase();
 		if (!this.events[type])
 		{
 			return false;
 		}
-		$each(this.events[type], (function(item, index) {
-			this.events[type][index] = null;
-		}).bind(this));
+		$each(this.events[type], function(item, index) {
+			_this.events[type][index] = null;
+		});
 		this.events[type] = null;
 		return true;
 	},
@@ -294,13 +292,15 @@ WebStudio.AbstractTemplater.prototype = {
 		}
 		this._brothers[this.ID] = this;
 		
+		var id = null;
+		
 		if (this.templateObjects[templateID]) 
 		{
-			var id = templateID;
+			id = templateID;
 		} 
 		else 
 		{
-			var id = 0;
+			id = 0;
 			if (!this.templateObjects[id])
 			{
 				$each(this.templateObjects, function(item, index) {
@@ -343,23 +343,29 @@ WebStudio.AbstractTemplater.prototype = {
 		this.buildGeneralLayer(templateID);
 	},
 	applyElementsConfig: function() {
-		$each(this.elementsConfig, (function(cItem, cIndex) {
-			this[cIndex] = [];
+		
+		var _this = this;
+		
+		$each(this.elementsConfig, function(cItem, cIndex) {
+			_this[cIndex] = [];
 			if (cItem.selector) 
 			{		
-				var els = this.generalLayer.getElementsBySelector(cItem.selector);
+				var els = _this.generalLayer.getElementsBySelector(cItem.selector);
 				if (els[0])
 				{
-					this[cIndex].el = els[0];
+					_this[cIndex].el = els[0];
 				}
-				$each(els, (function(elItem, elIndex) {
-					this.setGlobalElementConfig(elItem, elIndex, this[cIndex], cItem, cIndex);
-				}).bind(this));
+				$each(els, function(elItem, elIndex) {
+					_this.setGlobalElementConfig(elItem, elIndex, _this[cIndex], cItem, cIndex);
+				});
 			}
-		}).bind(this));
+		});
 		return this;
 	},
 	setGlobalElementConfig: function(item, index, ob, config, configIndex) {
+	
+		var _this = this;
+		
 	//'item' = html dom element, 'index' = number of 'item's element; ob = js container for 'index';
 	//config = js object with configuration for item
 		ob[index] = {};
@@ -429,12 +435,13 @@ WebStudio.AbstractTemplater.prototype = {
 				}
 			}
 			
-			if (config.events) {
+			if (config.events) 
+			{
 				oel.set({
 					ACID: this.ID,
 					events: config.events
 				});
-			};
+			}
 
 			if (config.attributes) 
 			{
@@ -448,9 +455,9 @@ WebStudio.AbstractTemplater.prototype = {
 
 			if (config.methods) 
 			{
-				$each(config.methods,(function(mItem, mIndex){
-					o[mIndex] = mItem.bind(this);
-				}).bind(this));
+				$each(config.methods, function(mItem, mIndex){
+					o[mIndex] = mItem.bind(_this);
+				});
 			}
 
 			if (config.propertyToInnerHTML)
@@ -490,18 +497,22 @@ WebStudio.AbstractTemplater.prototype = {
 
             		if (config.objects) 
             		{
-				$each(config.objects, (function(cItem, cIndex) {
+				$each(config.objects, function(cItem, cIndex) {
 					o[cIndex] = [];
-					if (cItem.selector) {
+					if (cItem.selector)
+					{
 						var els = o.el.getElementsBySelector(cItem.selector);
 
-						if (els[0]) o[cIndex].el = els[0];
+						if (els[0])
+						{
+							o[cIndex].el = els[0];
+						}
 
-						$each(els, (function(elItem, elIndex) {
-							this.setGlobalElementConfig(elItem, elIndex, o[cIndex], cItem);
-						}).bind(this));
+						$each(els, function(elItem, elIndex) {
+							_this.setGlobalElementConfig(elItem, elIndex, o[cIndex], cItem);
+						});
 					}
-				}).bind(this));
+				});
 			}
 		}
 	},
@@ -519,13 +530,15 @@ WebStudio.AbstractTemplater.prototype = {
 	},
 	setTemplateBySelector: function(selector, index) {
 		
+		var id = null;
+		
 		if (index)
 		{
-			var id = index;
+			id = index;
 		}
 		else
 		{
-			var id = this.templateID++;
+			id = this.templateID++;
 		}
 
 		if (this._templates[index]) 
@@ -565,14 +578,19 @@ WebStudio.AbstractTemplater.prototype = {
 		this._templates[id] = this.templateObjects[id];
 		return this;
 	},
-	setTemplateByHTML: function(html, index) { //Set template by html code
+	setTemplateByHTML: function(html, index) {
+	
+		//Set template by html code
+	
+		var id = null;
+		
 		if (index)
 		{
-			var id = index;
+			id = index;
 		}
 		else
 		{
-			var id = this.templateID++;
+			id = this.templateID++;
 		}
 		this.templateObjects[id] = new Element('div', {});
 		this.templateObjects[id].setHTML(html);
@@ -584,13 +602,16 @@ WebStudio.AbstractTemplater.prototype = {
 		return this;
 	},
 	setTemplateByDOMObject: function(object, index) {
+	
+		var id = null;
+		
 		if (index)
 		{
-			var id = index;
+			id = index;
 		}
 		else
 		{
-			var id = this.templateID++;
+			id = this.templateID++;
 		}
 
 		this.templateObjects[id] = object.clone();
@@ -607,7 +628,7 @@ WebStudio.AbstractTemplater.prototype = {
 		if ($type(object) == 'element') 
 		{
 			object.onselectstart = function(event) {
-				var event = new Event(event);
+				event = new Event(event);
 				event.preventDefault();
 				return false;
 			};
@@ -655,14 +676,24 @@ WebStudio.AbstractTemplater.prototype = {
 		}
 	},
 	addDebugMessages: function(type, text, more) {
-		if (type == 'error') {
-			var mess = this.dmErrorTemplate.replace('$', text);
-		} else if (type == 'success') {
-			var mess = this.dmSuccessTemplate.replace('$', text);
-		} else  if (type == 'message') {
-			var mess = this.dmSuccessTemplate.replace('$', text);
-		} else {
-			var mess = text;
+	
+		var mess = null;
+		
+		if (type == 'error') 
+		{
+			mess = this.dmErrorTemplate.replace('$', text);
+		} 
+		else if (type == 'success') 
+		{
+			mess = this.dmSuccessTemplate.replace('$', text);
+		} 
+		else  if (type == 'message') 
+		{
+			mess = this.dmSuccessTemplate.replace('$', text);
+		} 
+		else 
+		{
+			mess = text;
 		}
 		mess = this.dmPrefix + mess;
 		
@@ -675,6 +706,7 @@ WebStudio.AbstractTemplater.prototype = {
 			this.createBlockLayer();
 		}
 		this.blockLayer.injectInside(document.body);
+		//Alf.injectInside(document.body, this.blockLayer);
 		this.resizeBlockLayer();
 		return this;
 	},
@@ -693,13 +725,13 @@ WebStudio.AbstractTemplater.prototype = {
 		this.blockLayer = new Element('div', 
 		{
 		      styles: {
-			   backgroundColor: '#111111',
-			   position: 'absolute',
-			   width: window.getSize().scrollSize.x,
-			   height: window.getSize().scrollSize.y,
-			   left: 0,
-			   top: 0,
-			   opacity: 0.5
+			   'background-color': '#111111',
+			   'position': 'absolute',
+			   'width': window.getSize().scrollSize.x,
+			   'height': window.getSize().scrollSize.y,
+			   'left': 0,
+			   'top': 0,
+			   'opacity': 0.5
 		      }
         });
         //'z-index': this.generalLayer.getStyle('z-index') - 1
@@ -723,6 +755,8 @@ WebStudio.AbstractTemplater.prototype = {
 			this._brothersIDName = this._constructorName + 'sID';
 			this._templatesName = this._constructorName + 'Templates';
 
+			var evaler = null;
+			
 			if (this._constructorName.indexOf('.') > 0) {
 				this._isChild = true;
 				for (var i=this._constructorName.length; i>0; i--) {
@@ -734,43 +768,49 @@ WebStudio.AbstractTemplater.prototype = {
 				this._constructorParentName = this._constructorName.substr(0, i);
 				this._constructorFunctionName = this._constructorName.substr(i+1);
 
-				var evaler = 'this._constructorParent = '+this._constructorParentName;
+				evaler = 'this._constructorParent = '+this._constructorParentName;
 				eval(evaler);
 
 				this._constructorParent[this._constructorFunctionName+'s'] = {};
 				this._constructorParent[this._constructorFunctionName+'sID'] = 0;
 				this._constructorParent[this._constructorFunctionName+'Templates'] = {};
-			} else {
+			} 
+			else 
+			{
 				this._isChild = false;
-				var evaler = 'var '+this._brothersName+' = {}';
+				evaler = 'var '+this._brothersName+' = {}';
 				eval(evaler);
-				var evaler = 'var '+this._brothersIDName+' = 0';
+				evaler = 'var '+this._brothersIDName+' = 0';
 				eval(evaler);
-				var evaler = 'var '+this._templatesName+' = {}';
+				evaler = 'var '+this._templatesName+' = {}';
 				eval(evaler);
 			}
 
-			var evaler = 'this._constructor = '+this._constructorName;
+			evaler = 'this._constructor = '+this._constructorName;
 			eval(evaler);
 
-			if ($type(this._constructor) == 'function') {
-				var evaler = 'this._brothers = '+this._brothersName;
+			if ($type(this._constructor) == 'function') 
+			{
+				evaler = 'this._brothers = '+this._brothersName;
 				eval(evaler);
-				var evaler = 'this._brothersID = '+this._brothersIDName;
+				evaler = 'this._brothersID = '+this._brothersIDName;
 				eval(evaler);
-				var evaler = 'this._templates = '+this._templatesName;
+				evaler = 'this._templates = '+this._templatesName;
 				eval(evaler);
-			} else {
+			}
+			else
+			{
 				this.addDebugMessages('error', 'Constructor is not a function!', 'You use Alfresco.AbstractTemplater with unknown type of required parameter. This parameter is a string full name of constructor <b>function</b>.<br><br> For example:<br><br> Alfresco.NewComponent = function(){};<br>Alfresco.NewComponent.prototype = new Alfresco.AbstractTemplater(&quot;<b>Alfresco.NewComponent</b>&quot;)');
 			}
-		} else {
+		} 
+		else
+		{
 			this.addDebugMessages('error', 'Constructor name is required!', 'You use Alfresco.AbstractTemplater without one required parameter. This parameter is a string full name of constructor function.<br><br> For example:<br><br> Alfresco.NewComponent = function(){};<br>Alfresco.NewComponent.prototype = new Alfresco.AbstractTemplater(&quot;<b>Alfresco.NewComponent</b>&quot;)');
 		}
-
 	},
 	getWindowSize : function () {
 		return {
-		    w: Math.max(window.ie ? (document.body.offsetWidth - 15) : window.innerWidth, 1),
+		    w: Math.max(window.ie ? document.body.offsetWidth : window.innerWidth, 1),
 		    h: Math.max(window.ie ? document.body.offsetHeight : window.innerHeight, 1)
 		};
 	},

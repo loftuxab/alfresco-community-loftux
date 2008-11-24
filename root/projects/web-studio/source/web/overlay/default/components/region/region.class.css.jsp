@@ -1,5 +1,6 @@
 <%
 	String rootPath = org.alfresco.web.studio.OverlayUtil.getOriginalURL(request, "/proxy/alfresco-web-studio/overlay/default");
+	String proxyPath = org.alfresco.web.studio.OverlayUtil.getOriginalURL(request, "/proxy/alfresco-web-studio");
 %>
 
 /* CSS Document */
@@ -95,13 +96,28 @@
 	height: 4px;
 }
 
-.alf-region .region-body {
+.alf-region .region-body-old {
+	background: transparent url( <%=proxyPath%>/images/logo/alfresco_webstudio_fadedbg.png ) no-repeat scroll left top;
 	overflow: auto;
 	width: 292px;
 	height: 118px;
 	position: absolute;
 	top: 28px;
 	left: 4px;
+	border-top: 1px black solid;
+	border-left: 1px black solid;
+}
+
+.alf-region .region-body {
+	background: transparent url( <%=proxyPath%>/images/logo/alfresco_webstudio_fadedbg.png ) no-repeat scroll left top;
+	overflow: auto;
+	width: 292px;
+	height: 118px;
+	position: absolute;
+	top: 28px;
+	left: 4px;
+	border-top: 1px black solid;
+	border-left: 1px black solid;
 }
 
 .alf-region .button-divider {

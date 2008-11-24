@@ -109,6 +109,11 @@
       <load-on-startup>1</load-on-startup>
    </servlet> 
    
+   <servlet>
+      <servlet-name>debugServlet</servlet-name>
+      <servlet-class>org.alfresco.web.studio.servlet.WebStudioDebugServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet> 
    
    
    
@@ -188,12 +193,17 @@
    
    <servlet-mapping>
       <servlet-name>cssServlet</servlet-name>
-      <url-pattern>/over/css/*</url-pattern>
+      <url-pattern>/_css/*</url-pattern>
    </servlet-mapping>
 
    <servlet-mapping>
       <servlet-name>javascriptServlet</servlet-name>
-      <url-pattern>/over/js/*</url-pattern>
+      <url-pattern>/_js/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>debugServlet</servlet-name>
+      <url-pattern>/debug/*</url-pattern>
    </servlet-mapping>
 
       

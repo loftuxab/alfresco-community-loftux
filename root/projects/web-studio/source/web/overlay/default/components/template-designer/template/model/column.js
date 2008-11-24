@@ -19,7 +19,7 @@ WebStudio.Templates.Model.Column.prototype.init = function(parent)
 	
 	// CSS for menu div.
 	this.setMenuCSS("TemplateColumnMenu");	
-}
+};
 
 
 /**
@@ -30,22 +30,18 @@ WebStudio.Templates.Model.Column.prototype.getMenuItemsConfig = function()
 	var menuItems = [ ];
 
 	/**
-	 *  Prep the template, row id's
-	 *  that we will need for the column menu commands.
+	 * Get the binding properties for parent objects.
+	 * Those properties will serve as object id's for
+	 * updating the column info in the repo.
 	 */
-	
+	var bindingProperties = this.getBindingProperties();
+
 	/**
 	 * Get the parent of the column object.
 	 * We we will need the id to update appropriate row.
 	 */
-	var parentRow = this.getParent();
-	
-	/**
-	 * Get the parent of the row object.
-	 * We will need the id update appropriate template.
-	 */
-	var parentTemplate = parentRow.getParent();			
-	
+	var parent = this.getParent();		
+		
 	menuItems[menuItems.length] = {
 		id: 'deleteTemplateColumn',
 		text: "Delete Column", 
@@ -53,28 +49,64 @@ WebStudio.Templates.Model.Column.prototype.getMenuItemsConfig = function()
 			fn: this.deleteTemplateColumn.bind(this), 
 			obj: [
 			      	this.getId(), 
-			      	parentRow.getId(), 
-			      	parentTemplate.getId()
+			      	bindingProperties["row"], 
+			      	bindingProperties["template"]
 			] 
 		}
 	};
 	                 
-    if(this.getChildCount() == 0)
-    {        
-		menuItems[menuItems.length] = {
-			id: 'addTemplateRegion', 
-            text: "Add Region", 
-            onclick: { fn: this.addTemplateRegion.bind(this), 
-				obj: [
-				      	this.getId(), 
-				      	parentRow.getId(), 
-				      	parentTemplate.getId()
-				]
-			}
-		};
-	}
+	menuItems[menuItems.length] = {
+		id: 'addTemplateRegion', 
+        text: "Add Region", 
+        onclick: { fn: this.addTemplateRegion.bind(this), 
+		obj: [
+		      	this.getId(), 
+		      	bindingProperties["row"], 
+		      	bindingProperties["template"]
+		      ]
+		}
+	};
+	
 	return menuItems;
-}
+};
+
+
+WebStudio.Templates.Model.Column.prototype.editTemplateRegionSizes = function(eventType, eventArgs, parmsObj)
+{
+	var _this = this;
+	
+    // Get the current Event        
+    var e = eventArgs[0];
+
+    // Stop event propagation.
+    WebStudio.util.stopPropagation(e);
+    
+	/**
+	 * Get the binding properties for parent objects.
+	 * Those properties will serve as object id's for
+	 * updating the column info in the repo.
+	 */
+	var bindingProperties = this.getBindingProperties();
+    
+    var w = new WebStudio.Wizard();
+
+    w.setDefaultJson(
+    {
+        refreshSession: 'true',
+        templateId: bindingProperties["template"],        
+        rowId: bindingProperties["row"],
+        panelId: this.getId(),
+        actionFlag: 'editRegionSizes'
+    });                 
+    
+    w.start(WebStudio.ws.studio("/wizard/regionmanager/tablelayout"), 'tablelayout');
+    
+    w.onComplete = function() 
+    {
+        _this.templateDesigner.refresh();     
+    };
+};
+
 
 /**
  * Context Menu
@@ -82,11 +114,13 @@ WebStudio.Templates.Model.Column.prototype.getMenuItemsConfig = function()
  */ 
 WebStudio.Templates.Model.Column.prototype.deleteTemplateColumn = function(eventType, eventArgs, parmsObj)
 {
+	var _this = this;
+	
     // Get the current Event        
     var e = eventArgs[0];
 
     // Stop event propagation.
-    e.stopPropagation();
+    WebStudio.util.stopPropagation(e);
 
     // args will be coming in this order [columnId, rowId, templateId]
 
@@ -108,14 +142,14 @@ WebStudio.Templates.Model.Column.prototype.deleteTemplateColumn = function(event
                                     actionFlag: 'deletePanel'} );
     
     call = YAHOO.util.Connect.asyncRequest('GET', url, {   
-        success: (function(r) {       
-            this.templateDesigner.refresh();       	        	
-        }).bind(this),
+        success: function(r) {       
+            _this.templateDesigner.refresh();       	        	
+        },
         failure: function(r) {      
             //error deleting region
         }
     });
-}
+};
 
 /**
  * Context Menu
@@ -123,11 +157,13 @@ WebStudio.Templates.Model.Column.prototype.deleteTemplateColumn = function(event
  */ 
 WebStudio.Templates.Model.Column.prototype.addTemplateRegion = function(eventType, eventArgs, parmsObj)
 {
+	var _this = this;
+	
     // Get the current Event        
     var e = eventArgs[0];
 
     // Stop event propagation.
-    e.stopPropagation();
+    WebStudio.util.stopPropagation(e);
     
 	/**
 	 * Get the binding properties for parent objects.
@@ -149,11 +185,11 @@ WebStudio.Templates.Model.Column.prototype.addTemplateRegion = function(eventTyp
     
     w.start(WebStudio.ws.studio("/wizard/regionmanager/tablelayout"), 'tablelayout');
     
-    w.onComplete = (function() 
+    w.onComplete = function() 
     {
-        this.templateDesigner.refresh();     
-    }).bind(this);    
-}
+        _this.templateDesigner.refresh();     
+    };  
+};
 
 /**
  * Renders the template to a given container
@@ -161,44 +197,57 @@ WebStudio.Templates.Model.Column.prototype.addTemplateRegion = function(eventTyp
 WebStudio.Templates.Model.Column.prototype.render = function(container)
 {
 	
+	// Parent container.
 	this.container = container;
 
+	// Create TD that will contain root Div element.
 	var td = document.createElement('td');	
-	td.setAttribute("id", this.getId());	
-	td.setAttribute("class", this.getCSS());
+	td.setAttribute("id", this.getId());		
 	
-	td.setStyle("width", this.getWidth() + "%");	
+	// If a width was specified on creation
+	// of column, let's set it here.
+	if(this.getWidth())
+	{
+		WebStudio.util.setStyle(td, "width", this.getWidth() + "%");
+	}
 
-	td.injectInside(this.container);
+	// Add TD to parent container.
+	WebStudio.util.injectInside(this.container, td);	
 	
+	// Div element that represents column object.
 	var columnDiv = document.createElement('div');
 	columnDiv.setAttribute("id", "col_div_" + this.getId());
-	columnDiv.setAttribute("class", this.getCSS());	
-	columnDiv.setStyle("height", "100%");
-	columnDiv.setStyle("border", "1px dashed black");
+	YAHOO.util.Dom.addClass(columnDiv, this.getCSS());	
+	WebStudio.util.setStyle(columnDiv, "height", "93%");
 	
+	// Set this element as the root
+	// element for this column object.
 	this.setElement(columnDiv);
+		
+	// Add to the TD
+	WebStudio.util.injectInside(td, columnDiv);
 	
-	columnDiv.injectInside(td);
-
-	this.setupEvents(columnDiv)
+	// Setup mouse events
+	this.setupEvents(columnDiv);
 	
-	// title element
+	// Div element that will represent column title.
 	var titleElement = document.createElement('div');
-	titleElement.setAttribute("class", this.getTitleCSS());	
-	titleElement.setAttribute("id", "column_div_" + this.getId());
-	titleElement.setHTML("Column: " + this.getId());	
-	titleElement.injectInside(columnDiv);
+	YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());	
+	titleElement.setAttribute("id", "column_div_" + this.getId());	
+	WebStudio.util.pushHTML(titleElement, "Column: " + this.getSequenceNumber());
+	
+	// Add column div.
+	WebStudio.util.injectInside(columnDiv, titleElement);	
 
 	// register mouse events
 	this.setupEvents(titleElement);
 	
-	// register mouse events
-	this.setupEvents();
-	
-	// render child objects
-	this.renderChildren(columnDiv);
-}
+	if (this.getChildCount() > 0)
+	{		
+		// render child objects
+		this.renderChildren(columnDiv);
+	} 
+};
 
 
 //////////////////////////////////////
@@ -208,4 +257,4 @@ WebStudio.Templates.Model.Column.prototype.render = function(container)
 WebStudio.Templates.Model.Column.prototype.addRegion = function(regionObject)
 {
 	this.addChild(regionObject);
-}
+};

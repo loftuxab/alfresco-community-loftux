@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.DropDown = function() 
@@ -26,31 +25,35 @@ WebStudio.DropDown = function()
 		AlfDropDownHolder:{
 			selector:'span[id=AlfDropDownHolder]'
 		}
-	}
+	};
 	this._init();
 	this.container = null;
-}
+};
 
 WebStudio.DropDown.prototype = new WebStudio.AbstractTemplater('WebStudio.DropDown');
 
 WebStudio.DropDown.prototype._init = function()
 {
 	var _this = this;
-	document.addEvent('click', (function() {
-		if(_this.container)_this.container.hide();
-	}).bind(this));
-}
+	
+	document.addEvent('click', function() {
+		if (_this.container)
+		{
+			_this.container.hide();
+		}
+	});
+};
 
 WebStudio.DropDown.prototype.addItem = function(id,value)
 {
 	this.container.addItem(id,value);
-}
+};
 
 WebStudio.DropDown.prototype.activate = function()
 {
 	this.buildGeneralLayer();
 	this.container = this.buildRootItem("","");
-}
+};
 
 WebStudio.DropDown.prototype.selectItem = function(id)
 {
@@ -58,9 +61,11 @@ WebStudio.DropDown.prototype.selectItem = function(id)
 	var ci = im.getElementsBySelector("div[id=AlfDropDownItmCaption]")[0];
 	this.AlfDropDownCaptionHolder.el.setHTML(ci.innerHTML);
 	this.onItemClick(id);
-}
+};
 
-WebStudio.DropDown.prototype.onItemClick = function(id,data){}
+WebStudio.DropDown.prototype.onItemClick = function(id,data)
+{
+};
 
 WebStudio.DropDown.prototype.buildRootItem = function(id,value)
 {
@@ -71,19 +76,17 @@ WebStudio.DropDown.prototype.buildRootItem = function(id,value)
 	var ch = this.AlfDropDownHolder.el;
 		ch.addEvent("mouseover", function(e) {
             e = new Event(e);
-			//alert("mouseover");
 			this.addClass("selected");
             e.stop();
         });
         ch.addEvent("mouseout", function(e) {
             e = new Event(e);
-			//alert("mouseout");
 			this.removeClass("selected");
             e.stop();
         });
 
 	return ri;
-}
+};
 
 WebStudio.DropDown.prototype.show = function()
 {
@@ -96,7 +99,7 @@ WebStudio.DropDown.prototype.show = function()
 	this.isHide = false;
 	this.isShow = true;
 	return this;
-}
+};
 
 WebStudio.DropDown.prototype.showFast = function()
 {
@@ -105,7 +108,7 @@ WebStudio.DropDown.prototype.showFast = function()
 	this.isHide = false;
 	this.isShow = true;
 	return this;
-}
+};
 
 WebStudio.DropDown.prototype.hide = function()
 {
@@ -118,7 +121,7 @@ WebStudio.DropDown.prototype.hide = function()
 	this.isHide = true;
 	this.isShow = false;
 	return this;
-}
+};
 
 WebStudio.DropDownRootItem = function(he,menu)
 {
@@ -130,7 +133,7 @@ WebStudio.DropDownRootItem = function(he,menu)
     this.ih.injectInside(document.body);
     this.ch = this.he.getElementsBySelector('span[id=AlfDropDownCaptionHolder]')[0];
 	this._init();
-}
+};
 
 WebStudio.DropDownRootItem.prototype._init = function()
 {
@@ -141,23 +144,26 @@ WebStudio.DropDownRootItem.prototype._init = function()
 		_this.onRootItemClick();
 		 e.stop();
 	});
-}
+};
 
 WebStudio.DropDownRootItem.prototype.onRootItemClick = function()
 {
-	if(this.menu.activeRootItem) this.menu.activeRootItem.hide();
+	if(this.menu.activeRootItem)
+	{
+		this.menu.activeRootItem.hide();
+	}
 	this.show();
-}
+};
 
 WebStudio.DropDownRootItem.prototype.hide = function(){
 	this.ih.style.display = "none";
-}
+};
 
 WebStudio.DropDownRootItem.prototype.show = function(){
 	this.ih.style.display = "";
     this.ih.style.top = (this.he.offsetTop + this.menu.generalLayer.offsetHeight)+ "px";
     this.ih.style.left = this.menu.generalLayer.offsetLeft + "px";
-}
+};
 
 WebStudio.DropDownRootItem.prototype.addItem = function(id,value)
 {
@@ -187,4 +193,4 @@ WebStudio.DropDownRootItem.prototype.addItem = function(id,value)
         });
 
     this.items[id] = im; 
-}
+};

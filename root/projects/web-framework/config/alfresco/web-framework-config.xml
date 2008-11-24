@@ -201,14 +201,21 @@
 				<class>org.alfresco.web.site.AlfrescoUserFactory</class>
 			</user-factory>
 
-			<!-- Content Loaders -->
-			<content-loader>
-				<id>alfresco</id>
-				<name>Alfresco Content Loader</name>
-				<description>Loads content from an Alfresco repository</description>
-				<class>org.alfresco.web.site.AlfrescoContentLoader</class>
+			<!-- Resource Loaders -->
+			<resource-loader>
+				<id>alfresco-spaces</id>
+				<name>Alfresco Spaces Resource Loader</name>
+				<description>Loads content from an Alfresco Spaces Repository</description>
+				<class>org.alfresco.web.framework.resource.AlfrescoSpaceResourceLoader</class>
 				<endpoint>alfresco</endpoint>
-			</content-loader>
+			</resource-loader>
+			<resource-loader>
+				<id>alfresco-webapp</id>
+				<name>Alfresco Web Application Resource Loader</name>
+				<description>Loads content from an Alfresco Web Application Repository</description>
+				<class>org.alfresco.web.framework.resource.AlfrescoWebProjectResourceLoader</class>
+				<endpoint>alfresco</endpoint>
+			</resource-loader>
 
 			<!-- Error Handler Pages -->
 			<error-handler>
@@ -280,6 +287,12 @@
 			<debug>
 				<timer>false</timer>
 			</debug>
+			
+			<!-- Web Studio - inform Surf of its whereabouts -->
+			<web-studio>
+				<mode>disabled</mode>
+				<location>${contextPath}/proxy/alfresco-web-studio</location>
+			</web-studio>			
 
 		</web-framework>
 

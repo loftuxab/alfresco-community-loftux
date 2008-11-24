@@ -17,22 +17,19 @@ if(object != null)
     templateConfig = eval('(' + templateConfig + ')');        
   
     var rowsArray = templateConfig.rows;
-        
-    var tempRowsArray = new Array();
             
     for(var rowIndx=0;rowIndx<rowsArray.length;rowIndx++)
-    {        
-        if(!rowsArray[rowIndx].id.match(rowId))
-        {   
-            tempRowsArray.push(rowsArray[rowIndx]);
+    {            	 
+        if(String(rowsArray[rowIndx].id) == String(rowId))
+        {
+
+        	rowsArray.splice(rowIndx,1);
         }
     }   
-             
-    templateConfig.rows = tempRowsArray;
+
+    templateConfig.rows = rowsArray;
                             
     var tempString = templateConfig.toJSONString();                         
- 
- logger.log("tempString: " + tempString);
                                                 
     object.properties["config"] = tempString;
 

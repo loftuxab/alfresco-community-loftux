@@ -25,6 +25,7 @@ if(object != null)
 	// Get new values from form.
     var regionName = getJsonArrayValue(formElements, "name", "regionName");
     var regionScope = getJsonArrayValue(formElements, "name", "regionScope");
+    var regionHeight = getJsonArrayValue(formElements, "name", "regionHeight");    
 
 	// Convert to JS object.
     templateConfig = eval('(' + templateConfig + ')');        
@@ -46,8 +47,6 @@ if(object != null)
                 
                 var panelFound = false;
                 
-                tempPanelsArray = new Array();
-
 				// Look for panel that will be updated.                
 		        for(var panelIndx=0;panelIndx<panelsArray.length && !(panelFound);panelIndx++)
 		        {		        		        
@@ -61,26 +60,35 @@ if(object != null)
 
 						// Determine if we need to add a region, or update one.
     					if(actionFlag == "addRegion")
-    					{		                    
-							// create a new regions array                        
-							regionsArray = new Array();
-
+    					{		    
+    						
+    						var regionsArray = panelObject.regions;
+    						
+    						// Check for array. If not found,
+    						// let's create one.
+    						if(!regionsArray )
+    						{						    							
+    							// create a new regions array                        
+								regionsArray = new Array();									
+    						}
+    							
 							// create region object
 							regionObject = { };
-
+							
 							// set region attributes
-							regionObject.id = templateId + regionName;
+							regionObject.id = panelIndx + generateID();							
 							regionObject.name = regionName;
 							regionObject.scope = regionScope;
+							regionObject.height = regionHeight;
 
-							// add new region to new region array
+							// add new region to region array
 							regionsArray.push(regionObject);		                    
 
 							// add region array to panelObject
 							panelObject.regions = regionsArray;
 
 							// add panelObject back to panelsArray
-							tempPanelsArray.push(panelObject);														
+							panelsArray[panelIndx] = panelObject;							
 						} else if(actionFlag == "editRegion") {
 						
 							// Get region id from form element.
@@ -105,6 +113,7 @@ if(object != null)
 									// Set new attribute values.
 									regionObject.name = regionName;
 									regionObject.scope = regionScope; 
+									regionObject.height = regionHeight;									
 									
 									// Add update region back to regions array
 									regionsArray[regionIndx] = regionObject;
@@ -112,22 +121,24 @@ if(object != null)
 									// Add regions array back to panel object.
 									panelObject.regions = regionsArray;			
                 
-									// add panelObject back to panelsArray
-									tempPanelsArray.push(panelObject);							                					                					
+									// add panelObject back to panelsArray						                					                					
+									panelsArray[panelIndx] = panelObject;
 								}
 							}										
 						}
-		            } else {
-                        tempPanelsArray.push(panelsArray[panelIndx]);
-		            }		                                                                                            
+		            } 		                                                                                            
                 }
                 
-                templateConfig.rows.panels = tempPanelsArray;
+		        // Add panels array back to templateConfig.
+                templateConfig.rows.panels = panelsArray;		        
                             
+                // Prepare for sending.
                 var tempString = templateConfig.toJSONString();              
 
+                // Set string
                 object.properties["config"] = tempString;
 
+                // Save updated template config.
                 object.save();                
             }            
         }                                                             

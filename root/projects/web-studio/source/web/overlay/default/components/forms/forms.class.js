@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.Form = function() 
@@ -53,7 +52,7 @@ WebStudio.Form = function()
 	this.comboEls = [];
 	
 	this.focusElement = null;
-}
+};
 
 WebStudio.Form.prototype = new WebStudio.AbstractTemplater('WebStudio.Form');
 
@@ -61,45 +60,64 @@ WebStudio.Form.prototype.activate = function()
 {
 		this.buildGeneralLayer();
 		return this;
-}
+};
 
 WebStudio.Form.prototype.getFormData = function() 
 {
 	var elements = [];
 	
+	var i = 0;
+	var el = null;
+	
 	var inputs = this.BodyContent.el.getElementsBySelector("input,textarea");
-	for (var i = 0; i < inputs.length; i++) {	
-		var o = elements[i] = {};
+	for (i = 0; i < inputs.length; i++) 
+	{	
+		elements[i] = {};
+		var o = elements[i];
 		o.name = inputs[i].name;
 		o.value = inputs[i].value;	
-	}
-	
-	for(var i = 0, ln = this.radioBtns.length; i < ln; i++)
+	}	
+	for(i = 0, ln = this.radioBtns.length; i < ln; i++)
 	{
-		var el = {};
+		el = {};
 		el.name = this.radioBtns[i].getGroupName();
 		el.value = this.radioBtns[i].getCheckedValue();
 		elements.push(el);
 	}
-	for(var i = 0, ln = this.comboEls.length; i < ln; i++)
+	for(i = 0, ln = this.comboEls.length; i < ln; i++)
 	{
-		var el = {};
+		el = {};
 		el.name = this.comboEls[i].getName();
 		el.value = this.comboEls[i].getSelectedItemValue();
 		elements.push(el);
 	}
+	
 	return elements;
-}
+};
 
 WebStudio.Form.prototype.buildFormFields = function(data)
 {
+	// Create table that will contain the form elements.
+	var formTable = document.createElement("table");	
+	formTable.setAttribute("id", "wizard_form_table");
+	WebStudio.util.setStyle(formTable, "width", "100%");	
+	var formTBody = document.createElement("tbody");	
+	WebStudio.util.injectInside(formTable, formTBody);
+	
+	// Add table to container.
+	WebStudio.util.injectInside(this.BodyContent.el, formTable);	
+			
+	// Loop through fields for form and add them to the table.
 	for(var field in data)
 	{
-		this.buildFormCurrentField(data[field]);
-	}
-}
+		if(data.hasOwnProperty(field))
+		{
+			this.buildFormCurrentField(data[field], formTBody);
+		}
+	}	
+};
 
-WebStudio.Form.prototype.buildFormCurrentField = function(item)
+WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 {
 	var _this = this;
 	
@@ -108,8 +126,10 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item)
 	{
 		if(!item.hidden)
 		{
-			var bid = "_id" + (new Date().getTime()) + $random(0,10000);
-			if (item.type == "button") {
+			var _t = new Date().getTime();
+			var bid = "_id" + _t + "" + $random(0,10000);
+			if (item.type == "button") 
+			{
 				var el = new Element('input', {
 					id:bid,
 					value :item.text,
@@ -119,10 +139,15 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item)
 			var r = this.FooterContent.el;
 			var c1 = r.insertCell(-1);
 			c1.appendChild(el);
-			var yuibutton = new YAHOO.widget.Button(bid, {onclick: { fn: function() {
-				item.events.click((item.action) ? item.action : "", item.data);	
-			}
-			}});
+			var yuibutton = new YAHOO.widget.Button(bid, 
+			{
+				onclick: { 
+					fn: function() 
+					{
+						item.events.click((item.action ? item.action : ""), item.data);	
+					}
+				}
+			});
 			return true;
 		}
 	}
@@ -131,218 +156,256 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item)
 	if (item.content == "body")
 	{
 		if(item.type == 'text')
-		{
-			var control = this.AlfFormFieldText.el.clone();
-			control.injectInside(this.BodyContent.el);
-			var label = control.getElementsBySelector(".alf-form-label")[0];
-			var field = control.getElementsBySelector(".alf-form-field")[0];
+		{	
+			// wrap in a function so that variables are kept in
+			// a local scope
+			var f1 = function()
+			{	
+				// Create TR element
+				var tr = document.createElement("tr");
+	
+				// Add to Form's Table Body element.
+				WebStudio.util.injectInside(formTBody, tr);
+				
+				// Create TD for field label
+				var labelTD = document.createElement("td");			
+				
+				// Add to TR
+				WebStudio.util.injectInside(tr, labelTD);
+				
+				// Create tD for form field element
+				var fieldTD = document.createElement("td");
+				
+				// Add to TR
+				WebStudio.util.injectInside(tr, fieldTD);
+				
+				// Create text node.
+				var tn = document.createElement('text');			
+				
+				// Set text.
+				WebStudio.util.pushHTML(tn, item.label);
+				
+				// Add to label TD.
+				WebStudio.util.injectInside(labelTD, tn);				
+						
+				// Create input field node
+				var ifn = document.createElement('input');
+				
+				// Set name of input field
+				ifn.name = item.name;
+				
+				// Set input field value
+				ifn.value = item.value;						
+				
+				// Add input field node to fieldTD.
+				WebStudio.util.injectInside(fieldTD, ifn);
+			};
 			
-			label.innerHTML = item.label;
-			field.value = item.value;
-			field.name = item.name;
-			
-			var br = document.createElement("br");
-			br.injectInside(this.BodyContent.el);
-			
-			if(!this.focusElement)
-			{
-				this.focusElement = field;
-			}
+			// call the function right away
+			f1.bind(this).attempt();
 		}
 		if (item.type == 'textarea')
 		{
-			var control = this.AlfFormFieldTextArea.el.clone();
-			control.injectInside(this.BodyContent.el);
-			
-			var label = control.getElementsBySelector(".alf-form-label")[0];
-			var field = control.getElementsBySelector(".alf-form-field")[0];
-			
-			label.innerHTML = item.label;
-			field.value = item.value;
-			field.name = item.name;
-			
-			var br = document.createElement("br");
-			br.injectInside(this.BodyContent.el);
-
-			if(!this.focusElement)
+			// wrap in a function so that variables are kept in
+			// a local scope		
+			var f2 = function()
 			{
-				this.focusElement = field;
-			}			
+				// Create TR element
+				var tr = document.createElement("tr");
+	
+				// Add to Form's Table Body element.
+				WebStudio.util.injectInside(formTBody, tr);
+				
+				// Create TD for field label
+				var labelTD = document.createElement("td");			
+				
+				// Add to TR
+				WebStudio.util.injectInside(tr, labelTD);
+				
+				// Create tD for form field element
+				var fieldTD = document.createElement("td");
+				
+				// Add to TR
+				WebStudio.util.injectInside(tr, fieldTD);
+				
+				// Create text node.
+				var tn = document.createElement('text');			
+				
+				// Set text.
+				WebStudio.util.pushHTML(tn, item.label);
+				
+				// Add to label TD.
+				WebStudio.util.injectInside(labelTD, tn);				
+						
+				// Create input field node
+				var ifn = document.createElement('textarea');
+				
+				// Set name of input field
+				ifn.name = item.name;
+				
+				// Set input field value
+				ifn.value = item.value;						
+				
+				// Add input field node to fieldTD.
+				WebStudio.util.injectInside(fieldTD, ifn);
+			};
+			
+			// call the function right away
+			f2.bind(this).attempt();
 		}
 		if(item.type == 'hidden')
 		{
-			var hf = document.createElement('input');
-			hf.type = "hidden";
-			hf = $(hf);
-			hf.value = item.value;
-			hf.name = item.name;
-			hf.injectInside(this.BodyContent.el);
-
-			var br = document.createElement("br");
-			br.injectInside(this.BodyContent.el);			
-		}
-		if(item.type == "grid")
-		{
-			var gt = this.AlfFormFieldGrid.el.clone();
-			gt.injectInside(this.BodyContent.el);
-
-			//var gridTemplate = gt.getElementsBySelector('div[id=gridTemplate]')[0];
-			var toolPanel = gt.getElementsBySelector('div[id=gridToolbar]')[0];
-			var gridDataTable = gt.getElementsBySelector('div[id=gridDataTable]')[0];
-			item.dataTable = gridDataTable;
-
-			if(item.dataSource)
-			{
-				var table = new WebStudio.SelectSingleGrid("gridDataTable", item.columnFormats, item.columns, item.dataSource, {scrollable:true, width:"30em", height:"10em"});
-				// Subscribe to events for row selection
-				table.subscribe("rowMouseoverEvent", table.onEventHighlightRow);
-				table.subscribe("rowMouseoutEvent", table.onEventUnhighlightRow);
-				table.subscribe("rowClickEvent", table.onEventSelectRow);
-				this.grid = table;
-			}
-			else
-			{
-				if (item.nodatamessage)
-				{
-					gridDataTable.setHTML(item.nodatamessage);
-				}
-			}
+			// wrap in a function so that variables are kept in
+			// a local scope		
+			var f3 = function()
+			{		
+				var hf = document.createElement('input');
+				hf.type = "hidden";
+				hf.name = item.name;
+				hf = $(hf);
+				hf.value = item.value;
+				WebStudio.util.injectInside(this.BodyContent.el, hf);
+			};
 			
-			var _grid = this.grid;
-
-			if(item.toolbar)
-			{
-				item.toolbar.each(function(it)
-				{
-					var el = new Element('input',{
-						id: it.id,
-						type: "button"
-					});				
-					toolPanel.appendChild(el);
-
-					new YAHOO.widget.Button(it.id,{
-						type: "button",
-						title: it.tooltip,
-						label: it.text,
-						onclick:
-						{
-							fn: function()
-							{
-								var clickedId = it.id;
-								WebStudio.app.gridButtonClick(it.id, _grid);
-								
-								//item.toolbarhandler(it.id,null);
-							}
-						}
-					});
-				});
-			}
-			
-			var br = document.createElement("br");
-			br.injectInside(this.BodyContent.el);			
+			// call the function right away
+			f3.bind(this).attempt();
 		}
-		if('radio' == item.type)
+		if(item.type == 'radio')
 		{
-			if (item.controls)
-			{
-				var control = this.AlfFormRadio.el.clone();
-				control.injectInside(this.BodyContent.el);
-				var label = control.getElementsBySelector(".alf-form-label")[0];
-				var container = control.getElementsBySelector(".alf-form-field-container")[0];
-
-				// build the radio group				
-			    var radioGroup = new WebStudio.ButtonGroup(
-	   			{
-	         		id:  "buttongroup",
-	         		name:  item.name,
-					container:  container
-	        	});
+			// wrap in a function so that variables are kept in
+			// a local scope		
+			var f4 = function()
+			{			
+				if (item.controls)
+				{
+					var control = WebStudio.util.clone(this.AlfFormRadio.el);
 	
-				// copy in radio group items
-	      		item.controls.each(function(it)
-	      		{
-					radioGroup.addButton(
-					{
-						label: it.label,
-						value: it.value,
-						checked: it.checked || false
-					});
-	      		});
-	      		
-	      		// set up label
-	      		if(item.name)
-	      		{
-	      			label.innerHTML = item.name;
-	      		}
-	      		else
-	      		{
-	      			label.innerHTML = "";
-	      		}
-	      		
-				var br = document.createElement("br");
-				br.injectInside(this.BodyContent.el);
-			}
-			this.radioBtns.push(radioGroup);
-		}
-		if ('combo' == item.type)
-		{
-			var control = this.AlfFormCombo.el.clone();
-			control.injectInside(this.BodyContent.el);
-			var label = control.getElementsBySelector(".alf-form-label")[0];
-			var container = control.getElementsBySelector(".alf-form-field-container")[0];
+					WebStudio.util.injectInside(this.BodyContent.el, control);
 					
-			// build the dropdown list	
-			var dropdownlist = [];			
-			for (var i = 0; i < item.value.length; i++)
-			{
-				var menuitem = 
-				{
-					text: item.value[i][1],
-					value: item.value[i][0],
-					onclick:
-					{
-						fn: function(p_sType, p_aArgs, p_oItem)
+					var label = control.getElementsBySelector(".alf-form-label")[0];
+					var container = control.getElementsBySelector(".alf-form-field-container")[0];
+	
+					// build the radio group				
+				    var radioGroup = new WebStudio.ButtonGroup(
+		   			{
+		         		id:  "buttongroup",
+		         		name:  item.name,
+						container:  container
+		        	});
+		
+					// copy in radio group items
+		      		item.controls.each(function(it)
+		      		{
+						radioGroup.addButton(
 						{
-							nm.set("label", p_oItem.cfg.getProperty("text"));
-						}
-					}
+							label: it.label,
+							value: it.value,
+							checked: it.checked || false
+						});
+		      		});
+		      		
+		      		// set up label
+		      		if(item.name)
+		      		{
+						WebStudio.util.pushHTML(label, item.name);	      			
+		      		}
+		      		else
+		      		{
+						WebStudio.util.pushHTML(label, "");	      			
+		      		}
+		      		
+					var br = document.createElement("br");
+					WebStudio.util.injectInside(this.BodyContent.el, br);				
 				}
-				dropdownlist.push(menuitem);
-			}
+				this.radioBtns.push(radioGroup);
+			};
 			
-			// build the combo list
-			var combolist = 
-			{
-				type: "menu",
-				name: item.name,
-				menu: dropdownlist,
-				width: item.width,
-				container: container
-			}
-			if(!item.emptytext)
-			{
-				combolist.label = "";
-			}
-			else
-			{
-				combolist.label = item.emptytext; 
-			}
-			label.innerHTML = "";
-			if(item.name)
-			{
-				label.innerHTML = item.name;
-			}
-			if(item.title)
-			{
-				label.innerHTML = item.title;
-			}
-			var nm = new WebStudio.Combobox(combolist);
-			this.comboEls.push(nm);
-			
-			var br = document.createElement("br");
-			br.injectInside(this.BodyContent.el);
+			// call the function right away
+			f4.bind(this).attempt();
 		}
-		if ('url' == item.type)
+		if (item.type == 'combo')
+		{		
+			// wrap in a function so that variables are kept in
+			// a local scope				
+			var f5 = function()
+			{	
+				var br = document.createElement("br");
+				WebStudio.util.injectInside(this.BodyContent.el, br);
+				
+				var control = WebStudio.util.clone(this.AlfFormCombo.el);			
+				
+				WebStudio.util.injectInside(this.BodyContent.el, control);
+				
+				var label = control.getElementsBySelector(".alf-form-label")[0];
+	
+				var container = control.getElementsBySelector(".alf-form-field-container")[0];
+				
+				// build the dropdown list	
+				var dropdownlist = [];							
+				for (var i = 0; i < item.value.length; i++)
+				{
+					var menuitem = 
+					{
+						text: item.value[i][1],
+						value: item.value[i][0],
+						onclick: 
+						{
+							fn: _this.comboButtonClick.bind(_this)
+						}
+					};
+					dropdownlist.push(menuitem);
+				}				
+
+				// build the combo list
+				var combolist = 
+				{
+					type: "menu",
+					name: item.name,
+					menu: dropdownlist,
+					width: item.width,
+					container: container
+				};
+				if(!item.emptytext)
+				{
+					combolist.label = "";
+				}
+				else
+				{
+					combolist.label = item.emptytext; 
+				}
+	
+				WebStudio.util.pushHTML(label, "");
+				
+				if(item.name)
+				{
+					WebStudio.util.pushHTML(label, item.name);				
+				}
+				if(item.title)
+				{
+					WebStudio.util.pushHTML(label, item.title);				
+				}
+				var nm = new WebStudio.Combobox(combolist);
+				
+				this.comboEls.push(nm);
+				
+				// we have to walk back through the drop down list
+				// rebind the click handlers so they point to our
+				// combox instance
+				for(var t = 0; t < dropdownlist.length; t++)
+				{
+					// menu item
+					var mi = dropdownlist[t];
+					mi["onclick"] = { fn: _this.comboButtonClick.bind(nm) };
+				}
+								
+				var br9 = document.createElement("br");
+				WebStudio.util.injectInside(this.BodyContent.el, br9);
+			};
+			
+			// call the function right away
+			f5.bind(this).attempt();
+		}
+		if (item.type == 'url')
 		{
 			var superUrl = WebStudio.url.studio(item.url+"?contextPath="+WebStudio.url.studio(''));			
 			var fu = new Element('iframe',
@@ -356,20 +419,24 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item)
 				}
 			});	
 			
-			fu.injectInside(this.BodyContent.el);
-			
-			//var br = document.createElement("br");
-			//br.injectInside(this.BodyContent.el);			
+			WebStudio.util.injectInside(this.BodyContent.el, fu);			
 		}
 		if('html' == item.type)
 		{
-			this.BodyContent.el.innerHTML = item.html;
+			WebStudio.util.pushHTML(this.BodyContent.el, item.html);			
 		}
 		this.formType = item.type;
 	}	
-}
+};
 
 WebStudio.Form.prototype.getGrid = function()
 {
-	return (this.grid)? this.grid : null;
-}
+	return (this.grid ? this.grid : null);
+};
+
+// this = nm
+WebStudio.Form.prototype.comboButtonClick = function(p_sType, p_aArgs, p_oItem)
+{
+	var nm = this;
+	nm.set("label", p_oItem.cfg.getProperty("text"));
+};

@@ -112,21 +112,6 @@
 
 		</#if>
 
-		<#if useJW>
-
-			<div id="container">
-				<a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.
-			</div>
-			<script type="text/javascript">
-				var s1 = new SWFObject("${swfObjectPath}","ply","328","200","9","#FFFFFF");
-				s1.addParam("allowfullscreen","true");
-				s1.addParam("allowscriptaccess","always");
-				s1.addParam("flashvars","file=${src}&image=${swfImagePreview}");
-				s1.write("container");
-			</script>
-
-		</#if>
-
 	<#else>
 
 		${msg}

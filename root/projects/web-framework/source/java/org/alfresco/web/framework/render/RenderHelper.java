@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.model.Component;
@@ -40,6 +39,9 @@ import org.alfresco.web.framework.render.ProcessorContext.ProcessorDescriptor;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 
+/**
+ * @author muzquiano
+ */
 public class RenderHelper 
 {
     private static final String COMPONENTTYPE_WEBSCRIPT = "webscript";

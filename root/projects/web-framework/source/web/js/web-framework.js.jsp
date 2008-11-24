@@ -121,4 +121,4 @@ String.prototype.endsWith = function(str) { return (this.match(str+"$")==str); }
 //
 // Instances
 //
-var context = new Surf.RequestContext();
+Surf.context = new Surf.RequestContext();

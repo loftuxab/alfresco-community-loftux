@@ -24,21 +24,15 @@
  */
 package org.alfresco.web.framework.resource;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.alfresco.connector.Response;
-import org.alfresco.web.scripts.ScriptRemoteConnector;
-import org.alfresco.web.scripts.WebFrameworkScriptRemote;
+import org.alfresco.web.framework.exception.ResourceMetadataException;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.RequestUtil;
-import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * Resolves URI references to resources
  * 
  * @author muzquiano
  */
-public interface ResourceResolver 
+public interface ResourceResolver
 {
     /**
      * Returns the download URI for the given resource
@@ -46,7 +40,7 @@ public interface ResourceResolver
      * @param request
      * @return
      */
-    public String getDownloadURI(HttpServletRequest request);
+    public String getDownloadURI(RequestContext context);
 
     /**
      * Returns the proxied download URI for the given resource
@@ -54,15 +48,7 @@ public interface ResourceResolver
      * @param request
      * @return
      */
-    public String getProxiedDownloadURI(HttpServletRequest request);
-    
-    /**
-     * Returns the metadata URI for the given resource
-     * 
-     * @param request
-     * @return
-     */
-    public String getMetadataURI(HttpServletRequest request);
+    public String getProxiedDownloadURI(RequestContext context);
 
     /**
      * Returns the metadata URI for the given resource
@@ -70,22 +56,32 @@ public interface ResourceResolver
      * @param request
      * @return
      */
-    public String getProxiedMetadataURI(HttpServletRequest request);
-    
+    public String getMetadataURI(RequestContext context);
+
     /**
-     * Retrieves the container-formatted metadata for the 
-     * current resource
+     * Returns the metadata URI for the given resource
      * 
      * @param request
      * @return
      */
-    public String getMetadata(HttpServletRequest request);
-    
+    public String getProxiedMetadataURI(RequestContext context);
+
+    /**
+     * Retrieves the container-formatted metadata for the current
+     * resource
+     * 
+     * @param request
+     * @return
+     */
+    public String getMetadata(RequestContext context)
+            throws ResourceMetadataException;
+
     /**
      * Retrieves the raw metadata for the current resource
      * 
      * @param request
      * @return
      */
-    public String getRawMetadata(HttpServletRequest request);
+    public String getRawMetadata(RequestContext context)
+            throws ResourceMetadataException;
 }

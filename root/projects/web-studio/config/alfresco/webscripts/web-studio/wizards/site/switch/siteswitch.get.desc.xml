@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Switch Site Wizard</shortname>
-  <description>Switch Site Wizard</description>
-  <url>/wizard/site/switch</url>
-  <format default="json">argument</format>
-  <authentication>none</authentication>
-  <transaction>required</transaction>
-</webscript>

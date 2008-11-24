@@ -48,7 +48,7 @@ import org.json.JSONObject;
 public final class ScriptWizard implements Serializable
 {
     protected RequestContext context = null;
-    
+
     public ScriptWizard(RequestContext context)
     {
         this.context = context;
@@ -56,7 +56,7 @@ public final class ScriptWizard implements Serializable
 
     protected HttpServletRequest getHttpServletRequest()
     {
-    	return this.context.getRequest();
+        return this.context.getRequest();
     }
 
     // API
@@ -77,7 +77,7 @@ public final class ScriptWizard implements Serializable
         }
         catch (JSONException je)
         {
-        	FrameworkHelper.getLogger().error(je);
+            FrameworkHelper.getLogger().error(je);
         }
     }
 
@@ -89,7 +89,7 @@ public final class ScriptWizard implements Serializable
         }
         catch (JSONException je)
         {
-        	FrameworkHelper.getLogger().error(je);
+            FrameworkHelper.getLogger().error(je);
         }
     }
 
@@ -101,7 +101,7 @@ public final class ScriptWizard implements Serializable
         }
         catch (JSONException je)
         {
-        	FrameworkHelper.getLogger().error(je);
+            FrameworkHelper.getLogger().error(je);
         }
     }
 
@@ -177,7 +177,7 @@ public final class ScriptWizard implements Serializable
     protected void processRequest() throws DocumentException, JSONException
     {
         // arguments
-        //Map args = (Map) getModel().get("args");
+        // Map args = (Map) getModel().get("args");
         Description webscript = (Description) getModel().get("webscript");
 
         // load the wizard configuration
@@ -225,7 +225,8 @@ public final class ScriptWizard implements Serializable
             String start = page.attributeValue("start");
             String end = page.attributeValue("end");
 
-            // if the current page is null and this is the start page, use it
+            // if the current page is null and this is the start page,
+            // use it
             if (currentPageId == null && "true".equals(start))
                 currentPageId = pageId;
 
@@ -257,19 +258,24 @@ public final class ScriptWizard implements Serializable
                     {
                         Element button = (Element) buttons.get(j);
                         String buttonId = (String) button.attributeValue("id");
-                        String buttonLabel = (String) button.attributeValue("label");
-                        String buttonAction = (String) button.attributeValue("action");
-                        String buttonData = (String) button.attributeValue("data");
-                        String buttonEnabledString = (String) button.attributeValue("enabled");
-                        String buttonHiddenString = (String) button.attributeValue("hidden");
+                        String buttonLabel = (String) button
+                                .attributeValue("label");
+                        String buttonAction = (String) button
+                                .attributeValue("action");
+                        String buttonData = (String) button
+                                .attributeValue("data");
+                        String buttonEnabledString = (String) button
+                                .attributeValue("enabled");
+                        String buttonHiddenString = (String) button
+                                .attributeValue("hidden");
 
                         boolean buttonEnabled = true;
                         if ("false".equals(buttonEnabledString))
                             buttonEnabled = false;
-                        
+
                         boolean buttonHidden = false;
                         if ("true".equals(buttonHiddenString))
-                        	buttonHidden = true;
+                            buttonHidden = true;
 
                         // PUSH THIS BUTTON TO DIALOG OUTPUT
                         addButton(buttonId, buttonLabel, buttonAction,
@@ -289,7 +295,8 @@ public final class ScriptWizard implements Serializable
                     for (int k = 0; k < elements.size(); k++)
                     {
                         Element element = (Element) elements.get(k);
-                        String elementId = (String) element.attributeValue("id");
+                        String elementId = (String) element
+                                .attributeValue("id");
 
                         // push into the wizard session
                         JSONArray requestElements = null;
@@ -304,11 +311,15 @@ public final class ScriptWizard implements Serializable
                         {
                             for (int z = 0; z < requestElements.length(); z++)
                             {
-                                JSONObject requestElement = (JSONObject) requestElements.get(z);
-                                String requestElementName = (String) requestElement.get("name");
-                                if (requestElementName != null && requestElementName.equals(elementId))
+                                JSONObject requestElement = (JSONObject) requestElements
+                                        .get(z);
+                                String requestElementName = (String) requestElement
+                                        .get("name");
+                                if (requestElementName != null
+                                        && requestElementName.equals(elementId))
                                 {
-                                    String requestElementValue = (String) requestElement.get("value");
+                                    String requestElementValue = (String) requestElement
+                                            .get("value");
 
                                     this.sessionPut(requestElementName,
                                             requestElementValue);
@@ -334,15 +345,16 @@ public final class ScriptWizard implements Serializable
             {
                 this.setDialogType(currentPageType);
             }
-            
+
             // current page - title
-            String currentPageTitle = currentPageElement.attributeValue("title");
-            if(currentPageTitle != null && currentPageTitle.length() != 0)
+            String currentPageTitle = currentPageElement
+                    .attributeValue("title");
+            if (currentPageTitle != null && currentPageTitle.length() != 0)
             {
-            	this.setResponseTitle(currentPageTitle);
+                this.setResponseTitle(currentPageTitle);
             }
 
-            // process data elements (put in scope)			
+            // process data elements (put in scope)
             Element dataEl = currentPageElement.element("data");
             if (dataEl != null)
             {
@@ -353,7 +365,8 @@ public final class ScriptWizard implements Serializable
 
                     String elName = (String) el.attributeValue("id");
                     String elType = (String) el.attributeValue("type");
-                    String elDefaultValue = (String) el.attributeValue("defaultValue");
+                    String elDefaultValue = (String) el
+                            .attributeValue("defaultValue");
 
                     if ("String".equals(elType))
                     {
@@ -397,11 +410,11 @@ public final class ScriptWizard implements Serializable
         return (String) request.getString(name);
     }
 
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
     //
     // CURRENT PAGE METHODS
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     public void setCacheInvalidateAll() throws JSONException
     {
@@ -477,19 +490,19 @@ public final class ScriptWizard implements Serializable
             focus.put("focusCls", focusCls);
         current().put("focus", focus);
     }
-    
+
     public void setRedirectToPage(String pageId) throws JSONException
     {
-    	setResponseCode("redirect");
-    	current().put("redirect-type", "page");
-    	current().put("redirect-target", pageId);
+        setResponseCode("redirect");
+        current().put("redirect-type", "page");
+        current().put("redirect-target", pageId);
     }
-    
-    //////////////////////////////////////////////////////////
+
+    // ////////////////////////////////////////////////////////
     //
     // JSON STRUCTURE METHODS
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     protected JSONObject data() throws JSONException
     {
@@ -531,7 +544,7 @@ public final class ScriptWizard implements Serializable
         return ensureJSONObject(response, "current");
     }
 
-    /// Helpful JSON manip methods
+    // / Helpful JSON manip methods
 
     protected JSONObject ensureJSONObject(JSONObject obj, String objectName)
             throws JSONException
@@ -571,11 +584,11 @@ public final class ScriptWizard implements Serializable
         return a;
     }
 
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
     //
     // ELEMENTS
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     public void addElement(String name, String value) throws JSONException
     {
@@ -679,7 +692,7 @@ public final class ScriptWizard implements Serializable
         ourValue.put(selectionId);
         ourValue.put(selectionValue);
 
-        // add our value into the values array		
+        // add our value into the values array
         values.put(ourValue);
     }
 
@@ -701,11 +714,11 @@ public final class ScriptWizard implements Serializable
         return (String) getElementValue(name);
     }
 
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
     //
     // BUTTONS
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     public void addButton(String id, String text, String action, String data,
             boolean enabled, boolean hidden) throws JSONException
@@ -720,74 +733,69 @@ public final class ScriptWizard implements Serializable
             button.put("data", data);
         button.put("enabled", enabled);
         button.put("hidden", hidden);
-        
+
         // add in button
         buttons().put(button);
     }
-    
-    public JSONObject getButton(String id)
-    	throws JSONException
-	{
-    	JSONObject button = null;
-    	
-    	for(int i = 0; i < buttons().length(); i++)
-    	{
-    		JSONObject obj = buttons().getJSONObject(i);
-    		
-    		if(id.equalsIgnoreCase(obj.getString("id")))
-    		{
-    			button = obj;
-    		}
-    	}
-    	
-    	return button;	
-	}
-    
-    public void enableButton(String id)
-    	throws JSONException
+
+    public JSONObject getButton(String id) throws JSONException
     {
-    	JSONObject button = getButton(id);
-    	if(button != null)
-    	{
-    		button.put("enabled", true);
-    	}
+        JSONObject button = null;
+
+        for (int i = 0; i < buttons().length(); i++)
+        {
+            JSONObject obj = buttons().getJSONObject(i);
+
+            if (id.equalsIgnoreCase(obj.getString("id")))
+            {
+                button = obj;
+            }
+        }
+
+        return button;
     }
 
-    public void disableButton(String id)
-		throws JSONException
-	{
-    	JSONObject button = getButton(id);
-    	if(button != null)
-    	{
-    		button.put("enabled", false);
-    	}
-	}
-    
-    public void hideButton(String id)
-    	throws JSONException
+    public void enableButton(String id) throws JSONException
     {
-    	JSONObject button = getButton(id);
-    	if(button != null)
-    	{
-    		button.put("hidden", true);
-    	}    	
+        JSONObject button = getButton(id);
+        if (button != null)
+        {
+            button.put("enabled", true);
+        }
     }
-    
-    public void showButton(String id)
-    	throws JSONException
+
+    public void disableButton(String id) throws JSONException
     {
-    	JSONObject button = getButton(id);
-    	if(button != null)
-    	{
-    		button.put("hidden", false);
-    	}    	    	
+        JSONObject button = getButton(id);
+        if (button != null)
+        {
+            button.put("enabled", false);
+        }
     }
-    
-    //////////////////////////////////////////////////////////
+
+    public void hideButton(String id) throws JSONException
+    {
+        JSONObject button = getButton(id);
+        if (button != null)
+        {
+            button.put("hidden", true);
+        }
+    }
+
+    public void showButton(String id) throws JSONException
+    {
+        JSONObject button = getButton(id);
+        if (button != null)
+        {
+            button.put("hidden", false);
+        }
+    }
+
+    // ////////////////////////////////////////////////////////
     //
     // PAGE STATES
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     public void addPage(String id, String uri, boolean finish)
             throws JSONException
@@ -800,19 +808,16 @@ public final class ScriptWizard implements Serializable
         pages().put(page);
     }
 
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
     //
     // GRID
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     /*
-     public void addGridData(String gridData)
-     throws JSONException
-     {
-     JSONArray griddata = ensureJSONArray(grid(), "griddata");
-     griddata.put(gridData);
-     }
+     * public void addGridData(String gridData) throws JSONException {
+     * JSONArray griddata = ensureJSONArray(grid(), "griddata");
+     * griddata.put(gridData); }
      */
     public void addGridData(Object[] array) throws JSONException
     {
@@ -877,11 +882,11 @@ public final class ScriptWizard implements Serializable
         grid().put("nodatamessage", message);
     }
 
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
     //
     // WIZARD STATE
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     protected Map ensureMap()
     {
@@ -931,11 +936,11 @@ public final class ScriptWizard implements Serializable
         }
     }
 
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
     //
     // TOOLS
     //
-    //////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////
 
     public String getResponse()
     {
@@ -961,8 +966,8 @@ public final class ScriptWizard implements Serializable
         if (value == null)
             value = "";
         return value;
-    }   
-    
+    }
+
     public void setModel(Map<String, Object> model)
     {
         this.model = model;
@@ -973,5 +978,5 @@ public final class ScriptWizard implements Serializable
         return this.model;
     }
 
-    protected Map<String, Object> model;    
+    protected Map<String, Object> model;
 }

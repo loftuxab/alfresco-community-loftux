@@ -1,13 +1,9 @@
-<import resource="/include/support.js">
+<import resource="/components/common/js/component.js">
 
-var properties = instance.object.properties;
+// bind core properties and source
+WebStudio.Component.bind();
 
-model.title = form.bind("title", properties["title"], "");
-model.description = form.bind("description", properties["description"], "");
+// bind custom properties
+WebStudio.Component.bindProperty("imageText");
 
-// source bindings
-model.fetch = form.bind("fetch", properties["fetch"], "");
-model.source = form.bind("source", properties["source"], "");
 
-// image attributes
-model.imageText = form.bind("imageText", properties["imageText"], "");

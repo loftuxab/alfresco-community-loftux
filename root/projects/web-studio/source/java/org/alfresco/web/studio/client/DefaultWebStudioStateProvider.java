@@ -39,74 +39,86 @@ import org.alfresco.web.studio.WebStudio;
  * 
  * @author muzquiano
  */
-public class DefaultWebStudioStateProvider implements WebStudioStateProvider 
+public class DefaultWebStudioStateProvider implements WebStudioStateProvider
 {
-	public final static String SESSION_ATTR_WEBSTUDIO = "webstudio_incontext_state";
-	
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.studio.client.WebStudioStateProvider#provide(javax.servlet.http.HttpServletRequest)
-	 */
-	public synchronized WebStudioStateBean provide(HttpServletRequest request)
-	{
-		HttpSession session = request.getSession();
-		
-		WebStudioStateBean state = (WebStudioStateBean) session.getAttribute(SESSION_ATTR_WEBSTUDIO);
-		if(state == null)
-		{
-			state = new WebStudioStateBean();
-			session.setAttribute(SESSION_ATTR_WEBSTUDIO, state);
-			
-			// initialize the client state with settings from
-			// Web Studio configuration
+    public final static String SESSION_ATTR_WEBSTUDIO = "webstudio_incontext_state";
 
-			// applets
-			String[] appletIds = WebStudio.getConfig().getAppletIds();
-			for(int i = 0; i < appletIds.length; i++)
-			{
-				AppletDescriptor appletDescriptor = WebStudio.getConfig().getApplet(appletIds[i]);
-				
-				// create client-state container for the applet
-				AppletStateBean appletState = new AppletStateBean(appletDescriptor.getId());
-				appletState.setTitle(appletDescriptor.getTitle());
-				appletState.setDescription(appletDescriptor.getDescription());
-				appletState.setBootstrapClassname(appletDescriptor.getBootstrapClassName());
-				appletState.setBootstrapLocation(appletDescriptor.getBootstrapLocation());
-				
-				// add this applet to the webstudio state
-				state.applets.put(appletState.getId(), appletState);
-			}
-			
-			// applications
-			String[] appIds = WebStudio.getConfig().getApplicationIds();
-			for(int i = 0; i < appIds.length; i++)
-			{
-				ApplicationDescriptor appDescriptor = WebStudio.getConfig().getApplication(appIds[i]);
-				
-				// create client-state container for the application
-				ApplicationStateBean appState = new ApplicationStateBean(appDescriptor.getId());
-				appState.setTitle(appDescriptor.getTitle());
-				appState.setDescription(appDescriptor.getDescription());
-				appState.setBootstrapClassname(appDescriptor.getBootstrapClassName());
-				appState.setBootstrapLocation(appDescriptor.getBootstrapLocation());
-				
-				// add this application to the webstudio state
-				state.applications.put(appState.getId(), appState);
-				
-				// walk the included applets
-				List<String> includedAppletIds = appDescriptor.getAppletIncludes();
-				for(int z = 0; z < includedAppletIds.size(); z++)
-				{
-					String appletId = (String) includedAppletIds.get(z);
-					
-					AppletStateBean appletBean = state.getAppletState(appletId);
-					if(appletBean != null)
-					{
-						appState.applets.put(appletBean.getId(), appletBean);
-					}
-				}
-			}
-		}
-		
-		return state;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.studio.client.WebStudioStateProvider#provide(javax.servlet.http.HttpServletRequest)
+     */
+    public synchronized WebStudioStateBean provide(HttpServletRequest request)
+    {
+        HttpSession session = request.getSession();
+
+        WebStudioStateBean state = (WebStudioStateBean) session
+                .getAttribute(SESSION_ATTR_WEBSTUDIO);
+        if (state == null)
+        {
+            state = new WebStudioStateBean();
+            session.setAttribute(SESSION_ATTR_WEBSTUDIO, state);
+
+            // initialize the client state with settings from
+            // Web Studio configuration
+
+            // applets
+            String[] appletIds = WebStudio.getConfig().getAppletIds();
+            for (int i = 0; i < appletIds.length; i++)
+            {
+                AppletDescriptor appletDescriptor = WebStudio.getConfig()
+                        .getApplet(appletIds[i]);
+
+                // create client-state container for the applet
+                AppletStateBean appletState = new AppletStateBean(
+                        appletDescriptor.getId());
+                appletState.setTitle(appletDescriptor.getTitle());
+                appletState.setDescription(appletDescriptor.getDescription());
+                appletState.setBootstrapClassname(appletDescriptor
+                        .getBootstrapClassName());
+                appletState.setBootstrapLocation(appletDescriptor
+                        .getBootstrapLocation());
+
+                // add this applet to the webstudio state
+                state.applets.put(appletState.getId(), appletState);
+            }
+
+            // applications
+            String[] appIds = WebStudio.getConfig().getApplicationIds();
+            for (int i = 0; i < appIds.length; i++)
+            {
+                ApplicationDescriptor appDescriptor = WebStudio.getConfig()
+                        .getApplication(appIds[i]);
+
+                // create client-state container for the application
+                ApplicationStateBean appState = new ApplicationStateBean(
+                        appDescriptor.getId());
+                appState.setTitle(appDescriptor.getTitle());
+                appState.setDescription(appDescriptor.getDescription());
+                appState.setBootstrapClassname(appDescriptor
+                        .getBootstrapClassName());
+                appState.setBootstrapLocation(appDescriptor
+                        .getBootstrapLocation());
+
+                // add this application to the webstudio state
+                state.applications.put(appState.getId(), appState);
+
+                // walk the included applets
+                List<String> includedAppletIds = appDescriptor
+                        .getAppletIncludes();
+                for (int z = 0; z < includedAppletIds.size(); z++)
+                {
+                    String appletId = (String) includedAppletIds.get(z);
+
+                    AppletStateBean appletBean = state.getAppletState(appletId);
+                    if (appletBean != null)
+                    {
+                        appState.applets.put(appletBean.getId(), appletBean);
+                    }
+                }
+            }
+        }
+
+        return state;
+    }
 }

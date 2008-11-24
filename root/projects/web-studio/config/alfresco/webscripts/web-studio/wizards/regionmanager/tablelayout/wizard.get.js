@@ -14,9 +14,11 @@ wizard.addHiddenElement("rowId", rowId);
 wizard.addHiddenElement("panelId", panelId);    
 
 if (actionFlag == "addRegion") {
-
     wizard.addElement("regionName", "");
     wizard.addElementFormat("regionName", "Region Name", "textfield", 20);
+
+    wizard.addElement("regionHeight", "");
+    wizard.addElementFormat("regionHeight", "Height", "textfield", 20);
     
     wizard.addElement("regionScope", regionScope);
     wizard.addElementFormat("regionScope", "Scope", "combo", 290);
@@ -24,18 +26,26 @@ if (actionFlag == "addRegion") {
     wizard.addElementFormatKeyPair("regionScope", "emptyText", "Scope");
     wizard.addElementFormatKeyPair("regionScope", "title", "Scope");
 
-    wizard.addElementSelectionValue("regionScope", "Global", "Global");
-    wizard.addElementSelectionValue("regionScope", "Template", "Template");
-    wizard.addElementSelectionValue("regionScope", "Region", "Page");
+    wizard.addElementSelectionValue("regionScope", "global", "Global");
+    wizard.addElementSelectionValue("regionScope", "template", "Template");
+    wizard.addElementSelectionValue("regionScope", "page", "Page");
+} 
+else if (actionFlag == "editRegionSizes") 
+{
 
-    
-} else if (actionFlag == "editRegion") {
+	// Get regions for template/row/column.
+	// parms (templateId, rowId, columnId
+		
+	// Render form with current region sizes.
+	
+} 
+else if (actionFlag == "editRegion") 
+{
 
 	var regionId = wizard.request("regionId");
 
 	// get template instance for given ID.
 	var object = sitedata.getObject("template-instance", templateId);
-
 
 	// Retrieve the region that will get updated		
 	if(object != null) 
@@ -64,8 +74,6 @@ if (actionFlag == "addRegion") {
                 panelsArray = rowsArray[rowIndx].panels;
                 
                 var panelFound = false;
-                
-                tempPanelsArray = new Array();
 
 				// Look for panel that contains the region we will update.
 		        for(var panelIndx=0;panelIndx<panelsArray.length && !(panelFound);panelIndx++)
@@ -100,6 +108,8 @@ if (actionFlag == "addRegion") {
 								wizard.addElement("regionName", regionObject.name);
     							wizard.addElementFormat("regionName", "Region Name", "textfield", 20);
 
+    						    wizard.addElement("regionHeight", regionObject.height);
+    						    wizard.addElementFormat("regionHeight", "Height", "textfield", 20);    							
 
 								wizard.addElement("regionScope", regionScope);
 								wizard.addElementFormat("regionScope", "Scope", "combo", 290);
@@ -107,9 +117,9 @@ if (actionFlag == "addRegion") {
 								wizard.addElementFormatKeyPair("regionScope", "emptyText", "Scope");
 								wizard.addElementFormatKeyPair("regionScope", "title", "Scope");
 
-								wizard.addElementSelectionValue("regionScope", "Global", "Global");
-								wizard.addElementSelectionValue("regionScope", "Template", "Template");
-								wizard.addElementSelectionValue("regionScope", "Page", "Page");									
+								wizard.addElementSelectionValue("regionScope", "global", "Global");
+								wizard.addElementSelectionValue("regionScope", "template", "Template");
+								wizard.addElementSelectionValue("regionScope", "page", "Page");									
 							}
 						}		
 					}

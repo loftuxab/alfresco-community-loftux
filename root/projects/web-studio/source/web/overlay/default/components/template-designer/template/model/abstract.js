@@ -36,13 +36,15 @@ WebStudio.Templates.Model.Abstract = new Class({
 	// Reference to parent object.
 	this.parent = null;
 	
+	this.sequenceNumber = null;
+	
 	/**
 	 * Reference to Template designer, which is the 
 	 * the object that instantiated the tempate renderer.
 	 */
 	this.templateDesigner = templateDesigner;
 	
-	this.children = new Array();
+	this.children = [];
 	
 	this.CONTEXT_MENU_DIV = "templateContextMenuDiv";
 	this.CONTEXT_MENU_NAME = "templateContextMenu";
@@ -53,19 +55,19 @@ WebStudio.Templates.Model.Abstract = new Class({
 /** TO OVERRIDE **/
 WebStudio.Templates.Model.Abstract.prototype.init = function()
 {
-}
+};
 
 /** TO OVERRIDE **/
 WebStudio.Templates.Model.Abstract.prototype.getMenuConfiguration = function()
 {
 	// return null for no context menu
 	return null;
-}
+};
 
 /** @OVERRIDE **/
 WebStudio.Templates.Model.Abstract.prototype.render = function(container)
 {
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.destroy = function()
 {
@@ -94,7 +96,7 @@ WebStudio.Templates.Model.Abstract.prototype.destroy = function()
   
     // Destroy object's context menu.
     this.destroyMenu();    
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.destroyMenu = function(element)
 {
@@ -106,7 +108,7 @@ WebStudio.Templates.Model.Abstract.prototype.destroyMenu = function(element)
 
    // Check for a menu for this object in the menu manager
    var objContextMenu = YAHOO.widget.MenuManager.getMenu(this.CONTEXT_MENU_NAME);
-   if(objContextMenu != null && objContextMenu != 'undefined')
+   if(objContextMenu && objContextMenu != 'undefined')
    {
 		// Remove listeners for menu and all child notes.
 		YAHOO.util.Event.purgeElement(objContextMenu, true);
@@ -114,7 +116,7 @@ WebStudio.Templates.Model.Abstract.prototype.destroyMenu = function(element)
         // Remove menu from the menu manager.   
         YAHOO.widget.MenuManager.removeMenu(objContextMenu);
    }	
-}
+};
 
 /*
  *  Register event handlers for DOM element.
@@ -150,13 +152,12 @@ WebStudio.Templates.Model.Abstract.prototype.setupEvents = function(element)
                                  this.onClick, 
                                  this.element, 
                                  this);
-                                                                  
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getEditor = function()
 {
 	return this.templateDesigner.Editor.el;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getBindingProperties = function()
 {
@@ -197,46 +198,46 @@ WebStudio.Templates.Model.Abstract.prototype.getBindingProperties = function()
 		bindingProperties[this.getObjectType()] = this.getId();				
 	}	
 	return bindingProperties;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getParent = function()
 {
 	return this.parent;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setParent = function(parent)
 {
 	this.parent = parent;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getObjectType = function()
 {
 	return this.objectType;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setObjectType = function(objectType)
 {
 	this.objectType = objectType;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getElement = function()
 {
 	return this.el;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setElement = function(el)
 {
 	this.el = el;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getChildren = function()
 {
 	if(!this.children)
 	{
-		this.children = new Array();
+		this.children = [];
 	}
 	return this.children;
-}
+};
 
 /**
  * Adds a child
@@ -245,10 +246,10 @@ WebStudio.Templates.Model.Abstract.prototype.addChild = function(child)
 {
 	if(!this.children)
 	{
-		this.children = new Array();
+		this.children = [];
 	}
 	this.children[this.children.length] = child;   
-}
+};
 
 /**
  * Retrieves a child by id
@@ -259,7 +260,7 @@ WebStudio.Templates.Model.Abstract.prototype.getChild = function(id)
 	
 	if(!this.children)
 	{
-		this.children = new Array();
+		this.children = [];
 	}
 	for(var i = 0; i < this.children.length; i++)
 	{
@@ -274,22 +275,32 @@ WebStudio.Templates.Model.Abstract.prototype.getChild = function(id)
 	}
 
 	return _child;    
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.renderChildren = function(parentElement)
 {
 	var children = this.getChildren();
 	if(children)
-	{
-	
+	{	
 		for(var i = 0; i < children.length; i++)
-		{
+		{			
 			var child = children[i];
-			child.init(this);
+			
+			// Initialize child object.
+			// Pass it the parent object.
+			child.init(this);	
+			
+			// This will be used as the label for 
+			// components that don't have names,
+			// like rows and columns.
+			child.setSequenceNumber(i+1);
+			
+			// Call render method on child
+			// and pass in the container element.
 			child.render(parentElement);
 		} 
     }
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getChildCount = function()
 {
@@ -302,122 +313,132 @@ WebStudio.Templates.Model.Abstract.prototype.getChildCount = function()
 	}
 	
 	return size;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getId = function()
 {
     return this.id;    
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setTitle = function(title)
 {
 	this.title = title;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getTitle = function()
 {
     return this.title;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setDescription = function(description)
 {
     this.description = description;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getDescription = function()
 {
     return this.description;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setHeight = function(height)
 {
 	this.height = height;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getHeight = function()
 {
     return this.height;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setWidth = function(width)
 {
 	this.width = width;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getWidth = function()
 {
     return this.width;
-}
+};
+
+WebStudio.Templates.Model.Abstract.prototype.getSequenceNumber = function()
+{
+    return this.sequenceNumber;
+};
+
+WebStudio.Templates.Model.Abstract.prototype.setSequenceNumber = function(sequenceNumber)
+{
+	this.sequenceNumber = sequenceNumber;
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setCSS = function(css)
 {
     this.css = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getCSS = function()
 {
 	return this.css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setOnMouseOutCSS = function(css)
 {
     this.onMouseOutCSS = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getOnMouseOutCSS = function()
 {
 	return this.onMouseOutCSS;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setOnMouseOverCSS = function(css)
 {
     this.onMouseOverCSS = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getOnMouseOverCSS = function()
 {
 	return this.onMouseOverCSS;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setTitleOnMouseOutCSS = function(css)
 {
     this.titleOnMouseOutCSS = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getTitleOnMouseOutCSS = function()
 {
 	return this.titleOnMouseOutCSS;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setTitleOnMouseOverCSS = function(css)
 {
     this.titleOnMouseOverCSS = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getTitleOnMouseOverCSS = function()
 {
 	return this.titleOnMouseOverCSS;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setTitleCSS = function(css)
 {
     this.titleCSS = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getTitleCSS = function()
 {
 	return this.titleCSS;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setMenuCSS = function(css)
 {
     this.menuCSS = css;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getMenuCSS = function()
 {
 	return this.menuCSS;
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.onMouseOver = function(e, element)
 {    		
@@ -427,15 +448,16 @@ WebStudio.Templates.Model.Abstract.prototype.onMouseOver = function(e, element)
 	 // Determine title div name for this object.
 	 var objectType = this.getObjectType();
 	 var titleDivName = objectType + "_div_" + this.getId();
-	     
+	 var titleDiv = null;
+	    
 	 // Check target to see if
 	 // we are dealing with the element's title div.
 	 if(target.id == titleDivName)
 	 {
 	   	// Stop event from propagation to other DOM elements
-	    e.stopPropagation();
+        WebStudio.util.stopPropagation(e);
 		 
-	     var titleDiv = document.getElementById(titleDivName);
+		titleDiv = document.getElementById(titleDivName);
 	        
 	  	// Set the CSS on the title div
 	     YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOutCSS());	     
@@ -446,30 +468,20 @@ WebStudio.Templates.Model.Abstract.prototype.onMouseOver = function(e, element)
 	     YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOverCSS());	     	     
 	 } 
 	 else if( target.id == element.id)
-	 {   	    	
+	 {   	    
 	   	// Stop event from propagation to other DOM elements
-	    e.stopPropagation();
+        WebStudio.util.stopPropagation(e);		 
 
 	    YAHOO.util.Dom.removeClass(this.getElement(), this.getOnMouseOutCSS());	     
-	    YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOverCSS());	     
-	
-		//
-		// If the current element has specific width
-		// attribute set, let's make sure to not
-		// overwrite it with what could be in the css.
-		//			
-	    if(this.getWidth())
-	    {
-	      	element.setStyle("width", this.getWidth + "%");
-	    }
+	    YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOverCSS());
 	        
 	    // Finally, update the title div's CSS as well.
-	    var titleDiv = document.getElementById(titleDivName);
+	    titleDiv = document.getElementById(titleDivName);
 
 	    YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOutCSS());	     
 	    YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOverCSS());		            
-	 }	 
-}
+	 }
+};
 
 WebStudio.Templates.Model.Abstract.prototype.onMouseOut = function(e, element)
 {
@@ -481,54 +493,45 @@ WebStudio.Templates.Model.Abstract.prototype.onMouseOut = function(e, element)
     // Determine title div name for this object.
     var objectType = this.getObjectType();
     var titleDivName = objectType + "_div_" + this.getId();
+    var titleDiv = null;
 
     // Check target to see if it is the title div.    
     if(target.id == titleDivName)
     {
         // Stop event from propagation to other DOM elements
-        e.stopPropagation();
+        WebStudio.util.stopPropagation(e);    	
 
     	// Update root element's css
         YAHOO.util.Dom.removeClass(this.getElement(), this.getOnMouseOverCSS());
         YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOutCSS());        		
 
 		// Get the title div element
-        var titleDiv = document.getElementById(titleDivName);
+        titleDiv = document.getElementById(titleDivName);
         YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOverCSS());
         YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOutCSS());        		                
     }
     else if(target.id == element.id)    
     {
         // Stop event from propagation to other DOM elements
-        e.stopPropagation();
-
+        WebStudio.util.stopPropagation(e);
+        
     	// Update intended target.
         
         YAHOO.util.Dom.removeClass(element, this.getOnMouseOverCSS());
         YAHOO.util.Dom.addClass(element, this.getOnMouseOutCSS());        		
         
-		//
-		// If the current element has specific width
-		// attribute set, let's make sure to not
-		// overwrite it with what could be in the css.
-		//			
-        if(this.getWidth())
-        {
-        	element.setStyle("width", this.getWidth + "%");
-        }
-
         // Finally, update the current object's
         // title div's css as well.
-    	var titleDiv = document.getElementById(titleDivName);            	
+    	titleDiv = document.getElementById(titleDivName);            	
         YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOverCSS());
         YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOutCSS());        		
     }        
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.getContextMenuDivId = function()
 {
 	return "contextMenu_" + this.getId();
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype._createContextMenu = function()
 {
@@ -549,7 +552,8 @@ WebStudio.Templates.Model.Abstract.prototype._createContextMenu = function()
 	 * Add menu div container to 
 	 * current object's DOM element.
 	 */
-	contextMenuDiv.injectInside(this.getElement());          
+//	contextMenuDiv.injectInside(this.getElement());
+    WebStudio.util.injectInside(this.getElement(), contextMenuDiv);
 	
 	// Reference to context menu obj.                                            
 	var objContextMenu = null;      
@@ -561,13 +565,13 @@ WebStudio.Templates.Model.Abstract.prototype._createContextMenu = function()
 	 * If we find on, let's make sure it is defined
 	 * and then we can try to retrieve it from the YUI MenuManager
 	 */
-	if(contextMenuElement != null && contextMenuElement != 'undefined')
+	if(contextMenuElement && contextMenuElement != 'undefined')
 	{
 	    // Get menu from menu manager.
 	    objContextMenu = YAHOO.widget.MenuManager.getMenu(this.CONTEXT_MENU_NAME);
 	
 	    // Check for valid menu.
-	    if(objContextMenu != null && objContextMenu != 'undefined')
+	    if(objContextMenu && objContextMenu != 'undefined')
 	    {
 	        // Clear all menu content.
 	        objContextMenu.clearContent();                    
@@ -597,46 +601,45 @@ WebStudio.Templates.Model.Abstract.prototype._createContextMenu = function()
 	    YAHOO.widget.MenuManager.addMenu(objContextMenu);     
 	}    
 	return objContextMenu;
-}        
+};
 
 WebStudio.Templates.Model.Abstract.prototype._addMenuItems = function(objContextMenu) 
 {
 	var menuItems = this.getMenuItemsConfig();
 	
 	objContextMenu.addItems(menuItems);    
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.onClick = function(e, element)
 {
-	
     // Get click target.
     var target = YAHOO.util.Event.getTarget(e);    
     
     // Let's make sure that the onclick event was fired on the template.
-    if((target.id == element.id) && (target.id != ''))
+    if((target.id !== '') && (target.id == element.id))
     {
-        e.stopPropagation();
+        WebStudio.util.stopPropagation(e);
         
         // Create template menu. 
-        var objContextMenu = this._createContextMenu()                  
+        var objContextMenu = this._createContextMenu();                  
         
         // Attach menu to contextMenuDiv.
         objContextMenu.render(this.CONTEXT_MENU_DIV);
         // Make menu visibie.
         objContextMenu.show();
-        
+
         // Get DOM element for menu.
         var contextMenuElement = document.getElementById(this.CONTEXT_MENU_NAME);
 
         // Set position to absolute.        
-        contextMenuElement.setStyle('position', 'absolute');
+        WebStudio.util.setStyle(contextMenuElement, "position", "absolute");
         
-        // Set X,Y coordinates.
-        // todo: use the YAHOO.util.Event utility to get exact mouse position.              
-        contextMenuElement.setStyle('top', (e.clientY - 18));
-        contextMenuElement.setStyle('left', (e.clientX - 269));        
+        // Set X,Y coordinates.              
+        WebStudio.util.setStyle(contextMenuElement, 'top', (e.clientY - 18));
+        
+        WebStudio.util.setStyle(contextMenuElement, 'left', (e.clientX - 269));        
     }
-}
+};
 
 WebStudio.Templates.Model.Abstract.prototype.purgeElement = function(element) 
 {         
@@ -653,15 +656,15 @@ WebStudio.Templates.Model.Abstract.prototype.purgeElement = function(element)
 WebStudio.Templates.Model.Abstract.prototype.setHeight = function(height)
 {
 	this.height = height;
-} 
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setWidth = function(width)
 {
 	this.width = width;
-} 
+};
 
 WebStudio.Templates.Model.Abstract.prototype.setSize = function(width, height)
 {
 	this.width = width;
 	this.height = height;
-}
+};

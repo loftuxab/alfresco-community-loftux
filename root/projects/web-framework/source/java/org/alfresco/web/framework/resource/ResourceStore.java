@@ -24,14 +24,13 @@
  */
 package org.alfresco.web.framework.resource;
 
-
 /**
- * Interface which Resource abstractions can use to look up
- * attributes and values from resources.
+ * Interface which Resource abstractions can use to look up attributes
+ * and values from resources.
  * 
  * @author muzquiano
  */
-public interface ResourceStore 
+public interface ResourceStore
 {
     /**
      * Returns the names of attributes on the given resource
@@ -40,7 +39,7 @@ public interface ResourceStore
      * @return
      */
     public String[] getAttributeNames(String id);
-    
+
     /**
      * Returns the given attribute for the given resource
      * 
@@ -50,7 +49,7 @@ public interface ResourceStore
      * @return value
      */
     public String getAttribute(String id, String name);
-    
+
     /**
      * Sets an attribute for a given resource
      * 
@@ -59,16 +58,15 @@ public interface ResourceStore
      * @param value
      */
     public void setAttribute(String id, String name, String value);
-    
+
     /**
-     * Removes an attribute with the given name for the given
-     * resource
+     * Removes an attribute with the given name for the given resource
      * 
      * @param id
      * @param name
      */
     public void removeAttribute(String id, String name);
-    
+
     /**
      * Gets the resource data value
      * 
@@ -77,7 +75,7 @@ public interface ResourceStore
      * @return the value
      */
     public String getValue(String id);
-    
+
     /**
      * Sets the resource data value
      * 
@@ -86,5 +84,5 @@ public interface ResourceStore
      * 
      * @return the value
      */
-    public void setValue(String id, String value);    
+    public void setValue(String id, String value);
 }

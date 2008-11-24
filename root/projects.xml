@@ -3062,30 +3062,11 @@
    <target name="clean-webstudio" 
            depends="init">
       <clean projectdir="${dir.project.webstudio}" />
+      <delete dir="${dir.project.webstudio}/build/js" />
    </target>
    
    <target name="compile-webstudio" 
            depends="init">
-           
-      <!-- TODO: remove this and add dependency from /lib to thirdparty -->
-      <path id="classpath.compile">
-         <fileset dir="${dir.project.3rdparty.lib}">
-            <include name="**/*.jar" />
-         </fileset>
-         <fileset dir="${dir.projects}">
-            <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
-         </fileset>
-         <fileset dir="${dir.project.webstudio}">
-            <include name="**/${dir.name.lib}/*.jar" />
-         </fileset>
-         <fileset dir="${dir.modules}">
-            <include name="**/${dir.name.lib}/*.jar" />
-         </fileset>
-         <fileset dir="${dir.modules}">
-            <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
-         </fileset>
-      </path>
-           
       <compile-java projectdir="${dir.project.webstudio}" />
    </target>
    
@@ -3100,7 +3081,7 @@
    </target>
 
    <target name="package-webstudio-war" 
-           depends="assemble-webstudio-war">
+           depends="assemble-webstudio-war,minimize-webstudio-javascript">
       <war warfile="${dir.project.webstudio.dist}/${file.name.war.webstudio}" 
            webxml="${dir.project.webstudio.src.webinf}/web.xml">
          <fileset dir="${dir.project.webstudio.assemble}" />
@@ -3133,7 +3114,6 @@
          <fileset dir="${dir.projects}/web-framework-applibrary/config" excludes="**/extension/**" />
       </copy>
 
-
       <!-- add all JAR to WEB-INF/lib -->
       <copy todir="${dir.project.webstudio.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
@@ -3152,15 +3132,97 @@
                   includes="${file.name.jar.webstudio}" />
       </copy>
       
-      <!-- Auto Expand EXTJS and YUI into the Assembly -->
-      <!-- TOOD: Remove YUI -->
+      <!-- Auto Expand YUI into the Assembly -->
       <unzip src="${file.zip.webstudio.yui}"
              dest="${dir.project.webstudio.assemble}" />
       
       <!-- placeholder site-webscripts and templates folders are required -->
       <mkdir dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-webscripts" />
       <mkdir dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/templates" />
+
    </target>  
+   
+   <target name="minimize-webstudio-javascript">
+   
+   	<mkdir dir="${dir.project.webstudio}/build/js" />
+   	<mkdir dir="${dir.project.webstudio.assemble}/overlay/default/minimized" />
+   	
+	<taskdef name="jslint"
+	     classname="net.happygiraffe.jslint.ant.JSLintTask"
+             classpath="${dir.project.webstudio}/lib/jslint4java-1.2.1+rhino.jar" />
+                          
+	<echo>Validating the Web Studio Javascript files</echo>
+	<jslint options="browser,widget,evil,sub,passfail">
+		<formatter type="plain" />
+		<formatter type="xml" destfile="${dir.project.webstudio}/build/js/validation.xml" />
+		<fileset dir="${dir.project.webstudio}/source/web/overlay/default">
+			<include name="**/*.js" />
+			<exclude name="**/yui/**" />
+			<exclude name="**/jquery/**" />
+			<exclude name="**/mootools/**" />
+			<exclude name="**/htmlparser/**" />
+			<exclude name="**/*-min.js" />
+		</fileset>
+	</jslint>
+
+	<echo>Merging Web Studio Javascript to single file</echo>
+	<concat destfile="${dir.project.webstudio}/build/js/alf-web-studio.js" force="yes" binary="yes">
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/alf.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/alf.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/web-studio.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/alfresco.utils.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/abstract-templater.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/stretcher.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/YAHOOExtends.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/wizard.class.js" />
+		
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/abstract.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/dynamic-template.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/row.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/column.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/model/region.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/drop-down-list/drop-down-list.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/forms/forms.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/menu/menu.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/menu-new/menu-new.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/panel/panel.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/region/region.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/sliders-sector/sliders-sector.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/splitter/splitter.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/tree-view/tree-view.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/window/window.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/page-editor/page-editor.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/templates-view/templates-view.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template-designer.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/renderers/absolute.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/renderers/table.js" />
+
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/login-dialog.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/sandbox-dialog.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/cta-dialog.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/pta-dialog.class.js" />
+		
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/container/container.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/applications/abstract-application.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/applets/abstract-applet.class.js" />
+	</concat>
+	
+	<echo>Compressing Web Studio Javascript</echo>
+	<apply executable="java" parallel="false">
+		<fileset dir="${dir.project.webstudio}/build/js" includes="alf-web-studio.js"/>
+		<arg line="-jar"/>
+		<arg path="${dir.project.webstudio}/lib/yuicompressor-2.4.2.jar"/>
+		<srcfile/>
+		<arg line="-o"/>
+		<arg path="${dir.project.webstudio}/build/js/alf-web-studio.min.js"/>
+		<mapper type="glob" from="*.js" to="*-min.js"/>
+		<targetfile/>
+	</apply>
+	
+	<echo>Copy Compressed Web Studio Javascript to assembly</echo>
+	<copy file="${dir.project.webstudio}/build/js/alf-web-studio.min.js" todir="${dir.project.webstudio}/build/assemble/overlay/default/minimized"/>
+   
+   </target>
    
    <target name="test-webstudio" 
            depends="compile-webstudio">

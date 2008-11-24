@@ -132,12 +132,12 @@ public class WrappedRequestContext implements RequestContext
         return this.context.getCurrentObjectId();
     }
 
-    public void setCurrentObject(org.alfresco.web.site.Content content)
+    public void setCurrentObject(org.alfresco.web.framework.resource.ResourceContent content)
     {
         this.context.setCurrentObject(content);
     }
     
-    public org.alfresco.web.site.Content getCurrentObject()
+    public org.alfresco.web.framework.resource.ResourceContent getCurrentObject()
     {
         return this.context.getCurrentObject();
     }

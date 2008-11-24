@@ -25,6 +25,8 @@ if(templateId != null)
 	wizard.addHiddenElement("templateId", templateId);
 	wizard.addElement("templateName", templateName);
 	wizard.addElement("templateDescription", templateDescription);
+	wizard.addElement("templateHeight", templateHeight);	
+	wizard.addElement("templateWidth", templateWidth);	
 	wizard.addElementFormat("templateName", "Name", "textfield", 290);
 	wizard.addElementFormat("templateDescription", "Description", "textarea", 290);
 }

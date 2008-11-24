@@ -26,8 +26,8 @@ package org.alfresco.web.framework.resource;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.alfresco.web.framework.exception.ResourceMetadataException;
+import org.alfresco.web.site.RequestContext;
 
 /**
  * Defines a Web Framework model object resource
@@ -39,49 +39,49 @@ public interface Resource extends Serializable
     public static final String ATTR_ENDPOINT = "endpoint";
     public static final String ATTR_ID = "id";
     public static final String ATTR_TYPE = "type";
-    
+
     /**
      * Returns the id of the resource
      * 
      * @return the id
      */
     public String getId();
-    
+
     /**
      * Returns the type of the resource
      * 
      * @return the type
      */
     public String getType();
-    
+
     /**
      * Sets the type of the resource
      * 
      * @param type
      */
     public void setType(String type);
-    
+
     /**
      * Returns the endpoint of the resource
      * 
      * @return the endpoint
      */
     public String getEndpoint();
-    
+
     /**
      * Sets the endpoint of the resource
      * 
      * @param endpoint
      */
     public void setEndpoint(String endpoint);
-    
+
     /**
      * Returns the names of attributes
      * 
      * @return
      */
     public String[] getAttributeNames();
-    
+
     /**
      * Returns the attribute value for the given attribute name
      * 
@@ -90,7 +90,7 @@ public interface Resource extends Serializable
      * @return value
      */
     public String getAttribute(String name);
-    
+
     /**
      * Sets an attribute
      * 
@@ -98,54 +98,57 @@ public interface Resource extends Serializable
      * @param value
      */
     public void setAttribute(String name, String value);
-    
+
     /**
      * Removes an attribute
      * 
      * @param name
      */
     public void removeAttribute(String name);
-    
+
     /**
      * Gets the resource value
      * 
      * @return the value
      */
     public String getValue();
-    
+
     /**
      * Sets the resource value
      */
     public void setValue(String value);
-    
+
     /**
      * Provides the URI required to retrieve the content stream
-     *  
-     * @return
-     */
-    public String getDownloadURI(HttpServletRequest request);
-
-    /**
-     * Provides the Proxied URI required to retrieve the content stream
-     *  
-     * @return
-     */
-    public String getProxiedDownloadURI(HttpServletRequest request);
-    
-    /**
-     * Provides the URI required to access the metadata of the resource
      * 
      * @return
      */
-    public String getMetadataURI(HttpServletRequest request);
+    public String getDownloadURI(RequestContext context);
 
     /**
-     * Provides the URI required to access the metadata of the resource
+     * Provides the Proxied URI required to retrieve the content
+     * stream
      * 
      * @return
      */
-    public String getProxiedMetadataURI(HttpServletRequest request);
-    
+    public String getProxiedDownloadURI(RequestContext context);
+
+    /**
+     * Provides the URI required to access the metadata of the
+     * resource
+     * 
+     * @return
+     */
+    public String getMetadataURI(RequestContext context);
+
+    /**
+     * Provides the URI required to access the metadata of the
+     * resource
+     * 
+     * @return
+     */
+    public String getProxiedMetadataURI(RequestContext context);
+
     /**
      * Fetches the raw metadata from the remote storage location
      * 
@@ -153,15 +156,26 @@ public interface Resource extends Serializable
      * 
      * @return
      */
-    public String getRawMetadata(HttpServletRequest request);
+    public String getRawMetadata(RequestContext context)
+            throws ResourceMetadataException;
 
     /**
-     * Fetches the common-container formatted metadata from 
-     * the remote storage location
+     * Fetches the common-container formatted metadata from the remote
+     * storage location
      * 
      * @param request
      * 
      * @return
      */
-    public String getMetadata(HttpServletRequest request);    
+    public String getMetadata(RequestContext context)
+            throws ResourceMetadataException;
+
+    /**
+     * Returns a Content object representing the metadata of the
+     * object
+     * 
+     * @return
+     */
+    public ResourceContent getContent(RequestContext context);
+
 }
