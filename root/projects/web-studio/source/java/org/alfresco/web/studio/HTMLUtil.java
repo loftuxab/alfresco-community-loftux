@@ -47,36 +47,23 @@ public class HTMLUtil
             HttpServletResponse response, String renditionRelativePath,
             String originalRelativePath) throws ServletException
     {
-    	/*
-        RequestContext context = null;
-        try
-        {
-        	context = RequestUtil.getRequestContext(request);
-        }
-        catch(RequestContextException rce)
-        {
-        	throw new ServletException("Unable to locate request context in the request", rce);
-        }
-
-        // process the tags in the html
-        // this executes and commits to the writer
-        try
-        {
-            // load the html
-            IFile file = context.getFileSystem().getFile(renditionRelativePath);        
-            InputStream input = file.getInputStream();
-            String unprocessedHtml = DataUtil.copyToString(input, true);
-
-            // process the html
-            String content = FilterUtil.filterContent(context, request, response,
-                    unprocessedHtml, originalRelativePath);
-            response.getWriter().write(content);
-        }
-        catch (Exception ex)
-        {
-            throw new ServletException(ex);
-        }
-        */
+        /*
+         * RequestContext context = null; try { context =
+         * RequestUtil.getRequestContext(request); }
+         * catch(RequestContextException rce) { throw new
+         * ServletException("Unable to locate request context in the
+         * request", rce); }
+         *  // process the tags in the html // this executes and
+         * commits to the writer try { // load the html IFile file =
+         * context.getFileSystem().getFile(renditionRelativePath);
+         * InputStream input = file.getInputStream(); String
+         * unprocessedHtml = DataUtil.copyToString(input, true);
+         *  // process the html String content =
+         * FilterUtil.filterContent(context, request, response,
+         * unprocessedHtml, originalRelativePath);
+         * response.getWriter().write(content); } catch (Exception ex) {
+         * throw new ServletException(ex); }
+         */
     }
 
     /**
@@ -92,35 +79,24 @@ public class HTMLUtil
             HttpServletResponse response, String renditionRelativePath)
             throws ServletException
     {
-    	/*
-        RequestContext context = null;
-        try
-        {
-        	context = RequestUtil.getRequestContext(request);
-        }
-        catch(RequestContextException rce)
-        {
-        	throw new ServletException("Unable to locate request context in the request", rce);
-        }
-
-        try
-        {
-            // load the html
-            IFile file = context.getFileSystem().getFile(renditionRelativePath);        
-            InputStream input = file.getInputStream();
-            String unprocessedHtml = DataUtil.copyToString(input, true);
-            
-            // process the tags in the html
-            // this executes and commits to the writer
-            String content = FilterUtil.filterContent(context, request, response,
-                    unprocessedHtml, renditionRelativePath);
-            response.getWriter().write(content);
-        }
-        catch (Exception ex)
-        {
-            throw new ServletException(ex);
-        }
-        */
+        /*
+         * RequestContext context = null; try { context =
+         * RequestUtil.getRequestContext(request); }
+         * catch(RequestContextException rce) { throw new
+         * ServletException("Unable to locate request context in the
+         * request", rce); }
+         * 
+         * try { // load the html IFile file =
+         * context.getFileSystem().getFile(renditionRelativePath);
+         * InputStream input = file.getInputStream(); String
+         * unprocessedHtml = DataUtil.copyToString(input, true);
+         *  // process the tags in the html // this executes and
+         * commits to the writer String content =
+         * FilterUtil.filterContent(context, request, response,
+         * unprocessedHtml, renditionRelativePath);
+         * response.getWriter().write(content); } catch (Exception ex) {
+         * throw new ServletException(ex); }
+         */
     }
-	
+
 }

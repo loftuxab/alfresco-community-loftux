@@ -5,9 +5,7 @@
 <%
 	RenderContext context = RenderUtil.getContext(request);
 	
-	int statusCode = context.getCurrentObject().getStatusCode();
-	String statusMessage = context.getCurrentObject().getStatusMessage();
-	Throwable t = (Throwable) context.getCurrentObject().getStatusException();
+	Throwable t = (Throwable) context.getCurrentObject().getLoaderException();
 	String objectId = context.getCurrentObjectId();
 %>
 
@@ -45,12 +43,6 @@ function toggle(id)
 	<table width="100%">
 		<tr>
 			<td nowrap>Object ID</td><td><%=objectId%></td>
-		</tr>
-		<tr>
-			<td nowrap>Code</td><td><%=statusCode%></td>
-		</tr>
-		<tr>
-			<td nowrap>Message</td><td><%=statusMessage%></td>
 		</tr>
 	</table>
 	<table width="100%">

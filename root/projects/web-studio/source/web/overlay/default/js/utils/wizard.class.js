@@ -1,6 +1,6 @@
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.Wizard = function()
@@ -50,6 +50,8 @@ WebStudio.Wizard.prototype.stop = function()
 
 WebStudio.Wizard.prototype.loadFormData = function(url, json)
 {
+	var _this = this;
+	
 	// TODO: Not happy with this, need to fix the way that
 	// URLs are constructed
 	if(url.indexOf("?") > -1)
@@ -64,19 +66,19 @@ WebStudio.Wizard.prototype.loadFormData = function(url, json)
 	
 	this.call = YAHOO.util.Connect.asyncRequest('GET', url, {
 	
-		success: (function(r) {
+		success: function(r) {
 			
 			var d = eval('(' + r.responseText + ')');
 			
-			this.closeWaitWindow();
-			if(this.activewPage.window)
+			_this.closeWaitWindow();
+			if(_this.activewPage.window)
 			{
-				this.activewPage.window.destroy();
+				_this.activewPage.window.destroy();
 			}
 			
 			var proceed = true;
 			
-			if(d.current != null)
+			if(d.current)
 			{
 				if(d.current.code == "finish")
 				{
@@ -95,14 +97,14 @@ WebStudio.Wizard.prototype.loadFormData = function(url, json)
 			
 			if(proceed)
 			{
-				this.buildPage(d);
+				_this.buildPage(d);
 			}
 			else
 			{
-        		this.stop();
-        		this.closeWaitWindow();			
+        		_this.stop();
+        		_this.closeWaitWindow();			
 			}
-		}).bind(this)
+		}
 		,
 		failure: function(r) {
 		
@@ -123,12 +125,15 @@ WebStudio.Wizard.prototype.getDefaultJSONRequest = function(windowId, defaultJso
 	json["windowId"] = windowId;
 	json["schema"] = "adw10";
 
-	if(defaultJson != null)
+	if(defaultJson)
 	{
 		for(var key in defaultJson)
 		{
-			var val = defaultJson[key];
-			json[key] = val;
+			if(defaultJson.hasOwnProperty(key))
+			{
+				var val = defaultJson[key];
+				json[key] = val;
+			}
 		}
 	}
 
@@ -139,18 +144,6 @@ WebStudio.Wizard.prototype.setDefaultJson = function(defaultJson)
 {
 	this.defaultJson = 	defaultJson;
 };
-
-/*
-WebStudio.Wizard.prototype.loadFormDataCallback = function(data, x)
-{
-	this.closeWaitWindow();
-	if(this.activewPage.window)
-	{
-		this.activewPage.window.destroy();
-	}
-	this.buildPage(data);
-};
-*/
 
 WebStudio.Wizard.prototype.buildPage = function(data)
 {
@@ -276,21 +269,21 @@ WebStudio.WizardPage.prototype.parseFormData = function(formData)
 			d["type"] = "combo";
 			d["content"] = "body";			
 			var emptyText = this.getElementFormatValue(formData, el.name, "emptyText");
-			if(emptyText != null)
+			if(emptyText)
 			{
 				d["emptytext"] = emptyText;
 			}
 		}
 		else
 		{
-			d["type"] = (el.type == "textfield") ? "text" : (el.type || "hidden");
+			d["type"] = (el.type == "textfield" ? "text" : (el.type || "hidden"));
 			d["value"] = property[i].value;
-			d["label"] = (el.label) ? el.label + ":" : "";
+			d["label"] = (el.label ? el.label + ":" : "");
 			d["content"] = "body";
 			d["name"] = el.name;
 			d["style"] = {};
 			var s = d["style"];
-			s["width"] = (el.width)?el.width:290;	
+			s["width"] = (el.width?el.width:290);	
 		}       
    	}
 
@@ -302,7 +295,7 @@ WebStudio.WizardPage.prototype.parseFormData = function(formData)
 WebStudio.WizardPage.prototype.getElementFormatValue = function(data, name, propertyName)
 {
 	var array = data.elementformats;
-	if(array != null)
+	if(array)
 	{
 		for(var i = 0; i < array.length; i++)
 		{
@@ -319,7 +312,7 @@ WebStudio.WizardPage.prototype.getElementFormatValue = function(data, name, prop
 WebStudio.WizardPage.prototype.getElementSelectionValues = function(data, elementId)
 {
 	var array = data.elementvalues;
-	if(array != null)
+	if(array)
 	{
 		var values = array[elementId];
 		return values;
@@ -330,6 +323,12 @@ WebStudio.WizardPage.prototype.getElementSelectionValues = function(data, elemen
 WebStudio.WizardPage.prototype.parseFooterControls = function(data, footerControls)
 {
 	var _this = this;
+	
+	var f = function(action, data)
+	{
+		_this.onButtonClick(action,data);
+	};
+	
 	for(var i=0;i<footerControls.length;i++)
 	{
 		var b = footerControls[i];
@@ -341,18 +340,16 @@ WebStudio.WizardPage.prototype.parseFooterControls = function(data, footerContro
 		el["hidden"] = b.hidden;
 		el["text"] = b.text;
 		el["content"] = "footer";
-		el["data"] = (b.data)?b.data:"";
+		el["data"] = (b.data?b.data:"");
 		el["events"] = {};
 		var ev = el["events"];
-		ev["click"] = function (action,data) {
-			_this.onButtonClick(action,data);
-		};
+		ev["click"] = f;
 	}
 };
 
 WebStudio.WizardPage.prototype.parsePageData = function(data)
 {
-	var config =  (data.current)?data.current:null;
+	var config =  (data.current?data.current:null);
 	return config;
 };
 
@@ -445,7 +442,8 @@ WebStudio.Wizard.prototype.buildWaitWindow = function()
 
    this.waitWindow.setTemplateByDOMObject(WebStudio.App.AlfrescoMessageBoxProgressBar.el);
    this.waitWindow.activate();
-   this.waitWindow.AWMessageContainerPB.el.setHTML("Please wait...");
+//   this.waitWindow.AWMessageContainerPB.el.setHTML("Please wait...");
+   WebStudio.util.pushHTML(this.waitWindow.AWMessageContainerPB.el, "Please wait...");
    this.waitWindow.hide();
 };
 
@@ -475,6 +473,8 @@ WebStudio.WizardPage.prototype._init = function(data)
 	this.window.onClose = function(){
 		_this.onButtonClick('cancel');
 	};
+	
+	var ud = null;
 
 	if(this.config.dialogtype == "form")
 	{
@@ -493,7 +493,10 @@ WebStudio.WizardPage.prototype._init = function(data)
 
 			this.window.setTemplateByDOMObject(WebStudio.App.AlfrescoMessageBoxTmplate.el);
 			this.window.activate();
-			this.window.MessageContainer.el.setHTML(this.config.message);
+			
+//			this.window.MessageContainer.el.setHTML(this.config.message);
+			WebStudio.util.pushHTML(this.window.MessageContainer.el, this.config.message);			
+			
 			this.window.setTitle(this.config.title);
 			this.window.zIndexUpper = 2000;
 			var btnyui = new YAHOO.widget.Button("AWButtonOk", {onclick: { fn: this.onButtonClick.pass(['close'],this) } } );
@@ -538,7 +541,7 @@ WebStudio.WizardPage.prototype._init = function(data)
 
 	if("url" == this.config.dialogtype)
 	{
-		var ud = {};
+		ud = {};
 		ud[this.config.id] = {};
 		var d = ud[this.config.id];
 		d.type = "url";
@@ -562,7 +565,7 @@ WebStudio.WizardPage.prototype._init = function(data)
 
 	if("html" == this.config.dialogtype)
 	{
-		var ud = {};
+		ud = {};
 		ud[this.config.id] = {};
 		var da = ud[this.config.id];
 		da.type = "html";

@@ -24,30 +24,33 @@
  */
 package org.alfresco.web.framework.resource;
 
-import javax.servlet.http.HttpServletRequest;
+import org.alfresco.web.framework.exception.ResourceMetadataException;
+import org.alfresco.web.site.RequestContext;
 
 /**
  * @author muzquiano
  */
-public class ResourceImpl extends AbstractResource 
+public class ResourceImpl extends AbstractResource
 {
     protected ResourceResolver resolver = null;
+    protected String metadata = null;
+    protected String rawMetadata = null;
 
     public ResourceImpl(ResourceStore store, String id)
     {
         super(store, id);
-        
-        this.init(getType());        
+
+        this.init(getType());
     }
-    
+
     public ResourceImpl(ResourceStore store, String id, String type)
     {
         super(store, id);
-        
+
         this.init(type);
 
     }
-    
+
     protected void init(String type)
     {
         if ("site".equals(type))
@@ -67,53 +70,76 @@ public class ResourceImpl extends AbstractResource
             resolver = new URIResourceResolver(this);
         }
     }
-        
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.Resource#getDownloadURI(javax.servlet.http.HttpServletRequest)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.Resource#getDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getDownloadURI(HttpServletRequest request)
+    public String getDownloadURI(RequestContext context)
     {
-        return resolver.getDownloadURI(request);
+        return resolver.getDownloadURI(context);
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.Resource#getProxiedDownloadURI(javax.servlet.http.HttpServletRequest)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.Resource#getProxiedDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedDownloadURI(HttpServletRequest request)
+    public String getProxiedDownloadURI(RequestContext context)
     {
-        return resolver.getProxiedDownloadURI(request);
-    }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.Resource#getMetadataURI(javax.servlet.http.HttpServletRequest)
-     */
-    public String getMetadataURI(HttpServletRequest request)
-    {
-        return resolver.getMetadataURI(request);
-    }        
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.Resource#getProxiedMetadataURI(javax.servlet.http.HttpServletRequest)
-     */
-    public String getProxiedMetadataURI(HttpServletRequest request)
-    {
-        return resolver.getProxiedMetadataURI(request);
-    }        
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.Resource#rawMetadata(javax.servlet.http.HttpServletRequest)
-     */
-    public String getRawMetadata(HttpServletRequest request)
-    {
-        return resolver.getRawMetadata(request);
+        return resolver.getProxiedDownloadURI(context);
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.Resource#metadata(javax.servlet.http.HttpServletRequest)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.Resource#getMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getMetadata(HttpServletRequest request)
+    public String getMetadataURI(RequestContext context)
     {
-        return resolver.getMetadata(request);
+        return resolver.getMetadataURI(context);
     }
-    
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.Resource#getProxiedMetadataURI(org.alfresco.web.site.RequestContext)
+     */
+    public String getProxiedMetadataURI(RequestContext context)
+    {
+        return resolver.getProxiedMetadataURI(context);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.Resource#getRawMetadata(org.alfresco.web.site.RequestContext)
+     */
+    public String getRawMetadata(RequestContext context)
+            throws ResourceMetadataException
+    {
+        if (this.rawMetadata == null)
+        {
+            this.rawMetadata = resolver.getRawMetadata(context);
+        }
+
+        return this.rawMetadata;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.Resource#getMetadata(org.alfresco.web.site.RequestContext)
+     */
+    public String getMetadata(RequestContext context)
+            throws ResourceMetadataException
+    {
+        if (this.metadata == null)
+        {
+            this.metadata = resolver.getMetadata(context);
+        }
+
+        return this.metadata;
+    }
 }

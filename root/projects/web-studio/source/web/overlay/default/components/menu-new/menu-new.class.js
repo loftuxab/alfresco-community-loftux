@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.MenuNew = function() 
@@ -44,33 +43,37 @@ WebStudio.MenuNew = function()
 			selector:'span[id=AlfRootMenuHolder]',
 			remove:true
 		}
-	}
+	};
 
 	this.rootItems = {};
 	this.activeRootItem = null;
 	this.stretcher = null;
 	this._init();
-
-}
+};
 
 WebStudio.MenuNew.prototype = new WebStudio.AbstractTemplater('WebStudio.MenuNew');
 
 WebStudio.MenuNew.prototype._init = function()
 {
 	var _this = this;
-	document.addEvent('click', (function() {
-		if(_this.activeRootItem)_this.activeRootItem.hide();
-	}).bind(this));
+	document.addEvent('click', function() {
+		if(_this.activeRootItem)
+		{
+			_this.activeRootItem.hide();
+		}
+	});
 
-	 this.stretcher = new WebStudio.Stretcher({size: 12,weight: "normal"});
-}
+	this.stretcher = new WebStudio.Stretcher({size: 12,weight: "normal"});
+};
 
 WebStudio.MenuNew.prototype.activate = function()
 {
 	this.buildGeneralLayer();
-}
+};
 
-WebStudio.MenuNew.prototype.onItemClick = function(id,data){}
+WebStudio.MenuNew.prototype.onItemClick = function(id,data)
+{
+};
 
 WebStudio.MenuNew.prototype.addRootItem = function(id,value,imgSrc)
 {
@@ -80,7 +83,8 @@ WebStudio.MenuNew.prototype.addRootItem = function(id,value,imgSrc)
 	var ch = he.getElementsBySelector('span[id=AlfRootMenuCaptionHolder]')[0];
 	ch.setHTML(value);
 
-	if (imgSrc) {
+	if (imgSrc) 
+	{
 		var ih = this.AlfRootMenuCaptionImg.el.clone();
 		var h =  he.getElementsBySelector('span[id=AlfRootMenuCaptionImgholder]')[0];
 		ih.injectInside(h);
@@ -90,43 +94,31 @@ WebStudio.MenuNew.prototype.addRootItem = function(id,value,imgSrc)
 	var ri = new WebStudio.MenuRootItem(id,he,this);
 	this.rootItems[id] = ri;
 	return ri; 
-}
+};
 
 WebStudio.MenuNew.prototype.show = function()
 {
-	/*var fs = new Fx.Styles(this.generalLayer, {
-		duration: 0,
-		transition: Fx.Transitions.linear
-	});
-	fs.start({'opacity': 1});*/
 	this.generalLayer.style.visibility = '';
 	this.isHide = false;
 	this.isShow = true;
 	return this;
-}
+};
 
 WebStudio.MenuNew.prototype.showFast = function()
 {
-	//this.generalLayer.setOpacity(1);
 	this.generalLayer.style.visibility = '';
 	this.isHide = false;
 	this.isShow = true;
 	return this;
-}
+};
 
 WebStudio.MenuNew.prototype.hide = function()
 {
-	/*var fs = new Fx.Styles(this.generalLayer, {
-		duration: 0,
-		transition: Fx.Transitions.linear
-	});
-	fs.start({'opacity': 0});*/
 	this.generalLayer.style.visibility = 'hidden';
-	
 	this.isHide = true;
 	this.isShow = false;
 	return this;
-}
+};
 
 WebStudio.MenuRootItem = function(id,he,menu)
 {
@@ -138,7 +130,7 @@ WebStudio.MenuRootItem = function(id,he,menu)
     this.ih.injectInside(document.body);
     this.ch = this.he.getElementsBySelector('span[id=AlfRootMenuCaptionHolder]')[0];
 	this._init();
-}
+};
 
 WebStudio.MenuRootItem.prototype._init = function()
 {
@@ -152,7 +144,10 @@ WebStudio.MenuRootItem.prototype._init = function()
 
 	this.he.addEvent("mouseover",function(e){
 		e = new Event(e);
-        if(_this.menu.activeRootItem)_this.onRootItemClick();
+        if(_this.menu.activeRootItem)
+        {
+        	_this.onRootItemClick();
+        }
         this.addClass("selected");
 		e.stop();
 	});
@@ -162,8 +157,7 @@ WebStudio.MenuRootItem.prototype._init = function()
         this.removeClass("selected");
 		e.stop();
 	});
-	
-}
+};
 
 WebStudio.MenuRootItem.prototype.onRootItemClick = function()
 {
@@ -172,32 +166,38 @@ WebStudio.MenuRootItem.prototype.onRootItemClick = function()
 		this.menu.activeRootItem.hide();
 	}
 	this.show();
-}
+};
 
 
 WebStudio.MenuRootItem.prototype.hide = function(){
 	this.menu.activeRootItem = null;
 	this.ih.style.display = "none";
-}
+};
 
 WebStudio.MenuRootItem.prototype.show = function(){
     this.ih.style.display = "";
     this.ih.style.top = (this.he.offsetTop + this.menu.generalLayer.offsetHeight)+ "px";
     this.ih.style.left = this.he.offsetLeft + "px";
     this.menu.activeRootItem = this;
-}
+};
 
 WebStudio.MenuRootItem.prototype.disableItem = function(id,value)
 {
 	var im = this.items[id];
-	if(!im) return;
+	if(!im)
+	{
+		return;
+	}
 	
-	if(value == true){
+	if(value)
+	{
 		im.addClass("disable-i");
-	}else{
+	}
+	else
+	{
 		im.removeClass("disable-i");
 	}
-}
+};
 
 WebStudio.MenuRootItem.prototype.addItem = function(id,value,type,imgSrc,data)
 {
@@ -206,37 +206,43 @@ WebStudio.MenuRootItem.prototype.addItem = function(id,value,type,imgSrc,data)
 	type = type||"text";
 	data = data||{};
 	var im = null;
-	switch(type){
+	var ci = null;
+	var img = null;
+	switch(type)
+	{
 		case 'text':
 			im = this.menu.AlfRootMenuItm.el.clone();
-			var ci = im.getElementsBySelector("div[id=AlfRootMenuItmCaption]")[0];
+			ci = im.getElementsBySelector("div[id=AlfRootMenuItmCaption]")[0];
 			ci.setHTML(sValue);
-			if (imgSrc && imgSrc != "") {
-				var img = im.getElementsBySelector("img[id=AlfRootMenuItmIcon]")[0];
+			if (imgSrc && imgSrc !== "") 
+			{
+				img = im.getElementsBySelector("img[id=AlfRootMenuItmIcon]")[0];
 				img.src = imgSrc;
-			} else {
+			}
+			else 
+			{
 				im.getElementsBySelector("img[id=AlfRootMenuItmIcon]")[0].remove();
 			}
 			break;
 		case 'radio':
 			im = this.menu.AlfRootMenuItmRadio.el.clone();
-			var ci = im.getElementsBySelector("div[id=AlfMenuItmRadioCaption]")[0];
+			ci = im.getElementsBySelector("div[id=AlfMenuItmRadioCaption]")[0];
 			ci.setHTML(sValue);
 			break;
 		case 'checkbox':
 			im = this.menu.AlfRootMenuItmCheckBox.el.clone();
-			var ci = im.getElementsBySelector("div[id=AlfMenuItmCheckBoxCaption]")[0];
+			ci = im.getElementsBySelector("div[id=AlfMenuItmCheckBoxCaption]")[0];
             im.check = function (checked) {
                 this.getElementsBySelector("input[id=AlfMenuItmCheckBox]")[0].checked = checked;
-            }
+            };
 			ci.setHTML(sValue);
 			break;
 		case 'link':
 			im = this.menu.AlfRootMenuItmLink.el.clone();
-			var img = im.getElementsBySelector("img[id=AlfMenuItmIcon]")[0];
+			img = im.getElementsBySelector("img[id=AlfMenuItmIcon]")[0];
 			img.src = imgSrc;
 			var li = im.getElementsBySelector("a[id=AlfMenuItmLink]")[0];
-			li.href = (data.href) ? data.href : "";
+			li.href = (data.href ? data.href : "");
 			li.innerHTML = sValue;
 			break;
 		case 'separator':
@@ -246,11 +252,14 @@ WebStudio.MenuRootItem.prototype.addItem = function(id,value,type,imgSrc,data)
 	}
 
     im.injectInside(this.ih);
-    if (type == 'checkbox') {
+    if (type == 'checkbox') 
+    {
         im.check(data.checked);
     }
-    if (type != "separator" &&  data.disable!=true) {
-		if (type != "link") {
+    if (type != "separator" && !data.disable) 
+    {
+		if (type != "link") 
+		{
 			im.addEvent("click", function(e) {
 				//e = new Event(e);
 				_this.menu.onItemClick(id, data);
@@ -272,9 +281,10 @@ WebStudio.MenuRootItem.prototype.addItem = function(id,value,type,imgSrc,data)
 
 	}
 	
-	if(data.disable){
+	if(data.disable)
+	{
 		im.addClass("disable-i");
 	}
 	
 	this.items[id] = im;
-}
+};

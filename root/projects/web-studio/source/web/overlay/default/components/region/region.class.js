@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.Region = function(index) 
@@ -68,7 +67,10 @@ WebStudio.Region = function(index)
 			selector : 'table[id=button-delete]',
 			events : {
 				click : function() {
-					if (this.disabled) return;
+					if (this.disabled)
+					{
+						return;
+					}
 					_this.onDeleteClick();
 				}
 			}
@@ -78,23 +80,31 @@ WebStudio.Region = function(index)
 		}
 	};
 
-}
+	this.formLoaded = false;
+};
 
 WebStudio.Region.prototype = new WebStudio.AbstractTemplater('WebStudio.Region');
 
-WebStudio.Region.prototype.activate = function(templateID) {
+WebStudio.Region.prototype.activate = function(templateID) 
+{
 	this.buildGeneralLayer(templateID);
 
 	[this.DeleteButton.el].each(function(item) {
 		$(item).addEvents({
 			mouseover : function () {
-				if (this.disabled) return;
+				if (this.disabled)
+				{
+					return;
+				}
 				$(this.rows[0].cells[0]).addClass("btn_left_selected");
 				$(this.rows[0].cells[1]).addClass("btn_center_selected");
 				$(this.rows[0].cells[2]).addClass("btn_right_selected");
 			},
 			mouseout: function () {
-				if (this.disabled) return;
+				if (this.disabled)
+				{
+					return;
+				}
 				$(this).fireEvent("removeselection");
 			},
 			removeselection : function() {
@@ -113,40 +123,39 @@ WebStudio.Region.prototype.activate = function(templateID) {
 	});
 	
 	// set up our title
-	var title = 'Region ' + '\"' + this.regionId + '\" in the \"' + this.regionScopeId + '\" scope';
+	var title = "<B>" + this.componentTitle + "</B>";
 	
 	this.RegionOverlayTitle.el.setHTML(title);
 
 	return this;
-}
+};
 
-WebStudio.Region.prototype.load = function(url) {
-	new Ajax(url, {
-		method : 'get',
-		onComplete: (function(response) 
-		{
-			this.Body.el.setHTML(response);
-			
-		}).bind(this)
-	}).request();
-}
-
-WebStudio.Region.prototype.loadEditor = function(url) {
-	new Ajax(url, {
+WebStudio.Region.prototype.loadEditor = function(url) 
+{
+	this.formLoaded = false;
+	
+	var ajax = new Ajax(url, {
 		method : 'get', 
 		onComplete : this.onLoadComplete.bind(this), 
 		onFailure: this.onFailure.bind(this),
 		evalScripts: true
 	}).request();
-}
+};
 
 WebStudio.Region.prototype.onFailure = function(data)
 {
 	WebStudio.app.onFailure(data);
-}
+};
+
+WebStudio.Region.prototype.isFormLoaded = function()
+{
+	return this.formLoaded;
+};
 
 WebStudio.Region.prototype.onLoadComplete = function (response) 
 {
+	var _this = this;
+	
 	this.formElementsHtml = response;
 	
 	var editorHeadUrl = this.componentEditorUrl;
@@ -160,18 +169,28 @@ WebStudio.Region.prototype.onLoadComplete = function (response)
 		var ajax = new Ajax(editorHeadUrl, 
 		{
 			method : 'get', 
-			onComplete : (function(response) {
-
+			onComplete : function(response)
+			{
+				// take off any leading comments
+				var zz = response.indexOf("-->");
+				if(zz > -1)
+				{
+					response = response.substring(zz+3);
+				}
+				
 				// TODO: this works, got the header
 				// now parse it and set up data object
 				
 				// created parsed html dom element
-				var dummy = WebStudio.parser.parseHTML(response);
+				//var dummy = WebStudio.parser.parseHTML(response);
 
 				// set up a source loader to go after any dependencies
 				var data = { };
 				
 				// walk the dummy
+				var dummy = document.createElement('div');
+				dummy.innerHTML = response;
+
 				for(var z = 0; z < dummy.childNodes.length; z++)
 				{
 					var el = dummy.childNodes[z];
@@ -180,15 +199,17 @@ WebStudio.Region.prototype.onLoadComplete = function (response)
 					
 					var dataId = "Data" + z;
 					
+					var dataElement = null;
+					
 					if(tag == "SCRIPT")
 					{
 						var src = el.getProperty("src");
-						if(src.indexOf("/studio") == 0)
+						if(src.indexOf("/studio") === 0)
 						{
 							src = src.substring(7);
 						}
 						
-						var dataElement = {
+						dataElement = {
 							name: dataId,
 							path: src
 						};
@@ -198,12 +219,12 @@ WebStudio.Region.prototype.onLoadComplete = function (response)
 					if(tag == "LINK")
 					{
 						var href = el.getProperty("href");
-						if(href.indexOf("/studio") == 0)
+						if(href.indexOf("/studio") === 0)
 						{
 							href = href.substring(7);
 						}
 
-						var dataElement = {
+						dataElement = {
 							name: dataId,
 							path: href
 						};
@@ -211,18 +232,21 @@ WebStudio.Region.prototype.onLoadComplete = function (response)
 					}
 				}
 				
-				this.loader = new Alf.sourceLoader('Form Assets', data);
-				this.loader.jsPath = WebStudio.url.studio('', null, true);
-				this.loader.cssPath = WebStudio.url.studio('', null, true);	
-				this.loader.onLoad = this.setupForm.bind(this);
-				this.loader.load();	
-			}).bind(this)
+				_this.loader = new Alf.sourceLoader('Form Assets', data);
+				_this.loader.jsPath = WebStudio.url.studio('', null, true);
+				_this.loader.cssPath = WebStudio.url.studio('', null, true);	
+				_this.loader.onLoad = _this.setupForm.bind(_this);
+				_this.loader.load();	
+				
+			}
 		}).request();
 	}	
-}
+};
 
 WebStudio.Region.prototype.setupForm = function() 
 {
+	var _this = this;
+	
 	var formId = "form" + this.regionId + this.regionSourceId;
 
 	// componentEditorUrl = /c/edit/global.7451619de7region1
@@ -237,15 +261,15 @@ WebStudio.Region.prototype.setupForm = function()
 	this.Body.el.setHTML(html);
 	
 	// bind in events (on-click)
-	$(formId).addEvent('submit', (function(e) {
+	$(formId).addEvent('submit', function(e) {
 	
 		// stop the event
-		new Event(e).stop();
+		e = new Event(e).stop();
 	
 		// post the form in the background	
 		$(formId).send({
-			onSuccess: this.saveFormSuccess,
-			onFailure: this.saveFormError,
+			onSuccess: _this.saveFormSuccess,
+			onFailure: _this.saveFormError,
 			evalScripts: true,
 			headers: {
 				'Content-Type' : 'multipart/form-data',
@@ -253,40 +277,43 @@ WebStudio.Region.prototype.setupForm = function()
 			}
 		});
 
-	}).bind(this));	
-}
+	});
+	
+	this.formLoaded = true;	
+};
 
 WebStudio.Region.prototype.build = function() 
 {
 	var _this = this;
+	
 	this.generalLayer.set({
 		events: {
-			mouseleave: (function() 
+			mouseleave: function() 
 			{
-				if(!this.checkInterval)
+				if(!_this.checkInterval)
 				{
 					var waitTime = 1000*1.5;
 					var checkPeriod = 200;
 					
-					this.checkTotal = waitTime / checkPeriod;
-					this.checkCount = 0;				
-					this.checkInterval = this.checkCloseWindow.periodical(checkPeriod, this);		
+					_this.checkTotal = waitTime / checkPeriod;
+					_this.checkCount = 0;				
+					_this.checkInterval = _this.checkCloseWindow.periodical(checkPeriod, _this);		
 				}
 				
-			}).bind(this)
+			}
 			,
-			mouseenter: (function() 
+			mouseenter: function() 
 			{			
-				if(this.checkInterval)
+				if(_this.checkInterval)
 				{
-					$clear(this.checkInterval);
-					this.checkInterval = null;
+					$clear(_this.checkInterval);
+					_this.checkInterval = null;
 				}
 				
-			}).bind(this)
+			}
 		}
 	});
-}
+};
 
 WebStudio.Region.prototype.checkCloseWindow = function()
 {
@@ -299,12 +326,11 @@ WebStudio.Region.prototype.checkCloseWindow = function()
 		// close the window
 		this.shutdown();		
 	}
-}
+};
 
 WebStudio.Region.prototype.onClose = function()
 {
-
-}
+};
 
 WebStudio.Region.prototype.setWidth = function(w) 
 {
@@ -315,7 +341,7 @@ WebStudio.Region.prototype.setWidth = function(w)
 	this.RightBorder.el.setStyle('left', w - 4);
 	this.RTArnor.el.setStyle('left', w - 6);
 	this.generalLayer.setStyle('width', w);
-}
+};
 
 WebStudio.Region.prototype.setHeight = function(h) 
 {
@@ -326,7 +352,7 @@ WebStudio.Region.prototype.setHeight = function(h)
 	this.RBArnor.el.setStyle('top', h - 4);
 	this.RightBorder.el.setStyle('height', h - 32);
 	this.generalLayer.setStyle('height', h);
-}
+};
 
 WebStudio.Region.prototype.setCoords = function(x, y) 
 {
@@ -334,7 +360,7 @@ WebStudio.Region.prototype.setCoords = function(x, y)
 	{
 		this.generalLayer.setStyles({left : x, top : y});
 	}
-}
+};
 
 WebStudio.Region.prototype.disableButton = function (but, disabled) 
 {
@@ -345,7 +371,7 @@ WebStudio.Region.prototype.disableButton = function (but, disabled)
 	}
 	
 	this[but + 'Button'].el.fireEvent("disable", disabled);
-}
+};
 
 WebStudio.Region.prototype.hideButton = function (but)
 {
@@ -356,23 +382,26 @@ WebStudio.Region.prototype.hideButton = function (but)
 	}
 	
 	this[but + 'Button'].el.setStyle("display", "none");
-}
+};
 
-WebStudio.Region.prototype.onEditClick = function() {
-}
+WebStudio.Region.prototype.onEditClick = function()
+{
+};
 
 WebStudio.Region.prototype.saveFormError = function(r)
 {
 	alert("An error occurred while saving this form: " + r.statusText);
-}
+};
 
 WebStudio.Region.prototype.saveFormSuccess = function(r)
 {
 	this.shutdown();
-}
+};
 
 WebStudio.Region.prototype.shutdown = function()
 {
+	this.popout();
+	
 	// unload any assets
 	if(this.loader)
 	{
@@ -381,4 +410,28 @@ WebStudio.Region.prototype.shutdown = function()
 	
 	this.destroy();
 	this.onClose();
-}
+};
+
+WebStudio.Region.prototype.setActive = function() 
+{
+	//Set this window active, bring to front and apply Active styles
+	this.generalLayer.setStyle('z-index', WebStudio.WindowsZIndex + this.zIndexUpper);
+	WebStudio.WindowsZIndex++;
+	WebStudio.WindowsActive = this;
+	return this;
+};
+
+WebStudio.Region.prototype.popup = function() 
+{	
+	this.block();
+	this.show();
+	this.centered();
+	this.zIndexUpper = 2000;
+	this.setActive();
+};
+
+WebStudio.Region.prototype.popout = function()
+{	
+    this.hide();
+    this.unblock();
+};

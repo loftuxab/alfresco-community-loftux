@@ -26,96 +26,119 @@ package org.alfresco.web.studio;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
-import org.alfresco.web.framework.ModelPersistenceContext;
-import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
  * @author muzquiano
  */
-public class WebStudioUtil 
+public class WebStudioUtil
 {
-	// TODO: This method must be rethought and reimplemented
+    // TODO: This method must be rethought and reimplemented
     public static String getContentEditURL(RequestContext context,
             String endpointId, String itemRelativePath)
     {
-    	return null;    	
-    }	
-    
-	/**
-	 * Gets a cached object from the user session
-	 * 
-	 * @param request
-	 * @param key
-	 * @return
-	 */
-	public static Object getCachedObject(HttpServletRequest request, String key)
-	{
-		return (Object) request.getSession().getAttribute("CACHED_RESOURCE_" + key);
-	}
+        return null;
+    }
 
-	/**
-	 * Caches an object into the user session
-	 * 
-	 * @param request
-	 * @param key
-	 * @param object
-	 */
-	public static void setCachedObject(HttpServletRequest request, String key, Object object)
-	{
-		request.getSession().setAttribute("CACHED_RESOURCE_" + key, object);
-	}
-	
-	public static String getCurrentUserId(HttpServletRequest request)
-	{
-		return (String) getCachedObject(request, "CurrentUserId");
-	}
-	
-	public static void setCurrentUserId(HttpServletRequest request, String currentUserId)
-	{
-		setCachedObject(request, "CurrentUserId", currentUserId);
-	}
-	
-	public static String getCurrentWebProject(HttpServletRequest request)
-	{		
-		return (String) getCachedObject(request, "CurrentWebProject");
-	}
-	
-	public static void setCurrentWebProject(HttpServletRequest request, String webProjectId)
-	{
-		setCachedObject(request, "CurrentWebProject", webProjectId);
-	}
-	
-	public static String getCurrentSandbox(HttpServletRequest request)
-	{		
-		return (String) getCachedObject(request, "CurrentSandbox");
-	}
-	
-	public static void setCurrentSandbox(HttpServletRequest request, String sandboxId)
-	{
-		setCachedObject(request, "CurrentSandbox", sandboxId);
-	}
+    /**
+     * Gets a cached object from the user session
+     * 
+     * @param request
+     * @param key
+     * @return
+     */
+    public static Object getCachedObject(HttpServletRequest request, String key)
+    {
+        return (Object) request.getSession().getAttribute(
+                "CACHED_RESOURCE_" + key);
+    }
 
-	public static String getCurrentStore(HttpServletRequest request)
-	{		
-		return (String) getCachedObject(request, "CurrentStore");
-	}
-	
-	public static void setCurrentStore(HttpServletRequest request, String storeId)
-	{
-		setCachedObject(request, "CurrentStore", storeId);
-	}
+    /**
+     * Caches an object into the user session
+     * 
+     * @param request
+     * @param key
+     * @param object
+     */
+    public static void setCachedObject(HttpServletRequest request, String key,
+            Object object)
+    {
+        request.getSession().setAttribute("CACHED_RESOURCE_" + key, object);
+    }
 
-	public static String getCurrentWebapp(HttpServletRequest request)
-	{		
-		return (String) getCachedObject(request, "CurrentWebapp");
-	}
-	
-	public static void setCurrentWebapp(HttpServletRequest request, String webappId)
-	{
-		setCachedObject(request, "CurrentWebapp", webappId);
-	}
-	
+    public static String getCurrentUserId(HttpServletRequest request)
+    {
+        return (String) getCachedObject(request, "CurrentUserId");
+    }
+
+    public static void setCurrentUserId(HttpServletRequest request,
+            String currentUserId)
+    {
+        setCachedObject(request, "CurrentUserId", currentUserId);
+    }
+
+    public static String getCurrentWebProject(HttpServletRequest request)
+    {
+        return (String) getCachedObject(request, "CurrentWebProject");
+    }
+
+    public static void setCurrentWebProject(HttpServletRequest request,
+            String webProjectId)
+    {
+        setCachedObject(request, "CurrentWebProject", webProjectId);
+    }
+
+    public static String getCurrentSandbox(HttpServletRequest request)
+    {
+        return (String) getCachedObject(request, "CurrentSandbox");
+    }
+
+    public static void setCurrentSandbox(HttpServletRequest request,
+            String sandboxId)
+    {
+        setCachedObject(request, "CurrentSandbox", sandboxId);
+    }
+
+    public static String getCurrentStore(HttpServletRequest request)
+    {
+        return (String) getCachedObject(request, "CurrentStore");
+    }
+
+    public static void setCurrentStore(HttpServletRequest request,
+            String storeId)
+    {
+        setCachedObject(request, "CurrentStore", storeId);
+    }
+
+    public static String getCurrentWebapp(HttpServletRequest request)
+    {
+        return (String) getCachedObject(request, "CurrentWebapp");
+    }
+
+    public static void setCurrentWebapp(HttpServletRequest request,
+            String webappId)
+    {
+        setCachedObject(request, "CurrentWebapp", webappId);
+    }
+
+    public static void setOverlayEnabled(HttpServletRequest request,
+            boolean enabled)
+    {
+        request.getSession().setAttribute("OverlayState",
+                (enabled ? "enabled" : "disabled"));
+    }
+
+    public static boolean isOverlayEnabled(HttpServletRequest request)
+    {
+        boolean enabled = true;
+
+        String result = (String) request.getSession().getAttribute(
+                "OverlayState");
+        if ("disabled".equals(result))
+        {
+            enabled = false;
+        }
+
+        return enabled;
+    }
 }

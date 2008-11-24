@@ -1,6 +1,0 @@
-<webscript kind="webstudio">
-  <shortname>Alfresco Content Item</shortname>
-  <description>Displays an Alfresco Content Item</description>
-  <family>component</family>
-  <url>/component/common/alfcontent</url>
-</webscript>

@@ -27,6 +27,18 @@ if(templateId != null)
 	{
 		templateLayoutType = "";
 	}
+
+	var templateHeight = template.getProperty("height");
+	if(templateHeight == null)
+	{
+		templateHeight = "";
+	}
+	
+	var templateWidth = template.getProperty("width");
+	if(templateWidth == null)
+	{
+		templateWidth = "";
+	}	
 	
 	
 	// Form Title
@@ -43,6 +55,14 @@ if(templateId != null)
 	wizard.addElement("templateDescription", templateDescription);	
 	wizard.addElementFormat("templateDescription", "Description", "textarea", 290);
 
+	// Form Element: template height	
+	wizard.addElement("templateHeight", templateHeight);	
+	wizard.addElementFormat("templateHeight", "Height", "textfield", 5);
+
+	// Form Element: template description	
+	wizard.addElement("templateWidth", templateWidth);	
+	wizard.addElementFormat("templateWidth", "Width", "textfield", 5);	
+	
 	// Form Element: template layout type
 	wizard.addElement("templateLayoutType", templateLayoutType);
 	wizard.addElementFormat("templateLayoutType", "Layout", "combo", 290);	
@@ -50,8 +70,8 @@ if(templateId != null)
 	wizard.addElementFormatKeyPair("templateLayoutType", "title", "Layout Types");
 
 	// options	
-	wizard.addElementSelectionValue("templateLayoutType", "Absolute", "Absolute");
-	wizard.addElementSelectionValue("templateLayoutType", "Table", "Table");	
+	wizard.addElementSelectionValue("templateLayoutType", "Absolute Positioning", "Absolute Positioning");
+	wizard.addElementSelectionValue("templateLayoutType", "Table Layout", "Table Layout");	
 
 	// set to value	
 	wizard.updateElement("templateLayoutType", templateLayoutType);

@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.SearchView = function(index) 
@@ -17,13 +16,13 @@ WebStudio.SearchView = function(index)
 		Body: {
 			selector: 'div[id=ASVBody]'
 		}
-	}
+	};
 
 	this.events = {};
 	
 	this.nodes = {};
 	this.droppables = [];
-}
+};
 
 WebStudio.SearchView.prototype = new WebStudio.AbstractTemplater('WebStudio.SearchView');
 
@@ -46,10 +45,10 @@ WebStudio.SearchView.prototype.activate = function()
 	}
 
 	return this;
-}
+};
 
 WebStudio.SearchView.prototype.build = function() {
 	this.generalLayer.set({
 		id: this.ID
 	});
-}
+};

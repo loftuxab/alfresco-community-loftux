@@ -43,7 +43,7 @@ import org.alfresco.web.studio.WebStudioUtil;
 public final class ScriptWebStudio implements Serializable
 {
     protected RequestContext context = null;
-    
+
     public ScriptWebStudio(RequestContext context)
     {
         this.context = context;
@@ -51,76 +51,80 @@ public final class ScriptWebStudio implements Serializable
 
     protected HttpServletRequest getHttpServletRequest()
     {
-    	return context.getRequest();
+        return context.getRequest();
     }
-    
-	public String getCurrentWebProject()
-	{
-		return WebStudioUtil.getCurrentWebProject(getHttpServletRequest());
-	}
-	
-	public void setCurrentWebProject(String webProjectId)
-	{
-		WebStudioUtil.setCurrentWebProject(getHttpServletRequest(), webProjectId);
-		
-		// TODO: reset the staging store?
-	}
-	
-	public String getCurrentSandbox()
-	{
-		return WebStudioUtil.getCurrentSandbox(getHttpServletRequest());
-	}
-	
-	public void setCurrentSandbox(String sandboxId)
-	{
-		WebStudioUtil.setCurrentSandbox(getHttpServletRequest(), sandboxId);
-		
-		// this should be the same as the store id
-		setCurrentStore(sandboxId);
-	}
 
-	public String getCurrentStore()
-	{
-		return WebStudioUtil.getCurrentStore(getHttpServletRequest());
-	}
-	
-	public void setCurrentStore(String storeId)
-	{
-		WebStudioUtil.setCurrentStore(getHttpServletRequest(), storeId);
-		
-		// bind the web framework to the store
-		getHttpServletRequest().getSession(true).setAttribute(WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME, storeId);
-		
-		// set to the ROOT webapp if none set
-		String webappId = getCurrentWebapp();
-		if(webappId == null)
-		{
-			setCurrentWebapp("ROOT");
-		}
-	}
-	
-	public String getCurrentWebapp()
-	{
-		return WebStudioUtil.getCurrentWebapp(getHttpServletRequest());
-	}
-	
-	public void setCurrentWebapp(String webappId)
-	{
-		WebStudioUtil.setCurrentWebapp(getHttpServletRequest(), webappId);
+    public String getCurrentWebProject()
+    {
+        return WebStudioUtil.getCurrentWebProject(getHttpServletRequest());
+    }
 
-		// bind the web framework to the webapp
-		getHttpServletRequest().getSession(true).setAttribute(WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME, webappId);
-	}
-	
-	public String getCurrentUserId()
-	{
-		return WebStudioUtil.getCurrentUserId(getHttpServletRequest());
-	}
-	
-	public void setCurrentUserId(String currentUserId)
-	{
-		WebStudioUtil.setCurrentUserId(getHttpServletRequest(), currentUserId);
-	}
+    public void setCurrentWebProject(String webProjectId)
+    {
+        WebStudioUtil.setCurrentWebProject(getHttpServletRequest(),
+                webProjectId);
+
+        // TODO: reset the staging store?
+    }
+
+    public String getCurrentSandbox()
+    {
+        return WebStudioUtil.getCurrentSandbox(getHttpServletRequest());
+    }
+
+    public void setCurrentSandbox(String sandboxId)
+    {
+        WebStudioUtil.setCurrentSandbox(getHttpServletRequest(), sandboxId);
+
+        // this should be the same as the store id
+        setCurrentStore(sandboxId);
+    }
+
+    public String getCurrentStore()
+    {
+        return WebStudioUtil.getCurrentStore(getHttpServletRequest());
+    }
+
+    public void setCurrentStore(String storeId)
+    {
+        WebStudioUtil.setCurrentStore(getHttpServletRequest(), storeId);
+
+        // bind the web framework to the store
+        getHttpServletRequest().getSession(true).setAttribute(
+                WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME, storeId);
+
+        // set to the ROOT webapp if none set
+        String webappId = getCurrentWebapp();
+        if (webappId == null)
+        {
+            setCurrentWebapp("ROOT");
+        }
+    }
+
+    public String getCurrentWebapp()
+    {
+        return WebStudioUtil.getCurrentWebapp(getHttpServletRequest());
+    }
+
+    public void setCurrentWebapp(String webappId)
+    {
+        WebStudioUtil.setCurrentWebapp(getHttpServletRequest(), webappId);
+
+        // bind the web framework to the webapp
+        getHttpServletRequest().getSession(true).setAttribute(
+                WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME,
+                webappId);
+    }
+
+    public String getCurrentUserId()
+    {
+        return WebStudioUtil.getCurrentUserId(getHttpServletRequest());
+    }
+
+    public void setCurrentUserId(String currentUserId)
+    {
+        WebStudioUtil.setCurrentUserId(getHttpServletRequest(), currentUserId);
+    }
 
     public void setModel(Map<String, Object> model)
     {
@@ -132,37 +136,37 @@ public final class ScriptWebStudio implements Serializable
         return this.model;
     }
 
-    protected Map<String, Object> model;    
+    protected Map<String, Object> model;
 
-    public boolean login(String username, String password)
-    	throws Exception
+    public boolean login(String username, String password) throws Exception
     {
-    	boolean success = false;
-    	
-    	HttpServletRequest request = this.getHttpServletRequest();
-    	
-    	UserFactory userFactory = FrameworkHelper.getUserFactory();
-    	
+        boolean success = false;
+
+        HttpServletRequest request = this.getHttpServletRequest();
+
+        UserFactory userFactory = FrameworkHelper.getUserFactory();
+
         // see if we can authenticate the user
-        boolean authenticated = userFactory.authenticate(request, username, password);
+        boolean authenticated = userFactory.authenticate(request, username,
+                password);
         if (authenticated)
         {
             // this will fully reset all connector sessions
             RequestContext context = RequestUtil.getRequestContext(request);
             AuthenticationUtil.login(request, username);
-            
+
             // store the user
             setCurrentUserId(username);
-            
+
             // mark the fact that we succeeded
-            success = true;            
-	    }
-        
+            success = true;
+        }
+
         return success;
     }
-    
+
     public ScriptImporter getImporter()
     {
-    	return new ScriptImporter(context);
+        return new ScriptImporter(context);
     }
 }

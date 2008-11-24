@@ -30,18 +30,17 @@ import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
- * Interface which provides an adaptor pattern for resources
- * that seek to interact with the storage mechanism of
- * model objects.
+ * Interface which provides an adaptor pattern for resources that seek
+ * to interact with the storage mechanism of model objects.
  * 
  * @author muzquiano
  */
-public class ModelObjectResourceStore implements ResourceStore 
+public class ModelObjectResourceStore implements ResourceStore
 {
-    
+
     /** The object. */
     protected ModelObject object;
-    
+
     /**
      * Instantiates a new model object resource store.
      * 
@@ -52,58 +51,73 @@ public class ModelObjectResourceStore implements ResourceStore
         this.object = object;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.web.framework.resource.ResourceStore#getAttributeNames(java.lang.String)
      */
     public String[] getAttributeNames(String id)
     {
-        Element el = ModelObjectResourceProvider.getResourceElement(this.object, id);
-        
+        Element el = ModelObjectResourceProvider.getResourceElement(
+                this.object, id);
+
         String[] names = new String[el.attributeCount()];
-        
-        for(int i = 0; i < el.attributeCount(); i++)
+
+        for (int i = 0; i < el.attributeCount(); i++)
         {
             Attribute attribute = (Attribute) el.attribute(i);
             names[i] = attribute.getName();
         }
-        
-        return names;                
+
+        return names;
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceStore#getAttribute(java.lang.String, java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceStore#getAttribute(java.lang.String,
+     *      java.lang.String)
      */
     public String getAttribute(String id, String name)
     {
         String value = null;
-        
-        Element el = ModelObjectResourceProvider.getResourceElement(this.object, id);
+
+        Element el = ModelObjectResourceProvider.getResourceElement(
+                this.object, id);
         if (el != null)
         {
             value = el.attributeValue(name);
         }
-        
+
         return value;
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceStore#setAttribute(java.lang.String, java.lang.String, java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceStore#setAttribute(java.lang.String,
+     *      java.lang.String, java.lang.String)
      */
     public void setAttribute(String id, String name, String value)
     {
-        Element el = ModelObjectResourceProvider.getResourceElement(this.object, id);
+        Element el = ModelObjectResourceProvider.getResourceElement(
+                this.object, id);
         if (el != null)
         {
             el.addAttribute(name, value);
         }
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceStore#removeAttribute(java.lang.String, java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceStore#removeAttribute(java.lang.String,
+     *      java.lang.String)
      */
     public void removeAttribute(String id, String name)
     {
-        Element el = ModelObjectResourceProvider.getResourceElement(this.object, id);
+        Element el = ModelObjectResourceProvider.getResourceElement(
+                this.object, id);
         if (el != null)
         {
             Attribute attribute = el.attribute(name);
@@ -111,34 +125,41 @@ public class ModelObjectResourceStore implements ResourceStore
             {
                 el.remove(attribute);
             }
-        }        
+        }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.web.framework.resource.ResourceStore#getValue(java.lang.String)
      */
     public String getValue(String id)
     {
         String value = null;
-        
-        Element el = ModelObjectResourceProvider.getResourceElement(this.object, id);
+
+        Element el = ModelObjectResourceProvider.getResourceElement(
+                this.object, id);
         if (el != null)
         {
             value = XMLUtil.getValue(el);
         }
-        
+
         return value;
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceStore#setValue(java.lang.String, java.lang.String)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceStore#setValue(java.lang.String,
+     *      java.lang.String)
      */
     public void setValue(String id, String value)
     {
-        Element el = ModelObjectResourceProvider.getResourceElement(this.object, id);
+        Element el = ModelObjectResourceProvider.getResourceElement(
+                this.object, id);
         if (el != null)
         {
             XMLUtil.setValue(el, value);
-        }        
+        }
     }
 }

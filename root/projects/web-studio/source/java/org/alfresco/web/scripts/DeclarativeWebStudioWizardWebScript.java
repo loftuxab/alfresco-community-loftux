@@ -32,7 +32,8 @@ import org.alfresco.web.site.RequestContext;
 /**
  * @author muzquiano
  */
-public class DeclarativeWebStudioWizardWebScript extends DeclarativeWebStudioWebScript
+public class DeclarativeWebStudioWizardWebScript extends
+        DeclarativeWebStudioWebScript
 {
     private static final String ROOT_SCOPE_WIZARD = "wizard";
 
@@ -41,11 +42,14 @@ public class DeclarativeWebStudioWizardWebScript extends DeclarativeWebStudioWeb
      */
     public DeclarativeWebStudioWizardWebScript()
     {
-    	super();
+        super();
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.DeclarativeWebStudioWebScript#createScriptParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse, java.util.Map)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.scripts.DeclarativeWebStudioWebScript#createScriptParameters(org.alfresco.web.scripts.WebScriptRequest,
+     *      org.alfresco.web.scripts.WebScriptResponse, java.util.Map)
      */
     protected Map<String, Object> createScriptParameters(WebScriptRequest req,
             WebScriptResponse res, Map<String, Object> customParams)
@@ -62,8 +66,11 @@ public class DeclarativeWebStudioWizardWebScript extends DeclarativeWebStudioWeb
         return params;
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.AbstractWebScript#executeScript(org.alfresco.web.scripts.ScriptContent, java.util.Map)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.scripts.AbstractWebScript#executeScript(org.alfresco.web.scripts.ScriptContent,
+     *      java.util.Map)
      */
     @Override
     protected void executeScript(ScriptContent location,
@@ -79,8 +86,10 @@ public class DeclarativeWebStudioWizardWebScript extends DeclarativeWebStudioWeb
         }
         catch (Throwable err)
         {
-        	err.printStackTrace();
-            throw new AlfrescoRuntimeException("Error during wizard initialisation: " + err.getMessage(), err);
+            err.printStackTrace();
+            throw new AlfrescoRuntimeException(
+                    "Error during wizard initialisation: " + err.getMessage(),
+                    err);
         }
 
         // get the new script that we should execute
@@ -89,9 +98,10 @@ public class DeclarativeWebStudioWizardWebScript extends DeclarativeWebStudioWeb
         // boolean isEnd = wizard.isCurrentPageEnd();
         if (currentPageId != null && !isStart)
         {
-            String newScriptPath = this.getDescription().getId() + "-" + currentPageId + ".js";
-            ScriptContent theScript = getContainer().getScriptProcessor().findScript(
-                    newScriptPath);
+            String newScriptPath = this.getDescription().getId() + "-"
+                    + currentPageId + ".js";
+            ScriptContent theScript = getContainer().getScriptProcessor()
+                    .findScript(newScriptPath);
             super.executeScript(theScript, model);
         }
         else

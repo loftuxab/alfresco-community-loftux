@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.Panels = {};
@@ -58,7 +57,7 @@ WebStudio.Panel = function(index)
 			resizeObject: 'ATPLeftDiv',
 			events: {
 				contextmenu: function(event) {
-					var event = new Event(event);
+					event = new Event(event);
 					var sp = WebStudio.Panels[this.getProperty('APID')];
 					
 					sp.showResizerMenu(event);
@@ -123,7 +122,7 @@ WebStudio.Panel.prototype = {
 	},
 	setHeight: function(h) {
 		this.PanelsTable.el.setStyle('height', h);
-		this.setPanelsContentHeight(parseInt(h) - this._offsetPanelsTablecontent);
+		this.setPanelsContentHeight(Alf.parseInt(h) - this._offsetPanelsTablecontent);
 		return this;
 	},
 	getHeight: function() {
@@ -133,7 +132,7 @@ WebStudio.Panel.prototype = {
 		return this.PanelsTable.el.getCoordinates().width;
 	},
 	setPanelsContentHeight: function(h) {
-		h = parseInt(h);
+		h = Alf.parseInt(h);
 		if (h<this.minContentHeight)
 		{
 			h = this.minContentHeight;
@@ -147,23 +146,23 @@ WebStudio.Panel.prototype = {
 	},
 	resizerMenuSelect: function(group, index) {
 		//group == 'roots'
-		if (index == 0) {
+		if (index === 0) {
 			this.setPanelSizes(20);
-		} else if (index == 1) {
+		} else if (index === 1) {
 			this.setPanelSizes(30);
-		} else if (index == 2) {
+		} else if (index === 2) {
 			this.setPanelSizes(40);
-		} else if (index == 3) {
+		} else if (index === 3) {
 			this.setPanelSizes(50);
-		} else if (index == 4) {
+		} else if (index === 4) {
 			this.setPanelSizes(60);
-		} else if (index == 5) {
+		} else if (index === 5) {
 			this.setPanelSizes(70);
-		} else if (index == 6) {
+		} else if (index === 6) {
 			this.setPanelSizes(80);
-		} else if (index == 7) {
+		} else if (index === 7) {
 			this.setPanelSizes(90);
-		} else if (index == 8) {
+		} else if (index === 8) {
 			this.setPanelSizes(100);
 		}
 		this.hideResizerMenu();
@@ -187,7 +186,7 @@ WebStudio.Panel.prototype = {
 		var rightSize = 100 - leftSize;
 		
 		var allw = this.PanelsTable.el.getCoordinates().width;
-		var lw = parseInt(allw * (leftSize / 100));
+		var lw = Alf.parseInt(allw * (leftSize / 100));
 		
 		this.left.pSize = leftSize;
 		this.right.pSize = rightSize;
@@ -220,66 +219,70 @@ WebStudio.Panel.prototype = {
 		this.left = this.ATPLeftDiv;
 		this.right = this.ATPRightDiv;
 		
-		this.slipWidth = parseInt(this.PanelsTable.el.getCoordinates().width / 2);
+		this.slipWidth = Alf.parseInt(this.PanelsTable.el.getCoordinates().width / 2);
 	},
 	applyElementsConfig: function() {
-		$each(this.elementsConfig, (function(item, index) {
-			this.setElementConfig(item, index);
-		}).bind(this));
+		var _this = this;
+		
+		$each(_this.elementsConfig, function(item, index) {
+			_this.setElementConfig(item, index);
+		});
 		
 		return this;
 	},
 	setElementConfig: function(item, index) {
-		this[index] = [];
+		
+		var _this = this;
+		
+		_this[index] = [];
 		if (item.selector) 
 		{
-			var els = this.generalLayer.getElementsBySelector(item.selector);
+			var els = _this.generalLayer.getElementsBySelector(item.selector);
 			
 			if (els[0])
 			{
-				this[index].el = els[0];
+				_this[index].el = els[0];
 			}
 			
-			this._tempIndex = index;
-			this._tempItem = item;
+			_this._tempIndex = index;
+			_this._tempItem = item;
 			
-			$each(els, (function(item, index) {
-				var ob = this[this._tempIndex];
+			$each(els, function(item, index) {
+				var ob = _this[_this._tempIndex];
 				ob[index] = {};
 				ob[index].el = item;
 				if (ob[index].el) 
 				{
 					ob[index].state = 'default';
 					
-					if (this._tempItem.styles)
+					if (_this._tempItem.styles)
 					{
-						ob[index].el.setStyles(this._tempItem.styles);
+						ob[index].el.setStyles(_this._tempItem.styles);
 					}
 					
-					if (this._tempItem.events) {
+					if (_this._tempItem.events) {
 						ob[index].el.set({
-							'APID': this.ID, 
-							'Group': this._tempIndex,
+							'APID': _this.ID, 
+							'Group': _this._tempIndex,
 							'Index': index,
-							events: this._tempItem.events
+							events: _this._tempItem.events
 						});
 					}
 					
-					if (this._tempItem.blockSelection)
+					if (_this._tempItem.blockSelection)
 					{
-						this.blockSelection(ob[index].el);
+						_this.blockSelection(ob[index].el);
 					}
 					
-					if (this._tempItem.resizeHandler)
+					if (_this._tempItem.resizeHandler)
 					{
-						if (this._tempItem.resizeObject)
+						if (_this._tempItem.resizeObject)
 						{
-							this.setResize(ob[index].el, this._tempItem.resizeObject, 'e-resize', 'updatePanelDivsWidth');
+							_this.setResize(ob[index].el, _this._tempItem.resizeObject, 'e-resize', 'updatePanelDivsWidth');
 						}
 					}
-					
 				}
-			}).bind(this));
+			});
 		}
 	},
 	setConfig: function(object) {
@@ -299,7 +302,7 @@ WebStudio.Panel.prototype = {
 				mousedown: function(event) {
 					var sc = WebStudio.Panels[this.getProperty('APID')];
 					var roID = this.getProperty('ROID');
-					var event = new Event(event);
+					event = new Event(event);
 					if (document.selection)
 					{
 						if (document.selection.empty)
@@ -350,7 +353,7 @@ WebStudio.Panel.prototype = {
 							if (type=="e-resize") 
 							{
 								this.resizerIsMoved = true;
-								pw = parseInt(this.mdw) + event.clientX - this.mdx;
+								pw = Alf.parseInt(this.mdw) + event.clientX - this.mdx;
 								if ((pw>=this.slipWidth - sl)&&(pw<=this.slipWidth + sl))
 								{
 									pw = this.slipWidth;
@@ -460,7 +463,7 @@ WebStudio.Panel.prototype = {
 		if (typeof(object) == 'object') 
 		{
 			object.onselectstart = function(event) {
-				var event = new Event(event);
+				event = new Event(event);
 				event.preventDefault();
 				return false;
 			};
@@ -514,17 +517,19 @@ WebStudio.Panel.prototype = {
 			alert(text);
 		}
 		
+		var mess = null;
+		
 		if (type == 'error') 
 		{
-			var mess = this.dmErrorTemplate.replace('$', text);
+			mess = this.dmErrorTemplate.replace('$', text);
 		} 
 		else if (type == 'success') 
 		{
-			var mess = this.dmSuccessTemplate.replace('$', text);
+			mess = this.dmSuccessTemplate.replace('$', text);
 		} 
 		else 
 		{
-			var mess = text;
+			mess = text;
 		}
 	}
 };

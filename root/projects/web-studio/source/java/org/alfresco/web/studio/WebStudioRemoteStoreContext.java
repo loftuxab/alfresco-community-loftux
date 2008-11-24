@@ -31,70 +31,74 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThreadLocalRequestContext;
 
 /**
- * An implementation class for RemoteStoreContext which empowers
- * the RemoteStore to pull values from the Web Studio.
+ * An implementation class for RemoteStoreContext which empowers the
+ * RemoteStore to pull values from the Web Studio.
  * 
  * @author muzquiano
  */
 public class WebStudioRemoteStoreContext extends WebFrameworkRemoteStoreContext
 {
-	public WebStudioRemoteStoreContext()
-	{
-		super();
-	}
-			
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.framework.WebFrameworkRemoteStoreContext#getStoreId()
-	 */
-	public String getStoreId()
-	{
-		String storeId = null;
-		
-		// retrieve the request context
-		RequestContext context = ThreadLocalRequestContext.getRequestContext();
-		if(context != null)
-		{
-			HttpServletRequest request = context.getRequest();
-			
-			// get the storeId
-			storeId = WebStudioUtil.getCurrentStore(request);				
-		}
-		
-		// if we didn't find a storeId on the Web Studio context
-		// then we'll try to draw one from the Web Framework context
-		if(storeId == null)
-		{
-			storeId = super.getStoreId();
-		}
-		
-		return storeId;
-	}		
-	
-    /* (non-Javadoc)
+    public WebStudioRemoteStoreContext()
+    {
+        super();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.WebFrameworkRemoteStoreContext#getStoreId()
+     */
+    public String getStoreId()
+    {
+        String storeId = null;
+
+        // retrieve the request context
+        RequestContext context = ThreadLocalRequestContext.getRequestContext();
+        if (context != null)
+        {
+            HttpServletRequest request = context.getRequest();
+
+            // get the storeId
+            storeId = WebStudioUtil.getCurrentStore(request);
+        }
+
+        // if we didn't find a storeId on the Web Studio context
+        // then we'll try to draw one from the Web Framework context
+        if (storeId == null)
+        {
+            storeId = super.getStoreId();
+        }
+
+        return storeId;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.web.framework.WebFrameworkRemoteStoreContext#getWebappId()
      */
     public String getWebappId()
     {
         String webappId = null;
-        
+
         // retrieve the request context
         RequestContext context = ThreadLocalRequestContext.getRequestContext();
-        if(context != null)
+        if (context != null)
         {
             HttpServletRequest request = context.getRequest();
-            
+
             // get the webappId
-            webappId = WebStudioUtil.getCurrentWebapp(request);               
+            webappId = WebStudioUtil.getCurrentWebapp(request);
         }
-        
+
         // if we didn't find a webappId on the Web Studio context
         // then we'll try to draw one from the Web Framework context
-        if(webappId == null)
+        if (webappId == null)
         {
             webappId = super.getWebappId();
         }
-        
+
         return webappId;
     }
-	
+
 }

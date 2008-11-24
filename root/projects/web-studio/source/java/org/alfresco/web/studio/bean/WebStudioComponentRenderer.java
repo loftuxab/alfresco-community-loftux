@@ -36,141 +36,158 @@ import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.studio.WebStudioUtil;
 
 /**
  * Provides Web-Studio extensions to component rendering
  * 
- * Primarily, this enables components to output additional
- * Web Studio specific JavaScript to bind client-side DOM elements
- * together.
+ * Primarily, this enables components to output additional Web Studio
+ * specific JavaScript to bind client-side DOM elements together.
  * 
  * @author muzquiano
  */
 public class WebStudioComponentRenderer extends ComponentRenderer
 {
-	private static final String WEBSCRIPTS_REGISTRY = "webframework.webscripts.registry";
-	
-    /* (non-Javadoc)
+    private static final String WEBSCRIPTS_REGISTRY = "webframework.webscripts.registry";
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.web.framework.render.bean.RegionRenderer#postProcess(org.alfresco.web.framework.render.RenderContext)
      */
-    public void postProcess(RenderContext context)
-    	throws IOException
+    public void postProcess(RenderContext context) throws IOException
     {
-        // if web studio is enabled (and not passive mode)
-        if(FrameworkHelper.getConfig().isWebStudioEnabled() && !context.isPassiveMode())
+        // if web studio is enabled + not passive mode + overlays
+        // enabled
+        if (FrameworkHelper.getConfig().isWebStudioEnabled()
+                && !context.isPassiveMode()
+                && WebStudioUtil.isOverlayEnabled(context.getRequest()))
         {
-			// html binding id
-			String htmlId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
+            // html binding id
+            String htmlId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
 
-	        // component and component type properties
-	        String componentId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
-	        String componentTypeId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_TYPE_ID);
-	        	
-	        // commit to output
-			PrintWriter writer = context.getResponse().getWriter();
-			writer.println("<script language='Javascript'>");
-	        
-			// if there is a component, bind that in too
-			if(componentId != null && componentTypeId != null)
-			{
-				String componentTitle = "";
-				String componentTypeTitle = "";
-				String editorUrl = "";
-				Component c = (Component) context.getModel().getComponent(componentId);
-				if(c != null)
-				{
-					componentTitle = getComponentTitle(context, c);
-					componentTypeTitle = getComponentTypeTitle(context, c);				
-					editorUrl = getComponentEditorUrl(context, c);
-				}
-				writer.println("WebStudio.configureComponent('" + htmlId + "', '" + componentId + "', '" + componentTypeId + "', '" + componentTitle + "', '" + componentTypeTitle + "', '" + editorUrl + "');");
-			}
+            // component and component type properties
+            String componentId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
+            String componentTypeId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_COMPONENT_TYPE_ID);
 
-			writer.println("</script>");		
-			writer.flush();
+            // commit to output
+            PrintWriter writer = context.getResponse().getWriter();
+            writer
+                    .println("<script language='Javascript' type='text/javascript'>");
+
+            // if there is a component, bind that in too
+            if (componentId != null && componentTypeId != null)
+            {
+                String componentTitle = "";
+                String componentTypeTitle = "";
+                String editorUrl = "";
+                Component c = (Component) context.getModel().getComponent(
+                        componentId);
+                if (c != null)
+                {
+                    componentTitle = getComponentTitle(context, c);
+                    componentTypeTitle = getComponentTypeTitle(context, c);
+                    editorUrl = getComponentEditorUrl(context, c);
+                }
+                writer.println("if(WebStudio){");
+                writer.println("WebStudio.configureComponent('" + htmlId
+                        + "', '" + componentId + "', '" + componentTypeId
+                        + "', '" + componentTitle + "', '" + componentTypeTitle
+                        + "', '" + editorUrl + "');");
+                writer.println("}");
+            }
+
+            writer.println("</script>");
+            writer.flush();
         }
     }
-	
-	public static String getComponentTitle(RequestContext context, Component c)
-	{
-		String title = c.getTitle();
-		if(title == null)
-		{
-			title = c.getId();
-		}
-		
-		return title;
-	}
-		
-	public static String getComponentTypeTitle(RequestContext context, Component c)
-	{
-		String title = null;
-		
-		ComponentType ct = c.getComponentType(context);
-		if(ct != null)
-		{
-			title = ct.getTitle();
-			if(title == null)
-			{
-				title = ct.getId();
-			}
-			
-			if("webscript".equals(ct.getId()))
-			{
-				String url = c.getURL();
-				
-				Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
-				WebScript webScript = registry.getWebScript(url);
-				if(webScript != null)
-				{
-					title = webScript.getDescription().getShortName();
-				}
-			}
-		}
-		else
-		{
-			// assume the component type field is a web script id
-			String url = c.getComponentTypeId();
-			
-			Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
-			
+
+    public static String getComponentTitle(RequestContext context, Component c)
+    {
+        String title = c.getTitle();
+        if (title == null)
+        {
+            title = c.getId();
+        }
+
+        return title;
+    }
+
+    public static String getComponentTypeTitle(RequestContext context,
+            Component c)
+    {
+        String title = null;
+
+        ComponentType ct = c.getComponentType(context);
+        if (ct != null)
+        {
+            title = ct.getTitle();
+            if (title == null)
+            {
+                title = ct.getId();
+            }
+
+            if ("webscript".equals(ct.getId()))
+            {
+                String url = c.getURL();
+
+                Registry registry = (Registry) FrameworkHelper
+                        .getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
+                WebScript webScript = registry.getWebScript(url);
+                if (webScript != null)
+                {
+                    title = webScript.getDescription().getShortName();
+                }
+            }
+        }
+        else
+        {
+            // assume the component type field is a web script id
+            String url = c.getComponentTypeId();
+
+            Registry registry = (Registry) FrameworkHelper
+                    .getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
+
             for (WebScript webscript : registry.getWebScripts())
             {
-            	String[] uris = webscript.getDescription().getURIs();
-            	for(int z = 0; z < uris.length; z++)
-            	{
-            		String uri = uris[z];
-            		if(uri.equals(url))
-            		{
-            			title = webscript.getDescription().getShortName();
-            		}
-            	}
+                String[] uris = webscript.getDescription().getURIs();
+                for (int z = 0; z < uris.length; z++)
+                {
+                    String uri = uris[z];
+                    if (uri.equals(url))
+                    {
+                        title = webscript.getDescription().getShortName();
+                    }
+                }
             }
-		}
-		
-		return title;			
-	}
-	
-	public static String getComponentEditorUrl(RequestContext context, Component c)
-	{
-		String url = null;
-		
-		ComponentType ct = c.getComponentType(context);
-		if(ct != null)
-		{
-			if("webscript".equals(ct.getId()))
-			{
-				url = "/c/edit/" + c.getId();
-			}
-		}
-		else
-		{
-			// assume it is a web script
-			url = "/c/edit/" + c.getId();
-		}
-		
-		return url;		
-	}
-    
-    
+        }
+
+        return title;
+    }
+
+    public static String getComponentEditorUrl(RequestContext context,
+            Component c)
+    {
+        String url = null;
+
+        ComponentType ct = c.getComponentType(context);
+        if (ct != null)
+        {
+            if ("webscript".equals(ct.getId()))
+            {
+                url = "/c/edit/" + c.getId();
+            }
+        }
+        else
+        {
+            // assume it is a web script
+            url = "/c/edit/" + c.getId();
+        }
+
+        return url;
+    }
+
 }

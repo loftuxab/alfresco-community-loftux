@@ -4,7 +4,7 @@
 	cursor: pointer;	             	
 	background-color: #FFFFE0;
 
-	border: 1px dashed black;
+	border-spacing: 0;
 
 	width: 100%;                
     height: 100%;
@@ -25,8 +25,9 @@
 	cursor: pointer;	             	
 	height: 15px;
 	width: 100%; 
-	
-	//margin: 5px;
+
+	border-spacing: 0;
+	border: 0;
 	
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
@@ -38,9 +39,8 @@
 /* ROW */
 .TemplateTableRow 
 {
-    border:1px dashed black;
-
-/*    background-color: #FFFACD;*/
+	border: 0;
+		
 	background-color: #FFF7B5;
     width: 100%;
     height: 100%;
@@ -57,14 +57,31 @@
 /* ROW TITLE*/
 .TemplateRowTitle
 {
-/*    background-color: #FFFACD;*/	
 	background-color: #FFF7B5;
 	cursor: pointer;	
     height: 15px;
 	width: 100%; 	
-	
-	//margin: 5px;
-	
+
+	border: 0;
+
+	font-family:tahoma,arial,helvetica,sans-serif;
+	font-size:11px;
+	font-size-adjust:none;
+	font-style:normal;
+	font-variant:normal;
+}
+
+/* ROW */
+.TemplateTableTBodyRow 
+{
+	background-color: #FFF7B5;
+    width: 100%;
+    height: 100%;
+    
+	border: 0;
+
+    vertical-align, top;      
+    
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
@@ -76,15 +93,15 @@
 /* COLUMN */
 .TemplateTableColumn 
 { 
-/*    background-color: #FFF7B5;*/
-/*	background-color: #EEE9BF;*/
 	background-color: #EEE8AA;	
     vertical-align: top;          
 
     height: 100%;
 
-	border: 5px solid #FFFACD;
-	
+	border: 1px dashed black;
+
+	margin: 3px;
+
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
@@ -96,8 +113,6 @@
 /* COLUMN TITLE*/
 .TemplateColumnTitle 
 { 
-/*    background-color: #FFF7B5;*/
-/*	background-color: #EEE9BF;*/	
 	background-color: #EEE8AA;
 	cursor: pointer;	
     height: 15px;
@@ -114,14 +129,15 @@
 /* REGION */
 .TemplateRegion 
 { 
-	border-top: 1px dashed black;	
+	border: 1px dashed black;	
 
-/*    background-color: #EEE8AA;*/
-/*	background-color: #EEE9BF;*/
-	background-color: #EEDC82;
+	background-color: #EEDC82; 
 
-    height: 100%; 
-    
+	margin-top: 2px;	
+	margin-bottom: 5px;	
+	margin-left: 5px;
+	margin-right: 5px;
+
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
@@ -132,8 +148,6 @@
 /* REGION TITLE*/
 .TemplateRegionTitle 
 { 
-/*    background-color: #EEE8AA;*/	
-/*	background-color: #EEE9BF;*/
 	background-color: #EEDC82;
 	cursor: pointer;
     height: 15px;
@@ -197,19 +211,20 @@
 .TemplateTableOnMouseOver 
 { 
     background-color: #d9e8fb;                                           
-    width: 100%;                
-    height: 100%;
 
-	border: 1px dashed black;
+	width: 100%;                
+	height: 100%;
+	
+	border-spacing: 0;
+	border: 0;
 
-    vertical-align: top;
-
+	vertical-align: top;
+	
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
-	font-weight:bold;
     
     cursor: pointer;     
 }
@@ -217,8 +232,8 @@
 .RowOnMouseOver 
 { 
     cursor: pointer;
-
-	border: 1px dashed black;
+	
+	border: 0;
 
 	background-color: #d9e8fb;              
 	width: 100%;
@@ -242,7 +257,9 @@
     height: 100%;
 
 	border: 1px dashed black;
-    
+
+	margin: 3px;
+
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
@@ -258,7 +275,12 @@
                 
     background-color: #d9e8fb;
     height: 100%;
-    
+
+	margin-top: 2px;	
+	margin-bottom: 5px;	
+	margin-left: 5px;
+	margin-right: 5px;
+
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
@@ -272,31 +294,34 @@
 /* ROW TITLE ON MOUSE OVER */
 .TemplateTitleOnMouseOver
 {
-    background-color: #d9e8fb;	
-	cursor: pointer;	
-    height: 15px;
+	background-color: #d9e8fb;	
+		
+	cursor: pointer;	             	
+	height: 15px;
 	width: 100%; 
-
-	border: 0px;
+	
+	border-bottom: 0;
+	border-spacing: 0;
 	
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
-	font-weight:bold;
+	font-weight:bold;	
 }
 
 /* ROW TITLE ON MOUSE OVER */
 .TemplateRowTitleOnMouseOver
 {
     background-color: #d9e8fb;	
-	cursor: pointer;	
-    height: 15px;
+	
+	cursor: pointer;	             	
+	height: 15px;
 	width: 100%; 
-
-	border: 0px;
-
+	
+	border: 0;
+	
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;

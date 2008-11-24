@@ -35,8 +35,8 @@ import org.alfresco.web.studio.OverlayUtil;
 import org.alfresco.web.studio.WebStudio;
 
 /**
- * Retrieves CSS, Javascript and other assets on behalf of the currently
- * logged in user so as to render the in-context displays.
+ * Retrieves CSS on behalf of the currently logged in user so as to
+ * render the in-context displays.
  * 
  * @author muzquiano
  */
@@ -50,56 +50,44 @@ public class WebStudioCssServlet extends BaseServlet
     protected void service(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
-    	String cacheKey = request.getRequestURI() + request.getQueryString();
-    	
-		StringBuilder buffer = null;
-		
-		// load from cache (if configured)
-		if(WebStudio.getConfig().isCSSCachingEnabled())
-		{
-			buffer = OverlayUtil.getCachedResource(request, cacheKey); 
-		}
-	
-		if(buffer == null)
-		{
-			buffer = new StringBuilder(65536);
-			
-			try
-			{
-				// By default, include a JSP from disk so that we can at least be pretty flexible
-				// about some of the core stuff that gets included
-				OverlayUtil.include(request, buffer, "/overlay/default/core.css.jsp");
-					
-	    		// TODO: Include stuff from the application
-		
-				// General cleanup off CSS to help resolve variables
-				String rootPath = org.alfresco.web.studio.OverlayUtil.getOriginalURL(request, "/proxy/alfresco-web-studio");
-				String str = buffer.toString();
-				str = str.replace("url(/yui", "url(" + rootPath + "/yui");
-				buffer = new StringBuilder(32768);
-				buffer.append(str);
-				
-				// Execute CSS compression (if configured)
-	    		if(WebStudio.getConfig().isCSSCompressionEnabled())
-	    		{
-	    			String value = WebStudio.compressCSS(buffer);
-	    			buffer = new StringBuilder(131072);
-	    			buffer.append(value);
-	    		}
-				
-	    		// cache back (if configured)
-				if(WebStudio.getConfig().isJavascriptCachingEnabled())
-				{
-					OverlayUtil.setCachedResource(request, cacheKey, buffer);
-				}				
-			}
-			catch(IOException ioe)
-			{
-				// this was likely thrown during the compression step
-				ioe.printStackTrace();
-			}
-		}
-		
-		response.getWriter().println(buffer.toString());    	
+        String cacheKey = "CSS_" + request.getRequestURI()
+                + request.getQueryString();
+
+        StringBuilder buffer = null;
+
+        // load from cache (if configured)
+        if (!WebStudio.getConfig().isDeveloperMode())
+        {
+            buffer = OverlayUtil.getCachedResource(request, cacheKey);
+        }
+
+        if (buffer == null)
+        {
+            buffer = new StringBuilder(65536);
+
+            // By default, include a JSP from disk so that we can at
+            // least be pretty flexible
+            // about some of the core stuff that gets included
+            OverlayUtil.include(request, buffer,
+                    "/overlay/default/core.css.jsp");
+
+            // TODO: Include stuff from the application
+
+            // General cleanup off CSS to help resolve variables
+            String rootPath = org.alfresco.web.studio.OverlayUtil
+                    .getOriginalURL(request, "/proxy/alfresco-web-studio");
+            String str = buffer.toString();
+            str = str.replace("url(/yui", "url(" + rootPath + "/yui");
+            buffer = new StringBuilder(32768);
+            buffer.append(str);
+
+            // cache back (if configured)
+            if (!WebStudio.getConfig().isDeveloperMode())
+            {
+                OverlayUtil.setCachedResource(request, cacheKey, buffer);
+            }
+        }
+
+        response.getWriter().println(buffer.toString());
     }
 }

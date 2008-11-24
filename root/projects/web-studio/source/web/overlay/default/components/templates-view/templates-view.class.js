@@ -1,7 +1,6 @@
-
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.TemplatesView = function() 
@@ -25,7 +24,7 @@ WebStudio.TemplatesView = function()
 		Network: {
 			selector: 'div[id=ALVNetwork]'
 		}
-	}
+	};
 
 	this.events = {};
 	
@@ -33,12 +32,14 @@ WebStudio.TemplatesView = function()
 	this.INDEX_BUTTON_EDIT = 1;
 	this.INDEX_BUTTON_COPY = 2;
 	this.INDEX_BUTTON_DELETE = 3;	
-}
+};
 
 WebStudio.TemplatesView.prototype = new WebStudio.AbstractTemplater('WebStudio.TemplatesView');
 
 WebStudio.TemplatesView.prototype.activate = function() 
 {	
+	var _this = this;
+	
 	this.buildGeneralLayer();
 
 	if (this.MenuHolder.el) 
@@ -54,15 +55,16 @@ WebStudio.TemplatesView.prototype.activate = function()
 
 		this.menu.addEvent('click', 'TemplatesViewAddEditDelete', function(group, index) 
 		{
-			if (group == 'roots') {
-				if (index == 0) {
-					this.fireEvent('AddTemplate');
-				} else if (index == 1) {
-					this.fireEvent('EditTemplate');
-				} else if (index == 2) {
-					this.fireEvent('CopyTemplate');
-				} else if (index == 3) {
-					this.fireEvent('DeleteTemplate');
+			if (group == 'roots') 
+			{
+				if (index == _this.INDEX_BUTTON_ADD) {
+					_this.fireEvent('AddTemplate');
+				} else if (index == _this.INDEX_BUTTON_EDIT) {
+					_this.fireEvent('EditTemplate');
+				} else if (index == _this.INDEX_BUTTON_COPY) {
+					_this.fireEvent('CopyTemplate');
+				} else if (index == _this.INDEX_BUTTON_DELETE) {
+					_this.fireEvent('DeleteTemplate');
 				}
 			}
 		}, this);
@@ -95,8 +97,6 @@ WebStudio.TemplatesView.prototype.activate = function()
 	
 	// Reload Templates listing
 	this.reloadTemplatesListing();
-	
-	var _this = this;
 		
 	// Set up Events
 	this.addEvent('AddTemplate', 'add_template', function() 
@@ -108,11 +108,11 @@ WebStudio.TemplatesView.prototype.activate = function()
 		});
 		var url = WebStudio.ws.studio('/wizard/template/add');
 		w.start(url, 'addnewtemplate');
-		w.onComplete = (function() 
+		w.onComplete = function() 
 		{
 			// reload templates when complete
-			this.reloadTemplatesListing();
-		}).bind(this);
+			_this.reloadTemplatesListing();
+		};
 		
 	}, this);
 
@@ -126,11 +126,11 @@ WebStudio.TemplatesView.prototype.activate = function()
 		});
 		var url = WebStudio.ws.studio('/wizard/template/edit');
 		w.start(url, 'edittemplate');
-		w.onComplete = (function() 
+		w.onComplete = function() 
 		{
 			// reload templates when complete
-			this.reloadTemplatesListing();
-		}).bind(this);
+			_this.reloadTemplatesListing();
+		};
 
 	}, this);
 
@@ -144,11 +144,11 @@ WebStudio.TemplatesView.prototype.activate = function()
 		});
 		var url = WebStudio.ws.studio('/wizard/template/copy');
 		w.start(url, 'edittemplate');
-		w.onComplete = (function() 
+		w.onComplete = function() 
 		{
 			// reload templates when complete
-			this.reloadTemplatesListing();
-		}).bind(this);
+			_this.reloadTemplatesListing();
+		};
 
 	}, this);
 
@@ -162,116 +162,127 @@ WebStudio.TemplatesView.prototype.activate = function()
 		});
 		var url = WebStudio.ws.studio('/wizard/template/remove');
 		w.start(url, 'removetemplate');
-		w.onComplete = (function() 
+		w.onComplete = function() 
 		{
 			// reload templates when complete
-			this.reloadTemplatesListing();
-		}).bind(this);
+			_this.reloadTemplatesListing();
+		};
 
 	}, this);
 	
 	return this;
-}
+};
 
-WebStudio.TemplatesView.prototype.reloadTemplatesListing = function() {
+WebStudio.TemplatesView.prototype.reloadTemplatesListing = function() 
+{
+	var _this = this;
 
 	// Do an Ajax call to fetch all of the template instances
 	var url = WebStudio.ws.studio("/api/model/list", { type: "template-instance" } );
 	
 	this.call = YAHOO.util.Connect.asyncRequest('GET', url, 
 	{	
-		success: (function(r) 
+		success: function(r) 
 		{ 		
 			var d = eval('(' + r.responseText + ')');
 
+			var key = null;
+			var templateType = null;
+			var domId = null;
+			
 			var html = "<table width='100%' border='0'>";
-			for(var key in d.results)
+			for(key in d.results)
 			{
-				var templateType = d.results[key]["template-type"];
-				
-				// select image
-				var imageUrl = "/overlay/default/images/template.gif";
-				var colorStyle = " style='color: gray' ";
-				if("dynamic" == templateType)
+				if(d.results.hasOwnProperty(key))
 				{
-					imageUrl = "/overlay/default/images/dynamic-template.gif";
-					colorStyle = " ";
+					templateType = d.results[key]["template-type"];
+					
+					// select image
+					var imageUrl = "/overlay/default/images/template.gif";
+					var colorStyle = " style='color: gray' ";
+					if("dynamic" == templateType)
+					{
+						imageUrl = "/overlay/default/images/dynamic-template.gif";
+						colorStyle = " ";
+					}
+					
+					// write out the row
+					domId = _this.getTemplateDomId(key);
+					 
+					html += "<tr class='TemplateRow' id='" + domId + "'>";
+					html += "<td id='TemplateCell1_" + domId + "'>";
+					html += "<img src='" + WebStudio.url.studio(imageUrl) + "'>";
+					html += "</td>";
+					html += "<td width='100%' id='TemplateCell2_" + domId + "' " + colorStyle + " >";				 
+					
+					var title = d.results[key].title;
+					if(!title)
+					{
+						title = d.results[key]["template-type"];
+					}
+					if(!title)
+					{
+						title = key;
+					}
+					html += title;
+					html += "</td>";
+					html += "</tr>";
 				}
-				
-				// write out the row
-				var domId = this.getTemplateDomId(key);
-				 
-				html += "<tr class='TemplateRow' id='" + domId + "'>";
-				html += "<td id='TemplateCell1_" + domId + "'>";
-				html += "<img src='" + WebStudio.url.studio(imageUrl) + "'>";
-				html += "</td>";
-				html += "<td width='100%' id='TemplateCell2_" + domId + "' " + colorStyle + " >";				 
-				
-				var title = d.results[key].title;
-				if(!title)
-				{
-					title = d.results[key]["template-type"];
-				}
-				if(!title)
-				{
-					title = key;
-				}
-				html += title;
-				html += "</td>";
-				html += "</tr>";							
 			}
 			html += "</table>";	
-			this.Instances.el.setHTML(html);
-			
-				
-			var _this = this;
-			
-			// add in click events
-			for(var key in d.results)
-			{
-				var templateType = d.results[key]["template-type"];
-				if("dynamic" == templateType)
-				{
-					var domId = this.getTemplateDomId(key);
-	
-					var cell1 = $('TemplateCell1_' + domId);
-					cell1.templateId = key;
-					cell1.onclick = function(group, index) 
-					{
-						_this.onTemplateRowClick(this.templateId);
-					};
+			_this.Instances.el.setHTML(html);
 					
-					var cell2 = $('TemplateCell2_' + domId);
-					cell2.templateId = key;
-					cell2.onclick = function(group, index) 
+			var templateRowOnClickHandler = function(group, index)
+			{
+				_this.onTemplateRowClick(_this.templateId);
+			};
+				
+			// add in click events
+			for(key in d.results)
+			{
+				if(d.results.hasOwnProperty(key))
+				{
+					templateType = d.results[key]["template-type"];
+					if("dynamic" == templateType)
 					{
-						_this.onTemplateRowClick(this.templateId);
-					};
+						domId = _this.getTemplateDomId(key);
+		
+						var cell1 = $('TemplateCell1_' + domId);
+						cell1.templateId = key;
+						cell1.onclick = templateRowOnClickHandler;
+						
+						var cell2 = $('TemplateCell2_' + domId);
+						cell2.templateId = key;
+						cell2.onclick =  templateRowOnClickHandler;
+					}
 				}
 			}
 			
-		}).bind(this)
+		}
 		,
 		failure: function(r)
 		{		
 			alert("reloadTemplatesListing failed: " + r.responseText);
 		}
 	});	
-}
+};
 
 WebStudio.TemplatesView.prototype.build = function() 
 {
 	this.generalLayer.set({
 		id: this.ID
 	});
-}
+};
 
 WebStudio.TemplatesView.prototype.selectTemplate = function(templateId) 
 {
+	var domId = null;
+	var domElement = null;
+	
 	if(this.selectedTemplateId)
 	{
-		var domId = this.getTemplateDomId(this.selectedTemplateId);
-		var domElement = $(domId);
+		domId = this.getTemplateDomId(this.selectedTemplateId);
+		domElement = $(domId);
 		if(domElement)
 		{
 			domElement.removeClass('SelectedTemplateRow');
@@ -282,8 +293,8 @@ WebStudio.TemplatesView.prototype.selectTemplate = function(templateId)
 	// select
 	this.selectedTemplateId = templateId;
 	
-	var domId = this.getTemplateDomId(templateId);
-	var domElement = $(domId);
+	domId = this.getTemplateDomId(templateId);
+	domElement = $(domId);
 	if(domElement)
 	{
 		domElement.removeClass('TemplateRow');
@@ -300,9 +311,9 @@ WebStudio.TemplatesView.prototype.selectTemplate = function(templateId)
 WebStudio.TemplatesView.prototype.getTemplateDomId = function(templateId)
 {
 	return "templatesView_template_" + templateId;
-}
+};
 
 WebStudio.TemplatesView.prototype.onTemplateRowClick = function(templateId)
 {
 	// This is to be overridden elsewhere (templates applet most likely)
-}
+};

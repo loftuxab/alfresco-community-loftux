@@ -1,17 +1,25 @@
 {
 	"results" : {
 	
-		"none" : {
+<#assign first = true>	
+<#list sites?keys as id>
+
+	<#assign site = sites[id]>
+
+		<#if first == false>,</#if>
+	
+		"${id}" : {
 			
-			"title" : "Blank Web Site",
-			"previewImageUri" : "/resources/modelobject1/preview.png",
-			"archiveUrl" : "/samples/sample1.zip"
+			"title" : "${site.title}",
+			"description" : "${site.description}",
+			"previewImageUrl" : "${site.previewImageUrl}",
+			"archiveUrl" : "${site.archiveUrl}"
+			
 		}
-		,
-		"green" : {
-			"title" : "Green Energy",
-			"previewImageUri" : "/resources/modelobject2/preview.png",
-			"archiveUrl" : "/samples/sample2.zip"
-		}
+		
+		<#assign first = false>
+		
+</#list>
+
 	}
 }

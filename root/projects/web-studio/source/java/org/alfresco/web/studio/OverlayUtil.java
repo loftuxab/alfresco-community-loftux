@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.studio;
 
+import java.util.Enumeration;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.tools.FakeHttpServletResponse;
@@ -36,94 +38,136 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author muzquiano
  */
-public class OverlayUtil 
+public class OverlayUtil
 {
-	private static Log logger = LogFactory.getLog(OverlayUtil.class);
-	
-	/**
-	 * Performs a wrapped include of a resource and writes results to a buffer
-	 * 
-	 * @param request
-	 * @param buffer
-	 * @param path
-	 */
-	public static void include(HttpServletRequest request, StringBuilder buffer, String path)
-	{
-		WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
-		FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(false);
-	
-		try
-		{
-			// do the include
-			request.getRequestDispatcher(path).include(wrappedRequest, fakeResponse);
-			
-			// write to buffer
-			buffer.append(fakeResponse.getContentAsString());
-			
-			// append a line feed / carriage return
-			buffer.append("\r\n");
-		}
-		catch(Exception ex) 
-		{
-			logger.warn("Unable to include '" + path + "', " + ex.getMessage());
-		}		
-	}
-	
-	/**
-	 * Gets a cached resource from the user session
-	 * 
-	 * @param request
-	 * @param key
-	 * @return
-	 */
-	public static StringBuilder getCachedResource(HttpServletRequest request, String key)
-	{
-		return (StringBuilder) request.getSession().getAttribute("CACHED_RESOURCE_" + key);
-	}
+    private static Log logger = LogFactory.getLog(OverlayUtil.class);
 
-	/**
-	 * Caches a resource into the user session
-	 * 
-	 * @param request
-	 * @param key
-	 * @param buffer
-	 */
-	public static void setCachedResource(HttpServletRequest request, String key, StringBuilder buffer)
-	{
-		request.getSession().setAttribute("CACHED_RESOURCE_" + key, buffer);
-	}
-	
-	/**
-	 * Returns the host port for the web studio application
-	 * 
-	 * @return
-	 */
-	public static String getWebStudioHostPort(HttpServletRequest request)
-	{
-		String url = request.getScheme();
-		url += "://";
-		url += request.getServerName();
-		if(request.getServerPort() != 80)
-		{
-			url += ":" + request.getServerPort();
-		}
-		url += request.getContextPath();
-		
-		return url;
-	}
-	
-	/**
-	 * Constructs a browser-friendly path to the web studio relative path
-	 * 
-	 * @param request
-	 * @param relativePath
-	 * @return
-	 */
-	public static String getWebStudioURL(HttpServletRequest request, String relativePath)
-	{
-		return getWebStudioHostPort(request) + relativePath;
-	}
-	
+    /**
+     * Performs a wrapped include of a resource and writes results to a buffer
+     * 
+     * @param request
+     * @param buffer
+     * @param path
+     */
+    public static void include(HttpServletRequest request,
+            StringBuilder buffer, String path)
+    {
+        WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
+                request);
+        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(
+                false);
+
+        try
+        {
+            // do the include
+            request.getRequestDispatcher(path).include(wrappedRequest,
+                    fakeResponse);
+
+            // write to buffer
+            buffer.append(fakeResponse.getContentAsString());
+
+            // append a line feed / carriage return
+            buffer.append("\r\n");
+        }
+        catch (Exception ex)
+        {
+            logger.warn("Unable to include '" + path + "', " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Gets a cached resource from the user session
+     * 
+     * @param request
+     * @param key
+     * @return
+     */
+    public static StringBuilder getCachedResource(HttpServletRequest request,
+            String key)
+    {
+        return (StringBuilder) request.getSession().getAttribute(
+                "CACHED_RESOURCE_" + key);
+    }
+
+    /**
+     * Caches a resource into the user session
+     * 
+     * @param request
+     * @param key
+     * @param buffer
+     */
+    public static void setCachedResource(HttpServletRequest request,
+            String key, StringBuilder buffer)
+    {
+        request.getSession().setAttribute("CACHED_RESOURCE_" + key, buffer);
+    }
+
+    /**
+     * Removes a cached resource from the user session
+     * 
+     * @param request
+     *            the request
+     * @param key
+     *            the key
+     */
+    public static void removeCachedResource(HttpServletRequest request,
+            String key)
+    {
+        request.getSession().removeAttribute("CACHED_RESOURCE_" + key);
+    }
+
+    /**
+     * Removes cached resources that whose start with the given string
+     * 
+     * @param request
+     * @param car
+     */
+    public static void removeCachedResources(HttpServletRequest request,
+            String key)
+    {
+        Enumeration en = request.getSession().getAttributeNames();
+        while (en.hasMoreElements())
+        {
+            String attributeName = (String) en.nextElement();
+            if (attributeName.startsWith("CACHED_RESOURCE_" + key))
+            {
+                request.getSession().removeAttribute(attributeName);
+            }
+        }
+    }
+
+    /**
+     * Returns the host port for the web studio application
+     * 
+     * @return
+     */
+    public static String getWebStudioHostPort(HttpServletRequest request)
+    {
+        String url = request.getScheme();
+        url += "://";
+        url += request.getServerName();
+        if (request.getServerPort() != 80)
+        {
+            url += ":" + request.getServerPort();
+        }
+        url += request.getContextPath();
+
+        return url;
+    }
+
+    /**
+     * Constructs a browser-friendly path to the web studio relative path
+     * 
+     * @param request
+     * @param relativePath
+     * @return
+     */
+    public static String getWebStudioURL(HttpServletRequest request,
+            String relativePath)
+    {
+        return getWebStudioHostPort(request) + relativePath;
+    }
+
     /**
      * Returns the context path of the original web application
      * 
@@ -132,15 +176,15 @@ public class OverlayUtil
      */
     public static String getOriginalContextPath(HttpServletRequest request)
     {
-    	String contextPath = request.getParameter("contextPath");
-    	if(contextPath == null)
-    	{
-    		contextPath = "/";
-    	}
-    	
-    	return contextPath;
+        String contextPath = request.getParameter("contextPath");
+        if (contextPath == null)
+        {
+            contextPath = "/";
+        }
+
+        return contextPath;
     }
-    
+
     /**
      * Constructs a browser-friendly path to the original webapp relative path
      * 
@@ -148,9 +192,10 @@ public class OverlayUtil
      * @param relativePath
      * @return
      */
-    public static String getOriginalURL(HttpServletRequest request, String relativePath)
+    public static String getOriginalURL(HttpServletRequest request,
+            String relativePath)
     {
-    	return getOriginalContextPath(request) + relativePath;
+        return getOriginalContextPath(request) + relativePath;
     }
-	
+
 }

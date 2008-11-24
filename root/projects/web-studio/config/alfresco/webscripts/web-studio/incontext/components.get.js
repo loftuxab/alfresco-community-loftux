@@ -119,11 +119,19 @@ function pushComponentResources(component, resources)
 					{
 						if(attributeName == "value")
 						{
-							resource.value = attributeValue;
+							resource.setValue(attributeValue);
+						}
+						else if(attributeName == "type")
+						{
+							resource.setType(attributeValue);
+						}
+						else if(attributeName == "endpoint")
+						{
+							resource.setEndpoint(attributeValue);
 						}
 						else
 						{
-							resource.properties[attributeName] = attributeValue;
+							resource.setAttribute(attributeName, attributeValue);
 						}
 					}
 				}
@@ -220,4 +228,3 @@ if(callback != null)
 	outputString = callback + "(" + outputString + ");";
 }
 model.json = outputString;
-

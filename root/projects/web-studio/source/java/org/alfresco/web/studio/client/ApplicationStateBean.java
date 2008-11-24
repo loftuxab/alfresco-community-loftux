@@ -32,29 +32,30 @@ import java.util.Map;
  * 
  * @author muzquiano
  */
-public class ApplicationStateBean extends BrowserStateBean 
+public class ApplicationStateBean extends BrowserStateBean
 {
-	protected Map<String, AppletStateBean> applets;
-	
-	/**
-	 * Instantiates a new application state bean.
-	 * 
-	 * @param id the id
-	 */
-	public ApplicationStateBean(String id)
-	{
-		super(id);
-		
-		this.applets = new HashMap<String, AppletStateBean>(16, 1.0f);
-	}
-	
-	/**
-	 * Retrives the applets that are part of this application
-	 * 
-	 * @return
-	 */
-	public AppletStateBean[] getApplets()
-	{
-		return this.applets.values().toArray(new AppletStateBean[this.applets.size()]);
-	}
+    protected Map<String, AppletStateBean> applets;
+
+    /**
+     * Instantiates a new application state bean.
+     * 
+     * @param id the id
+     */
+    public ApplicationStateBean(String id)
+    {
+        super(id);
+
+        this.applets = new HashMap<String, AppletStateBean>(16, 1.0f);
+    }
+
+    /**
+     * Retrives the applets that are part of this application
+     * 
+     * @return
+     */
+    public AppletStateBean[] getApplets()
+    {
+        return this.applets.values().toArray(
+                new AppletStateBean[this.applets.size()]);
+    }
 }

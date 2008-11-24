@@ -42,6 +42,7 @@ import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.scripts.WebScriptException;
 import org.apache.commons.logging.Log;
 
@@ -76,7 +77,7 @@ public abstract class AbstractRequestContext implements RequestContext
     
     protected Page currentPage;
     protected TemplateInstance currentTemplate;
-    protected org.alfresco.web.site.Content currentObject;
+    protected ResourceContent currentObject;
     protected String currentFormatId;
     protected String storeId;
     protected User user;
@@ -315,7 +316,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @param content
      */
-    public void setCurrentObject(org.alfresco.web.site.Content content)
+    public void setCurrentObject(ResourceContent content)
     {
         this.currentObject = content;
     }
@@ -323,7 +324,7 @@ public abstract class AbstractRequestContext implements RequestContext
     /**
      * Returns the current object
      */
-    public org.alfresco.web.site.Content getCurrentObject()
+    public ResourceContent getCurrentObject()
     {
         return this.currentObject;
     }

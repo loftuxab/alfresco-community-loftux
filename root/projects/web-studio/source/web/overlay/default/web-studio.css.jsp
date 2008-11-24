@@ -7,14 +7,17 @@
 	String iconsPath = imagesPath + "/icons";
 	String treesPath = imagesPath + "/trees";
 %>
+
 body.studio 
 {
 	font-family: Tahoma,Arial,Helvetica,sans-serif;
-	font-size:12px;
-	color:#333;
+	font-size: 12px;
+	color: #333;
 	background-color: white;
 	padding: 0px;
 	margin: 0px;
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 #no_webproject_selected
@@ -35,9 +38,6 @@ body.studio
 }
 #no_sandbox_selected DIV:hover { cursor: pointer; }
 
-.MountSelectorCenter DIV:hover { 
-	cursor: pointer;
-}
 
 
 
@@ -368,66 +368,6 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
     padding-left:1px;    
 }
 
-
-
-.MountSelector
-{
-	width:100%;
-	height:25px;
-	cursor:default !important;
-	border-top:1px solid #F0F5FA;
-	border-bottom:1px solid #A9BFD3;
-	background-image:url(<%=overlayPath%>/images/menubg.gif);
-}
-
-.MountSelectorRoot
-{
-	padding-top:1px;
-	cursor:pointer;
-	float:left;
-	font-size:11px;
-	font-family:tahoma,verdana,helvetica;
-	color:black;
-	height:16px;
-	text-align:center;
-	background-image:url(<%=overlayPath%>/images/menubg.gif);
-	overflow:visible;
-	margin-top:1px;
-	margin-left:3px;
-}
-
-
-.MountSelectorLeft
-{
-	background-image:url(<%=overlayPath%>/images/menuBgLeft.gif);	
-}
-
-.MountSelectorCenter
-{
-	font-family: Tahoma,Arial,Helvetica,sans-serif;
-	font-size:11px;
-	color: #000000;
-	padding: 0px;
-	margin: 0px;
-	background-image:url(<%=overlayPath%>/images/menuBgCenter.gif);	
-}
-
-.MountSelectorCenterSelected
-{
-	font-family: Tahoma,Arial,Helvetica,sans-serif;
-	font-size:11px;
-	font-weight: bold;	
-	color: #000000;
-	padding: 0px;
-	margin: 0px;
-	background-image:url(<%=overlayPath%>/images/menuBgCenter.gif);	
-}
-
-.MountSelectorRight
-{
-	background-image:url(<%=overlayPath%>/images/menuBgRight.gif);	
-}
-
 .OverlaySearch
 {
 	padding-top: 0px;
@@ -549,155 +489,6 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
 }
 
 
-
-
-
-
-
-
-
-
-.login-window
-{
-	position:absolute;
-	width:500px;
-	height:300px;
-	left:300px;
-	top: 200px;
-	cursor:default;
-}
-
-.login-panel
-{
-   position:absolute;
-   background-color: #B4B4B4;
-   text-align: left;   
-   width: 502px;
-   height: 289px;
-   background: transparent url("<%=imagesPath%>/login/loginbg.png") no-repeat;
-   font-family: Arial,Helvetica,sans-serif;
-   font-size: 12px;
-   font-weight: bold;
-   color: #515354;
-}
-
-.login-input
-{
-   border: 1px solid #C5D6E2;
-   padding: 2px;
-   font-weight: normal;
-}
-
-.login-fieldset
-{
-   border: 0px;
-   padding: 10px;
-}
-
-.login-button
-{
-   background-color: #f0f0f0;
-}
-
-.login-copyright
-{
-   font-family: Arial,Helvetica,sans-serif;
-   font-size: 11px;
-   font-weight: normal;
-   color: #959a9b;
-}
-
-.login-logo
-{
-   position: absolute;
-   top: 16px;
-   left: 20px;
-   height: 64px;
-   width: 450px;
-   background: transparent url("<%=imagesPath%>/login/logo.png") no-repeat;
-}
-
-
-
-
-.sandbox-window
-{
-	position:absolute;
-	width:500px;
-	height:300px;
-	left:300px;
-	top: 200px;
-	cursor:default;
-}
-
-.sandbox-panel
-{
-   position:absolute;
-   background-color: #B4B4B4;
-   text-align: left;   
-   width: 502px;
-   height: 289px;
-   background: transparent url("<%=imagesPath%>/login/loginbg.png") no-repeat;
-   font-family: Arial,Helvetica,sans-serif;
-   font-size: 12px;
-   font-weight: bold;
-   color: #515354;
-}
-
-.sandbox-input
-{
-   border: 1px solid #C5D6E2;
-   padding: 2px;
-   font-weight: normal;
-}
-
-.sandbox-fieldset
-{
-   border: 0px;
-   padding: 10px;
-}
-
-.sandbox-table
-{
-   border: 1px;
-   padding: 10px;
-}
-
-.sandbox-table TD
-{
-	border-spacing:10px;
-}
-
-.sandbox-button
-{
-   background-color: #f0f0f0;
-}
-
-.sandbox-copyright
-{
-   font-family: Arial,Helvetica,sans-serif;
-   font-size: 11px;
-   font-weight: normal;
-   color: #959a9b;
-}
-
-.sandbox-header
-{
-   font-family: Arial,Helvetica,sans-serif;
-   font-size: 14px;
-   font-weight: normal;
-
-   position: absolute;
-   top: 16px;
-   left: 20px;
-   height: 64px;
-   width: 450px;
-}
-
-.sandbox-info
-{
-	font-weight: normal;
-}
 
 
 .AlfrescoComponentEditor

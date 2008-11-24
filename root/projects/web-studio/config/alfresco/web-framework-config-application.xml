@@ -65,11 +65,11 @@
 		</web-framework>
 		
 	</config>
-	
+		
 	<config evaluator="string-compare" condition="Remote">
 
 		<remote>
-		
+				
 			<endpoint>
 				<id>alfresco-web-studio</id>
 				<name>Alfresco Web Studio</name>
@@ -96,6 +96,16 @@
 				<endpoint-url>http://localhost:8080/alfresco</endpoint-url>
 				<identity>user</identity>
 			</endpoint>
+			
+			<!-- Include the Alfresco Network unauthenticated endpoint -->
+			<endpoint>
+				<id>alfresco-network</id>
+				<name>Alfresco Network</name>
+				<description>Alfresco Network</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>https://network.alfresco.com/extranet</endpoint-url>
+				<identity>none</identity>
+			</endpoint>			
 		
 		</remote>
 				

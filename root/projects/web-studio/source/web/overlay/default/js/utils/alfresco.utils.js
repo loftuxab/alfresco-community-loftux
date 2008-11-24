@@ -1,6 +1,6 @@
-if (typeof Alf == "undefined")
+if (typeof Alf == "undefined" || !Alf)
 {
-	var Alf = {};
+	Alf = {};
 }
 
 Alf.getParentByTag = function(el, tag) 
@@ -10,14 +10,20 @@ Alf.getParentByTag = function(el, tag)
 		while(true) 
 		{
 			var p = el.getParent();
-			if (p.getTag() == tag) return p;
-			else if (p.getTag() == 'body') return false;
+			if (p.getTag() == tag)
+			{
+				return p;
+			}
+			else if (p.getTag() == 'body')
+			{
+				return false;
+			}
 			el = p;
 		}
 	}
-}
+};
 
-Alf.activeSourceLoaders = { }; //Only active loaders hire!!!
+Alf.activeSourceLoaders = { };
 
 Alf.sourceLoader = function(index, data) 
 {
@@ -33,8 +39,8 @@ Alf.sourceLoader = function(index, data)
 	this.idPrefix = 'AlfLoadSources';
 	
 	this.assets = { };
-	this.assetIds = new Array();
-}
+	this.assetIds = [];
+};
 
 Alf.sourceLoader.prototype = {
 	load: function() 
@@ -50,7 +56,7 @@ Alf.sourceLoader.prototype = {
 	{
 		this.waitTime = this.waitTime.toInt();
 		this.checkPeriod = this.checkPeriod.toInt();
-		this.checkCount = parseInt(this.waitTime/this.checkPeriod);
+		this.checkCount = Alf.parseInt(this.waitTime/this.checkPeriod);
 		if (this.checkCount < 1)
 		{
 			this.checkCount = 1;
@@ -58,14 +64,9 @@ Alf.sourceLoader.prototype = {
 	},
 	buildAssets: function() 
 	{
-		if(this.pauser)
-		{
-			debugger;
-		}
-		
 		var _this = this;
 		
-		$each(this.data, (function(item, index) 
+		$each(this.data, function(item, index) 
 		{
 			var type = null;
 			if(item.type)
@@ -74,21 +75,21 @@ Alf.sourceLoader.prototype = {
 			}
 			else
 			{
-				type = this.getFileType(item.path);
+				type = _this.getFileType(item.path);
 			}
 			if(type == 'jsp')
 			{
 				// make a better guess
-				if(item.path != null)
+				if(item.path)
 				{
 					if(item.path.endsWith(".css.jsp"))
 					{
-						var type = "css";
+						type = "css";
 						item.path = item.path + "?contextPath=" + WebStudio.request.contextPath;
 					}
 					if(item.path.endsWith(".js.jsp"))
 					{
-						var type = "js";
+						type = "js";
 						item.path = item.path + "?contextPath=" + WebStudio.request.contextPath;
 					}
 				}
@@ -104,20 +105,19 @@ Alf.sourceLoader.prototype = {
 					sourceLoader.assets[this.id] = this;
 				}
 			};
-			this.assetIds[this.assetIds.length] = id;
+			_this.assetIds[_this.assetIds.length] = id;
 			
 			if ((type == 'js')||(type == 'javascript')||(type == 'jscript')) 
 			{
-				path = path + this.jsPath + item.path;
-				this.loadJS(path, options);
-			};
+				path = path + _this.jsPath + item.path;
+				_this.loadJS(path, options);
+			}
 			if ((type == 'css')||(type == 'styles')||(type == 'stylesheets')) 
 			{
-				path = path + this.cssPath + item.path;
-				this.loadCSS(path, options);
-			};
-			
-		}).bind(this));
+				path = path + _this.cssPath + item.path;
+				_this.loadCSS(path, options);
+			}
+		});
 	}
 	,
 	loadJS: function(url, options)
@@ -132,19 +132,22 @@ Alf.sourceLoader.prototype = {
 			'onload': Class.empty
 		}, properties);
 		
+		var script = null;
+		
 		if(window.ie) 
 		{
-			var script = new Element('script', {'src': source}).inject(document.head);
-				script.onreadystatechange = function () {
-				if (script.readyState == 'complete' || script.readyState=="loaded") {
+			script = new Element('script', {'src': source}).inject(document.head);
+			script.onreadystatechange = function () {
+				if (script.readyState == 'complete' || script.readyState=="loaded") 
+				{
 					properties.onload();
 					script.onreadystatechange = null;
 				}
-			}
+			};
 		} 
 		else 
 		{
-			var script = new Element('script', {'src': source}).addEvents({
+			script = new Element('script', {'src': source}).addEvents({
 				'load': properties.onload
 			});
  
@@ -159,11 +162,15 @@ Alf.sourceLoader.prototype = {
 		
 		var asset = new Asset.css(url, options);
 		
-		var f = (function() {
+		var _this = this;
+		
+		var f = function() {
 		
 			this.assets[asset.id] = asset;
 			
-		}).delay(1000, this);
+		};
+		
+		f.delay(1000, this);
 	}
 	,
 	check: function() 
@@ -187,19 +194,19 @@ Alf.sourceLoader.prototype = {
 			}
 		}
 
-		if (result == true) 
+		if (result === true) 
 		{
 			$clear(this.checkInterval);
 			this.complete();
 			return true;
-		};
+		}
 		
 		if (this.nowCount > this.checkCount) 
 		{
 			$clear(this.checkInterval);
 			this.failed();
 			return false;
-		};
+		}
 		return null;
 	},
 	complete: function() 
@@ -238,37 +245,4 @@ Alf.sourceLoader.prototype = {
 			}
 		}
 	}	
-}
-
-Alf.initializeCSSMorph = function() 
-{
-	Fx.Morph = Fx.Styles.extend({
-		start: function(className){
-			var to = {};
-
-			$each(document.styleSheets, function(style){
-				var rules = style.rules || style.cssRules;
-				$each(rules, function(rule){
-					if (!rule.selectorText.test('\.' + className + '$')) return;
-					Fx.CSS.Styles.each(function(style){
-						if (!rule.style || !rule.style[style]) return;
-						var ruleStyle = rule.style[style];
-						to[style] = (style.test(/color/i) && ruleStyle.test(/^rgb/)) ? ruleStyle.rgbToHex() : ruleStyle;
-					});
-				});
-			});
-			return this.parent(to);
-		}
-	});
-
-	Fx.CSS.Styles = ["backgroundColor", "backgroundPosition", "color", "width", "height", "left", "top", "bottom", "right", "fontSize", "letterSpacing", "lineHeight", "textIndent", "opacity"];
-
-	Fx.CSS.Styles.extend(Element.Styles.padding);
-	Fx.CSS.Styles.extend(Element.Styles.margin);
-
-	Element.Styles.border.each(function(border){
-		['Width', 'Color'].each(function(property){
-			Fx.CSS.Styles.push(border + property);
-		});
-	});
-}
+};

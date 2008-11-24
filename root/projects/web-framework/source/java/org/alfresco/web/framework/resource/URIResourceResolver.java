@@ -24,44 +24,52 @@
  */
 package org.alfresco.web.framework.resource;
 
-import javax.servlet.http.HttpServletRequest;
+import org.alfresco.web.framework.exception.ResourceMetadataException;
+import org.alfresco.web.site.RequestContext;
 
 /**
- * Resolves URI references to Alfresco Repository objects
- * hosted within Alfresco 3.0 Sites
+ * Resolves URI references to Alfresco Repository objects hosted
+ * within Alfresco 3.0 Sites
  * 
  * @author muzquiano
  */
-public class URIResourceResolver extends AbstractResourceResolver 
+public class URIResourceResolver extends AbstractResourceResolver
 {
     public URIResourceResolver(Resource resource)
     {
         super(resource);
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getDownloadURI(HttpServletRequest request)
+    public String getDownloadURI(RequestContext context)
     {
         return this.resource.getValue();
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getMetadataURI(HttpServletRequest request)
+    public String getMetadataURI(RequestContext context)
     {
         // there is no way to interrogate the asset
         return null;
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getMetadata(javax.servlet.http.HttpServletRequest)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadata(org.alfresco.web.site.RequestContext)
      */
-    public String getMetadata(HttpServletRequest request)
+    public String getMetadata(RequestContext context)
+            throws ResourceMetadataException
     {
         // NOT IMPLEMENTED, return null
         return null;
-    }        
+    }
 }

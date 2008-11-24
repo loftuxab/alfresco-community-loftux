@@ -25,9 +25,9 @@
  /**
   * Extends The ButtonGroup class.
   */
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 /**
@@ -41,7 +41,7 @@ if (typeof WebStudio == "undefined")
  */
 WebStudio.ButtonGroup = function(p_oElement, p_oAttributes)
 {
-	 WebStudio.ButtonGroup.superclass.constructor.call(this, (this._createGroupElement()), p_oElement);
+	 WebStudio.ButtonGroup.superclass.constructor.call(this, this._createGroupElement(), p_oElement);
 };
 
 YAHOO.extend(WebStudio.ButtonGroup, YAHOO.widget.ButtonGroup,
@@ -74,7 +74,7 @@ YAHOO.extend(WebStudio.ButtonGroup, YAHOO.widget.ButtonGroup,
  */
 WebStudio.Combobox = function(p_oElement, p_oAttributes)
 {
-	 WebStudio.Combobox.superclass.constructor.call(this, (this.createButtonElement(p_oElement.type)), p_oElement);
+	 WebStudio.Combobox.superclass.constructor.call(this, this.createButtonElement(p_oElement.type), p_oElement);
 };
 
 YAHOO.extend(WebStudio.Combobox, YAHOO.widget.Button,
@@ -118,7 +118,8 @@ WebStudio.SelectSingleGrid = function(elContainer, aColumnFormats, aColumns, oDa
 		width: 30
 	});
 	var fields = [];
-	for (var i = 0, len = aColumnFormats.length; i < len; i++){
+	for (var i = 0, len = aColumnFormats.length; i < len; i++)
+	{
 		var colf = aColumnFormats[i];
 		var col = aColumns[i];
 		columnDefs.push({
@@ -161,9 +162,8 @@ YAHOO.extend(WebStudio.SelectSingleGrid, YAHOO.widget.DataTable,
 	formatCheckbox : function(el, oRecord, oColumn, oData)
 	{
         var bChecked = oData;
-        bChecked = (bChecked) ? " checked" : "";
-        el.innerHTML = "<input type=\"checkbox\"" + bChecked +
-                " class=\"" + YAHOO.widget.DataTable.CLASS_CHECKBOX + "\">";
+        bChecked = (bChecked ? " checked" : "");
+        el.innerHTML = "<input type=\"checkbox\"" + bChecked + " class=\"" + YAHOO.widget.DataTable.CLASS_CHECKBOX + "\">";
         el.onclick = this.onEventSelectRow;        
     },
 	
@@ -174,20 +174,24 @@ YAHOO.extend(WebStudio.SelectSingleGrid, YAHOO.widget.DataTable,
 	{
 	    var oRecord, elRow;
 	
-	    if(row instanceof YAHOO.widget.Record) {
+	    if(row instanceof YAHOO.widget.Record) 
+	    {
 	        oRecord = this._oRecordSet.getRecord(row);
 	        elRow = this.getTrEl(oRecord);
 	    }
-	    else if(YAHOO.lang.isNumber(row)) {
+	    else if(YAHOO.lang.isNumber(row)) 
+	    {
 	        oRecord = this.getRecord(row);
 	        elRow = this.getTrEl(oRecord);
 	    }
-	    else {
+	    else 
+	    {
 	        elRow = this.getTrEl(row);
 	        oRecord = this.getRecord(elRow);
 	    }
 	
-	    if(oRecord) {
+	    if(oRecord) 
+	    {
 	        // Update selection trackers
 	        var tracker = this._aSelections || [];
 	        var sRecordId = oRecord.getId();
@@ -198,12 +202,13 @@ YAHOO.extend(WebStudio.SelectSingleGrid, YAHOO.widget.DataTable,
 	        /*if(tracker.indexOf && (tracker.indexOf(sRecordId) >  -1)) {
 	            tracker.splice(tracker.indexOf(sRecordId),1);
 	        }*/
-	        if(tracker.indexOf) {
+	        if(tracker.indexOf) 
+	        {
 	            index = tracker.indexOf(sRecordId);
-	            
 	        }
-	        // ...or do it the old-fashioned way
-	        else {
+	        else 
+	        {
+	        	// ...or do it the old-fashioned way
 	            for(var j=tracker.length-1; j>-1; j--) {
 	                if(tracker[j] === sRecordId){
 	                    index = j;
@@ -220,20 +225,19 @@ YAHOO.extend(WebStudio.SelectSingleGrid, YAHOO.widget.DataTable,
 	        this._aSelections = tracker;
 	
 	        // Update trackers
-	        if(!this._oAnchorRecord) {
+	        if(!this._oAnchorRecord) 
+	        {
 	            this._oAnchorRecord = oRecord;
 	        }
 	
 	        // Update UI
-	        if(elRow) {
+	        if(elRow) 
+	        {
 	            YAHOO.util.Dom.addClass(elRow, YAHOO.widget.DataTable.CLASS_SELECTED);
-	            
 	            this.changeCheckboxValue(elRow,true);
 	        }
 	
 	        this.fireEvent("rowSelectEvent", {record:oRecord, el:elRow});
-	    }
-	    else {
 	    }
 	},
 	

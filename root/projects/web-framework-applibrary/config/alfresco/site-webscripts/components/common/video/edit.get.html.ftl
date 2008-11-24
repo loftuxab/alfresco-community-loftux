@@ -1,32 +1,31 @@
+<#import "/components/include/component-editor.ftl" as editor />
+
 <table class="AlfrescoComponentEditor">
+
+  <@editor.properties />
+  
+  <@editor.spacer />
+  
+  <@editor.source />
+  
+  <@editor.spacer />
+
+  <!-- Custom Properties -->
   <tr>
-    <td>Title</td>
-    <td><input type="text" size="40" name="${title.id}" value="${title.value}"></td>
-  </tr>
-  <tr>
-    <td>Description</td>
+    <td class="label">Mimetype</td>
     <td>
-    	<textarea rows="3" size="40" name="${description.id}">${description.value}</textarea>
+    	<input name="${mimetype.id}" value="${mimetype.value}" />
     </td>
   </tr>
   <tr>
-    <td colspan="2">
-      <hr/>
-    </td>
-  </tr>
-  <tr>
-    <td>Renderer</td>
+    <td class="label">Player</td>
     <td>
-    	<select name="${renderer.id}">
-    	    <option value="horizontal" <#if renderer.value == "horizontal">selected</#if> >Horizontal</option>
-    	    <option value="vertical" <#if renderer.value == "horizontal">selected</#if> >Vertical</option>
+    	<select name="${player.id}">
+    	    <option value="quicktime" <#if player.value == "quicktime">selected</#if> >Quick Time</option>
+    	    <option value="windowsmedia" <#if player.value == "windowsmedia">selected</#if> >Windows Media</option>
+    	    <option value="shockwave" <#if player.value == "shockwave">selected</#if> >Shockwave</option>
+    	    <option value="real" <#if player.value == "real">selected</#if> >Real Player</option>
     	</select>
-    </td>
-  </tr>
-  <tr>
-    <td>Background Color</td>
-    <td>
-    	<input type="text" size="40" id="${backgroundColor.id}" name="${backgroundColor.id}" value="${backgroundColor.value}">
     </td>
   </tr>
 </table>

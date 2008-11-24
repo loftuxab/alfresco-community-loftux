@@ -1,5 +1,6 @@
 <%@ page import="org.alfresco.web.framework.render.*"%>
 <%@ page import="org.alfresco.web.site.*"%>
+<%@ page import="org.alfresco.web.framework.resource.*"%>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
@@ -9,7 +10,7 @@
 	String backgroundImageUrl = URLUtil.browser(context, "/images/logo/AlfrescoFadedBG.png");	
 	String homePageUrl = URLUtil.browser(context, "/");
 	
-	Content object = context.getCurrentObject();
+	ResourceContent object = context.getCurrentObject();
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

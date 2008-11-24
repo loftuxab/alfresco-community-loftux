@@ -26,8 +26,9 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.framework.exception.ContentLoaderException;
 import org.alfresco.web.framework.model.Page;
-import org.alfresco.web.site.exception.ContentLoaderException;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,7 +66,7 @@ public abstract class AbstractPageMapper implements PageMapper
     }
     
     /**
-     * Execute the mapper.
+     * Execute mapper.
      * 
      * @param context the context
      * @param request the request
@@ -141,7 +142,7 @@ public abstract class AbstractPageMapper implements PageMapper
      * @param objectId
      * @return
      */
-    protected Content loadContent(RequestContext context, String objectId)
+    protected ResourceContent loadContent(RequestContext context, String objectId)
         throws ContentLoaderException
     {
         return ContentLoaderUtil.loadContent(context, objectId);

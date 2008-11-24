@@ -31,8 +31,8 @@ import org.alfresco.web.site.RequestContext;
 /**
  * Base Web Script implementation for Web Studio Web Scripts
  * 
- * This extends from DeclarativeSiteWebScript so as to provide root-scoped objects
- * directly from the Web Framework (Surf).
+ * This extends from DeclarativeSiteWebScript so as to provide
+ * root-scoped objects directly from the Web Framework (Surf).
  * 
  * It also introduces a new root-scoped object called "webstudio"
  * 
@@ -49,8 +49,11 @@ public class DeclarativeWebStudioWebScript extends DeclarativeSiteWebScript
     {
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.DeclarativeSiteWebScript#createScriptParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse, java.util.Map)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.scripts.DeclarativeSiteWebScript#createScriptParameters(org.alfresco.web.scripts.WebScriptRequest,
+     *      org.alfresco.web.scripts.WebScriptResponse, java.util.Map)
      */
     protected Map<String, Object> createScriptParameters(WebScriptRequest req,
             WebScriptResponse res, Map<String, Object> customParams)
@@ -60,8 +63,8 @@ public class DeclarativeWebStudioWebScript extends DeclarativeSiteWebScript
         RequestContext context = getRequestContext(req);
         if (context != null)
         {
-        	ScriptWebStudio scriptWebStudio = new ScriptWebStudio(context);
-        	scriptWebStudio.setModel(params);
+            ScriptWebStudio scriptWebStudio = new ScriptWebStudio(context);
+            scriptWebStudio.setModel(params);
             params.put(ROOT_SCOPE_WEB_STUDIO, scriptWebStudio);
         }
         return params;

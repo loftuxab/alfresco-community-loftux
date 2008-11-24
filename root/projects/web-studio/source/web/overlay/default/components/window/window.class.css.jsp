@@ -245,12 +245,3 @@
 	width:4px;
 	height:4px;
 }
-
-
-
-
-
-
-
-
-

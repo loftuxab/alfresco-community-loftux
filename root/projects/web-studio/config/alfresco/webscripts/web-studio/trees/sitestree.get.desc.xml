@@ -2,6 +2,8 @@
   <shortname>Sites Tree</shortname>
   <description>Sites Tree</description>
   <url>/tree/sites</url>
+  <url>/tree/sites/{site}</url>
+  <url>/tree/sites/{site}/{path}</url>  
   <format default="html">argument</format>
   <authentication>user</authentication>
   <transaction>required</transaction>

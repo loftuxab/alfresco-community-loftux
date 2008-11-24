@@ -35,11 +35,12 @@ import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLDecoder;
+import org.alfresco.web.framework.exception.ContentLoaderException;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.scripts.ProcessorModelHelper;
 import org.alfresco.web.scripts.URLHelper;
-import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.uri.UriTemplateListIndex;
 
@@ -206,7 +207,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
          */
     	if (objectId != null)
     	{
-        	Content content = null;
+        	ResourceContent content = null;
         	try
         	{
         		content = loadContent(context, objectId);

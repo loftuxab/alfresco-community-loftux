@@ -31,46 +31,61 @@ import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.render.bean.RegionRenderer;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.studio.WebStudioUtil;
 
 /**
  * Provides Web-Studio extensions to region rendering
  * 
- * Primarily, this enables the regions to output additional
- * Web Studio specific JavaScript to bind client-side DOM elements
- * together.
+ * Primarily, this enables the regions to output additional Web Studio
+ * specific JavaScript to bind client-side DOM elements together.
  * 
  * @author muzquiano
  */
 public class WebStudioRegionRenderer extends RegionRenderer
 {
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.web.framework.render.bean.RegionRenderer#postProcess(org.alfresco.web.framework.render.RenderContext)
      */
-    public void postProcess(RenderContext context)
-    	throws IOException
+    public void postProcess(RenderContext context) throws IOException
     {
-        // if web studio is enabled (and not passive mode)
-        if(FrameworkHelper.getConfig().isWebStudioEnabled() && !context.isPassiveMode())
+        // if web studio is enabled +
+        // not passive mode + overlays
+        // enabled
+        if (FrameworkHelper.getConfig().isWebStudioEnabled()
+                && !context.isPassiveMode()
+                && WebStudioUtil.isOverlayEnabled(context.getRequest()))
         {
-			// html binding id
-			String htmlId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
-		
-			// region properties
-	        String regionId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
-	        String regionScopeId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
-	        String regionSourceId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID);
-	        
-	        // commit to output
-			PrintWriter writer = context.getResponse().getWriter();
-			writer.println("<script language='Javascript'>");
-			
-			if(regionId != null && regionScopeId != null && regionSourceId != null)
-			{
-				writer.println("WebStudio.configureRegion('" + htmlId + "', '" + regionId + "', '" + regionScopeId + "', '" + regionSourceId + "');");
-			}
-			
-			writer.println("</script>");		
-			writer.flush();
+            // html binding id
+            String htmlId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
+
+            // region properties
+            String regionId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
+            String regionScopeId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
+            String regionSourceId = (String) context
+                    .getValue(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID);
+
+            // commit to output
+            PrintWriter writer = context.getResponse().getWriter();
+            writer
+                    .println("<script language='Javascript' type='text/javascript'>");
+
+            if (regionId != null && regionScopeId != null
+                    && regionSourceId != null)
+            {
+                writer.println("if(WebStudio){");
+                writer.println("WebStudio.configureRegion('" + htmlId + "', '"
+                        + regionId + "', '" + regionScopeId + "', '"
+                        + regionSourceId + "');");
+                writer.println("}");
+            }
+
+            writer.println("</script>");
+            writer.flush();
         }
-    }	        
+    }
 }

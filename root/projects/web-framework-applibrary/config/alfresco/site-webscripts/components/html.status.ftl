@@ -14,7 +14,7 @@
          </table>
          <br/>
          <table>
-            <tr><td>The Web Component '${context.page.title}' has responded with a status of ${status.code} - ${status.codeName}.</td></tr>
+            <tr><td>The Web Component '${page.title}' has responded with a status of ${status.code} - ${status.codeName}.</td></tr>
          </table>
          <br/>
          <table>

@@ -1,4 +1,6 @@
-var source = instance.object.resources.get("source");
+<import resource="/components/common/js/component.js">
+
+var source = WebStudio.Component.getSource();
 if(source == null)
 {
 	model.ready = false;
@@ -6,7 +8,6 @@ if(source == null)
 else
 {
 	model.src = url.context + source.proxiedDownloadURI;
-
 
 	// mimetype
 	model.mimetype = instance.object.properties["mimetype"];
@@ -26,10 +27,6 @@ else
 		model.useWindowsMedia = false;
 		model.useReal = false;
 		model.useShockwave = false;
-		model.useJW = false;
-
-		model.swfObjectPath = url.context + "/components/common/video/jw/player.swf";
-		model.swfImagePreview = url.context + "/components/common/video/jw/preview.jpg";
 
 		// which player to use
 		model.player = instance.object.properties["player"];
@@ -49,11 +46,8 @@ else
 		{
 			model.useReal = true;
 		}
-		if(model.player == "jw")
-		{
-			model.useJW = true;
-		}
-	
 	}
+	
+	model.ready = true;
 }
 

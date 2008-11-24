@@ -24,16 +24,17 @@
  */
 package org.alfresco.web.framework.resource;
 
-import javax.servlet.http.HttpServletRequest;
+import org.alfresco.web.site.RequestContext;
 
 /**
- * Resolves URI references to Alfresco Repository objects
- * hosted within Alfresco 3.0 Sites
+ * Resolves URI references to Alfresco Repository objects hosted
+ * within Alfresco 3.0 Sites
  * 
  * @author muzquiano
  */
-public class AlfrescoSpaceResourceResolver extends AbstractAlfrescoResourceResolver 
-{    
+public class AlfrescoSpaceResourceResolver extends
+        AbstractAlfrescoResourceResolver
+{
     /**
      * Instantiates a new alfresco space resource resolver.
      * 
@@ -44,29 +45,33 @@ public class AlfrescoSpaceResourceResolver extends AbstractAlfrescoResourceResol
         super(resource);
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(javax.servlet.http.HttpServletRequest)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getDownloadURI(HttpServletRequest request)
+    public String getDownloadURI(RequestContext context)
     {
-        String url ="/api/node/{value}/content";
-        
+        String url = "/api/node/{value}/content";
+
         url = url.replace("{endpoint}", this.resource.getEndpoint());
         url = url.replace("{value}", this.resource.getValue());
-        
+
         return url;
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(javax.servlet.http.HttpServletRequest)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getMetadataURI(HttpServletRequest request)
+    public String getMetadataURI(RequestContext context)
     {
         String url = "/webframework/content/metadata?id={nodeRef}";
 
-        String nodeRef = toNodeRefString(this.resource.getValue());        
+        String nodeRef = toNodeRefString(this.resource.getValue());
         url = url.replace("{nodeRef}", nodeRef);
-        
+
         return url;
-    }        
+    }
 }

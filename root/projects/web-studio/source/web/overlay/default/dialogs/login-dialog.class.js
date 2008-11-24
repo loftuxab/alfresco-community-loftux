@@ -1,6 +1,6 @@
-if (typeof WebStudio == "undefined")
+if (typeof WebStudio == "undefined" || !WebStudio)
 {
-	var WebStudio = {};
+	WebStudio = {};
 }
 
 WebStudio.LoginDialog = function(index) 
@@ -22,12 +22,12 @@ WebStudio.LoginDialog = function(index)
 		Login: {
 			selector: 'input[id=AlfrescoWebStudioLoginTemplateLogin]'
 		}
-	}
+	};
 
 	this.events = {};	
 	this.nodes = {};
 	this.droppables = [];
-}
+};
 
 WebStudio.LoginDialog.prototype = new WebStudio.AbstractTemplater('WebStudio.LoginDialog');
 
@@ -37,12 +37,12 @@ WebStudio.LoginDialog.prototype.activate = function()
 	
 	// set up on click handler
 	this.Login.el.addEvent("click", this.loginHandler);
-}
+};
 
 WebStudio.LoginDialog.prototype.setLoginHandler = function(f)
 {
 	this.loginHandler = f;
-}
+};
 
 WebStudio.LoginDialog.prototype.setActive = function() 
 {
@@ -51,7 +51,7 @@ WebStudio.LoginDialog.prototype.setActive = function()
 	WebStudio.WindowsZIndex++;
 	WebStudio.WindowsActive = this;
 	return this;
-}
+};
 
 
 WebStudio.LoginDialog.prototype.popup = function() 
@@ -63,10 +63,10 @@ WebStudio.LoginDialog.prototype.popup = function()
 	this.setActive();
 	
 	this.Username.el.focus();
-}
+};
 
 WebStudio.LoginDialog.prototype.popout = function()
 {	
     this.hide();
     this.unblock();
-}
+};

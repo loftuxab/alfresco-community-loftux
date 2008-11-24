@@ -33,6 +33,7 @@ import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.framework.render.bean.TemplateInstanceRenderer;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.studio.WebStudioUtil;
 
 /**
  * @author muzquiano
@@ -40,43 +41,57 @@ import org.alfresco.web.site.WebFrameworkConstants;
 public class WebStudioTemplateInstanceRenderer extends TemplateInstanceRenderer
 {
     public void postHeaderProcess(RenderContext context)
-    	throws RendererExecutionException
+            throws RendererExecutionException
     {
-        // if web studio is enabled, bind it in via javascript
-        if(FrameworkHelper.getConfig().isWebStudioEnabled())
+        // if web studio is enabled + overlays enabled, bind it in via
+        // javascript
+        if (FrameworkHelper.getConfig().isWebStudioEnabled()
+                && WebStudioUtil.isOverlayEnabled(context.getRequest()))
         {
-        	String location = FrameworkHelper.getConfig().getWebStudioLocation();
-        	if(location != null)
-        	{
-        		// get the context path to the webapp (i.e. /alfwf)
-        		String contextPath = context.getRequest().getContextPath();
-        		
-        		// allow for replace of ${contextPath} variable in location string
-        		if(location.indexOf("${contextPath}") > -1)
-        		{
-        			location = location.replace("${contextPath}", contextPath);
-        		}
-        		
-        		// get the current query string
-        		// add the contextPath parameter into it
-        		// convert back to string
-        		Map queryStringMap = WebUtil.getQueryStringMap(context.getRequest());
-        		queryStringMap.put("contextPath", contextPath);
-        		String qs = WebUtil.getQueryStringForMap(queryStringMap);
-        		
-        		// append into the buffer a JS and CSS include
-            	print(context, RenderUtil.NEWLINE);
-            	print(context, WebFrameworkConstants.WEB_STUDIO_SIGNATURE);
-            	print(context, RenderUtil.NEWLINE);
-            	print(context, "<script type=\"text/javascript\" src=\"" + contextPath + "/js/web-framework.js.jsp?" + qs + "\"></script>");
-            	print(context, RenderUtil.NEWLINE);
-            	print(context, "<script type=\"text/javascript\" src=\"" + location + "/over/js?" + qs + "\"></script>");
-            	print(context, RenderUtil.NEWLINE);
-            	print(context, "<link type=\"text/css\" rel=\"stylesheet\" href=\"" + location + "/over/css?" + qs + "\"/>");
-            	print(context, RenderUtil.NEWLINE);
-        	}
-        }            
-    	
+            String location = FrameworkHelper.getConfig()
+                    .getWebStudioLocation();
+            if (location != null)
+            {
+                // get the context path to the webapp (i.e. /alfwf)
+                String contextPath = context.getRequest().getContextPath();
+
+                // allow for replace of ${contextPath} variable in
+                // location
+                // string
+                if (location.indexOf("${contextPath}") > -1)
+                {
+                    location = location.replace("${contextPath}", contextPath);
+                }
+
+                // get the current query string
+                // add the contextPath parameter into it
+                // convert back to string
+                Map queryStringMap = WebUtil.getQueryStringMap(context
+                        .getRequest());
+                queryStringMap.put("contextPath", contextPath);
+                String qs = WebUtil.getQueryStringForMap(queryStringMap);
+
+                // append into the buffer a JS and CSS include
+                print(context, RenderUtil.NEWLINE);
+                print(context, WebFrameworkConstants.WEB_STUDIO_SIGNATURE);
+                print(context, RenderUtil.NEWLINE);
+                print(context, "<script type=\"text/javascript\" src=\""
+                        + contextPath + "/js/web-framework.js.jsp?" + qs
+                        + "\"></script>");
+                print(context, RenderUtil.NEWLINE);
+                print(context, "<script type=\"text/javascript\" src=\""
+                        + location + "/_js/static?" + qs + "\"></script>");
+                print(context, RenderUtil.NEWLINE);
+                print(context, "<script type=\"text/javascript\" src=\""
+                        + location + "/_js/dynamic?" + qs + "\"></script>");
+                print(context, RenderUtil.NEWLINE);
+                print(context,
+                        "<link type=\"text/css\" rel=\"stylesheet\" href=\""
+                                + location + "/_css/?" + qs + "\">");
+                print(context, RenderUtil.NEWLINE);
+            }
+        }
+
     }
-    
+
 }

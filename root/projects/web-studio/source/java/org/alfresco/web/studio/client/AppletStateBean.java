@@ -30,14 +30,14 @@ package org.alfresco.web.studio.client;
  * @author muzquiano
  */
 public class AppletStateBean extends BrowserStateBean
-{	
-	/**
-	 * Instantiates a new applet state bean.
-	 * 
-	 * @param id the id
-	 */
-	public AppletStateBean(String id)
-	{
-		super(id);	
-	}
+{
+    /**
+     * Instantiates a new applet state bean.
+     * 
+     * @param id the id
+     */
+    public AppletStateBean(String id)
+    {
+        super(id);
+    }
 }

@@ -25,7 +25,6 @@
             <!-- Web Framework -->
             <value>classpath:alfresco/web-framework-config.xml</value>
             <value>classpath:alfresco/web-framework-config-remote.xml</value>
-            <value>classpath:alfresco/web-framework-config-web-studio.xml</value>
             <value>classpath:alfresco/web-framework-config-application.xml</value>
             <value>classpath:alfresco/web-extension/web-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/web-framework-config-custom.xml</value>

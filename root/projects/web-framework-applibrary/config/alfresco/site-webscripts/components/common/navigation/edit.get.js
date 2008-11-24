@@ -1,11 +1,36 @@
-<import resource="/include/support.js">
+<import resource="/components/common/js/component.js">
 
-var properties = instance.object.properties;
+// bind core properties and source
+WebStudio.Component.bind();
 
-// title field
-model.title = form.bind("title", properties["title"], "");
-model.description = form.bind("description", properties["description"], "");
-model.renderer = form.bind("renderer", properties["renderer"], "");
-model.backgroundColor = form.bind("backgroundColor", properties["backgroundColor"], "");
-model.rootNode = form.bind("rootNode", properties["rootNode"], "");
+// bind custom properties
+WebStudio.Component.bindProperty("style");
+WebStudio.Component.bindProperty("orientation");
+
+WebStudio.Component.bindProperty("startingPage");
+WebStudio.Component.bindProperty("topPage");
+WebStudio.Component.bindProperty("childSiblings");
+
+
+// default values
+if(model.style.value == null || model.style.value == "")
+{
+	model.style.value = "tabbed";
+}
+if(model.orientation.value == null || model.orientation.value == "")
+{
+	model.orientation.value = "horizontal";
+}
+if(model.startingPage.value == null || model.startingPage.value == "")
+{
+	model.startingPage.value = "siteroot";
+}
+if(model.topPage.value == null || model.topPage.value == "")
+{
+	model.topPage.value = "show";
+}
+if(model.childSiblings.value == null || model.childSiblings.value == "")
+{
+	model.childSiblings.value = "showChildren";
+}
 

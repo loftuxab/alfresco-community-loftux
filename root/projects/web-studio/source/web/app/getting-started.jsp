@@ -14,19 +14,17 @@
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="Expires" content="Sat, 1 Jan 2000 08:00:00 GMT" />
     <title><alf:pageTitle/></title>
     <alf:head/>
 </head>
 <body class="studio">
 <table width="100%" height="100%" border="0" style="background-image:url('<%=bgImageUrl%>'); background-repeat:no-repeat;">
 	<tr>
-		<td valign="center" align="middle">
+		<td valign="middle" align="center">
 			
-			<div onClick="javascript:WebStudio.app.initOverlays();">
+			<div onclick="javascript:WebStudio.app.initOverlays();">
 			 
-			<img src="<%=logoImageUrl%>"/>
+			<img src="<%=logoImageUrl%>" alt="Alfresco Logo"/>
 			<br/>
 			Welcome to Alfresco Web Studio
 

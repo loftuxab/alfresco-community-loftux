@@ -5,8 +5,40 @@
 	// Include MooTools
 	OverlayUtil.include(request, buffer, "/overlay/default/js/mootools/mootools.v1.11.js");
 
+	// Include jQuery
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/jquery-1.2.6.min.js");
+	
+	// Include html parser
+	OverlayUtil.include(request, buffer, "/overlay/default/js/htmlparser/htmlparser.js");
+	
+	// Include Alfresco Tools
+	OverlayUtil.include(request, buffer, "/overlay/default/alf.js");
+	
 	// Include the "web-studio" container
-	OverlayUtil.include(request, buffer, "/overlay/default/web-studio.js.jsp");
+	OverlayUtil.include(request, buffer, "/overlay/default/web-studio.js");
+	
+	// Include jQuery UI
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/ui/jquery-ui-personalized-1.6rc2.min.js");
+	
+	// Include jQuery Plugins
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flip.js");
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flyout.js");
+	
+	// Include jQuery UI
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/ui/jquery-ui-personalized-1.6rc2.min.js");
+	//OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/ui/jquery-ui-core.min.js");
+	
+	// Include jQuery Plugins
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flip.js");
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flyout.js");
+	
+	// Include jQuery UI
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/ui/jquery-ui-personalized-1.6rc2.min.js");
+	//OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/ui/jquery-ui-core.min.js");
+	
+	// Include jQuery Plugins
+	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flip.js");
+	//OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flyout.min.js");
 			
 	// Include YUI Core
 	OverlayUtil.include(request, buffer, "/yui/yahoo/yahoo-min.js");
@@ -54,8 +86,8 @@
 	OverlayUtil.include(request, buffer, "/overlay/default/components/page-editor/page-editor.class.js");
 	OverlayUtil.include(request, buffer, "/overlay/default/components/templates-view/templates-view.class.js");
 	OverlayUtil.include(request, buffer, "/overlay/default/components/template-designer/template-designer.class.js");
-	OverlayUtil.include(request, buffer, "/overlay/default/components/template-designer/template/renderers/absolute.js.jsp");
-	OverlayUtil.include(request, buffer, "/overlay/default/components/template-designer/template/renderers/table.js.jsp");
+	OverlayUtil.include(request, buffer, "/overlay/default/components/template-designer/template/renderers/absolute.js");
+	OverlayUtil.include(request, buffer, "/overlay/default/components/template-designer/template/renderers/table.js");
 
 	// Include Web Studio Dialogs
 	OverlayUtil.include(request, buffer, "/overlay/default/dialogs/login-dialog.class.js");
@@ -64,11 +96,11 @@
 	OverlayUtil.include(request, buffer, "/overlay/default/dialogs/pta-dialog.class.js");
 	
 	// Include Web Studio Core Container
-	OverlayUtil.include(request, buffer, "/overlay/default/container/container.js.jsp");
+	OverlayUtil.include(request, buffer, "/overlay/default/container/container.js");
 	
 	// Include Abstracts
-	OverlayUtil.include(request, buffer, "/overlay/default/applications/abstract-application.class.js.jsp");
-	OverlayUtil.include(request, buffer, "/overlay/default/applets/abstract-applet.class.js.jsp");	
-	
+	OverlayUtil.include(request, buffer, "/overlay/default/applications/abstract-application.class.js");
+	OverlayUtil.include(request, buffer, "/overlay/default/applets/abstract-applet.class.js");	
+		
 	out.println(buffer.toString());
 %>

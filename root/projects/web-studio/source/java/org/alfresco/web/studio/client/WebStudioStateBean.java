@@ -35,58 +35,58 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author muzquiano
  */
-public class WebStudioStateBean implements Serializable 
+public class WebStudioStateBean implements Serializable
 {
-	private static Log logger = LogFactory.getLog(WebStudioStateBean.class);
-	
-	protected HashMap<String, ApplicationStateBean> applications = null;
-	protected HashMap<String, AppletStateBean> applets = null;
-	
-	public WebStudioStateBean()
-	{
-	}
+    private static Log logger = LogFactory.getLog(WebStudioStateBean.class);
 
-	/**
-	 * Returns an array of application ids for Web Studio
-	 * 
-	 * @return array of ids
-	 */
-	public String[] getApplicationIds()
-	{
-		return applications.values().toArray(new String[applications.size()]);
-	}
-	
-	/**
-	 * Retrieves the application state for a given application id
-	 * 
-	 * @param id
-	 * 
-	 * @return application state
-	 */
-	public ApplicationStateBean getApplicationState(String id)
-	{
-		return (ApplicationStateBean) applications.get(id);		
-	}
-	
-	/**
-	 * Returns an array of applet ids for Web Studio
-	 * 
-	 * @return array of ids
-	 */
-	public String[] getAppletIds()
-	{
-		return applets.values().toArray(new String[applications.size()]);
-	}
-	
-	/**
-	 * Retrives the applet state for a given applet id
-	 * 
-	 * @param id
-	 * 
-	 * @return applet state
-	 */
-	public AppletStateBean getAppletState(String id)
-	{
-		return (AppletStateBean) applets.get(id);		
-	}
+    protected HashMap<String, ApplicationStateBean> applications = null;
+    protected HashMap<String, AppletStateBean> applets = null;
+
+    public WebStudioStateBean()
+    {
+    }
+
+    /**
+     * Returns an array of application ids for Web Studio
+     * 
+     * @return array of ids
+     */
+    public String[] getApplicationIds()
+    {
+        return applications.values().toArray(new String[applications.size()]);
+    }
+
+    /**
+     * Retrieves the application state for a given application id
+     * 
+     * @param id
+     * 
+     * @return application state
+     */
+    public ApplicationStateBean getApplicationState(String id)
+    {
+        return (ApplicationStateBean) applications.get(id);
+    }
+
+    /**
+     * Returns an array of applet ids for Web Studio
+     * 
+     * @return array of ids
+     */
+    public String[] getAppletIds()
+    {
+        return applets.values().toArray(new String[applications.size()]);
+    }
+
+    /**
+     * Retrives the applet state for a given applet id
+     * 
+     * @param id
+     * 
+     * @return applet state
+     */
+    public AppletStateBean getAppletState(String id)
+    {
+        return (AppletStateBean) applets.get(id);
+    }
 }

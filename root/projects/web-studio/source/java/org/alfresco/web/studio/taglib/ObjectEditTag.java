@@ -74,40 +74,28 @@ public class ObjectEditTag extends AbstractObjectTag
 
     public int doStartTag() throws JspException
     {
-        if (WebStudio.getConfig().isInContextEnabled())
-        {
-            RequestContext context = getRequestContext();
+        // TODO: this is to be refactored
 
-            // get the url
-            String url = WebStudioUtil.getContentEditURL(context, getEndpoint(),
-                    getId());
-
-            // icon uri
-            String newIconUri = "/themes/builder/images/default/icons/incontext/edit_content.gif";
-            if (iconUri != null)
-                newIconUri = iconUri;
-            newIconUri = URLUtil.browser(context, newIconUri);
-
-            // target
-            String newTargetString = " target='_blank' ";
-            if (target != null)
-            {
-                if ("".equals(target))
-                    newTargetString = " ";
-                else
-                    newTargetString = " target='" + target + "' ";
-            }
-
-            // render
-            StringBuffer buffer = new StringBuffer();
-            String newGuid = ModelHelper.newGUID();
-            buffer.append("<div id='ipe-" + newGuid + "'>");
-            buffer.append("<a href='" + url + "' " + newTargetString + ">");
-            buffer.append("<img border='0' src='" + newIconUri + "'/>");
-            buffer.append("</a>");
-            buffer.append("</div>");
-            print(buffer.toString());
-        }
+        /*
+         * if (WebStudio.getConfig().isInContextEnabled()) {
+         * RequestContext context = getRequestContext();
+         *  // get the url String url =
+         * WebStudioUtil.getContentEditURL(context, getEndpoint(),
+         * getId());
+         *  // icon uri String newIconUri =
+         * "/themes/builder/images/default/icons/incontext/edit_content.gif";
+         * if (iconUri != null) newIconUri = iconUri; newIconUri =
+         * URLUtil.browser(context, newIconUri);
+         *  // target String newTargetString = " target='_blank' "; if
+         * (target != null) { if ("".equals(target)) newTargetString = " ";
+         * else newTargetString = " target='" + target + "' "; }
+         *  // render StringBuffer buffer = new StringBuffer(); String
+         * newGuid = ModelHelper.newGUID(); buffer.append("<div
+         * id='ipe-" + newGuid + "'>"); buffer.append("<a href='" +
+         * url + "' " + newTargetString + ">"); buffer.append("<img
+         * border='0' src='" + newIconUri + "'/>"); buffer.append("</a>");
+         * buffer.append("</div>"); print(buffer.toString()); }
+         */
         return EVAL_BODY_INCLUDE;
     }
 }

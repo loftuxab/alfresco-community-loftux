@@ -60,8 +60,8 @@ if(object != null) {
                     for(var panelIndx=0;panelIndx<numberPanels;panelIndx++)
 	                {
 	                    var panelObject = { };
-	    
-	                    panelObject.id = rowId + "panel" + (panelIndx+1);                           
+	                               
+	                    panelObject.id = panelIndx + generateID();	                    
 	                          
 	                    panelObject.width = avgWidth;
 	                    panelObject.height = "100";
@@ -79,8 +79,6 @@ if(object != null) {
             templateConfig.rows = tempRowsArray;
             
             var tempString = templateConfig.toJSONString();               
-            
-            logger.log("tempString: " + tempString);
             
             object.properties["config"] = tempString;
         
@@ -118,8 +116,8 @@ if(object != null) {
             for(var panelIndx=0;panelIndx<rowNumPanels;panelIndx++)
             {
                 var panelObject = { };
-	
-	            panelObject.id = "panel" + (panelIndx+1);            	            
+	            	            
+	            panelObject.id = panelIndx + generateId();                
 		                  
 		        panelObject.width = "100";
 		        panelObject.height = "100";
@@ -127,12 +125,12 @@ if(object != null) {
 		    }
 			    	
 	        var rowObject = { };
-		
-		    // todo: change the way the id is set.
-	        rowObject.id = "row" + (rowIndx + 1);
-
+	
+	        // Set row attributes.
+	        rowObject.id = rowIndx + generateID();        
             rowObject.height = avgRowHeight;
 		                
+            // Update row object 
 	        rowObject.panels = panelsArray;
 		
 	        rowsArray.push(rowObject);        	        
