@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.mediawikiintegration;
 
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -38,6 +39,9 @@ public interface Constants
     public static final String CONFIG_NAMESPACE = "http://www.alfresco.org/model/mediawikiintegrationconfigproperty/1.0";
     public static final String PREFIX = "mw";
     public static final String CONFIG_PREFIX = "mwcp";
+    
+    /** MediWiki main page URL */
+    public static final String MEDIAWIKI_PAGE_URL = "alfresco-php://{0}?title={1}";
     
     /** MediaWiki Type */
     public static final QName TYPE_MEDIAWIKI = QName.createQName(NAMESPACE, "mediaWiki");
@@ -55,4 +59,7 @@ public interface Constants
     public static final QName PROP_DB_PREFIX        = QName.createQName(CONFIG_NAMESPACE, "wgDBprefix");
     public static final QName PROP_SQL_DROP_TABLES  = QName.createQName(NAMESPACE, "sqlDropTables");
     
+    /** Site custom properties aspect */
+    public static final QName ASPECT_SITE_CUSTOM_PROPERTIES = QName.createQName(NAMESPACE, "siteCustomProperties");
+    public static final QName PROP_MEDIA_WIKI_URL = QName.createQName(SiteModel.SITE_CUSTOM_PROPERTY_URL, "mediaWikiURL");    
 }

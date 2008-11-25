@@ -18,6 +18,8 @@
       	<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
       	<!-- Import Alfresco Content Domain Model Definitions -->
       	<import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+      	<!-- Import custom site properties namespace -->      	
+      	<import uri="http://www.alfresco.org/model/sitecustomproperty/1.0" prefix="stcp" />
    	</imports>
 
    	<!-- MediaWiki Integration Namespace -->
@@ -119,8 +121,22 @@
 	      	</properties>
 	      	
 		</type>
-		
-	
+			
 	</types>
+	
+	<aspects>
+   
+      	<!-- Site Custom Properties -->
+      	<aspect name="mw:siteCustomProperties">
+     	   <title>Site MediaWiki Custom Properties</title> 	      
+           <properties>
+              <property name="stcp:mediaWikiURL">
+                 <title>Site MediaWiki Page</title>
+            	 <type>d:text</type>        
+              </property>
+         </properties>
+  	   </aspect>
+   
+   </aspects>
    
 </model>

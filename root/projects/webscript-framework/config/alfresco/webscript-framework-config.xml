@@ -15,6 +15,7 @@
          <scheme>http</scheme>
          <hostname>localhost</hostname>
          <port>8080</port>
+         <path>alfresco</path>
          -->
       </server>
    </config>
@@ -88,6 +89,15 @@
 				<basic-auth>true</basic-auth>
 				<identity>user</identity>
 			</endpoint>
+			
+			<endpoint>
+    			<id>alfresco-php</id>
+    			<name>Alfresco - PHP servlet access</name>
+    			<description>Access to Alfresco Repository PHP servlet that require user authentication</description>
+    			<connector-id>alfresco</connector-id>
+    			<endpoint-url>http://localhost:8080/alfresco/php</endpoint-url>    
+    			<identity>user</identity>
+   			</endpoint>
 
 			<!-- Credential Vaults -->
 			<credential-vault>

@@ -24,6 +24,8 @@
  */
 package org.alfresco.module.mediawikiintegration;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +49,8 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class MediaWikiSitePageManager implements NodeServicePolicies.OnCreateNodePolicy
+public class MediaWikiSitePageManager implements NodeServicePolicies.OnCreateNodePolicy,
+                                                 Constants
 {
     /** Policy Component */
     private PolicyComponent policyComponent;
@@ -60,6 +63,12 @@ public class MediaWikiSitePageManager implements NodeServicePolicies.OnCreateNod
     
     /** The template service */
     private TemplateService templateService;
+    
+    /** Site page tamplate node */
+    private static NodeRef templateNodeRef = new NodeRef("workspace://SpacesStore/php_mediawiki_site_page");
+    
+    /** MediaWiki url */
+    private String mediaWikiURL;
     
     /**
      * Set policy component
@@ -102,6 +111,16 @@ public class MediaWikiSitePageManager implements NodeServicePolicies.OnCreateNod
     }
     
     /**
+     * Set the mediaWiki URL
+     * 
+     * @param mediaWikiURL
+     */
+    public void setMediaWikiURL(String mediaWikiURL)
+    {
+        this.mediaWikiURL = mediaWikiURL;
+    }
+    
+    /**
      * Initialise method
      */
     public void init()
@@ -128,19 +147,24 @@ public class MediaWikiSitePageManager implements NodeServicePolicies.OnCreateNod
         // Get the title of the site to be used as the title of the created page
         String siteTitle = (String)this.nodeService.getProperty(site, ContentModel.PROP_TITLE);
         
-        // Create the site page        
-        NodeRef templateNodeRef = new NodeRef("workspace://SpacesStore/php_mediawiki_site_page");
+        // Execute the site page template         
         Object model = new HashMap<String, Object>(1);
         ((Map<String, Object>)model).put("site", site);
-        String pageContent = this.templateService.processTemplate(templateNodeRef.toString(), model);
-        
+        String pageContent = this.templateService.processTemplate(MediaWikiSitePageManager.templateNodeRef.toString(), model);        
         HashMap<String, String> params = new HashMap<String, String>(1);
         params.put("pageContent", pageContent);
         
+        // Execute the action to contact mediawiki and create the site page
         Action action = actionService.createAction(MediaWikiActionExecuter.NAME);
         action.setParameterValue(MediaWikiActionExecuter.PARAM_MEDIAWIKI_ACTION, "createPage");
         action.setParameterValue(MediaWikiActionExecuter.PARAM_PAGE_TITLE, siteTitle);
         action.setParameterValue(MediaWikiActionExecuter.PARAM_PARAMS, params);
         actionService.executeAction(action, site, false, true);
+        
+        // Apply the custom aspect to the site and generate the media wiki page
+        String pageURL = MessageFormat.format(MEDIAWIKI_PAGE_URL, this.mediaWikiURL, siteTitle);
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(PROP_MEDIA_WIKI_URL, pageURL);
+        this.nodeService.addAspect(site, ASPECT_SITE_CUSTOM_PROPERTIES, properties);         
     } 
 }

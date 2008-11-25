@@ -82,7 +82,8 @@
     	<property name="policyComponent" ref="policyComponent"/>
     	<property name="nodeService" ref="NodeService" />  	
     	<property name="actionService" ref="ActionService" />   
-    	<property name="templateService" ref="TemplateService" />     	       	
+    	<property name="templateService" ref="TemplateService" />    
+    	<property name="mediaWikiURL" value="wiki/index.php"/> 	       	
     </bean>
     
     <bean id="mediawiki-action-executer" class="org.alfresco.module.mediawikiintegration.action.MediaWikiActionExecuter" parent="action-executer">

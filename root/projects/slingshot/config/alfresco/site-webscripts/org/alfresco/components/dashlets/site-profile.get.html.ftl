@@ -6,6 +6,21 @@
 <#if (profile.description != "")>
          <p>${profile.description?html}</p>
 </#if>
+<#if profile.customProperties??>
+	<#list profile.customProperties?keys as prop>
+	   <#assign customValue=profile.customProperties[prop].value>	
+	   <#if customValue?starts_with('alfresco-php://') == true>
+			<p>
+				<a href="${url.context}/proxy/alfresco-php/${customValue?substring(15)}" target="_blank">${profile.customProperties[prop].title}</a>
+			</p>
+	   <#else>	
+		 <p>
+            <span class="label">${profile.customProperties[prop].title}</span>
+            <span>${customValue}</span>
+         </p>
+       </#if>  
+	</#list>		
+</#if>
 <#if (sitemanagers?exists && sitemanagers?size &gt; 0)>
          <p>
             <span class="label">${msg("label.siteAdmin")}</span>
