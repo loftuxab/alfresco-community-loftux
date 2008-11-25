@@ -204,31 +204,37 @@ WebStudio.Region.prototype.onLoadComplete = function (response)
 					if(tag == "SCRIPT")
 					{
 						var src = el.getProperty("src");
-						if(src.indexOf("/studio") === 0)
+						if(src)
 						{
-							src = src.substring(7);
+							if(src.indexOf("/studio") === 0)
+							{
+								src = src.substring(7);
+							}
+							
+							dataElement = {
+								name: dataId,
+								path: src
+							};
+							data[dataId] = dataElement;
 						}
-						
-						dataElement = {
-							name: dataId,
-							path: src
-						};
-						data[dataId] = dataElement;				
 					}
 					
 					if(tag == "LINK")
 					{
 						var href = el.getProperty("href");
-						if(href.indexOf("/studio") === 0)
+						if(href)
 						{
-							href = href.substring(7);
+							if(href.indexOf("/studio") === 0)
+							{
+								href = href.substring(7);
+							}
+	
+							dataElement = {
+								name: dataId,
+								path: href
+							};
+							data[dataId] = dataElement;	
 						}
-
-						dataElement = {
-							name: dataId,
-							path: href
-						};
-						data[dataId] = dataElement;										
 					}
 				}
 				

@@ -109,7 +109,6 @@
 }
 
 .alf-region .region-body {
-	background: transparent url( <%=proxyPath%>/images/logo/alfresco_webstudio_fadedbg.png ) no-repeat scroll left top;
 	overflow: auto;
 	width: 292px;
 	height: 118px;
