@@ -3081,7 +3081,7 @@
    </target>
 
    <target name="package-webstudio-war" 
-           depends="assemble-webstudio-war,minimize-webstudio-javascript">
+           depends="assemble-webstudio-war,ant17orHigherCheck,minimize-webstudio-javascript">
       <war warfile="${dir.project.webstudio.dist}/${file.name.war.webstudio}" 
            webxml="${dir.project.webstudio.src.webinf}/web.xml">
          <fileset dir="${dir.project.webstudio.assemble}" />
@@ -3142,7 +3142,13 @@
 
    </target>  
    
-   <target name="minimize-webstudio-javascript">
+   <target name="ant17orHigherCheck">
+	<condition property="isJsLintCompatible">
+		<contains string="${ant.version}" substring="1.7" />
+	</condition>
+   </target>
+   
+   <target name="minimize-webstudio-javascript" if="isAnt17orHigher">
    
    	<mkdir dir="${dir.project.webstudio}/build/js" />
    	<mkdir dir="${dir.project.webstudio.assemble}/overlay/default/minimized" />
@@ -3150,7 +3156,7 @@
 	<taskdef name="jslint"
 	     classname="net.happygiraffe.jslint.ant.JSLintTask"
              classpath="${dir.project.webstudio}/lib/jslint4java-1.2.1+rhino.jar" />
-                          
+
 	<echo>Validating the Web Studio Javascript files</echo>
 	<jslint options="browser,widget,evil,sub,passfail">
 		<formatter type="plain" />
