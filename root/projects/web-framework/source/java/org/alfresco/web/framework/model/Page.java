@@ -265,7 +265,7 @@ public class Page extends AbstractModelObject
         
         int i = 0;
         Iterator it = objects.values().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             PageAssociation pageAssociation = (PageAssociation) it.next();            
             pages[i] = (Page) pageAssociation.getDestPage(context);

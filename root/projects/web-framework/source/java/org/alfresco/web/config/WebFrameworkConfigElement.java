@@ -37,7 +37,7 @@ import org.dom4j.Element;
  */
 public class WebFrameworkConfigElement extends ConfigElementAdapter implements WebFrameworkConfigProperties
 {
-	public static final String CONFIG_ELEMENT_ID = "web-framework";
+    public static final String CONFIG_ELEMENT_ID = "web-framework";
 
     protected HashMap<String, FormatDescriptor> formats = null;
     protected HashMap<String, PageMapperDescriptor> pageMappers = null;
@@ -103,7 +103,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     {
         WebFrameworkConfigElement configElement = (WebFrameworkConfigElement) element;
 
-        // new combined element    	
+        // new combined element        
         WebFrameworkConfigElement combinedElement = new WebFrameworkConfigElement();
 
         // copy in our things
@@ -134,91 +134,91 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
         // other properties
         combinedElement.isTimerEnabled = this.isTimerEnabled;
-        if(configElement.isTimerEnabled)
+        if (configElement.isTimerEnabled)
         {
             combinedElement.isTimerEnabled = configElement.isTimerEnabled;
         }
         combinedElement.defaultFormatId = this.defaultFormatId;
-        if(configElement.defaultFormatId != null)
+        if (configElement.defaultFormatId != null)
         {
             combinedElement.defaultFormatId = configElement.defaultFormatId;
         }
         combinedElement.defaultPageMapperId = this.defaultPageMapperId;
-        if(configElement.defaultPageMapperId != null)
+        if (configElement.defaultPageMapperId != null)
         {
             combinedElement.defaultPageMapperId = configElement.defaultPageMapperId;
         }
         combinedElement.defaultLinkBuilderId = this.defaultLinkBuilderId;
-        if(configElement.defaultLinkBuilderId != null)
+        if (configElement.defaultLinkBuilderId != null)
         {
             combinedElement.defaultLinkBuilderId = configElement.defaultLinkBuilderId;
         }
         combinedElement.defaultRequestContextId = this.defaultRequestContextId;
-        if(configElement.defaultRequestContextId != null)
+        if (configElement.defaultRequestContextId != null)
         {
             combinedElement.defaultRequestContextId = configElement.defaultRequestContextId;
         }
         combinedElement.defaultUserFactoryId = this.defaultUserFactoryId;
-        if(configElement.defaultUserFactoryId != null)
+        if (configElement.defaultUserFactoryId != null)
         {
             combinedElement.defaultUserFactoryId = configElement.defaultUserFactoryId;
         }
 
         combinedElement.defaultRegionChrome = this.defaultRegionChrome;
-        if(configElement.defaultRegionChrome != null)
+        if (configElement.defaultRegionChrome != null)
         {
             combinedElement.defaultRegionChrome = configElement.defaultRegionChrome;
         }
         combinedElement.defaultComponentChrome = this.defaultComponentChrome;
-        if(configElement.defaultComponentChrome != null)
+        if (configElement.defaultComponentChrome != null)
         {
             combinedElement.defaultComponentChrome = configElement.defaultComponentChrome;
         }
         combinedElement.defaultTheme = this.defaultTheme;
-        if(configElement.defaultTheme != null)
+        if (configElement.defaultTheme != null)
         {
             combinedElement.defaultTheme = configElement.defaultTheme;
         }
 
         combinedElement.rootPath = this.rootPath;
-        if(configElement.rootPath != null)
+        if (configElement.rootPath != null)
         {
             combinedElement.rootPath = configElement.rootPath;
         }
         
         combinedElement.defaultSiteConfiguration = this.defaultSiteConfiguration;
-        if(configElement.defaultSiteConfiguration != null)
+        if (configElement.defaultSiteConfiguration != null)
         {
             combinedElement.defaultSiteConfiguration = configElement.defaultSiteConfiguration;
         }
         
         combinedElement.persisterCacheCheckDelay = this.persisterCacheCheckDelay;
-        if(configElement.persisterCacheCheckDelay != null)
+        if (configElement.persisterCacheCheckDelay != null)
         {
             combinedElement.persisterCacheCheckDelay = configElement.persisterCacheCheckDelay;
         }
         
         combinedElement.persisterCacheEnabled = this.persisterCacheEnabled;
-        if(configElement.persisterCacheEnabled != null)
+        if (configElement.persisterCacheEnabled != null)
         {
             combinedElement.persisterCacheEnabled = configElement.persisterCacheEnabled;
         }
         
         
         combinedElement.webStudioMode = this.webStudioMode;
-        if(configElement.webStudioMode != null)
+        if (configElement.webStudioMode != null)
         {
-        	combinedElement.webStudioMode = configElement.webStudioMode;
+            combinedElement.webStudioMode = configElement.webStudioMode;
         }
         combinedElement.webStudioLocation = this.webStudioLocation;
-        if(configElement.webStudioLocation != null)
+        if (configElement.webStudioLocation != null)
         {
-        	combinedElement.webStudioLocation = configElement.webStudioLocation;
+            combinedElement.webStudioLocation = configElement.webStudioLocation;
         }
         combinedElement.webStudioEnabled = this.webStudioEnabled;
-        if(configElement.webStudioEnabled)
+        if (configElement.webStudioEnabled)
         {
-        	combinedElement.webStudioEnabled = configElement.webStudioEnabled;
+            combinedElement.webStudioEnabled = configElement.webStudioEnabled;
         }
         
         return combinedElement;
@@ -317,7 +317,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
     public String getRootPath()
     {
-        if(rootPath == null)
+        if (rootPath == null)
         {
             return "/WEB-INF/classes/alfresco";
         }
@@ -327,12 +327,12 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     // resource loaders
     public String[] getResourceLoaderIds()
     {
-    	return this.resourceLoaders.keySet().toArray(new String[this.resourceLoaders.size()]);
+        return this.resourceLoaders.keySet().toArray(new String[this.resourceLoaders.size()]);
     }
     
     public ResourceLoaderDescriptor getResourceLoaderDescriptor(String id)
     {
-    	return (ResourceLoaderDescriptor) this.resourceLoaders.get(id);    	
+        return (ResourceLoaderDescriptor) this.resourceLoaders.get(id);        
     }
     
     // debug
@@ -354,7 +354,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String[] getDefaultPageTypeIds()
     {
-    	return this.pageTypes.keySet().toArray(new String[this.pageTypes.size()]);
+        return this.pageTypes.keySet().toArray(new String[this.pageTypes.size()]);
     }
     
     public String getDefaultPageTypeInstanceId(String id)
@@ -364,7 +364,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getDefaultThemeId()
     {
-        if(this.defaultTheme == null)
+        if (this.defaultTheme == null)
         {
             return "default";
         }
@@ -373,7 +373,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getDefaultSiteConfigurationId()
     {
-        if(this.defaultSiteConfiguration == null)
+        if (this.defaultSiteConfiguration == null)
         {
             return "default.site.configuration";
         }
@@ -383,7 +383,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     // framework defaults
     public String getDefaultFormatId()
     {
-        if(this.defaultFormatId == null)
+        if (this.defaultFormatId == null)
         {
             return "default";
         }
@@ -392,7 +392,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getDefaultPageMapperId()
     {
-        if(this.defaultPageMapperId == null)
+        if (this.defaultPageMapperId == null)
         {
             return "default";
         }
@@ -401,7 +401,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getDefaultLinkBuilderId()
     {
-        if(this.defaultLinkBuilderId == null)
+        if (this.defaultLinkBuilderId == null)
         {
             return "default";
         }
@@ -410,7 +410,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getDefaultRequestContextId()
     {
-        if(this.defaultRequestContextId == null)
+        if (this.defaultRequestContextId == null)
         {
             return "http";
         }
@@ -419,7 +419,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getDefaultUserFactoryId()
     {
-        if(this.defaultUserFactoryId == null)
+        if (this.defaultUserFactoryId == null)
         {
             return "default";
         }
@@ -452,17 +452,17 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String getWebStudioMode()
     {
-    	return this.webStudioMode;
+        return this.webStudioMode;
     }
     
     public String getWebStudioLocation()
     {
-    	return this.webStudioLocation;
+        return this.webStudioLocation;
     }
     
     public boolean isWebStudioEnabled()
     {
-    	return this.webStudioEnabled;    	
+        return this.webStudioEnabled;        
     }
     
 
@@ -489,14 +489,14 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
         public void put(Element el)
         {
-            if(this.map == null)
+            if (this.map == null)
             {
                 this.map = new HashMap<String, String>();
             }
 
             String key = el.getName();
             String value = (String) el.getTextTrim();
-            if(value != null)
+            if (value != null)
             {
                 this.map.put(key, value);
             }
@@ -504,18 +504,18 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
         public Object get(String key)
         {
-            if(this.map == null)
+            if (this.map == null)
             {
                 this.map = new HashMap<String, String>();
             }
 
             return (Object) this.map.get(key);
-        }	
+        }    
 
         public String getId() 
         {
             return (String) get(ID);
-        }		
+        }        
 
         public Object getProperty(String key)
         {
@@ -529,7 +529,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         
         public Map<String, String> map()
         {
-        	return this.map;
+            return this.map;
         }
     }
 
@@ -710,7 +710,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         public String getName() 
         {
             return getStringProperty(NAME);
-        }    	    	
+        }                
     }
     
     public static class TypeDescriptor extends Descriptor
@@ -889,30 +889,30 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
         // framework defaults
         Element frameworkDefaults = elem.element("framework-defaults");
-        if(frameworkDefaults != null)
+        if (frameworkDefaults != null)
         {
             String _requestContext = frameworkDefaults.elementTextTrim("request-context");
-            if(_requestContext != null)
+            if (_requestContext != null)
             {
                 configElement.defaultRequestContextId = _requestContext;
             }
             String _format = frameworkDefaults.elementTextTrim("format");
-            if(_format != null)
+            if (_format != null)
             {
                 configElement.defaultFormatId = _format;
             }
             String _pageMapper = frameworkDefaults.elementTextTrim("page-mapper");
-            if(_pageMapper != null)
+            if (_pageMapper != null)
             {
                 configElement.defaultPageMapperId = _pageMapper;
             }
             String _linkBuilder = frameworkDefaults.elementTextTrim("link-builder");
-            if(_linkBuilder != null)
+            if (_linkBuilder != null)
             {
                 configElement.defaultLinkBuilderId = _linkBuilder;
             }
             String _userFactory = frameworkDefaults.elementTextTrim("user-factory");
-            if(_userFactory != null)
+            if (_userFactory != null)
             {
                 configElement.defaultUserFactoryId = _userFactory;
             }
@@ -920,20 +920,20 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
         // application defaults
         Element applicationDefaults = elem.element("application-defaults");
-        if(applicationDefaults != null)
+        if (applicationDefaults != null)
         {
             String _regionChrome = applicationDefaults.elementTextTrim("region-chrome");
-            if(_regionChrome != null)
+            if (_regionChrome != null)
             {
                 configElement.defaultRegionChrome = _regionChrome;
             }
             String _componentChrome = applicationDefaults.elementTextTrim("component-chrome");
-            if(_componentChrome != null)
+            if (_componentChrome != null)
             {
                 configElement.defaultComponentChrome = _componentChrome;
             }
             String _theme = applicationDefaults.elementTextTrim("theme");
-            if(_theme != null && _theme.length() != 0)
+            if (_theme != null && _theme.length() != 0)
             {
                 configElement.defaultTheme = _theme;
             }
@@ -948,7 +948,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             }
             
             String _siteConfiguration = applicationDefaults.elementTextTrim("site-configuration");
-            if(_siteConfiguration != null)
+            if (_siteConfiguration != null)
             {
                 configElement.defaultSiteConfiguration = _siteConfiguration;
             }
@@ -959,14 +959,14 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         //////////////////////////////////////////////////////
 
         Element debugElement = elem.element("debug");
-        if(debugElement != null)
+        if (debugElement != null)
         {
             String _isTimerEnabled = debugElement.elementTextTrim("timer");
-            if(_isTimerEnabled != null)
+            if (_isTimerEnabled != null)
             {
                 configElement.isTimerEnabled = Boolean.parseBoolean(_isTimerEnabled);
             }
-        }    	
+        }        
 
         //////////////////////////////////////////////////////
         // Type Specific Things
@@ -981,7 +981,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
 
         String _rootPath = elem.elementTextTrim("model-root-path");
-        if(_rootPath != null)
+        if (_rootPath != null)
         {
             configElement.rootPath = _rootPath;
         }
@@ -1025,21 +1025,21 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         //////////////////////////////////////////////////////
 
         Element webStudio = elem.element("web-studio");
-        if(webStudio != null)
+        if (webStudio != null)
         {
-        	String _webStudioMode = webStudio.elementTextTrim("mode");
-            if(_webStudioMode != null)
+            String _webStudioMode = webStudio.elementTextTrim("mode");
+            if (_webStudioMode != null)
             {
                 configElement.webStudioMode = _webStudioMode;
-                if("enabled".equalsIgnoreCase(_webStudioMode))
+                if ("enabled".equalsIgnoreCase(_webStudioMode))
                 {
-                	configElement.webStudioEnabled = true;
+                    configElement.webStudioEnabled = true;
                 }
             }
             String _webStudioLocation = webStudio.elementTextTrim("location");
-            if(_webStudioLocation != null)
+            if (_webStudioLocation != null)
             {
-            	configElement.webStudioLocation = _webStudioLocation;
+                configElement.webStudioLocation = _webStudioLocation;
             }
         }
         

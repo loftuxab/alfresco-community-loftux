@@ -80,7 +80,7 @@ public final class ScriptHelper implements Serializable
         
         // convert to map of script model objects
         Iterator it = objects.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String id = (String) it.next();
             ModelObject modelObject = (ModelObject) objects.get(id);

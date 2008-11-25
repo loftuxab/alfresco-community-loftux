@@ -120,7 +120,7 @@ public final class ScriptRenderingInstance extends ScriptBase
         
         int i = 0;
         Iterator it = map.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             names[i] = (String) it.next();
             i++;

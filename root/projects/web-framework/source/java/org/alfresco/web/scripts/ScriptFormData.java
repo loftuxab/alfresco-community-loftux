@@ -98,7 +98,7 @@ public final class ScriptFormData extends ScriptBase
         
         int i = 0;
         Iterator it = fields.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String key = (String) it.next();
             FormField field = (FormField) fields.get(key);
@@ -164,7 +164,7 @@ public final class ScriptFormData extends ScriptBase
         if (map != null)
         {
             Iterator it = map.keySet().iterator();
-            while(it.hasNext())
+            while (it.hasNext())
             {
                 String prefixedId = (String) it.next();
                 

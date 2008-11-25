@@ -31,24 +31,24 @@ package org.alfresco.web.framework.render;
  */
 public enum RenderFocus 
 {
-	HEADER("header"),
-	BODY("body"),
-	FOOTER("footer"),
-	ALL("all");
-	
-	private final String focus;
-	
-	private RenderFocus(String focus)
-	{
-		this.focus = focus;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return this.focus;
-	}
-	
+    HEADER("header"),
+    BODY("body"),
+    FOOTER("footer"),
+    ALL("all");
+    
+    private final String focus;
+    
+    private RenderFocus(String focus)
+    {
+        this.focus = focus;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.focus;
+    }
+    
     // TODO: I understand from Kevin that this method is not
     // necessary.  However, when I tried to use his changes, they
     // broke web studio.  Apparently, the way he was doing it is
@@ -58,16 +58,16 @@ public enum RenderFocus
     // TODO: Investigate because I would like to use Kevin's method
     // however the primary goal is to get things working so this will
     // be left in for the moment
-	//
-	public static RenderFocus fromString(String focus)
-	{
-		for(RenderFocus e: values())
-		{
-			if(e.focus.equals(focus))
-			{
-				return e;
-			}
-		}
-		return null;
-	}
+    //
+    public static RenderFocus fromString(String focus)
+    {
+        for(RenderFocus e: values())
+        {
+            if (e.focus.equals(focus))
+            {
+                return e;
+            }
+        }
+        return null;
+    }
 }

@@ -125,29 +125,29 @@ public final class ScriptContentObject extends ScriptBase
 
     public String getStatusMessage()
     {
-    	String message = null;
-    	
-    	if(this.content.getLoaderException() != null)
-    	{
-    		message = this.content.getLoaderException().getMessage();
-    	}
+        String message = null;
         
-    	return message;
+        if (this.content.getLoaderException() != null)
+        {
+            message = this.content.getLoaderException().getMessage();
+        }
+        
+        return message;
     } 
     
     public String getJson()
     {
-    	return this.content.getJSON();
+        return this.content.getJSON();
     }
     
     public ScriptResource getResource()
     {
-    	if(this.scriptResource == null)
-    	{
-    		this.scriptResource = new ScriptResource(context, this.content.getResource());    		
-    	}
-    	
-    	return this.scriptResource;
+        if (this.scriptResource == null)
+        {
+            this.scriptResource = new ScriptResource(context, this.content.getResource());            
+        }
+        
+        return this.scriptResource;
     }
     
     // --------------------------------------------------------------

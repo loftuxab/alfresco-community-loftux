@@ -45,10 +45,10 @@ import org.alfresco.web.site.exception.RequestDispatchException;
  * 
  * URLs are expected to be invoked as shown:
  * 
- * /c/<componentId>					-> runs the view mode for component
- * /c/view/<componentId>			-> runs the view mode for component
- * /c/view/header/<componentId>		-> runs the view mode for component (and processes the 'header')
- * /c/edit/<componentId>       		-> runs the edit mode for component
+ * /c/<componentId>                    -> runs the view mode for component
+ * /c/view/<componentId>            -> runs the view mode for component
+ * /c/view/header/<componentId>        -> runs the view mode for component (and processes the 'header')
+ * /c/edit/<componentId>               -> runs the edit mode for component
  * /c/edit/header/<componentId>     -> runs the edit mode for component (and processes the 'header')
  * 
  * The component is then executed and its output streamed back.
@@ -57,7 +57,7 @@ import org.alfresco.web.site.exception.RequestDispatchException;
  */
 public class ComponentDispatcherServlet extends DispatcherServlet
 {
-	public void init() throws ServletException
+    public void init() throws ServletException
     {
         super.init();
     }
@@ -92,42 +92,42 @@ public class ComponentDispatcherServlet extends DispatcherServlet
         // was this the render mode?
         try
         {
-        	renderMode = RenderMode.fromString(componentId);
+            renderMode = RenderMode.fromString(componentId);
         }
-        catch(IllegalArgumentException iae) 
+        catch (IllegalArgumentException iae) 
         { 
-        	// this means it wasn't an enum type
+            // this means it wasn't an enum type
         }
         
         // if we received the render mode, advance the token
-        if(renderMode != null)
+        if (renderMode != null)
         {
-        	componentId = t.nextToken();
-        	
-        	try
-        	{
-        		renderFocus = RenderFocus.fromString(componentId);
-        	}
-        	catch(IllegalArgumentException iae)
-        	{
-        		// this means it wasn't an enum type
-        	}
-        	
-        	// advance the token if we found a render focus
-        	if(renderFocus != null)
-        	{
-        		componentId = t.nextToken();
-        	}
+            componentId = t.nextToken();
+            
+            try
+            {
+                renderFocus = RenderFocus.fromString(componentId);
+            }
+            catch (IllegalArgumentException iae)
+            {
+                // this means it wasn't an enum type
+            }
+            
+            // advance the token if we found a render focus
+            if (renderFocus != null)
+            {
+                componentId = t.nextToken();
+            }
         }
         
         // some defaults
-        if(renderMode == null)
+        if (renderMode == null)
         {
-        	renderMode = RenderMode.VIEW;
+            renderMode = RenderMode.VIEW;
         }
-        if(renderFocus == null)
+        if (renderFocus == null)
         {
-        	renderFocus = RenderFocus.BODY;
+            renderFocus = RenderFocus.BODY;
         }
         
         // set the render mode

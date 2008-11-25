@@ -30,7 +30,7 @@ package org.alfresco.web.framework.exception;
  * @author muzquiano
  */
 public class ResourceMetadataException
-	extends RendererExecutionException
+    extends RendererExecutionException
 {
     public ResourceMetadataException(String message)
     {

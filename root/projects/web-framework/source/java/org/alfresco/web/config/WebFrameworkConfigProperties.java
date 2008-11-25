@@ -40,7 +40,7 @@ import org.alfresco.web.config.WebFrameworkConfigElement.UserFactoryDescriptor;
  */
 public interface WebFrameworkConfigProperties
 {
-	// formats
+    // formats
     public String[] getFormatIds();
     public FormatDescriptor getFormatDescriptor(String id);
     

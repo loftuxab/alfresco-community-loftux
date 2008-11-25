@@ -123,7 +123,7 @@ class WebScriptPageComponentRequest extends WebScriptRequestURLImpl
    {
       List<String> headersList = new ArrayList<String>();
       Enumeration<String> enumNames = servletRequest.getHeaderNames();
-      while(enumNames.hasMoreElements())
+      while (enumNames.hasMoreElements())
       {
          headersList.add(enumNames.nextElement());
       }

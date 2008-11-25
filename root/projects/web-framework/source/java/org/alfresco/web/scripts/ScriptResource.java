@@ -36,14 +36,14 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptResource extends ScriptBase
 {
-	protected ScriptContentObject scriptContentObject = null;
-	protected Resource resource;
+    protected ScriptContentObject scriptContentObject = null;
+    protected Resource resource;
 
     public ScriptResource(RequestContext context, Resource resource)
     {
-    	super(context);
-    	
-    	this.resource = resource;
+        super(context);
+        
+        this.resource = resource;
     }
 
     /* (non-Javadoc)
@@ -51,7 +51,7 @@ public final class ScriptResource extends ScriptBase
      */
     protected ScriptableMap<String, Serializable> buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
         }
         
@@ -64,95 +64,95 @@ public final class ScriptResource extends ScriptBase
 
     public String getId()
     {
-    	return this.resource.getId();
+        return this.resource.getId();
     }
     
     public String getValue()
     {
-    	return this.resource.getValue();
+        return this.resource.getValue();
     }
     
     public void setValue(Object value)
     {
-    	this.resource.setValue((String) value);
+        this.resource.setValue((String) value);
     }    
 
     public String getAttribute(String name)
     {
-    	return (String) this.resource.getAttribute(name);
+        return (String) this.resource.getAttribute(name);
     }
 
     public void setAttribute(String name, String value)
     {
-    	this.resource.setAttribute(name, value);
+        this.resource.setAttribute(name, value);
     }
     
     public String getType()
     {
-    	return (String) this.resource.getType();
+        return (String) this.resource.getType();
     }
     
     public void setType(String type)
     {
-    	this.resource.setType(type);
+        this.resource.setType(type);
     }
                 
     public String getEndpoint()
     {
-    	return this.resource.getEndpoint();
+        return this.resource.getEndpoint();
     }
     
     public void setEndpoint(String endpoint)
     {
-    	this.resource.setEndpoint(endpoint);
+        this.resource.setEndpoint(endpoint);
     }
     
     public String getDownloadURI()
     {
-    	return this.resource.getDownloadURI(context);
+        return this.resource.getDownloadURI(context);
     }
 
     public String getProxiedDownloadURI()
     {
-    	return this.resource.getProxiedDownloadURI(context);
+        return this.resource.getProxiedDownloadURI(context);
     }
     
     public String getMetadataURI()
     {
-    	return this.resource.getMetadataURI(context);
+        return this.resource.getMetadataURI(context);
     }    
 
     public String getProxiedMetadataURI()
     {
-    	return this.resource.getProxiedMetadataURI(context);
+        return this.resource.getProxiedMetadataURI(context);
     }    
     
     public String getMetadata()
     {
-    	String metadata = null;
+        String metadata = null;
     
-    	try
-    	{
-    		metadata = this.resource.getMetadata(context);
-    	}
-    	catch(ResourceMetadataException rme)
-    	{
-    		rme.printStackTrace();
-    	}
-    	
-    	return metadata;
+        try
+        {
+            metadata = this.resource.getMetadata(context);
+        }
+        catch (ResourceMetadataException rme)
+        {
+            rme.printStackTrace();
+        }
+        
+        return metadata;
     }
     
     public ScriptContentObject getContent()
     {
-    	if(this.scriptContentObject == null)
-    	{
-    		ResourceContent resourceContent = this.resource.getContent(context);
-    		
-    		this.scriptContentObject = new ScriptContentObject(context, resourceContent);
-    	}
-    	
-    	return this.scriptContentObject;    	
+        if (this.scriptContentObject == null)
+        {
+            ResourceContent resourceContent = this.resource.getContent(context);
+            
+            this.scriptContentObject = new ScriptContentObject(context, resourceContent);
+        }
+        
+        return this.scriptContentObject;        
     }
 }
 

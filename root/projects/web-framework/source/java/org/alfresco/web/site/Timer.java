@@ -234,7 +234,7 @@ public class Timer
         {
             // report timing blocks in order they were received
             Iterator it = t.keys.iterator();
-            while(it.hasNext())
+            while (it.hasNext())
             {
                 String blockId = (String) it.next();
                 report(request, blockId);
