@@ -154,7 +154,7 @@ public final class ScriptCredentialVault extends ScriptBase
         
         // now walk through our properties and place them back into the vault
         Iterator it = getProperties().keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String endpointId = (String) it.next();
 
@@ -166,7 +166,7 @@ public final class ScriptCredentialVault extends ScriptBase
             
             // now do the mapping
             Iterator it2 = scriptCredentials.getProperties().keySet().iterator();
-            while(it2.hasNext())
+            while (it2.hasNext())
             {
                 String propertyKey = (String) it2.next();
                 Object propertyValue = scriptCredentials.getProperties().get(propertyKey);

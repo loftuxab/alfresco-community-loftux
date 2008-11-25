@@ -260,7 +260,7 @@ public final class ScriptModelObject extends ScriptBase
     {
         // retrieve values from our properties array
         Iterator it = getProperties().keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String propertyName = (String) it.next();
             String propertyValue = (String) getProperties().get(propertyName);

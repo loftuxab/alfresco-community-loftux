@@ -782,7 +782,7 @@ public final class ScriptSiteData extends ScriptBase
         ArrayList<Page> list = new ArrayList<Page>(16);
         
         Iterator it = pageAssociations.values().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             PageAssociation pageAssociation = (PageAssociation) it.next();
             Page page = pageAssociation.getDestPage(context);
@@ -818,7 +818,7 @@ public final class ScriptSiteData extends ScriptBase
         ArrayList<Page> list = new ArrayList<Page>(16);
         
         Iterator it = pageAssociations.values().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             PageAssociation pageAssociation = (PageAssociation) it.next();
             Page page = pageAssociation.getSourcePage(context);

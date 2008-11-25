@@ -87,11 +87,11 @@ public class DispatcherServlet extends BaseServlet
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
         try
         {
-        	FrameworkHelper.initFramework(getServletContext(), context);
+            FrameworkHelper.initFramework(getServletContext(), context);
         }
-        catch(FrameworkInitializationException fie)
+        catch (FrameworkInitializationException fie)
         {
-        	throw new ServletException("Unable to initialize the Web Framework: " + fie);
+            throw new ServletException("Unable to initialize the Web Framework: " + fie);
         }
     }
     
@@ -310,19 +310,19 @@ public class DispatcherServlet extends BaseServlet
             // Go to the getting started page
             try
             {
-            	RenderUtil.renderSystemPage(context, 
+                RenderUtil.renderSystemPage(context, 
                     WebFrameworkConstants.SYSTEM_PAGE_GETTING_STARTED);
             }
-            catch(RendererExecutionException ree)
+            catch (RendererExecutionException ree)
             {
-            	throw new RequestDispatchException(ree);
+                throw new RequestDispatchException(ree);
             }
         }
         else
         {
             // we know we're dispatching to something...
             // if we have a page specified, then we'll go there
-            if(pageId != null)
+            if (pageId != null)
             {
                 if (isDebugEnabled())
                     debug(context, "Dispatching to Page: " + pageId);
@@ -348,90 +348,90 @@ public class DispatcherServlet extends BaseServlet
 
     protected void dispatchJsp(DefaultRenderContext renderContext, String dispatchPage) throws RequestDispatchException
     {
-    	PresentationUtil.renderJspPage(renderContext, dispatchPage);
+        PresentationUtil.renderJspPage(renderContext, dispatchPage);
     }
 
     protected void dispatchContent(RenderContext context,
             String contentId, String formatId) throws RequestDispatchException
     {
-    	// get the current object
-    	ResourceContent content = context.getCurrentObject();
-    	if(content == null)
-    	{
-    		throw new RequestDispatchException("Unable to dispatch to content page because current content object is null");
-    	}
-    	
-    	// ensure that we were able to load the content object
-    	if(!content.isLoaded())
-    	{
-    		// something wiped out while trying to load the content
-    		// we want to display a friendly page to communicate this
-    		try
-    		{
-    			RenderUtil.renderSystemPage(context, 
+        // get the current object
+        ResourceContent content = context.getCurrentObject();
+        if (content == null)
+        {
+            throw new RequestDispatchException("Unable to dispatch to content page because current content object is null");
+        }
+        
+        // ensure that we were able to load the content object
+        if (!content.isLoaded())
+        {
+            // something wiped out while trying to load the content
+            // we want to display a friendly page to communicate this
+            try
+            {
+                RenderUtil.renderSystemPage(context, 
                     WebFrameworkConstants.SYSTEM_PAGE_CONTENT_NOT_LOADED);
-    		}
-    		catch(RendererExecutionException ree)
-    		{
-    			throw new RequestDispatchException(ree);
-    		}
-    	}
-    	else
-    	{    	
-    		// otherwise, we dispatch to the associated content template
-	    	String sourceId = content.getTypeId();
-	    	if (isDebugEnabled())
-	            debug(context, "Content - Object Source Id: " + sourceId);
-	    	
-	    	// Look up which template to use to display this content
-	    	// this must also take into account the current format
+            }
+            catch (RendererExecutionException ree)
+            {
+                throw new RequestDispatchException(ree);
+            }
+        }
+        else
+        {        
+            // otherwise, we dispatch to the associated content template
+            String sourceId = content.getTypeId();
+            if (isDebugEnabled())
+                debug(context, "Content - Object Source Id: " + sourceId);
+            
+            // Look up which template to use to display this content
+            // this must also take into account the current format
             Map<String, ModelObject> objects = context.getModel().findContentAssociations(sourceId, null, null, null);
-            if(objects.size() > 0)
+            if (objects.size() > 0)
             {
                 ContentAssociation association = (ContentAssociation) objects.values().iterator().next();
                 TemplateInstance templateInstance = association.getTemplate(context);
-	            if (templateInstance != null)
-	            {
-	                if (isDebugEnabled())
-	                    debug(context, "Content - Dispatching to Template Instance: " + templateInstance.getId());
-	
-	                // set the current template
-	                context.setTemplate(templateInstance);
-	                
-	                // render content
-	                PresentationUtil.renderContent(context, RenderFocus.BODY);
-	            }
-	            else
-	            {
-	            	// there was an associated content display template instance
-	            	// however, it appears to be missing or unloadable
-		        	try
-		        	{
-		        		RenderUtil.renderSystemPage(context, 
-		                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
-		        	}
-		        	catch(RendererExecutionException ree)
-		        	{
-		        		throw new RequestDispatchException(ree);
-		        	}	            	
-	            }
-	        }
-	        else
-	        {
-	        	// we couldn't find a content association template
-	        	
-	            // Render a friendly page to show that we could not find
-	        	// a content association to a page
-	        	try
-	        	{
-	        		RenderUtil.renderSystemPage(context, 
-	                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
-	        	}
-	        	catch(RendererExecutionException ree)
-	        	{
-	        		throw new RequestDispatchException(ree);
-	        	}	        	
-	        }
+                if (templateInstance != null)
+                {
+                    if (isDebugEnabled())
+                        debug(context, "Content - Dispatching to Template Instance: " + templateInstance.getId());
+    
+                    // set the current template
+                    context.setTemplate(templateInstance);
+                    
+                    // render content
+                    PresentationUtil.renderContent(context, RenderFocus.BODY);
+                }
+                else
+                {
+                    // there was an associated content display template instance
+                    // however, it appears to be missing or unloadable
+                    try
+                    {
+                        RenderUtil.renderSystemPage(context, 
+                            WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
+                    }
+                    catch (RendererExecutionException ree)
+                    {
+                        throw new RequestDispatchException(ree);
+                    }                    
+                }
+            }
+            else
+            {
+                // we couldn't find a content association template
+                
+                // Render a friendly page to show that we could not find
+                // a content association to a page
+                try
+                {
+                    RenderUtil.renderSystemPage(context, 
+                        WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
+                }
+                catch (RendererExecutionException ree)
+                {
+                    throw new RequestDispatchException(ree);
+                }                
+            }
         }
     }
     
@@ -445,8 +445,8 @@ public class DispatcherServlet extends BaseServlet
             String formatId)
         throws RequestDispatchException
     {
-    	Page page = context.getPage();
-    	
+        Page page = context.getPage();
+        
         if (isDebugEnabled())
             debug(context, "Template ID: " + page.getTemplateId());
         
@@ -456,7 +456,7 @@ public class DispatcherServlet extends BaseServlet
             if (isDebugEnabled())
                 debug(context, "Rendering Page with template: " + currentTemplate.getId());
             
-           	PresentationUtil.renderPage(context, RenderFocus.BODY);
+               PresentationUtil.renderPage(context, RenderFocus.BODY);
         }
         else
         {
@@ -465,12 +465,12 @@ public class DispatcherServlet extends BaseServlet
             
             try
             {
-            	RenderUtil.renderSystemPage(context, 
+                RenderUtil.renderSystemPage(context, 
                     WebFrameworkConstants.SYSTEM_PAGE_UNCONFIGURED);
             }
-            catch(RendererExecutionException ree)
+            catch (RendererExecutionException ree)
             {
-            	throw new RequestDispatchException(ree);
+                throw new RequestDispatchException(ree);
             }
         }
     }

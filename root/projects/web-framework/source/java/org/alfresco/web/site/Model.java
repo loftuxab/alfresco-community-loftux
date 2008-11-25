@@ -1013,7 +1013,7 @@ public class Model
     {
         Map<String, ModelObject> objects = findPageAssociations(sourceId, destId, associationTypeId);
         Iterator it = objects.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String pageAssociationId = (String) it.next();
             unassociatePage(pageAssociationId);
@@ -1068,7 +1068,7 @@ public class Model
     {
         Map<String, ModelObject> objects = findContentAssociations(sourceId, destId, assocType, formatId);
         Iterator it = objects.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String associationId = (String) it.next();
             unassociateContent(associationId);
@@ -1350,7 +1350,7 @@ public class Model
         // copy in properties
         Map<String, Serializable> properties = object.getProperties();
         Iterator propIt = properties.keySet().iterator();
-        while(propIt.hasNext())
+        while (propIt.hasNext())
         {
             String propertyName = (String) propIt.next();
             Object propertyValue = properties.get(propertyName);

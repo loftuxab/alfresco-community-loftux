@@ -454,7 +454,7 @@ public class FakeJspPageContext
         ArrayList<Object> array = new ArrayList<Object>();
 
         Iterator it = values.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             array.add(it.next());
         }

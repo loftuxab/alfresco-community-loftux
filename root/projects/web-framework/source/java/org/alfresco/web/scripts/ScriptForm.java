@@ -124,7 +124,7 @@ public final class ScriptForm extends ScriptBase
         
         int i = 0;
         Iterator it = bindings.keySet().iterator();
-        while(it.hasNext())
+        while (it.hasNext())
         {
             String key = (String) it.next();
             FormBinding binding = (FormBinding) bindings.get(key);

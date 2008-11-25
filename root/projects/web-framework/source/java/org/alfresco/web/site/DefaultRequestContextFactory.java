@@ -78,7 +78,7 @@ public class DefaultRequestContextFactory implements RequestContextFactory
             
             // Copy in request parameters
             Enumeration parameterNames = ((HttpServletRequest)request).getParameterNames();
-            while(parameterNames.hasMoreElements())
+            while (parameterNames.hasMoreElements())
             {
                 String parameterName = (String) parameterNames.nextElement();
                 Object parameterValue = ((HttpServletRequest)request).getParameter(parameterName);

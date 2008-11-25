@@ -42,11 +42,11 @@ import org.alfresco.web.framework.resource.TransientResourceImpl;
  */
 public class ResourceTag extends TagBase
 {
-	private String id = null;
-	private String target = null;
-	private String type = null;
-	private String endpoint = null;
-	private String value = null;
+    private String id = null;
+    private String target = null;
+    private String type = null;
+    private String endpoint = null;
+    private String value = null;
 
     public void setId(String id)
     {
@@ -60,115 +60,115 @@ public class ResourceTag extends TagBase
     
     public void setTarget(String target)
     {
-    	this.target = target;
+        this.target = target;
     }
     
     public String getTarget()
     {
-    	return this.target;
+        return this.target;
     }
     
     public void setType(String type)
     {
-    	this.type = type;
+        this.type = type;
     }
     
     public String getType()
     {
-    	return this.type;
+        return this.type;
     }
     
     public void setEndpoint(String endpoint)
     {
-    	this.endpoint = endpoint;
+        this.endpoint = endpoint;
     }
     
     public String getEndpoint()
     {
-    	return this.endpoint;
+        return this.endpoint;
     }
     
     public void setValue(String value)
     {
-    	this.value = value;
+        this.value = value;
     }
     
     public String getValue()
     {
-    	return this.value;
+        return this.value;
     }
     
     public int doStartTag() throws JspException
     {
-    	RenderContext context = getRenderContext();
+        RenderContext context = getRenderContext();
 
-    	ModelObject object = context.getObject();
-    	if(object != null)
-    	{
-    		try
-    		{    			
-    			// if the resource is identified by ID
-    			// and the object is a resource provider
-    			if(getId() != null && object instanceof ResourceProvider)
-    			{
-    				ResourceProvider provider = (ResourceProvider) object;
-    				Resource resource = provider.getResource(this.id);
-    			
-	    			String uri = resource.getProxiedDownloadURI(this.getRequestContext());    			
-	    			if("metadata".equalsIgnoreCase(this.target))
-	    			{
-	    				uri = resource.getProxiedMetadataURI(this.getRequestContext());
-	    			}
-    			
-	    			this.getOut().write(uri);
-    			}
-    			else if(getType() != null)
-    			{    				
-    				// allow for creation of transient, run-time identified resources
-    				
-    				// generate a temporary resource id
-    				String id = new ObjectGUID().toString();
-    				
-    				// create a resource
-    				TransientResourceImpl resource = new TransientResourceImpl(id, getType());
-    				    		    	    		    	
-    		    	// set the value
-    		    	String v = getValue();
-    		    	if(v == null)
-    		    	{
-    		    		v = "";
-    		    	}
-    		    	resource.setValue(v);
-    		    	
-    		    	// set the endpoint
-    		    	String ep = getEndpoint();
-    		    	if(ep == null)
-    		    	{
-    		    		ep = "alfresco";
-    		    	}
-    		    	resource.setEndpoint(ep);
-    				
-    		    	// construct the proxied uri
-	    			String uri = resource.getProxiedDownloadURI(this.getRequestContext());    			
-	    			if("metadata".equalsIgnoreCase(this.target))
-	    			{
-	    				uri = resource.getProxiedMetadataURI(this.getRequestContext());
-	    			}
-    			
-	    			this.getOut().write(uri);
-    			}
-	        }
-	        catch (Throwable t)
-	        {
-	            throw new JspException(t);
-	        }
-    	}
+        ModelObject object = context.getObject();
+        if (object != null)
+        {
+            try
+            {                
+                // if the resource is identified by ID
+                // and the object is a resource provider
+                if (getId() != null && object instanceof ResourceProvider)
+                {
+                    ResourceProvider provider = (ResourceProvider) object;
+                    Resource resource = provider.getResource(this.id);
+                
+                    String uri = resource.getProxiedDownloadURI(this.getRequestContext());                
+                    if ("metadata".equalsIgnoreCase(this.target))
+                    {
+                        uri = resource.getProxiedMetadataURI(this.getRequestContext());
+                    }
+                
+                    this.getOut().write(uri);
+                }
+                else if (getType() != null)
+                {                    
+                    // allow for creation of transient, run-time identified resources
+                    
+                    // generate a temporary resource id
+                    String id = new ObjectGUID().toString();
+                    
+                    // create a resource
+                    TransientResourceImpl resource = new TransientResourceImpl(id, getType());
+                                                            
+                    // set the value
+                    String v = getValue();
+                    if (v == null)
+                    {
+                        v = "";
+                    }
+                    resource.setValue(v);
+                    
+                    // set the endpoint
+                    String ep = getEndpoint();
+                    if (ep == null)
+                    {
+                        ep = "alfresco";
+                    }
+                    resource.setEndpoint(ep);
+                    
+                    // construct the proxied uri
+                    String uri = resource.getProxiedDownloadURI(this.getRequestContext());                
+                    if ("metadata".equalsIgnoreCase(this.target))
+                    {
+                        uri = resource.getProxiedMetadataURI(this.getRequestContext());
+                    }
+                
+                    this.getOut().write(uri);
+                }
+            }
+            catch (Throwable t)
+            {
+                throw new JspException(t);
+            }
+        }
         return SKIP_BODY;
     }
     
     public void release()
     {
-    	this.id = null;
+        this.id = null;
         
         super.release();
     }

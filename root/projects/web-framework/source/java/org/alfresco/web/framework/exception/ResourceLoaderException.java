@@ -30,7 +30,7 @@ package org.alfresco.web.framework.exception;
  * @author muzquiano
  */
 public class ResourceLoaderException
-	extends RendererExecutionException
+    extends RendererExecutionException
 {
     public ResourceLoaderException(String message)
     {
