@@ -31,21 +31,43 @@ package org.alfresco.web.framework.render;
  */
 public enum RenderMode 
 {
-    VIEW("view"),
-    EDIT("edit"),
-    HELP("help"),
-    ADMIN("admin");
-    
-    private final String mode;
-    
-    private RenderMode(String mode)
-    {
-        this.mode = mode;
-    }
-    
-    @Override
-    public String toString()
-    {
-        return this.mode;
-    }
+	VIEW("view"),
+	EDIT("edit"),
+	HELP("help"),
+	ADMIN("admin");
+	
+	private final String mode;
+	
+	private RenderMode(String mode)
+	{
+		this.mode = mode;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.mode;
+	}
+
+	// TODO: I understand from Kevin that this method is not
+	// necessary.  However, when I tried to use his changes, they
+	// broke web studio.  Apparently, the way he was doing it is
+	// not equivalent to doing fromString as it is shown here since
+	// it was always returning null.
+	//
+	// TODO: Investigate because I would like to use Kevin's method
+	// however the primary goal is to get things working so this will
+	// be left in for the moment
+	//
+	public static RenderMode fromString(String mode)
+	{
+		for(RenderMode e: values())
+		{
+			if(e.mode.equals(mode))
+			{
+				return e;
+			}
+		}
+		return null;
+	}
 }

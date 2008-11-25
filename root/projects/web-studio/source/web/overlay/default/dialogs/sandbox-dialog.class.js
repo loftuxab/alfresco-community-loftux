@@ -242,6 +242,7 @@ WebStudio.SandboxDialog.prototype.updateLoadWebSiteSearchResults = function(text
 				html += "<td>" + id + "</td>";
 				html += "<td>" + title + "</td>";
 				html += "</tr>";
+
 			}
 			
 			html += "</table>";
