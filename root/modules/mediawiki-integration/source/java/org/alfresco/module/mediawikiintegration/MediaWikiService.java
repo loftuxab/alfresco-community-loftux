@@ -93,7 +93,7 @@ public class MediaWikiService implements Constants,
     private String url;
     private String username;
     private String password;
-    private String databaseName;
+    private String databaseName = "alfresco";
     private String host = "localhost";
     private String hostPort = "5432";    
     
@@ -154,7 +154,8 @@ public class MediaWikiService implements Constants,
      */
     public void setUrl(String url)
     {
-        this.url = url;
+        this.url = url;        
+        System.out.println("The connection URL: " + url);
         
         // Parse this to find the component parts of the URL
         // Note:  currently only MySQL is supported
@@ -166,6 +167,8 @@ public class MediaWikiService implements Constants,
             if (index > 0)
             {
                 String host = remainder.substring(0, index);
+                this.databaseName = remainder.substring(index + 1);
+                
                 index = host.indexOf(":");
                 if (index >= 0)
                 {
@@ -176,10 +179,6 @@ public class MediaWikiService implements Constants,
                 {
                     this.host = host;
                 }
-            }
-            else
-            {
-                this.databaseName = remainder.substring(index + 1);
             }
         }
         else
