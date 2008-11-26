@@ -77,7 +77,7 @@ public class WebStudioRegionRenderer extends RegionRenderer
             if (regionId != null && regionScopeId != null
                     && regionSourceId != null)
             {
-                writer.println("if(WebStudio){");
+                writer.println("if(typeof WebStudio != \"undefined\"){");
                 writer.println("WebStudio.configureRegion('" + htmlId + "', '"
                         + regionId + "', '" + regionScopeId + "', '"
                         + regionSourceId + "');");

@@ -13,7 +13,11 @@ else
 
 	// mimetype
 	model.mimetype = instance.object.properties["mimetype"];
-	model.isAudio = (model.mimetype.substring(0,5) == "audio");
+	model.isAudio = false;
+	if(model.mimetype != null && model.mimetype.length > 5)
+	{
+		model.isAudio = (model.mimetype.substring(0,5) == "audio");
+	}
 
 	// players
 	model.useQuicktime = false;

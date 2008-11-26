@@ -92,7 +92,8 @@ public class WebStudioComponentRenderer extends ComponentRenderer
                     componentTypeTitle = getComponentTypeTitle(context, c);
                     editorUrl = getComponentEditorUrl(context, c);
                 }
-                writer.println("if(WebStudio){");
+                
+                writer.println("if(typeof WebStudio != \"undefined\"){");
                 writer.println("WebStudio.configureComponent('" + htmlId
                         + "', '" + componentId + "', '" + componentTypeId
                         + "', '" + componentTitle + "', '" + componentTypeTitle

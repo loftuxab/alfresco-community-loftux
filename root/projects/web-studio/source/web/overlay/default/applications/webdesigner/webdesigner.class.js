@@ -259,7 +259,7 @@ WebStudio.Applications.WebDesigner.prototype.setupPageEditor = function()
 		}		
 	}
 	
-	var applet1 = this.getApplet("webcomponents");
+	var applet1 = this.getApplet("components");
 	if(applet1)
 	{
 		applet1.treeView.setDroppables(this.pageEditor.tabs);
@@ -347,7 +347,8 @@ WebStudio.Applications.WebDesigner.prototype.GoToTemplateDisplay = function(temp
  */
 WebStudio.Applications.WebDesigner.prototype.dropFromTreeView = function(dropDivId, options)
 {
-	this.dropOntoRegion(this.pageEditor.tabs[dropDivId],null,null,null,options);
+	var regionTab = this.pageEditor.tabs[dropDivId];
+	this.dropOntoRegion(regionTab,null,null,null,options);
 };
 
 WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab, nodeData, source, e, options)
@@ -762,6 +763,21 @@ WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html,
 				}
 			}
 			
+			// recompute size of dom element
+			for(var a = 0; a < regionDiv.childNodes; a++)
+			{
+				var tag = regionDiv.childNodes[a].nodeName;
+				if(tag)
+				{
+					if( (tag != "SCRIPT") && (tag != "LINK") )
+					{
+						regionDiv.style.width = regionDiv.childNodes[a].offsetWidth;
+						regionDiv.style.height = regionDiv.childNodes[a].offsetHeight;
+					}
+				}
+			}			
+
+			// restore the page editor (if it was enabled originally)			
 			if(restorePageEditor)
 			{
 				// TODO: Ideally, this should trigger from completion of tags and load of the DOM element
