@@ -129,7 +129,7 @@ WebStudio.SandboxDialog.prototype.activate = function()
 WebStudio.SandboxDialog.prototype.updateCreateWebSiteBasedOn = function()
 {
 	var _this = this;
-	
+		
 	// call over to login web script
 	var url = WebStudio.ws.studio("/api/prebuilt/list", { } );
 	this.call = YAHOO.util.Connect.asyncRequest('GET', url, 
@@ -173,6 +173,11 @@ WebStudio.SandboxDialog.prototype.updateCreateSelected = function()
 {
 	var _this = this;
 	
+	// Set the Create Site preview image to a fun "loading" image
+	_this.ToolCreateWebSiteImage.el.src = "/studio/overlay/default/images/sandbox-dialog-website-preview-loading.gif";
+	_this.ToolCreateWebSiteImage.el.removeAttribute("width");
+	_this.ToolCreateWebSiteImage.el.removeAttribute("height");	
+	
 	var url = WebStudio.ws.studio("/api/prebuilt/list", { } );
 	this.call = YAHOO.util.Connect.asyncRequest('GET', url, 
 	{	
@@ -192,7 +197,12 @@ WebStudio.SandboxDialog.prototype.updateCreateSelected = function()
 						{
 							previewImageUrl = "/studio" + previewImageUrl;
 						}
+
+						_this.ToolCreateWebSiteImage.el.src = "";
+						_this.ToolCreateWebSiteImage.el.setAttribute("width", "160px");
+						_this.ToolCreateWebSiteImage.el.setAttribute("height", "120px");
 						
+						// flip to image
 						_this.ToolCreateWebSiteImage.el.src = previewImageUrl;
 					}
 				}

@@ -105,6 +105,8 @@ WebStudio.Templates.Model.Row.prototype.deleteTableRow = function(eventType, eve
  */ 
 WebStudio.Templates.Model.Row.prototype.editRowColumnSizes = function(eventType, eventArgs, parmsObj) 
 {
+	var _this = this;
+	
     // Get Event
     var e = eventArgs[0];
 
@@ -137,6 +139,8 @@ WebStudio.Templates.Model.Row.prototype.editRowColumnSizes = function(eventType,
  */ 
 WebStudio.Templates.Model.Row.prototype.addTableColumns = function(eventType, eventArgs, parmsObj) 
 {
+	var _this = this;
+	
     // Get Event.
     var e = eventArgs[0];
     

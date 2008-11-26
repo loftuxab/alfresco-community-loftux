@@ -70,15 +70,18 @@
 
 		<remote>
 				
+			<!-- Include the Alfresco Web Studio endpoint -->
 			<endpoint>
 				<id>alfresco-web-studio</id>
 				<name>Alfresco Web Studio</name>
-				<description>Alfresco Web Studio</description>
+				<description>Allows this Surf application to mount Web Studio's in-context editors</description>
 				<connector-id>http</connector-id>
-				<endpoint-url>http://localhost:8280/studio</endpoint-url>
+				<endpoint-url>http://localhost:8080/studio</endpoint-url>
 				<identity>none</identity>
 			</endpoint>
-
+				
+			<!-- Include the Alfresco endpoint -->
+			<!-- This is the location of the Alfresco Repository services -->
 			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - user access</name>
@@ -88,6 +91,8 @@
 				<identity>user</identity>
 			</endpoint>
 
+			<!-- Include the Alfresco JSF client endpoint -->
+			<!-- This is the root web application for the Alfresco JSF client -->
 			<endpoint>
 				<id>alfresco-root</id>
 				<name>Alfresco Root Context</name>

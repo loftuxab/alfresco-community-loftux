@@ -232,9 +232,9 @@ WebStudio.TemplatesView.prototype.reloadTemplatesListing = function()
 			html += "</table>";	
 			_this.Instances.el.setHTML(html);
 					
-			var templateRowOnClickHandler = function(group, index)
+			var templateRowOnClickHandler = function(a,b)
 			{
-				_this.onTemplateRowClick(_this.templateId);
+				_this.onTemplateRowClick(this.templateId);
 			};
 				
 			// add in click events

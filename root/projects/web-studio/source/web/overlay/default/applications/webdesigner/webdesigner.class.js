@@ -763,19 +763,9 @@ WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html,
 				}
 			}
 			
-			// recompute size of dom element
-			for(var a = 0; a < regionDiv.childNodes; a++)
-			{
-				var tag = regionDiv.childNodes[a].nodeName;
-				if(tag)
-				{
-					if( (tag != "SCRIPT") && (tag != "LINK") )
-					{
-						regionDiv.style.width = regionDiv.childNodes[a].offsetWidth;
-						regionDiv.style.height = regionDiv.childNodes[a].offsetHeight;
-					}
-				}
-			}			
+			// resize the element to the size of its children
+			// this removes excess white space
+			Alf.resizeToChildren(regionDiv);
 
 			// restore the page editor (if it was enabled originally)			
 			if(restorePageEditor)
