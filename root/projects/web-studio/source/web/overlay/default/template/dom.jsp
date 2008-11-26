@@ -891,8 +891,8 @@
 										</tr>
 									</table>
 								</td>
-								<td>
-									<img id="AlfrescoWebStudioSandboxTemplate_Image" src="" width="160px" height="120px"/>
+								<td width="160px" height="120px" align="center" valign="middle">
+									<img id="AlfrescoWebStudioSandboxTemplate_Image" src=""/>
 								</td>
 							</tr>
 						</table>

@@ -174,6 +174,8 @@ WebStudio.PETabItem = function(el, whiteOverlay, colorOverlay, backPanelOverlay,
 	this.editWnd = null;
 	this.w = -1;
 	this.h = -1;
+	
+	this.originalBackgroundColor = this.el.getStyle("background-color");
 
 	// information about region
 	this.regionId = this.el.getAttribute("regionId");
@@ -423,8 +425,12 @@ WebStudio.PETabItem.prototype.restore = function()
 			
     	// unmark as "expanded"
     	_this.expanded = false;
-    	
-    	_this.resizeTab(width, height);			
+
+		// force tab to resize to underlying element
+		Alf.resizeToChildren(_this.el);
+		    	
+    	// resize tabs to their underlying dom element
+    	_this.pageEditor.resizeTabItems();			
 	};
 	
 	// wait 750 ms, then fire function

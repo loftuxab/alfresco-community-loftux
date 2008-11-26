@@ -508,8 +508,20 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 	
 	if(webSiteName && webSiteBasedOn && webSiteId)
 	{
+		// TODO: Change these assumptions
+		// Ideally, they should be fetched or computed in a pluggable way
+		var _userSandboxId = webSiteId + "--" + WebStudio.context.getCurrentUserId();
+		var _userStoreId = webSiteId + "--" + WebStudio.context.getCurrentUserId();		
+		
 		// call web studio to tell it to create the web project
-		var url = WebStudio.ws.studio("/api/site/create", { id: webSiteId, name: webSiteName, description: webSiteDescription, basedOn: webSiteBasedOn } );
+		var url = WebStudio.ws.studio("/api/site/create", { 
+			id: webSiteId, 
+			name: webSiteName, 
+			description: webSiteDescription, 
+			basedOn: webSiteBasedOn,
+			storeId: _userStoreId,
+			sandboxId: _userSandboxId 
+		});
 		
 		// hide the sandbox dialog
 		this.sandboxDialog.popout();
@@ -522,9 +534,13 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 			success: function(r) 
 			{		
 				// set up the context
+				
+				// TODO: implement a call to Mark's Web Projects sandbox services
+				// retrieve this since implementation of naming conventional may shift
+				
 				WebStudio.context.webProjectId = webSiteId;
-				WebStudio.context.sandboxId = webSiteId;
-				WebStudio.context.storeId = webSiteId;
+				WebStudio.context.sandboxId = _userSandboxId;
+				WebStudio.context.storeId = _userStoreId;
 				
 				var _onComplete = function() 
 				{
@@ -571,9 +587,13 @@ WebStudio.Application.prototype.webSiteLoadHandler = function(e)
 	var selectedWebSiteId = this.sandboxDialog.ToolLoadWebSiteSelectedId.el.value;	
 	if(selectedWebSiteId)
 	{
+		// TODO: Change these assumptions
+		// Ideally, they should be fetched or computed in a pluggable way
+		var _userSandboxId = selectedWebSiteId + "--" + WebStudio.context.getCurrentUserId();
+		var _userStoreId = selectedWebSiteId + "--" + WebStudio.context.getCurrentUserId();		
+	
 		// call over and fetch metadata about this web project
 		// we must determine it's web project id, its staging sandbox id and its store id
-
 		var webProjectRef = selectedWebSiteId; // dns name
 		var url = WebStudio.ws.repo("/api/wcm/webprojects/" + webProjectRef);
 	
@@ -583,11 +603,10 @@ WebStudio.Application.prototype.webSiteLoadHandler = function(e)
 				
 				var d = Json.evaluate(oResponse.responseText);
 				var webProjectId = d.data.webprojectref;
-								
-				// TODO: look up sandboxes, here we assume the staging store name
-				
-				var sandboxId = d.data.webprojectref;
-				var storeId = d.data.webprojectref;
+
+				// use our assumed values								
+				var sandboxId = _userSandboxId;
+				var storeId = _userStoreId;
 				
 				var _onComplete = function() {
 

@@ -140,3 +140,23 @@ Alf.parseInt = function(value)
 {
 	return parseInt(value, 10);
 };
+
+Alf.resizeToChildren = function(el)
+{
+	// recompute size of dom element
+	for(var a = 0; a < el.childNodes.length; a++)
+	{
+		var tag = el.childNodes[a].nodeName;
+		if(tag)
+		{
+			if( (tag != "SCRIPT") && (tag != "LINK") )
+			{
+				if(el.childNodes[a].offsetWidth)
+				{
+					el.style.width = el.childNodes[a].offsetWidth;
+					el.style.height = el.childNodes[a].offsetHeight;
+				}
+			}
+		}
+	}			
+};

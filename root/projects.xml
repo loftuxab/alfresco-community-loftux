@@ -3081,7 +3081,7 @@
    </target>
 
    <target name="package-webstudio-war" 
-           depends="assemble-webstudio-war,ant17orHigherCheck,minimize-webstudio-javascript">
+           depends="assemble-webstudio-war,ant17orHigherCheck,validate-webstudio-javascript,minimize-webstudio-javascript">
       <war warfile="${dir.project.webstudio.dist}/${file.name.war.webstudio}" 
            webxml="${dir.project.webstudio.src.webinf}/web.xml">
          <fileset dir="${dir.project.webstudio.assemble}" />
@@ -3148,11 +3148,10 @@
 	</condition>
    </target>
    
-   <target name="minimize-webstudio-javascript" if="isAnt17orHigher">
-   
-   	<mkdir dir="${dir.project.webstudio}/build/js" />
-   	<mkdir dir="${dir.project.webstudio.assemble}/overlay/default/minimized" />
-   	
+   <target name="validate-webstudio-javascript" if="isAnt17orHigher">
+
+	<mkdir dir="${dir.project.webstudio}/build/js" />
+	
 	<taskdef name="jslint"
 	     classname="net.happygiraffe.jslint.ant.JSLintTask"
              classpath="${dir.project.webstudio}/lib/jslint4java-1.2.1+rhino.jar" />
@@ -3170,6 +3169,13 @@
 			<exclude name="**/*-min.js" />
 		</fileset>
 	</jslint>
+
+   </target>
+   
+   <target name="minimize-webstudio-javascript">
+   
+   	<mkdir dir="${dir.project.webstudio}/build/js" />
+   	<mkdir dir="${dir.project.webstudio.assemble}/overlay/default/minimized" />
 
 	<echo>Merging Web Studio Javascript to single file</echo>
 	<concat destfile="${dir.project.webstudio}/build/js/alf-web-studio.js" force="yes" binary="yes">
