@@ -11,7 +11,7 @@ else
 
 	// mimetype
 	model.mimetype = instance.object.properties["mimetype"];
-	if(model.mimetype != null)
+	if(model.mimetype != null && model.mimetype.length > 5)
 	{
 		model.isVideo = (model.mimetype.substring(0,5) == "video");
 	}

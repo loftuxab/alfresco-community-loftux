@@ -261,7 +261,11 @@ WebStudio.Region.prototype.setupForm = function()
 	var html = "<form id=\"" + formId + "\" method=\"post\" action=\"" + url + "\">";	
 	html += this.formElementsHtml;	
 	html += "<br/>";
-	html += "<input type=\"submit\" value=\"Save\" />";	
+	html += "<div width='100%' align='center'>";
+	html += "<input id=\"formCancelButton\" type=\"button\" value=\"Cancel\" />";
+	html += "&nbsp;&nbsp;";
+	html += "<input type=\"submit\" value=\"Save\" />";
+	html += "</div>";		
 	html += "</form>";
 	
 	this.Body.el.setHTML(html);
@@ -282,7 +286,15 @@ WebStudio.Region.prototype.setupForm = function()
 				'encoding': 'utf-8'			
 			}
 		});
+	});
+	
+	$('formCancelButton').addEvent('click', function(e) {
 
+		// stop the event
+		e = new Event(e).stop();
+
+		// close the window
+		_this.shutdown();
 	});
 	
 	this.formLoaded = true;	
@@ -291,7 +303,8 @@ WebStudio.Region.prototype.setupForm = function()
 WebStudio.Region.prototype.build = function() 
 {
 	var _this = this;
-	
+
+	/*	
 	this.generalLayer.set({
 		events: {
 			mouseleave: function() 
@@ -319,8 +332,10 @@ WebStudio.Region.prototype.build = function()
 			}
 		}
 	});
+	*/
 };
 
+/*
 WebStudio.Region.prototype.checkCloseWindow = function()
 {
 	this.checkCount++;
@@ -333,6 +348,7 @@ WebStudio.Region.prototype.checkCloseWindow = function()
 		this.shutdown();		
 	}
 };
+*/
 
 WebStudio.Region.prototype.onClose = function()
 {

@@ -158,20 +158,33 @@ WebStudio.TreeView.prototype.setDroppables = function(map)
 	var _this = this;
 	$each(map, function(it)
 	{
+		var _el = it.colorOverlay;
+		
+		// remove existing events
+		// this is to prevent event handlers from stacking
+		it.colorOverlay.removeEvents(['over','leave','drop']);
+		
+		// re-add events
 		it.colorOverlay.addEvents({
 			'over': function(el, obj){
 				this.setOpacity(0.5);
+				return false;
 			},
 			'leave': function(el, obj){
 				this.setOpacity(0.2);
+				return false;
 			},
 			'drop': function(el, obj){			
-				
-				el.remove();
-				
-				obj.options.label.fireEvent('mouseup');
-				
-				_this.dropFromTreeView(it.id, obj.options);
+
+				if(el.parentNode)
+				{
+					obj.options.label.fireEvent('mouseup');
+					
+					el.parentNode.removeChild(el);
+					_this.dropFromTreeView(it.id, obj.options);
+				}
+					
+				return false;			
 			}
 		});
 		
@@ -235,26 +248,27 @@ WebStudio.TreeView.prototype.setDraggableNode = function(nodeId)
 						clone.addClass('ATVWebComponents');
 						clone.addEvent('emptydrop', function() 
 						{
+							var _clone = this;
+							
 							var atv = WebStudio.TreeViews[this.getProperty('ATVID')];
 							var dragNode = atv.nodes[atv.dragNodeId];
 							var label = $(dragNode.getLabelEl());
 							var fx = new Fx.Styles(this, {duration: 300, transition: Fx.Transitions.linear});
 							fx.addEvent('onComplete', function() {
-								_this.remove();
+								_clone.remove();
 							});
 							var coor = label.getCoordinates();
 							label.removeProperty('drag');
 							fx.start({top: coor.top, left: coor.left, opacity: 0.2});						
-							
 						});
 						clone.inject(document.body);
 	
 						var drag = clone.makeDraggable(
 						{
-						 droppables: _this.droppables,
-						 nodeId: nodeId,
-						 data: node.data,
-						 label: this
+							droppables: _this.droppables,
+							nodeId: nodeId,
+							data: node.data,
+							label: this
 						});
 						drag.start(event);
 					}
