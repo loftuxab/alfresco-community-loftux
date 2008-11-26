@@ -208,21 +208,12 @@
            description="Creates the distibution files for WCM"
            depends="assemble-virtual,
                     distribute-wcm-windows,
-                    distribute-wcm-linux,
-                    distribute-webstudio" />
-
-
-   <target name="distribute-webstudio">
-      <copy todir="${dir.continuous.dist}">
-         <fileset dir="${dir.project.webstudio.dist}"
-                  includes="${file.name.war.webstudio}" />
-      </copy>
-   </target>
+                    distribute-wcm-linux" />
 
 
    <target name="distribute-wcm-windows">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
-         <zipfileset dir="${dir.continuous.assemble.virtualtomcat}" 
+         <zipfileset dir="${dir.continuous.assemble.virtualtomcat}"
                      prefix="virtual-tomcat" />
          <zipfileset dir="${dir.project.installer}"
                      includes="wcm-bootstrap-context.xml" />
@@ -233,6 +224,9 @@
                                virtual_alf.bat" />
          <zipfileset dir="${dir.project.installer}/extras-wcm" 
                      prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.webstudio.dist}"
+                     includes="${file.name.war.webstudio}"
+                     fullpath="tomcat/webapps/${file.name.war.webstudio}" />
       </zip>
    </target>
 
@@ -241,7 +235,7 @@
            longfile="gnu" 
            compression="gzip">
          <tarfileset dir="${dir.continuous.assemble.virtualtomcat}" 
-                     prefix="virtual-tomcat" 
+                     prefix="virtual-tomcat"
                      excludes="**/bin/*.sh,**/bin/*.bat" />
          <tarfileset dir="${dir.continuous.assemble.virtualtomcat}/bin"
                      prefix="virtual-tomcat/bin"
@@ -256,6 +250,9 @@
                      mode="755" />
          <tarfileset dir="${dir.project.installer}/extras-wcm"
                      prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.webstudio.dist}"
+                     includes="${file.name.war.webstudio}"
+                     fullpath="tomcat/webapps/${file.name.war.webstudio}" />
       </tar>
    </target>
 
