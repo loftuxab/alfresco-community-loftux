@@ -3675,7 +3675,7 @@ File ::D8F8A07A-77E6-40EA-B4C5-C2227F7499DD -type dir -name tmp -parent 05945FDF
 File ::1A1CE54A-A1E3-44F8-9C2E-DEF22ED95D27 -type dir -name prop-base -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
 File ::B5B798A7-4C2D-4B64-A1DC-FB4DDE422751 -type dir -name props -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
 File ::064CF832-7814-4900-A00B-F1BE42A94F19 -type dir -name text-base -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
-File ::9D4FA511-4820-4348-B5B1-8E61D45C289A -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -parent 33087B4E-DFD2-42AB-A812-338D015C210B
+File ::9D4FA511-4820-4348-B5B1-8E61D45C289A -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -parent 33087B4E-DFD2-42AB-A812-338D015C210B
 FileGroup ::B2ED123B-F320-4F2D-A38A-7091403BDEB7 -setup Install -alias {Java File} -active Yes -platforms {Windows ZipArchive} -name {Java File} -parent FileGroups
 File ::7C7CC5EC-84E6-4572-A398-45D02DFE9959 -directory <%InstallDir%> -name W:/resources/jdk-i586-p.exe -location ../../../../ALF-BINARIES/installer/win32 -parent B2ED123B-F320-4F2D-A38A-7091403BDEB7
 FileGroup ::E181E06B-BC95-4065-80E8-8614EE6074B7 -setup Install -alias {OpenOffice File} -active No -platforms {Windows ZipArchive} -name {OpenOffice File} -parent FileGroups
