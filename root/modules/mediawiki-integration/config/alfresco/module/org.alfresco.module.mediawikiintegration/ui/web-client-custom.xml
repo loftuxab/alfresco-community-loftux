@@ -9,7 +9,8 @@
    	
    	<config evaluator="node-type" condition="mw:mediaWikiConfig">
    		<property-sheet>
-   			<show-property name="mwcp:wgSitename"/>   			
+   			<show-property name="mwcp:wgSitename"/>
+   			<show-property name="mwcp:wgLogo"/>   			
    		</property-sheet>   	
    	</config>
       

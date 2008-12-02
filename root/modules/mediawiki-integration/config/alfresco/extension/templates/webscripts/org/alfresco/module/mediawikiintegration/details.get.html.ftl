@@ -12,6 +12,16 @@
 		<tr>
 			<td>Name:&nbsp;&nbsp;</td>
 			<td>${config.properties["mwcp:wgSitename"]?html}</td>
+		</tr>		
+		<tr>
+			<td>Logo Image:&nbsp;&nbsp;</td>
+			<td>
+			<#if config.properties["mwcp:wgLogo"]?exists>			
+				${config.properties["mwcp:wgLogo"]?html}
+			<#else>
+				default
+			</#if>	
+			</td>
 		</tr>
 	</table>
 	<br>
