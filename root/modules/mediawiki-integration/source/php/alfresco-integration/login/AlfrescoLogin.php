@@ -1,5 +1,12 @@
 <?php
 	
+// Store the title if one has been passed
+$title = null;
+if (isset($_REQUEST["title"]) == true)
+{
+	$title = $_REQUEST["title"];
+}		
+	
 if (isset($_REQUEST["doLogin"]) == true)
 {
 	// Get the login details
@@ -12,7 +19,10 @@ if (isset($_REQUEST["doLogin"]) == true)
 	if (isset($_REQUEST["loginForm:user-password"]) == true)
 	{
 		$password = $_REQUEST["loginForm:user-password"];
-	}
+	}	
+	
+	// Set a null failure message
+	$failure = null;
 	
 	if ($username != null && $password != null)
 	{
@@ -24,14 +34,19 @@ if (isset($_REQUEST["doLogin"]) == true)
 			if (isset($ticket) == true)
 			{
 				// Redirect to the index page with the ticket information
-				header( "Location: /alfresco/php/wiki/index.php?alfTicket=".$ticket."&alfUser=".$username);
+				$url = "/alfresco/php/wiki/index.php?alfTicket=".$ticket."&alfUser=".$username;
+				if ($title != null)
+				{
+					$url .= "&title=".$title;
+				}				
+				header( "Location: ".$url);
 				exit;
 			}
 		}
 		catch (Exception $e)
 		{
 			// Need to indicate that the login failed
-			// TODO	
+			$failure = "Login to MediaWiki failed, please try again.";
 		}	
 	}
 }
@@ -54,7 +69,7 @@ if (isset($_REQUEST["doLogin"]) == true)
 
 <body>
 
-	<form id="loginForm" name="loginForm" method="post" action="AlfrescoLogin.php" accept-charset="UTF-8" enctype="application/x-www-form-urlencoded">
+	<form id="loginForm" name="loginForm" method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>" accept-charset="UTF-8" enctype="application/x-www-form-urlencoded">
 		<table width=100% height=98% align=center>
 			<tr width=100% align=center>
 				<td valign=middle align=center width=100%>
@@ -120,6 +135,19 @@ Language:
 </td>
 </tr>
 
+<?php
+if ($failure != null)
+{
+?>
+   <tr>
+      <td colspan=2>
+         <span class='mainSubTitle' style="color:red"><?php echo $failure ?></span>
+      </td>
+   </tr>
+<?php
+}
+?>
+
 <tr>
 <td colspan=2>
 
@@ -172,9 +200,16 @@ document.getElementById("no-cookies").style.display = 'inline';
 
 
   <input type="hidden" name="doLogin" value="true"/> 
+<?php
+  if ($title != null)
+  {
+?>
+	 <input type="hidden" name="title" value="<?php echo $title ?>"/>
+<?php
+  }  
+?>
   
-  
-
+ 
 </form>
 
 

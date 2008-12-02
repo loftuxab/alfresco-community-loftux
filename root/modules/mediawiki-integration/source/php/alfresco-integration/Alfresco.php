@@ -62,6 +62,19 @@
 	 	$alfWikiSpaceNodeRef = $_SESSION["mediaWikiSpace"];	
 	}
 	
+	// Create the login URL
+	$loginURL = "extensions/alfresco-integration/login/AlfrescoLogin.php";
+	$tempDelim = "?";
+	if (isset($_REQUEST["title"]) == true)
+	{
+		$loginURL .= $tempDelim."title=".urlencode($_REQUEST["title"]);
+		$tempDelim = "&";
+	}
+	if (isset($_REQUEST["action"]) == true)
+	{
+		$loginURL .= $tempDelim."action=".urlencode($_REQUEST["action"]);		
+	}
+	
 	// Create the repository object
 	$alfRepository = new Repository();
 	
@@ -95,7 +108,7 @@
 	if ($alfTicket == null)
 	{	
 		// Redirect to the login page
-		header( "Location: extensions/alfresco-integration/login/AlfrescoLogin.php" );
+		header( "Location: ".$loginURL );
 		exit;	
 	}
 	
@@ -114,7 +127,7 @@
 		if (sizeof($nodes) == 0)
 		{
 			// Redirect to the login page, since we can't find the mediaWiki space (probably means incorrect permissions)
-			header( "Location: extensions/alfresco-integration/login/AlfrescoLogin.php" );
+			header( "Location: ".$loginURL );
 			exit;	
 		}	
 		$alfMediaWikiNode = $nodes[0];
@@ -125,7 +138,7 @@
 	if (MediaWikiSpace::validate($alfRepository, $alfWikiSpaceNodeRef, "", $alfTicket) == false)
 	{
 		// Redirect to the login page, since the ticket is knacked or you don't have permissions
-		header( "Location: extensions/alfresco-integration/login/AlfrescoLogin.php" );
+		header( "Location: ".$loginURL );
 		exit;	
 	}
 	
