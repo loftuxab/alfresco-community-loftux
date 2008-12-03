@@ -160,19 +160,22 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 			w.start(url, 'addpage');
 			w.onComplete = function() 
 			{
-				var node = _treeView.getActiveNode();
-				
-				node.collapse();
-				node.childrenRendered = false;
-				node.dynamicLoadComplete = false;
-				for(var i = 0; i < node.children.length; i++)
+				if (this.wizardFinished)
 				{
-					_treeView.tree.removeNode(node.children[i]);
+					var node = _treeView.getActiveNode();
+					
+					node.collapse();
+					node.childrenRendered = false;
+					node.dynamicLoadComplete = false;
+					for(var i = 0; i < node.children.length; i++)
+					{
+						_treeView.tree.removeNode(node.children[i]);
+					}
+					node.children = [];
+					
+					//this.activeNode = null;
+					node.expand();
 				}
-				node.children = [];
-				
-				//this.activeNode = null;
-				node.expand();				
 			};			
 		});
 		
@@ -193,21 +196,24 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 	
 			w.onComplete = function()
 			{
-				var parent = _treeView.getActiveNode().parent;
-				
-				parent.collapse();
-				parent.childrenRendered = false;
-				parent.dynamicLoadComplete = false;
-				
-				for(var i = parent.children.length - 1; i >= 0; i--)
+				if (this.wizardFinished)
 				{
-					var child = parent.children[i];
-					_treeView.tree.removeNode(child);
+					var parent = _treeView.getActiveNode().parent;
+					
+					parent.collapse();
+					parent.childrenRendered = false;
+					parent.dynamicLoadComplete = false;
+					
+					for(var i = parent.children.length - 1; i >= 0; i--)
+					{
+						var child = parent.children[i];
+						_treeView.tree.removeNode(child);
+					}
+					parent.children = [];
+					
+					_treeView.activeNode = parent;			
+					parent.expand();
 				}
-				parent.children = [];
-				
-				_treeView.activeNode = parent;			
-				parent.expand();
 			};
 		});
 	
@@ -229,20 +235,23 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 	
 			w.onComplete = function()
 			{
-				var parent = _treeView.getActiveNode().parent;
-				
-				parent.collapse();
-				parent.childrenRendered = false;
-				parent.dynamicLoadComplete = false;
-				for(var i = 0; i < parent.children.length; i++)
+				if (this.wizardFinished)
 				{
-					var child = parent.children[i];
-					_treeView.tree.removeNode(child);
+					var parent = _treeView.getActiveNode().parent;
+					
+					parent.collapse();
+					parent.childrenRendered = false;
+					parent.dynamicLoadComplete = false;
+					for(var i = 0; i < parent.children.length; i++)
+					{
+						var child = parent.children[i];
+						_treeView.tree.removeNode(child);
+					}
+					parent.children = [];
+							
+					_treeView.activeNode = parent;			
+					parent.expand();
 				}
-				parent.children = [];
-						
-				_treeView.activeNode = parent;			
-				parent.expand();
 			};
 		});
 
@@ -264,20 +273,23 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 	
 			w.onComplete = function()
 			{
-				var parent = _treeView.getActiveNode().parent;
-				
-				parent.collapse();
-				parent.childrenRendered = false;
-				parent.dynamicLoadComplete = false;
-				for(var i = 0; i < parent.children.length; i++)
+				if (this.wizardFinished)
 				{
-					var child = parent.children[i];
-					_treeView.tree.removeNode(child);
+					var parent = _treeView.getActiveNode().parent;
+					
+					parent.collapse();
+					parent.childrenRendered = false;
+					parent.dynamicLoadComplete = false;
+					for(var i = 0; i < parent.children.length; i++)
+					{
+						var child = parent.children[i];
+						_treeView.tree.removeNode(child);
+					}
+					parent.children = [];
+					
+					_treeView.activeNode = parent;
+					parent.expand();
 				}
-				parent.children = [];
-				
-				_treeView.activeNode = parent;
-				parent.expand();
 			};
 		});
 		

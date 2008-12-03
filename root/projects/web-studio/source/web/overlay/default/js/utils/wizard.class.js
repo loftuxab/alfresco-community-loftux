@@ -91,6 +91,8 @@ WebStudio.Wizard.prototype.loadFormData = function(url, json)
 						window.location.reload(true);
 					}
 					
+					this.wizardFinished = true;
+					
 					proceed = false;
 				}
 			}

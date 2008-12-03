@@ -788,7 +788,7 @@ WebStudio.components = WebStudio.components ||
 	,
 	newFlash: function(type, endpoint, path, mimetype)
 	{
-		var config = newVideo(type, endpoint, path, mimetype);
+		var config = this.newVideo(type, endpoint, path, mimetype);
 		config["binding"]["componentType"] = "/component/common/jwplayer";
 		config["properties"]["title"] = "JW Flash Player";
 		
@@ -811,9 +811,9 @@ WebStudio.components = WebStudio.components ||
 		return config;
 	}
 	,
-	newFlashMP3: function(type, endppint, path, mimetype)
+	newFlashMP3: function(type, endpoint, path, mimetype)
 	{
-		var config = newAudio(type, endpoint, path, mimetype);
+		var config = this.newAudio(type, endpoint, path, mimetype);
 		config["binding"]["componentType"] = "/component/common/flash-mp3";
 		config["properties"]["title"] = "Flash MP3";
 		
@@ -833,5 +833,6 @@ WebStudio.components = WebStudio.components ||
 		config["properties"]["container"] = "div";
 		
 		return config;	
-	}
+	}	
+	
 };

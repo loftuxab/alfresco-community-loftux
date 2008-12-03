@@ -162,7 +162,7 @@ WebStudio.TreeView.prototype.setDroppables = function(map)
 		
 		// remove existing events
 		// this is to prevent event handlers from stacking
-		//it.colorOverlay.removeEvents(['over', 'leave', 'drop']);
+		it.colorOverlay.removeEvents(['over', 'leave', 'drop']);
 		
 		it.colorOverlay.addEvents({
 			'over': function(el, obj)

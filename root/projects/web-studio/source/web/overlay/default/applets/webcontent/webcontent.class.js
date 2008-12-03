@@ -94,8 +94,7 @@ WebStudio.Applets.WebContent.prototype.bindSliderControl = function(container)
 					childDiv.ondblclick = this.nodeDoubleClickHandler.bind(childNode);
 				}
 			}
-		});
-		
+		});		
 
 		this.treeView = treeView;
 	}

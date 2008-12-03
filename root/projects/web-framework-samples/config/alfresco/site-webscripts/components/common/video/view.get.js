@@ -47,6 +47,13 @@ else
 		}
 	}
 	
+	model.title = "Video";
+	var x1 = model.src.lastIndexOf("/");
+	if(x1 > -1)
+	{
+		model.title = model.src.substring(x1+1);
+	}
+	
 	model.ready = true;
 }
 
