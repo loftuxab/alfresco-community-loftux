@@ -983,7 +983,15 @@ WebStudio.PETabItem.prototype.loadForm = function(id)
 	var _editWnd = this.editWnd;
 	this.editWnd.saveFormSuccess = function(r)
 	{
-		_editWnd.application.faultRegion(_editWnd.regionId, _editWnd.regionScopeId);
+		// define the binding
+		var binding = { };
+		
+		// region data
+		binding["regionId"] = _editWnd.regionId;
+		binding["regionScopeId"] = _editWnd.regionScopeId;
+		binding["regionSourceId"] = _editWnd.regionSourceId;
+		
+		_editWnd.application.faultRegion(binding);
 		
 		_editWnd.shutdown();
 		

@@ -35,7 +35,7 @@ WebStudio.SandboxDialog = function(index)
 			selector: 'input[id=AlfrescoWebStudioSandboxTemplate_WebSiteName]'
 		},
 		ToolCreateWebSiteBasedOn: {
-			selector: 'select[id=AlfrescoWebStudioSandboxTemplate_BasedOn]'
+			selector: 'td[id=AlfrescoWebStudioSandboxTemplate_BasedOn]'
 		},
 		ToolCreateWebSiteCreate: {
 			selector: 'input[id=AlfrescoWebStudioSandboxTemplate_Create]'
@@ -115,15 +115,7 @@ WebStudio.SandboxDialog.prototype.activate = function()
 	this.ToolCreateWebSiteCreate.el.addEvent("click", this.webSiteCreateHandler);
 	
 	// set up web site load click handlers
-	this.ToolLoadWebSiteLoad.el.addEvent("click", this.webSiteLoadHandler);
-	
-	
-	// set up an event handler for when the SELECT "create" control changes value
-	this.ToolCreateWebSiteBasedOn.el.addEvent("change", function(e)
-	{
-		_this.createSelectedId = e.explicitOriginalTarget.value;		
-		_this.updateCreateSelected();
-	});
+	this.ToolLoadWebSiteLoad.el.addEvent("click", this.webSiteLoadHandler);	
 };
 
 WebStudio.SandboxDialog.prototype.updateCreateWebSiteBasedOn = function()
@@ -139,7 +131,7 @@ WebStudio.SandboxDialog.prototype.updateCreateWebSiteBasedOn = function()
 			// fault response into json
 			var json = Json.evaluate(r.responseText);
 			
-			var html = "";
+			var html = "<select id='sandbox-create-template-selector' maxlength='256' style='width:200px' class='sandbox-input'>";
 			var selectedId = null;
 			for(var id in json.results)
 			{
@@ -147,9 +139,10 @@ WebStudio.SandboxDialog.prototype.updateCreateWebSiteBasedOn = function()
 				{
 					var url = json.results[id].archiveUrl;
 					
-					html += "<option value='" + id + "'>";
+					html += "<option value=\"" + id + "\">";
 					html += json.results[id].title;
 					html += "</option>";
+					html += "\n";
 					
 					if(!_this.createSelectedId)
 					{
@@ -157,8 +150,20 @@ WebStudio.SandboxDialog.prototype.updateCreateWebSiteBasedOn = function()
 					}
 				}
 			}
+			html += "</select>";
 			
-			_this.ToolCreateWebSiteBasedOn.el.setHTML(html);			
+			_this.ToolCreateWebSiteBasedOn.el.setHTML(html);
+			
+			// set up an event handler for when the SELECT "create" control changes value
+			var select = $('sandbox-create-template-selector');
+			if(select)
+			{
+				select.addEvent("change", function(e)
+				{
+					_this.createSelectedId = select.value;		
+					_this.updateCreateSelected();
+				});
+			}			
 		}	
 		,
 		failure: function(r) {
@@ -175,8 +180,12 @@ WebStudio.SandboxDialog.prototype.updateCreateSelected = function()
 	
 	// Set the Create Site preview image to a fun "loading" image
 	_this.ToolCreateWebSiteImage.el.src = "/studio/overlay/default/images/sandbox-dialog-website-preview-loading.gif";
-	_this.ToolCreateWebSiteImage.el.removeAttribute("width");
-	_this.ToolCreateWebSiteImage.el.removeAttribute("height");	
+	_this.ToolCreateWebSiteImage.el.setStyle("width", "auto");
+	_this.ToolCreateWebSiteImage.el.setStyle("height", "auto");
+	_this.ToolCreateWebSiteImage.el.setStyle("border-top", "0");
+	_this.ToolCreateWebSiteImage.el.setStyle("border-left", "0");
+	_this.ToolCreateWebSiteImage.el.setStyle("border-bottom", "0");
+	_this.ToolCreateWebSiteImage.el.setStyle("border-right", "0");		
 	
 	var url = WebStudio.ws.studio("/api/prebuilt/list", { } );
 	this.call = YAHOO.util.Connect.asyncRequest('GET', url, 
@@ -199,11 +208,17 @@ WebStudio.SandboxDialog.prototype.updateCreateSelected = function()
 						}
 
 						_this.ToolCreateWebSiteImage.el.src = "";
-						_this.ToolCreateWebSiteImage.el.setAttribute("width", "160px");
-						_this.ToolCreateWebSiteImage.el.setAttribute("height", "120px");
+						//_this.ToolCreateWebSiteImage.el.setStyle("width", "180px");
+						//_this.ToolCreateWebSiteImage.el.setStyle("height", "164px");
+						_this.ToolCreateWebSiteImage.el.setStyle("width", "150px");
+						_this.ToolCreateWebSiteImage.el.setStyle("height", "135px");
 						
 						// flip to image
 						_this.ToolCreateWebSiteImage.el.src = previewImageUrl;
+						_this.ToolCreateWebSiteImage.el.setStyle("border-top", "1px white solid");
+						_this.ToolCreateWebSiteImage.el.setStyle("border-left", "1px white solid");
+						_this.ToolCreateWebSiteImage.el.setStyle("border-bottom", "1px black solid");
+						_this.ToolCreateWebSiteImage.el.setStyle("border-right", "1px black solid");						
 					}
 				}
 			}

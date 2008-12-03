@@ -12,6 +12,8 @@ WebStudio.Wizard = function()
 	this.waitWindow = null;
 	this._init();
 	this.config = null;
+	
+	this.wizardFinished = false;
 };
 
 WebStudio.Wizard.prototype._init = function()
@@ -91,7 +93,7 @@ WebStudio.Wizard.prototype.loadFormData = function(url, json)
 						window.location.reload(true);
 					}
 					
-					this.wizardFinished = true;
+					_this.wizardFinished = true;
 					
 					proceed = false;
 				}

@@ -30,6 +30,7 @@ WebStudio.Applets.Templates.prototype.bindSliderControl = function(container)
 		this.templatesView.setTemplate(controlTemplate);
 		this.templatesView.setInjectObject(container);
 		this.templatesView.activate();
+		this.templatesView.application = this.getApplication();
 		
 		var _this = this;
 		

@@ -9,6 +9,16 @@ if(source == null || source.value == null || source.value == "")
 else
 {
 	model.src = url.context + source.proxiedDownloadURI;
+	
+	var fileext = instance.object.properties["fileext"];
+	if(fileext == null || fileext == "")
+	{
+		fileext = "flv";
+	}
+	model.fileext = fileext;
+	
+	model.src = model.src + "?filename=content." + fileext;
+
 }
 
 var previewImageUrl = instance.object.properties["previewImageUrl"];

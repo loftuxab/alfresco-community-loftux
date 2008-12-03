@@ -19,7 +19,7 @@ if(templateId != null)
 	if(templateDescription == null)
 		templateDescription = "";
 	
-	wizard.setResponseTitle("Edit Template: " + templateName);
+	wizard.setResponseTitle("Copy Template: " + templateName);
 
 	// set up form elements
 	wizard.addHiddenElement("templateId", templateId);
