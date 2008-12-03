@@ -345,12 +345,12 @@ WebStudio.Applets.Navigation.prototype.loadData = function(node, fnLoadComplete)
 	YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
 };
 
-WebStudio.Applets.Navigation.prototype.onShowSlider = function()
+WebStudio.Applets.Navigation.prototype.onShowApplet = function()
 {
 	this.getApplication().hideAllDesigners();
 };
 
-WebStudio.Applets.Navigation.prototype.onHideSlider = function()
+WebStudio.Applets.Navigation.prototype.onHideApplet = function()
 {
 };
 

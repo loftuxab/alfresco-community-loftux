@@ -88,7 +88,8 @@ WebStudio.Applets.Sites.prototype.loadData = function(node, fnLoadComplete)
 					nodeID: oResults[i].nodeId, 
 					draggable:oResults[i].draggable, 
 					path: node.data.path+'/'+oResults[i].text,
-					alfType: oResults[i].alfType||null,
+					alfType: oResults[i].alfType || null,
+					shareType: oResults[i].shareType || null,
 					mimetype: oResults[i].mimetype || null
 				}, node, false);
 				_this.addNodeLink(oResults[i].nodeId, tempNode);
@@ -103,8 +104,29 @@ WebStudio.Applets.Sites.prototype.loadData = function(node, fnLoadComplete)
 				} 
 				else
 				{
-					// dmSpace
+					// assume dmSpace
 					tempNode.labelStyle = 'icon-sites-folder';
+				
+					if(oResults[i].shareType == "wiki")
+					{
+						tempNode.labelStyle = 'icon-sites-wiki';
+					}
+					else if(oResults[i].shareType == "blog")
+					{
+						tempNode.labelStyle = 'icon-sites-blog';
+					}
+					else if(oResults[i].shareType == "discussions")
+					{
+						tempNode.labelStyle = 'icon-sites-discussions';
+					}
+					else if(oResults[i].shareType == "doclib")
+					{
+						tempNode.labelStyle = 'icon-sites-doclib';
+					}
+					else if(oResults[i].shareType == "calendar")
+					{
+						tempNode.labelStyle = 'icon-sites-calendar';
+					}
 				}
 				
 				var leaf = false;
@@ -133,7 +155,7 @@ WebStudio.Applets.Sites.prototype.loadData = function(node, fnLoadComplete)
 	YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
 };
 
-WebStudio.Applets.Sites.prototype.onShowSlider = function()
+WebStudio.Applets.Sites.prototype.onShowApplet = function()
 {
 	// hide all designers
     this.getApplication().hideAllDesigners();
@@ -142,7 +164,7 @@ WebStudio.Applets.Sites.prototype.onShowSlider = function()
     this.getApplication().showPageEditor();
 };
 
-WebStudio.Applets.Sites.prototype.onHideSlider = function()
+WebStudio.Applets.Sites.prototype.onHideApplet = function()
 {
     // hide the page editor
     this.getApplication().hidePageEditor();
@@ -169,4 +191,12 @@ WebStudio.Applets.Sites.prototype.nodeDoubleClickHandler = function(e)
 	}
 	
 	e.stop();					
+};
+
+WebStudio.Applets.Sites.prototype.bindPageEditor = function(pageEditor)
+{
+	if(this.treeView)
+	{
+		this.treeView.setDroppables(pageEditor.tabs);
+	}
 };

@@ -14,6 +14,7 @@
 		s1.addParam("allowfullscreen","true");
 		s1.addParam("allowscriptaccess","always");
 		s1.addParam("flashvars","file=${src}&image=${previewImageUrl}");
+		s1.addParam("wmode", "transparent");
 		s1.write("container");
 	</script>
 	

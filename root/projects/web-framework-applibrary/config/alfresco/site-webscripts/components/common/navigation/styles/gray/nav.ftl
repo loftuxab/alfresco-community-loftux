@@ -83,7 +83,7 @@
       <td>
          <img src="${baseDir}/button_left.png" height="35px" />
       </td>
-      <td style="padding-left: 10px; padding-right: 10px;">
+      <td style="padding-left: 10px; padding-right: 10px;" nowrap>
          <a href="${href}" style="color: black; font-face: Verdana; font-weight: bold; text-decoration: none;">${page.title}</a>
       </td>
       <td>

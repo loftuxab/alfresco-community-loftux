@@ -19,7 +19,9 @@
 			
 			<param name="autoplay" value="true" />
 			
-			<embed src="${url.context}/components/common/flash-mp3/xspf_player_slim.swf?autoplay=true&song_title=${songTitle}&song_url=${src}" quality="high" bgcolor="#e6e6e6" width="400" height="15" name="xspf_player" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+			<param name="wmode" value="transparent" />
+			
+			<embed src="${url.context}/components/common/flash-mp3/xspf_player_slim.swf?autoplay=true&song_title=${songTitle}&song_url=${src}&wmode=transparent" quality="high" bgcolor="#e6e6e6" width="400" height="15" name="xspf_player" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
 		</object>
 	
 	</#if>
@@ -39,7 +41,9 @@
 			
 			<param name="autoplay" value="true" />
 			
-			<embed src="${url.context}/components/common/flash-mp3/xspf_player.swf?autoplay=true&song_title=${songTitle}&song_url=${src}" quality="high" bgcolor="#e6e6e6" width="400" height="170" name="xspf_player" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+			<param name="wmode" value="transparent" />
+			
+			<embed src="${url.context}/components/common/flash-mp3/xspf_player.swf?autoplay=true&song_title=${songTitle}&song_url=${src}&wmode=transparent" quality="high" bgcolor="#e6e6e6" width="400" height="170" name="xspf_player" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
 		</object>
 		
 	</#if>

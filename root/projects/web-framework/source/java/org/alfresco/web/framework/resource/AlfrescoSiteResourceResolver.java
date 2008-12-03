@@ -65,7 +65,7 @@ public class AlfrescoSiteResourceResolver extends
         String url = "/webframework/content/metadata?id={nodeRef}";
 
         String nodeRef = toNodeRefString(this.resource.getValue());
-        url = url.replace("{rodeRef}", nodeRef);
+        url = url.replace("{nodeRef}", nodeRef);
 
         return url;
     }

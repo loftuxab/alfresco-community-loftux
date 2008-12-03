@@ -29,9 +29,16 @@ WebStudio.Applications.WebDesigner.prototype.getMenu = function()
 		r1.addItem("separator2","item2","separator");	
 		r1.addItem("site-content-type-associations", "Content Associations...", "text", WebStudio.overlayIconsPath + "/content_type_associations.gif");
 		r1.addItem("separator3","item2","separator");
+		r1.addItem("site-view-web-project", "View in Explorer", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
+		r1.addItem("site-view-web-project-webdav", "View in WebDAV", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true} );
+		r1.addItem("site-view-web-project-cifs", "View in CIFS", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
+		r1.addItem("site-view-web-project-ftp", "View in FTP", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
+		
+		/*		
 		r1.addItem("site-view-modified-items", "View Modified Items", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
-		r1.addItem("site-view-web-project", "View Web Project", "text", WebStudio.overlayIconsPath + "/dashboard.gif" ); 	
 		r1.addItem("site-view-sandbox", "View Sandbox", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
+		*/
+		
 		r1.addItem("separator4","item2","separator");
 		r1.addItem("site-properties", "Properties...", "text", WebStudio.overlayIconsPath + "/properties.gif");
 		
@@ -56,7 +63,7 @@ WebStudio.Applications.WebDesigner.prototype.getMenu = function()
 
 WebStudio.Applications.WebDesigner.prototype.getTabTitle = function()
 {
-	return "Studio";
+	return "Design";
 };
 
 WebStudio.Applications.WebDesigner.prototype.getTabImageUrl = function()
@@ -165,19 +172,42 @@ WebStudio.Applications.WebDesigner.prototype.onMenuItemClick = function(index,da
 	if (index == 'site-view-modified-items')
 	{
 	}
+
+	// Site - View Sandbox
+	if(index == 'site-view-sandbox')
+	{
+	}
 	
-	// Site - View Web Project
+	// Site - View Web Project (Alfresco Explorer)
 	if(index == 'site-view-web-project')
 	{
 		url = "http://localhost:8080/alfresco/service/webframework/redirect/jsf-client/browse/webproject/" + WebStudio.context.getWebProjectId();
 		WebStudio.app.openBrowser("alfresco", url);
 	}	
-	
-	// Site - View Sandbox
-	if(index == 'site-view-sandbox')
-	{
-	}
 
+	// Site - View Web Project (WebDAV)
+	if(index == 'site-view-web-project-webdav')
+	{
+		url = "http://localhost:8080/alfresco/webdav/Web Projects/" + WebStudio.context.getWebProjectId();
+		WebStudio.app.openBrowser("webdav", url);
+	}	
+
+	// Site - View Web Project (CIFS)
+	if(index == 'site-view-web-project-cifs')
+	{
+	}	
+
+	// Site - View Web Project (FTP)
+	if(index == 'site-view-web-project-ftp')
+	{
+		url = "ftp://localhost/AVM/";
+		url += WebStudio.context.getStoreId();
+		url += "/HEAD/DATA/www/avm_webapps/";
+		url += WebStudio.context.getWebappId();
+		url += "/";
+		WebStudio.app.openBrowser("ftp", url);
+	}	
+	
 	// Page - Edit Template
 	if (index == 'page-template-edit')
 	{
@@ -259,28 +289,15 @@ WebStudio.Applications.WebDesigner.prototype.setupPageEditor = function()
 		}		
 	}
 	
-	var applet1 = this.getApplet("components");
-	if(applet1)
+	// get the selected applet
+	var selectedAppletId = this.getActiveAppletId();
+	var applet = this.getApplet(selectedAppletId);
+	if(applet)
 	{
-		applet1.treeView.setDroppables(this.pageEditor.tabs);
-	}
-
-	var applet2 = this.getApplet("webcontent");
-	if(applet2)
-	{
-		applet2.treeView.setDroppables(this.pageEditor.tabs);
-	}
-
-	var applet3 = this.getApplet("spaces");
-	if(applet3)
-	{
-		applet3.treeView.setDroppables(this.pageEditor.tabs);
-	}
-
-	var applet4 = this.getApplet("sites");
-	if(applet4)
-	{
-		applet4.treeView.setDroppables(this.pageEditor.tabs);
+		if(applet.bindPageEditor)
+		{
+			applet.bindPageEditor(this.pageEditor);
+		}
 	}	
 };
 
@@ -288,7 +305,8 @@ WebStudio.Applications.WebDesigner.prototype.hidePageEditor = function()
 {
 	if(this.pageEditor)
 	{
-		this.pageEditor.hideTabItems();
+		//this.pageEditor.hideTabItems();
+		this.pageEditor.restoreAllTabItems();
 	}
 };
 
@@ -356,295 +374,183 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	// get the kind of thing that was dropped
 	var alfType = options.data.alfType;
 	var config = null;
-	var path = null;
-	var mimetype = null;
 	
 	var cmType = null;
 	var nodeRef = null;
 	var nodeString = null;
-
-	// ACTION: they drop a file from the webapp slider
-	if ("file" == alfType)
-	{
-		path = options.data.path;
-		mimetype = options.data.mimetype;
-				
-		// FILE: image
-		// RESULT: bind in an image component
-		if (mimetype && mimetype.startsWith("image"))
-		{
-			config = this.newConfigBinding();
-			config["binding"]["componentType"] = "/component/common/image";
-			config["resources"]["source"] = {
-				"type" : "webapp",
-				"endpoint" : "alfresco",
-				"value" : path
-			};
-			config["properties"]["title"] = "Image Component";
-			config["properties"]["description"] = path;
-
-			this.bindToRegionTab(regionTab, config);
-
-			return true;
-		}
-
-		// FILE: xml (TODO)
-		// RESULT: bind in XML display control
-		if (mimetype && mimetype == "text/xml")
-		{		
-			config = this.newConfigBinding();
-			config["binding"]["componentType"] = "/component/common/xmldisplay";
-			config["resources"]["source"] = {
-				"type" : "webapp",
-				"endpoint" : "alfresco",
-				"value" : path
-			};
-			config["properties"]["title"] = "XML Display Component";
-			config["properties"]["description"] = path;
-
-			this.bindToRegionTab(regionTab, config);
-
-			return true;
-		}
-
-		// FILE: html (TODO)
-		// RESULT: bind in an include control
-		if (mimetype && 
-			(	(mimetype == "text/html") ||
-				(mimetype == "text/shtml")	) )
-		{
-			config = this.newConfigBinding();
-			config["binding"]["componentType"] = "/component/common/include";
-			config["resources"]["source"] = {
-				"type" : "webapp",
-				"endpoint" : "alfresco",
-				"value" : path
-			};
-			config["properties"]["title"] = "Include Component";
-			config["properties"]["description"] = path;
-			config["properties"]["container"] = "div";
-
-			this.bindToRegionTab(regionTab, config);
-
-			return true;
-		}
-
-		// FILE: they dropped a video
-		// RESULT: bind in a video component
-		if (mimetype && mimetype.startsWith("video"))
-		{
-			config = this.newConfigBinding();
-			config["binding"]["componentType"] = "/component/common/video";
-			config["resources"]["source"] = {
-				"type" : "webapp",
-				"endpoint" : "alfresco",
-				"value" : path
-			};
-			config["properties"]["title"] = "Video Component";
-			config["properties"]["description"] = path;
-			config["properties"]["mimetype"] = mimetype;
-
-			this.bindToRegionTab(regionTab, config);
-
-			return true;
-		}
-
-		// FILE: they dropped audio
-		// RESULT: bind in a audio component
-		if (mimetype && mimetype.startsWith("audio"))
-		{
-			config = this.newConfigBinding();
-			config["binding"]["componentType"] = "/component/common/audio";
-			config["resources"]["source"] = {
-				"type" : "webapp",
-				"endpoint" : "alfresco",
-				"value" : path
-			};
-			config["properties"]["title"] = "Audio Component";
-			config["properties"]["description"] = path;
-			config["properties"]["mimetype"] = mimetype;
-
-			this.bindToRegionTab(regionTab, config);
-
-			return true;
-		}
-	}
-
-
-	// ACTION: they drop a directory from the webapp slider
-	if ("directory" == alfType)
-	{
-		path = options.data.path;
-		
-		config = this.newConfigBinding();
-		config["binding"]["componentType"] = "/component/common/display-items";
-		config["resources"]["source"] = {
-			"type" : "webapp",
-			"endpoint" : "alfresco",
-			"value" : path
-		};
-		config["properties"]["title"] = "Display Items Component";
-		config["properties"]["container"] = "div";
 	
-		this.bindToRegionTab(regionTab, config);
-		
-		return true;
-	}
+	var mimetype = null;
+	var sourcePath = null;
+	var sourceType = null;
+	var sourceEndpoint = "alfresco";
+	var isContainer = false;
 
-
-	// ACTION: they drop a component type
-	if ("componentType" == alfType)
-	{
-		// TODO
-		return true;
-	}
-	
-	
-	// ACTION: they drop a web script component type
+	// SHORTCUT ACTION: they drop a web script component type
 	// Special Handling for Web Scripts as components
+	// Do binding and exit
 	if ("webscriptComponent" == alfType)
 	{
-		config = this.newConfigBinding();
+		config = WebStudio.components.newBinding();
 		config["binding"]["componentType"] = "webscript";
 		config["properties"]["title"] = "WebScript Component";
 		config["properties"]["description"] = options.nodeId;
 		config["properties"]["url"] = options.nodeId;
-
 		this.bindToRegionTab(regionTab, config);
-
-		return true;	
+		return true;
 	}
 
-
-	// ACTION: they dropped a navigation node
-	if ("navNode" == alfType)
+	/** WEB APPLICATION: FILE **/
+	if ("file" == alfType)
 	{
-		config = this.newConfigBinding();
-		config["binding"]["componentType"] = "webscript";
-		config["properties"]["title"] = "WebScript Component";
-		config["properties"]["description"] = options.nodeId;
-		config["properties"]["rootNode"] = options.nodeId;
-		config["properties"]["renderer"] = "horizontal";
-
-		this.bindToRegionTab(regionTab, config);
-
-		return true;	
+		sourcePath = options.data.path;
+		sourceType = "webapp";
+		mimetype = options.data.mimetype;
 	}
 
-	// ACTION: they dropped a dm node
+	/** WEB APPLICATION: FOLDER **/
+	if ("directory" == alfType)
+	{
+		sourcePath = options.data.path;
+		sourceType = "webapp";
+		mimetype = null;
+		isContainer = true;
+	}
+	
+	/** SPACES: FILE **/
 	if ("dmFile" == alfType)
 	{
-		cmType = options.data.cmType;
-		
+		cmType = options.data.cmType;		
 		nodeRef = options.data.nodeRef;		
-		nodeString = WebStudio.app.toNodeString(nodeRef);
-				
-		var contentUrl = WebStudio.ws.repo("/api/node/" + nodeString + "/content");
-		
+		nodeString = WebStudio.app.toNodeString(nodeRef);		
 		mimetype = options.data.mimetype;
-		if(!mimetype)
-		{
-			// TODO: handle this
-		}
-		else
-		{		
-			// RESULT: bind in an image component
-			if (mimetype && mimetype.startsWith("image"))
-			{
-				config = this.newConfigBinding();
-				config["binding"]["componentType"] = "/component/common/image";
-				config["resources"]["source"] = {
-					"type" : "space",
-					"endpoint" : "alfresco",
-					"value" : nodeString
-				};
-				config["properties"]["title"] = "Image Component";
-	
-				this.bindToRegionTab(regionTab, config);
-	
-				return true;
-			}
-			
-			// RESULT: bind in the html
-			if (mimetype == "text/html")
-			{
-				config = this.newConfigBinding();
-				config["binding"]["componentType"] = "/component/common/include";
-				config["resources"]["source"] = {
-					"type" : "space",
-					"endpoint" : "alfresco",
-					"value" : nodeString
-				};
-				config["properties"]["title"] = "Include Component";
-				config["properties"]["container"] = "div";
-	
-				this.bindToRegionTab(regionTab, config);
-				
-				return true;
-			} 
-			
-			// RESULT: bind in a video component
-			if (mimetype && mimetype.startsWith("video"))
-			{
-				config = this.newConfigBinding();
-				config["binding"]["componentType"] = "/component/common/video";
-				config["resources"]["source"] = {
-					"type" : "space",
-					"endpoint" : "alfresco",
-					"value" : nodeString
-				};
-				config["properties"]["title"] = "Video Component";
-				config["properties"]["mimetype"] = mimetype;
-	
-				this.bindToRegionTab(regionTab, config);
-	
-				return true;
-			}
-	
-			// RESULT: bind in a audio component
-			if (mimetype && mimetype.startsWith("audio"))
-			{
-				config = this.newConfigBinding();
-				config["binding"]["componentType"] = "/component/common/audio";
-				config["resources"]["source"] = {
-					"type" : "space",
-					"endpoint" : "alfresco",
-					"value" : nodeString
-				};
-				config["properties"]["title"] = "Audio Component";
-				config["properties"]["mimetype"] = mimetype;
-	
-				this.bindToRegionTab(regionTab, config);
-	
-				return true;
-			}
-			
-		}
+		
+		sourcePath = nodeString;
+		sourceType = "space";
 	}
-
-
-	// ACTION: they dropped a dm space
+	
+	/** SPACES: FOLDER **/
 	if ("dmSpace" == alfType)
-	{
+	{	
 		cmType = options.data.cmType;
-
-		// RESULT: display the contents of the space in a list
 		nodeRef = options.data.nodeRef;
 		nodeString = WebStudio.app.toNodeString(nodeRef);
 		
-		config = this.newConfigBinding();
-		config["binding"]["componentType"] = "/component/common/display-items";
-		config["resources"]["source"] = {
-			"type" : "space",
-			"endpoint" : "alfresco",
-			"value" : nodeString
-		};
-		config["properties"]["title"] = "Display Items Component";
-		config["properties"]["container"] = "div";
+		sourcePath = nodeString;
+		sourceType = "space";
+		isContainer = true;
+	}
 
-		this.bindToRegionTab(regionTab, config);
+	/** SITES: FILE **/
+	if ("siteFile" == alfType)
+	{
+		cmType = options.data.cmType;		
+		nodeString = "workspace/SpacesStore/" + options.data.nodeID;		
+		mimetype = options.data.mimetype;
 		
-		return true;
+		sourcePath = nodeString;
+		sourceType = "space";
+	}
+	
+	/** SITES: FOLDER **/
+	if ("siteSpace" == alfType)
+	{	
+		cmType = options.data.cmType;
+		nodeString = "workspace/SpacesStore/" + options.data.nodeID;
+		
+		sourcePath = nodeString;
+		sourceType = "space";
+		isContainer = true;
+	}
+	
+	/** COMPONENT TYPE **/
+	if ("componentType" == alfType)
+	{
+		// TODO
+		mimetype = null;
+	}
+
+
+	//////////////////////////////////////////
+	// Now process the bindings
+	//////////////////////////////////////////
+
+	
+	/** LIST VIEW **/
+	if(isContainer)
+	{
+		// right now, the only way we have to display containers
+		// is to bind to a "display items" component
+		config = WebStudio.components.newDisplayItems(sourceType, sourceEndpoint, sourcePath, null);		
+	}
+		
+	/** FILE BINDINGS **/
+	if(!isContainer)
+	{
+		if(mimetype)
+		{
+			/** IMAGE **/
+			if (mimetype.startsWith("image"))
+			{
+				// stock image component
+				config = WebStudio.components.newImage(sourceType, sourceEndpoint, sourcePath, mimetype);
+			}
+			
+			/** XML **/
+			if (mimetype == "text/xml")
+			{		
+				// TODO: configurable XML display
+				// compatibility with Alfresco WCM Web Forms
+				//config = WebStudio.components.newXml("webapp", "alfresco", path, mimetype);
+			}
+			
+			/** HTML **/
+			if (mimetype == "text/html" && mimetype == "text/shtml") 
+			{
+				config = WebStudio.components.newInclude(sourceType, sourceEndpoint, sourcePath, mimetype);
+			}
+	
+			/** VIDEO **/
+			if (mimetype.startsWith("video"))
+			{
+				config = WebStudio.components.newVideo(sourceType, sourceEndpoint, sourcePath, mimetype);
+				if(mimetype == "video/quicktime")
+				{
+					config["properties"]["player"] = "quicktime";
+				}
+				else
+				{
+					if(window.ie)
+					{
+						config["properties"]["player"] = "windowsmedia";
+					}
+					else
+					{
+						config["properties"]["player"] = "quicktime";
+					}
+				}
+			}
+	
+			/** AUDIO **/
+			if (mimetype.startsWith("audio"))
+			{
+				config = WebStudio.components.newAudio(sourceType, sourceEndpoint, sourcePath, mimetype);
+			}
+						
+			if (mimetype == "application/x-shockwave-flash")
+			{
+				config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, mimetype);
+			}
+		}
+		else
+		{
+			// an object of some kind...
+		}
+	}
+	
+	if(config)
+	{
+		this.bindToRegionTab(regionTab, config);
+		return true;	
 	}
 
 	return false;
@@ -690,17 +596,29 @@ WebStudio.Applications.WebDesigner.prototype.RefreshPageRegion = function(data)
 	// refresh the object cache
 	WebStudio.app.refreshObjectCache();
 
-	var componentId = data.componentId;
-	var componentTypeId = data.componentTypeId;
-	var regionId = data.regionId;
-	var regionScopeId = data.regionScopeId;
+	var binding = { };
+	
+	// region data
+	binding["regionId"] = data.regionId;
+	binding["regionScopeId"] = data.regionScopeId;
+	binding["regionSourceId"] = data.regionSourceId;
+	
+	// component binding data
+	binding["componentId"] = data.componentId;
+	binding["componentTypeId"] = data.componentTypeId;
+	binding["componentTitle"] = data.componentTitle;
+	binding["componentTypeTitle"] = data.componentTypeTitle;
+	binding["componentEditorUrl"] = data.componentEditorUrl;
 
-	this.faultRegion(regionId, regionScopeId);
+	this.faultRegion(binding);
 };
 
-WebStudio.Applications.WebDesigner.prototype.faultRegion = function(regionId, regionScopeId)
+WebStudio.Applications.WebDesigner.prototype.faultRegion = function(binding)
 {
 	var _this = this;
+	
+	var regionId = binding["regionId"];
+	var regionScopeId = binding["regionScopeId"];
 	
  	var templateId = Surf.context.getCurrentTemplateId();
  	
@@ -712,13 +630,83 @@ WebStudio.Applications.WebDesigner.prototype.faultRegion = function(regionId, re
 	var myAjax = new Ajax(url, {
 		method: 'get',
 		onComplete: function(responseObject) {
-			_this.faultRegionSuccess(responseObject, regionId, regionScopeId);
+			_this.faultRegionSuccess(responseObject, binding);
 		}
 	}).request();	
 };
 
-WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html, regionId, regionScopeId)
+WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html, binding)
 {
+	var _this = this;
+	
+	// region binding data
+	var regionId = binding["regionId"];
+	var regionScopeId = binding["regionScopeId"];
+	var regionSourceId = binding["regionSourceId"];
+
+	// component binding data
+	var componentId = binding["componentId"];
+	var componentTypeId = binding["componentTypeId"];
+	var componentTitle = binding["componentTitle"];
+	var componentTypeTitle = binding["componentTypeTitle"];
+	var componentEditorUrl = binding["componentEditorUrl"];	
+	
+	// this is the function that we call to do final processing
+	var finalProcessing = function(scriptText, regionDiv, restorePageEditor)
+	{
+		// set up new component binding information
+		if(componentId)
+		{
+			WebStudio.configureComponent(regionDiv.id, componentId, componentTypeId, componentTitle, componentTypeTitle, componentEditorUrl);
+		}
+
+		// process scripts and other dependencies
+		for(var st = 0; st < scriptText.length; st++)
+		{
+			// evaluate the script
+			try {
+				var t = scriptText[st];
+				if(t)
+				{
+					Alf.evaluate(t);
+				}
+			}
+			catch(err)
+			{
+				alert("ERROR: " + err);
+				// TODO: explore how and why this could occur
+			}				
+		}
+		
+		// resize the element to the size of its children
+		// this removes excess white space
+		Alf.resizeToChildren(regionDiv);
+		
+		// fire the load event
+		Alf.fireEvent(regionDiv, "load");				
+
+		// restore the page editor (if it was enabled originally)			
+		if(restorePageEditor)
+		{
+			// TODO: Ideally, this should trigger from completion of tags and load of the DOM element
+			// it should be tied to an update event of some kind
+			
+			// delay
+			_this.showPageEditor.delay(500, _this);
+		}						
+	};
+	
+	var delayFinalProcessing = function(scriptText, regionDiv, restorePageEditor)
+	{
+		var f = function()
+		{
+			var g = finalProcessing.bind(_this);
+			g(scriptText, regionDiv, restorePageEditor);
+		};
+		
+		f.bind(this).delay(500);
+	};
+	
 	// walk through all of the divs and find the one that matches this
 	var regions = WebStudio.app.panels.secondPanel.getElementsByTagName("div");
 	for(var i = 0; i < regions.length; i++)
@@ -742,54 +730,76 @@ WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html,
 				restorePageEditor = true;
 			} 			
 
-			var regionDiv = regions[i];
+			var regionDiv = $(regions[i]);
+			
+			
+			// blank out the existing region div
+			Alf.setHTML(regionDiv, "");
+			WebStudio.unconfigureComponent(regionDiv.id);
+			
+			
+			// manually parse out the region div
+			var origHtml = html;
+			var i1 = html.indexOf("<div");
+			var i2 = html.indexOf("</div>", i1);
+			html = html.substring(i1,i2+6);
 			
 			// replace contents of regionDiv
+			// this sets the child nodes into the DIV
 			WebStudio.util.setHTML(regionDiv, html, true);
-									
-			// process any tags
+						
+			// any script text that we need to process
+			var scriptText = [];			
+			
+			// deal with SCRIPT and LINK tags in the retrieved content
+			var hasDependencies = false;
 			var x = regionDiv.getElementsByTagName("script");
-			for(var a = 0; a < x.length; a++)
+			if(x)
 			{
-				if(x[a] && x[a].text)
+				for(var x1 = 0; x1 < x.length; x1++)
 				{
-					try {
-						eval(x[a].text);
-					}
-					catch(err)
+					// gather up script text
+					if(x[x1] && x[x1].text && x[x1].text !== "")
 					{
-						// TODO: explore how and why this could occur
+						// store for execution later
+						scriptText[scriptText.length] = x[x1].text;
+					}
+					
+					// flag if there are script imports to process
+					if(x[x1] && x[x1].src && x[x1].src !== "")
+					{
+						hasDependencies = true;
 					}
 				}
 			}
-			
-			// resize the element to the size of its children
-			// this removes excess white space
-			Alf.resizeToChildren(regionDiv);
-
-			// restore the page editor (if it was enabled originally)			
-			if(restorePageEditor)
+			var y = regionDiv.getElementsByTagName("link");
+			if(y)
 			{
-				// TODO: Ideally, this should trigger from completion of tags and load of the DOM element
-				// it should be tied to an update event of some kind
-				
-				// delay
-				this.showPageEditor.delay(500, this);
-			}			
-			
+				for(var y1 = 0; y1 < y.length; y1++)
+				{
+					// flag if there are link imports to process
+					if(y[y1] && y[y1].src && y[y1].src !== "")
+					{
+						requiresLoading = true;
+					}
+				}
+			}
+
+			if(!hasDependencies)
+			{
+				// if we don't require any loading
+				// execute the final processing
+				finalProcessing(scriptText, regionDiv, restorePageEditor);
+			}
+			else
+			{
+				// load all dependencies and do final processing on
+				// completion of the load
+				var zFunc = delayFinalProcessing.pass([scriptText, regionDiv, restorePageEditor], _this); 
+				_this.tempLoader = WebStudio.util.loadDependencies(regionDiv.id, regionDiv, zFunc);
+			}						
 		}
 	}
-};
-
-WebStudio.Applications.WebDesigner.prototype.newConfigBinding = function()
-{
-	var config = { };
-	config["operation"] = "bindComponent";
-	config["binding"] = { };
-	config["properties"] = { };
-	config["resources"] = { };
-
-	return config;
 };
 
 WebStudio.Applications.WebDesigner.prototype.showContentTypeAssociationsDialog = function()

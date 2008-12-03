@@ -178,19 +178,12 @@ WebStudio.Region.prototype.onLoadComplete = function (response)
 					response = response.substring(zz+3);
 				}
 				
-				// TODO: this works, got the header
-				// now parse it and set up data object
-				
-				// created parsed html dom element
-				//var dummy = WebStudio.parser.parseHTML(response);
-
-				// set up a source loader to go after any dependencies
-				var data = { };
-				
-				// walk the dummy
+				// build the dummy
 				var dummy = document.createElement('div');
 				dummy.innerHTML = response;
-
+				
+				// load dependencies off the dummy
+				var data = { };
 				for(var z = 0; z < dummy.childNodes.length; z++)
 				{
 					var el = dummy.childNodes[z];
@@ -268,7 +261,8 @@ WebStudio.Region.prototype.setupForm = function()
 	html += "</div>";		
 	html += "</form>";
 	
-	this.Body.el.setHTML(html);
+	//this.Body.el.setHTML(html);
+	Alf.setHTML(this.Body.el, html);
 	
 	// bind in events (on-click)
 	$(formId).addEvent('submit', function(e) {

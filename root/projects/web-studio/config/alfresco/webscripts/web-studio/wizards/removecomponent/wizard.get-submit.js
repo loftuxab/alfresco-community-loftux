@@ -11,8 +11,8 @@ if(componentId != null)
 	}
 }
 
-wizard.setResponseMessage("The component was successfully unassociated");
-wizard.setBrowserReload(true);	
+//wizard.setResponseMessage("The component was successfully unassociated");
+//wizard.setBrowserReload(true);	
 
 wizard.setResponseCodeFinish();
 

@@ -162,24 +162,21 @@ WebStudio.TreeView.prototype.setDroppables = function(map)
 		
 		// remove existing events
 		// this is to prevent event handlers from stacking
-		it.colorOverlay.removeEvents(['over','leave','drop']);
+		//it.colorOverlay.removeEvents(['over', 'leave', 'drop']);
 		
-		// re-add events
 		it.colorOverlay.addEvents({
-			'over': function(el, obj){
-				this.setOpacity(0.5);
-				return false;
-			},
-			'leave': function(el, obj){
-				this.setOpacity(0.2);
-				return false;
-			},
-			'drop': function(el, obj){			
-
+			'over': function(el, obj)
+			{		
+				// throw down a little shake
+				//jQuery(it.el).effect("shake", { times: 2, distance: 1 });
+			}
+			,
+			'drop': function(el, obj)
+			{
 				if(el.parentNode)
 				{
 					obj.options.label.fireEvent('mouseup');
-					
+										
 					el.parentNode.removeChild(el);
 					_this.dropFromTreeView(it.id, obj.options);
 				}
@@ -226,7 +223,7 @@ WebStudio.TreeView.prototype.setDraggableNode = function(nodeId)
 				this.setProperty('mdy', e.client.y);
 			});
 			label.addEvent('mousemove', function(event) {
-				if (this.getProperty('drag')) 
+				if (this.getProperty('drag') == 'true') 
 				{
 					event = new Event(event);
 					var mdx = this.getProperty('mdx').toInt();
@@ -239,13 +236,14 @@ WebStudio.TreeView.prototype.setDraggableNode = function(nodeId)
 						var clone = this.clone();
 						clone.set({id: ''});
 						clone.setStyles(this.getCoordinates());
+						clone.setStyle('top', this.getCoordinates().top + 20);
 						clone.setStyles({
 							'opacity': 0.7,
 							'position': 'absolute',
 							'z-index': 10,
 							'width': 200
 						});
-						clone.addClass('ATVWebComponents');
+						clone.addClass('DragClone');
 						clone.addEvent('emptydrop', function() 
 						{
 							var _clone = this;
@@ -271,6 +269,8 @@ WebStudio.TreeView.prototype.setDraggableNode = function(nodeId)
 							label: this
 						});
 						drag.start(event);
+						
+						this.setProperty('drag', 'running');
 					}
 				}
 			});

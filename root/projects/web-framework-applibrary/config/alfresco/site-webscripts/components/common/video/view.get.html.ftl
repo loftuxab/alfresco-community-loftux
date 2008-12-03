@@ -94,6 +94,7 @@
 				<param name="controller" value="true" />
 				<param name="autoplay" value="true" />
 				<param name="autostart" value="1" />
+				<param name="wmode" value="transparent" />
 
 				<!--[if !IE]> <-->
 
@@ -101,6 +102,7 @@
 					<param name="controller" value="true" />
 					<param name="autoplay" value="true" />
 					<param name="autostart" value="1" />
+					<param name="wmode" value="transparent" />
 
 					<embed src="${src}" type="${src}" width="320" height="256" autostart="true" controller="true" ></embed>
 

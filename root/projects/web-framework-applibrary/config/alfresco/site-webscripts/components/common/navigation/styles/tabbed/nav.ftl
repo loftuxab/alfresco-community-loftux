@@ -132,7 +132,7 @@
       <#assign className="tab-selected">
    </#if>
 
-   <td align="center" valign="middle" class="${className}${htmlid}"><a href="${href}">${page.title}</a></td>
+   <td align="center" valign="middle" class="${className}${htmlid}" nowrap><a href="${href}">${page.title}</a></td>
    <td width="1px" style="background-color: black;">
    	<img src="${baseDir}/spacer.gif" width="1px"/>
    </td>

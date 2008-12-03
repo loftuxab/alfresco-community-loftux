@@ -22,7 +22,6 @@ else
 	}
 	else
 	{
-
 		model.useQuicktime = false;
 		model.useWindowsMedia = false;
 		model.useReal = false;

@@ -172,7 +172,7 @@ WebStudio.Applets.WebContent.prototype.loadData = function(node, fnLoadComplete)
 	YAHOO.util.Connect.asyncRequest('GET', sUrl, callback);
 };
 
-WebStudio.Applets.WebContent.prototype.onShowSlider = function()
+WebStudio.Applets.WebContent.prototype.onShowApplet = function()
 {
 	// hide all designers
 	this.getApplication().hideAllDesigners();
@@ -181,7 +181,7 @@ WebStudio.Applets.WebContent.prototype.onShowSlider = function()
 	this.getApplication().showPageEditor();
 };
 
-WebStudio.Applets.WebContent.prototype.onHideSlider = function()
+WebStudio.Applets.WebContent.prototype.onHideApplet = function()
 {
 	// hide the page editor
 	this.getApplication().hidePageEditor();
@@ -215,4 +215,12 @@ WebStudio.Applets.WebContent.prototype.nodeDoubleClickHandler = function(e)
 	}
 
 	e.stop();
+};
+
+WebStudio.Applets.WebContent.prototype.bindPageEditor = function(pageEditor)
+{
+	if(this.treeView)
+	{
+		this.treeView.setDroppables(pageEditor.tabs);
+	}
 };
