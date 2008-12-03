@@ -17,4 +17,10 @@
     	<input name="${previewImageUrl.id}" value="${previewImageUrl.value}" />
     </td>
   </tr>
+  <tr>
+    <td class="label">File Extensions</td>
+    <td>
+    	<input name="${fileext.id}" value="${fileext.value}" />
+    </td>
+  </tr>
 </table>

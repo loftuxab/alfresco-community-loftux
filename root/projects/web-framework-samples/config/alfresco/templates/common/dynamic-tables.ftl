@@ -8,30 +8,29 @@
       
          <tr id="${row.id}">
          
-         <td>
+         <td width="100%">
          
             <table width="100%" cellspacing="0" cellpadding="0">
 
-            <tr valign="top">
+            <tr>
 
             <#list row.panels as col>
          
-               <td id="${col.id}" width="${col.width}%" style="vertical-align: top">
+               <td id="${col.id}" valign="top" align="left">
 
                   <#if col.regions?exists>
 	             <#list col.regions as r>
 	          
-	          <div id="${r.name}" <#if r.height?exists && r.height?length &gt; 0>height="${r.height}%"</#if> >
                      <@region id="${r.name}" scope="${r.scope}"/>
-                  </div>
                   
 		     </#list>
 		  </#if>
+		  
 	       </td>
 	       
             </#list>
          
-         </tr>
+            </tr>
          
          </table>
          

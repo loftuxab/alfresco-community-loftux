@@ -166,6 +166,12 @@ WebStudio.TemplatesView.prototype.activate = function()
 		{
 			// reload templates when complete
 			_this.reloadTemplatesListing();
+			
+			if (this.wizardFinished)
+			{
+				_this.application.GoToTemplateDisplay(null);
+				_this.selectTemplate(null);
+			}
 		};
 
 	}, this);
@@ -293,19 +299,21 @@ WebStudio.TemplatesView.prototype.selectTemplate = function(templateId)
 	// select
 	this.selectedTemplateId = templateId;
 	
-	domId = this.getTemplateDomId(templateId);
-	domElement = $(domId);
-	if(domElement)
-	{
-		domElement.removeClass('TemplateRow');
-		domElement.addClass('SelectedTemplateRow');
-	}
-	
-	this.menu.setEnabled('roots', this.INDEX_BUTTON_ADD);
-	this.menu.setEnabled('roots', this.INDEX_BUTTON_EDIT);
-	this.menu.setEnabled('roots', this.INDEX_BUTTON_COPY);
-	this.menu.setEnabled('roots', this.INDEX_BUTTON_DELETE);
-	
+	if(templateId)
+	{	
+		domId = this.getTemplateDomId(templateId);
+		domElement = $(domId);
+		if(domElement)
+		{
+			domElement.removeClass('TemplateRow');
+			domElement.addClass('SelectedTemplateRow');
+		}
+		
+		this.menu.setEnabled('roots', this.INDEX_BUTTON_ADD);
+		this.menu.setEnabled('roots', this.INDEX_BUTTON_EDIT);
+		this.menu.setEnabled('roots', this.INDEX_BUTTON_COPY);
+		this.menu.setEnabled('roots', this.INDEX_BUTTON_DELETE);
+	}	
 };
 
 WebStudio.TemplatesView.prototype.getTemplateDomId = function(templateId)

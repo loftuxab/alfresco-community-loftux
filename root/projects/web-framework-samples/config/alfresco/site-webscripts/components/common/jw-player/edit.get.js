@@ -5,4 +5,5 @@ WebStudio.Component.bind();
 
 // bind custom properties
 WebStudio.Component.bindProperty("previewImageUrl");
+WebStudio.Component.bindProperty("fileext");
 

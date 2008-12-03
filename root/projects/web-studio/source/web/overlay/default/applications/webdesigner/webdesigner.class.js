@@ -30,7 +30,7 @@ WebStudio.Applications.WebDesigner.prototype.getMenu = function()
 		r1.addItem("site-content-type-associations", "Content Associations...", "text", WebStudio.overlayIconsPath + "/content_type_associations.gif");
 		r1.addItem("separator3","item2","separator");
 		r1.addItem("site-view-web-project", "View in Explorer", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
-		r1.addItem("site-view-web-project-webdav", "View in WebDAV", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true} );
+		r1.addItem("site-view-web-project-webdav", "View in WebDAV", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
 		r1.addItem("site-view-web-project-cifs", "View in CIFS", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
 		r1.addItem("site-view-web-project-ftp", "View in FTP", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
 		
@@ -380,6 +380,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	var nodeString = null;
 	
 	var mimetype = null;
+	var filePath = null;
 	var sourcePath = null;
 	var sourceType = null;
 	var sourceEndpoint = "alfresco";
@@ -404,6 +405,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	{
 		sourcePath = options.data.path;
 		sourceType = "webapp";
+		filePath = options.data.path;
 		mimetype = options.data.mimetype;
 	}
 
@@ -413,6 +415,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 		sourcePath = options.data.path;
 		sourceType = "webapp";
 		mimetype = null;
+		filePath = options.data.path;
 		isContainer = true;
 	}
 	
@@ -421,7 +424,8 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	{
 		cmType = options.data.cmType;		
 		nodeRef = options.data.nodeRef;		
-		nodeString = WebStudio.app.toNodeString(nodeRef);		
+		nodeString = WebStudio.app.toNodeString(nodeRef);
+		filePath = options.data.path;		
 		mimetype = options.data.mimetype;
 		
 		sourcePath = nodeString;
@@ -434,6 +438,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 		cmType = options.data.cmType;
 		nodeRef = options.data.nodeRef;
 		nodeString = WebStudio.app.toNodeString(nodeRef);
+		filePath = options.data.path;
 		
 		sourcePath = nodeString;
 		sourceType = "space";
@@ -444,7 +449,8 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	if ("siteFile" == alfType)
 	{
 		cmType = options.data.cmType;		
-		nodeString = "workspace/SpacesStore/" + options.data.nodeID;		
+		nodeString = "workspace/SpacesStore/" + options.data.nodeID;
+		filePath = options.data.path;		
 		mimetype = options.data.mimetype;
 		
 		sourcePath = nodeString;
@@ -456,6 +462,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	{	
 		cmType = options.data.cmType;
 		nodeString = "workspace/SpacesStore/" + options.data.nodeID;
+		filePath = options.data.path;
 		
 		sourcePath = nodeString;
 		sourceType = "space";
@@ -548,15 +555,17 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 
 			if (mimetype == "application/octet-stream")
 			{
-				if(sourcePath && sourcePath.endsWith(".flv"))
+				if(filePath && filePath.endsWith(".flv"))
 				{
 					config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, mimetype);
+					config["properties"]["fileext"] = "flv";
 				}
 			}
 
 			if (mimetype == "video/mp4")
 			{
 				config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, mimetype);
+				config["properties"]["fileext"] = "mp4";
 			}
 
 		}

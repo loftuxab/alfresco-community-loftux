@@ -896,9 +896,7 @@
 											</td>
 										</tr>
 										<tr>
-											<td colspan="2" align="right" style="padding-right: 20px">
-												<select id="AlfrescoWebStudioSandboxTemplate_BasedOn" maxlength="256" style="width:200px" class="sandbox-input">
-												</select>
+											<td id="AlfrescoWebStudioSandboxTemplate_BasedOn" colspan="2" align="right" style="padding-right: 20px">
 											</td>
 										</tr>
 										<tr><td colspan="2"><br/></td></tr>
@@ -909,7 +907,7 @@
 										</tr>
 									</table>
 								</td>
-								<td width="160px" height="120px" align="center" valign="middle">
+								<td width="160px" height="140px" align="center" valign="middle">
 									<img id="AlfrescoWebStudioSandboxTemplate_Image" src=""/>
 								</td>
 							</tr>

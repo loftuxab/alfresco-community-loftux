@@ -4,9 +4,14 @@
 // Data Binding: websiteDescription
 //
 
-
-// update the site configuration
-assertSiteConfiguration(websiteName, websiteDescription);
+// get the web site config
+var siteConfig = sitedata.getSiteConfiguration();
+if(siteConfig != null)
+{
+	siteConfig.setTitle(websiteName);
+	siteConfig.setDescription(websiteDescription);
+	siteConfig.save();
+}
 
 // finalize things
 wizard.setResponseCodeFinish();

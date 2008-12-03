@@ -71,7 +71,7 @@
       <td>
          <img src="${baseDir}/selected_button_left.png" height="35px" />
       </td>
-      <td style="padding-left: 10px; padding-right: 10px; background-image: url(${baseDir}/selected_button_fill.png); background-repeat: repeat; height: 35px;">
+      <td nowrap style="padding-left: 10px; padding-right: 10px; background-image: url(${baseDir}/selected_button_fill.png); background-repeat: repeat; height: 35px;">
          <a href="${href}" style="color: white; font-face: Verdana; font-weight: bold; text-decoration: none;">${page.title}</a>
       </td>
       <td>
@@ -83,7 +83,7 @@
       <td>
          <img src="${baseDir}/button_left.png" height="35px" />
       </td>
-      <td style="padding-left: 10px; padding-right: 10px;" nowrap>
+      <td nowrap style="padding-left: 10px; padding-right: 10px;" nowrap>
          <a href="${href}" style="color: black; font-face: Verdana; font-weight: bold; text-decoration: none;">${page.title}</a>
       </td>
       <td>

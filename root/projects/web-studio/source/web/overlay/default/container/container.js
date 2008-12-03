@@ -497,8 +497,14 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 	var _this = this;
 	
 	var webSiteName = this.sandboxDialog.ToolCreateWebSiteName.el.value;
-	var webSiteBasedOn = this.sandboxDialog.ToolCreateWebSiteBasedOn.el.value;
 	var webSiteDescription = webSiteName;
+	
+	var webSiteBasedOn = "none";
+	var select = $('sandbox-create-template-selector');
+	if(select)
+	{
+		webSiteBasedOn = select.value;
+	}
 	
 	// TODO: figure a nice, easy DNS name for this web project
 	// We use some voodoo assumptions here...
