@@ -193,8 +193,11 @@ public class MediaWikiSpace extends Folder
             {
                 if (entry.getKey().getNamespaceURI().equals(Constants.CONFIG_NAMESPACE) == true)
                 {
-                    
-                    configProperties.put(entry.getKey().toString(), entry.getValue().toString());
+                    String value = entry.getValue().toString();
+                    if (value != null && value.trim().length() != 0)
+                    {
+                        configProperties.put(entry.getKey().toString(), value);
+                    }
                 }
             }  
         }
