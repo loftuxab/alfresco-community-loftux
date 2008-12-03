@@ -51,6 +51,8 @@ http://localhost:8280/studio/proxy/alfresco-web-studio/service/incontext/compone
 
 */
 
+logger.log("WOO");
+
 function pushComponentProperties(component, properties)
 {
 	if(properties != null)
@@ -164,15 +166,23 @@ var output = { };
 if(componentTypeId != null)
 {
 	output["componentTypeId"] = componentTypeId;
-	
+
 	// get the component type
 	var componentType = sitedata.getComponentType(componentTypeId);
-	var componentTypeTitle = componentType.getTitle();
-	if(componentTypeTitle == null || "" == componentTypeTitle)
+	if(componentType != null)
 	{
-		componentTypeTitle = componentType.getId();
+		var componentTypeTitle = componentType.getTitle();
+		if(componentTypeTitle == null || "" == componentTypeTitle)
+		{
+			componentTypeTitle = componentType.getId();
+		}
+		output["componentTypeTitle"] = componentTypeTitle;
 	}
-	output["componentTypeTitle"] = componentTypeTitle;
+	else
+	{
+		// assume
+		output["componentTypeTitle"] = "Web Script Component";
+	}
 }
 output["regionId"] = regionId;
 output["regionSourceId"] = regionSourceId;

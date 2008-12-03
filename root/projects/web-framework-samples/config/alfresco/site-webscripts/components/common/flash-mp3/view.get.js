@@ -9,12 +9,12 @@ if(source == null)
 else
 {
 	// set up the source
-	var url = source.downloadURI;
-	if(url.substring(0,1) == "/")
+	var src = source.downloadURI;
+	if(src.substring(0,1) == "/")
 	{
-		url = url.context + source.proxiedDownloadURI;
+		src = url.context + source.proxiedDownloadURI;
 	}
-	model.src = url;
+	model.src = src;
 
 	model.title = instance.properties["title"];
 	if(model.title == null)
@@ -29,13 +29,13 @@ else
 	}
 	
 	model.appearance = instance.properties["appearance"];
-	if(model.appearance == null)
+	if(model.appearance == null || model.appearance == "")
 	{
 		model.appearance = "full";
 	}
 
 	model.songTitle = instance.properties.songTitle;
-	if(model.songTitle == null)
+	if(model.songTitle == null || model.songTitle == "")
 	{
 		model.songTitle = source.id;
 	}

@@ -7,6 +7,8 @@
 <#else>
 
 	<#if isVideo>
+	
+		<div width="100%" align="center">${title}</div>
 
 		<#if useQuicktime>
 

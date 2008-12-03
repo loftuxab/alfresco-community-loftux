@@ -3106,12 +3106,12 @@
          <fileset dir="${dir.project.webstudio.config}" excludes="**/extension/**" />
       </copy>
 
-      <!-- copy all required files from project: web-framework-applibrary -->
+      <!-- copy all required files from project: web-framework-samples -->
       <copy todir="${dir.project.webstudio.assemble}">
-         <fileset dir="${dir.projects}/web-framework-applibrary/source/web" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
       </copy>
       <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.projects}/web-framework-applibrary/config" excludes="**/extension/**" />
+         <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->

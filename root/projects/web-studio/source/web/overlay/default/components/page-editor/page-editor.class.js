@@ -853,67 +853,69 @@ WebStudio.PETabItem.prototype.onDeleteClickEWnd = function()
 	w.start(WebStudio.ws.studio('/wizard/removecomponent'), 'removecomponent');
 	w.onComplete = function() 
 	{
-		// break down this component and its overlays
-		_this.optionsOverlay.setStyle('display', 'none');
-		_this.backPanelOverlay.setStyle('display', 'none');
-		_this.whiteOverlay.setStyle('display', 'none');
-		
-		// remove the magnifiers (if they exist)
-		_this.removeMagnifiers();
-		
-		// hide the component
-		_this.el.setStyle('visibility', 'none');
-
-		// restore color overlay
-		var unflippedColor = _this.origColorOverlayBackgroundColor;
-		_this.colorOverlay.setStyle('background-color', unflippedColor);
-				
-    	// unmark as "expanded"
-    	_this.expanded = false;
-
-		// force tab to resize to underlying element
-		Alf.resizeToChildren(_this.el);
-		    	
-    	// resize tabs to their underlying dom element
-    	_this.pageEditor.resizeTabItems();			
-		
-		// do a little explode effect
-		// why not, it is fun
-		_this.colorOverlay.setStyle("background-color", "#000000");
-		_this.colorOverlay.setOpacity(1);
-		jQuery(_this.colorOverlay).hide("explode", { pieces: 49 }, 1300);
-
-		var aFunc = function()
+		if (this.wizardFinished)
 		{
-			// unbind the old component
-			WebStudio.unconfigureComponent(_this.el.id);
-			_this.colorOverlay.setStyle('display', 'none');
+			// break down this component and its overlays
+			_this.optionsOverlay.setStyle('display', 'none');
+			_this.backPanelOverlay.setStyle('display', 'none');
+			_this.whiteOverlay.setStyle('display', 'none');
 			
-			// set up the binding
-			var binding = { };
+			// remove the magnifiers (if they exist)
+			_this.removeMagnifiers();
 			
-			// region data
-			binding["regionId"] = _this.regionId;
-			binding["regionScopeId"] = _this.regionScopeId;
-			binding["regionSourceId"] = _this.regionSourceId;
+			// hide the component
+			_this.el.setStyle('visibility', 'none');
+	
+			// restore color overlay
+			var unflippedColor = _this.origColorOverlayBackgroundColor;
+			_this.colorOverlay.setStyle('background-color', unflippedColor);
+					
+	    	// unmark as "expanded"
+	    	_this.expanded = false;
+	
+			// force tab to resize to underlying element
+			Alf.resizeToChildren(_this.el);
+			    	
+	    	// resize tabs to their underlying dom element
+	    	_this.pageEditor.resizeTabItems();			
 			
-			// component binding data
-			// leave empty
-			//binding["componentId"] = _this.componentId;
-			//binding["componentTypeId"] = _this.componentTypeId;
-			//binding["componentTitle"] = _this.componentTitle;
-			//binding["componentTypeTitle"] = _this.componentTypeTitle;
-			//binding["componentEditorUrl"] = _this.componentEditorUrl;
+			// do a little explode effect
+			// why not, it is fun
+			_this.colorOverlay.setStyle("background-color", "#000000");
+			_this.colorOverlay.setOpacity(1);
+			jQuery(_this.colorOverlay).hide("explode", { pieces: 49 }, 1300);
+	
+			var aFunc = function()
+			{
+				// unbind the old component
+				WebStudio.unconfigureComponent(_this.el.id);
+				_this.colorOverlay.setStyle('display', 'none');
+				
+				// set up the binding
+				var binding = { };
+				
+				// region data
+				binding["regionId"] = _this.regionId;
+				binding["regionScopeId"] = _this.regionScopeId;
+				binding["regionSourceId"] = _this.regionSourceId;
+				
+				// component binding data
+				// leave empty
+				//binding["componentId"] = _this.componentId;
+				//binding["componentTypeId"] = _this.componentTypeId;
+				//binding["componentTitle"] = _this.componentTitle;
+				//binding["componentTypeTitle"] = _this.componentTypeTitle;
+				//binding["componentEditorUrl"] = _this.componentEditorUrl;
+				
+				// reload the region
+				// this will force the region to display it's default 
+				// "nothing configured for this region" message
+				_this.pageEditor.application.faultRegion(binding);
+			};
 			
-			// reload the region
-			// this will force the region to display it's default 
-			// "nothing configured for this region" message
-			_this.pageEditor.application.faultRegion(binding);
-		};
-		
-		// wait until the explode effect finishes
-		aFunc.delay(1500);
-		
+			// wait until the explode effect finishes
+			aFunc.delay(1500);
+		}		
 	};		
 };
 

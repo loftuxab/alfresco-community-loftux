@@ -384,7 +384,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	var sourceType = null;
 	var sourceEndpoint = "alfresco";
 	var isContainer = false;
-
+	
 	// SHORTCUT ACTION: they drop a web script component type
 	// Special Handling for Web Scripts as components
 	// Do binding and exit
@@ -535,11 +535,30 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 			{
 				config = WebStudio.components.newAudio(sourceType, sourceEndpoint, sourcePath, mimetype);
 			}
-						
+			
+			if (mimetype == "audio/x-mpeg")
+			{
+				config = WebStudio.components.newFlashMP3(sourceType, sourceEndpoint, sourcePath, mimetype);
+			}
+									
 			if (mimetype == "application/x-shockwave-flash")
 			{
 				config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, mimetype);
 			}
+
+			if (mimetype == "application/octet-stream")
+			{
+				if(sourcePath && sourcePath.endsWith(".flv"))
+				{
+					config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, mimetype);
+				}
+			}
+
+			if (mimetype == "video/mp4")
+			{
+				config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, mimetype);
+			}
+
 		}
 		else
 		{
@@ -707,6 +726,60 @@ WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html,
 		f.bind(this).delay(500);
 	};
 	
+	var processHtml = function(regionDiv, restorePageEditor)
+	{
+		// any script text that we need to process
+		var scriptText = [];			
+		
+		// deal with SCRIPT and LINK tags in the retrieved content
+		var hasDependencies = false;
+		var x = regionDiv.getElementsByTagName("script");
+		if(x)
+		{
+			for(var x1 = 0; x1 < x.length; x1++)
+			{
+				// gather up script text
+				if(x[x1] && x[x1].text && x[x1].text !== "")
+				{
+					// store for execution later
+					scriptText[scriptText.length] = x[x1].text;
+				}
+				
+				// flag if there are script imports to process
+				if(x[x1] && x[x1].src && x[x1].src !== "")
+				{
+					hasDependencies = true;
+				}
+			}
+		}
+		var y = regionDiv.getElementsByTagName("link");
+		if(y)
+		{
+			for(var y1 = 0; y1 < y.length; y1++)
+			{
+				// flag if there are link imports to process
+				if(y[y1] && y[y1].src && y[y1].src !== "")
+				{
+					requiresLoading = true;
+				}
+			}
+		}
+
+		if(!hasDependencies)
+		{
+			// if we don't require any loading
+			// execute the final processing
+			finalProcessing(scriptText, regionDiv, restorePageEditor);
+		}
+		else
+		{
+			// load all dependencies and do final processing on
+			// completion of the load
+			var zFunc = delayFinalProcessing.pass([scriptText, regionDiv, restorePageEditor], _this); 
+			_this.tempLoader = WebStudio.util.loadDependencies(regionDiv.id, regionDiv, zFunc);
+		}
+	};
+		
 	// walk through all of the divs and find the one that matches this
 	var regions = WebStudio.app.panels.secondPanel.getElementsByTagName("div");
 	for(var i = 0; i < regions.length; i++)
@@ -741,63 +814,17 @@ WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html,
 			// manually parse out the region div
 			var origHtml = html;
 			var i1 = html.indexOf("<div");
-			var i2 = html.indexOf("</div>", i1);
+			var i2 = html.lastIndexOf("</div>");
+			//var i2 = html.indexOf("</div>", i1);
 			html = html.substring(i1,i2+6);
 			
 			// replace contents of regionDiv
 			// this sets the child nodes into the DIV
 			WebStudio.util.setHTML(regionDiv, html, true);
-						
-			// any script text that we need to process
-			var scriptText = [];			
 			
-			// deal with SCRIPT and LINK tags in the retrieved content
-			var hasDependencies = false;
-			var x = regionDiv.getElementsByTagName("script");
-			if(x)
-			{
-				for(var x1 = 0; x1 < x.length; x1++)
-				{
-					// gather up script text
-					if(x[x1] && x[x1].text && x[x1].text !== "")
-					{
-						// store for execution later
-						scriptText[scriptText.length] = x[x1].text;
-					}
-					
-					// flag if there are script imports to process
-					if(x[x1] && x[x1].src && x[x1].src !== "")
-					{
-						hasDependencies = true;
-					}
-				}
-			}
-			var y = regionDiv.getElementsByTagName("link");
-			if(y)
-			{
-				for(var y1 = 0; y1 < y.length; y1++)
-				{
-					// flag if there are link imports to process
-					if(y[y1] && y[y1].src && y[y1].src !== "")
-					{
-						requiresLoading = true;
-					}
-				}
-			}
-
-			if(!hasDependencies)
-			{
-				// if we don't require any loading
-				// execute the final processing
-				finalProcessing(scriptText, regionDiv, restorePageEditor);
-			}
-			else
-			{
-				// load all dependencies and do final processing on
-				// completion of the load
-				var zFunc = delayFinalProcessing.pass([scriptText, regionDiv, restorePageEditor], _this); 
-				_this.tempLoader = WebStudio.util.loadDependencies(regionDiv.id, regionDiv, zFunc);
-			}						
+			// ideally, we want to now wait until the HTML finishes loading
+			var delayedProcessHtml = processHtml.pass([regionDiv, restorePageEditor], _this);
+			delayedProcessHtml.delay(1000); 
 		}
 	}
 };
