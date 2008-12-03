@@ -15,7 +15,8 @@ img,body,html
 }
 address,caption,cite,code,dfn,em,strong,th,var
 {
-	font-style:normal;font-weight:normal;
+	font-style:normal;
+	font-weight:normal;
 }
 ol,ul{
 	list-style:none;
@@ -38,38 +39,6 @@ div#AlfrescoApplication.Default {
 	top:0px;
 	width:100%;
 }
-div#AlfrescoApplication.Default #AAStartEditControl {
-	position:absolute;
-	border:1px solid #808080;
-	width:100px;
-	background-color:#FFFFFF;
-}
-
-div#AlfrescoApplication.Default #AAStartEditControl .AAContentManagedIcon {
-	width:88px;
-	height:32px;
-	background-image:url(<%=rootPath%>/images/AlfrescoContentManaged.gif);
-	background-repeat:no-repeat;
-	cursor: pointer;
-    position:relative;
-    top:0px;
- }
-
-div#AlfrescoApplication.Default #AAStartEditControl .AAContentEditIcon {
-	width:16px;
-	height:16px;
-	background-image:url(<%=rootPath%>/images/AlfrescoContentEdit.gif);
-	background-repeat:no-repeat;
-	float:left;
-	cursor:pointer;
-}
-
-div#AlfrescoApplication.Default #AAStartEditControl .AAContentEditCaption {
-	font-family:Tahoma,Arial,Helvetica,sans-serif;
-	font-size:12px;
-	padding-left:5px;
-	cursor:pointer;
-}
 
 .MountSelector
 {
@@ -83,24 +52,26 @@ div#AlfrescoApplication.Default #AAStartEditControl .AAContentEditCaption {
 .MountSelectorRoot
 {
 	padding-top:1px;
-	cursor:pointer;
 	float:left;
 	font-size:11px;
 	font-family:tahoma,verdana,helvetica;
 	color:black;
-	height:16px;
-	text-align:center;
 	background-image:url(<%=rootPath%>/images/menubg.gif);
 	margin-top:1px;
 	margin-left:3px;
+	cursor:pointer;
+}
+
+.MountSelectorTable
+{ 
 }
 
 .MountSelectorLeft
 {
 	background-image:url(<%=rootPath%>/images/menuBgLeft.gif);
 	padding: 0px;
-	margin: 0px;	
-	float:left
+	margin: 0px;
+	border: 0px;
 }
 
 .MountSelectorCenter
@@ -108,10 +79,10 @@ div#AlfrescoApplication.Default #AAStartEditControl .AAContentEditCaption {
 	font-family: Tahoma,Arial,Helvetica,sans-serif;
 	font-size:11px;
 	color: #000000;
+	background-image:url(<%=rootPath%>/images/menuBgCenter.gif);
 	padding: 0px;
 	margin: 0px;
-	background-image:url(<%=rootPath%>/images/menuBgCenter.gif);
-	float:left;	
+	border: 0px;	
 }
 
 .MountSelectorCenterSelected
@@ -120,20 +91,80 @@ div#AlfrescoApplication.Default #AAStartEditControl .AAContentEditCaption {
 	font-size:11px;
 	font-weight: bold;	
 	color: #000000;
+	background-image:url(<%=rootPath%>/images/menuBgCenter.gif);
 	padding: 0px;
 	margin: 0px;
-	background-image:url(<%=rootPath%>/images/menuBgCenter.gif);
-	float:left;
+	border: 0px;
 }
 
 .MountSelectorRight
 {
 	background-image:url(<%=rootPath%>/images/menuBgRight.gif);	
 	padding: 0px;
-	margin: 0px;
-	float: left;
+	margin: 0px;	
 }
 
 .MountSelectorCenter DIV:hover { 
 	cursor: pointer;
+}
+
+#FloatingMenuControl
+{
+	font-family: Tahoma,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	font-style:normal;
+	position:absolute;
+	border-left:1px solid #000000;
+	border-top:1px solid #000000;
+	border-right:1px solid #000000;
+	border-bottom:1px solid #000000;
+	width:160px;
+	height:48px;
+	background-image:url(<%=rootPath%>/images/floatingmenu/background.png);
+	cursor: pointer;
+}
+
+.FloatingMenuWebProjectId
+{
+	font-family: Tahoma,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	font-style:normal;
+	font-weight: bold;
+}
+
+.FloatingMenuSandboxId
+{
+	font-family: Tahoma,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	font-style:normal;
+}
+
+.FloatingMenuOptions
+{
+	font-family: Tahoma,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	font-style:normal;
+	background-color: transparent;
+}
+
+#FloatingMenuIcon
+{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+    width: 64px;
+    height: 64px;
+}
+
+.FloatingMenuIconView
+{
+	background-image:url(<%=rootPath%>/images/floatingmenu/webstudio-64.png);
+	background-repeat:no-repeat;
+}
+
+.FloatingMenuIconEdit
+{
+	background-image:url(<%=rootPath%>/images/floatingmenu/webstudio-design-64.png);
+	background-repeat:no-repeat;
 }

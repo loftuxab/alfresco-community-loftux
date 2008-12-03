@@ -164,6 +164,15 @@ var output = { };
 if(componentTypeId != null)
 {
 	output["componentTypeId"] = componentTypeId;
+	
+	// get the component type
+	var componentType = sitedata.getComponentType(componentTypeId);
+	var componentTypeTitle = componentType.getTitle();
+	if(componentTypeTitle == null || "" == componentTypeTitle)
+	{
+		componentTypeTitle = componentType.getId();
+	}
+	output["componentTypeTitle"] = componentTypeTitle;
 }
 output["regionId"] = regionId;
 output["regionSourceId"] = regionSourceId;
@@ -218,6 +227,17 @@ if(componentTypeId != null)
 
 	// assign component id onto json return
 	output["componentId"] = component.getId();
+	
+	var componentTitle = component.getTitle();
+	if(componentTitle == null || "" == componentTitle)
+	{
+		componentTitle = component.getId();
+	}
+	output["componentTitle"] = componentTitle;
+	
+	// set up the editor url
+	// assume it is a web script
+	output["componentEditorUrl"] = "/c/edit/" + component.getId();	
 }
 
 // format the json

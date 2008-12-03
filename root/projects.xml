@@ -3148,7 +3148,7 @@
 	</condition>
    </target>
    
-   <target name="validate-webstudio-javascript" if="isAnt17orHigher">
+   <target name="validate-webstudio-javascript" if="isJsLintCompatible">
 
 	<mkdir dir="${dir.project.webstudio}/build/js" />
 	

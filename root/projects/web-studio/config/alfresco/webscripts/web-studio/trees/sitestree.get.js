@@ -77,6 +77,30 @@ else
 			{
 				json[i]["mimetype"] = node["mimetype"];
 			}
+			
+			
+			// try to guess at the object type
+			if(node["name"] == "documentLibrary")
+			{
+				json[i]["shareType"] = "doclib";
+			}
+			if(node["name"] == "wiki")
+			{
+				json[i]["shareType"] = "wiki";
+			}
+			if(node["name"] == "blog")
+			{
+				json[i]["shareType"] = "blog";
+			}
+			if(node["name"] == "calendar")
+			{
+				json[i]["shareType"] = "calendar";
+			}
+			if(node["name"] == "discussions")
+			{
+				json[i]["shareType"] = "discussions";
+			}
+			
 	
 			json[i]["url"] = node.url;
 			json[i]["nodeId"] = node.id;

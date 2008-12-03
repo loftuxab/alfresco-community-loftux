@@ -37,6 +37,10 @@
    <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWizardWebScript" singleton="false" />
 
 
+   <!-- Override remote store implementation for Labs 3C -->
+   <bean id="webscripts.remotestore" class="org.alfresco.web.scripts.WebStudioRemoteStore" abstract="true" />
+   
+
    <!-- Override: Remote Store Context for Web Studio -->
    <bean id="webframework.context.remotestore" class="org.alfresco.web.studio.WebStudioRemoteStoreContext" />
 

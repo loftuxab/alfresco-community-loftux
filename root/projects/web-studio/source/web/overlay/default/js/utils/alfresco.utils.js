@@ -107,15 +107,24 @@ Alf.sourceLoader.prototype = {
 			};
 			_this.assetIds[_this.assetIds.length] = id;
 			
+			var handled = false;
+			
 			if ((type == 'js')||(type == 'javascript')||(type == 'jscript')) 
 			{
 				path = path + _this.jsPath + item.path;
 				_this.loadJS(path, options);
+				handled = true;
 			}
 			if ((type == 'css')||(type == 'styles')||(type == 'stylesheets')) 
 			{
 				path = path + _this.cssPath + item.path;
 				_this.loadCSS(path, options);
+				handled = true;
+			}
+			
+			if(!handled)
+			{
+				alert("Unable to handle load of: " + item.path);
 			}
 		});
 	}

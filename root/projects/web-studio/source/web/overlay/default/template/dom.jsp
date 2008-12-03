@@ -255,19 +255,37 @@
 	
 		<div id="AATwoPanels"></div>
 
-		<div id="AAStartEditControl">
-			<table width="100" cellspacing="2" cellpadding="2" border="0">
+		<div id="FloatingMenuIcon">&nbsp;</div>
+		
+		<div id="FloatingMenuControl">
+			<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
 				<tr>
-					<td align="center">
-						<div class="AAContentManagedIcon">
-							<input type='text' style='visibility:hidden;width:1px;height:1px;'/>
-						</div>
+					<td width="48px" style="border-bottom: 1px white solid; border-top: 1px white solid; border-left: 1px white solid">
+						<img src="<%=rootPath%>/images/spacer.gif" width="48px" />
 					</td>
-				</tr>
-				<tr>
-					<td>
-						<div class="AAContentEditIcon">&nbsp;</div>
-						<span class="AAContentEditCaption">Start Editing</span>
+					<td width="100%" valign="top" style="padding-left: 3px; padding-top: 1px; padding-right: 1px; border-right: 1px white solid; border-bottom: 1px white solid; border-top: 1px white solid" valign="top" align="left">
+					
+						<table width="100%" cellpadding="1" cellspacing="0">
+							<tr>
+								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
+									<span class="FloatingMenuOptions">
+										<img src="<%=rootPath%>/images/arrow-right.gif">
+										Options
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
+									<span class="FloatingMenuWebProjectId"></span>
+								</td>
+							</tr>
+							<tr>
+								<td width="100%" style="padding-bottom: 1px">
+									<span class="FloatingMenuSandboxId"></span>
+								</td>
+							</tr>
+						</table>
+						
 					</td>
 				</tr>
 			</table>

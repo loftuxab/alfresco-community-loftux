@@ -100,8 +100,12 @@ WebStudio.PageEditor.prototype.removeTabItems = function()
 			var optionsOverlay = this.tabs[tn].optionsOverlay;
 			if(optionsOverlay && optionsOverlay.parentNode)
 			{
+				// remove the overlay
 				optionsOverlay.parentNode.removeChild(optionsOverlay);
 			}
+			
+			// set the component to be visible again
+			this.tabs[tn].el.setStyle('visibility', 'visible');
 		}
 	}
 	
@@ -132,6 +136,26 @@ WebStudio.PageEditor.prototype.hide = function()
 	return this;
 };
 
+WebStudio.PageEditor.prototype.restoreAllTabItems = function()
+{
+	for (var tn in this.tabs) 
+	{
+		if(this.tabs.hasOwnProperty(tn))
+		{
+			this.tabs[tn].whiteOverlay.setStyle('display', 'none');
+			this.tabs[tn].colorOverlay.setStyle('display', 'none');
+			this.tabs[tn].backPanelOverlay.setStyle('display', 'none');
+			this.tabs[tn].optionsOverlay.setStyle('display', 'none');
+
+			// set the component to be visible again
+			this.tabs[tn].el.setStyle('visibility', 'visible');
+			
+			// resize component against its surroundings
+			Alf.resizeToChildren(this.tabs[tn].el);
+		}
+	}
+};
+
 WebStudio.PageEditor.prototype.hideTabItems = function()
 {
 	for (var tn in this.tabs) 
@@ -142,6 +166,9 @@ WebStudio.PageEditor.prototype.hideTabItems = function()
 			this.tabs[tn].colorOverlay.setStyle('display', 'none');
 			this.tabs[tn].backPanelOverlay.setStyle('display', 'none');
 			this.tabs[tn].optionsOverlay.setStyle('display', 'none');
+			
+			// set the component to be visible again
+			this.tabs[tn].el.setStyle('visibility', 'visible');
 		}
 	}
 };
@@ -154,8 +181,6 @@ WebStudio.PageEditor.prototype.showTabItems = function()
 		{
 			this.tabs[tn].whiteOverlay.setStyle('display', 'block');
 			this.tabs[tn].colorOverlay.setStyle('display', 'block');
-			//this.tabs[tn].backPanelOverlay.setStyle('display', 'block');
-			//this.tabs[tn].optionsOverlay.setStyle('display', 'block');
 		}
 	}
 };
@@ -262,7 +287,8 @@ WebStudio.PETabItem = function(el, whiteOverlay, colorOverlay, backPanelOverlay,
 	// Set up the BackPanel Overlay
 	this.backPanelOverlay.id = "options-background-overlay-" + this.regionId + "-" + this.regionScopeId + "-" + this.regionSourceId;
 	//this.backPanelOverlay.innerHTML = "<img src='/studio/overlay/default/images/backpanel.png' width='100%' height='100%'>";
-	this.backPanelOverlay.innerHTML = "<img src='/studio/overlay/default/images/backpanel_silver.png' width='100%' height='100%'>";
+	//this.backPanelOverlay.innerHTML = "<img src='/studio/overlay/default/images/backpanel_silver.png' width='100%' height='100%'>";
+	this.backPanelOverlay.innerHTML = "<img src='/studio/overlay/default/images/backpanel_white.png' width='100%' height='100%'>";
 	this.backPanelOverlay.style.position = "absolute";
 	this.backPanelOverlay.injectInside(document.body);
 	this.backPanelOverlay.setOpacity(1);
@@ -275,18 +301,16 @@ WebStudio.PETabItem = function(el, whiteOverlay, colorOverlay, backPanelOverlay,
 
 	// Set up the Options Overlay
 	this.optionsOverlay.id = "options-overlay-" + this.regionId + "-" + this.regionScopeId + "-" + this.regionSourceId;
-	this.optionsOverlay.innerHTML = this.generateOptionsHtml(this.optionsOverlay.id);
+	this.optionsOverlay.setHTML(this.generateOptionsHtml(this.optionsOverlay.id));
 	this.optionsOverlay.style.position = "absolute";
 	this.optionsOverlay.injectInside(document.body);
-	/*
 	this.optionsOverlay.setStyle('border-top', '1px white solid');
 	this.optionsOverlay.setStyle('border-left', '1px white solid');
-	this.optionsOverlay.setStyle('border-right', '1px gray solid');
-	this.optionsOverlay.setStyle('border-bottom', '1px gray solid');
+	this.optionsOverlay.setStyle('border-right', '1px white solid');
+	this.optionsOverlay.setStyle('border-bottom', '1px white solid');
 	this.optionsOverlay.setStyle('margin', '1px');
-	*/
 	this.optionsOverlay.setStyle('display', 'none');
-	//this.optionsOverlay.setStyle('zIndex', this.backPanelOverlay.zIndex + 1);
+	//this.optionsOverlay.setStyle('zIndex', this.backPanelOverlay.zIndex + 1);	
 	
 	this.optionsOverlay.addEvent("click", function(e) {
 		e = new Event(e);
@@ -295,15 +319,24 @@ WebStudio.PETabItem = function(el, whiteOverlay, colorOverlay, backPanelOverlay,
 
 		e.stop();
 		
+		WebStudio.util.stopPropagation(e);
+		
+		return false;
+		
 	});
 
 	// add color overlay events
 	this.colorOverlay.addEvent("click", function(e) {
+	
 		e = new Event(e);
 				
 		_this.expand();
 		
 		e.stop();
+		
+		WebStudio.util.stopPropagation(e);
+		
+		return false;
 	});
 
 	var myFx = new Fx.Style(this.colorOverlay, 'opacity', {
@@ -348,12 +381,18 @@ WebStudio.PETabItem.prototype.expand = function()
 		height = 150;
 	}
 
-	this.resizeTab(width, height);
+	this.resizeTab(width, height);	
 	
-	var unflippedColor = this.colorOverlay.style.backgroundColor;
+	var unflippedColor = this.colorOverlay.style.backgroundColor;	
+	this.origColorOverlayBackgroundColor = unflippedColor;
+	
+	// set the component as invisible
+	this.el.setStyle('visibility', 'hidden');
 
-	// flip it	
-	jQuery(this.el).flip({ direction: 'tb', bgColor: unflippedColor, color: '#333333', speed: 400 });
+	// flip it
+	var direction = 'tb';
+	//jQuery(this.el).flip({ direction: direction, bgColor: unflippedColor, color: '#333333', speed: 400 });
+	jQuery(this.colorOverlay).flip({ direction: direction, bgColor: unflippedColor, color: '#333333', speed: 400 });
 	
 	var f = function(){
 	
@@ -363,36 +402,8 @@ WebStudio.PETabItem.prototype.expand = function()
 		// show the options div
 		_this.optionsOverlay.setStyle('display', 'block');
 		
-		// launch magnifier
-    	jQuery("#magnifier_" + _this.optionsOverlay.id).magnifier({
-    		overlap: true,
-    		distance: 50,
-    		click: function(e, ui){
-    		
-    			e = new Event(e);
-    			
-    			var elem = ui.current;
-    			if(elem.id)
-    			{
-    				if(elem.id.substring(0,5) == "edit_")
-    				{
-    					_this.loadForm(_this.el.id);
-    				}
-    				if(elem.id.substring(0,11) == "standalone_")
-    				{
-    					var url = WebStudio.url.studio("/c/view/" + _this.componentId);
-    					Alf.openBrowser('component', url);
-    				}
-    				if(elem.id.substring(0,7) == "remove_")
-    				{
-    					_this.onDeleteClickEWnd();
-    				}
-    			}
-    			
-				e.stop();
-    			
-    		}
-    	});
+		// init the magnifiers
+		_this.initMagnifiers();
     	
     	// mark as "expanded"
     	_this.expanded = true;
@@ -400,7 +411,7 @@ WebStudio.PETabItem.prototype.expand = function()
 	};
 	
 	// wait 750 ms, then fire function
-	f.delay(750);
+	f.delay(750);	
 };
 
 WebStudio.PETabItem.prototype.restore = function()
@@ -413,16 +424,24 @@ WebStudio.PETabItem.prototype.restore = function()
 	// hide the back panel div
 	this.backPanelOverlay.setStyle('display', 'none');
 
-	var unflippedColor = this.colorOverlay.style.backgroundColor;
+	// restore the original background color
+	var unflippedColor = this.origColorOverlayBackgroundColor;
 	
 	// flip it	
-	jQuery(this.el).flip({ direction: 'bt', bgColor: '#333333', color: unflippedColor, speed: 400 });
+	//jQuery(this.el).flip({ direction: 'bt', bgColor: '#333333', color: unflippedColor, speed: 400 });
+	jQuery(this.colorOverlay).flip({ direction: 'bt', bgColor: '#333333', color: unflippedColor, speed: 400 });
 
 	var f = function(){
 	
 		var height = _this.originalHeight;
 		var width = _this.originalWidth;
-			
+
+		// remove the magnifiers (if they exist)
+		_this.removeMagnifiers();
+		
+		// show the component again
+		_this.el.setStyle('visibility', 'visible');
+		
     	// unmark as "expanded"
     	_this.expanded = false;
 
@@ -478,22 +497,34 @@ WebStudio.PETabItem.prototype.generateOptionsHtml = function(uid)
 		html += "<tr>";
 		html += "<td colspan='2'>";
 		
-		html += "<img height='6px' src='" + WebStudio.url.studio("/overlay/default/images/spacer.gif") + "'/>";
-
-		// magnifier test block
-		html += "<div id='magnifier_" + uid + "' style='height: 32px; padding-left: 4px'>";
-	
+		html += "<table cellpadding='0' cellspacing='0' border='0'>";
+		html += "<tr>";
+		
 		// Edit Command
+		html += "<td width='70px'>";
+		html += "<div id='magnifier_edit_" + uid + "' style='height: 32px; padding-left: 4px'>";
 		html += "<img id='edit_"+uid+"' src='" + WebStudio.url.studio("/overlay/default/images/componentedit/paper&pencil_48.png") + "' width='48' height='48' style='padding: 8px' title='Edit the properties for this component' />";
+		html += "</div>";
+		html += "</td>";
 	
 		// View Standalone
+		html += "<td width='70px'>";
+		html += "<div id='magnifier_standalone_" + uid + "' style='height: 32px; padding-left: 4px'>";
 		html += "<img id='standalone_"+uid+"' src='" + WebStudio.url.studio("/overlay/default/images/componentedit/computer_48.png") + "' width='48' height='48' style='padding: 8px' title='View this component standalone (in a new window)' />";
+		html += "</div>";
+		html += "</td>";
 	
 		// Remove
+		html += "<td width='70px'>";
+		html += "<div id='magnifier_remove_" + uid + "' style='height: 32px; padding-left: 4px'>";
 		html += "<img id='remove_"+uid+"' src='" + WebStudio.url.studio("/overlay/default/images/componentedit/cancel_48.png") + "' width='48' height='48' style='padding: 8px' title='Remove this component' />";
-	
 		html += "</div>";
+		html += "</td>";
 		
+		html += "</tr>";
+		html += "</table>";
+	
+
 		html += "</td>";
 		html += "</tr>";
 	}
@@ -502,10 +533,10 @@ WebStudio.PETabItem.prototype.generateOptionsHtml = function(uid)
 		// otherwise, we'll just show information about the region
 		html += "<tr>";
 		html += "<td><img src='" + regionImageUrl + "'/></td>";
-		html += "<td>";
-		html += this.regionId;
+		html += "<td width='100%'>";
+		html += "<b>Region:</b> " + this.regionId;
 		html += "<br/>";
-		html += this.regionScopeId;
+		html += "<b>Scope:</b> " + this.regionScopeId;
 		html += "</td>";
 		html += "</tr>";
 	}
@@ -513,6 +544,97 @@ WebStudio.PETabItem.prototype.generateOptionsHtml = function(uid)
 	html += "</table>";
 	
 	return html;
+};
+
+WebStudio.PETabItem.prototype.removeMagnifiers = function()
+{
+	var _this = this;
+	
+	if(this.hasMagnifiers)
+	{
+		jQuery("#magnifier_edit_" + _this.optionsOverlay.id).magnifier("destroy");
+		jQuery("#magnifier_standalone_" + _this.optionsOverlay.id).magnifier("destroy");
+		jQuery("#magnifier_remove_" + _this.optionsOverlay.id).magnifier("destroy");
+	}
+	
+	this.hasMagnifiers = false;
+};
+
+WebStudio.PETabItem.prototype.resetMagnifiers = function()
+{
+	var _this = this;
+	
+	if(this.hasMagnifiers)
+	{
+		_this.removeMagnifiers();
+	}
+	
+	_this.optionsOverlay.setHTML(_this.generateOptionsHtml(_this.optionsOverlay.id));
+};
+
+WebStudio.PETabItem.prototype.initMagnifiers = function()
+{
+	var _this = this;
+	
+	// reset existing magnifiers if they are in place
+	this.resetMagnifiers();
+
+	// launch edit magnifier
+   	jQuery("#magnifier_edit_" + _this.optionsOverlay.id).magnifier({
+   		overlap: true,
+   		distance: 50,
+   		click: function(e, ui){
+   		
+   			e = new Event(e);
+   			
+   			var elem = ui.current;
+   			if(elem.id)
+   			{
+  					_this.loadForm(_this.el.id);
+  				}
+   			
+			e.stop();    			
+   		}
+   	});
+
+	// launch edit magnifier
+   	jQuery("#magnifier_standalone_" + _this.optionsOverlay.id).magnifier({
+   		overlap: true,
+   		distance: 50,
+   		click: function(e, ui){
+   		
+   			e = new Event(e);
+   			
+   			var elem = ui.current;
+   			if(elem.id)
+   			{
+  					var url = WebStudio.url.studio("/c/view/" + _this.componentId);
+  					Alf.openBrowser('component', url);
+  				}
+   			
+			e.stop();
+   		}
+   	});
+
+	// launch edit magnifier
+   	jQuery("#magnifier_remove_" + _this.optionsOverlay.id).magnifier({
+   		overlap: true,
+   		distance: 50,
+   		click: function(e, ui){
+   		
+   			e = new Event(e);
+   			
+   			var elem = ui.current;
+   			if(elem.id)
+   			{
+  					_this.onDeleteClickEWnd();
+   			}
+   			
+			e.stop();    			
+   		}
+   	});
+   	
+   	this.hasMagnifiers = true;
 };
 
 WebStudio.PETabItem.prototype.resize = function()
@@ -682,6 +804,12 @@ WebStudio.PETabItem.prototype.resize = function()
 		// ensure these overlays show up
 		this.whiteOverlay.style.display = "block";
 		this.colorOverlay.style.display = "block";		
+		
+		if(this.optionsOverlay && this.hasMagnifiers)
+		{
+			// reset magnifiers if they are in place
+			this.initMagnifiers();	
+		}
 	}
 	else
 	{
@@ -708,20 +836,12 @@ WebStudio.PETabItem.prototype.resizeTab = function(w, h)
 
 WebStudio.PETabItem.prototype.onAddClickEWnd = function()
 {
-	/*
-	var w = new WebStudio.Wizard();
-	w.setDefaultJson( {
-		regionId: this.regionId,
-		regionScopeId: this.regionScopeId,
-		regionSourceId: this.regionSourceId,
-		refreshSession:'true'
-	});
-	w.start(WebStudio.ws.studio('/wizard/addnewcomponent'), 'addnewcomponent');
-	*/
 };
 
 WebStudio.PETabItem.prototype.onDeleteClickEWnd = function()
 {
+	var _this = this;
+	
 	var w = new WebStudio.Wizard();
 	w.setDefaultJson({
 		regionId: this.regionId,
@@ -731,22 +851,74 @@ WebStudio.PETabItem.prototype.onDeleteClickEWnd = function()
 		componentTypeId: this.componentTypeId
 	});
 	w.start(WebStudio.ws.studio('/wizard/removecomponent'), 'removecomponent');
+	w.onComplete = function() 
+	{
+		// break down this component and its overlays
+		_this.optionsOverlay.setStyle('display', 'none');
+		_this.backPanelOverlay.setStyle('display', 'none');
+		_this.whiteOverlay.setStyle('display', 'none');
+		
+		// remove the magnifiers (if they exist)
+		_this.removeMagnifiers();
+		
+		// hide the component
+		_this.el.setStyle('visibility', 'none');
+
+		// restore color overlay
+		var unflippedColor = _this.origColorOverlayBackgroundColor;
+		_this.colorOverlay.setStyle('background-color', unflippedColor);
+				
+    	// unmark as "expanded"
+    	_this.expanded = false;
+
+		// force tab to resize to underlying element
+		Alf.resizeToChildren(_this.el);
+		    	
+    	// resize tabs to their underlying dom element
+    	_this.pageEditor.resizeTabItems();			
+		
+		// do a little explode effect
+		// why not, it is fun
+		_this.colorOverlay.setStyle("background-color", "#000000");
+		_this.colorOverlay.setOpacity(1);
+		jQuery(_this.colorOverlay).hide("explode", { pieces: 49 }, 1300);
+
+		var aFunc = function()
+		{
+			// unbind the old component
+			WebStudio.unconfigureComponent(_this.el.id);
+			_this.colorOverlay.setStyle('display', 'none');
+			
+			// set up the binding
+			var binding = { };
+			
+			// region data
+			binding["regionId"] = _this.regionId;
+			binding["regionScopeId"] = _this.regionScopeId;
+			binding["regionSourceId"] = _this.regionSourceId;
+			
+			// component binding data
+			// leave empty
+			//binding["componentId"] = _this.componentId;
+			//binding["componentTypeId"] = _this.componentTypeId;
+			//binding["componentTitle"] = _this.componentTitle;
+			//binding["componentTypeTitle"] = _this.componentTypeTitle;
+			//binding["componentEditorUrl"] = _this.componentEditorUrl;
+			
+			// reload the region
+			// this will force the region to display it's default 
+			// "nothing configured for this region" message
+			_this.pageEditor.application.faultRegion(binding);
+		};
+		
+		// wait until the explode effect finishes
+		aFunc.delay(1500);
+		
+	};		
 };
 
 WebStudio.PETabItem.prototype.onEditClickEWnd = function()
 {
-	/*
-	var w = new WebStudio.Wizard();
-	w.setDefaultJson( {
-		regionId: this.regionId,
-		regionScopeId: this.regionScopeId,
-		regionSourceId: this.regionSourceId,
-		componentId: this.componentId,
-		componentTypeId: this.componentTypeId,
-		refreshSession:true
-	});
-	w.start(WebStudio.ws.studio('/component/' + this.componentTypeId + '/edit'), 'editcomponent');
-	*/
 };
 
 WebStudio.PETabItem.prototype.onCloseEWnd = function()

@@ -13,14 +13,6 @@
 	String regionId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
 	String regionScopeId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
 %>
-<div id="<%=htmlId%>" style="border-top: 1px black solid; border-left: 1px black solid; border-right: 1px #fafafa solid; border-bottom: 1px #fafafa solid; background-color: #f5f5f5">
-Region: <b><%=regionId%></b>
-<br/>
-Scope: <b><%=regionScopeId%></b>
-<br/>
-<br/>
-This region has nothing in it.
-<br/>
-Drop a component here to bind it into the page.
-<br/>
+<div id="<%=htmlId%>" style="border-top: 2px #aaaaaa dotted; border-left: 2px #aaaaaa dotted; border-right: 2px #aaaaaa dotted; border-bottom: 2px #aaaaaa dotted; padding: 8px; margin: 2px; color: #aaaaaa" align="center" valign="middle">
+<i><%=regionId%></i>
 </div>

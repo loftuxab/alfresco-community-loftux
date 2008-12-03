@@ -193,7 +193,7 @@ version: 2.5.1
 
 .ygtvspacer { height: 22px; width: 12px; }
 
-.ATVWebComponents {
+.DragClone {
 	color:black;
 	font-size:11px;
 	height:16px;

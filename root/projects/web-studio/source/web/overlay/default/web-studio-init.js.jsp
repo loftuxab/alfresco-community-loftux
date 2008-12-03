@@ -119,6 +119,9 @@ WebStudio.originalContextPath = "<%=originalContextPath%>";
 WebStudio.proxyStudioPath = "<%=proxyStudioPath%>";
 WebStudio.proxyRepoPath = "<%=proxyRepoPath%>";
 
+// IsLoaded
+WebStudio.isLoaded = false;
+
 /**
  * WebStudio top-level context namespace.
  * 
@@ -191,8 +194,7 @@ WebStudio.request = WebStudio.request ||
 	contextPath : <%=(contextPath == null ? "null" : "\"" + contextPath + "\"") %>
 };
 
-
-window.addEvent('load', function()
+WebStudio.onLoad = function()
 {
 	var templateData = "<%=cleanup(overlayTemplate.toString())%>";
 	
@@ -315,6 +317,15 @@ window.addEvent('load', function()
 
 	// Start Web Studio
 	WebStudio.app.init();
+};
+
+// set up the load handler
+window.addEvent('load', function() {
+
+	if(!WebStudio.isLoaded)
+	{
+		WebStudio.onLoad();
+		WebStudio.isLoaded = true;
+	}
+	
 });
-
-

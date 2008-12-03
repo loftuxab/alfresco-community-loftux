@@ -172,7 +172,59 @@ WebStudio.util = WebStudio.util ||  {
 			}
 		}
 	}
-	
+	,
+	loadDependencies: function(loaderId, parentNode, onLoad)
+	{
+		var data = { };
+		var loader = null;
+		
+		for(var z = 0; z < parentNode.childNodes.length; z++)
+		{
+			var el = parentNode.childNodes[z];
+			
+			var tag = el.nodeName;
+			
+			var dataId = "Data" + z;
+			
+			var dataElement = null;
+			
+			if(tag == "SCRIPT")
+			{
+				var src = el.getProperty("src");
+				if(src)
+				{
+					dataElement = {
+						name: dataId,
+						path: src,
+						type: 'js'
+					};
+					data[dataId] = dataElement;
+				}
+			}
+			
+			if(tag == "LINK")
+			{
+				var href = el.getProperty("href");
+				if(href)
+				{
+					dataElement = {
+						name: dataId,
+						path: href,
+						type: 'css'
+					};
+					data[dataId] = dataElement;	
+				}
+			}
+		}
+		
+		loader = new Alf.sourceLoader(loaderId, data);
+		loader.jsPath = '';
+		loader.cssPath = '';	
+		loader.onLoad = onLoad;
+		loader.load();
+		
+		return loader;	
+	}	
 };
 
 /**
@@ -592,18 +644,50 @@ WebStudio.Bootstrap.prototype.check = function()
 
 WebStudio.configureRegion = function(elId, regionId, regionScopeId, regionSourceId)
 {
-	$(elId).setAttribute('regionId', regionId);
-	$(elId).setAttribute('regionScopeId', regionScopeId);
-	$(elId).setAttribute('regionSourceId', regionSourceId);
+	var el = $(elId);
+	if (el)
+	{
+		el.setAttribute('regionId', regionId);
+		el.setAttribute('regionScopeId', regionScopeId);
+		el.setAttribute('regionSourceId', regionSourceId);
+	}
+};
+
+WebStudio.unconfigureRegion = function(elId)
+{
+	var el = $(elId);
+	if (el)
+	{
+		el.removeAttribute('regionId');
+		el.removeAttribute('regionScopeId');
+		el.removeAttribute('regionSourceId');
+	}
 };
 
 WebStudio.configureComponent = function(elId, componentId, componentTypeId, componentTitle, componentTypeTitle, componentEditorUrl)
 {
-	$(elId).setAttribute('componentId', componentId);
-	$(elId).setAttribute('componentTypeId', componentTypeId);
-	$(elId).setAttribute('componentTitle', componentTitle);
-	$(elId).setAttribute('componentTypeTitle', componentTypeTitle);
-	$(elId).setAttribute('componentEditorUrl', componentEditorUrl);
+	var el = $(elId);
+	if (el)
+	{
+		el.setAttribute('componentId', componentId);
+		el.setAttribute('componentTypeId', componentTypeId);
+		el.setAttribute('componentTitle', componentTitle);
+		el.setAttribute('componentTypeTitle', componentTypeTitle);
+		el.setAttribute('componentEditorUrl', componentEditorUrl);
+	}
+};
+
+WebStudio.unconfigureComponent = function(elId)
+{
+	var el = $(elId);
+	if (el)
+	{
+		el.removeAttribute('componentId');
+		el.removeAttribute('componentTypeId');
+		el.removeAttribute('componentTitle');
+		el.removeAttribute('componentTypeTitle');
+		el.removeAttribute('componentEditorUrl');
+	}
 };
  
 /**
@@ -620,31 +704,134 @@ WebStudio.parser = WebStudio.parser ||
 	}
 };
 
-
-/*
-// Fix for bug in IE7
-$$.unique = function(array){
-	var elements = [];
- 
-	for (var i = 0, l = array.length; i < l; i++)
+/**
+ * WebStudio top-level components namespace.
+ *
+ * @namespace WebStudio
+ * @class WebStudio.components
+ */
+WebStudio.components = WebStudio.components ||
+{
+	newBinding: function()
 	{
-		if (array[i].$included) continue;
-		var element = $(array[i]);
- 
-		if (element && !element.$included){
- 
-			element.$included = true;
-			elements.push(element);
-		}
+		var config = { };
+		
+		config["operation"] = "bindComponent";
+		config["binding"] = { };
+		config["properties"] = { };
+		config["resources"] = { };
+		
+		return config;
 	}
- 
-	for (var n = 0, d = elements.length; n < d; n++) {
-        	//new for IE 6 and IE 7
-	  	if(window.ie) elements[n].removeAttribute('$included');
-	  	else elements[n].$included=false;
- 
-	 }
- 
-	return new Elements(elements);
+	,	
+	newImage: function(type, endpoint, path, mimetype)
+	{
+		var config = this.newBinding();
+		config["binding"]["componentType"] = "/component/common/image";
+		config["resources"]["source"] = {
+			"type" : type,
+			"endpoint" : endpoint,
+			"value" : path
+		};
+		config["properties"]["title"] = "Image Component";
+		config["properties"]["description"] = path;
+		
+		return config;	
+	}
+	,
+	newXml: function(type, endpoint, path, mimetype)
+	{
+		var config = this.newBinding();
+		config["binding"]["componentType"] = "/component/common/xmldisplay";
+		config["resources"]["source"] = {
+			"type" : type,
+			"endpoint" : endpoint,
+			"value" : path
+		};
+		config["properties"]["title"] = "XML Display Component";
+		config["properties"]["description"] = path;
+		
+		return config;
+	}
+	,
+	newInclude: function(type, endpoint, value, mimetype)
+	{
+		var config = this.newBinding();
+		config["binding"]["componentType"] = "/component/common/include";
+		config["resources"]["source"] = {
+			"type" : type,
+			"endpoint" : endpoint,
+			"value" : path
+		};
+		config["properties"]["title"] = "Include Component";
+		config["properties"]["description"] = path;
+		config["properties"]["container"] = "div";
+		
+		return config;
+	}
+	,
+	newVideo: function(type, endpoint, path, mimetype)
+	{
+		var config = this.newBinding();
+		config["binding"]["componentType"] = "/component/common/video";
+		config["resources"]["source"] = {
+			"type" : type,
+			"endpoint" : endpoint,
+			"value" : path
+		};
+		config["properties"]["title"] = "Video Component";
+		config["properties"]["description"] = path;
+		config["properties"]["mimetype"] = mimetype;
+		
+		return config;
+	}
+	,
+	newFlash: function(type, endpoint, path, mimetype)
+	{
+		var config = newVideo(type, endpoint, path, mimetype);
+		config["binding"]["componentType"] = "/component/common/jwplayer";
+		config["properties"]["title"] = "JW Flash Player";
+		
+		return config;
+	}
+	,
+	newAudio: function(type, endpoint, path, mimetype)
+	{
+		var config = this.newBinding();
+		config["binding"]["componentType"] = "/component/common/audio";
+		config["resources"]["source"] = {
+			"type" : type,
+			"endpoint" : endpoint,
+			"value" : path
+		};
+		config["properties"]["title"] = "Audio Component";
+		config["properties"]["description"] = path;
+		config["properties"]["mimetype"] = mimetype;
+		
+		return config;
+	}
+	,
+	newFlashMP3: function(type, endppint, path, mimetype)
+	{
+		var config = newAudio(type, endpoint, path, mimetype);
+		config["binding"]["componentType"] = "/component/common/flash-mp3";
+		config["properties"]["title"] = "Flash MP3";
+		
+		return config;
+	}
+	,
+	newDisplayItems: function(type, endpoint, path, mimetype)
+	{
+		var config = this.newBinding();
+		config["binding"]["componentType"] = "/component/common/display-items";
+		config["resources"]["source"] = {
+			"type" : type,
+			"endpoint" : endpoint,
+			"value" : path
+		};
+		config["properties"]["title"] = "Display Items Component";
+		config["properties"]["container"] = "div";
+		
+		return config;	
+	}
 };
-*/

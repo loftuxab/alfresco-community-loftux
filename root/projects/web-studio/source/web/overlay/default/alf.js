@@ -143,20 +143,78 @@ Alf.parseInt = function(value)
 
 Alf.resizeToChildren = function(el)
 {
+	var maxWidth = 0;
+	var maxHeight = 0;
+	
+	var thisWidth = 0;
+	var thisHeight = 0;
+	
 	// recompute size of dom element
 	for(var a = 0; a < el.childNodes.length; a++)
 	{
-		var tag = el.childNodes[a].nodeName;
+		var childNode = el.childNodes[a];
+		var tag = childNode.nodeName;
 		if(tag)
 		{
-			if( (tag != "SCRIPT") && (tag != "LINK") )
+			if (tag == "SCRIPT")
 			{
-				if(el.childNodes[a].offsetWidth)
+			}
+			else if (tag == "LINK")
+			{
+			}
+			else if (tag == "OBJECT")
+			{
+				thisWidth = childNode.getAttribute("width");
+				if (thisWidth && (thisWidth > maxWidth))
 				{
-					el.style.width = el.childNodes[a].offsetWidth;
-					el.style.height = el.childNodes[a].offsetHeight;
+					maxWidth = thisWidth;
+				}
+
+				thisHeight = childNode.getAttribute("height");
+				if (thisHeight && (thisHeight > maxHeight))
+				{
+					maxHeight = thisHeight;
+				}
+			}
+			else
+			{
+				thisWidth = childNode.offsetWidth;
+				if (thisWidth && (thisWidth > maxWidth))
+				{
+					maxWidth = thisWidth;
+				}
+				
+				thisHeight = childNode.offsetHeight;
+				if (thisHeight && (thisHeight > maxHeight))
+				{
+					maxHeight = thisHeight;
 				}
 			}
 		}
-	}			
+	}
+	
+	el.setStyle("height", maxHeight);
+	el.setAttribute("height", maxHeight);
+	el.setStyle("width", maxWidth);
+	el.setAttribute("width", maxWidth);
+};
+
+Alf.evaluate = function(text)
+{
+	jQuery.globalEval( text );
+};
+
+Alf.fireEvent = function(obj, evt)
+{
+	var fireOnThis = obj;
+	if (document.createEvent) 
+	{
+		var evObj = document.createEvent("MouseEvents");
+		evObj.initEvent(evt, true, false);
+		fireOnThis.dispatchEvent(evObj);
+	}
+	else if (document.createEventObject) 
+	{
+		fireOnThis.fireEvent("on" + evt);
+	}
 };

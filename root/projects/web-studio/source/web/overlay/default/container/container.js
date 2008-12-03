@@ -26,36 +26,34 @@ WebStudio.Application = function()
 
 	this.defaultElementsConfig = {
 	
-		StartEditControl: {
+		FloatingMenuControl: {
 	
-			selector: 'div[id=AAStartEditControl]',
+			selector: 'div[id=FloatingMenuControl]',
 			blockSelection: true,
 			objects: {
-				ContentManagedIcon: {
-					selector: '.AAContentManagedIcon',
+				FloatingMenuOptions: {
+					selector: '.FloatingMenuOptions',
 					events: {
-						click: function() {
-							WebStudio.app.toggleEdit();
+						mouseenter: function() {
+							this.setStyle('text-decoration', 'underline');
+						},
+						mouseleave: function() {
+							this.setStyle('text-decoration', 'none');
 						}
 					}
 				},
-				ContentEditIcon: {
-					selector: '.AAContentEditIcon',
-					events: {
-						click: function() {
-							WebStudio.app.toggleEdit();
-						}
-					}
+				FloatingMenuWebProjectId: {
+					selector: '.FloatingMenuWebProjectId'
 				},
-				ContentEditCaption: {
-					selector: '.AAContentEditCaption',
-					events: {
-						click: function() {
-							WebStudio.app.toggleEdit();
-						}
-					}
+				FloatingMenuSandboxId: {
+					selector: '.FloatingMenuSandboxId'
 				}
-			}
+			},
+			events: {
+				click: function() {
+					WebStudio.app.toggleEdit();
+				}
+			}			
 		}
 		,
 		PanelsHolder: {
@@ -307,15 +305,16 @@ WebStudio.Application.prototype.newMountSelectorItem = function(id, title, image
 	var _this = this;
 	
 	var mountSelectorRoot = new Element('div', { 
-		'class': 'MountSelectorRoot', 
+		'class': 'MountSelectorRoot',
+		'height': '21px', 
 		'styles': { width: '70px' }
 	});
 	
 	var table = new Element('table', {
 		'height': '21px',
-		'cellpadding': 0,
-		'cellspacing': 0,
-		'border': 0
+		'class': 'MountSelectorTable',
+		'cellpadding': '0',
+		'cellspacing': '0'
 	});
 	Alf.injectInside(mountSelectorRoot, table);
 	
@@ -334,8 +333,8 @@ WebStudio.Application.prototype.newMountSelectorItem = function(id, title, image
 	// TD IMAGE
 	var td2 = new Element('td', {
 		'class': 'MountSelectorCenter',
-		'valign': 'middle',
 		'height' : '21px',
+		'valign' : 'center',
 		'events': {
 			'click' : function() {
 				_this.onMountSelectorClick(id);
@@ -347,7 +346,6 @@ WebStudio.Application.prototype.newMountSelectorItem = function(id, title, image
 		'src': imageUrl,
 		'border': 0
 	});
-	img.setStyle('vertical-align', 'middle');
 	Alf.injectInside(td2, img);
 	
 	// TD TITLE
@@ -359,15 +357,15 @@ WebStudio.Application.prototype.newMountSelectorItem = function(id, title, image
 	var td3 = new Element('td', {
 		'id': 'mountSelectorItem_' + id,
 		'class': td3class,
-		'valign': 'middle',
 		'height' : '21px',
+		'valign' : 'center',
 		'events': {
 			'click' : function() {
 				_this.onMountSelectorClick(id);
 			}
 		}
 	});
-	td3.setHTML("<span style='display:inline-block; vertical-align: middle'>" + title + "</span>");
+	td3.setHTML(title);
 	Alf.injectInside(tr, td3);
 	
 	// TD SPACER
@@ -1204,16 +1202,43 @@ WebStudio.Application.prototype._refreshObjects = function(options, onComplete, 
 WebStudio.Application.prototype.updateFloatingMenu = function() 
 {
 	var top = this.getWindowSize().h - 70;
-	var left = 15;
+	var left = 25;
 	
-	this.StartEditControl.el.setStyles({
+	this.FloatingMenuControl.el.setStyles({
 		top: top,
 		left: left
 	});
 	
+	// set up the floating caption
+	this.updateFloatingMenuCaption();
+	
+	var floatingMenuIcon = $('FloatingMenuIcon');
+	
+	// set up the floating icon
+	if(this.editState == 'edit')
+	{
+		floatingMenuIcon.removeClass("FloatingMenuIconView");
+		floatingMenuIcon.addClass("FloatingMenuIconEdit");
+	}
+	else
+	{
+		floatingMenuIcon.removeClass("FloatingMenuIconEdit");
+		floatingMenuIcon.addClass("FloatingMenuIconView");
+	}
+	
+	// position the icon
+	floatingMenuIcon.setStyles({
+		top: top - 15,
+		left: left - 15,
+		width: '64px',
+		height: '64px'
+	});
+	
 	// update the z-index to bring it to the top
-	this.StartEditControl.el.setStyle('z-index', WebStudio.WindowsZIndex + 1);
-	WebStudio.WindowsZIndex++;				
+	this.FloatingMenuControl.el.setStyle('z-index', WebStudio.WindowsZIndex + 1);
+	WebStudio.WindowsZIndex++;					
+	floatingMenuIcon.setStyle('z-index', WebStudio.WindowsZIndex + 1);
+	WebStudio.WindowsZIndex++;
 };
 
 /**
@@ -1222,7 +1247,8 @@ WebStudio.Application.prototype.updateFloatingMenu = function()
 WebStudio.Application.prototype.showFloatingMenu = function()
 {
 	// default, hide stuff
-	this.StartEditControl.el.style.display = "none";
+	this.FloatingMenuControl.el.style.display = "none";
+	$('FloatingMenuIcon').style.display = "none";
 	
 	// Check whether the user is authenticated
 	if(this.userAuth())
@@ -1230,7 +1256,8 @@ WebStudio.Application.prototype.showFloatingMenu = function()
 		// Check whether we've picked a sandbox
 		if(this.sandboxMounted())
 		{
-			this.StartEditControl.el.style.display = "";
+			this.FloatingMenuControl.el.style.display = "";
+			$('FloatingMenuIcon').style.display = "block";
 		}
 	}
 };
@@ -1263,7 +1290,7 @@ WebStudio.Application.prototype.startEdit = function()
 	{
 		var postFunction = function()
 		{
-			_this.startEdit();			
+			_this.startEdit();
 		};
 	
 		this.startApplications(postFunction);
@@ -1278,8 +1305,6 @@ WebStudio.Application.prototype.startEdit = function()
 		this.panels.showPanels();
 	}
 
-	this.setEditControlCaption(WebStudio.context.getStoreId());
-	    
 	this.panels.generalLayer.setStyle('margin-top', this.getTopOffset());
 	this.panels.setHeight(this.panels.getHeight() - this.getTopOffset());
 	this.editState = 'edit';
@@ -1301,7 +1326,7 @@ WebStudio.Application.prototype.endEdit = function()
 		this.panels.hidePanel(true);
 	}
 	
-	this.setEditControlCaption(WebStudio.context.getStoreId());
+	this.updateFloatingMenuCaption();
 	
 	this.panels.generalLayer.setStyle('margin-top', 0);
 	this.panels.setHeight(this.panels.getHeight() + this.getTopOffset());
@@ -1334,9 +1359,25 @@ WebStudio.Application.prototype.endEdit = function()
 /**
  * Sets the text for the edit control
  */
-WebStudio.Application.prototype.setEditControlCaption = function(text) 
+WebStudio.Application.prototype.updateFloatingMenuCaption = function() 
 {
-	this.StartEditControl[0].ContentEditCaption.el.setHTML(text);
+	var webProjectId = WebStudio.context.getWebProjectId();
+	var sandboxId = WebStudio.context.getSandboxId();
+	
+	this.FloatingMenuControl[0].FloatingMenuWebProjectId.el.setHTML(webProjectId);
+	this.FloatingMenuControl[0].FloatingMenuSandboxId.el.setHTML(sandboxId);
+	
+	var html = "<img src='" + WebStudio.overlayImagesPath + "/arrow-right.gif'/>";
+	html += "Start Editing";
+	
+	if(this.editState == 'edit')
+	{
+		// editor is on
+		html = "<img src='" + WebStudio.overlayImagesPath + "/arrow.gif'/>";
+		html += "Stop Editing";
+	}
+
+	this.FloatingMenuControl[0].FloatingMenuOptions.el.setHTML(html);
 };
 
 /**

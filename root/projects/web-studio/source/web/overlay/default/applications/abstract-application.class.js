@@ -6,6 +6,8 @@ WebStudio.Applications.Abstract = new Class({
 	
 	this.isInitialized = false;
 	
+	this.activeAppletId = null;
+	
 	this.applets = { };
   }
 });
@@ -195,6 +197,8 @@ WebStudio.Applications.Abstract.prototype.showApplet = function(appletId)
 	{
 		this.slidersSector.toggleSliderData(index);
 	}
+	
+	this.setActiveAppletId(appletId);
 };
 
 WebStudio.Applications.Abstract.prototype.getMenu = function()
@@ -248,10 +252,6 @@ WebStudio.Applications.Abstract.prototype.onSelected = function()
 {
 };
 
-WebStudio.Applications.Abstract.prototype.onSelected = function()
-{
-};
-
 WebStudio.Applications.Abstract.prototype.onPanelsResize = function()
 {
 };
@@ -266,4 +266,14 @@ WebStudio.Applications.Abstract.prototype.onSlidersPanelHide = function()
 
 WebStudio.Applications.Abstract.prototype.onSlidersPanelShow = function()
 {
+};
+
+WebStudio.Applications.Abstract.prototype.setActiveAppletId = function(appletId)
+{
+	this.activeAppletId = appletId;
+};
+
+WebStudio.Applications.Abstract.prototype.getActiveAppletId = function()
+{
+	return this.activeAppletId;
 };

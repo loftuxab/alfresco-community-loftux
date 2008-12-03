@@ -192,3 +192,23 @@ WebStudio.Applets.Abstract.prototype.getContainer = function()
 WebStudio.Applets.Abstract.prototype.onClose = function()
 {
 };
+
+WebStudio.Applets.Abstract.prototype.onShowSlider = function()
+{
+	this.getApplication().setActiveAppletId(this.getId());
+	
+	if(this.onShowApplet)
+	{
+		this.onShowApplet();
+	}
+};
+
+WebStudio.Applets.Abstract.prototype.onHideSlider = function()
+{
+	if(this.onHideApplet)
+	{
+		this.onHideApplet();
+	}
+	
+	this.getApplication().setActiveAppletId(null);
+};
