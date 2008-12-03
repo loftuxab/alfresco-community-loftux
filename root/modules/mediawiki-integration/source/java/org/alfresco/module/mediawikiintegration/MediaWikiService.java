@@ -252,9 +252,10 @@ public class MediaWikiService implements Constants,
         this.permissionService.setInheritParentPermissions(mediawiki, false);
         this.permissionService.setPermission(mediawiki, wikiAdminsGroup, "WikiAdministrator", true);
         this.permissionService.setPermission(mediawiki, wikiUsersGroup, "WikiUser", true);
+        permissionService.setPermission(mediawiki, PermissionService.ALL_AUTHORITIES, "WikiUser", true);
         this.permissionService.setInheritParentPermissions(config, false);
         this.permissionService.setPermission(config, wikiAdminsGroup, "WikiAdministrator", true);
-        
+
         // Install the mediawiki db
         install(mediawiki, config);        
     }
@@ -355,6 +356,7 @@ public class MediaWikiService implements Constants,
      * 
      * @param mediaWiki     the media wiki space node reference
      */
+    @SuppressWarnings("unused")
     private void uninstall(NodeRef mediaWiki)
     {
         // Get the configuration node
