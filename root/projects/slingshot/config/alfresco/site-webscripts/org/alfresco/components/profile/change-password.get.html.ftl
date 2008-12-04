@@ -5,7 +5,7 @@
 //]]></script>
 
 <div id="${args.htmlid}-body" class="password">
-   <form id="${htmlid}-form" action="${url.serviceContext}/components/profile/change-password" method="post">
+   <form id="${htmlid}-form" action="${url.context}/service/components/profile/change-password" method="post">
    
       <div class="header-bar">${msg("label.changepassword")}</div>
       <div class="row">

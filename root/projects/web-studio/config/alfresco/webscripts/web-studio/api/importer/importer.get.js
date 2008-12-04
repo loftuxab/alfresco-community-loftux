@@ -10,7 +10,8 @@ var store = args["alfStoreId"];
 var importer = webstudio.importer;
 
 // import the archive
-importer.importArchive(store, "ROOT", url);
+var taskId = importer.importArchive(store, "ROOT", url);
 
 model.status = "ok";
-model.message = "The archive was successfully imported into store '" + store + "'.";
+model.message = "The archive import was started.";
+model.taskId = taskId;

@@ -108,6 +108,12 @@
       Web Studio Client State Provider
    -->
    <bean id="webstudio.clientStateProvider" class="org.alfresco.web.studio.client.DefaultWebStudioStateProvider" />
-   
+
+
+   <!-- Web Framework Task Manager -->
+   <bean id="webframework.taskmanager" class="org.alfresco.web.framework.TaskManager" init-method="init">
+      <property name="threadPoolSize"><value>5</value></property>
+   </bean>
+      
 </beans>
 

@@ -118,7 +118,7 @@
    
    <#if editable>
    <div id="${args.htmlid}-editview" class="hidden">
-      <form id="${htmlid}-form" action="${url.serviceContext}/components/profile/userprofile" method="post">
+      <form id="${htmlid}-form" action="${url.context}/service/components/profile/userprofile" method="post">
       
       <div class="header-bar">${msg("label.about")}</div>
       <div class="drow">

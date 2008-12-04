@@ -264,34 +264,41 @@ WebStudio.Region.prototype.setupForm = function()
 	//this.Body.el.setHTML(html);
 	Alf.setHTML(this.Body.el, html);
 	
-	// bind in events (on-click)
-	$(formId).addEvent('submit', function(e) {
-	
-		// stop the event
-		e = new Event(e).stop();
-	
-		// post the form in the background	
-		$(formId).send({
-			onSuccess: _this.saveFormSuccess,
-			onFailure: _this.saveFormError,
-			evalScripts: true,
-			headers: {
-				'Content-Type' : 'multipart/form-data',
-				'encoding': 'utf-8'			
-			}
+	var bindForm = function()
+	{
+		// bind in events (on-click)
+		$(formId).addEvent('submit', function(e) {
+		
+			// stop the event
+			e = new Event(e).stop();
+		
+			// post the form in the background	
+			$(formId).send({
+				onSuccess: _this.saveFormSuccess,
+				onFailure: _this.saveFormError,
+				evalScripts: true,
+				headers: {
+					'Content-Type' : 'multipart/form-data',
+					'encoding': 'utf-8'			
+				}
+			});
 		});
-	});
+		
+		$('formCancelButton').addEvent('click', function(e) {
 	
-	$('formCancelButton').addEvent('click', function(e) {
-
-		// stop the event
-		e = new Event(e).stop();
-
-		// close the window
-		_this.shutdown();
-	});
+			// stop the event
+			e = new Event(e).stop();
 	
-	this.formLoaded = true;	
+			// close the window
+			_this.shutdown();
+		});
+		
+		this.formLoaded = true;	
+	};
+	
+	// delay the form binding by a bit to allow time for the DOM to settle
+	// TODO: would be much better to listen to changestate events
+	bindForm.delay(500);
 };
 
 WebStudio.Region.prototype.build = function() 

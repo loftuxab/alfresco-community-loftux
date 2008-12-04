@@ -1,4 +1,5 @@
 {
 	"status" : "${status}",
-	"message" : "${message}"
+	"message" : "${message}",
+	"taskId" : "${taskId}"
 }

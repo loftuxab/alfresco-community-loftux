@@ -27,6 +27,7 @@ package org.alfresco.web.studio;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.web.config.WebStudioConfigElement;
+import org.alfresco.web.framework.TaskManager;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.studio.client.WebStudioStateProvider;
 import org.apache.commons.logging.Log;
@@ -54,5 +55,10 @@ public class WebStudio
     {
         return (WebStudioStateProvider) FrameworkHelper.getApplicationContext()
                 .getBean("webstudio.clientStateProvider");
+    }
+    
+    public static TaskManager getTaskManager()
+    {
+        return (TaskManager) FrameworkHelper.getApplicationContext().getBean("webframework.taskmanager");
     }
 }

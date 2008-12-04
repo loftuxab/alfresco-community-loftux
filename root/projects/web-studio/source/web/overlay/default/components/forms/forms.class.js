@@ -329,9 +329,7 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 			// a local scope				
 			var f5 = function()
 			{	
-				var br = document.createElement("br");
-				WebStudio.util.injectInside(this.BodyContent.el, br);
-				
+
 				var control = WebStudio.util.clone(this.AlfFormCombo.el);			
 				
 				WebStudio.util.injectInside(this.BodyContent.el, control);
@@ -339,7 +337,7 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 				var label = control.getElementsBySelector(".alf-form-label")[0];
 	
 				var container = control.getElementsBySelector(".alf-form-field-container")[0];
-				
+
 				// build the dropdown list	
 				var dropdownlist = [];							
 				for (var i = 0; i < item.value.length; i++)
