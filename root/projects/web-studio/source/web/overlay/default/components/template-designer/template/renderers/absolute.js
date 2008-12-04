@@ -191,28 +191,39 @@ Alfresco.AbsolutePositionRenderer.Template.prototype.templateOnClick = function(
 { 	
     // Get click target.
     var target = YAHOO.util.Event.getTarget(e);    
-
- 	var menuContainerDiv = document.getElementById("menuContainerDiv");
-
+	
  	if(target.id == element.id)
  	{
  		WebStudio.util.stopPropagation(e);
- 		
-	 	this.purgeElement(menuContainerDiv);
-				
+ 	
+ 	
+		var menuContainerDiv = document.getElementById("menuContainerDiv");
+
+		if(menuContainerDiv && menuContainerDiv != 'undefined')
+		{
+	 		this.purgeElement(menuContainerDiv);
+		}
+		
 	    // Create a clean context menu container div and insert into the Template object's root element.
 	    menuContainerDiv = document.createElement('div');
 	    menuContainerDiv.setAttribute('id', 'menuContainerDiv');
 		YAHOO.util.Dom.addClass(menuContainerDiv, 'yui-skin-sam');	    
-	              
-	    menuContainerDiv = document.createElement('div');
-	    menuContainerDiv.setAttribute("id", "menuContainerDiv");    
-	    YAHOO.util.Dom.addClass(menuContainerDiv, 'yui-skin-sam');
-		  	
+		          
 	    WebStudio.util.injectInside(this.templateContainerDiv, menuContainerDiv);
 	    
+	    // Let's make sure that we don't already have
+	    // a templateContextMenu element.
+		var menuDiv = document.getElementById("templateContextMenu");
+		
+		if(menuDiv && menuDiv != 'undefined')
+		{
+			this.purgeElement(menuDiv);		
+		}
+		
 	    var objContextMenu = new YAHOO.widget.Menu("templateContextMenu", { fixedcenter: false });   
 		        
+		objContextMenu.clearContent();
+		
 	    objContextMenu.addItems([
 	                             {id: 'addRegion', 
 	                             text: "Add Region",
@@ -232,7 +243,7 @@ Alfresco.AbsolutePositionRenderer.Template.prototype.templateOnClick = function(
 	    WebStudio.util.setStyle(contextMenuElement, 'position', 'absolute');
 	        
 	    // Set X,Y coordinates.              
-	    WebStudio.util.setStyle(contextMenuElement, 'top', (e.clientY - 18));	    
+	    WebStudio.util.setStyle(contextMenuElement, 'top', (e.clientY - 28));	    
 	    
 	    WebStudio.util.setStyle(contextMenuElement, 'left', (e.clientX - 269));	    
  	}
@@ -686,7 +697,6 @@ Alfresco.AbsolutePositionRenderer.Region.prototype.saveTemplateInstance = functi
 
 Alfresco.AbsolutePositionRenderer.Region.prototype.regionOnClick = function(e, element)
 {
-	
     // Get actual click event target.      
     var target = YAHOO.util.Event.getTarget(e);    
             
@@ -708,7 +718,7 @@ Alfresco.AbsolutePositionRenderer.Region.prototype.regionOnClick = function(e, e
     WebStudio.util.setStyle(contextMenuElement, 'position', 'absolute');
         
     // Set X,Y coordinates.              
-    WebStudio.util.setStyle(contextMenuElement, 'top', (e.clientY - 18));
+    WebStudio.util.setStyle(contextMenuElement, 'top', (e.clientY - 28));
     WebStudio.util.setStyle(contextMenuElement, 'left', (e.clientX - 269));        
 };
 
@@ -733,7 +743,9 @@ Alfresco.AbsolutePositionRenderer.Region.prototype.createMenu = function()
         
         // Let's look for a previous template context menu in the DOM.
         var contextMenuElement = document.getElementById("regionContextMenu");
-        
+      
+	    this.purgeDOMElement(contextMenuElement);
+	    
         // If we find one, let's make sure it is defined and then we can try to retrieve it from the menu manager
         if(contextMenuElement && contextMenuElement != 'undefined')
         {
@@ -752,11 +764,16 @@ Alfresco.AbsolutePositionRenderer.Region.prototype.createMenu = function()
                 // Added to menu manager.
                 YAHOO.widget.MenuManager.addMenu(objContextMenu);            
             }             
+            
+            objContextMenu.clearContent();
+            
             // Add menu items.
             this.addMenuItems(objContextMenu);  
         } else {
             // Let's create new menu object
             objContextMenu = new YAHOO.widget.Menu("regionContextMenu", { fixedcenter: false });                       
+
+            objContextMenu.clearContent();
         
             // Add menu items
             this.addMenuItems(objContextMenu);

@@ -1,13 +1,15 @@
 {
-	"status" : "${status}"
-	
-<#if status == 'ok'>	
+	"status" : "${status}"	
 	,	
 	"webProjectId" : "${webProjectId}"
 	,
 	"sandboxId" : "${sandboxId}"
 	,
 	"storeId" : "${storeId}"
-</#if>
+
+<#if status == 'importing'>
+	,
+	"taskId" : "${taskId}"
+</#if>	
 
 }

@@ -53,28 +53,28 @@ if(response != null)
 	// Should not technically be necessary for new sites... but we'll leave it in for now.
 	removeSiteObjects();
 	
+
 	// Now create the site
 	if(basedOn == "none")
 	{
 		// set up a basic site via scripting
 		var siteConfiguration = createSite(title, description);
-	}
-	else if(basedOn == "starter")
-	{
-		// set up a very basic starter site via scripting
-		// TODO
+		
+		model.status = 'completed';
 	}
 	else
 	{
 		// load the site information from network
 		var site = getSite(basedOn);
-		
-		// import the archive
-		var url = site.archiveUrl;		
-		webstudio.importer.importArchive(model.storeId, model.webappId, url);
-	}
 
-	model.status = 'ok';
+		// import the archive asynchronously
+		// this will give us back a task id that we can check against
+		// to see if and when the job finally completes
+		var taskId = webstudio.importer.importArchive(model.storeId, model.webappId, site.archiveUrl);
+		
+		model.status = 'importing';
+		model.taskId = taskId;		
+	}
 }
 
 if(model.status == null)

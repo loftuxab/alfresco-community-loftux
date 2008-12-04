@@ -518,7 +518,7 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 		var _userStoreId = webSiteId + "--" + WebStudio.context.getCurrentUserId();		
 		
 		// call web studio to tell it to create the web project
-		var url = WebStudio.ws.studio("/api/site/create", { 
+		var createWebSiteUrl = WebStudio.ws.studio("/api/site/create", { 
 			id: webSiteId, 
 			name: webSiteName, 
 			description: webSiteDescription, 
@@ -527,55 +527,131 @@ WebStudio.Application.prototype.webSiteCreateHandler = function(e)
 			sandboxId: _userSandboxId 
 		});
 		
+		var refreshCacheOnComplete = function() 
+		{
+			// callback once cache finishes refreshing
+			var fCallback = function()
+			{
+				// refresh the page
+				_this.refreshBrowser();
+				
+			};
+			
+			// refresh all caches
+			_this.refreshAll(fCallback);
+			
+		};
+		
+		var refreshCacheOnFailure = function() 
+		{				
+			_this.sandboxDialog.popout();
+			
+			// TODO			
+		};
+		
+		var allDone = function()
+		{
+			_this.setContext(WebStudio.context.webProjectId, WebStudio.context.sandboxId, WebStudio.context.storeId, refreshCacheOnComplete, refreshCacheOnFailure);
+		};		
+		
 		// hide the sandbox dialog
 		this.sandboxDialog.popout();
 		
 		// launch the modal
 		this.blockNotify("Creating Web Site...");
 		
-		this.call = YAHOO.util.Connect.asyncRequest('GET', url, 
+		this.call = YAHOO.util.Connect.asyncRequest('GET', createWebSiteUrl, 
 		{	
 			success: function(r) 
-			{		
-				// set up the context
+			{
+				// at this point, the web project creation completed
+				// the web studio script either created a blank web site or
+				// else it kicked off an importer activity.
+				//
+				// if an import task was kicked off, then we've been given back
+				// a ticket and we will need to query for updates until the
+				// import has completed
+				var d = Json.evaluate(r.responseText);
 				
-				// TODO: implement a call to Mark's Web Projects sandbox services
-				// retrieve this since implementation of naming conventional may shift
-				
-				WebStudio.context.webProjectId = webSiteId;
-				WebStudio.context.sandboxId = _userSandboxId;
-				WebStudio.context.storeId = _userStoreId;
-				
-				var _onComplete = function() 
+				if(d.status == 'completed')
 				{
-					// callback once cache finishes refreshing
-					var fCallback = function()
+					// TODO: implement a call to Mark's Web Projects sandbox services
+					// retrieve this since implementation of naming conventional may shift
+
+					// set context
+					WebStudio.context.webProjectId = webSiteId;
+					WebStudio.context.sandboxId = _userSandboxId;
+					WebStudio.context.storeId = _userStoreId;
+
+					// finalize and refresh
+					allDone();
+				}
+				else if(d.status == 'importing')
+				{
+					// TODO: implement a call to Mark's Web Projects sandbox services
+					// retrieve this since implementation of naming conventional may shift
+
+					// set context
+					WebStudio.context.webProjectId = webSiteId;
+					WebStudio.context.sandboxId = _userSandboxId;
+					WebStudio.context.storeId = _userStoreId;
+
+					// the task id
+					var taskId = d.taskId;
+
+					// url to check the status of the task
+					var taskCheckUrl = WebStudio.ws.studio("/api/importer/statuscheck", { taskId: taskId }); 
+					
+					// we need to wait until the import either succeeds or it fails
+					var xf = function()
 					{
-						// refresh the page
-						_this.refreshBrowser();
-						
+						var xfCall = YAHOO.util.Connect.asyncRequest('GET', taskCheckUrl,
+						{
+							success: function(r2)
+							{
+								var d2 = Json.evaluate(r2.responseText);
+								
+								var d2_isError = d2.isError;
+								var d2_isSuccess = d2.isSuccess;
+								var d2_isFinished = d2.isFinished;
+								var d2_isRunning = d2.isRunning;
+								var d2_status = d2.status;
+								
+								if(d2_isRunning)
+								{
+									_this.blockNotify(d2_status);
+								}
+								
+								if(d2_isFinished === true)
+								{
+									if(d2_isError === true)
+									{
+										alert("Import ended in an error state");
+									}
+									if(d2_isSuccess === true)
+									{
+										// get rid of the periodical
+										$clear(xf);
+										
+										// finalize and refresh
+										allDone();										
+									}
+								}
+							}
+						});
 					};
 					
-					// refresh all caches
-					_this.refreshAll(fCallback);
-					
-				};
-				
-				var _onFailure = function() 
-				{				
-					_this.sandboxDialog.popout();
-					
-					// TODO
-					
-				};
-
-				// do another call to set the context
-				_this.setContext(WebStudio.context.webProjectId, WebStudio.context.sandboxId, WebStudio.context.storeId, _onComplete, _onFailure);
-			
+					// set up the xf function to run every 500 ms
+					xf.periodical(500);					
+				}
+				else
+				{
+					// TODO: uh oh case
+				}
 			}
 			,
 			failure: function(r) {
-		
+			
 				alert('create failed');
 						
 			}

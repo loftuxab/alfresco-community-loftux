@@ -45,12 +45,12 @@ WebStudio.TemplateDesigner.prototype.activate = function()
 	
 	// set up the frame
 	this.Frame.el.id = "AlfrescoTemplateDesignerFrame";
-//	this.Frame.el.setStyle('display', 'block');
+
 	WebStudio.util.setStyle(this.Frame.el, 'display', 'block');
 	
 	// set up the editor	
 	this.Editor.id = "AlfrescoTemplateDesignerEditor";
-//	this.Editor.el.setStyle('display', 'block');
+
 	WebStudio.util.setStyle(this.Editor.el, 'display', 'block');	
 	
 	this.resize();
@@ -62,31 +62,25 @@ WebStudio.TemplateDesigner.prototype.resize = function()
 {
 	if(this.Frame.el)
 	{
-//		this.Frame.el.setStyle('left', 0);
+
 		WebStudio.util.setStyle(this.Frame.el, 'left', 0);
 		
-//		this.Frame.el.setStyle('top', 0);
 		WebStudio.util.setStyle(this.Frame.el, 'top', 0);		
 
-//		this.Frame.el.setStyle('width', this.injectObject.offsetWidth);
 		WebStudio.util.setStyle(this.Frame.el, 'width', this.injectObject.offsetWidth);
 		
-//		this.Frame.el.setStyle('height', this.injectObject.offsetHeight);	
 		WebStudio.util.setStyle(this.Frame.el, 'height', this.injectObject.offsetHeight);		
 	}
 	
 	if(this.Editor.el)
 	{
-//		this.Editor.el.setStyle('left', '7px');
+
 		WebStudio.util.setStyle(this.Editor.el, 'left', '7px');		
 		
-//		this.Editor.el.setStyle('top', '7px');
 		WebStudio.util.setStyle(this.Editor.el, 'top', '7px');		
 		
-//		this.Editor.el.setStyle('width', this.injectObject.offsetWidth - 14);
 		WebStudio.util.setStyle(this.Editor.el, 'width', this.injectObject.offsetWidth - 14);		
 		
-//		this.Editor.el.setStyle('height', this.injectObject.offsetHeight - 14);
 		WebStudio.util.setStyle(this.Editor.el, 'height', this.injectObject.offsetHeight - 14);		
 	}
 };

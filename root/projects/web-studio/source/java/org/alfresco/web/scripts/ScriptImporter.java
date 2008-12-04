@@ -24,25 +24,13 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.RemoteClient;
-import org.alfresco.connector.Response;
 import org.alfresco.connector.exception.RemoteConfigException;
-import org.alfresco.tools.DataUtil;
-import org.alfresco.tools.ObjectGUID;
-import org.alfresco.util.TempFileProvider;
+import org.alfresco.web.framework.ImportTask;
+import org.alfresco.web.framework.Task;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.studio.WebStudio;
 
 /**
  * Utility for importing Surf assets from a remote location into the
@@ -84,204 +72,69 @@ public final class ScriptImporter extends ScriptBase
     /**
      * Imports a Surf archive into the given store from a URL location
      * 
+     * A task id is returned so that the task can be monitored asynchrously 
+     * 
      * @param store
      * @param webappId empty or webapp id
      * @param url
+     * 
+     * @return task id
      */
-    public void importArchive(String store, String webappId, String url)
+    public String importArchive(String store, String webappId, String url)
     {
+        String taskId = null;
+        
+        String taskName = "Import from: " + url;
+
+        // allow for resolution of relative url's
         if (url.startsWith("/"))
         {
             String baseUrl = context.getRequest().getScheme() + "://"
                     + context.getRequest().getServerName();
+
             if (context.getRequest().getServerPort() != 80)
             {
                 baseUrl += ":" + context.getRequest().getServerPort();
-            }
+            }            
             baseUrl += context.getRequest().getContextPath();
+            
             url = baseUrl + url;
         }
+        
+        // create the alfresco connector ahead of time
+        Connector alfrescoConnector = null;
+        try
+        {
+            alfrescoConnector = FrameworkHelper.getConnector(context, "alfresco");        
 
-        // build a remote client to the destination
-        RemoteClient r = new RemoteClient("");
-
-        // pull down the bytes
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        r.call(url, baos);
-
-        byte[] array = baos.toByteArray();
-
-        importArchive(store, webappId, array);
+            // create the task
+            ImportTask task = new ImportTask(taskName);
+            task.setAlfrescoConnector(alfrescoConnector);
+            task.setStoreId(store);
+            task.setWebappId(webappId);
+            task.setUrl(url);
+            
+            // add the task to the task manager
+            taskId = WebStudio.getTaskManager().addTask(task);
+            
+        }
+        catch(RemoteConfigException rce)
+        {
+            FrameworkHelper.getLogger().warn("Unable to load 'alfresco' endpoint connector for script import", rce);
+        }
+        
+        return taskId;
     }
-
+    
     /**
-     * Imports a Surf archive into the given store
+     * Returns a task with the given task id
      * 
-     * @param store
-     * @param webappId empty or webapp id
-     * @param array
-     */
-    public void importArchive(String store, String webappId, byte[] array)
-    {
-        // assume empty
-        String alfrescoPath = "/";
-
-        if (webappId != null && !"".equals(webappId))
-        {
-            alfrescoPath = "/WEB-INF/classes";
-        }
-
-        // write to temporary file
-        String tempFilePath = writeToTempFile(array);
-
-        // read zip file entries
-        ZipFile zf = null;
-        try
-        {
-            zf = new ZipFile(tempFilePath);
-            Enumeration en = zf.entries();
-            while (en.hasMoreElements())
-            {
-                // get the entry
-                ZipEntry zipEntry = (ZipEntry) en.nextElement();
-
-                // get the entry name
-                String zipEntryName = zipEntry.getName();
-
-                if (!zipEntry.isDirectory())
-                {
-                    if (zipEntryName.startsWith("alfresco/"))
-                    {
-                        String path = zipEntryName;
-
-                        // post to "alfresco" directory location
-                        String uri = "/remotestore/create" + alfrescoPath + "/"
-                                + path + "?s=" + store + "&w=" + webappId;
-
-                        post(zf, zipEntry, uri);
-                    }
-                    if (zipEntryName.startsWith("web-root/"))
-                    {
-                        String path = zipEntryName.substring(9);
-
-                        // post to "alfresco" directory location
-                        String uri = "/remotestore/create/" + path + "?s="
-                                + store + "&w=" + webappId;
-
-                        post(zf, zipEntry, uri);
-                    }
-                }
-            }
-
-        }
-        catch (IOException ioe)
-        {
-            FrameworkHelper.getLogger().warn(
-                    "Unable to import archive from zip: " + tempFilePath, ioe);
-        }
-        finally
-        {
-            try
-            {
-                if (zf != null)
-                {
-                    zf.close();
-                }
-
-                File f = new File(tempFilePath);
-                if (f.exists())
-                {
-                    f.delete();
-                }
-            }
-            catch (Exception e)
-            {
-                // oh well, we gave it our best shot
-            }
-        }
-    }
-
-    protected void post(ZipFile zf, ZipEntry zipEntry, String uri)
-    {
-        String zipEntryName = zipEntry.getName();
-
-        // Open a Connector to Alfresco
-        InputStream in = null;
-        try
-        {
-            in = zf.getInputStream(zipEntry);
-
-            Connector c = FrameworkHelper.getConnector(context, "alfresco");
-
-            Response response = c.call(uri, null, in);
-            if (response.getStatus().getCode() != 200)
-            {
-                // throw out
-                FrameworkHelper.getLogger().warn(
-                        "Received a " + response.getStatus().getCode()
-                                + " on call to: " + uri);
-            }
-        }
-        catch (IOException ioe)
-        {
-            // we failed to write one of the files...
-            FrameworkHelper.getLogger().warn(
-                    "The file '" + zipEntryName
-                            + "' could not be written to the store");
-        }
-        catch (RemoteConfigException rce)
-        {
-            // the "alfresco" endpoint wasn't defined
-            FrameworkHelper.getLogger().error(
-                    "The 'alfresco' endpoint could not be processed", rce);
-        }
-        finally
-        {
-            if (in != null)
-            {
-                try
-                {
-                    in.close();
-                }
-                catch (IOException i)
-                {
-                }
-            }
-        }
-    }
-
-    /**
-     * Writes the contents of an array to a temporary file
+     * @param taskId
      * 
-     * @param array
-     * @return
+     * @return task
      */
-    protected String writeToTempFile(byte[] array)
+    public Task getTask(String taskId)
     {
-        ByteArrayInputStream in = new ByteArrayInputStream(array);
-
-        String tempFileName = new ObjectGUID().toString() + ".zip";
-        File tempDir = TempFileProvider.getTempDir();
-
-        // write the temp file
-        String tempFilePath = tempDir.getPath() + File.separatorChar
-                + tempFileName;
-        File tempFile = new File(tempFilePath);
-        try
-        {
-            FileOutputStream out = new FileOutputStream(tempFile);
-            DataUtil.copyStream(in, out);
-
-            out.close();
-            in.close();
-        }
-        catch (IOException ioe)
-        {
-            ioe.printStackTrace();
-            tempFilePath = null;
-        }
-
-        return tempFilePath;
+        return WebStudio.getTaskManager().getTask(taskId);
     }
-
 }

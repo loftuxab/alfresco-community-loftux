@@ -194,7 +194,7 @@
 	
 	
 		<!-- Alfresco Form -->
-		<div id="AlfrescoForm" class="alf-form yui-skin-sam">
+		<div id="AlfrescoForm" class="alf-form yui-skin-sam" height="600px">
 			<div class="alf-form-caption"></div>
 			<div class="alf-form-body">
 				<table border="0" cellpadding="0" cellspacing="0">
