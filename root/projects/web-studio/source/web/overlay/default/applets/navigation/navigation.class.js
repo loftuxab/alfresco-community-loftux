@@ -162,19 +162,22 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 			{
 				if (this.wizardFinished)
 				{
-					var node = _treeView.getActiveNode();
-					
-					node.collapse();
-					node.childrenRendered = false;
-					node.dynamicLoadComplete = false;
-					for(var i = 0; i < node.children.length; i++)
-					{
-						_treeView.tree.removeNode(node.children[i]);
+					if(!_treeView.getActiveNode().alfIsRoot)
+					{				
+						var node = _treeView.getActiveNode();
+						
+						node.collapse();
+						node.childrenRendered = false;
+						node.dynamicLoadComplete = false;
+						for(var i = 0; i < node.children.length; i++)
+						{
+							_treeView.tree.removeNode(node.children[i]);
+						}
+						node.children = [];
+						
+						//this.activeNode = null;
+						node.expand();
 					}
-					node.children = [];
-					
-					//this.activeNode = null;
-					node.expand();
 				}
 			};			
 		});
@@ -198,21 +201,24 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 			{
 				if (this.wizardFinished)
 				{
-					var parent = _treeView.getActiveNode().parent;
-					
-					parent.collapse();
-					parent.childrenRendered = false;
-					parent.dynamicLoadComplete = false;
-					
-					for(var i = parent.children.length - 1; i >= 0; i--)
+					if(!_treeView.getActiveNode().alfIsRoot)
 					{
-						var child = parent.children[i];
-						_treeView.tree.removeNode(child);
+						var parent = _treeView.getActiveNode().parent;
+						
+						parent.collapse();
+						parent.childrenRendered = false;
+						parent.dynamicLoadComplete = false;
+						
+						for(var i = parent.children.length - 1; i >= 0; i--)
+						{
+							var child = parent.children[i];
+							_treeView.tree.removeNode(child);
+						}
+						parent.children = [];
+						
+						_treeView.activeNode = parent;			
+						parent.expand();
 					}
-					parent.children = [];
-					
-					_treeView.activeNode = parent;			
-					parent.expand();
 				}
 			};
 		});
@@ -237,20 +243,23 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 			{
 				if (this.wizardFinished)
 				{
-					var parent = _treeView.getActiveNode().parent;
-					
-					parent.collapse();
-					parent.childrenRendered = false;
-					parent.dynamicLoadComplete = false;
-					for(var i = 0; i < parent.children.length; i++)
-					{
-						var child = parent.children[i];
-						_treeView.tree.removeNode(child);
+					if(!_treeView.getActiveNode().alfIsRoot)
+					{				
+						var parent = _treeView.getActiveNode().parent;
+						
+						parent.collapse();
+						parent.childrenRendered = false;
+						parent.dynamicLoadComplete = false;
+						for(var i = 0; i < parent.children.length; i++)
+						{
+							var child = parent.children[i];
+							_treeView.tree.removeNode(child);
+						}
+						parent.children = [];
+								
+						_treeView.activeNode = parent;			
+						parent.expand();
 					}
-					parent.children = [];
-							
-					_treeView.activeNode = parent;			
-					parent.expand();
 				}
 			};
 		});
@@ -275,20 +284,23 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 			{
 				if (this.wizardFinished)
 				{
-					var parent = _treeView.getActiveNode().parent;
-					
-					parent.collapse();
-					parent.childrenRendered = false;
-					parent.dynamicLoadComplete = false;
-					for(var i = 0; i < parent.children.length; i++)
-					{
-						var child = parent.children[i];
-						_treeView.tree.removeNode(child);
+					if(!_treeView.getActiveNode().alfIsRoot)
+					{				
+						var parent = _treeView.getActiveNode().parent;
+						
+						parent.collapse();
+						parent.childrenRendered = false;
+						parent.dynamicLoadComplete = false;
+						for(var i = 0; i < parent.children.length; i++)
+						{
+							var child = parent.children[i];
+							_treeView.tree.removeNode(child);
+						}
+						parent.children = [];
+						
+						_treeView.activeNode = parent;
+						parent.expand();
 					}
-					parent.children = [];
-					
-					_treeView.activeNode = parent;
-					parent.expand();
 				}
 			};
 		});
