@@ -260,8 +260,13 @@ WebStudio.Region.prototype.setupForm = function()
 	html += "<input type=\"submit\" value=\"Save\" />";
 	html += "</div>";		
 	html += "</form>";
+
+	/*
+	jQuery(this.Body.el).load(function() {
+		//alert("The form was loaded");
+	});
+	*/
 	
-	//this.Body.el.setHTML(html);
 	Alf.setHTML(this.Body.el, html);
 	
 	var bindForm = function()
@@ -288,10 +293,26 @@ WebStudio.Region.prototype.setupForm = function()
 	
 			// stop the event
 			e = new Event(e).stop();
+
+			// get the form
+			var formId = "form" + _this.regionId + _this.regionSourceId;
+			var theForm = $(formId);
+	
+			// dismantle the form
+			if (theForm)
+			{
+				theForm.remove();
+			}
+			
+			// give this a shot
+			_this.loader.unloadAll();
 	
 			// close the window
 			_this.shutdown();
 		});
+		
+		// fire the "load" event to the form
+		Alf.fireEvent($(formId), "load");				
 		
 		this.formLoaded = true;	
 	};
@@ -299,6 +320,7 @@ WebStudio.Region.prototype.setupForm = function()
 	// delay the form binding by a bit to allow time for the DOM to settle
 	// TODO: would be much better to listen to changestate events
 	bindForm.delay(500);
+	
 };
 
 WebStudio.Region.prototype.build = function() 

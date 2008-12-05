@@ -9,7 +9,12 @@ if(source == null)
 else
 {
 	// set up the source
-	model.src = url.context + source.proxiedDownloadURI;
+	var src = source.downloadURI;
+	if(src.substring(0,1) == "/")
+	{
+		src = url.context + source.proxiedDownloadURI;
+	}
+	model.src = src;
 
 	model.title = instance.properties["title"];
 	if(model.title == null)

@@ -143,6 +143,13 @@ Alf.parseInt = function(value)
 
 Alf.resizeToChildren = function(el)
 {
+	el.setStyle("height", "auto");
+	el.setStyle("width", "auto");
+};
+
+/*
+Alf.resizeToChildren = function(el)
+{
 	var maxWidth = 0;
 	var maxHeight = 0;
 	
@@ -198,6 +205,7 @@ Alf.resizeToChildren = function(el)
 	el.setStyle("width", maxWidth);
 	el.setAttribute("width", maxWidth);
 };
+*/
 
 Alf.evaluate = function(text)
 {

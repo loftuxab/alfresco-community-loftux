@@ -7,7 +7,13 @@ if(source == null)
 }
 else
 {
-	model.src = url.context + source.proxiedDownloadURI;
+	// set up the source
+	var src = source.downloadURI;
+	if(src.substring(0,1) == "/")
+	{
+		src = url.context + source.proxiedDownloadURI;
+	}
+	model.src = src;
 
 	// mimetype
 	model.mimetype = instance.object.properties["mimetype"];

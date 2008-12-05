@@ -40,6 +40,7 @@
 	
 	// Include YUI SAM Elements
 	yuiInclude(request, buffer, "/yui/assets/skins/sam", "skin.css");
+	//<link rel="stylesheet" type="text/css" href="${url.context}/yui/editor/assets/skins/sam/editor.css"/>
 	
 	// Include Web Studio Core Dialogs
 	OverlayUtil.include(request, buffer, "/overlay/default/dialogs/login-dialog.class.css.jsp");

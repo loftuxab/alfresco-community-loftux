@@ -118,7 +118,6 @@ div#AlfrescoApplication.Default {
 	border-top:1px solid #000000;
 	border-right:1px solid #000000;
 	border-bottom:1px solid #000000;
-	width:160px;
 	height:48px;
 	background-image:url(<%=rootPath%>/images/floatingmenu/background.png);
 	cursor: pointer;

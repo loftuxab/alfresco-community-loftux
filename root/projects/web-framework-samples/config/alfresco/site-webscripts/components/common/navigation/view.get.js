@@ -59,6 +59,12 @@ model.showTopPage = (model.topPage == "show");
 model.showChildren = (model.childSiblings == "showChildren");
 model.showSiblings = (model.childSiblings == "showSiblings");
 
+// determine the current page id
+model.currentPageId = "";
+if(context.page != null)
+{
+	model.currentPageId = context.page.id;
+}
 
 // set up the base dir
 model.baseDir = url.context + "/components/common/navigation/styles/" + model.style;

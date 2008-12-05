@@ -105,7 +105,8 @@ WebStudio.PageEditor.prototype.removeTabItems = function()
 			}
 			
 			// set the component to be visible again
-			this.tabs[tn].el.setStyle('visibility', 'visible');
+			//this.tabs[tn].el.setStyle('visibility', 'visible');
+			this.tabs[tn].el.style.visibility = 'visible';
 		}
 	}
 	
@@ -148,7 +149,8 @@ WebStudio.PageEditor.prototype.restoreAllTabItems = function()
 			this.tabs[tn].optionsOverlay.setStyle('display', 'none');
 
 			// set the component to be visible again
-			this.tabs[tn].el.setStyle('visibility', 'visible');
+			//this.tabs[tn].el.setStyle('visibility', 'visible');
+			this.tabs[tn].el.style.visibility = 'visible';
 			
 			// resize component against its surroundings
 			Alf.resizeToChildren(this.tabs[tn].el);
@@ -168,7 +170,8 @@ WebStudio.PageEditor.prototype.hideTabItems = function()
 			this.tabs[tn].optionsOverlay.setStyle('display', 'none');
 			
 			// set the component to be visible again
-			this.tabs[tn].el.setStyle('visibility', 'visible');
+			//this.tabs[tn].el.setStyle('visibility', 'visible');
+			this.tabs[tn].el.style.visibility = 'visible';
 		}
 	}
 };
@@ -387,7 +390,8 @@ WebStudio.PETabItem.prototype.expand = function()
 	this.origColorOverlayBackgroundColor = unflippedColor;
 	
 	// set the component as invisible
-	this.el.setStyle('visibility', 'hidden');
+	//this.el.setStyle('visibility', 'hidden');
+	this.el.style.visibility = 'hidden';
 
 	// flip it
 	var direction = 'tb';
@@ -440,7 +444,8 @@ WebStudio.PETabItem.prototype.restore = function()
 		_this.removeMagnifiers();
 		
 		// show the component again
-		_this.el.setStyle('visibility', 'visible');
+		//_this.el.setStyle('visibility', 'visible');
+		_this.el.style.visibility = 'visible';
 		
     	// unmark as "expanded"
     	_this.expanded = false;
@@ -590,8 +595,8 @@ WebStudio.PETabItem.prototype.initMagnifiers = function()
    			var elem = ui.current;
    			if(elem.id)
    			{
-  					_this.loadForm(_this.el.id);
-  				}
+  				_this.loadForm(_this.el.id);
+  			}
    			
 			e.stop();    			
    		}
@@ -608,9 +613,9 @@ WebStudio.PETabItem.prototype.initMagnifiers = function()
    			var elem = ui.current;
    			if(elem.id)
    			{
-  					var url = WebStudio.url.studio("/c/view/" + _this.componentId);
-  					Alf.openBrowser('component', url);
-  				}
+				var url = WebStudio.url.studio("/c/view/" + _this.componentId);
+				Alf.openBrowser('component', url);
+			}
    			
 			e.stop();
    		}
@@ -627,7 +632,7 @@ WebStudio.PETabItem.prototype.initMagnifiers = function()
    			var elem = ui.current;
    			if(elem.id)
    			{
-  					_this.onDeleteClickEWnd();
+   				_this.onDeleteClickEWnd();
    			}
    			
 			e.stop();    			
@@ -864,7 +869,8 @@ WebStudio.PETabItem.prototype.onDeleteClickEWnd = function()
 			_this.removeMagnifiers();
 			
 			// hide the component
-			_this.el.setStyle('visibility', 'none');
+			//_this.el.setStyle('visibility', 'none');
+			_this.el.style.visibility = 'visible';
 	
 			// restore color overlay
 			var unflippedColor = _this.origColorOverlayBackgroundColor;
@@ -983,6 +989,16 @@ WebStudio.PETabItem.prototype.loadForm = function(id)
 	var _editWnd = this.editWnd;
 	this.editWnd.saveFormSuccess = function(r)
 	{
+		// the form
+		var formId = "form" + _editWnd.regionId + _editWnd.regionSourceId;
+		var theForm = $(formId);
+				
+		// dismantle the form
+		if (theForm)
+		{
+			theForm.remove();
+		}
+		
 		// define the binding
 		var binding = { };
 		

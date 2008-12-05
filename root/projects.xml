@@ -3180,7 +3180,6 @@
 	<echo>Merging Web Studio Javascript to single file</echo>
 	<concat destfile="${dir.project.webstudio}/build/js/alf-web-studio.js" force="yes" binary="yes">
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/alf.js" />
-		<fileset file="${dir.project.webstudio}/source/web/overlay/default/alf.js" />
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/web-studio.js" />
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/alfresco.utils.js" />
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/js/utils/abstract-templater.class.js" />
