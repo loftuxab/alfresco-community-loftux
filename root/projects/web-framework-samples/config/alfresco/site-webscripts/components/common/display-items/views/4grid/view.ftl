@@ -83,6 +83,10 @@ div.collabNodeActions {
 		<#list container.children as c>
 		
 			<#assign curl="">
+			<#if c.linkUrl?exists>
+				<#assign curl="${c.linkUrl}">
+			</#if>
+			
 			<#assign iconUrl="${c.iconUrl}">
 			<#assign detailsUrl="#">
 			<#assign detailsIconUrl="${url.context}/images/common/icons/view_properties.gif">

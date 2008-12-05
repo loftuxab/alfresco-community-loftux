@@ -1290,7 +1290,7 @@ WebStudio.Application.prototype.updateFloatingMenu = function()
 		top: top,
 		left: left
 	});
-	
+		
 	// set up the floating caption
 	this.updateFloatingMenuCaption();
 	
@@ -1315,6 +1315,18 @@ WebStudio.Application.prototype.updateFloatingMenu = function()
 		width: '64px',
 		height: '64px'
 	});
+	
+	// stupid IE tricks
+	// set up some widths (for ie)
+	if(window.ie)
+	{
+		var _w = this.FloatingMenuControl[0].FloatingMenuWebProjectId.el.offsetWidth;
+		if(this.FloatingMenuControl[0].FloatingMenuSandboxId.el.offsetWidth > _w)
+		{
+			_w = this.FloatingMenuControl[0].FloatingMenuSandboxId.el.offsetWidth;
+		}
+		this.FloatingMenuControl.el.setStyle("width", _w + 64);
+	}
 	
 	// update the z-index to bring it to the top
 	this.FloatingMenuControl.el.setStyle('z-index', WebStudio.WindowsZIndex + 1);

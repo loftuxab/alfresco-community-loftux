@@ -25,7 +25,8 @@
 	OverlayUtil.include(request, buffer, "/yui/dragdrop/dragdrop-min.js");
 	OverlayUtil.include(request, buffer, "/yui/container/container-min.js");
 	OverlayUtil.include(request, buffer, "/yui/element/element-beta-min.js");
-	OverlayUtil.include(request, buffer, "/yui/connection/connection-min.js");		
+	OverlayUtil.include(request, buffer, "/yui/connection/connection-min.js");
+	OverlayUtil.include(request, buffer, "/yui/editor/editor-beta-min.js");
 
 	// Include YUI Elements for Web Studio Core (all minimized)
 	OverlayUtil.include(request, buffer, "/yui/treeview/treeview-min.js");		

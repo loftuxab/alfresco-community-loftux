@@ -128,7 +128,7 @@
    <#assign href = linkbuilder.page(page.id, context.formatId)>
    <#assign className = "tab">
    
-   <#if page.id == context.page.id>
+   <#if page.id == currentPageId>
       <#assign className="tab-selected">
    </#if>
 
@@ -183,7 +183,7 @@
    <#assign href = linkbuilder.page(page.id, context.formatId)>
    <#assign className = "tab">
    
-   <#if page.id == context.page.id>
+   <#if page.id == currentPageId>
       <#assign className = "tab-selected">
    </#if>
 

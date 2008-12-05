@@ -2,7 +2,7 @@
 
    <#if templateConfig.rows?exists>   
 
-      <table border="0" cellpadding="0" cellspacing="0" <#if templateConfig.width?exists && templateConfig.width?length &gt; 0> width="${templateConfig.width}%"</#if> >
+      <table border="0" cellpadding="0" cellspacing="0" <#if templateConfig.width?exists && templateConfig.width?length &gt; 0> width="${templateConfig.width}%"<#else> width="75%"</#if> >
 
       <#list templateConfig.rows as row>
       

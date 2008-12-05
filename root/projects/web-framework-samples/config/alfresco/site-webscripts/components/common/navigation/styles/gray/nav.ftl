@@ -66,7 +66,7 @@
 
    <#assign href = linkbuilder.page(page.id, context.formatId)>
    
-   <#if page.id == context.page.id>
+   <#if page.id == currentPageId>
 
       <td>
          <img src="${baseDir}/selected_button_left.png" height="35px" />
@@ -157,7 +157,7 @@
 			</td>
             
 
-		<#if page.id == context.page.id>
+		<#if page.id == currentPageId>
 
 			<td>
 				<img src="${baseDir}/selected_button_left.png" height="35px" />

@@ -94,7 +94,7 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 				var childDiv = childNode.getEl();
 				if(childDiv)
 				{
-					childDiv.ondblclick = this.nodeDoubleClickHandler.bind(childNode);
+					childDiv.ondblclick = _this.nodeDoubleClickHandler.bind(childNode);
 				}
 			}
 		});
@@ -162,22 +162,19 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 			{
 				if (this.wizardFinished)
 				{
-					if(!_treeView.getActiveNode().alfIsRoot)
-					{				
-						var node = _treeView.getActiveNode();
-						
-						node.collapse();
-						node.childrenRendered = false;
-						node.dynamicLoadComplete = false;
-						for(var i = 0; i < node.children.length; i++)
-						{
-							_treeView.tree.removeNode(node.children[i]);
-						}
-						node.children = [];
-						
-						//this.activeNode = null;
-						node.expand();
+					var node = _treeView.getActiveNode();
+					
+					node.collapse();
+					node.childrenRendered = false;
+					node.dynamicLoadComplete = false;
+					for(var i = 0; i < node.children.length; i++)
+					{
+						_treeView.tree.removeNode(node.children[i]);
 					}
+					node.children = [];
+					
+					//this.activeNode = null;
+					node.expand();
 				}
 			};			
 		});
