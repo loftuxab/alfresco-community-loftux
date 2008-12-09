@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -37,10 +37,9 @@ import org.alfresco.config.element.ConfigElementAdapter;
 public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 {
     public static final String CONFIG_ELEMENT_ID = "constraint-handlers";
-    private List<String> types = new ArrayList<String>();
-    private Map<String, String> handlers = new HashMap<String, String>();
-    private Map<String, String> messages = new HashMap<String, String>();
-    private Map<String, String> messageIDs = new HashMap<String, String>();
+    
+    private List<String> itemTypes = new ArrayList<String>();
+    private Map<String, ItemDefinition> items = new HashMap<String, ItemDefinition>();
 
     private static final long serialVersionUID = 1L;
 
@@ -83,7 +82,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 
         ConstraintHandlersConfigElement result = new ConstraintHandlersConfigElement();
 
-        for (String nextType : types)
+        for (String nextType : itemTypes)
         {
             String nextValidationHandler = getValidationHandlerFor(nextType);
             String nextMessage = getMessageFor(nextType);
@@ -92,7 +91,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
                     nextMessageId);
         }
 
-        for (String nextType : otherCHCElement.types)
+        for (String nextType : otherCHCElement.itemTypes)
         {
             String nextValidationHandler = otherCHCElement
                     .getValidationHandlerFor(nextType);
@@ -108,10 +107,18 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /* package */void addDataMapping(String type, String validationHandler,
             String message, String messageID)
     {
-        types.add(type);
-        handlers.put(type, validationHandler);
-        messages.put(type, message);
-        messageIDs.put(type, messageID);
+    	//TODO Is this how we should handle null values?
+    	if (message == null)
+    	{
+    		message = "";
+    	}
+    	if (messageID == null)
+    	{
+    		messageID = "";
+    	}
+    	
+        itemTypes.add(type);
+        items.put(type, new ItemDefinition(type, validationHandler, message, messageID));
     }
 
     /**
@@ -119,8 +126,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
      */
     public int hashCode()
     {
-        return types.hashCode() + 7 * handlers.hashCode() + 13
-                * messages.hashCode() + 17 * messageIDs.hashCode();
+        return items.hashCode();
     }
 
     /**
@@ -133,19 +139,16 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
             return false;
         }
         ConstraintHandlersConfigElement otherCHCE = (ConstraintHandlersConfigElement) otherObj;
-        return this.types.equals(otherCHCE.types)
-                && this.handlers.equals(otherCHCE.handlers)
-                && this.messages.equals(otherCHCE.messages)
-                && this.messageIDs.equals(otherCHCE.messageIDs);
+        return this.items.equals(otherCHCE.items);
     }
 
     /**
      * This method returns the registered constraint types.
      * @return an unmodifiable List of the constraint types.
      */
-    public List<String> getConstraintTypes()
+    List<String> getConstraintTypes()
     {
-        return Collections.unmodifiableList(this.types);
+        return Collections.unmodifiableList(itemTypes);
     }
 
     /**
@@ -155,9 +158,9 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
      * @param type the constraint type.
      * @return a String identifier for the validation-handler.
      */
-    public String getValidationHandlerFor(String type)
+    String getValidationHandlerFor(String type)
     {
-        return handlers.get(type);
+        return items.get(type).getValidationHandler();
     }
 
     /**
@@ -167,9 +170,9 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
      * @param type the constraint type.
      * @return the message String for the validation-handler.
      */
-    public String getMessageFor(String type)
+    String getMessageFor(String type)
     {
-        return messages.get(type);
+    	return items.get(type).getMessage();
     }
 
     /**
@@ -179,8 +182,47 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
      * @param type the constraint type.
      * @return the message-id String for the validation-handler.
      */
-    public String getMessageIdFor(String type)
+    String getMessageIdFor(String type)
     {
-        return messageIDs.get(type);
+    	return items.get(type).getMessageId();
+    }
+
+    public List<String> getItemNames()
+    {
+    	return Collections.unmodifiableList(itemTypes);
+    }
+    
+    public Map<String, ItemDefinition> getItems()
+    {
+    	return Collections.unmodifiableMap(items);
+    }
+    
+    public class ItemDefinition
+    {
+    	private final String type;
+    	private final String validationHandler;
+    	private final String message;
+    	private final String messageId;
+    	
+    	public ItemDefinition(String type, String validationHandler, String msg, String msgId)
+    	{
+    		this.type = type;
+    		this.validationHandler = validationHandler;
+    		this.message = msg;
+    		this.messageId = msgId;
+    	}
+    	
+		public String getType() {
+			return type;
+		}
+		public String getValidationHandler() {
+			return validationHandler;
+		}
+		public String getMessage() {
+			return message;
+		}
+		public String getMessageId() {
+			return messageId;
+		}
     }
 }

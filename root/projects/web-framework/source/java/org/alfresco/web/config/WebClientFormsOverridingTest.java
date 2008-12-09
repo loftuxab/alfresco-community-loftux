@@ -81,7 +81,7 @@ public class WebClientFormsOverridingTest extends BaseTest
                 (globalDefaultControls instanceof DefaultControlsConfigElement));
         DefaultControlsConfigElement dcCE = (DefaultControlsConfigElement) globalDefaultControls;
 
-        assertTrue("New template is missing.", dcCE.getNames().contains("xyz"));
+        assertTrue("New template is missing.", dcCE.getItemNames().contains("xyz"));
         assertEquals("Expected template incorrect.", "org/alfresco/xyz.ftl",
                 dcCE.getTemplateFor("xyz"));
 

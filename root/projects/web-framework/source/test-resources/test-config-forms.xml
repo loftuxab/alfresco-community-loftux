@@ -1,13 +1,6 @@
 <alfresco-config>
    <plug-ins>
       <element-readers>
-         <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
-         <element-reader element-name="client" class="org.alfresco.web.config.ClientElementReader"/>
-         <element-reader element-name="navigation" class="org.alfresco.web.config.NavigationElementReader" />
-         <element-reader element-name="languages" class="org.alfresco.web.config.LanguagesElementReader" />
-         <element-reader element-name="advanced-search" class="org.alfresco.web.config.AdvancedSearchElementReader" />
-         <element-reader element-name="views" class="org.alfresco.web.config.ViewsElementReader" />
-         <element-reader element-name="actions" class="org.alfresco.web.config.ActionsElementReader" />
          <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
          <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
          <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>

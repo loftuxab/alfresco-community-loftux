@@ -110,7 +110,7 @@ public class WebClientFormsTest extends BaseTest
                 "org/alfresco/forms/controls/association-picker.ftl");
         expectedDataMappings.put("abc", "org/alfresco/abc.ftl");
 
-        Set<String> actualNames = defltCtrlsConfElement.getNames();
+        List<String> actualNames = defltCtrlsConfElement.getItemNames();
         assertEquals("Incorrect name count, expected "
                 + expectedDataMappings.size(), expectedDataMappings.size(),
                 actualNames.size());
@@ -286,7 +286,7 @@ public class WebClientFormsTest extends BaseTest
         // Test that the constraint-handlers' messages are read from the config
         // file
         Map<String, String> expectedMessages = new HashMap<String, String>();
-        expectedMessages.put("REGEX", null);
+        expectedMessages.put("REGEX", "");
         expectedMessages.put("NUMERIC", "Test Message");
 
         // Test that the types map to the expected message.
@@ -301,7 +301,7 @@ public class WebClientFormsTest extends BaseTest
         // Test that the constraint-handlers' message-ids are read from the
         // config file
         Map<String, String> expectedMessageIDs = new HashMap<String, String>();
-        expectedMessageIDs.put("REGEX", null);
+        expectedMessageIDs.put("REGEX", "");
         expectedMessageIDs.put("NUMERIC", "regex_error");
 
         // Test that the types map to the expected message-id.
