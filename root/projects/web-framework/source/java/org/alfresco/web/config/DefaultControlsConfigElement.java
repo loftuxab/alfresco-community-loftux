@@ -46,6 +46,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
 {
     public static final String CONFIG_ELEMENT_ID = "default-controls";
 
+    private final List<String> itemNames = new ArrayList<String>();
     private final Map<String, DefaultControl> datatypeDefCtrlMappings = new HashMap<String, DefaultControl>();
     private static final long serialVersionUID = -6758804774427314050L;
 
@@ -119,6 +120,8 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     /* package */void addDataMapping(String dataType, String template,
             List<ControlParam> parameters)
     {
+    	itemNames.add(dataType);
+    	
         if (parameters == null)
         {
             parameters = Collections.emptyList();
@@ -129,6 +132,16 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             newControl.addControlParam(p);
         }
         this.datatypeDefCtrlMappings.put(dataType, newControl);
+    }
+    
+    public List<String> getItemNames()
+    {
+    	return Collections.unmodifiableList(itemNames);
+    }
+    
+    public Map<String, DefaultControl> getItems()
+    {
+    	return Collections.unmodifiableMap(datatypeDefCtrlMappings);
     }
 
     /**
@@ -151,20 +164,6 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         DefaultControlsConfigElement otherDCCE = (DefaultControlsConfigElement) otherObj;
         return this.datatypeDefCtrlMappings
                 .equals(otherDCCE.datatypeDefCtrlMappings);
-    }
-
-    /**
-     * This method returns an unmodifiable Set of the names of the default-control items.
-     * @return Set of names.
-     */
-    public Set<String> getNames()
-    {
-        Set<String> result = new HashSet<String>(datatypeDefCtrlMappings.size());
-        for (String dataType : datatypeDefCtrlMappings.keySet())
-        {
-            result.add(dataType);
-        }
-        return Collections.unmodifiableSet(result);
     }
 
     /**
