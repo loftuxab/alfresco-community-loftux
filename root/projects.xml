@@ -1497,6 +1497,94 @@
                          projectdir="${dir.project.webframework}"/>
    </target>
    
+   <!-- *********************************** -->
+   <!-- ** Web Framework Commons Project ** -->
+   <!-- *********************************** -->
+   
+   <target name="incremental-webframeworkcommons" 
+           depends="package-webframeworkcommons" />
+   
+   <target name="build-webframeworkcommons" 
+           depends="clean-webframeworkcommons, 
+                    incremental-webframeworkcommons" />
+   
+   <target name="clean-webframeworkcommons" 
+           depends="init">
+      <clean projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   <target name="compile-webframeworkcommons" 
+           depends="init">
+      <compile-java projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   <target name="package-webframeworkcommons"
+           depends="package-webframeworkcommons-war" />
+   
+   <target name="package-webframeworkcommons-jar"
+              depends="compile-webframeworkcommons">
+      <mkdir dir="${dir.project.webframeworkcommons.dist}" />
+      <jar jarfile="${dir.project.webframeworkcommons.dist}/${file.name.jar.webframeworkcommons}" 
+           basedir="${dir.project.webframeworkcommons.classes}" />
+   </target>
+
+   <target name="package-webframeworkcommons-war" 
+           depends="assemble-webframeworkcommons-war">
+      <war warfile="${dir.project.webframeworkcommons.dist}/${file.name.war.webframeworkcommons}" 
+           webxml="${dir.project.webframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webframeworkcommons.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-webframeworkcommons-war" 
+           depends="package-webframeworkcommons-jar">
+      <mkdir dir="${dir.project.webframeworkcommons.assemble}" />
+      
+      <!-- copy all required files from webscript and web framework projects -->
+      <copy todir="${dir.project.webframeworkcommons.assemble}">
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      
+      <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
+      </copy>
+
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.webframeworkcommons.dist}" 
+                  includes="${file.name.jar.webframeworkcommons}" />
+      </copy>
+   </target>  
+   
+   <target name="test-webframeworkcommons" 
+           depends="compile-webframeworkcommons">
+      <run-tests projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
+   <target name="generate-javadocs-webframeworkcommons" 
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Framework Commons" 
+                         windowtitle="Alfresco Web Framework Commons" 
+                         projectdir="${dir.project.webframeworkcommons}" />
+   </target>
+   
    <!-- **************************************** -->
    <!-- ** Web Client 3.0 (Slingshot) Project ** -->
    <!-- **************************************** -->

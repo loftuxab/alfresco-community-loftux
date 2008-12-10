@@ -524,6 +524,9 @@
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframework}" />
       <delete dir="${dir.deploy.tomcat.application.webframework}" 
               includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframeworkcommons}" />
+      <delete dir="${dir.deploy.tomcat.application.webframeworkcommons}" 
+              includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
       <delete dir="${dir.deploy.tomcat.application.slingshot}" 
               includeEmptyDirs="true" quiet="yes" />
@@ -718,6 +721,17 @@
       <!-- copy the WebFramework WAR file to the application Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
+   </target>
+   
+   <target name="deploy-webframeworkcommons-tomcat" depends="init" 
+           description="Deploys the WebFrameworkCommons WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframeworkcommons}" />
+      <delete dir="${dir.deploy.tomcat.application.webframeworkcommons}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
+      <!-- copy the WebFrameworkCommons WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
+            file="${dir.project.webframeworkcommons.dist}/${file.name.war.webframeworkcommons}" />
    </target>
    
    <target name="deploy-slingshot-tomcat" depends="init" 
