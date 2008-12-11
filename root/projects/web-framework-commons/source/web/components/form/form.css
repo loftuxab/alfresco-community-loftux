@@ -1,0 +1,26 @@
+/* FormUI Component */
+
+.form
+{
+   padding-top: 10px;
+   border: 1px dashed #ccc;
+}
+
+.form form
+{
+   margin: 3px;
+}
+
+.form label
+{
+   display: block;
+   font-weight: bold;
+   margin-top: 12px;
+   margin-left: 12px;
+}
+
+.form input
+{
+   display: block;
+   margin: 12px;
+}
