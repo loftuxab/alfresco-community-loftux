@@ -77,6 +77,7 @@
          <pathelement location="${dir.project.remoteapi.classes}" />
          <pathelement location="${dir.project.repository.classes}" />
          <pathelement location="${dir.project.webframework.classes}" />
+         <pathelement location="${dir.project.webframeworkcommons.classes}" />
          <pathelement location="${dir.project.webscriptframework.classes}" />
          <pathelement location="${dir.project.webclient.classes}" />
          <pathelement location="${dir.project.webserviceclient.classes}" />
@@ -303,6 +304,7 @@
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-webframework,
+                    incremental-webframeworkcommons,
                     incremental-slingshot,
                     incremental-webstudio" />
 
@@ -378,6 +380,7 @@
            depends="incremental-core, 
                     package-webscriptframework-jar, 
                     package-webframework-jar, 
+                    package-webframeworkcommons-jar,
                     incremental-slingshot,
                     deploy-slingshot-tomcat" />
 
@@ -385,6 +388,7 @@
            depends="incremental-core, 
                     package-webscriptframework-jar, 
                     package-webframework-jar, 
+                    package-webframeworkcommons-jar,
                     package-slingshot-jar,
                     deploy-slingshot-tomcat-exploded" />
    
@@ -482,6 +486,7 @@
                     clean-linkvalidation, 
                     clean-webscriptframework,
                     clean-webframework,
+                    clean-webframeworkcommons,
                     clean-slingshot,
                     clean-webclient, 
                     clean-webserviceclient,
@@ -753,6 +758,7 @@
       <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.slingshot.src.web}" />
       </copy>
       
@@ -761,6 +767,7 @@
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
          <fileset dir="${dir.project.slingshot.config}" excludes="**/extension/**" />
       </copy>
       
@@ -769,6 +776,7 @@
          <fileset dir="${dir.project.core.classes}" />
          <fileset dir="${dir.project.webscriptframework.classes}" />
          <fileset dir="${dir.project.webframework.classes}" />
+         <fileset dir="${dir.project.webframeworkcommons.classes}" />
          <fileset dir="${dir.project.slingshot.classes}" />
       </copy>
       
@@ -926,7 +934,8 @@
                     test-repository, 
                     test-remoteapi, 
                     test-catalinavirtual,
-                    test-webscriptframework, 
+                    test-webscriptframework,
+                    test-webframeworkcommons, 
                     test-webclient, 
                     test-webserviceclient" />
 
