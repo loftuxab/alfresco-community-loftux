@@ -40,7 +40,7 @@ import org.alfresco.web.config.DefaultControlsConfigElement.ControlParam;
  * 
  * @author Neil McErlean
  */
-public class WebClientFormsOverridingTest extends BaseTest
+public class FormConfigOverrideTest extends BaseTest
 {
     private XMLConfigService configService;
     private Config globalConfig;
