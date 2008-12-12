@@ -1,12 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.FormUI("${args.htmlid}").setOptions(
-   {
-      currentUser: "${user.id}" <#-- ,
-      formFields:
-      [
-         <#list fields as field>"${field}"<#if field_has_next>,</#if></#list>
-      ]  -->
-   };
+   new Alfresco.FormUI("${args.htmlid}");
 //]]></script>
 
 <div class="form">
