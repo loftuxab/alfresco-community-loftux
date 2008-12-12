@@ -318,6 +318,10 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
          */
         public ControlParam(String name, String value)
         {
+        	if (value == null)
+        	{
+        		value = "";
+        	}
             this.name = name;
             this.value = value;
         }

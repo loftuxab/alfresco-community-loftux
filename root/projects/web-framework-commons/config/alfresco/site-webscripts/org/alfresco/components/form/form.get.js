@@ -1,47 +1,58 @@
-model.trash = config.scoped["content"]["form"].modelOverrideProperties.get(0).name;
-
-//var itemNames = config.global["constraint-handlers"].itemNames;
-//for (var i = 0; i < itemNames.size; i++)
-//{
-//	nextKey = itemNames.get(i);
-//	nextType = config.global["constraint-handlers"].items[nextKey].type;
-//	nextVH = config.global["constraint-handlers"].items[nextKey].validationHandler;
-//	nextM = config.global["constraint-handlers"].items[nextKey].message;
-//	nextMId = config.global["constraint-handlers"].items[nextKey].messageId;
-//}
-
-
 //Constraint Handlers
 model.constraints = [];
+var constraintTypes = config.global["constraint-handlers"].itemNames;
+model.constraints['types'] = constraintTypes;
+model.constraints['handlers'] = [];
+model.constraints['messages'] = [];
+model.constraints['messageIDs'] = [];
 
-var constraintNames = config.global["constraint-handlers"].itemNames;
-for (var x = 0; x < constraintNames.size(); x++)
+for (var i = 0; i < constraintTypes.size(); i++)
 {
-	var constName = constraintNames.get(x);
-	model.constraints.push(constName);
-	model.constraints.push(config.global["constraint-handlers"].items[constName].message);
+	var constName = constraintTypes.get(i);
+	model.constraints['handlers'][constName] = config.global["constraint-handlers"].items[constName].validationHandler;
+	model.constraints['messages'][constName] = config.global["constraint-handlers"].items[constName].message;
+	model.constraints['messageIDs'][constName] = config.global["constraint-handlers"].items[constName].messageId;
 }
 
 //Default Controls
 model.defaultcontrols = [];
 
-var controlNames = config.global["default-controls"].itemNames;
-// TODO Move this to a hash-based data structure.
-//model.defaultcontrols['names'] = controlNames;
+var controlNames = config.global['default-controls'].itemNames;
+model.defaultcontrols['names'] = controlNames;
+
+model.defaultcontrols['templates'] = [];
+model.defaultcontrols['control-params'] = [];
+
 for (var x = 0; x < controlNames.size(); x++)
 {
-	var constName = controlNames.get(x);
-	model.defaultcontrols.push(constName);
-	model.defaultcontrols.push(config.global["default-controls"].items[constName].template);
-	model.defaultcontrols.push(config.global["default-controls"].items["abc"].controlParams.get(2).value);
-//	model.defaultcontrols.push(config.global["default-controls"].items[constName].controlParams);
+	var ctrlName = controlNames.get(x);
+	model.defaultcontrols['templates'][ctrlName] = config.global['default-controls'].items[ctrlName].template;
+
+	model.defaultcontrols['control-params'][ctrlName] = [];
+	model.defaultcontrols['control-params'][ctrlName]['names'] = [];
+	model.defaultcontrols['control-params'][ctrlName]['values'] = [];
+
+	var params = config.global['default-controls'].items[ctrlName].controlParams;
+	for (var p = 0; p < params.size(); p++)
+	{
+		var nextParam = params.get(p);
+		model.defaultcontrols['control-params'][ctrlName]['names'].push(nextParam.name);
+		model.defaultcontrols['control-params'][ctrlName]['values'][nextParam.name] = nextParam.value;
+	}
 }
 
+// Some representative Form data just to show it works.
+model.form = [];
+model.form['submissionURL'] = config.scoped['content']['form'].submissionURL;
+model.form.viewFieldNames = config.scoped['content']['form'].visibleViewFieldNames;
+model.form.viewFields = config.scoped['content']['form'].visibleViewFields;
 
 
 
+model.submitLabel = 'OK';
+	
 
-model.submitLabel = "OK";
+
 
 
 var fakedJson = "{   \"foo\" : \"bar\", " +
@@ -54,5 +65,3 @@ for (var x=0; x < data.items.length; x++)
 {
    model.fields.push(data.items[x]);
 }
-              
-// model.form = form;

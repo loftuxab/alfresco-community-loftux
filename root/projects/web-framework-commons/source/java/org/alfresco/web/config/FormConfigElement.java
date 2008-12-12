@@ -308,6 +308,19 @@ public class FormConfigElement extends ConfigElementAdapter
         return getFieldsVisibleInMode(Mode.VIEW);
     }
 
+    public List<String> getVisibleCreateFieldNames()
+    {
+    	return getFieldNamesVisibleInMode(Mode.CREATE);
+    }
+    public List<String> getVisibleEditFieldNames()
+    {
+    	return getFieldNamesVisibleInMode(Mode.EDIT);
+    }
+    public List<String> getVisibleViewFieldNames()
+    {
+    	return getFieldNamesVisibleInMode(Mode.VIEW);
+    }
+
     public Map<String, String> getCreateTemplates()
     {
         return Collections.unmodifiableMap(this.rolesForCreateTemplates);
@@ -561,6 +574,19 @@ public class FormConfigElement extends ConfigElementAdapter
         return result;
     }
 
+    private List<String> getFieldNamesVisibleInMode(Mode mode)
+    {
+    	List<String> result = new ArrayList<String>();
+        for (String fieldId : this.fields.keySet())
+        {
+            if (this.isFieldVisible(fieldId, mode))
+            {
+            	result.add(fieldId);
+            }
+        }
+        return result;
+    }
+
     /**
      * This inner class represents a &lt;set&gt; element within a &lt;form&gt;
      * element.
@@ -652,6 +678,15 @@ public class FormConfigElement extends ConfigElementAdapter
         public Map<String, String> getAttributes()
         {
             return Collections.unmodifiableMap(attributes);
+        }
+        public List<String> getAttributeNames()
+        {
+        	List<String> result = new ArrayList<String>(attributes.size());
+        	for (Iterator<String> iter = attributes.keySet().iterator(); iter.hasNext(); )
+        	{
+        		result.add(iter.next());
+        	}
+            return Collections.unmodifiableList(result);
         }
         public String getTemplate()
         {
