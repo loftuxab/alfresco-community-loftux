@@ -50,7 +50,7 @@ import org.alfresco.web.config.FormConfigElement.Mode;
  * 
  * @author Neil McErlean
  */
-public class WebClientFormsTest extends BaseTest
+public class FormConfigTest extends BaseTest
 {
     private static final String TEST_CONFIG_XML = "test-config-forms.xml";
     private XMLConfigService configService;
