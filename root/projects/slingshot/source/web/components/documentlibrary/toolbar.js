@@ -118,7 +118,15 @@
           * @type int
           * @default 5
           */
-         groupActivitiesAt: 5
+         groupActivitiesAt: 5,
+         
+         /**
+          * Flag indicating whether navigation bar is visible or not.
+          * 
+          * @property hideNavBar
+          * @type boolean
+          */
+         hideNavBar: false
       },
       
       /**
@@ -238,6 +246,9 @@
          // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
          this.widgets.selectedItems.getMenu().lazyLoad = false;
          this.widgets.selectedItems.getMenu().initEvent.fire();
+
+         // Hide/Show NavBar button
+         this.widgets.hideNavBar = Alfresco.util.createYUIButton(this, "hideNavBar-button", this.onHideNavBar);
          
          // RSS Feed link button
          this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
@@ -749,6 +760,21 @@
          {
             this.modules.docList.selectFiles("selectNone");
          }
+      },
+
+      /**
+       * Show/Hide navigation bar button click handler
+       *
+       * @method onHideNavBar
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onHideNavBar: function DLTB_onHideNavBar(e, p_obj)
+      {
+         this.options.hideNavBar = !this.options.hideNavBar;
+         p_obj.set("label", this._msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
+         Dom.setStyle(this.id + "-navBar", "display", this.options.hideNavBar ? "none" : "block");
+         Event.preventDefault(e);
       },
 
 

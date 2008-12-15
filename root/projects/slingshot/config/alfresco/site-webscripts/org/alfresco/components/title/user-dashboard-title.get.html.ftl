@@ -1,7 +1,8 @@
 <#assign activePage = page.url.templateArgs.pageid!"customise-user-dashboard">
+<#assign userName>${user.properties["firstName"]?html} <#if user.properties["lastName"]??>${user.properties["lastName"]?html}</#if></#assign>
 <div class="page-title"><!-- ${activePage} -->
    <div class="title">
-      <h1><span class="light">${msg("header.dashboardPrefix")}</span> ${user.properties["firstName"]?html} <#if user.properties["lastName"]??>${user.properties["lastName"]?html}</#if> <span class="light">${msg("header.dashboardSuffix")}</span></h1>
+      <h1>${msg("header.dashboard", "<span>${userName}</span>")}</h1>
    </div>
    <div class="links title-button">
       <#assign linkClass><#if "customise-user-dashboard" == activePage>class="active-page"</#if></#assign>

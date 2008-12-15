@@ -1,18 +1,14 @@
-<#-- title -->
 <div class="page-title">
    <div class="title">
-      <h1>${msg("header.title")}</h1>
+      <h1><span>${msg("header.title")}</span></h1>
    </div>
 </div>
 
-<#-- error -->
 <#if (error?? && error)>
 <div class="reject-invite-body">
    <h1>${msg("error.noinvitation.title")}</h1>
    <p>${msg("error.noinvitation.text")}</p>
 </div>
-
-<#-- content -->
 <#else>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.RejectInvite("${args.htmlid}").setOptions(
@@ -24,18 +20,15 @@
    );
 //]]></script>
 
-<#-- construct the inviter name -->
-<#assign inviter=invite.inviter.userName />
+<#assign inviter = invite.inviter.userName>
 <#if (invite.inviter.firstName?? || invite.inviter.lastName??)>
-   <#assign inviter=(invite.inviter.firstName!'' + ' ' + invite.inviter.lastName!'') />
+   <#assign inviter = (invite.inviter.firstName!'' + ' ' + invite.inviter.lastName!'')>
 </#if>
 <#assign siteName><#if (invite.site.title?? && invite.site.title?length > 0)>${invite.site.title}<#else>${invite.site.shortName}</#if></#assign>
 <#assign siteMarkup><span class="site-name">${siteName}</span></#assign>
 <div class="reject-invite-body">
    <div id="${args.htmlid}-confirm" class="main-content">
-      <div class="question">
-         ${msg("reject.question", inviter, siteMarkup)}
-      </div>
+      <div class="question">${msg("reject.question", inviter, siteMarkup)}</div>
       <div class="actions">
          <span id="${args.htmlid}-decline-button" class="yui-button yui-push-button"> 
             <span class="first-child"> 

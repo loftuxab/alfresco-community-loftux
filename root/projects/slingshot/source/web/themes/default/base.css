@@ -76,7 +76,7 @@ h1 .lighter,
 h2 .light,
 h2 .lighter
 {
-   color: #C7DBEB;
+   color: #c7dbeb;
 }
 
 h3
@@ -312,7 +312,13 @@ hr
 
 .page-title h1
 {
+   color: #c7dbeb;
    display: inline;
+}
+
+.page-title h1 span
+{
+   color: #fff;
 }
 
 .site-navigation
