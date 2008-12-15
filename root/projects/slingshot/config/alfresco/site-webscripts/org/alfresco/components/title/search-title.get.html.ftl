@@ -1,6 +1,6 @@
 <div class="page-title">	
 	<div class="float-left">
-		<h1>${msg("header.searchresults")}</h1>
+		<h1><span>${msg("header.searchresults")}</span></h1>
 	</div>
 	<#if page.url.templateArgs.site??>
 	<div class="float-right">

@@ -8,7 +8,7 @@
 .toolbar .nav-bar
 {
    clear: both;
-   min-height: 1.6em;
+   height: 1.6em;
    padding: 4px 0.5em 9px;
 }
 
@@ -28,7 +28,22 @@
 .toolbar .header-bar
 {
    background-color: #e3eaec;
-   border-bottom: 2px solid #f0f3f4;
+}
+
+.toolbar .left
+{
+   float: left;
+}
+
+.toolbar .right
+{
+   float: right;
+}
+
+.toolbar .hide-navbar,
+.toolbar .rss-feed
+{
+   float: left;
 }
 
 .toolbar .selected-items li
@@ -88,7 +103,8 @@
 .toolbar .nav-bar
 {
    background-color: #e9edef;
-   border-bottom: 2px solid #c7ccce;
+   border-top: 2px solid #f0f3f4;
+   overflow-y: hidden;
    padding-bottom: 8px;
 }
 
@@ -123,11 +139,6 @@
    padding: 0.5em 0 0.5em 0.5em;
 }
 
-
-.toolbar .rss-feed
-{
-   float: right;
-}
 
 .toolbar .description
 {
