@@ -274,8 +274,6 @@
 <!--
          <include name="**/LuceneTest2.java" />
 -->
-         <!-- TEMP - due to merge fallout, probably r11206 -->
-         <exclude name="**/org/alfresco/repo/tenant/**/*Test.java" />
       </patternset>
    </target>
 
