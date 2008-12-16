@@ -44,7 +44,7 @@
       Alfresco.util.YUILoaderHelper.require(["json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
    
    Alfresco.LinkEdit.prototype =
    {
@@ -172,7 +172,7 @@
          var loadLinkDataSuccess = function CommentsList_loadCommentsSuccess(response)
          {
             // set the link data
-            var data = response.json.item
+            var data = response.json.item;
             me.linkData = data;
             
             // now initialize the form, which will use the data we just loaded
@@ -252,13 +252,15 @@
          }
          Dom.get(this.id + '-url').value = url;
 
-         // internal
-         var internal = "false";
+         // internal link
+         var internal = false;
          if (this.options.editMode)
          {
-            internal = Alfresco.util.stripUnsafeHTMLTags(this.linkData.internal);
+            internal = this.linkData.internal;
          }
-         Dom.get(this.id + '-internal').checked = internal=="true"?true:false;
+         Dom.get(this.id + '-internal').checked = internal;
+         Dom.get(this.id + '-tag-input-field').tabIndex = 5;
+         Dom.get(this.id + "-add-tag-button").tabIndex = 6;
          
          // register the behaviour with the form and display the form
          this._registerLinkForm();
@@ -271,7 +273,10 @@
       {
          // initialize the tag library
          this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
-         this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
+         this.modules.tagLibrary.setOptions(
+         {
+            siteId: this.options.siteId
+         });
          this.modules.tagLibrary.initialize();
          
          // add the tags that are already set on the link
@@ -290,27 +295,22 @@
          {
             okButtonLabel = this._msg('button.save');
          }
-         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-ok", {type: "submit", label: okButtonLabel });
+         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-ok",
+         {
+            type: "submit",
+            label: okButtonLabel
+         });
 
          // cancel button
-         this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel", {type: "button"});
-         this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
-
-         // instantiate the simple editor we use for the form
-         /*this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
-            height: '300px',
-            width: '538px',
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
-         this.widgets.editor._render();*/
+         this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onFormCancelButtonClick);
 
          // create the form that does the validation/submit
          this.widgets.linkForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.linkForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
-         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.mandatory, null, "keyup");          
+
+         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.mandatory, null, "keyup");
+         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.regexMatch, {pattern: /^(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/}, "keyup");
+
          this.widgets.linkForm.setShowSubmitStateDynamically(true, false);
          this.widgets.linkForm.setSubmitElements(this.widgets.okButton);
          this.widgets.linkForm.setAJAXSubmit(true,
@@ -353,7 +353,7 @@
                });
             },
             scope: this
-         }
+         };
          this.widgets.linkForm.init();
          
          // finally display the form
@@ -392,8 +392,9 @@
       /**
        * Reenables the inputs which got disabled as part of a comment submit
        */
-      onFormSubmitFailure: function LinkEdit_onFormSubmitFailure()
+      onFormSubmitFailure: function LinkEdit_onFormSubmitFailure(response)
       {
+         response.config.failureMessage = YAHOO.lang.JSON.parse(response.serverResponse.responseText).message;
          // enable the buttons
          this.widgets.okButton.set("disabled", false);
 
@@ -412,10 +413,9 @@
        */
       _loadLinkViewPage: function LinkEdit__loadLinkViewPage(linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?container={container}&linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}",
          {
             site: this.options.siteId,
-            container: this.options.containerId,
             linkId: linkId
          });
          window.location = url;

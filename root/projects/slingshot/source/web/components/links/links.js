@@ -39,6 +39,7 @@
    var Dom = YAHOO.util.Dom,
          Event = YAHOO.util.Event,
          Element = YAHOO.util.Element;
+         
    var $html = Alfresco.util.encodeHTML;
 
    /**
@@ -92,7 +93,7 @@
       this.newLinkBtn = null;
       this.changeListViewBtn = null;
       this.linksMenu = null;
-   }
+   };
 
    Alfresco.Links.prototype =
    {
@@ -125,9 +126,7 @@
          /**
           * Initially used filter name and id.
           */
-         initialFilter:
-         {
-         },
+         initialFilter: {},
 
          /**
           * Number of items displayed per page
@@ -144,6 +143,16 @@
           * @type boolean
           */
          simpleView: false,
+
+         /**
+          * permission delete
+          */
+         permissionDelete: true,
+
+         /**
+          * permission update
+          */
+         permissionUpdate:true,
 
          /**
           * Length of preview content loaded for each topic
@@ -181,9 +190,8 @@
           *
           * @property containerId
           * @type string
-          * @default "links"
           */
-         containerId: "links"
+         containerId: ""
       },
 
       /**
@@ -225,9 +233,7 @@
        * @property widgets
        * @type object
        */
-      widgets :
-      {
-      },
+      widgets: null,
 
       /**
        * init DataSource
@@ -248,17 +254,29 @@
          this.widgets.dataSource.responseSchema =
          {
             resultsList: 'items',
-            fields: ['name','title', 'description', 'url', 'tags','internal','isUpdated'],
+            fields: ['name', 'title', 'description', 'url', 'tags', 'internal', 'createdOn', 'author', 'permissions'],
             metaFields:
             {
-               paginationRecordOffset:'startIndex',
-               totalRecords:'total'
+               paginationRecordOffset: 'startIndex',
+               totalRecords: 'total',
+               metadata: 'metadata'
             }
-         }
+         };
 
          return this;
       },
-
+      /**
+       * Updates the toolbar using the passed permissions
+       * @method updateToolbar
+       * @param linkPermissions {object} Container permissions
+       */
+      updateToolbar: function Links_updateToolbar(linkPermissions)
+      {  
+         if (linkPermissions.create === "false")
+         {
+            this.newLinkBtn.set("disabled", true);
+         }
+      },
       /**
        * Set messages for this component.
        *
@@ -272,124 +290,206 @@
          return this;
       },
 
-      /**init DataTable
+      /**
+       * Initialise DataTable
+       *
        * @method createDataTable
-       * @return {Alfresco.Links} returns 'this' for method chaining
        */
       createDataTable : function Links_createDataTable()
       {
          var me = this;
-         var renderCellThumbnail = function Links_renderCellThumbnail(elCell, oRecord, oColumn, oData)
+
+         var generateUserProfileUrl = function DL_generateUserProfileUrl(userName)
+         {
+            return Alfresco.util.uriTemplate("userpage",
+            {
+               userid: userName,
+               pageid: "profile"
+            });
+         };
+
+         /**
+          * Selector custom datacell formatter
+          *
+          * @method renderCellSelected
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         var renderCellSelected = function Links_renderCellSelected(elCell, oRecord, oColumn, oData)
          {
             elCell.innerHTML = '<input class="checkbox-column" type="checkbox" />';
             elCell.firstChild.onclick = function()
             {
                var count = me.getSelectedLinks().length;
-               me.linksMenu.set("disabled", count == 0);
-            }
+               me.linksMenu.set("disabled", count === 0);
+            };
          };
 
+         /**
+          * Description custom datacell formatter
+          *
+          * @method renderCellDescription
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
          var renderCellDescription = function Links_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var data = oRecord.getData(); 
-            var name = oRecord.getData('title');
-            var url = oRecord.getData('url');
-            var description = oRecord.getData('description');
-            var tags = oRecord.getData('tags');
-            var isUpdated = oRecord.getData('isUpdated');
+            var data = oRecord.getData();
+            var name = data["title"],
+               url = data["url"],
+               description = data["description"],
+               createdOn = data["createdOn"],
+               author = data["author"],
+               tags = data["tags"],
+               internal = data["internal"];
+            
             var linksViewUrl = me.generateLinksViewUrl(me.options.siteId, me.options.containerId, data.name);
             var tagsStr = "";
-             if (tags.length > 0)
-             {
-                 for (var i = 0; i < tags.length; i++)
-                 {
-
-                     tagsStr += me._generateTagLink(tags[i]);
-                     if (i != (tags.length - 1)) tagsStr += ', &nbsp;';
-                 }
-             }
-             else
-             {
-                 tagsStr = me._msg("dialog.tags.none");
-             }
-             elCell.innerHTML = '<div><span class="name-links-and-url"><a href="' + linksViewUrl + '">' + name + '</a></span>' +
-                                '<span>&nbsp;</span>' + '<span class="nodeStatus-isUpdate">' + ((eval(isUpdated)) ? "(Updated)" : "") + '</span></div>' +
-                                ((!me.options.simpleView) ? (description + '<br />' + 'URL : <a target="_blank" href="' + url + '">' + url + '</a><br />' +
-                                                            'tags : ' + tagsStr) : "");
-         }
-
-         var renderCellActions = function Links_renderCellActions(elCell, oRecord, oColumn, oData)
-         {
-            var prefix = oRecord.getData('title');
-            elCell.style.display = "none";
-
-            elCell.innerHTML = "<div class='" + me.EDITEDCLASS + ((me.options.simpleView)?" simple-view":"") + "'><a id='edit-" + prefix + "'><span>" + me._msg("links.edit") + "</a></span></div>" +
-                               "<div class='" + me.DELETEDCLASS + ((me.options.simpleView)?" simple-view":"") + "'><a id='delete-" + prefix + "'><span>" + me._msg("links.delete") + "</a></span></div>";
-
-            var elink = elCell.getElementsByTagName("a")[0];
-            var dlink = elCell.getElementsByTagName("a")[1];
-
-            elink.parentNode.onclick = function Links_onEditLink()
+            if (tags.length > 0)
             {
-               var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?container={container}&linkId={linkId}",
+               for (var i = 0; i < tags.length; i++)
                {
-                  site: me.options.siteId,
-                  container: me.options.containerId,
-                  linkId: oRecord.getData('name')
-               });
-               window.location = url;
+                  tagsStr += me._generateTagLink(tags[i]);
+                  if (i != (tags.length - 1))
+                  {
+                     tagsStr += ', &nbsp;';
+                  }
+               }
             }
-            /*elink.parentNode.onclick = function Links_updateHandler()
+            else
             {
-               me.showEditLinkDlg(oRecord)
-            };*/
+               tagsStr = me._msg("dialog.tags.none");
+            }
+            var innerHtml = '<h3 class="link-title"><a href="' + linksViewUrl + '">' + $html(name) + '</a></h3>';
+            
+            innerHtml += '<div class="detail"><span class="item"><em style="padding-right: 2px; float: left">' + me._msg("details.url") + ':</em> ' +
+                         '<a style="float: left;"' +  (internal ? '' : ' target="_blank" class="external"') + ' href=' + (url.indexOf("://") === -1 || url[0] === '/' ? 'http://' : '') +
+                         $html(url) + '>' + $html(url) + '</a></span></div>';
 
-            elink.parentNode.onmouseover = function()
+            if (!me.options.simpleView)
             {
-               Dom.addClass(this, me.EDITEDCLASS + "-over");
-            };
+               innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.created.on") + ':</em> ' + Alfresco.util.formatDate(data["createdOn"]) + '</span>' +
+                            '<span class="item"><em>' + me._msg("details.created.by") + ':</em> ' + Alfresco.util.people.generateUserLink(author) + '</span></div>';
 
-            elink.parentNode.onmouseout = function()
-            {
-               Dom.removeClass(this, me.EDITEDCLASS + "-over");
-            };
+               innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + ':</em> ' + $html(description) + '</span></div>';
 
-            dlink.parentNode.onclick = function ()
-            {
-               var mes = me._msg("dialog.confirm.message.delete").replace('{0}', prefix);
-               var callback = function() {
-                  me.deleteLinks([oRecord])
-               };
-               me.showConfirmDialog(mes, callback);
-            };
+               innerHtml += '<div class="detail"><span class="tag-item"><em>' + me._msg("details.tags") + ': </em>' + tagsStr + '</span></div>';
+            }
 
-            dlink.parentNode.onmouseover = function()
-            {
-               Dom.addClass(this, me.DELETEDCLASS + "-over");
-            };
-
-            dlink.parentNode.onmouseout = function()
-            {
-               Dom.removeClass(this, me.DELETEDCLASS + "-over");
-            };
-
-            Dom.setStyle(elCell.parentNode, "border-left", "3px solid #fff");
+            elCell.innerHTML = innerHtml;
          };
 
+         /**
+          * Actions custom datacell formatter
+          *
+          * @method renderCellActions
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         var renderCellActions = function Links_renderCellActions(elCell, oRecord, oColumn, oData)
+         {
+            var prefix = oRecord.getData("title"),
+               permissions = oRecord.getData("permissions");
+               
+            elCell.style.display = "none";
+            elCell.innerHTML = "<div class='" + me.EDITEDCLASS + "'><a id='edit-" + prefix + "'><span>" + me._msg("links.edit") + "</a></span></div>" +
+               "<div class='" + me.DELETEDCLASS + "'><a id='delete-" + prefix + "'><span>" + me._msg("links.delete") + "</a></span></div>";
+
+            var elink = elCell.getElementsByTagName("a")[0];
+            var ec = elCell.childNodes[0];
+            var dlink = elCell.getElementsByTagName("a")[1];
+            var dc = elCell.childNodes[1];
+
+            // Edit permission?
+            if (permissions["edit"])
+            {
+               ec.onclick = function Links_onEditLink()
+               {
+                  window.location = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?linkId={linkId}",
+                  {
+                     site: me.options.siteId,
+                     linkId: oRecord.getData('name')
+                  });
+               };
+
+               ec.onmouseover = function()
+               {
+                  Dom.addClass(this, me.EDITEDCLASS + "-over");
+               };
+
+               ec.onmouseout = function()
+               {
+                  Dom.removeClass(this, me.EDITEDCLASS + "-over");
+               };
+            }
+            else
+            {
+               Dom.addClass(ec, 'hidden');
+            }
+            
+            // Delete permission?
+            if (permissions["delete"])
+            {
+               dc.onclick = function ()
+               {
+                  var mes = me._msg("dialog.confirm.message.delete", prefix);
+                  var callback = function()
+                  {
+                     me.deleteLinks([oRecord]);
+                  };
+                  me.showConfirmDialog(mes, callback);
+               };
+
+               dc.onmouseover = function()
+               {
+                  Dom.addClass(this, me.DELETEDCLASS + "-over");
+               };
+
+               dc.onmouseout = function()
+               {
+                  Dom.removeClass(this, me.DELETEDCLASS + "-over");
+               };
+
+            }
+            else
+            {
+               Dom.addClass(dc, 'hidden');
+            }
+
+            // Styling
+            Dom.setStyle(elCell.parentNode, "border-left", "3px solid #fff");
+            if (me.options.simpleView)
+            {
+               Dom.addClass(elCell.parentNode, 'simple-view');
+            }
+            else
+            {
+               Dom.removeClass(elCell.parentNode, 'simple-view');
+            }
+         };
+         
          var columnDefinitions =
-               [{
-                  key: 'shortName', label: 'Short Name', sortable: false, formatter: renderCellThumbnail
-               }, {
-                  key: 'title', label: 'Title', sortable: false, formatter: renderCellDescription, editor:"textbox"
-               }, {
-                  key: 'description', label: 'Description', formatter: renderCellActions
-               }
-               ];
+         [
+            {
+               key: 'selected', label: 'Selected', sortable: false, formatter: renderCellSelected
+            },
+            {
+               key: 'title', label: 'Title', sortable: false, formatter: renderCellDescription
+            },
+            {
+               key: 'description', label: 'Description', formatter: renderCellActions
+            }
+         ];
 
          YAHOO.widget.DataTable.CLASS_SELECTED = "links-selected-row";
 
-         YAHOO.widget.DataTable.MSG_EMPTY = '<span class="datatable-msg-empty">' +
-                                            Alfresco.util.message("links.empty", "Alfresco.Links") + '</span>';
+         YAHOO.widget.DataTable.MSG_EMPTY = '<span class="datatable-msg-empty">' + this._msg("links.empty") + '</span>';
 
          this.widgets.paginator = new YAHOO.widget.Paginator(
          {
@@ -397,19 +497,24 @@
             rowsPerPage: this.options.pageSize,
             initialPage: 1,
             template: this._msg("pagination.template"),
-            pageReportTemplate: this._msg("pagination.template.page-report")
+            pageReportTemplate: this._msg("pagination.template.page-report"),
+            previousPageLinkLabel: this._msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel: this._msg("pagination.nextPageLinkLabel")
          });
 
          // called by the paginator on state changes
          var handlePagination = function Links_handlePagination (state, dt)
          {
-            me.updateLinks({ page : state.page });
-         }
+            me.updateLinks(
+            {
+               page: state.page
+            });
+         };
 
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + '-links', columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
-            initialLoad : false,
+            initialLoad: false,
             paginationEventHandler: handlePagination,
             paginator: this.widgets.paginator
          });
@@ -430,12 +535,12 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
+               this.renderLoopSize = oResponse.results.length >> YAHOO.env.ua.gecko ? 3 : 5;
             }
 
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
-         }
+         };
 
          this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
          {
@@ -445,19 +550,20 @@
 
          this.widgets.dataTable.set("selectionMode", "single");
 
-         var onRowMouseover = function(e)
+         var onRowMouseover = function Links_onRowMouseover(e)
          {
             me.widgets.dataTable.selectRow(e.target);
             e.target.cells[2].childNodes[0].style.display = "";
+            e.target.cells[2].childNodes[0].style.width = "100px";
             e.target.cells[2].style.borderLeft = "1px solid #C5E6E9";
-         }
+         };
 
-         var onRowMouseout = function(e)
+         var onRowMouseout = function Links_onRowMouseout(e)
          {
             me.widgets.dataTable.unselectRow(e.target);
             e.target.cells[2].childNodes[0].style.display = "none";
             e.target.cells[2].style.borderLeft = "1px solid #FFF";
-         }
+         };
 
          this.widgets.dataTable.subscribe("rowMouseoverEvent", onRowMouseover);
          this.widgets.dataTable.subscribe("rowMouseoutEvent", onRowMouseout);
@@ -468,21 +574,19 @@
             filterOwner: "Alfresco.LinkFilter",
             filterData: null
          }, this.options.initialFilter);
+         
          YAHOO.Bubbling.fire("filterChanged", filterObj);
-
-         this.widgets.dataTable.subscribe("initEvent",this._adjustFilterHeight,this,true);
-
       },
 
       /**
       * Generate a view url for a given site, link id.
       *
-      * @param linkId the id/name of the post
-      * @return an url to access the post
+      * @param linkId the id/name of the link
+      * @return an url to access the link
       */
       generateLinksViewUrl: function Links_generateLinksViewUrl(site, container, linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?container={container}&linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}",
          {
             site: site,
             container: container,
@@ -537,9 +641,11 @@
          {
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             this.updateListTitle();
-            this.linksMenu.set("disabled", this.getSelectedLinks().length == 0);
-            this._adjustFilterHeight();
-            YAHOO.Bubbling.fire("tagRefresh", null);
+            this.linksMenu.set("disabled", this.getSelectedLinks().length === 0);
+            var perm = oResponse.meta.metadata.linkPermissions;
+            this.options.permissionDelete = perm["delete"];
+            this.options.permissionUpdate = perm["edit"];
+            this.updateToolbar(perm);
          }
 
          function failureHandler(sRequest, oResponse)
@@ -582,7 +688,7 @@
        */
       updateListTitle: function Links_updateListTitle()
       {
-         var elem = Dom.get(this.id + '-listtitle');
+         var elem = Dom.get(this.id + '-listTitle');
          var title = this._msg("title.generic");
 
          var filterOwner = this.currentFilter.filterOwner;
@@ -592,9 +698,15 @@
          {
             switch (filterId)
             {
-               case "all":title = this._msg("title.all"); break;
-               case "internal":title = this._msg("title.internal"); break;
-               case "www":title = this._msg("title.www"); break;
+               case "all":
+                  title = this._msg("title.all");
+                  break;
+               case "user":
+                  title = this._msg("title.user");
+                  break;
+               case "recent":
+                  title = this._msg("title.recent");
+                  break;
             }
 
          }
@@ -617,7 +729,10 @@
       {
          for (var widget in this.widgets)
          {
-            this.widgets[widget].set("disabled", true);
+            if (widget)
+            {
+               this.widgets[widget].set("disabled", true);
+            }
          }
       },
 
@@ -630,24 +745,10 @@
          this.attachButtons();
          Dom.setStyle(this.id + '-links-header', 'visibility', 'visible');
          Dom.setStyle(this.id + '-body', 'visibility', 'visible');
-         this._generateRSSFeedUrl();
+
          this.createDataSource();
-         this._createResizeCovers();
          this._attachResize();
          this.createDataTable();
-         //this._initCreateLinkDialog();
-      },
-
-      /**
-       * create of components
-       * @method _createResizeCovers.
-       */
-      _createResizeCovers : function Links__createResizeCovers()
-      {
-         this.leftCover = document.createElement("div");
-         this.rightCover = document.createElement("div");
-         this.leftCover.className = this.rightCover.className = "cover";
-         if (YAHOO.env.ua.ie) this.leftCover.style.backgroundColor = this.rightCover.style.backgroundColor = "red"
       },
 
       /**
@@ -659,9 +760,8 @@
       {
          if (width)
          {
-            //Dom.setStyle(Dom.get("divLinkFilters"), "height", "auto");
+            Dom.setStyle(Dom.get("divLinkFilters"), "height", "auto");
             Dom.setStyle(Dom.get("divLinkList"), "margin-left", width + 3 + "px");
-            this._adjustFilterHeight();
          }
       },
 
@@ -683,6 +783,7 @@
                };
                this.showConfirmDialog(this._msg("dialog.confirm.message.delete.selected"), callback);
                break;
+               
             case "deselect-item" :
                this.deselectAll();
                this.linksMenu.set("disabled", true);
@@ -713,30 +814,35 @@
       attachButtons : function Links_attachButtons()
       {
          var me = this;
-         this.newLinkBtn = new YAHOO.widget.Button(this.id + '-create-link-button');
-         this.newLinkBtn.addListener("click", this.showCreateLinkDlg, this, true);
+         this.newLinkBtn = Alfresco.util.createYUIButton(this, "create-link-button", this.showCreateLinkDlg,
+         {
+            disabled: false,
+            value: "create"
+         });
 
-         this.linksMenu = new YAHOO.widget.Button(this.id + '-selected-i-dd',
+         this.linksMenu = Alfresco.util.createYUIButton(this, "selected-i-dd", this.onMenuItemClick,
+         {
+            disabled : true,
+            type: "menu",
+            menu:"selectedItems-menu"
+         });
+
+         this.changeListViewBtn = Alfresco.util.createYUIButton(this, "viewMode-button", this.changeListView,
+         {
+         });
+
+         this.linksSelectMenu = Alfresco.util.createYUIButton(this, "select-button", this.onSelectItemClick,
          {
             type: "menu",
-            menu: this.id + "-selectedItems-menu"
-         });
-         this.linksMenu.set("disabled", true);
-         this.linksMenu.getMenu().subscribe("click", this.onMenuItemClick, this, true);
-         this.changeListViewBtn = new YAHOO.widget.Button(this.id + "-viewMode-button",
-         {
-            type : "checkbox",
-            checked : false
-         });
-         this.changeListViewBtn.addListener('click', this.changeListView, this, true);
-
-         this.linksSelectMenu = new YAHOO.widget.Button(this.id + '-select-button',
-         {
-            type: "menu",
-            menu: this.id + "-selecItems-menu"
+            menu: "selecItems-menu"
          });
 
-         this.linksSelectMenu.getMenu().subscribe('click', this.onSelectItemClick, this, true);
+         this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rss-feed", null,
+         {
+            type: "link"
+         });
+
+         this.widgets.rssFeed.set("href", this._generateRSSFeedUrl());
       },
 
       /**
@@ -749,7 +855,10 @@
       onSelectItemClick : function Links_onSelectItemClick(sType, aArgs, p_obj)
       {
          var elem = YAHOO.env.ua.ie ? aArgs[0].srcElement : aArgs[0].target;
-         if (elem.tagName.toLocaleLowerCase() != "span") elem = elem.getElementsByTagName("span")[0];
+         if (elem.tagName.toLocaleLowerCase() != "span")
+         {
+            elem = elem.getElementsByTagName("span")[0];
+         }
          switch (elem.className.split(" ")[0])
          {
             case "links-action-deselect-all" :
@@ -780,7 +889,7 @@
          {
             var ipt = rows[i].cells[0].getElementsByTagName('input')[0];
             ipt.checked = !ipt.checked;
-            isDisable = (ipt.checked) ? true : isDisable;
+            isDisable = ipt.checked ? true : isDisable;
          }
          this.linksMenu.set("disabled", !isDisable);
       },
@@ -804,21 +913,9 @@
        */
       showCreateLinkDlg : function Links_showCreateLinkDlg()
       {
-         /*this.widgets.createLinkDlg.setOptions(
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit",
          {
-            onSuccess:
-            {
-               fn: this.createLink,
-               scope: this
-            },
-            editMode: false,
-            clearForm: true
-         });
-         this.widgets.createLinkDlg.show();*/
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?container={container}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
+            site: this.options.siteId
          });
          window.location = url;
       },
@@ -837,31 +934,14 @@
          var j = 0;
          for (var i in records)
          {
-            colDefinitions[1].formatter.call(this, rows[j].cells[1].firstChild, records[i]);
-            colDefinitions[2].formatter.call(this, rows[j].cells[2].firstChild, records[i]);
-            j++;
-         }
-         this._adjustFilterHeight();
-      },
-
-      /**
-       * Shows 'Edit link' dialog.
-       * @method editLink.
-       */
-      showEditLinkDlg: function Links_showEditLinkDlg(row)
-      {
-         this.widgets.createLinkDlg.setOptions(
-         {
-            onSuccess:
+            if (i)
             {
-               fn: this.onUpdateLink,
-               obj: row,
-               scope: this
-            },
-            editMode: true,
-            clearForm: true
-         });
-         this.widgets.createLinkDlg.show(row.getData());
+               colDefinitions[1].formatter.call(this, rows[j].cells[1].firstChild, records[i]);
+               colDefinitions[2].formatter.call(this, rows[j].cells[2].firstChild, records[i]);
+               j++;
+            }
+         }
+         this.changeListViewBtn.set("label", this._msg(this.options.simpleView ? "header.detailedList" : "header.simpleList"));
       },
 
       /**
@@ -871,16 +951,19 @@
       deleteLinks: function Links_deleteLinks(arr)
       {
          var me = this;
-         if (! this._setBusy(this._msg('message.wait')))
+         if (!this._setBusy(this._msg('message.wait')))
          {
             return;
          }
 
          // get the url to call
-         var ids = new Array();
+         var ids = [];
          for (var i in arr)
          {
-            ids.push(arr[i].getData().name);
+            if (i)
+            {
+               ids.push(arr[i].getData().name);
+            }
          }
 
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/links/delete/site/{site}/{container}",
@@ -890,13 +973,14 @@
          });
 
          // ajax request success handler
-         var onDeletedSuccess = function Links_deleteLinkPostConfirm_onDeletedSuccess(response)
+         var onDeletedSuccess = function Links_deleteLinkConfirm_onDeletedSuccess(response)
          {
             // remove busy message
             this._releaseBusy();
 
             // reload the table data
             this.updateLinks();
+            YAHOO.Bubbling.fire("tagRefresh");
          };
 
          // execute ajax request
@@ -916,6 +1000,7 @@
             {
                fn: function(response)
                {
+                  response.config.failureMessage = YAHOO.lang.JSON.parse(response.serverResponse.responseText).message;
                   this._releaseBusy();
                },
                scope: this
@@ -964,29 +1049,23 @@
          {
             text: mes,
             buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function()
                {
-                  text: this._msg("button.delete"),
-                  handler: function()
-                  {
-                     callback();
-                     this.destroy();
-                  },
-                  isDefault: true
+                  callback();
+                  this.destroy();
+               }
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function()
+               {
+                  this.destroy();
                },
-               {
-                  text: this._msg("button.cancel"),
-                  handler: function()
-                  {
-                     this.destroy();
-                  }
-               }]
+               isDefault: true
+            }]
          });
-         if (YAHOO.env.ua.ie)
-         {
-            prompt.element.style.width = "300px";
-            prompt.underlay.style.width = "300px";
-            prompt.center();
-         }
       },
 
       /**
@@ -1003,7 +1082,10 @@
             if (rows[i].cells[0].getElementsByTagName('input')[0].checked)
             {
                var data = this.widgets.dataTable.getRecord(i);
-               if (data)arr.push(data);
+               if (data)
+               {
+                  arr.push(data);
+               }
             }
          }
 
@@ -1020,7 +1102,6 @@
        */
       _attachResize : function Links__attachResize()
       {
-         var me = this;
          this.widgets.horizResize = new YAHOO.util.Resize("divLinkFilters",
          {
             handles: ["r"],
@@ -1028,42 +1109,13 @@
             maxWidth: this.options.MAX_FILTER_PANEL_WIDTH
          });
 
-         var resizeCovers = function()
-         {
-            var leftWidth = me.widgets.horizResize._handles['r'].offsetLeft + 10;
-            me.leftCover.style.width = leftWidth + "px";
-            me.rightCover.style.left = (leftWidth + 5) + "px";
-            me.rightCover.style.width = (Dom.get("doc3").offsetWidth - leftWidth + 15) + "px";
-            me.leftCover.style.height = me.rightCover.style.height = (Dom.get("ft").offsetHeight + Dom.get("doc3").offsetHeight) + "px";
-         }
-
-         this.widgets.horizResize.on("startResize",
-               function()
-               {
-                  document.body.appendChild(me.leftCover);
-                  document.body.appendChild(me.rightCover);
-                  resizeCovers();
-               }, this, true);
 
          this.widgets.horizResize.on("resize",
                function(eventTarget)
                {
-                  resizeCovers();
                   this.onTopicListResize(eventTarget.width);
                }, this, true);
 
-         this.widgets.horizResize.on("endResize",
-               function()
-               {
-                  document.body.removeChild(me.leftCover);
-                  document.body.removeChild(me.rightCover);
-                  me._adjustFilterHeight();
-               }, this, true);
-
-         document.body.onresize = function()
-         {
-            me._adjustFilterHeight();
-         }
          this.widgets.horizResize.resize(null, null, this.options.MIN_FILTER_PANEL_WIDTH, 0, 0, true);
       },
 
@@ -1089,29 +1141,6 @@
          return this.id + "-tagId-" + id;
       },
 
-      /**
-       * Adjusts the height of filter panel.
-       *
-       * @method _adjustFilterHeight
-       */
-      _adjustFilterHeight: function Links__adjustFilterHeight()
-      {
-         var h = Dom.get("ft").parentNode.offsetTop - Dom.get("hd").offsetHeight;
-         if (YAHOO.env.ua.ie == 6)
-         {
-            var hd = Dom.get("hd"), tmpHeight = -5;
-            tmpHeight += hd.childNodes[0].offsetHeight;
-            tmpHeight += hd.childNodes[1].offsetHeight;
-            tmpHeight += hd.childNodes[2].offsetHeight;
-            h = Dom.get("ft").parentNode.offsetTop - tmpHeight; 
-         }
-         if (this.options.MAX_FILTER_PANEL_HEIGHT > h)
-         {
-            h = this.options.MAX_FILTER_PANEL_HEIGHT;
-         }
-         this.widgets.horizResize._handles['r'].style.height = h + 'px';
-      },
-
       /**Build URI parameter string for doclist JSON data webscript
        *
        * @method _buildDocListParams
@@ -1128,7 +1157,7 @@
 
             page: this.widgets.paginator.get("page") || "1",
             pageSize: this.widgets.paginator.get("rowsPerPage")
-         }
+         };
 
          // Passed-in overrides
          if (typeof p_obj == "object")
@@ -1148,12 +1177,17 @@
          var url = "";
          if (filterOwner == "Alfresco.LinkFilter")
          {
-            // latest only
             switch (filterId)
             {
-               case "all":url = "?filter=all";break;
-               case "internal":url = "?filter=internal";break;
-               case "www":url = "?filter=www";break;
+               case "all":
+                  url = "?filter=all";
+                  break;
+               case "user":
+                  url = "?filter=user";
+                  break;
+               case "recent":
+                  url = "?filter=recent";
+                  break;
             }
          }
          else if (filterOwner == "Alfresco.LinkTags")
@@ -1175,7 +1209,7 @@
          {
             urlExt = urlExt.substring(1);
          }
-         return url + '&format=json' + "&" + urlExt;
+         return url + "&" + urlExt;
 
       },
 
@@ -1187,7 +1221,7 @@
        * @return {string} The custom message
        * @private
        */
-      _msg:function Links_msg(messageId)
+      _msg: function Links_msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
       },
@@ -1267,7 +1301,7 @@
          return html;
       },
 
-            /**
+      /**
        * Generates the HTML mark-up for the RSS feed link
        *
        * @method _generateRSSFeedUrl
@@ -1275,16 +1309,12 @@
        */
       _generateRSSFeedUrl: function Links__generateRSSFeedUrl()
       {
-         var divFeed = Dom.get(this.id + "-rssFeed");
-         if (divFeed)
-         {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "service/components/links/rss?site={site}&amp;container={container}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "service/components/links/rss?site={site}",
             {
-               site: this.options.siteId,
-               container: this.options.containerId
+               site: this.options.siteId
             });
-            divFeed.innerHTML = '<a href="' + url + '">' + this._msg("header.rssFeed") + '</a>';
-         }
+
+       return url;
       }
-   }
+   };
 })();

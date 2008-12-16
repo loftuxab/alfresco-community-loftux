@@ -79,7 +79,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
 
       return this;
-   }
+   };
 
    Alfresco.LinkTags.prototype =
    {
@@ -194,11 +194,7 @@
             return true;
          });
 
-         // Kick-off tag population
-         /*if (this.options.siteId && this.options.containerId)
-         {
-            YAHOO.Bubbling.fire("tagRefresh");
-         }*/
+         YAHOO.Bubbling.fire("tagRefresh");
       },
 
 
@@ -371,5 +367,5 @@
          }
          return this.id + "-tagId-" + id;
       }
-   }
+   };
 })();

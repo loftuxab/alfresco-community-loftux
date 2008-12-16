@@ -2,7 +2,7 @@
    new Alfresco.CreateComment("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${args.container!"blog"}",
+      containerId: "${args.container!"links"}",
       height: ${args.editorHeight!250},
       width: ${args.editorWidth!538}
    }).setMessages(
@@ -11,9 +11,7 @@
 //]]></script>
 
 <div id="${args.htmlid}-form-container" class="addCommentForm hidden">
-	<div class="commentFormTitle">
-		${msg("addComment")}:
-	</div>
+	<div class="commentFormTitle">${msg("addComment")}:</div>
 	<div class="editComment">
 		<form id="${htmlid}-form" method="post" action="">
 		    <div>
@@ -23,7 +21,6 @@
             <input type="hidden" id="${args.htmlid}-itemTitle" name="itemTitle" value="" />
             <input type="hidden" id="${args.htmlid}-page" name="page" value="" />
             <input type="hidden" id="${args.htmlid}-pageParams" name="pageParams" value="" />
-
 			   <textarea id="${htmlid}-content" rows="8" cols="80" name="content"></textarea>
 			</div>
 			<div class="commentFormAction">

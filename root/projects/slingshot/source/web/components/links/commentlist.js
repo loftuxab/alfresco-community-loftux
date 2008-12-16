@@ -50,7 +50,7 @@
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
       YAHOO.Bubbling.on("refreshComments", this.refreshComments, this);
       return this;
-   }
+   };
 
    Alfresco.CommentList.prototype =
    {
@@ -220,14 +220,14 @@
                if (typeof me[action] == "function")
                {
                   var commentElem = Dom.getAncestorByClassName(owner, 'comment');
-                  var index = parseInt(commentElem.id.substring((me.id + '-comment-view-').length));
+                  var index = parseInt(commentElem.id.substring((me.id + '-comment-view-').length),10);
                   me[action].call(me, index);
                   args[1].stop = true;
                }
             }
 
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("linkcomment-action", fnActionHandlerDiv);
 
          // initialize the mouse over listener
@@ -328,7 +328,7 @@
       /**
        * Load comments ajax request success handler.
        */
-      loadCommentsSuccess: function CommentsList_loadCommentsSuccess(response)
+      loadCommentsSuccess: function CommentList_loadCommentsSuccess(response)
       {
          // make sure any edit data is cleared
          this._hideEditView();
@@ -372,7 +372,7 @@
          var eventData =
          {
             canCreateComment: response.json.nodePermissions.create
-         }
+         };
          YAHOO.Bubbling.fire("setCanCreateComment", eventData);
 
          this._updatePaginator(response.json.startIndex, response.json.total);
@@ -388,12 +388,13 @@
        * @param page {int} The page of comments in the paging list that is displayed
        * @param total {int} The totla number of comments in the paging
        */
-      _updatePaginator: function LinksComment__updatePaginator(page, total)
+      _updatePaginator: function CommentList__updatePaginator(page, total)
       {
          if(this.widgets && this.widgets.paginator)
          {
-            this.widgets.paginator.set('recordOffset', page);
             this.widgets.paginator.set('totalRecords', total);
+            this.widgets.paginator.set('recordOffset', page);
+
          }
          else
          {
@@ -404,7 +405,7 @@
       /**
        * Edit comment action links handler.
        */
-      onEditComment: function LinksComment_onEditComment(row)
+      onEditComment: function CommentList_onEditComment(row)
       {   
          var data = this.commentsData[row];
          this._loadForm(row, data);
@@ -413,7 +414,7 @@
       /**
        * Delete comment action links handler.
        */
-      onDeleteComment: function LinksComment_onDeleteComment(row)
+      onDeleteComment: function CommentList_onDeleteComment(row)
       {
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
@@ -422,7 +423,7 @@
             buttons: [
             {
                text: this._msg("button.delete"),
-               handler: function LinksComment_onDeleteComment_delete()
+               handler: function CommentList_onDeleteComment_delete()
                {
                   this.destroy();
                   me._onDeleteCommentConfirm.call(me, row);
@@ -431,7 +432,7 @@
             },
             {
                text: this._msg("button.cancel"),
-               handler: function LinksComment_onDeleteComment_cancel()
+               handler: function CommentList_onDeleteComment_cancel()
                {
                   this.destroy();
                }
@@ -442,7 +443,7 @@
       /**
        * Delete comment implementation.
        */
-      _onDeleteCommentConfirm: function LinksComment__onDeleteCommentConfirm(row)
+      _onDeleteCommentConfirm: function CommentList__onDeleteCommentConfirm(row)
       {
          var data = this.commentsData[row];
          this._deleteComment(row, data);
@@ -453,7 +454,7 @@
       /**
        * Implementation of the comment deletion action
        */
-      _deleteComment: function LinksComment__deleteComment(row, data)
+      _deleteComment: function CommentList__deleteComment(row, data)
       {
          // show busy message
          if (! this._setBusy(this._msg('message.wait')))
@@ -462,7 +463,7 @@
          }
 
          // ajax request success handler
-         var success = function LinksComment__deleteComment_success(response, object)
+         var success = function CommentList__deleteComment_success(response, object)
          {
             // remove busy message
             this._releaseBusy();
@@ -472,7 +473,7 @@
          };
 
          // ajax request success handler
-         var failure = function LinksComment__deleteComment_failure(response, object)
+         var failure = function CommentList__deleteComment_failure(response, object)
          {
             // remove busy message
             this._releaseBusy();
@@ -516,7 +517,7 @@
       /**
        * Loads the comment edit form
        */
-      _loadForm: function LinksComment__loadForm(row, data)
+      _loadForm: function CommentList__loadForm(row, data)
       {
          // we always load the template through an ajax request
          var formId = this.id + "-edit-comment-" + row;
@@ -546,7 +547,7 @@
        * @method onFormLoaded
        * @param response {object} Server response from load form XHR request
        */
-      onFormLoaded: function LinksComment_onFormLoaded(response, obj)
+      onFormLoaded: function CommentList_onFormLoaded(response, obj)
       {
          // get the data and formId of the loaded form
          var row = 0;
@@ -589,7 +590,7 @@
             row: row,
             widgets : {},
             formId: formId
-         }
+         };
 
          // and finally register the form handling
          this._registerEditCommentForm(row, data, formId);
@@ -599,7 +600,7 @@
        * Registers the form with the html (that should be available in the page)
        * as well as the buttons that are part of the form.
        */
-      _registerEditCommentForm: function LinksComment__registerEditCommentForm(row, data, formId)
+      _registerEditCommentForm: function CommentList__registerEditCommentForm(row, data, formId)
       {
          // register the okButton
          this.editData.widgets.okButton = new YAHOO.widget.Button(formId + "-submit", {type: "submit"});
@@ -658,14 +659,14 @@
                this.editData.widgets.editor.saveHTML();
             },
             scope: this
-         }
+         };
          commentForm.init();
       },
 
       /**
        * Edit form submit success handler
        */
-      onEditFormSubmitSuccess: function LinksComment_onCreateFormSubmitSuccess(response, object)
+      onEditFormSubmitSuccess: function CommentList_onCreateFormSubmitSuccess(response, object)
       {
          this.editData.widgets.feedbackMessage.destroy();
 
@@ -682,7 +683,7 @@
       /**
        * Edit form submit failure handler
        */
-      onEditFormSubmitFailure: function LinksComment_onEditFormSubmitFailure(response, args)
+      onEditFormSubmitFailure: function CommentList_onEditFormSubmitFailure(response, args)
       {
          this.editData.widgets.feedbackMessage.destroy();
          this.editData.widgets.okButton.set("disabled", false);
@@ -693,7 +694,7 @@
       /**
        * Form cancel button click handler
        */
-      onEditFormCancelButtonClick: function LinksComment_onEditFormCancelButtonClick(type, args)
+      onEditFormCancelButtonClick: function CommentList_onEditFormCancelButtonClick(type, args)
       {
           this._hideEditView();
       },
@@ -702,14 +703,14 @@
        * Renders a comment element.
        * Each comment element consists of an edit and a view div.
        */
-      renderComment: function LinksComment_renderComment(index, data)
+      renderComment: function CommentList_renderComment(index, data)
       {
          // add a div for the comment edit form
          var html = '';
          html += '<div id="' + this.id + '-comment-edit-' + index + '" class="hidden"></div>';
 
          // output the view
-         var rowClass = index % 2 == 0 ? "even" : "odd";
+         var rowClass = index % 2 === 0 ? "even" : "odd";
          html += '<div class="comment ' + rowClass + '" id="' + this.id + '-comment-view-' + index + '">';
          html += this.renderCommentView(index, data);
          html += '</div>';
@@ -720,12 +721,12 @@
       /**
        * Renders the content of the comment view div.
        */
-      renderCommentView: function LinksComment_renderCommentView(index, data)
+      renderCommentView: function CommentList_renderCommentView(index, data)
       {
          var html = '';
 
          // actions
-         html += '<div class="nodeEdit">'
+         html += '<div class="nodeEdit">';
          if (data.permissions.edit)
          {
             html += '<div class="onEditComment"><a href="#" class="linkcomment-action">' + this._msg("action.edit") + '</a></div>';
@@ -737,7 +738,7 @@
          html += '</div>';
 
          // avatar image
-         html += '<div class="authorPicture">' + Alfresco.util.people.generateUserAvatarImg(data.author) + '</div>'
+         html += '<div class="authorPicture">' + Alfresco.util.people.generateUserAvatarImg(data.author) + '</div>';
 
          // comment info and content
          html += '<div class="nodeContent"><div class="userLink">' + Alfresco.util.people.generateUserLink(data.author);
@@ -746,13 +747,13 @@
          {
             html += '<span class="nodeStatus">(' + this._msg("comment.updated") + ')</span>';
          }
-         html += '</div>'
-         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>'
+         html += '</div>';
+         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
          html += '</div>';
 
          // footer
-         html += '<div class="commentFooter">'
-         html += '<span class="nodeFooterBlock">'
+         html += '<div class="commentFooter">';
+         html += '<span class="nodeFooterBlock">';
          html += '<span class="nodeAttrLabel">' + this._msg("comment.postedOn") + ': ';
          html += Alfresco.util.formatDate(data.createdOn);
          html += '</span></span></div>';
@@ -797,14 +798,14 @@
        */
       _hideEditView: function CommentList__hideEditView()
       {
-         if (this.editData.editDiv != null)
+         if (this.editData.editDiv !== null)
          {
             // hide edit div and remove form
             Dom.addClass(this.editData.editDiv, "hidden");
             this.editData.editDiv.innerHTML = "";
             this.editData.editDiv = null;
          }
-         if (this.editData.viewDiv != null)
+         if (this.editData.viewDiv !== null)
          {
             // display view div
             Dom.removeClass(this.editData.viewDiv, "hidden");
@@ -818,7 +819,7 @@
        *
        * @return true if the busy state was set, false if the component is already busy
        */
-      _setBusy: function LinksComment__setBusy(busyMessage)
+      _setBusy: function CommentList__setBusy(busyMessage)
       {
          if (this.busy)
          {
@@ -837,7 +838,7 @@
       /**
        * Removes the busy message and marks the component as non-busy
        */
-      _releaseBusy: function LinksComment__releaseBusy()
+      _releaseBusy: function CommentList__releaseBusy()
       {
          if (this.busy)
          {

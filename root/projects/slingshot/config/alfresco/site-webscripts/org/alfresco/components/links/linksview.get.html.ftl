@@ -11,7 +11,7 @@
 
 <div class="linksview-header">
 	<div class="navbar">
-		<span class="backLink">
+		<span class="back-link">
 			<a href="${url.context}/page/site/${page.url.templateArgs.site}/links">
 				${msg("header.back")}
 			</a>

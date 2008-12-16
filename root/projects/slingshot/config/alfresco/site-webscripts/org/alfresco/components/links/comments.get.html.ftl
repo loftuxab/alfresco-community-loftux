@@ -1,4 +1,3 @@
-
 <script type="text/javascript">//<![CDATA[
    new Alfresco.CommentList("${args.htmlid}").setOptions(
    {
@@ -12,8 +11,6 @@
 //]]></script>
 
 <div id="${args.htmlid}-body" class="comment-list" style="display:none;">
-
-
    <div class="postlist-infobar">
       <div id="${args.htmlid}-title" class="commentsListTitle"></div>
       <div id="${args.htmlid}-paginator" class="paginator"></div>

@@ -1,5 +1,7 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
+   <!-- General Links Assets -->
+   <script type="text/javascript" src="${page.url.context}/components/links/linksdiscuss-common.js"></script>
 </@>
 
 <@template.body>

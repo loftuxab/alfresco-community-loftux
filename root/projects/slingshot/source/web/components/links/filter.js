@@ -70,7 +70,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
 
       return this;
-   }
+   };
    
    Alfresco.LinkFilter.prototype =
    {
