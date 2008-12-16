@@ -1,0 +1,48 @@
+/********
+ * FORM *
+*********/
+.editLinkForm
+{
+  margin: 4px;
+  border: thin solid #000;
+  padding: 4px;
+  background-color: #FAFAFA;
+}
+
+.editLinkForm label
+{
+  width: 100px;
+  float: left;
+  text-align: right;
+  clear: left;
+  margin: 5px 15px 7px 0;
+}
+
+.editLinkForm input, .editLinkForm textarea
+{
+  margin-bottom: 15px;
+}
+
+.editLinkForm .internal
+{
+  margin-top: 6px;
+  margin-bottom: 0px;
+}
+
+.editLinkForm .nodeFormAction
+{
+  margin: 0 0 10px 115px;
+}
+
+/* Tag lib */
+.editLinkForm .taglibrary
+{
+  margin-bottom : 0px;
+  margin-left : 115px;	
+}
+
+.hidden
+{
+  display: none;
+}
+

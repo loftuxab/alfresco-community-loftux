@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>generic-page</shortname>
+  <description>Generic page component</description>
+  <url>/components/generic-page</url>
+</webscript>

@@ -1,6 +1,7 @@
 <#assign activeSite = page.url.templateArgs.site!"">
 <#assign activePage = page.url.templateArgs.pageid!"dashboard">
 <#if activePage = "blog-postview" || activePage = "blog-postedit"><#assign activePage="blog-postlist"></#if>
+<#if activePage = "links-linkedit" || activePage = "links-view"><#assign activePage="links"></#if>
 <#if activePage = "discussions-topicview"><#assign activePage="discussions-topiclist"></#if>
 <#if activePage = "document-details"><#assign activePage="documentlibrary"></#if>
 <#if activePage = "wiki-create"><#assign activePage="wiki"></#if>

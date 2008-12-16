@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>node-info</id>
+   <page-type>node-info</page-type>
+   <title>Node info</title>
+   <description>Node info</description>
+   <template-instance>node-info</template-instance>
+   <authentication>user</authentication>
+</page>
