@@ -24,18 +24,17 @@
  */
 package org.alfresco.web.framework;
 
-import java.net.URLDecoder;
-
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 
 /**
  * The Class AbstractModelObjectPersister.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public abstract class AbstractModelObjectPersister implements ModelObjectPersister
 {
-    protected String objectTypeId;
+    protected final String objectTypeId;
 
     /**
      * Instantiates a new abstract model object persister.
@@ -65,21 +64,23 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     }
     
     /**
-     * Default way to convert a storage path into an object id
-     * This essentially just strips the extension from the file name.
+     * Default way to convert a storage path into an object id is to
+     * strips the extension (if any) from the file name.
+     * <p>
+     * This method should never return a null value.
      * 
-     * @param storagePath the storage path
+     * @param path  the storage path
      * 
-     * @return the string
+     * @return the id for this path
      */
-    public String pathToId(String storagePath)
+    public String pathToId(String path)
     {
-        String id = null;
+        String id = path;
         
-        int x = storagePath.lastIndexOf('.');
-        if (x != -1)
+        int i = path.lastIndexOf('.');
+        if (i != -1)
         {
-            id = storagePath.substring(0, x);
+            id = path.substring(0, i);
         }
         
         return id;
@@ -87,14 +88,16 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     
     /**
      * Default way to convert an object id into a storage path
-     * This just adds the .xml extension to the id.
+     * is to add the .xml extension to the object id.
+     * <p>
+     * This method should never return a null value.
      * 
      * @param objectId the object id
      * 
-     * @return the string
+     * @return the storage path for this id
      */
-    public String idToPath(String objectId)
+    public String idToPath(String id)
     {
-        return new StringBuilder(objectId.length() + 4).append(objectId).append(".xml").toString();
+        return new StringBuilder(id.length() + 4).append(id).append(".xml").toString();
     }
 }

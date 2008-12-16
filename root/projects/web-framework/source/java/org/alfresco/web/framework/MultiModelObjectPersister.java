@@ -25,7 +25,6 @@
 package org.alfresco.web.framework;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
@@ -33,17 +32,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * The Class MultiModelObjectPersister.
+ * MultiModelObjectPersister class maintains the ModelObjectPersister contract
+ * but redirects the persistance and retreval of object to a number of delegates.
+ * The delegate persisters can be of any persister implementation and are called
+ * in order of the supplied map of persisters during construction.  
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class MultiModelObjectPersister implements ModelObjectPersister
 {
-    private static Log logger = LogFactory.getLog(MultiModelObjectPersister.class);
-    private String persisterId;
-    private String objectTypeId;
-    private WebFrameworkManager service;    
-    private Map<String, ModelObjectPersister> persisters = null;
+    private final static Log logger = LogFactory.getLog(MultiModelObjectPersister.class);
+    private final String persisterId;
+    private final String objectTypeId;
+    private final WebFrameworkManager service;    
+    private final Map<String, ModelObjectPersister> persisters;
     
     /**
      * Instantiates a new multi model object persister.
@@ -89,12 +92,9 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         ModelObject modelObject = null;
         
-        // for each persister, see if we can load the object from its
-        // underlying storage
-        Iterator<String> it = this.persisters.keySet().iterator();
-        while (it.hasNext())
+        // for each persister, see if we can load the object from its underlying storage
+        for (String persisterId : this.persisters.keySet())
         {
-            String persisterId = it.next();
             ModelObjectPersister persister = persisters.get(persisterId);
             
             // try to load the object
@@ -109,6 +109,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
             {
                 throw new ModelObjectPersisterException("Error loading object id: " + objectId + " from persister id: " + persisterId, mope);
             }
+            
             if (modelObject != null)
             {
                 if (logger.isDebugEnabled())
@@ -164,11 +165,9 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         boolean removed = false;
         
-        // for each persister, see if we can load the object from its underlying storage
-        Iterator<String> it = this.persisters.keySet().iterator();
-        while (it.hasNext())
+        // for each persister, see if we can find the object from its underlying storage
+        for (String persisterId : this.persisters.keySet())
         {
-            String persisterId = it.next();
             ModelObjectPersister persister = persisters.get(persisterId);
             
             if (persister.hasObject(context, objectId))
@@ -179,7 +178,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
                 removed = persister.removeObject(context, objectId);
                 
                 if (logger.isDebugEnabled())
-                    logger.debug("removeObject remove from persister '" + persisterId + "' returned: " + removed);
+                    logger.debug("removeObject removed from persister '" + persisterId + "' returned: " + removed);
                 
                 break;
             }
@@ -204,15 +203,14 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         boolean hasObject = false;
         
         // for each persister, see if we can load the object from its underlying storage
-        Iterator<String> it = this.persisters.keySet().iterator();
-        while (it.hasNext())
+        for (String persisterId : this.persisters.keySet())
         {
-            String persisterId = it.next();
             ModelObjectPersister persister = persisters.get(persisterId);
             
             if (persister.hasObject(context, objectId))
             {
                 hasObject = true;
+                break;
             }
         }
         
@@ -252,11 +250,9 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         Map<String, ModelObject> objects = new HashMap<String, ModelObject>(512, 1.0f);
         
-        // for each persister, see if we can load the object from its underlying storage
-        Iterator<String> it = this.persisters.keySet().iterator();
-        while (it.hasNext())
+        // for each persister, see if we can load all objects from its underlying storage
+        for (String persisterId : this.persisters.keySet())
         {
-            String persisterId = it.next();
             ModelObjectPersister persister = persisters.get(persisterId);
             
             Map<String, ModelObject> map = persister.getAllObjects(context);
@@ -264,11 +260,34 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         }
         
         if (logger.isDebugEnabled())
-            logger.debug("getAllObjects for type: " + this.objectTypeId + " return set of size: " + objects.size());
+            logger.debug("getAllObjects for type: " + this.objectTypeId + " returned set of size: " + objects.size());
         
         return objects;
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.ModelObjectPersister#getAllObjectsByFilter(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
+     */
+    public Map<String, ModelObject> getAllObjectsByFilter(ModelPersistenceContext context, String filter) throws ModelObjectPersisterException
+    {
+        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(128, 1.0f);
+        
+        // for each persister, see if we can load all objects from its underlying storage
+        for (String persisterId : this.persisters.keySet())
+        {
+            ModelObjectPersister persister = persisters.get(persisterId);
+            
+            Map<String, ModelObject> map = persister.getAllObjectsByFilter(context, filter);
+            objects.putAll(map);
+        }
+        
+        if (logger.isDebugEnabled())
+            logger.debug("getAllObjects for type: " + this.objectTypeId + " by filter: " + filter +
+                         " returned set of size: " + objects.size());
+        
+        return objects;
+    }
+
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#getTimestamp(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
@@ -278,21 +297,15 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         long timestamp = -1;
         
         // find the persister that has the object
-        Iterator<String> it = this.persisters.keySet().iterator();
-        while (it.hasNext())
+        for (String persisterId : this.persisters.keySet())
         {
-            String persisterId = it.next();
             ModelObjectPersister persister = persisters.get(persisterId);
             
             if (persister.hasObject(context, objectId))
             {
                 timestamp = persister.getTimestamp(context, objectId);
+                break;
             }
-        }
-        
-        if (timestamp == -1)
-        {
-            throw new ModelObjectPersisterException("Unable to find object: " + objectId + " in any persister, unable to return timestamp");
         }
         
         return timestamp;
@@ -303,11 +316,25 @@ public class MultiModelObjectPersister implements ModelObjectPersister
      */
     public void invalidateCache()
     {
-        Iterator<ModelObjectPersister> it = this.persisters.values().iterator();
-        while (it.hasNext())
+        for (ModelObjectPersister persister : this.persisters.values())
         {
-            ModelObjectPersister persister = it.next();            
             persister.invalidateCache();
         }
-    }    
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder out = new StringBuilder();
+        int i = 0;
+        for (ModelObjectPersister p : this.persisters.values())
+        {
+            if (i == 0) out.append("[");
+            out.append(p.toString());
+            if (i < this.persisters.size() - 1) out.append(", ");
+            if (i == this.persisters.size() - 1) out.append("]");
+            i++;
+        }
+        return out.toString();
+    }
 }

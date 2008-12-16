@@ -576,6 +576,24 @@ public class Model
     }
     
     /**
+     * Returns a map with all object instances of the given type filtered
+     * by the given object ID filter pattern. This mechanism can be used for all
+     * model object types that persist themselves with a deterministically generated
+     * path from their respective object IDs, such as pages and components.
+     * <p>
+     * Object ID patterns support wildcard '*' only i.e. "page.*.dashboard"
+     * 
+     * @param objectTypeId  the object type id
+     * @param filter        the object id filter pattern
+     * 
+     * @return the map
+     */
+    public Map<String, ModelObject> getAllObjects(String objectTypeId, String filter)
+    {
+        return this.getObjectManager().getAllObjects(Component.TYPE_ID, filter);
+    }
+    
+    /**
      * Returns a map of Chrome instances
      * 
      * @return the map< string, model object>
@@ -763,7 +781,7 @@ public class Model
      */
     public Map<String, ModelObject> findComponents()
     {
-        return findComponents(null, null, null, null);
+        return findObjects(Component.TYPE_ID);
     }
 
     /**
@@ -791,15 +809,39 @@ public class Model
     public Map<String, ModelObject> findComponents(
             String scope, String regionId, String sourceId, String componentTypeId)
     {
-        // build property map
-        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE, scope);
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_REGION_ID, regionId);
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID, sourceId);
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_COMPONENT_TYPE_ID, componentTypeId);
-        
-        // do the lookup
-        return findObjects(Component.TYPE_ID, propertyConstraintMap);
+        if (componentTypeId != null || (scope == null && regionId == null && sourceId == null))
+        {
+            // build property map
+            Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+            addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE, scope);
+            addPropertyConstraint(propertyConstraintMap, Component.PROP_REGION_ID, regionId);
+            addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID, sourceId);
+            addPropertyConstraint(propertyConstraintMap, Component.PROP_COMPONENT_TYPE_ID, componentTypeId);
+            
+            // do the lookup
+            return findObjects(Component.TYPE_ID, propertyConstraintMap);
+        }
+        else
+        {
+            // perform an optimized lookup - using any of scope/regionid/sourceid as component path keys
+            // TODO: careful of future encoding of component IDs which may affect the filtering process
+            if (scope == null)
+            {
+                scope = "*";
+            }
+            if (regionId == null)
+            {
+                regionId = "*";
+            }
+            if (sourceId == null)
+            {
+                sourceId = "*";
+            }
+            
+            String filter = Component.generateId(scope, regionId, sourceId);
+            
+            return getAllObjects(Component.TYPE_ID, filter);
+        }
     }
 
     /**
@@ -878,9 +920,8 @@ public class Model
     {
         // build property map
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
-        addPropertyConstraint(propertyConstraintMap, ComponentType.PROP_URI,
-                uri);
-
+        addPropertyConstraint(propertyConstraintMap, ComponentType.PROP_URI, uri);
+        
         // do the lookup
         return findObjects(ComponentType.TYPE_ID, propertyConstraintMap);
     }
@@ -1226,97 +1267,86 @@ public class Model
     }
     
     /**
-     * Filtering function that looks up objects of a given type id
-     * and then applies the provided property constraint map.
-     * 
-     * @param propertyConstraintMap the property constraint map
-     * @param objectTypeId the object type id
-     * 
-     * @return the map
-     */
-    protected Map<String, ModelObject> findObjects(String objectTypeId, Map<String, Object> propertyConstraintMap)
-    {
-        Map<String, ModelObject> objectsMap = null;        
-        try
-        {
-            objectsMap = getAllObjects(objectTypeId);
-            
-            List<String> toRemove = new ArrayList<String>(16);
-
-            Iterator objectsIt = objectsMap.keySet().iterator();
-            while (objectsIt.hasNext())
-            {
-                boolean success = true;
-                
-                String objectKey = (String) objectsIt.next();
-                ModelObject object = (ModelObject) objectsMap.get(objectKey);
-
-                // walk the property map and make sure all matches are satisfied
-                if (propertyConstraintMap != null)
-                {
-                    Iterator it = propertyConstraintMap.keySet().iterator();
-                    while (it.hasNext())
-                    {
-                        String propertyName = (String) it.next();
-                        Object propertyValue = propertyConstraintMap.get(propertyName);
-                        if (propertyValue != null)
-                        {
-                            // constraints
-                            if (propertyValue instanceof String)
-                            {
-                                String currentValue = (String) object.getProperty(propertyName);
-                                if (!propertyValue.equals(currentValue))
-                                {
-                                    success = false;
-                                }
-                            }
-                            if (propertyValue instanceof Boolean)
-                            {
-                                boolean currentValue = object.getBooleanProperty(propertyName);
-                                if (currentValue != ((Boolean) propertyValue).booleanValue())
-                                {
-                                    success = false;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (!success)
-                {
-                    toRemove.add(objectKey);
-                }
-            }
-            
-            // remove anything we no longer want to keep
-            for (int i = 0; i < toRemove.size(); i++)
-            {
-                String objectKey = (String) toRemove.get(i);
-                objectsMap.remove(objectKey);
-            }            
-        }
-        catch (Exception ex)
-        {
-            FrameworkHelper.getLogger().fatal(ex);
-        }
-        
-        return objectsMap;
-    }
-
-    /**
      * Adds the property constraint.
      * 
      * @param propertyConstraintMap the property constraint map
      * @param propertyName the property name
      * @param propertyValue the property value
      */
-    protected void addPropertyConstraint(Map propertyConstraintMap,
+    protected static void addPropertyConstraint(Map propertyConstraintMap,
             String propertyName, Object propertyValue)
     {
         if (propertyValue != null)
         {
             propertyConstraintMap.put(propertyName, propertyValue);
         }
+    }
+    
+    /**
+     * Filtering function that looks up objects of a given type id
+     * and then applies the provided property constraint map.
+     * 
+     * @param propertyConstraintMap the property constraint map
+     * @param objectTypeId the object type id
+     * 
+     * @return the map of IDs to ModelObjects
+     */
+    protected Map<String, ModelObject> findObjects(String objectTypeId, Map<String, Object> propertyConstraintMap)
+    {
+        Map<String, ModelObject> objectsMap = getAllObjects(objectTypeId);
+        
+        List<String> toRemove = new ArrayList<String>(objectsMap.size());
+        
+        for (String objectKey : objectsMap.keySet())
+        {
+            boolean found = true;
+            
+            ModelObject object = objectsMap.get(objectKey);
+            
+            // walk the property map and make sure all matches are satisfied
+            if (propertyConstraintMap != null)
+            {
+                for (String propertyName : propertyConstraintMap.keySet())
+                {
+                    Object propertyValue = propertyConstraintMap.get(propertyName);
+                    if (propertyValue != null)
+                    {
+                        // constraints
+                        if (propertyValue instanceof String)
+                        {
+                            String currentValue = object.getProperty(propertyName);
+                            if (!propertyValue.equals(currentValue))
+                            {
+                                found = false;
+                                break;
+                            }
+                        }
+                        else if (propertyValue instanceof Boolean)
+                        {
+                            boolean currentValue = object.getBooleanProperty(propertyName);
+                            if (currentValue != ((Boolean) propertyValue).booleanValue())
+                            {
+                                found = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!found)
+            {
+                toRemove.add(objectKey);
+            }
+        }
+        
+        // remove anything we no longer want to keep
+        for (int i = 0; i < toRemove.size(); i++)
+        {
+            objectsMap.remove(toRemove.get(i));
+        }
+        
+        return objectsMap;
     }
     
     /**
