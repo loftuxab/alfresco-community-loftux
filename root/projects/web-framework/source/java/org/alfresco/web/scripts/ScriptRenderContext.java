@@ -25,19 +25,13 @@
 package org.alfresco.web.scripts;
 
 import org.alfresco.connector.User;
-import org.alfresco.web.framework.ModelPersistenceContext;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.site.AuthenticationUtil;
-import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
-import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * A read-only root-scoped Java object that wraps the Render Context 
@@ -55,7 +49,8 @@ public final class ScriptRenderContext extends ScriptBase
     private ScriptUser scriptUser = null;
     private ScriptLinkBuilder scriptLinkBuilder = null;
     
-    private RenderContext renderContext = null;
+    final private RenderContext renderContext;
+    
     
     /**
      * Constructs a new ScriptRequestContext object.

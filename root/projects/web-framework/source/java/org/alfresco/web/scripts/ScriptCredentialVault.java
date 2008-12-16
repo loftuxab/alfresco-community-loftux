@@ -40,8 +40,8 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptCredentialVault extends ScriptBase
 {    
-    protected CredentialVault vault;
-    protected User user;
+    final private CredentialVault vault;
+    final private User user;
     
     /**
      * Constructs a new ScriptRequestContext object.
@@ -81,7 +81,6 @@ public final class ScriptCredentialVault extends ScriptBase
     
     // --------------------------------------------------------------
     // JavaScript Properties
-    //    
     
     /**
      * Returns the user to whom this credential vault belongs
@@ -188,5 +187,4 @@ public final class ScriptCredentialVault extends ScriptBase
         this.properties = null;
         buildProperties();
     }
-    
 }

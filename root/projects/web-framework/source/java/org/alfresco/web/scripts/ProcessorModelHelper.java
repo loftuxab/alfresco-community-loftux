@@ -320,8 +320,7 @@ public final class ProcessorModelHelper
             model.put(MODEL_CONFIG, new TemplateConfigModel(FrameworkHelper.getConfigService(), null));
         }
         
-        // TODO: adding this in because Components rendered in HEADER focus
-        // need to have access to URL... is this right?
+        // Components rendered in HEADER focus need to have access to URL
         if (context.getObject() instanceof Component)
         {
             if (model.get(MODEL_URL) == null)

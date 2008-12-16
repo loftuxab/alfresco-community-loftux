@@ -35,13 +35,13 @@ import org.alfresco.web.site.RequestContext;
 /**
  * Defines a render response context
  * 
- * @author Uzquiano
+ * @author muzquiano
  */
 public interface RenderContext extends RequestContext 
 {
-    public int SCOPE_ANY = 0;
-    public int SCOPE_RENDERING = 1;
-    public int SCOPE_REQUEST = 2;
+    public final int SCOPE_ANY = 0;
+    public final int SCOPE_RENDERING = 1;
+    public final int SCOPE_REQUEST = 2;
 
     public RenderMode getRenderMode();
     public void setRenderMode(RenderMode renderMode);

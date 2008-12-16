@@ -35,9 +35,9 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptCredentials extends ScriptBase
 {
-    protected CredentialVault vault;
-    protected Credentials credentials;
-    protected boolean hideNonPersistent;
+    final private CredentialVault vault;
+    final private Credentials credentials;
+    final private boolean hideNonPersistent;
 
     public ScriptCredentials(RequestContext context, CredentialVault vault, Credentials credentials)
     {
@@ -79,9 +79,10 @@ public final class ScriptCredentials extends ScriptBase
         return this.properties;
     }
     
+    
     // --------------------------------------------------------------
     // JavaScript Properties
-    //
+    
     public boolean isHidden()
     {
         return !isPersistent() && hideNonPersistent;
@@ -91,6 +92,5 @@ public final class ScriptCredentials extends ScriptBase
     {
         return credentials.isPersistent();
     }
-
 }
 

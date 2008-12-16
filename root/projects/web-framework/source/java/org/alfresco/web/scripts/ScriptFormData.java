@@ -46,8 +46,8 @@ import org.alfresco.web.framework.render.RenderContext;
  */
 public final class ScriptFormData extends ScriptBase
 {
-    protected Map<String, FormField> fields;
-    protected RenderContext renderContext;
+    private Map<String, FormField> fields;
+    final private RenderContext renderContext;
     
     /**
      * Instantiates a new script form.
@@ -71,6 +71,7 @@ public final class ScriptFormData extends ScriptBase
     {
         return null;
     }
+    
     
     // --------------------------------------------------------------
     // JavaScript Properties
@@ -118,7 +119,6 @@ public final class ScriptFormData extends ScriptBase
     {
         return fields.keySet().toArray(new String[fields.keySet().size()]);
     }
-    
     
     /**
      * Populates the object with form bindings for the given namespace

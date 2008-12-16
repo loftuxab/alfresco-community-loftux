@@ -40,7 +40,6 @@ public final class ScriptLinkBuilder extends ScriptBase
         super(context);
     }
         
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebFrameworkScriptBase#buildProperties()
      */
@@ -198,4 +197,3 @@ public final class ScriptLinkBuilder extends ScriptBase
         return context.getLinkBuilder().object(context, objectId, formatId, params);
     }
 }
-

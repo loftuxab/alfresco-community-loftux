@@ -384,6 +384,10 @@ public abstract class AbstractWebScript implements WebScript
     {
         Map<String, Object> params = new HashMap<String, Object>(64, 1.0f);
         
+        // add context & runtime parameters
+        params.putAll(req.getRuntime().getTemplateParameters());
+        params.putAll(container.getTemplateParameters());
+        
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
         params.put("format", new FormatModel(container.getFormatRegistry(), req.getFormat()));
@@ -406,10 +410,6 @@ public abstract class AbstractWebScript implements WebScript
         // add the webscript I18N resources as a JSON object
         params.put("messages", renderJSONResources(getResources()));
 
-        // add context & runtime parameters
-        params.putAll(req.getRuntime().getTemplateParameters());
-        params.putAll(container.getTemplateParameters());
-        
         // add configuration
         params.put("config", new TemplateConfigModel(this.container.getConfigService(), this.xmlConfig));
         

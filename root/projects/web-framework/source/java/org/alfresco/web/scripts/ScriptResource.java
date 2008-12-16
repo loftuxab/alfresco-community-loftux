@@ -36,8 +36,8 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptResource extends ScriptBase
 {
-    protected ScriptContentObject scriptContentObject = null;
-    protected Resource resource;
+    private ScriptContentObject scriptContentObject = null;
+    final private Resource resource;
 
     public ScriptResource(RequestContext context, Resource resource)
     {
@@ -51,16 +51,12 @@ public final class ScriptResource extends ScriptBase
      */
     protected ScriptableMap<String, Serializable> buildProperties()
     {
-        if (this.properties == null)
-        {
-        }
-        
         return null;
     }
     
+    
     // --------------------------------------------------------------
     // JavaScript Properties
-    //
 
     public String getId()
     {
@@ -155,4 +151,3 @@ public final class ScriptResource extends ScriptBase
         return this.scriptContentObject;        
     }
 }
-

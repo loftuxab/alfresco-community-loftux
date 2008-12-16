@@ -212,7 +212,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
      * @see org.alfresco.web.framework.render.RenderContext#setValue(java.lang.String, java.io.Serializable, int)
      */
     public void setValue(String key, Serializable value, int scope)
-    {        
+    {
         if (scope == RenderContext.SCOPE_REQUEST)
         {
             this.getOriginalContext().setValue(key, value);

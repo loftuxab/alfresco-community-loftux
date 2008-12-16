@@ -44,7 +44,7 @@ public final class ScriptResources extends ScriptBase
 {
     private static final long serialVersionUID = -3378946227712931201L;
     
-    private ModelObject modelObject;
+    final private ModelObject modelObject;
     
     /**
      * Instantiates a new resources object
@@ -66,11 +66,6 @@ public final class ScriptResources extends ScriptBase
     {
         return null;
     }
-    
-    
-    // --------------------------------------------------------------
-    // JavaScript Properties
-    
     
     
     // --------------------------------------------------------------

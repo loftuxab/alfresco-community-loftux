@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.framework.render.RenderContext;
@@ -53,16 +55,12 @@ public final class ScriptWebApplication extends ScriptBase
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebFrameworkScriptBase#buildProperties()
      */
-    protected ScriptableMap buildProperties()
+    protected ScriptableMap<String, Serializable> buildProperties()
     {
-        if (this.properties == null)
-        {
-        }
-        
-        return this.properties;
+        return null;
     }
 
-    
+
     // --------------------------------------------------------------
     // JavaScript Properties
     
@@ -106,5 +104,4 @@ public final class ScriptWebApplication extends ScriptBase
         
         return builder.toString();
     }        
-    
 }
