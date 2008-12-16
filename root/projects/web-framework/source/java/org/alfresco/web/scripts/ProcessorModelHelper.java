@@ -43,7 +43,14 @@ import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
+ * Helper to generate the model map for Script and Template execution.
+ * <p>
+ * The model consists of a number of context driven objects such as current
+ * page and current template and a number of common helper objects such as the
+ * URL and current user. 
+ * 
  * @author muzquiano
+ * @author kevinr
  */
 public final class ProcessorModelHelper
 {
@@ -79,7 +86,6 @@ public final class ProcessorModelHelper
      * page
      * theme
      * htmlid
-     * 
      * url
      * head
      * 
@@ -94,7 +100,6 @@ public final class ProcessorModelHelper
      * page
      * theme
      * htmlid
-     * 
      */
 
     /**
