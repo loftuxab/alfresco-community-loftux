@@ -47,6 +47,5 @@
    <div class="bdft">
       <input type="submit" id="${args.htmlid}-edit-button" value="${msg("button.edit")}" />
       <input type="submit" id="${args.htmlid}-delete-button" value="${msg("button.delete")}" />
-      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.close")}" />
    </div>
 </div>

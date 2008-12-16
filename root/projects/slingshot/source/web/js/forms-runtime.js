@@ -476,7 +476,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       {
          // TODO: Allow an error handler to be plugged in which
          //       would allow for custom error handling
-         
+         YAHOO.Bubbling.fire('formValidationError',{msg:msg,field:field});
          if (this.errorContainer != null)
          {
             if (this.errorContainer === "alert")

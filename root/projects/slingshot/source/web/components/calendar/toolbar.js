@@ -88,9 +88,23 @@
          this.nextButton = Alfresco.util.createYUIButton(this, "next-button", this.onNextNav);
          this.prevButton = Alfresco.util.createYUIButton(this, "prev-button", this.onPrevNav);
          this.todayButton = Alfresco.util.createYUIButton(this, "today-button", this.onTodayNav);
-		 
-		 
+
          this.navButtonGroup = new YAHOO.widget.ButtonGroup(this.id + "-navigation");
+		 
+		 var view = Alfresco.util.getQueryStringParameter('view') || 'month';
+         var views = [Alfresco.CalendarView.VIEWTYPE_DAY,Alfresco.CalendarView.VIEWTYPE_WEEK,Alfresco.CalendarView.VIEWTYPE_MONTH,Alfresco.CalendarView.VIEWTYPE_AGENDA];
+         for (var i=0;i<views.length;i++)
+         {
+             if (views[i]==view)
+             {
+                  this.navButtonGroup.check(i);
+                  this.disableButtons(i)
+                  break;
+             }
+         }
+         
+         
+         
          this.navButtonGroup.on("checkedButtonChange", this.onNavigation, this.navButtonGroup, this);
       },
 
@@ -111,25 +125,28 @@
 
       onNavigation: function(e)
       {
-        var selectedButton = this.navButtonGroup.getButtons()[e.newValue.index];
-        // disable buttons for agenda view only
-    	if ( selectedButton.get('label') === Alfresco.util.message('label.agenda','Alfresco.CalendarView') ) {
-    		this.todayButton.set('disabled',true);
-            this.nextButton.set('disabled',true);
-            this.prevButton.set('disabled',true);	
-		}
-		else {
-    		this.todayButton.set('disabled',false);
-            this.nextButton.set('disabled',false);
-            this.prevButton.set('disabled',false);				
-		}
+        this.disableButtons(e.newValue.index);
 
 		YAHOO.Bubbling.fire("viewChanged",
          {
             activeView: e.newValue.index
          })
       },
-
+      disableButtons : function(butIndex) 
+      {
+        var selectedButton = this.navButtonGroup.getButtons()[butIndex];
+         // disable buttons for agenda view only
+      	if ( selectedButton.get('label') === Alfresco.util.message('label.agenda','Alfresco.CalendarView') ) {
+      		this.todayButton.set('disabled',true);
+            this.nextButton.set('disabled',true);
+            this.prevButton.set('disabled',true);	
+  		}
+  		else {
+      		this.todayButton.set('disabled',false);
+            this.nextButton.set('disabled',false);
+            this.prevButton.set('disabled',false);				
+  		}          
+      },
       _fireEvent: function(type)
       {
          YAHOO.Bubbling.fire(type, 
@@ -150,20 +167,26 @@
       onButtonClick: function(e)
       {
          // TODO: look at caching this
-         var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-         var options =
-         {
-            "siteId": this.siteId
-         };
-
+         // var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
+         //          var options =
+         //          {
+         //             "siteId": this.siteId
+         //          };
+         // 
+         //          var obj = Alfresco.util.ComponentManager.findFirst("Alfresco.CalendarView");
+         //          if (obj)
+         //          {
+         //             obj.currentDate = new Date();
+         //             options["displayDate"] = obj.currentDate;
+         //          }
+         // 
+         //          eventDialog.setOptions(options);
+         //          eventDialog.show();
          var obj = Alfresco.util.ComponentManager.findFirst("Alfresco.CalendarView");
-         if (obj)
-         {
-            options["displayDate"] = obj.currentDate;
+         if (obj) {
+             obj.showAddDialog();
+             
          }
-
-         eventDialog.setOptions(options);
-         eventDialog.show();
       }
 
    };

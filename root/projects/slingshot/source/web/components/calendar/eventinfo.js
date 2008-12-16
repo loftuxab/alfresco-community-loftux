@@ -1,3 +1,7 @@
+// Ensure namespaces exist
+Alfresco.module.event =  Alfresco.module.event || {}; 
+Alfresco.module.event.validation = Alfresco.module.event.validation || {};
+
 /**
  * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
@@ -37,7 +41,6 @@
 
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
-
       return this;
    };
 
@@ -61,16 +64,36 @@
       event: null,
       
       /**
-       * Sets the current site for this component.
+       * Object container for initialization options
        *
-       * @property siteId
-       * @type string
+       * @property options
+       * @type object
        */
-      setSiteId: function(siteId)
+      options:
       {
-         this.siteId = siteId;
-         return this;
-      },
+        siteId: "",
+      /**
+       * Stores the URI of the event IF an edit is happening 
+       *
+       * @property eventURI
+       * @type String
+       */
+        eventUri: null,
+        displayDate: null
+      },      
+      
+      
+       /**
+        * Set multiple initialization options at once.
+        *
+        * @method setOptions
+        * @param obj {object} Object literal specifying a set of options
+        */
+       setOptions: function (obj)
+       {
+          this.options = YAHOO.lang.merge(this.options, obj);
+          return this;
+       },
 
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -78,14 +101,14 @@
        *
        * @method onComponentsLoaded
        */
-         componentsLoaded: function()
-         {
-            /* Shortcut for dummy instance */
-            if (this.id === null)
-            {
-               return;
-            }
-         },
+       componentsLoaded: function()
+       {
+          /* Shortcut for dummy instance */
+          if (this.id === null)
+          {
+             return;
+          }
+       },
 
       /**
        * Renders the event info panel. 
@@ -93,7 +116,7 @@
        * @method show
        * @param event {object} JavaScript object representing an event
        */
-      show: function(event)
+      show: function()
       {
          Alfresco.util.Ajax.request(
          {
@@ -101,7 +124,7 @@
             dataObj:
             { 
                "htmlid": this.id,
-               "uri": "/" + event.uri
+               "uri": "/" + this.options.eventUri
             },
             successCallback:
             {
@@ -110,8 +133,6 @@
             },
             failureMessage: "Could not load event info panel"
          });
-
-         this.event = event;
       },
 
       /**
@@ -138,7 +159,7 @@
          // Buttons
          Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
          Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick);
-         Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
+         // Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
 
          // Display the panel
          this.panel.show();
@@ -163,19 +184,127 @@
        */
       onEditClick: function(e)
       {
-         this.panel.hide();
+          this.panel.hide();
+          this.eventDialog = Alfresco.util.DialogManager.registerDialog('CalendarView.editEvent');
+          this.eventDialog.id = this.id+ "-editEvent";
+          // add the tags that are already set on the post
+          if (this.eventDialog.tagLibrary == undefined)
+          {
+             this.eventDialog.tagLibrary = new Alfresco.module.TagLibrary( this.eventDialog.id);
+             this.eventDialog.tagLibrary.setOptions({ siteId: this.options.siteId });
+          }
          
-         var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
-         eventDialog.setOptions(
+         var options = 
          {
-            "siteId": this.siteId,
-            "eventURI": "/" + this.event.uri
-         });
-         eventDialog.show();
+              site : this.options.siteId,
+              displayDate :this.options.displayDate,
+              actionUrl : Alfresco.constants.PROXY_URI + this.options.eventUri + "?page=calendar",
+              templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+              templateRequestParams : {
+                     site : this.options.siteId,
+                     uri : '/'+this.options.eventUri
+              },
+              doBeforeFormSubmit : 
+              {
+                fn : function(form, obj)
+                     {                           
+                       // Update the tags set in the form
+                       this.tagLibrary.updateForm(this.id + "-form", "tags");
+                       // Avoid submitting the input field used for entering tags
+                       var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+                       if (tagInputElem)
+                       {
+                          tagInputElem.disabled = true;
+                       }
+                       var errorEls = YAHOO.util.Dom.getElementsByClassName('error',null,YAHOO.util.Dom.get(this.id + "-form"));
+                       
+                       for (var i = 0; i <errorEls.length;i++)
+                       {
+                         YAHOO.util.Dom.removeClass(errorEls[i],'error');                           
+                       }
+
+                     },
+                scope:this.eventDialog
+              },
+              doBeforeAjaxRequest : {
+                  fn : function(p_config, p_obj) 
+                       {
+                           p_config.method = Alfresco.util.Ajax.PUT
+                           if (p_config.dataObj.tags)
+                           {
+                             p_config.dataObj.tags = p_config.dataObj.tags.join(' ');
+                           }
+
+                           this.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+                           
+                           return true;
+                       },
+                  scope : this.eventDialog
+              },
+              doBeforeDialogShow : {
+                  fn : function()
+                         {
+                            var editEvent = Alfresco.util.ComponentManager.findFirst("Alfresco.CalendarView").editEvent;
+                            var Dom = YAHOO.util.Dom;
+                            
+                            var dts  = Alfresco.util.fromISO8601(editEvent.getData('dtstart'));
+                            var dte  = Alfresco.util.fromISO8601(editEvent.getData('dtend'));
+                            // Pretty formatting
+                            var dateStr = Alfresco.util.formatDate(dts, "dddd, d mmmm yyyy");
+                            Dom.get("fd").value = dateStr;
+                            var dateStr = Alfresco.util.formatDate(dte, "dddd, d mmmm yyyy");
+                            Dom.get("td").value = dateStr;
+                            Dom.get(this.id+"-from").value = Dom.get("fd").value;
+                            Dom.get(this.id+"-to").value = Dom.get("td").value;
+                            
+                            //init taglib
+                            this.tagLibrary.initialize();
+                            var tags = YAHOO.util.Dom.get(this.id + "-tag-input-field").value;
+                            YAHOO.util.Dom.get(this.id + "-tag-input-field").value = '';
+                            this.tagLibrary.setTags(tags.split(' '));
+                            this.form.errorContainer=null;
+                         },
+                 scope : this.eventDialog
+              },
+              onSuccess : {
+                 fn : this.onEdited,
+                 scope : this
+              },
+              onFailure : {
+                 fn : function() 
+                 {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                       text: Alfresco.util.message('message.edited.failure','Alfresco.CalendarView')
+                    });
+                },
+                scope : this
+             }
+          };
+          this.eventDialog.setOptions(options);
+          this.eventDialog.show();
+              
       },
-      
       /**
-       * Fired when the delete button is clicked. Kicks off a DELETE request
+        * Called when an event is successfully edited.
+        *
+        * @method onDeleted
+        * @param e {object} DomEvent
+        */
+       onEdited: function(o)
+       {
+         this.panel.hide();
+         YAHOO.Bubbling.fire('eventEdited',
+         {
+            id: this.options.event, // so we know which event we are dealing with
+            data : o.json.data
+         });
+         this.panel.destroy();
+         this.eventDialog.dialog.destroy();
+       },
+      /**
+       * Fired when the delete #calendarendpicker button, #calendarpicker button {calendar.css (line 114)
+       background:transparent url(images/calendar-16.png) no-repeat scroll is clicked. Kicks off a DELETE request
        * to the Alfresco repo to remove an event.
        *
        * @method onDeleteClick
@@ -186,13 +315,13 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + this.event.uri + "?page=calendar",
+            url: Alfresco.constants.PROXY_URI + this.options.eventUri + "?page=calendar",
             successCallback:
             {
                fn: this.onDeleted,
                scope: this
             },
-            failureMessage: "Could not delete event"
+            failureMessage: Alfresco.util.message('message.deleted.failure','Alfresco.CalendarView')
          });
       },
       
@@ -205,12 +334,39 @@
       onDeleted: function(e)
       {
          this.panel.hide();
-         
          YAHOO.Bubbling.fire('eventDeleted',
          {
-            name: this.event.name, // so we know which event we are dealing with
-            from: this.event.from // grab the events for this date and remove the event
-         });         
+            id: this.options.event // so we know which event we are dealing with
+         });
+         this.panel.destroy();        
       }
    };
 })();
+
+
+
+/**
+ * Tags entry field validation handler, tests that the given field's value is a valid.
+ * This is identical to the test for the name for a node in the repository minus the requirement
+ * that there must not be any white space; tags are separated by white space.
+ *
+ * @method nodeName
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.module.event.validation.tags = function mandatory(field, args, event, form, silent)
+{
+   if (!args)
+   {
+      args = {};
+   }
+
+   args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/;
+   args.match = false;
+
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent); 
+};

@@ -267,13 +267,17 @@
          }
          else
          {
+            var data = {
+                htmlid : this.id
+            };
+            if (this.options.templateRequestParams)
+            {
+                data = YAHOO.lang.merge(this.options.templateRequestParams,data);
+            }
             Alfresco.util.Ajax.request(
             {
                url: this.options.templateUrl,
-               dataObj:
-               {
-                  htmlid: this.id
-               },
+               dataObj:data,
                successCallback:
                {
                   fn: this.onTemplateLoaded,
@@ -296,7 +300,7 @@
       _showDialog: function AmSD__showDialog()
       {
          var form = Dom.get(this.id + "-form");
-         
+
          if (this.options.actionUrl !== null)
          {
             form.attributes.action.nodeValue = this.options.actionUrl;
@@ -311,7 +315,12 @@
                inputs[i].value = "";
             }
          }
-
+         //Carry out code before showing dialog if specified
+         var doBeforeDialogShow = this.options.doBeforeDialogShow;
+         if (doBeforeDialogShow && typeof doBeforeDialogShow.fn == "function")
+         {
+             doBeforeDialogShow.fn.call(doBeforeDialogShow.scope || this, this.form, doBeforeDialogShow.obj);
+         }
          this.dialog.show();
 
          // Fix Firefox caret issue
@@ -365,6 +374,7 @@
       onTemplateLoaded: function AmSD_onTemplateLoaded(response)
       {
          // Inject the template from the XHR request into a new DIV element
+
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;
 
@@ -392,10 +402,8 @@
          {
             type: "submit"
          });
-
          // Cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
-
          // Form definition
          this.form = new Alfresco.forms.Form(this.id + "-form");
          this.form.setSubmitElements(this.widgets.okButton);
@@ -432,7 +440,7 @@
 
          // Initialise the form
          this.form.init();
-
+         
          this._showDialog();
       },
 

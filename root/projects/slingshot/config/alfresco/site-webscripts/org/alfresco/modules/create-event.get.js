@@ -5,9 +5,11 @@ if (args['uri'])
 	var uri = unescape(args['uri']);
 	// Call the repo for the event information
 	model.event = doGetCall(uri);
+	model.edit = true;
 }
 else
 {
 	model.event = {};
+	model.edit =false;
 }
 

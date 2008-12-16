@@ -11,7 +11,8 @@
 
 #divCalendarEvents
 {
-   margin-left: 16em;
+   margin-left: 15.1em;
+   border-left:2px solid #EAEAEA;   
 }
 
 #divCalendarFilters

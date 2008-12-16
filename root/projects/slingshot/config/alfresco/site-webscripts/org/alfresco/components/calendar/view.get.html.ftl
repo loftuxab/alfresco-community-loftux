@@ -1,102 +1,224 @@
+
 <script type="text/javascript">//<![CDATA[
-   var view = new Alfresco.CalendarView("${args.htmlid}").setSiteId(
-      "${page.url.templateArgs.site!""}"
-   ).setMessages(
-      ${messages}
-   );
-<#if page.url.args["date"]?exists>
-   view.currentDate = Alfresco.util.fromISO8601("${page.url.args["date"]}");
-</#if>
+  new Alfresco.CalendarView('${args.htmlid}Container').setOptions(
+       {
+           siteId: "${page.url.templateArgs.site!""}",
+           //view type
+           view : '${viewArgs.viewType}',
+           id : '${args.htmlid}View',
+          /*
+           * The start date of the week/month if week or month
+           * a Date object or a ISO string
+           **/
+           startDate : Alfresco.util.fromISO8601('${viewArgs.view.startDate}'),
+           endDate : Alfresco.util.fromISO8601('${viewArgs.view.endDate}'),
+           titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate}')
+        }
+       ).setMessages(
+            ${messages}
+        );
 //]]></script>
 
-<div id="${args.htmlid}-body">
-<div id="eventInfoPanel"></div>
-<div id="calendar-view">
+<#if (viewArgs.viewType=='month')>    
+<h2 id="calTitle"></h2>
+<div id="${args.htmlid}Container" class="calendar vcalendar monthview">
+    <table id="${args.htmlid}View" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <#assign days_in_week = msg("days.medium")?split(",") >
+                <#list days_in_week as day>
+                <th>${day}</th>
+                </#list>
+            </tr>
+        </thead>
 
-<div class="yui-content" style="background: #FFFFFF;">
-   <div id="${args.htmlid}-day">
-      <div id="${args.htmlid}-dayLabel" class="date-title"></div>
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr><td>
-      <div id="dayContainer">
-        <div id="timeLabels">
-         <#list 0..23 as i>
+        <tbody>
+             <#list 0..5 as row><#-- ROW -->
+              <tr>
+                 <#list 0..6 as column><#-- COLUMN -->
+                    <#assign id = (row?number * 7) + column>
+                    <#assign tdclass = ''>
+                    <#if (id<viewArgs.view.startDay_month | id>(viewArgs.view.num_daysInMonth+viewArgs.view.startDay_month-1) ) >
+                    <#assign tdclass = 'class="disabled"'>
+                    </#if>
+                    <td id="cal-${viewArgs.view.dates[id].id}" ${tdclass} width="12.5%">
+                       <div class="day">
+                          <a class="dayLabel">${viewArgs.view.dates[id].day}</a>
+                          <#if (viewArgs.view.dates[id].events??)>
+                           <#assign numEvents = 0>
+                           <#list viewArgs.view.dates[id].events as event>
+                                <#if (event.allday) >                              
+                                    <div class="vevent allday">
+                                        <div>
+                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary">${event.summary}</a>
+                                             <p class="description">${event.description}</p>
+                                             <p>From <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
+                                             til <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
+                                             <span class="location">${event.location}</span>
+                                             <span class="duration" title="PT1H">1h</span>
+                                             <span class="category" >${event.tags}</span> 
+                                        </div>
+                                    </div>
+                                    <#else>
+                                    <#assign outputtedUl = false>
+                                           <#if numEvents==0>
+                                            <ul class="dayEvents">
+                                            <#assign outputtedUl = true>
+                                           </#if>
+                                               <#if (numEvents > 4) >
+                                                  <#assign class="hidden">
+                                               <#else>
+                                                  <#assign class="">
+                                               </#if>
+
+                                               <li class="vevent ${class}">
+                                                     <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary">${event.summary}</a>
+                                                     <p class="description">${event.description}</p>
+                                                     <p>From <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
+                                                     til <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
+                                                     <span class="location">${event.location}</span>
+                                                     <span class="duration" title="PT1H">1h</span>
+                                                     <span class="category" >${event.tags}</span>
+                                                   </li>
+                                               <#assign numEvents=numEvents + 1>
+
+                                           <#if (numEvents>4)>
+                                               <li class="moreEvents"><a href="#todo">+ 5 More</a></li>                                
+                                           </#if>
+                                           
+                                 </#if>
+                           </#list>
+                           <#if outputtedUl?exists>
+                            <#if outputtedUl==true>
+                                </ul>
+                            </#if>
+                           </#if>
+                          </#if>
+                       </div>
+                    </td>
+                    </#list>
+              </tr>
+              </#list>
+            
+        </tbody>
+    </table>
+</div>
+
+
+<#elseif (viewArgs.viewType=='week')>
+<!-- week view -->
+<h2 id="calTitle"></h2>
+<div id="${args.htmlid}Container" class="calendar vcalendar weekview">
+    <table id="${args.htmlid}View" cellspacing="0" cellpadding="0">
+        <thead>
+            <tr>
+                <th scope="col">${msg("label.hours")}</th>
+                <#assign days_in_week = msg("days.medium")?split(",") >
+                <#list 0..6 as i>
+                <th scope="col">${days_in_week[i]} ${viewArgs.view.columnHeaders[i]?string("d")}</th>
+                </#list>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="alldayRow">
+               <th scope="row" width="105"><h2>${msg("label.all-day")}</h2></th>
+              
+               <#list 0..6 as day>
+                 <#assign tdclass = ''>
+                <#if (viewArgs.view.dayOfWeek == day)>
+                    <#assign tdclass = 'current'>
+                </#if>
+                <#if (day==6)>
+                    <#assign tdclass = tdclass + ' last'>
+                </#if> 
+                <td class="${tdclass}"><div class="target" width="12.5%"> </div></td>
+               </#list>
+            </tr>
+            <tr id="collapseTrigger">
+                <td colspan="8" width="100%"><a href="" id="collapseTriggerLink">${msg("label.click-for-early-hours")}</a></td>
+            </tr>
+            <#assign cellcount = 0  />
+                <#list 0..23 as i>
+                 <#assign class = ''>
+           
+                 <#if i < 7>
+                  <#assign class = 'early'>
+                 </#if>
+                 <#assign time = i?string>
+                 <#if i < 10>
+                    <#assign time = "0" + time>
+                 </#if>
+                 <tr id="hour-${time}" class="${class}">   
+                 <th scope="row" width="105"><h2>${time}:00</h2></th>
+                 <#list 0..6 as day>
+                  <#assign id = viewArgs.view.dates[day].id>
+                  <#assign divclass = ''>
+                  <#if (viewArgs.view.dayOfWeek == day)>
+                      <#assign divclass = 'current"'>
+                  </#if>
+                    <td id="cal-${id}T${time}:00" width="12.5%">
+                        <div class="day ${divclass}">
+                            <div class="hourSegment">
+                            </div>
+                            <div class="hourSegment last">
+                            </div>
+                        </div>                        
+                    </td>
+                 </#list>
+                 </tr>
+              </#list>
+        </tbody>
+    </table>
+</div>
+
+<#elseif (viewArgs.viewType=='day')>
+<!-- day view -->
+<h2 id="calTitle"></h2>
+<div id="${args.htmlid}Container" class="calendar vcalendar dayview">
+    <table id="${args.htmlid}View" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr class="alldayRow">
+                <th scope="row"><h2>${msg("label.all-day")}</h2></th>
+                <td id="allday">
+                </td>
+            </tr>
+            <tr id="collapseTrigger">
+                <td colspan="2"><a href="" id="collapseTriggerLink">${msg("label.click-for-early-hours")}</a></td>
+            </tr>
+            <#assign cellcount = 0  />
+            <#list 0..23 as i>
             <#assign time = i?string>
             <#if i < 10>
-               <#assign time = "0" + time>
+                <#assign time = "0" + time>
             </#if>
-            <div class="timeLabel<#if i == 23> last</#if>">${time}:00</div>
-         </#list>
-        </div>
-        <div id="${args.htmlid}-dayEventsView" class="dayEventsView"><#-- events go here --></div>
-      </div>
-      </td></tr>
-      </table>                  
-   </div>
-   <div id="${args.htmlid}-week">
-      <div id="${args.htmlid}-weekLabel" class="date-title"></div>
-      <table id="week-view" cellspacing="0" cellpadding="2" border="1" width="100%">
-      <tr>
-      <th></th>
-      <#list columnHeaders as header>
-         <th id="${args.htmlid}-weekheader-${header_index}" align="center" valign="top"><a href="#">${header?string("E M/d")}</a></th>
-      </#list>
-      </tr>
-      <#assign cellcount = 0  />
-      <#list 0..23 as i>
-         <#assign time = i?string>
-         <#if i < 10>
-            <#assign time = "0" + time>
-         </#if>
-         <#if i % 2 == 0>
-            <#assign class="even">
-         <#else>
-            <#assign class="odd">
-         </#if>
-         <tr class="${class}">   
-         <td class="label">${time}:00</td>
-         <#list 1..7 as day>
-            <td id="${args.htmlid}_calendar_cell${cellcount}"></td>
-            <#assign cellcount = cellcount + 1 />
-         </#list>
-         </tr>
-         <tr class="${class}">
-            <td class="label">&nbsp;</td>
-            <#list 1..7 as day>
-               <td id="${args.htmlid}_calendar_cell${cellcount}"></td>
-               <#assign cellcount = cellcount + 1 />
-            </#list>
-         </tr>   
-      </#list>
-      </table>
-   </div>
-   <div id="${args.htmlid}-month">
-      <div id="${args.htmlid}-monthLabel" class="date-title"></div>
-      <table id="month-view">
-      <tr>
-      <#assign days_in_week = msg("days.medium")?split(",") >
-      <#list days_in_week as day>
-         <th align="center" style="width: 14%">${day}</th>
-         </#list>
-      </tr>
-      <#list 0..5 as row><#-- ROW -->
-      <tr>
-         <#list 0..6 as column><#-- COLUMN -->
-            <#assign id = (row?number * 7) + column>
-            <td style="width: 14%" id="cal_month_t_${id}">
-               <div class="boxOutline">
-                  <div id="dh${id}" class="dayLabel"></div>
-               </div>
-            </td>
-            </#list>
-      </tr>
-      </#list>
-      </table>
-   </div>
-   <div id="${args.htmlid}-agenda">
-      <div class="date-title">${msg("title.agenda")}</div>
-      <div id="${args.htmlid}-agendaContainer" style="width: 100%;"></div>
-   </div>
+            
+
+            <#assign class = ''>
+       
+             <#if i < 7>
+              <#assign class = 'early'>
+             </#if>
+            <tr class="${class}">
+                <th scope="row" width="52px"><h2>${time}:00</h2></th>
+                <td id="cal-${viewArgs.view.startDate}T${time}:00" width="95%">
+                    <div class="day">
+                        <div class="hourSegment">
+                        </div>
+                        <div class="hourSegment last">
+                        </div>
+                    </div>                        
+                </td>
+            </tr>
+            </#list>            
+        </tbody>
+    </table>
 </div>
+<#elseif (viewArgs.viewType=='agenda')>
+
+<!-- agenda -->
+<h2 id="calTitle"></h2>
+<div id="${args.htmlid}Container" class="alf-calendar agendaview">
+    <!-- hit repo to get this list of events -->
 </div>
-</div>
+</#if>
+
