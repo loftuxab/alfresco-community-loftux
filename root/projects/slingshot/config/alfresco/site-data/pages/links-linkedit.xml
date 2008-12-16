@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
    <id>links-linkedit</id>
-   <page-type>link-linkedit</page-type>
+   <page-type>links-linkedit</page-type>
    <title>Links: create or edit link</title>
    <description>Displays a form to create or edit link</description>
    <template-instance>links-linkedit</template-instance>

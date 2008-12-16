@@ -3,7 +3,7 @@ function main()
 {
    // gather all required data
    var site = args["site"];
-   var container = (args["container"] != undefined) ? args["container"] : "link";
+   var container = "links";
    
    var url = '/api/links/site/' + site + '/' + container + "?page=1&pageSize=512";
    

@@ -5,7 +5,7 @@
    <h2>${msg("header.links")}</h2>
    <ul class="filterLink">
       <li class="first-link"><span class="all"><a href="#" onclick="return false;" class="filter-link">${msg("link.all")}</a></span></li>
-      <li><span class="internal"><a href="#" onclick="return false;" class="filter-link">${msg("link.internal")}</a></span></li>
-      <li><span class="www"><a href="#" onclick="return false;" class="filter-link">${msg("link.www")}</a></span></li>
+      <li><span class="user"><a href="#" onclick="return false;" class="filter-link">${msg("link.user")}</a></span></li>
+      <li><span class="recent"><a href="#" onclick="return false;" class="filter-link">${msg("link.recent")}</a></span></li>
    </ul>
 </div>

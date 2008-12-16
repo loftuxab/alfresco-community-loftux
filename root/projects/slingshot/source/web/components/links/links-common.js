@@ -30,81 +30,26 @@
 Alfresco.util.links = {};
 
 /**
- * Generates the status label text for a given links
- */
-Alfresco.util.links.generateLinksStatusLabel = function generateLinksStatusLabel(me, data)
-{
-   if (data.isDraft)
-   {
-      return "(" + me._msg("status.draft") + ")";
-   }
-   else if (data.isUpdated || data.isPublished)
-   {
-      var status = '';
-      if (data.isUpdated)
-      {
-         status += "(" + me._msg("status.updated") + ") ";
-      }
-
-      if (data.isPublished)
-      {
-         if (data.outOfDate)
-         {
-            return status + "(" + me._msg("status.published.outofsync") + ")";
-         }
-         else
-         {
-            return status + "(" + me._msg("status.published") + ")";
-         }
-      }
-      else
-      {
-         return status;
-      }
-   }
-   else
-   {
-      // internally published, no status displayed
-      return "";
-   }
-};
-
-/**
  * Returns the html for the actions for a given links.
  * @param me the object that holds the _msg method used for i18n
  * @param data the links data
  * @param tagName the tag name to use for the actions. This will either be div or span, depending
  *                whether the actions are for the simple or detailed view.
  */
-Alfresco.util.links.generateLinksActions = function generateLinksActions(me, data, tagName, showPublishingActions)
+Alfresco.util.links.generateLinksActions = function generateLinksActions(me, data, tagName)
 {
-   var desc = '';
-   // begin actions
-   desc += '<div class="nodeEdit">';
-   if (data.permissions.edit)
+   var desc = '<div class="nodeEdit">';
+
+   if (data.permissions["edit"])
    {
       desc += '<' + tagName + ' class="onEditLink"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
    }
-   if (data.permissions.edit && ! data.isDraft && showPublishingActions)
-   {
-      if (data.isPublished)
-      {
-         if (data.outOfDate)
-         {
-            desc += '<' + tagName + ' class="onUpdateExternal"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.updateexternal") + '</a></' + tagName + '>';
-         }
-         desc += '<' + tagName + ' class="onUnpublishExternal"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.unpublishexternal") + '</a></' + tagName + '>';
-      }
-      else
-      {
-         desc += '<' + tagName + ' class="onPublishExternal"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.publishexternal") + '</a></' + tagName + '>';
-      }
-   }
-   if (data.permissions['delete'])
+   if (data.permissions["delete"])
    {
       desc += '<' + tagName + ' class="onDeleteLink"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.delete") + '</a></' + tagName + '>';
    }
    desc += '</div>';
+
    return desc;
 };
 

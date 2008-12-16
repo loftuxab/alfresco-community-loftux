@@ -3,8 +3,8 @@
    <script type="text/javascript" src="${url.context}/templates/links/links-view.css"></script>
    <script type="text/javascript" src="${url.context}/templates/links/links-view.js"></script>
 
-    <!-- General Links Assets -->
-   <script type="text/javascript" src="${page.url.context}/components/links/linksdisscus-common.js"></script>
+   <!-- General Links Assets -->
+   <script type="text/javascript" src="${page.url.context}/components/links/linksdiscuss-common.js"></script>
    <script type="text/javascript" src="${page.url.context}/components/links/links-common.js"></script>
 </@>
 

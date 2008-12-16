@@ -2,7 +2,7 @@
 	var links = new Alfresco.Links("${args.htmlid}").setOptions(
 	{
 		siteId: "${page.url.templateArgs.site!''}",
-		containerId: "${args.container!'links'}",
+		containerId: "${page.url.templateArgs.container!'links'}",
       initialFilter:
       {
          filterId: "${page.url.args.filterId!'all'}",
@@ -17,14 +17,14 @@
 
 <div id="${args.htmlid}-links-header" class="links-header" style="visibility:hidden">
 	
-   <div id="${args.htmlid}-linksBar" class="links-toolbar">
+   <div id="${args.htmlid}-linksBar" class="links-toolbar flat-button">
       <div>
-         <div id="${args.htmlid}-create-link-container" class="hidden">
-            <div style="float:left"><button id="${args.htmlid}-create-link-button" name="postlist-create-link-button">${msg("header.createLink")}</button></div>
-            <div style="float:left">|</div>
+         <div id="${args.htmlid}-create-link-container" class="hidden createLink">
+            <div style="float:left"><button id="${args.htmlid}-create-link-button" name="linklist-create-link-button">${msg("header.createLink")}</button></div>
+            <div class="separator hideable"> </div>
          </div>
          <div style="float:left" class="btn-selected-items">
-			<button id="${args.htmlid}-selected-i-dd" name="postlist-create-link-button">${msg("header.selectedItems")}</button>
+			<button id="${args.htmlid}-selected-i-dd" name="linklist-create-link-button">${msg("header.selectedItems")}</button>
 		  	<div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
 				<div class="bd">
                <ul>
@@ -35,19 +35,21 @@
            </div>
 		 </div>
       </div>
-                  <div id="${args.htmlid}-rssFeed" class="rss-feed hideable"> </div>
-	  <div  class="vm-button-container">
-         <button id="${args.htmlid}-viewMode-button" name="topiclist-simpleView-button">${msg("header.simpleList")}</button>
-      </div>
+      <div class="rss-feed"><button id="${args.htmlid}-rss-feed" name="rss-feed">${msg("header.rssFeed")}</button></div>
    </div>
 
    <div id="${args.htmlid}-links-titleBar" class="links-titlebar" >
-	   <div id="${args.htmlid}-listtitle" class="list-title">
+	   <div id="${args.htmlid}-listTitle" class="list-title">
             ${msg("title.generic")}
         </div>
    </div>
 
-   <div id="${args.htmlid}-links-infoBar" class="links-infobar" >
+   <div id="${args.htmlid}-links-infoBar" class="links-infobar flat-button" >
+      <div class="vm-button-container">
+         <button id="${args.htmlid}-viewMode-button"
+                 name="topiclist-simpleView-button">${msg("header.simpleList")}</button>
+      </div>
+      <div class="separator hideable"> </div>
        <div id="${args.htmlid}-paginator" class="paginator"></div>
 	   <div  class="select-button-container">
          <button id="${args.htmlid}-select-button">${msg("header.select")}</button>

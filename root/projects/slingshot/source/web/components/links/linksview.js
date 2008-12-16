@@ -52,7 +52,7 @@
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
 
       return this;
-   }
+   };
 
    Alfresco.LinksView.prototype =
    {
@@ -118,14 +118,6 @@
       busy: false,
 
       /**
-       * True if publishing actions should be displayed
-       *
-       * @property showPublishingActions
-       * @type boolean
-       */
-      showPublishingActions: false,
-
-      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -186,7 +178,7 @@
                }
             }
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("link-action-link-div", fnActionHandlerDiv);
 
          // Hook tag clicks
@@ -195,7 +187,7 @@
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onLinkElementMouseEntered, this.onLinkElementMouseExited, this);
 
-         // load the post data
+         // load the link data
          this._loadLinksData();
       },
 
@@ -220,7 +212,7 @@
                fn: this.loadLinksDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.loadpostdata.failure")
+            failureMessage: this._msg("message.loadlinkdata.failure")
          });
       },
 
@@ -233,11 +225,11 @@
       loadLinksDataSuccess: function LinksView_loadLinksDataSuccess(response)
       { 
          // store the returned data locally
-         var data = response.json.item
+         var data = response.json.item;
          this.linksData = data;
          
 
-         // get the container div to insert the the post into
+         // get the container div 
          var viewDiv = Dom.get(this.id + '-link-view-div');
 
          // render the link and insert it into the div
@@ -265,54 +257,47 @@
             {
                linkId: this.linksData.name
             }
-         }
+         };
          YAHOO.Bubbling.fire("setCommentedNode", eventData);
       },
+       
       /**
-       * Renders the links post given a link data object returned by the server.
+       * Renders the links.
        */
       renderLinks: function LinksView_renderLinks(data)
-      {   
+      {
          var me = this;
          // preformat some values
          var linksViewUrl = me.generateLinksViewUrl(this.options.siteId, this.options.containerId, data.name);
-         var statusLabel = Alfresco.util.links.generateLinksStatusLabel(this, data);
          var authorLink = Alfresco.util.people.generateUserLink(data.author);
 
          var html = '';
-         html += '<div id="' + this.id + '-linksview" class="node post linksview">'
-         html += Alfresco.util.links.generateLinksActions(this, data, 'div', this.showPublishingActions);
+         html += '<div id="' + this.id + '-linksview" class="node linksview">';
+         html += Alfresco.util.links.generateLinksActions(this, data, 'div');
 
-         // content
+         // Link details
          html += '<div class="nodeContent">';
-         html += '<div class="nodeTitle"><a href="' + linksViewUrl + '">' + $html(data.title) + '</a> ';
-         html += '<span class="nodeStatus">' + statusLabel + '</span>';
-         html += '</div>';
+         html += '<div class="nodeTitle"><a href="' + linksViewUrl + '">' + $html(data.title) + '</a></div>';
 
          html += '<div class="nodeURL">';
-         html += '<span class="nodeURLValue>' + data.url + '</span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("link.url") + ": </span><a " + (data.internal ? "" : "target='_blank' class='external'") + " href='" + (data.url.substring(0, 1) != '/' || data.url.indexOf("://") == -1 ? 'http://' : '') + data.url + "'>" + $html(data.url) + '</a>';
          html += '</div>';
 
-         html += '<div class="published">';
-         if (! data.isDraft)
-         {
-            html += '<span class="nodeAttrLabel">' + this._msg("post.publishedOn") + ': </span>';
-            html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
-            html += '<span class="separator">&nbsp;</span>';
-         }
-
-         html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ': </span>';
-         html += '<span class="nodeAttrValue">' + authorLink + '</span>';
-
-         if (data.isPublished && data.postLink != undefined && data.postLink.length > 0)
-         {
-            html += '<span class="separator">&nbsp;</span>';
-            html += '<span class="nodeAttrLabel">' + this._msg("post.externalLink") + ': </span>';
-            html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + this._msg("post.clickHere") + '</a></span>';
-         }
-
+         html += '<div class="detail">';
+         html += '<span class="nodeAttrLabel">' + this._msg("link.createdOn") + ': </span>';
+         html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
          html += '<span class="separator">&nbsp;</span>';
-         html += '<span class="nodeAttrLabel tag">' + this._msg("post.tags") + ': </span>';
+         html += '<span class="nodeAttrLabel">' + this._msg("link.createdBy") + ': </span>';
+         html += '<span class="nodeAttrValue">' + authorLink + '</span>';
+         html += '</div>';
+
+         html += '<div class="detail">';
+         html += '<span class="nodeAttrLabel">' + this._msg("link.description") + ": </span>";
+         html += '<span class="nodeAttrValue">' + $html(data.description) + '</span>';
+         html += '</div>';
+         
+         html += '<div class="nodeFooter">';
+         html += '<span class="nodeAttrLabel tag">' + this._msg("link.tags") + ': </span>';
          if (data.tags.length > 0)
          {
             for (var x=0; x < data.tags.length; x++)
@@ -326,27 +311,26 @@
          }
          else
          {
-            html += '<span class="nodeAttrValue">' + this._msg("post.noTags") + '</span>';
+            html += '<span class="nodeAttrValue">' + this._msg("link.noTags") + '</span>';
          }
-         html += '</div>'
+         html += '</div>';
 
-         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.description) + '</div>';
-         html += '</div></div>';
+         html += '</div>';
+
          return html;
       },
 
       /**
       * Generate a view url for a given site, link id.
       *
-      * @param linkId the id/name of the post
-      * @return an url to access the post
+      * @param linkId the id/name of the link
+      * @return an url to access the link
       */
       generateLinksViewUrl: function LinksView_generateLinksViewUrl(site, container, linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?container={container}&linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}",
          {
             site: site,
-            container: container,
             linkId: linkId
          });
          return url;
@@ -366,10 +350,9 @@
          var obj = args[1];
          if (obj && (obj.tagName !== null))
          {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links?container={container}&filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links?filterId={filterId}&filterOwner={filterOwner}&filterData={filterData}",
             {
                site: this.options.siteId,
-               container: this.options.containerId,
                filterId: "tag",
                filterOwner: "Alfresco.LinkTags",
                filterData: obj.tagName
@@ -397,15 +380,15 @@
                {
                   this.destroy();
                   me._deleteLinkConfirm.call(me, me.linksData.name);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function LinksView_onDeleteLink_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },
@@ -431,10 +414,9 @@
             this._releaseBusy();
 
             // load the link list page
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links?container={container}",
+            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links",
             {
-               site: this.options.siteId,
-               container: this.options.containerId
+               site: this.options.siteId
             });
             window.location = url;
          };
@@ -474,15 +456,13 @@
       },
 
        /**
-       * Loads the edit post form and displays it instead of the content
-       * The div class should have the same name as the above function (onEditLinks)
+       * Loads the edit link form and displays it instead of the content
        */
       onEditLink: function LinksView_onEditNode(linkId)
       {  
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?container={container}&linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit?linkId={linkId}",
          {
             site: this.options.siteId,
-            container: this.options.containerId,
             linkId: linkId
          });
          window.location = url;
@@ -495,7 +475,7 @@
       {
          // make sure the user sees at least one action, otherwise we won't highlight
          var permissions = this.linksData.permissions;
-         if (! (permissions.edit || permissions["delete"]))
+         if (! (permissions["edit"] || permissions["delete"]))
          {
             return;
          }
@@ -522,7 +502,7 @@
        *
        * @return true if the busy state was set, false if the component is already busy
        */
-      _setBusy: function LinksList__setBusy(busyMessage)
+      _setBusy: function LinksView__setBusy(busyMessage)
       {
          if (this.busy)
          {
@@ -541,7 +521,7 @@
       /**
        * Removes the busy message and marks the component as non-busy
        */
-      _releaseBusy: function LinksList__releaseBusy()
+      _releaseBusy: function LinksView__releaseBusy()
       {
          if (this.busy)
          {

@@ -46,3 +46,31 @@
   display: none;
 }
 
+.help
+{
+  font-size:81%;
+  margin-left:5px;
+  margin-top:8px;
+}
+
+.lbl
+{
+   float: left;
+}
+
+input.lbl,
+textarea.lbl
+{
+   width: 30em;
+}
+
+.dot
+{
+  margin-left:10px;
+  margin-top:5px;
+}
+
+.checkInternal
+{
+  margin-top:8px;
+}

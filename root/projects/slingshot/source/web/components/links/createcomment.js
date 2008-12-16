@@ -9,7 +9,7 @@
    /**
    * YUI Library aliases
    */
-   var Dom = YAHOO.util.Dom
+   var Dom = YAHOO.util.Dom;
 
    /**
     * CreateComment constructor.
@@ -38,7 +38,7 @@
       YAHOO.Bubbling.on("setCanCreateComment", this.onSetCanCreateComment, this);
 
       return this;
-   }
+   };
 
    Alfresco.CreateComment.prototype =
    {
@@ -158,7 +158,7 @@
       /**
        * Called by a bubble event to set the node for which comments should be displayed
        */
-      onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
+      onSetCommentedNode: function CreateComment_onSetCommentedNode(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.nodeRef !== null) && (obj.title !== null) && (obj.page !== null))
@@ -174,7 +174,7 @@
       /**
        * Called by a bubble event to set whether the user is allowed to comment.
        */
-      onSetCanCreateComment: function CommentList_onSetCanCreateComment(layer, args)
+      onSetCanCreateComment: function CreateComment_onSetCanCreateComment(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.canCreateComment !== null))
@@ -253,11 +253,23 @@
             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
          this.widgets.editor._render();
+         this.widgets.validateOnZero = 0;
+         this.widgets.editor.subscribe("editorKeyUp", function (e)
+         {
+            // Only bother checking if length is short, otherwise HTML cleanup slows the UI down undesirably
+            // NOTE: Don't check for zero-length, due to HTML <br>, <span> tags, etc. possibly being present.
+            if (this.widgets.editor.getEditorHTML().length < 20)
+            {
+               this.widgets.editor.saveHTML();
+               this.widgets.commentForm.updateSubmitElements();
+            }
+         }, this, true);
 
          // create the form that does the validation/submit
          this.widgets.commentForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.commentForm.setShowSubmitStateDynamically(true, false);
          this.widgets.commentForm.setSubmitElements(this.widgets.okButton);
+         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null,"keyup");
          this.widgets.commentForm.setAJAXSubmit(true,
          {
             successMessage: this._msg("message.createcomment.success"),
@@ -294,7 +306,7 @@
                });
             },
             scope: this
-         }
+         };
          this.widgets.commentForm.init();
 
          // finally show the form
@@ -323,6 +335,7 @@
       {
          this.widgets.feedbackMessage.destroy();
          this.widgets.okButton.set("disabled", false);
+         this.widgets.editor.currentEvent = null; 
          this.widgets.editor._disableEditor(false);
       },
 
