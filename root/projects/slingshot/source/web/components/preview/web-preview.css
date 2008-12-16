@@ -1,0 +1,44 @@
+div.web-preview
+{
+   margin-left: -10px;
+   border-right: 1px solid #CCCCCC;
+   border-bottom: 1px solid #CCCCCC;
+}
+
+div.web-preview span,
+div.web-preview div
+{
+   color: #000000;
+}
+
+div.web-preview .hd
+{
+   background-color: #FAFAFA;    
+   height: 40px;
+   line-height: 40px;
+}                                     
+
+div.web-preview img,
+div.web-preview span,
+div.web-preview input
+{
+   vertical-align: middle;
+}
+
+div.web-preview .bd
+{
+   text-align: center;
+}
+
+div.web-preview .bd .preview-swf
+{
+   width: 100%;
+   height: 670px;
+}
+
+div.web-preview .bd .preview-swf div
+{
+   background-color:#FAFAFA;
+   padding-bottom:430px;
+   padding-top:200px;
+}
