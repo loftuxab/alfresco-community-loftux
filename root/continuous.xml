@@ -401,12 +401,6 @@
             file="${dir.project.3rdparty.distro}/server.xml"
             overwrite="true"/>
 
-      <!-- place latest Xalan jars to ensure they are used -->
-      <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed"
-            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
-      <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed"
-            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
-
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.continuous.assemble.tomcat}/webapps">
          <fileset dir="${dir.project.webclient.dist}" 
@@ -415,8 +409,13 @@
                   includes="${file.name.war.slingshot}" />
       </copy>
       <!-- Copy any required common libs -->
-      <copy todir="${dir.continuous.assemble.tomcat}/lib"
+      <copy todir="${dir.continuous.assemble.tomcat}/lib" 
             file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
+      <!-- Add shared loader to Tomcat 6-->
+	  <replace file="${dir.continuous.assemble.tomcat}/conf/catalina.properties" 
+	      token="shared.loader=" 
+	      value="shared.loader=${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar" />
+	  <!-- Add config to shared location -->
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
          <fileset dir="${dir.project.webclient.config}/alfresco/extension" />

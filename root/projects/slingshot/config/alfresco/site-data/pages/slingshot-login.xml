@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page>
-  <title>Slingshot Login Page</title>
+  <title>Login</title>
   <template-instance>slingshot-login</template-instance>
   <authentication>none</authentication>  
 </page>

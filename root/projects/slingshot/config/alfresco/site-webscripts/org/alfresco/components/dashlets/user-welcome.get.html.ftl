@@ -27,7 +27,7 @@ new Alfresco.UserWelcome("${args.htmlid}");
    </#list>
       </div>
 </#if>
-      <div class="detail-list-item last">
+      <div class="detail-list-item last-item">
          <h4>${msg("header.createSite")}</h4>
          <div>${msg("text.createSite")}</div>
          <div><a id="${args.htmlid}-createSite-button" href="#">${msg("link.createSite")}</a></div>

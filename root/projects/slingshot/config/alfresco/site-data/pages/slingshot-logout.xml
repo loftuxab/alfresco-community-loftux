@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page>
-  <title>Slingshot Logout Page</title>
+  <title>Logout</title>
   <template-instance>slingshot-logout</template-instance>
   <authentication>none</authentication>  
 </page>

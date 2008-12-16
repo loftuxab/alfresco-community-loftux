@@ -138,7 +138,7 @@
             value: "all",
             checked: true
          });
-         this.widgets.all.on("checkedChange", this.onAllCheckedChanged, this, true);
+         this.widgets.all.on("checkedChange", this.onAllCheckedChanged, this.widgets.all, this);
          
          // Dropdown filter
          this.widgets.dueOn = new YAHOO.widget.Button(this.id + "-dueOn",
@@ -243,7 +243,7 @@
                break;
             
             default:
-               this.widgets.all.set("checked", false);
+               this.widgets.all.set("checked", false, true);
                Dom.addClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
                break;
          }
@@ -269,14 +269,13 @@
        * All tasks
        * @method onAllCheckedChanged
        * @param p_oEvent {object} Button event
+       * @param p_obj {object} Button
        */
-      onAllCheckedChanged: function MyTasks_onAllCheckedChanged(p_oEvent)
+      onAllCheckedChanged: function MyTasks_onAllCheckedChanged(p_oEvent, p_obj)
       {
-         if (p_oEvent.newValue)
-         {
-            this.setActiveFilter("all");
-            this.populateTaskList("all");
-         }
+         this.setActiveFilter("all");
+         this.populateTaskList("all");
+         p_obj.set("checked", true, true);
       },
 
       /**

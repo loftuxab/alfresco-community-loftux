@@ -16,7 +16,7 @@
 </div>
    </#list>
 <#else>
-<div class="detail-list-item first last">
+<div class="detail-list-item first-item last-item">
    <span>${msg("label.no-activities")}</span>
 </div>
 </#if>

@@ -170,7 +170,7 @@
             value: "today",
             checked: true
          });
-         this.widgets.today.on("checkedChange", this.onTodayCheckedChanged, this, true);
+         this.widgets.today.on("checkedChange", this.onTodayCheckedChanged, this.widgets.today, this);
          
          // Dropdown filter
          this.widgets.range = new YAHOO.widget.Button(this.id + "-range",
@@ -246,7 +246,7 @@
        */
       onListLoadFailed: function Activities_onListLoadFailed()
       {
-         this.activityList.innerHTML = '<div class="detail-list-item first last">' + this._msg("label.load-failed") + '</div>';
+         this.activityList.innerHTML = '<div class="detail-list-item first-item last-item">' + this._msg("label.load-failed") + '</div>';
       },
       
       /**
@@ -263,7 +263,7 @@
                break;
             
             default:
-               this.widgets.today.set("checked", false);
+               this.widgets.today.set("checked", false, true);
                Dom.addClass(this.widgets.range.get("element"), "yui-checkbox-button-checked");
                break;
          }
@@ -302,14 +302,13 @@
        * Today only
        * @method onTodayCheckedChanged
        * @param p_oEvent {object} Button event
+       * @param p_obj {object} Button
        */
-      onTodayCheckedChanged: function Activities_onTodayCheckedChanged(p_oEvent)
+      onTodayCheckedChanged: function Activities_onTodayCheckedChanged(p_oEvent, p_obj)
       {
-         if (p_oEvent.newValue)
-         {
-            this.setActiveFilter("today");
-            this.populateActivityList("today");
-         }
+         this.setActiveFilter("today");
+         this.populateActivityList("today");
+         p_obj.set("checked", true, true);
       },
 
       /**
