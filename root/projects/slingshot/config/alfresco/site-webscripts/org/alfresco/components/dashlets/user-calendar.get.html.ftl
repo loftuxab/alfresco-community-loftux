@@ -3,7 +3,7 @@
    <div class="body scrollableList">
 <#if eventList?size &gt; 0>
    <#list eventList as event>
-      <div class="detail-list-item <#if event_index = 0>first<#elseif !event_has_next>last</#if>">
+      <div class="detail-list-item <#if event_index = 0>first-item<#elseif !event_has_next>last-item</#if>">
          <div class="icon"><img src="${url.context}/components/calendar/images/calendar-16.png" alt="event" /></div>
          <div class="details2">
             <h4><a href="${url.context}/${event.url}">${event.title?html}</a></h4>
@@ -14,7 +14,7 @@
       </div>
    </#list>
 <#else>
-      <div class="detail-list-item first last">
+      <div class="detail-list-item first-item last-item">
  	      <span>${msg("label.noEvents")}</span>
       </div>
 </#if>

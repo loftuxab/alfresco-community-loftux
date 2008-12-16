@@ -19,8 +19,8 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
    <div class="body scrollableList">
 <#if sites??>
    <#list sites as site>
-      <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if site_index = 0>first<#elseif !site_has_next>last</#if>">
-         <div>
+      <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if site_index = 0>first-item<#elseif !site_has_next>last-item</#if>">
+         <div>                                                                                        
             <div class="site">
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
             </div>
@@ -36,7 +36,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions({
       </div>
    </#list>
 <#else>
-      <div class="detail-list-item first last">
+      <div class="detail-list-item first-item last-item">
          <span>${msg("label.noSites")}</span>
       </div>
 </#if>

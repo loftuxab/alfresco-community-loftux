@@ -17,7 +17,7 @@
          <div>${msg("text.customiseDashboard")}</div>
          <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard">${msg("link.customiseDashboard")}</a></div>
       </div>
-      <div class="detail-list-item last">
+      <div class="detail-list-item last-item">
          <h4>${msg("header.customiseSite")}</h4>
          <div>${msg("text.customiseSite")}</div>
          <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site">${msg("link.customiseSite")}</a></div>
@@ -33,7 +33,7 @@
          <div>${msg("text.onlineHelp")}</div>
          <div><a href="http://www.alfresco.com/help/3/EUHelp" target="_new">${msg("link.onlineHelp")}</a></div>
       </div>
-      <div class="detail-list-item last">
+      <div class="detail-list-item last-item">
          <h4>${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
          <div><a href="http://www.alfresco.com/help/3/Tutorial" target="_new">${msg("link.featureTour")}</a></div>
