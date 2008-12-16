@@ -65,7 +65,7 @@ public abstract class FreemarkerTagSupportDirective implements TemplateDirective
      * 
      * @return the string
      */
-    public String executeTag(Tag tag)
+    public final String executeTag(Tag tag)
         throws TagExecutionException
     {
         return executeTag(tag, null);
@@ -79,12 +79,12 @@ public abstract class FreemarkerTagSupportDirective implements TemplateDirective
      * 
      * @return the string
      */
-    public String executeTag(Tag tag, String bodyContent)
+    public final String executeTag(Tag tag, String bodyContent)
         throws TagExecutionException
     {
         // generate a request that packages up the render context
         RenderContextRequest request = new RenderContextRequest(context);
-            
+        
         // execute the tag
         return TagUtil.execute(tag, request, bodyContent);
     }

@@ -40,7 +40,6 @@ import org.alfresco.web.site.exception.TagExecutionException;
  */
 public class TagUtil
 {
-    
     /**
      * Executes the given tag within the context of the given servlet request.
      * 
