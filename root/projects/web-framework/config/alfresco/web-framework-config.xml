@@ -61,7 +61,7 @@
 			   
 			   <!-- delay in seconds between checking store caches are dirty -->
 			   <!-- same setting can be overriden below on a per model-type basis -->
-			   <cache-check-delay>60</cache-check-delay>
+			   <cache-check-delay>600</cache-check-delay>
 			</persisters>
 
 			<!-- object model -->

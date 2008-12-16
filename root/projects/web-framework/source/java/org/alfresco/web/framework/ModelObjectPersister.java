@@ -110,14 +110,31 @@ public interface ModelObjectPersister
         throws ModelObjectPersisterException;
     
     /**
-     * Returns a map of all of the objects
+     * Returns a map of all of the objects referenced by this persister.
+     * <p>
+     * In general, this is a very expensive call and should be avoided. Each object
+     * descriptor referenced by the persister is loaded into the model object cache. 
      * 
-     * In general, this is a very expensive call
+     * @return Map of object IDs to ModelObject instances
      * 
-     * @return
      * @throws ModelObjectException
      */
     public Map<String, ModelObject> getAllObjects(ModelPersistenceContext context)
+        throws ModelObjectPersisterException;
+    
+    /**
+     * Returns a map of all of the objects referenced by this persister filtered by
+     * the given ID filter.
+     * <p>
+     * In general, this is an expensive call but less expensive than getAllObjects().
+     * Each object descriptor referenced by the persister found using the filter is
+     * loaded into the model object cache. 
+     * 
+     * @return Map of object IDs to ModelObject instances
+     * 
+     * @throws ModelObjectException
+     */
+    public Map<String, ModelObject> getAllObjectsByFilter(ModelPersistenceContext context, String filter)
         throws ModelObjectPersisterException;
 
     /**
@@ -135,5 +152,4 @@ public interface ModelObjectPersister
      * Invalidates the entire cache for this persister
      */
     public void invalidateCache();
-    
 }

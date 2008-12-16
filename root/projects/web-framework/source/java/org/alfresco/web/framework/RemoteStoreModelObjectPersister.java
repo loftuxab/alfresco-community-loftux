@@ -24,10 +24,10 @@
  */
 package org.alfresco.web.framework;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.web.framework.cache.ModelObjectCache;
-import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.scripts.RemoteStore;
 import org.alfresco.web.scripts.Store;
 import org.apache.commons.logging.Log;
@@ -49,6 +49,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
 {
+    private static Log logger = LogFactory.getLog(RemoteStoreModelObjectPersister.class);
+    
+    protected final Map<String, ModelObjectCache> objectCaches = new HashMap<String, ModelObjectCache>();
+    
+    
     /**
      * Instantiates a new store model object persister.
      * 
@@ -68,6 +73,20 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
         this.id = "RemoteStore_" + store.getBasePath() + "_" + this.objectTypeId; 
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.ModelObjectPersister#invalidateCache(org.alfresco.web.framework.ModelPersistenceContext)
+     */
+    @Override
+    public void invalidateCache()
+    {
+        super.invalidateCache();
+        synchronized (this.objectCaches)
+        {
+            this.objectCaches.clear();
+        }
+    }
+
+
     /**
      * Gets the cache for a particular model persistence context
      * 
@@ -78,18 +97,22 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     @Override
     protected ModelObjectCache getCache(ModelPersistenceContext context)
     {
-        String key = getId();
+        ModelObjectCache cache = this.objectCache;
+        
         String storeId = (String)context.getValue(ModelPersistenceContext.REPO_STOREID);
         if (storeId != null)
         {
-            key = new StringBuilder(100).append(storeId).append(':').append(getId()).toString();
-        }
-        
-        ModelObjectCache cache = objectCaches.get(key);
-        if (cache == null)
-        {
-            cache = new ModelObjectCache(this.store, this.delay);
-            objectCaches.put(key, cache);
+            // need to lookup a store specific object cache
+            String key = new StringBuilder(100).append(storeId).append(':').append(getId()).toString();
+            synchronized (this.objectCaches)
+            {
+                cache = this.objectCaches.get(key);
+                if (cache == null)
+                {
+                    cache = new ModelObjectCache(this.store, this.delay);
+                    this.objectCaches.put(key, cache);
+                }
+            }
         }
         
         return cache;

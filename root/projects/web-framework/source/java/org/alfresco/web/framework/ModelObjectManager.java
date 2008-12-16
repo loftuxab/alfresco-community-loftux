@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.framework;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -49,13 +49,14 @@ import org.apache.commons.logging.LogFactory;
  * type (this is defined in configuration).
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public final class ModelObjectManager
 {
     private static final Log logger = LogFactory.getLog(ModelObjectManager.class);
 
-    private WebFrameworkManager service;
-    private ModelPersistenceContext context;
+    private final WebFrameworkManager service;
+    private final ModelPersistenceContext context;
     
     
     /**
@@ -85,11 +86,14 @@ public final class ModelObjectManager
     }
     
     /**
-     * Static instantiator of ModelObjectServices
+     * Static factory method for ModelObjectManager instances. Each instance is tied to
+     * a particular ModelPersistenceContext object.
      * 
      * @param service a valid WebFrameworkManager instance
      * @param context a valid PersisterContext instance
-     * @return
+     * 
+     * @return ModelObjectManager for the given context
+     * 
      * @throws ModelObjectManagerException
      */
     static ModelObjectManager newInstance(WebFrameworkManager service, ModelPersistenceContext context)
@@ -101,21 +105,21 @@ public final class ModelObjectManager
         }
         if (context == null)
         {
-            throw new IllegalArgumentException("PersisterContext is null");
+            throw new IllegalArgumentException("ModelPersistenceContext is null");
         }
         
         return new ModelObjectManager(service, context);
     }
         
     /**
-     * Retrieves an object from the framework.
+     * Retrieves an object from the persister that manages the given object type.
+     * <p>
+     * If the object is not available in cache, it is loaded from storage.
      * 
-     * If the object is not in cache, it is loaded from storage.
+     * @param objectTypeId  the object type id
+     * @param objectId      the object id
      * 
-     * @param objectTypeId the object type id
-     * @param objectId the object id
-     * 
-     * @return the object
+     * @return the ModelObject or null if not found
      */
     public ModelObject getObject(String objectTypeId, String objectId)
     {
@@ -133,20 +137,21 @@ public final class ModelObjectManager
             }
             catch (ModelObjectPersisterException mope)
             {
-                throw new AlfrescoRuntimeException("Unable to retrieve object: " + objectId + " of type: " + objectTypeId, mope);
+                throw new AlfrescoRuntimeException("Unable to retrieve object: " + objectId + " of type: " +
+                        objectTypeId, mope);
             }
         }
-       
+        
         return obj;
     }
     
     /**
-     * New object.
+     * Create a new object.
      * 
-     * @param objectTypeId the object type id
-     * @param objectId the object id
+     * @param objectTypeId  the object type id
+     * @param objectId      the object id
      * 
-     * @return the model object
+     * @return the ModelObject or null if no persister for the given type can be found.
      */
     public ModelObject newObject(String objectTypeId, String objectId)
     {
@@ -162,8 +167,8 @@ public final class ModelObjectManager
             }
             catch (ModelObjectPersisterException mope)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Unable to create object: " + objectId + " of type " + objectTypeId, mope);
+                if (logger.isInfoEnabled())
+                    logger.info("Unable to create object: " + objectId + " of type: " + objectTypeId, mope);
                 
                 // allow null to be returned
             }                
@@ -173,9 +178,11 @@ public final class ModelObjectManager
     }
 
     /**
-     * New object.
+     * Create a new object.
      * 
-     * @param objectTypeId the object type id
+     * @param objectTypeId  the object type id
+     * 
+     * @return the ModelObject or null if not found
      * 
      * @return the model object
      */
@@ -194,8 +201,8 @@ public final class ModelObjectManager
             }
             catch (ModelObjectPersisterException mope)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Unable to create object: " + objectId + " of type " + objectTypeId, mope);
+                if (logger.isInfoEnabled())
+                    logger.info("Unable to create object: " + objectId + " of type: " + objectTypeId, mope);
             }                
         }
        
@@ -203,9 +210,9 @@ public final class ModelObjectManager
     }
     
     /**
-     * Saves the object to its persister
+     * Saves the object to its persister.
      * 
-     * @param object the object
+     * @param object    the ModelObject to save
      */
     public boolean saveObject(ModelObject object)
     {
@@ -217,15 +224,15 @@ public final class ModelObjectManager
             try
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Attempting to save object '" + object.getId() + "' to persister id: " + persister.getId()); 
+                    logger.debug("Attempting to save object '" + object.getId() + "' to persister: " + persister.getId()); 
                 
                 saved = persister.saveObject(this.context, object);
             }
             catch (ModelObjectPersisterException mope)
             {
                 if (logger.isInfoEnabled())
-                    logger.info("Unable to save object: " + object.getId() + " of type " + object.getTypeId() +
-                            " to storage: " + persister.getId() + " due to error: " + mope.getMessage()); 
+                    logger.info("Unable to save object: " + object.getId() + " of type: " + object.getTypeId() +
+                                " to persister: " + persister.getId() + " due to error: " + mope.getMessage()); 
             }                                
         }
         
@@ -235,9 +242,9 @@ public final class ModelObjectManager
     /**
      * Removes the object.
      * 
-     * @param object the object
+     * @param object    the ModelObject to remove
      * 
-     * @return true, if successful
+     * @return true if successful, false otherwise
      */
     public boolean removeObject(ModelObject object)
     {
@@ -247,10 +254,10 @@ public final class ModelObjectManager
     /**
      * Removes the object.
      * 
-     * @param objectTypeId the object type id
-     * @param objectId the object id
+     * @param objectTypeId  the object type id
+     * @param objectId      the object id
      * 
-     * @return true, if successful
+     * @return true if successful, false otherwise
      */
     public boolean removeObject(String objectTypeId, String objectId)
     {
@@ -262,14 +269,14 @@ public final class ModelObjectManager
             try
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Attempting to remove object '" + objectId + "' from persister id: " + persister.getId()); 
+                    logger.debug("Attempting to remove object '" + objectId + "' from persister: " + persister.getId()); 
                 
                 removed = persister.removeObject(this.context, objectId);
             }
             catch (ModelObjectPersisterException mope)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Unable to remove object: " + objectId + " of type " + objectTypeId, mope);
+                if (logger.isInfoEnabled())
+                    logger.info("Unable to remove object: " + objectId + " of type: " + objectTypeId, mope);
             }                
         }
         
@@ -277,27 +284,55 @@ public final class ModelObjectManager
     }
     
     /**
-     * Retrieves all objects of a given type id
+     * Retrieves all objects of a given type id.
      * 
-     * @param objectTypeId
+     * @param objectTypeId      Type ID
      * 
      * @return a map of model objects (keyed by object id)
      */
     public Map<String, ModelObject> getAllObjects(String objectTypeId)
     {
-        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(256, 1.0f);
-
+        Map<String, ModelObject> objects = Collections.<String, ModelObject>emptyMap();
+        
         ModelObjectPersister persister = this.service.getPersister(objectTypeId);
         if (persister != null)
         {
             try
             {
-                objects.putAll(persister.getAllObjects(this.context));
+                objects = persister.getAllObjects(this.context);
             }
             catch (ModelObjectPersisterException mope)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("ModelObjectService unable to retrieve all objects", mope);                
+                if (logger.isInfoEnabled())
+                    logger.info("ModelObjectManager unable to retrieve all objects", mope);                
+            }
+        }
+        
+        return objects;
+    }
+    
+    /**
+     * Retrieves all objects of a given type id with the given object ID filter
+     * 
+     * @param objectTypeId  the object type id
+     * 
+     * @return a map of model objects (keyed by object id)
+     */
+    public Map<String, ModelObject> getAllObjects(String objectTypeId, String filter)
+    {
+        Map<String, ModelObject> objects = Collections.<String, ModelObject>emptyMap();
+        
+        ModelObjectPersister persister = this.service.getPersister(objectTypeId);
+        if (persister != null)
+        {
+            try
+            {
+                objects = persister.getAllObjectsByFilter(this.context, filter);
+            }
+            catch (ModelObjectPersisterException mope)
+            {
+                if (logger.isInfoEnabled())
+                    logger.info("ModelObjectManager unable to retrieve all objects by filter: " + filter, mope);                
             }
         }
         
@@ -309,7 +344,7 @@ public final class ModelObjectManager
      * 
      * @return the string
      */
-    protected String newGUID()
+    private static String newGUID()
     {
         return ModelHelper.newGUID();
     }

@@ -256,7 +256,7 @@ public class WebFrameworkManager implements ApplicationContextAware
             TypeDescriptor descriptor = wfConfig.getTypeDescriptor(typeIds[i]);
             
             // get the default store id
-            Store defaultStore = (Store) getApplicationContext().getBean(descriptor.getDefaultStoreId());
+            Store defaultStore = (Store)getApplicationContext().getBean(descriptor.getDefaultStoreId());
             boolean addedDefaultStore = false;
             
             // cache enabled setting (can override default per store)
@@ -319,11 +319,14 @@ public class WebFrameworkManager implements ApplicationContextAware
             }
             typeIdToPersisterMap.put(typeIds[i], persister);
             
-            // debug
+            if (logger.isDebugEnabled())
+                logger.debug("Initalised " + typeIds[i] + " persister: " + persister.toString());
+            
+            // warning if no default store provided for a type (i.e. nowhere to write changes)
             if (!addedDefaultStore)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Unable to add default store persister for object type id: " + typeIds[i]);                                             
+                if(logger.isWarnEnabled())
+                    logger.warn("Unable to add default store persister for object type id: " + typeIds[i]);                                             
             }
         }
     }
