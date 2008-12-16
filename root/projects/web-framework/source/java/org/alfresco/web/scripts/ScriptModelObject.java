@@ -394,5 +394,4 @@ public final class ScriptModelObject extends ScriptBase
         ModelObject obj = getModel().clone(objectTypeId, objectId, newObjectId);
         return ScriptHelper.toScriptModelObject(context, obj);
     }
-    
 }

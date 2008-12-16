@@ -39,8 +39,8 @@ import org.alfresco.web.framework.render.RenderContext;
  */
 public final class ScriptForm extends ScriptBase
 {
-    protected Map<String, FormBinding> bindings;
-    protected RenderContext renderContext;
+    final private Map<String, FormBinding> bindings;
+    final private RenderContext renderContext;
         
     /**
      * Instantiates a new script form.
@@ -62,6 +62,7 @@ public final class ScriptForm extends ScriptBase
     {
         return null;
     }
+    
     
     // --------------------------------------------------------------
     // JavaScript Properties

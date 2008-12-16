@@ -41,7 +41,7 @@ import org.alfresco.web.site.RequestContext;
  */
 public abstract class ScriptBase implements Serializable
 {
-    protected RequestContext context;
+    final protected RequestContext context;
     protected ScriptableMap<String, Serializable> properties;
 
     /**
@@ -58,6 +58,7 @@ public abstract class ScriptBase implements Serializable
     public ScriptBase()
     {
         super();
+        this.context = null;
     }
 
     /**
@@ -65,7 +66,7 @@ public abstract class ScriptBase implements Serializable
      * 
      * @return the request context
      */
-    public RequestContext getRequestContext()
+    final public RequestContext getRequestContext()
     {
         return context;
     }
@@ -79,7 +80,7 @@ public abstract class ScriptBase implements Serializable
      * 
      * @return the script model object
      */
-    public ScriptModelObject getObject(String objectTypeId, String objectId)
+    final public ScriptModelObject getObject(String objectTypeId, String objectId)
     {
         return ScriptHelper.getObject(getRequestContext(), objectTypeId, objectId);
     }        
@@ -94,12 +95,12 @@ public abstract class ScriptBase implements Serializable
         return this.properties;
     }    
     
-    public Model getModel()
+    final public Model getModel()
     {
         return context.getModel();
     }
     
-    public WebFrameworkConfigElement getConfig()
+    final public WebFrameworkConfigElement getConfig()
     {
         return context.getConfig();
     }

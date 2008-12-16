@@ -46,7 +46,7 @@ import org.mozilla.javascript.Scriptable;
  */
 public final class ScriptRenderingInstance extends ScriptBase
 {
-    protected RenderContext renderContext = null;
+    final private RenderContext renderContext;
     
     /**
      * Instantiates a new script renderer instance.

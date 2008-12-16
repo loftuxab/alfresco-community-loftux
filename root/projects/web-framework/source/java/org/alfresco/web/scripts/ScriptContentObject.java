@@ -55,8 +55,8 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptContentObject extends ScriptBase
 {
-    protected ResourceContent content;
-    protected ScriptResource scriptResource;
+    final private ResourceContent content;
+    private ScriptResource scriptResource;
     
     /**
      * Instantiates a new script content.
@@ -149,9 +149,4 @@ public final class ScriptContentObject extends ScriptBase
         
         return this.scriptResource;
     }
-    
-    // --------------------------------------------------------------
-    // JavaScript Functions
-    //
-    
 }

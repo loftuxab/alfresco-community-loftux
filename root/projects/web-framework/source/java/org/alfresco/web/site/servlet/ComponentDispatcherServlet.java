@@ -86,13 +86,13 @@ public class ComponentDispatcherServlet extends DispatcherServlet
         // render mode and render focus
         RenderMode renderMode = null;
         RenderFocus renderFocus = null;
-                
-        String componentId = t.nextToken();
+        
+        String element = t.nextToken();
         
         // was this the render mode?
         try
         {
-            renderMode = RenderMode.fromString(componentId);
+            renderMode = RenderMode.valueOf(element.toUpperCase());
         }
         catch (IllegalArgumentException iae) 
         { 
@@ -102,11 +102,11 @@ public class ComponentDispatcherServlet extends DispatcherServlet
         // if we received the render mode, advance the token
         if (renderMode != null)
         {
-            componentId = t.nextToken();
+            element = t.nextToken();
             
             try
             {
-                renderFocus = RenderFocus.fromString(componentId);
+                renderFocus = RenderFocus.valueOf(element.toUpperCase());
             }
             catch (IllegalArgumentException iae)
             {
@@ -116,7 +116,7 @@ public class ComponentDispatcherServlet extends DispatcherServlet
             // advance the token if we found a render focus
             if (renderFocus != null)
             {
-                componentId = t.nextToken();
+                element = t.nextToken();
             }
         }
         
@@ -132,8 +132,8 @@ public class ComponentDispatcherServlet extends DispatcherServlet
         
         // set the render mode
         context.setRenderMode(renderMode);
-
+        
         // do the render of the component
-        PresentationUtil.renderComponent(context, renderFocus, componentId);        
+        PresentationUtil.renderComponent(context, renderFocus, element);        
     }
 }
