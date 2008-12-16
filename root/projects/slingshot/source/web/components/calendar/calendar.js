@@ -166,17 +166,13 @@
       onEventSaved: function(e, args)
       {
          var params = args[1];
-         if (params)
+         if (params && params.from)
          {
             var from = params.from;
             var selectedDates = this.calendar.getSelectedDates();
             
-            var dates = selectedDates.map(function(d)
-            {
-               return Alfresco.util.formatDate(d, "mm/dd/yyyy");
-            });
-            dates.push(from);
-            
+            dates.push(Alfresco.util.formatDate(Alfresco.thirdparty.fromISO8601(from), "mm/dd/yyyy"));
+
             this.calendar.cfg.setProperty("selected", dates.join(","));
             this.calendar.render();
          }
@@ -193,27 +189,26 @@
        */
       onEventDataLoad: function(e, args)
       {
-         var params = args[1];
-         if (params)
+         var events = args[1];
+         if (events)
          {
-            // Grab the source of the event
-            var source = params.source;
-            if (source)
-            {
-               var events = source.eventData;
-               var selectedDates = [];
-               
-               for (var key in events)
+            
+             var selectedDates = [];
+
+             for (var i=0;i<events.length;i++)
+             {
+               var event = events[i];
+               if (event)
                {
-                  if (events.hasOwnProperty(key)) {
-                     selectedDates.push(key);
-                  }
+                 var from = event.from || event.dtstart;
+                 
+                 selectedDates.push(Alfresco.util.formatDate(Alfresco.thirdparty.fromISO8601(from),"mm/dd/yyyy"));  
                }
-               
-               // Get the data and refresh the view
-               this.calendar.cfg.setProperty("selected", selectedDates.join(","));
-               this.calendar.render();
-            }
+             }
+             // Get the data and refresh the view
+             this.calendar.cfg.setProperty("selected", selectedDates.join(','));
+             this.calendar.render();
+
          }
       },
    

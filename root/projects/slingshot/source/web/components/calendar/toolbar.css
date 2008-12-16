@@ -2,9 +2,9 @@
 {
    background-color: #E3EAEC;
    border-bottom: 2px solid #C7CCCE;
-   margin: 0 -10px;
+   margin: 0;
    min-height: 2em;
-   padding: 0.5em;
+/*   padding: 0.5em;*/
 }
 
 .toolbar .inline
@@ -14,8 +14,9 @@
 
 .toolbar .addEvent button
 {
-   background: transparent url(images/add-event-16.png) no-repeat 12px 4px;
+   background: transparent url(images/add-event-16-2.png) no-repeat 17px 7px;
    padding-left: 32px;
+   *background-position:17px 5px;
 }
 
 .toolbar div.first
@@ -23,11 +24,11 @@
    width: auto;
 }
 
-.toolbar .first div 
+/*.toolbar .first div 
 {
    float: left;
 }
-
+*/
 .toolbar .yui-buttongroup .yui-button
 {
    margin: auto 0;
@@ -42,7 +43,7 @@ div.separator
 
 .toolbar .ical-feed a
 {
-   background: transparent url(../images/feed-icon-16-blue.png) no-repeat 12px 4px;
+   background: transparent url(images/publish.png) no-repeat 12px 4px;
    padding-left: 32px;
 }
 
@@ -56,4 +57,34 @@ div.separator
 {
    margin: 0 -10px;
    padding: 0.5em 0.5em 0 10px;
+}
+
+.toolbar div.yui-u div.addEvent, .toolbar div.yui-u div.separator {
+    float:left;
+}
+.toolbar div.flat-button {
+    float:left;
+    width:24%;
+    padding:0.5em;
+}
+.calendar-bar .yui-u.first {
+  background:transparent url(images/toolbar-bg-gradient.gif);
+  padding:0.5em;
+  border-right:1px solid #9eb0b7;
+}
+.toolbar .yui-button {
+  background: url(images/toolbar-unchecked-gradient.gif) 0 0;
+}
+.toolbar .yui-button, .toolbar .yui-button .first-child {
+  border-color:#b7b7b7;
+}
+.toolbar .yui-radio-button-checked, .toolbar .yui-checkbox-button-checked {
+  background: url(images/toolbar-checked-gradient.gif) 0 0;
+}
+.toolbar .yui-button button {
+  color:#464646;
+}
+
+.toolbar .yui-radio-button-checked button, .toolbar .yui-checkbox-button-checked button{
+  color:#fff;
 }

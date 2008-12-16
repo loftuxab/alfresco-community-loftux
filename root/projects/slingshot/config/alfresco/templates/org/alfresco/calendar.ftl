@@ -13,7 +13,7 @@
         <div class="yui-t1" id="divCalendarWrapper">
            <div id="yui-main">
               <div id="divCalendarEvents">
-               <@region id="toolbar" scope="template" protected=true />
+                <@region id="toolbar" scope="template" protected=true />               
                 <@region id="view" scope="template" protected=true />
               </div>
            </div>
