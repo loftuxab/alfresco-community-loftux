@@ -21,7 +21,7 @@
       
       <div class="yui-g">
          <div class="yui-g first">
-            <@region id="preview" scope="template" protected=true />
+            <@region id="web-preview" scope="template" protected=true />
             <div class="document-details-comments">
                <@region id="comments" scope="template" protected=true />
                <@region id="createcomment" scope="template" protected=true />
@@ -39,7 +39,6 @@
          </div>
       </div>
    </div>
-   <@region id="full-preview" scope="template" protected=true />      
    
    <script type="text/javascript">//<![CDATA[
    new Alfresco.DocumentDetails().setOptions(
