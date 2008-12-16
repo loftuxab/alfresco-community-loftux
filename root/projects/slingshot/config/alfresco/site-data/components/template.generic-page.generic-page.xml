@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>generic-page</region-id>
+   <source-id>generic-page</source-id>
+   <url>/components/generic-page</url>
+</component>

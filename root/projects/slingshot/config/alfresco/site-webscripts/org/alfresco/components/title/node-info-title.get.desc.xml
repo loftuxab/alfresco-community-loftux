@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>node-info-title</shortname>
+  <description>Node info title</description>
+  <url>/components/title/node-info-title</url>
+</webscript>

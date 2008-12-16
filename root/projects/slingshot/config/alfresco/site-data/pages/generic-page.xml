@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>generic-page</id>
+   <page-type>generic-page</page-type>
+   <title>Generic page</title>
+   <description>Generic page</description>
+   <template-instance>generic-page</template-instance>
+   <authentication>user</authentication>
+</page>

@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>links-view</id>
+   <page-type>links-view</page-type>
+   <title>Links: display links detail view</title>
+   <description>Displays the links detail view</description>
+   <template-instance>links-view</template-instance>
+   <authentication>user</authentication>
+</page>

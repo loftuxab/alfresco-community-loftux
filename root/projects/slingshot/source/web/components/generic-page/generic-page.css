@@ -1,0 +1,52 @@
+.yui-skin-default tr.yui-dt-odd,
+   .yui-skin-default tr.yui-dt-even {
+   background-color: #FFF;
+}
+
+.yui-skin-default tr.yui-dt-odd td.yui-dt-asc,
+   .yui-skin-default tr.yui-dt-odd td.yui-dt-desc,
+   .yui-skin-default tr.yui-dt-even td.yui-dt-asc,
+   .yui-skin-default tr.yui-dt-even td.yui-dt-desc {
+   background-color: #FFF;
+}
+
+.yui-skin-default .yui-dt td {
+   border-style: none solid solid none;
+   border-width: medium 1px 1px medium;
+   border-color: #CBCBCB;
+}
+
+.site-page-titlebar {
+   background-color: #E9EDEF;
+   border-bottom: 2px solid #C7CCCE;
+   height: 2em;
+   padding: 0.5em;
+}
+
+.site-page-infobar {
+   background-color: #F8F8F8;
+   border-bottom: 1px dashed #C0C0C0;
+   height: 2em;
+   padding: 0.5em;
+}
+
+.site-page-infobar .paginator {
+   text-align: right;
+   float: right;
+}
+
+.site-page-body {
+   margin-left: 0px;
+   margin-right: 0px;
+}
+
+#yui-dt0-bodytable {
+   width: 100%;
+}
+
+.yui-dt-first {
+   width:10%;
+}
+.yui-dt-last {
+   width:45%;
+}
