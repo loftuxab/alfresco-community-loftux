@@ -101,8 +101,6 @@
          });
          
          // Labels
-         var yes = Alfresco.util.message("button.yes", this.name);
-         var no = Alfresco.util.message("button.no", this.name);
          var confirmText = Alfresco.util.message("panel.confirm.delete-msg", this.name);
          
          this.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
@@ -117,7 +115,7 @@
             constraintoviewport: true,
             buttons: [
             {
-               text: yes,
+               text: Alfresco.util.message("button.delete", this.name),
                handler:
                {
                   fn: this.onConfirm,
@@ -125,7 +123,7 @@
                }
             },
             {
-               text: no,
+               text: Alfresco.util.message("button.cancel", this.name),
                handler:
                {
                   fn: this.onCancel,

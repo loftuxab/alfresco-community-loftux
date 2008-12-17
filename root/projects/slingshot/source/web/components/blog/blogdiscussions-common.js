@@ -139,7 +139,7 @@ Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventNa
          e = window.event;
       }
       var relTarg = e.relatedTarget || e.fromElement;
-      while (relTarg !== null && relTarg != eventElem && relTarg.nodeName != 'BODY')
+      while (relTarg && relTarg != eventElem && relTarg.nodeName != 'BODY')
       {
          relTarg = relTarg.parentNode;
       }

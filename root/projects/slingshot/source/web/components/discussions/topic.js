@@ -388,15 +388,15 @@
                {
                   this.destroy();
                   me._deleteTopicConfirm.call(me);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function DiscussionsTopic_onDeleteTopic_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },

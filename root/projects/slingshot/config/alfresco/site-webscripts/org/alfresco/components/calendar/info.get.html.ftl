@@ -1,4 +1,7 @@
 <!-- Event Info Panel -->
+<script type="text/javascript">//<![CDATA[
+   Alfresco.util.addMessages(${messages}, "Alfresco.EventInfo");
+//]]></script>
 <div class="hd">${msg("label.eventinfo")}</div>
 <div class="bd">
    <div class="yui-g">

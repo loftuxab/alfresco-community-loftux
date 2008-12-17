@@ -392,15 +392,15 @@
                {
                   this.destroy();
                   me._deleteBlogPostConfirm.call(me, me.blogPostData.name);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function BlogPostList_onDeleteBlogPost_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },

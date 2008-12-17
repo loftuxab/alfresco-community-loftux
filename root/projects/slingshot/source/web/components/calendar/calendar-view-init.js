@@ -567,10 +567,29 @@
 
       onEventClick: function(e, obj)
       {
-         // TODO: look at caching this
+         Event.stopEvent(e);
+         // Stop listening after first click so we don't launch the event info panel several times...
+         Event.removeListener(obj.div, 'click', this.onEventClick);
          var panel = new Alfresco.EventInfo(this.id + "-eventInfo");
-         panel.setSiteId(this.siteId);
-         panel.show(obj); // event object
+         panel.setOptions(
+         {
+            siteId: this.siteId,
+            onClose:
+            {
+               fn: function()
+               {
+                  // ... and start listening again when the event info panel is closed.
+                  Event.addListener(obj.div, 'click', this.onEventClick,
+                  {
+                     event: obj.event,
+                     div: obj.div
+                  }, this);
+               },
+               scope: this,
+               obj: obj.div
+            }
+         });
+         panel.show(obj.event); // event object
       },
 
       /**
@@ -797,7 +816,9 @@
         }
         div.setAttribute("class", classes.join(" "));
         div.innerHTML = '<a href="#">' + label + '</a>';
-        Event.addListener(div, 'click', this.onEventClick, event, this);
+
+        // Listen for clicks on the event div so we later can launch the event info panel
+        Event.addListener(div, 'click', this.onEventClick, {event: event, div: div}, this);
         return div;
      },
 

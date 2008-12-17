@@ -36,7 +36,7 @@
       this.panel = null;
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.onComponentsLoaded, this);
 
       return this;
    };
@@ -98,14 +98,14 @@
        *
        * @method onComponentsLoaded
        */
-       componentsLoaded: function()
-       {
-          /* Shortcut for dummy instance */
-          if (this.id === null)
-          {
-             return;
-          }
-       },
+      onComponentsLoaded: function EventInfo_onComponentsLoaded()
+      {
+         /* Shortcut for dummy instance */
+         if (this.id === null)
+         {
+            return;
+         }
+      },
 
       /**
        * Renders the event info panel. 
@@ -113,7 +113,7 @@
        * @method show
        * @param event {object} JavaScript object representing an event
        */
-      show: function()
+      show: function EventInfo_show(event)
       {
          Alfresco.util.Ajax.request(
          {
@@ -121,15 +121,18 @@
             dataObj:
             { 
                "htmlid": this.id,
-               "uri": "/" + this.options.eventUri
+               "uri": "/" + event.uri
             },
             successCallback:
             {
                fn: this.templateLoaded,
                scope: this
             },
-            failureMessage: "Could not load event info panel"
+            failureMessage: "Could not load event info panel",
+            execScripts: true
          });
+
+         this.event = event;
       },
 
       /**
@@ -138,7 +141,7 @@
        * @method templateLoaded
        * @param response {object} DomEvent
        */
-      templateLoaded: function(response)
+      templateLoaded: function EventInfo_templateLoaded(response)
       {
          var div = document.getElementById("eventInfoPanel");
          div.innerHTML = response.serverResponse.responseText;
@@ -156,7 +159,7 @@
          // Buttons
          Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
          Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick);
-         // Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
+         Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
 
          // Display the panel
          this.panel.show();
@@ -168,9 +171,9 @@
        * @method onCancelClick
        * @param e {object} DomEvent
        */
-      onCancelClick: function(e)
+      onCancelClick: function EventInfo_onCancelClick(e)
       {
-         this.panel.hide();
+         this._hide();
       },
       
       /**
@@ -181,7 +184,7 @@
        */
       onEditClick: function(e)
       {
-          this.panel.hide();
+          this._hide();
           this.eventDialog = Alfresco.util.DialogManager.registerDialog('CalendarView.editEvent');
           this.eventDialog.id = this.id+ "-editEvent";
           // add the tags that are already set on the post
@@ -307,18 +310,51 @@
        * @method onDeleteClick
        * @param e {object} DomEvent
        */
-      onDeleteClick: function(e)
+      onDeleteClick: function EventInfo_onDeleteClick(e)
+      {
+         var me = this;
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.confirm.delete", this.event.name),
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler: function DL_onActionDelete_delete()
+               {
+                  this.destroy();
+                  me._onActionDeleteConfirm.call(me, record);
+               }
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler: function DL_onActionDelete_cancel()
+               {
+                  this.destroy();
+               },
+               isDefault: true
+            }]
+         });
+      },
+      
+      /**
+       * Delete Event confirmed.
+       * Kicks off a DELETE request to the Alfresco repo to remove an event.
+       *
+       * @method _onDeleteConfirm
+       * @private
+       */
+      _onDeleteConfirm: function EventInfo_onDeleteConfirm()
       {
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + this.options.eventUri + "?page=calendar",
+            url: Alfresco.constants.PROXY_URI + this.event.uri + "?page=calendar",
             successCallback:
             {
                fn: this.onDeleted,
                scope: this
             },
-            failureMessage: Alfresco.util.message('message.deleted.failure','Alfresco.CalendarView')
+            failureMessage: this._msg("message.delete.failure", this.event.name),
          });
       },
       
@@ -328,14 +364,51 @@
        * @method onDeleted
        * @param e {object} DomEvent
        */
-      onDeleted: function(e)
+      onDeleted: function EventInfo_onDeleted(e)
       {
-         this.panel.hide();
+         this._hide();
+
          YAHOO.Bubbling.fire('eventDeleted',
          {
-            id: this.options.event // so we know which event we are dealing with
-         });
-         this.panel.destroy();        
+            name: this.event.name, // so we know which event we are dealing with
+            from: this.event.from // grab the events for this date and remove the event
+         });         
+      },
+
+
+      /**
+       * PRIVATE FUNCTIONS
+       */
+
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function EventInfo__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.EventInfo", Array.prototype.slice.call(arguments).slice(1));
+      },
+
+      /**
+       * Hides the panel and calls onClose callback if present
+       *
+       * @method _hide
+       * @param e {object} DomEvent
+       * @private
+       */
+      _hide: function EventInfo__hide()
+      {
+         this._hide();
+         var callback = this.options.onClose;
+         if (callback && typeof callback.fn == "function")
+         {
+            // Call the onClose callback in the correct scope
+            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), callback.obj);
+         }
       }
    };
 })();

@@ -1236,6 +1236,7 @@ Alfresco.util.PopupManager = function()
        *    modal: {boolean},      // if a grey transparent overlay should be displayed in the background
        *    close: {boolean},      // if a close icon should be displayed in the right upper corner, default is false
        *    buttons: []            // an array of button configs as described by YUI:s SimpleDialog, default is a single OK button
+       *    noEscape: {boolean}    // indicates the the message has already been escaped (e.g. to display HTML-based messages)
        * }
        */
       displayPrompt: function(config)

@@ -86,32 +86,40 @@
    margin: 0 -8px;	
 }
 
-.blog-postlist table {
+.blog-postlist table
+{
 	width: 100%;
 	border: none !important;
 }
-.blog-postlist table thead {
+.blog-postlist table thead
+{
 	display: none;
 }
-/*.blog-postlist table td {
-	border: none;
-}*/
-.blog-postlist table .yui-dt-empty {
+.blog-postlist table .yui-dt-empty
+{
 	background-color: transparent;
 }
-.blog-postlist table .yui-dt-liner {
+.blog-postlist table .yui-dt-liner
+{
 	padding: 0px;
 }
-.blog-postlist table td {
+.blog-postlist table tr.yui-dt-odd
+{
+   background-color: #fff;
+}
+.blog-postlist table td
+{
 	border: none !important;
 }
 
-.blog-postlist .row-separator {
+.blog-postlist .row-separator
+{
    border-bottom: 1px solid #c6c6c6;
 }
 
-.blog-postlist tr.yui-dt-odd .node{
-  border-color:#EDF5FF;
+.blog-postlist tr.yui-dt-odd .node
+{
+  border-color: #EDF5FF;
 }
 
 
@@ -127,24 +135,24 @@
    float: right;
    margin: 10px 0 0 15px;
    position: relative;
-   width: 6em;
+   width: 11em;
 }
 
 .nodeEdit div, .replyEdit div
 {
-  padding: 2px 19px;
+  padding: 2px 0 2px 20px;
   margin-bottom: 4px;
 }
 
-.simple .nodeEdit {
+.simple .nodeEdit
+{
   width: 300px;
   text-align: right;
   margin: 4px;
 }
 
-.nodeEdit .action-link {
-  font-family: Arial, sans-serif;
-  font-weight: normal;
+.nodeEdit .action-link
+{
   font-size: 93%;
   line-height: 150%;
   color: #2B6EB5;
@@ -268,10 +276,11 @@
 }
 .nodeContent
 {
-  padding-right: 40px;
   font-size: 100%;
   line-height: 150%;
-  margin-right: 140px;
+  margin-right: 11em;
+  min-height: 6.5em;
+  padding-right: 2em;
 }
 
 .nodeFooter
