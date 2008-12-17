@@ -6,7 +6,7 @@
         <property name="id"><value>patch.wcmFolders</value></property>
         <property name="description"><value>patch.wcmFolders.description</value></property>
         <property name="fixesFromSchema"><value>0</value></property>
-        <property name="fixesToSchema"><value>9999</value></property>
+        <property name="fixesToSchema"><value>${version.schema}</value></property>
         <property name="targetSchema"><value>10000</value></property>
         <!-- helper beans for execution -->
         <property name="messageSource">
