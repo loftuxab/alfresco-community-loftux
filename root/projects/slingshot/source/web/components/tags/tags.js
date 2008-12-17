@@ -67,6 +67,17 @@
       {
          YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
       },
+      /**
+       * Set messages for this component
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       */
+      setMessages: function(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
    
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -116,7 +127,7 @@
        */
       onTagRefresh: function TagComponent_onRefresh(e)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}",
+         var uri = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}",
          {
             site: this.options.siteId,
             container: this.options.container,
@@ -125,14 +136,14 @@
          
          Alfresco.util.Ajax.request({
             method: Alfresco.util.Ajax.GET,
-				url: Alfresco.constants.PROXY_URI + uri,
-				successCallback:
-				{
-					fn: this.onTagsLoaded,
-					scope: this
-				},
-				failureMessage: "Couldn't refresh tag data"
-			});
+            url: uri,
+            successCallback:
+            {
+              fn: this.onTagsLoaded,
+              scope: this
+            },
+          failureMessage: "Couldn't refresh tag data"
+        });
       },
       
       /**
@@ -160,6 +171,7 @@
             var elem = document.getElementById('tagFilterLinks');
             if (elem)
             {
+               html = '<li class="onTagSelection nav-label">'+elem.getElementsByTagName('li')[0].innerHTML+'</li>'+html;
                elem.innerHTML = html;
                this._registerDefaultActionHandler();
             }
