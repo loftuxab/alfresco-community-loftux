@@ -83,25 +83,28 @@
             <scope>page</scope>
             <region-id>component-1-1</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/user-welcome</url>
+            <url>/components/dashlets/user-calendar</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-1-2</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/user-calendar</url>
+            <url>/components/dashlets/alfresco-network</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-2-1</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/rssfeed</url>
+            <url>/components/dashlets/user-welcome</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-2-2</region-id>
             <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/alfresco-network</url>
+            <url>/components/dashlets/rssfeed</url>
+            <properties>
+               <limit>10</limit>
+            </properties>
          </component>
          <component>
              <scope>page</scope>
@@ -109,12 +112,6 @@
              <source-id>user/${userid}/dashboard</source-id>
              <url>/components/dashlets/my-activities</url>
           </component>
-         <component>
-            <scope>page</scope>
-            <region-id>component-2-4</region-id>
-            <source-id>user/${userid}/dashboard</source-id>
-            <url>/components/dashlets/cmisfeed</url>
-         </component>
          <component>
             <scope>page</scope>
             <region-id>component-3-1</region-id>
