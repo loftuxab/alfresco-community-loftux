@@ -153,53 +153,73 @@ public abstract class AbstractRuntime implements Runtime
                 logger.info("Caught exception & redirecting to status template: " + e.getMessage());
             if (logger.isDebugEnabled())
                 logger.debug("Caught exception: " + e.toString());
-            
+
+            // setup context
+            WebScriptRequest req = createRequest(null);
+            WebScriptResponse res = createResponse();
+
             // extract status code, if specified
             int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+            StatusTemplate statusTemplate = null;
+            Map<String, Object> statusModel = null;
             if (e instanceof WebScriptException)
             {
-                statusCode = ((WebScriptException)e).getStatus();
+                WebScriptException we = (WebScriptException)e;
+                statusCode = we.getStatus();
+                statusTemplate = we.getStatusTemplate();
+                statusModel = we.getStatusModel();
             }
 
-            // create web script status for status template rendering
+            // retrieve status template for response rendering
+            if (statusTemplate == null)
+            {
+                // locate status template
+                // NOTE: search order...
+                //   1) root located <status>.ftl
+                //   2) root located status.ftl
+                statusTemplate = getStatusCodeTemplate(statusCode);
+                if (!container.getTemplateProcessor().hasTemplate(statusTemplate.getPath()))
+                {
+                    statusTemplate = getStatusTemplate();
+                    if (!container.getTemplateProcessor().hasTemplate(statusTemplate.getPath()))
+                    {
+                        throw new WebScriptException("Failed to find status template " + statusTemplate.getPath() + " (format: " + statusTemplate.getFormat() + ")");
+                    }
+                }                
+            }
+
+            // create basic model for all information known at this point, if one hasn't been pre-provided
+            if (statusModel == null || statusModel.equals(Collections.EMPTY_MAP))
+            {
+                statusModel = new HashMap<String, Object>(8, 1.0f);
+                statusModel.put("url", new URLModel(req));
+                statusModel.put("server", container.getDescription());
+                statusModel.put("date", new Date());
+                if (match != null && match.getWebScript() != null)
+                {
+                    statusModel.put("webscript", match.getWebScript().getDescription());
+                }
+            }
+
+            // add status to model
             Status status = new Status();
             status.setCode(statusCode);
             status.setMessage(e.getMessage());
             status.setException(e);
-            
-            // create basic model for status template rendering
-            WebScriptRequest req = createRequest(null);
-            WebScriptResponse res = createResponse();
-            Map<String, Object> model = new HashMap<String, Object>(8, 1.0f);
-            model.put("status", status);
-            model.put("url", new URLModel(req));
-            model.put("server", container.getDescription());
-            model.put("date", new Date());
-            if (match != null && match.getWebScript() != null)
-            {
-                model.put("webscript", match.getWebScript().getDescription());
-            }
-            
-            // locate status template
-            // NOTE: search order...
-            //   1) root located <status>.ftl
-            //   2) root located status.ftl
-            String templatePath = getStatusCodeTemplate(statusCode);
-            if (!container.getTemplateProcessor().hasTemplate(templatePath))
-            {
-                templatePath = getStatusTemplate();
-                if (!container.getTemplateProcessor().hasTemplate(templatePath))
-                {
-                    throw new WebScriptException("Failed to find status template " + templatePath + " (format: " + WebScriptResponse.HTML_FORMAT + ")");
-                }
-            }
+            statusModel.put("status", status);
 
             // render output
+            String mimetype = container.getFormatRegistry().getMimeType(req.getAgent(), statusTemplate.getFormat());
+            if (mimetype == null)
+            {
+                throw new WebScriptException("Web Script format '" + statusTemplate.getFormat() + "' is not registered");
+            }
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Force success status header in response: " + req.forceSuccessStatus());
-                logger.debug("Sending status " + statusCode + " (Template: " + templatePath + ")");
-                logger.debug("Rendering response: content type=" + Format.HTML.mimetype());
+                logger.debug("Sending status " + statusCode + " (Template: " + statusTemplate.getPath() + ")");
+                logger.debug("Rendering response: content type=" + mimetype);
             }
 
             res.reset();
@@ -210,7 +230,7 @@ public abstract class AbstractRuntime implements Runtime
             res.setContentType(Format.HTML.mimetype() + ";charset=UTF-8");
             try
             {
-                container.getTemplateProcessor().process(templatePath, model, res.getWriter());
+                container.getTemplateProcessor().process(statusTemplate.getPath(), statusModel, res.getWriter());
             }
             catch (IOException e1)
             {
@@ -246,9 +266,9 @@ public abstract class AbstractRuntime implements Runtime
      * @param statusCode
      * @return  path
      */
-    protected String getStatusCodeTemplate(int statusCode)
+    protected StatusTemplate getStatusCodeTemplate(int statusCode)
     {
-        return "/" + statusCode + ".ftl";
+        return new StatusTemplate("/" + statusCode + ".ftl", WebScriptResponse.HTML_FORMAT);
     }
     
     /**
@@ -256,9 +276,9 @@ public abstract class AbstractRuntime implements Runtime
      * 
      * @return  path
      */
-    protected String getStatusTemplate()
+    protected StatusTemplate getStatusTemplate()
     {
-        return "/status.ftl";
+        return new StatusTemplate("/status.ftl", WebScriptResponse.HTML_FORMAT);
     }
 
     /* (non-Javadoc)

@@ -29,8 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.Match;
-import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.RuntimeContainer;
+import org.alfresco.web.scripts.StatusTemplate;
+import org.alfresco.web.scripts.WebScriptRequest;
+import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -102,18 +104,18 @@ public class FacebookServletRuntime extends FacebookAPIRuntime
      * @see org.alfresco.web.scripts.WebScriptRuntime#getStatusCodeTemplate(int)
      */
     @Override
-    protected String getStatusCodeTemplate(int statusCode)
+    protected StatusTemplate getStatusCodeTemplate(int statusCode)
     {
-        return "/fbml." + statusCode + ".ftl";
+        return new StatusTemplate("/fbml." + statusCode + ".ftl", WebScriptResponse.HTML_FORMAT);
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScriptRuntime#getStatusTemplate()
      */
     @Override
-    protected String getStatusTemplate()
+    protected StatusTemplate getStatusTemplate()
     {
-        return "/fbml.status.ftl";
+        return new StatusTemplate("/fbml.status.ftl", WebScriptResponse.HTML_FORMAT);
     }
 
 }

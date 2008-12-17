@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.scripts;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -38,6 +41,8 @@ public class WebScriptException extends AlfrescoRuntimeException
     private static final long serialVersionUID = -7338963365877285084L;
 
     private int status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+    private StatusTemplate statusTemplate = null;
+    private Map<String, Object> statusModel = Collections.emptyMap();
 
 
     public WebScriptException(String msgId)
@@ -84,9 +89,49 @@ public class WebScriptException extends AlfrescoRuntimeException
         this.status = status;
     }
 
+    /**
+     * Attach an advanced description of the status code associated to this exception
+     * 
+     * @param template  status template
+     * @param model  template model
+     */
+    public void setStatusTemplate(StatusTemplate statusTemplate, Map<String, Object> statusModel)
+    {
+        this.statusTemplate = statusTemplate;
+        if (statusModel != null)
+        {
+            this.statusModel = statusModel;
+        }
+    }
+
+    /**
+     * Get status code
+     * 
+     * @return  status code
+     */
     public int getStatus()
     {
         return status;
     }
-    
+
+    /**
+     * Get status template
+     * 
+     * @return  template
+     */
+    public StatusTemplate getStatusTemplate()
+    {
+        return statusTemplate;
+    }
+
+    /**
+     * Get status model
+     * 
+     * @return  model
+     */
+    public Map<String, Object> getStatusModel()
+    {
+        return statusModel;
+    }
+
 }
