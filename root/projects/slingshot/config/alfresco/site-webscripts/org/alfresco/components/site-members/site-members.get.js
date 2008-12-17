@@ -1,7 +1,7 @@
 var siteId = page.url.templateArgs.site;
 
 // get the membership info for the current user in the current site
-var url = "/api/sites/" + siteId + "/memberships/" + user.id;
+var url = "/api/sites/" + siteId + "/memberships/" + stringUtils.urlEncode(user.name);
 var json = remote.call(url);
 var membership = eval('(' + json + ')');
 

@@ -124,7 +124,7 @@
       <div class="drow">
          <div class="reqcolumn">&nbsp;*</div>
          <div class="rightcolumn">
-            <span class="label"><label for="${args.htmlid}-input-lastName">"${msg("label.lastname")}:</label></span>
+            <span class="label"><label for="${args.htmlid}-input-lastName">${msg("label.lastname")}:</label></span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-lastName" value="<#if profile.lastName??>${profile.lastName?html}</#if>" /></span>
          </div>
          <div class="leftcolumn">

@@ -3,7 +3,7 @@ new Alfresco.UserWelcome("${args.htmlid}");
 //]]></script>
 <div class="dashlet user-welcome">
    <div class="title">${msg("header.userWelcome")}</div>
-   <div class="body">
+   <div class="body scrollableList">
       <div class="detail-list-item-alt">
          <h4>${msg("header.userDashboard")}</h4>
          <div>${msg("text.userDashboard")}</div>
@@ -27,10 +27,20 @@ new Alfresco.UserWelcome("${args.htmlid}");
    </#list>
       </div>
 </#if>
-      <div class="detail-list-item last-item">
+      <div class="detail-list-item">
          <h4>${msg("header.createSite")}</h4>
          <div>${msg("text.createSite")}</div>
          <div><a id="${args.htmlid}-createSite-button" href="#">${msg("link.createSite")}</a></div>
+      </div>
+      <div class="detail-list-item">
+         <h4>${msg("header.onlineHelp")}</h4>
+         <div>${msg("text.onlineHelp")}</div>
+         <div><a href="http://www.alfresco.com/help/3/enterprise/DMShareHelp" target="_new">${msg("link.onlineHelp")}</a></div>
+      </div>
+      <div class="detail-list-item last-item">
+         <h4>${msg("header.featureTour")}</h4>
+         <div>${msg("text.featureTour")}</div>
+         <div><a href="http://www.alfresco.com/help/3/enterprise/ShareTutorial" target="_new">${msg("link.featureTour")}</a></div>
       </div>
       <div class="clear"></div>
    </div>

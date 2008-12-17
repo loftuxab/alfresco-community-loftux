@@ -6,7 +6,7 @@ function sortByTitle(site1, site2)
 function main()
 {
 	// Call the repo for sites the user is a member of
-	var result = remote.call("/api/people/" + user.name + "/sites");
+	var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/sites");
 	if (result.status == 200)
 	{
 		// Create javascript objects from the server response

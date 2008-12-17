@@ -19,7 +19,7 @@ if (json.status == 200)
 
 // Call the repository to see if the user is site manager or not
 var userIsSiteManager = false;
-json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + user.name);
+json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
 if (json.status == 200)
 {
    var obj = eval('(' + json + ')');
@@ -29,4 +29,3 @@ if (json.status == 200)
 // Prepare the model
 model.profile = profile;
 model.userIsSiteManager = userIsSiteManager;
-
