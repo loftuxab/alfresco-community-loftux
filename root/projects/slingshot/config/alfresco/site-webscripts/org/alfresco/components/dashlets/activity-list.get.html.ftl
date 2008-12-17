@@ -2,8 +2,8 @@
    <#assign mode = args.mode!"">
    <#assign lastDate = "3000-01-01"?date("yyyy-MM-dd") lastHour = -1>
    <#list activities as activity>
-      <#assign userLink="<a href=\"${activity.userProfile}\">${activity.fullName}</a>">
-      <#assign itemLink="<a href=\"${activity.itemPage}\">${activity.title}</a>">
+      <#assign userLink="<a href=\"${activity.userProfile}\">${activity.fullName?html}</a>">
+      <#assign itemLink="<a href=\"${activity.itemPage}\">${activity.title?html}</a>">
       <#assign siteLink="<a href=\"${activity.sitePage}\">${activity.siteId}</a>">
       <#if dateCompare(lastDate?date, activity.date.fullDate?date) == 1>
          <#assign lastDate = activity.date.fullDate lastHour = activity.date.hour>

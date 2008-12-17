@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Edit Image Component</shortname>
-  <description>Edit Image Component</description>
-  <url>/component/ct-imageComponent/edit</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

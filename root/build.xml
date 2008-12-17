@@ -391,40 +391,6 @@
                     package-slingshot-jar,
                     deploy-slingshot-tomcat-exploded" />
    
-   <target name="incremental-dynamicwebsite-tomcat" 
-           description="Performs an incremental build and deployment of the dynamic website WAR"
-           depends="incremental-core,
-                    package-webscriptframework-jar,
-                    incremental-jlan, 
-                    incremental-mbeans, 
-                    incremental-deployment,
-                    incremental-repository,
-                    incremental-jndi,
-                    package-webframework-jar, 
-                    incremental-dynamicwebsite,
-                    deploy-dynamicwebsite-tomcat" />
-   
-   <target name="incremental-extranet-tomcat" 
-           description="Performs an incremental build and deployment of the extranet WAR"
-           depends="incremental-core, 
-                    package-webscriptframework-jar, 
-                    package-webframework-jar, 
-                    incremental-extranet,
-                    deploy-extranet-tomcat" />
-                    
-   <target name="incremental-webstudio-tomcat" 
-           description="Performs an incremental build and deployment of the web studio WAR"
-           depends="incremental-core,
-                    package-webscriptframework-jar,
-                    incremental-jlan, 
-                    incremental-mbeans, 
-                    incremental-deployment,
-                    incremental-repository,
-                    incremental-jndi,
-                    package-webframework-jar, 
-                    incremental-webstudio,
-                    deploy-webstudio-tomcat" />                    
-   
    <!--
    <target name="build-jboss" 
            description="Performs a clean build for JBoss and deploys the WAR file"
@@ -489,8 +455,6 @@
                     clean-slingshot,
                     clean-webclient, 
                     clean-webserviceclient,
-                    clean-extranet,
-                    clean-dynamicwebsite,
                     clean-webstudio" />
    
    <target name="clean-modules"
@@ -533,12 +497,6 @@
               includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
       <delete dir="${dir.deploy.tomcat.application.slingshot}" 
-              includeEmptyDirs="true" quiet="yes" />
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.dynamicwebsite}" />
-      <delete dir="${dir.deploy.tomcat.application.dynamicwebsite}" 
-              includeEmptyDirs="true" quiet="yes" />
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.extranet}" />
-      <delete dir="${dir.deploy.tomcat.application.extranet}" 
               includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webstudio}" />
       <delete dir="${dir.deploy.tomcat.application.webstudio}" 
@@ -799,28 +757,6 @@
          <fileset dir="${dir.project.slingshot.src.web}/yui" />
       </copy>
 
-   </target>
-   
-   <target name="deploy-dynamicwebsite-tomcat" depends="init" 
-           description="Deploys the dynamic website WAR to the application Tomcat server">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.dynamicwebsite}" />
-      <delete dir="${dir.deploy.tomcat.application.dynamicwebsite}" 
-              includeEmptyDirs="true" quiet="yes" />
-
-      <!-- copy the dynamic website WAR file to application Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.dynamicwebsite.dist}/${file.name.war.dynamicwebsite}" />
-   </target>
-   
-   <target name="deploy-extranet-tomcat" depends="init" 
-           description="Deploys the extranet WAR to the application Tomcat server">
-      <delete file="${dir.deploy.tomcat.application}/${file.name.war.extranet}" />
-      <delete dir="${dir.deploy.tomcat.application.extranet}" 
-              includeEmptyDirs="true" quiet="yes" />
-      
-      <!-- copy the dynamic website WAR file to the application Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.application}" 
-            file="${dir.project.extranet.dist}/${file.name.war.extranet}" />
    </target>
    
    <target name="deploy-webstudio-tomcat" depends="init" 

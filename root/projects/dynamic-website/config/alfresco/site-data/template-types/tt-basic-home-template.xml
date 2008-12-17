@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<template-type>
-	<id>tt-basic-home-template</id>
-	<title>Basic Home Template</title>
-	<description>Basic Home Template</description>
-	<renderer-type>html</renderer-type>
-	<renderer>/build/basic/basic-home-template.html</renderer>
-</template-type>

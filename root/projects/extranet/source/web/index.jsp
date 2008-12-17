@@ -1,1 +1,0 @@
-<%	request.getRequestDispatcher("/page").include(request, response);%>

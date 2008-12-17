@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Edit Item Component</shortname>
-  <description>Edit Item Component</description>
-  <url>/components/ct-itemComponent/edit</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

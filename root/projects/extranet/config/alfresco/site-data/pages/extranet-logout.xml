@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<page>
-  <title>Extranet Logout Page</title>
-  <page-type>logout</page-type>
-  <template-instance>extranet-logout</template-instance>
-  <authentication>none</authentication>  
-</page>

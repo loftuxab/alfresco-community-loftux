@@ -1,1 +1,0 @@
-<%	request.getRequestDispatcher("/adw").include(request, response);%>

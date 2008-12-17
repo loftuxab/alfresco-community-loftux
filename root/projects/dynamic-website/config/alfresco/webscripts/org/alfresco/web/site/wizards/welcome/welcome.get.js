@@ -1,1 +1,0 @@
-wizard.setDialogURL("/app/welcome-splash.jsp");

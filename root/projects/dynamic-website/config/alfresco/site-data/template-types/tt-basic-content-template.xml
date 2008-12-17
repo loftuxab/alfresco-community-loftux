@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<template-type>
-	<id>tt-basic-content-template</id>
-	<title>Basic Content Template</title>
-	<description>Basic Content Template</description>
-	<renderer-type>html</renderer-type>
-	<renderer>/build/basic/basic-content-template.html</renderer>
-</template-type>

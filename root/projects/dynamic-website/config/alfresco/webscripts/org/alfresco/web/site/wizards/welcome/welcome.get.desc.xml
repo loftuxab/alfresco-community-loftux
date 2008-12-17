@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Welcome Wizard</shortname>
-  <description>Welcome Wizard</description>
-  <url>/wizard/welcome</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
