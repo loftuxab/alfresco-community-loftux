@@ -36,6 +36,12 @@
       </span>
    </#if>
    <#if userIsSiteManager>
+      <#assign linkClass><#if "edit-site" == activePage>class="active-page"</#if></#assign>
+      <span class="yui-button yui-link-button">
+         <span class="first-child">
+            <a href="javascript: Alfresco.module.getEditSiteInstance().show({shortName: '${profile.shortName}'});" ${linkClass}>${msg("link.editSite")}</a>
+         </span>
+      </span>
       <#assign linkClass><#if "customise-site" == activePage>class="active-page"</#if></#assign>
       <span class="yui-button yui-link-button">
          <span class="first-child">
