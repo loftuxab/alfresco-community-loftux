@@ -77,8 +77,10 @@ function microformatParser(args){
    */ 
   var extractData = function (node) {
       switch (node.nodeName.toLowerCase()) {
-          case 'span': return (node.title);
-          case 'img': return (node.alt);
+          case 'span': 
+            return node.title || node.innerHTML;
+          case 'img': 
+            return (node.alt);
       };
       while (node && node.hasChildNodes())
       {
@@ -116,7 +118,14 @@ function microformatParser(args){
       {
           switch (node.nodeName.toLowerCase()) {
              case 'span': 
-                 node.title=value;
+                 if (node.title)
+                 {
+                  node.title=value;
+                 }
+                 else 
+                 {
+                   node.innerHTML = value
+                 }
                  return;
              case 'img': 
                  node.alt = value;

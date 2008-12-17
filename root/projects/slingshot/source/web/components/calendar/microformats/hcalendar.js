@@ -138,7 +138,7 @@ hcalendar = {
        {
          if (node && parsedData)
           {
-              node.innerHTML = parsedData.join(', ');
+              node.innerHTML = parsedData.join(' ');
               return parsedData.join(' ');
           }
           

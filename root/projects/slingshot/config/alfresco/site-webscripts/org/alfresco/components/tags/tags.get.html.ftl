@@ -3,7 +3,9 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       container: "${args.container!""}"
-   });
+   }).setMessages(
+      ${messages}
+   );
 //]]></script>
 <div id="${args.htmlid}-body" class="tag tagTitle">
 	<h2>${msg("header.title")}</h2>

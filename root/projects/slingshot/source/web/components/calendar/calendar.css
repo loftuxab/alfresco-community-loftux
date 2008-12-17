@@ -153,6 +153,15 @@ div.boxOutline
   color:#333;
   margin:0.5em;
 }
+#calTitle span.tagged 
+{
+ color:#A1A1A1;
+ margin-left:0.5em;
+}
+#calTitle span.tagged span
+{
+  color:#669966;
+}
 /* Styles calendar dashlet */
 .yui-skin-sam .yui-calendar td.event
 {

@@ -299,9 +299,9 @@ var CalendarScriptHelper  = ( function()
             var endOfWeekDate = new Date(((startDate.getTime() + (DAY*6))));
               
             //get day of week if current day is in the week that is shown
-            viewArgs.startDate = toISOString(startDate,{selector:'date'});
-            viewArgs.titleDate = toISOString(endOfWeekDate,{selector:'date'}); 
-            viewArgs.endDate = viewArgs.titleDate;
+            viewArgs.startDate = toISOString(startDate).split('+')[0];
+            viewArgs.titleDate = toISOString(endOfWeekDate).split('+')[0]; 
+            viewArgs.endDate = toISOString(new Date(((startDate.getTime() + (DAY*7))))).split('+')[0];
             if (currentDateMs > startTime && currentDateMs < endOfWeekDate.getTime()) {
               viewArgs.dayOfWeek = currentDate.getDay();
             }
