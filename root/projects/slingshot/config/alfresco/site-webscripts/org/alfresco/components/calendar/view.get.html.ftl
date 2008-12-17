@@ -82,12 +82,13 @@
                                                    </li>
                                                <#assign numEvents=numEvents + 1>
 
-                                           <#if (numEvents>4)>
-                                               <li class="moreEvents"><a href="#todo">+ 5 More</a></li>                                
-                                           </#if>
+                                           
                                            
                                  </#if>
                            </#list>
+                           <#if (numEvents>4)>
+                                  <li class="moreEvents"><a href="#todo">+ 5 More</a></li>                                
+                              </#if>
                            <#if outputtedUl?exists>
                             <#if outputtedUl==true>
                                 </ul>
