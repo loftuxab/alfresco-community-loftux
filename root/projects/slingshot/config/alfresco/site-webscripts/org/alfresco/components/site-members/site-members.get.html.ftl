@@ -15,7 +15,7 @@
 
 <div id="${args.htmlid}-body" class="site-members">
    
-   <div class="heading">${msg("site-members.heading")}</div>
+   <div class="heading"><label for="${args.htmlid}-term">${msg("site-members.heading")}</label></div>
    
    <div class="search-controls">
       <input id="${args.htmlid}-term" type="text" class="search-term" />

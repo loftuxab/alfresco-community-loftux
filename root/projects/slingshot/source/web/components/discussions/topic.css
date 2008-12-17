@@ -15,10 +15,11 @@
 
 .topicview-header .backLink a
 {
-   background-image:url(../images/back-arrow.png);
+   background-image:url(../images/forward-arrow-16.png);
    background-repeat:no-repeat;
+   background-position: right center;
    color:#333333;
-   padding:0 5px 0 19px;
+   padding:0 21px 0 5px;
    font-size: 108%;
 }
 

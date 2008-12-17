@@ -7,19 +7,19 @@
 	<div class="heading">${msg("document-links.heading")}</div>
 	
 	<!-- download link -->
-	<div class="url-title">${msg("document-links.download")}</div>
+	<div class="url-title"><label for="${args.htmlid}-download-url">${msg("document-links.download")}</label></div>
 	<input id="${args.htmlid}-download-url" class="link-value" />
 	<br/>
 	<input id="${args.htmlid}-download-button" type="button" class="copy-button" value="${msg("document-links.copy")}" />
 	
 	<!-- document/view link -->
-	<div class="url-title">${msg("document-links.view")}</div>
+	<div class="url-title"><label for="${args.htmlid}-view-url">${msg("document-links.view")}</label></div>
 	<input id="${args.htmlid}-view-url" class="link-value" />
 	<br/>
 	<input id="${args.htmlid}-view-button" type="button" class="copy-button" value="${msg("document-links.copy")}" />
 
    <!-- page link -->
-	<div class="url-title">${msg("document-links.page")}</div>
+	<div class="url-title"><label for="${args.htmlid}-page-url">${msg("document-links.page")}</label></div>
 	<input id="${args.htmlid}-page-url" class="link-value" />
 	<br/>
 	<input id="${args.htmlid}-page-button" type="button" class="copy-button" value="${msg("document-links.copy")}" />

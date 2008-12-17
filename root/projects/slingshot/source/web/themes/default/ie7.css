@@ -70,6 +70,14 @@ textarea
    position: relative;
 }
 
+/**
+ * My Sites dashlet / padding bug
+ */
+.my-sites .first-item div.description
+{
+   margin-top: -7px;
+}
+
 
 /**
  * Document Library
@@ -85,6 +93,11 @@ textarea
 .toolbar span.crumb
 {
    background-position: left center;
+}
+
+.doclist .documents .detail
+{
+   width: 100%;
 }
 
 .workflow .people-selected

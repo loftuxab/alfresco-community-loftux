@@ -30,15 +30,15 @@
          <input type="hidden" id="${args.htmlid}-draft" name="draft" value=""/>
                
          <!-- title -->
-         <label>${msg("title")}:</label>
+         <label for="${args.htmlid}-title">${msg("title")}:</label>
          <input type="text" id="${args.htmlid}-title" name="title" value="" />
 
          <!-- content -->
-         <label>${msg("text")}:</label>
+         <label for="${args.htmlid}-content">${msg("text")}:</label>
          <textarea rows="8" id="${args.htmlid}-content" name="content" cols="180" class="yuieditor"></textarea> 
       
          <!-- tags -->
-         <label>${msg("tags")}:</label>
+         <label for="${htmlid}-tag-input-field">${msg("tags")}:</label>
          <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
          <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
          <!-- end tags -->

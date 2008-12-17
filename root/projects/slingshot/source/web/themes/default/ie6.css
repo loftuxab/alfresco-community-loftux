@@ -326,6 +326,14 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 }
 
 /**
+ * My Sites dashlet / padding bug
+ */
+.my-sites .first-item div.description
+{
+   margin-top: -7px;
+}
+
+/**
  * Members / invite pages
  */
 .members-bar
@@ -346,6 +354,11 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 #divDocLibraryDocs .toolbar .nav-bar
 {
    margin: 0 -10px;
+}
+
+.doclist .documents .detail
+{
+   width: 100%;
 }
 
 .doclist a.action-link,

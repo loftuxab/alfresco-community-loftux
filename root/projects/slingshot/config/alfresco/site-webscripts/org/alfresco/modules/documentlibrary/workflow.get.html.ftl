@@ -26,9 +26,9 @@
          <div class="yui-g">
             <h2>${msg("header.date")}:</h2>
          </div>
-         <div class="field">
+         <div class="field">    
             <input id="${args.htmlid}-dueDate-checkbox" name="-" type="checkbox" value="${msg("label.due-date.none")}" tabindex="4"/>&nbsp;
-            <span id="${args.htmlid}-dueDate">${msg("label.due-date.none")}</span>
+            <span id="${args.htmlid}-dueDate"><label for="${args.htmlid}-dueDate-checkbox">${msg("label.due-date.none")}</label></span>
          </div>
          <div id="${args.htmlid}-calendarOverlay" class="calendar-overlay">
             <div class="bd">

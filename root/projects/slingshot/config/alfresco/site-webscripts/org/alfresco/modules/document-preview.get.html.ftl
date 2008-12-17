@@ -13,7 +13,7 @@
          <span  id="${args.htmlid}-currentFrame-span" class="footerText">${msg("label.currentFrame")}</span>
          <input id="${args.htmlid}-next-button" type="button" value="${msg("button.next")}" />
          &nbsp;|&nbsp;
-         <span class="footerText">${msg("label.jumpToPage")}</span>
+         <span class="footerText"><label for="${args.htmlid}-jumpToPage-textfield">${msg("label.jumpToPage")}</label></span>
          <input id="${args.htmlid}-jumpToPage-textfield" class="jumpToPage" type="text" />
       </div>
 

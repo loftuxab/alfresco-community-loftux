@@ -23,19 +23,19 @@
             <h2>${msg("section.info")}</h2>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first caret-fix"><label for="${args.htmlid}-id">${msg("label.id")}:</label></div>
+            <div class="yui-u first caret-fix"><label for="${args.htmlid}-blogid">${msg("label.id")}:</label></div>
             <div class="yui-u caret-fix">
                <input id="${args.htmlid}-blogid" type="text" name="blogId" tabindex="3" value="" />
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first caret-fix">${msg("label.name")}:</div>
+            <div class="yui-u first caret-fix"><label for="${args.htmlid}-title">${msg("label.name")}:</label></div>
             <div class="yui-u caret-fix">
                <input id="${args.htmlid}-title" type="text" name="blogName" tabindex="5" value="" />
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first caret-fix">${msg("label.description")}:</div>
+            <div class="yui-u first caret-fix"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
             <div class="yui-u caret-fix">
                <textarea id="${args.htmlid}-description" name="blogDescription" rows="3" tabindex="7" value=""></textarea>
             </div>

@@ -15,17 +15,10 @@
       pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
 	}).setMessages(
       ${messages}
-   );
+   );    
 //]]></script>
 <#-- Note, since result.pagetext has already been stripped by the page.get.js script -->
 <div class="yui-g wikipage-bar">
-   <div class="wikipage-header">
-      <div class="back-nav">
-         <span class="backLink">
-            <a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">${msg("header.back")}</a>
-         </span>
-      </div>
-   </div>
 
    <div class="title-bar">
       <div id="${args.htmlid}-viewButtons" class="yui-u first pageTitle">
