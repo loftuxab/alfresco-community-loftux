@@ -414,6 +414,7 @@
                for (var x=0; x < me.options.roles.length; x++)
                {
                   var role = me.options.roles[x];
+                  var recordIndex = x;
                   rolesMenu.push(
                   {
                      text: me._msg("role." + role),
@@ -424,7 +425,8 @@
                         obj: {
                            user: userName,
                            currentRole: currentRole,
-                           newRole: role
+                           newRole: role,
+                           recordId: oRecord.getId()
                         },
                         scope: me
                      }
@@ -628,49 +630,48 @@
        */
       onRoleSelect: function SiteMembers_onRoleSelect(type, event, args)
       {
-         // show a wait message
-         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this._msg("message.changingrole"),
-            spanClass: "wait",
-            displayTime: 0
-         });
-         
-         // request success handler
-         var success = function SiteMembers_onRoleSelect_success(response, userRole)
-         {
-            // hide the wait message
-            this.widgets.feedbackMessage.destroy();
-            
-            // show popup message to confirm
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this._msg("site-members.change-role-success", userRole.user, userRole.role)
-            });
-
-            // update the data and table
-            var recordIndex = this.widgets.dataTable.getRecordIndex(event[0].target);
-            var data = this.widgets.dataTable.getRecord(recordIndex).getData();
-            data.role = args.newRole;
-            this.widgets.dataTable.updateRow(recordIndex, data);
-         };
-         
-         // request failure handler
-         var failure = function SiteMembers_onRoleSelect_failure(response)
-         {
-            // remove the message
-            this.widgets.feedbackMessage.destroy();
-         };
-         
          // fetch the current and new roles to see whether we have to change the role
-         var recordIndex = this.widgets.dataTable.getRecordIndex(event[0].target);
-         var data = this.widgets.dataTable.getRecord(recordIndex).getData();
+         var record = this.widgets.dataTable.getRecord(args.recordId)
+         var data = record.getData();
+         var recordIndex = this.widgets.dataTable.getRecordIndex(record);
          var currentRole = data.role;
          var selectedRole = args.newRole;
          var user = args.user;
-         
          if (selectedRole !== currentRole)
          {
+            // show a wait message
+            this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.changingrole"),
+               spanClass: "wait",
+               displayTime: 0
+            });
+
+            // request success handler
+            var success = function SiteMembers_onRoleSelect_success(response, userRole)
+            {
+               // hide the wait message
+               this.widgets.feedbackMessage.destroy();
+
+               // show popup message to confirm
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this._msg("site-members.change-role-success", userRole.user, userRole.role)
+               });
+
+               // update the data and table
+               var data = this.widgets.dataTable.getRecord(userRole.recordIndex).getData();
+               data.role = args.newRole;
+               this.widgets.dataTable.updateRow(userRole.recordIndex, data);
+            };
+
+            // request failure handler
+            var failure = function SiteMembers_onRoleSelect_failure(response)
+            {
+               // remove the message
+               this.widgets.feedbackMessage.destroy();
+            };
+
             // make ajax call to site service to change role
             Alfresco.util.Ajax.jsonRequest(
             {
@@ -689,7 +690,8 @@
                   fn: success,
                   obj: {
                      user: user,
-                     role: selectedRole
+                     role: selectedRole,
+                     recordIndex: recordIndex
                   },
                   scope: this
                },

@@ -4,4 +4,7 @@
    <region-id>toolbar</region-id>
    <source-id>wiki-page</source-id>
    <url>/components/wiki/toolbar</url>
+   <properties>
+      <showBackLink>true</showBackLink>
+   </properties>
 </component>

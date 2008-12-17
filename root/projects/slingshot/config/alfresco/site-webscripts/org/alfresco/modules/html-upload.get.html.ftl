@@ -29,7 +29,7 @@
             </div>
             <div class="yui-gd <#if (contentTypes?size == 1)>hidden</#if>">
                <div class="yui-u first">
-                  ${msg("label.contentType")}
+                  <label for="${args.htmlid}-contentType-select">${msg("label.contentType")}</label>
                </div>
                <div class="yui-u">
                   <select id="${args.htmlid}-contentType-select" name="contentType">
@@ -43,7 +43,7 @@
             </div>
             <div class="yui-gd">
                <div class="yui-u first">
-                  ${msg("label.file")}
+                  <label for="${args.htmlid}-filedata-file">${msg("label.file")}</label>
                </div>
                <div class="yui-u">
                   <input type="file" id="${args.htmlid}-filedata-file" name="filedata">
@@ -57,7 +57,7 @@
             </div>
             <div class="yui-gd">
                <div class="yui-u first">
-                  ${msg("label.version")}
+                  <label for="${args.htmlid}-minorVersion-radioButton">${msg("label.version")}</label>
                </div>
                <div class="yui-u">
                   <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" value="false"/> ${msg("label.minorVersion")}
@@ -72,7 +72,7 @@
             </div>
             <div class="yui-gd">
                <div class="yui-u first">
-                  ${msg("label.comments")}
+                  <label for="${args.htmlid}-description-textarea">${msg("label.comments")}</label>
                </div>
                <div class="yui-u">
                   <textarea id="${args.htmlid}-description-textarea" name="description" rows="4"></textarea>

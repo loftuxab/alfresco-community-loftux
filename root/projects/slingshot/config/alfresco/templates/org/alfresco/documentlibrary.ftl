@@ -4,11 +4,26 @@
    <script type="text/javascript">//<![CDATA[
    (function()
    {
-      // If no location.hash exists, convert a location.search to a location.hash and replace the page
+      // If no location.hash exists, convert certain params in location.search to location.hash and replace the page
       var loc = window.location;
       if (loc.hash === "" && loc.search !== "")
       {
-         var url = loc.protocol + "//" + loc.host + loc.pathname + "#" + loc.search.substring(1);
+         var qs = Alfresco.util.getQueryStringParameters(), q, url = loc.protocol + "//" + loc.host + loc.pathname, hash = "";
+         var hashParams =
+         {
+            "path": true,
+            "page": true
+         };
+         for (q in qs)
+         {
+            if (qs.hasOwnProperty(q) && q in hashParams)
+            {
+               hash += "&" +q + "=" + encodeURIComponent(qs[q]);
+               delete qs[q];
+            }
+         }
+         
+         url += Alfresco.util.toQueryString(qs) + "#" + hash.substring(1);
          window.location.replace(url);
       }
    })();

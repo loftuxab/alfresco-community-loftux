@@ -4,7 +4,7 @@
       <form id="${args.htmlid}-form" method="POST" action="">
          <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
          <div class="yui-gd">
-            <div class="yui-u first">${msg("label.name")}:</div>
+            <div class="yui-u first"><label for="${args.htmlid}-title">${msg("label.name")}:</label></div>
             <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" tabindex="1"/>&nbsp;*</div>
          </div>
          <div class="yui-gd">
@@ -15,11 +15,11 @@
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first">${msg("label.description")}:</div>
+            <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
             <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3" tabindex="3"></textarea></div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first">${msg("label.type")}:</div>
+            <div class="yui-u first"><label for="${args.htmlid}-sitePreset">${msg("label.type")}:</label></div>
             <div class="yui-u">
                <select id="${args.htmlid}-sitePreset" name="sitePreset" tabindex="4">
                   <#list sitePresets as sitePreset>
@@ -29,7 +29,7 @@
             </div>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first">${msg("label.isPublic")}:</div>
+            <div class="yui-u first"><label for="${args.htmlid}-isPublic-checkbox">${msg("label.isPublic")}:</label></div>
             <div class="yui-u"><input id="${args.htmlid}-isPublic-checkbox" type="checkbox" checked="checked" tabindex="5"/> ${msg("text.isPublic")}</div>
          </div>
          <div class="bdft">

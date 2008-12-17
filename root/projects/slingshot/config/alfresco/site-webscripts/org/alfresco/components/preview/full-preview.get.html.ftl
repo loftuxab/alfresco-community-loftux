@@ -24,7 +24,7 @@ new Alfresco.FullPreview("${args.htmlid}").setOptions({
             <span  id="${args.htmlid}-currentFrame-span">${msg("label.currentFrame")}</span>
             <input id="${args.htmlid}-next-button" type="button" value="${msg("button.next")}" />
             <span>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <span>${msg("label.jumpToPage")}</span>
+            <span><label for="${args.htmlid}-jumpToPage-textfield">${msg("label.jumpToPage")}</label></span>
             <input id="${args.htmlid}-jumpToPage-textfield" class="jumpToPage" type="text" />
          </div>
       </div>

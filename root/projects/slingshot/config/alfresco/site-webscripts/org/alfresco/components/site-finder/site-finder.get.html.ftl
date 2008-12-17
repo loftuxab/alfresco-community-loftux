@@ -10,7 +10,7 @@
 
 <div id="${args.htmlid}-body" class="site-finder">
 	
-	<div class="title">${msg("site-finder.heading")}</div>
+	<div class="title"><label for="${args.htmlid}-term">${msg("site-finder.heading")}</label></div>
 	
    <div class="finder-wrapper">
       <div class="search-bar">

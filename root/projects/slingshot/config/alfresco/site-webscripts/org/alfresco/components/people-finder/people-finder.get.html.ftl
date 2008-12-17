@@ -11,7 +11,7 @@
 
 <div id="${args.htmlid}-body" class="people-finder list">
    
-   <div class="title">${msg("title")}</div>
+   <div class="title"><label for="${args.htmlid}-search-text">${msg("title")}</div>
    
    <div class="finder-wrapper">
       <div class="search-bar">

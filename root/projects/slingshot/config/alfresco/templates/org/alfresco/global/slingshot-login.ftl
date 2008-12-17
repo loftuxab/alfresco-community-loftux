@@ -18,13 +18,13 @@
       <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/login" onsubmit="return alfLogin();">
          <fieldset>
             <div style="padding-top:96px">
-               <span id="txt-username"></span>
+               <label id="txt-username" for="username"></label>
             </div>
             <div style="padding-top:4px">
                <input type="text" id="username" name="username" maxlength="256" style="width:200px"/>
             </div>
             <div style="padding-top:12px">
-               <span id="txt-password"></span>
+               <label id="txt-password" for="password"></label>
             </div>
             <div style="padding-top:4px">
                <input type="password" id="password" name="password" maxlength="256" style="width:200px"/>

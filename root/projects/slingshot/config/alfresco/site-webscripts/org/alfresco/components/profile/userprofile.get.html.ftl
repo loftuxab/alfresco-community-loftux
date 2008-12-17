@@ -124,22 +124,22 @@
       <div class="drow">
          <div class="reqcolumn">&nbsp;*</div>
          <div class="rightcolumn">
-            <span class="label">${msg("label.lastname")}:</span>
+            <span class="label"><label for="${args.htmlid}-input-lastName">"${msg("label.lastname")}:</label></span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-lastName" value="<#if profile.lastName??>${profile.lastName?html}</#if>" /></span>
          </div>
          <div class="leftcolumn">
-            <span class="label">${msg("label.firstname")}:</span>
+            <span class="label"><label for="${args.htmlid}-input-firstName">${msg("label.firstname")}:</label></span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-firstName" value="<#if profile.firstName??>${profile.firstName?html}</#if>" />&nbsp;*</span>
          </div>
       </div>
       <div class="drow">
          <div class="reqcolumn">&nbsp;</div>         
          <div class="leftcolumn">
-            <span class="label">${msg("label.title")}:</span>
+            <span class="label"><label for="${args.htmlid}-input-jobtitle">${msg("label.title")}:</label></span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-jobtitle" value="<#if profile.jobTitle??>${profile.jobTitle?html}</#if>" /></span>
          </div>
          <div class="rightcolumn">
-            <span class="label">${msg("label.location")}:</span>
+            <span class="label"><label for="${args.htmlid}-input-location">${msg("label.location")}:</label></span>
             <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-location" value="<#if profile.location??>${profile.location?html}</#if>" /></span>
          </div>
       </div>
@@ -154,7 +154,7 @@
       </div>
       -->
       <div class="row">
-         <span class="label">${msg("label.bio")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-bio">${msg("label.bio")}:</label></span>
          <span class="input"><textarea id="${args.htmlid}-input-bio" name="${args.htmlid}-text-biography" rows="5" cols="60">${profile.biography!""}</textarea></span>
       </div>
       
@@ -172,33 +172,33 @@
       
       <div class="header-bar">${msg("label.contactinfo")}</div>
       <div class="row">
-         <span class="label">${msg("label.telephone")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-telephone">${msg("label.telephone")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-telephone" value="<#if profile.telephone??>${profile.telephone?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.mobile")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-mobile">${msg("label.mobile")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-mobile" value="<#if profile.mobilePhone??>${profile.mobilePhone?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.email")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-email">${msg("label.email")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-email" value="<#if profile.email??>${profile.email?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.skype")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-skype">${msg("label.skype")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-skype" value="<#if profile.skype??>${profile.skype?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.im")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-instantmsg">${msg("label.im")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-instantmsg" value="<#if profile.instantMsg??>${profile.instantMsg?html}</#if>" /></span>
       </div>
       
       <div class="header-bar">${msg("label.companyinfo")}</div>
       <div class="row">
-         <span class="label">${msg("label.name")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-organization">${msg("label.name")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-organization" value="<#if profile.organization??>${profile.organization?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.address")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-companyaddress1">${msg("label.address")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyaddress1" value="<#if profile.companyAddress1??>${profile.companyAddress1?html}</#if>" /></span>
       </div>
       <div class="row">
@@ -210,7 +210,7 @@
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyaddress3" value="<#if profile.companyAddress3??>${profile.companyAddress3?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.postcode")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-companypostcode">${msg("label.postcode")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companypostcode" value="<#if profile.companyPostcode??>${profile.companyPostcode?html}</#if>" /></span>
       </div>
       <!--
@@ -220,15 +220,15 @@
       </div>
       -->
       <div class="row">
-         <span class="label">${msg("label.telephone")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-companytelephone">${msg("label.telephone")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companytelephone" value="<#if profile.companyTelephone??>${profile.companyTelephone?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.fax")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-companyfax">${msg("label.fax")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyfax" value="<#if profile.companyFax??>${profile.companyFax?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label">${msg("label.email")}:</span>
+         <span class="label"><label for="${args.htmlid}-input-companyemail">${msg("label.email")}:</label></span>
          <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyemail" value="<#if profile.companyEmail??>${profile.companyEmail?html}</#if>" /></span>
       </div>
       

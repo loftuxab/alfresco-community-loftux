@@ -12,7 +12,7 @@
 
 <div id="${args.htmlid}-form-container" class="addCommentForm hidden">
 	<div class="commentFormTitle">
-		${msg("addComment")}:
+		<label for="${htmlid}-content">${msg("addComment")}:</label>
 	</div>
 	<div class="editComment">
 		<form id="${htmlid}-form" method="post" action="">

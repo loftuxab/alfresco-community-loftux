@@ -3,7 +3,7 @@
 	background: #FFFFFF;
 }
 
-.wikipage-bar
+.wikipage-bar  
 {
 }
 
@@ -58,20 +58,4 @@ table.versionHistory
    margin: 0 -10px;
    padding-right: 10px;
    width: auto;
-}
-
-.wikipage-header .back-nav
-{
-   color: #333333;
-   float: left;
-   font-size: 113.1%;
-   padding: 4px 10px;
-}
-
-.wikipage-header .backLink
-{
-   background-image: url(../images/back-arrow.png);
-   background-repeat: no-repeat;
-   color: #333333;
-   padding: 0 5px 0 19px;
 }
