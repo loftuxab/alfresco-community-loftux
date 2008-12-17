@@ -193,7 +193,7 @@
 
 .doclist .documents .folder
 {
-   background: url(images/folder-closed-48.png) no-repeat;
+   background: url(images/folder-48.png) no-repeat;
    display: block;
    margin-left: 24px;
    height: 48px;
@@ -201,7 +201,7 @@
 }
 .doclist .documents .folder-small
 {
-   background: url(images/folder-closed-32.png) no-repeat;
+   background: url(images/folder-32.png) no-repeat;
    display: block;
    height: 32px;
    width: 32px;

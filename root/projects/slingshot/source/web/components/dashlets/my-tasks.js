@@ -226,7 +226,7 @@
        */
       onTasksLoadFailed: function MyTasks_onTasksLoadFailed()
       {
-         this.taskList.innerHTML = this._msg("label.load-failed");
+         this.taskList.innerHTML = '<div class="detail-list-item first-item last-item"><span>' + this._msg("label.load-failed") + '</span></div>';
       },
       
       /**

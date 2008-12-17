@@ -141,57 +141,56 @@
          var myThis = this;
          for (var i = 0; i < versions.length; i++)
          {
-            var deleteSpan = document.getElementById(this.id + "-revert-span-" + i);
+            var deleteSpan = YAHOO.util.Dom.get(this.id + "-revert-span-" + i);
             if(deleteSpan)
             {
                YAHOO.util.Event.addListener(deleteSpan, "click",
-                     function (event)
-                     {
-                        // Find the index of the version link by looking at its id
-                        var id = event.currentTarget.id;
-                        var version = versions[new Number(id.substring(id.lastIndexOf("-") + 1))];
+                       function (event, obj)
+                       {
+                          // Find the index of the version link by looking at its id
+                          var version = versions[obj.versionIndex];
 
-                        // Find the version through the index and display the revert dialog for the version
-                        Alfresco.module.getRevertVersionInstance().show({
-                           filename: this.options.filename,
-                           nodeRef: this.options.nodeRef,
-                           version: version.label,
-                           onRevertVersionComplete: {
-                              fn: myThis.onRevertVersionComplete,
-                              scope: myThis
-                           }
-                        });
-                     },
-                     this, true);
+                          // Find the version through the index and display the revert dialog for the version
+                          Alfresco.module.getRevertVersionInstance().show({
+                             filename: this.options.filename,
+                             nodeRef: this.options.nodeRef,
+                             version: version.label,
+                             onRevertVersionComplete: {
+                                fn: this.onRevertVersionComplete,
+                                scope: this
+                             }
+                          });
+                       }, {versionIndex: i}, this);
             }
 
             // Listen on clicks on the version - date row so we can expand and collapse it
-            var expandDiv = document.getElementById(this.id + "-expand-div-" + i);
+            var expandDiv = YAHOO.util.Dom.get(this.id + "-expand-div-" + i);
+            var moreVersionInfoDiv = YAHOO.util.Dom.get(this.id + "-moreVersionInfo-div-" + i);            
             if(expandDiv)
             {
                YAHOO.util.Event.addListener(expandDiv, "click",
-                     function (event)
-                     {
-                        var Dom = YAHOO.util.Dom;
-                        // Find the index of the version link by looking at its id
-                        var expandDiv = event.currentTarget;
-                        var id = expandDiv.id;
-                        var index = id.substring(id.lastIndexOf("-") + 1);
-                        var moreVersionInfoDiv = Dom.get(this.id + "-moreVersionInfo-div-" + index);
-                        if(moreVersionInfoDiv && Dom.hasClass(expandDiv, "collapsed"))
-                        {
-                           Alfresco.util.Anim.fadeIn(moreVersionInfoDiv);
-                           Dom.removeClass(expandDiv, "collapsed");
-                           Dom.addClass(expandDiv, "expanded");
-                        }
-                        else
-                        {
-                           Dom.setStyle(moreVersionInfoDiv, "display", "none"); 
-                           Dom.removeClass(expandDiv, "expanded");
-                           Dom.addClass(expandDiv, "collapsed");
-                        }
-                     },
-                     this, true);
+                       function (event, obj)
+                       {
+                          //alert(obj.versionIndex);
+                          var Dom = YAHOO.util.Dom;
+                          //var moreVersionInfoDiv = Dom.get(this.id + "-moreVersionInfo-div-" + obj.versionIndex);
+                          if(obj.moreVersionInfoDiv && Dom.hasClass(obj.expandDiv, "collapsed"))
+                          {
+                             Alfresco.util.Anim.fadeIn(obj.moreVersionInfoDiv);
+                             Dom.removeClass(obj.expandDiv, "collapsed");
+                             Dom.addClass(obj.expandDiv, "expanded");
+                          }
+                          else
+                          {
+                             Dom.setStyle(obj.moreVersionInfoDiv, "display", "none");
+                             Dom.removeClass(obj.expandDiv, "expanded");
+                             Dom.addClass(obj.expandDiv, "collapsed");
+                          }
+                       },
+               {
+                  expandDiv: expandDiv,
+                  moreVersionInfoDiv: moreVersionInfoDiv
+               }, this);
             }
 
             // Format and display the createdDate
