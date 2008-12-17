@@ -25,6 +25,7 @@
 
 package org.alfresco.jlan.server.auth.ntlm;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -34,7 +35,7 @@ import java.util.Date;
  *
  * @author gkspencer
  */
-public class NTLMLogonDetails
+public class NTLMLogonDetails implements Serializable
 {
   // User name, workstation name and domain
     
