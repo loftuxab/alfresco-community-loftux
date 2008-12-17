@@ -1,3 +1,4 @@
+<#if (node?exists)>
 <script type="text/javascript">//<![CDATA[
 new Alfresco.Preview("${args.htmlid}").setOptions({
    nodeRef: '${node.nodeRef}',
@@ -9,6 +10,7 @@ new Alfresco.Preview("${args.htmlid}").setOptions({
    ${messages}
       );
 //]]></script>
+</#if>
 <div class="preview">
    <div class="hd">
       <div class="title">

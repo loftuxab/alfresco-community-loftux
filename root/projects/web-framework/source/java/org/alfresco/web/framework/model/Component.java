@@ -305,16 +305,17 @@ public class Component extends AbstractModelObject implements ResourceProvider
      */
     protected void regenerateId()
     {
-        this.id = generateId(this.scope, this.regionId, this.sourceId);
-        if (this.id == null)
+        String id = generateId(this.scope, this.regionId, this.sourceId);
+        if (id == null)
         {
-            this.id = getGUID();
-            if (this.id == null)
+            id = getGUID();
+            if (id == null)
             {
-                this.id = ModelHelper.newGUID();
-                setGUID(id);                
+                id = ModelHelper.newGUID();
+                setGUID(id);
             }
         }
+        this.id = id;
     }    
     
     // resource provider methods

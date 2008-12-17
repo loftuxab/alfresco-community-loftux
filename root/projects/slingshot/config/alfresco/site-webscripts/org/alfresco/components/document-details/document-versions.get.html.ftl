@@ -8,8 +8,8 @@ new Alfresco.DocumentVersions("${args.htmlid}").setOptions({
       }<#if (version_has_next)>,</#if>
    </#list>
    ],
-   filename: '${filename}',
-   nodeRef: '${nodeRef}'
+   filename: '${filename!}',
+   nodeRef: '${nodeRef!}'
 }).setMessages(
       ${messages}
 );

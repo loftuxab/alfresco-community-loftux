@@ -20,32 +20,28 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.bean.actions.blogIntegration;
+package org.alfresco.repo.blog.wordpress;
 
-import org.alfresco.model.BlogIntegrationModel;
-import org.alfresco.web.action.evaluator.BaseActionEvaluator;
-import org.alfresco.web.bean.repository.Node;
-
+import org.alfresco.repo.blog.BlogDetails;
+import org.alfresco.repo.blog.DefaultBlogIntegrationImplementation;
 
 /**
- * Remove blog details evaluator
- * 
  * @author Roy Wetherall
  */
-public class RemoveBlogDetailsEvaluator extends BaseActionEvaluator implements BlogIntegrationModel
+public class WordPressIntegration extends DefaultBlogIntegrationImplementation
 {
+    private static String ENDPOINT = "xmlrpc.php";
+    
     /**
-     * @see org.alfresco.web.action.ActionEvaluator#evaluate(org.alfresco.web.bean.repository.Node)
+     * @see org.alfresco.module.blogIntegration.DefaultBlogIntegrationImplementation#getEndpointURL(org.alfresco.module.blogIntegration.BlogDetails)
      */
-    public boolean evaluate(Node node)
+    @Override
+    protected String getEndpointURL(BlogDetails blogDetails)
     {
-        boolean result = false;
-        if (node.hasAspect(ASPECT_BLOG_DETAILS) == true)
-        {
-            result = true;
-        }
-        return result;
+        String endpoint = checkForProtocol(blogDetails.getUrl());
+        return checkForTrainlingSlash(endpoint) + ENDPOINT;
     }
+
 }
