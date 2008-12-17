@@ -3,26 +3,86 @@
 
 <beans>
 
-   <bean id="commandRemoveDirectory" class="org.alfresco.util.exec.RuntimeExec" >
+   <bean id="commandListRootDir" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandsAndArguments">
+          <map>
+              <entry key="Windows.*">
+                  <list>
+                      <value>dir</value>
+                      <value>c:</value>
+                  </list>
+              </entry>
+              <entry key=".*">
+                  <list>
+                      <value>ls</value>
+                      <value>/</value>
+                  </list>
+              </entry>
+          </map>
+      </property>
+      <property name="waitForCompletion">
+          <value>true</value>
+      </property>
+      <property name="errorCodes">
+          <value>1</value>
+      </property>
+   </bean>
+
+   <!-- Checks that the deprecated setCommandMap gives an appropriate warning.  It should still work. -->
+   <bean id="commandCheckDeprecatedSetCommandMap" class="org.alfresco.util.exec.RuntimeExec" >
       <property name="commandMap">
           <map>
               <entry key="Windows.*">
-                  <value>cmd /C rmdir ${dir}</value>
-              </entry>
-              <entry key="Linux">
-                  <value>rm -rf ${dir}</value>
-              </entry>
-              <entry key="Mac OS X">
-                  <value>rm -rf ${dir}</value>
+                  <value>dir c:</value>
               </entry>
               <entry key=".*">
-                  <value>wibble</value>
+                  <value>ls /</value>
+              </entry>
+          </map>
+      </property>
+      <property name="waitForCompletion">
+          <value>true</value>
+      </property>
+      <property name="errorCodes">
+          <value>1</value>
+      </property>
+   </bean>
+
+   <bean id="commandRemoveDirectory" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandsAndArguments">
+          <map>
+              <entry key="Windows.*">
+                  <list>
+                      <value>cmd</value>
+                      <value>/C</value>
+                      <value>rmdir</value>
+                      <value>${dir}</value>
+                  </list>
+              </entry>
+              <entry key="Linux">
+                  <list>
+                      <value>rm</value>
+                      <value>-rf</value>
+                      <value>${dir}</value>
+                  </list>
+              </entry>
+              <entry key="Mac OS X">
+                  <list>
+                      <value>rm</value>
+                      <value>-rf</value>
+                      <value>${dir}</value>
+                  </list>
+              </entry>
+              <entry key=".*">
+                  <list>
+                      <value>wibble</value>
+                  </list>
               </entry>
           </map>
       </property>
       <property name="defaultProperties">
           <props>
-              <prop key="dir">dir_RuntimeExecBootstrapBeanTest</prop>
+              <prop key="dir">dir RuntimeExecBootstrapBeanTest</prop>
           </props>
       </property>
       <property name="errorCodes">
@@ -32,10 +92,12 @@
 
    <!-- A bean to make sure that the startup doesn't fall over -->
    <bean id="commandFailureGuaranteed" class="org.alfresco.util.exec.RuntimeExec" >
-      <property name="commandMap">
+      <property name="commandsAndArguments">
           <map>
               <entry key=".*">
-                  <value>wibble</value>
+                  <list>
+                      <value>wibble</value>
+                  </list>
               </entry>
           </map>
       </property>
@@ -62,13 +124,17 @@
 	
    <!-- A bean to make sure that never-ending processes can be handled -->
    <bean id="commandNeverEnding" class="org.alfresco.util.exec.RuntimeExec" >
-      <property name="commandMap">
+      <property name="commandsAndArguments">
           <map>
               <entry key="Windows.*">
-                  <value>cmd</value>
+                  <list>
+                      <value>cmd</value>
+                  </list>
               </entry>
               <entry key=".*">
-                  <value>ls</value>
+                  <list>
+                      <value>ls</value>
+                  </list>
               </entry>
           </map>
       </property>
@@ -80,15 +146,21 @@
       </property>
    </bean>
 
-   <!-- A bean to make sure that never-ending processes can be handled -->
-   <bean id="commandListRootDir" class="org.alfresco.util.exec.RuntimeExec" >
-      <property name="commandMap">
+   <!-- A bean to do a simple directory listing, but against a directory containing a space -->
+   <bean id="commandListGivenDirectory" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandsAndArguments">
           <map>
               <entry key="Windows.*">
-                  <value>dir c:</value>
+                  <list>
+                      <value>dir</value>
+                      <value>${dir}</value>
+                  </list>
               </entry>
               <entry key=".*">
-                  <value>ls /</value>
+                  <list>
+                      <value>ls</value>
+                      <value>${dir}</value>
+                  </list>
               </entry>
           </map>
       </property>

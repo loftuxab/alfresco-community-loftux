@@ -29,9 +29,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -73,7 +75,7 @@ public class RuntimeExec
 
     private static Log logger = LogFactory.getLog(RuntimeExec.class);
 
-    private String command;
+    private String[] command;
     private Charset charset;
     private boolean waitForCompletion;
     private Map<String, String> defaultProperties;
@@ -105,9 +107,11 @@ public class RuntimeExec
     /**
      * Set the command to execute regardless of operating system
      * 
-     * @param command the command string
+     * @param command       an array of strings representing the command (first entry) and arguments
+     * 
+     * @since 3.0
      */
-    public void setCommand(String command)
+    public void setCommand(String[] command)
     {
         this.command = command;
     }
@@ -145,15 +149,25 @@ public class RuntimeExec
      * Supply a choice of commands to execute based on a mapping from the <i>os.name</i> system
      * property to the command to execute.  The {@link #KEY_OS_DEFAULT *} key can be used
      * to get a command where there is not direct match to the operating system key.
+     * <p>
+     * Each command is an array of strings, the first of which represents the command and all subsequent
+     * entries in the array represent the arguments.  All elements of the array will be checked for
+     * the presence of any substitution parameters (e.g. '{dir}').  The parameters can be set using the
+     * {@link #setDefaultProperties(Map) defaults} or by passing the substitution values into the
+     * {@link #execute(Map)} command. 
      * 
-     * @param commandsByOS a map of command string keyed by operating system names
+     * @param commandsByOS          a map of command string arrays, keyed by operating system names
+     * 
+     * @see #setDefaultProperties(Map)
+     * 
+     * @since 3.0
      */
-    public void setCommandMap(Map<String, String> commandsByOS)
+    public void setCommandsAndArguments(Map<String, String[]> commandsByOS)
     {
         // get the current OS
         String serverOs = System.getProperty(KEY_OS_NAME);
         // attempt to find a match
-        String command = commandsByOS.get(serverOs);
+        String[] command = commandsByOS.get(serverOs);
         if (command == null)
         {
             // go through the commands keys, looking for one that matches by regular expression matching
@@ -185,6 +199,37 @@ public class RuntimeExec
                     "   commands: " + commandsByOS);
         }
         this.command = command;
+    }
+    
+    /**
+     * Supply a choice of commands to execute based on a mapping from the <i>os.name</i> system
+     * property to the command to execute.  The {@link #KEY_OS_DEFAULT *} key can be used
+     * to get a command where there is not direct match to the operating system key.
+     * 
+     * @param commandsByOS a map of command string keyed by operating system names
+     * 
+     * @deprecated          Use {@link #setCommandsAndArguments(Map)}
+     */
+    public void setCommandMap(Map<String, String> commandsByOS)
+    {
+        // This is deprecated, so issue a warning
+        logger.warn(
+                "The bean RuntimeExec property 'commandMap' has been deprecated;" +
+        		" use 'commandsAndArguments' instead.  See https://issues.alfresco.com/jira/browse/ETHREEOH-579.");
+        Map<String, String[]> fixed = new LinkedHashMap<String, String[]>(7);
+        for (Map.Entry<String, String> entry : commandsByOS.entrySet())
+        {
+            String os = entry.getKey();
+            String unparsedCmd = entry.getValue();
+            StringTokenizer tokenizer = new StringTokenizer(unparsedCmd);
+            String[] cmd = new String[tokenizer.countTokens()];
+            for (int i = 0; i < cmd.length; i++)
+            {
+                cmd[i] = tokenizer.nextToken();
+            }
+            fixed.put(os, cmd);
+        }
+        setCommandsAndArguments(fixed);
     }
     
     /**
@@ -259,7 +304,7 @@ public class RuntimeExec
         // create the properties
         Runtime runtime = Runtime.getRuntime();
         Process process = null;
-        String commandToExecute = null;
+        String[] commandToExecute = null;
         try
         {
             // execute the command with full property replacement
@@ -330,7 +375,7 @@ public class RuntimeExec
      * @return Returns the command that will be executed if no additional properties
      *      were to be supplied
      */
-    public String getCommand()
+    public String[] getCommand()
     {
         return getCommand(defaultProperties);
     }
@@ -345,7 +390,7 @@ public class RuntimeExec
      * @return Returns the command that will be executed should the additional properties
      *      be supplied
      */
-    public String getCommand(Map<String, String> properties)
+    public String[] getCommand(Map<String, String> properties)
     {
         Map<String, String> execProperties = null;
         if (properties == defaultProperties)
@@ -359,30 +404,35 @@ public class RuntimeExec
             // overlay the supplied properties
             execProperties.putAll(properties);
         }
-        // perform the substitution
-        StringBuilder sb = new StringBuilder(command);
-        for (Map.Entry<String, String> entry : execProperties.entrySet())
+        // Perform the substitution for each element of the command
+        String[] adjustedCommand = new String[command.length];
+        for (int i = 0; i < command.length; i++)
         {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            // ignore null
-            if (value == null)
+            StringBuilder sb = new StringBuilder(command[i]);
+            for (Map.Entry<String, String> entry : execProperties.entrySet())
             {
-                value = "";
+                String key = entry.getKey();
+                String value = entry.getValue();
+                // ignore null
+                if (value == null)
+                {
+                    value = "";
+                }
+                // progressively replace the property in the command
+                key = (VAR_OPEN + key + VAR_CLOSE);
+                int index = sb.indexOf(key);
+                while (index > -1)
+                {
+                    // replace
+                    sb.replace(index, index + key.length(), value);
+                    // get the next one
+                    index = sb.indexOf(key, index + 1);
+                }
             }
-            // progressively replace the property in the command
-            key = (VAR_OPEN + key + VAR_CLOSE);
-            int index = sb.indexOf(key);
-            while (index > -1)
-            {
-                // replace
-                sb.replace(index, index + key.length(), value);
-                // get the next one
-                index = sb.indexOf(key, index + 1);
-            }
+            adjustedCommand[i] = sb.toString();
         }
         // done
-        return sb.toString();
+        return adjustedCommand;
     }
     
     /**
@@ -393,7 +443,7 @@ public class RuntimeExec
     public static class ExecutionResult
     {
         private final Process process;
-        private final String command;
+        private final String[] command;
         private final Set<Integer> errCodes;
         private final int exitValue;
         private final String stdOut;
@@ -405,7 +455,7 @@ public class RuntimeExec
          */
         private ExecutionResult(
                 final Process process,
-                final String command,
+                final String[] command,
                 final Set<Integer> errCodes,
                 final int exitValue,
                 final String stdOut,
@@ -428,7 +478,7 @@ public class RuntimeExec
             StringBuilder sb = new StringBuilder(128);
             sb.append("Execution result: \n")
               .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n")
-              .append("   command:    ").append(command).append("\n")
+              .append("   command:    ").append(Arrays.deepToString(command)).append("\n")
               .append("   succeeded:  ").append(getSuccess()).append("\n")
               .append("   exit code:  ").append(exitValue).append("\n")
               .append("   out:        ").append(out).append("\n")

@@ -259,8 +259,13 @@
          this.widgets.validateOnZero = 0;
          this.widgets.editor.subscribe("editorKeyUp", function (e)
          {
-            this.widgets.validateOnZero++;            
-            YAHOO.lang.later(1000, this, this.validateAfterEditorChange);
+            // Only bother checking if length is short, otherwise HTML cleanup slows the UI down undesirably
+            // NOTE: Don't check for zero-length, due to HTML <br>, <span> tags, etc. possibly being present.
+            if (this.widgets.editor.getEditorHTML().length < 20)
+            {
+               this.widgets.editor.saveHTML();
+               this.widgets.commentForm.updateSubmitElements();
+            }
          }, this, true);
 
          // create the form that does the validation/submit
@@ -310,27 +315,6 @@
          // finally show the form
          var contanerElem = Dom.get(this.id + '-form-container');
          Dom.removeClass(contanerElem, 'hidden');
-      },
-
-      /**
-       * Called when a key was pressed in the yui editor.
-       * Will trigger form validation after the last key stroke after a seconds pause.
-       *
-       * @method validateAfterEditorChange
-       */
-      validateAfterEditorChange: function()
-      {
-         this.widgets.validateOnZero--;
-         if(this.widgets.validateOnZero == 0)
-         {
-            var oldLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
-            this.widgets.editor.saveHTML();
-            var newLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
-            if((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
-            {
-               this.widgets.commentForm.updateSubmitElements();
-            }
-         }
       },
 
       /**

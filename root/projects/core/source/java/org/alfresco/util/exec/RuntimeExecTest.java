@@ -24,6 +24,7 @@
  */
 package org.alfresco.util.exec;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,10 +46,10 @@ public class RuntimeExecTest extends TestCase
         
         // This test will return different results on Windows and Linux!
         // note that some Unix variants will error without a path
-        HashMap<String, String> commandMap = new HashMap<String, String>(5);
-        commandMap.put("*", "find / -maxdepth 1 -name var");
-        commandMap.put("Windows.*", "find /?");
-        exec.setCommandMap(commandMap);
+        HashMap<String, String[]> commandMap = new HashMap<String, String[]>(5);
+        commandMap.put("*", new String[] {"find", "/", "-maxdepth", "1", "-name", "var"});
+        commandMap.put("Windows.*", new String[] {"find", "/?"});
+        exec.setCommandsAndArguments(commandMap);
         // execute
         ExecutionResult ret = exec.execute();
         
@@ -65,12 +66,12 @@ public class RuntimeExecTest extends TestCase
         RuntimeExec exec = new RuntimeExec();
 
         // set the command
-        Map<String, String> commandMap = new HashMap<String, String>(3, 1.0f);
-        commandMap.put(".*", "TEST");
-        exec.setCommandMap(commandMap);
+        Map<String, String[]> commandMap = new HashMap<String, String[]>(3, 1.0f);
+        commandMap.put(".*", (new String[]{"TEST"}));
+        exec.setCommandsAndArguments(commandMap);
         
-        String commandStr = exec.getCommand();
-        assertEquals("Expected default match to work", "TEST", commandStr);
+        String[] commandStr = exec.getCommand();
+        assertTrue("Expected default match to work", Arrays.deepEquals(new String[] {"TEST"}, commandStr));
     }
     
     public void testWithProperties() throws Exception
@@ -78,12 +79,12 @@ public class RuntimeExecTest extends TestCase
         RuntimeExec exec = new RuntimeExec();
 
         // set the command
-        Map<String, String> commandMap = new HashMap<String, String>(3, 1.0f);
-        commandMap.put("Windows.*", "dir \"${path}\"");
-        commandMap.put("Linux", "ls '${path}'");
-        commandMap.put("Mac OS X", "ls '${path}'");
-        commandMap.put("*", "wibble ${path}");
-        exec.setCommandMap(commandMap);
+        Map<String, String[]> commandMap = new HashMap<String, String[]>(3, 1.0f);
+        commandMap.put("Windows.*", new String[]{"dir", "${path}"});
+        commandMap.put("Linux", new String[] {"ls", "${path}"});
+        commandMap.put("Mac OS X", new String[]{"ls", "${path}"});
+        commandMap.put("*", new String[]{"wibble", "${path}"});
+        exec.setCommandsAndArguments(commandMap);
         
         // set the default properties
         Map<String, String> defaultProperties = new HashMap<String, String>(1, 1.0f);
@@ -91,28 +92,28 @@ public class RuntimeExecTest extends TestCase
         exec.setDefaultProperties(defaultProperties);
         
         // check that the command lines generated are correct
-        String defaultCommand = exec.getCommand();
-        String dynamicCommand = exec.getCommand(Collections.singletonMap("path", "./"));
+        String defaultCommand[] = exec.getCommand();
+        String dynamicCommand[] = exec.getCommand(Collections.singletonMap("path", "./"));
         // check
         String os = System.getProperty("os.name");
-        String defaultCommandCheck = null;
-        String dynamicCommandCheck = null;
+        String[] defaultCommandCheck = null;
+        String[] dynamicCommandCheck = null;
         if (os.matches("Windows.*"))
         {
-            defaultCommandCheck = "dir \".\"";
-            dynamicCommandCheck = "dir \"./\"";
+            defaultCommandCheck = new String[]{"dir", "."};
+            dynamicCommandCheck = new String[]{"dir", "./"};
         }
         else if (os.equals("Linux") || os.equals("Mac OS X"))
         {
-            defaultCommandCheck = "ls '.'";
-            dynamicCommandCheck = "ls './'";
+            defaultCommandCheck = new String[]{"ls", "."};
+            dynamicCommandCheck = new String[]{"ls", "./"};
         }
         else
         {
-            defaultCommandCheck = "wibble .";
-            dynamicCommandCheck = "wibble ./";
+            defaultCommandCheck = new String[]{"wibble", "."};
+            dynamicCommandCheck = new String[]{"wibble", "./"};
         }
-        assertEquals("Default command for OS " + os + " is incorrect", defaultCommandCheck, defaultCommand);
-        assertEquals("Dynamic command for OS " + os + " is incorrect", dynamicCommandCheck, dynamicCommand);
+        assertTrue("Default command for OS " + os + " is incorrect", Arrays.deepEquals(defaultCommandCheck, defaultCommand));
+        assertTrue("Dynamic command for OS " + os + " is incorrect", Arrays.deepEquals(dynamicCommandCheck, dynamicCommand));
     }
 }

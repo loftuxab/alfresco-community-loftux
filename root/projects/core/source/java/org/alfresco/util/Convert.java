@@ -324,7 +324,7 @@ public class Convert
     private void convertSvn(File currentDir) throws Throwable
     {
         RuntimeExec exec = new RuntimeExec();
-        exec.setCommand("svn status " + currentDir);
+        exec.setCommand(new String[] {"svn", "status", currentDir.toString()});
         ExecutionResult result = exec.execute();
         if (!result.getSuccess())
         {

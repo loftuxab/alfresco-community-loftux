@@ -172,8 +172,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           }
          
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
-         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
+         eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
          eventForm.addValidation(this.id + "-tags", Alfresco.module.event.validation.tags, null, "keyup");
          
          var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"];

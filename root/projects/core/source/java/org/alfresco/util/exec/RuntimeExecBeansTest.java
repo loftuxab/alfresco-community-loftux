@@ -29,6 +29,8 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -40,16 +42,23 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class RuntimeExecBeansTest extends TestCase
 {
+    private static Log logger = LogFactory.getLog(RuntimeExecBeansTest.class);
+    
     private static final String APP_CONTEXT_XML =
             "classpath:org/alfresco/util/exec/RuntimeExecBeansTest-context.xml";
-    private static final String DIR = "dir_RuntimeExecBootstrapBeanTest";
+    private static final String DIR = "dir RuntimeExecBootstrapBeanTest";
+    
+    private File dir;
 
-    public void testBootstrapAndShutdown() throws Exception
+    public void setUp() throws Exception
     {
-        File dir = new File(DIR);
+        dir = new File(DIR);
         dir.mkdir();
         assertTrue("Directory not created", dir.exists());
-        
+    }
+    
+    public void testBootstrapAndShutdown() throws Exception
+    {
         // now bring up the bootstrap
         ApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         
@@ -65,6 +74,41 @@ public class RuntimeExecBeansTest extends TestCase
         
         // the folder should be gone
         assertFalse("Folder was not deleted by shutdown", dir.exists());
+    }
+    
+    public void testSimpleSuccess() throws Exception
+    {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        try
+        {
+            RuntimeExec dirRootExec = (RuntimeExec) ctx.getBean("commandListRootDir");
+            assertNotNull(dirRootExec);
+            // Execute it
+            dirRootExec.execute();
+        }
+        finally
+        {
+            ctx.close();
+        }
+    }
+    
+    public void testDeprecatedSetCommandMap() throws Exception
+    {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        try
+        {
+            RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandCheckDeprecatedSetCommandMap");
+            assertNotNull(failureExec);
+            // Execute it
+            failureExec.execute();
+            // The command is never-ending, so this should be out immediately
+        }
+        finally
+        {
+            ctx.close();
+        }
+        // The best we can do is look at the log manually
+        logger.warn("There should be a warning re. the use of deprecated 'setCommandMap'.");
     }
     
     public void testFailureModeOfMissingCommand()
