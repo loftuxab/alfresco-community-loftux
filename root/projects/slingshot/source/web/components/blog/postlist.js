@@ -80,7 +80,7 @@
       YAHOO.Bubbling.on("blogpostlistRefresh", this.onBlogPostListRefresh, this);
       
       return this;
-   }
+   };
    
    Alfresco.BlogPostList.prototype =
    {
@@ -272,7 +272,7 @@
             }
       		 
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-div", fnActionHandlerDiv);
          
          // Hook action events for simple view
@@ -291,7 +291,7 @@
             }
       		 
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-span", fnActionHandlerSpan);
          
          // Hook tag clicks
@@ -347,7 +347,7 @@
             
             var html = "";
             // detailed view
-            if (! me.options.simpleView)
+            if (!me.options.simpleView)
             {
                html += '<div class="node post">';
 
@@ -375,7 +375,7 @@
                }
                html += '</div>';
                html += '<div class="content yuieditor"></div>';
-               html += '</div>'
+               html += '</div>';
                // end view
 
                html += '</div>';
@@ -444,7 +444,7 @@
             
             // now show the element
             Dom.removeClass(elCell, 'hidden');
-         }
+         };
 
          // DataTable column defintions
          var columnDefinitions = [
@@ -460,7 +460,7 @@
          {
             //me.currentPage = state.page;
             me._updateBlogPostList({ page : state.page });
-         }
+         };
          
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-postlist", columnDefinitions, this.widgets.dataSource,
@@ -497,7 +497,7 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
+               this.renderLoopSize = oResponse.results.length >> YAHOO.env.ua.gecko ? 3 : 5;
             }
             
             // extract the create permission and update the UI accordingly
@@ -511,7 +511,7 @@
             
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
-         }
+         };
          
          // Enable row highlighting
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
@@ -550,13 +550,11 @@
       {
          if (blogPermissions.create)
          {
-            var elem = Dom.get(this.id + '-create-post-container');
-            Dom.removeClass(elem, 'hidden');
+            Dom.removeClass(this.id + '-create-post-container', 'hidden');
          }
          if (blogPermissions.edit)
          {
-            var elem = Dom.get(this.id + '-configure-blog-container');
-            Dom.removeClass(elem, 'hidden');
+            Dom.removeClass(this.id + '-configure-blog-container', 'hidden');
          }
       },
 
@@ -1035,9 +1033,13 @@
        */
       onDeactivateAllControls: function BlogPostList_onDeactivateAllControls(layer, args)
       {
+         var widget;
          for (widget in this.widgets)
          {
-            this.widgets[widget].set("disabled", true);
+            if (this.widgets.hasOwnProperty(widget))
+            {
+               this.widgets[widget].set("disabled", true);
+            }
          }
       },
       
@@ -1082,7 +1084,7 @@
          else if (filterOwner == "Alfresco.BlogPostListArchive" && filterId == "bymonth")
          {
             var date = new Date(filterData.year, filterData.month, 1);
-            var formattedDate = Alfresco.util.formatDate(date, "mmmm yyyy")
+            var formattedDate = Alfresco.util.formatDate(date, "mmmm yyyy");
             title = this._msg("title.bymonth", formattedDate);
          }
          
@@ -1191,7 +1193,7 @@
             
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             this.updateListTitle();
-         }
+         };
          
          // ajax request failure handler
          var failureHandler = function BlogPostList__updateBlogPostList_failureHandler(sRequest, oResponse)
@@ -1222,7 +1224,7 @@
                   this._setDefaultDataTableErrors();
                }
             }
-         }
+         };
          
          // get the url to call
          this.widgets.dataSource.sendRequest(this._buildBlogPostListParams(p_obj || {}),
@@ -1242,15 +1244,15 @@
        */
       _buildBlogPostListParams: function BlogPostList__buildDocListParams(p_obj)
       {
-         var params = {
+         var params =
+         {
             contentLength: this.options.maxContentLength,
             fromDate: null,
             toDate: null,
             tag: null,
-            
             page: this.widgets.paginator.get("page") || "1",
             pageSize: this.widgets.paginator.get("rowsPerPage")
-         }
+         };
          
          // Passed-in overrides
          if (typeof p_obj == "object")
@@ -1259,7 +1261,7 @@
          }
 
          // calculate the startIndex param
-         params.startIndex = (params.page-1) * params.pageSize
+         params.startIndex = (params.page-1) * params.pageSize;
 
          // check what url to call and with what parameters
          var filterOwner = this.currentFilter.filterOwner;
@@ -1281,15 +1283,15 @@
             }
             else if (filterId == "mydrafts")
             {
-                url = "/mydrafts"
+                url = "/mydrafts";
             }
             else if (filterId == "mypublished")
             {
-                url = "/mypublished"
+                url = "/mypublished";
             }
             else if (filterId == "publishedext")
             {
-                url = "/publishedext"
+                url = "/publishedext";
             }
          }
          else if (filterOwner == "Alfresco.BlogPostListTags")
@@ -1306,7 +1308,7 @@
          }
          
          // build the url extension
-         var urlExt = "";
+         var urlExt = "", paramName;
          for (paramName in params)
          {
             if (params[paramName] !== null)

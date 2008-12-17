@@ -33,7 +33,7 @@
          <div class="fieldlabelright">${msg("label.im")}:</div>
          <div class="fieldvalue">${user.properties["instantmsg"]!""}</div>
       </div>
-      <div class="clear"></div>      
+      <div class="clear"></div>
    </div>
 </div>
 </#escape>

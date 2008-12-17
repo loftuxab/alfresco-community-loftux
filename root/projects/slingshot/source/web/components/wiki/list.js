@@ -7,6 +7,7 @@
    {
 	   this.name = "Alfresco.WikiList";
       this.id = containerId;
+      this.options = {};
 
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
@@ -16,23 +17,51 @@
    Alfresco.WikiList.prototype = 
    {
       _selectedTag: "",
-      
+
       /**
-   	  * Sets the current site for this component.
-   	  * 
-   	  * @property siteId
-   	  * @type string
-   	  */
-   	setSiteId: function(siteId)
-   	{
-   		this.siteId = siteId;
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Current siteId.
+          *
+          * @property siteId
+          * @type string
+          */
+         siteId: "",
 
+         /**
+          * The pages on this sites wiki.
+          *
+          * @property pages
+          * @type Array
+          */
+         pages: []
+
+      },
+
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.DocListToolbar} returns 'this' for method chaining
+       */
+      setOptions: function DLTB_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+
+         // Make sure the parser is using the current site
          this.$parser = new Alfresco.WikiParser();
-         this.$parser.URL = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=";
+         this.$parser.URL = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";
 
-   		return this;
-   	},
-   	
+         return this;
+      },
+
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -61,7 +90,7 @@
           for (var i=0; i < divs.length; i++)
           {
              div = divs[i];
-             div.innerHTML = this.$parser.parse(div.innerHTML);
+             div.innerHTML = this.$parser.parse(div.innerHTML, this.options.pages);
           }
           
           YAHOO.Bubbling.addDefaultAction('delete-link', function(layer, args)
@@ -93,7 +122,20 @@
              
              return true;
           });          
-          
+
+          YAHOO.Bubbling.addDefaultAction('wiki-tag-link', function(layer, args)
+          {
+             var link = args[1].target;
+             if (link)
+             {
+                var tagName = link.firstChild.nodeValue;
+                YAHOO.Bubbling.fire("tagSelected", {
+                   "tagname": tagName
+                });
+             }
+             return true;
+          });
+
           YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
        },
        

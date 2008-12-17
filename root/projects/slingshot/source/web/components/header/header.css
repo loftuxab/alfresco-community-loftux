@@ -14,10 +14,11 @@
 
 .header .menu-wrapper
 {
-   background-color: #f2f2f2;
-   margin-right: -10px;
-   height: 19px;
-   padding: 17px 0px 13px;
+   background-color:#F2F2F2;
+   height:19px;
+   line-height:19px;
+   margin-right:-10px;
+   padding:10px 0 20px;
 }
 
 .header span.menu-item-separator
@@ -40,8 +41,13 @@
 
 .header span.menu-item-icon
 {
-   padding: 0px 0.5em;
+   padding: 3px 5px 0; 
    vertical-align: middle;
+}
+
+.header .link-menu-button span.menu-item-icon
+{
+   padding: 1px 5px 0;
 }
 
 .header span.menu-item-icon a
@@ -82,6 +88,8 @@
 {
    float: left;
    margin: 1px 0px 0px 0.5em;
+   vertical-align:middle;
+   line-height:2.2em;
 }
 
 .header div.personal-menu a,
@@ -92,8 +100,8 @@
 
 .header div.util-menu
 {
-   float: right;
-   margin: 0px 10px 0px 0px;
+   float:right;
+   margin:5px 10px 0 0;
 }
 
 .header .search-tinput
@@ -133,7 +141,7 @@
    cursor:pointer;
    padding-left:8px;
    position:relative;
-   top:1px;
+   /*top:1px;*/
 }
 
 .header .sites-menu-icon:hover
@@ -146,16 +154,13 @@
 * html .header .search-site-icon {position: fixed;}
 /* */
 
-.header .yuimenu .yuimenuitemlabel.disabled
-{
-	color: #ccc;
-	cursor: default;
-}
 
 .header .hidden
 {
    display: none;
 }
+
+/* Drop-down menus */
 
 .header .yuimenu
 {
@@ -163,34 +168,51 @@
 	position: relative;
 }
 
-
 .header .yuimenu .bd
-{    
+{
 	zoom: normal;
-	border: 1px thin #84B4D5;
-	background-color: #EBEFF1;
+   border: 1px solid #84B4D5;
+	background-color: #FFFFFF;
 	padding: 0;
+   margin-top: 2px;
 }
 
-.header .yuimenu ul
+.header .yuimenu .bd ul
 {
    padding:0;
+   border-width: 0;
+   color: #68A2D2;
 }
 
-
-.header .yuimenu .yuimenuitemlabel
+.header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 {
-	cursor: pointer;
+   color: #68A2D2;
+   cursor: pointer;
 	padding: 4px 15px;
 }
 
-.header .yuimenu .yuimenuitemlabel.disabled:hover
+/* Menu: Selected state */
+
+.header .yuimenu .bd ul li.yuimenuitem-selected
 {
-	color: #eee;
-	cursor: default;
+   background-color: #7BA9CE;
 }
 
-.header .yuimenu .yuimenuitemlabel.disabled .menuitem.selected
+.header .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
 {
-	background-color: transparent;
+   color: #FFFFFF;
+}
+
+/* Menu: disabled */
+
+.header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel.disabled
+{
+	color: #ccc;
+   background-color: #FFF;
+   cursor: default;
+}
+
+.header .personal-menu .link-menu-button input
+{
+   visibility: hidden;
 }

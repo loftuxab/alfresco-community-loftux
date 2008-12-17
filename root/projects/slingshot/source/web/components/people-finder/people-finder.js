@@ -88,6 +88,14 @@
          siteId: "",
 
          /**
+          * Current username.
+          *
+          * @property currentUser
+          * @type string
+          */
+         currentUser: "",
+
+         /**
           * Compact mode flag
           * 
           * @property compactMode
@@ -271,7 +279,17 @@
                {
                   items = oFullResponse.people;
                }
-               
+
+               // Remove thecurrent user form the list
+               for (var i = 0; i < items.length; i++)
+               {
+                   if(items[i].userName == me.options.currentUser)
+                   {
+                      items.splice(i, 1);
+                      break;
+                   }
+               }
+
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {

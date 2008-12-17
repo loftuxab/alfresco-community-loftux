@@ -51,7 +51,8 @@
          siteId: "",
          pageTitle: "",
          mode: "view", // default is "view" mode
-         tags: []
+         tags: [],
+         pages: []
       },		
 
       /**
@@ -112,7 +113,7 @@
 			{
 				this.parser.URL = this._getAbsolutePath();
 				// Format any wiki markup
-				pageText.innerHTML = this.parser.parse(pageText.innerHTML);
+				pageText.innerHTML = this.parser.parse(pageText.innerHTML, this.options.pages);
 			}
 		
 		},
@@ -292,7 +293,7 @@
 		onVersionInfo: function(e)
 		{
 		   var page = Dom.get(this.id + "-page");
-		   page.innerHTML = this.parser.parse(e.serverResponse.responseText);
+		   page.innerHTML = this.parser.parse(e.serverResponse.responseText, this.options.pages);
 		   
 		   var pagecontent = Dom.get(this.id + "-pagecontent");
 		   if (pagecontent)

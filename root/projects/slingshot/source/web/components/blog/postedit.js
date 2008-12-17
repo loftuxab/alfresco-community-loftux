@@ -12,8 +12,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
-       Element = YAHOO.util.Element;
+       Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -44,7 +43,7 @@
       Alfresco.util.YUILoaderHelper.require(["json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
       
       return this;
-   }
+   };
    
    Alfresco.BlogPostEdit.prototype =
    {
@@ -145,7 +144,7 @@
        */
       onComponentsLoaded: function BlogPostEdit_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -178,7 +177,7 @@
          var loadBlogPostDataSuccess = function CommentsList_loadCommentsSuccess(response)
          {
             // set the blog data
-            var data = response.json.item
+            var data = response.json.item;
             me.blogPostData = data;
             
             // now initialize the form, which will use the data we just loaded
@@ -214,31 +213,29 @@
       _initializeBlogPostForm: function BlogPostEdit__initializeBlogPostForm()
       {
          // construct the actionUrl, which is different for creating/updating a post
-         var actionUrl = '';
+         var actionUrl, draft = true, title = "", content = "";
          if (this.options.editMode)
          {
-            var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/node/{nodeRef}",
+            actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/node/{nodeRef}",
             {
                nodeRef: this.blogPostData.nodeRef.replace(':/', '')
             });
          }
          else
          {
-            var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/site/{site}/{container}/posts",
+            actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/site/{site}/{container}/posts",
             {
                site: this.options.siteId,
                container: this.options.containerId
             });
          }         
-         var form = Dom.get(this.id + '-form');
-         form.setAttribute("action", actionUrl);
+         Dom.get(this.id + '-form').setAttribute("action", actionUrl);
 
          // site and container
          Dom.get(this.id + '-site').setAttribute("value", this.options.siteId);
          Dom.get(this.id + '-container').setAttribute("value", this.options.containerId);
                   
          // draft
-         var draft = true;
          if (this.options.editMode)
          {
             draft = this.blogPostData.isDraft;
@@ -246,7 +243,6 @@
          Dom.get(this.id + '-draft').setAttribute("value", draft);
          
          // title
-         var title = '';
          if (this.options.editMode)
          {
             title = this.blogPostData.title;
@@ -254,7 +250,6 @@
          Dom.get(this.id + '-title').setAttribute("value", title);
          
          // content
-         var content = '';
          if (this.options.editMode)
          {
             content = Alfresco.util.stripUnsafeHTMLTags(this.blogPostData.content);
@@ -272,7 +267,10 @@
       {
          // initialize the tag library
          this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
-         this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
+         this.modules.tagLibrary.setOptions(
+         {
+            siteId: this.options.siteId
+         });
          this.modules.tagLibrary.initialize();
          
          // add the tags that are already set on the post
@@ -282,29 +280,22 @@
          }
          
          // create the Button
-         var saveButtonLabel = '';
-         if (this.options.editMode)
+         this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button",
          {
-            saveButtonLabel = this._msg('action.update');
-         }
-         else
-         {
-            saveButtonLabel = this._msg('action.saveAsDraft');
-         }
-         this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button", {type: "submit", label: saveButtonLabel });
+            type: "submit",
+            label: this._msg(this.options.editMode ? "action.update" : "action.saveAsDraft")
+         });
 
          // publishing of a draft post button - only visible if post is a draft
-         if ((! this.options.editMode) || (this.blogPostData.isDraft))
+         if (!this.options.editMode || this.blogPostData.isDraft)
          {
-            var publishButtonElem = YAHOO.util.Dom.get(this.id + "-publish-button");
-            this.widgets.publishButton = new YAHOO.widget.Button(this.id + "-publish-button", {type: "button"});
-            this.widgets.publishButton.subscribe("click", this.onFormPublishButtonClick, this, true);
-            Dom.removeClass(publishButtonElem, "hidden");
+            this.widgets.publishButton = Alfresco.util.createYUIButton(this, "publish-button", this.onFormPublishButtonClick);
+            Dom.removeClass(this.id + "-publish-button", "hidden");
          }
          
          // publishing internal and external button / update internal and publish external
-         var publishExternalButtonLabel = ''
-         if (! this.options.editMode)
+         var publishExternalButtonLabel = '';
+         if (!this.options.editMode)
          {
             publishExternalButtonLabel = this._msg('action.publishIntAndExt');
          }
@@ -316,15 +307,17 @@
          {
             publishExternalButtonLabel = this._msg('action.updateIntAndPublishExt');
          }
-         this.widgets.publishExternalButton = new YAHOO.widget.Button(this.id + "-publishexternal-button", {type: "button", label: publishExternalButtonLabel });
-         this.widgets.publishExternalButton.subscribe("click", this.onFormPublishExternalButtonClick, this, true);         
-         
+         this.widgets.publishExternalButton = Alfresco.util.createYUIButton(this, "publishexternal-button", this.onFormPublishExternalButtonClick,
+         {
+            label: publishExternalButtonLabel
+         });
+
          // cancel button
-         this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
-         this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
+         this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onFormCancelButtonClick);
 
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
+         {
             height: '300px',
             width: '538px',
             dompath: false, //Turns on the bar at the bottom
@@ -332,7 +325,7 @@
             markup: "xhtml",
             toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.widgets.editor._render();
+         this.widgets.editor.render();
 
          // create the form that does the validation/submit
          this.widgets.postForm = new Alfresco.forms.Form(this.id + "-form");
@@ -385,12 +378,11 @@
                });
             },
             scope: this
-         }
+         };
          this.widgets.postForm.init();
          
          // finally display the form
-         var containerElem = YAHOO.util.Dom.get(this.id + "-div");
-         Dom.removeClass(containerElem, "hidden");
+         Dom.removeClass(this.id + "-div", "hidden");
       },
       
       /**
@@ -399,8 +391,7 @@
       onFormPublishButtonClick: function BlogPostEdit_onFormPublishButtonClick(type, args)
       {
          // make sure we set the draft flag to false
-         var draftElem = YAHOO.util.Dom.get(this.id + "-draft");
-         draftElem.value=false;
+         Dom.get(this.id + "-draft").setAttribute("value", false);
           
          // submit the form
          this.widgets.saveButton.fireEvent("click");
@@ -412,8 +403,7 @@
       onFormPublishExternalButtonClick: function BlogPostEdit_onFormPublishExternalButtonClick(type, args)
       {
          // make sure we set the draft flag to false
-         var draftElem = YAHOO.util.Dom.get(this.id + "-draft");
-         draftElem.value=false;
+         Dom.get(this.id + "-draft").setAttribute("value", false);
           
          // make sure that the post gets also externally published
          this.performExternalPublish = true;

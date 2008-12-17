@@ -427,12 +427,12 @@
 
                      // leave button
                      button.set("label", Alfresco.util.message("site-finder.leave", "Alfresco.SiteFinder"));
-                     button.set("onclick", { fn: me.doLeave, obj: shortName, scope: me});
+                     button.set("onclick", { fn: me.doLeave, obj: {shortName: shortName, title: title}, scope: me});
                   }
                   else
                   {
                      button.set("label", Alfresco.util.message("site-finder.join", "Alfresco.SiteFinder"));
-                     button.set("onclick", { fn: me.doJoin, obj: shortName, scope: me});
+                     button.set("onclick", { fn: me.doJoin, obj: {shortName: shortName, title: title}, scope: me});
                   }
                   
                   me.buttons[shortName] = { button: button };
@@ -524,7 +524,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.jsonRequest(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site.shortName + "/memberships/" + encodeURIComponent(user),
             method: "PUT",
             dataObj:
             {
@@ -540,7 +540,7 @@
                obj: site,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-finder.join-failure", "Alfresco.SiteFinder", this.options.currentUser, site)
+            failureMessage: Alfresco.util.message("site-finder.join-failure", "Alfresco.SiteFinder", this.options.currentUser, site.title)
          });
       },
       
@@ -554,12 +554,12 @@
       _joinSuccess: function SiteFinder__joinSuccess(response, site)
       {
          // add site to site membership list
-         this.memberOfSites[site] = true;
+         this.memberOfSites[site.shortName] = true;
          
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("site-finder.join-success", "Alfresco.SiteFinder", this.options.currentUser, site)
+            text: Alfresco.util.message("site-finder.join-success", "Alfresco.SiteFinder", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -580,7 +580,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site.shortName + "/memberships/" + encodeURIComponent(user),
             method: "DELETE",
             successCallback:
             {
@@ -588,7 +588,7 @@
                obj: site,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-finder.leave-failure", "Alfresco.SiteFinder", this.options.currentUser, site)
+            failureMessage: Alfresco.util.message("site-finder.leave-failure", "Alfresco.SiteFinder", this.options.currentUser, site.title)
          });
       },
       
@@ -602,12 +602,12 @@
       _leaveSuccess: function SiteFinder__leaveSuccess(response, site)
       {
          // remove site from site membership list
-         delete this.memberOfSites[site];
+         delete this.memberOfSites[site.shortName];
          
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("site-finder.leave-success", "Alfresco.SiteFinder", this.options.currentUser, site)
+            text: Alfresco.util.message("site-finder.leave-success", "Alfresco.SiteFinder", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info

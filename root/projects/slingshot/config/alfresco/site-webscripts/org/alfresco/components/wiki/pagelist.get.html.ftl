@@ -1,7 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiList("${args.htmlid}").setSiteId(
-      "${page.url.templateArgs["site"]!""}"
-   );
+   new Alfresco.WikiList("${args.htmlid}").setOptions({
+      siteId: "${page.url.templateArgs["site"]!""}",    
+      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
+   });                                       
 //]]></script>
 <div id="${args.htmlid}-pagelist" class="yui-navset pagelist"> 
 <#if pageList.pages?size &gt; 0>
@@ -23,11 +24,11 @@
 		<span class="attrLabel">${msg("label.modifiedDate")}</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>
 	<#assign pageCopy>${(p.text!"")?replace("</?[^>]+>", " ", "ir")}</#assign>
-   <div class="pageCopy"><#if pageCopy?length &lt; 1000>${pageCopy}<#else>${pageCopy?substring(0, 1000)}...</#if></div>
+   <div class="pageCopy rich-content"><#if pageCopy?length &lt; 1000>${pageCopy}<#else>${pageCopy?substring(0, 1000)}...</#if></div>
    <#-- Display tags, if any -->
    <div class="pageTags">
       <span class="tagDetails">${msg("label.tags")}</span>
-      <#if p.tags?? && p.tags?size &gt; 0><#list p.tags as tag><span>${tag}</span><#if tag_has_next>,&nbsp;</#if></#list><#else>${msg("label.none")}</#if>
+      <#if p.tags?? && p.tags?size &gt; 0><#list p.tags as tag><a href="#"  class="wiki-tag-link">${tag}</a><#if tag_has_next>,&nbsp;</#if></#list><#else>${msg("label.none")}</#if>
    </div>
    </div><#-- End of wikipage -->
 </#list>

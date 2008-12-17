@@ -79,7 +79,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
-   }
+   };
    
    Alfresco.BlogPostListTags.prototype =
    {
@@ -370,5 +370,5 @@
          }
          return this.id + "-tagId-" + id;
       }
-   }
+   };
 })();

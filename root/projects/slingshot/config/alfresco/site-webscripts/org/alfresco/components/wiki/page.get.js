@@ -7,8 +7,11 @@ if (title)
   	var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + page.url.args.title + "?context=" + escape(context);
 
    var result = doGetCall(uri);
-   result.pagetext = stringUtils.stripUnsafeHTML(result.pagetext);
+   result.pagetext = result.pagetext ? stringUtils.stripUnsafeHTML(result.pagetext) : null;
    model.result = result;
+
+   // Get all pages for the site so we can display links correctly
+   model.pageList = doGetCall("/slingshot/wiki/pages/" + page.url.templateArgs.site);   
 }
 else
 {

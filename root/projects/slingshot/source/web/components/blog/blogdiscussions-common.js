@@ -35,7 +35,7 @@
  * }
  * Only the username is mandatory
  */
-Alfresco.util.people = {}
+Alfresco.util.people = {};
 
 /**
  * Generate html markup for the user profile page
@@ -50,7 +50,7 @@ Alfresco.util.people.generateUserLink = function generateUserLink(person)
    var name = Alfresco.util.people.generateUserDisplayName(person);
    
    return '<a href="' + link + '">' + Alfresco.util.encodeHTML(name) + '</a>';
-}
+};
          
 /**
  * Generate URL to user profile page
@@ -66,7 +66,7 @@ Alfresco.util.people.generateUserProfileUrl = function generateUserProfileUrl(pe
       userid: person.username,
       pageid: "profile"
    });
-}
+};
          
 /**
  * Generate the display name for a user
@@ -78,21 +78,21 @@ Alfresco.util.people.generateUserProfileUrl = function generateUserProfileUrl(pe
 Alfresco.util.people.generateUserDisplayName = function generateUserDisplayName(person)
 {
    var displayName = person.username;
-   if ((person.firstName != undefined && person.firstName.length > 0) ||
-       (person.lastName != undefined && person.lastName.length > 0))
+   if ((person.firstName !== undefined && person.firstName.length > 0) ||
+       (person.lastName !== undefined && person.lastName.length > 0))
    {
       displayName = '';
-      if (person.firstName != undefined)
+      if (person.firstName !== undefined)
       {
          displayName = person.firstName + ' ';
       }
-      if (person.lastName != undefined)
+      if (person.lastName !== undefined)
       {
          displayName += person.lastName;
       }
    }
    return Alfresco.util.encodeHTML(displayName);
-}
+};
          
 /**
  * Generate the avatar image markup for a perrson
@@ -103,20 +103,20 @@ Alfresco.util.people.generateUserDisplayName = function generateUserDisplayName(
  */
 Alfresco.util.people.generateUserAvatarImg = function generateUserAvatarImg(person)
 {
+   var avatarUrl;
    if (person.avatarRef)
    {
-      var avatarUrl = Alfresco.constants.PROXY_URI + 'api/node/' + person.avatarRef.replace('://','/') + '/content/thumbnails/avatar?c=queue&amp;ph=true';
+      avatarUrl = Alfresco.constants.PROXY_URI + 'api/node/' + person.avatarRef.replace('://','/') + '/content/thumbnails/avatar?c=queue&amp;ph=true';
    }
    else
    {
-      var avatarUrl = Alfresco.constants.URL_CONTEXT + 'components/images/no-user-photo-64.png'
+      avatarUrl = Alfresco.constants.URL_CONTEXT + 'components/images/no-user-photo-64.png';
    }
    return '<img src="' + avatarUrl + '" alt="' + person.username + '-avatar-image" />';
-}
+};
 
 
-
-Alfresco.util.rollover = {}
+Alfresco.util.rollover = {};
 
 /**
  * Attaches mouseover/exit event listener to the passed element.
@@ -134,13 +134,19 @@ Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventNa
    {
       // find the correct target element and check whether we only moved between
       // subelements of the hovered element
-      if (! e) var e = window.event;
-      var relTarg = e.relatedTarget || e.fromElement;
-      while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY')
+      if (!e)
       {
-         relTarg = relTarg.parentNode
+         e = window.event;
       }
-      if (relTarg == eventElem) return;
+      var relTarg = e.relatedTarget || e.fromElement;
+      while (relTarg !== null && relTarg != eventElem && relTarg.nodeName != 'BODY')
+      {
+         relTarg = relTarg.parentNode;
+      }
+      if (relTarg == eventElem)
+      {
+         return;
+      }
     
       // the mouse entered the element, fire an event to inform about it
       YAHOO.Bubbling.fire(mouseOverEventName, {event : e, target : eventElem});
@@ -150,21 +156,31 @@ Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventNa
    {
       // find the correct target element and check whether we only moved between
       // subelements of the hovered element
-      if (! e) var e = window.event;
-      var relTarg = e.relatedTarget || e.toElement;
-      while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY')
+      if (!e)
       {
-         relTarg = relTarg.parentNode
+         e = window.event;         
       }
-      if (relTarg == eventElem) return;
+      var relTarg = e.relatedTarget || e.toElement;
+      while (relTarg !== null && relTarg != eventElem && relTarg.nodeName != 'BODY')
+      {
+         relTarg = relTarg.parentNode;
+      }
+      if (relTarg == eventElem)
+      {
+         return;
+      }
      
       // the mouse exited the element, fire an event to inform about it
-      YAHOO.Bubbling.fire(mouseOutEventName, {event : e, target : eventElem});
+      YAHOO.Bubbling.fire(mouseOutEventName,
+      {
+         event: e,
+         target: eventElem
+      });
    };
  
    YAHOO.util.Event.addListener(elem, 'mouseover', mouseOverHandler);
    YAHOO.util.Event.addListener(elem, 'mouseout', mouseOutHandler);
-}
+};
 
 /**
  * Register rollover listeners to elements identified by a class and tag name.
@@ -179,11 +195,12 @@ Alfresco.util.rollover.registerListenersByClassName = function(htmlId, className
    var mouseEnteredBubbleEventName = 'onRolloverMouseEntered-' + htmlId;
    var mouseExitedBubbleEventName = 'onRolloverMouseExited-' + htmlId;
    var elems = YAHOO.util.Dom.getElementsByClassName(className, tagName);
-   for (var x=0; x < elems.length; x++) {
+   for (var x = 0; x < elems.length; x++)
+   {
       Alfresco.util.rollover._attachRolloverListener(elems[x], mouseEnteredBubbleEventName, mouseExitedBubbleEventName);
    }
+};
 
-}
 
 /**
  * Register handle functions that handle the mouse enter/exit events
@@ -200,7 +217,7 @@ Alfresco.util.rollover.registerHandlerFunctions = function(htmlId, mouseEnteredF
    var mouseExitedBubbleEventName = 'onRolloverMouseExited-' + htmlId;
    YAHOO.Bubbling.on(mouseEnteredBubbleEventName, mouseEnteredFn, scope);
    YAHOO.Bubbling.on(mouseExitedBubbleEventName, mouseExitedFn, scope);
-}
+};
 
 
 /**
@@ -225,9 +242,7 @@ Alfresco.util.tags.registerTagActionHandler = function registerTagActionHandler(
       var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
       if (owner !== null)
       {
-         var tagId = "";
-         tagId = owner.id;
-         tagId = tagId.substring(tagId.lastIndexOf("-") + 1);
+         var tagId = owner.id.substring(tagId.lastIndexOf("-") + 1);
          for (tag in scope.tagId.tags)
          {
             if (scope.tagId.tags[tag] == tagId)
@@ -243,9 +258,9 @@ Alfresco.util.tags.registerTagActionHandler = function registerTagActionHandler(
       }
     		 
       return true;
-   }
+   };
    YAHOO.Bubbling.addDefaultAction("tag-link", fnTagHandler);
-}
+};
 
 /**
  * Generate ID alias for tag, suitable for DOM ID attribute
@@ -289,40 +304,91 @@ Alfresco.util.tags.generateTagLink = function generateTagLink(scope, tagName)
     html += '</a>';
     html += '</span>';
     return html;
-}
+};
 
 
 Alfresco.util.editor = {};
 
 Alfresco.util.editor.getTextOnlyToolbarConfig = function(msg)
 {
-   var toolbar = {
+   var toolbar =
+   {
       titlebar: false,
-      buttons: [
-         { group: 'textstyle', label: msg("yuieditor.toolbar.group.font"),
-            buttons: [
-               { type: 'push', label: msg("yuieditor.toolbar.item.bold"), value: 'bold' },
-               { type: 'push', label: msg("yuieditor.toolbar.item.italic"), value: 'italic' },
-               { type: 'push', label: msg("yuieditor.toolbar.item.underline"), value: 'underline' },
-               { type: 'separator' },
-               { type: 'color', label: msg("yuieditor.toolbar.item.fontcolor"), value: 'forecolor', disabled: true },
-               { type: 'color', label: msg("yuieditor.toolbar.item.backgroundcolor"), value: 'backcolor', disabled: true }
+      buttons:
+      [
+         {
+            group: 'textstyle', label: msg("yuieditor.toolbar.group.font"),
+            buttons:
+            [
+               {
+                  type: 'push',
+                  label: msg("yuieditor.toolbar.item.bold"),
+                  value: 'bold'
+               },
+               {
+                  type: 'push',
+                  label: msg("yuieditor.toolbar.item.italic"),
+                  value: 'italic'
+               },
+               {
+                  type: 'push',
+                  label: msg("yuieditor.toolbar.item.underline"),
+                  value: 'underline'
+               },
+               {
+                  type: 'separator'
+               },
+               {
+                  type: 'color',
+                  label: msg("yuieditor.toolbar.item.fontcolor"),
+                  value: 'forecolor',
+                  disabled: true
+               },
+               {
+                  type: 'color',
+                  label: msg("yuieditor.toolbar.item.backgroundcolor"), 
+                  value: 'backcolor',
+                  disabled: true
+               }
             ]
          },
-         { type: 'separator' },
-         { group: 'indentlist', label: msg("yuieditor.toolbar.group.lists"),
-            buttons: [
-               { type: 'push', label: msg("yuieditor.toolbar.item.createunorderedlist"), value: 'insertunorderedlist' },
-               { type: 'push', label: msg("yuieditor.toolbar.item.createorderedlist"), value: 'insertorderedlist' }
+         {
+            type: 'separator'
+         },
+         {
+            group: 'indentlist',
+            label: msg("yuieditor.toolbar.group.lists"),
+            buttons:
+            [
+               {
+                  type: 'push',
+                  label: msg("yuieditor.toolbar.item.createunorderedlist"),
+                  value: 'insertunorderedlist'
+               },
+               {
+                  type: 'push',
+                  label: msg("yuieditor.toolbar.item.createorderedlist"),
+                  value: 'insertorderedlist'
+               }
             ]
          },
-         { type: 'separator' },
-         { group: 'insertitem', label: msg("yuieditor.toolbar.group.link"),
-            buttons: [
-              { type: 'push', label: msg("yuieditor.toolbar.item.link"), value: 'createlink', disabled: true }
+         {
+            type: 'separator'
+         },
+         {
+            group: 'insertitem',
+            label: msg("yuieditor.toolbar.group.link"),
+            buttons:
+            [
+               {
+                  type: 'push',
+                  label: msg("yuieditor.toolbar.item.link"),
+                  value: 'createlink',
+                  disabled: true
+               }
             ]
-        }
+         }
       ]
    };
-   return toolbar
-}
+   return toolbar;
+};

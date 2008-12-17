@@ -133,10 +133,7 @@
          if (typeof width != 'undefined')
          {
             // Reset widget height to ensure correct rendering
-            if (YAHOO.env.ua.ie == 0)
-            {
-               Dom.setStyle("divTopicListFilters", "height", "auto");
-            }
+            Dom.setStyle("divTopicListFilters", "height", "auto");
             // 8px breathing space for resize gripper
             Dom.setStyle("divTopicListTopics", "margin-left", 8 + width + "px");
          }

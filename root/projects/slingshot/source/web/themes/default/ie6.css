@@ -1,5 +1,10 @@
 /* CSS Overrides for Microsoft Internet Explorer v6 */
 
+textarea
+{
+   font-family: Arial, sans-serif; 
+}
+
 /**
  * Global site header
  */
@@ -7,21 +12,68 @@
 {
    margin-bottom: -1px;
    margin-right: -3px;
-   padding-bottom: 4px;
+   /*padding-bottom: 10px;*/
 }
 
-.header .menu-wrapper {
-   padding:17px 0 14px;
-}
-
-.header div.util-menu
+.header .menu-wrapper
 {
-   margin-top: -1px;
+   height:18px;
+   line-height:18px;
+   padding-bottom: 8px;
 }
 
-.header .search-site-icon
+.header .personal-menu
 {
-   margin-left: -4px;
+   height:18px;
+   padding-top: 6px;
+   padding-bottom: 6px;
+}
+
+.header .link-menu-button
+{
+   border:1px solid #F2F2F2;
+   padding-bottom:2px;
+   padding-top:1px;
+}
+
+.yui-skin-default span.link-menu-button span.yui-menu-button.yui-menu-button-hover
+{
+   border: 1px solid #7BA9CE;
+}
+
+.yui-skin-default .link-menu-button.link-menu-button-menu-active
+{
+   border: 1px solid #7BA9CE;
+}
+
+.yui-skin-default span.link-menu-button.link-menu-button-menu-active span.yui-menu-button
+{
+   border: 1px solid #FFFFFF;
+}
+
+.yui-skin-default span.link-menu-button.link-menu-button-menu-active span.yui-menu-button.yui-menu-button-hover
+{
+   border: 1px solid #FFFFFF;
+}
+
+
+.header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+{
+   text-decoration: none;
+}
+
+/**
+ * Global site footer
+ */
+.sticky-wrapper
+{
+   margin-bottom: -2.5em;
+}
+
+.footer
+{
+   padding-bottom: 0;
+   padding-top: 0;
 }
 
 /* These messages/dialogs was getting full width if none was specified */
@@ -54,6 +106,12 @@
    border-color: #F6F6F6;
 }
 
+.yui-skin-default .header .yui-button .first-child,
+.yui-skin-default .header .yui-button
+{
+   border-color: #F2F2F2;
+}
+
 .yui-skin-default .dashlet .toolbar .yui-button.yui-button-hover .first-child,
 .yui-skin-default .dashlet .toolbar .yui-button.yui-button-hover,
 .yui-skin-default .flat-button      .yui-button.yui-button-hover .first-child,
@@ -62,6 +120,16 @@
    border-color: #808080;
 }
 
+.yui-skin-default .header .flat-button      .yui-button.yui-button-hover
+{
+   border: 1px solid #7BA9CE;
+}
+
+.yui-skin-default .sites-wrapper .yui-button.yui-split-button-activeoption,
+.yui-skin-default .sites-wrapper .yui-button.yui-split-button-hover
+{
+   border: 1px solid #7BA9CE;
+}
 /**
  * Dashlets
  */
@@ -85,6 +153,11 @@ div.dashlet .body .clear
 .page-title div.title
 {
    margin-top: -4px;
+}
+
+.yui-skin-default .title-button .yui-button
+{
+   margin-left: 0.7em;
 }
 
 .site-navigation
@@ -264,10 +337,15 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 /**
  * Document Library
  */
-.toolbar .header-bar,
-.toolbar .nav-bar
+#divDocLibraryDocs .toolbar .header-bar
 {
    padding-bottom: 2em;
+}
+
+#divDocLibraryDocs .toolbar .header-bar,
+#divDocLibraryDocs .toolbar .nav-bar
+{
+   margin: 0 -10px;
 }
 
 .doclist a.action-link,
@@ -279,7 +357,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    width: 1px;
 }
 
-/* When folder names are too long the layou is destroyed */
+/* When folder names are too long the layout is destroyed */
 #divDocLibraryFilters
 {
    overflow-x: hidden;
@@ -308,7 +386,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 }
 
 /**
- * Padding to some of the dashetls
+ * Padding to some of the dashlets
  */
 
 div.dashlet.site-profile div.body,
@@ -327,3 +405,15 @@ div.dashlet.calendar div.body
    margin: 0;
 }
 
+/* Full preview backgroundd mask */
+
+body.masked div.mask.full-preview-mask
+{
+   background-color: #303030;
+   filter: alpha(opacity = 100);   
+}
+
+.site-finder .search-bar
+{
+   height:2em;
+}

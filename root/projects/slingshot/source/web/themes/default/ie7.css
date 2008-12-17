@@ -1,17 +1,49 @@
 /* CSS Overrides for Microsoft Internet Explorer v7 */
 
+textarea
+{
+   font-family: Arial, sans-serif; 
+} 
+
 
 /**
  * Global site header
  */
-.header div.util-menu
+
+.header .personal-menu
 {
-    margin-top: -2px;
+   padding-top: 6px;
+}
+
+.header .util-menu
+{
+   padding-top: 1px;
+}
+
+.header .link-menu-button
+{
+   padding-bottom:3px;
+   padding-top:1px;
 }
 
 .header .search-site-icon
 {
    top: -2px;
+}
+
+
+/**
+ * Global site footer
+ */
+.sticky-wrapper
+{
+   margin-bottom: -2.5em;
+}
+
+.footer
+{
+   padding-bottom: 0px;
+   padding-top: 0px;
 }
 
 
@@ -22,6 +54,11 @@
 {
    margin-top: -1px;
    padding-top: 6px;
+}
+
+.yui-skin-default .title-button .yui-button
+{
+   margin: 0 0.7em;
 }
 
 
@@ -45,6 +82,11 @@
    width: 10em;
 }
 
+.toolbar span.crumb
+{
+   background-position: left center;
+}
+
 .workflow .people-selected
 {
    height: 206px;
@@ -57,4 +99,13 @@
 .calendar-bar .align-right
 {
    width: 68% !important;
+}
+
+
+/* Full preview backgroundd mask */
+
+body.masked div.mask.full-preview-mask
+{
+   background-color: #303030;
+   filter: alpha(opacity = 100);
 }
