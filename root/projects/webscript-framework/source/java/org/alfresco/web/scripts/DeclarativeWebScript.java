@@ -25,6 +25,8 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,27 +155,14 @@ public class DeclarativeWebScript extends AbstractWebScript
         }
         catch(Throwable e)
         {
-            if (logger.isInfoEnabled())
-                logger.info("Caught exception & redirecting to status template: " + e.getMessage());
-                
-            // extract status code, if specified
-            int statusCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-            if (e instanceof WebScriptException)
+            if (logger.isDebugEnabled())
             {
-                statusCode = ((WebScriptException)e).getStatus();
+                StringWriter stack = new StringWriter();
+                e.printStackTrace(new PrintWriter(stack));
+                logger.debug("Caught exception; decorating with appropriate status template : " + stack.toString());
             }
 
-            // send status
-            Status status = new Status();
-            status.setCode(statusCode);
-            status.setMessage(e.getMessage());
-            status.setException(e);
-            Cache cache = new Cache();
-            cache.setNeverCache(true);
-            Map<String, Object> customModel = new HashMap<String, Object>(8, 1.0f);
-            customModel.put("status", status);
-            Map<String, Object> templateModel = createTemplateParameters(req, res, customModel);
-            sendStatus(req, res, status, cache, format, templateModel);
+            throw createStatusException(e, req, res);
         }
     }
     

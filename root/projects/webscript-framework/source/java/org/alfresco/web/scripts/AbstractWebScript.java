@@ -546,16 +546,16 @@ public abstract class AbstractWebScript implements WebScript
         StatusTemplate template = getStatusTemplate(scriptId, statusCode, statusFormat);
 
         // render output
-        String mimetype = container.getFormatRegistry().getMimeType(req.getAgent(), template.format);
+        String mimetype = container.getFormatRegistry().getMimeType(req.getAgent(), template.getFormat());
         if (mimetype == null)
         {
-            throw new WebScriptException("Web Script format '" + template.format + "' is not registered");
+            throw new WebScriptException("Web Script format '" + template.getFormat() + "' is not registered");
         }
     
         if (logger.isDebugEnabled())
         {
             logger.debug("Force success status header in response: " + req.forceSuccessStatus());
-            logger.debug("Sending status " + statusCode + " (Template: " + template.path + ")");
+            logger.debug("Sending status " + statusCode + " (Template: " + template.getPath() + ")");
             logger.debug("Rendering response: content type=" + mimetype);
         }
     
@@ -570,9 +570,40 @@ public abstract class AbstractWebScript implements WebScript
             res.setHeader(WebScriptResponse.HEADER_LOCATION, location);
         }
         res.setContentType(mimetype + ";charset=UTF-8");
-        renderTemplate(template.path, model, res.getWriter());
+        renderTemplate(template.getPath(), model, res.getWriter());
     }
 
+    /**
+     * Create an exception whose associated message is driven from a status template and model
+     * 
+     * @param e  exception
+     * @param req  web script request
+     * @param res  web script response
+     * @return  web script exception with associated template message and model
+     */
+    final protected WebScriptException createStatusException(Throwable e, WebScriptRequest req, WebScriptResponse res)
+    {
+        // decorate exception with template message
+        WebScriptException we;
+        if (e instanceof WebScriptException)
+        {
+            we = (WebScriptException)e;
+        }
+        else
+        {
+            we = new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Wrapped Exception (with status template): " + e.getMessage(), e);
+        }
+        
+        // find status template and construct model for it
+        Map<String, Object> statusModel = createTemplateParameters(req, res, null);
+        int statusCode = we.getStatus();
+        String format = req.getFormat();
+        String scriptId = getDescription().getId();
+        StatusTemplate statusTemplate = getStatusTemplate(scriptId, statusCode, (format == null) ? "" : format);
+        we.setStatusTemplate(statusTemplate, statusModel);
+        return we;
+    }
+    
     /**
      * Find status template
      * 
@@ -583,7 +614,7 @@ public abstract class AbstractWebScript implements WebScript
      * @param format
      * @return  status template (or null if not found)
      */
-    private StatusTemplate getStatusTemplate(String scriptId, int statusCode, String format)
+    protected StatusTemplate getStatusTemplate(String scriptId, int statusCode, String format)
     {
         StatusTemplate statusTemplate = null;
         statusTemplateLock.readLock().lock();
@@ -617,7 +648,7 @@ public abstract class AbstractWebScript implements WebScript
                         }
                         
                         if (logger.isDebugEnabled())
-                            logger.debug("Caching template " + statusTemplate.path + " for web script " + scriptId +
+                            logger.debug("Caching template " + statusTemplate.getPath() + " for web script " + scriptId +
                                          " and status " +statusCode + " (format: " + format + ")");
                         
                         statusTemplates.put(key, statusTemplate);
@@ -839,25 +870,4 @@ public abstract class AbstractWebScript implements WebScript
 		}
 	}
 
-
-	/**
-     * Status Template
-     */
-    private class StatusTemplate
-    {
-        /**
-         * Construct
-         * 
-         * @param path
-         * @param format
-         */
-        private StatusTemplate(String path, String format)
-        {
-            this.path = path;
-            this.format = format;
-        }
-        
-        private String path;
-        private String format;
-    }
 }
