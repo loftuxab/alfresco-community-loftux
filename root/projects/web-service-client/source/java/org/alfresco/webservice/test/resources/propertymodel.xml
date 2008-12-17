@@ -48,6 +48,11 @@
             <property name="ws:datetimeProp">
                <title>DateTimeProp</title>
                <type>d:datetime</type>
+			   <index enabled="true">
+				  <atomic>true</atomic>
+				  <stored>false</stored> 
+                  <tokenised>both</tokenised>
+               </index>
             </property>            
             <property name="ws:booleanProp">
                <title>BooleanProp</title>
