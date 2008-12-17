@@ -84,10 +84,15 @@ public class AuthenticationUtil
     public static boolean isAuthenticated(HttpServletRequest request)
     {
         // get user id from the session
-        String userId = (String) request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+        String userId = (String)request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
         
         // return whether is non-null
         return (userId != null);        
+    }
+    
+    public static String getUserId(HttpServletRequest request)
+    {
+        return (String)request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
     }
 
     /**

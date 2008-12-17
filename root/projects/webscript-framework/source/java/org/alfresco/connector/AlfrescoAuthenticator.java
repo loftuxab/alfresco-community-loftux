@@ -61,12 +61,12 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
         {
             // build a new remote client
             RemoteClient remoteClient = new RemoteClient(endpoint);
-    
+            
             // call the login web script
             String user = (String) credentials.getProperty(Credentials.CREDENTIAL_USERNAME);
             String pass = (String) credentials.getProperty(Credentials.CREDENTIAL_PASSWORD);
             
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Authenticating user: " + user);
             
             Response response = remoteClient.call("/api/login?u=" + URLEncoder.encode(user) + "&pw=" + pass);
@@ -90,11 +90,11 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
                             "Unable to retrieve ticket from Alfresco", de);
                 }
                 
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Parsed ticket: " + ticket);
     
                 // place the ticket back into the connector session
-                if(connectorSession != null)
+                if (connectorSession != null)
                 {
                     connectorSession.setParameter(CS_PARAM_ALF_TICKET, ticket);
                     
@@ -119,5 +119,4 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
     {
         return (connectorSession.getParameter(CS_PARAM_ALF_TICKET) != null);
     }
-    
 }

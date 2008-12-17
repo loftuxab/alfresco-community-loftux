@@ -197,7 +197,7 @@ public class ConnectorService implements ApplicationListener
         
         // set credentials
         Credentials credentials = null;
-        if(userId != null)
+        if (userId != null)
         {
             credentials = this.getCredentialVault(session, userId).retrieve(endpointId);
         }        

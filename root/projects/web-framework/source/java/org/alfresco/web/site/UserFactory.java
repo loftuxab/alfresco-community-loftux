@@ -41,11 +41,19 @@ public abstract class UserFactory
     public static final String USER_GUEST = "guest";
     public static String SESSION_ATTRIBUTE_KEY_USER_OBJECT = "USER_OBJECT";
     public static String SESSION_ATTRIBUTE_KEY_USER_ID = "USER_ID";
-
-    protected User guestUser = null;
-    protected String id;
+    
+    private User guestUser = null;
     
     
+    /**
+     * Retrieve the special "Guest" user instance.
+     * 
+     * @param context
+     * 
+     * @return Guest User
+     * 
+     * @throws UserFactoryException
+     */
     protected User getGuestUser(RequestContext context) throws UserFactoryException
     {
         if (this.guestUser == null)
@@ -63,7 +71,9 @@ public abstract class UserFactory
      * 
      * @param context
      * @param request
-     * @return
+     * 
+     * @return User
+     * 
      * @throws UserFactoryException
      */
     public User faultUser(RequestContext context, HttpServletRequest request)
@@ -71,8 +81,7 @@ public abstract class UserFactory
     {
         return faultUser(context, request, false);
     }
-       
-
+    
     /**
      * Loads a user from the remote user store and stores it into the session.
      * 
@@ -82,7 +91,9 @@ public abstract class UserFactory
      * @param context
      * @param request
      * @param force
-     * @return
+     * 
+     * @return User
+     * 
      * @throws UserFactoryException
      */
     public User faultUser(RequestContext context, HttpServletRequest request, boolean force)
@@ -121,7 +132,6 @@ public abstract class UserFactory
             }
         }
         
-        // TODO: should we do this?
         // return the guest user
         if (user == null)
         {
@@ -136,7 +146,9 @@ public abstract class UserFactory
      * 
      * @param context
      * @param userId
-     * @return
+     * 
+     * @return User
+     * 
      * @throws UserFactoryException
      */
     public abstract User loadUser(RequestContext context, String userId)
@@ -152,14 +164,4 @@ public abstract class UserFactory
      * @return success/failure
      */
     public abstract boolean authenticate(HttpServletRequest request, String username, String password);
-    
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-    
-    public String getId()
-    {
-        return this.id;
-    }
 }

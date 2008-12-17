@@ -148,7 +148,7 @@ public class HttpConnector extends AbstractConnector
             response = new Response(status);
         }
         
-        return response;        
+        return response;
     }
     
     /**
