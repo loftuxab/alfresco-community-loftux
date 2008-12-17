@@ -355,6 +355,10 @@
  * @param silent {boolean} Determines whether the user should be informed upon failure
  * @static
  */
+// Ensure namespaces exist
+Alfresco.module.event =  Alfresco.module.event || {}; 
+Alfresco.module.event.validation = Alfresco.module.event.validation || {};
+ 
 Alfresco.module.event.validation.tags = function mandatory(field, args, event, form, silent)
 {
    if (!args)
