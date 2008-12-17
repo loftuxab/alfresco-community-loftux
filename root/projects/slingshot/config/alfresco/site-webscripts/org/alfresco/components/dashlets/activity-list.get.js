@@ -23,6 +23,7 @@ if (activityFeed != null)
          {
             id: activity.id,
             type: activity.activityType,
+            siteId: activity.siteNetwork,
             date:
             {
                isoDate: activity.postDate,
@@ -31,10 +32,12 @@ if (activityFeed != null)
             },
             title: summary.title || "title.generic",
             fullName: fullName,
+            itemPage: itemPageUrl(activity, summary),
             sitePage: sitePageUrl(activity, summary),
             userProfile: userProfileUrl(activity),
             custom0: summary.custom0 || "",
-            custom1: summary.custom1 || ""
+            custom1: summary.custom1 || "",
+            suppressSite: false
          };
          // Run through specialize function for special cases
          activities.push(specialize(item, activity, summary));
@@ -57,6 +60,7 @@ function specialize(item, activity, summary)
       case "org.alfresco.site.user-role-changed":
          item.title = activity.siteNetwork;
          item.custom0 = summary.role;
+         item.suppressSite = true;
          break;
    }
    
@@ -111,11 +115,19 @@ function userProfileUrl(activity)
 }
 
 /**
- * URL to site page
+ * URL to item page (could be site dashboard page)
+ */
+function itemPageUrl(activity, summary)
+{
+   return url.context + "/page/site/" + encodeURI(activity.siteNetwork) + (summary.page !== undefined ? "/" + summary.page : "/dashboard");
+}
+
+/**
+ * URL to site dashboard page
  */
 function sitePageUrl(activity, summary)
 {
-   return url.context + "/page/site/" + encodeURI(activity.siteNetwork) + (summary.page !== undefined ? "/" + summary.page : "/dashboard");
+   return url.context + "/page/site/" + encodeURI(activity.siteNetwork) + "/dashboard";
 }
 
 /**

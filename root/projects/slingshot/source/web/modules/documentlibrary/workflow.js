@@ -273,7 +273,8 @@
          this.modules.peopleFinder.setOptions(
          {
             compactMode: true,
-            singleSelectMode: true
+            singleSelectMode: true,
+            showSelf: true
          });
 
          // Due date checkbox
@@ -508,7 +509,7 @@
          var successCount = p_data.json.successCount;
          var failureCount = p_data.json.failureCount;
 
-         this.widgets.dialog.hide();
+         this._hideDialog();
 
          // Did the operation succeed?
          if (!p_data.json.overallSuccess)
@@ -554,7 +555,7 @@
        */
       onFailure: function DLW_onFailure(p_data)
       {
-         this.widgets.dialog.hide();
+         this._hideDialog();
 
          Alfresco.util.PopupManager.displayMessage(
          {
@@ -610,7 +611,6 @@
        */
       onCancel: function DLW_onCancel(e, p_obj)
       {
-         this.widgets.calendarOverlay.hide();
          this._hideDialog();
       },
 
@@ -740,6 +740,9 @@
       {
          // Grab the form element
          var formElement = Dom.get(this.id + "-form");
+         
+         // Ensure pop-up calendar is hidden
+         this.widgets.calendarOverlay.hide();
 
          // Undo Firefox caret issue
          Alfresco.util.undoCaretFix(formElement);

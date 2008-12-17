@@ -282,7 +282,7 @@ public class StringUtils
                 if (endTagIndex != -1)
                 {
                     // found end of the tag to match
-                    String tag = s.substring(i + 1, endTagIndex).toLowerCase();
+                    String tag = s.substring(i + 1, endTagIndex);
                     String matchTag = tag;
                     if (endMatchIndex != -1)
                     {

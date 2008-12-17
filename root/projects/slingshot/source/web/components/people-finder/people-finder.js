@@ -114,6 +114,15 @@
          singleSelectMode: false,
          
          /**
+          * Whether we show the current user or not flag
+          * 
+          * @property showSelf
+          * @type boolean
+          * @default false
+          */
+         showSelf: false,
+         
+         /**
           * People List mode flag
           * 
           * @property peopleListMode
@@ -280,14 +289,17 @@
                   items = oFullResponse.people;
                }
 
-               // Remove thecurrent user form the list
-               for (var i = 0; i < items.length; i++)
+               // Remove the current user form the list?
+               if (!me.options.showSelf)
                {
-                   if(items[i].userName == me.options.currentUser)
-                   {
-                      items.splice(i, 1);
-                      break;
-                   }
+                  for (var i = 0; i < items.length; i++)
+                  {
+                      if(items[i].userName == me.options.currentUser)
+                      {
+                         items.splice(i, 1);
+                         break;
+                      }
+                  }
                }
 
                // we need to wrap the array inside a JSON object so the DataTable is happy

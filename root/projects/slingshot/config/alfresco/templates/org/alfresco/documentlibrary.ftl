@@ -18,7 +18,7 @@
          {
             if (qs.hasOwnProperty(q) && q in hashParams)
             {
-               hash += "&" +q + "=" + encodeURIComponent(qs[q]);
+               hash += "&" + q + "=" + encodeURIComponent(qs[q]);
                delete qs[q];
             }
          }
