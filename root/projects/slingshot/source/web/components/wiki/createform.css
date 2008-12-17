@@ -36,10 +36,22 @@
 
 .wikipage-header .backLink
 {
-   background: transparent url(../images/back-arrow.png) no-repeat scroll 3px 3px;
+   background-image: url(../images/back-arrow.png);
+   background-position: left center;
+   background-repeat: no-repeat;
    color: #333333;
-   font-size: 116%;
    padding: 0 5px 0 19px;
+   margin-right:5px;
+}
+
+.wikipage-header .forwardLink
+{
+   background-image: url(../images/forward-arrow-16.png);
+   background-position: right center;
+   background-repeat: no-repeat;
+   color: #333333;
+   padding: 0 21px 0 5px;
+   margin-right:5px;
 }
 
 .wikipage input, wikipage textarea

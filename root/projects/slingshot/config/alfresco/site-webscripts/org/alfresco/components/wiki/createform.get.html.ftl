@@ -7,7 +7,7 @@
 //]]></script>
 <div class="wikipage-header">
 	<div class="back-nav">
-		<span class="backLink">
+		<span class="<#if (page.url.args.listViewLinkBack! == "true")>backLink<#else>forwardLink</#if>">
 			<a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">
 				${msg("header.back")}
 			</a>

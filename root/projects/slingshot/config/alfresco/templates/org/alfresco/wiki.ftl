@@ -1,5 +1,8 @@
 <#import "import/alfresco-template.ftl" as template />
-<@template.header />
+<@template.header>
+   <link rel="stylesheet" type="text/css" href="${url.context}/templates/wiki/wiki.css" />
+   <script type="text/javascript" src="${url.context}/templates/wiki/wiki.js"></script>
+</@>
 
 <@template.body>
    <div id="hd">
@@ -8,16 +11,19 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-	<div class="yui-gf">
-		<div class="yui-u first">
-		    <@region id="filter" scope="template" protected=true />
-		    <@region id="tags" scope="template" protected=true />   
-   	</div>
-		<div class="yui-u">
-		    <@region id="toolbar" scope="template" protected=true />
-			 <@region id="pagelist" scope="template" protected=true />
-   	</div>
- 	</div>
+      <div class="yui-t1" id="divTopicListWrapper">
+         <div id="yui-main">
+            <div class="yui-b" id="divTopicListTopics">
+               <@region id="toolbar" scope="template" protected=true />
+               <@region id="pagelist" scope="template" protected=true />
+            </div>
+         </div>
+         <div class="yui-b" id="divTopicListFilters">
+            <@region id="filter" scope="template" protected=true />
+            <@region id="tags" scope="template" protected=true />
+         </div>
+      </div>
+
 	</div>
 </@>
 

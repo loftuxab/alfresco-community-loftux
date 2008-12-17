@@ -395,7 +395,7 @@
          // take all full words in the string
          var tags = [];
          var tag = null;
-         var regexp = /([^\s^,^&^\/]+)/gi;
+         var regexp = /([^\s^,^&^\^<^>^\|^\"^\:^\/^\\^\?^\*/]+)/gi; 
          while ((tag = regexp.exec(text)))
          {
             tags.push(tag[1]);
