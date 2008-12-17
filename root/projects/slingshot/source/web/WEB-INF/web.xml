@@ -17,6 +17,37 @@
       <description>Spring config file locations</description>
    </context-param>
    
+   <!-- For NTLM authentication support use the following filter -->
+   <!--
+   <filter>
+      <filter-name>Authentication Filter</filter-name>
+      <filter-class>org.alfresco.web.site.servlet.NTLMAuthenticationFilter</filter-class>
+      <init-param>
+         <param-name>endpoint</param-name>
+         <param-value>alfresco</param-value>
+      </init-param>
+   </filter>
+   -->
+   
+   <!-- For NTLM authentication support enable the following mappings -->
+   <!-- after enabling the NTLMAuthenticationFilter filter class above -->
+   <!--
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/page/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/p/*</url-pattern>
+   </filter-mapping>
+   
+   <filter-mapping>
+      <filter-name>Authentication Filter</filter-name>
+      <url-pattern>/s/*</url-pattern>
+   </filter-mapping>
+   -->
+   
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
