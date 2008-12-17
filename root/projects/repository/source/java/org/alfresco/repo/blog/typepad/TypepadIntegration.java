@@ -20,32 +20,41 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.bean.actions.blogIntegration;
+package org.alfresco.repo.blog.typepad;
 
-import org.alfresco.model.BlogIntegrationModel;
-import org.alfresco.web.action.evaluator.BaseActionEvaluator;
-import org.alfresco.web.bean.repository.Node;
-
+import org.alfresco.repo.blog.BlogDetails;
+import org.alfresco.repo.blog.DefaultBlogIntegrationImplementation;
 
 /**
- * Update blog evaluator
+ * Typepad integration implementation
  * 
  * @author Roy Wetherall
  */
-public class UpdateBlogEvaluator extends BaseActionEvaluator implements BlogIntegrationModel
+public class TypepadIntegration extends DefaultBlogIntegrationImplementation
 {
     /**
-     * @see org.alfresco.web.action.ActionEvaluator#evaluate(org.alfresco.web.bean.repository.Node)
+     * @see org.alfresco.module.blogIntegration.DefaultBlogIntegrationImplementation#getEndpointURL(org.alfresco.module.blogIntegration.BlogDetails)
      */
-    public boolean evaluate(Node node)
+    @Override
+    protected String getEndpointURL(BlogDetails blogDetails)
     {
-        boolean result = false;
-        if (node.hasAspect(ASPECT_BLOG_POST) == true)
-        {
-            result = true;
-        }
-        return result;
+        return "http://www.typepad.com/t/api";
     }
+    
+    /**
+     * For some reason typepad returns a hash table rather than the expected boolean result.
+     * 
+     * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#deletePost(org.alfresco.module.blogIntegration.BlogDetails, java.lang.String)
+     */
+    @Override
+    public boolean deletePost(BlogDetails blogDetails, String postId)
+    {
+        // NOTE:  At the time of testing typepad.com failed when making this call, for now the implementation is
+        //        being overriden to return success
+        
+        return true;
+    }
+
 }

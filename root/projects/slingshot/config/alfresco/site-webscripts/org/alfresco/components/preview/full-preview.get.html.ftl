@@ -1,3 +1,4 @@
+<#if (node?exists)>
 <script type="text/javascript">//<![CDATA[
 new Alfresco.FullPreview("${args.htmlid}").setOptions({
    nodeRef: '${node.nodeRef}',
@@ -9,6 +10,7 @@ new Alfresco.FullPreview("${args.htmlid}").setOptions({
    ${messages}
       );
 //]]></script>
+</#if>
 <div id="${args.htmlid}-fullPreview-panel" class="full-preview">
    <div class="bd">
       <div id="${args.htmlid}-hd-div" class="bdhd" style="visibility: hidden;">

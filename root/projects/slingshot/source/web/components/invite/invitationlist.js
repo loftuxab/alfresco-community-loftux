@@ -355,6 +355,7 @@
          inviteData.userName = data.userName;
          inviteData.firstName = data.firstName;
          inviteData.lastName = data.lastName;
+         inviteData.userName = data.userName;
          inviteData.email = data.email;
          this.widgets.dataTable.addRow(inviteData);
          this._enableDisableInviteButton();
@@ -560,6 +561,7 @@
          var firstName = record.getData('firstName');
          var lastName = record.getData('lastName');
          var email = record.getData('email');
+         var userName = record.getData('userName');
          var role = record.getData('role');
          
          // We have to do a backend call for each invited person
@@ -573,6 +575,7 @@
                inviteeFirstName: firstName,
                inviteeLastName: lastName,
                inviteeEmail: email,
+               inviteeUserName: userName,
                siteShortName : this.options.siteId,
                inviteeSiteRole : role,
                serverPath : serverPath,
@@ -609,6 +612,9 @@
          // inform the user
          var message = this._msg("message.inviteresult", inviteData.successes.length, inviteData.failures.length);
          Alfresco.util.PopupManager.displayMessage({text: message });
+         
+         // re-enable invite button
+         this.widgets.inviteButton.set("disabled", false);
       },
 
       /**

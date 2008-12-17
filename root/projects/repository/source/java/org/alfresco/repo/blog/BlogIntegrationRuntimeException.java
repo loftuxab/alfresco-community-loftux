@@ -20,32 +20,63 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.bean.actions.blogIntegration;
+package org.alfresco.repo.blog;
 
-import org.alfresco.model.BlogIntegrationModel;
-import org.alfresco.web.action.evaluator.BaseActionEvaluator;
-import org.alfresco.web.bean.repository.Node;
-
+import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
- * Add blog details evaluator
+ * Blog integration runtime exception
  * 
  * @author Roy Wetherall
  */
-public class AddBlogDetailsEvaluator extends BaseActionEvaluator implements BlogIntegrationModel
+public class BlogIntegrationRuntimeException extends AlfrescoRuntimeException
 {
+    private static final long serialVersionUID = -159901552962025003L;
+
     /**
-     * @see org.alfresco.web.action.ActionEvaluator#evaluate(org.alfresco.web.bean.repository.Node)
+     * Constructor 
+     * 
+     * @param msgId
      */
-    public boolean evaluate(Node node)
+    public BlogIntegrationRuntimeException(String msgId)
     {
-        boolean result = false;
-        if (node.hasAspect(ASPECT_BLOG_DETAILS) == false)
-        {
-            result = true;
-        }
-        return result;
+        super(msgId);
     }
+
+    /**
+     * Constructor
+     * 
+     * @param msgId
+     * @param msgParams
+     */
+    public BlogIntegrationRuntimeException(String msgId, Object[] msgParams)
+    {
+        super(msgId, msgParams);
+    }
+
+    /**
+     * Constructor
+     * 
+     * @param msgId
+     * @param cause
+     */
+    public BlogIntegrationRuntimeException(String msgId, Throwable cause)
+    {
+        super(msgId, cause);
+    }
+
+    /**
+     * Constructor
+     * 
+     * @param msgId
+     * @param msgParams
+     * @param cause
+     */
+    public BlogIntegrationRuntimeException(String msgId, Object[] msgParams, Throwable cause)
+    {
+        super(msgId, msgParams, cause);
+    }
+
 }
