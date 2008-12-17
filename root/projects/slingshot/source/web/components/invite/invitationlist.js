@@ -220,7 +220,11 @@
          {
             // we currently render all results the same way
             var name = oRecord.getData("firstName") + " " + oRecord.getData("lastName");
-            var userName = "(" + oRecord.getData("userName") + ")";
+            var userName = "";
+            if (oRecord.getData("userName") !== undefined)
+            {
+                userName = "(" + oRecord.getData("userName") + ")";
+            }
             var email = oRecord.getData("email");
             elCell.innerHTML = '<h3 class="itemname">' + $html(name) + ' <span class="lighter">' + $html(userName) + '</span></h3><div class="detail">' + $html(email) + '</div>';
          };
@@ -352,7 +356,7 @@
          var data = args[1];
          var inviteData = {};
          inviteData.id = this.uniqueRecordId++;
-         inviteData.userName = data.userName;
+         inviteData.userName = data.userName || "";
          inviteData.firstName = data.firstName;
          inviteData.lastName = data.lastName;
          inviteData.userName = data.userName;
@@ -561,7 +565,7 @@
          var firstName = record.getData('firstName');
          var lastName = record.getData('lastName');
          var email = record.getData('email');
-         var userName = record.getData('userName');
+         var userName = record.getData('userName') || "";
          var role = record.getData('role');
          
          // We have to do a backend call for each invited person

@@ -60,6 +60,7 @@ function specialize(item, activity, summary)
       case "org.alfresco.site.user-role-changed":
          item.title = activity.siteNetwork;
          item.custom0 = summary.role;
+         item.fullName = trim(summary.memberFirstName + " " + summary.memberLastName);
          item.suppressSite = true;
          break;
    }

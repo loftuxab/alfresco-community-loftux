@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -72,6 +73,7 @@ public class RuntimeExec
     private static final int BUFFER_SIZE = 1024;
     private static final String VAR_OPEN = "${";
     private static final String VAR_CLOSE = "}";
+    private static final String DIRECTIVE_SPLIT = "SPLIT:";
 
     private static Log logger = LogFactory.getLog(RuntimeExec.class);
 
@@ -154,7 +156,16 @@ public class RuntimeExec
      * entries in the array represent the arguments.  All elements of the array will be checked for
      * the presence of any substitution parameters (e.g. '{dir}').  The parameters can be set using the
      * {@link #setDefaultProperties(Map) defaults} or by passing the substitution values into the
-     * {@link #execute(Map)} command. 
+     * {@link #execute(Map)} command.
+     * <p>
+     * If parameters passed may be multiple arguments, or if the values provided in the map are themselves
+     * collections of arguments (not recommended), then prefix the value with <b>SPLIT:</b> to ensure that
+     * the value is tokenized before being passed to the command.  Any values that are not split, will be
+     * passed to the command as single arguments.  For example:<br>
+     * '<b>SPLIT: dir . ..</b>' becomes '<b>dir</b>', '<b>.</b>' and '<b>..</b>'.<br>
+     * '<b>SPLIT: dir ${path}</b>' (if path is '<b>. ..</b>') becomes '<b>dir</b>', '<b>.</b>' and '<b>..</b>'.<br>
+     * The splitting occurs post-subtitution.  Where the arguments are known, it is advisable to avoid
+     * <b>SPLIT:</b>.
      * 
      * @param commandsByOS          a map of command string arrays, keyed by operating system names
      * 
@@ -405,7 +416,7 @@ public class RuntimeExec
             execProperties.putAll(properties);
         }
         // Perform the substitution for each element of the command
-        String[] adjustedCommand = new String[command.length];
+        ArrayList<String> adjustedCommandElements = new ArrayList<String>(20);
         for (int i = 0; i < command.length; i++)
         {
             StringBuilder sb = new StringBuilder(command[i]);
@@ -429,10 +440,24 @@ public class RuntimeExec
                     index = sb.indexOf(key, index + 1);
                 }
             }
-            adjustedCommand[i] = sb.toString();
+            String adjustedValue = sb.toString();
+            // Now SPLIT: it
+            if (adjustedValue.startsWith(DIRECTIVE_SPLIT))
+            {
+                String unsplitAdjustedValue = sb.substring(DIRECTIVE_SPLIT.length());
+                StringTokenizer tokenizer = new StringTokenizer(unsplitAdjustedValue);
+                while (tokenizer.hasMoreTokens())
+                {
+                    adjustedCommandElements.add(tokenizer.nextToken());
+                }
+            }
+            else
+            {
+                adjustedCommandElements.add(adjustedValue);
+            }
         }
         // done
-        return adjustedCommand;
+        return adjustedCommandElements.toArray(new String[adjustedCommandElements.size()]);
     }
     
     /**

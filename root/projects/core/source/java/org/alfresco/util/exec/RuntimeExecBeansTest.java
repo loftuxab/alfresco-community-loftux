@@ -25,6 +25,7 @@
 package org.alfresco.util.exec;
 
 import java.io.File;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 
@@ -97,11 +98,10 @@ public class RuntimeExecBeansTest extends TestCase
         ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         try
         {
-            RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandCheckDeprecatedSetCommandMap");
-            assertNotNull(failureExec);
+            RuntimeExec deprecatedExec = (RuntimeExec) ctx.getBean("commandCheckDeprecatedSetCommandMap");
+            assertNotNull(deprecatedExec);
             // Execute it
-            failureExec.execute();
-            // The command is never-ending, so this should be out immediately
+            deprecatedExec.execute();
         }
         finally
         {
@@ -109,6 +109,42 @@ public class RuntimeExecBeansTest extends TestCase
         }
         // The best we can do is look at the log manually
         logger.warn("There should be a warning re. the use of deprecated 'setCommandMap'.");
+    }
+    
+    public void testSplitArguments() throws Exception
+    {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        try
+        {
+            RuntimeExec splitExec = (RuntimeExec) ctx.getBean("commandSplitArguments");
+            assertNotNull(splitExec);
+            String[] splitCommand = splitExec.getCommand();
+            assertTrue(
+                    "Command arguments not split into 'dir', '.' and '..' :" + Arrays.deepToString(splitCommand),
+                    Arrays.deepEquals(new String[] {"dir", ".", ".."}, splitCommand));
+        }
+        finally
+        {
+            ctx.close();
+        }
+    }
+    
+    public void testSplitArgumentsAsSingleValue() throws Exception
+    {
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        try
+        {
+            RuntimeExec splitExec = (RuntimeExec) ctx.getBean("commandSplitArgumentsAsSingleValue");
+            assertNotNull(splitExec);
+            String[] splitCommand = splitExec.getCommand();
+            assertTrue(
+                    "Command arguments not split into 'dir', '.' and '..' : " + Arrays.deepToString(splitCommand),
+                    Arrays.deepEquals(new String[] {"dir", ".", ".."}, splitCommand));
+        }
+        finally
+        {
+            ctx.close();
+        }
     }
     
     public void testFailureModeOfMissingCommand()
