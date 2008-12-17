@@ -24,7 +24,43 @@
           <value>true</value>
       </property>
       <property name="errorCodes">
-          <value>1</value>
+          <value>1, 2</value>
+      </property>
+   </bean>
+
+   <bean id="commandSplitArguments" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandsAndArguments">
+          <map>
+              <entry key=".*">
+                  <list>
+                      <value>dir</value>
+                      <value>SPLIT:${paths}</value>
+                  </list>
+              </entry>
+          </map>
+      </property>
+      <property name="defaultProperties">
+          <props>
+              <prop key="paths">. ..</prop>
+          </props>
+      </property>
+      <property name="errorCodes">
+          <value>1, 2</value>
+      </property>
+   </bean>
+
+   <bean id="commandSplitArgumentsAsSingleValue" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandsAndArguments">
+          <map>
+              <entry key=".*">
+                  <list>
+                      <value>SPLIT: dir . ..</value>
+                  </list>
+              </entry>
+          </map>
+      </property>
+      <property name="errorCodes">
+          <value>1, 2</value>
       </property>
    </bean>
 
