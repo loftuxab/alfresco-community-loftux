@@ -1,0 +1,114 @@
+<alfresco-config>
+   
+   <!-- Overriding endpoints to reference a remote Alfresco server -->
+   <!--
+   <config evaluator="string-compare" condition="Remote">
+		<remote>
+
+         <endpoint>
+				<id>alfresco-noauth</id>
+				<name>Alfresco - unauthenticated access</name>
+				<description>Access to Alfresco Repository WebScripts that do not require authentication</description>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://yourserver:8080/alfresco/s</endpoint-url>
+				<identity>none</identity>
+			</endpoint>
+
+			<endpoint>
+				<id>alfresco</id>
+				<name>Alfresco - user access</name>
+				<description>Access to Alfresco Repository WebScripts that require user authentication</description>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://yourserver:8080/alfresco/s</endpoint-url>
+				<identity>user</identity>
+			</endpoint>
+
+			<endpoint>
+				<id>alfresco-rss</id>
+				<name>Alfresco RSS</name>
+				<description>Alfresco RSS - supports basic HTTP authentication</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://yourserver:8080/alfresco/s</endpoint-url>
+				<basic-auth>true</basic-auth>
+				<identity>user</identity>
+			</endpoint>
+			
+		</remote>
+	</config>
+	-->
+	
+   <!-- Overriding endpoints to reference an Alfresco server with NTLM filter enabled -->
+   <!-- NOTE: the NTLM Authentication Filter must be enabled for both repository and web-tier web.xml -->
+   <!-- NOTE: if utilising a load balancer between web-tier and repository cluster, the "sticky -->
+   <!--       sessions" feature of your load balancer must be used when NTLM filter is active -->
+   <!--
+   <config evaluator="string-compare" condition="Remote">
+		<remote>
+
+         <endpoint>
+				<id>alfresco-noauth</id>
+				<name>Alfresco - unauthenticated access</name>
+				<description>Access to Alfresco Repository WebScripts that do not require authentication</description>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://yourserver:8080/alfresco/wcs</endpoint-url>
+				<identity>none</identity>
+			</endpoint>
+
+			<endpoint>
+				<id>alfresco</id>
+				<name>Alfresco - user access</name>
+				<description>Access to Alfresco Repository WebScripts that require user authentication</description>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://yourserver:8080/alfresco/wcs</endpoint-url>
+				<identity>user</identity>
+			</endpoint>
+
+			<endpoint>
+				<id>alfresco-rss</id>
+				<name>Alfresco RSS</name>
+				<description>Alfresco RSS - supports basic HTTP authentication</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://yourserver:8080/alfresco/wcs</endpoint-url>
+				<basic-auth>true</basic-auth>
+				<identity>user</identity>
+			</endpoint>
+			
+		</remote>
+	</config>
+	-->
+	
+	<!-- Disabling caches for components and pages - to allow share web-app clustering (web farm) -->
+	<!-- A load balancer may then be enabled between multiple web-app instances and the client browser -->
+	<!-- NOTE: the "sticky sessions" feature of your load balancer must be enabled -->
+	<!--
+   <config evaluator="string-compare" condition="WebFramework">
+		<web-framework>
+		
+			<model-type>
+				<id>component</id>
+				<version>1.0</version>
+				<name>Component</name>
+				<description>Component</description>
+				<namespace></namespace>
+				<class>org.alfresco.web.framework.model.Component</class>
+				<search-path-id>webframework.searchpath.component</search-path-id>
+				<default-store-id>webframework.remotestore.component</default-store-id>
+				<cache-enabled>false</cache-enabled>
+			</model-type>
+			<model-type>
+				<id>page</id>
+				<version>1.0</version>
+				<name>Page</name>
+				<description>Page</description>
+				<namespace></namespace>
+				<class>org.alfresco.web.framework.model.Page</class>
+				<search-path-id>webframework.searchpath.page</search-path-id>
+				<default-store-id>webframework.remotestore.page</default-store-id>
+				<cache-enabled>false</cache-enabled>
+			</model-type>
+			
+		</web-framework>
+	</config>
+	-->
+
+</alfresco-config>

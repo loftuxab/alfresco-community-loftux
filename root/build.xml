@@ -773,6 +773,7 @@
       <!-- add all class files to WEB-INF/classes -->
       <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.core.classes}" />
+         <fileset dir="${dir.project.jlan.classes}" />
          <fileset dir="${dir.project.webscriptframework.classes}" />
          <fileset dir="${dir.project.webframework.classes}" />
          <fileset dir="${dir.project.webframeworkcommons.classes}" />

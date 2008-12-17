@@ -405,7 +405,7 @@ public class RemoteClient extends AbstractClient
             String encoding = service(
                     buildURL(uri),
                     isPush ? req.getInputStream() : null,
-                    res.getOutputStream(),
+                    res != null ? res.getOutputStream() : null,
                     req, res, status);
             result = new Response(status);
             result.setEncoding(encoding);
@@ -505,7 +505,7 @@ public class RemoteClient extends AbstractClient
             connection.setReadTimeout(READ_TIMEOUT);
             
             // proxy over any headers from the request stream to proxied request
-            if (res != null)
+            if (req != null)
             {
                 Enumeration<String> headers = req.getHeaderNames();
                 while (headers.hasMoreElements())
@@ -640,7 +640,10 @@ public class RemoteClient extends AbstractClient
                         if (read != -1) responseCommit = true;
                         while (read != -1)
                         {
-                            out.write(buffer, 0, read);
+                            if (out != null)
+                            {
+                                out.write(buffer, 0, read);
+                            }
                             
                             if (trace)
                             {
@@ -665,7 +668,10 @@ public class RemoteClient extends AbstractClient
                             input.close();
                             if (responseCommit)
                             {
-                                out.close();
+                                if (out != null)
+                                {
+                                    out.close();
+                                }
                             }
                             connection.disconnect();
                         }

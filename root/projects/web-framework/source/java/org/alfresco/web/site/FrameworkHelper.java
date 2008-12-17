@@ -139,7 +139,6 @@ public final class FrameworkHelper
                 throw new FrameworkInitializationException(
                         "Unable to create user factory for class name: " + className);
             }
-            factory.setId(defaultId);
             
             if (logger.isDebugEnabled())
                 logger.debug("Created User Factory: " + className);

@@ -1381,7 +1381,7 @@
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" 
-                  excludes="**/extension/**" />
+                  excludes="**/web-extension/**" />
       </copy>
 
       <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF/lib">
@@ -1464,9 +1464,9 @@
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" 
-                  excludes="**/extension/**" />
+                  excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webframework.config}" 
-                  excludes="**/extension/**" />
+                  excludes="**/web-extension/**" />
       </copy>
 
       <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
@@ -1478,6 +1478,8 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
          <fileset dir="${dir.project.webscriptframework.dist}" 
                   includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.webframework.dist}" 
@@ -1549,9 +1551,9 @@
       
       <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="**/web-extension/**" />
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
@@ -1638,10 +1640,10 @@
       
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.project.slingshot.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
+         <fileset dir="${dir.project.slingshot.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
@@ -1654,6 +1656,8 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
          <fileset dir="${dir.project.webscriptframework.dist}" 
                   includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.webframework.dist}" 
@@ -1767,7 +1771,7 @@
          <fileset dir="${dir.project.remoteapi.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webscriptframework.config}"
-                  excludes="**/extension/**" />
+                  excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webclient.config}"
                   excludes="**/extension/**" />
          <!-- 
@@ -2959,9 +2963,9 @@
       
       <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.dynamicwebsite.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.dynamicwebsite.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
@@ -2974,6 +2978,8 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
          <fileset dir="${dir.project.webscriptframework.dist}" 
                   includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.webframework.dist}" 
@@ -3078,24 +3084,24 @@
       
       <copy todir="${dir.project.extranet.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.extranet.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.extranet.config}" excludes="**/web-extension/**" />
       </copy>
       
       <!-- Additional development mode support -->
       <echo>${dir.project.extranet}/dev/extranet.properties</echo>
-      <echo>${home.tomcat.application}/shared/classes/alfresco/extension</echo>
+      <echo>${home.tomcat.application}/shared/classes/alfresco/web-extension</echo>
       <copy file="${dir.project.extranet}/dev/custom-extranet.properties"
-	    tofile="${home.tomcat.application}/shared/classes/alfresco/extension/custom-extranet.properties"
+	    tofile="${home.tomcat.application}/shared/classes/alfresco/web-extension/custom-extranet.properties"
 	    failonerror="false" 
 	    overwrite="true" />
       <copy file="${dir.project.extranet}/dev/web-framework-config-custom.xml"
-	    tofile="${home.tomcat.application}/shared/classes/alfresco/extension/web-framework-config-custom.xml"
+	    tofile="${home.tomcat.application}/shared/classes/alfresco/web-extension/web-framework-config-custom.xml"
 	    failonerror="false"
 	    overwrite="true" />
       <copy file="${dir.project.extranet}/dev/extranet-application-custom-context.xml"
-	    tofile="${home.tomcat.application}/shared/classes/alfresco/extension/extranet-application-custom-context.xml"
+	    tofile="${home.tomcat.application}/shared/classes/alfresco/web-extension/extranet-application-custom-context.xml"
 	    failonerror="false"
 	    overwrite="true" />
 
@@ -3109,6 +3115,8 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
          <fileset dir="${dir.project.webscriptframework.dist}" 
                   includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.webframework.dist}" 
@@ -3193,9 +3201,9 @@
       
       <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.webstudio.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webstudio.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- copy all required files from project: web-framework-samples -->
@@ -3203,7 +3211,7 @@
          <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
       </copy>
       <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/extension/**" />
+         <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->

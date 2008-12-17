@@ -41,6 +41,7 @@ import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.scripts.ProcessorModelHelper;
 import org.alfresco.web.scripts.URLHelper;
+import org.alfresco.web.scripts.WebScriptProcessor;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.uri.UriTemplateListIndex;
 
@@ -111,7 +112,14 @@ public class SlingshotPageMapper extends AbstractPageMapper
 	    // strip servlet name and set remaining path as currently executing URI
         Map<String, String> uriTokens = null;
         int pathIndex = requestURI.indexOf('/', 1);
-        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1))
+        
+        // Test to see if any elements are provided beyond the servlet name.
+        // Optimization to ignore webscript /service requests when processing page URIs -
+        // this is because a RequestContext is created manually for service requests
+        // that pass through the web-framework webscript runtime - we know those requests
+        // are not related to pages or page types so we can skip some processing.
+        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1) &&
+            !WebScriptProcessor.WEBSCRIPT_SERVICE_SERVLET.equals(requestURI.substring(0, pathIndex)))
         {
             pageId = requestURI.substring(pathIndex + 1);
             context.setUri(pageId);

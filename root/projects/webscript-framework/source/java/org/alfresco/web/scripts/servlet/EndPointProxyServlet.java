@@ -57,10 +57,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * EndPoint HTTP Proxy Servlet.
  * 
  * Provides the ability to submit a URL request via a configured end point such as a
- * remote  Alfresco Server. Automatically appends TICKET information for the current
+ * remote Alfresco Server. Automatically appends TICKET information for the current
  * user context.
  * 
- * This servlet accepts:
+ * This servlet accepts URIs of the following format:
  * 
  * /proxy/<endpointid>[/uri]*[?[<argName>=<argValue>]*]
  * 
@@ -73,9 +73,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * E.g.
  * 
- * /proxy/alf1/api/sites?name=mysite&desc=description
+ * /proxy/alfresco/api/sites?name=mysite&desc=description
  * 
- * The proxy currently supports all valid HTTP methods.
+ * The proxy supports all valid HTTP methods.
  * 
  * @author kevinr
  */

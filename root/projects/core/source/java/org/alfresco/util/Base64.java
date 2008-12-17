@@ -629,8 +629,6 @@ public class Base64
     }   // end decodeToBytes
     
     
-    
-    
     /**
      * Very low-level access to decoding ASCII characters in
      * the form of a byte array. Does not support automatically
@@ -689,6 +687,10 @@ public class Base64
     }   // end decode
     
     
+    public static byte[] decode(byte[] source)
+    {
+        return decode(source, 0, source.length);
+    }
     
     
     /**

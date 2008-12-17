@@ -156,7 +156,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                     }
                     else
                     {
-                        throw new ModelObjectPersisterException("Unable to create object of type '" + implClassName + "' via reflection");
+                        throw new ModelObjectPersisterException("Unable to construct object of class: " + implClassName);
                     }
                 }
                 else    
@@ -358,7 +358,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
             }
             else
             {
-                throw new ModelObjectPersisterException("Unable to create new object for path: " + path);
+                throw new ModelObjectPersisterException("Unable to construct object of class: " + implClassName + " for path: " + path);
             }
         }
         catch (DocumentException de)

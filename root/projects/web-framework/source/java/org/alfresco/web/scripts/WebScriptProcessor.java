@@ -66,6 +66,9 @@ import org.springframework.context.ApplicationContext;
  */
 public class WebScriptProcessor extends AbstractProcessor
 {
+    /** The WebScript service servlet path */
+    public static final String WEBSCRIPT_SERVICE_SERVLET = "/service";
+    
     /** The Constant PARAM_WEBSCRIPT_ID. */
     static final String PARAM_WEBSCRIPT_ID  = "_wsId";
     
@@ -271,7 +274,7 @@ public class WebScriptProcessor extends AbstractProcessor
         else
         {
             // else use the webscript default url
-            webScriptContext.ExecuteUrl = requestPath + "/service" + url;
+            webScriptContext.ExecuteUrl = requestPath + WEBSCRIPT_SERVICE_SERVLET + url;
         }
         
         // Set up character encoding.  If none, set the default.
