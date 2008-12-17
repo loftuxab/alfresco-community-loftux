@@ -25,6 +25,7 @@
 
 package org.alfresco.jlan.server.auth.ntlm;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +36,7 @@ import org.alfresco.jlan.util.HexDump;
  *
  * @author gkspencer
  */
-public class Type2NTLMMessage extends NTLMMessage
+public class Type2NTLMMessage extends NTLMMessage implements Serializable
 {
   // Minimal type 2 message length
     
