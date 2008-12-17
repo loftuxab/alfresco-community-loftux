@@ -111,7 +111,12 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
                     int extIdx = pathInfo.lastIndexOf('.');
                     if (extIdx != -1)
                     {
-                        format = pathInfo.substring(extIdx +1);
+                        // format extension is only valid as the last URL element 
+                        int pathIdx = pathInfo.lastIndexOf('/');
+                        if (pathIdx < extIdx)
+                        {
+                            format = pathInfo.substring(extIdx +1);
+                        }
                     }
                 }
             }
