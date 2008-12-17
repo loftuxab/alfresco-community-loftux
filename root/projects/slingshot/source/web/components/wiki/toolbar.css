@@ -71,16 +71,24 @@
    padding-left: 32px; 
 }
 
-.toolbar .delete-page a
+.toolbar .delete-page button
 {
-   background: transparent url(../images/remove-16.png) no-repeat 12px 4px;
+   background: transparent url(../images/delete-wiki-16.png) no-repeat 12px 4px;
    padding-left: 32px; 
 }
+.toolbar .delete-page .yui-button-disabled button
+{
+   background-image: url(../images/delete-wiki-unavailable-16.png);
+}
 
-.toolbar .rename-page a
+.toolbar .rename-page button
 {
    background: transparent url(../images/edit-wiki-16.png) no-repeat 12px 4px;
    padding-left: 32px; 
+}
+.toolbar .rename-page .yui-button-disabled button
+{
+   background-image: url(../images/rename-wiki-unavailable-16.png);
 }
 
 .toolbar .rss-feed

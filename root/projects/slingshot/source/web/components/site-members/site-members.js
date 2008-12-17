@@ -275,7 +275,13 @@
                      items.push(member);
                   }
                }
-               
+               // Sort the memeber list by name
+               items.sort(function (membership1, membership2){
+                  var name1 = membership1.firstName + membership1.lastName;
+                  var name2 = membership2.firstName + membership2.lastName;
+                  return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
+               });
+
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse = {
                   "items": items
@@ -313,7 +319,7 @@
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
-      
+
       _setupDataTable: function SiteMembers_setupDataTable()
       {
          /**
