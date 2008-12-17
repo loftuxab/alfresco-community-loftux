@@ -30,13 +30,13 @@
             <li id="${args.htmlid}-currentPage-li-${page.pageId}" <#if (!page.used)>style="display: none;"</#if>>
                <div class="pageTitle"><h4>${page.title}</h4></div>
                <div class="pageIcon">
-                  <img src="${url.context}/components/site/images/page-icon-placeholder.png"/>
+                  <img src="${url.context}/components/site/images/page.png"/>
                </div>
                <div class="pageActions">
-                  <img src="${url.context}/components/site/images/i-icon-placeholder.png"
+                  <img src="${url.context}/components/site/images/info-16.png"
                        title="${page.description}"/>
                   <a id="${args.htmlid}-remove-link-${page.pageId}" href="javascript: var nothing;">
-                     <img src="${url.context}/components/site/images/remove-icon-placeholder.png"
+                     <img src="${url.context}/components/site/images/generic-remove-16.png"
                           title="${msg("button.remove")}"/>
                   </a>
                </div>
@@ -67,7 +67,7 @@
             <#list pages as page>
                <li id="${args.htmlid}-page-li-${page.pageId}" <#if (page.used)>style="display: none;"</#if>>
                <div class="pageIcon">
-                  <img src="${url.context}/components/site/images/page-icon-placeholder.png"/>                  
+                  <img src="${url.context}/components/site/images/page.png"/>                  
                </div>
                <div class="pageActions">
                   <input id="${args.htmlid}-select-button-${page.pageId}" type="button" value="${msg("button.select")}"/>

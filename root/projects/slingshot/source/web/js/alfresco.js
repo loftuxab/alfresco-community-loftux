@@ -203,6 +203,54 @@ Alfresco.util.formatFileSize = function(fileSize)
 }
 
 /**
+ * Given a filename, returns either a filetype icon or generic icon file stem
+ *
+ * @method Alfresco.util.getFileIcon
+ * @param fileName {string} File to find icon for
+ * @param iconSize {int} Icon size: 32
+ * @return {string} The icon name, e.g. doc-file-32.png
+ * @static
+ * @throws {Error}
+ */
+Alfresco.util.getFileIcon = function(fileName, iconSize)
+{
+   // Mapping from extn to icon name
+   var icons = 
+   {
+      "doc": "doc",
+      "docx": "doc",
+      "ppt": "ppt",
+      "pptx": "ppt",
+      "xls": "xls",
+      "xlsx": "xls",
+      "pdf": "pdf",
+      "bmp": "img",
+      "gif": "img",
+      "jpg": "img",
+      "jpeg": "img",
+      "png": "img",
+      "txt": "text"
+   };
+   
+   if (iconSize === undefined)
+   {
+      iconSize = 32;
+   }
+   else if (typeof iconSize == "string")
+   {
+      fileSize = parseInt(fileSize, 10);
+   }
+   
+   var extn = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase(), icon = "generic";
+   if (extn in icons)
+   {
+      icon = icons[extn];
+   }
+
+   return icon + "-file-" + iconSize + ".png";
+}
+
+/**
  * Formats a Freemarker datetime into more UI-friendly format
  *
  * @method Alfresco.util.formatDate

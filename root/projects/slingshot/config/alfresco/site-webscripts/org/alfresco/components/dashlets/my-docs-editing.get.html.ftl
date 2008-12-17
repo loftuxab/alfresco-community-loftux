@@ -6,7 +6,7 @@
    <div class="body scrollableList">
    <#if docs.message?exists>
       <div class="detail-list-item first-item last-item">
-         <span class="error">${docs.message}</span>
+         <span class="error">${msg(docs.message)}</span>
       </div>
    <#else>
       <#if docs.items?size == 0>
