@@ -327,10 +327,32 @@
          });
          this.widgets.editor.render();
 
+         // Add validation to the yui editor
+         this.widgets.validateOnZero = 0;
+         this.widgets.editor.subscribe("editorKeyUp", function (e)
+         {
+            this.widgets.validateOnZero++;
+            YAHOO.lang.later(1000, this, this.validateAfterEditorChange);
+         }, this, true);
+
          // create the form that does the validation/submit
          this.widgets.postForm = new Alfresco.forms.Form(this.id + "-form");
+
+         // Title is mandatory
+         this.widgets.postForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+
+         // Text is mandatory
+         this.widgets.postForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
+
          this.widgets.postForm.setShowSubmitStateDynamically(true, false);
-         this.widgets.postForm.setSubmitElements(this.widgets.saveButton);
+         if(this.widgets.publishButton)
+         {
+            this.widgets.postForm.setSubmitElements([this.widgets.saveButton, this.widgets.publishExternalButton, this.widgets.publishButton]);            
+         }
+         else
+         {
+            this.widgets.postForm.setSubmitElements([this.widgets.saveButton, this.widgets.publishExternalButton]);
+         }
          this.widgets.postForm.setAJAXSubmit(true,
          {
             successCallback:
@@ -354,6 +376,17 @@
          {
             fn: function(form, obj)
             {
+               //Put the HTML back into the text area
+               this.widgets.editor.saveHTML();
+
+               // Make sure the user has written a text
+               if(YAHOO.util.Dom.get(this.id + '-content').value.length == 0)
+               {
+                  Alfresco.util.PopupManager.displayMessage({text: Alfresco.util.message("message.noText", this.name)});
+                  return;
+               }
+
+
                 // disable ui elements
                this.widgets.saveButton.set("disabled", true);
                if (this.widgets.publishButton)
@@ -362,10 +395,7 @@
                }
                this.widgets.publishExternalButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
-                
-               //Put the HTML back into the text area
-               this.widgets.editor.saveHTML();
-               
+
                // update the tags set in the form
                this.modules.tagLibrary.updateForm(this.id + "-form", "tags");
                
@@ -384,7 +414,28 @@
          // finally display the form
          Dom.removeClass(this.id + "-div", "hidden");
       },
-      
+
+      /**
+       * Called when a key was pressed in the yui editor.
+       * Will trigger form validation after the last key stroke after a seconds pause.
+       *
+       * @method validateAfterEditorChange
+       */
+      validateAfterEditorChange: function()
+      {
+         this.widgets.validateOnZero--;
+         if(this.widgets.validateOnZero == 0)
+         {
+            var oldLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
+            this.widgets.editor.saveHTML();
+            var newLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
+            if((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
+            {
+               this.widgets.postForm.updateSubmitElements();
+            }
+         }
+      },
+
       /**
        * Publish button click handler
        */

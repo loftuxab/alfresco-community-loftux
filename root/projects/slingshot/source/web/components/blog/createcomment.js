@@ -255,9 +255,18 @@
          });
          this.widgets.editor._render();
          
+         // Add validation to the yui editor
+         this.widgets.validateOnZero = 0;
+         this.widgets.editor.subscribe("editorKeyUp", function (e)
+         {
+            this.widgets.validateOnZero++;            
+            YAHOO.lang.later(1000, this, this.validateAfterEditorChange);
+         }, this, true);
+
          // create the form that does the validation/submit
          this.widgets.commentForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.commentForm.setShowSubmitStateDynamically(true, false);
+         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);         
          this.widgets.commentForm.setSubmitElements(this.widgets.okButton);
          this.widgets.commentForm.setAJAXSubmit(true,
          {
@@ -301,8 +310,29 @@
          // finally show the form
          var contanerElem = Dom.get(this.id + '-form-container');
          Dom.removeClass(contanerElem, 'hidden');
-      },     
-      
+      },
+
+      /**
+       * Called when a key was pressed in the yui editor.
+       * Will trigger form validation after the last key stroke after a seconds pause.
+       *
+       * @method validateAfterEditorChange
+       */
+      validateAfterEditorChange: function()
+      {
+         this.widgets.validateOnZero--;
+         if(this.widgets.validateOnZero == 0)
+         {
+            var oldLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
+            this.widgets.editor.saveHTML();
+            var newLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
+            if((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
+            {
+               this.widgets.commentForm.updateSubmitElements();
+            }
+         }
+      },
+
       /**
        * Success handler for the form submit ajax request
        */

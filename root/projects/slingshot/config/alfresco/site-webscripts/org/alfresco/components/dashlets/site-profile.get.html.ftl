@@ -25,7 +25,7 @@
          <p>
             <span class="label">${msg("label.siteAdmin")}</span>
    <#list sitemanagers as sitemanager>
-            <a href="${url.context}/page/user/${sitemanager.person.userName}/profile">${sitemanager.person.firstName?html}<#if sitemanager.person.lastName != ""> ${sitemanager.person.lastName?html}</#if></a><#if sitemanager_has_next>, </#if>
+            <a href="${url.context}/page/user/${sitemanager.person.userName?url}/profile">${sitemanager.person.firstName?html}<#if sitemanager.person.lastName != ""> ${sitemanager.person.lastName?html}</#if></a><#if sitemanager_has_next>, </#if>
    </#list>
          </p>
 </#if>

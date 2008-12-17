@@ -175,6 +175,32 @@ public class NTLMv2Blob
   }
   
   /**
+   * Calcualte the LMv2 HMAC value
+   * 
+   * @param v2hash byte[]
+   * @param srvChallenge byte[]
+   * @param clChallenge byte[]
+   * @return byte[]
+   */
+  public final byte[] calculateLMv2HMAC( byte[] v2hash, byte[] srvChallenge, byte[] clChallenge)
+  	  throws Exception {
+
+    // Concatenate the server and client challenges
+	    
+    byte[] blob = new byte[16];
+    System.arraycopy( srvChallenge, 0, blob, 0, srvChallenge.length);
+    System.arraycopy( clChallenge,  0, blob, 8, clChallenge.length);
+	    
+    // Generate the LMv2 HMAC of the blob using the v2 hash as the key
+	    
+    Mac hmacMd5 = Mac.getInstance( "HMACMD5");
+    SecretKeySpec blobKey = new SecretKeySpec( v2hash, 0, v2hash.length, "MD5");
+	    
+    hmacMd5.init( blobKey);
+    return hmacMd5.doFinal( blob);
+  }
+  
+  /**
    * Dump the NTLMv2 blob details
    */
   public final void Dump() {
