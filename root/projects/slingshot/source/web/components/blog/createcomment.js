@@ -9,7 +9,7 @@
    /**
    * YUI Library aliases
    */
-   var Dom = YAHOO.util.Dom
+   var Dom = YAHOO.util.Dom;
     
    /**
     * CreateComment constructor.
@@ -38,7 +38,7 @@
       YAHOO.Bubbling.on("setCanCreateComment", this.onSetCanCreateComment, this);
       
       return this;
-   }
+   };
    
    Alfresco.CreateComment.prototype =
    {
@@ -48,7 +48,8 @@
        * @property options
        * @type object
        */
-      options: {
+      options:
+      {
          /**
           * Current siteId.
           * 
@@ -294,7 +295,7 @@
                });
             },
             scope: this
-         }
+         };
          this.widgets.commentForm.init();
          
          // finally show the form

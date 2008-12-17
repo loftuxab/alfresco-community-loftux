@@ -326,7 +326,8 @@
        */
       _createPanel: function()
       {
-         var panelHeight = Dom.getViewportHeight() - 60;
+         var panelHeight = Dom.getViewportHeight() - 20;
+         var panelWidth = Dom.getViewportWidth() - 20;
          this.widgets.fullPreviewPanel = Dom.get(this.id + "-fullPreview-panel");
          this.widgets.panel = new YAHOO.widget.Panel(this.widgets.fullPreviewPanel,
          {
@@ -335,6 +336,7 @@
             fixedcenter: true,
             close: false,
             visible: false,
+            width: panelWidth + "px",
             height: panelHeight + "px",
             underlay: "none"
          });

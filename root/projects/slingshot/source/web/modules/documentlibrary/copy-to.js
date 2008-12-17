@@ -316,8 +316,22 @@
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
 
          // Mode buttons
-         this.widgets.modeButtons = new YAHOO.widget.ButtonGroup(this.id + "-modeGroup");
-         this.widgets.modeButtons.on("checkedButtonChange", this.onModeChange, this.widgets.modeButtons, this);
+         var modeButtons = new YAHOO.widget.ButtonGroup(this.id + "-modeGroup");
+         modeButtons.on("checkedButtonChange", this.onModeChange, this.widgets.modeButtons, this);
+         this.widgets.modeButtons = modeButtons;
+
+         // Make user enter-key-strokes also trigger a change
+         var buttons = this.widgets.modeButtons.getButtons();
+         for(var i = 0; i < buttons.length; i++)
+         {
+            var bi = i;
+            buttons[i].addListener("keydown", function(e){
+               if(YAHOO.util.KeyListener.KEY.ENTER == e.keyCode)
+               {
+                  modeButtons.check(bi);
+               }
+            });
+         }
          
          /**
           * Dynamically loads TreeView nodes.

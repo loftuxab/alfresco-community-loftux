@@ -2,6 +2,7 @@
    new Alfresco.PeopleFinder("${args.htmlid}").setOptions(
    {
       siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
+      currentUser: "${user.name}",
       minSearchTermLength: "${args.minSearchTermLength!'3'}"
    }).setMessages(
       ${messages}

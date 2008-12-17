@@ -13,9 +13,8 @@
    * YUI Library aliases
    */
    var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
-       Element = YAHOO.util.Element;
-    
+       Event = YAHOO.util.Event;
+
    /**
     * CommentList constructor.
     * 
@@ -50,7 +49,7 @@
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
       YAHOO.Bubbling.on("refreshComments", this.refreshComments, this);
       return this;
-   }
+   };
    
    Alfresco.CommentList.prototype =
    {
@@ -179,7 +178,7 @@
        */
       onComponentsLoaded: function CommentList_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -220,14 +219,14 @@
                if (typeof me[action] == "function")
                {
                   var commentElem = Dom.getAncestorByClassName(owner, 'comment');
-                  var index = parseInt(commentElem.id.substring((me.id + '-comment-view-').length));
+                  var index = parseInt(commentElem.id.substring((me.id + '-comment-view-').length), 10);
                   me[action].call(me, index);
                   args[1].stop = true;
                }
             }
       		 
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("blogcomment-action", fnActionHandlerDiv);
 
          // initialize the mouse over listener
@@ -372,7 +371,7 @@
          var eventData =
          {
             canCreateComment: response.json.nodePermissions.create
-         }
+         };
          YAHOO.Bubbling.fire("setCanCreateComment", eventData);
 
          this._updatePaginator(response.json.startIndex, response.json.total);
@@ -589,7 +588,7 @@
             row: row,
             widgets : {},
             formId: formId
-         }
+         };
              
          // and finally register the form handling
          this._registerEditCommentForm(row, data, formId);
@@ -658,7 +657,7 @@
                this.editData.widgets.editor.saveHTML();
             },
             scope: this
-         }
+         };
          commentForm.init();
       },
       
@@ -709,7 +708,7 @@
          html += '<div id="' + this.id + '-comment-edit-' + index + '" class="hidden"></div>';
          
          // output the view
-         var rowClass = index % 2 == 0 ? "even" : "odd";
+         var rowClass = index % 2 === 0 ? "even" : "odd";
          html += '<div class="comment ' + rowClass + '" id="' + this.id + '-comment-view-' + index + '">';
          html += this.renderCommentView(index, data);
          html += '</div>';
@@ -725,7 +724,7 @@
          var html = '';
          
          // actions
-         html += '<div class="nodeEdit">'
+         html += '<div class="nodeEdit">';
          if (data.permissions.edit)
          {
             html += '<div class="onEditComment"><a href="#" class="blogcomment-action">' + this._msg("action.edit") + '</a></div>';
@@ -737,7 +736,7 @@
          html += '</div>';
   
          // avatar image
-         html += '<div class="authorPicture">' + Alfresco.util.people.generateUserAvatarImg(data.author) + '</div>'
+         html += '<div class="authorPicture">' + Alfresco.util.people.generateUserAvatarImg(data.author) + '</div>';
   
          // comment info and content
          html += '<div class="nodeContent"><div class="userLink">' + Alfresco.util.people.generateUserLink(data.author);
@@ -746,13 +745,13 @@
          {
             html += '<span class="nodeStatus">(' + this._msg("comment.updated") + ')</span>';
          }
-         html += '</div>'
-         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>'
+         html += '</div>';
+         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
          html += '</div>';
 
          // footer
-         html += '<div class="commentFooter">'
-         html += '<span class="nodeFooterBlock">'
+         html += '<div class="commentFooter">';
+         html += '<span class="nodeFooterBlock">';
          html += '<span class="nodeAttrLabel">' + this._msg("comment.postedOn") + ': ';
          html += Alfresco.util.formatDate(data.createdOn);
          html += '</span></span></div>';
@@ -776,14 +775,14 @@
          }
           
          var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         Dom.addClass(elem, 'overNode');
       },
       
       /** Called whenever the mouse exits a list item. */
       onCommentElementMouseExited: function CommentList_onCommentElementMouseExited(layer, args)
       {
          var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(elem, 'overNode');
       },
 
    
@@ -797,14 +796,14 @@
        */
       _hideEditView: function CommentList__hideEditView()
       {
-         if (this.editData.editDiv != null)
+         if (this.editData.editDiv !== null)
          {
             // hide edit div and remove form
             Dom.addClass(this.editData.editDiv, "hidden");
             this.editData.editDiv.innerHTML = "";
             this.editData.editDiv = null;
          }
-         if (this.editData.viewDiv != null)
+         if (this.editData.viewDiv !== null)
          {
             // display view div
             Dom.removeClass(this.editData.viewDiv, "hidden");

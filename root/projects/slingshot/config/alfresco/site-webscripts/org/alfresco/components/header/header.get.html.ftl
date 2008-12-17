@@ -20,12 +20,12 @@
 
    <div class="menu-wrapper">
       <#if !isGuest>
-      <div class="personal-menu">
+      <div class="personal-menu">   
          <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name?url}/dashboard">${msg("link.myDashboard")}</a></span>
          <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.myProfile")}</a></span>
-         <span class="menu-item-icon sites">
-            <a href="${url.context}/page/site-finder">${msg("link.sites")}</a>
-            <span id="${args.htmlid}-sites-tbutton" class="sites-menu-icon">&nbsp;</span>
+         <span id="${args.htmlid}-sites-linkMenuButton" class="link-menu-button">
+            <span class="menu-item-icon sites link-menu-button-link"><a href="${url.context}/page/site-finder">${msg("link.sites")}</a></span>
+            <input id="${args.htmlid}-sites" type="button"/>
          </span>
          <span class="menu-item-icon people"><a href="${url.context}/page/people-finder">${msg("link.people")}</a></span>
       </div>
@@ -48,7 +48,7 @@
       </div>
    </div>
 
-   <div id="${args.htmlid}-sitestogglemenu" class="hidden">
+   <div id="${args.htmlid}-sites-menu" class="yui-overlay">
       <div class="bd">
          <ul>
             <li>

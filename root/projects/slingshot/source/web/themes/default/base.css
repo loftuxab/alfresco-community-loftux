@@ -11,10 +11,10 @@ html, body
 
 .sticky-wrapper
 {
-   min-height: 99%;
    height: auto !important;
    height: 100%;
    margin: 0 auto -2.4em;
+   min-height: 100%;
 }
 
 .sticky-footer, .sticky-push
@@ -28,6 +28,12 @@ body
    font-family: Arial, sans-serif;
    font-size: 81%;
    color: #515D6B;
+}
+
+#alfresco-yuiloader
+{
+   height: 0;
+   line-height: 0;
 }
 
 .caret-fix
@@ -418,6 +424,11 @@ em
    list-style-position:inside;
 }
 
+.rich-content a.wiki-missing-page
+{
+   color: #CC2200 !important;
+}
+
 .draggable
 {
    cursor: move;
@@ -523,4 +534,78 @@ textarea
 .yui-skin-default .yui-pg-container a.yui-pg-previous
 {
    color:#2B6EB5;
+}
+
+/* A combination of a link and splitbutton wrapped inside a span */
+
+.yui-skin-default .link-menu-button
+{ 
+   padding-bottom:4px;
+   padding-top:2px;
+   vertical-align:middle;
+   border: 1px solid transparent;
+}
+
+.yui-skin-default .link-menu-button .yui-menu-button,
+.yui-skin-default .link-menu-button .yui-menu-button span,
+.yui-skin-default .link-menu-button .yui-menu-button span button
+{
+   margin: 0;
+   padding: 0;
+   vertical-align: middle;  
+}
+
+.yui-skin-default .link-menu-button .yui-menu-button
+{
+   border: 1px solid transparent;
+   background-image: none;
+   /*margin-top:3px;*/
+}
+
+.yui-skin-default .link-menu-button .yui-menu-button span button
+{
+   color: #4C4C4C;
+   font-size: 2px;
+
+   padding: 6px 7px;   
+   /*
+   width: 20px;
+   */
+   background-image: url(images/link-menu-button-arrow.png);
+   background-position: center center;
+}
+
+.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-hover
+{
+   background-color: #FFFFFF;
+   border: 1px solid #7BA9CE;
+}
+
+.yui-skin-default .link-menu-button .yui-menu-button span.first-child,
+.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-activeoption span.first-child,
+.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-hover span.first-child
+{
+   border-width: 0;
+}
+
+.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-activeoption button,
+.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-hover button
+{
+   text-decoration: none;
+}
+
+.yui-skin-default .link-menu-button span.link-menu-button-link
+{
+   border-right: 1px #BDBDBD solid;
+}
+
+.yui-skin-default .link-menu-button.link-menu-button-menu-active
+{
+   background-color: #FFFFFF;
+   border: 1px solid #7BA9CE;
+}
+
+.yui-skin-default .link-menu-button.link-menu-button-menu-active .yui-menu-button.yui-menu-button-hover
+{   
+   border: 1px solid #FFFFFF;
 }

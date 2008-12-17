@@ -8,10 +8,11 @@
 <script type="text/javascript">//<![CDATA[
 	new Alfresco.Wiki("${args.htmlid}").setOptions(
 	{
-	   "siteId": "${page.url.templateArgs.site}",
-	   "pageTitle": "${page.url.args["title"]!""}",
-	   "mode": "${page.url.args["action"]!"view"}",
-	   "tags": [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>]
+	   siteId: "${page.url.templateArgs.site}",
+      pageTitle: "${page.url.args["title"]!""}",
+	   mode: "${page.url.args["action"]!"view"}",
+	   tags: [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>],
+      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
 	}).setMessages(
       ${messages}
    );

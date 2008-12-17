@@ -7,6 +7,8 @@
    {
       this.name = "Alfresco.Header";
       this.id = htmlId;
+
+      this.widgets = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -93,7 +95,7 @@
             correctScope: true
          }, 
          "keydown").enable();
-
+                         
          var searchMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu");
          searchMenu.render();
          searchMenu.owner = this;
@@ -102,6 +104,17 @@
          YAHOO.util.Event.addListener(this.id + "-search-tbutton", "click", this.openToggleSearchMenu, null, searchMenu);
          YAHOO.util.Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
 
+         var sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
+         sitesMenu.render();
+         sitesMenu.subscribe("hide", this.onSitesMenuHide, this, true);
+         this.widgets.sitesMenu = sitesMenu;
+         var sitesButton = new YAHOO.widget.Button(this.id + "-sites",
+         {
+            type: "menu"
+         });
+         sitesButton.subscribe("click", this.onSitesMenuShow, this, true);
+
+         /*
          var sitesMenu = new YAHOO.widget.Menu(this.id + "-sitestogglemenu");
          sitesMenu.render();
          sitesMenu.owner = this;
@@ -109,6 +122,7 @@
 
          YAHOO.util.Event.addListener(this.id + "-sites-tbutton", "click", this.openToggleSitesMenu, null, sitesMenu);
          YAHOO.util.Dom.removeClass(this.id + "-sitestogglemenu", "hidden");
+         */
       },
       
       focusSearchText: function ()
@@ -201,13 +215,22 @@
       },
 
 
-      openToggleSitesMenu: function()
+      onSitesMenuShow: function(e)
       {
-         this.show();
-         var coord = YAHOO.util.Dom.getXY(this.owner.id + "-sites-tbutton");
-         coord[0] -= (YAHOO.util.Dom.get(this.owner.id + "-sitestogglemenu").offsetWidth - YAHOO.util.Dom.get(this.owner.id + "-sites-tbutton").offsetWidth);
-         coord[1] += YAHOO.util.Dom.get(this.owner.id + "-sites-tbutton").offsetHeight;
-         YAHOO.util.Dom.setXY(this.id, coord);
+         // todo: Replace this positioning code when we use YUI 2.6.0 with position: "dynamic" and context
+         // Position the menu under the link-menu-button wrapper span
+         var coord = YAHOO.util.Dom.getXY(this.id + "-sites-linkMenuButton");
+         coord[1] += YAHOO.util.Dom.get(this.id + "-sites-linkMenuButton").offsetHeight;
+         YAHOO.util.Dom.setXY(this.widgets.sitesMenu.id, coord);
+         this.widgets.sitesMenu.show();
+         this.widgets.sitesMenu.focus();
+
+         // Add a selector the link-menu-button wrapper so we can put a border around bothe the link and the button
+         YAHOO.util.Dom.addClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
+      },
+      onSitesMenuHide: function(e)
+      {
+         YAHOO.util.Dom.removeClass(this.id + "-sites-linkMenuButton", "link-menu-button-menu-active");
       },
 
 

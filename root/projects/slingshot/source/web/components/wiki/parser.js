@@ -35,11 +35,12 @@
 		 * @method parse
 		 * @param test {String} The text to render
 		 */
-		parse: function(text)
+		parse: function(text, pages)
 		{
-			var text = this._renderLinks(text);
-			text = this._renderEmphasizedText(text);
-			return text;
+         pages = pages == null ? [] : pages;
+         var text = this._renderLinks(text, pages);
+         text = this._renderEmphasizedText(text);
+         return text;
 		},
 		
 		/**
@@ -61,9 +62,10 @@
 		 * them as appropriate.
 		 * 
 		 * @method _renderLinks
-		 * @param text {String} The text to render
+		 * @param s {String} The text to render
+		 * @param pages {Array} The existing pages on the current site
 		 */
-		_renderLinks: function(s)
+		_renderLinks: function(s, pages)
 		{
 			var result = s.split("[[");
 			var text = result[0];
@@ -78,7 +80,8 @@
 					if (re.test(str))
 					{
 						var matches = re.exec(str);
-						uri = '<a href="' + this.URL + matches[1].replace(/\s+/g, "_") + '">';
+                  var exists = Alfresco.util.arrayContains(pages, matches[1]);                 
+                  uri = '<a href="' + this.URL + matches[1].replace(/\s+/g, "_") + '" ' + (!exists ? 'class="wiki-missing-page"' : '') + '>';
 						uri += (matches[2] ? matches[2] : matches[1]);
 						uri += '</a>';
 						

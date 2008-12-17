@@ -39,8 +39,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -70,7 +69,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
 
       return this;
-   }
+   };
    
    Alfresco.BlogPostListFilter.prototype =
    {

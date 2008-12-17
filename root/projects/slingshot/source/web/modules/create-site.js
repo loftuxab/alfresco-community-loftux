@@ -51,7 +51,7 @@
       var instance = Alfresco.util.ComponentManager.find({id: this.id});
       if (instance !== undefined && instance.length > 0)
       {
-         throw new Error("An instance of Alfresco.module.FileUpload already exists.");
+         throw new Error("An instance of Alfresco.module.CreateSite already exists.");
       }
       
       // Register this component

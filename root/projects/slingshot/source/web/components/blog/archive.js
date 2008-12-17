@@ -72,7 +72,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
-   }
+   };
    
    Alfresco.BlogPostListArchive.prototype =
    {
@@ -359,8 +359,8 @@
       {
          // get the date millis part
          var millis = id.substring((this.id + "-month-").length);
-         millis = parseInt(millis);
+         millis = parseInt(millis, 10);
          return new Date(millis);
       }
-   }
+   };
 })();

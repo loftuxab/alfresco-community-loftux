@@ -1,7 +1,3 @@
-// Ensure namespaces exist
-Alfresco.module.event =  Alfresco.module.event || {}; 
-Alfresco.module.event.validation = Alfresco.module.event.validation || {};
-
 /**
  * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
@@ -41,6 +37,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
 
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
+
       return this;
    };
 

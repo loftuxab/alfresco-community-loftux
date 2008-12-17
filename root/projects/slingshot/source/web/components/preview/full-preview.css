@@ -1,9 +1,4 @@
-.yui-skin-default div.full-preview
-{
-   width: 800px;
-}
-
-.yui-skin-default .full-preview-mask
+body.masked div.mask.full-preview-mask
 {
    background-color: #303030;
    opacity: 1;
@@ -16,14 +11,14 @@ div.full-preview div
 }
 
 
-.yui-skin-default div.yui-panel.full-preview .bd
+div.yui-panel.full-preview .bd
 {
    border: 2px solid #282828;
    background-color: #DCDCDC;
    text-align: center;
 }
 
-.yui-skin-default div.yui-panel.full-preview .bd .bdhd
+div.yui-panel.full-preview .bd .bdhd
 {
    border-bottom: 2px solid #282828;
    background-color: #434343;
@@ -32,31 +27,31 @@ div.full-preview div
    text-align:center;
 }
 
-.yui-skin-default div.yui-panel.full-preview .bd .bdhd .title
+div.yui-panel.full-preview .bd .bdhd .title
 {
    float: left;
    padding-left:1em;
 }
 
-.yui-skin-default div.yui-panel.full-preview .bd .bdhd .close
+div.yui-panel.full-preview .bd .bdhd .close
 {
    float: right;
    padding-right:1em;
 }
 
-.yui-skin-default div.yui-panel.full-preview .bd .bdhd .controls
+div.yui-panel.full-preview .bd .bdhd .controls
 {
 
 }
 
-.yui-skin-default div.full-preview img,
-.yui-skin-default div.full-preview span,
-.yui-skin-default div.full-preview input
+div.full-preview img,
+div.full-preview span,
+div.full-preview input
 {
    vertical-align: middle;
 }
 
-.yui-skin-default div.full-preview input
+div.full-preview input
 {
    width: 1.8em;
 }

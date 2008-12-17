@@ -52,7 +52,7 @@
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
 
       return this;
-   }
+   };
    
    Alfresco.BlogPostView.prototype =
    {
@@ -186,7 +186,7 @@
                }
             }
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-div", fnActionHandlerDiv);
          
          // Hook tag clicks
@@ -234,7 +234,7 @@
       loadBlogPostDataSuccess: function BlogPostView_loadCommentsSuccess(response)
       {
          // store the returned data locally
-         var data = response.json.item
+         var data = response.json.item;
          this.blogPostData = data;
          this.showPublishingActions = response.json.metadata.externalBlogConfig;
          
@@ -266,7 +266,7 @@
             {
                postId: this.blogPostData.name
             }
-         }
+         };
          YAHOO.Bubbling.fire("setCommentedNode", eventData);
       },
       
@@ -280,8 +280,7 @@
          var statusLabel = Alfresco.util.blog.generatePostStatusLabel(this, data);
          var authorLink = Alfresco.util.people.generateUserLink(data.author);
           
-         var html = '';
-         html += '<div id="' + this.id + '-postview" class="node post postview">'
+         var html = '<div id="' + this.id + '-postview" class="node post postview">';
          html += Alfresco.util.blog.generateBlogPostActions(this, data, 'div', this.showPublishingActions);
   
          // content
@@ -291,7 +290,7 @@
          html += '</div>';
           
          html += '<div class="published">';
-         if (! data.isDraft)
+         if (!data.isDraft)
          {
             html += '<span class="nodeAttrLabel">' + this._msg("post.publishedOn") + ': </span>';
             html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
@@ -301,7 +300,7 @@
          html += '<span class="nodeAttrLabel">' + this._msg("post.author") + ': </span>';
          html += '<span class="nodeAttrValue">' + authorLink + '</span>';
 
-         if (data.isPublished && data.postLink != undefined && data.postLink.length > 0)
+         if (data.isPublished && data.postLink !== undefined && data.postLink.length > 0)
          {
             html += '<span class="separator">&nbsp;</span>';
             html += '<span class="nodeAttrLabel">' + this._msg("post.externalLink") + ': </span>';
@@ -325,7 +324,7 @@
          {
             html += '<span class="nodeAttrValue">' + this._msg("post.noTags") + '</span>';
          }
-         html += '</div>'
+         html += '</div>';
       
          html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
          html += '</div></div>';

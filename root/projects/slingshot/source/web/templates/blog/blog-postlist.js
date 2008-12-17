@@ -133,10 +133,7 @@
          if (typeof width != 'undefined')
          {
             // Reset widget height to ensure correct rendering
-            if (YAHOO.env.ua.ie == 0)
-            {
-               Dom.setStyle("divPostListFilters", "height", "auto");
-            }
+            Dom.setStyle("divPostListFilters", "height", "auto");
             // 8px breathing space for resize gripper
             Dom.setStyle("divPostListPosts", "margin-left", 8 + width + "px");
          }

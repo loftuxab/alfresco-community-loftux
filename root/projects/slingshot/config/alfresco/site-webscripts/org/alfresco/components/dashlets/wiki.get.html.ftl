@@ -1,7 +1,9 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiDashlet("${args.htmlid}").setGUID(
-      "${instance.object.id}"
-   ).setSiteId("${page.url.templateArgs.site!""}");
+   new Alfresco.WikiDashlet("${args.htmlid}").setOptions({
+      guid: "${instance.object.id}",
+      siteId: "${page.url.templateArgs.site!""}",
+      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
+   });
 //]]></script>
 <div class="dashlet wiki">
    <div class="title" id="${args.htmlid}-title">${msg("label.header-prefix")} - ${pageTitle!msg("label.header")}</div>

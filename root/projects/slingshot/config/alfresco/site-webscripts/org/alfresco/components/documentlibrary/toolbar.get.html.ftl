@@ -38,9 +38,13 @@
    </div>
 
    <div id="${args.htmlid}-navBar" class="nav-bar flat-button">
-      <div class="folder-up hideable DocListTree"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
-      <div class="separator hideable DocListTree">&nbsp;</div>
-      <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable DocListTree"></div>
+      <div class="nav-bar-left">
+         <div class="folder-up hideable DocListTree"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
+         <div class="separator hideable DocListTree">&nbsp;</div>
+      </div>
+      <div class="nav-bar-right">
+         <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable DocListTree"></div>
+      </div>
       <div id="${args.htmlid}-description" class="description hideable DocListFilter DocListTags"></div>
    </div>
 

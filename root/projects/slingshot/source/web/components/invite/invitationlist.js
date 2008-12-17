@@ -609,9 +609,6 @@
          // inform the user
          var message = this._msg("message.inviteresult", inviteData.successes.length, inviteData.failures.length);
          Alfresco.util.PopupManager.displayMessage({text: message });
-         
-         // re-enable invite button
-         this.widgets.inviteButton.set("disabled", false);
       },
 
       /**
