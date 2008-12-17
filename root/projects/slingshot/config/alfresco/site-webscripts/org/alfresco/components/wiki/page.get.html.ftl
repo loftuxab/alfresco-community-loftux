@@ -54,7 +54,7 @@
       </div>
    </div>
 </div>  
-<div id="${args.htmlid}-wikipage" class="yui-navset">       
+<div id="${args.htmlid}-wikipage" class="wiki-page">       
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 <#if action == "view">	    
 	        <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 

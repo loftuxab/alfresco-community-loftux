@@ -664,15 +664,15 @@
                {
                   this.destroy();
                   me._deleteTopicConfirm.call(me, record.getData('name'));
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function DiscussionsTopicList_onDeleteTopic_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },

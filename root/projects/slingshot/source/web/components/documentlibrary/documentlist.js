@@ -1507,15 +1507,15 @@
                {
                   this.destroy();
                   me._onActionDeleteConfirm.call(me, record);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function DL_onActionDelete_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },
@@ -1610,15 +1610,45 @@
                      // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
                      var fnAfterUpdate = function DL_oAEO_success_afterUpdate()
                      {
-                        Alfresco.util.PopupManager.displayMessage(
+                        var downloadUrl = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
+                        if (YAHOO.env.ua.ie > 6)
                         {
-                           text: this._msg("message.edit-offline.success", displayName)
-                        });
-                        // Kick off the download 3 seconds after the confirmation message
-                        YAHOO.lang.later(3000, this, function()
+                           // MSIE7 blocks the download and gets the wrong URL in the "manual download bar"
+                           Alfresco.util.PopupManager.displayPrompt(
+                           {
+                              title: this._msg("message.edit-offline.success", displayName),
+                              text: this._msg("message.edit-offline.success.ie7"),
+                              buttons: [
+                              {
+                                 text: this._msg("button.download"),
+                                 handler: function DL_oAEO_success_download()
+                                 {
+                                    window.location = downloadUrl;
+                                    this.destroy();
+                                 },
+                                 isDefault: true
+                              },
+                              {
+                                 text: this._msg("button.close"),
+                                 handler: function DL_oAEO_success_close()
+                                 {
+                                    this.destroy();
+                                 }
+                              }]
+                           });
+                        }
+                        else
                         {
-                           window.location = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
-                        });
+                           Alfresco.util.PopupManager.displayMessage(
+                           {
+                              text: this._msg("message.edit-offline.success", displayName)
+                           });
+                           // Kick off the download 3 seconds after the confirmation message
+                           YAHOO.lang.later(3000, this, function()
+                           {
+                              window.location = downloadUrl;
+                           });
+                        }
                      };
                      this.afterDocListUpdate.push(fnAfterUpdate);
                   },

@@ -71,8 +71,16 @@
 {
    background-image: url(images/copy-16.png);
 }
+.toolbar .yuimenuitem-disabled .onActionCopyTo
+{
+   background-image: url(images/copy-16.png);
+}
 
 .toolbar .onActionMoveTo
+{
+   background-image: url(images/move-to-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionMoveTo
 {
    background-image: url(images/move-to-16.png);
 }
@@ -81,13 +89,25 @@
 {
    background-image: url(images/remove-16.png);
 }
+.toolbar .yuimenuitem-disabled .onActionDelete
+{
+   background-image: url(images/remove-16.png);
+}
 
 .toolbar .onActionAssignWorkflow
 {
    background-image: url(images/workflow-16.png);
 }
+.toolbar .yuimenuitem-disabled .onActionAssignWorkflow
+{
+   background-image: url(images/workflow-16.png);
+}
 
 .toolbar .onActionManagePermissions
+{
+   background-image: url(images/permissions-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionManagePermissions
 {
    background-image: url(images/permissions-16.png);
 }

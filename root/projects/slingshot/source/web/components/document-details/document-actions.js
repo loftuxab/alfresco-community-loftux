@@ -375,15 +375,15 @@
                {
                   this.destroy();
                   me._onActionDeleteConfirm.call(me, this.docData);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function DocumentActions_onActionDelete_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },

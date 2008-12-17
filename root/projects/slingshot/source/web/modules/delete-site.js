@@ -145,20 +145,20 @@
             noEscape: true,
             buttons: [
                {
-                  text: Alfresco.util.message("button.ok", this.name),
+                  text: Alfresco.util.message("button.delete", this.name),
                   handler: function DS_delete()
                   {
                      this.destroy();
                      me._onDeleteClick.call(me, c);
-                  },
-                  isDefault: true
+                  }
                },
                {
                   text: Alfresco.util.message("button.cancel", this.name),
                   handler: function DL_cancel()
                   {
                      this.destroy();
-                  }
+                  },
+                  isDefault: true
                }]
          });
       },
@@ -179,15 +179,15 @@
                   {
                      this.destroy();
                      me._onConfirmedDeleteClick.call(me, c);
-                  },
-                  isDefault: true
+                  }
                },
                {
                   text: Alfresco.util.message("button.no", this.name),
                   handler: function DL_cancel()
                   {
                      this.destroy();
-                  }
+                  },
+                  isDefault: true
                }]
          });
       },

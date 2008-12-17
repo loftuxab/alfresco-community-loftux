@@ -550,15 +550,15 @@
                {
                   this.destroy();
                   me._onActionDeleteConfirm.call(me, files);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function DLTB_onActionDelete_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },

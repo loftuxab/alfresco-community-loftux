@@ -425,15 +425,15 @@
                {
                   this.destroy();
                   me._onDeleteCommentConfirm.call(me, row);
-               },
-               isDefault: true
+               }
             },
             {
                text: this._msg("button.cancel"),
                handler: function BlogComment_onDeleteComment_cancel()
                {
                   this.destroy();
-               }
+               },
+               isDefault: true
             }]
          });
       },
