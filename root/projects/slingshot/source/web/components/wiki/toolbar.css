@@ -24,7 +24,7 @@
 
 .toolbar .navigation-bar
 {
-   padding:2px 1em 2px 0.5em;
+   padding:2px 1em;
    line-height: 30px;
    height: 30px;
    background-color: #D6DEE3;
@@ -98,3 +98,8 @@
 {
    width: 70%;
 }
+
+div.divTopicListTopics
+{
+   border: 1px solid red;
+}           

@@ -15,6 +15,10 @@
 <head>
    <title>Alfresco Share &raquo; ${page.title}</title>
 
+<!-- Shortcut Icons -->
+   <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 
+   <link rel="icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" />
+
 <!-- Site-wide YUI Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
    <link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/${theme}/skin.css" />

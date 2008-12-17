@@ -78,7 +78,7 @@
        * @property widgets
        * @type object
        */
-       widgets: {},
+      widgets: null,
       
       /**
        * Set messages for this component.
@@ -144,11 +144,11 @@
          Dom.get(this.id + "-tags").innerHTML = tagsHtml;
          
          // render permissions values
-         var unknownPerm = Alfresco.util.message("document-info.unknown", this.name);
-         var managerPerms = unknownPerm;
-         var collaboratorPerms = unknownPerm;
-         var consumerPerms = unknownPerm;
-         var everyonePerms = unknownPerm;
+         var noPerms = Alfresco.util.message("document-info.role.None", this.name);
+         var managerPerms = noPerms;
+         var collaboratorPerms = noPerms;
+         var consumerPerms = noPerms;
+         var everyonePerms = noPerms;
          
          var rawPerms = docData.permissions.roles;
          for (var x = 0; x < rawPerms.length; x++)

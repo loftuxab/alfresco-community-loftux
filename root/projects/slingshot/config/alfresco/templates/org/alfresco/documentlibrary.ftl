@@ -23,8 +23,11 @@
             }
          }
          
-         url += Alfresco.util.toQueryString(qs) + "#" + hash.substring(1);
-         window.location.replace(url);
+         if (hash.length > 0)
+         {
+            url += Alfresco.util.toQueryString(qs) + "#" + hash.substring(1);
+            window.location.replace(url);
+         }
       }
    })();
    //]]></script>

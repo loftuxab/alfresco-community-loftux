@@ -15,6 +15,12 @@
    font-size: 116%;
 }
 
+.wikipage div.pageTitle,
+.wikipage .publishedDetails
+{
+   padding-left: 1em;
+}
+
 .wikipage .pageCopy
 {
    line-height: 150%;

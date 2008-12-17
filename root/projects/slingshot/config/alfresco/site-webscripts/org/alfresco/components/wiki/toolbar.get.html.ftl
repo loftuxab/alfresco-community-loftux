@@ -10,18 +10,20 @@
    <div class="navigation-bar">
       <div>
          <#if args.showBackLink == "true">
-         <span class="forwardLink">
+         <span class="<#if (page.url.args.listViewLinkBack! == "true")>backLink<#else>forwardLink</#if>">
             <a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">${msg("link.listView")}</a>
          </span>
          </#if>
+         <#if page.url.args.title! != "Main_Page">         
          <span class="forwardLink">
-            <a href="${url.context}/page/site/${page.url.templateArgs.site!""}/wiki-page?filter=main&amp;title=Main_Page">${msg("link.mainPage")}</a>
+            <a href="${url.context}/page/site/${page.url.templateArgs.site!""}/wiki-page?filter=main&amp;title=Main_Page<#if args.showBackLink != "true">&amp;listViewLinkBack=true</#if>">${msg("link.mainPage")}</a>
          </span>
+         </#if>
       </div>
    </div>
 
    <div class="action-bar">
-      <div class="new-page"><a href="${page.url.context}/page/site/${page.url.templateArgs["site"]}/wiki-create" id="${args.htmlid}-create-button">${msg("button.create")}</a></div>
+      <div class="new-page"><a href="${page.url.context}/page/site/${page.url.templateArgs["site"]}/wiki-create<#if args.showBackLink != "true">?listViewLinkBack=true</#if>" id="${args.htmlid}-create-button">${msg("button.create")}</a></div>
       <div class="separator">&nbsp;</div>
       <div class="delete-page"><a href="#" id="${args.htmlid}-delete-button">${msg("button.delete")}</a></div>
       <div class="separator">&nbsp;</div>

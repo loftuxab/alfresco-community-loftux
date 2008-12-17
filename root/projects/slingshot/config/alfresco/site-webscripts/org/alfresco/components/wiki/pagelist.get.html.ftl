@@ -9,17 +9,17 @@
 <#list pageList.pages as p>
    <div class="wikipage <#if p.tags??><#list p.tags as t>wp-${t}<#if t_has_next> </#if></#list></#if>">
    <div class="actionPanel">
-      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit">${msg("link.edit")}</a></div>
-      <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details">${msg("link.details")}</a></div>
+      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit&amp;listViewLinkBack=true">${msg("link.edit")}</a></div>
+      <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details&amp;listViewLinkBack=true">${msg("link.details")}</a></div>
       <div class="deletePage"><a href="#" class="delete-link" title="${p.name}">${msg("link.delete")}</a></div>
    </div>
-   <div class="pageTitle"><a class="pageTitle" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}">${p.title}</a></div>
+   <div class="pageTitle"><a class="pageTitle" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&listViewLinkBack=true">${p.title}</a></div>
    <div class="publishedDetails">
-      <span class="attrLabel">${msg("label.creator")}</span> <span class="attrValue"><a href="${url.context}/user/${p.createdByUser?url}/profile">${p.createdBy}</a></span>
+      <span class="attrLabel">${msg("label.creator")}</span> <span class="attrValue"><a href="${url.context}/page/user/${p.createdByUser?url}/profile">${p.createdBy}</a></span>
 		<span class="spacer">&nbsp;</span>
 		<span class="attrLabel">${msg("label.createDate")}</span> <span class="attrValue">${p.createdOn}</span>
 		<span class="spacer">&nbsp;</span>
-		<span class="attrLabel">${msg("label.modifier")}</span> <span class="attrValue"><a href="${url.context}/user/${p.modifiedByUser?url}/profile">${p.modifiedBy}</a></span>
+		<span class="attrLabel">${msg("label.modifier")}</span> <span class="attrValue"><a href="${url.context}/page/user/${p.modifiedByUser?url}/profile">${p.modifiedBy}</a></span>
 		<span class="spacer">&nbsp;</span><br/>
 		<span class="attrLabel">${msg("label.modifiedDate")}</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>
