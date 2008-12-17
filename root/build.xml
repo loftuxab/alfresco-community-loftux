@@ -223,8 +223,9 @@
          <pathelement location="${dir.project.3rdparty.lib}/standard.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/stax-utils-20060502.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/subetha-smtp.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/tlc124.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/tm-extractors-1.0.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/truelicense-1_29.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/truexml-1_29.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/truezip.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/wsdl4j-1.6.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/wss4j.jar" />

@@ -47,7 +47,8 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/spring-2.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/spring-mock-2.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/standard.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/tlc124.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/truelicense-1_29.jar"/>
+    <classpathentry exported="true" kind="lib" path="dependencies/truexml-1_29.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/tlddoc.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/tm-extractors-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/wsdl4j-1.6.2.jar"/>
