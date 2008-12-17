@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<content-association>
-  <source-id>{http://www.alfresco.org/model/content/1.0}content</source-id>
-  <dest-id>view-content</dest-id>
-  <assoc-type>page</assoc-type>
-</content-association>

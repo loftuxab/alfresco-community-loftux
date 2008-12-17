@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component-type>
-	<id>ct-mediaComponent</id>
-	<title>Media Component</title>
-	<description>Media Component</description>
-	<renderer>/components/mediaComponent/component.jsp</renderer>
-</component-type>

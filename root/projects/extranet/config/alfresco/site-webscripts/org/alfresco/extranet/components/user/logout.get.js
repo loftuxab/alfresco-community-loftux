@@ -1,1 +1,0 @@
-sitedata.logout();

@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Add New Component Wizard</shortname>
-  <description>Add New Component Wizard</description>
-  <url>/wizard/addnewcomponent</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

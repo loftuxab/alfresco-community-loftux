@@ -41,6 +41,15 @@ public class CIFSPacketPool {
 	
 	private boolean m_debug;
 	
+	// Allow over sized packet allocations, maximum over sized packet size to allow
+	
+	private boolean m_allowOverSize = true;
+	private int m_maxOverSize = 128 * 1024;		// 128K
+	
+	// Maximum buffer size that the pool provides
+	
+	private int m_maxPoolBufSize;
+	
 	/**
 	 * Class constructor
 	 * 
@@ -48,6 +57,10 @@ public class CIFSPacketPool {
 	 */
 	public CIFSPacketPool( ByteBufferPool bufPool) {
 		m_bufferPool = bufPool;
+		
+		// Set the maximum pooled buffer size
+		
+		m_maxPoolBufSize = m_bufferPool.getLargestSize();
 	}
 	
 	/**
@@ -60,9 +73,33 @@ public class CIFSPacketPool {
 	public final SMBSrvPacket allocatePacket( int reqSiz)
 		throws NoPooledMemoryException {
 		
-		// Allocate the byte buffer for the CIFS packet
+		// Check if the buffer can be allocated from the pool
+
+		byte[] buf = null;
 		
-		byte[] buf = m_bufferPool.allocateBuffer( reqSiz, CIFSAllocateWaitTime);
+		if ( reqSiz < m_maxPoolBufSize) {
+			
+			// Allocate the byte buffer for the CIFS packet
+			
+			buf = m_bufferPool.allocateBuffer( reqSiz, CIFSAllocateWaitTime);
+		}
+
+		// Check if over sized allocations are allowed
+		
+		else if ( allowsOverSizedAllocations() && reqSiz <= getMaximumOverSizedAllocation()) {
+				
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Allocating an over-sized packet, reqSiz=" + reqSiz);
+			
+			// Allocate an over sized packet
+			
+			buf = new byte[reqSiz];
+		}
+
+		// Check if the buffer was allocated
+		
 		if ( buf == null) {
 			
 			// DEBUG
@@ -74,11 +111,6 @@ public class CIFSPacketPool {
 			
 			throw new NoPooledMemoryException( "Request size " + reqSiz);
 		}
-
-		// DEBUG
-		
-		if ( Debug.EnableDbg && hasDebug())
-			Debug.println("[SMB] CIFS Packet allocate reqSiz=" + reqSiz + ", allocSiz=" + buf.length);
 		
 		// Create the CIFS packet
 		
@@ -150,29 +182,44 @@ public class CIFSPacketPool {
 		
 		if ( smbPkt.isQueuedForAsyncIO())
 			Debug.println("*** Packet queued for async I/O, pkt=" + smbPkt);
+
+		// Check if the packet is an over sized packet, just let the garbage collector pick it up
 		
-		// Release the buffer from the CIFS packet back to the pool
+		if ( smbPkt.getBuffer().length <= m_maxPoolBufSize) {
+			
+			// Release the buffer from the CIFS packet back to the pool
+			
+			m_bufferPool.releaseBuffer( smbPkt.getBuffer());
 		
-		m_bufferPool.releaseBuffer( smbPkt.getBuffer());
-		
-		// DEBUG
-		
-		if ( Debug.EnableDbg && hasDebug() && smbPkt.hasAssociatedPacket() == false)
-			Debug.println("[SMB] CIFS Packet released bufSiz=" + smbPkt.getBuffer().length);
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug() && smbPkt.hasAssociatedPacket() == false)
+				Debug.println("[SMB] CIFS Packet released bufSiz=" + smbPkt.getBuffer().length);
+		}
+		else if ( Debug.EnableDbg && hasDebug())
+			Debug.println("[SMB] Over sized packet left for garbage collector");
 		
 		// Check if the packet has an associated packet which also needs releasing
 		
 		if ( smbPkt.hasAssociatedPacket()) {
 
-			// Release the associated packets buffer back to the pool
+			// Check if the associated packet is using an over sized packet
 			
-			m_bufferPool.releaseBuffer( smbPkt.getAssociatedPacket().getBuffer());
-
-			// DEBUG
+			byte[] assocBuf = smbPkt.getAssociatedPacket().getBuffer();
+			if ( assocBuf.length <= m_maxPoolBufSize) {
+				
+				// Release the associated packets buffer back to the pool
+				
+				m_bufferPool.releaseBuffer( smbPkt.getAssociatedPacket().getBuffer());
+	
+				// DEBUG
+				
+				if ( Debug.EnableDbg && hasDebug())
+					Debug.println("[SMB] CIFS Packet released bufSiz=" + smbPkt.getBuffer().length + " and assoc packet, bufSiz=" + smbPkt.getAssociatedPacket().getBuffer().length);
+			}
+			else if ( Debug.EnableDbg && hasDebug())
+				Debug.println("[SMB] Over sized associated packet left for garbage collector");
 			
-			if ( Debug.EnableDbg && hasDebug())
-				Debug.println("[SMB] CIFS Packet released bufSiz=" + smbPkt.getBuffer().length + " and assoc packet, bufSiz=" + smbPkt.getAssociatedPacket().getBuffer().length);
-
 			// Clear the associated packet
 			
 			smbPkt.clearAssociatedPacket();
@@ -196,6 +243,24 @@ public class CIFSPacketPool {
 	public final int getLargestSize() {
 		return m_bufferPool.getLargestSize();
 	}
+
+	/**
+	 * Check if over sized packet allocations are allowed
+	 * 
+	 * @return boolean
+	 */
+	public final boolean allowsOverSizedAllocations() {
+		return m_allowOverSize;
+	}
+	
+	/**
+	 * Return the maximum size of over sized packet that is allowed
+	 * 
+	 * @return int
+	 */
+	public final int getMaximumOverSizedAllocation() {
+		return m_maxOverSize;
+	}
 	
 	/**
 	 * Enable/disable debug output
@@ -213,6 +278,15 @@ public class CIFSPacketPool {
 	 */
 	public final boolean hasDebug() {
 		return m_debug;
+	}
+	
+	/**
+	 * Enable/disable over sized packet allocations
+	 * 
+	 * @param ena
+	 */
+	public final void setAllowOverSizedAllocations(boolean ena) {
+		m_allowOverSize = ena;
 	}
 	
 	/**

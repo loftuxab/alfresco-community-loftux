@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component-type>
-	<id>ct-itemComponent</id>
-	<title>Item Component</title>
-	<description>Item Component</description>
-	<renderer-type>jsp</renderer-type>		
-	<renderer>/components/itemComponent/component.jsp</renderer>
-</component-type>

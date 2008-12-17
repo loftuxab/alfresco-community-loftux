@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<component-type>
-	<id>ct-htmlComponent</id>
-	<title>HTML Component</title>
-	<description>HTML Component Description</description>
-	<renderer-type>java</renderer-type>
-	<renderer>org.alfresco.web.site.ui.MarkupComponentType</renderer>
-</component-type>

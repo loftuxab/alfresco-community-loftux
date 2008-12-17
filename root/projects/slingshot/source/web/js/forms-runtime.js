@@ -857,7 +857,24 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   }
                   else if (!((element.type === "checkbox" || element.type === "radio") && !element.checked))
                   {
-                     formData[name] = value;
+                     if (element.type == "select-multiple")
+                     {
+                        for (var j = 0; j < element.options.length; j++)
+                        {
+                           if (element.options[j].selected)
+                           {
+                              if (formData[name] == undefined)
+                              {
+                                 formData[name] = new Array();
+                              }
+                              formData[name].push(element.options[j].value);
+                           }
+                        }
+                     }
+                     else
+                     {
+                        formData[name] = value;
+                     }
                   }
                }
             }

@@ -9,14 +9,14 @@
    <generator version="1.0">Alfresco (1.0)</generator>
    <link rel="self" href="${absurl(url.full)?xml}" />
    <id>${absurl(url.full)?xml}</id>
-   <title>${title}</title>
+   <title>${title?xml}</title>
 <#if activities?exists && activities?size &gt; 0>
    <updated>${activities[0].date.isoDate}</updated>
    <#list activities as activity>
-      <#assign userLink="<a href=\"${activity.userProfile}\">${activity.fullName}</a>">
-      <#assign siteLink="<a href=\"${activity.sitePage}\">${activity.title}</a>">
+      <#assign userLink="<a href=\"${activity.userProfile}\">${activity.fullName?html}</a>">
+      <#assign siteLink="<a href=\"${activity.sitePage}\">${activity.title?html}</a>">
    <entry xmlns='http://www.w3.org/2005/Atom'>
-      <title>${activity.title!genericTitle}</title>
+      <title><#if activity.title??>${activity.title?xml}<#else>${genericTitle?xml}</#if></title>
       <link rel="alternate" type="text/html" href="${absurl(activity.sitePage)}" />
       <id>${absurl(activity.sitePage)}</id>
       <updated>${activity.date.isoDate}</updated>
@@ -24,7 +24,7 @@
          <![CDATA[${msg(activity.type, siteLink, userLink, activity.custom0, activity.custom1)}]]>
       </summary>
       <author>
-         <name>${activity.fullName!""}</name>
+         <name>${activity.fullName?xml}</name>
          <uri>${absurl(activity.userProfile)}</uri>
       </author> 
    </entry>
