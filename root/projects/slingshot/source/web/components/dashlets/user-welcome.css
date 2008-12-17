@@ -1,3 +1,8 @@
+div.dashlet.user-welcome .scrollableList
+{
+   padding: 0px;
+}
+
 div.dashlet.user-welcome div.detail-list-item-alt
 {
    background-color: #fffbdd;
