@@ -25,9 +25,9 @@
    <div class="action-bar">
       <div class="new-page"><a href="${page.url.context}/page/site/${page.url.templateArgs["site"]}/wiki-create<#if args.showBackLink != "true">?listViewLinkBack=true</#if>" id="${args.htmlid}-create-button">${msg("button.create")}</a></div>
       <div class="separator">&nbsp;</div>
-      <div class="delete-page"><a href="#" id="${args.htmlid}-delete-button">${msg("button.delete")}</a></div>
+      <div class="delete-page"><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
       <div class="separator">&nbsp;</div>
-      <div class="rename-page"><a href="#" id="${args.htmlid}-rename-button">${msg("button.rename")}</a></div>
+      <div class="rename-page"><button id="${args.htmlid}-rename-button">${msg("button.rename")}</button></div>
    </div>
 
    <div class="rss-feed">
