@@ -32,6 +32,8 @@ import org.alfresco.module.vti.VtiResponse;
 import org.alfresco.module.vti.metadata.dic.VtiConstraint;
 import org.alfresco.module.vti.metadata.dic.VtiProperty;
 import org.alfresco.module.vti.metadata.dic.VtiType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling OpenService Method
@@ -40,6 +42,9 @@ import org.alfresco.module.vti.metadata.dic.VtiType;
  */
 public class OpenServiceMethod extends AbstractVtiMethod
 {
+    
+    private static Log logger = LogFactory.getLog(OpenServiceMethod.class);
+            
     private static final String METHOD_NAME = "open service";
 
     public String getName()
@@ -52,7 +57,21 @@ public class OpenServiceMethod extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())        
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
+        String alfrescoContext = request.getAlfrescoContextName();
+        String realContext = request.getContextPath();
+        if (!realContext.equalsIgnoreCase(alfrescoContext))
+        {            
+            response.getOutputStream().close();
+        }
         String service_name = request.getParameter("service_name");
+        if (logger.isDebugEnabled())        
+        {
+            logger.debug("Opening service with name: '" + service_name + "'");
+        }
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
         response.beginList("service");
         response.addParameter("service_name=" + (service_name.equals("/") ? "" : service_name));
@@ -65,13 +84,16 @@ public class OpenServiceMethod extends AbstractVtiMethod
         response.writeMetaDictionary(VtiProperty.SERVICE_SERVERTZ, VtiType.STRING, VtiConstraint.X, vtiHandler.getServertimeZone());
         response.writeMetaDictionary(VtiProperty.SERVICE_SOURCECONTROLSYSTEM, VtiType.STRING, VtiConstraint.R, "lw");
         response.writeMetaDictionary(VtiProperty.SERVICE_SOURCECONTROLVERSION, VtiType.STRING, VtiConstraint.R, "V1");
-        response.writeMetaDictionary(VtiProperty.SERVICE_DOCLIBWEBVIEWENABLED, VtiType.INT, VtiConstraint.X, "0");
-        response.getOutputStream().print("<li>vti_sourcecontrolcookie\n");
-        response.getOutputStream().print("<li>SX|fp_internal\n");
-        response.getOutputStream().print("<li>vti_sourcecontrolproject\n");
-        response.getOutputStream().print("<li>SX|&#60;STS-based Locking&#62;\n");
+        response.writeMetaDictionary(VtiProperty.SERVICE_DOCLIBWEBVIEWENABLED, VtiType.INT, VtiConstraint.X, "1");
+        response.writeMetaDictionary(VtiProperty.SERVICE_SOURCECONTROLCOOKIE, VtiType.STRING, VtiConstraint.X, "fp_internal");        
+        response.writeMetaDictionary(VtiProperty.SERVICE_SOURCECONTROLPROJECT, VtiType.STRING, VtiConstraint.X, "&#60;STS-based Locking&#62;");        
         response.endList();
         response.endList();
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());            
+        }
     }
 }

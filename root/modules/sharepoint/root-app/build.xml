@@ -12,7 +12,9 @@
    <property name="tomcat.home" value="${env.TOMCAT_HOME}" />
    
    <path id="class.path">
-      <fileset dir="${tomcat.home}/common/lib" includes="**/*.jar" />
+      <fileset dir="../../../projects/3rd-party/lib/devenv">
+         <include name="**/*.jar" />
+      </fileset>
    </path>
    
    <target name="clean">

@@ -30,9 +30,12 @@ import java.util.EnumSet;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.Document;
 import org.alfresco.module.vti.metadata.dic.options.PutOption;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling "put document" method
@@ -42,6 +45,8 @@ import org.alfresco.module.vti.metadata.dic.options.PutOption;
  */
 public class PutDocumentMethod extends AbstractVtiMethod
 {
+
+    private static Log logger = LogFactory.getLog(PutDocumentMethod.class);
 
     /**
      * Default constructor
@@ -57,13 +62,18 @@ public class PutDocumentMethod extends AbstractVtiMethod
     @Override
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         String serviceName = request.getParameter("service_name", "");
         Document document = request.getParameter("document", new Document());
         EnumSet<PutOption> putOptionSet = PutOption.getOptions(request.getParameter("put_option"));
         String comment = request.getParameter("comment", "");
         boolean keepCheckedOut = request.getParameter("keep_checked_out", false);
-        boolean validateWelcomeNames = request.getParameter("validateWelcomeNames", false);
+        boolean validateWelcomeNames = request.getParameter("validateWelcomeNames", false);        
         
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
         DocMetaInfo docMetaInfo = vtiHandler.putDocument(serviceName, document, putOptionSet, comment, keepCheckedOut, validateWelcomeNames);
 
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
@@ -75,6 +85,11 @@ public class PutDocumentMethod extends AbstractVtiMethod
         response.endList();
         response.endList();
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
     /**

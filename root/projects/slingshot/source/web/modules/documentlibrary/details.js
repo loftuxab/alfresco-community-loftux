@@ -255,6 +255,23 @@
          // OK button submits the form
          this.modules.form.setSubmitElements(this.widgets.okButton);
 
+         // Hide dialog and disable ok button after submit and display a waitin message
+         this.modules.form.doBeforeFormSubmit = {
+            fn: function(){
+               this.widgets.okButton.set("disabled", true);
+               this.widgets.cancelButton.set("disabled", true);
+               this.widgets.dialog.hide();
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.saving", this.name),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
+            },
+            obj: null,
+            scope: this
+         }
+
          // JSON submit type
          this.modules.form.setAJAXSubmit(true,
          {
@@ -263,7 +280,11 @@
                fn: this.onSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.details.failure")
+            failureCallback:
+            {
+               fn: this.onFailure,
+               scope: this
+            }
          });
          this.modules.form.setSubmitAsJSON(true);
 
@@ -295,6 +316,25 @@
             }
          });
          
+      },
+
+      /**
+       * Details form submit failure handler
+       *
+       * @method onFailure
+       * @param response {object} Server response object
+       */
+      onFailure: function DLD_onFailure(response)
+      {
+         this.widgets.feedbackMessage.destroy();
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+         this.widgets.dialog.show();
+
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: this._msg("message.details.failure")
+         });         
       },
 
       /**
@@ -411,6 +451,10 @@
             Dom.addClass(this.id + "-mimetype-field", "hidden");
             Dom.get(this.id + "-mimetype").name = "-";
          }
+
+         // Enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
 
          // Initialise the form
          this.modules.form.init();

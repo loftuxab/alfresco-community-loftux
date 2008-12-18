@@ -32,8 +32,11 @@ import java.util.List;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling "remove documents" method
@@ -44,6 +47,8 @@ import org.alfresco.module.vti.metadata.DocsMetaInfo;
 public class RemoveDocumentsMethod extends AbstractVtiMethod
 {
 
+    private static Log logger = LogFactory.getLog(RemoveDocumentsMethod.class);
+            
     /**
      * Default constructor 
      */
@@ -58,13 +63,18 @@ public class RemoveDocumentsMethod extends AbstractVtiMethod
     @Override
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         String serviceName = request.getParameter("service_name", "");
         List<String> urlList = request.getParameter("url_list", new LinkedList<String>());
         // parameter time_tokens has been deprecated in Microsoft 
         // Windows SharePoint Services and the method does not act upon its value
         //List<Date> timeTokens = request.getParameter("time_tokens", new LinkedList<Date>());
-        boolean validateWelcomeNames = request.getParameter("validateWelcomeNames", false);
+        boolean validateWelcomeNames = request.getParameter("validateWelcomeNames", false);        
         
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
         /*if (timeTokens.isEmpty() || urlList.size() != timeTokens.size())
         {
             // TODO: throw exception or may be move this check to protocol handler
@@ -106,6 +116,11 @@ public class RemoveDocumentsMethod extends AbstractVtiMethod
         response.beginList("failed_dirs");
         response.endList();
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
     /** 

@@ -24,6 +24,10 @@
 					<property name="servlet" ref="vtiResourceServlet"/>
 				</bean>
 				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
+					<property name="pattern" value="browser_servlet" />
+					<property name="servlet" ref="vtiBrowserServlet" />
+				</bean>
+				<bean class="org.alfresco.module.vti.httpconnector.ServletPattern">
 					<property name="pattern" value="*.asmx"/>
 					<property name="servlet" ref="soap"/>
 				</bean>
@@ -105,6 +109,7 @@
         <property name="acceptRules">
         	<map>
                 <entry key="User-Agent"><value>(FrontPage)|(Microsoft Data Access Internet Publishing Provider Protocol Discovery)|(Microsoft Office)</value></entry>
+                <entry key="URL"><value>.*\.vti</value></entry>
             </map>
         </property>
     </bean>   
@@ -164,7 +169,11 @@
 		<property name="fileFolderService" ref="FileFolderService" />
 		<property name="checkOutCheckInService" ref="CheckoutCheckinService" />
 		<property name="authenticationService" ref="AuthenticationService" />
-                <property name="contentService" ref="ContentService" />
+		<property name="contentService" ref="ContentService" />
+	</bean>
+	
+	<bean id="vtiBrowserServlet" class="org.alfresco.module.vti.VtiBrowserServlet">
+		<property name="handler" ref="dwsServiceHandler" />		
 	</bean>
 	
 	<bean id="soap" class="org.springframework.ws.transport.http.MessageDispatcherServlet">

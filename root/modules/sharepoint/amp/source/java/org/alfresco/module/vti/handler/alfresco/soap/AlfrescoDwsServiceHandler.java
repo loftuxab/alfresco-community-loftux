@@ -24,29 +24,21 @@
  */
 package org.alfresco.module.vti.handler.alfresco.soap;
 
+import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.model.FileFolderService;
-import org.alfresco.service.cmr.model.FileInfo;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.AccessPermission;
-import org.alfresco.service.cmr.security.AccessStatus;
-import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.AuthorityType;
-import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.Pair;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.WebServiceErrorCodeException;
@@ -66,6 +58,21 @@ import org.alfresco.module.vti.metadata.soap.dws.SchemaBean;
 import org.alfresco.module.vti.metadata.soap.dws.SchemaFieldBean;
 import org.alfresco.module.vti.metadata.soap.dws.UserBean;
 import org.alfresco.module.vti.metadata.soap.dws.WorkspaceType;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessPermission;
+import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.Pair;
+import org.apache.commons.httpclient.HttpException;
 
 /**
  * Alfresco implementation of DwsServiceHandler interface
@@ -81,8 +88,19 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
     private PermissionService permissionService;
     private AuthenticationService authenticationService;
     private PersonService personService;
+    private AuthorityService authorityService;
 
     private VtiPathHelper pathHelper;
+    
+    private Map<String, String> pagesMap;
+
+	public Map<String, String> getPagesMap() {
+		return pagesMap;
+	}
+
+	public void setPagesMap(Map<String, String> pagesMap) {
+		this.pagesMap = pagesMap;
+	}
 
     public void setPathHelper(VtiPathHelper pathHelper)
     {
@@ -118,12 +136,18 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
     {
         this.personService = personService;
     }
+    
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
 
     public DwsMetadata getDWSMetaData(String document, String id, boolean minimal) throws Exception
     {
+        String dws = EndpointUtils.getDwsFromUri();
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String dws = URLDecoder.decode(document.substring(0, document.lastIndexOf('/')).replaceAll("http://"+host+context+"/", ""), "UTF-8");
+        
         // get the nodeRef for current dws
         FileInfo dwsNode = pathHelper.resolvePathFileInfo(dws);
         
@@ -133,12 +157,12 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         }               
         
         DwsMetadata dwsMetadata = new DwsMetadata();
-        //TODO set usefull urls 
-        dwsMetadata.setSubscribeUrl("http://" + host + context);
+                
+        dwsMetadata.setSubscribeUrl("http://" + host + context + dws + "/subscribe.vti");
         dwsMetadata.setMtgInstance("");
-        dwsMetadata.setSettingsUrl("http://" + host + context);
-        dwsMetadata.setPermsUrl("http://" + host + context);
-        dwsMetadata.setUserInfoUrl("http://" + host + context);
+        dwsMetadata.setSettingsUrl("http://" + host + context + dws + "/siteSettings.vti");
+        dwsMetadata.setPermsUrl("http://" + host + context + dws + "/siteGroupMembership.vti");
+        dwsMetadata.setUserInfoUrl("http://" + host + context + dws + "/userInformation.vti");
 
         // adding the list of roles
         dwsMetadata.setRoles(permissionService.getSettablePermissions(ContentModel.TYPE_FOLDER));
@@ -219,7 +243,7 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         DwsData dwsData = new DwsData();        
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String dws = URLDecoder.decode(document.substring(0, document.lastIndexOf('/')).replaceAll("http://"+host+context+"/", ""), "UTF-8");
+        String dws = EndpointUtils.getDwsFromUri();
         
         FileInfo dwsInfo = pathHelper.resolvePathFileInfo(dws); 
         
@@ -245,7 +269,9 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         
         addDwsContentRecursive(dwsInfo, dws_content, dws + "/");               
         
-        dwsData.setDocumentsList(dws_content);        
+        dwsData.setDocumentsList(dws_content); 
+        
+        dwsData.setDocLibUrl("http://" + host + context + dws + "/documentLibrary.vti");
 
         dwsData.setLastUpdate(lastUpdate);
         
@@ -280,7 +306,9 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         else
         {
             // this means that no path was provided then lets create new dws in user's home space
-            dwsUrl = pathHelper.getUserHomeLocation() + "/" + dwsUrl;            
+            String userHome = pathHelper.getUserHomeLocation();
+            if (!userHome.equals(""))
+                dwsUrl = pathHelper.getUserHomeLocation() + "/" + dwsUrl;            
         }
 
         FileInfo dwsFileInfo = pathHelper.resolvePathFileInfo(dwsUrl);
@@ -327,7 +355,7 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
 
         DwsBean dwsBean = new DwsBean();
         dwsBean.setDoclibUrl(dwsUrl);
-        dwsBean.setUrl("http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + "/");
+        dwsBean.setUrl("http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + "?nodeId=" + dwsFileInfo.getNodeRef().getId()+ "&");
         dwsBean.setParentWeb(parentDwsUrl);
 
         return dwsBean;
@@ -512,6 +540,31 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         
     }
     
+    public void handleRedirect(HttpServletRequest req, HttpServletResponse resp) throws HttpException, IOException
+    {
+        String uuid = req.getParameter("nodeId");
+        
+        String uri = req.getRequestURI();
+        String redirectTo;
+        
+        if (uuid != null)
+        {
+            // open site in browser
+            final NodeRef siteNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, uuid.toLowerCase());
+            redirectTo = pagesMap.get("siteInBrowser");
+            redirectTo = redirectTo.replace("...", siteNodeRef.getId());
+        }
+        else
+        {
+            // gets the action is performed
+            String action = uri.substring(uri.lastIndexOf("/") + 1, uri.indexOf(".vti"));
+            redirectTo = pagesMap.get(action);
+        }
+        
+        resp.addCookie(new Cookie("alfUser", ""));
+        resp.sendRedirect(redirectTo);
+    } 
+    
     
     /*
      * Collect information about files and folders in current dws     
@@ -539,6 +592,12 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
             String editor = (String)nodeService.getProperty(fileInfo.getNodeRef(), ContentModel.PROP_MODIFIER);
             
             result.add(new DocumentBean(id, progID, fileRef, objType, created, author, modified, editor));          
+            
+            // word dont show list of documents longer then 99 itmes 
+            if (result.size() > 99)
+            {
+                return;
+            }
             
             // enter in other folders recursively
             if (fileInfo.isFolder())
@@ -593,15 +652,43 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
                     users.add(authority);
                 }
                 
-                NodeRef person = personService.getPerson(authority);
-                
-                String loginName = (String)nodeService.getProperty(person, ContentModel.PROP_USERNAME);                
-                String email = (String)nodeService.getProperty(person, ContentModel.PROP_EMAIL);
-                String firstName = (String)nodeService.getProperty(person, ContentModel.PROP_FIRSTNAME);
-                String lastName = (String)nodeService.getProperty(person, ContentModel.PROP_LASTNAME);                
-                boolean isDomainGroup = (permission.getAuthorityType() == AuthorityType.GROUP ? true : false);
-                
-                members.add(new MemberBean(loginName, firstName + ' ' + lastName, loginName, email, isDomainGroup));
+                if (permission.getAuthorityType() == AuthorityType.GROUP)
+                {
+                    members.add(new MemberBean(authority, authority, "", "", true));
+                    Set<String> authorities = authorityService.getContainedAuthorities(AuthorityType.USER, authority, false);
+                    for (String user : authorities)
+                    {
+                        if (users.contains(user))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            users.add(user);
+                        }    
+                        NodeRef person = personService.getPerson(user);
+                        
+                        String loginName = (String)nodeService.getProperty(person, ContentModel.PROP_USERNAME);                
+                        String email = (String)nodeService.getProperty(person, ContentModel.PROP_EMAIL);
+                        String firstName = (String)nodeService.getProperty(person, ContentModel.PROP_FIRSTNAME);
+                        String lastName = (String)nodeService.getProperty(person, ContentModel.PROP_LASTNAME);                
+                        boolean isDomainGroup = false;
+                        
+                        members.add(new MemberBean(loginName, firstName + ' ' + lastName, loginName, email, isDomainGroup));
+                    }
+                }
+                else
+                {
+                    NodeRef person = personService.getPerson(authority);
+                    
+                    String loginName = (String)nodeService.getProperty(person, ContentModel.PROP_USERNAME);                
+                    String email = (String)nodeService.getProperty(person, ContentModel.PROP_EMAIL);
+                    String firstName = (String)nodeService.getProperty(person, ContentModel.PROP_FIRSTNAME);
+                    String lastName = (String)nodeService.getProperty(person, ContentModel.PROP_LASTNAME);                
+                    boolean isDomainGroup = false;
+                    
+                    members.add(new MemberBean(loginName, firstName + ' ' + lastName, loginName, email, isDomainGroup));                    
+                }
             }
         }
         
@@ -619,5 +706,5 @@ public class AlfrescoDwsServiceHandler implements DwsServiceHandler
         }
         
         return members;     
-    }
+    }    
 }

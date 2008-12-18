@@ -30,7 +30,10 @@ import java.util.Date;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Michael Shavnev
@@ -39,6 +42,8 @@ import org.alfresco.module.vti.metadata.DocMetaInfo;
 public class UncheckoutDocumentMethod extends AbstractVtiMethod
 {
 
+    private static Log logger = LogFactory.getLog(UncheckoutDocumentMethod.class);
+
     public String getName()
     {
         return "uncheckout document";
@@ -46,12 +51,18 @@ public class UncheckoutDocumentMethod extends AbstractVtiMethod
 
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         String serviceName  = request.getParameter("service_name", "");
         String documentName  = request.getParameter("document_name", "");
         boolean force  = request.getParameter("force", false);
         Date timeCheckedOut  = request.getParameter("time_checked_out", new Date());
         boolean rlsshortterm  = request.getParameter("rlsshortterm", false);
-        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);
+        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);        
+        
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));   
 
         DocMetaInfo docMetaInfo = vtiHandler.uncheckOutDocument(serviceName, documentName, force, timeCheckedOut, rlsshortterm, validateWelcomeNames);
 
@@ -62,6 +73,11 @@ public class UncheckoutDocumentMethod extends AbstractVtiMethod
         
         response.endList();
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
 }

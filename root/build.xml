@@ -405,13 +405,11 @@
                     deploy-jboss" />
    -->
 
-   <target name="build-sharepoint" depends="clean-sharepoint, incremental-webclient-tomcat">
-      <ant dir="${dir.modules}/sharepoint/amp" target="deploy" />
-      <ant dir="${dir.modules}/sharepoint/root-app" target="deploy" />
-      <copy file="${dir.modules}/sharepoint/amp/build/dist/vti-module.amp"
-            todir="${dir.projects}/installer" />
-      <copy file="${dir.modules}/sharepoint/root-app/build/dist/ROOT.war"
-            todir="${dir.projects}/installer" />
+   <target name="build-sharepoint" 
+           depends="clean-sharepoint, incremental-webclient-tomcat, incremental-slingshot-tomcat">
+      <ant dir="${dir.module.sharepoint}/amp" target="deploy" />
+      <ant dir="${dir.module.sharepoint}/share-amp" target="deploy" />
+      <ant dir="${dir.module.sharepoint}/root-app" target="deploy" />
    </target>
    
    <target name="generate-docs" 
@@ -517,8 +515,12 @@
        </delete>
    </target>
    
-   <target name="clean-sharepoint" depends="clean-webclient-tomcat-deploy">
-      <ant dir="${dir.modules}/sharepoint/root-app" target="undeploy" />
+   <target name="clean-sharepoint" 
+           depends="clean-webclient-tomcat-deploy, clean-application-tomcat-deploy">
+      <ant dir="${dir.module.sharepoint}/amp" target="clean" />
+      <ant dir="${dir.module.sharepoint}/share-amp" target="clean" />
+      <ant dir="${dir.module.sharepoint}/root-app" target="clean" />
+      <ant dir="${dir.module.sharepoint}/root-app" target="undeploy" />
    </target>
       
    <!--

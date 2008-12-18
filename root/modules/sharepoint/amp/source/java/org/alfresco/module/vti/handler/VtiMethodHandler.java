@@ -33,6 +33,9 @@ import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
 import org.alfresco.module.vti.metadata.Document;
+import org.alfresco.module.vti.metadata.dialog.DialogsMetaInfo;
+import org.alfresco.module.vti.metadata.dic.VtiSort;
+import org.alfresco.module.vti.metadata.dic.VtiSortField;
 import org.alfresco.module.vti.metadata.dic.options.GetOption;
 import org.alfresco.module.vti.metadata.dic.options.PutOption;
 import org.alfresco.module.vti.metadata.dic.options.RenameOption;
@@ -202,4 +205,18 @@ public interface VtiMethodHandler
      * @return DocMetaInfo
      */
     public DocMetaInfo putDocument(String serviceName, Document document, EnumSet<PutOption> putOptionSet, String comment, boolean keepCheckedOut, boolean validateWelcomeNames);
+
+    /**
+     * @param siteUrl specifies the server-relative URL of a site
+     * @param location specifies the site-relative URL of a document library or of a folder or file within a document library
+     * @param fileDialogFilterValue specifies the file type extension by which to filter the view in the file dialog box. For example, <i>*.doc</i>, <i>*.txt</i>, or <i>*.htm</i>
+     * @param rootFolder
+     * @param sortField specify the name of the field on which to sort
+     * @param sortDir indicate an <i>ascending (asc)</i> or <i>descending (desc)</i> sort order
+     * @param view
+     * @return DialogsMetaInfo
+     */
+    public DialogsMetaInfo getFileOpen(String siteUrl, String location, List<String> fileDialogFilterValue, String rootFolder, VtiSortField sortField, VtiSort sortDir, String view);
+
+
 }

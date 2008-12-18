@@ -31,6 +31,8 @@ import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.UserGroupServiceHandler;
 import org.alfresco.module.vti.metadata.soap.usergroup.UserBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -50,9 +52,8 @@ public class AddUserCollectionToRoleEndpoint extends VtiEndpoint
     // xml namespace prefix
     private static String prefix = "usergroup";
 
-    /**
-     * @param handler
-     */
+    private static Log logger = LogFactory.getLog(AddUserCollectionToRoleEndpoint.class);
+
     public AddUserCollectionToRoleEndpoint(UserGroupServiceHandler handler)
     {
         super();
@@ -67,16 +68,22 @@ public class AddUserCollectionToRoleEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element requestElement, Document responseDocument) throws Exception
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is started.");
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
 
         // getting document parameter from request
+        if (logger.isDebugEnabled()) 
+            logger.debug("Getting role from request.");
         XPath roleNamePath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/AddUserCollectionToRole/roleName"));
         roleNamePath.setNamespaceContext(nc);
         Element roleName = (Element) roleNamePath.selectSingleNode(requestElement);
 
         // getting document parameter from request
+        if (logger.isDebugEnabled()) 
+            logger.debug("Getting users from request.");        
         XPath usersPath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/AddUserCollectionToRole/usersInfoXml/Users/User"));
         usersPath.setNamespaceContext(nc);
         List<Element> usersElementList = (List<Element>) usersPath.selectNodes(requestElement);
@@ -88,21 +95,25 @@ public class AddUserCollectionToRoleEndpoint extends VtiEndpoint
         }
         
         String role = roleName.getTextTrim();
+        Element root = null;
         if (role != null)
         {
-            String dws = sessionManager.getSession(EndpointUtils.getRequest()).get(VtiEndpoint.DWS).toString();
-            handler.addUserCollectionToRole(dws, role, usersList);
+            String dwsNodeId = EndpointUtils.getRequest().getParameter("nodeId");            
+            if (logger.isDebugEnabled()) { 
+                String users = "";
+                for (UserBean userBean : usersList) {
+                    users += userBean.getDisplayName() + ", ";
+                }
+                logger.debug("Adding users [ " + users + "] to role '" + role + "' for node '" + dwsNodeId + "'");
+            }            
+            handler.addUserCollectionToRole(dwsNodeId, role, usersList);
             // creating soap response
-            Element root = responseDocument.addElement("AddUserCollectionToRoleResponse", namespace);
-            return root;
-        }
-        else
-        {
-            // TODO: error
-            return null;
+            root = responseDocument.addElement("AddUserCollectionToRoleResponse", namespace);            
         }
 
-
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is finished.");
+        return root;
     }
 
 }

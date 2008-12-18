@@ -170,7 +170,15 @@ public class VtiPropfindMethod extends PropFindMethod
         String basePath = baseBuild.toString();        
 
         // Output the response for the root node, depth zero
-        generateResponseForNode(xml, pathNodeInfo, basePath);
+        try
+        {
+            generateResponseForNode(xml, pathNodeInfo, basePath);            
+        }
+        catch (Exception e)
+        {
+            m_response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }        
 
         // If additional levels are required and the root node is a folder then recurse to the required
         // level and output node details a level at a time
@@ -245,7 +253,16 @@ public class VtiPropfindMethod extends PropFindMethod
                             baseBuild.append(curChildInfo.getName());
     
                             // Output the current child node details
-                            generateResponseForNode(xml, curChildInfo, baseBuild.toString());
+                            try
+                            {
+                                generateResponseForNode(xml, curChildInfo, baseBuild.toString());                                
+                            }
+                            catch (Exception e)
+                            {
+                                m_response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                                return;
+                            }
+                            
     
                             // If the child is a folder add it to the list of next level nodes
                             if (nextNodeInfos != null && curChildInfo.isFolder())

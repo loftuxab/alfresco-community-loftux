@@ -52,6 +52,7 @@
 				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://yourserver:8080/alfresco/wcs</endpoint-url>
 				<identity>user</identity>
+				<external-auth>true</external-auth>
 			</endpoint>
 			
 		</remote>

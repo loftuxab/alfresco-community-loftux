@@ -33,6 +33,8 @@ import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling "getDocsMetaInfo" method
@@ -41,24 +43,32 @@ import org.alfresco.module.vti.metadata.DocsMetaInfo;
  */
 public class GetDocsMetaInfoMethod extends AbstractVtiMethod
 {
+    private static Log logger = LogFactory.getLog(GetDocsMetaInfoMethod.class);
+    
     /**
      * Provides the meta-information for the files in the current Web site
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());            
+        }
+        
         String serviceName = request.getParameter("service_name", "");
         boolean listHiddenDocs = request.getParameter("listHiddenDocs", false);
         boolean listLinkInfo = request.getParameter("listLinkInfo", false);
         boolean validateWelcomeNames = request.getParameter("validateWelcomeNames", false);
         List<String> urlList = request.getParameter("url_list", new LinkedList<String>());
-        String alfrescoContext = request.getAlfrescoContextName();
-        //TODO retrives path to the document
+        String context = request.getContextPath();
+        
+        serviceName = request.getRequestURI().substring(context.length() + 1, request.getRequestURI().indexOf("/_vti_bin"));
         for (int i = 0; i < urlList.size(); ++i)
         {
             String url = urlList.get(i);
-            if (url.startsWith("http://" + request.getHeader("Host") + alfrescoContext + "/"))
+            if (url.startsWith("http://" + request.getHeader("Host") + context + "/" + serviceName + "/"))
             {
-                urlList.set(i, url.split("http://" + request.getHeader("Host") + alfrescoContext + "/")[1]);
+                urlList.set(i, url.split("http://" + request.getHeader("Host") + context + "/" + serviceName + "/")[1]);
             }
         }
 
@@ -103,6 +113,11 @@ public class GetDocsMetaInfoMethod extends AbstractVtiMethod
             response.endList();
         }
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
     /**

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="share-vti-amp" default="deploy" basedir=".">	
+   
+   <property name="amp.file" value="share-vti.amp" />
+   <property name="dist.dir" value="${basedir}/build/dist" />
+   <property name="tomcat.home" value="${env.APP_TOMCAT_HOME}" />
+   
+   <path id="class.path">
+      <fileset dir="../../../projects/3rd-party/lib">
+         <include name="**/*.jar" />
+      </fileset>
+      <fileset dir="../../../projects">
+         <include name="**/build/dist/*.jar" />
+      </fileset>	
+   </path>
+   
+   <target name="clean">
+      <delete dir="${dist.dir}" />
+      <mkdir dir="${dist.dir}"/>
+   </target>
+   
+   <target name="amp" depends="clean">
+      <zip destfile="${dist.dir}/${amp.file}" encoding="UTF-8">
+         <fileset dir="${basedir}" includes="config/**/*.*" excludes="config/alfresco/*.properties" />
+         <fileset dir="${basedir}/config/alfresco" includes="*.properties"/>
+      </zip>
+   </target>
+   
+   <target name="deploy" depends="amp">
+      <java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool">
+         <classpath refid="class.path" />
+         <arg line="install ${dist.dir}/${amp.file} ${tomcat.home}/webapps/share.war -force -verbose" />
+      </java>		
+   </target>
+</project>

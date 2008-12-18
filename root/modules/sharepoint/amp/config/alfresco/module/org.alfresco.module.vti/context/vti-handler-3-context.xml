@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <bean id="versionsServiceHandler" class="org.alfresco.module.vti.handler.alfresco.soap.Alfresco3VersionsServiceHandler">
+        <property name="nodeService" ref="NodeService" />
+        <property name="fileFolderService" ref="FileFolderService" />
+        <property name="versionService" ref="VersionService" />
+        <property name="transactionService" ref="transactionService" />
+
+        <property name="pathHelper" ref="vtiPathHelper" />
+    </bean>
+      
+    <bean id="dwsServiceHandler" class="org.alfresco.module.vti.handler.alfresco.soap.Alfresco3DwsServiceHandler">
+    	<property name="fileFolderService" ref="FileFolderService"/>
+    	<property name="nodeService" ref="NodeService"/>    	
+    	<property name="permissionService" ref="PermissionService"/>
+    	<property name="transactionService" ref="transactionService"/>
+    	<property name="authenticationService" ref="AuthenticationService"/>
+    	<property name="authenticationComponent" ref="AuthenticationComponent" />
+    	<property name="personService" ref="PersonService"/>
+    	<property name="authorityService" ref="AuthorityService" /> 
+    	<property name="siteService" ref="siteService" />
+    	<property name="shareUtils" ref="shareUtils" />  	
+    	<property name="sessionManager" ref="vtiSessionManager" />	
+    	
+    	<property name="pathHelper" ref="vtiPathHelper"/>
+    	<property name="pagesMap">
+    		<map>
+    			<entry key="siteInBrowser">
+    				<value>/share/page/site/.../dashboard</value>
+    			</entry>
+    			<entry key="siteSettings">
+    				<value>/share/page/site/.../customise-site</value>
+    			</entry>
+    			<entry key="siteGroupMembership">
+    				<value>/share/page/site/.../site-members</value>
+    			</entry>
+    			<entry key="userInformation">
+    				<value>/share/page/user/.../profile</value>
+    			</entry>
+    			<entry key="documentLibrary">
+    				<value>/share/page/site/.../documentlibrary</value>
+    			</entry>
+    			<entry key="documentDetails">
+    				<value>/share/page/site/.../document-details</value>
+    			</entry>   			
+    		</map>
+    	</property>	
+    </bean>
+    
+    <bean id="userGroupServiceHandler" class="org.alfresco.module.vti.handler.alfresco.soap.Alfresco3UserGroupServiceHandler">    	
+    	<property name="personService" ref="PersonService"/>
+    	<property name="nodeService" ref="NodeService"/> 
+    	<property name="siteService" ref="siteService" />
+    	<property name="transactionService" ref="transactionService" />	   	   	
+    	
+    	<property name="pathHelper" ref="vtiPathHelper"/>    	
+    </bean>
+
+    <bean id="vtiHandlerTarget" class="org.alfresco.module.vti.handler.alfresco.Alfresco3VtiMethodHandler">
+        <property name="nodeService" ref="NodeService" />
+        <property name="fileFolderService" ref="FileFolderService" />
+        <property name="permissionService" ref="PermissionService" />
+        <property name="checkOutCheckInService" ref="CheckoutCheckinService" />
+        <property name="authenticationService" ref="AuthenticationService" />
+        <property name="versionService" ref="VersionService" />
+        <property name="lockService" ref="LockService" />
+        <property name="contentService" ref="ContentService" />
+        <property name="transactionService" ref="transactionService" />
+        <property name="siteService" ref="siteService" />
+
+        <property name="documentHelper" ref="vtiDocumentHelper" />
+        <property name="pathHelper" ref="vtiPathHelper" />
+        <property name="shareUtils" ref="shareUtils" />
+    </bean>
+
+    <bean id="vtiDocumentHelper" class="org.alfresco.module.vti.handler.alfresco.VtiDocumentHepler">
+        <property name="nodeService" ref="NodeService" />
+        <property name="lockService" ref="LockService" />
+        <property name="checkOutCheckInService" ref="CheckoutCheckinService" />
+    </bean>
+
+    <bean id="vtiPathHelper" class="org.alfresco.module.vti.handler.alfresco.VtiPathHelper">
+    
+        <property name="rootPath" value="/app:company_home/st:sites" />
+
+        <property name="storePath" value="workspace://SpacesStore" />        
+
+        <property name="authenticationComponent" ref="AuthenticationComponent" />
+
+        <property name="searchService" ref="SearchService" />
+        <property name="namespaceService" ref="NamespaceService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="fileFolderService" ref="FileFolderService" />
+        <property name="permissionService" ref="PermissionService" />
+        <property name="personService" ref="PersonService" />
+    </bean>
+
+    <bean id="handlerExceptionAdvice" class="org.alfresco.module.vti.handler.alfresco.AlfrescoVtiMethodHandlerThrowsAdvice" />
+
+    <bean id="handlerExceptionPointcutAdvisor" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="mappedName">
+            <value>*</value>
+        </property>
+        <property name="advice">
+            <ref bean="handlerExceptionAdvice" />
+        </property>
+    </bean>
+
+    <bean id="vtiHandler" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.vti.handler.VtiMethodHandler</value>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>handlerExceptionPointcutAdvisor</value>
+            </list>
+        </property>
+        <property name="target" ref="vtiHandlerTarget" />
+    </bean>
+
+    <bean id="vtiAuthService" class="org.alfresco.module.vti.auth.AlfrescoVtiAuthService">
+        <property name="authenticationService" ref="AuthenticationService" />
+    </bean>
+    
+    <bean id="shareUtils" class="org.alfresco.module.vti.handler.alfresco.ShareUtils">
+    	<property name="shareHostWithPort" value="localhost:8080" />
+    	<property name="shareContext" value="/share" />
+    	<property name="shareWelcomeUri" value="/page/site-index" />
+    	<property name="shareLoginUri" value="/login" />
+    	<property name="shareCreateSiteUri" value="/service/modules/create-workspace-site" />
+    	<property name="shareDeleteSiteUri" value="/service/modules/delete-site" />    	
+    	<property name="shareSiteDashboardUri" value="/page/site/.../dashboard" />
+    </bean>
+
+</beans>

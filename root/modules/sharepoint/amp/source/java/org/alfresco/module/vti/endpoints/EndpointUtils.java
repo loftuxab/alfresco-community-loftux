@@ -28,9 +28,12 @@ package org.alfresco.module.vti.endpoints;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.module.vti.httpconnector.VtiServletContainer;
+import org.alfresco.util.Pair;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.ws.transport.context.TransportContext;
 import org.springframework.ws.transport.context.TransportContextHolder;
 import org.springframework.ws.transport.http.HttpServletConnection;
@@ -98,10 +101,10 @@ public class EndpointUtils
         String uri = request.getRequestURI();
         if (uri.startsWith(getContext() + "/_vti_bin"))
             return "";
-        dws = uri.substring(getContext().length() + 1, uri.indexOf("/_vti_bin"));
+        dws = uri.substring(getContext().length(), uri.indexOf("/_vti_bin"));
         try
         {
-            dws = URLDecoder.decode(dws, "UTF-8");                
+            dws = URLDecoder.decode(dws, "UTF-8");
         }catch (UnsupportedEncodingException e) {
             // TODO: handle exception
         }
@@ -113,6 +116,46 @@ public class EndpointUtils
         TransportContext context = TransportContextHolder.getTransportContext();
         HttpServletConnection connection = (HttpServletConnection )context.getConnection();
         return connection.getHttpServletRequest();        
+    }
+    
+    public static String getVtiSessionId()
+    {
+        HttpServletRequest request = getRequest();
+        Cookie[] cookies = request.getCookies();        
+        String result = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("VTISESSION".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return result;
+    }
+    
+    public static Pair<String, String> getCredentials()
+    {
+        Pair<String, String> result = null;
+        String authHdr = getRequest().getHeader("Authorization");    
+
+        if ( authHdr != null && authHdr.length() > 5 && authHdr.substring(0,5).equalsIgnoreCase("BASIC"))
+        {
+            // Basic authentication details present
+            String basicAuth = new String(Base64.decodeBase64(authHdr.substring(5).getBytes()));
+
+            // Split the username and password
+            String username = null;
+            String password = null;
+
+            int pos = basicAuth.indexOf(":");
+            if ( pos != -1)
+            {
+                username = basicAuth.substring(0, pos);
+                password = basicAuth.substring(pos + 1);
+                return new Pair<String, String>(username, password);
+            }           
+        }
+        return result;
     }
     
 }

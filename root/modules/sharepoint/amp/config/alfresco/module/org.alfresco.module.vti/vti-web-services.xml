@@ -26,6 +26,7 @@
 
     <bean id="webUrlFromPageUrlEndpoint" class="org.alfresco.module.vti.endpoints.webs.WebUrlFromPageUrlEndpoint">
         <constructor-arg ref="vtiHandler" />
+        <property name="pathHelper" ref="vtiPathHelper" />        
         <property name="name">
             <value>WebUrlFromPageUrl</value>
         </property>
@@ -66,6 +67,7 @@
             <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
         </property>
         <property name="sessionManager" ref="vtiSessionManager" />
+        <property name="pathHelper" ref="vtiPathHelper" />
     </bean>
 
     <bean id="getVersionsEndpoint" class="org.alfresco.module.vti.endpoints.versions.GetVersionsEndpoint">
@@ -181,7 +183,7 @@
     <bean id="removeDwsUserEndpoint" class="org.alfresco.module.vti.endpoints.dws.RemoveDwsUserEndpoint">
         <constructor-arg ref="dwsServiceHandler" />
         <property name="name">
-            <value>RenameDwsUser</value>
+            <value>RemoveDwsUser</value>
         </property>
         <property name="namespace">
             <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>

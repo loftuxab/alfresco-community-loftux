@@ -321,6 +321,11 @@
          {
              doBeforeDialogShow.fn.call(doBeforeDialogShow.scope || this, this.form, doBeforeDialogShow.obj);
          }
+         // Make sure ok button is in the correct state if fialog is reused  
+         this.widgets.okButton.set("disabled", false);
+         this.form.updateSubmitElements();
+         this.widgets.cancelButton.set("disabled", false);
+
          this.dialog.show();
 
          // Fix Firefox caret issue
@@ -350,7 +355,7 @@
             Dom.get(this.options.firstFocus).focus();
          }
       },
-      
+
       /**
        * Hide the dialog, removing the caret-fix patch
        *
@@ -413,6 +418,11 @@
             {
                fn: this.onSuccess,
                scope: this
+            },
+            failureCallback:
+            {
+               fn: this.onFailure,
+               scope: this
             }
          });
          this.form.setSubmitAsJSON(true);
@@ -429,6 +439,18 @@
          if (typeof doBeforeFormSubmit.fn == "function")
          {
             this.form.doBeforeFormSubmit = doBeforeFormSubmit;
+         }
+         else
+         {
+            // If no specific handler disable buttons before submit to avoid double submits
+            this.form.doBeforeFormSubmit = {
+               fn: function AmSD__defaultDoBeforeSubmit()
+               {
+                  this.widgets.okButton.set("disabled", true);
+                  this.widgets.cancelButton.set("disabled", true);
+               },
+               scope: this
+            }
          }
 
          // Custom ajax before-request interest registered?
@@ -496,7 +518,39 @@
                });
             }
          }
+      },
+
+      /**
+       * Failed data webscript call event handler
+       *
+       * @method onFailure
+       * @param response {object} Server response object
+       */
+      onFailure: function AmSD_onSuccess(response)
+      {
+         // Make sure ok button is in the correct state if fialog is reused
+         this.widgets.okButton.set("disabled", false);
+         this.form.updateSubmitElements();
+         this.widgets.cancelButton.set("disabled", false);
+
+         // Invoke the callback if one was supplied
+         if (typeof this.options.onFailureCallback.fn == "function")
+         {
+            this.options.onFailureCallback.fn.call(this.options.onFailureCallback.scope, this.options.onFailureCallback.obj);
+         }
+         else
+         {
+            if (response.json && response.json.message && response.json.status.name)
+            {
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  title: response.json.status.name,
+                  text: response.json.message
+               });
+            }
+         }
       }
+
 
    };
 })();

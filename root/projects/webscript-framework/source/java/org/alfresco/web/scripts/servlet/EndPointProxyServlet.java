@@ -151,8 +151,7 @@ public class EndPointProxyServlet extends HttpServlet
             // they do not share the same session (annoyingly) so we must apply the ticket directly
             String ticket = req.getParameter(PARAM_ALF_TICKET);
             
-            // user id from session
-            // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?
+            // user id from session NOTE: @see org.alfresco.web.site.UserFactory
             Connector connector;
             String userId = (String)req.getSession().getAttribute(USER_ID);
             if (userId != null)
@@ -162,10 +161,13 @@ public class EndPointProxyServlet extends HttpServlet
             }
             else if (ticket != null ||
                      descriptor.getIdentity() == IdentityType.NONE ||
-                     descriptor.getIdentity() == IdentityType.DECLARED)
+                     descriptor.getIdentity() == IdentityType.DECLARED ||
+                     descriptor.getExternalAuth())
             {
-                // build an unauthenticated/predeclared authentication connector
-                connector = this.connectorService.getConnector(endpointId, req.getSession());                
+                // the authentication for this endpoint is either not required, declared in config or
+                // managed "externally" (i.e. by a servlet filter such as NTLM) - this means we should
+                // proceed on the assumption it will be dealt with later
+                connector = this.connectorService.getConnector(endpointId, req.getSession());
             }
             else if (descriptor.getBasicAuth())
             {

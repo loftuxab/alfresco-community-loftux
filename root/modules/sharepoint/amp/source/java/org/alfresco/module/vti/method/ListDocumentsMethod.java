@@ -31,8 +31,11 @@ import java.util.Map;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling ListDocuments Method
@@ -41,6 +44,8 @@ import org.alfresco.module.vti.metadata.DocsMetaInfo;
  */
 public class ListDocumentsMethod extends AbstractVtiMethod
 {
+    private static Log logger = LogFactory.getLog(ListDocumentsMethod.class);
+            
     private static final String METHOD_NAME = "list documents";
 
 
@@ -60,6 +65,10 @@ public class ListDocumentsMethod extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         String serviceName  = request.getParameter("service_name", "");
         boolean listHiddenDocs = request.getParameter("listHiddenDocs", false);
         boolean listExplorerDocs = request.getParameter("listExplorerDocs", false);
@@ -75,6 +84,8 @@ public class ListDocumentsMethod extends AbstractVtiMethod
         boolean validateWelcomeNames = request.getParameter("validateWelcomeNames", false);
         Map<String, Object> folderList = request.getMetaDictionary("folderList");
         boolean listChildWebs = request.getParameter("listChildWebs", false);
+        
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));  
 
         DocsMetaInfo documents = vtiHandler.getListDocuments(serviceName, listHiddenDocs, listExplorerDocs, platform, initialURL, listRecurse, listLinkInfo,
                 listFolders, listFiles, listIncludeParent, listDerived, listBorders, validateWelcomeNames, folderList, listChildWebs);
@@ -86,7 +97,7 @@ public class ListDocumentsMethod extends AbstractVtiMethod
         for (DocMetaInfo docMetaInfo: fileMetaInfoList)
         {
             response.beginList();
-                response.addParameter("document_name", docMetaInfo.getPath());
+            response.addParameter("document_name", docMetaInfo.getPath().substring(serviceName.length() + 1));
                 response.beginList("meta_info");
                     processDocMetaInfo(docMetaInfo, request, response);
                 response.endList();
@@ -99,7 +110,21 @@ public class ListDocumentsMethod extends AbstractVtiMethod
         for (DocMetaInfo docMetaInfo: folderMetaInfoList)
         {
             response.beginList();
-            response.addParameter("url", docMetaInfo.getPath());
+            if (docMetaInfo.getPath().equalsIgnoreCase(serviceName))
+            {
+                response.addParameter("url", "");
+            }
+            else
+            {
+                if (serviceName.equals(""))                
+                {
+                    response.addParameter("url", docMetaInfo.getPath());                    
+                }                    
+                else
+                {
+                    response.addParameter("url", docMetaInfo.getPath().substring(serviceName.length() + 1));
+                }
+            }                      
             response.beginList("meta_info");
             processDocMetaInfo(docMetaInfo, request, response);
             response.endList();
@@ -108,5 +133,10 @@ public class ListDocumentsMethod extends AbstractVtiMethod
         response.endList();
         
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 }

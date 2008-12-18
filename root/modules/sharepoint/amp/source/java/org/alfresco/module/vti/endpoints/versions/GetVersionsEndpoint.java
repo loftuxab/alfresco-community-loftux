@@ -30,6 +30,8 @@ import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.VersionsServiceHandler;
 import org.alfresco.module.vti.metadata.soap.versions.DocumentVersionBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -50,11 +52,8 @@ public class GetVersionsEndpoint extends VtiEndpoint
     // xml namespace prefix
     private static String prefix = "versions";
 
-    /**
-     * constructor
-     *
-     * @param handler that provides methods for operating with documents and folders
-     */
+    private static Log logger = LogFactory.getLog(GetVersionsEndpoint.class);
+    
     public GetVersionsEndpoint(VersionsServiceHandler handler)
     {
         this.handler = handler;
@@ -69,10 +68,19 @@ public class GetVersionsEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element reqElement, Document document) throws Exception
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is started.");
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
 
+        String host = EndpointUtils.getHost();
+        String context = EndpointUtils.getContext();
+        String dws = EndpointUtils.getDwsFromUri();
+        String sessionId = EndpointUtils.getVtiSessionId();
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Getting fileName parameter from request.");        
         // getting fileName parameter from request
         XPath fileNamePath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/GetVersions/fileName"));
         fileNamePath.setNamespaceContext(nc);
@@ -86,10 +94,13 @@ public class GetVersionsEndpoint extends VtiEndpoint
 
         results.addElement("list").addAttribute("id", "");
         results.addElement("versioning").addAttribute("enabled", "1");
-        results.addElement("settings").addAttribute("url", "");
+        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText() + "&sessionId=" + sessionId);
 
+        if (logger.isDebugEnabled())
+            logger.debug("Getting versions for file '" + dws + "/" + fileName.getText() + "'.");
+        
         // getting all versions for given file
-        List<DocumentVersionBean> versions = handler.getVersions(fileName.getText());
+        List<DocumentVersionBean> versions = handler.getVersions(dws + "/" + fileName.getText());
 
         boolean isCurrent = true;
         for (DocumentVersionBean version : versions)
@@ -99,16 +110,16 @@ public class GetVersionsEndpoint extends VtiEndpoint
             {
                 // prefix @ means that it is current working version, it couldn't be restored or deleted
                 result.addAttribute("version", "@" + version.getVersion());
-                String url = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + "/" + fileName.getTextTrim();
+                String url = "http://" + host + context + dws + "/" + fileName.getTextTrim();
                 result.addAttribute("url", url);
                 isCurrent = false;
             }
             else
             {
                 result.addAttribute("version", version.getVersion());
-                String url = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + version.getUrl();
+                String url = "http://" + host + context + version.getUrl();
                 result.addAttribute("url", url);
-            }
+            }            
             
             result.addAttribute("created", version.getCreatedTime());
             result.addAttribute("createdBy", version.getCreatedBy());
@@ -116,6 +127,17 @@ public class GetVersionsEndpoint extends VtiEndpoint
             result.addAttribute("comments", version.getComments());
         }
 
+        if (logger.isDebugEnabled()) {
+            String versionsStr = "";
+            for (DocumentVersionBean version : versions)
+            {
+                versionsStr += version.getVersion() + " ";
+            }
+            logger.debug("The folloving versions [ "+ versionsStr + "] were retrieved");
+        }            
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is finished.");
         return root;
     }
 

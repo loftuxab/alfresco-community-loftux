@@ -293,7 +293,7 @@
             container: this.options.containerId,
             path: this.currentPath
          });
-         
+
          var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
          {
             // Validation
@@ -303,7 +303,7 @@
             p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
             p_form.setShowSubmitStateDynamically(true, false);
          };
-         
+
          if (!this.modules.createFolder)
          {
             this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder").setOptions(

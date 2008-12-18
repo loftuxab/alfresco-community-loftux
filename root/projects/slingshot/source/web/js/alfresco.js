@@ -671,11 +671,12 @@ Alfresco.util.undoCaretFix = function(p_formElement)
  *
  * @method Alfresco.util.parseJSON
  * @param jsonStr {string} Message id to resolve
+ * @param jsonStr {boolean} Will display a message informing about bad json syntax if any
  * @return {object} The object representing the json str
  * @throws {Error} if str contains invalid json
  * @static
  */
-Alfresco.util.parseJSON = function(jsonStr)
+Alfresco.util.parseJSON = function(jsonStr, displayError)
 {
    try
    {
@@ -683,11 +684,14 @@ Alfresco.util.parseJSON = function(jsonStr)
    }
    catch(error)
    {
-      Alfresco.util.PopupManager.displayPrompt(
+      if(displayError)
       {
-         title: "Failure",
-         text: "Can't parse response as json: '" + jsonStr + "'"
-      });
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: "Failure",
+            text: "Can't parse response as json: '" + jsonStr + "'"
+         });
+      }
    }
    return null;
 }
@@ -1714,11 +1718,18 @@ Alfresco.util.Ajax = function()
          {
             if (callback && typeof callback.fn == "function")
             {
+               // If the caller has defined an error message display that instead of displaying message about bad json syntax
+               var displayBadJsonResult = true;
+               if(config.failureMessage)
+               {
+                  displayBadJsonResult = false;
+               }
+
                // User provided a custom failureHandler
                var json = null;
                if (config.responseContentType === "application/json")
                {
-                  json = Alfresco.util.parseJSON(serverResponse.responseText);
+                  json = Alfresco.util.parseJSON(serverResponse.responseText, displayBadJsonResult);
                }
                callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
                {

@@ -60,8 +60,7 @@ public enum VtiProperty
     FILE_SOURCECONTROLCHECKEDOUTBY ("vti_sourcecontrolcheckedoutby"),
     FILE_SOURCECONTROLTIMECHECKEDOUT ("vti_sourcecontroltimecheckedout"),
     FILE_THICKETSUPPORTINGFILE ("vti_thicketsupportingfile"),
-    FILE_SOURCECONTROLLOCKEXPIRES ("vti_sourcecontrollockexpires"),
-    FILE_SOURCECONTROLCOOKIE ("vti_sourcecontrolcookie"),
+    FILE_SOURCECONTROLLOCKEXPIRES ("vti_sourcecontrollockexpires"),    
     FILE_SOURCECONTROLVERSION ("vti_sourcecontrolversion"),
     FILE_AUTHOR("vti_author"),
     FILE_MODIFIEDBY("vti_modifiedby"),
@@ -76,7 +75,9 @@ public enum VtiProperty
     SERVICE_SERVERTZ ("vti_servertz"),
     SERVICE_SOURCECONTROLSYSTEM ("vti_sourcecontrolsystem"),
     SERVICE_SOURCECONTROLVERSION ("vti_sourcecontrolversion"),
-    SERVICE_DOCLIBWEBVIEWENABLED ("vti_doclibwebviewenabled");
+    SERVICE_DOCLIBWEBVIEWENABLED ("vti_doclibwebviewenabled"),
+    SERVICE_SOURCECONTROLCOOKIE ("vti_sourcecontrolcookie"),
+    SERVICE_SOURCECONTROLPROJECT ("vti_sourcecontrolproject");
 
     private final String value;
 

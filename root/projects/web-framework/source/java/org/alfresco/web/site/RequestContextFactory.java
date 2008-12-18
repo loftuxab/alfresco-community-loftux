@@ -43,6 +43,12 @@ import org.alfresco.web.site.exception.RequestContextException;
 public interface RequestContextFactory
 {
     /**
+     * Request level marker to the factory impl to perform minimum silent init on the creation
+     * of the request - this ensures no authenticated connections etc. are made during init
+     */
+    public static final String SILENT_INIT = "alfSilentRequestInit";
+    
+    /**
      * Produces a new RequestContext instance for a given request. Always returns
      * a new RequestContext instance - or an exception is thrown.
      * 

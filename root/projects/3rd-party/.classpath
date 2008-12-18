@@ -119,7 +119,7 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/XmlSchema-1.4.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-2.0.6.jar" sourcepath="src/spring-2.0.6-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.1b1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar"/>

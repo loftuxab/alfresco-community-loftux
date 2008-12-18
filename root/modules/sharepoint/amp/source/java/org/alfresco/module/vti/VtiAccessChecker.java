@@ -59,6 +59,11 @@ public class VtiAccessChecker
 
     public boolean isRequestAcceptableForRoot(HttpServletRequest request)
     {
+        if (request.getParameter("nodeId") != null)
+        {
+            return true;
+        }
+        
         Set<Entry<String, Pattern>> entries = accessRules.entrySet();
         boolean result = false;
         for (Entry<String, Pattern> entry : entries)

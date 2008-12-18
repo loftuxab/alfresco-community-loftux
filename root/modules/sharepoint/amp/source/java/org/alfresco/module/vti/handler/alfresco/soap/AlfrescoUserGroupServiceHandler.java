@@ -7,6 +7,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
@@ -53,7 +54,9 @@ public class AlfrescoUserGroupServiceHandler implements UserGroupServiceHandler
 
     public void addUserCollectionToRole(String dwsUrl, String roleName, List<UserBean> usersList)
     {
-        FileInfo dwsFileInfo = pathHelper.resolvePathFileInfo(dwsUrl);
+        NodeRef dwsNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, dwsUrl);
+        
+        FileInfo dwsFileInfo = pathHelper.getFileFolderService().getFileInfo(dwsNodeRef);
 
         if (dwsFileInfo == null)
         {

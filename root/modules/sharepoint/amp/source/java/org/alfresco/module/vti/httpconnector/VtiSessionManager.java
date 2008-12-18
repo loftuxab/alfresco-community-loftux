@@ -91,7 +91,7 @@ public class VtiSessionManager extends Thread {
     }
     
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getSession(String sessionGuid) {
+    public Map<String, Object> getSession(String sessionGuid) {
         Map<String, Object> result = null;
         try {
             sessionsLock.readLock().lock(); 

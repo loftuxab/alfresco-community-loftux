@@ -29,7 +29,8 @@ import java.io.IOException;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
-import org.alfresco.module.vti.httpconnector.VtiServletContainer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling "url to web url" method
@@ -38,22 +39,33 @@ import org.alfresco.module.vti.httpconnector.VtiServletContainer;
  */
 public class UrlToWebUrlMethod extends AbstractVtiMethod
 {
+    private static Log logger = LogFactory.getLog(UrlToWebUrlMethod.class);
+    
     /**
      * Given a URL for a file, returns the URL of the Web site to which the file belongs, and the subsite, if applicable    
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         String url = request.getParameter("url");
 
         if (url != null && url.length() > 0)
         {
-            String alfrescoContext = (String) request.getAttribute(VtiServletContainer.VTI_ALFRESCO_CONTEXT);
+            String alfrescoContext = request.getAlfrescoContextName();
             String[] relativeUrls = vtiHandler.decomposeURL(url, alfrescoContext);
 
             response.beginVtiAnswer(getName(), ServerVersionMethod.version);
             response.addParameter("webUrl=" + relativeUrls[0]);
             response.addParameter("fileUrl=" + relativeUrls[1]);
             response.endVtiAnswer();
+        }
+        
+        if (logger.isDebugEnabled())        
+        {
+            logger.debug("End of method execution. Method name: " + getName());
         }
     }
 

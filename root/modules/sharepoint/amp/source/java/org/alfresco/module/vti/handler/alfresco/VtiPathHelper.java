@@ -73,7 +73,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
 
     private String rootPath;
     private String storePath;
-
+    
     public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
         this.authenticationComponent = authenticationComponent;
@@ -122,6 +122,8 @@ public class VtiPathHelper extends AbstractLifecycleBean
      */
     public FileInfo resolvePathFileInfo(String initialURL)
     {
+        initialURL = removeSlashes(initialURL);
+        
         FileInfo fileInfo = null;
 
         if (initialURL.length() == 0)
@@ -178,6 +180,8 @@ public class VtiPathHelper extends AbstractLifecycleBean
      */
     public static Pair<String, String> splitPathParentChild(String path)
     {
+        path = removeSlashes(path);
+        
         int indexOfName = path.lastIndexOf("/");
 
         String name = path.substring(indexOfName + 1);
@@ -277,6 +281,17 @@ public class VtiPathHelper extends AbstractLifecycleBean
             }
 		}, authenticationComponent.getSystemUserName());
 	}
+	
+	public static String removeSlashes(String value)
+	{	    
+	    value = value.replaceAll("//", "/");
+	    
+	    if (value.startsWith("/"))
+	        value = value.substring(1);
+	    if (value.endsWith("/"))
+	        value = value.substring(0, value.length() - 1);
+	    return value;	    
+	}
 
 	@Override
 	protected void onShutdown(ApplicationEvent event) {
@@ -302,5 +317,10 @@ public class VtiPathHelper extends AbstractLifecycleBean
     {
         this.personService = personService;
     }
-    
+
+    public FileFolderService getFileFolderService()
+    {
+        return fileFolderService;
+    }
+       
 }

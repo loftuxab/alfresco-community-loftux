@@ -27,6 +27,8 @@ package org.alfresco.module.vti.endpoints.dws;
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.DwsServiceHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
@@ -36,6 +38,8 @@ import org.dom4j.Element;
  */
 public class DeleteDwsEndpoint extends VtiEndpoint
 {
+
+	private final static Log logger = LogFactory.getLog(DeleteDwsEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
@@ -59,14 +63,21 @@ public class DeleteDwsEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element element, Document document) throws Exception
     {
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is started.");
+    	}
+    	
         // creating soap response
         Element root = document.addElement("DeleteDwsResponse");
-        Element deleteDwsResult = root.addElement("DeleteDwsResult", namespace);  
+        Element deleteDwsResult = root.addElement("DeleteDwsResult", namespace);        
         
-        String dws = sessionManager.getSession(EndpointUtils.getRequest()).get(VtiEndpoint.DWS).toString();
-        handler.deleteDws(dws);
+        handler.deleteDws(EndpointUtils.getDwsFromUri());
         
         deleteDwsResult.addElement("Result");
+
+        if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is finished.");
+    	}
 
         return root;
     }

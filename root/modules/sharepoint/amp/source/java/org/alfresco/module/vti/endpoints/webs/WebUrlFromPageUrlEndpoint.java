@@ -25,11 +25,14 @@
 package org.alfresco.module.vti.endpoints.webs;
 
 import java.net.URLDecoder;
-import java.util.Map;
 
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.VtiMethodHandler;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -44,8 +47,11 @@ import org.jaxen.dom4j.Dom4jXPath;
 public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
 {
 
+    private static Log logger = LogFactory.getLog(WebUrlFromPageUrlEndpoint.class);
+    
     // handler that provides methods for operating with documents and folders
     private VtiMethodHandler handler;
+    private VtiPathHelper pathHelper;
 
     // xml namespace prefix
     private static String prefix = "webs";
@@ -60,6 +66,11 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
         this.handler = handler;
     }
 
+    public void setPathHelper(VtiPathHelper pathHelper)
+    {
+        this.pathHelper = pathHelper;
+    }
+
     /**
      * Handle the WebUrlFromPageUrl method from webs web service
      *
@@ -69,6 +80,9 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element element, Document document) throws Exception
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is started.");
+        
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
@@ -76,17 +90,24 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
         // getting pageUrl parameter from request
         XPath xpath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/WebUrlFromPageUrl/pageUrl"));
         xpath.setNamespaceContext(nc);
-        String pageUrl = ((Element) xpath.selectSingleNode(element)).getTextTrim();        
+        String pageUrl = URLDecoder.decode(((Element) xpath.selectSingleNode(element)).getTextTrim(), "UTF-8");        
 
-        // recognizing the host
-        String server = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext();        
-        Map<String, Object> session = sessionManager.getSession(EndpointUtils.getRequest());
-        session.put(VtiEndpoint.DWS, URLDecoder.decode(pageUrl.substring(0, pageUrl.lastIndexOf('/')).replaceAll(server + "/", ""),"UTF-8"));
+        if (logger.isDebugEnabled())
+            logger.debug("pageUrl parameter for this request: " + pageUrl);
+        String server = "http://" + EndpointUtils.getHost();
+        String context = EndpointUtils.getContext();
+                
+        String[] uris = handler.decomposeURL(pageUrl.replaceAll(server, ""), context);        
+
+        NodeRef dwsNodeRef = pathHelper.resolvePathFileInfo(uris[0].replaceFirst(context, "")).getNodeRef();           
 
         // creating soap response
         Element responsElement = document.addElement("WebUrlFromPageUrlResponse", namespace);
         Element result = responsElement.addElement("WebUrlFromPageUrlResult");       
-        result.setText(server);
+        result.setText(server + uris[0] + "?nodeId=" + dwsNodeRef.getId() + "&sessionId=" + EndpointUtils.getVtiSessionId());
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is finished.");
         return responsElement;
     }
 

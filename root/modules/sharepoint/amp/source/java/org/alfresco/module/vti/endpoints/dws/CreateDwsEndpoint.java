@@ -24,12 +24,13 @@
  */
 package org.alfresco.module.vti.endpoints.dws;
 
-import java.util.Map;
-
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.soap.DwsServiceHandler;
 import org.alfresco.module.vti.metadata.soap.dws.DwsBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -42,10 +43,11 @@ import org.jaxen.dom4j.Dom4jXPath;
  */
 public class CreateDwsEndpoint extends VtiEndpoint
 {
+	private final static Log logger = LogFactory.getLog(CreateDwsEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
-
+    private VtiPathHelper pathHelper;
     // xml namespace prefix
     private static String prefix = "dws";
 
@@ -61,6 +63,10 @@ public class CreateDwsEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element requestElement, Document responseDocument) throws Exception
     {
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is started.");
+    	}
+    	
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
@@ -74,16 +80,21 @@ public class CreateDwsEndpoint extends VtiEndpoint
         Element root = responseDocument.addElement("CreateDwsResponse", namespace);
         Element createDwsResult = root.addElement("CreateDwsResult");
 
-        String parentDws = EndpointUtils.getDwsFromUri();        
-             
-        Map<String, Object> session = sessionManager.getSession(EndpointUtils.getRequest());
-        session.put(VtiEndpoint.DWS, (parentDws.equals("") ? title.getTextTrim() : parentDws + "/" + title.getTextTrim()));
+        String parentDws = EndpointUtils.getDwsFromUri();           
         
         DwsBean dws = handler.createDws(parentDws, null, null, title.getTextTrim(), null);
 
         createDwsResult.addText(dws.toString());
 
+        if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is finished.");
+    	}
+
         return root;
     }
 
+    public void setPathHelper(VtiPathHelper pathHelper)
+    {
+        this.pathHelper = pathHelper;
+    }
 }
