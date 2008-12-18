@@ -130,7 +130,7 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
     {
         this.lockService = lockService;
     }
-
+    
     public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
         this.authenticationComponent = authenticationComponent;
@@ -358,83 +358,83 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
                 {
 
                     public String[] doWork() throws Exception
-    {
-        if (!url.startsWith(alfrescoContext))
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Url must start with alfresco context.");
-            }
-            throw VtiException.create(VtiError.V_BAD_URL);
-        }
-        
-        if (url.equalsIgnoreCase(alfrescoContext))
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("WebUrl: " + alfrescoContext + ", fileUrl: ''");
-            }
-            return new String[]{alfrescoContext, ""};
-        }
-        
-        if (url.startsWith(alfrescoContext + "/history"))
-        {
-            return new String[]{alfrescoContext, url.substring(alfrescoContext.length() + 1)};
-        }
-        
-        String webUrl = "";
-        String fileUrl = "";        
-        
-        String[] splitPath = url.replaceAll(alfrescoContext, "").substring(1).split("/");
-        
-        StringBuilder tempWebUrl = new StringBuilder();
-        
-        for (int i = splitPath.length; i > 0; i--)
-        {
-            tempWebUrl.delete(0, tempWebUrl.length());
-            
-            for (int j = 0; j < i; j++)
-            {
-                if ( j < i-1)
-                {
-                    tempWebUrl.append(splitPath[j] + "/");
-                }
-                else
-                {
-                    tempWebUrl.append(splitPath[j]);
-                }
-            }            
-            
-            FileInfo fileInfo = pathHelper.resolvePathFileInfo(tempWebUrl.toString());
-            
-            if (fileInfo != null)
-            {
-                if (nodeService.getType(fileInfo.getNodeRef()).equals(SiteModel.TYPE_SITE))
-                {
-                    webUrl = alfrescoContext + "/" + tempWebUrl;
-                    if (url.replaceAll(webUrl, "").startsWith("/"))
                     {
-                        fileUrl = url.replaceAll(webUrl, "").substring(1);
+                        if (!url.startsWith(alfrescoContext))
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Url must start with alfresco context.");
+                            }
+                            throw VtiException.create(VtiError.V_BAD_URL);
+                        }
+                        
+                        if (url.equalsIgnoreCase(alfrescoContext))
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("WebUrl: " + alfrescoContext + ", fileUrl: ''");
+                            }
+                            return new String[]{alfrescoContext, ""};
+                        }
+                        
+                        if (url.startsWith(alfrescoContext + "/history"))
+                        {
+                            return new String[]{alfrescoContext, url.substring(alfrescoContext.length() + 1)};
+                        }
+                        
+                        String webUrl = "";
+                        String fileUrl = "";        
+                        
+                        String[] splitPath = url.replaceAll(alfrescoContext, "").substring(1).split("/");
+                        
+                        StringBuilder tempWebUrl = new StringBuilder();
+                        
+                        for (int i = splitPath.length; i > 0; i--)
+                        {
+                            tempWebUrl.delete(0, tempWebUrl.length());
+                            
+                            for (int j = 0; j < i; j++)
+                            {
+                                if ( j < i-1)
+                                {
+                                    tempWebUrl.append(splitPath[j] + "/");
+                                }
+                                else
+                                {
+                                    tempWebUrl.append(splitPath[j]);
+                                }
+                            }            
+                            
+                            FileInfo fileInfo = pathHelper.resolvePathFileInfo(tempWebUrl.toString());
+                            
+                            if (fileInfo != null)
+                            {
+                                if (nodeService.getType(fileInfo.getNodeRef()).equals(SiteModel.TYPE_SITE))
+                                {
+                                    webUrl = alfrescoContext + "/" + tempWebUrl;
+                                    if (url.replaceAll(webUrl, "").startsWith("/"))
+                                    {
+                                        fileUrl = url.replaceAll(webUrl, "").substring(1);
+                                    }
+                                    else
+                                    {
+                                        fileUrl = url.replaceAll(webUrl, "");                        
+                                    }
+                                    if (logger.isDebugEnabled())
+                                    {
+                                        logger.debug("WebUrl: " + webUrl + ", fileUrl: '" + fileUrl + "'");
+                                    }
+                                    return new String[]{webUrl, fileUrl};
+                                }
+                            }
+                        }
+                        if (webUrl.equals(""))
+                        {
+                            throw VtiException.create(VtiError.V_BAD_URL);
+                        }
+                        return new String[]{webUrl, fileUrl};
                     }
-                    else
-                    {
-                        fileUrl = url.replaceAll(webUrl, "");                        
-                    }
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("WebUrl: " + webUrl + ", fileUrl: '" + fileUrl + "'");
-                    }
-                    return new String[]{webUrl, fileUrl};
-                }
-            }
-        }
-        if (webUrl.equals(""))
-        {
-            throw VtiException.create(VtiError.V_BAD_URL);
-        }
-        return new String[]{webUrl, fileUrl};
-    }
-
+            
                 },
                 authenticationComponent.getSystemUserName());        
     }
@@ -465,7 +465,7 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
     }
 
     public DocsMetaInfo getDocsMetaInfo(String serviceName, boolean listHiddenDocs, boolean listLinkInfo, boolean validateWelcomeNames, List<String> urlList)
-    {
+    {        
         DocsMetaInfo docsMetaInfo = new DocsMetaInfo();
 
         if (urlList.isEmpty())
@@ -1074,7 +1074,13 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
             {
                 logger.debug("Document not already checked out!!!");
             }
-            throw VtiException.create(VtiError.V_DOC_NOT_CHECKED_OUT);
+            documentFileInfo = fileFolderService.getFileInfo(documentFileInfo.getNodeRef());
+
+            DocMetaInfo docMetaInfo = new DocMetaInfo(false);
+            docMetaInfo.setPath(documentName);
+            setDocMetaInfo(documentFileInfo, docMetaInfo);
+
+            return docMetaInfo;
         }
 
         // if document is checked out, but user isn't owner, then throw exception
@@ -1476,5 +1482,5 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
                 docsMetaInfo.getFileMetaInfoList().add(docMetaInfo);
             }
         }
-    }    
+    }       
 }

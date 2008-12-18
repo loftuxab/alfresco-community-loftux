@@ -69,7 +69,7 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
     {
         if (logger.isDebugEnabled())
             logger.debug("Soap Method with name " + getName() + " is started.");
-     // mapping xml namespace to prefix
+        // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
 
@@ -91,7 +91,7 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
         Element result = root.addElement("GetUserLoginFromEmailResult");
 
         Element getUserLoginFromEmail = result.addElement("GetUserLoginFromEmail");
-
+        
         if (logger.isDebugEnabled()) {
             String emails = "";
             for(String email : emailList) {
@@ -101,7 +101,7 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
         }
         
         List<UserBean> users = handler.getUserLoginFromEmail(null, emailList);
-
+        
         if (logger.isDebugEnabled()) {
             String usernames = "";
             for(UserBean user : users) {
@@ -119,7 +119,7 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
             user.addAttribute("Email", userBean.getEmail());
             user.addAttribute("SiteUser", "1");
         }
-
+        
         if (logger.isDebugEnabled())
             logger.debug("Soap Method with name " + getName() + " is finished.");
         return root;

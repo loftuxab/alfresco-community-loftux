@@ -51,7 +51,7 @@ public class AddUserCollectionToRoleEndpoint extends VtiEndpoint
 
     // xml namespace prefix
     private static String prefix = "usergroup";
-
+    
     private static Log logger = LogFactory.getLog(AddUserCollectionToRoleEndpoint.class);
 
     public AddUserCollectionToRoleEndpoint(UserGroupServiceHandler handler)
@@ -80,7 +80,7 @@ public class AddUserCollectionToRoleEndpoint extends VtiEndpoint
         XPath roleNamePath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/AddUserCollectionToRole/roleName"));
         roleNamePath.setNamespaceContext(nc);
         Element roleName = (Element) roleNamePath.selectSingleNode(requestElement);
-
+        
         // getting document parameter from request
         if (logger.isDebugEnabled()) 
             logger.debug("Getting users from request.");        

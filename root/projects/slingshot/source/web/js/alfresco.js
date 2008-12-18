@@ -67,6 +67,14 @@ Alfresco.util = Alfresco.util || {};
 Alfresco.logger = Alfresco.logger || {};
 
 /**
+ * Alfresco top-level service namespace.
+ *
+ * @namespace Alfresco
+ * @class Alfresco.service
+ */
+Alfresco.service = Alfresco.service || {};
+
+/**
  * Alfresco top-level thirdparty namespace.
  * Used for importing third party javascript functions
  * 
@@ -139,7 +147,7 @@ Alfresco.util.arrayToObject = function(arr)
 
 /**
  * Check if an array contains an object
- * @method Alfresco.util.contains
+ * @method Alfresco.util.arrayContains
  * @param arr {array} Array to convert to object
  * @param el {object} The element to be searched for in the array
  * @return {boolean} True if arr contains el
@@ -147,17 +155,75 @@ Alfresco.util.arrayToObject = function(arr)
  */
 Alfresco.util.arrayContains = function(arr, el)
 {
+   return Alfresco.util.arrayIndex(arr, el) != -1;
+};
+
+/**
+ * Removes element el from array arr
+ *
+ * @method Alfresco.util.arrayRemove
+ * @param arr {array} Array to remove el from
+ * @param el {object} The element to be removed
+ * @return {boolean} The array now without the element
+ * @static
+ */
+Alfresco.util.arrayRemove = function(arr, el)
+{
+   var i = Alfresco.util.arrayIndex(arr, el);
+   while(i != -1)
+   {
+      arr.splice(i, 1);
+      i = Alfresco.util.arrayIndex(arr, el);
+   }
+   return arr;
+};
+
+
+/**
+ * Finds the index of an object in an array
+ *
+ * @method Alfresco.util.arrayIndex
+ * @param arr {array} Array to search in
+ * @param el {object} The element to find the index for in the array
+ * @return {integer} -1 if not found, other wise the index
+ * @static
+ */
+Alfresco.util.arrayIndex = function(arr, el)
+{
    if (arr)
    {
       for (var i = 0; i < arr.length; i++)
       {
           if (arr[i] == el)
           {
-             return true;
+             return i;
           }
       }
    }
-   return false;
+   return -1;
+};
+
+/**
+ * Finds the index of an object in an array
+ *
+ * @method Alfresco.util.createObjectFromString
+ * @param str {string} an object descriptor i.e. "org.alfresco.site"
+ * @return {object} A newly created object, i.e. {org:{alfresco:{site:"share"}}}
+ * @static
+ */
+Alfresco.util.createObjectFromString = function(property)
+{
+   var currObj = {};
+   if(property && obj)
+   {
+      var props = property.split(".");
+      for (var i = 0; i < props.length && currObj; i++)
+      {
+         currObj[props[i]] = {};
+      }
+      currObj[props[i-1]] = null;      
+   }
+   return currObj;
 };
 
 /**
@@ -1519,9 +1585,9 @@ Alfresco.util.Ajax = function()
          if (c.requestContentType === this.JSON)
          {
             // If json is used encode the dataObj parameter and put it in the body
-            if (c.method.toUpperCase() === this.GET)
+            if (c.method.toUpperCase() === this.GET && c.dataObj)
             {
-               throw new Error("Parameter 'method' can not be 'GET' when using contentType '" + c.requestContentType + "'");
+               throw new Error("Parameter 'method' can not be 'GET' when trying to submit data in dataObj with contentType '" + c.requestContentType + "'");
             }
             else
             {
@@ -2507,3 +2573,221 @@ Alfresco.thirdparty.toISO8601 = function()
 
    return toISOString.apply(arguments.callee, arguments);
 }; 
+
+
+/**
+ * Alfresco BaseService.
+ *
+ * @namespace Alfresco.BaseService
+ * @class Alfresco.service.BaseService
+ */
+/**
+ * BaseService constructor.
+ *
+ * @return {Alfresco.service.BaseService} The new Alfresco.service.BaseService instance
+ * @constructor
+ */
+Alfresco.service.BaseService = function BaseService_constructor()
+{
+   return this;
+};
+
+Alfresco.service.BaseService.prototype =
+{
+
+   /**
+    * Generic helper method for invoking a Alfresco.util.Ajax.request() from a responseConfig object
+    *
+    * @method _jsonCall
+    * @param method {string} The method for the XMLHttpRequest
+    * @param url {string} The url for the XMLHttpRequest
+    * @param dataObj {object} An object that will be transformed to a json string and put in the request body
+    * @param responseConfig.successCallback {object} A success callback object
+    * @param responseConfig.successMessage {string} A success message
+    * @param responseConfig.failureCallback {object} A failure callback object
+    * @param responseConfig.succesfailreCallback {sintrg} A failure message
+    */
+   _jsonCall: function BaseService__jsonCall(method, url, dataObj, responseConfig)
+   {      
+      responseConfig = responseConfig ? responseConfig : {};
+      Alfresco.util.Ajax.jsonRequest(
+      {
+         method: method,
+         url: url,
+         dataObj: dataObj,
+         successCallback: responseConfig.successCallback,
+         successMessage: responseConfig.successMessage,
+         failureCallback: responseConfig.failureCallback,
+         failureMessage: responseConfig.failureMessage
+      });
+   }
+};
+
+/**
+ * Alfresco Preferences.
+ *
+ * @namespace Alfresco.Preferences
+ * @class Alfresco.service.Preferences
+ */
+(function()
+{
+   /**
+    * Preferences constructor.
+    *
+    * @return {Alfresco.service.Preferences} The new Alfresco.service.Preferences instance
+    * @constructor
+    */
+   Alfresco.service.Preferences = function Preferences_constructor()
+   {
+      Alfresco.service.Preferences.superclass.constructor.call(this);
+      return this;
+   };
+
+   YAHOO.extend(Alfresco.service.Preferences, Alfresco.service.BaseService,
+   {
+
+      /**
+       * Gets a user specific property
+       *
+       * @method url
+       * @return {string} The base url to the preference webscripts
+       */
+      _url: function Preferences_url()
+      {
+         return Alfresco.constants.PROXY_URI + "api/people/" + Alfresco.constants.USERNAME + "/preferences";
+      },
+
+      /**
+       * Gets a user specific property
+       *
+       * @method get
+       * @param name {string} The name of the property to get, or null or no param for all
+       * @param responseConfig {object} A config object with only success and failure callbacks and messages
+       */
+      get: function Preferences_get(name, responseConfig)
+      {
+         this._jsonCall(Alfresco.util.Ajax.GET, this._url() + (name ? "?pf=" + name : ""), null, responseConfig);
+      },
+
+      /**
+       * Gets a user specific property
+       *
+       * @method set
+       * @param name {string} The name of the property to set
+       * @param value {object} The value of the property to set
+       * @param responseConfig {object} A config object with only success and failure callbacks and messages
+       */
+      set: function Preferences_get(name, value, responseConfig)
+      {
+         this._jsonCall(Alfresco.util.Ajax.POST, this._url(), value, responseConfig);
+      },
+
+      /**
+       * Adds a value to a user specific property that is treated as a multi value.
+       * Since arrays aren't supported in the webscript we store multiple values using a comma separated string.
+       *
+       * @method add
+       * @param name {string} The name of the property to set
+       * @param value {object} The value of the property to set
+       * @param responseConfig {object} A config object with only success and failure callbacks and messages
+       */
+      add: function Preferences_add(name, value, responseConfig)
+      {
+         var n = name, v = value;
+         var rc = responseConfig ? responseConfig : {};
+         var originalSuccessCallback = rc.successCallback;
+         rc.successCallback =
+         {
+            fn: function (response, obj)
+            {
+               // Make sure the original succes callback is used
+               rc.successCallback = originalSuccessCallback;
+
+               // Parse string to array, add the value and convert to string again
+               var preferences = response.json ? response.json : Alfresco.util.createObjectFromString(n);
+               var preference = eval("preferences." + n);
+               var values = preference ? preference.split(",") : [];
+               values.push(v);
+               eval("preferences." + n + " = '" + values.join(",") + "'");
+
+               // Save preference with the new value
+               this.set(name, preferences, rc);
+            },
+            scope: this
+         };
+         this.get(name, rc);
+      },
+
+      /**
+       * Removes a value from a user specific property that is treated as a multi value.
+       * Since arrays aren't supported in the webscript we store multiple values using a comma separated string.
+       *
+       * @method add
+       * @param name {string} The name of the property to set
+       * @param value {object} The value of the property to set
+       * @param responseConfig {object} A config object with only success and failure callbacks and messages
+       */
+      remove: function Preferences_add(name, value, responseConfig)
+      {
+         var n = name, v = value;
+         var rc = responseConfig ? responseConfig : {};
+         var originalSuccessCallback = rc.successCallback;
+         rc.successCallback =
+         {
+            fn: function (response, obj)
+            {
+               // Make sure the original succes callback is used
+               rc.successCallback = originalSuccessCallback;
+
+               // Parse string to array, remove the value and convert to string again
+               var preferences = response.json ? response.json : Alfresco.util.createObjectFromString(n);
+               var preference = eval("preferences." + n);
+               var values = preference ? preference.split(",") : [];
+               values = Alfresco.util.arrayRemove(values, v);
+               eval("preferences." + n + " = '" + values.join(",") + "'");
+
+               // Save preference without value
+               this.set(name, preferences, rc);
+            },
+            scope: this
+         };
+         this.get(name, rc);
+      },
+
+      /**
+       * Generic helper method for invoking a Alfresco.util.Ajax.request() from a responseConfig
+       *
+       * Maybe this should be placed in some Alfresco.service.Service class instead?
+       *
+       * @method add
+       * @param method {string} The method for the XMLHttpRequest
+       * @param url {string} The url for the XMLHttpRequest
+       * @param dataObj {object} An object that will be transformed to a json string and put in the request body
+       * @param responseConfig {object} A config object with only success and failure callbacks and messages
+       */
+      _jsonCall: function Preferences__jsonCall(method, url, dataObj, responseConfig)
+      {
+         responseConfig = responseConfig ? responseConfig : {};
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            method: method,
+            url: url,
+            dataObj: dataObj,
+            successCallback: responseConfig.successCallback,
+            successMessage: responseConfig.successMessage,
+            failureCallback: responseConfig.failureCallback,
+            failureMessage: responseConfig.failureMessage
+         });
+      }
+
+   });
+   
+   /**
+    * The name token that is used to save the user's favourite sites.
+    *
+    * @property SITE_FAVOURITES
+    * @type string
+    */
+    Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
+
+})();

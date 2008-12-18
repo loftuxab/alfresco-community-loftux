@@ -115,7 +115,7 @@ public class VtiFilter implements Filter
             else 
             {
                 if (validSiteUrl == null && !httpRequest.getRequestURI().endsWith(".vti"))
-                session = sessionManager.createSession(httpRequest, httpResponse);
+                    session = sessionManager.createSession(httpRequest, httpResponse);
             }
         }
         if (logger.isDebugEnabled())
@@ -147,7 +147,11 @@ public class VtiFilter implements Filter
             }
             httpResponse.setHeader("Public-Extension", "http://schemas.microsoft.com/repl-2");
             httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
-            httpResponse.setHeader("Cache-Control", "no-cache");
+            if (METHOD_GET.equals(httpMethod)) {
+                httpResponse.setHeader("Cache-Control", "private");
+            } else {
+                httpResponse.setHeader("Cache-Control", "no-cache");
+            }
             httpResponse.setContentType("text/html");
         }
         else if (METHOD_PROPFIND.equals(httpMethod))
@@ -193,7 +197,7 @@ public class VtiFilter implements Filter
             }
             
             if (!vtiHandler.existResource(decodedUrl, httpResponse))
-            {                
+            {
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Resource doesn't exist");
@@ -339,7 +343,7 @@ public class VtiFilter implements Filter
         // Chain other filters
         if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null && !uri.startsWith(alfrescoContext + "/history/a") && (validSiteUrl == null) && request.getParameter("dialogview") == null)
         {
-        response.getOutputStream().flush();
+            response.getOutputStream().flush();
         }
         chain.doFilter(request, response);
     }

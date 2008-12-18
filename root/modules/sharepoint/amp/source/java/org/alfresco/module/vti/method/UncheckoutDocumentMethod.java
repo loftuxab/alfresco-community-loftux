@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class UncheckoutDocumentMethod extends AbstractVtiMethod
 {
-
+    
     private static Log logger = LogFactory.getLog(UncheckoutDocumentMethod.class);
 
     public String getName()

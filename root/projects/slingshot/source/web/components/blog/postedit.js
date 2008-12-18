@@ -474,7 +474,10 @@
          Dom.get(this.id + "-draft").setAttribute("value", false);
           
          // submit the form
-         this.widgets.saveButton.fireEvent("click");
+         this.widgets.saveButton.fireEvent("click",
+         {
+            type: "click"
+         });
       },
       
       /**
@@ -489,7 +492,10 @@
          this.performExternalPublish = true;
           
          // submit the form
-         this.widgets.saveButton.fireEvent("click");
+         this.widgets.saveButton.fireEvent("click",
+         {
+            type: "click"
+         });
       },
       
       /**

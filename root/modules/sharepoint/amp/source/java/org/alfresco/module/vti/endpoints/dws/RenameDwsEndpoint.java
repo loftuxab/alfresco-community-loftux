@@ -42,7 +42,7 @@ import org.jaxen.dom4j.Dom4jXPath;
 public class RenameDwsEndpoint extends VtiEndpoint
 {
 	private final static Log logger = LogFactory.getLog(RenameDwsEndpoint.class);
-
+	
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
 
@@ -68,7 +68,7 @@ public class RenameDwsEndpoint extends VtiEndpoint
     	if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is started.");
     	}
-
+    	
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
@@ -85,7 +85,7 @@ public class RenameDwsEndpoint extends VtiEndpoint
         handler.renameDws(EndpointUtils.getDwsFromUri(), title.getText());
 
         renameDwsResult.setText("<Result/>");
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}

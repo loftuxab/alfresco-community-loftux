@@ -194,7 +194,7 @@
        */
       _generateRSSFeedUrl: function BlogPostList__generateRSSFeedUrl()
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/blog/rss?site={site}&amp;container={container}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/blog/rss?site={site}&container={container}",
          {
             site: this.options.siteId,
             container: this.options.containerId

@@ -168,11 +168,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
             }
             catch (RequestContextException rce)
             {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Unable to retrieve the RequestContext instance from the current request");
-                    logger.debug(rce);
-                }
+                throw new IOException("Unable to retrieve the RequestContext instance from the current request: " + rce.getMessage());
             }
         }
         

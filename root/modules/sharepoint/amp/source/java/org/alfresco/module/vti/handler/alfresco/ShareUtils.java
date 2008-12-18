@@ -216,7 +216,7 @@ public class ShareUtils
         String createSiteBody = "{\"isPublic\":\"" + isPublic + "\",\"title\":\"" + title + "\",\"shortName\":\"" + shortName + "\"," +
         		"\"description\":\"" + description + "\",\"sitePreset\":\"" + sitePreset + "\"" +
         		(isPublic ? ",\"alfresco-createSite-instance-isPublic-checkbox\":\"on\"}" : "}");        
-        createSiteMethod.setRequestEntity(new StringRequestEntity(createSiteBody, CONTENT_TYPE_TEXT_PLAIN, UTF_8));        
+        createSiteMethod.setRequestEntity(new StringRequestEntity(createSiteBody, CONTENT_TYPE_TEXT_PLAIN, UTF_8));
         PostMethod loginMethod = createLoginMethod(login, password);
         try
         {
@@ -248,7 +248,7 @@ public class ShareUtils
         }
         catch(Exception e)
         {
-        createSiteMethod.releaseConnection();
+            createSiteMethod.releaseConnection();
             if (logger.isDebugEnabled())
                 logger.debug("Fail to create the Site with name: " + shortName + ". Message: " + e.getMessage());
             throw new RuntimeException(e);
@@ -331,8 +331,8 @@ public class ShareUtils
         }
         finally
         {
-            deleteSiteMethod.releaseConnection();               
-        }
+            deleteSiteMethod.releaseConnection();            
+        }                       
     }
 
 }

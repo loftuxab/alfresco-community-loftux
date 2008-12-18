@@ -48,7 +48,7 @@ public class VtiAccessChecker
     private Map<String, Pattern> accessRules = new HashMap<String, Pattern>();
 
     private static final String URL_PARAM_NAME = "URL";
-
+    
     private VtiMethodHandler vtiHandler;
     
     public void setVtiHandler(VtiMethodHandler vtiHandler)
@@ -68,7 +68,7 @@ public class VtiAccessChecker
     }
 
     public boolean isRequestAcceptableForRoot(HttpServletRequest request)
-    {
+    {        
         if (validSiteUri(request))
             return true;
         

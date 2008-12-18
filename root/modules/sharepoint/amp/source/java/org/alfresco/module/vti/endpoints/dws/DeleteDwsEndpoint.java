@@ -38,7 +38,7 @@ import org.dom4j.Element;
  */
 public class DeleteDwsEndpoint extends VtiEndpoint
 {
-
+	
 	private final static Log logger = LogFactory.getLog(DeleteDwsEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
@@ -74,7 +74,7 @@ public class DeleteDwsEndpoint extends VtiEndpoint
         handler.deleteDws(EndpointUtils.getDwsFromUri());
         
         deleteDwsResult.addElement("Result");
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}

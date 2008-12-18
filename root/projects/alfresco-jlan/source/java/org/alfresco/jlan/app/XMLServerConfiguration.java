@@ -661,6 +661,12 @@ public class XMLServerConfiguration extends CifsOnlyXMLServerConfiguration {
 			ConfigElement params = buildConfigElement(elem);
 			nfsConfig.setRpcAuthenticator(getText(classElem), params);
 		}
+		else {
+			
+			// Use the null RPC authenticator as the default
+			
+			nfsConfig.setRpcAuthenticator( "org.alfresco.jlan.oncrpc.DefaultRpcAuthenticator", new ConfigElement( "", ""));
+		}
 
 		// Check if NFS debug is enabled
 

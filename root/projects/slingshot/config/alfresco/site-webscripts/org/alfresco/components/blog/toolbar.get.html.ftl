@@ -27,10 +27,9 @@
 
    <div class="rss-feed">
       <div>
-         <a id="${args.htmlid}-rssFeed-button" href="${url.context}/proxy/alfresco-feed/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">${msg("button.rssfeed")}</a>
+         <a id="${args.htmlid}-rssFeed-button" href="#">${msg("button.rssfeed")}</a>
       </div>
    </div>
 
 </div>
 <div class="clear"></div>
-        

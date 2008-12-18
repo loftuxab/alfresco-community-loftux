@@ -61,6 +61,7 @@ import org.alfresco.module.vti.metadata.soap.dws.WorkspaceType;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.site.SiteService;
 import org.alfresco.service.cmr.model.FileFolderService;
@@ -85,9 +86,9 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
     private PermissionService permissionService;
     private AuthenticationService authenticationService;
     private AuthenticationComponent authenticationComponent;
-    private PersonService personService;
+    private PersonService personService;    
     private SiteService siteService;
-    private ShareUtils shareUtils;
+    private ShareUtils shareUtils;   
 
     private VtiPathHelper pathHelper;
     
@@ -141,7 +142,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
     public void setPersonService(PersonService personService)
     {
         this.personService = personService;
-    }
+    }     
     
     public void setSiteService(SiteService siteService)
     {
@@ -162,7 +163,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         }
         
         // replace all illegal characters
-        title = removeIllegalCharacters(title);
+        title = removeIllegalCharacters(title);        
         
         String dwsUrl = parentDwsUrl + "/" + title;        
 
@@ -213,7 +214,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
 
             throw VtiExceptionUtils.createRuntimeException(e);
         }
-
+        
         if (logger.isDebugEnabled()) {
         	logger.debug("Document workspace with name '" + title + "' was successfully created.");
         }
@@ -268,7 +269,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             catch (Exception tex) {}
 
             throw VtiExceptionUtils.createRuntimeException(e);
-        }        
+        }
         
         if (logger.isDebugEnabled()) {
         	logger.debug("Folder with url '" + url.substring(url.indexOf('/', 1)) + "' was created in site: " + VtiPathHelper.removeSlashes(EndpointUtils.getDwsFromUri()) + ".");
@@ -341,7 +342,10 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             fileFolderService.delete(folderFileInfo.getNodeRef());
 
             tx.commit();
-        }
+        } 
+        catch (AccessDeniedException e) {
+        	throw new WebServiceErrorCodeException(3);
+		}
         catch (Throwable e)
         {
             try
@@ -351,7 +355,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             catch (Exception tex) {}
 
             throw VtiExceptionUtils.createRuntimeException(e);
-        }        
+        }
         
         if (logger.isDebugEnabled()) {
         	logger.debug("Folder with url '" + url.substring(url.indexOf('/', 1)) +
@@ -363,7 +367,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
     {        
         String dws = EndpointUtils.getDwsFromUri();
         String host = EndpointUtils.getHost();
-        String context = EndpointUtils.getContext();
+        String context = EndpointUtils.getContext();        
         
         // get the nodeRef for current dws
         FileInfo dwsNode = pathHelper.resolvePathFileInfo(dws);
@@ -467,7 +471,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         
         String dws = EndpointUtils.getDwsFromUri();
         String host = EndpointUtils.getHost();
-        String context = EndpointUtils.getContext();
+        String context = EndpointUtils.getContext();        
         
         FileInfo dwsInfo = pathHelper.resolvePathFileInfo(dws); 
         
@@ -519,11 +523,11 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             List<AssigneeBean> assignees = new ArrayList<AssigneeBean>();
             for (MemberBean member : members)
             {
-                assignees.add(new AssigneeBean(member.getId(), member.getName(), member.getLoginName()));
+            	assignees.add(new AssigneeBean(member.getId(), member.getName(), member.getLoginName()));
             }
             dwsData.setAssignees(assignees);
         }
-
+        
         if (logger.isDebugEnabled()) {
         	logger.debug("Document workspace data was retrieved for '" + dwsInfo.getName() + "' site.");
         }
@@ -605,12 +609,12 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
     {
         
         String uri = VtiPathHelper.removeSlashes(req.getRequestURI());
-        String redirectTo;
-        
+        String redirectTo;       
+                
         if (!uri.endsWith(".vti"))
         {
             if (logger.isDebugEnabled())
-                logger.debug("Redirection to site in browser");
+                logger.debug("Redirection to site in browser");            
             redirectTo = pagesMap.get("siteInBrowser");
             
             String siteName = uri.substring(uri.lastIndexOf('/') + 1);
@@ -630,7 +634,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             if (action.equals("userInformation"))
             {
                 // redirect to user profile
-                String userName = req.getParameter("ID");
+                String userName = req.getParameter("ID");               
                 redirectTo = redirectTo.replace("...", userName);                
             }
             else
@@ -638,7 +642,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
                 // redirect to site information (dashboard, site members ...) 
                 String[] parts = uri.split("/");
                 String siteName = parts[parts.length - 2];
-                redirectTo = redirectTo.replace("...", siteName);
+                redirectTo = redirectTo.replace("...", siteName);                 
             }
             final String doc = req.getParameter("doc");
             if (doc != null)
@@ -647,10 +651,10 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
                 NodeRef nodeRef = AuthenticationUtil.runAs(new RunAsWork<NodeRef>()
                         {
                             public NodeRef doWork() throws Exception
-                {
+                            {
                                 return pathHelper.resolvePathFileInfo(doc).getNodeRef();
-                }
-                
+                            }
+                    
                         }, authenticationComponent.getSystemUserName());
                 
                 redirectTo = redirectTo + "?nodeRef=" + nodeRef;
@@ -658,7 +662,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             if (logger.isDebugEnabled())
                 logger.debug("Redirection URI: " + redirectTo);
             
-        }       
+        }
         
         String redirectionUrl = "http://" + shareUtils.getShareHostWithPort() + redirectTo; 
         if (logger.isDebugEnabled())
@@ -742,10 +746,10 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             String lastName = nodeService.getProperty(personNodeRef, ContentModel.PROP_LASTNAME).toString();
             String email = nodeService.getProperty(personNodeRef, ContentModel.PROP_EMAIL).toString();
             members.add(new MemberBean(username, firstName + " " + lastName, username, email, false));
-        }  
-
+        }       
+        
         return members;     
-    } 
+    }    
     
     
     private String removeIllegalCharacters(String value)

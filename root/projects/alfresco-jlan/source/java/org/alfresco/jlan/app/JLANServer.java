@@ -529,7 +529,7 @@ public class JLANServer implements ServerListener {
       
     //  Create the port mapper server instance
     
-    return createServer( "org.alfresco.jlan.oncprc.portmap.PortMapperServer", config);
+    return createServer( "org.alfresco.jlan.oncrpc.portmap.PortMapperServer", config);
   }
   
 	/**

@@ -91,7 +91,7 @@ public class GetDwsDataEndpoint extends VtiEndpoint
         DwsData dwsData = handler.getDwsData(URLDecoder.decode(doc, "UTF-8"), lastUpdate.getTextTrim());
 
         getDwsDataResult.setText(dwsData.toString());
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}

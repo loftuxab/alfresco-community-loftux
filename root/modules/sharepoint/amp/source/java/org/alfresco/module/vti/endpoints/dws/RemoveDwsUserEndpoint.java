@@ -41,7 +41,7 @@ import org.jaxen.dom4j.Dom4jXPath;
  */
 public class RemoveDwsUserEndpoint extends VtiEndpoint
 {
-
+	
 	private final static Log logger = LogFactory.getLog(RemoveDwsUserEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
@@ -85,7 +85,7 @@ public class RemoveDwsUserEndpoint extends VtiEndpoint
         handler.removeDwsUser(EndpointUtils.getDwsFromUri(), id.getText());
 
         removeDwsUserResult.setText("<Results/>");
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}

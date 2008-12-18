@@ -85,7 +85,7 @@ public class VtiUtils
     {
         return versionDateFormat.format(date);
     }
-
+    
     public static String formatPropfindDate(Date date)
     {
         return propfindDateFormate.format(date);
