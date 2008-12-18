@@ -112,6 +112,7 @@
                 <entry key="URL"><value>.*\.vti</value></entry>
             </map>
         </property>
+        <property name="vtiHandler" ref="vtiHandler" />
     </bean>   
     
     <bean id="vtiSessionManager" class="org.alfresco.module.vti.httpconnector.VtiSessionManager">

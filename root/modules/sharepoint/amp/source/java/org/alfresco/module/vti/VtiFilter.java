@@ -96,6 +96,7 @@ public class VtiFilter implements Filter
         // Assume it's an HTTP request
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
+        Object validSiteUrl = httpRequest.getAttribute("VALID_SITE_URL");
         if (logger.isDebugEnabled())
         {
             logger.debug("Checking request for VTI or not");
@@ -113,7 +114,7 @@ public class VtiFilter implements Filter
             } 
             else 
             {
-                if (request.getParameter("nodeId") == null && !httpRequest.getRequestURI().endsWith(".vti"))
+                if (validSiteUrl == null && !httpRequest.getRequestURI().endsWith(".vti"))
                 session = sessionManager.createSession(httpRequest, httpResponse);
             }
         }
@@ -174,7 +175,7 @@ public class VtiFilter implements Filter
         if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod))  && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.startsWith(alfrescoContext + "/history/a")
                 && !uri.startsWith(alfrescoContext + "/resources") && if_header == null)
         {
-            if (request.getParameter("nodeId") != null || uri.endsWith(".vti"))
+            if (validSiteUrl != null || uri.endsWith(".vti"))
             {                
                 chain.doFilter(request, response);           
                 return;
@@ -336,7 +337,7 @@ public class VtiFilter implements Filter
             logger.debug("Request accepted");
         }
         // Chain other filters
-        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null && !uri.startsWith(alfrescoContext + "/history/a") && request.getParameter("nodeId") == null && request.getParameter("dialogview") == null)
+        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null && !uri.startsWith(alfrescoContext + "/history/a") && (validSiteUrl == null) && request.getParameter("dialogview") == null)
         {
         response.getOutputStream().flush();
         }

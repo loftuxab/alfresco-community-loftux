@@ -11,21 +11,88 @@
    text-align: center;
 }
 
-.flash-upload .fileUploadTableMessage
+.flash-upload div.browse-wrapper
 {
-   padding: 0.5em !important;
+   text-align: center;
+}
+
+.flash-upload div.browse-wrapper div.center
+{
+   padding-top:0.5em;
+   line-height:2em;
+   margin-left: auto;
+   margin-right: auto;
+   width: 18em;
+}
+
+.flash-upload div.browse-wrapper div.browse,
+.flash-upload div.browse-wrapper div.label
+{
+   float: left;
+}
+
+.flash-upload div.tip-wrapper
+{
+   padding-top:0.5em;
+   line-height:2em;
+   text-align: center;
+   clear: both;
+}
+
+.flash-upload div.status-wrapper
+{
+   padding-bottom:0.5em;
+   text-align:center;
+}
+
+.flash-upload .browse,
+.flash-upload .tip
+{
+   float:left;
+}
+
+.flash-upload .browse
+{
+   width:38px;
+   height:26px;
+   margin-left:10px;
+   margin-right:10px;
+}
+
+.flash-upload .tip
+{
+   height:40px;
+   line-height:40px;
+}
+
+.flash-upload div.section span.status
+{
+   margin-left: 210px;
 }
 
 /* Add som padding to the file list so it looks centered */
 .yui-skin-default .yui-panel .bd .fileUpload-filelist-table
 {
    padding: 0.8em;
+   /*clear:both;*/
 }
 
 /* Remove the padding inherited from the panel for divs in the file list */
-.yui-skin-default .yui-panel .bd .fileUpload-filelist-table div
+.yui-skin-default .yui-panel .bd .fileUpload-filelist-table div.yui-dt-hd
 {
+   height: 0;
    padding: 0;
+}
+
+.yui-skin-default .yui-panel .bd .fileUpload-filelist-table tbody.yui-dt-message td
+{
+   border: none;
+}
+
+.yui-skin-default .yui-panel .bd .fileUpload-filelist-table tbody.yui-dt-message tr td div.yui-dt-empty
+{
+   border: none;
+   padding: 0.5em !important;
 }
 
 /* Create a visible gray line beneath each row */
@@ -66,6 +133,7 @@
 {
    position:relative;
    width:620px;
+   overflow-x:hidden;
 }
 
 /* Style left column and its elements */
@@ -159,10 +227,11 @@
 
 /* Style right column and its elements */
 
-.fileUpload-filelist-table tbody .col-right
+.fileUpload-filelist-table tbody .col-right,
+.fileUpload-filelist-table tbody .col-right div.fileupload-right-div
 {
    height: 40px;
-   width: 100px;
+   width: 130px;      
 }
 
 .fileupload-right-div

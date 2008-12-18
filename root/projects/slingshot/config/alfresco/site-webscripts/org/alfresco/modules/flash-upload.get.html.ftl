@@ -3,20 +3,22 @@
       <span id="${args.htmlid}-title-span"></span>
    </div>
    <div class="bd">
-      <p>
-         <input id="${args.htmlid}-browse-button" type="button" value="${msg("button.browse")}" />
+      <div class="browse-wrapper">
+         <div class="center">
+            <div id="${args.htmlid}-flashuploader-div" class="browse">${msg("label.noFlash")}</div>
+            <div class="label">${msg("label.browse")}</div>
+         </div>
+      </div>
+      <div class="tip-wrapper">
          <span id="${args.htmlid}-multiUploadTip-span">${msg("label.multiUploadTip")}</span>
          <span id="${args.htmlid}-singleUpdateTip-span">${msg("label.singleUpdateTip")}</span>
-      </p>
-      <p>
-         <span id="${args.htmlid}-status-span"></span>
-      </p>
-      <#-- Increase width and height and remove display:none to see flash debug info -->
-      <div id="${args.htmlid}-flashuploader-div" style="height: 0px;">
-         <p>${msg("label.noFlash")}</p>
       </div>
 
       <div id="${args.htmlid}-filelist-table" class="fileUpload-filelist-table"></div>
+
+      <div class="status-wrapper">
+         <span id="${args.htmlid}-status-span" class="status"></span>
+      </div>
 
       <div id="${args.htmlid}-versionSection-div">
          <div class="yui-g">

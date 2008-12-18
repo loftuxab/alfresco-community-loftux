@@ -51,6 +51,9 @@ import org.alfresco.module.vti.metadata.dic.VtiSortField;
 import org.alfresco.module.vti.metadata.dic.options.GetOption;
 import org.alfresco.module.vti.metadata.dic.options.PutOption;
 import org.alfresco.module.vti.metadata.dic.options.RenameOption;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.site.SiteInfo;
 import org.alfresco.repo.site.SiteModel;
@@ -102,6 +105,7 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
     private ContentService contentService;
     private TransactionService transactionService;
     private SiteService siteService;
+    private AuthenticationComponent authenticationComponent;
 
     private VtiDocumentHepler documentHelper;
     private VtiPathHelper pathHelper;
@@ -126,6 +130,11 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
     {
         this.lockService = lockService;
     }
+
+    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
+    {
+        this.authenticationComponent = authenticationComponent;
+    } 
 
     public void setNodeService(NodeService nodeService)
     {
@@ -343,7 +352,12 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
         return true;
     }
 
-    public String[] decomposeURL(String url, String alfrescoContext)
+    public String[] decomposeURL(final String url, final String alfrescoContext)
+    {
+        return AuthenticationUtil.runAs(new RunAsWork<String[]>()
+                {
+
+                    public String[] doWork() throws Exception
     {
         if (!url.startsWith(alfrescoContext))
         {
@@ -419,6 +433,10 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
             throw VtiException.create(VtiError.V_BAD_URL);
         }
         return new String[]{webUrl, fileUrl};
+    }
+
+                },
+                authenticationComponent.getSystemUserName());        
     }
 
     public boolean existResource(String uri, HttpServletResponse response)

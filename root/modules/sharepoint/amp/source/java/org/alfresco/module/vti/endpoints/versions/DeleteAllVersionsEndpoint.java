@@ -77,7 +77,6 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
         String dws = EndpointUtils.getDwsFromUri();
-        String sessionId = EndpointUtils.getVtiSessionId();
         
         // getting fileName parameter from request
         XPath fileNamePath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/DeleteAllVersions/fileName"));
@@ -92,7 +91,7 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
 
         results.addElement("list").addAttribute("id", "");
         results.addElement("versioning").addAttribute("enabled", "1");
-        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText() + "&sessionId=" + sessionId);
+        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText());
 
         if (logger.isDebugEnabled())
             logger.debug("Deleting all versions for " + dws + "/" + fileName.getText() + ".");

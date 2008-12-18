@@ -314,7 +314,7 @@
              animate: false, //Animates the opening, closing and moving of Editor windows
              toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.widgets.editor._render();
+         this.widgets.editor.render();    
          
          // create the form that does the validation/submit
          var topicForm = new Alfresco.forms.Form(this.id + "-form");

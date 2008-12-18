@@ -78,9 +78,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       // Create the appropriate uploader component
-      // Since Flash player 10 the OS's browse dialog can only be triggered by an actual user mouse interaction
-      // This is due to Flash Players new security rules which breaks the YUI uploader component in its current state
-      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45) && !Alfresco.util.hasRequiredFlashPlayer(10, 0, 0);
+      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45); // && !Alfresco.util.hasRequiredFlashPlayer(10, 0, 0);
       if(this.hasRequiredFlashPlayer)        
       {
          this.uploader = Alfresco.module.getFlashUploadInstance();
@@ -91,7 +89,7 @@
       }
 
       return this;
-   }
+   };
 
    Alfresco.module.FileUpload.prototype =
    {
@@ -215,7 +213,7 @@
          // Let the uploader instance show itself
          this.uploader.show(this.showConfig);
       }
-   }
+   };
 
 })();
 
@@ -233,7 +231,6 @@ Alfresco.module.getFileUploadInstance = function()
       instance = new Alfresco.module.FileUpload(instanceId);
    }
    return instance;
-}
-
+};
 /* Create the instance to load optional YUI components and SWF early */
 Alfresco.module.getFileUploadInstance();

@@ -27,7 +27,6 @@ package org.alfresco.module.vti.method;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

@@ -29,8 +29,6 @@ import java.net.URLDecoder;
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.VtiMethodHandler;
-import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -51,7 +49,6 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
     
     // handler that provides methods for operating with documents and folders
     private VtiMethodHandler handler;
-    private VtiPathHelper pathHelper;
 
     // xml namespace prefix
     private static String prefix = "webs";
@@ -64,11 +61,6 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
     public WebUrlFromPageUrlEndpoint(VtiMethodHandler handler)
     {
         this.handler = handler;
-    }
-
-    public void setPathHelper(VtiPathHelper pathHelper)
-    {
-        this.pathHelper = pathHelper;
     }
 
     /**
@@ -99,12 +91,10 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
                 
         String[] uris = handler.decomposeURL(pageUrl.replaceAll(server, ""), context);        
 
-        NodeRef dwsNodeRef = pathHelper.resolvePathFileInfo(uris[0].replaceFirst(context, "")).getNodeRef();           
-
         // creating soap response
         Element responsElement = document.addElement("WebUrlFromPageUrlResponse", namespace);
         Element result = responsElement.addElement("WebUrlFromPageUrlResult");       
-        result.setText(server + uris[0] + "?nodeId=" + dwsNodeRef.getId() + "&sessionId=" + EndpointUtils.getVtiSessionId());
+        result.setText(server + uris[0]);
         
         if (logger.isDebugEnabled())
             logger.debug("Soap Method with name " + getName() + " is finished.");

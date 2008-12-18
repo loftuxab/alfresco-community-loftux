@@ -30,17 +30,14 @@ import java.util.List;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.endpoints.WebServiceErrorCodeException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.soap.UserGroupServiceHandler;
-import org.alfresco.module.vti.metadata.dic.VtiError;
 import org.alfresco.module.vti.metadata.soap.usergroup.UserBean;
+import org.alfresco.repo.site.SiteInfo;
 import org.alfresco.repo.site.SiteService;
-import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
@@ -56,7 +53,6 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
 {
 
     private PersonService personService;
-    private VtiPathHelper pathHelper;
     private NodeService nodeService;
     private SiteService siteService;
     
@@ -79,39 +75,27 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
         this.personService = personService;
     }
 
-    public void setPathHelper(VtiPathHelper pathHelper)
-    {
-        this.pathHelper = pathHelper;
-    }
-
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
 
-    public void addUserCollectionToRole(String dwsUrl, String roleName, List<UserBean> usersList)
+    public void addUserCollectionToRole(String dws, String roleName, List<UserBean> usersList)
     {
+        dws = VtiPathHelper.removeSlashes(dws);
         if (logger.isDebugEnabled())
             logger.debug("Method with name 'addUserCollectionToRole' is started.");
         
-        NodeRef dwsNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, dwsUrl);
         
-        if (logger.isDebugEnabled())
-            logger.debug("Getting fileinfo for '" + dwsNodeRef + "'.");
-        FileInfo dwsFileInfo = pathHelper.getFileFolderService().getFileInfo(dwsNodeRef);
+            if (logger.isDebugEnabled())
+            logger.debug("Getting siteInfo for '" + dws + "'.");
+        SiteInfo siteInfo = siteService.getSite(dws);
 
-        if (dwsFileInfo == null)
+        if (siteInfo == null)
         {
             if (logger.isDebugEnabled())
-                logger.debug("Error: File info is null.");
+                logger.debug("Error: Site info not found.");
             throw new WebServiceErrorCodeException(10);
-        }
-
-        if (dwsFileInfo.isFolder() == false)
-        {
-            if (logger.isDebugEnabled())
-                logger.debug("Error: File info is not folder.");
-            throw VtiException.create(VtiError.V_BAD_URL);
         }
 
         for (UserBean userBean : usersList)
@@ -131,11 +115,11 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
                 try
                 {
                     if (logger.isDebugEnabled())
-                        logger.debug("Setting membership [" + dwsFileInfo.getName() + ", " + userName + "].");
+                        logger.debug("Setting membership [" + dws + ", " + userName + "].");
                     
                     tx.begin();
                     
-                    siteService.setMembership(dwsFileInfo.getName(), userName, roleName);
+                    siteService.setMembership(dws, userName, roleName);
                     
                     tx.commit();
                 }

@@ -138,7 +138,16 @@
           * @type int
           * @default 3
           */
-         minSearchTermLength: 3
+         minSearchTermLength: 3,
+         
+         /**
+          * Maximum number of items to display in the results list
+          * 
+          * @property maxSearchResults
+          * @type int
+          * @default 100
+          */
+         maxSearchResults: 100
       },
 
       /**
@@ -259,34 +268,15 @@
          this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
          {
             var updatedResponse = oFullResponse;
-               
+            
             if (oFullResponse)
             {
-               var items = [];
-               
-               // Determine list of sites to show
-               if (me.searchTerm.length > 0)
+               var items = oFullResponse.people;
+
+               // crop item list to max length if required
+               if (items.length > me.options.maxSearchResults)
                {
-                  // Filter the results for the search term
-                  var lowerCaseTerm = me.searchTerm.toLowerCase();
-                  var personData, firstName, lastName;
-                  for (var i = 0, j = oFullResponse.people.length; i < j; i++)
-                  {
-                     personData = oFullResponse.people[i];
-                     firstName = (personData.firstName !== null) ? personData.firstName.toLowerCase() : "";
-                     lastName = (personData.lastName !== null) ? personData.lastName.toLowerCase() : "";
-                     
-                     // Determine if person matches search term
-                     if ((firstName.indexOf(lowerCaseTerm) != -1) || (lastName.indexOf(lowerCaseTerm) != -1))
-                     {
-                        // Add site to list
-                        items.push(personData);
-                     }
-                  }
-               }
-               else
-               {
-                  items = oFullResponse.people;
+                  items = items.slice(0, me.options.maxSearchResults-1);
                }
 
                // Remove the current user form the list?
@@ -703,7 +693,7 @@
        */
       _buildSearchParams: function PeopleFinder__buildSearchParams(searchTerm)
       {
-         return "filter=" + encodeURIComponent(searchTerm);
+         return "filter=" + encodeURIComponent(searchTerm) + "&maxResults=" + this.options.maxSearchResults;
       },
       
       /**
