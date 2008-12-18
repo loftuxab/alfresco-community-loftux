@@ -43,7 +43,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "editor", "element", "dom", "datatable", "paginator"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["event", "editor", "element", "dom", "paginator"], this.onComponentsLoaded, this);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);

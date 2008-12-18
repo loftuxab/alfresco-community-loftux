@@ -39,108 +39,32 @@
     */
    Alfresco.BlogViewPosts = function BlogViewPosts_constructor()
    {
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
-            
+      Alfresco.BlogViewPosts.superclass.constructor.call(this);
       return this;
    };
    
-   Alfresco.BlogViewPosts.prototype =
+   YAHOO.extend(Alfresco.BlogViewPosts, Alfresco.widget.Resizer,
    {
       /**
-       * Minimum Filter Panel width.
-       * 
-       * @property MIN_FILTER_PANEL_WIDTH
-       * @type int
+       * DOM ID of left-hand container DIV
+       *
+       * @property divLeft
+       * @type string
+       * @default "divLeft"
        */
-      MIN_FILTER_PANEL_WIDTH: 140,
+      divLeft: "divPostListFilters",
 
       /**
-       * Default Filter Panel width.
-       * 
-       * @property DEFAULT_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      DEFAULT_FILTER_PANEL_WIDTH: 180,
-
-      /**
-       * Maximum Filter Panel width.
-       * 
-       * @property MAX_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      MAX_FILTER_PANEL_WIDTH: 750,
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-       widgets: {},
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
+       * DOM ID of right-hand container DIV
        *
-       * @method onComponentsLoaded
+       * @property divRight
+       * @type string
+       * @default "divRight"
        */
-      onComponentsLoaded: function BlogViewPosts_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onDOMReady(this.onReady, this, true);
-      },
-   
-      /**
-       * Fired by YUI when parent element is available for scripting.
-       * Template initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
-       */
-      onReady: function BlogViewPosts_onReady()
-      {
-         // Horizontal Resizer
-         this.widgets.horizResize = new YAHOO.util.Resize("divPostListFilters",
-         {
-            handles: ["r"],
-            minWidth: this.MIN_FILTER_PANEL_WIDTH,
-            maxWidth: this.MAX_FILTER_PANEL_WIDTH
-         });
-         this.widgets.horizResize.on("resize", function(eventTarget)
-         {
-            this.onPostListResize(eventTarget.width);
-         }, this, true);
-         
-         // Initial size
-         if (YAHOO.env.ua.ie > 0)
-         {
-            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-         }
-         else
-         {
-            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-         }
-      },
-   
-      /**
-       * Fired by via resize event listener.
-       *
-       * @method onDocLibraryResize
-       */
-      onPostListResize: function BlogViewPosts_onPostListResize(width)
-      {
-         var Dom = YAHOO.util.Dom;
-         
-         if (typeof width != 'undefined')
-         {
-            // Reset widget height to ensure correct rendering
-            Dom.setStyle("divPostListFilters", "height", "auto");
-            // 8px breathing space for resize gripper
-            Dom.setStyle("divPostListPosts", "margin-left", 8 + width + "px");
-         }
-      }
-   };
+      divRight: "divPostListPosts"
+   });
    
 })();
 
-// Instantiate the Blog View Posts template
+// Instantiate the Document Library template
 new Alfresco.BlogViewPosts();

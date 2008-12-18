@@ -37,12 +37,14 @@ import java.util.TimeZone;
 public class VtiUtils
 {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+    private static final SimpleDateFormat propfindDateFormate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     private static final SimpleDateFormat versionDateFormat = new SimpleDateFormat("M/d/yyyy h:mm a", Locale.ENGLISH);
 
     static
     {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         versionDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        propfindDateFormate.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     /**
@@ -82,6 +84,11 @@ public class VtiUtils
     public static String formatVersionDate(Date date)
     {
         return versionDateFormat.format(date);
+    }
+
+    public static String formatPropfindDate(Date date)
+    {
+        return propfindDateFormate.format(date);
     }
 
     public static boolean compare(Date date, String dateString)

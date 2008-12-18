@@ -8,6 +8,11 @@
    width: 18px;
 }
 
+.treeview .ygtvchildren
+{
+   width: 150%;
+}
+
 .treeview .ygtvitem
 {
    background-color: #ffffff;

@@ -39,111 +39,31 @@
     */
    Alfresco.DocumentLibrary = function DocumentLibrary_constructor()
    {
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
-      
-      // Initialise prototype properties
-      this.widgets = {};
-            
+      Alfresco.DocumentLibrary.superclass.constructor.call(this);
       return this;
    };
    
-   Alfresco.DocumentLibrary.prototype =
+   YAHOO.extend(Alfresco.DocumentLibrary, Alfresco.widget.Resizer,
    {
       /**
-       * Minimum Filter Panel width.
-       * 
-       * @property MIN_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      MIN_FILTER_PANEL_WIDTH: 140,
-
-      /**
-       * Default Filter Panel width.
-       * 
-       * @property DEFAULT_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      DEFAULT_FILTER_PANEL_WIDTH: 160,
-
-      /**
-       * Maximum Filter Panel width.
-       * 
-       * @property MAX_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      MAX_FILTER_PANEL_WIDTH: 400,
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-       widgets: null,
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
+       * DOM ID of left-hand container DIV
        *
-       * @method onComponentsLoaded
+       * @property divLeft
+       * @type string
+       * @default "divLeft"
        */
-      onComponentsLoaded: function DocumentLibrary_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onDOMReady(this.onReady, this, true);
-      },
+      divLeft: "divDocLibraryFilters",
+
+      /**
+       * DOM ID of right-hand container DIV
+       *
+       * @property divRight
+       * @type string
+       * @default "divRight"
+       */
+      divRight: "divDocLibraryDocs"
+   });
    
-      /**
-       * Fired by YUI when parent element is available for scripting.
-       * Template initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
-       */
-      onReady: function DocumentLibrary_onReady()
-      {
-         var Dom = YAHOO.util.Dom;
-         
-         // Horizontal Resizer
-         this.widgets.horizResize = new YAHOO.util.Resize("divDocLibraryFilters",
-         {
-            handles: ["r"],
-            minWidth: this.MIN_FILTER_PANEL_WIDTH,
-            maxWidth: this.MAX_FILTER_PANEL_WIDTH
-         });
-         this.widgets.horizResize.on("resize", function(eventTarget)
-         {
-            this.onDocLibraryResize(eventTarget.width);
-         }, this, true);
-         
-         // Initial size
-         if (YAHOO.env.ua.ie > 0)
-         {
-            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-         }
-         else
-         {
-            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-         }
-      },
-   
-      /**
-       * Fired by via resize event listener.
-       *
-       * @method onDocLibraryResize
-       */
-      onDocLibraryResize: function DocumentLibrary_onDocLibraryResize(width)
-      {
-         var Dom = YAHOO.util.Dom;
-         
-         if (typeof width != 'undefined')
-         {
-            // Reset widget height to ensure correct rendering
-            Dom.setStyle("divDocLibraryFilters", "height", "auto");
-            // 8px breathing space for resize gripper
-            Dom.setStyle("divDocLibraryDocs", "margin-left", 8 + width + "px");
-         }
-      }
-   };
 })();
 
 // Instantiate the Document Library template

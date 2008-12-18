@@ -9,3 +9,6 @@
 
 <link rel="stylesheet" type="text/css" href="${page.url.context}/modules/taglibrary/taglibrary.css" />
 <script type="text/javascript" src="${page.url.context}/modules/taglibrary/taglibrary.js"></script>
+
+<script type="text/javascript" src="${page.url.context}/modules/wiki/revert-wiki-version.js"></script>
+<link rel="stylesheet" type="text/css" href="${page.url.context}/modules/wiki/revert-wiki-version.css" />

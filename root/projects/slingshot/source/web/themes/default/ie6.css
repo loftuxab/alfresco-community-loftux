@@ -5,6 +5,7 @@ textarea
    font-family: Arial, sans-serif; 
 }
 
+
 /**
  * Global site header
  */
@@ -62,6 +63,7 @@ textarea
    text-decoration: none;
 }
 
+
 /**
  * Global site footer
  */
@@ -76,8 +78,8 @@ textarea
    padding-top: 0;
 }
 
-/* These messages/dialogs was getting full width if none was specified */
 
+/* These messages/dialogs were getting full width if none was specified */
 .yui-skin-default #prompt
 {
    width: 30em;
@@ -87,6 +89,7 @@ textarea
 {
    width: 30em;
 }
+
 
 /**
  * Buttons
@@ -130,6 +133,8 @@ textarea
 {
    border: 1px solid #7BA9CE;
 }
+
+
 /**
  * Dashlets
  */
@@ -140,6 +145,7 @@ div.dashlet .body .clear
    clear: both;
    height: 1px;
 }
+
 
 /**
  * Page title and navigation
@@ -166,6 +172,7 @@ div.dashlet .body .clear
    padding-top: 6px;
 }
 
+
 /**
  * Re-apply the color for the popup bodies
  */
@@ -174,6 +181,7 @@ div.dashlet .body .clear
    color: #515D6B;
    background-color: #F9FBFD;
 }
+
 
 /**
  * Flash Upload needs some extra width on its popup to look good 
@@ -272,7 +280,6 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 /**
  * Customise dashlets
  */
-
 .customise-layout div.layouts ul
 {
    overflow: hidden;
@@ -325,6 +332,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    background-color: #f9fcfd;
 }
 
+
 /**
  * My Sites dashlet / padding bug
  */
@@ -332,6 +340,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 {
    margin-top: -7px;
 }
+
 
 /**
  * Members / invite pages
@@ -343,8 +352,9 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 
 .sent-invites .search-bar
 {
-   height:2em;  
+   height: 2em;  
 }
+
 
 /**
  * Document Library
@@ -385,6 +395,11 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    width: 16em;
 }
 
+.workflow .people-finder .results table
+{
+   margin-right: -20px;
+}
+
 /**
  * Calendar
  */
@@ -394,6 +409,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 }
 
 
+
 /**
  * Profile
  */
@@ -401,6 +417,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 {
    height: 1.2em;
 }
+
 
 /**
  * Padding to some of the dashlets
@@ -422,8 +439,8 @@ div.dashlet.calendar div.body
    margin: 0;
 }
 
-/* Full preview backgroundd mask */
 
+/* Full preview backgroundd mask */
 body.masked div.mask.full-preview-mask
 {
    background-color: #303030;

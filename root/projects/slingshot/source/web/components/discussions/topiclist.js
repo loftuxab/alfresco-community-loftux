@@ -130,7 +130,11 @@
          simpleView: false,
          
          /**
-          * Length of preview content loaded for each topic
+          * Maximum length of topic to show in list view
+          *
+          * @property maxContentLength
+          * @type int
+          * @default 512
           */
          maxContentLength: 512
       },
@@ -176,6 +180,24 @@
        */
       busy: false,
       
+      /**
+       * Offset of first record on page
+       * 
+       * @property recordOffset
+       * @type int
+       * @default 0
+       */
+      recordOffset: 0,
+
+      /**
+      * Total number of topics in the current view (across all pages)
+       * 
+       * @property totalRecords
+       * @type int
+       * @default 0
+       */
+      totalRecords: 0,
+
       /**
        * Set multiple initialization options at once.
        *
@@ -236,6 +258,16 @@
          // Simple view button
          this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
          
+         // Called by the paginator on state changes
+         var handlePagination = function DiscussionsTopicList_handlePagination(state, dt)
+         {
+            me.widgets.paginator.setState(state);
+            me._updateDiscussionsTopicList(
+            {
+               page: state.page
+            });
+         }
+         
          // YUI Paginator definition
          this.widgets.paginator = new YAHOO.widget.Paginator(
          {
@@ -247,6 +279,7 @@
             previousPageLinkLabel : this._msg("pagination.previousPageLinkLabel"),
             nextPageLinkLabel     : this._msg("pagination.nextPageLinkLabel")
          });
+         this.widgets.paginator.subscribe("changeRequest", handlePagination, this);
 
          // Hook action events for details view
          var fnActionHandlerDiv = function DiscussionsTopicList_fnActionHandlerDiv(layer, args)
@@ -308,7 +341,7 @@
             ],
             metaFields:
             {
-               paginationRecordOffset: "startIndex",
+               recordOffset: "startIndex",
                totalRecords: "total",
                forumPermissions: "forumPermissions"
             }
@@ -475,22 +508,38 @@
             key: "topics", label: "Topics", sortable: false, formatter: renderTopic
          }];
 
-         // called by the paginator on state changes
-         var handlePagination = function DL_handlePagination(state, dt)
-         {
-            //me.currentPage = state.page;
-            me._updateDiscussionsTopicList({ page : state.page });
-         }
-         
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-topiclist", columnDefinitions, this.widgets.dataSource,
          {
             initialLoad: false,
-            paginationEventHandler: handlePagination,
             paginator: this.widgets.paginator,
+            dynamicData: true,
             MSG_EMPTY: this._msg("message.loading")
          });
          
+         // Update totalRecords on the fly with value from server
+         this.widgets.dataTable.handleDataReturnPayload = function DL_handleDataReturnPayload(oRequest, oResponse, oPayload)
+         {
+            // Save metadata for Paginator update later
+            me.recordOffset = oResponse.meta.recordOffset;
+            me.totalRecords = oResponse.meta.totalRecords;
+
+            oPayload = oPayload || {};
+            oPayload.recordOffset = oResponse.meta.recordOffset;
+            oPayload.totalRecords = oResponse.meta.totalRecords;
+            return oPayload;
+         }
+
+         // Rendering complete event handler
+         this.widgets.dataTable.subscribe("renderEvent", function()
+         {
+            this.widgets.paginator.setState(
+            {
+               recordOffset: this.recordOffset,
+               totalRecords: this.totalRecords
+            });
+         }, this, true);
+
          // Custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
 

@@ -31,6 +31,7 @@
       }
    })();
    //]]></script>
+   <script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></script>
    <script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></script>
    <script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></script>
 </@>
@@ -56,8 +57,6 @@
          </div>
       </div>
    </div>
-   <p>&nbsp;</p>
-   <p>&nbsp;</p>
 </@>
 
 <@template.footer>

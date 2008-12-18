@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.repo.webdav.PropFindMethod;
 import org.alfresco.repo.webdav.WebDAV;
 import org.alfresco.repo.webdav.WebDAVHelper;
@@ -84,8 +85,7 @@ public class VtiPropfindMethod extends PropFindMethod
     private int m_depth = DEPTH_INFINITY;
     private boolean containsCollblob = false;
     
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    
+
     public VtiPropfindMethod()
     {
         m_namespaces.put("urn:schemas-microsoft-com:office:office", "Office");
@@ -153,7 +153,7 @@ public class VtiPropfindMethod extends PropFindMethod
         {
             xml.startElement("http://schemas.microsoft.com/repl/", "repl", "Repl:repl", getDAVHelper().getNullAttributes());
             xml.startElement("http://schemas.microsoft.com/repl/", "collblob", "Repl:collblob", getDAVHelper().getNullAttributes());
-            xml.write(dateFormat.format(new Date()));
+            xml.write(VtiUtils.formatPropfindDate(new Date()));
             xml.endElement("http://schemas.microsoft.com/repl/", "collblob", "Repl:collblob");
             xml.endElement("http://schemas.microsoft.com/repl/", "repl", "Repl:repl");
         }
@@ -445,7 +445,7 @@ public class VtiPropfindMethod extends PropFindMethod
 
         xml.startElement(WebDAV.DAV_NS, WebDAV.XML_GET_LAST_MODIFIED, WebDAV.XML_NS_GET_LAST_MODIFIED, nullAttr);
         if (davValue != null)
-            xml.write(WebDAV.formatCreationDate(typeConv.convert(Date.class, davValue)));
+            xml.write(VtiUtils.formatPropfindDate(typeConv.convert(Date.class, davValue)));
         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_GET_LAST_MODIFIED, WebDAV.XML_NS_GET_LAST_MODIFIED);
         
         // Get the creation date
@@ -455,7 +455,7 @@ public class VtiPropfindMethod extends PropFindMethod
 
         xml.startElement(WebDAV.DAV_NS, WebDAV.XML_CREATION_DATE, WebDAV.XML_NS_CREATION_DATE, nullAttr);
         if (davValue != null)
-            xml.write(WebDAV.formatCreationDate(typeConv.convert(Date.class, davValue)));
+            xml.write(VtiUtils.formatPropfindDate(typeConv.convert(Date.class, davValue)));
         xml.endElement(WebDAV.DAV_NS, WebDAV.XML_CREATION_DATE, WebDAV.XML_NS_CREATION_DATE);
 
         // For a file node output the content language and content type
