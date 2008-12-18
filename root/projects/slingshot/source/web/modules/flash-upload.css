@@ -11,6 +11,11 @@
    text-align: center;
 }
 
+.flash-upload .fileUploadTableMessage
+{
+   padding: 0.5em !important;
+}
+
 /* Add som padding to the file list so it looks centered */
 .yui-skin-default .yui-panel .bd .fileUpload-filelist-table
 {
@@ -26,22 +31,22 @@
 /* Create a visible gray line beneath each row */
 .fileUpload-filelist-table tbody .yui-dt-liner
 {
-   margin: 0;
-   padding: 0;
    border-bottom-style: solid;
    border-bottom-color: #CBCBCB;
    border-bottom-width: 1px;
+   margin: 0;
+   padding: 0;
    white-space: nowrap;
 }
 
-/* Width of the file list */
-.fileUpload-filelist-table .yui-dt-bd table
+/* Width of the file list - needs to override YUI element style setting */
+.fileUpload-filelist-table .yui-dt table
 {
-   width: 600px;
+   width: 620px !important;
 }
 
 /* Hide the table header */
-.fileUpload-filelist-table .yui-dt-hd table
+.fileUpload-filelist-table .yui-dt table thead
 {
    display: none;
 }

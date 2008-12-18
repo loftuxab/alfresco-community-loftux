@@ -79,7 +79,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "paginator", "json", "history"], this.onComponentsLoaded, this);
       
       /**
        * Decoupled event listeners
@@ -481,8 +481,7 @@
                containers: [this.id + "-paginator"],
                rowsPerPage: this.options.pageSize,
                initialPage: this.currentPage,
-               template: this._msg("pagination.template"),
-               pageReportTemplate: this._msg("pagination.template.page-report")
+               template: this._msg("pagination.template")
             });
          }
 
@@ -630,6 +629,7 @@
           */
          var renderCellSelected = function DL_renderCellSelected(elCell, oRecord, oColumn, oData)
          {
+            Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             elCell.innerHTML = '<input id="checkbox-' + oRecord.getId() + '" type="checkbox" name="fileChecked" value="'+ oData + '"' + (me.selectedFiles[oData] ? ' checked="checked">' : '>');
@@ -646,6 +646,7 @@
           */
          var renderCellStatus = function DL_renderCellStatus(elCell, oRecord, oColumn, oData)
          {
+            Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             var status = oRecord.getData("actionSet");
@@ -696,9 +697,9 @@
           */
          var renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var name = oRecord.getData("fileName");
-            var extn = name.substring(name.lastIndexOf("."));
-            var docDetailsUrl;
+            var name = oRecord.getData("fileName"),
+               extn = name.substring(name.lastIndexOf(".")),
+               docDetailsUrl;
 
             if (me.options.simpleView)
             {
@@ -706,6 +707,7 @@
                 * Simple View
                 */
                oColumn.width = 40;
+               Dom.setStyle(elCell, "width", oColumn.width + "px");
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
                if (oRecord.getData("type") == "folder")
@@ -714,11 +716,12 @@
                }
                else
                {
+                  var id = me.id + '-preview-' + oRecord.getId();
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
-                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="icon32"><a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + id + '" class="icon32"><a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" /></a></span>';
                   
                   // Preview tooltip
-                  me.previewTooltips.push(elCell.parentNode.id);
+                  me.previewTooltips.push(id);
                }
             }
             else
@@ -727,6 +730,7 @@
                 * Detailed View
                 */
                oColumn.width = 100;
+               Dom.setStyle(elCell, "width", oColumn.width + "px");
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
                if (oRecord.getData("type") == "folder")
@@ -886,8 +890,22 @@
           */
          var renderCellActions = function DL_renderCellActions(elCell, oRecord, oColumn, oData)
          {
+            if (me.options.simpleView)
+            {
+               /**
+                * Simple View
+                */
+                oColumn.width = 80;
+            }
+            else
+            {
+               /**
+                * Detailed View
+                */
+                oColumn.width = 140;
+            }
+            Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            //Dom.setStyle(elCell.parentNode, "border-left", "3px solid #fff");
 
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
          };
@@ -911,9 +929,6 @@
             key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 140
          }];
 
-         // Temporary "empty datatable" message
-         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.loading");
-
          var handlePagination = function DL_handlePagination(state, dt)
          {
             YAHOO.util.History.navigate("page", String(state.page));
@@ -924,18 +939,13 @@
          {
             renderLoopSize: this.options.usePagination ? 16 : 32,
             initialLoad: false,
-            /*
-            initialRequest: this._buildDocListParams(
-            {
-               page: this.currentPage
-            }),
-            */
             paginationEventHandler: handlePagination,
-            paginator: this.widgets.paginator
+            paginator: this.widgets.paginator,
+            MSG_EMPTY: this._msg("message.loading")
          });
          
          // Custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
 
          // Hook tableMsgShowEvent to clear out fixed-pixel width on <table> element (breaks resizer)
          this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
@@ -952,11 +962,11 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
-                  me._setDefaultDataTableErrors();
+                  me._setDefaultDataTableErrors(me.widgets.dataTable);
                }
             }
             else if (oResponse.results && !me.options.usePagination)
@@ -1018,8 +1028,8 @@
          });
          this.widgets.previewTooltip.contextTriggerEvent.subscribe(function(type, args)
          {
-            var context = args[0];
-            var record = me.widgets.dataTable.getRecord(context.id);
+            var context = args[0],
+               record = me.widgets.dataTable.getRecord(context.id);
             this.cfg.setProperty("text", '<img src="' + generateThumbnailUrl(record) + '" />');
          });
          
@@ -2127,12 +2137,13 @@
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function DL__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function DL__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.DocumentList");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.DocumentList");
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.DocumentList"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.DocumentList"));
       },
       
       /**
@@ -2162,7 +2173,7 @@
          };
          
          // Reset the custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Reset preview tooltips array
          this.previewTooltips = [];
@@ -2221,7 +2232,7 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                   if (oResponse.status == 404)
                   {
@@ -2231,7 +2242,7 @@
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
          };

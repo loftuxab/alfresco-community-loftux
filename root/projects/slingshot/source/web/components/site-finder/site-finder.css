@@ -52,7 +52,7 @@
    width: 75%;
 }
 
-.site-finder .yui-dt-bd table
+.site-finder .yui-dt table
 {
 	width: 100%;
 	border: none;
@@ -63,7 +63,7 @@
     white-space: nowrap;
 }
 
-.site-finder .yui-dt-bd table thead
+.site-finder .yui-dt table thead
 {
 	display: none;
 }

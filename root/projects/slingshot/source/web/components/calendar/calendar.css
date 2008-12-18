@@ -106,6 +106,7 @@ div.boxOutline
 
 #calendarmenu
 {
+   border: 1px solid #bfbfbf;
    position: absolute; 
 }
 
@@ -131,9 +132,10 @@ div.boxOutline
 	padding: .5em;
 }
 
-#calendarpicker
+#calendarpicker,
+#calendarendpicker
 {
-	vertical-align: baseline;	
+	vertical-align: middle;	
 }
 
 #calendar-view

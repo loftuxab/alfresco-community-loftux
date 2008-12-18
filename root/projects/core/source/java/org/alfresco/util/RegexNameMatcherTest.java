@@ -45,5 +45,40 @@ public class RegexNameMatcherTest extends TestCase {
 		assertTrue(!ret6);
 			
 	}
+	
+	public void testRegexGif() {
+		RegexNameMatcher matcher = new RegexNameMatcher();
+		
+		ArrayList<String>patterns = new ArrayList<String>();
+		patterns.add(".*.jpg");
+		matcher.setPatterns(patterns);
+		
+		boolean ret = matcher.matches("ROOT/myapp/file.jpg");
+		assertTrue(ret);
+		
+		boolean ret2 = matcher.matches("xxROOT/myapp/dir1.gif");
+		assertFalse(ret2);
+				
+	}
+	public void testRegexGifAndJpg() {
+		RegexNameMatcher matcher = new RegexNameMatcher();
+		
+		ArrayList<String>patterns = new ArrayList<String>();
+		patterns.add(".*.jpg$|.*.gif$");
+		matcher.setPatterns(patterns);
+		
+		boolean ret = matcher.matches("ROOT/myapp/file.jpg");
+		assertTrue(ret);
+		
+		boolean ret2 = matcher.matches("xxROOT/myapp/dir1.gif");
+		assertTrue(ret2);
+		
+		boolean ret3 = matcher.matches("xxROOT/myapp/dir7.png");
+		assertFalse(ret3);
+		
+		boolean ret4 = matcher.matches("xxROOT/myapp/dir7.png.old");
+		assertFalse(ret3);
+				
+	}
 
 }

@@ -6,12 +6,14 @@
   display: none;
 }
 
-.search .yui-dt-bd table{
+.search .yui-dt table
+{
 	width: 100%;
 	border: none;
 }
 
-.search .yui-dt-bd table thead{
+.search .yui-dt table thead
+{
 	display: none;
 }
 

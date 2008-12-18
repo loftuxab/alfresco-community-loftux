@@ -325,10 +325,10 @@
          }];
 
          // DataTable definition
-         YAHOO.widget.DataTable.MSG_EMPTY = ""; // "First add users to this list";  //msg("message.empty", "Alfresco.InvitationList");
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-inviteelist", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32
+            renderLoopSize: 32,
+            MSG_EMPTY: ""
          });
       },
 
@@ -379,9 +379,7 @@
             userName: this.widgets.dataTable.getRecord(recordId).getData("userName")
          });
 
-         // remove the element, but first set the empty message (which is static,
-         // thus shared by this table and the one to find users)
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
+         // remove the element
          this.widgets.dataTable.deleteRow(recordId);
          this._enableDisableInviteButton();
       },

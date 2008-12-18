@@ -218,7 +218,7 @@
          }
          
          // Create and render the YUI dialog
-         this.widgets.dialog = new YAHOO.widget.Panel(dialogDiv,
+         this.widgets.dialog = new YAHOO.widget.Dialog(dialogDiv,
          {
             modal: true,
             draggable: false,
@@ -227,7 +227,8 @@
             visible: false,
             width: this.options.width
          });
-
+         
+         this.widgets.dialog.cancelEvent.subscribe(this.onCancel, null, this);
          this.widgets.dialog.render(document.body);
 
          // Load the People Finder component from the server
@@ -404,8 +405,10 @@
          }];
 
          // DataTable definition
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
-         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-peopleselected", columnDefinitions, this.widgets.dataSource);
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-peopleselected", columnDefinitions, this.widgets.dataSource,
+         {
+            MSG_EMPTY: this._msg("label.no-users-selected")
+         });
 
          // Hook remove person action click events
          var fnRemoveHandler = function DLW_fnRemoveHandler(layer, args)
@@ -421,7 +424,6 @@
                if (record)
                {
                   userName = record.getData("userName");
-                  YAHOO.widget.DataTable.MSG_EMPTY = "";
                   me.widgets.dataTable.deleteRow(rowId);
                   YAHOO.Bubbling.fire("personDeselected",
                   {
@@ -705,7 +707,6 @@
          }
 
          // Clear results DataTable
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
          var recordCount = this.widgets.dataTable.getRecordSet().getLength();
          this.widgets.dataTable.deleteRows(0, recordCount);
          

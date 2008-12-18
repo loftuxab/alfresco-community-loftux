@@ -209,7 +209,8 @@
          var me = this;
          
          // build a list of sites the current user is a member of
-         var config = {
+         var config =
+         {
             method: "GET",
             url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.options.currentUser) + "/sites",
             successCallback: 
@@ -217,7 +218,7 @@
                fn: this._processMembership, 
                scope: this 
             },
-            failureMessage: Alfresco.util.message("site-finder.no-membership-detail", "Alfresco.SiteFinder")
+            failureMessage: me._msg("site-finder.no-membership-detail")
          };
          Alfresco.util.Ajax.request(config);
          
@@ -422,20 +423,50 @@
                      {
                          container: me.id + '-deleteButton-' + shortName
                      });
-                     deleteButton.set("label", Alfresco.util.message("site-finder.delete", "Alfresco.SiteFinder"));
-                     deleteButton.set("onclick", { fn: me.doDelete, obj: {shortName: shortName, title: title}, scope: me});
+                     deleteButton.set("label", me._msg("site-finder.delete"));
+                     deleteButton.set("onclick",
+                     {
+                        fn: me.doDelete,
+                        obj:
+                        {
+                           shortName: shortName,
+                           title: title
+                        },
+                        scope: me
+                     });
 
                      // leave button
-                     button.set("label", Alfresco.util.message("site-finder.leave", "Alfresco.SiteFinder"));
-                     button.set("onclick", { fn: me.doLeave, obj: {shortName: shortName, title: title}, scope: me});
+                     button.set("label", me._msg("site-finder.leave"));
+                     button.set("onclick",
+                     {
+                        fn: me.doLeave,
+                        obj:
+                        {
+                           shortName: shortName,
+                           title: title
+                        },
+                        scope: me
+                     });
                   }
                   else
                   {
-                     button.set("label", Alfresco.util.message("site-finder.join", "Alfresco.SiteFinder"));
-                     button.set("onclick", { fn: me.doJoin, obj: {shortName: shortName, title: title}, scope: me});
+                     button.set("label", me._msg("site-finder.join"));
+                     button.set("onclick",
+                     {
+                        fn: me.doJoin,
+                        obj:
+                        {
+                           shortName: shortName, 
+                           title: title
+                        },
+                        scope: me
+                     });
                   }
                   
-                  me.buttons[shortName] = { button: button };
+                  me.buttons[shortName] =
+                  {
+                     button: button
+                  };
                }
             }
             else
@@ -458,13 +489,12 @@
          }
          ];
 
-         YAHOO.widget.DataTable.MSG_EMPTY = '';
-
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
-            initialLoad: false
+            initialLoad: false,
+            MSG_EMPTY: this._msg("message.instructions")
          });
          this.widgets.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
 
@@ -477,19 +507,18 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
-                  me._setDefaultDataTableErrors();
+                  me._setDefaultDataTableErrors(me.widgets.dataTable);
                }
             }
             else if (oResponse.results)
             {
                if (oResponse.results.length == 0)
                {
-                  YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' + 
-                     Alfresco.util.message("message.empty", "Alfresco.SiteFinder") + '</span>';
+                  me.widgets.dataTable.set("MSG_EMPTY", '<span style="white-space: nowrap;">' + me._msg("message.empty") + '</span>');
                }
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
@@ -540,7 +569,7 @@
                obj: site,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-finder.join-failure", "Alfresco.SiteFinder", this.options.currentUser, site.title)
+            failureMessage: this._msg("site-finder.join-failure", this.options.currentUser, site.title)
          });
       },
       
@@ -559,7 +588,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("site-finder.join-success", "Alfresco.SiteFinder", this.options.currentUser, site.title)
+            text: this._msg("site-finder.join-success", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -588,7 +617,7 @@
                obj: site,
                scope: this
             },
-            failureMessage: Alfresco.util.message("site-finder.leave-failure", "Alfresco.SiteFinder", this.options.currentUser, site.title)
+            failureMessage: this._msg("site-finder.leave-failure", this.options.currentUser, site.title)
          });
       },
       
@@ -607,7 +636,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("site-finder.leave-success", "Alfresco.SiteFinder", this.options.currentUser, site.title)
+            text: this._msg("site-finder.leave-success", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -634,12 +663,13 @@
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function SiteFinder__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function SiteFinder__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.SiteFinder");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.SiteFinder");
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.SiteFinder"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.SiteFinder"));
       },
       
       /**
@@ -651,10 +681,10 @@
       _performSearch: function SiteFinder__performSearch(searchTerm)
       {
          // Reset the custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Display loading message
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("site-finder.searching", "Alfresco.SiteFinder");
+         this.widgets.dataTable.set("MSG_EMPTY", Alfresco.util.message("site-finder.searching", "Alfresco.SiteFinder"));
          
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -677,12 +707,12 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
          }
@@ -721,7 +751,7 @@
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onSiteDeleted: function CS_onSiteDeleted(layer, args)
+      onSiteDeleted: function SiteFinder_onSiteDeleted(layer, args)
       {
          var site = args[1].site;
          var rs = this.widgets.dataTable.getRecordSet();
@@ -744,12 +774,25 @@
        * @method onRowDeleteEvent
        * @param event {object} a DataTable "rowDelete" event
        */
-      onRowDeleteEvent: function FU_onRowDeleteEvent(event)
+      onRowDeleteEvent: function SiteFinder_onRowDeleteEvent(event)
       {
          if (this.widgets.dataTable.getRecordSet().getLength() === 0)
          {
-            this.widgets.dataTable.showTableMessage(Alfresco.util.message("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
+            this.widgets.dataTable.showTableMessage(this._msg("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
          }
+      },
+
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function SiteFinder__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.SiteFinder", Array.prototype.slice.call(arguments).slice(1));
       }
    };
 })();

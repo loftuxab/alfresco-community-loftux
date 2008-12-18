@@ -83,7 +83,8 @@
 
 .blog-postlist 
 {
-   margin: 0 -8px;	
+   clear: left;
+   margin: 0 -8px;
 }
 
 .blog-postlist table

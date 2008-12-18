@@ -9,6 +9,11 @@ html, body
    height: 100%;
 }
 
+#bd
+{
+   padding-bottom: 2em;
+}
+
 .sticky-wrapper
 {
    height: auto !important;
@@ -460,6 +465,12 @@ textarea
    padding: 2px;
    font-weight: normal;
    width: 15em;
+}
+
+/* DataTable overrides */
+.yui-skin-default .yui-dt tr.yui-dt-first td
+{
+   border-top: medium none;
 }
 
 /* Richtext Editor Plug-ins */

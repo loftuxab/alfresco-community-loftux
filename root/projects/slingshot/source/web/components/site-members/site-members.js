@@ -517,14 +517,12 @@
          }
          ];
 
-         YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' +
-            this._msg("site-members.enter-search-term") + '</span>';
-
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-members", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
-            initialLoad: false
+            initialLoad: false,
+            MSG_EMPTY: '<span style="white-space: nowrap;">' + this._msg("site-members.enter-search-term") + '</span>'
          });
          
          // Override abstract function within DataTable to set custom error message
@@ -535,19 +533,18 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  me.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
-                  me._setDefaultDataTableErrors();
+                  me._setDefaultDataTableErrors(me.widgets.dataTable);
                }
             }
             else if (oResponse.results)
             {
                if (oResponse.results.length === 0)
                {
-                  YAHOO.widget.DataTable.MSG_EMPTY = '<span style="white-space: nowrap;">' + 
-                     me._msg("message.empty") + '</span>';
+                  me.widgets.dataTable.set("MSG_EMPTY", '<span style="white-space: nowrap;">' + me._msg("message.empty") + '</span>');
                }
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko > 0) ? 3 : 5;
             }
@@ -717,12 +714,13 @@
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function SiteMembers__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function SiteMembers__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.SiteMembers");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.SiteMembers");
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.SiteMembers"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.SiteMembers"));
       },
       
       /**
@@ -734,10 +732,10 @@
       _performSearch: function SiteMembers__performSearch(searchTerm)
       {
          // Reset the custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Display loading message
-         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("site-members.searching");
+         this.widgets.dataTable.set("MSG_EMPTY", this._msg("site-members.searching"));
          
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -760,12 +758,12 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
          }
