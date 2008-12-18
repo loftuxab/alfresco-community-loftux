@@ -92,7 +92,7 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
                 
                 if (logger.isDebugEnabled())
                     logger.debug("Parsed ticket: " + ticket);
-    
+                
                 // place the ticket back into the connector session
                 if (connectorSession != null)
                 {
@@ -104,11 +104,15 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
             }
             else
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Authentication failed, received response code: " + response.getStatus().getCode());            
             }
         }
-
+        else if (logger.isDebugEnabled())
+        {
+            logger.debug("No user credentials available - cannot authenticate.");
+        }
+        
         return cs;
     }
     

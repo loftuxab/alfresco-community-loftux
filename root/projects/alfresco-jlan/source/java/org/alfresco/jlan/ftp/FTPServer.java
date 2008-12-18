@@ -702,9 +702,13 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 			}
 		}
     
-    //	Fire a shutdown notification event
+		// Close the authenticator
+		
+		m_configSection.getFTPAuthenticator().closeAuthenticator();
+		
+		//	Fire a shutdown notification event
     
-    fireServerEvent(ServerListener.ServerShutdown);
+		fireServerEvent(ServerListener.ServerShutdown);
 	}
 
 	/**

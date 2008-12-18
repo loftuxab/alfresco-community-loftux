@@ -172,4 +172,10 @@ public class LocalAuthenticator implements FTPAuthenticator {
     if ( params.getChild( "Debug") != null)
       m_debug = true;
   }
+
+  /**
+   * Close the authenticator
+   */
+  public void closeAuthenticator() {
+  }
 }

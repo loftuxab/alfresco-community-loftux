@@ -23,41 +23,33 @@
  * http://www.alfresco.com/legal/licensing"
  */
 
-package org.alfresco.jlan.ftp;
-
-import org.alfresco.jlan.server.auth.ClientInfo;
-import org.alfresco.jlan.server.config.InvalidConfigurationException;
-import org.alfresco.jlan.server.config.ServerConfiguration;
-import org.alfresco.config.ConfigElement;
+package org.alfresco.jlan.server.auth;
 
 /**
- * FTP Authenticator Interface
- *
+ * Challenge Authentication Context Class
+ * 
+ * <p>Contains a challenge to be sent to a client for password hashing.
+ * 
  * @author gkspencer
  */
-public interface FTPAuthenticator {
+public class ChallengeAuthContext extends AuthContext {
+
+  // Challenge sent to client
+
+  protected byte[] m_challenge;
 
   /**
-   * Initialize the authenticator
-   * 
-   * @param config ServerConfiguration
-   * @param params ConfigElement
-   * @exception InvalidConfigurationException
+   * Default contructor
    */
-  public void initialize(ServerConfiguration config, ConfigElement params)
-    throws InvalidConfigurationException;
+  public ChallengeAuthContext() {
+  }
   
   /**
-   * Authenticate the user
+   * Get the challenge
    * 
-   * @param cInfo ClientInfo
-   * @param sess FTPSrvSession
-   * @return boolean
+   * return byte[]
    */
-  public boolean authenticateUser( ClientInfo cInfo, FTPSrvSession sess);
-  
-  /**
-   * Close the authenticator, perform any cleanup
-   */
-   public void closeAuthenticator();
+  public byte[] getChallenge() {
+    return m_challenge;
+  }
 }

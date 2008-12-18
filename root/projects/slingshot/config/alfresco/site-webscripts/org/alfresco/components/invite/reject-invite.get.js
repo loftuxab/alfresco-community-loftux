@@ -17,7 +17,8 @@ function main()
    
    //fetch the invite information, which gives us all information required to display the page
    var url = "/api/invite/" + page.url.args.inviteId + "/" + page.url.args.inviteTicket;
-   var json = remote.call(url);
+   var connector = remote.connect("alfresco-noauth");
+   var json = connector.call(url);
    if (json.status == 200)
    {
       // Create javascript objects from the repo response
