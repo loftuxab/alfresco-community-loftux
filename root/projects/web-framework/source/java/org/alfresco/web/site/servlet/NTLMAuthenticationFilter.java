@@ -50,8 +50,13 @@ import org.alfresco.jlan.server.auth.ntlm.Type2NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type3NTLMMessage;
 import org.alfresco.util.Base64;
 import org.alfresco.web.config.RemoteConfigElement;
+import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.site.AuthenticationUtil;
+import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -115,9 +120,31 @@ public class NTLMAuthenticationFilter implements Filter
     public void doFilter(ServletRequest sreq, ServletResponse sresp, FilterChain chain)
         throws IOException, ServletException
     {
+        // initialize the request context
+        // it may already exist if an outer authentication filter has intercepted first
+        RequestContext context = null;
+        try
+        {
+            context = RequestUtil.getRequestContext(sreq);
+        }
+        catch (RequestContextException ex)
+        {
+            throw new ServletException(ex);
+        }
+        
+        // get the page from the model if any - it may not require authentication
+        Page page = context.getPage();
+        if (page != null && page.getAuthentication() == RequiredAuthentication.none)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Unauthenticated page requested - skipping auth filter...");
+            chain.doFilter(sreq, sresp);
+            return;
+        }
+        
         // Get the HTTP request/response/session
-        HttpServletRequest req = (HttpServletRequest) sreq;
-        HttpServletResponse res = (HttpServletResponse) sresp;
+        HttpServletRequest req = (HttpServletRequest)sreq;
+        HttpServletResponse res = (HttpServletResponse)sresp;
         HttpSession session = req.getSession(true);
         
         // Check if there is an authorization header with an NTLM security blob

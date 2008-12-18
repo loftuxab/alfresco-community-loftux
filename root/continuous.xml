@@ -306,7 +306,7 @@
                      prefix="bin" />
          <zipfileset dir="${dir.name.binaries.installer.win32}"
                      prefix="bin"
-                     excludes="jdk*, OpenOffice*" />
+                     includes="imconvert.exe, pdf2swf.exe" />
          <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
          <zipfileset dir="${dir.continuous.dist}"

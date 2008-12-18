@@ -38,15 +38,11 @@ import org.alfresco.jlan.util.HexDump;
  *
  * @author gkspencer
  */
-public class NTLanManAuthContext extends AuthContext {
+public class NTLanManAuthContext extends ChallengeAuthContext {
 
   // Random number generator used to generate challenge
 
   private static Random m_random = new Random(System.currentTimeMillis());
-
-  // Challenge sent to client
-
-  private byte[] m_challenge;
 
   /**
    * Class constructor
@@ -66,15 +62,6 @@ public class NTLanManAuthContext extends AuthContext {
    */
   public NTLanManAuthContext(byte[] challenge) {
     m_challenge = challenge;
-  }
-
-  /**
-   * Get the challenge
-   * 
-   * return byte[]
-   */
-  public final byte[] getChallenge() {
-    return m_challenge;
   }
 
   /**

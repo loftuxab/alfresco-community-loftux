@@ -421,7 +421,7 @@ public abstract class CifsAuthenticator {
 
 		// Pack the negotiate response for NT/LanMan challenge/response authentication
 
-		NTLanManAuthContext authCtx = (NTLanManAuthContext) getAuthContext(sess);
+		ChallengeAuthContext authCtx = (ChallengeAuthContext) getAuthContext(sess);
 
 		// Encryption key and primary domain string should be returned in the byte area
 

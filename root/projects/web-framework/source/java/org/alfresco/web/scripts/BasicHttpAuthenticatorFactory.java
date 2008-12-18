@@ -36,8 +36,7 @@ import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 import org.alfresco.web.scripts.servlet.WebScriptServletResponse;
-import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.UserFactory;
+import org.alfresco.web.site.AuthenticationUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -146,9 +145,9 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
                         CredentialVault vault = connectorService.getCredentialVault(req.getSession(true), "guest");
                         vault.store(credentials);
                         
-                        // see if we can authenticate the user
-                        UserFactory userFactory = FrameworkHelper.getUserFactory();
-                        authorized = userFactory.authenticate(req, username, parts[1]);
+                        AuthenticationUtil.login(req, username);
+                        
+                        authorized = true;
                     }
                     catch (Throwable err)
                     {
