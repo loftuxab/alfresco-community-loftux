@@ -405,7 +405,7 @@
 
          // content            
          html += '<div class="nodeContent">';
-         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + this._msg("post.said") + ': ';
+         html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + ' ' + this._msg("post.said") + ': ';
          if (data.isUpdated)
          {
             html += '<span class="nodeStatus">(' + this._msg("post.updated") + ')</span>';

@@ -420,24 +420,15 @@ public abstract class AbstractRequestContext implements RequestContext
     }
     
     /**
-     * Returns the user id
-     * 
-     * @return
+     * @return the user id
      */
     public String getUserId()
     {
-        String userId = null;
-        if (getUser() != null)
-        {
-            userId = getUser().getId();
-        }
-        return userId;
+    	return (getUser() != null ? getUser().getId() : null);
     }
 
     /**
-     * Returns the credential vault for the current user
-     * 
-     * @return
+     * @return the credential vault for the current user
      */
     public CredentialVault getCredentialVault()
     {

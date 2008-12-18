@@ -84,9 +84,8 @@ function getActivities()
    }
    else
    {
-      // TODO: Use alfresco-rss when that code path works
-      connector = remote.connect("alfresco-rss");
-      connector = remote.connect("alfresco");
+      // Use alfresco-feed connector as a basic HTTP auth challenge will be issued
+      connector = remote.connect("alfresco-feed");
    }
 
    if (mode == "site")

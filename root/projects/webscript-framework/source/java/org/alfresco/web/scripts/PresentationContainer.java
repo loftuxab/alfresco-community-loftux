@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,9 +49,14 @@ public class PresentationContainer extends AbstractRuntimeContainer
     public void executeScript(WebScriptRequest scriptReq, WebScriptResponse scriptRes, Authenticator auth)
         throws IOException
     {
-        // TODO: Consider Web Tier Authentication
-        WebScript script = scriptReq.getServiceMatch().getWebScript();
-        script.execute(scriptReq, scriptRes);
+        // TODO: handle authentication of scripts correctly on a case-by-case basis
+        //       currently we assume that if a webscript servlet has any authenticator
+        //       applied then it must be for some kind of remote user auth as supplied
+        if (auth == null || auth.authenticate(RequiredAuthentication.user, false))
+        {
+            WebScript script = scriptReq.getServiceMatch().getWebScript();
+            script.execute(scriptReq, scriptRes);
+        }
     }
 
     /* (non-Javadoc)

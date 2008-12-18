@@ -62,11 +62,12 @@
       Alfresco.constants.DEBUG = ${DEBUG?string};
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
       Alfresco.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
-      Alfresco.constants.PROXY_RSS_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco-rss/";
+      Alfresco.constants.PROXY_FEED_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco-feed/";
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
       Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
+      Alfresco.constants.URL_FEEDSERVICECONTEXT = "${url.context}/feedservice/";
       Alfresco.constants.ALF_TICKET = "${context.properties.alfTicket!""}";
       Alfresco.constants.USERNAME = "${user.name!""}";
    //]]></script>

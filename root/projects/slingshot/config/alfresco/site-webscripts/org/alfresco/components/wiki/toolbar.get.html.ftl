@@ -32,7 +32,7 @@
 
    <div class="rss-feed">
       <div>
-         <a id="${args.htmlid}-rssFeed-button" href="${url.context}/proxy/alfresco-rss/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">${msg("message.rssfeed")}</a>
+         <a id="${args.htmlid}-rssFeed-button" href="${url.context}/proxy/alfresco-feed/slingshot/wiki/pages/${page.url.templateArgs["site"]}?format=rss">${msg("message.rssfeed")}</a>
       </div>
    </div>
 
