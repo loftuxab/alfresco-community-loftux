@@ -86,6 +86,7 @@ namespace AlfrescoPowerPoint2003
             else
             {
                m_ServerDetails.DocumentPath = "";
+               this.showHome(false);
             }
 
             if (!m_ManuallyHidden)
@@ -180,7 +181,7 @@ namespace AlfrescoPowerPoint2003
             string theURI = string.Format(@"{0}{1}myAlfresco?p=&e=ppt", m_ServerDetails.WebClientURL, m_TemplateRoot);
             // We don't prompt the user if the document is closing
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
-            if (strAuthTicket != "")
+            if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
                theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
             }
@@ -234,7 +235,7 @@ namespace AlfrescoPowerPoint2003
             }
             string theURI = string.Format(@"{0}{1}documentDetails?p={2}&e=ppt", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
-            if (strAuthTicket != "")
+            if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
                theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
             }

@@ -57,8 +57,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * EndPoint HTTP Proxy Servlet.
  * 
  * Provides the ability to submit a URL request via a configured end point such as a
- * remote Alfresco Server. Automatically appends TICKET information for the current
- * user context.
+ * remote Alfresco Server. Makes use of the Connector framework so that appropriate
+ * authentication is automatically applied to the proxied request as applicable.
  * 
  * This servlet accepts URIs of the following format:
  * 
@@ -147,8 +147,9 @@ public class EndPointProxyServlet extends HttpServlet
                 throw new AlfrescoRuntimeException("Invalid EndPoint Id: " + endpointId);
             }
             
-            // special case for Flash based apps - they pass in the alf_ticket directly as a parameter
-            // they do not share the same session (annoyingly) so we must apply the ticket directly
+            // special case for some Flash based apps - they might pass in the alf_ticket directly
+            // as a parameter as POST requests do not correctly pickup the browser cookies and
+            // therefore do not share the same session so we must apply the ticket directly
             String ticket = req.getParameter(PARAM_ALF_TICKET);
             
             // user id from session NOTE: @see org.alfresco.web.site.UserFactory
@@ -228,7 +229,7 @@ public class EndPointProxyServlet extends HttpServlet
             }
             else
             {
-                // special case for Flash apps - see above
+                // special case for some Flash apps - see above
                 Map<String, String> params = new HashMap<String, String>(1, 1.0f);
                 params.put(PARAM_ALF_TICKET, ticket);
                 context = new ConnectorContext(params, null);

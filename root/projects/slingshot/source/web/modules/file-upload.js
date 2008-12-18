@@ -194,7 +194,6 @@
        */
       show: function FU_show(config)
       {
-
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
 

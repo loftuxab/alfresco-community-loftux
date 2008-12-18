@@ -68,7 +68,6 @@
       Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
       Alfresco.constants.URL_FEEDSERVICECONTEXT = "${url.context}/feedservice/";
-      Alfresco.constants.ALF_TICKET = "${context.properties.alfTicket!""}";
       Alfresco.constants.USERNAME = "${user.name!""}";
    //]]></script>
    <@common.uriTemplate />

@@ -1462,14 +1462,9 @@
             url = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL;
          }
          
-         if (Alfresco.constants.ALF_TICKET.length != 0)
-         {
-            url += "?alf_ticket=" + Alfresco.constants.ALF_TICKET;
-         }
-         else
-         {
-            url += ";jsessionid=" + YAHOO.util.Cookie.get("JSESSIONID");
-         }
+         // Flash does not correctly bind to the session cookies during POST
+         // so we manually patch the jsessionid directly onto the URL instead
+         url += ";jsessionid=" + YAHOO.util.Cookie.get("JSESSIONID");
          
          // Find files to upload
          var startedUploads = 0;
