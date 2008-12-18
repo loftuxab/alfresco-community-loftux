@@ -32,12 +32,10 @@ package org.alfresco.previewer
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
 	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 	
-	import mx.controls.Alert;
 	import mx.core.MovieClipAsset;
 	import mx.events.ResizeEvent;
 	
@@ -82,6 +80,11 @@ package org.alfresco.previewer
 		private var _page:int = -1;		
 		
 		/**
+		 * If true clicks on pages will dispatch events.  
+		 */
+		private var _interactive:Boolean = false;
+		
+		/**
 		 * Flag to remember if we have added event listeners or not.
 		 */
 		private var addedEventListeners:Boolean = false;		
@@ -102,7 +105,8 @@ package org.alfresco.previewer
 		private var doc:Document;
 		
 		/**
-		 * An array to store the movie clip/image or swf movie before they are added as pages in the document.  
+		 * An array to store the Page(s) (containing a movie clip, image or swf movie) 
+		 * before they are added as pages in the document.  
 		 */
 		private var pages:Array;
 		
@@ -131,6 +135,9 @@ package org.alfresco.previewer
 		 */	
 		private var fitToScreen:Number;
 		
+		/**
+		 * The preloader to display while the content is loading.
+		 */
 		[Embed(source="assets/preloader.swf")]		
 		public var Preloader:Class;
 		public var preloader:MovieClipAsset;
@@ -209,11 +216,46 @@ package org.alfresco.previewer
 		
 		/**
 		 * Returns the last page that was set.
+		 * 
 		 * @return the last page that was set.
 		 */
 		public function get page():int
 		{
 			return _page;
+		}
+		
+		/**
+		 * Returns true if the document's pages are clickable.
+		 * 
+		 * @return true if the document's pages are clickable.
+		 */
+		public function get interactiveDocument():Boolean
+		{
+			return _interactive;
+		}
+
+		/**
+		 * Enables or disables the document displayed as interactive or not.
+		 * 
+		 * @param interactive If true the document's pages will be clickable.
+		 */
+		public function set interactiveDocument(interactive:Boolean):void
+		{
+			if(_interactive != interactive)
+			{
+				_interactive = interactive;
+				
+				// Make sure SpritZoomDisplay isn't draggable if we are in interactive mode
+				draggingEnabled = !_interactive;			
+				
+				// Make sure each page has a background color if in interactive mode
+				var p:Page;
+				for(var i:int = 0; i < doc.numChildren; i++)
+				{
+					p = doc.getChildAt(i) as Page;
+					p.interactive = _interactive;
+				}
+			}
 		}
 	
 		/**
@@ -258,33 +300,36 @@ package org.alfresco.previewer
     	    }
     	    else
     	    {
+    	    	var p:Page = new Page();
     	    	// Find out what we have loaded and add it as page to the single paged document
 		    	if (loader.content is MovieClip)
 	    	    {    
-	    	    	contentType = MOVIE_CLIP;		        	        	   
-					pages.push(MovieClip(loader.content));						
+	    	    	contentType = MOVIE_CLIP;	    	    	
+	    	    	p.addChild(MovieClip(loader.content));		        	        	   											
 	    	    }
 	    	    else if (event.currentTarget.loader.content is flash.display.Bitmap)
 	    	    {    
 	        		contentType = IMAGE;
-					pages.push(Bitmap(loader.content));								     
+	    	    	p.addChild(Bitmap(loader.content));		        	        	   													    
 	    	    }
 	    	    else if (event.target.actionScriptVersion == 2)
 		    	{
 		    		contentType = AVM1_MOVIE;
-	    	    	pages.push(AVM1Movie(loader.content));
+	    	    	p.addChild(AVM1Movie(loader.content));	    	    	
 	    	    }
 	    	    else
 	    	    {
 	    	    	// Can't display url because loaded content is not a bitmap or movieclip.
     	    		sprite = null;
 					var e:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR);					
-					dispatchEvent(e);	    	    	    	    	
+					dispatchEvent(e);	
+					return;    	    	    	    	
 	    	    }									
 	    	    
 	    	    // Create the document and add the page to it
-				doc = new Document();				
-				doc.addChild(pages[0]);						
+				doc = new Document();
+				pages.push(p);				
+				doc.addChild(p);						
 				
 				// Add the document as the sprite/document of the document zoom display 										
 				sprite = doc;
@@ -305,8 +350,13 @@ package org.alfresco.previewer
     		createMovieClipInstance(
     			loader, 
     			function movieClipCreated(mc:MovieClip, obj:Object):void{
-    				// Add the new unique move clip instance to the page array			    			
-					pages.push(mc);
+    				/**
+    				 * Create a new Page containing the new unique move clip instance
+    				 * and add it to the page array
+    				 */
+	    			var p:Page = new Page();	    			
+	    			p.addChild(mc);
+					pages.push(p);
 												
 					if (obj.yetToCreate > 0)
 					{
@@ -362,16 +412,20 @@ package org.alfresco.previewer
 		{	
 			// Create the document with padding around and between the pages 		
 			doc = new Document();
-			doc.padding = 30;
-			doc.gap = 30;
+			doc.addEventListener(DocumentEvent.DOCUMENT_PAGE_CLICK, onDocumentPageClick);
+			doc.padding = 5;
+			doc.gap = 5;
 			
 			// Add clips/frames/pages from the pages array to the document
-			var mc:MovieClip;
+			var page:Page, 
+				mc:MovieClip;
 			for (var j:Number = 0; j < pages.length; j++)
 			{
-    			mc = pages[j];
+				page = pages[j] as Page;
+				page.padding = 15;
+    			mc = page.getChildAt(0) as MovieClip;
 				mc.gotoAndStop(j + 1);
-				doc.addChild(mc);	
+				doc.addChild(page);	
 			}
 						
 			/**
@@ -400,7 +454,7 @@ package org.alfresco.previewer
 				// Add listeners for important events
 				addedEventListeners = true;
 				this.addEventListener(ResizeEvent.RESIZE, onDocumentDisplayResize);			
-				this.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
+				
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			}
 		}
@@ -423,8 +477,7 @@ package org.alfresco.previewer
 				var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext(w * fitToWidth, h * fitToWidth);
 				
 				// Get an exact value that considers scrollbars
-				fitToWidth = ctx.screenWidth / w;								
-				fitToWidth -= 0.01;
+				fitToWidth = ctx.screenWidth / w;												
 				
 				// Fit to height  				
 				w = doc.getDocWidth();
@@ -437,8 +490,7 @@ package org.alfresco.previewer
 				ctx = getZoomSpriteDisplatyContext(w * fitToHeight, h * fitToHeight);
 				
 				// Get an exact value that considers scrollbars
-				fitToHeight = ctx.screenHeight / h;															
-				fitToHeight -= 0.01;
+				fitToHeight = ctx.screenHeight / h;																			
 				
 				// Use the value that displays most of the content				
 				fitToScreen = Math.min(fitToWidth, fitToHeight);				
@@ -477,16 +529,32 @@ package org.alfresco.previewer
 		}		  					
 		
 		/**
-		 * Called when the user moves the mouse wheel.
-		 * This will not get called on Mac in a browser if not the 3rd party class 
-		 * ExternalMouseWheelSupport is activated.
+		 * Called when a page in the document was clicked.
+		 * 
+		 * @param event Describes the page click event.
 		 */
-        private function onMouseWheel(event:MouseEvent):void 
-        {				
-        	// Move the document up or down in the display area
-        	adjustVerticalScrollbarPosition(vsb.scrollPosition - event.delta * (vsb.lineScrollSize / 3));        				 
-		}
-		
+		 private function onDocumentPageClick(event:DocumentEvent):void
+		 {
+		 	if(_interactive)
+		 	{		 	
+		 		// Change zoom
+			 	spriteNewZoom = fitToScreen;
+			 	
+				// Find the y-position of the page in the document.
+				var yTo:Number = doc.getPageStart(event.pageIndex) - doc.gap;
+				spriteNewY = yTo * fitToScreen * -1;			 	
+				spriteNewYChanged = true;
+				
+				// Make sure sprite and the rest of the gui gets updated
+			 	invalidateDisplayList();
+			 	
+			 	// Notify others about the zoom change
+			 	var dsc:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_SCALE_CHANGE);
+			 	dsc.documentScale = fitToScreen;
+			 	dispatchEvent(dsc);			 				 				 			 			 		
+		 	}
+		 }
+				
 		/**
 		 * Listen for key events that can be used to navigate in the document
 		 */
@@ -520,26 +588,6 @@ package org.alfresco.previewer
 			}			
 		}
 		
-		/**
-		 * Adjusts the scrollbar position and makes sure it doesn's scroll out of bounds.
-		 * 
-		 * @param newScrollbarPosition The new y-position for the scroll thumb of the vertical scrollbar.
-		 */
-		private function adjustVerticalScrollbarPosition(newScrollPosition:Number):void
-		{
-			// Make sure scrolling doesn't go out of bounds
-			newScrollPosition = Math.max(newScrollPosition, 0);
-        	newScrollPosition = Math.min(newScrollPosition, vsb.maxScrollPosition);
-        	        	
-			if (newScrollPosition != vsb.scrollPosition)
-			{
-				// scroll position has changed make sure we force the sprite to be positioned 				 
-				vsb.scrollPosition = newScrollPosition;
-				vsbUpdated = true;
-				invalidateDisplayList();
-			}
-		}	
-  
  		/**
  		 * Called by the FLEX framework when this componentneeds to redraw itself.
  		 * Other functions inside this class will tell the FLEX framework that this component 
@@ -561,8 +609,12 @@ package org.alfresco.previewer
             	var cp:int = 1;
             	for (var pageIndex:Number = 0; pageIndex < doc.getNoOfPages(); pageIndex++)
             	{
-            		// Need to round them of since the pixels can appear as 1200.32 and 1200.38 when scaled 
-            		if (Math.floor(zcy) < Math.floor(doc.getPageEnd(pageIndex) * spritePrevZoom))
+            		/**
+            		 * Need to floor them and add a pixel to sprite's position since the pixels 
+            		 * can appear as 1200.32 and 1200.38 when scaled and all the numbers will 
+            		 * not be "fraction"-exact as expected.
+            		 */  
+            		if ((Math.floor(zcy) + 1) < Math.floor(doc.getPageEnd(pageIndex) * spritePrevZoom))
             		{
             			cp = pageIndex + 1;
             			break;
@@ -595,7 +647,7 @@ package org.alfresco.previewer
 			// Create and dispatch the event
 			var e:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_PAGE_SCOPE_CHANGE);
 			e.page = this._page;
-			e.noOfPages = pages ? pages.length : 0;
+			e.noOfPages = pages ? pages.length : 0;			
 			dispatchEvent(e);
 		}
 		
