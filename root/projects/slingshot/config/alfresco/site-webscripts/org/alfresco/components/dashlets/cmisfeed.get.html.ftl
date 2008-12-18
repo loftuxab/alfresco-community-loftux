@@ -1,6 +1,6 @@
 <#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
 <#assign DISPLAY_ITEMS = 5>
-<#assign target="_new">
+<#assign target="_blank">
 
 <div class="dashlet cmis">
    <div class="title">${msg("label.title")}</div>

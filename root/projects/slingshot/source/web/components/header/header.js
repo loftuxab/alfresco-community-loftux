@@ -1,5 +1,33 @@
-/*
- *** Alfresco.Header
+/**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+ 
+/**
+ * Global Header
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.Header
 */
 (function()
 {
@@ -7,7 +35,13 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
+      Element = YAHOO.util.Element,
       Event = YAHOO.util.Event;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
 
    Alfresco.Header = function(htmlId)
    {
@@ -22,9 +56,13 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
 
-      // give the search component a change to tell the header that it has been loaded
+      // Give the search component a chance to tell the header that it has been loaded
       // (and thus no page reload is required for a new search)
       YAHOO.Bubbling.on("searchComponentExists", this.onSearchComponentExists, this);
+
+      // Notifications that the favourite sites have been updated
+      YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
+      YAHOO.Bubbling.on("favouriteSiteRemoved", this.onFavouriteSiteRemoved, this);
       
       return this;
    };
@@ -55,7 +93,16 @@
           * @type string
           * @default ""
           */
-         searchType: ""
+         searchType: "",
+         
+         /**
+          * Favourite sites
+          * 
+          * @property favouriteSites
+          * @type object
+          * @default {}
+          */
+         favouriteSites: {}
       },
       
       /**
@@ -196,7 +243,7 @@
          var coord = Dom.getXY(this.owner.id + "-search-tbutton");
          coord[0] -= (Dom.get(this.owner.id + "-searchtogglemenu").offsetWidth - Dom.get(this.owner.id + "-search-tbutton").offsetWidth);
          coord[1] += Dom.get(this.owner.id + "-search-tbutton").offsetHeight;
-         Dom.setXY(this.id, coord);       	
+         Dom.setXY(this.id, coord);          
       },
       
       /**
@@ -259,7 +306,7 @@
        * @return {string} i18n message corresponding to search type
        * @private
        */
-	   _getToggleLabel: function Header__getToggleLabel(type)
+      _getToggleLabel: function Header__getToggleLabel(type)
       {
          if (type == 'all')
          {
@@ -307,6 +354,87 @@
       showCreateSite: function Header_showCreateSite()
       {
          Alfresco.module.getCreateSiteInstance().show();
+      },
+      
+      /**
+       * Favourite Site has been added
+       *
+       * @method onFavouriteSiteAdded
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFavouriteSiteAdded: function Header_onFavouriteSiteAdded(layer, args)
+      {
+         var obj = args[1];
+         if (obj && obj.shortName !== null)
+         {
+            this.options.favouriteSites[obj.shortName] = obj.title;
+            this._renderFavouriteSites();
+         }
+      },
+
+      /**
+       * Favourite Site has been removed
+       *
+       * @method onFavouriteSiteAdded
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFavouriteSiteRemoved: function Header_onFavouriteSiteRemoved(layer, args)
+      {
+         var obj = args[1];
+         if (obj && obj.shortName !== null)
+         {
+            if (obj.shortName in this.options.favouriteSites)
+            {
+               delete this.options.favouriteSites[obj.shortName];
+               this._renderFavouriteSites();
+            }
+         }
+      },
+
+      /**
+       * Renders favourite sites into menu
+       *
+       * @method renderFavouriteSites
+       * @private
+       */
+      _renderFavouriteSites: function Header__renderFavouriteSites()
+      {
+         var sites = [], site, sitesMenu = this.widgets.sitesMenu, sitesGroup, i, ii;
+         
+         // Create a sorted list of our current favourites
+         for (site in this.options.favouriteSites)
+         {
+            if (this.options.favouriteSites.hasOwnProperty(site))
+            {
+               sites.push(site);
+            }
+         }
+         sites.sort();
+
+         sitesGroup = sitesMenu.getItemGroups()[1];
+         for (i = 0, ii = sitesGroup.length; i < ii; i++)
+         {
+            sitesMenu.removeItem(0, 1, true);
+         }
+         
+         Dom.setStyle(this.id + "-favouritesContainer", "display", sites.length > 0 ? "block" : "none");
+         Dom.setStyle(this.id + "-favouriteSites", "display", site.length > 0 ? "block" : "none");
+
+         for (i = 0, ii = sites.length; i < ii; i++)
+         {
+            sitesMenu.addItem(
+            {
+               text: $html(this.options.favouriteSites[sites[i]]),
+               url: Alfresco.util.uriTemplate("sitedashboardpage",
+               {
+                  site: sites[i]
+               })
+            }, 1);
+         }
+         
+         sitesMenu.render();
       },
 
       /**

@@ -500,7 +500,7 @@
             // YUI Paginator definition
             this.widgets.paginator = new YAHOO.widget.Paginator(
             {
-               containers: [this.id + "-paginator"],
+               containers: [this.id + "-paginator", this.id + "-paginatorBottom"],
                rowsPerPage: this.options.pageSize,
                initialPage: this.currentPage,
                template: this._msg("pagination.template"),
@@ -510,6 +510,9 @@
             });
             
             this.widgets.paginator.subscribe("changeRequest", handlePagination, this);
+            
+            // Display the bottom paginator bar
+            Dom.setStyle(this.id + "-doclistBarBottom", "display", "block");
          }
 
 

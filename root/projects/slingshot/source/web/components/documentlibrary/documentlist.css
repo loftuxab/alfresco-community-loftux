@@ -31,6 +31,13 @@
    padding: 4px 0.5em;
 }
 
+.doclist .doclist-bar-bottom
+{
+   border-top: 1px dashed #d9d9d9;
+   margin-top: 2em;
+   display: none;
+}
+
 .doclist span.separator
 {
    border-right: 1px dotted #457A9C;
@@ -146,6 +153,11 @@
    border-bottom: 1px dashed #d9d9d9;
    border-right: medium none;
    vertical-align: top;
+}
+
+.doclist .documents.yui-dt .yui-dt-data .yui-dt-last td
+{
+   border-bottom: medium none;
 }
 
 .doclist .documents.yui-dt tr.yui-dt-first td

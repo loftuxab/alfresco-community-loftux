@@ -5,7 +5,8 @@
    var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      searchType: "${page.url.templateArgs.site!'all'}" // default search type
+      searchType: "${page.url.templateArgs.site!'all'}", // default search type
+      favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>}
    }).setMessages(
       ${messages}
    );
@@ -33,7 +34,7 @@
       </#if>
 
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
-         <span class="menu-item"><a href="http://www.alfresco.com/help/3/EUHelp" rel="_new">${msg("link.help")}</a></span>
+         <span class="menu-item"><a href="http://www.alfresco.com/help/3/EUHelp" rel="_blank">${msg("link.help")}</a></span>
          <#if !isGuest>
          <span class="menu-item-separator">&nbsp;</span>
          <#if !context.externalAuthentication>
@@ -53,20 +54,19 @@
 
    <div id="${args.htmlid}-sites-menu" class="yui-overlay">
       <div class="bd">
-         <#if favouriteSites?? && favouriteSites?size &gt; 0>
-         <ul class="favourite-sites">
+         <#assign favDisplay><#if favouriteSites?size &gt; 0>block<#else>none</#if></#assign>
+         <ul id="${args.htmlid}-favouritesContainer" class="favourite-sites" style="display: ${favDisplay}">
             <li class="header">
                ${msg("header.site.favouriteSites")}
             </li>
          </ul>
-         <ul class="favourite-sites-list separator">
+         <ul id="${args.htmlid}-favouriteSites" class="favourite-sites-list separator" style="display: ${favDisplay}">
          <#list favouriteSites as site>
             <li>
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
             </li>
          </#list>
          </ul>
-         </#if>
          <ul class="<#if !isGuest>separator</#if>">
             <li>
                <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>
