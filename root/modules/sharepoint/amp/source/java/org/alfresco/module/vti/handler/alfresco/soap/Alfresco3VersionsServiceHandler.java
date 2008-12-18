@@ -34,7 +34,6 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.VtiDownloadContentServlet;
-import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.handler.soap.VersionsServiceHandler;

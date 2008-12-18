@@ -63,6 +63,7 @@
     */
    Alfresco.module.FlashUpload = function(containerId)
    {
+
       this.name = "Alfresco.module.FlashUpload";
       this.id = containerId;
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
@@ -81,7 +82,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "cookie", "uploader"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
    Alfresco.module.FlashUpload.prototype =
    {
@@ -281,6 +282,14 @@
       uploader: null,
 
       /**
+       * A property that is set to true after the loaded swf movie has dispatched its swfReady/contentReady event
+       *
+       * @property uploader Ready
+       * @type boolean
+       */
+      uploaderReady: false,
+
+      /**
        * Used to display the user selceted files and keep track of what files
        * that are selected and should be STATE_FINISHED.
        *
@@ -388,8 +397,21 @@
          // Shortcut for dummy instance
          if (this.id === null)
          {
-            return;
+            //return;
          }
+         /*
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/flash-upload?htmlid=" + this.id,
+            successCallback:
+            {
+               fn: this.onTemplateLoaded,
+               scope: this
+            },
+            failureMessage: "Could not load file upload template",
+            execScripts: true
+         });
+         */
       },
 
       /**
@@ -417,6 +439,7 @@
        */
       show: function FU_show(config)
       {
+
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
          if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
@@ -434,6 +457,7 @@
          }
          else
          {
+
             // If it hasn't load the gui (template) from the server
             Alfresco.util.Ajax.request(
             {
@@ -446,6 +470,7 @@
                failureMessage: "Could not load file upload template",
                execScripts: true
             });
+
          }
       },
 
@@ -504,7 +529,7 @@
          this.minorVersion = YAHOO.util.Dom.get(this.id + "-minorVersion-radioButton");
 
          // Save a reference to browseButton so wa can change it later
-         this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
+         //this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
 
          // Save a reference to the HTMLElement displaying version input so we can hide or show it
          this.versionSection = Dom.get(this.id + "-versionSection-div");
@@ -515,8 +540,20 @@
          // Create and save a reference to the cancelOkButton so we can alter it later
          this.widgets.cancelOkButton = Alfresco.util.createYUIButton(this, "cancelOk-button", this.onCancelOkButtonClick);
 
+         // Adjust the flash movie to fit the link
+         /*
+         var browseLink = YAHOO.util.Dom.getRegion(this.id + "-label-link");
+         var browseOverlay = YAHOO.util.Dom.get(this.id + "-flashuploader-div");
+         YAHOO.util.Dom.setStyle(browseOverlay, 'width', browseLink.right - browseLink.left + "px");
+         YAHOO.util.Dom.setStyle(browseOverlay, 'height', browseLink.bottom - browseLink.top + "px");
+         */
+
+
          // Create and save a reference to the uploader so we can call it later
-         this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
+         this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div", Alfresco.constants.URL_CONTEXT + "themes/" + Alfresco.constants.THEME + "/images/upload-button-sprite.png");
+
+         //this.uploader.addListener('contentReady', this.handleContentReady);
+
          this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
          this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
          this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
@@ -525,11 +562,24 @@
          this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
          this.uploader.subscribe("uploadError",this.onUploadError, this, true);
 
-         // The contentReady event can't be used since it crashes FF2 on Mac
-         //this.uploader.subscribe("contentReady", this.onContentReady, this, true);
+         //this.uploader.subscribe('rollOver', this.handleRollOver, this, true);
 
-         // Show panel and handle if flash is loaded later 
+         // The contentReady event can't be used since it crashes FF2 on Mac
+         /*this.uploader.subscribe("contentReady", function()
+         {
+            alert('ready');
+            this.uploaderReady = true;
+            this._showPanel();
+            alert('ready:' + this.uploaderReady);
+         }, this, true);
+         */
+
+         // Show panel and handle if flash is loaded later
          this._showPanel();
+      },
+
+      handleRollOver: function() {
+            alert('asdf');
       },
 
       /**
@@ -562,10 +612,6 @@
        */
       onRowDeleteEvent: function FU_onRowDeleteEvent(event)
       {
-         if (this.dataTable.getRecordSet().getLength() === 0)
-         {
-            this.dataTable.showTableMessage(Alfresco.util.message("label.noFiles", this.name), "fileUploadTableMessage");            
-         }
       },
 
       /**
@@ -583,6 +629,10 @@
          // add files to the table that haven's been added before.
          for (var i in event.fileList)
          {
+            if(this.dataTable.get("renderLoopSize") == 0)
+            {
+               this.dataTable.set("renderLoopSize", 1);
+            }
             var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
@@ -825,7 +875,9 @@
             {
                // If it was the last file, disable the gui since no files exist.
                this.widgets.uploadButton.set("disabled", true);
-               this.widgets.browseButton.set("disabled", false);
+               // todo enable!!
+               this.uploader.enable();
+               //this.widgets.browseButton.set("disabled", false);
             }
          }
          else if (this.state === this.STATE_UPLOADING)
@@ -917,17 +969,17 @@
          this.panel.hide();
          
          // Firefox 2 isn't always great at hiding the panel
-         /*
 
-         Since panel is set to null it will make the panel load its template
-         from the server everytime show() is called. Find another solution...
+
+         //Since panel is set to null it will make the panel load its template
+         //from the server everytime show() is called. Find another solution...
 
          if (YAHOO.env.ua.gecko == 1.8)
          {
             this.panel.destroy();
             this.panel = null;
          }
-         */
+         
 
          // Remove all files and references for this upload "session"
          this._clear();
@@ -956,7 +1008,9 @@
             {
                this.state = this.STATE_UPLOADING;
                this.widgets.uploadButton.set("disabled", true);
-               this.widgets.browseButton.set("disabled", true);
+               // todo disable!!
+               this.uploader.disable();
+               //this.widgets.browseButton.set("disabled", true);
                this._updateStatus();
             }
             // And start uploading from the queue
@@ -1049,8 +1103,37 @@
          var p = Dom.getFirstChild(uploaderDiv);
          if(p && p.tagName.toLowerCase() == "p")
          {
-            // Flash isn't installed, make sure the flash no flash error message is displayed
+            // Flash isn't installed, make sure the no flash error message is displayed
             Dom.setStyle(uploaderDiv, "height", "30px");
+            Dom.setStyle(uploaderDiv, "height", "200px");
+         }
+         else
+         {
+            this._applyUploaderConfig({
+               multiSelect: this.showConfig.mode === this.MODE_MULTI_UPLOAD,
+               filter: this.showConfig.filter
+            }, 0);
+
+         }
+      },
+
+      _applyUploaderConfig: function (obj, attempt)
+      {
+         try
+         {
+            this.uploader.enable();
+            this.uploader.setAllowMultipleFiles(obj.multiSelect);
+            this.uploader.setFileFilters(obj.filter);
+         }
+         catch(e)
+         {
+            if(attempt == 7)
+            {
+               Alfresco.util.PopupManager.displayMessage({text: Alfresco.util.message("message.flashConfigError", this.name)});
+            }
+            else{
+               YAHOO.lang.later(100, this, this._applyUploaderConfig, [obj, ++attempt]);
+            }
          }
       },
 
@@ -1078,7 +1161,7 @@
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         this.formatLeftCell = function(el, oRecord) {
+         var formatLeftCell = function(el, oRecord, oColumn, oData) {
             myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.left);
          };
 
@@ -1088,7 +1171,7 @@
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         this.formatCenterCell = function(el, oRecord) {
+         var formatCenterCell = function(el, oRecord, oColumn, oData) {
             myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.center);
          };
 
@@ -1098,7 +1181,7 @@
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         this.formatRightCell = function(el, oRecord) {
+         var formatRightCell = function(el, oRecord, oColumn, oData) {
             myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.right);
          };
 
@@ -1150,10 +1233,9 @@
                this.fileStore[flashId].progressInfo["innerHTML"] = fileInfoStr;
             }
 
-            /**
-             * Save a reference to the contentType dropdown so we can find each
-             * files contentType before upload.
-             */
+
+            // * Save a reference to the contentType dropdown so we can find each
+            // * files contentType before upload.            
             var contentType = Dom.getElementsByClassName("fileupload-contentType-select", "select", templateInstance);
             if (contentType.length == 1)
             {
@@ -1183,9 +1265,9 @@
 
          // Definition of the data table column
          var myColumnDefs = [
-            {className:"col-left", resizable: false, formatter: this.formatLeftCell},
-            {className:"col-center", resizable: false, formatter: this.formatCenterCell},
-            {className:"col-right", resizable: false, formatter: this.formatRightCell}
+            {key: "id",      className:"col-left", resizable: false, formatter: formatLeftCell},
+            {key: "name",    className:"col-center", resizable: false, formatter: formatCenterCell},
+            {key: "created", className:"col-right", resizable: false, formatter: formatRightCell}
          ];
 
          // The data tables underlying data source.
@@ -1205,13 +1287,14 @@
          var dataTableDiv = Dom.get(this.id + "-filelist-table");
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
-            scrollable: true,
+            scrollable: true,            
+            height: "100px", // must be set to something so it can be changed afterwards, when the showconfig options decides if its a sinlge or multi upload
             width: "620px",
-            renderLoopSize: 1
+            renderLoopSize: 0, // value > 0 results in an error in IE & Safari from YIU2.6.0
+            MSG_EMPTY: Alfresco.util.message("label.noFiles", this.name)
          });
          this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
          this.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
-
       },
 
       /**
@@ -1234,15 +1317,13 @@
          this.widgets.uploadButton.set("disabled", true);
          this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
          this.widgets.cancelOkButton.set("disabled", false);
-         this.widgets.browseButton.set("disabled", false);
 
          // Apply the config before it is showed
          this._applyConfig();
 
          // Show the upload panel
          this.panel.show();
-                  
-         this.dataTable.showTableMessage(Alfresco.util.message("label.noFiles", this.name), "fileUploadTableMessage");
+
       },
 
       /**
@@ -1379,7 +1460,7 @@
                   siteId: this.showConfig.siteId,
                   containerId: this.showConfig.containerId,
                   username: this.showConfig.username
-               }
+               };
                if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
                {         
                   attributes.updateNodeRef = this.showConfig.updateNodeRef;
@@ -1458,5 +1539,5 @@ Alfresco.module.getFlashUploadInstance = function()
       instance = new Alfresco.module.FlashUpload(instanceId);
    }
    return instance;
-}
+};
 

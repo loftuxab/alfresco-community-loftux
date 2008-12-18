@@ -98,15 +98,15 @@ public class AddUserCollectionToRoleEndpoint extends VtiEndpoint
         Element root = null;
         if (role != null)
         {
-            String dwsNodeId = EndpointUtils.getRequest().getParameter("nodeId");            
+            String dws = EndpointUtils.getDwsFromUri();
             if (logger.isDebugEnabled()) { 
                 String users = "";
                 for (UserBean userBean : usersList) {
                     users += userBean.getDisplayName() + ", ";
                 }
-                logger.debug("Adding users [ " + users + "] to role '" + role + "' for node '" + dwsNodeId + "'");
+                logger.debug("Adding users [ " + users + "] with role '" + role + "' to the site '" + dws + "'");
             }            
-            handler.addUserCollectionToRole(dwsNodeId, role, usersList);
+            handler.addUserCollectionToRole(dws, role, usersList);
             // creating soap response
             root = responseDocument.addElement("AddUserCollectionToRoleResponse", namespace);            
         }

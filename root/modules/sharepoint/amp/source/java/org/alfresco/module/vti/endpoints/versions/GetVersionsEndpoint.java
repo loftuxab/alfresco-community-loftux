@@ -77,7 +77,6 @@ public class GetVersionsEndpoint extends VtiEndpoint
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
         String dws = EndpointUtils.getDwsFromUri();
-        String sessionId = EndpointUtils.getVtiSessionId();
         
         if (logger.isDebugEnabled())
             logger.debug("Getting fileName parameter from request.");        
@@ -94,7 +93,7 @@ public class GetVersionsEndpoint extends VtiEndpoint
 
         results.addElement("list").addAttribute("id", "");
         results.addElement("versioning").addAttribute("enabled", "1");
-        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText() + "&sessionId=" + sessionId);
+        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText());
 
         if (logger.isDebugEnabled())
             logger.debug("Getting versions for file '" + dws + "/" + fileName.getText() + "'.");

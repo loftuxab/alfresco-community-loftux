@@ -26,7 +26,6 @@ package org.alfresco.module.vti.endpoints.dws;
 
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
-import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.soap.DwsServiceHandler;
 import org.alfresco.module.vti.metadata.soap.dws.DwsBean;
 import org.apache.commons.logging.Log;
@@ -47,7 +46,7 @@ public class CreateDwsEndpoint extends VtiEndpoint
 
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
-    private VtiPathHelper pathHelper;
+    
     // xml namespace prefix
     private static String prefix = "dws";
 
@@ -91,10 +90,5 @@ public class CreateDwsEndpoint extends VtiEndpoint
     	}
 
         return root;
-    }
-
-    public void setPathHelper(VtiPathHelper pathHelper)
-    {
-        this.pathHelper = pathHelper;
     }
 }

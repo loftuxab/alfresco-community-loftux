@@ -3,7 +3,8 @@
    {
       siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
       currentUser: "${user.name}",
-      minSearchTermLength: "${args.minSearchTermLength!'3'}"
+      minSearchTermLength: "${args.minSearchTermLength!'3'}",
+      maxSearchResults: "${args.maxSearchResults!'100'}"
    }).setMessages(
       ${messages}
    );

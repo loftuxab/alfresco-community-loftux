@@ -115,7 +115,7 @@ Alfresco.util.appendArrayToObject = function(obj, arr)
       }
    }
    return obj;
-}
+};
 
 /**
  * Convert an array into an object
@@ -135,7 +135,7 @@ Alfresco.util.arrayToObject = function(arr)
       }
    }
    return obj;
-}
+};
 
 /**
  * Check if an array contains an object
@@ -158,7 +158,7 @@ Alfresco.util.arrayContains = function(arr, el)
       }
    }
    return false;
-}
+};
 
 /**
  * Asserts param contains a proper value
@@ -174,7 +174,7 @@ Alfresco.util.assertNotEmpty = function(param, message)
    {
       throw new Error(message);
    }
-}
+};
 
 /**
  * Converts a file size in bytes to human readable form
@@ -209,7 +209,7 @@ Alfresco.util.formatFileSize = function(fileSize)
 
    fileSize = Math.round(fileSize / 1073741824);
    return fileSize + " " + Alfresco.util.message("size.gigabytes");
-}
+};
 
 /**
  * Given a filename, returns either a filetype icon or generic icon file stem
@@ -257,7 +257,7 @@ Alfresco.util.getFileIcon = function(fileName, iconSize)
    }
 
    return icon + "-file-" + iconSize + ".png";
-}
+};
 
 /**
  * Formats a Freemarker datetime into more UI-friendly format
@@ -278,7 +278,7 @@ Alfresco.util.formatDate = function(date)
    {
       return date;
    }
-}
+};
 
 /**
  * Convert an ISO8601 date string into a JavaScript native Date object
@@ -298,7 +298,7 @@ Alfresco.util.fromISO8601 = function(date)
    {
       return null;
    }
-}
+};
 
 /**
  * Convert a JavaScript native Date object into an ISO8601 date string
@@ -318,7 +318,7 @@ Alfresco.util.toISO8601 = function(date)
    {
       return "";
    }
-}
+};
 
 /**
  * Decodes an HTML-encoded string
@@ -332,7 +332,7 @@ Alfresco.util.toISO8601 = function(date)
 Alfresco.util.decodeHTML = function(html)
 {
    return html.split("&lt;").join("<").split("&gt;").join(">").split("&amp;").join("&");
-}
+};
 
 /**
  * Encodes a potentially unsafe string with HTML entities
@@ -353,7 +353,7 @@ Alfresco.util.encodeHTML = function(text)
    var me = arguments.callee;
    me.text.data = text;
    return me.div.innerHTML;
-}
+};
 Alfresco.util.encodeHTML.div = document.createElement("div");
 Alfresco.util.encodeHTML.text = document.createTextNode("");
 Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
@@ -411,18 +411,18 @@ Alfresco.util.stripUnsafeHTMLTags = function(s)
          if (endTagIndex != -1)
          {
             // found end of the tag to match
-            var tag = s.substring(i + 1, endTagIndex).toLowerCase();
+            var tag = s.substring(i + 1, endTagIndex);
             var matchTag = tag;
             if (endMatchIndex != -1)
             {
-               matchTag = s.substring(i + 1, endMatchIndex).toLowerCase();
+               matchTag = s.substring(i + 1, endMatchIndex);
             }
             if(matchTag.charAt(0) == '/')
             {
                // Remove the '/' since it was an endtag
                matchTag = matchTag.substring(1);
             }
-            if (me.safeTags[matchTag])
+            if (me.safeTags[matchTag.toLowerCase()])
             {
                // safe tag - append to buffer
                buf.push('<');
@@ -437,9 +437,29 @@ Alfresco.util.stripUnsafeHTMLTags = function(s)
       buf.push(s.charAt(i));
    }
    return buf.join("");
-}
+};
 
-Alfresco.util.stripUnsafeHTMLTags.safeTags = {"strong":"strong", "em":"em", "p":"p", "b":"b", "i":"i", "br":"br", "ul":"ul", "ol":"ol", "li":"li", "h1":"h1", "h2":"h2", "h3":"h3", "h4":"h4", "h5":"h5", "h6":"h6", "span":"span", "a":"a", "img":"img", "font":"font"};
+Alfresco.util.stripUnsafeHTMLTags.safeTags = {
+   "strong":"strong",
+   "em":"em",
+   "p":"p",
+   "b":"b",
+   "i":"i",
+   "br":"br",
+   "ul":"ul",
+   "ol":"ol",
+   "li":"li",
+   "h1":"h1",
+   "h2":"h2",
+   "h3":"h3",
+   "h4":"h4",
+   "h5":"h5",
+   "h6":"h6",
+   "span":"span",
+   "a":"a",
+   "img":"img",
+   "font":"font"
+};
 
 /**
  * Wrapper to create a YUI Button with common attributes.
@@ -495,7 +515,7 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
       }
    }
    return button;
-}
+};
 
 /**
  * Find an event target's class name, ignoring YUI classes.
@@ -524,7 +544,7 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
    }
 
    return src.className;
-}
+};
 
 /**
  * Check if flash is installed.
@@ -540,7 +560,7 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
 Alfresco.util.hasRequiredFlashPlayer = function(reqMajorVer, reqMinorVer, reqRevision)
 {
    return DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision);
-}
+};
 
 /**
  * Add a component's messages to the central message store.
@@ -569,7 +589,7 @@ Alfresco.util.addMessages = function(p_obj, p_messageScope)
    }
    // for completeness...
    return false;
-}
+};
 
 /**
  * Resolve a messageId into a message.
@@ -621,7 +641,7 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
    msg = YAHOO.lang.substitute(msg, tokens);
    
    return msg;
-}
+};
 
 /**
  * Fixes the hidden caret problem in Firefox 2.x.
@@ -646,7 +666,7 @@ Alfresco.util.caretFix = function(p_formElement)
          YAHOO.util.Dom.addClass(elem, "caret-fix");
       }
    }
-}
+};
 
 /**
  * Remove the fixes for the hidden caret problem in Firefox 2.x.
@@ -671,7 +691,7 @@ Alfresco.util.undoCaretFix = function(p_formElement)
          YAHOO.util.Dom.removeClass(elem, "caret-fix");
       }
    }
-}
+};
 
 /**
  * Parses a string to a json object and returns it.
@@ -701,7 +721,7 @@ Alfresco.util.parseJSON = function(jsonStr, displayError)
       }
    }
    return null;
-}
+};
 
 /**
  * Returns a populated URI template, given a TemplateId and an object literal
@@ -738,7 +758,7 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
    uri += Alfresco.constants.URL_PAGECONTEXT + YAHOO.lang.substitute(template, obj);
    
    return uri;
-}
+};
 
 /**
  * Returns a URL to the content represented by the passed-in nodeRef
@@ -753,7 +773,7 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
 Alfresco.util.contentURL = function(nodeRef, name, attach)
 {
    return Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRef.replace(":/", "") + "/" + name + (attach ? "?a=true" : "");
-}
+};
 
 /**
  * Returns the value of the specified query string parameter.
@@ -775,7 +795,7 @@ Alfresco.util.getQueryStringParameter = function(paramName, url)
     }
 
     return null;
-}
+};
 
 /**
  * Returns the query string parameters as an object literal.
@@ -831,7 +851,7 @@ Alfresco.util.getQueryStringParameters = function(url)
    }
 
    return objParams;
-}
+};
 
 /**
  * Turns an object literal into a valid queryString.
@@ -863,7 +883,7 @@ Alfresco.util.toQueryString = function(p_params)
    
    // Return the string after removing the last character
    return qs.substring(0, qs.length - 1);
-}
+};
 
 /**
  * Checks the validity of a URL.
@@ -2121,7 +2141,7 @@ Alfresco.util.Anim = function()
 Alfresco.logger.isDebugEnabled = function()
 {
    return Alfresco.constants.DEBUG;
-}
+};
 
 /**
  * @method Alfresco.logger.debug
@@ -2164,7 +2184,7 @@ Alfresco.logger.debug = function(p1, p2)
       alert(msg);
       */
    }
-}
+};
 
 
 /**
@@ -2277,7 +2297,7 @@ Alfresco.thirdparty.dateFormat = function()
     * Alfresco wrapper: delegate to wrapped code
     */
    return dateFormat.apply(arguments.callee, arguments);
-}
+};
 Alfresco.thirdparty.dateFormat.DAY_NAMES = (Alfresco.util.message("days.medium") + "," + Alfresco.util.message("days.long")).split(",");
 Alfresco.thirdparty.dateFormat.MONTH_NAMES = (Alfresco.util.message("months.short") + "," + Alfresco.util.message("months.long")).split(",");
 Alfresco.thirdparty.dateFormat.TIME_AM = Alfresco.util.message("date-format.am");
@@ -2386,11 +2406,11 @@ Alfresco.thirdparty.fromISO8601 = function()
       	}
 
       	return result; // Date or null
-      }
+      };
    }();
    
    return fromISOString.apply(arguments.callee, arguments);
-}
+};
 
 /**
  * Converts a JavaScript native Date object into a ISO8601-formatted string
@@ -2460,8 +2480,8 @@ Alfresco.thirdparty.toISO8601 = function()
       		formattedDate.push(time);
       	}
       	return formattedDate.join('T'); // String
-      }
+      };
    }();
 
    return toISOString.apply(arguments.callee, arguments);
-}
+}; 

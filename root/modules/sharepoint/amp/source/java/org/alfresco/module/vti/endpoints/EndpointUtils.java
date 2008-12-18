@@ -28,7 +28,6 @@ package org.alfresco.module.vti.endpoints;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.module.vti.httpconnector.VtiServletContainer;
@@ -116,21 +115,6 @@ public class EndpointUtils
         TransportContext context = TransportContextHolder.getTransportContext();
         HttpServletConnection connection = (HttpServletConnection )context.getConnection();
         return connection.getHttpServletRequest();        
-    }
-    
-    public static String getVtiSessionId()
-    {
-        HttpServletRequest request = getRequest();
-        Cookie[] cookies = request.getCookies();        
-        String result = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("VTISESSION".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return result;
     }
     
     public static Pair<String, String> getCredentials()

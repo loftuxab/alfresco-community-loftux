@@ -169,8 +169,9 @@ public class VtiServletContainer
     public void doServlets(ServletRequest request, ServletResponse response) throws IOException, ServletException
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        Object validSiteUrl = httpRequest.getAttribute("VALID_SITE_URL");
         String uri = getUri(httpRequest);
-        String nodeId = request.getParameter("nodeId");        
+        
         if (logger.isDebugEnabled()) {
             logger.debug("Find appropriate servlet by pattern for uri='" + uri + "'");
         }
@@ -201,7 +202,7 @@ public class VtiServletContainer
             }            
         }
         
-        if (httpMethod.equals(VtiFilter.METHOD_GET) && (nodeId != null || uri.endsWith(".vti")))
+        if (httpMethod.equals(VtiFilter.METHOD_GET) && (validSiteUrl != null || uri.endsWith(".vti")))
         {
             for (ServletPattern servletPattern : exactMatchServlets) 
             {         
@@ -211,18 +212,6 @@ public class VtiServletContainer
                     break;
                 }                
             }            
-        }
-        
-        if (httpMethod.equals(VtiFilter.METHOD_POST) && nodeId != null)//&& nodeId.contains("_vti_bin/usergroup.asmx"))
-        {
-            for (ServletPattern servletPattern : exactMatchServlets) 
-            {         
-                if (servletPattern.getPattern().equals("/_vti_bin/usergroup.asmx"))
-                {
-                    targetServlet = servletPattern.getServlet();
-                    break;
-                }                
-            }                        
         }
         
         for (ServletPattern servletPattern : exactMatchServlets) {

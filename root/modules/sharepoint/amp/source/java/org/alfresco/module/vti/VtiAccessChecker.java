@@ -34,6 +34,9 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.module.vti.handler.VtiMethodHandler;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
+
 /**
 *
 * @author Stas Sokolovsky
@@ -45,6 +48,13 @@ public class VtiAccessChecker
     private Map<String, Pattern> accessRules = new HashMap<String, Pattern>();
 
     private static final String URL_PARAM_NAME = "URL";
+
+    private VtiMethodHandler vtiHandler;
+    
+    public void setVtiHandler(VtiMethodHandler vtiHandler)
+    {
+        this.vtiHandler = vtiHandler;        
+    }
 
     public void setAcceptRules(Map<String, String> acceptRules)
     {
@@ -59,10 +69,8 @@ public class VtiAccessChecker
 
     public boolean isRequestAcceptableForRoot(HttpServletRequest request)
     {
-        if (request.getParameter("nodeId") != null)
-        {
+        if (validSiteUri(request))
             return true;
-        }
         
         Set<Entry<String, Pattern>> entries = accessRules.entrySet();
         boolean result = false;
@@ -87,6 +95,39 @@ public class VtiAccessChecker
             }
         }
         return result;
+    }
+    
+    public boolean validSiteUri(HttpServletRequest request)
+    {
+        if (!request.getMethod().equals("GET"))
+            return false;
+        
+        String[] result;
+        String uri = request.getRequestURI();
+        String context = request.getContextPath();
+        
+        String[] parts = VtiPathHelper.removeSlashes(uri).split("/");
+        
+        if (parts[parts.length - 1].indexOf('.') != -1)
+            return false;
+        
+        try
+        {
+            result = vtiHandler.decomposeURL(uri, context);
+            if (result[0].length() > context.length())
+            {
+                request.setAttribute("VALID_SITE_URL", "true");
+                return true;                
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch(Throwable e)
+        {
+            return false;
+        }
     }
     
 }

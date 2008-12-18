@@ -20,10 +20,8 @@
     	<property name="authenticationService" ref="AuthenticationService"/>
     	<property name="authenticationComponent" ref="AuthenticationComponent" />
     	<property name="personService" ref="PersonService"/>
-    	<property name="authorityService" ref="AuthorityService" /> 
     	<property name="siteService" ref="siteService" />
-    	<property name="shareUtils" ref="shareUtils" />  	
-    	<property name="sessionManager" ref="vtiSessionManager" />	
+    	<property name="shareUtils" ref="shareUtils" />  		
     	
     	<property name="pathHelper" ref="vtiPathHelper"/>
     	<property name="pagesMap">
@@ -54,9 +52,7 @@
     	<property name="personService" ref="PersonService"/>
     	<property name="nodeService" ref="NodeService"/> 
     	<property name="siteService" ref="siteService" />
-    	<property name="transactionService" ref="transactionService" />	   	   	
-    	
-    	<property name="pathHelper" ref="vtiPathHelper"/>    	
+    	<property name="transactionService" ref="transactionService" />	  
     </bean>
 
     <bean id="vtiHandlerTarget" class="org.alfresco.module.vti.handler.alfresco.Alfresco3VtiMethodHandler">
@@ -70,6 +66,7 @@
         <property name="contentService" ref="ContentService" />
         <property name="transactionService" ref="transactionService" />
         <property name="siteService" ref="siteService" />
+        <property name="authenticationComponent" ref="AuthenticationComponent" />
 
         <property name="documentHelper" ref="vtiDocumentHelper" />
         <property name="pathHelper" ref="vtiPathHelper" />

@@ -39,14 +39,12 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.VtiException;
-import org.alfresco.module.vti.VtiFilter;
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.WebServiceErrorCodeException;
 import org.alfresco.module.vti.handler.alfresco.ShareUtils;
 import org.alfresco.module.vti.handler.alfresco.VtiExceptionUtils;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.soap.DwsServiceHandler;
-import org.alfresco.module.vti.httpconnector.VtiSessionManager;
 import org.alfresco.module.vti.metadata.dic.VtiError;
 import org.alfresco.module.vti.metadata.soap.dws.AssigneeBean;
 import org.alfresco.module.vti.metadata.soap.dws.DocumentBean;
@@ -69,18 +67,13 @@ import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.Pair;
-import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -93,10 +86,8 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
     private AuthenticationService authenticationService;
     private AuthenticationComponent authenticationComponent;
     private PersonService personService;
-    private AuthorityService authorityService;  
     private SiteService siteService;
     private ShareUtils shareUtils;
-    private VtiSessionManager sessionManager;
 
     private VtiPathHelper pathHelper;
     
@@ -152,11 +143,6 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         this.personService = personService;
     }
     
-    public void setAuthorityService(AuthorityService authorityService)
-    {
-        this.authorityService = authorityService;
-    }    
-    
     public void setSiteService(SiteService siteService)
     {
         this.siteService = siteService;        
@@ -167,11 +153,6 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         this.shareUtils = shareUtils;
     }
     
-    public void setSessionManager(VtiSessionManager sessionManager)    
-    {
-        this.sessionManager = sessionManager;        
-    }
-
     public DwsBean createDws(String parentDwsUrl, String name, List users, String title, List documents)
     {
         // ensure that new dws will be created in Sites space
@@ -182,8 +163,6 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         
         // replace all illegal characters
         title = removeIllegalCharacters(title);
-        
-        String sessionId = EndpointUtils.getVtiSessionId();
         
         String dwsUrl = parentDwsUrl + "/" + title;        
 
@@ -241,7 +220,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
 
         DwsBean dwsBean = new DwsBean();
         dwsBean.setDoclibUrl("documentLibrary");
-        dwsBean.setUrl("http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + dwsUrl + "?nodeId=" + dwsFileInfo.getNodeRef().getId() + "&sessionId=" + sessionId);
+        dwsBean.setUrl("http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + dwsUrl);
         dwsBean.setParentWeb(parentDwsUrl);
 
         return dwsBean;
@@ -385,7 +364,6 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         String dws = EndpointUtils.getDwsFromUri();
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String sessionId = EndpointUtils.getVtiSessionId();
         
         // get the nodeRef for current dws
         FileInfo dwsNode = pathHelper.resolvePathFileInfo(dws);
@@ -397,11 +375,11 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         
         DwsMetadata dwsMetadata = new DwsMetadata();
         //TODO set usefull urls
-        dwsMetadata.setSubscribeUrl("http://" + host + context + dws + "/subscribe.vti?sessionId=" + sessionId);
+        dwsMetadata.setSubscribeUrl("http://" + host + context + dws + "/subscribe.vti");
         dwsMetadata.setMtgInstance("");
-        dwsMetadata.setSettingsUrl("http://" + host + context + dws + "/siteSettings.vti?sessionId=" + sessionId);
-        dwsMetadata.setPermsUrl("http://" + host + context + dws + "/siteGroupMembership.vti?sessionId=" + sessionId);
-        dwsMetadata.setUserInfoUrl("http://" + host + context + dws + "/userInformation.vti?sessionId=" + sessionId);
+        dwsMetadata.setSettingsUrl("http://" + host + context + dws + "/siteSettings.vti");
+        dwsMetadata.setPermsUrl("http://" + host + context + dws + "/siteGroupMembership.vti");
+        dwsMetadata.setUserInfoUrl("http://" + host + context + dws + "/userInformation.vti");
 
         // adding the list of roles
         dwsMetadata.setRoles(permissionService.getSettablePermissions(SiteModel.TYPE_SITE));
@@ -490,7 +468,6 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         String dws = EndpointUtils.getDwsFromUri();
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String sessionId = EndpointUtils.getVtiSessionId();
         
         FileInfo dwsInfo = pathHelper.resolvePathFileInfo(dws); 
         
@@ -525,7 +502,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         
         dwsData.setDocumentsList(dws_content); 
         
-        dwsData.setDocLibUrl("http://" + host + context + dws + "/documentLibrary.vti?sessionId=" + sessionId);
+        dwsData.setDocLibUrl("http://" + host + context + dws + "/documentLibrary.vti");
         
         dwsData.setLastUpdate(lastUpdate);
         
@@ -626,30 +603,18 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
     
     public void handleRedirect(HttpServletRequest req, HttpServletResponse resp) throws HttpException, IOException
     {
-        String uuid = req.getParameter("nodeId");
-        String sessionId;
         
-        String uri = req.getRequestURI();
+        String uri = VtiPathHelper.removeSlashes(req.getRequestURI());
         String redirectTo;
         
-        if (logger.isDebugEnabled())
-            logger.debug("Checking uuid...");
-                
-        if (uuid != null)        {
+        if (!uri.endsWith(".vti"))
+        {
             if (logger.isDebugEnabled())
-                logger.debug("Redirection to site in browser");            
-            sessionId = req.getParameter("sessionId");
-            // open site in browser or site shortcut was choosen
-            final NodeRef siteNodeRef = new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, uuid.toLowerCase());
+                logger.debug("Redirection to site in browser");
             redirectTo = pagesMap.get("siteInBrowser");
             
-            String siteName = AuthenticationUtil.runAs(new RunAsWork<String>()
-                    {
-                        public String doWork() throws Exception
-                        {
-                            return nodeService.getProperty(siteNodeRef, ContentModel.PROP_NAME).toString();
-                        }                
-                    }, authenticationComponent.getSystemUserName());
+            String siteName = uri.substring(uri.lastIndexOf('/') + 1);
+                
             redirectTo = redirectTo.replace("...", siteName);
             if (logger.isDebugEnabled())
                 logger.debug("Redirection URI: " + redirectTo);
@@ -665,9 +630,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             if (action.equals("userInformation"))
             {
                 // redirect to user profile
-                String[] params = req.getParameter("sessionId").split("\\?");
-                sessionId = params[0];
-                String userName = params[1].split("=")[1];
+                String userName = req.getParameter("ID");
                 redirectTo = redirectTo.replace("...", userName);                
             }
             else
@@ -676,20 +639,20 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
                 String[] parts = uri.split("/");
                 String siteName = parts[parts.length - 2];
                 redirectTo = redirectTo.replace("...", siteName);
-                
-                sessionId = req.getParameter("sessionId");
-                
-                int pos = sessionId.indexOf("?");
-                if (pos != -1)
-                {
-                    sessionId = sessionId.substring(0, pos);
-                }
-                
             }
-            String doc = req.getParameter("doc");
+            final String doc = req.getParameter("doc");
             if (doc != null)
             {
-                NodeRef nodeRef = pathHelper.resolvePathFileInfo(doc).getNodeRef();
+                
+                NodeRef nodeRef = AuthenticationUtil.runAs(new RunAsWork<NodeRef>()
+                        {
+                            public NodeRef doWork() throws Exception
+                {
+                                return pathHelper.resolvePathFileInfo(doc).getNodeRef();
+                }
+                
+                        }, authenticationComponent.getSystemUserName());
+                
                 redirectTo = redirectTo + "?nodeRef=" + nodeRef;
             }
             if (logger.isDebugEnabled())
@@ -697,28 +660,9 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             
         }       
         
-        Pair<String, String> credentials = getCredentials(sessionId);
-        
-        if (logger.isDebugEnabled())
-            logger.debug("Executing authentication request to Share");        
-        // firstly lets login to share using current credential
-        PostMethod loginMethod = shareUtils.createLoginMethod(credentials.getFirst(), credentials.getSecond());
-        HttpClient httpClient = new HttpClient();
-        httpClient.executeMethod(loginMethod);
-        NameValuePair[] setCookieHeaders = loginMethod.getResponseHeaders(ShareUtils.HEADER_SET_COOKIE);
-        loginMethod.releaseConnection();
-        httpClient = null;
-        if (logger.isDebugEnabled())
-            logger.debug("Session cookie is retrieved");     
-                
-        // redirection
-        for (NameValuePair setCookieHeader : setCookieHeaders)
-        {
-            resp.addHeader(ShareUtils.HEADER_SET_COOKIE, setCookieHeader.getValue());
-        }
         String redirectionUrl = "http://" + shareUtils.getShareHostWithPort() + redirectTo; 
         if (logger.isDebugEnabled())
-            logger.debug("Executing redirect to URL: '" + redirectionUrl + "' with session cookie");     
+            logger.debug("Executing redirect to URL: '" + redirectionUrl + "'.");     
         
         resp.sendRedirect(redirectionUrl);                
     } 
@@ -803,20 +747,6 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
         return members;     
     } 
     
-    // get the login and password from session
-    private Pair<String, String> getCredentials(String sessionId)
-    {
-        Pair<String, String> result = null;
-        Map<String, Object> session = sessionManager.getSession(sessionId);
-        if (session != null)
-        {
-            String login = (String) session.get(VtiFilter.AUTHENTICATION_USERNAME);            
-            String password = (String) session.get(VtiFilter.AUTHENTICATION_PASSWORD);
-            result = new Pair<String, String>(login, password);           
-        }
-        
-        return result;
-    }
     
     private String removeIllegalCharacters(String value)
     {        
