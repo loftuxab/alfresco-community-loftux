@@ -88,11 +88,13 @@ public class AuthenticatingConnector implements Connector
     {
         Response response = null;
         boolean handshake = false;
+        boolean firstcall = true;
         
         if (isAuthenticated())
         {
             // try to call into the connector to see if we can successfully do this
             response = this.connector.call(uri);
+            firstcall = false;
             
             if (logger.isDebugEnabled())
                 logger.debug("Received " + response.getStatus().getCode() + " on first call to: " + uri);
@@ -118,7 +120,7 @@ public class AuthenticatingConnector implements Connector
         
         if (logger.isDebugEnabled())
             logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (handshake ? " second " : "first") + "call to: " + uri);
+                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }
@@ -130,11 +132,13 @@ public class AuthenticatingConnector implements Connector
     {
         Response response = null;
         boolean handshake = false;
+        boolean firstcall = true;
         
         if (isAuthenticated())
         {
             // try to call into the connector to see if we can successfully do this
             response = this.connector.call(uri, context);
+            firstcall = false;
             
             if (logger.isDebugEnabled())
                 logger.debug("Received " + response.getStatus().getCode() + " on first call to: " + uri);
@@ -160,7 +164,7 @@ public class AuthenticatingConnector implements Connector
 
         if (logger.isDebugEnabled())
             logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (handshake ? " second " : "first") + "call to: " + uri);
+                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;        
     }
@@ -172,11 +176,13 @@ public class AuthenticatingConnector implements Connector
     {
         Response response = null;
         boolean handshake = false;
+        boolean firstcall = true;
         
         if (isAuthenticated())
         {
             // try to call into the connector to see if we can successfully do this
             response = this.connector.call(uri, context, in);
+            firstcall = false;
             
             if (logger.isDebugEnabled())
                 logger.debug("Received " + response.getStatus().getCode() + " on first call to: " + uri);
@@ -202,7 +208,7 @@ public class AuthenticatingConnector implements Connector
         
         if (logger.isDebugEnabled())
             logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (handshake ? " second " : "first") + "call to: " + uri);
+                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }
@@ -214,11 +220,13 @@ public class AuthenticatingConnector implements Connector
     {
         Response response = null;
         boolean handshake = false;
+        boolean firstcall = true;
         
         if (isAuthenticated())
         {
             // try to call into the connector to see if we can successfully do this
             response = this.connector.call(uri, context, in, out);
+            firstcall = false;
             
             if (logger.isDebugEnabled())
                 logger.debug("Received " + response.getStatus().getCode() + " on first call to: " + uri);
@@ -244,7 +252,7 @@ public class AuthenticatingConnector implements Connector
         
         if (logger.isDebugEnabled())
             logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (handshake ? " second " : "first") + "call to: " + uri);
+                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }
@@ -256,11 +264,13 @@ public class AuthenticatingConnector implements Connector
     {
         Response response = null;
         boolean handshake = false;
+        boolean firstcall = true;
         
         if (isAuthenticated())
         {
             // try to call into the connector to see if we can successfully do this
             response = this.connector.call(uri, context, req, res);
+            firstcall = false;
             
             if (logger.isDebugEnabled())
                 logger.debug("Received " + response.getStatus().getCode() + " on first call to: " + uri);
@@ -286,7 +296,7 @@ public class AuthenticatingConnector implements Connector
         
         if (logger.isDebugEnabled())
             logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (handshake ? " second " : "first") + "call to: " + uri);
+                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }

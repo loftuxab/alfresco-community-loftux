@@ -78,7 +78,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "uploader"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "cookie", "uploader"], this.onComponentsLoaded, this);
 
       return this;
    }
@@ -1347,11 +1347,20 @@
          var url;
          if (this.showConfig.uploadURL == null)
          {
-            url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+            url = Alfresco.constants.PROXY_URI + "api/upload";
          }
          else
          {
-            url = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL + "?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+            url = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL;
+         }
+         
+         if (Alfresco.constants.ALF_TICKET.length != 0)
+         {
+            url += "?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+         }
+         else
+         {
+            url += ";jsessionid=" + YAHOO.util.Cookie.get("JSESSIONID");
          }
          
          // Find files to upload

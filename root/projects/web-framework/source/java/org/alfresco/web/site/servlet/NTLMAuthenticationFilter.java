@@ -151,10 +151,6 @@ public class NTLMAuthenticationFilter implements Filter
         String authHdr = req.getHeader("Authorization");
         boolean reqAuth = (authHdr != null && authHdr.startsWith(AUTH_NTLM));
         
-        //
-        // TODO: validate ticket via REST call? reqAuth=true failure...
-        //
-        
         // If user exists and we do not require re-authentication then continue to next filter
         if (!reqAuth && AuthenticationUtil.isAuthenticated(req))
         {
@@ -299,7 +295,6 @@ public class NTLMAuthenticationFilter implements Filter
                             // Store the NTLM logon details, cache the type2 message, and token if using passthru
                             ntlmDetails = new NTLMLogonDetails();
                             ntlmDetails.setType2Message(type2Msg);
-                            //ntlmDetails.setAuthenticationToken(authToken);
                             session.setAttribute(NTLM_AUTH_DETAILS, ntlmDetails);
                             
                             if (logger.isDebugEnabled())
@@ -394,10 +389,6 @@ public class NTLMAuthenticationFilter implements Filter
             
             if (logger.isDebugEnabled())
                 logger.debug("Using cached NTLM hash, authenticated = " + authenticated);
-            
-            //
-            // TODO: validate ticket via REST call? Redirect to login on failure...
-            //
             
             // Allow the user to access the requested page
             chain.doFilter( req, res);
