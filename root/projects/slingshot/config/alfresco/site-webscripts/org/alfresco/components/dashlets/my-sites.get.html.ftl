@@ -1,14 +1,15 @@
 <script type="text/javascript">//<![CDATA[
-new Alfresco.MySites("${args.htmlid}").setOptions({
+new Alfresco.MySites("${args.htmlid}").setOptions(
+{
    sites: [
-   <#if sites??>
-	   <#list sites as site>
-	      {
-	         shortName: '${site.shortName?js_string}',
-	         title: '${site.title?js_string}'
-	      }<#if (site_has_next)>,</#if>
-	   </#list>
-   </#if>
+<#if sites??>
+   <#list sites as site>
+   {
+      shortName: '${site.shortName?js_string}',
+      title: '${site.title?js_string}'
+   }<#if (site_has_next)>,</#if>
+   </#list>
+</#if>
    ]
 });
 //]]></script>

@@ -1,7 +1,3 @@
-// Ensure namespaces exist
-Alfresco.module.event =  Alfresco.module.event || {}; 
-Alfresco.module.event.validation = Alfresco.module.event.validation || {};
-
 /**
  * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
@@ -27,11 +23,21 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
  * http://www.alfresco.com/legal/licensing
  */
 
+// Ensure namespaces exist
+Alfresco.module.event =  Alfresco.module.event || {}; 
+Alfresco.module.event.validation = Alfresco.module.event.validation || {};
+
 /*
  *** Alfresco.module.AddEvent
 */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
    Alfresco.module.AddEvent = function(containerId)
    {
       this.name = "Alfresco.module.AddEvent";
@@ -40,7 +46,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
       this.panel = null;
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "calendar", "container", "connection"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "calendar", "container", "connection"], this.onComponentsLoaded, this);
 
       return this;
    };
@@ -61,30 +67,52 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
         * @property options
         * @type object
         */
-       options:
-       {
-          siteId: "",
-          /**
-           * Stores the URI of the event IF an edit is happening 
-           *
-           * @property eventURI
-           * @type String
-           */
-          eventURI: null,
-          displayDate: null
-       },      
+      options:
+      {
+         /**
+         *  The current site's id
+         *
+         * @property siteId
+         * @type String
+         */
+         siteId: "",
 
-       /**
-        * Set multiple initialization options at once.
-        *
-        * @method setOptions
-        * @param obj {object} Object literal specifying a set of options
-        */
-       setOptions: function Wiki_setOptions(obj)
-       {
-          this.options = YAHOO.lang.merge(this.options, obj);
-          return this;
-       },
+         /**
+         * Stores the URI of the event IF an edit is happening
+         *
+         * @property eventURI
+         * @type String
+         */
+         eventURI: null,
+
+         /**
+         * If the dialog is in "add" or "edit" mode
+         *
+         * @property eventURI
+         * @type String
+         */
+         mode: "add",
+
+         /**
+         * Default date to use instead of today
+         *
+         * @property displayDate
+         * @type object
+         */
+         displayDate: null
+      },      
+
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       */
+      setOptions: function AddEvent_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
        
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -92,14 +120,14 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        *
        * @method onComponentsLoaded
        */
-         componentsLoaded: function()
+      onComponentsLoaded: function AddEvent_onComponentsLoaded()
+      {
+         /* Shortcut for dummy instance */
+         if (this.id === null)
          {
-            /* Shortcut for dummy instance */
-            if (this.id === null)
-            {
-               return;
-            }
-         },
+            return;
+         }
+      },
 
       /**
        * Renders the event create form. If the form has been previously rendered
@@ -108,7 +136,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        *
        * @method show
        */
-      show: function()
+      show: function AddEvent_show()
       {
          var args =
          {
@@ -130,6 +158,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
                fn: this.templateLoaded,
                scope: this
             },
+            execScripts: true,
             failureMessage: "Could not load add event form"
          });
       },
@@ -141,14 +170,14 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method templateLoaded
        * @param response {object} DomEvent
        */
-       templateLoaded: function(response)
+       templateLoaded: function AddEvent_templateLoaded(response)
        {
           // Inject the template from the XHR request into a new DIV element
           var containerDiv = document.createElement("div");
           containerDiv.innerHTML = response.serverResponse.responseText;
 
           // The panel is created from the HTML returned in the XHR request, not the container
-          var panelDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+          var panelDiv = Dom.getFirstChild(containerDiv);
 
           this.panel = new YAHOO.widget.Panel(panelDiv,
           {
@@ -162,23 +191,27 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           // Add it to the Dom
           this.panel.render(document.body);
 
-          var Dom = YAHOO.util.Dom;
-
+          // Set the title depending on the mode
+          Dom.get(this.id + "-title-div").innerHTML = Alfresco.util.message("title." + this.options.mode + "Event", this.name);
+                   
           // "All day" check box
           var allDay = Dom.get(this.id + "-allday");
           if (allDay)
           {
-             YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, allDay, this);
+             Event.addListener(allDay, "click", this.onAllDaySelect, allDay, this);
           }
          
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
          eventForm.addValidation(this.id + "-tags", Alfresco.module.event.validation.tags, null, "keyup");
          
-         var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"];
-         for (var i=0; i < dateElements.length; i++)
+         var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"], i, ii;
+         for (i = 0, ii = dateElements.length; i < ii; i++)
          {
-            eventForm.addValidation(dateElements[i], this._onDateValidation, { "obj": this }, "blur");
+            eventForm.addValidation(dateElements[i], this._onDateValidation,
+            {
+               obj: this
+            }, "blur");
          }
          
          // Setup date validation
@@ -216,7 +249,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          }
          else  // Event Edit
          {   
-            var form = document.getElementById(this.id + "-addEvent-form");
+            var form = Dom.get(this.id + "-addEvent-form");
             // Reset the "action" attribute
             form.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + this.options.eventURI;
             
@@ -231,8 +264,8 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
             });        
             
             // Is this an all day event?
-            var startTime = Dom.get(this.id + "-start");
-            var endTime = Dom.get(this.id + "-end");
+            var startTime = Dom.get(this.id + "-start"),
+               endTime = Dom.get(this.id + "-end");
             
             // TODO: perhaps "allday" property to calendar event
             if (startTime.value === "00:00" && (startTime.value === endTime.value))
@@ -306,12 +339,11 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          escapeListener.enable();
 
          // Set intial focus
-         YAHOO.util.Dom.get(this.id + "-title").focus();
+         Dom.get(this.id + "-title").focus();
       },
       
-      _onDateValidation: function(field, args, event, form, silent)
+      _onDateValidation: function AddEvent__onDateValidation(field, args, event, form, silent)
       {
-         var Dom = YAHOO.util.Dom;
          // Check that the end date is after the start date
          var start = Alfresco.util.formatDate(Dom.get("fd").value, "yyyy/mm/dd");
          var startDate = new Date(start + " " + Dom.get(args.obj.id + "-start").value);
@@ -344,7 +376,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method onAllDaySelect
        * @param e {object} DomEvent
        */
-      onAllDaySelect: function(e, checkbox)
+      onAllDaySelect: function AddEvent_onAllDaySelect(e, checkbox)
       {
          var display = !(checkbox.checked);
          this._displayTimeFields(display);
@@ -357,21 +389,21 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method _displayTimeFields
        * @param display {Boolean} if true, displays the start / end time fields
        */   
-      _displayTimeFields: function(display)
+      _displayTimeFields: function AddEvent__displayTimeFields(display)
       {
-        var ids = [this.id + "-starttime", this.id + "-endtime"];
-        var elem;
-        for (var i=0; i < ids.length; i++)
-        {
-           elem = document.getElementById(ids[i]);
-           if (elem)
-           {
-             elem.style.display = (display ? "inline" : "none");
-           }
-        } 
+         var ids = [this.id + "-starttime", this.id + "-endtime"], elem;
+
+         for (var i = 0, ii = ids.length; i < ii; i++)
+         {
+            elem = Dom.get(ids[i]);
+            if (elem)
+            {
+               elem.style.display = (display ? "inline" : "none");
+            }
+         } 
       },
       
-      onEventUpdated: function(e)
+      onEventUpdated: function AddEvent_onEventUpdated(e)
       {
          this.panel.destroy();
          // Fire off "eventUpdated" event
@@ -386,7 +418,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method onDateSelectButton
        * @param e {object} DomEvent
        */
-      onDateSelectButton: function(e)
+      onDateSelectButton: function AddEvent_onDateSelectButton(e)
       {
          var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
          oCalendarMenu.setBody("&#32;");
@@ -399,21 +431,24 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          // Align the Overlay to the Button instance
          oCalendarMenu.align();
 
-            var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
+         var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
          oCalendar.render();
 
-         oCalendar.changePageEvent.subscribe(function () {
-            window.setTimeout(function () {
+         oCalendar.changePageEvent.subscribe(function ()
+         {
+            window.setTimeout(function ()
+            {
                oCalendarMenu.show();
             }, 0);
          });
          var me = this;
          
-         oCalendar.selectEvent.subscribe(function (type, args) {
+         oCalendar.selectEvent.subscribe(function (type, args)
+         {
             var date;
-            var Dom = YAHOO.util.Dom;
 
-            if (args) {
+            if (args)
+            {
                var prettyId, hiddenId;
                if (container.indexOf("enddate") > -1)
                {
@@ -431,11 +466,11 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
                elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
                elem.focus();
 
-               if(prettyId == "fd")
+               if (prettyId == "fd")
                {
                   // If a new fromDate was selected
                   var toDate = new Date(Alfresco.util.formatDate(Dom.get("td").value, "yyyy/mm/dd"));
-                  if(YAHOO.widget.DateMath.before(toDate, selectedDate))
+                  if (YAHOO.widget.DateMath.before(toDate, selectedDate))
                   {                     
                      //...adjust the toDate if toDate is earlier than the new fromDate
                      var tdEl = Dom.get("td");
@@ -456,7 +491,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @param e {object} DomEvent
        * @param obj {object} Object passed back from addListener method
        */
-      onCancelButtonClick: function(e, obj)
+      onCancelButtonClick: function AddEvent_onCancelButtonClick(e, obj)
       {
            this.panel.destroy();
       },
@@ -469,7 +504,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method onCreateEventSuccess
        * @param e {object} DomEvent
        */
-      onCreateEventSuccess: function(e)
+      onCreateEventSuccess: function AddEvent_onCreateEventSuccess(e)
       {
          this.panel.destroy();
 

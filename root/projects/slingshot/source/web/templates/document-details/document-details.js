@@ -98,7 +98,8 @@
        */
       onReady: function DocumentDetails_onReady()
       {
-         var config = {
+         var config =
+         {
             method: "GET",
             url: Alfresco.constants.PROXY_URI + '/slingshot/doclib/doclist/documents/node/' + 
                  this.options.nodeRef.replace(":/", "") + '?filter=node',

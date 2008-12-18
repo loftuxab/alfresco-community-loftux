@@ -76,7 +76,10 @@ function specialize(item, activity, summary)
 function getActivities()
 {
    // Call the correct repo script depending on the mode
-   var mode = args["mode"], site = args["site"], connector, result = {status: 0};
+   var mode = args["mode"], site = args["site"], connector, result =
+   {
+      status: 0
+   };
 
    if (format.name == "html")
    {

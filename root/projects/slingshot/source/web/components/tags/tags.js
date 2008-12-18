@@ -1,8 +1,54 @@
-/*
+/**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+ 
+/**
  * Alfresco.TagComponent
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.TagComponent
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
+    * TagComponent constructor.
+    * 
+    * @param {String} htmlId The HTML id of the parent element
+    * @return {Alfresco.TagComponent} The new TagComponent instance
+    * @constructor
+    */
    Alfresco.TagComponent = function(htmlId)
    {
       this.name = "Alfresco.TagComponent";
@@ -12,7 +58,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       
       return this;
    }
@@ -63,9 +109,9 @@
        *
        * @method onComponentsLoaded
        */
-      componentsLoaded: function TagComponent_componentsLoaded()
+      onComponentsLoaded: function TagComponent_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
       /**
        * Set messages for this component
@@ -110,7 +156,8 @@
             if (link)
             {
                var tagName = link.firstChild.nodeValue;
-               YAHOO.Bubbling.fire("tagSelected", {
+               YAHOO.Bubbling.fire("tagSelected",
+               {
                   "tagname": tagName
                });
             }
@@ -134,7 +181,8 @@
             d: new Date().getTime()
          });
          
-         Alfresco.util.Ajax.request({
+         Alfresco.util.Ajax.request(
+         {
             method: Alfresco.util.Ajax.GET,
             url: uri,
             successCallback:
@@ -158,17 +206,15 @@
          var resp = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
          if (resp && !YAHOO.lang.isUndefined(resp.tags))
          {
-            var html = "";
-            
-            var tags = resp.tags;
-            var tag;
-            for (var i=0; i < tags.length; i++)
+            var html = "", tags = resp.tags, tag, i, j;
+
+            for (i = 0, j = tags.length; i < j; i++)
             {
                tag = tags[i];
                html += this._generateTagMarkup(tag);
             }
             
-            var elem = document.getElementById('tagFilterLinks');
+            var elem = Dom.get('tagFilterLinks');
             if (elem)
             {
                html = '<li class="onTagSelection nav-label">'+elem.getElementsByTagName('li')[0].innerHTML+'</li>'+html;
@@ -187,7 +233,7 @@
       _generateTagMarkup: function (tag)
       {
          var html = '<li class="onTagSelection nav-label">';
-         html += '<a href="#" class="tag-link nav-link">' + tag.name + '</a> (' + tag.count + ')';
+         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a> (' + tag.count + ')';
          html += '</li>';
          return html;
       }

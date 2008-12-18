@@ -7,7 +7,7 @@ function main()
    // Call the repo to create the site
    var scriptRemoteConnector = remote.connect("alfresco");
    var repoResponse = scriptRemoteConnector.post("/api/sites", clientRequest, "application/json");
-   if(repoResponse.status == 401)
+   if (repoResponse.status == 401)
    {
       status.setCode(repoResponse.status, "error.loggedOut");
       return;
@@ -17,7 +17,7 @@ function main()
       var repoJSON = eval('(' + repoResponse + ')');
 
       // Check if we got a positive result
-      if(repoJSON.shortName)
+      if (repoJSON.shortName)
       {
          // Yes we did, now create the site in the webtier
          var tokens = new Array();
@@ -26,7 +26,7 @@ function main()
 
          model.success = true;
       }
-      else if(repoJSON.status.code)
+      else if (repoJSON.status.code)
       {
          status.setCode(repoJSON.status.code, repoJSON.message);
          return;

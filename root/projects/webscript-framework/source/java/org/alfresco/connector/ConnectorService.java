@@ -481,7 +481,7 @@ public class ConnectorService implements ApplicationListener
         }
         
         // session binding key
-        String cacheKey = PREFIX_VAULT_SESSION + userId + "_" + vaultId;
+        String cacheKey = PREFIX_VAULT_SESSION + vaultId;
         
         // pull the credential vault from session
         CredentialVault vault = (CredentialVault)session.getAttribute(cacheKey);

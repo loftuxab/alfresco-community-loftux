@@ -6,7 +6,7 @@ function convertTopicJSONData(topic)
     topic["createdOn"] = created;
     
     // last reply
-    if(topic["lastReplyOn"] != undefined)
+    if (topic["lastReplyOn"] != undefined)
     {
         topic["lastReplyOn"] = new Date(topic["lastReplyOn"])
     }
@@ -18,7 +18,7 @@ function convertTopicJSONData(topic)
  */
 function convertTopicsJSONData(data)
 {
-    for(var x=0; x < data.items.length; x++)
+    for (var x=0; x < data.items.length; x++)
     {
         convertTopicJSONData(data.items[x]);
     }

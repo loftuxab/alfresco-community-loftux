@@ -120,7 +120,7 @@ Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me
    desc += '<div class="nodeEdit">';
    if (data.permissions.edit)
    {
-      desc += '<' + tagName + ' class="onEditBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
+      desc += '<' + tagName + ' class="onEditBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '"><span>' + me._msg("action.edit") + '</span></a></' + tagName + '>';
    }
    if (data.permissions.edit && ! data.isDraft && showPublishingActions)
    {
@@ -128,18 +128,18 @@ Alfresco.util.blog.generateBlogPostActions = function generateBlogPostActions(me
       {
          if (data.outOfDate)
          {
-            desc += '<' + tagName + ' class="onUpdateExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.updateexternal") + '</a></' + tagName + '>';
+            desc += '<' + tagName + ' class="onUpdateExternal"><a href="#" class="blogpost-action-link-' + tagName + '"><span>' + me._msg("action.updateexternal") + '</span></a></' + tagName + '>';
          }
-         desc += '<' + tagName + ' class="onUnpublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.unpublishexternal") + '</a></' + tagName + '>';
+         desc += '<' + tagName + ' class="onUnpublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '"><span>' + me._msg("action.unpublishexternal") + '</span></a></' + tagName + '>';
       }
       else
       {
-         desc += '<' + tagName + ' class="onPublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.publishexternal") + '</a></' + tagName + '>';
+         desc += '<' + tagName + ' class="onPublishExternal"><a href="#" class="blogpost-action-link-' + tagName + '"><span>' + me._msg("action.publishexternal") + '</span></a></' + tagName + '>';
       }
    }
    if (data.permissions['delete'])
    {
-      desc += '<' + tagName + ' class="onDeleteBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '">' + me._msg("action.delete") + '</a></' + tagName + '>';
+      desc += '<' + tagName + ' class="onDeleteBlogPost"><a href="#" class="blogpost-action-link-' + tagName + '"><span>' + me._msg("action.delete") + '</span></a></' + tagName + '>';
    }
    desc += '</div>';
    return desc;

@@ -8,7 +8,6 @@
  */
 (function()
 {
-    
    /**
     * YUI Library aliases
     */
@@ -158,7 +157,7 @@
        */
       onComponentsLoaded: function BlogPostView_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -633,20 +632,18 @@
       {
          // make sure the user sees at least one action, otherwise we won't highlight
          var permissions = this.blogPostData.permissions;
-         if (! (permissions.edit || permissions["delete"]))
+         if (!(permissions.edit || permissions["delete"]))
          {
             return;
          }
           
-         var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         Dom.addClass(args[1].target, 'overNode');
       },
       
       /** Called whenever the mouse exits a list item. */
       onPostElementMouseExited: function BlogPostView_onListElementMouseExited(layer, args)
       {
-         var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(args[1].target, 'overNode');
       },
 
    

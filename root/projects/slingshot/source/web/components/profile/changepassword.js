@@ -152,16 +152,25 @@
          if (response && response.json.success)
          {
             // succesfully updated details - refresh back to the user profile main page
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.success", this.name)});
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: Alfresco.util.message("message.success", this.name)
+            });
             this.navigateToProfile();
          }
          else if (response && response.json.message)
          {
-            Alfresco.util.PopupManager.displayPrompt({text: response.json.message});
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: response.json.message
+            });
          }
          else
          {
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: Alfresco.util.message("message.failure", this.name)
+            });
          }
       },
       

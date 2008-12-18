@@ -48,7 +48,10 @@
       this.name = "Alfresco.module.CreateSite";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.CreateSite already exists.");
@@ -186,16 +189,20 @@
          // Shortname is mandatory
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
          // and can NOT contain whitespace characters
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[0-9a-zA-Zs]+$/}, "keyup");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch,
+         {
+            pattern: /^[0-9a-zA-Zs]+$/
+         }, "keyup");
          // and should be valid file name
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
          createSiteForm.setShowSubmitStateDynamically(true, false);
          createSiteForm.setSubmitElements(this.widgets.okButton);
-         createSiteForm.doBeforeFormSubmit = {
-            fn: function(){
-
+         createSiteForm.doBeforeFormSubmit =
+         {
+            fn: function()
+            {
                var formEl = YAHOO.util.Dom.get(this.id + "-form");
                formEl.attributes.action.nodeValue = Alfresco.constants.URL_SERVICECONTEXT + "modules/create-site"; 
 
@@ -309,12 +316,15 @@
          this.widgets.cancelButton.set("disabled", false);
          this.widgets.panel.show();
          var text = Alfresco.util.message("message.failure", this.name);
-         if(response.json.message)
+         if (response.json.message)
          {
             var tmp = Alfresco.util.message(response.json.message, this.name);
             text = tmp ? tmp : text;
          }
-         Alfresco.util.PopupManager.displayPrompt({text: text});
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: text
+         });
       },
 
       /**
@@ -356,7 +366,10 @@
 Alfresco.module.getCreateSiteInstance = function()
 {
    var instanceId = "alfresco-createSite-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length != 0)
    {
       instance = instance[0];

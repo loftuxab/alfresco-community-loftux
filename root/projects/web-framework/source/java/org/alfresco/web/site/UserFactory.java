@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.UserFactoryException;
@@ -100,20 +101,21 @@ public abstract class UserFactory
         throws UserFactoryException
     {
         User user = null;
+        HttpSession session = request.getSession();
         
         // do we want to force a user fault?
         if (force)
         {
             // remove the user object from session
-            request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+            session.removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
         }
         
         // check whether there is a "USER_ID" marker in the session
-        String userId = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_ID);
+        String userId = (String)session.getAttribute(SESSION_ATTRIBUTE_KEY_USER_ID);
         if (userId != null)
         {
             // check whether there is a user object loaded already
-            user = (User) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+            user = (User)session.getAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
             if (user == null)
             {
                 // load the user from whatever store...
@@ -122,12 +124,15 @@ public abstract class UserFactory
                 // if we got the user, set onto session
                 if (user != null)
                 {
-                    request.getSession().setAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
+                    session.setAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
+                    
+                    // update the user ID - as the case may be different than used on the login dialog
+                    session.setAttribute(SESSION_ATTRIBUTE_KEY_USER_ID, user.getId());
                 }
                 else
                 {
                     // unable to load the user
-                    request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);                    
+                    session.removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);                	
                 }
             }
         }

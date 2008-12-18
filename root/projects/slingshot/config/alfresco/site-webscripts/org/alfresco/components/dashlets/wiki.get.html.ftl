@@ -1,5 +1,6 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiDashlet("${args.htmlid}").setOptions({
+   new Alfresco.WikiDashlet("${args.htmlid}").setOptions(
+   {
       guid: "${instance.object.id}",
       siteId: "${page.url.templateArgs.site!""}",
       pages: [<#if (pageList?? && pageList.pages?size &gt; 0)><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>]

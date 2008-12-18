@@ -283,7 +283,8 @@
                });
 
                // we need to wrap the array inside a JSON object so the DataTable is happy
-               updatedResponse = {
+               updatedResponse =
+               {
                   "items": items
                };
             }
@@ -306,7 +307,10 @@
          
          // register the "enter" event on the search text field
          var searchInput = Dom.get(this.id + "-term");
-         var escapeListener = new YAHOO.util.KeyListener(searchInput, { keys:13 }, 
+         var escapeListener = new YAHOO.util.KeyListener(searchInput,
+         {
+            keys:13
+         },
          {
             fn: function() 
             {
@@ -428,7 +432,8 @@
                      onclick:
                      {
                         fn: me.onRoleSelect,
-                        obj: {
+                        obj:
+                        {
                            user: userName,
                            currentRole: currentRole,
                            newRole: role,
@@ -450,12 +455,16 @@
                });
                
                // store a reference to the role selector button
-               me.listWidgets[userName] = {
+               me.listWidgets[userName] =
+               {
                   roleSelector: roleselector
                };
                
                // store the buttons
-               me.buttons[userName + "-roleselector"] = { roleselector: roleselector };
+               me.buttons[userName + "-roleselector"] =
+               {
+                  roleselector: roleselector
+               };
             }
             else
             {
@@ -488,11 +497,19 @@
                {
                    container: me.id + '-button-' + userName,
                    label: me._msg("site-members.uninvite"),
-                   onclick: { fn: me.doRemove, obj: userName, scope: me}
+                   onclick:
+                   {
+                      fn: me.doRemove,
+                      obj: userName,
+                      scope: me
+                     }
                });
                
                // store the buttons
-               me.buttons[userName + "-button"] = { button: button };
+               me.buttons[userName + "-button"] =
+               {
+                  button: button
+               };
             }
             else
             {
@@ -595,7 +612,7 @@
             });
          
             // remove the entry
-            var recordIndex = this.widgets.dataTable.getRecordIndex(event.target);
+            var recordIndex = this.widgets.dataTable.getRecordIndex(event.target.id);
             this.widgets.dataTable.deleteRow(recordIndex);
          };
          
@@ -691,7 +708,8 @@
                successCallback:
                {
                   fn: success,
-                  obj: {
+                  obj:
+                  {
                      user: user,
                      role: selectedRole,
                      recordIndex: recordIndex

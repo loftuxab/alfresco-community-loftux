@@ -31,6 +31,11 @@
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
 
    /**
     * Dashboard DocumentVersions constructor.
@@ -55,7 +60,6 @@
 
    Alfresco.DocumentVersions.prototype =
    {
-
       /**
        * Object container for initialization options
        *
@@ -127,7 +131,7 @@
        */
       onComponentsLoaded: function DV_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
 
       /**
@@ -137,56 +141,57 @@
       onReady: function DV_onReady()
       {
          // Listen on clicks for revert version icons
-         var versions = this.options.versions;
-         var myThis = this;
-         for (var i = 0; i < versions.length; i++)
+         var versions = this.options.versions, version, i, j, revertSpan;
+         
+         for (i = 0, j = versions.length; i < j; i++)
          {
-            var revertSpan = YAHOO.util.Dom.get(this.id + "-revert-span-" + i);
-            if(revertSpan)
+            revertSpan = Dom.get(this.id + "-revert-span-" + i);
+            if (revertSpan)
             {
-               YAHOO.util.Event.addListener(revertSpan, "click",
-                       function (event, obj)
-                       {
-                          // Find the index of the version link by looking at its id
-                          var version = versions[obj.versionIndex];
+               Event.addListener(revertSpan, "click", function (event, obj)
+               {
+                  // Find the index of the version link by looking at its id
+                  version = versions[obj.versionIndex];
 
-                          // Find the version through the index and display the revert dialog for the version
-                          Alfresco.module.getRevertVersionInstance().show({
-                             filename: this.options.filename,
-                             nodeRef: this.options.nodeRef,
-                             version: version.label,
-                             onRevertVersionComplete: {
-                                fn: this.onRevertVersionComplete,
-                                scope: this
-                             }
-                          });
-                       }, {versionIndex: i}, this);
+                  // Find the version through the index and display the revert dialog for the version
+                  Alfresco.module.getRevertVersionInstance().show(
+                  {
+                     filename: this.options.filename,
+                     nodeRef: this.options.nodeRef,
+                     version: version.label,
+                     onRevertVersionComplete:
+                     {
+                        fn: this.onRevertVersionComplete,
+                        scope: this
+                     }
+                  });
+               },
+               {
+                  versionIndex: i
+               }, this);
             }
 
             // Listen on clicks on the version - date row so we can expand and collapse it
-            var expandDiv = YAHOO.util.Dom.get(this.id + "-expand-div-" + i);
-            var moreVersionInfoDiv = YAHOO.util.Dom.get(this.id + "-moreVersionInfo-div-" + i);            
-            if(expandDiv)
+            var expandDiv = Dom.get(this.id + "-expand-div-" + i),
+               moreVersionInfoDiv = Dom.get(this.id + "-moreVersionInfo-div-" + i);            
+
+            if (expandDiv)
             {
-               YAHOO.util.Event.addListener(expandDiv, "click",
-                       function (event, obj)
-                       {
-                          //alert(obj.versionIndex);
-                          var Dom = YAHOO.util.Dom;
-                          //var moreVersionInfoDiv = Dom.get(this.id + "-moreVersionInfo-div-" + obj.versionIndex);
-                          if(obj.moreVersionInfoDiv && Dom.hasClass(obj.expandDiv, "collapsed"))
-                          {
-                             Alfresco.util.Anim.fadeIn(obj.moreVersionInfoDiv);
-                             Dom.removeClass(obj.expandDiv, "collapsed");
-                             Dom.addClass(obj.expandDiv, "expanded");
-                          }
-                          else
-                          {
-                             Dom.setStyle(obj.moreVersionInfoDiv, "display", "none");
-                             Dom.removeClass(obj.expandDiv, "expanded");
-                             Dom.addClass(obj.expandDiv, "collapsed");
-                          }
-                       },
+               Event.addListener(expandDiv, "click", function (event, obj)
+               {
+                  if (obj.moreVersionInfoDiv && Dom.hasClass(obj.expandDiv, "collapsed"))
+                  {
+                     Alfresco.util.Anim.fadeIn(obj.moreVersionInfoDiv);
+                     Dom.removeClass(obj.expandDiv, "collapsed");
+                     Dom.addClass(obj.expandDiv, "expanded");
+                  }
+                  else
+                  {
+                     Dom.setStyle(obj.moreVersionInfoDiv, "display", "none");
+                     Dom.removeClass(obj.expandDiv, "expanded");
+                     Dom.addClass(obj.expandDiv, "collapsed");
+                  }
+               },
                {
                   expandDiv: expandDiv,
                   moreVersionInfoDiv: moreVersionInfoDiv
@@ -194,11 +199,8 @@
             }
 
             // Format and display the createdDate
-            var createdDateSpan = document.getElementById(this.id + "-createdDate-span-" + i);
-            createdDateSpan.innerHTML = Alfresco.util.formatDate(versions[i].createdDate);
-
+            Dom.get(this.id + "-createdDate-span-" + i).innerHTML = Alfresco.util.formatDate(versions[i].createdDate);
          }
-
       },
 
       /**
@@ -208,7 +210,10 @@
        */
       onRevertVersionComplete: function DV_onRevertVersionComplete()
       {
-         Alfresco.util.PopupManager.displayMessage({ text: Alfresco.util.message("message.revertComplete", this.name) });
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.revertComplete", this.name)
+         });
 
          window.location.reload();
       }

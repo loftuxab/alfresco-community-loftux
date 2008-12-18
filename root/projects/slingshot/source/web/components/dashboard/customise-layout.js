@@ -169,7 +169,7 @@
             });
 
             // Remove layout/li-element from available layouts if its the current layout
-            if(this.options.currentLayout.templateId == layoutId)
+            if (this.options.currentLayout.templateId == layoutId)
             {
                this.widgets.layoutUlElement.removeChild(layoutLi);
             }
@@ -197,7 +197,7 @@
          {
             //var layoutLi = Dom.get(this.id + "-layout-li-" + layoutId);
             var layoutLi = this.widgets.layoutLiElements[layoutId];
-            if(selectedLayoutId == layoutId)
+            if (selectedLayoutId == layoutId)
             {
                // Set the current layout
                var selectedLayout = this.options.layouts[layoutId];
@@ -210,7 +210,10 @@
                iconImg.src = selectedLayout.icon;
 
                // Send out event to let other component know that the layout has changed
-               YAHOO.Bubbling.fire("onDashboardLayoutChanged", {dashboardLayout: selectedLayout});
+               YAHOO.Bubbling.fire("onDashboardLayoutChanged",
+               {
+                  dashboardLayout: selectedLayout
+               });
             }
          }
 
@@ -219,7 +222,7 @@
           * used style="display:none" but that makes IE6 crash the layout in some combinations :-(
           */
          var lis = Dom.getChildren(this.widgets.layoutUlElement);
-         for(var i = 0; i < lis.length; i++)
+         for (var i = 0; i < lis.length; i++)
          {
             this.widgets.layoutUlElement.removeChild(lis[i]);
          }
@@ -227,7 +230,7 @@
          // Add the available layouts to the list
          for (var layoutId in this.options.layouts)
          {
-            if(layoutId != selectedLayoutId)
+            if (layoutId != selectedLayoutId)
             {
                this.widgets.layoutUlElement.appendChild(this.widgets.layoutLiElements[layoutId]);
             }

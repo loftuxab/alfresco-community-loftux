@@ -371,7 +371,7 @@
          this.widgets.postForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
 
          this.widgets.postForm.setShowSubmitStateDynamically(true, false);
-         if(this.widgets.publishButton)
+         if (this.widgets.publishButton)
          {
             this.widgets.postForm.setSubmitElements([this.widgets.saveButton, this.widgets.publishExternalButton, this.widgets.publishButton]);            
          }
@@ -406,9 +406,12 @@
                this.widgets.editor.saveHTML();
 
                // Make sure the user has written a text
-               if(YAHOO.util.Dom.get(this.id + '-content').value.length == 0)
+               if (Dom.get(this.id + '-content').value.length == 0)
                {
-                  Alfresco.util.PopupManager.displayMessage({text: Alfresco.util.message("message.noText", this.name)});
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: Alfresco.util.message("message.noText", this.name)
+                  });
                   return;
                }
 
@@ -450,12 +453,12 @@
       validateAfterEditorChange: function()
       {
          this.widgets.validateOnZero--;
-         if(this.widgets.validateOnZero == 0)
+         if (this.widgets.validateOnZero == 0)
          {
-            var oldLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
+            var oldLength = Dom.get(this.id + '-content').value.length;
             this.widgets.editor.saveHTML();
-            var newLength = YAHOO.util.Dom.get(this.id + '-content').value.length;
-            if((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
+            var newLength = Dom.get(this.id + '-content').value.length;
+            if ((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
             {
                this.widgets.postForm.updateSubmitElements();
             }
@@ -532,7 +535,10 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("message.savepost.success")});
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.savepost.success")
+            });
             this._loadPostViewPage(response.json.item.name);
          }
       },

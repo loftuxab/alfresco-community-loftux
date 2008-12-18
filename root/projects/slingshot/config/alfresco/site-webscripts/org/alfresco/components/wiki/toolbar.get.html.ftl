@@ -1,5 +1,6 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiToolbar("${args.htmlid}").setOptions({
+   new Alfresco.WikiToolbar("${args.htmlid}").setOptions(
+   {
       siteId: "${page.url.templateArgs["site"]!""}",
       title: "${page.url.args["title"]!""}",
       showBackLink: ${(args.showBackLink == "true")?string}

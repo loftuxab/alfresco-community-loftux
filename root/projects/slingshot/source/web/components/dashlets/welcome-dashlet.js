@@ -15,7 +15,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["grids"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["grids"], this.onComponentsLoaded, this);
       
       return this;
    }
@@ -53,7 +53,7 @@
 		 *
 		 * @method onComponentsLoaded
 	    */	
- 		componentsLoaded: function()
+ 		onComponentsLoaded: function()
     	{
 			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
 		},
@@ -82,11 +82,13 @@
 		onRemoveSelect: function(e)
 		{
 		   // Make the call to have the component remove itself
-		   Alfresco.util.Ajax.request({
+		   Alfresco.util.Ajax.request(
+		   {
 				url: Alfresco.constants.URL_SERVICECONTEXT + "modules/remove-component",
 				method: Alfresco.util.Ajax.POST,
 				requestContentType: Alfresco.util.Ajax.JSON,
-				dataObj: {
+				dataObj:
+				{
 				   componentId: this.options.componentId,
 				   dashboardURL: this.options.dashboardURL
 				},

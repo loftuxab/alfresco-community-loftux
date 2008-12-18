@@ -151,7 +151,7 @@ Alfresco.util.arrayContains = function(arr, el)
    {
       for (var i = 0; i < arr.length; i++)
       {
-          if(arr[i] == el)
+          if (arr[i] == el)
           {
              return true;
           }
@@ -417,7 +417,7 @@ Alfresco.util.stripUnsafeHTMLTags = function(s)
             {
                matchTag = s.substring(i + 1, endMatchIndex);
             }
-            if(matchTag.charAt(0) == '/')
+            if (matchTag.charAt(0) == '/')
             {
                // Remove the '/' since it was an endtag
                matchTag = matchTag.substring(1);
@@ -1710,7 +1710,8 @@ Alfresco.util.Ajax = function()
             }
 
             // Call the success callback in the correct scope
-            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), {
+            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
+            {
                config: config,
                json: json,
                serverResponse: serverResponse
@@ -1761,7 +1762,7 @@ Alfresco.util.Ajax = function()
             {
                // If the caller has defined an error message display that instead of displaying message about bad json syntax
                var displayBadJsonResult = true;
-               if(config.failureMessage)
+               if (config.failureMessage)
                {
                   displayBadJsonResult = false;
                }
@@ -1891,7 +1892,7 @@ Alfresco.util.Cursor = function()
          for (var i = 0; i < allStates.length; i++)
          {
             var cs = allStates[i];
-            if(cs === cursorState)
+            if (cs === cursorState)
             {
                YAHOO.util.Dom.addClass(el, cursorState);
             }
@@ -1981,14 +1982,14 @@ Alfresco.util.Anim = function()
          var supportsOpacity = YAHOO.env.ua.ie === 0;
 
          // Prepare el before fade
-         if(supportsOpacity)
+         if (supportsOpacity)
          {
             Dom.setStyle(el, "opacity", fadeIn ? 0 : 1);
          }
 
          // Show the element, transparent if opacity supported,
          // otherwise its visible and the "fade in" is finished
-         if(supportsOpacity)
+         if (supportsOpacity)
          {
             Dom.setStyle(el, "visibility", "visible");
          }
@@ -1998,7 +1999,7 @@ Alfresco.util.Anim = function()
          }
 
          // Make sure element is displayed
-         if(adjustDisplay && Dom.getStyle(el, "display") === "none")
+         if (adjustDisplay && Dom.getStyle(el, "display") === "none")
          {
             Dom.setStyle(el, "display", "");
          }
@@ -2007,17 +2008,24 @@ Alfresco.util.Anim = function()
          var fn = attributes.callback;
          var scope = attributes.scope;
          var myEl = el;
-         if(supportsOpacity)
+         if (supportsOpacity)
          {
             // Do the fade (from value/opacity has already been set above)
-            var fade = new YAHOO.util.Anim(el, { opacity: { to: fadeIn ? 1 : 0 } }, 0.5);
-            fade.onComplete.subscribe(function(e) {
-               if(!fadeIn && adjustDisplay)
+            var fade = new YAHOO.util.Anim(el,
+            {
+               opacity:
+               {
+                  to: fadeIn ? 1 : 0
+               }
+            }, 0.5);
+            fade.onComplete.subscribe(function(e)
+            {
+               if (!fadeIn && adjustDisplay)
                {
                   // Hide element from Dom if its a fadeOut
                   YAHOO.util.Dom.setStyle(myEl, "display", "none");
                }
-               if(fn)
+               if (fn)
                {
                   // Call custom callback
                   fn.call(scope ? scope : this);
@@ -2027,12 +2035,12 @@ Alfresco.util.Anim = function()
          }
          else
          {
-            if(!fadeIn && adjustDisplay)
+            if (!fadeIn && adjustDisplay)
             {
                // Hide element from Dom if its a fadeOut
                YAHOO.util.Dom.setStyle(myEl, "display", "none");
             }
-            if(fn)
+            if (fn)
             {
                // Call custom callback
                fn.call(scope ? scope : this);
@@ -2470,7 +2478,7 @@ Alfresco.thirdparty.toISO8601 = function()
       		{
       			time += "Z";
       		}
-      		else if(options.selector != "time")
+      		else if (options.selector != "time")
       		{
       			var timezoneOffset = dateObject.getTimezoneOffset();
       			var absOffset = Math.abs(timezoneOffset);

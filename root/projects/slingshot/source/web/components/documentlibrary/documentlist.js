@@ -437,6 +437,12 @@
          YAHOO.util.History.register("path", bookmarkedPath, function(newPath)
          {
             Alfresco.logger.debug("HistoryManager: path changed:" + newPath);
+            
+            if (newPath == "/")
+            {
+               newPath = "";
+            }
+            
             if (this.expectedHistoryEvent)
             {
                // Clear the flag and update the DocList
@@ -964,7 +970,7 @@
          {
             me.totalRecords = oResponse.meta.totalRecords;
             return oResponse.meta;
-         }
+         };
 
          // Custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
@@ -1019,7 +1025,7 @@
          {
             Alfresco.logger.debug("DataTable renderEvent");
             
-            if (this.widgets.dataTable.getRecordSet().getLength() == 0)
+            if (this.widgets.dataTable.getRecordSet().getLength() === 0)
             {
                this.widgets.dataTable.set("renderLoopSize", 0);
             }
@@ -1978,6 +1984,10 @@
                   
                   var bookmarkedState = YAHOO.util.History.getBookmarkedState("path");
                   while (bookmarkedState != (bookmarkedState = decodeURIComponent(bookmarkedState))){}
+                  if (bookmarkedState == "/")
+                  {
+                     bookmarkedState = "";
+                  }
                   if (obj.path != bookmarkedState)
                   {
                      var objNav =

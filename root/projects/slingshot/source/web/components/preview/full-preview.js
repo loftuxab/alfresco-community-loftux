@@ -218,7 +218,11 @@
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.options.icon.substring(1);
 
          // Display the current frame status
-         var message = Alfresco.util.message("label.currentFrame", this.name, {"0": "0", "1": "0"});
+         var message = Alfresco.util.message("label.currentFrame", this.name,
+         {
+            "0": "0",
+            "1": "0"
+         });
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
          // Show the hidden buttons now that they have become styled as yui buttons
@@ -235,18 +239,21 @@
        */
       _createFlash: function FP__createFlash()
       {
-         if(Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
+         if (Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
          {
-            if(this._resolvePreview())
+            if (this._resolvePreview())
             {
-               if(this.swfPlayer == null)
+               if (this.swfPlayer == null)
                {
                   // Maximize the height of the swf div
                   var swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
                   Dom.setStyle(swfPlayerDiv, "height", Dom.getViewportHeight() - 100 + "px");
 
                   // Create and save a reference to the swfPlayer so we can call it later
-                  this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {wmode: "transparent"});
+                  this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", 
+                  {
+                     wmode: "transparent"
+                  });
                   this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
                   this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
                   this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
@@ -257,7 +264,10 @@
             {
                // Cant find a preview
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true";
-               var message = Alfresco.util.message("label.noPreview", this.name, {"0": url});
+               var message = Alfresco.util.message("label.noPreview", this.name,
+               {
+                  "0": url
+               });
                this.widgets.swfPlayerMessage["innerHTML"] = message;
             }
          }
@@ -284,7 +294,7 @@
          // Try to prioritise usage of imgpreview for images and webpreview for other content
          var ps = this.options.previews;
          var preview, webpreview = "webpreview", imgpreview = "imgpreview";
-         if(this.options.mimeType.match(/image\/jpeg|image\/gif|image\/png|application\/x-shockwave-flash/))
+         if (this.options.mimeType.match(/image\/jpeg|image\/gif|image\/png|application\/x-shockwave-flash/))
          {
             var url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + "?a=true";
             return {url: url, doNavigate: false};
@@ -292,7 +302,7 @@
          else
          {
             preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
-            if(preview)
+            if (preview)
             {
                var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview;
                url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
@@ -309,13 +319,13 @@
        */
       onContentReady: function FP_onContentReady(event)
       {
-         if(!this.contentReady)
+         if (!this.contentReady)
          {
             // Flash movie makes this call twice, make sure we only react on it once
             this.contentReady = true;
 
             var result = this._resolvePreview();
-            if(result)
+            if (result)
             {
                this.swfPlayer.load(result.url, result.doNavigate);
             }
@@ -393,7 +403,7 @@
          this._handleSuccessFullLoadedSwfEvent(event);
 
          // Show the navigation controls if there are more pages than 1
-         if(parseInt(event.totalFrames) > 1)
+         if (parseInt(event.totalFrames) > 1)
          {
             Dom.setStyle(this.id + "-controls-div", "visibility", "");
          }
@@ -512,7 +522,7 @@ x      },
          this._createFlash();
 
          var mask = Dom.get(this.id + "-fullPreview-panel_mask");
-         if(!Dom.hasClass("full-preview-mask"))
+         if (!Dom.hasClass("full-preview-mask"))
          {
             Dom.addClass(mask, "full-preview-mask");            
          }

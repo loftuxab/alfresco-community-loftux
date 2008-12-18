@@ -11,7 +11,7 @@ function main()
 	{
 		// Create javascript objects from the server response
 		var sites = eval('(' + result + ')');
-      if(sites.length > 2)
+      if (sites.length > 2)
       {
          sites = sites.slice(sites.length - 3);
       }

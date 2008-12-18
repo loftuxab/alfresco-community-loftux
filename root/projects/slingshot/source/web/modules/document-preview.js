@@ -53,7 +53,10 @@
       this.id = containerId;
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/swfplayer/assets/SWFPlayer.swf";
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.DocumentPreview already exists.");
@@ -259,7 +262,10 @@
          Dom.setStyle(swfPlayerDiv, "height", panelHeight - 80 + "px");
 
          // Create and save a reference to the swfPlayer so we can call it later
-         this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {backgroundColor: "#FFFFFF"}); //"#5C5C5C"});
+         this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div",
+         {
+            backgroundColor: "#FFFFFF"
+         }); //"#5C5C5C"});
          this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
          this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
          this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
@@ -276,7 +282,7 @@
 
       onContentReady: function DP_onContentReady(event)
       {
-         if(!this.ready)
+         if (!this.ready)
          {
             this.ready = true;
             this._initFlash(0);
@@ -464,7 +470,11 @@
 
          // Display the current frame status
          var message = Alfresco.util.message("label.currentFrame", this.name);
-         message = YAHOO.lang.substitute(message, {"0": "0", "1": "0"});
+         message = YAHOO.lang.substitute(message,
+         {
+            "0": "0",
+            "1": "0"
+         });
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
          // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
@@ -552,7 +562,10 @@
 Alfresco.module.getDocumentPreviewInstance = function()
 {
    var instanceId = "alfresco-documentPreview-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];

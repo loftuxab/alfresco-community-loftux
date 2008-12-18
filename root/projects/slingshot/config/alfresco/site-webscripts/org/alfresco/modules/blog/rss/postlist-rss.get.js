@@ -5,7 +5,7 @@ function convertPostJSONData(post)
    post["createdOn"] = created;
    
    // modified
-   if(post["modifiedOn"] != undefined)
+   if (post["modifiedOn"] != undefined)
    {
       var modified = new Date(post["modifiedOn"]);
       post["modifiedOn"] = created;
@@ -21,7 +21,7 @@ function convertPostJSONData(post)
        post["updatedOn"] = new Date(post["updatedOn"]);
    }
    // last comment
-   if(post["lastCommentOn"] != undefined)
+   if (post["lastCommentOn"] != undefined)
    {
       post["lastCommentOn"] = new Date(post["lastCommentOn"])
    }
@@ -33,7 +33,7 @@ function convertPostJSONData(post)
  */
 function convertPostsJSONData(data)
 {
-   for(var x=0; x < data.items.length; x++)
+   for (var x=0; x < data.items.length; x++)
    {
       convertPostJSONData(data.items[x]);
    }

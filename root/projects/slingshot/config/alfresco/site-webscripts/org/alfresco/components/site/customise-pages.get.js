@@ -3,14 +3,14 @@
 var siteId = page.url.templateArgs.site;
 var p = sitedata.getPage("site/" + siteId + "/dashboard");
 var usedPages = eval('(' + p.properties.sitePages + ')');
-if(usedPages == null)
+if (usedPages == null)
 {
    usedPages = [];
 }
 
 // Get ids for all pages that have been configured to be addable for sites
 var availablePages = config.scoped["SitePages"]["pages"].childrenMap["page"];
-if(availablePages == null)
+if (availablePages == null)
 {
    availablePages = [];
 }
@@ -19,15 +19,16 @@ if(availablePages == null)
 var pages = [];
 
 // Start by adding the current pages in the order they were added
-for(var i = 0; i < usedPages.length; i++)
+for (var i = 0; i < usedPages.length; i++)
 {
    var pageId = usedPages[i].pageId;
    // Look up real page object from framework
    var p = sitedata.getPage(pageId);
-   if(p)
+   if (p)
    {
       // Create a page object
-      pages[pages.length] = {
+      pages[pages.length] =
+      {
          pageId: pageId,
          title: p.title,
          description: p.description,
@@ -44,20 +45,21 @@ for (i = 0; i < availablePages.size(); i++)
    var used = false;
    for (var j = 0; j < usedPages.length; j++)
    {
-      if(usedPages[j].pageId == pageId)
+      if (usedPages[j].pageId == pageId)
       {
          used = true;
          break;
       }
    }
-   if(!used)
+   if (!used)
    {
       // Look up real page object from framework
       var p = sitedata.getPage(pageId);
-      if(p)
+      if (p)
       {
          // Create a page object
-         pages[pages.length] = {
+         pages[pages.length] =
+         {
             pageId: pageId,
             title: p.title,
             description: p.description,

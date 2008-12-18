@@ -3,7 +3,7 @@ var contentviewer =  new XML(config.script);
 
 // Check mandatory parameters
 var nodeRef = page.url.args.nodeRef;
-if(nodeRef == null || nodeRef.length == 0)
+if (nodeRef == null || nodeRef.length == 0)
 {
    status.code = 400;
    status.message = "Parameter 'nodeRef' is missing.";
@@ -23,13 +23,13 @@ var preload = false;
 var contentData = null;
 
 var content = contentviewer.content.(@mimetype==node.mimetype);
-if(content.length() == 1)
+if (content.length() == 1)
 {
    // Found a configured viewer for the mimetype
    viewer = content.@viewer.toString();
    preload = (content.@preload.toString() == "true");
 }
-else if(content.length() > 1)
+else if (content.length() > 1)
 {
    // Multiple viewers found for the same mimetype, throw an error
    status.code = 500;
@@ -48,7 +48,7 @@ var nodeId = node.properties[msns + "node-uuid"];
 var name = node.properties[mcns + "name"];
 
 var contentUrl = "/api/node/content/" +storeType+ "/" +storeId + "/" + nodeId + "?" + encodeURIComponent(name)
-if(preload)
+if (preload)
 {
    /**
     * This mimetype can be displayed inline and has therefore been configured
@@ -65,30 +65,30 @@ model.contentUrl = "/alfresco/service" + contentUrl;
 
 // Set the width
 model.width = "100%"; // default value
-if(node.properties[mcns + "width"])
+if (node.properties[mcns + "width"])
 {
    model.width = node.properties[mcns + "width"];
 }
-else if(args.width)
+else if (args.width)
 {
    model.width = args.width;
 }
-else if(content.@width.toString().length > 0)
+else if (content.@width.toString().length > 0)
 {
    model.width = content.@width.toString();
 }
 
 // Set the height
 model.height = "100%"; // default value
-if(node.properties[mcns + "height"])
+if (node.properties[mcns + "height"])
 {
    model.height = node.properties[mcns + "height"];
 }
-else if(args.height)
+else if (args.height)
 {
    model.height = args.height;
 }
-else if(content.@height.toString().length > 0)
+else if (content.@height.toString().length > 0)
 {
    model.height = content.@height.toString();
 }

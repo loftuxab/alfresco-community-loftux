@@ -281,13 +281,20 @@
             var pageId = li.id.substring((this.id + "-currentPage-li-").length);
 
             // Create a page object to send to the server
-            var page = {pageId: pageId};
+            var page =
+            {
+               pageId: pageId
+            };
             pages[pages.length] = page;
          }
 
          // Prepare the root object to send to the server
          var siteId = this.options.siteId;
-         var dataObj = {siteId: siteId, pages: pages};
+         var dataObj =
+         {
+            siteId: siteId,
+            pages: pages
+         };
 
          // Do the request and send the user to the dashboard after wards
          Alfresco.util.Ajax.jsonRequest(
@@ -295,7 +302,8 @@
             method: Alfresco.util.Ajax.POST,
             url: Alfresco.constants.URL_SERVICECONTEXT + "components/site/customise-pages",
             dataObj: dataObj,
-            successCallback: {
+            successCallback:
+            {
                fn: function()
                {
                   // Send the user to the newly configured dashboard
@@ -304,7 +312,8 @@
                scope: this
             },
             failureMessage: Alfresco.util.message("message.saveFailure", this.name),
-            failureCallback: {
+            failureCallback:
+            {
                fn: function()
                {
                   // Hide spinner
@@ -368,7 +377,7 @@
       {
          var parentUl = li.parentNode;
          var children = Dom.getChildrenBy(parentUl, this._isRealPage);
-         if(children.length > 0)
+         if (children.length > 0)
          {
             Dom.setStyle(li, "display", "none");
          }

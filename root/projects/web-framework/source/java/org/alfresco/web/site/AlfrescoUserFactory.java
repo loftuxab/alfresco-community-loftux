@@ -78,6 +78,7 @@ public class AlfrescoUserFactory extends UserFactory
     public static final String CM_JOBTITLE = "{http://www.alfresco.org/model/content/1.0}jobtitle";
     public static final String CM_LASTNAME = "{http://www.alfresco.org/model/content/1.0}lastName";
     public static final String CM_FIRSTNAME = "{http://www.alfresco.org/model/content/1.0}firstName";
+    public static final String CM_USERNAME = "{http://www.alfresco.org/model/content/1.0}userName";
     
     public static final String ALFRESCO_ENDPOINT_ID = "alfresco";
 
@@ -150,7 +151,8 @@ public class AlfrescoUserFactory extends UserFactory
             JSONObject properties = json.getJSONObject("properties");
             
             // Construct the Alfresco User object based on the cm:person properties
-            user = constructUser(userId);
+            // ensure we have the correct username case
+            user = constructUser(properties.getString(CM_USERNAME));
             user.setFirstName(properties.getString(CM_FIRSTNAME));
             user.setLastName(properties.getString(CM_LASTNAME));
             if (properties.has(CM_JOBTITLE))

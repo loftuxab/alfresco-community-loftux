@@ -159,7 +159,7 @@
        */
       onComponentsLoaded: function DiscussionsTopic_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
   
@@ -551,20 +551,30 @@
          if (this.modules.tagLibrary == undefined)
          {
             this.modules.tagLibrary = new Alfresco.module.TagLibrary(formId);
-            this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
+            this.modules.tagLibrary.setOptions(
+            {
+               siteId: this.options.siteId
+            });
          }
          this.modules.tagLibrary.initialize();
          this.modules.tagLibrary.setTags(this.topicData.tags);
          
          // register the okButton
-         this.widgets.okButton = new YAHOO.widget.Button(formId + "-submit", {type: "submit"});
+         this.widgets.okButton = new YAHOO.widget.Button(formId + "-submit",
+         {
+            type: "submit"
+         });
          
          // register the cancel button
-         this.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel", {type: "button"});
+         this.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel",
+         {
+            type: "button"
+         });
          this.widgets.cancelButton.subscribe("click", this.onEditFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content', {
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content',
+         {
              height: '180px',
              width: '700px',
              dompath: false, //Turns on the bar at the bottom
@@ -704,13 +714,12 @@
       {
          // make sure the user sees at least one action, otherwise we won't highlight
          var permissions = this.topicData.permissions;
-         if (! (permissions.edit || permissions["delete"]))
+         if (!(permissions.edit || permissions["delete"]))
          {
             return;
          } 
          
-         var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         Dom.addClass(args[1].target, 'overNode');
       },
      
       /**
@@ -718,8 +727,7 @@
        */
       onTopicElementMouseExited: function DiscussionsTopicList_onTopicElementMouseExited(layer, args)
       {
-         var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(args[1].target, 'overNode');
       },
 
       /**
@@ -727,7 +735,8 @@
        */
       _fireTopicDataChangedEvent: function DiscussionsTopicList__fireTopicDataChangedEvent()
       {
-         var eventData = {
+         var eventData =
+         {
             topicRef: this.topicData.nodeRef,
             topicTitle: this.topicData.title,
             topicId: this.topicData.name

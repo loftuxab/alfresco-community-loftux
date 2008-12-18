@@ -19,7 +19,7 @@
       this.options = {};
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.onComponentsLoaded, this);
 
       return this;
    };
@@ -118,7 +118,7 @@
        *
        * @method onComponentsLoaded
        */
-      componentsLoaded: function()
+      onComponentsLoaded: function()
       {
          Event.onContentReady(this.id, this.init, this, true);
       },

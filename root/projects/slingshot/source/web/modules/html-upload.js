@@ -65,7 +65,10 @@
       this.name = "Alfresco.module.HtmlUpload";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.HtmlUpload already exists.");
@@ -296,7 +299,10 @@
          this.widgets.versionSection = Dom.get(this.id + "-versionSection-div");
 
          // Create and save a reference to the buttons so we can alter them later
-         this.widgets.uploadButton = Alfresco.util.createYUIButton(this, "upload-button", null, {type: "submit" });
+         this.widgets.uploadButton = Alfresco.util.createYUIButton(this, "upload-button", null,
+         {
+            type: "submit"
+         });
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
          
          // Configure the forms runtime
@@ -309,8 +315,10 @@
          // The ok button is the submit button, and it should be enabled when the form is ready
          form.setShowSubmitStateDynamically(true, false);
          form.setSubmitElements(this.widgets.uploadButton);
-         form.doBeforeFormSubmit = {
-            fn: function(){
+         form.doBeforeFormSubmit =
+         {
+            fn: function()
+            {
                this.widgets.uploadButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
                this.widgets.panel.hide();
@@ -382,7 +390,10 @@
          this.widgets.feedbackMessage.destroy();
 
          // Inform user that upload was successful
-         Alfresco.util.PopupManager.displayMessage({ text: Alfresco.util.message("message.success", this.name) });
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.success", this.name)
+         });
       },
 
       /**
@@ -423,7 +434,10 @@
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
 
-            var tip = Alfresco.util.message("label.singleUpdateTip", this.name, {"0": this.showConfig.updateFilename});
+            var tip = Alfresco.util.message("label.singleUpdateTip", this.name,
+            {
+               "0": this.showConfig.updateFilename
+            });
             this.widgets.singleUpdateTip["innerHTML"] = tip;
 
             // Display the version input form
@@ -489,7 +503,6 @@
          var failure = "window.parent.Alfresco.util.ComponentManager.find({id: '" + this.id + "'})[0]";
          this.widgets.failureCallback.value = failure + ".onUploadFailure";
          this.widgets.failureScope.value = failure;
-
       },
 
       /**
@@ -519,7 +532,10 @@
 Alfresco.module.getHtmlUploadInstance = function()
 {
    var instanceId = "alfresco-htmlupload-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];
