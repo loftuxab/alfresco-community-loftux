@@ -1110,6 +1110,7 @@
        */
       showDialog : function(e,elTarget)
       {
+          
           //show create event dialog
           if (YAHOO.util.Selector.test(elTarget, 'button#addEventButton')  )
           {
@@ -1120,26 +1121,33 @@
           {
             var elPar = Dom.getAncestorByClassName(elTarget,'vevent');
             this.editEvent = this.events[elPar.id];
-
+            
             var div = document.createElement('div');
             div.id = 'eventInfoPanel';
             document.body.appendChild(div);
-            var panel = new Alfresco.EventInfo(this.id + "");
-            // panel.event = elTarget.parentNode.id;
+            this.eventInfoPanel= new Alfresco.EventInfo(this.id + "");
             
-            panel.setOptions(
-              {
-               siteId : this.options.siteId,
-               eventUri : 'calendar/'+elTarget.href.split('/calendar/')[1],
-               displayDate : this.currentDate,
-               event  : Dom.getAncestorByClassName(elTarget,'vevent').id
-              }
-            );
-            panel.show(); // event object 
+            if (!this.eventInfoPanel.isShowing)
+            {
+               this.eventInfoPanel.setOptions(
+               {
+                siteId : this.options.siteId,
+                eventUri : 'calendar/'+elTarget.href.split('/calendar/')[1],
+                displayDate : this.currentDate,
+                event  : Dom.getAncestorByClassName(elTarget,'vevent').id
+               }
+               );
+
+               this.eventInfoPanel.show({
+                 uri : 'calendar/'+elTarget.href.split('/calendar/')[1],
+                 name : this.editEvent.getData('summary')
+               });
+               
+            }
           }
-       
+
           YAHOO.util.Event.preventDefault(e);
-          
+
       },
       
       /**

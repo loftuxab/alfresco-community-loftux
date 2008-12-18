@@ -115,6 +115,7 @@
        */
       show: function EventInfo_show(event)
       {
+         this.isShowing = false;
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/info",
@@ -133,6 +134,7 @@
          });
 
          this.event = event;
+
       },
 
       /**
@@ -143,7 +145,7 @@
        */
       templateLoaded: function EventInfo_templateLoaded(response)
       {
-         var div = Dom.get("eventInfoPanel");
+         var div = YAHOO.util.Dom.get("eventInfoPanel");
          div.innerHTML = response.serverResponse.responseText;
 
          this.panel = new YAHOO.widget.Panel(div,
@@ -159,10 +161,18 @@
          // Buttons
          Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
          Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick);
-         Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
+         // Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
 
          // Display the panel
          this.panel.show();
+         
+         this.panel.hideEvent.subscribe(function() {
+            this.isShowing=false;
+         },this,true);
+         this.panel.showEvent.subscribe(function() {
+            this.isShowing=true;
+         },this,true);
+         
       },
       
       /**
@@ -229,7 +239,7 @@
               doBeforeAjaxRequest : {
                   fn : function(p_config, p_obj) 
                        {
-                           p_config.method = Alfresco.util.Ajax.PUT
+                           p_config.method = Alfresco.util.Ajax.PUT;
                            if (p_config.dataObj.tags)
                            {
                              p_config.dataObj.tags = p_config.dataObj.tags.join(' ');
@@ -303,60 +313,59 @@
          this.eventDialog.dialog.destroy();
        },
       /**
-       * Fired when the delete #calendarendpicker button, #calendarpicker button {calendar.css (line 114)
-       background:transparent url(images/calendar-16.png) no-repeat scroll is clicked. Kicks off a DELETE request
+       * Fired when the delete is clicked. Kicks off a DELETE request
        * to the Alfresco repo to remove an event.
        *
        * @method onDeleteClick
        * @param e {object} DomEvent
        */
       onDeleteClick: function EventInfo_onDeleteClick(e)
-      {
-         var me = this;
-         Alfresco.util.PopupManager.displayPrompt(
-         {
-            text: this._msg("message.confirm.delete", this.event.name),
-            buttons: [
-            {
-               text: this._msg("button.delete"),
-               handler: function DL_onActionDelete_delete()
-               {
-                  this.destroy();
-                  me._onActionDeleteConfirm.call(me, record);
-               }
-            },
-            {
-               text: this._msg("button.cancel"),
-               handler: function DL_onActionDelete_cancel()
-               {
-                  this.destroy();
-               },
-               isDefault: true
-            }]
-         });
-      },
-      
-      /**
-       * Delete Event confirmed.
-       * Kicks off a DELETE request to the Alfresco repo to remove an event.
-       *
-       * @method _onDeleteConfirm
-       * @private
-       */
-      _onDeleteConfirm: function EventInfo_onDeleteConfirm()
-      {
-         Alfresco.util.Ajax.request(
-         {
-            method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + this.event.uri + "?page=calendar",
-            successCallback:
-            {
-               fn: this.onDeleted,
-               scope: this
-            },
-            failureMessage: this._msg("message.delete.failure", this.event.name),
-         });
-      },
+       {
+          var me = this;
+          Alfresco.util.PopupManager.displayPrompt(
+          {
+             text: this._msg("message.confirm.delete", this.event.name),
+             buttons: [
+             {
+                text: this._msg("button.delete"),
+                handler: function DL_onActionDelete_delete()
+                {
+                   this.destroy();
+                   me._onDeleteConfirm.call(me);
+                }
+             },
+             {
+                text: this._msg("button.cancel"),
+                handler: function DL_onActionDelete_cancel()
+                {
+                   this.destroy();
+                },
+                isDefault: true
+             }]
+          });
+       },
+
+       /**
+        * Delete Event confirmed.
+        * Kicks off a DELETE request to the Alfresco repo to remove an event.
+        *
+        * @method _onDeleteConfirm
+        * @private
+        */
+       _onDeleteConfirm: function EventInfo_onDeleteConfirm()
+       {
+          Alfresco.util.Ajax.request(
+          {
+             method: Alfresco.util.Ajax.DELETE,
+             url: Alfresco.constants.PROXY_URI + this.event.uri + "?page=calendar",
+             successCallback:
+             {
+                fn: this.onDeleted,
+                scope: this
+             },
+             failureMessage: this._msg("message.delete.failure", this.event.name)
+          });
+       },
       
       /**
        * Called when an event is successfully deleted.
@@ -364,52 +373,52 @@
        * @method onDeleted
        * @param e {object} DomEvent
        */
-      onDeleted: function EventInfo_onDeleted(e)
-      {
-         this._hide();
+       onDeleted: function EventInfo_onDeleted(e)
+       {
+          this._hide();
 
-         YAHOO.Bubbling.fire('eventDeleted',
-         {
-            name: this.event.name, // so we know which event we are dealing with
-            from: this.event.from // grab the events for this date and remove the event
-         });         
-      },
+          YAHOO.Bubbling.fire('eventDeleted',
+          {
+              id: this.options.event // so we know which event we are dealing with
+          });
+          this.panel.destroy();        
+       },
 
 
-      /**
-       * PRIVATE FUNCTIONS
-       */
+       /**
+        * PRIVATE FUNCTIONS
+        */
 
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function EventInfo__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.EventInfo", Array.prototype.slice.call(arguments).slice(1));
-      },
+       /**
+        * Gets a custom message
+        *
+        * @method _msg
+        * @param messageId {string} The messageId to retrieve
+        * @return {string} The custom message
+        * @private
+        */
+       _msg: function EventInfo__msg(messageId)
+       {
+          return Alfresco.util.message.call(this, messageId, "Alfresco.EventInfo", Array.prototype.slice.call(arguments).slice(1));
+       },
 
-      /**
-       * Hides the panel and calls onClose callback if present
-       *
-       * @method _hide
-       * @param e {object} DomEvent
-       * @private
-       */
-      _hide: function EventInfo__hide()
-      {
-         this._hide();
-         var callback = this.options.onClose;
-         if (callback && typeof callback.fn == "function")
-         {
-            // Call the onClose callback in the correct scope
-            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), callback.obj);
-         }
-      }
+       /**
+        * Hides the panel and calls onClose callback if present
+        *
+        * @method _hide
+        * @param e {object} DomEvent
+        * @private
+        */
+       _hide: function EventInfo__hide()
+       {
+          this.panel.hide();
+          var callback = this.options.onClose;
+          if (callback && typeof callback.fn == "function")
+          {
+             // Call the onClose callback in the correct scope
+             callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), callback.obj);
+          }
+       }
    };
 })();
 
