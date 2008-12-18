@@ -37,6 +37,12 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
     */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event;
+   
+   /**
+    * Internal date formats
+    */
+   var DATE_LONG = "dddd, d mmmm yyyy",
+      DATE_SHORT = "yyyy/mm/dd";
 
    Alfresco.module.AddEvent = function(containerId)
    {
@@ -243,9 +249,13 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
             // Initialise the start and end dates to today
             var today = this.options.displayDate || new Date();
             // Pretty formatting
-            var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
+            var dateStr = Alfresco.util.formatDate(today, DATE_LONG);
             Dom.get("fd").value = dateStr;
             Dom.get("td").value = dateStr;
+            // Machine-readable formatting
+            dateStr = Alfresco.util.formatDate(today, DATE_SHORT);
+            Dom.get(this.id + "-from").value = dateStr;
+            Dom.get(this.id + "-to").value = dateStr;
          }
          else  // Event Edit
          {   
@@ -280,13 +290,6 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
          {
             fn: function(form, obj)
             {
-               // Set the value of the hidden form variables   
-               var start = Alfresco.util.formatDate(Dom.get("fd").value, "ddd, d mmmm yyyy");
-               Dom.get(this.id + "-from").value = Alfresco.util.formatDate(start, "yyyy/mm/dd");
-               
-               var to = Alfresco.util.formatDate(Dom.get("td").value, "ddd, d mmmm yyyy");
-               Dom.get(this.id + "-to").value = Alfresco.util.formatDate(to, "yyyy/mm/dd");
-               
                this.okButton.set("disabled", true);
             },
             scope: this
@@ -307,7 +310,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
              id: "calendarpicker",
              container: this.id + "-startdate"
          });
-         startButton.on("click", this.onDateSelectButton);
+         startButton.on("click", this.onDateSelectButton, this);
 
          var endButton = new YAHOO.widget.Button(
          {
@@ -315,7 +318,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
             id: "calendarendpicker",
             container: this.id + "-enddate"
          });
-         endButton.on("click", this.onDateSelectButton);
+         endButton.on("click", this.onDateSelectButton, this);
 
          // Display the panel
          this.panel.show();
@@ -345,10 +348,10 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
       _onDateValidation: function AddEvent__onDateValidation(field, args, event, form, silent)
       {
          // Check that the end date is after the start date
-         var start = Alfresco.util.formatDate(Dom.get("fd").value, "yyyy/mm/dd");
+         var start = Alfresco.util.formatDate(Dom.get(args.obj.id + "-from").value, DATE_SHORT);
          var startDate = new Date(start + " " + Dom.get(args.obj.id + "-start").value);
          
-         var to = Alfresco.util.formatDate(Dom.get("td").value, "yyyy/mm/dd");
+         var to = Alfresco.util.formatDate(Dom.get(args.obj.id + "-to").value, DATE_SHORT);
          var toDate = new Date(to + " " + Dom.get(args.obj.id + "-end").value);
          
          var after = YAHOO.widget.DateMath.after(toDate, startDate);
@@ -418,7 +421,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method onDateSelectButton
        * @param e {object} DomEvent
        */
-      onDateSelectButton: function AddEvent_onDateSelectButton(e)
+      onDateSelectButton: function AddEvent_onDateSelectButton(e, me)
       {
          var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
          oCalendarMenu.setBody("&#32;");
@@ -441,9 +444,8 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
                oCalendarMenu.show();
             }, 0);
          });
-         var me = this;
          
-         oCalendar.selectEvent.subscribe(function (type, args)
+         oCalendar.selectEvent.subscribe(function (type, args, me)
          {
             var date;
 
@@ -453,34 +455,41 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
                if (container.indexOf("enddate") > -1)
                {
                   prettyId = "td";
+                  hiddenId = me.id + "-to";
                }
                else
                {
                   prettyId = "fd";
+                  hiddenId = me.id + "-from";
                }
 
                date = args[0][0];
                var selectedDate = new Date(date[0], (date[1]-1), date[2]);
 
-               var elem = Dom.get(prettyId);
-               elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
-               elem.focus();
+               var prettyEl = Dom.get(prettyId);
+               prettyEl.value = Alfresco.util.formatDate(selectedDate, DATE_LONG);
+               prettyEl.focus();
+
+               var hiddenEl = Dom.get(hiddenId);
+               hiddenEl.value = Alfresco.util.formatDate(selectedDate, DATE_SHORT);
 
                if (prettyId == "fd")
                {
                   // If a new fromDate was selected
-                  var toDate = new Date(Alfresco.util.formatDate(Dom.get("td").value, "yyyy/mm/dd"));
+                  var toDateHiddenEl = Dom.get(me.id + "-to");
+                  var toDate = new Date(Alfresco.util.formatDate(toDateHiddenEl.value, DATE_SHORT));
+
                   if (YAHOO.widget.DateMath.before(toDate, selectedDate))
                   {                     
                      //...adjust the toDate if toDate is earlier than the new fromDate
-                     var tdEl = Dom.get("td");
-                     tdEl.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
+                     Dom.get("td").value = prettyEl.value;
+                     toDateHiddenEl.value = hiddenEl.value;
                   }
                }
             }
 
             oCalendarMenu.hide();
-         });
+         }, me);
       },
 
       /**
