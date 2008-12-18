@@ -247,7 +247,7 @@ Alfresco.util.getFileIcon = function(fileName, iconSize)
    }
    else if (typeof iconSize == "string")
    {
-      fileSize = parseInt(fileSize, 10);
+      iconSize = parseInt(iconSize, 10);
    }
    
    var extn = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase(), icon = "generic";
@@ -439,7 +439,8 @@ Alfresco.util.stripUnsafeHTMLTags = function(s)
    return buf.join("");
 };
 
-Alfresco.util.stripUnsafeHTMLTags.safeTags = {
+Alfresco.util.stripUnsafeHTMLTags.safeTags =
+{
    "strong":"strong",
    "em":"em",
    "p":"p",
@@ -532,7 +533,7 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
    var tagName = (p_tagName || "span").toLowerCase();
 
    // Walk down until specified tag found and not a yui class
-   while ((src !== null) && ((src.tagName.toLowerCase() != tagName) || (src.className.indexOf("yui") == 0)))
+   while ((src !== null) && ((src.tagName.toLowerCase() != tagName) || (src.className.indexOf("yui") === 0)))
    {
       src = src.firstChild;
    }
@@ -559,7 +560,11 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
  */
 Alfresco.util.hasRequiredFlashPlayer = function(reqMajorVer, reqMinorVer, reqRevision)
 {
-   return DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision);
+   if (typeof DetectFlashVer == "function")
+   {
+      return DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision);
+   }
+   return false;
 };
 
 /**
@@ -707,7 +712,7 @@ Alfresco.util.parseJSON = function(jsonStr, displayError)
 {
    try
    {
-      return YAHOO.lang.JSON.parse(jsonStr)
+      return YAHOO.lang.JSON.parse(jsonStr);
    }
    catch (error)
    {
@@ -832,7 +837,7 @@ Alfresco.util.getQueryStringParameters = function(url)
       if (tokens.length >= 2)
       {
          name = tokens[0];
-         value = unescape(tokens[1]);
+         value = window.unescape(tokens[1]);
          switch (typeof objParams[name])
          {
             case "undefined":
@@ -864,20 +869,26 @@ Alfresco.util.getQueryStringParameters = function(url)
  */
 Alfresco.util.toQueryString = function(p_params)
 {
-   var qs = "?", i, ii, value;
+   var qs = "?", i, ii, name, value, val;
    for (name in p_params)
    {
-      value = p_params[name];
-      if (typeof value == "object")
+      if (p_params.hasOwnProperty(name))
       {
-         for (val in value)
+         value = p_params[name];
+         if (typeof value == "object")
          {
-            qs += name + "=" + escape(value[val]) + "&";
+            for (val in value)
+            {
+               if (value.hasOwnProperty(val))
+               {
+                  qs += name + "=" + window.escape(value[val]) + "&";
+               }
+            }
          }
-      }
-      else if (typeof value == "string")
-      {
-         qs += name + "=" + escape(value) + "&";
+         else if (typeof value == "string")
+         {
+            qs += name + "=" + window.escape(value) + "&";
+         }
       }
    }
    
@@ -897,7 +908,7 @@ Alfresco.util.isValidURL = function(url)
 {
    var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
    return regexp.test(url);
-}
+};
 
 
 /**
@@ -1568,7 +1579,7 @@ Alfresco.util.Ajax = function()
          c.url = encodeURI(c.url);
          
          // Do we need to tunnel the HTTP method if the client can't support it (Adobe AIR)
-         if (YAHOO.env.ua.air != 0)
+         if (YAHOO.env.ua.air !== 0)
          {
             // Check for unsupported HTTP methods
             if (c.method.toUpperCase() == "PUT" || c.method.toUpperCase() == "DELETE")
@@ -1613,27 +1624,30 @@ Alfresco.util.Ajax = function()
        */
       jsonToParamString: function(obj, encode)
       {
-         var params = "";
-         var first = true;
+         var params = "", first = true, attr;
+         
          for (attr in obj)
          {
-            if (first)
+            if (obj.hasOwnProperty(attr))
             {
-               first = false;
-            }
-            else
-            {
-               params += "&";
-            }
-            
-            // Make sure no user input destroys the url 
-            if (encode === true)
-            {
-               params += encodeURIComponent(attr) + "=" + encodeURIComponent(obj[attr]);
-            }
-            else
-            {
-               params += attr + "=" + obj[attr];
+               if (first)
+               {
+                  first = false;
+               }
+               else
+               {
+                  params += "&";
+               }
+
+               // Make sure no user input destroys the url 
+               if (encode)
+               {
+                  params += encodeURIComponent(attr) + "=" + encodeURIComponent(obj[attr]);
+               }
+               else
+               {
+                  params += attr + "=" + obj[attr];
+               }
             }
          }
          return params;
@@ -1755,7 +1769,8 @@ Alfresco.util.Ajax = function()
          }
 
          // Invokde the callback
-         var callback = config.failureCallback;
+         var callback = config.failureCallback, json = null;
+         
          if ((callback && typeof callback.fn == "function") || (config.failureMessage))
          {
             if (callback && typeof callback.fn == "function")
@@ -1768,7 +1783,6 @@ Alfresco.util.Ajax = function()
                }
 
                // User provided a custom failureHandler
-               var json = null;
                if (config.responseContentType === "application/json")
                {
                   json = Alfresco.util.parseJSON(serverResponse.responseText, displayBadJsonResult);
@@ -1801,7 +1815,7 @@ Alfresco.util.Ajax = function()
              */
             if (config.responseContentType == "application/json")
             {
-               var json = Alfresco.util.parseJSON(serverResponse.responseText);
+               json = Alfresco.util.parseJSON(serverResponse.responseText);
                Alfresco.util.PopupManager.displayPrompt(
                {
                   title: json.status.name,
@@ -2167,7 +2181,7 @@ Alfresco.logger.debug = function(p1, p2)
    
    var msg;
    
-   if (typeof p1 == "string" && p2 != null)
+   if (typeof p1 == "string" && p2 !== null)
    {
       msg = p1 + " " + YAHOO.lang.dump(p2);
    }
@@ -2227,7 +2241,7 @@ Alfresco.thirdparty.dateFormat = function()
       		pad = function (value, length)
       		{
       			value = String(value);
-      			length = parseInt(length) || 2;
+      			length = parseInt(length, 10) || 2;
       			while (value.length < length)
       			{
       				value = "0" + value;

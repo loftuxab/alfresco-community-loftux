@@ -9,7 +9,7 @@
          <div class="details2">
             <h4><a href="${url.context}/${event.url}">${event.title?html}</a></h4>
             <div>${event.when} (${event.start} - ${event.end})</div>
-         <#assign siteLink><a href='${url.context}/page/site/${event.site}/dashboard'>${event.site}</a></#assign>
+         <#assign siteLink><a href='${url.context}/page/site/${event.site}/dashboard'>${event.siteTitle?html}</a></#assign>
             <div>${msg("label.in-site", siteLink)}</div>
          </div>
       </div>
