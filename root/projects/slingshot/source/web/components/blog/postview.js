@@ -556,7 +556,7 @@
             {
                action : "update"
             },
-            successMessage: this._msg("message.updatedExternal.success"),
+            successMessage: this._msg("message.updateExternal.success"),
             successCallback:
             {
                fn: onUpdatedSuccess,
