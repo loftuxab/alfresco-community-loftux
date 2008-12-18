@@ -9,21 +9,21 @@
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.what")}: *</div>
-      <div class="yui-u">${result.what!""}</div>
+      <div class="yui-u">${result.what?html!""}</div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.location")}:</div>
-      <div class="yui-u">${result.location!""}</div>
+      <div class="yui-u">${result.location?html!""}</div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.description")}:</div>
-      <div class="yui-u">${result.description!""}</div>
+      <div class="yui-u">${result.description?html!""}</div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.tags")}:</div>
       <div class="yui-u">
 <#if result.tags?? && result.tags?size &gt; 0>
-   <#list result.tags as tag>${tag}<#if tag_has_next>&nbsp;</#if></#list>
+   <#list result.tags as tag>${tag?html}<#if tag_has_next>&nbsp;</#if></#list>
 <#else>
     ${msg("label.none")}
 </#if>

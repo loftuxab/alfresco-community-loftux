@@ -132,7 +132,7 @@
    			for (var i = 0, ii = events.length; i < ii; i++)
    			{
    				item = events[i];
-   				html += '<div><span>' + item.start + ' <a href="' + url + '">' + item.name + '</a></span></div>';
+   				html += '<div><span>' + item.start + ' <a href="' + url + '">' + $html(item.name) + '</a></span></div>';
    			}
    			html += '</div></div>';
    		}
