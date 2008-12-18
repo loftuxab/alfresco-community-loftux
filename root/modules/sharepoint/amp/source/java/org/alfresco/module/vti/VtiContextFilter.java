@@ -99,6 +99,7 @@ public class VtiContextFilter implements Filter
         if (logger.isDebugEnabled()) {
             logger.debug("Target is VTI request");
         }
+        accessChecker.validSiteUri(httpRequest);
         contextContainer.service((HttpServletRequest)request, (HttpServletResponse)response);
     }
     

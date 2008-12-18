@@ -66,7 +66,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
    Alfresco.module.DeleteSite.prototype =
    {
@@ -262,7 +262,7 @@
          });
       }
 
-   }
+   };
 
 })();
 
@@ -282,4 +282,4 @@ Alfresco.module.getDeleteSiteInstance = function()
       instance = new Alfresco.module.DeleteSite(instanceId);
    }
    return instance;
-}
+};

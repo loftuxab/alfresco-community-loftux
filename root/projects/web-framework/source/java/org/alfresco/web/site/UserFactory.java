@@ -39,10 +39,21 @@ import org.alfresco.web.site.exception.UserFactoryException;
  */
 public abstract class UserFactory
 {
+    /** Guest user name key*/
     public static final String USER_GUEST = "guest";
+    
+    /** User object key in the session */
     public static String SESSION_ATTRIBUTE_KEY_USER_OBJECT = "USER_OBJECT";
+    
+    /** User name id key in the session */
     public static String SESSION_ATTRIBUTE_KEY_USER_ID = "USER_ID";
     
+    /** flag to set in the user Session when an external authentication mechanism is used
+     *  this informs the framework that user cannot Change Password or Logout in the usual way */
+    public static final String SESSION_ATTRIBUTE_EXTERNAL_AUTH= "_alfExternalAuth";
+    
+    
+    /** Guest user cache (no sync required - multiple instance creation will not cause an issue) */
     private User guestUser = null;
     
     

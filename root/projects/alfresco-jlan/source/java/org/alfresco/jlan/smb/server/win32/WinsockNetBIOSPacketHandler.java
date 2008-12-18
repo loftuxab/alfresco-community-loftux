@@ -225,6 +225,10 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler implements Asynch
 			// Clear the received packet to indicate error
 			
 			pkt = null;
+			
+			// Rethrow the exception
+			
+			throw ex;
 		}
 
 		// Set the received packet length

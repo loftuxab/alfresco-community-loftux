@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.module.vti.handler.VtiMethodHandler;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
+import org.alfresco.repo.site.SiteService;
 
 /**
 *
@@ -51,9 +52,16 @@ public class VtiAccessChecker
     
     private VtiMethodHandler vtiHandler;
     
+    private SiteService siteService;
+    
     public void setVtiHandler(VtiMethodHandler vtiHandler)
     {
         this.vtiHandler = vtiHandler;        
+    }
+
+    public void setSiteService(SiteService siteService)
+    {
+        this.siteService = siteService;        
     }
 
     public void setAcceptRules(Map<String, String> acceptRules)
@@ -128,6 +136,33 @@ public class VtiAccessChecker
         {
             return false;
         }
+    }
+    
+    public boolean isSiteMember(HttpServletRequest request, String userName)
+    {
+        String alfrescoContext = request.getContextPath();
+        String uri = request.getRequestURI();
+        
+        if (request.getMethod().equalsIgnoreCase("OPTIONS"))
+            return true;
+        
+        String targetUri = uri.startsWith(alfrescoContext) ? uri.substring(alfrescoContext.length()) : uri;
+        
+        if (targetUri.startsWith("/_vti_inf.html") || targetUri.startsWith("/_vti_bin/") || targetUri.startsWith("/resources/") || targetUri.startsWith("/history/"))
+            return true;
+        
+        String siteName = null;
+        
+        try
+        {
+            String[] decompsedUrls = vtiHandler.decomposeURL(uri, alfrescoContext);
+            siteName = decompsedUrls[0].substring(decompsedUrls[0].lastIndexOf("/") + 1);
+            return siteService.isMember(siteName, userName);
+        }
+        catch (Exception e)
+        {
+            return false;
+        }        
     }
     
 }

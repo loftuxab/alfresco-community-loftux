@@ -196,20 +196,28 @@ public class VtiFilter implements Filter
                 decodedUrl = decodedUrl.substring(alfrescoContext.length() + 1);
             }
             
-            if (!vtiHandler.existResource(decodedUrl, httpResponse))
+            try
             {
-                if (logger.isDebugEnabled())
+                VtiUser user = (VtiUser) session.get(AUTHENTICATION_USER);
+                
+                user = checkAthorisationHeader(httpRequest, session, user);
+                
+                if (!accessChecker.isSiteMember(httpRequest, user.getName()))
                 {
-                    logger.debug("Resource doesn't exist");
+                    session.clear();
+                    throw new Exception("Access denied. Coldn't open document.");
                 }
+                
+                vtiHandler.existResource(decodedUrl, httpResponse);
+                
                 return;
+                
             }
-            else
-            {
-                if (logger.isDebugEnabled())
+            catch(Exception e)
                 {
-                    logger.debug("Resource exists");
-                }
+                httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Server\"");
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                httpResponse.getOutputStream().close();
                 return;
             }
         }        
@@ -235,52 +243,7 @@ public class VtiFilter implements Filter
             if (logger.isDebugEnabled())
                 logger.debug("Session user is null. Authenticate user.");
             
-            String authHdr = httpRequest.getHeader("Authorization");
-
-            if ( authHdr != null && authHdr.length() > 5 && authHdr.substring(0,5).equalsIgnoreCase("BASIC"))
-            {
-                // Basic authentication details present
-
-                String basicAuth = new String(Base64.decodeBase64(authHdr.substring(5).getBytes()));
-
-                // Split the username and password
-
-                String username = null;
-                String password = null;
-
-                int pos = basicAuth.indexOf(":");
-                if ( pos != -1)
-                {
-                    username = basicAuth.substring(0, pos);
-                    password = basicAuth.substring(pos + 1);
-                    if (session != null)
-                    {
-                        session.put(AUTHENTICATION_USERNAME, username);
-                        session.put(AUTHENTICATION_PASSWORD, password);
-                    }
-                }
-                else
-                {
-                    username = basicAuth;
-                    password = "";
-                }
-
-                try
-                {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Authenticate the user '" + username + "'");
-                    
-                    // Authenticate the user
-                    authService.authenticate(username, password.toCharArray());
-                    user = new VtiUser(username, authService.getCurrentTicket());
-                    if (session != null)
-                        session.put(AUTHENTICATION_USER, user);
-                }
-                catch (VtiAuthException ex)
-                {
-                    // Do nothing, user object will be null
-                }
-            }
+            user = checkAthorisationHeader(httpRequest, session, user);
 
             // Check if the user is authenticated, if not then prompt again
 
@@ -315,6 +278,12 @@ public class VtiFilter implements Filter
                 // Setup the authentication context
                 authService.validate(user.getTicket());
                 
+                if (!accessChecker.isSiteMember(httpRequest, user.getName()))
+                {
+                    session.clear();
+                    throw new Exception("Not a member!!!!");
+                }
+                
                 if (logger.isDebugEnabled())
                     logger.debug("Ticket was validated");
             }
@@ -346,6 +315,60 @@ public class VtiFilter implements Filter
             response.getOutputStream().flush();
         }
         chain.doFilter(request, response);
+    }
+   
+    private VtiUser checkAthorisationHeader(HttpServletRequest httpRequest, Map<String, Object> session, VtiUser user)
+    {
+        String authHdr = httpRequest.getHeader("Authorization");
+
+        if ( authHdr != null && authHdr.length() > 5 && authHdr.substring(0,5).equalsIgnoreCase("BASIC"))
+        {
+            // Basic authentication details present
+
+            String basicAuth = new String(Base64.decodeBase64(authHdr.substring(5).getBytes()));
+
+            // Split the username and password
+
+            String username = null;
+            String password = null;
+
+            int pos = basicAuth.indexOf(":");
+            if ( pos != -1)
+            {
+                username = basicAuth.substring(0, pos);
+                password = basicAuth.substring(pos + 1);
+                if (session != null)
+                {
+                    session.put(AUTHENTICATION_USERNAME, username);
+                    session.put(AUTHENTICATION_PASSWORD, password);
+                }
+            }
+            else
+            {
+                username = basicAuth;
+                password = "";
+            }
+
+            try
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("Authenticate the user '" + username + "'");
+                if (accessChecker.isSiteMember(httpRequest, username))
+                {
+                    // Authenticate the user
+                    authService.authenticate(username, password.toCharArray());
+                    user = new VtiUser(username, authService.getCurrentTicket());
+                    if (session != null)
+                        session.put(AUTHENTICATION_USER, user);
+                }
+            }
+            catch (VtiAuthException ex)
+            {
+                // Do nothing, user object will be null
+            }
+        }    
+        
+        return user;
     }
    
     private static class VtiUser implements Serializable

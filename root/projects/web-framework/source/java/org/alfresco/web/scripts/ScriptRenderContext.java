@@ -248,6 +248,14 @@ public final class ScriptRenderContext extends ScriptBase
     }
     
     /**
+     * @return true if external authentication is being used to manage the user
+     */
+    public boolean getExternalAuthentication()
+    {
+        return AuthenticationUtil.isExternalAuthentication(this.renderContext.getRequest());
+    }
+    
+    /**
      * Gets the link builder helper object
      * 
      * @return the link builder

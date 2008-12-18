@@ -218,7 +218,7 @@
             },
             obj: null,
             scope: this
-         }
+         };
 
          // Submit as an ajax submit (not leave the page), in json format
          createSiteForm.setAJAXSubmit(true,
@@ -379,4 +379,4 @@ Alfresco.module.getCreateSiteInstance = function()
       instance = new Alfresco.module.CreateSite(instanceId);
    }
    return instance;
-}
+};

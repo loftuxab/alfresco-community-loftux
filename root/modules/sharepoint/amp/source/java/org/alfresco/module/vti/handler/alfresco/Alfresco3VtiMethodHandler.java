@@ -454,12 +454,15 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
         }
         else
         {
-            ContentReader reader = fileFolderService.getReader(resourceFileInfo.getNodeRef());
-            try
+            if (!resourceFileInfo.isFolder())
             {
-                FileCopyUtils.copy(reader.getContentInputStream(), response.getOutputStream());
+                ContentReader reader = fileFolderService.getReader(resourceFileInfo.getNodeRef());
+                try
+                {
+                    FileCopyUtils.copy(reader.getContentInputStream(), response.getOutputStream());
+                }
+                catch(Exception e){}
             }
-            catch(Exception e){}
         }
         return resourceFileInfo != null;
     }

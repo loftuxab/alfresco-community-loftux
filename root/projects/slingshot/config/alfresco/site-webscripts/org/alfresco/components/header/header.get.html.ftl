@@ -36,8 +36,10 @@
          <span class="menu-item"><a href="http://www.alfresco.com/help/3/EUHelp" rel="_new">${msg("link.help")}</a></span>
          <#if !isGuest>
          <span class="menu-item-separator">&nbsp;</span>
+         <#if !context.externalAuthentication>
          <span class="menu-item"><a href="${url.context}/logout" title="${msg("link.logout.tooltip", user.name?html)}">${msg("link.logout")}</a></span>
          <span class="menu-item-separator">&nbsp;</span>
+         </#if>
          <span class="menu-item">
             <span class="search-container">
                <label for="${args.htmlid}-searchtext" style="display:none">${msg("header.search.inputlabel")}</label>
@@ -51,25 +53,39 @@
 
    <div id="${args.htmlid}-sites-menu" class="yui-overlay">
       <div class="bd">
-         <ul>
+         <#if favouriteSites?? && favouriteSites?size &gt; 0>
+         <ul class="favourite-sites">
+            <li class="header">
+               ${msg("header.site.favouriteSites")}
+            </li>
+         </ul>
+         <ul class="favourite-sites-list separator">
+         <#list favouriteSites as site>
+            <li>
+               <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
+            </li>
+         </#list>
+         </ul>
+         </#if>
+         <ul class="<#if !isGuest>separator</#if>">
             <li>
                <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>
             </li>
          </ul>
+         <#if !isGuest>
          <ul>
-            <#if !isGuest>
             <li>
                <a href="#" onclick="thisHeader.showCreateSite(); return false;">${msg("header.sites.createSite")}</a>
             </li>
-            </#if>
          </ul>
+         </#if>
       </div>
    </div>
 
    <#if !isGuest>
    <div id="${args.htmlid}-searchtogglemenu" class="hidden">
       <div class="bd">
-         <ul>
+         <ul class="last">
             <li>
                <a href="#" <#if siteActive == 'false'>class="disabled"<#else>onclick="thisHeader.doToggleSearchType('site'); return false;"</#if>>${msg("header.search.searchsite", page.url.templateArgs.site!"")}</a>
             </li>

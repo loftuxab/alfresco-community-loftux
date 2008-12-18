@@ -20,7 +20,7 @@
     	<property name="authenticationService" ref="AuthenticationService"/>
     	<property name="authenticationComponent" ref="AuthenticationComponent" />
     	<property name="personService" ref="PersonService"/>
-    	<property name="siteService" ref="siteService" />
+    	<property name="siteService" ref="SiteService" />
     	<property name="shareUtils" ref="shareUtils" />  		
     	
     	<property name="pathHelper" ref="vtiPathHelper"/>
@@ -51,7 +51,7 @@
     <bean id="userGroupServiceHandler" class="org.alfresco.module.vti.handler.alfresco.soap.Alfresco3UserGroupServiceHandler">    	
     	<property name="personService" ref="PersonService"/>
     	<property name="nodeService" ref="NodeService"/> 
-    	<property name="siteService" ref="siteService" />
+    	<property name="siteService" ref="SiteService" />
     	<property name="transactionService" ref="transactionService" />	  
     </bean>
 
@@ -65,7 +65,7 @@
         <property name="lockService" ref="LockService" />
         <property name="contentService" ref="ContentService" />
         <property name="transactionService" ref="transactionService" />
-        <property name="siteService" ref="siteService" />
+        <property name="siteService" ref="SiteService" />
         <property name="authenticationComponent" ref="AuthenticationComponent" />
 
         <property name="documentHelper" ref="vtiDocumentHelper" />
