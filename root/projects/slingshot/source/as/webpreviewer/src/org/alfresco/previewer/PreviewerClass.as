@@ -49,7 +49,7 @@ package org.alfresco.previewer
 	 * zooming, paging and fullscreen.
 	 * 
 	 * This component does not extend Application since it now can be reused as a separate component
-	 * both on a wepage and in an air desktop appilcation.
+	 * both on a wepage and in an air desktop application.
 	 */
 	[Bindable]
 	public class PreviewerClass extends VBox
@@ -187,6 +187,9 @@ package org.alfresco.previewer
             
             // Make sure we update our gui depending on what page that currently is displayed
             documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_PAGE_SCOPE_CHANGE, onDocumentPageScopeChange);
+
+            // Make sure we update our slider if the document zoom display decides to change the scale
+            documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_SCALE_CHANGE, onDocumentScaleChange);
             
             // Listen for error events so we can disable our controls
 			documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR, onDocumentDisplayError);
@@ -195,8 +198,9 @@ package org.alfresco.previewer
             
             // Setup zoom slider control           
             zoomSlider.liveDragging = true;
-            zoomSlider.minimum = 0.17;
-            zoomSlider.maximum = 2.50;            
+            zoomSlider.minimum = 0.17; // Going below 0.17 makes the first frame invert??!!
+            zoomSlider.maximum = 2.50;
+            zoomSlider.value = 1;            
             zoomSlider.snapInterval = 0.001;
             zoomSlider.addEventListener(SliderEvent.CHANGE, onZoomChange);
             zoomSlider.dataTipFormatFunction = formatZoomTip;
@@ -229,7 +233,7 @@ package org.alfresco.previewer
 		 */
 		public function onDocumentSnapPointsChange(event:DocumentZoomDisplayEvent):void
 		{	
-			// Remove older snapPOints, menu will update since snapPOints is dataProivder to snapPointsMenu								            
+			// Remove older snapPoints, menu will update since snapPoints is dataProivder to snapPointsMenu								            
             snapPoints.removeAll();            
             snapPoints.addItem({label: "Actual Size", data: 1});
             snapPoints.addItem({label: "Fit Page", data: event.fitToScreen});
@@ -253,7 +257,7 @@ package org.alfresco.previewer
 			noOfPagesLabel.text = event.noOfPages + "";
 			if(stage.displayState != StageDisplayState.FULL_SCREEN)
 			{
-				if(event.noOfPages > 1)
+				if (event.noOfPages > 1)
 				{
 					currentState = "";
 				}
@@ -263,6 +267,21 @@ package org.alfresco.previewer
 				}
 			}
 		}
+		
+		/**
+		 * Called when a new page is displayed in the top of the document zoom display's display are.
+		 * 
+		 * @param event Describes the current page scope in in the cosument zoom display.
+		 */ 
+		public function onDocumentScaleChange(event:DocumentZoomDisplayEvent):void
+		{
+			// Set slider to the new zoom value, changed by the document display itself 
+			zoomSlider.value = event.documentScale;	
+			
+			// Update zoom gi controls
+			updateZoomControls();
+		}
+		
 		
 		/**
 		 * Called if something goes wrong during the loading of the content specified by url.
@@ -408,6 +427,15 @@ package org.alfresco.previewer
 		 */
 		private function changeZoom():void
 		{	
+			// Update other gui controls
+			updateZoomControls();
+			
+			// Change the zoom on the document in the document display			
+			documentDisplay.zoom = zoomSlider.value;
+		}
+		
+		private function updateZoomControls():void
+		{
 			// Update the percent text input with the new zoom value.		
 			zoomPercentageTextInput.text = zoomSlider.value ? Math.round(zoomSlider.value * 100)  + "%" : "";
 			
@@ -415,13 +443,8 @@ package org.alfresco.previewer
 			zoomInButton.enabled = zoomSlider.value < zoomSlider.maximum;
 			zoomOutButton.enabled = zoomSlider.value > zoomSlider.minimum;
 			
-			// Dispatch event			
-			documentDisplay.zoom = zoomSlider.value;
-			
-			// TODO: Make sure document becomes interactive when the lowest possible zoom level is reached
 			// Make doc display interactive
-			//documentDisplay.interactive = !zoomOut.enabled;
-					
+			documentDisplay.interactiveDocument = !zoomOutButton.enabled;				
 		}
 		
 		/**
@@ -450,7 +473,7 @@ package org.alfresco.previewer
 		
 		private function onFullScreenDisplayStates(event:FullScreenEvent):void
 		{
-			if(event.fullScreen)
+			if (event.fullScreen)
 			{
 				/**
 				 * Change the gui so filename is visible and text inputs are disabled
@@ -468,7 +491,7 @@ package org.alfresco.previewer
 			else
 			{
 				// Change the gui so filename is hidden and text inputs are enabled again.
-				if(currentState == "singlePagedFullScreen")
+				if (currentState == "singlePagedFullScreen")
 				{
 		 			currentState = "singlePaged";					 	
 				}

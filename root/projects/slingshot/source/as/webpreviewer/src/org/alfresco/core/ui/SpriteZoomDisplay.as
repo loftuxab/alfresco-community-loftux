@@ -58,12 +58,12 @@ package org.alfresco.core.ui
  		 */
 		public var verticalDefaultPosition:String = "center";
 		
-		/**
+		/** 
 		 * True if the sprite shall be draggable inside the display area.
 		 * Default is true
 		 */
 		public var draggingEnabled:Boolean = true;
-		
+
 		/* LOCAL / PRIVATE PROPERTIES */
 		
 		/**
@@ -112,6 +112,24 @@ package org.alfresco.core.ui
 		 * The fortcoming scale of the sprite
 		 */
 		protected var spriteNewZoom:Number = 1;
+				
+		/**
+		 * The fortcoming x position of the sprite.
+		 * Normally the move is done directly in the changing method such as moveSprite
+		 * but if a move shall be made after a zoom this can be used.
+		 * Make sure to set spriteNewXChange to true to make the move.
+		 */
+		protected var spriteNewX:Number = NaN;
+		protected var spriteNewXChanged:Boolean = false;
+		
+		/**
+		 * The fortcoming y position of the sprite.
+		 * Normally the move is done directly in the changing method such as moveSprite
+		 * but if a move shall be made after a zoom this can be used.
+		 * Make sure to set spriteNewYChange to true to make the move.
+		 */
+		protected var spriteNewY:Number = NaN;
+		protected var spriteNewYChanged:Boolean = false;
 		
 		/**
 		 * Set to true if the sprite has been moved/dragged and  
@@ -164,11 +182,25 @@ package org.alfresco.core.ui
 				spritePrevZoom = 1;
 				spriteNewZoom = 1;	
 				
-				// Add drag n drop event listeners
-				sprite.addEventListener(MouseEvent.ROLL_OVER, Cursors.showHandCursor);
-	   			sprite.addEventListener(MouseEvent.ROLL_OUT, Cursors.hideHandCursor);
+				// Add drag n drop event listeners		
 	   			sprite.addEventListener(MouseEvent.MOUSE_DOWN, startSpriteDrag);
 	            stage.addEventListener(MouseEvent.MOUSE_UP, stopSpriteDrag, true);
+				
+				// Show mouse cursor as hand if		
+				sprite.addEventListener(MouseEvent.ROLL_OVER, function (event:Event):void
+				{				
+					if(draggingEnabled)
+					{
+						Cursors.showHandCursor(null);
+					}
+				});
+	   			sprite.addEventListener(MouseEvent.ROLL_OUT, function (event:Event):void
+				{				
+					if(draggingEnabled)
+					{
+						 Cursors.hideHandCursor(null);
+					}
+				});
 	            
 	            // Add sprite to child   			
 				addChildAt(sprite, 0);
@@ -230,8 +262,8 @@ package org.alfresco.core.ui
 			_sprite.y = Math.max(y, this.height - _sprite.height);
 			_sprite.x = x; 
 			
-			// Make sure the scrollbars are updated in updateDisplayList
-        	spritePositionChanged = true;		
+			// Make sure the scrollbars are updated in updateDisplayList    
+			spritePositionChanged = true;    			
 			invalidateDisplayList();			
 		}
 				
@@ -275,6 +307,9 @@ package org.alfresco.core.ui
 		 	 * appropriate position after a resize, i.e. a full screen 
 		 	 */
 		    this.addEventListener(ResizeEvent.RESIZE, onResize);
+		    
+		    // Listen for mouse wheel so we can do vertical scrolling 
+		    this.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 		}
 		
         /**
@@ -303,8 +338,38 @@ package org.alfresco.core.ui
 			invalidateDisplayList();			
 		}		
 
-		/* DRAGGING */
-		
+
+		/**
+		 * Called when the user moves the mouse wheel.
+		 * This will not get called on Mac in a browser if not the 3rd party class 
+		 * ExternalMouseWheelSupport is activated.
+		 */
+        private function onMouseWheel(event:MouseEvent):void 
+        {				
+        	// Move the document up or down in the display area
+        	adjustVerticalScrollbarPosition(vsb.scrollPosition - event.delta * (vsb.lineScrollSize / 3));        				 
+		}
+
+		/**
+		 * Adjusts the scrollbar position and makes sure it doesn's scroll out of bounds.
+		 * 
+		 * @param newScrollbarPosition The new y-position for the scroll thumb of the vertical scrollbar.
+		 */
+		protected function adjustVerticalScrollbarPosition(newScrollPosition:Number):void
+		{
+			// Make sure scrolling doesn't go out of bounds
+			newScrollPosition = Math.max(newScrollPosition, 0);
+        	newScrollPosition = Math.min(newScrollPosition, vsb.maxScrollPosition);
+        	        	
+			if (newScrollPosition != vsb.scrollPosition)
+			{
+				// scroll position has changed make sure we force the sprite to be positioned 				 
+				vsb.scrollPosition = newScrollPosition;
+				vsbUpdated = true;
+				invalidateDisplayList();
+			}
+		}	
+  		
 		/**
          * Called when the user performs a mouse down operation on the sprite or one of its children.
          * Makes the sprite draggable inside an area based on the sprite size and the visible screen.
@@ -314,8 +379,7 @@ package org.alfresco.core.ui
 		private function startSpriteDrag(mouseDown:Event):void
 		{
 			if (draggingEnabled)
-			{
-				
+			{				
 				_sprite.startDrag(false, getSpriteDragRectangle());
 				_sprite.addEventListener(MouseEvent.MOUSE_MOVE, onSpriteMouseMove);							
 			}
@@ -377,6 +441,15 @@ package org.alfresco.core.ui
 		 */
 		private function onResize(event:ResizeEvent):void
 		{
+			/**
+			 * Draw a transparent background so we can receive mouse scroll events
+			 * even when the zoomable sprite object is smaller than the display area.
+			 */
+			graphics.clear();
+			graphics.beginFill(0xFFCC00, 0);
+	        graphics.drawRect(0, 0, this.width, this.height);
+	        graphics.endFill();
+			
 			// Make sure the sprite is updated to the new display area
 			displayResized = true;
 			invalidateDisplayList();				
@@ -394,8 +467,8 @@ package org.alfresco.core.ui
 			var ctx:SpriteZoomDisplayContext = new SpriteZoomDisplayContext();
 			
 			// If no "virtual" values are siupplied use the sprites current values
-			h = h != -1 ? h : _sprite.height;
-			w = w != -1 ? w : _sprite.width;
+			h = Math.floor(h != -1 ? h : _sprite.height);
+			w = Math.floor(w != -1 ? w : _sprite.width);
 			
 			// Let's first assume no scrollbars are needed
 			ctx.screenWidth = this.width;
@@ -441,7 +514,7 @@ package org.alfresco.core.ui
             super.updateDisplayList(unscaledWidth, unscaledHeight);    
                      
 	        if (_sprite)
-	        {		        	
+	        {		       	
 				if (defaultPosition)
 	            {
 	            	// Make sure it doesnt get's updated twice
@@ -459,7 +532,7 @@ package org.alfresco.core.ui
 	            	// Make sure it doesnt get's updated twice
 	            	displayResized = false;
 	            	
-	            	// CAll the actual resize position method
+	            	// Call the actual resize position method
 	            	doResizePosition();
 	            	
 	            	// Make sure scrollbars adjust
@@ -471,7 +544,27 @@ package org.alfresco.core.ui
 					// scale/zoom has changed, call the zoom method
 					doZoom();
 	            }
-	        		        	
+	        	
+	        	if (spriteNewXChanged)
+	            {		         
+					// A new x position for the sprite has been requested
+					sprite.x = spriteNewX;	
+					spriteNewXChanged = false;
+					
+					//Make sure scrollbars are updated
+					spritePositionChanged = true;				
+	            }
+
+	        	if (spriteNewYChanged)
+	            {		         
+					// A new y position for the sprite has been requested
+					sprite.y = spriteNewY;		
+					spriteNewYChanged = false;
+					
+					//Make sure scrollbars are updated
+					spritePositionChanged = true;			
+	            }
+	            	        	
 	        	if (spriteNewZoom != spritePrevZoom || spritePositionChanged)
             	{   
             		// Make sure we son't update scrollbars more than once

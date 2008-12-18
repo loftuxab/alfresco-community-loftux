@@ -27,14 +27,14 @@ package org.alfresco.previewer
 {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
-	
-	import mx.controls.Alert;
+	import flash.events.MouseEvent;
 	
 	/**
 	 * A sprite object that displays its children as pages in a document.
 	 */
 	public class Document extends Sprite
 	{
+		
 		/**
 		 * The outer padding of the whpole document (top, left, right, bottom)
 		 */
@@ -70,7 +70,7 @@ package org.alfresco.previewer
 		 */
 		public function Document()
 		{
-			super();	
+			super();			
 		}				
 						
 		/**
@@ -79,6 +79,7 @@ package org.alfresco.previewer
 		 */
         private function redrawChildren():void 
         {               	    
+        	graphics.clear();
         	_pageEnds = new Array();
         	_pageStarts = new Array();
             var obj:DisplayObject;
@@ -91,8 +92,6 @@ package org.alfresco.previewer
             {
             	// Position each child/page.
             	obj = getChildAt(i);
-            	obj.height = obj.height;
-            	obj.width = obj.width;
             	obj.x = left;            	
             	obj.y = top;
             	_pageStarts.push(top);
@@ -107,16 +106,12 @@ package org.alfresco.previewer
             	
             	// Save the width/height of the widest/highest page/child.
             	widest = Math.max(obj.width, widest);     
-            	highest = Math.max(obj.height, highest);
+            	highest = Math.max(obj.height, highest);            	            	
             }
             top += _padding; // padding bottom
             left += widest; // widest page
             left += _padding; // padding right      
-            
-            // Update the dimension of the document itself so it's dimensions include the padding.
-            height = top;
-            width = left;
-            graphics.clear();
+                        
             graphics.beginFill(0xFFCC00, 0); // alpha set to 0 so the yellow "padding" isn't "visible"
             graphics.drawRect(0, 0, left, top);
             graphics.endFill();
@@ -127,19 +122,29 @@ package org.alfresco.previewer
         }
 		
 		/**
-		 * Adds a display object as a child to the display list and treats it like page in a document
+		 * Adds a Page as a child to the display list and treats it like a page in a document.
 		 * 
-		 * @param child The display object that will be treated as a page in a document.
+		 * @param child A page in the document.
 		 */
-		override public function addChild(child:DisplayObject):DisplayObject {
-			// Call super class addChild.
-            super.addChild(child);      
-            
-            // Layout all the pages in the document.       
-			redrawChildren();			           
-			
-			// Return the child/page.
-            return child;
+		override public function addChild(child:DisplayObject):DisplayObject {			
+			if (child is Page)
+			{			
+				// Call super class addChild.
+	            super.addChild(child);                  
+	            
+	            // Add event listener for page clicks
+	            child.addEventListener(MouseEvent.CLICK, onPageClick);
+	            
+	            // Layout all the pages in the document.       
+				redrawChildren();			           
+				
+				// Return the child/page.
+	            return child;	            				
+			}
+			else
+			{
+				throw Error("A child to a Document must be of type Child.");
+			}
         }
 		
 		/**
@@ -159,10 +164,13 @@ package org.alfresco.previewer
 		 */
 		public function set padding(padding:Number):void
 		{
-			_padding = padding;
-			
-			// Make sure we layout the pages according to the ne padding.
-			redrawChildren();
+			if (_padding != padding)
+			{
+				_padding = padding;
+				
+				// Make sure we layout the pages according to the new padding.
+				redrawChildren();				
+			}
 		}
 		
 		/**
@@ -182,8 +190,13 @@ package org.alfresco.previewer
 		 */
 		public function set gap(gap:Number):void
 		{			
-			_gap = gap;
-			redrawChildren();
+			if (_gap != gap)
+			{
+				_gap = gap;
+				
+				// Make sure we layout the pages according to the new gap.
+				redrawChildren();				
+			}
 		}
 			
 		/**
@@ -259,5 +272,23 @@ package org.alfresco.previewer
 		{
 			return numChildren;
 		}
+		
+		/**
+		 * Called when one of the pages is clicked.
+		 * 
+		 * @param event Describes the click event on the page.
+		 */ 
+		private function onPageClick(event:MouseEvent):void
+		{
+			var pageIndex:int = getChildIndex(event.currentTarget as DisplayObject);
+			if (pageIndex != -1)
+			{
+				var de:DocumentEvent = new DocumentEvent(DocumentEvent.DOCUMENT_PAGE_CLICK);
+				de.page = event.currentTarget as Page;
+				de.pageIndex = pageIndex;
+				dispatchEvent(de);
+			}
+		}
+		
 	}
 }
