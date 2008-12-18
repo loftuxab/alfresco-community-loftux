@@ -1,13 +1,14 @@
 <project name="alfresco"
          default="build-tomcat" >
+   <dirname property="alfresco.basedir" file="${ant.file.alfresco}"/>
 
 
    <!-- ****************************************************** -->
    <!-- ************ Initialisation/Configuration ************ -->
    <!-- ****************************************************** -->
 
-   <import file="macros.xml" />
-   <import file="projects.xml" />
+   <import file="${alfresco.basedir}/macros.xml" />
+   <import file="${alfresco.basedir}/projects.xml" />
 
    <target name="init">
       <property environment="env" />
@@ -30,8 +31,8 @@
       <property file      = "${alfresco.user.override.properties.file}" />
 
 <!--      <property file="${basedir}/projects/repository/config/alfresco/version.properties" /> -->
-      <property file="${basedir}/build.properties" />
-      <property file="${basedir}/shared.properties" />
+      <property file="${alfresco.basedir}/build.properties" />
+      <property file="${alfresco.basedir}/shared.properties" />
       
       <echo>user.home = ${user.home}</echo>
 
@@ -49,6 +50,8 @@
             <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
          </fileset>
       </path>
+	  <!-- Extension point for overriding -->
+      <path id="classpath.compile.extension"/>
 
       <path id="classpath.unit.test">
          <!--
@@ -237,10 +240,14 @@
          <pathelement location="${dir.project.3rdparty.lib}/XmlSchema-1.4.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
       </path>
+	  <!-- Extension point for overriding -->
+      <path id="classpath.unit.test.extension"/>
 
       <path id="classpath.javadoc">
          <path refid="classpath.compile"/>
       </path>
+	  <!-- Extension point for overriding -->
+      <path id="classpath.javadoc.extension"/>
 
       <patternset id="files.tests">
          <exclude name="**/Base*Test.java" />
@@ -290,10 +297,10 @@
            description="Performs a clean build of all projects" 
            depends="clean, incremental" />
 
-   <target name="incremental" 
-           description="Performs an incremental build of all projects"
+   <target name="incremental-webclient-depends" 
+           description="Performs an incremental build of the dependencies of the Alfresco WAR"
            depends="incremental-core,
-                    incremental-webscriptframework,
+                    package-webscriptframework-jar,
                     incremental-jlan,
                     incremental-mbeans,
                     incremental-deployment,
@@ -301,7 +308,12 @@
                     incremental-remoteapi,
                     incremental-jndi,
                     incremental-catalinavirtual, 
-                    incremental-linkvalidation,
+                    incremental-linkvalidation" />
+		   
+   <target name="incremental" 
+           description="Performs an incremental build of all projects"
+           depends="incremental-webclient-depends,
+                    incremental-webscriptframework,
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-webframework,
@@ -335,16 +347,7 @@
    
    <target name="incremental-webclient-tomcat" 
            description="Performs an incremental build and deployment of the Alfresco WAR"
-           depends="incremental-core,
-                    package-webscriptframework-jar,
-                    incremental-jlan, 
-                    incremental-mbeans, 
-                    incremental-deployment,
-                    incremental-repository,
-                    incremental-remoteapi, 
-                    incremental-jndi,
-                    incremental-catalinavirtual, 
-                    incremental-linkvalidation,
+           depends="incremental-webclient-depends,
                     incremental-webclient,
                     deploy-webclient-tomcat" />
    
@@ -352,16 +355,7 @@
    <target name="incremental-tomcat-exploded" depends="incremental-webclient-tomcat-exploded" />
    
    <target name="incremental-webclient-tomcat-exploded" 
-           depends="incremental-core,
-                    package-webscriptframework-jar,
-                    incremental-jlan, 
-                    incremental-mbeans, 
-                    incremental-deployment,
-                    incremental-repository, 
-                    incremental-remoteapi, 
-                    incremental-jndi,
-                    incremental-catalinavirtual, 
-                    incremental-linkvalidation,
+           depends="incremental-webclient-depends,
                     package-webclient-jar,
                     deploy-webclient-tomcat-exploded" />
    
@@ -942,7 +936,7 @@
 
    <target name="dump-env-properties" 
            depends="init">
-      <echo level="info">basedir = ${basedir}</echo>
+      <echo level="info">alfresco.basedir = ${alfresco.basedir}</echo>
       <echo level="info">dir.projects = ${dir.projects}</echo>
       <echo level="info">user.home = ${user.home}</echo>
       <echo level="info">ant.home = ${ant.home}</echo>

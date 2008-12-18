@@ -26,7 +26,10 @@
                 debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}"
                 excludes="@{compileExcludes}" >
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
-            <classpath refid="classpath.compile" />
+            <classpath>
+				<path refid="classpath.compile"/>
+				<path refid="classpath.compile.extension"/>
+			</classpath>
 
             <!-- To run javac with Xlint:unchecked, uncomment the line below  -->
             <!-- <compilerarg value="-Xlint:unchecked"/> -->
@@ -54,7 +57,10 @@
                 debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <src path="@{projectdir}/${dir.name.source}/${dir.name.generated}" />
-            <classpath refid="classpath.compile" />
+            <classpath>
+				<path refid="classpath.compile"/>
+				<path refid="classpath.compile.extension"/>
+			</classpath>
          </javac>
          
          <copy todir="@{projectdir}/${dir.name.build}/${dir.name.classes}">
@@ -81,8 +87,11 @@
                   excludepackagenames="${javadoc.packages.exclude}" 
                   bottom="${javadoc.copyright}"
                   doctitle="@{documenttitle}"
-                  windowtitle="@{windowtitle}" 
-                  classpathref="classpath.javadoc">
+                  windowtitle="@{windowtitle}">
+            <classpath>
+				<path refid="classpath.javadoc"/>
+				<path refid="classpath.javadoc.extension"/>
+			</classpath>
             <!-- doclet that hides public classes/members via @exclude -->
             <doclet name="ExcludeDoclet" path="${dir.project.3rdparty.lib}/${dir.name.devenv}/exclude-doclet.jar"/>
          </javadoc>
@@ -102,8 +111,11 @@
                   excludepackagenames="${javadoc.packages.exclude}" 
                   bottom="${javadoc.copyright}"
                   doctitle="@{documenttitle}"
-                  windowtitle="@{windowtitle}" 
-                  classpathref="classpath.javadoc">
+                  windowtitle="@{windowtitle}">
+            <classpath>
+				<path refid="classpath.javadoc"/>
+				<path refid="classpath.javadoc.extension"/>
+			</classpath>
             <!-- doclet that hides public classes/members via @exclude -->
             <doclet name="ExcludeDoclet" path="${dir.project.3rdparty.lib}/${dir.name.devenv}/exclude-doclet.jar"/>
          </javadoc>
@@ -116,7 +128,10 @@
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
          <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}">
             <jvmarg value="-server"/>
-            <classpath refid="classpath.unit.test" />
+            <classpath>
+				<path refid="classpath.unit.test"/>
+				<path refid="classpath.unit.test.extension"/>
+			</classpath>
             <formatter type="xml" />
             <batchtest todir="@{projectdir}/${dir.name.build}/${dir.name.test.results}">
                <fileset dir="@{projectdir}/${dir.name.source}/${dir.name.java}">
