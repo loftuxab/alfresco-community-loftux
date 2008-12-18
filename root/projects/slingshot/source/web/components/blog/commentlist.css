@@ -23,7 +23,7 @@ html>body .comment {
 .comment-list .commentsListTitle
 {
    float: left;
-   background: transparent url(../images/tag-16.png) no-repeat scroll 20px 50%;
+   background: transparent url(../images/comment-16.png) no-repeat scroll 20px 50%;
 	font-size: 116%;
 	padding: 20px 0pt 20px 40px;
 }

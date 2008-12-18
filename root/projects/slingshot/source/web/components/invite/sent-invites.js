@@ -186,17 +186,22 @@
                {
                   // Filter the results for the search term
                   var lowerCaseTerm = me.searchTerm.toLowerCase();
-                  var personData, firstName, lastName;
+                  var personData, userName, firstName, lastName, fullName;
                   for (var i = 0, j = oFullResponse.invites.length; i < j; i++)
                   {
                      personData = oFullResponse.invites[i].invitee;
-                     firstName = (personData.firstName !== null) ? personData.firstName.toLowerCase() : "";
-                     lastName = (personData.lastName !== null) ? personData.lastName.toLowerCase() : "";
+                     userName = (personData.userName || "").toLowerCase();
+                     firstName = (personData.firstName || "").toLowerCase();
+                     lastName = (personData.lastName || "").toLowerCase();
+                     fullName = (firstName + " " + lastName).toLowerCase();
                      
                      // Determine if person matches search term
-                     if ((firstName.indexOf(lowerCaseTerm) != -1) || (lastName.indexOf(lowerCaseTerm) != -1))
+                     if ((userName.indexOf(lowerCaseTerm) != -1)
+                        || (firstName.indexOf(lowerCaseTerm) != -1)
+                        || (lastName.indexOf(lowerCaseTerm) != -1)
+                        || (fullName.indexOf(lowerCaseTerm) != -1))
                      {
-                        // Add site to list
+                        // Add user to list
                         items.push(oFullResponse.invites[i]);
                      }
                   }

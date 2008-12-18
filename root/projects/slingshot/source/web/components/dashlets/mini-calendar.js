@@ -3,6 +3,16 @@
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
    Alfresco.MiniCalendar = function(htmlId)
    {
       this.name = "Alfresco.MiniCalendar";
@@ -12,10 +22,10 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["calendar"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["calendar"], this.onComponentsLoaded, this);
       
       return this;
-   }
+   };
    
    Alfresco.MiniCalendar.prototype =
    {
@@ -36,7 +46,7 @@
 		 *
 		 * @method onComponentsLoaded
 	    */	
- 		componentsLoaded: function()
+ 		onComponentsLoaded: function()
     	{
 			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
 		},
@@ -100,8 +110,7 @@
             html = "Could not load calendar data";
          }
          
-         var div = document.getElementById(this.id + "-eventsContainer");
-         div.innerHTML = html;
+         Dom.get(this.id + "-eventsContainer").innerHTML = html;
 		},
 		
 		_dayRenderer: function(date, eventData)
@@ -117,8 +126,8 @@
    		{
    			var title = Alfresco.util.formatDate(date, "ddd, d mmm yyyy");
 				var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/calendar?date=" + theDate;
-   			html += '<div class="detail-list-item">'
-   			html += '<div class="icon"><img src="' + Alfresco.constants.URL_CONTEXT + '/components/calendar/images/calendar-16.png" alt="day" /></div>'
+   			html += '<div class="detail-list-item">';
+   			html += '<div class="icon"><img src="' + Alfresco.constants.URL_CONTEXT + '/components/calendar/images/calendar-16.png" alt="day" /></div>';
    			html += '<div class="details2"><h4>' + title + '</h4>';
    			for (var i = 0, ii = events.length; i < ii; i++)
    			{

@@ -75,9 +75,9 @@ YAHOO.extend(YAHOO.widget.SWFPlayer, YAHOO.widget.FlashAdapter,
     *
     * @param swfUrl {string} the url to the swf that should be played.
     */
-   load: function(swfUrl)
-   {      
-      this._swf.load(swfUrl);
+   load: function(swfUrl, doNavigate)
+   {
+      this._swf.load(swfUrl, typeof doNavigate == "boolean" ? doNavigate : true);
    },
 
    /**

@@ -31,10 +31,11 @@
  */
 (function()
 {
-
-   var Dom = YAHOO.util.Dom;
-   var Event = YAHOO.util.Event;
-   var DDM = YAHOO.util.DragDropMgr;
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
 
    /**
     * Alfresco.CustomiseLayout constructor.
@@ -158,8 +159,7 @@
             });
 
             // Add a listener to the image so we change layout when its clicked
-            var selectLayoutLink = document.getElementById(this.id + "-select-img-" + layoutId);
-            YAHOO.util.Event.addListener(selectLayoutLink, "click", function (event, obj)
+            Event.addListener(this.id + "-select-img-" + layoutId, "click", function (event, obj)
             {
                obj.thisComponent.onSelectLayoutClick(obj.selectedLayoutId);
             },

@@ -203,7 +203,7 @@
 
          // Listen for changes on the "Jump to page" textfield
          this.widgets.jumpToPageTextField = Dom.get(this.id + "-jumpToPage-textfield");
-         YAHOO.util.Event.addListener(this.widgets.jumpToPageTextField, "change", this.onJumpToPageTextFieldChange, this, true);
+         YAHOO.util.Event.addListener(this.widgets.jumpToPageTextField, "keyup", this.onJumpToPageTextFieldChange, this, true);
 
          // Save a reference for the span element that displays the current and total no of pages of the viewed content
          this.widgets.currentFrameSpan = Dom.get(this.id + "-currentFrame-span");
@@ -261,16 +261,31 @@
       {
          // Try to prioritise usage of imgpreview for images and webpreview for other content
          var ps = this.options.previews;
-         var preview, webpreview = "webpreview", imgpreview = "imgpreview";
+         var webpreview = "webpreview", imgpreview = "imgpreview";
+         var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
+         var ticketAndNoCache = "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
          if(this.options.mimeType.match(/^image\/\w+/))
          {
-            preview = Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : (Alfresco.util.arrayContains(ps, webpreview) ? webpreview : null);
+            var preview = Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : (Alfresco.util.arrayContains(ps, webpreview) ? webpreview : null);
+            var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + ticketAndNoCache;
+            return {url: url, doNavigate: false};
+         }
+         else if(this.options.mimeType.match(/application\/x-shockwave-flash/))
+         {
+            url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + ticketAndNoCache + "&a=true";
+            return {url: url, doNavigate: false};
          }
          else
          {
-            preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
+            var preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
+            if(preview != null)
+            {
+               var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + ticketAndNoCache;
+               return {url: url, doNavigate: true};
+            }
+            return null;
+
          }
-         return preview;
       },
 
       /**
@@ -286,11 +301,11 @@
             this.contentReady = true;
 
             // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
-            var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
-            var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + this._resolvePreview();
-            url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
-
-            this.swfPlayer.load(url);
+            var result = this._resolvePreview();
+            if(result)
+            {
+               this.swfPlayer.load(result.url, result.doNavigate);
+            }
          }
       },
 
@@ -398,8 +413,11 @@
        */
       onJumpToPageTextFieldChange: function P_onJumpToPageTextFieldChange(event)
       {
-         var newFrame = parseInt(event.target.value);
-         this.swfPlayer.goToFrameNo(newFrame);
+         if (event.keyCode == 13)
+         {
+            var newFrame = parseInt(Dom.get(this.id + "-jumpToPage-textfield").value, 10);
+            this.swfPlayer.goToFrameNo(newFrame);
+         }
       },
 
       /**

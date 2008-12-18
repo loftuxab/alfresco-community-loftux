@@ -5,6 +5,11 @@
    margin-left: -50em;
 }
 
+.blog-filter
+{
+   overflow-x: hidden;   
+}
+
 .blog-filter h2
 {
    background: url(images/expanded.png) no-repeat 0% 50%;

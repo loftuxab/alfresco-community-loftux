@@ -168,7 +168,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           var allDay = Dom.get(this.id + "-allday");
           if (allDay)
           {
-             YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
+             YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, allDay, this);
           }
          
          var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
@@ -344,17 +344,10 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
        * @method onAllDaySelect
        * @param e {object} DomEvent
        */
-      onAllDaySelect: function(e)
+      onAllDaySelect: function(e, checkbox)
       {
-        var checkbox = e.target;
-        var display = true; // Time fields are enabled by default
-        
-        if (checkbox.checked)
-        {
-           display = false;
-        } 
-        
-       this._displayTimeFields(display);
+         var display = !(checkbox.checked);
+         this._displayTimeFields(display);
       },
       
       /**

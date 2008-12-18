@@ -1,11 +1,11 @@
-<div class="page-title">	
-	<div class="float-left">
-		<h1><span>${msg("header.searchresults")}</span></h1>
-	</div>
+<div class="page-title search-title">
+	<h1><span>${msg("header.searchresults")}</span></h1>	
 	<#if page.url.templateArgs.site??>
-	<div class="float-right">
-	  <span class="navigation-item back-icon">
-	     <a href="${url.context}/page/site/${page.url.templateArgs.site}/dashboard">${msg("header.backlink", profile.title)}</a></span>
-	</div>
-	</#if>
+      <div>
+         <span class="navigation-item backLink">
+            <a href="${url.context}/page/site/${page.url.templateArgs.site}/dashboard">${msg("header.backlink", profile.title)}</a>
+         </span>
+      </div>
+   </#if>
+   <div class="clear"></div>
 </div>

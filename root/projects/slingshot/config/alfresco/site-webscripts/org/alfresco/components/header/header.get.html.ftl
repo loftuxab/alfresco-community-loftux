@@ -2,7 +2,8 @@
 <#assign isGuest = (user.name=='guest') />
 <#if !isGuest>
 <script type="text/javascript">//<![CDATA[
-   var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions({
+   var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions(
+   {
       siteId: "${page.url.templateArgs.site!""}",
       searchType: "${page.url.templateArgs.site!'all'}" // default search type
    }).setMessages(
@@ -41,7 +42,7 @@
             <span class="search-container">
                <label for="${args.htmlid}-searchtext" style="display:none">${msg("header.search.inputlabel")}</label>
                <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />
-               <span id="${args.htmlid}-search-tbutton" class="search-site-icon">&nbsp;</span>
+               <span id="${args.htmlid}-search-tbutton" class="search-site-icon"><a href="#">&nbsp;&nbsp;</a></span>
             </span>
          </span>
          </#if>
@@ -58,7 +59,7 @@
          <ul>
             <#if !isGuest>
             <li>
-               <a href="javascript:thisHeader.showCreateSite();">${msg("header.sites.createSite")}</a>
+               <a href="#" onclick="thisHeader.showCreateSite(); return false;">${msg("header.sites.createSite")}</a>
             </li>
             </#if>
          </ul>
@@ -70,10 +71,10 @@
       <div class="bd">
          <ul>
             <li>
-               <a class="<#if siteActive == 'false'> disabled</#if>" href="<#if siteActive == 'false'>#<#else>javascript:thisHeader.doToggleSearchType('site')</#if>">${msg("header.search.searchsite", page.url.templateArgs.site!"")}</a>
+               <a href="#" <#if siteActive == 'false'>class="disabled"<#else>onclick="thisHeader.doToggleSearchType('site'); return false;"</#if>>${msg("header.search.searchsite", page.url.templateArgs.site!"")}</a>
             </li>
             <li>
-               <a href="javascript:thisHeader.doToggleSearchType('all')">${msg("header.search.searchall")}</a>
+               <a href="#" onclick="thisHeader.doToggleSearchType('all'); return false;">${msg("header.search.searchall")}</a>
             </li>
          </ul>            
       </div>

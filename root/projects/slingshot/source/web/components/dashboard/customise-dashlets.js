@@ -32,9 +32,11 @@
 (function()
 {
 
-   var Dom = YAHOO.util.Dom;
-   var Event = YAHOO.util.Event;
-   var DDM = YAHOO.util.DragDropMgr;
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element,
+      KeyListener = YAHOO.util.KeyListener,
+      DDM = YAHOO.util.DragDropMgr;
 
    /**
     * Alfresco.CustomiseDashlets constructor.
@@ -46,7 +48,10 @@
    Alfresco.CustomiseDashlets = function(htmlId)
    {
       this.name = "Alfresco.CustomiseDashlets";
-      this.id = htmlId;      
+      this.id = htmlId;
+      
+      this.widgets = {};
+      this.keyListeners = {};
 
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -55,7 +60,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "dragdrop"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
    Alfresco.CustomiseDashlets.prototype =
    {
@@ -66,7 +71,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Cache for YAHOO.util.KeyListener objects for each dashlet-li.
@@ -74,7 +79,7 @@
        * @property keyListeners
        * @type object
        */
-      keyListeners:{},
+      keyListeners: null,
 
       /**
        * The drag'n'drop group for where dashlets can be dropped to be added.
@@ -150,7 +155,7 @@
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.CustomiseDashlets} returns 'this' for method chaining
        */
-      setOptions: function DL_setOptions(obj)
+      setOptions: function CD_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -175,7 +180,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function FU_onComponentsLoaded()
+      onComponentsLoaded: function CD_onComponentsLoaded()
       {
          // Shortcut for dummy instance
          if (this.id === null)
@@ -189,22 +194,23 @@
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
          // Save a reference to the shadow that will be used during drag n drop
-         this.shadow = Dom.get(this.id + "-dashlet-li-shadow")
+         this.shadow = Dom.get(this.id + "-dashlet-li-shadow");
 
-         for (var i = 0; true ; i++)
+         var ul, dashlets, i, j, jj;
+         for (i = 0; true; i++)
          {
-            var ul = Dom.get(this.id + "-column-ul-" + i);
-            if(ul)
+            ul = Dom.get(this.id + "-column-ul-" + i);
+            if (ul)
             {
                // Make only column 1-n lists drop targets for add since 0 is available dashlets list
-               if(i !== 0)
+               if (i !== 0)
                {
                   new YAHOO.util.DDTarget(ul, this.DND_GROUP_ADD_DASHLET);
                }
 
                // Make all dashlets in column draggable
-               var dashlets = Dom.getElementsByClassName("customisableDashlet", "li", ul);
-               for (var j = 0; j < dashlets.length; j++)
+               dashlets = Dom.getElementsByClassName("customisableDashlet", "li", ul);
+               for (j = 0, jj = dashlets.length; j < jj; j++)
                {
                   this._createDashlet(dashlets[j]);
                }
@@ -218,19 +224,16 @@
          // Save a reference to the dashlet list and garbage can
          this.widgets.dashletListEl = Dom.get(this.id + "-column-ul-0");
          this.widgets.trashcanListEl = Dom.get(this.id + "-trashcan-img");
-         
 
          // ... and create a delete drop target on them
          new YAHOO.util.DDTarget(this.widgets.dashletListEl, this.DND_GROUP_DELETE_DASHLET);
          new YAHOO.util.DDTarget(this.widgets.trashcanListEl, this.DND_GROUP_DELETE_DASHLET);
-         
 
          YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
          YAHOO.Bubbling.on("onDashboardLayoutsDisplayed", this.onDashboardLayoutsDisplayed, this);
          YAHOO.Bubbling.on("onDashboardLayoutsHidden", this.onDashboardLayoutsHidden, this);
 
-         var closeAddDashletsLink = document.getElementById(this.id + "-closeAddDashlets-link");
-         YAHOO.util.Event.addListener(closeAddDashletsLink, "click", this.onCloseAddDashletsLinkClick, this, true);
+         Event.addListener(this.id + "-closeAddDashlets-link", "click", this.onCloseAddDashletsLinkClick, this, true);
 
          // Save references so available dashlet can be shown/hidden later
          this.widgets.availableDiv = Dom.get(this.id + "-available-div");
@@ -244,19 +247,19 @@
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDashboardLayoutChanged: function DLT_onDashboardLayoutChanged(layer, args)
+      onDashboardLayoutChanged: function CD_onDashboardLayoutChanged(layer, args)
       {
          var newLayout = args[1].dashboardLayout;
          this.options.currentLayout = newLayout;
          var wrapper = Dom.get(this.id +"-wrapper-div");
-         if(newLayout)
+         if (newLayout)
          {
             for (var i = 1; true; i++)
             {
                var ul = Dom.get(this.id + "-column-div-" + i);
-               if(ul)
+               if (ul)
                {
-                  if(i <= newLayout.noOfColumns)
+                  if (i <= newLayout.noOfColumns)
                   {
                      Dom.setStyle(ul, "display", "");
                   }
@@ -286,7 +289,7 @@
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDashboardLayoutsDisplayed: function DLT_onDashboardLayoutsDisplayed(layer, args)
+      onDashboardLayoutsDisplayed: function CD_onDashboardLayoutsDisplayed(layer, args)
       {
          // Hide this component
          Dom.setStyle(this.id, "display", "none");
@@ -299,7 +302,7 @@
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDashboardLayoutsHidden: function DLT_onDashboardLayoutsHidden(layer, args)
+      onDashboardLayoutsHidden: function CD_onDashboardLayoutsHidden(layer, args)
       {
          // Show this component
          Dom.setStyle(this.id, "display", "");
@@ -315,15 +318,16 @@
       onAddDashletsButtonClick: function CD_onAddDashletsButtonClick(event)
       {
          // Hide add dashlets button and fade in available dashlets
-         YAHOO.util.Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "none");
+         Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "none");
          Alfresco.util.Anim.fadeIn(this.widgets.availableDiv);
       },
 
       onCloseAddDashletsLinkClick: function CD_onCloseAddDashletsLinkClick(event)
       {
          // Show add dashlets button and hide available dashlets
-         YAHOO.util.Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "");
-         YAHOO.util.Dom.setStyle(this.widgets.availableDiv, "display", "none");
+         Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "");
+         Dom.setStyle(this.widgets.availableDiv, "display", "none");
+         Event.stop(event);
       },
 
       /**
@@ -350,7 +354,7 @@
                var li = lis[j];
                var dashlet = {url: li.getAttribute("dashletUrl"), regionId: "component-" + i + "-" + (j + 1)};
                var originalRegionId = li.getAttribute("originalRegionId");
-               if(originalRegionId && originalRegionId.length > 0)
+               if (originalRegionId && originalRegionId.length > 0)
                {
                   dashlet.originalRegionId = originalRegionId;
                }
@@ -437,7 +441,7 @@
       onDashletBlur: function CD_onDashletBlur(event, li)
       {
          // Remove the "focused" class from the dashlet so it doesn't appera to be selected
-         if(this.currentDashletEl)
+         if (this.currentDashletEl)
          {
             Dom.removeClass(this.currentDashletEl, "focused");
          }
@@ -446,7 +450,7 @@
 
          // Stop listening to key events
          var kl = this.keyListeners[li.id];
-         if(kl !== undefined)
+         if (kl !== undefined)
          {
             kl.disable();
          }
@@ -466,10 +470,10 @@
        * @method onDashletFocus
        * @param event {object} a "focus" event
        */
-      onDashletFocus: function(event, li)
+      onDashletFocus: function CD_onDashletFocus(event, li)
       {
          // Remove the focused class from no longer selected dashlets and add it to the current
-         if(this.currentDashletEl)
+         if (this.currentDashletEl)
          {
             Dom.removeClass(this.currentDashletEl, "focused");
          }
@@ -483,23 +487,23 @@
           * such as the document since several components that listens to key
           * events might live on the same page.
           */
-         var a = new YAHOO.util.Element(li).getElementsByTagName("a")[0];
+         var a = new Element(li).getElementsByTagName("a")[0];
 
          var kl = this.keyListeners[li.id];
-         if(kl === undefined)
+         if (kl === undefined)
          {
-            kl = new YAHOO.util.KeyListener(
-                  a,
+            kl = new KeyListener(a,
             {
-               keys: [
-                  YAHOO.util.KeyListener.KEY.UP,
-                  YAHOO.util.KeyListener.KEY.DOWN,
-                  YAHOO.util.KeyListener.KEY.LEFT,
-                  YAHOO.util.KeyListener.KEY.RIGHT,
-                  YAHOO.util.KeyListener.KEY.ESCAPE,
-                  YAHOO.util.KeyListener.KEY.DELETE,
-                  YAHOO.util.KeyListener.KEY.ENTER,
-                  YAHOO.util.KeyListener.KEY.SPACE
+               keys:
+               [
+                  KeyListener.KEY.UP,
+                  KeyListener.KEY.DOWN,
+                  KeyListener.KEY.LEFT,
+                  KeyListener.KEY.RIGHT,
+                  KeyListener.KEY.ESCAPE,
+                  KeyListener.KEY.DELETE,
+                  KeyListener.KEY.ENTER,
+                  KeyListener.KEY.SPACE
                ]
             },
             {
@@ -528,18 +532,16 @@
        * @method onKeyPressed
        * @param event {object} a "key" event
        */
-      onKeyPressed: function FU_onKeyPressed(event, id)
+      onKeyPressed: function CD_onKeyPressed(event, id)
       {
-         var currentDashlet = this.currentDashletEl;
-         var relativeNode;
-         var destColumn
+         var currentDashlet = this.currentDashletEl, relativeNode, destColumn;
 
-         if (id[1].keyCode === YAHOO.util.KeyListener.KEY.ESCAPE)
+         if (id[1].keyCode === KeyListener.KEY.ESCAPE)
          {
             // Deselect the current dashlet when escape is clicked
             this.focusDashletAfterDomChange(currentDashlet, false);
          }
-         else if (id[1].keyCode === YAHOO.util.KeyListener.KEY.ENTER)
+         else if (id[1].keyCode === KeyListener.KEY.ENTER)
          {
             // Was enter hit for a dashlet available to columns?
             if (!this.isColumnDashlet(currentDashlet))
@@ -548,16 +550,16 @@
                for (var i = 1; true; i++)
                {
                   destColumn = Dom.get(this.id + "-column-ul-" + i);
-                  if(destColumn)
+                  if (destColumn)
                   {
-                     if(i <= this.options.currentLayout.noOfColumns && !this.isColumnFull(destColumn))
+                     if (i <= this.options.currentLayout.noOfColumns && !this.isColumnFull(destColumn))
                      {
                         /**
                          * We have found a visible column with free space, make a copy
                          * of the dashlet and insert it in the first position.
                          */
                         var children = Dom.getChildrenBy(destColumn, this.isRealDashlet);
-                        this.copyAndInsertDashlet(currentDashlet, destColumn, children.length > 0 ? children[0] : null)
+                        this.copyAndInsertDashlet(currentDashlet, destColumn, children.length > 0 ? children[0] : null);
                         return;
                      }
                   }
@@ -574,10 +576,10 @@
             }
 
          }
-         else if (id[1].keyCode === YAHOO.util.KeyListener.KEY.DELETE)
+         else if (id[1].keyCode === KeyListener.KEY.DELETE)
          {
             // Make sure we don't delete any dashlet from the available list
-            if( this.isColumnDashlet(currentDashlet))
+            if ( this.isColumnDashlet(currentDashlet))
             {
                this.deleteDashlet(currentDashlet);
             }
@@ -585,7 +587,7 @@
          else if (this.isColumnDashlet(currentDashlet))
          {
             // UP, DOWN, LEFT & RIGHT key events apply only to column dashlets.
-            if (id[1].keyCode === YAHOO.util.KeyListener.KEY.UP)
+            if (id[1].keyCode === KeyListener.KEY.UP)
             {
                relativeNode = Dom.getPreviousSiblingBy(currentDashlet, this.isRealDashlet);
                if (relativeNode)
@@ -595,10 +597,10 @@
                   this.focusDashletAfterDomChange(currentDashlet, true);
                }
             }
-            else if (id[1].keyCode === YAHOO.util.KeyListener.KEY.DOWN)
+            else if (id[1].keyCode === KeyListener.KEY.DOWN)
             {
                relativeNode = Dom.getNextSiblingBy(currentDashlet, this.isRealDashlet);
-               if(relativeNode)
+               if (relativeNode)
                {
                   // Found a dashlet below, move the current one beneath it
                   Dom.insertAfter(currentDashlet, relativeNode);
@@ -609,11 +611,11 @@
             {
                // Find a column index for the column to the left or right of the current dashlet
                var column = this.getColumnIndex(currentDashlet);
-               if (id[1].keyCode === YAHOO.util.KeyListener.KEY.LEFT)
+               if (id[1].keyCode === KeyListener.KEY.LEFT)
                {
                   column = column -1;
                }
-               else if (id[1].keyCode === YAHOO.util.KeyListener.KEY.RIGHT)
+               else if (id[1].keyCode === KeyListener.KEY.RIGHT)
                {
                   column = column +1;
                }
@@ -622,7 +624,7 @@
                   column = -1;
                }
                // Look for the column
-               destColumn = Dom.get(this.id + "-column-ul-" + column)
+               destColumn = Dom.get(this.id + "-column-ul-" + column);
                if (column > 0 && destColumn)
                {
                   // A column was found, make sure it has free space
@@ -666,14 +668,14 @@
          d.addToGroup(this.DND_GROUP_DELETE_DASHLET);
 
          // Find hidden link to add tab support
-         var a = new YAHOO.util.Element(li).getElementsByTagName("a")[0];
-         var aEl = new YAHOO.util.Element(a); 
+         var a = new Element(li).getElementsByTagName("a")[0];
+         var aEl = new Element(a); 
 
          aEl.addListener("focus", this.onDashletFocus, li, this);
          aEl.addListener("blur", this.onDashletBlur, li, this);
 
          // Add select support when using mouse
-         var liEl = new YAHOO.util.Element(li);
+         var liEl = new Element(li);
          liEl.addListener("click", function(e, obj)
          {
             obj.focus(); // will call selectDashlet
@@ -709,7 +711,7 @@
          // Make sure the new dashlet is visible to the user.
          Dom.setStyle(copy, "visibility", "");
          Dom.setStyle(copy, "display", "");
-         if(insertBeforeNode)
+         if (insertBeforeNode)
          {
             // Insert it after the specified node
             destUl.insertBefore(copy, insertBeforeNode);
@@ -734,7 +736,7 @@
       focusDashletAfterDomChange: function CD_focusDashletAfterDomChange(li, focus)
       {
          var doFocus = focus;
-         var a = new YAHOO.util.Element(li).getElementsByTagName("a")[0];
+         var a = new Element(li).getElementsByTagName("a")[0];
 
          // Don't call it directly, give the browser 50 ms to fix the Dom first.
          YAHOO.lang.later(50, a, function()
@@ -756,7 +758,7 @@
        * @method deleteDashlet
        * @param li {HTMLElement} of type li (the dashlet to be deleted)
        */
-      deleteDashlet: function(li)
+      deleteDashlet: function CD_deleteDashlet(li)
       {
          // Remove the dashlet from the Dom.
          li.parentNode.removeChild(li);
@@ -808,14 +810,13 @@
        */
       getColumnIndex: function CD_getColumnIndex(el)
       {
-         if (el.nodeName.toLowerCase() === "li")
+         if (el.nodeName.toLowerCase() == "li")
          {
             el = el.parentNode;
          }
-         if (el.nodeName.toLocaleLowerCase() === "ul")
+         if (el.nodeName.toLocaleLowerCase() == "ul")
          {
-            var column = el.id.substr(el.id.lastIndexOf("-") + 1);
-            return parseInt(column);
+            return parseInt(el.id.substr(el.id.lastIndexOf("-") + 1), 10);
          }
          return -1;
       },
@@ -853,7 +854,7 @@
        * @param li {HTMLElement} of type li (the dashlet)
        * @return {int} the column index
        */
-      isColumnDashlet: function DC_isColumnDashlet(li)
+      isColumnDashlet: function CD_isColumnDashlet(li)
       {
          return this.getColumnIndex(li) > 0;
       },
@@ -881,7 +882,7 @@
        */
       isOfTagType: function CD_isOfTagType(el, tagType)
       {
-         return el.nodeName.toLowerCase() === tagType;
+         return el.nodeName.toLowerCase() == tagType;
       },
 
       /**
@@ -894,14 +895,14 @@
       isAddTarget: function CD_isAddTarget(el)
       {
          // Either el is a column/ul ...
-         if (el === this.widgets.dashletListEl || el === this.widgets.trashcanListEl)
+         if (el == this.widgets.dashletListEl || el == this.widgets.trashcanListEl)
          {
             return false;
          }
          else if (el){
             // .. or it was a dashlet/li, then check its column/ul instead. 
             el = el.parentNode;
-            if(el === this.widgets.dashletListEl || el === this.widgets.trashcanListEl)
+            if (el == this.widgets.dashletListEl || el == this.widgets.trashcanListEl)
             {
                return false;
             }
@@ -926,8 +927,8 @@
     * @return {Alfresco.CustomiseDashlets} The new CustomiseDashlets instance
     * @constructor
     */
-   Alfresco.CustomiseDashlets.DashletProxy = function(li, shadow, customiseDashletComponent) {
-
+   Alfresco.CustomiseDashlets.DashletProxy = function(li, shadow, customiseDashletComponent)
+   {
       Alfresco.CustomiseDashlets.DashletProxy.superclass.constructor.call(this, li);
 
       // Make the drag proxy slightly transparent
@@ -951,8 +952,8 @@
 
    };
 
-   YAHOO.extend(Alfresco.CustomiseDashlets.DashletProxy, YAHOO.util.DDProxy, {
-
+   YAHOO.extend(Alfresco.CustomiseDashlets.DashletProxy, YAHOO.util.DDProxy,
+   {
       /**
        * Callback for when the user drags the dashlet.
        * Will style the proxy to match the dashlet.
@@ -961,7 +962,7 @@
        * @param x {int} the x position of where the drag started
        * @param y {int} the y position of where the drag started
        */
-      startDrag: function CD_startDrag(x, y)
+      startDrag: function CD_DP_startDrag(x, y)
       {
          // A new drag operation has started, make sure the droppedOnEl is reset.
          this.droppedOnEl = null;
@@ -1011,7 +1012,7 @@
        *
        * @method _resetSrcShadow
        */
-      _resetSrcShadow: function CD__resetSrcShadow()
+      _resetSrcShadow: function CD_DP__resetSrcShadow()
       {
          var srcEl = this.getEl();
          var p = srcEl.parentNode;
@@ -1035,7 +1036,7 @@
        * @param e {int}
        * @param id {string}
        */
-      endDrag: function CD_endDrag(e, id)
+      endDrag: function CD_DP_endDrag(e, id)
       {
          // Get the actual dashlet and the proxy
          var srcEl = this.getEl();
@@ -1075,16 +1076,20 @@
 
          // Show the proxy element and animate it towards the shadow.
          Dom.setStyle(proxy, "visibility", "");
-         var a = new YAHOO.util.Motion(proxy, {points: {to: Dom.getXY(this.srcShadow)}},
-               0.3,
-               YAHOO.util.Easing.easeOut
-               );
+         var a = new YAHOO.util.Motion(proxy,
+         {
+            points:
+            {
+               to: Dom.getXY(this.srcShadow)
+            }
+         }, 0.3, YAHOO.util.Easing.easeOut);
 
          // Save the scope of this for the callback after the anumation.
          var myThis = this;    
 
-         a.onComplete.subscribe(function() {
-            var srcShadow = myThis.srcShadow;
+         a.onComplete.subscribe(function()
+         {
+            var srcShadow = srcShadow;
 
             // Hide proxy
             Dom.setStyle(proxy, "visibility", "hidden");
@@ -1104,7 +1109,7 @@
        * @method insertSrcEl
        * @param srcEl {HTMLelement}
        */
-      insertSrcEl: function CD_insertSrcEl(srcEl)
+      insertSrcEl: function CD_DP_insertSrcEl(srcEl)
       {
          // Find out to where and from the dashlet was dragged.
          var destUl = this.srcShadow.parentNode;
@@ -1135,13 +1140,14 @@
        * @param event {HTMLelement}
        * @param id {string} The id of the target element the proxy was dropped over.
        */
-      onDragDrop: function CD_onDragDrop(event, id)
+      onDragDrop: function CD_DP_onDragDrop(event, id)
       {
          // Find the drop target and save it for later.
          var destEl = Dom.get(id);
          this.droppedOnEl = destEl;
 
-         if(destEl === this.customiseDashletComponent.widgets.trashcanListEl && Dom.hasClass(destEl, "target")){
+         if (destEl == this.customiseDashletComponent.widgets.trashcanListEl && Dom.hasClass(destEl, "target"))
+         {
             Dom.removeClass(destEl, "target");
          }
 
@@ -1195,7 +1201,6 @@
                   destDD.isEmpty = false;
                }
             }
-
          }
       },
 
@@ -1207,10 +1212,10 @@
        * @param cursorState {string} A state constant from Alfresco.util.Cursor
        * @private
        */
-      _changeCursor: function CD__changeCursor(cursorState)
+      _changeCursor: function CD_DP__changeCursor(cursorState)
       {
          var proxy = this.getDragEl();
-         var proxyEl = new YAHOO.util.Element(proxy, {});
+         var proxyEl = new Element(proxy, {});
          var span = proxyEl.getElementsByTagName("div")[0];
          Alfresco.util.Cursor.setCursorState(span, cursorState);
       },
@@ -1230,18 +1235,18 @@
          this.droppedOnEl = null;
          
          var prevDestEl = Dom.get(id);
-         if(this.customiseDashletComponent.isOfTagType(prevDestEl, "ul"))
+         if (this.customiseDashletComponent.isOfTagType(prevDestEl, "ul"))
          {
             // Place the shadow in the dashlets original position
             this._resetSrcShadow();
             this._changeCursor(Alfresco.util.Cursor.DRAG);
 
-            if(this.customiseDashletComponent.getColumnIndex(prevDestEl) === 0)
+            if (this.customiseDashletComponent.getColumnIndex(prevDestEl) === 0)
             {
                Dom.removeClass(prevDestEl, "deleteDrag");
             }
          }
-         else if(prevDestEl === this.customiseDashletComponent.widgets.trashcanListEl)
+         else if (prevDestEl == this.customiseDashletComponent.widgets.trashcanListEl)
          {
             this._changeCursor(Alfresco.util.Cursor.DRAG);
             Dom.removeClass(prevDestEl, "target");
@@ -1257,7 +1262,7 @@
        * @method onDrag
        * @param event {HTMLelement}
        */
-      onDrag: function CD_onDrag(event)
+      onDrag: function CD_DP_onDrag(event)
       {
          // Keep track of the direction of the drag for use during onDragOver
          var y = Event.getPageY(event);
@@ -1281,7 +1286,7 @@
        * @param event {HTMLelement}
        * @param id {string} The id of the target element the proxy was dragged over.
        */
-      onDragOver: function CD_onDragOver(event, id)
+      onDragOver: function CD_DP_onDragOver(event, id)
       {
          this.isOver = true;
          
@@ -1299,9 +1304,8 @@
              * Check what columns we dragged from and drag above and make sure
              * the dest columns isn't full.
              */
-            if (!this.customiseDashletComponent.isColumnFull(destEl.parentNode) ||
-                srcElColumn === destElColumn)
-            {               
+            if (!this.customiseDashletComponent.isColumnFull(destEl.parentNode) || srcElColumn == destElColumn)
+            {
                // Make sure we only add the shadow to a column and not the available dashlets
                if (destElColumn > 0)
                {
@@ -1312,21 +1316,19 @@
                   }
 
                   // Show shadow instead of original dashlet next to its target
-                  if(Dom.getStyle(this.srcShadow, "display") === "none")
+                  if (Dom.getStyle(this.srcShadow, "display") == "none")
                   {
                      Dom.setStyle(this.srcShadow, "display", "");
                   }
                   if (this.goingUp)
                   {
                      // Insert shadow before hovered li
-                     var p = destEl.parentNode;
-                     p.insertBefore(this.srcShadow, destEl);
+                     destEl.parentNode.insertBefore(this.srcShadow, destEl);
                   }
                   else
                   {
                      // Insert shadow after hovered li
-                     var p = destEl.parentNode;
-                     p.insertBefore(this.srcShadow, destEl.nextSibling);
+                     destEl.parentNode.insertBefore(this.srcShadow, destEl.nextSibling);
                   }
                }
             }
@@ -1334,18 +1336,18 @@
          else if (this.customiseDashletComponent.isOfTagType(destEl, "ul"))
          {
             var destElColumnIsFull = this.customiseDashletComponent.isColumnFull(destEl);
-            if((srcElColumn > 0 && destElColumn === 0) || // delete: from column over available.
+            if ((srcElColumn > 0 && destElColumn === 0) || // delete: from column over available.
                   (destElColumn > 0 && (!destElColumnIsFull || srcElColumn === destElColumn)))
             {
                // Set the cursor to indicate that the user may drop the dashlet here.
                this._changeCursor(Alfresco.util.Cursor.DROP_VALID);
-               if(destElColumn === 0)
+               if (destElColumn === 0)
                {
                   // Indicate that a drop means a delete
                   Dom.addClass(destEl, "deleteDrag");
                }
             }
-            else if(destElColumn > 0 && destElColumnIsFull)
+            else if (destElColumn > 0 && destElColumnIsFull)
             {
                // Set the cursor to indicate that the user may NOT drop the dashlet here.
                this._changeCursor(Alfresco.util.Cursor.DROP_INVALID);
@@ -1355,14 +1357,13 @@
                // Cursor should be the drag cursor, keep it.
             }
          }
-         else if(destEl === this.customiseDashletComponent.widgets.trashcanListEl)
+         else if (destEl == this.customiseDashletComponent.widgets.trashcanListEl)
          {
             this._changeCursor(Alfresco.util.Cursor.DROP_VALID);
             Dom.addClass(destEl, "target");
          }
       }
    });
-
 })();
 
 /* Dummy instance to load optional YUI components early */

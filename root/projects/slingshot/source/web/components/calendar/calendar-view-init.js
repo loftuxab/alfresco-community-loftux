@@ -640,7 +640,7 @@
          }
 
          // Clear any previous events
-         var container = document.getElementById("week-view");
+         var container = Dom.get("week-view");
          if (container)
          {
             var elems = this._getWeekViewEvents(container, "cal-event-entry");
