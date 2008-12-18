@@ -141,7 +141,7 @@
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: Alfresco.util.message("title.deleteSite", this.name),
-            text: Alfresco.util.message("label.deleteSite", this.name, {"0": c.site.title}),
+            text: Alfresco.util.message("label.deleteSite", this.name, {"0": Alfresco.util.encodeHTML(c.site.title)}),
             noEscape: true,
             buttons: [
                {

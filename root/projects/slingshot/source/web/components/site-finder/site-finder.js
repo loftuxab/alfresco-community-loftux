@@ -349,7 +349,7 @@
          {
             var shortName = oRecord.getData("shortName");
             var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";
-            var siteName = oRecord.getData("title");
+            var siteName = $html(oRecord.getData("title"));
 
             // Render the icon
             elCell.innerHTML = '<a href="' + url + '"><img src="' + 
@@ -399,7 +399,7 @@
                if (isPublic)
                {
                   var shortName = oRecord.getData("shortName");
-                  var title = oRecord.getData("title");
+                  var title = $html(oRecord.getData("title"));
                   var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
                   if (shortName in me.memberOfSites)
                   {

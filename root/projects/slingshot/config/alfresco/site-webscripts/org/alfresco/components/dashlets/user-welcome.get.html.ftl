@@ -23,7 +23,7 @@ new Alfresco.UserWelcome("${args.htmlid}");
          <h4>${msg("header.mySites")}</h4>
          <div>${msg("text.mySites")}</div>
    <#list sites as site>
-         <div class="site"><a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title}</a></div>
+         <div class="site"><a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a></div>
    </#list>
       </div>
 </#if>
