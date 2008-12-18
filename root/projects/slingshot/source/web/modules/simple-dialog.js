@@ -321,10 +321,10 @@
          {
              doBeforeDialogShow.fn.call(doBeforeDialogShow.scope || this, this.form, doBeforeDialogShow.obj);
          }
-         // Make sure ok button is in the correct state if fialog is reused  
+         // Make sure ok button is in the correct state if dialog is reused  
          this.widgets.okButton.set("disabled", false);
-         this.form.updateSubmitElements();
          this.widgets.cancelButton.set("disabled", false);
+         this.form.updateSubmitElements();
 
          this.dialog.show();
 
@@ -443,7 +443,8 @@
          else
          {
             // If no specific handler disable buttons before submit to avoid double submits
-            this.form.doBeforeFormSubmit = {
+            this.form.doBeforeFormSubmit =
+            {
                fn: function AmSD__defaultDoBeforeSubmit()
                {
                   this.widgets.okButton.set("disabled", true);
@@ -526,12 +527,12 @@
        * @method onFailure
        * @param response {object} Server response object
        */
-      onFailure: function AmSD_onSuccess(response)
+      onFailure: function AmSD_onFailure(response)
       {
-         // Make sure ok button is in the correct state if fialog is reused
+         // Make sure ok button is in the correct state if dialog is reused
          this.widgets.okButton.set("disabled", false);
-         this.form.updateSubmitElements();
          this.widgets.cancelButton.set("disabled", false);
+         this.form.updateSubmitElements();
 
          // Invoke the callback if one was supplied
          if (typeof this.options.onFailureCallback.fn == "function")
@@ -550,8 +551,6 @@
             }
          }
       }
-
-
    };
 })();
 

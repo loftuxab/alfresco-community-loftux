@@ -581,7 +581,7 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             }
             catch (Exception tex) {}
 
-            throw VtiExceptionUtils.createRuntimeException(e);
+            throw new WebServiceErrorCodeException(3);
         }
         
         if (logger.isDebugEnabled()) {

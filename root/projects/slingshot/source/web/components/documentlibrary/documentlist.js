@@ -489,9 +489,11 @@
 
          // Hide/Show Folders button
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
+         this.widgets.showFolders.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
 
          // Detailed/Simple List button
          this.widgets.simpleView =  Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
+         this.widgets.simpleView.set("label", this._msg(this.options.simpleView ? "button.view.detailed" : "button.view.simple"));
 
          // File Select menu button
          this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "fileSelect-button", this.onFileSelect,
