@@ -24,9 +24,9 @@
 			</endpoint>
 
 			<endpoint>
-				<id>alfresco-rss</id>
-				<name>Alfresco RSS</name>
-				<description>Alfresco RSS - supports basic HTTP authentication</description>
+				<id>alfresco-feed</id>
+				<name>Alfresco Feed</name>
+				<description>Alfresco Feed - supports basic HTTP authentication</description>
 				<connector-id>http</connector-id>
 				<endpoint-url>http://yourserver:8080/alfresco/s</endpoint-url>
 				<basic-auth>true</basic-auth>
@@ -64,9 +64,9 @@
 			</endpoint>
 
 			<endpoint>
-				<id>alfresco-rss</id>
-				<name>Alfresco RSS</name>
-				<description>Alfresco RSS - supports basic HTTP authentication</description>
+				<id>alfresco-feed</id>
+				<name>Alfresco Feed</name>
+				<description>Alfresco Feed - supports basic HTTP authentication</description>
 				<connector-id>http</connector-id>
 				<endpoint-url>http://yourserver:8080/alfresco/wcs</endpoint-url>
 				<basic-auth>true</basic-auth>
