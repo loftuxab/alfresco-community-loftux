@@ -33,7 +33,7 @@ function main()
    
    var url = '/api/forum/site/' + site + '/' + container + "/posts?contentLength=512";
    
-   var connector = remote.connect("alfresco-rss");
+   var connector = remote.connect("alfresco-feed");
    var result = connector.get(url);
    if (result.status != status.STATUS_OK)
    {

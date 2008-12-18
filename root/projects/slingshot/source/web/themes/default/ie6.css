@@ -80,12 +80,12 @@ textarea
 
 .yui-skin-default #prompt
 {
-   width: 400px;
+   width: 30em;
 }
 
 .yui-skin-default #message
 {
-   width: 400px;
+   width: 30em;
 }
 
 /**

@@ -122,3 +122,14 @@ body.masked div.mask.full-preview-mask
    background-color: #303030;
    filter: alpha(opacity = 100);
 }
+
+.yui-skin-default #prompt
+{
+   width: 30em;
+}
+
+.yui-skin-default #message
+{
+   width: 30em;
+}
+

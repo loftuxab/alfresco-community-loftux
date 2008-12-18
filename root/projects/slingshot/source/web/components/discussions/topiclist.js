@@ -568,7 +568,7 @@
        */
       _generateRSSFeedUrl: function DiscussionsTopicList__generateRSSFeedUrl()
       {
-         var url = Alfresco.constants.URL_CONTEXT + "service/components/discussions/rss?site=" + this.options.siteId;
+         var url = Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/discussions/rss?site=" + this.options.siteId;
          this.widgets.rssFeed.set("href", url);
       },
       

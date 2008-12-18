@@ -279,7 +279,7 @@
          var link = Dom.get(this.id + "-feedLink");
          if (link)
          {
-            var url = Alfresco.constants.URL_SERVICECONTEXT + "components/dashlets/activities/list?";
+            var url = Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/dashlets/activities/list?";
             var dataObj =
             {
                format: "atomfeed",
