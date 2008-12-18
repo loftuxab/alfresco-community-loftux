@@ -2,13 +2,13 @@
 new Alfresco.MySites("${args.htmlid}").setOptions(
 {
    sites: [
-      <#if sites??>
+<#if sites??>
    <#list sites as site>
    {
       shortName: '${site.shortName?js_string}',
       title: '${site.title?js_string}',
-      favourite: ${site.favourite?string},
-      isSiteManager: ${site.isSiteManager?string},
+      isFavourite: ${site.isFavourite?string},
+      isSiteManager: ${site.isSiteManager?string}
    }<#if (site_has_next)>,</#if>
    </#list>
 </#if>
@@ -29,7 +29,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions(
       <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if site_index = 0>first-item<#elseif !site_has_next>last-item</#if>">
          <div>
             <div class="my-actions">
-               <span id="${args.htmlid}-favourite-span-${site_index}" class="favourite <#if (site.favourite)>enabled</#if>" title="${msg("link.favouriteSite")}">&nbsp;</span>
+               <span id="${args.htmlid}-favourite-span-${site_index}" class="favourite <#if (site.isFavourite)>enabled</#if>" title="${msg("link.favouriteSite")}">&nbsp;</span>
             </div>
             <div class="site">
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>

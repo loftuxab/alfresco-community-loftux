@@ -112,7 +112,7 @@
        * @param obj {object} Object literal specifying a set of messages
        * @return {Alfresco.MySites} returns 'this' for method chaining
        */
-      setMessages: function Header_setMessages(obj)
+      setMessages: function MySites_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -141,7 +141,7 @@
          var sites = this.options.sites, i, j;
          for (i = 0, j = sites.length; i < j; i++)
          {
-            if(sites[i].isSiteManager)
+            if (sites[i].isSiteManager)
             {
                this._addDeleteHandling(i);               
             }
@@ -173,85 +173,87 @@
          }
       },
 
-       /**
-        * Adds an event handler that adds or removes the site as favourite site
-        *
-        * @method _addFavouriteHandling
-        * @param siteIndex {int} The index of the site in the this.options.sites array
-        * @private
-        */
-       _addFavouriteHandling: function MySites__addFavouriteHandling(siteIndex)
-       {
-           var me = this;
-           var favouriteSpan = Dom.get(this.id + "-favourite-span-" + siteIndex);
-           if (favouriteSpan)
-           {
-               var favouriteClickHandler = function (event, obj)
+      /**
+       * Adds an event handler that adds or removes the site as favourite site
+       *
+       * @method _addFavouriteHandling
+       * @param siteIndex {int} The index of the site in the this.options.sites array
+       * @private
+       */
+      _addFavouriteHandling: function MySites__addFavouriteHandling(siteIndex)
+      {
+         var me = this;
+         var favouriteSpan = Dom.get(this.id + "-favourite-span-" + siteIndex);
+         if (favouriteSpan)
+         {
+            var favouriteClickHandler = function (event, obj)
+            {
+               /**
+                * We assume that the change of favourite site will work and therefore change
+                * the gui immediatly after the server call.
+                * If it doesn't we revoke the gui changes and display an error message
+                */
+               var responseConfig =
                {
-                   /**
-                    * We assume that the change of favourite site will work and therefore change
-                    * the gui immediatly after the server call.
-                    * If it doesn't we revoke the gui changes and display an error message
-                    */
-                   var responseConfig =
-                   {
-                       failureCallback:
-                       {
-                           fn: function(event, obj)
-                           {
-                               obj.thisComponent._addFavouriteHandling(obj.siteIndex);
-                               obj.thisComponent._toggleFavourite(obj.siteIndex);
-                               Alfresco.util.PopupManager.displayPrompt(
-                               {
-                                   text: Alfresco.util.message("message.siteFavourite.failure", obj.thisComponent.name)
-                               });
-                           },
-                           scope: this,
-                           obj:
-                           {
-                               siteIndex: siteIndex,
-                               thisComponent: me
-                           }
-                       },
-                       successCallback:
-                       {
-                           fn: function(event, obj)
-                           {
-                               obj.thisComponent._addFavouriteHandling(obj.siteIndex);
-                           },
-                           scope: this,
-                           obj:
-                           {
-                               siteIndex: siteIndex,
-                               thisComponent: me
-                           }
-                       }
-                   };
-
-                   // Remove listener so we don't do double submits
-                   Event.removeListener(favouriteSpan, "click", favouriteClickHandler);
-                   me._toggleFavourite(siteIndex);
-                   me.preferencesService.set(
-                           Alfresco.service.Preferences.FAVOURITE_SITES + "." + me.options.sites[siteIndex].shortName,
-                           me.options.sites[siteIndex].favourite,
-                           responseConfig);
+                  failureCallback:
+                  {
+                     fn: function(event, obj)
+                     {
+                        obj.thisComponent._addFavouriteHandling(obj.siteIndex);
+                        obj.thisComponent._toggleFavourite(obj.siteIndex);
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           text: Alfresco.util.message("message.siteFavourite.failure", obj.thisComponent.name)
+                        });
+                     },
+                     scope: this,
+                     obj:
+                     {
+                         siteIndex: siteIndex,
+                         thisComponent: me
+                     }
+                  },
+                  successCallback:
+                  {
+                     fn: function(event, obj)
+                     {
+                        obj.thisComponent._addFavouriteHandling(obj.siteIndex);
+                        var site = obj.thisComponent.options.sites[obj.siteIndex];
+                        YAHOO.Bubbling.fire(site.isFavourite ? "favouriteSiteAdded" : "favouriteSiteRemoved", site);
+                     },
+                     scope: this,
+                     obj:
+                     {
+                        siteIndex: siteIndex,
+                        thisComponent: me
+                     }
+                  }
                };
 
-               // Add listener to favourite icons
-               Event.addListener(favouriteSpan, "click", favouriteClickHandler);
-           }
-       },
+               // Remove listener so we don't do double submits
+               Event.removeListener(favouriteSpan, "click", favouriteClickHandler);
+               me._toggleFavourite(siteIndex);
+               me.preferencesService.set(
+                  Alfresco.service.Preferences.FAVOURITE_SITES + "." + me.options.sites[siteIndex].shortName,
+                  me.options.sites[siteIndex].isFavourite,
+                  responseConfig);
+            };
 
-       /**
-        * Helper method to change the gui and our local data model of sites
-        * @method _toggleFavourite
-        * @param siteIndex {integer} the index in our local data model
+            // Add listener to favourite icons
+            Event.addListener(favouriteSpan, "click", favouriteClickHandler);
+         }
+      },
+
+      /**
+       * Helper method to change the gui and our local data model of sites
+       * @method _toggleFavourite
+       * @param siteIndex {integer} the index in our local data model
        */
-      _toggleFavourite: function(siteIndex)
+      _toggleFavourite: function MySites__toggleFavourite(siteIndex)
       {
          var span = YAHOO.util.Dom.get(this.id + "-favourite-span-" + siteIndex);
-         this.options.sites[siteIndex].favourite = !this.options.sites[siteIndex].favourite;
-         if(this.options.sites[siteIndex].favourite)
+         this.options.sites[siteIndex].isFavourite = !this.options.sites[siteIndex].isFavourite;
+         if (this.options.sites[siteIndex].isFavourite)
          {
             YAHOO.util.Dom.addClass(span, "enabled");
          }

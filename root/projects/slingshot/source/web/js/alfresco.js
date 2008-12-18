@@ -119,7 +119,7 @@ Alfresco.util.appendArrayToObject = function(obj, arr)
    {
       for (var i = 0; i < arr.length; i++)
       {
-          obj[arr[i]] = true;
+         obj[arr[i]] = true;
       }
    }
    return obj;
@@ -139,7 +139,7 @@ Alfresco.util.arrayToObject = function(arr)
    {
       for (var i = 0; i < arr.length; i++)
       {
-          obj[arr[i]] = true;
+         obj[arr[i]] = true;
       }
    }
    return obj;

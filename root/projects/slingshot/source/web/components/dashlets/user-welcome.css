@@ -1,8 +1,3 @@
-div.dashlet.user-welcome .scrollableList
-{
-   padding: 0px;
-}
-
 div.dashlet.user-welcome div.detail-list-item-alt
 {
    background-color: #fffbdd;
@@ -27,14 +22,4 @@ div.dashlet.user-welcome div.detail-list-item-alt div
 div.dashlet.user-welcome a
 {
    color: #4F94C9
-}
-
-div.dashlet.user-welcome div.detail-list-item div.site
-{
-   background-image: url(../images/site-24.png);
-   background-repeat: no-repeat;
-   background-position: 0 2px;
-   line-height: 2.2em;
-   padding-bottom: 0;
-   padding-left: 32px;
 }

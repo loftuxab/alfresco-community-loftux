@@ -52,6 +52,13 @@
 
    <div id="${args.htmlid}-documents" class="documents"></div>
 
+   <div id="${args.htmlid}-doclistBarBottom" class="yui-gc doclist-bar doclist-bar-bottom flat-button">
+      <div class="yui-u first">
+         <div class="file-select">&nbsp;</div>
+         <div id="${args.htmlid}-paginatorBottom" class="paginator"></div>
+      </div>
+   </div>
+
    <!-- Action Sets -->
    <div style="display:none">
       <!-- Action Set "More..." container -->
