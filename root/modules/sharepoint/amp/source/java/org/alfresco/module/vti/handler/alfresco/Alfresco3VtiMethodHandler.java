@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
@@ -80,6 +81,7 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.FileCopyUtils;
 
 
 /**
@@ -419,9 +421,29 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
         return new String[]{webUrl, fileUrl};
     }
 
-    public boolean existResource(String uri)
+    public boolean existResource(String uri, HttpServletResponse response)
     {
-        return pathHelper.resolvePathFileInfo(uri) != null;
+        FileInfo resourceFileInfo = pathHelper.resolvePathFileInfo(uri);
+        if (resourceFileInfo == null)
+        {
+            try
+            {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getOutputStream().write("NOT FOUND".getBytes());
+                response.getOutputStream().close();
+            }
+            catch (Exception e){}
+        }
+        else
+        {
+            ContentReader reader = fileFolderService.getReader(resourceFileInfo.getNodeRef());
+            try
+            {
+                FileCopyUtils.copy(reader.getContentInputStream(), response.getOutputStream());
+            }
+            catch(Exception e){}
+        }
+        return resourceFileInfo != null;
     }
 
     public DocsMetaInfo getDocsMetaInfo(String serviceName, boolean listHiddenDocs, boolean listLinkInfo, boolean validateWelcomeNames, List<String> urlList)
@@ -473,6 +495,11 @@ public class Alfresco3VtiMethodHandler implements VtiMethodHandler
         {
             logger.debug("Retrieving of document: '" + documentName + "' from site: " +serviceName);
         }
+        
+        String role = siteService.getMembersRole(serviceName, authenticationService.getCurrentUserName());
+        if (role.equalsIgnoreCase("SiteConsumer") || role.equalsIgnoreCase("SiteContributor"))
+            throw VtiException.create(VtiError.V_OWSSVR_ERRORACCESSDENIED);
+        
         FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + documentName);
         AlfrescoVtiMethodHandler.assertValidFileInfo(fileFileInfo);
         AlfrescoVtiMethodHandler.assertFile(fileFileInfo);

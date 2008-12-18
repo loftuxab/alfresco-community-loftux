@@ -209,7 +209,16 @@ public class VtiIfHeaderServlet extends HttpServlet
             }            
         }
         // updates changes on the server
-        writer.putContent(req.getInputStream());
+        try
+        {
+            writer.putContent(req.getInputStream());
+        }
+        catch(Exception e)
+        {
+            resp.setStatus(HttpServletResponse.SC_CONFLICT);
+            resp.getOutputStream().close();
+            return;
+        }
         
         // original document properties
         Map<QName, Serializable> props = nodeService.getProperties(nodeRef);

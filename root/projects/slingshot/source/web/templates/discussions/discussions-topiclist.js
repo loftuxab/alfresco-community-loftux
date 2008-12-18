@@ -32,115 +32,39 @@
 (function()
 {
    /**
-    * DocumentLibrary constructor.
+    * DiscussionsViewTopics constructor.
     * 
     * @return {Alfresco.DiscussionsViewTopics} The new DiscussionsViewTopics instance
     * @constructor
     */
    Alfresco.DiscussionsViewTopics = function DiscussionsViewTopics_constructor()
    {
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
-            
+      Alfresco.DiscussionsViewTopics.superclass.constructor.call(this);
       return this;
    };
    
-   Alfresco.DiscussionsViewTopics.prototype =
+   YAHOO.extend(Alfresco.DiscussionsViewTopics, Alfresco.widget.Resizer,
    {
       /**
-       * Minimum Filter Panel width.
-       * 
-       * @property MIN_FILTER_PANEL_WIDTH
-       * @type int
+       * DOM ID of left-hand container DIV
+       *
+       * @property divLeft
+       * @type string
+       * @default "divLeft"
        */
-      MIN_FILTER_PANEL_WIDTH: 140,
+      divLeft: "divTopicListFilters",
 
       /**
-       * Default Filter Panel width.
-       * 
-       * @property DEFAULT_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      DEFAULT_FILTER_PANEL_WIDTH: 180,
-
-      /**
-       * Maximum Filter Panel width.
-       * 
-       * @property MAX_FILTER_PANEL_WIDTH
-       * @type int
-       */
-      MAX_FILTER_PANEL_WIDTH: 750,
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-       widgets: {},
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
+       * DOM ID of right-hand container DIV
        *
-       * @method onComponentsLoaded
+       * @property divRight
+       * @type string
+       * @default "divRight"
        */
-      onComponentsLoaded: function DiscussionsViewTopics_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onDOMReady(this.onReady, this, true);
-      },
-   
-      /**
-       * Fired by YUI when parent element is available for scripting.
-       * Template initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
-       */
-      onReady: function DiscussionsViewTopics_onReady()
-      {
-         // Horizontal Resizer
-         this.widgets.horizResize = new YAHOO.util.Resize("divTopicListFilters",
-         {
-            handles: ["r"],
-            minWidth: this.MIN_FILTER_PANEL_WIDTH,
-            maxWidth: this.MAX_FILTER_PANEL_WIDTH
-         });
-         this.widgets.horizResize.on("resize", function(eventTarget)
-         {
-            this.onTopicListResize(eventTarget.width);
-         }, this, true);
-         
-         // Initial size
-         if (YAHOO.env.ua.ie > 0)
-         {
-            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("element").offsetHeight, this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-         }
-         else
-         {
-            this.widgets.horizResize.resize(null, this.widgets.horizResize.get("height"), this.DEFAULT_FILTER_PANEL_WIDTH, 0, 0, true);
-         }
-      },
-   
-      /**
-       * Fired by via resize event listener.
-       *
-       * @method onDocLibraryResize
-       */
-      onTopicListResize: function DiscussionsViewTopics_onTopicListResize(width)
-      {
-         var Dom = YAHOO.util.Dom;
-         
-         if (typeof width != 'undefined')
-         {
-            // Reset widget height to ensure correct rendering
-            Dom.setStyle("divTopicListFilters", "height", "auto");
-            // 8px breathing space for resize gripper
-            Dom.setStyle("divTopicListTopics", "margin-left", 8 + width + "px");
-         }
-      }
-   };
+      divRight: "divTopicListTopics"
+   });
    
 })();
 
-// Instantiate the Discussions View Topics template
+// Instantiate the Document Library template
 new Alfresco.DiscussionsViewTopics();

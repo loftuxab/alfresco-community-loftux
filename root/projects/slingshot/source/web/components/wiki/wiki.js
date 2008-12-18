@@ -19,6 +19,7 @@
    {
 	   this.name = "Alfresco.Wiki";
       this.id = containerId;
+      this.widgets = {};
 
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
@@ -30,8 +31,17 @@
 
 	Alfresco.Wiki.prototype =
 	{
-	   
+
+      /**
+       * Object container for storing YUI widget instances.
+       *
+       * @property widgets
+       * @type object
+       */
+      widgets: {},
+      
 	   selectedTags: [],
+      
 		/**
 		 * An instance of a Wiki parser for this page.
 		 * 
@@ -52,7 +62,8 @@
          pageTitle: "",
          mode: "view", // default is "view" mode
          tags: [],
-         pages: []
+         pages: [],
+         versions: []
       },		
 
       /**
@@ -99,7 +110,7 @@
 		 */
 		init: function()
 		{
-			if (this.options.mode === "edit") 
+			if (this.options.mode === "edit")
 			{
 			  this._setupEditForm();
 			}
@@ -115,24 +126,103 @@
 				// Format any wiki markup
 				pageText.innerHTML = this.parser.parse(pageText.innerHTML, this.options.pages);
 			}
-		
+
 		},
 		
 		_setupPageDetails: function()
 		{
 		   // Add 'onchange' handler to dropdown
-		   YAHOO.util.Event.addListener(this.id + "-selectVersion", 'change', this.onSelectChange, null, this);
-		   
-		   Alfresco.util.createYUIButton(this, "revert-button", this.onRevert);
-   		
-   		// Hide the revert button
-   		var div  = Dom.get(this.id + "-revertPanel");
-   		if (div)
-   		{
-   		   div.style.display = "none";
-   		}
+		   //YAHOO.util.Event.addListener(this.id + "-selectVersion", 'change', this.onSelectChange, null, this);
+
+         var versions = this.options.versions;
+
+         // Versioning drop down
+         if(versions.length > 0)
+         {
+            this.widgets.versionSelect = Alfresco.util.createYUIButton(this, "selectVersion-button", this.onVersionSelectChange,
+            {
+               type: "menu",
+               menu: "selectVersion-menu"
+            });
+         }
+
+         // Listen on clicks for revert version icons
+         var myThis = this;
+         for (var i = 0; i < versions.length; i++)
+         {
+            var revertSpan = YAHOO.util.Dom.get(this.id + "-revert-span-" + i);
+            if(revertSpan)
+            {
+               YAHOO.util.Event.addListener(revertSpan, "click",
+                       function (event, obj)
+                       {
+                          // Find the index of the version link by looking at its id
+                          var version = versions[obj.versionIndex];
+
+                          // Find the version through the index and display the revert dialog for the version
+                          Alfresco.module.getRevertWikiVersionInstance().show({
+                             siteId: obj.siteId,
+                             pageTitle: obj.pageTitle,
+                             version: version.label,
+                             versionId: version.versionId,
+                             onRevertWikiVersionComplete: {
+                                fn: this.onRevertWikiVersionComplete,
+                                scope: this
+                             }
+                          });
+                       }, {siteId: this.options.siteId, pageTitle: this.options.pageTitle, versionIndex: i}, this);
+            }
+
+            // Listen on clicks on the version - date row so we can expand and collapse it
+            var expandDiv = YAHOO.util.Dom.get(this.id + "-expand-div-" + i);
+            var moreVersionInfoDiv = YAHOO.util.Dom.get(this.id + "-moreVersionInfo-div-" + i);
+            if(expandDiv)
+            {
+               YAHOO.util.Event.addListener(expandDiv, "click",
+                       function (event, obj)
+                       {
+                          //alert(obj.versionIndex);
+                          var Dom = YAHOO.util.Dom;
+                          //var moreVersionInfoDiv = Dom.get(this.id + "-moreVersionInfo-div-" + obj.versionIndex);
+                          if(obj.moreVersionInfoDiv && Dom.hasClass(obj.expandDiv, "collapsed"))
+                          {
+                             Alfresco.util.Anim.fadeIn(obj.moreVersionInfoDiv);
+                             Dom.removeClass(obj.expandDiv, "collapsed");
+                             Dom.addClass(obj.expandDiv, "expanded");
+                          }
+                          else
+                          {
+                             Dom.setStyle(obj.moreVersionInfoDiv, "display", "none");
+                             Dom.removeClass(obj.expandDiv, "expanded");
+                             Dom.addClass(obj.expandDiv, "collapsed");
+                          }
+                       },
+               {
+                  expandDiv: expandDiv,
+                  moreVersionInfoDiv: moreVersionInfoDiv
+               }, this);
+            }
+
+            // Format and display the createdDate
+            var createdDateSpan = document.getElementById(this.id + "-createdDate-span-" + i);
+            createdDateSpan.innerHTML = Alfresco.util.formatDate(versions[i].createdDate);
+         }
+		         
 		},
-		
+
+      /**
+       * Fired by the Revert Version component after a successfull revert.
+       *
+       * @method onRevertWikiVersionComplete
+       */
+      onRevertWikiVersionComplete: function DV_onRevertWikiVersionComplete()
+      {
+         Alfresco.util.PopupManager.displayMessage({ text: Alfresco.util.message("message.revertComplete", this.name) });
+
+         window.location.reload();
+      },
+
+      /* REMOVE */
 		onRevert: function(e)
 		{
 		   // Make a PUT request 
@@ -247,23 +337,30 @@
          
          form.init();   		
    		
-   		YAHOO.Bubbling.on("onTagLibraryTagsChanged", this.onTagLibraryTagsChanged, this);
-		},
+         YAHOO.Bubbling.on("onTagLibraryTagsChanged", this.onTagLibraryTagsChanged, this);
+      },
 		
-		onTagLibraryTagsChanged: function(layer, args)
+      onTagLibraryTagsChanged: function(layer, args)
+      {
+         this.selectedTags = args[1].tags;
+      },
+
+       /**
+        * Called when the user selects a version in the version list
+        *
+        * @method onVersionSelectChange
+        * @param sType {string} Event type, e.g. "click"
+        * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
+        * @param p_obj {object} Object passed back from subscribe method
+        */
+      onVersionSelectChange: function Wiki_onVersionSelectChange(sType, aArgs, p_obj)
 		{
-		   this.selectedTags = args[1].tags;
-		},
-		
-		onSelectChange: function(e)
-		{
-		   var select = e.target;
-		   var id = select.options[select.selectedIndex].value; 
+         var versionId = aArgs[1].value;
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
          {
             site: this.options.siteId,
             title: this.options.pageTitle,
-            version: id
+            version: versionId
          });
 		   
 		   Alfresco.util.Ajax.request(
@@ -273,34 +370,38 @@
 				successCallback:
 				{
 					fn: this.onVersionInfo,
-					scope: this
+					scope: this,
+               obj: {index: aArgs[1].index}
 				},
 		      failureMessage: "Could not retrieve version information"
 		   });
 		   
-		   // Decide whether to display the revert button or not
-		   var div  = Dom.get(this.id + "-revertPanel");
-		   if (select.selectedIndex === 0)
-		   {
-		      div.style.display = "none";
-		   }
-		   else
-		   {
-		      div.style.display = "block";
-		   }
 		},
-		
-		onVersionInfo: function(e)
-		{
+
+       /**
+        * Called when the content for a new version has been loaded
+        * (because of a user click in the version select menu).
+        *
+        * @method onVersionInfo
+        * @param event {object} event from Alfresco.ajax.request
+        * @param obj {object} contians the index of the selected version in the versions array
+        */
+		onVersionInfo: function Wiki_onVersionInfo(event, obj)
+		{        
+         // Show the content
 		   var page = Dom.get(this.id + "-page");
-		   page.innerHTML = this.parser.parse(e.serverResponse.responseText, this.options.pages);
-		   
-		   var pagecontent = Dom.get(this.id + "-pagecontent");
-		   if (pagecontent)
-		   {
-		      // We store the raw content in this hidden div
-		      pagecontent.innerHTML = e.serverResponse.responseText;
-		   }
+		   page.innerHTML = this.parser.parse(event.serverResponse.responseText, this.options.pages);
+
+         // Update the version label in the header
+         var versionHeaderSpan = Dom.get(this.id + "-version-header");
+         if(versionHeaderSpan)
+         {
+            versionHeaderSpan.innerHTML = Alfresco.util.message("label.shortVersion", this.name) + this.options.versions[obj.index].label;
+         }
+
+         // Update the label in the version select menu
+         var label = this.options.versions[obj.index].label + " (" + (obj.index == 0 ?  Alfresco.util.message("label.latest", this.name) : Alfresco.util.message("label.earlier", this.name)) + ")";
+         this.widgets.versionSelect.set("label", label);
 		},
 		
 		/**

@@ -354,7 +354,7 @@
       onExpandComplete: function DLT_onExpandComplete(oNode)
       {
          // Make sure the tree's Dom has been updated
-         this.widgets.treeview.draw();
+         this.widgets.treeview.render();
          // Redrawing the tree will clear the highlight
          if (this.isFilterOwner)
          {
@@ -392,11 +392,14 @@
       /**
        * Fired by YUI TreeView when a node label is clicked
        * @method onNodeClicked
-       * @param node {YAHOO.widget.Node} the node clicked
+       * @param args.event {HTML Event} the event object
+       * @param args.node {YAHOO.widget.Node} the node clicked
        * @return allowExpand {boolean} allow or disallow node expansion
        */
-      onNodeClicked: function DLT_onNodeClicked(node)
+      onNodeClicked: function DLT_onNodeClicked(args)
       {
+         var node = args.node;
+         
          this._updateSelectedNode(node);
          
          // Fire the filter changed event
@@ -515,7 +518,7 @@
             {
                // Node found, so rename it
                node.label = obj.file.displayName;
-               this.widgets.treeview.draw();
+               this.widgets.treeview.render();
                this._showHighlight(true);
             }
          }
@@ -561,7 +564,7 @@
                   }
                }
                
-               this.widgets.treeview.draw();
+               this.widgets.treeview.render();
                this._showHighlight(true);
             }
          }
@@ -628,7 +631,7 @@
                      parentNode.isLeaf = true;
                   }
                }
-               this.widgets.treeview.draw();
+               this.widgets.treeview.render();
                this._showHighlight(true);
             }
          }
@@ -690,7 +693,7 @@
                      }
                   }
                   
-                  this.widgets.treeview.draw();
+                  this.widgets.treeview.render();
                   this._showHighlight(true);
                }
             }
@@ -779,11 +782,11 @@
          }, root, false);
 
          // Register tree-level listeners
-         tree.subscribe("labelClick", this.onNodeClicked, this, true);
+         tree.subscribe("clickEvent", this.onNodeClicked, this, true);
          tree.subscribe("expandComplete", this.onExpandComplete, this, true);
 
          // Render tree with this one top-level node
-         tree.draw();
+         tree.render();
       },
 
       /**
@@ -799,7 +802,7 @@
          {
             // Yes, so clearing the leaf flag and redrawing will automatically query the child nodes
             node.isLeaf = false;
-            this.widgets.treeview.draw();
+            this.widgets.treeview.render();
             this._showHighlight(true);
             return;
          }
@@ -875,7 +878,7 @@
                   }
                   
                   // Update the tree
-                  this.widgets.treeview.draw();
+                  this.widgets.treeview.render();
                   this._showHighlight(true);
                   
                   // Execute the onSortComplete callback

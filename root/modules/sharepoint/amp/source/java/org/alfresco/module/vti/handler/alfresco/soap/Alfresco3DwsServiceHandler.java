@@ -73,7 +73,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
-import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.transaction.TransactionService;
@@ -799,18 +798,8 @@ public class Alfresco3DwsServiceHandler implements DwsServiceHandler
             String lastName = nodeService.getProperty(personNodeRef, ContentModel.PROP_LASTNAME).toString();
             String email = nodeService.getProperty(personNodeRef, ContentModel.PROP_EMAIL).toString();
             members.add(new MemberBean(username, firstName + " " + lastName, username, email, false));
-        }       
-        
-        String siteGroupName = siteService.getSiteGroup(dwsInfo.getName());
-        Set<String> groups = authorityService.getContainedAuthorities(AuthorityType.GROUP, siteGroupName, true);
-        Iterator<String> groupIterator = groups.iterator();
-        
-        while (groupIterator.hasNext())
-        {
-            String groupName = groupIterator.next();
-            members.add(new MemberBean(groupName, groupName.substring(groupName.lastIndexOf('_') + 1), "", "", true));
-        }
-        
+        }  
+
         return members;     
     } 
     

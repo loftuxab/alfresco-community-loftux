@@ -1,6 +1,7 @@
 <#import "import/alfresco-template.ftl" as template />
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/wiki/wiki.css" />
+   <script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></script>
    <script type="text/javascript" src="${url.context}/templates/wiki/wiki.js"></script>
 </@>
 

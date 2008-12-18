@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
@@ -1001,7 +1002,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
         return result;
     }
 
-    public boolean existResource(String uri)
+    public boolean existResource(String uri, HttpServletResponse response)
     {
         return pathHelper.resolvePathFileInfo(uri) != null;
     }

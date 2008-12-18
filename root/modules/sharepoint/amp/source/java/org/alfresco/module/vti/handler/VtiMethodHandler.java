@@ -29,6 +29,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
@@ -163,9 +165,10 @@ public interface VtiMethodHandler
 
     /**
      * @param uri check if resource exists
+     * @param response 
      * @return <i>true</i>, if resource exists; otherwise, <i>false</i>
      */
-    public boolean existResource(String uri);
+    public boolean existResource(String uri, HttpServletResponse response);
 
     /**
      * Deletes the specified documents or folders from the Web site

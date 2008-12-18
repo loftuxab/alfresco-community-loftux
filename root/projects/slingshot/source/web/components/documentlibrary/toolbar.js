@@ -246,6 +246,7 @@
          // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
          this.widgets.selectedItems.getMenu().lazyLoad = false;
          this.widgets.selectedItems.getMenu().initEvent.fire();
+         this.widgets.selectedItems.getMenu().render();
 
          // Hide/Show NavBar button
          this.widgets.hideNavBar = Alfresco.util.createYUIButton(this, "hideNavBar-button", this.onHideNavBar);

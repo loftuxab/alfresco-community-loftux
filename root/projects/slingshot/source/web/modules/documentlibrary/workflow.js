@@ -649,7 +649,17 @@
          var checked = Event.getTarget(e).checked;
          if (checked)
          {
+            var cal, selDate, elCell;
+
             this.widgets.calendarOverlay.show();
+            cal = this.widgets.calendar;
+            selDate = cal.getSelectedDates()[0] || cal.today;
+            elCell = cal.cells[cal.getCellIndex(selDate)];
+            
+            if (elCell)
+            {
+               elCell.childNodes[0].focus();
+            }
          }
          else
          {
@@ -669,8 +679,8 @@
        */
       onDueDateSelected: function DLW_onDueDateSelected(p_type, p_args, p_obj)
       {
-         var selected = p_args[0];
-         var selDate = this.widgets.calendar.toDate(selected[0]);
+         var selected = p_args[0],
+            selDate = this.widgets.calendar.toDate(selected[0]);
          Dom.get(this.id + "-dueDate").innerHTML = '<a href="#" class="due-date">' + Alfresco.util.formatDate(selDate, this._msg("format.due-date")) + '</a>';
          Dom.get(this.id + "-date").value = selDate.toString();
          this.widgets.calendarOverlay.hide();

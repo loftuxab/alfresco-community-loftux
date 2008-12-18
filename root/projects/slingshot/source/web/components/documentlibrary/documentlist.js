@@ -249,6 +249,15 @@
        * @default 1
        */
       currentPage: 1,
+      
+      /**
+       * Total number of records (documents + folders) in the currentPath.
+       * 
+       * @property totalRecords
+       * @type int
+       * @default 0
+       */
+      totalRecords: 0,
 
       /**
        * Current filter to filter document list.
@@ -451,6 +460,12 @@
          /**
           * YUI History - page
           */
+         var handlePagination = function DL_handlePagination(state, me)
+         {
+            me.widgets.paginator.setState(state);
+            YAHOO.util.History.navigate("page", String(state.page));
+         };
+
          if (this.options.usePagination)
          {
             var bookmarkedPage = YAHOO.util.History.getBookmarkedState("page") || "1";
@@ -481,8 +496,13 @@
                containers: [this.id + "-paginator"],
                rowsPerPage: this.options.pageSize,
                initialPage: this.currentPage,
-               template: this._msg("pagination.template")
+               template: this._msg("pagination.template"),
+               pageReportTemplate: this._msg("pagination.template.page-report"),
+               previousPageLinkLabel: this._msg("pagination.previousPageLinkLabel"),
+               nextPageLinkLabel: this._msg("pagination.nextPageLinkLabel")
             });
+            
+            this.widgets.paginator.subscribe("changeRequest", handlePagination, this);
          }
 
 
@@ -929,20 +949,27 @@
             key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 140
          }];
 
-         var handlePagination = function DL_handlePagination(state, dt)
-         {
-            YAHOO.util.History.navigate("page", String(state.page));
-         };
-
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: this.options.usePagination ? 16 : 32,
             initialLoad: false,
-            paginationEventHandler: handlePagination,
             paginator: this.widgets.paginator,
             MSG_EMPTY: this._msg("message.loading")
          });
+
+         // Update totalRecords on the fly with value from server
+         this.widgets.dataTable.handleDataReturnPayload = function DL_handleDataReturnPayload(oRequest, oResponse, oPayload)
+         {
+            me.totalRecords = oResponse.meta.totalRecords;
+            return oResponse.meta;
+         }
+
+         // Prevent the DataTable from updating the Paginator widget
+         this.widgets.dataTable.doBeforePaginatorChange = function DL_doBeforePaginatorChange(oPaginatorState)
+         {
+            return false;
+         }
          
          // Custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
@@ -974,10 +1001,10 @@
                this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko > 0) ? 3 : 5;
             }
             
-            // We don't get an initEvent for an empty recordSet, but we'd like one anyway
+            // We don't get an renderEvent for an empty recordSet, but we'd like one anyway
             if (oResponse.results.length === 0)
             {
-               this.fireEvent("initEvent");
+               this.fireEvent("renderEvent");
             }
             
             // Must return true to have the "Loading..." message replaced by the error message
@@ -993,8 +1020,21 @@
          }, this, true);
          
          // Rendering complete event handler
-         this.widgets.dataTable.subscribe("initEvent", function()
+         this.widgets.dataTable.subscribe("renderEvent", function()
          {
+            Alfresco.logger.debug("DataTable renderEvent");
+            // Update the paginator if it's been created
+            if (this.widgets.paginator)
+            {
+               Alfresco.logger.debug("Setting paginator state: page=" + this.currentPage + ", totalRecords=" + this.totalRecords);
+
+               this.widgets.paginator.setState(
+               {
+                  page: this.currentPage,
+                  totalRecords: this.totalRecords
+               });
+            }
+            
             // Need to highlight a file now the data is available?
             if (this.options.highlightFile)
             {
@@ -1901,7 +1941,7 @@
          this.modules.permissions.showDialog();
       },
 
-
+      
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
@@ -2156,9 +2196,9 @@
       _updateDocList: function DL__updateDocList(p_obj)
       {
          Alfresco.logger.debug("DL__updateDocList: ", p_obj);
-         var successPath = (p_obj && (p_obj.path !== undefined)) ? p_obj.path : this.currentPath;
-         var successPage = (p_obj && (p_obj.page !== undefined)) ? p_obj.page : this.currentPage;
-         var loadingMessage = null;
+         var successPath = (p_obj && (p_obj.path !== undefined)) ? p_obj.path : this.currentPath,
+            successPage = (p_obj && (p_obj.page !== undefined)) ? p_obj.page : this.currentPage,
+            loadingMessage = null;
 
          // Clear the current document list if the data webscript is taking too long
          var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
@@ -2285,8 +2325,8 @@
          // Pagination in use?
          if (this.options.usePagination)
          {
-            obj.page = this.widgets.paginator.get("page") || "1";
-            obj.pageSize = this.widgets.paginator.get("rowsPerPage");
+            obj.page = this.widgets.paginator.getCurrentPage() || this.currentPage;
+            obj.pageSize = this.widgets.paginator.getRowsPerPage();
          }
 
          // Passed-in overrides

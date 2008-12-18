@@ -76,6 +76,15 @@ Alfresco.logger = Alfresco.logger || {};
 Alfresco.thirdparty = Alfresco.thirdparty || {};
 
 /**
+ * Alfresco top-level widget namespace.
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.widget
+ */
+Alfresco.widget = Alfresco.widget || {};
+
+
+/**
  * Alfresco top-level messages namespace.
  * 
  * @namespace Alfresco
@@ -670,10 +679,9 @@ Alfresco.util.undoCaretFix = function(p_formElement)
  * If str contains invalid json code that is displayed using displayPrompt().
  *
  * @method Alfresco.util.parseJSON
- * @param jsonStr {string} Message id to resolve
- * @param jsonStr {boolean} Will display a message informing about bad json syntax if any
- * @return {object} The object representing the json str
- * @throws {Error} if str contains invalid json
+ * @param jsonStr {string} The JSON string to be parsed
+ * @param displayError {boolean} Set true to display a message informing about bad JSON syntax
+ * @return {object} The object representing the JSON string
  * @static
  */
 Alfresco.util.parseJSON = function(jsonStr, displayError)
@@ -682,9 +690,9 @@ Alfresco.util.parseJSON = function(jsonStr, displayError)
    {
       return YAHOO.lang.JSON.parse(jsonStr)
    }
-   catch(error)
+   catch (error)
    {
-      if(displayError)
+      if (displayError)
       {
          Alfresco.util.PopupManager.displayPrompt(
          {

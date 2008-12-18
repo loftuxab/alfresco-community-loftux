@@ -12,7 +12,19 @@
       pageTitle: "${page.url.args["title"]!""}",
 	   mode: "${page.url.args["action"]!"view"}",
 	   tags: [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>],
-      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
+      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>],
+      versions: [
+      <#if result.versionhistory??>
+         <#list result.versionhistory as version>
+         {
+            title: '${version.name}',
+            label: '${version.version}',
+            versionId: '${version.versionId}',
+            createdDate: '${version.date}'
+         }<#if (version_has_next)>,</#if>
+         </#list>
+      </#if>              
+      ]
 	}).setMessages(
       ${messages}
    );    
@@ -81,59 +93,99 @@
 			</div> 
 <#elseif action == "details">	    		
 			<div>
-   			<div style="border: 3px solid #CCC; margin-bottom:15px; width:100%; height:400px; overflow-y:auto">
-   			<div class="yui-g" style="background: #CCC;">
-			   <div class="yui-u first"><h2>${result.title!""}</h2></div>
-			   <div class="yui-u">
-			   	<#if versionhistory??>
-			      <div style="float:right">
-				      <select id="${args.htmlid}-selectVersion">
+   			<div class="details-wrapper">
+   			<div class="yui-g">
+			      <div class="yui-u first">
+                  <h2>
+                     ${result.title!""}
+                     <#if result.versionhistory??><#list result.versionhistory as version><#if version_index == 0><span id="${args.htmlid}-version-header" class="light">${msg("label.shortVersion")}${version.version}</span></#if></#list></#if>
+                  </h2>
+               </div>
+			      <div class="yui-u">
+			   	<#if result.versionhistory??>
+                  <div class="version-quick-change">
 				      <#list result.versionhistory as version>
-				         <option value="${version.versionId}">${version.version} <#if version_index = 0>(Latest)</#if></option>
+                  <#if version_index == 0>
+                  <input type="button" id="${args.htmlid}-selectVersion-button" name="selectButton" value="${version.version} (${msg("label.latest")})">
+				      <select id="${args.htmlid}-selectVersion-menu" name="selectVersion">
+                  </#if>
+				         <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})<#else>(${msg("label.earlier")})</#if></option>
 				      </#list>
 				      </select>
-			      </div>
+                  </div>
+                  <div class="version-quick-change">${msg("label.viewVersion")}</div>
 			      </#if>
 			   </div>
 			</div>
-			<div id="${args.htmlid}-page">
+			<div id="${args.htmlid}-page" class="details-page-content">
 			   <#-- PAGE CONTENT GOES HERE -->
 			   <#if result.pagetext??>${result.pagetext}</#if>
 			</div>
-			<div id="${args.htmlid}-pagecontent" style="display:none;"><#if result.pagetext??>${result.pagetext}</#if></div>		
+         <!--
+			<div id="${args.htmlid}-pagecontent" style="display:none;"><#if result.pagetext??>${result.pagetext}</#if></div>
+		   -->
 			</div>
-			 <div style="display:none; margin-bottom: 5px;" id="${args.htmlid}-revertPanel"><button id="${args.htmlid}-revert-button">${msg("button.revert")}</button></div>
+         <!--
+			<div style="display:none; margin-bottom: 5px;" id="${args.htmlid}-revertPanel"><button id="${args.htmlid}-revert-button">${msg("button.revert")}</button></div>
+			-->
 			<div class="yui-gb">
 			   <div class="yui-u first">
-			      <div class="columnHeader">${msg("label.versionHistory")}</div>
-			      <#if result.versionhistory??>
-			      <#list result.versionhistory as version>
-			      <table class="versionHistory">
-			         <tr><td colspan="2" class="pageTitle">${version.name}</td></tr>
-			         <tr><td class="attributeLabel">${msg("label.version")}:</td><td class="attribute">${version.version}</td></tr>
-			         <tr><td class="attributeLabel">${msg("label.modifier")}:</td><td class="attribute">${version.author}</td></tr>
-			         <tr><td class="attributeLabel">${msg("label.modifiedOn")}:</td><td class="attribute">${version.date}</td></tr>
-			      </table>
-			      </#list>
-			      </#if>
+               <div class="columnHeader">${msg("label.versionHistory")}</div>
+               <#if result.versionhistory??>
+               <#list result.versionhistory as version>
+                  <#if version_index == 0>
+                     <div class="info-sub-section">
+                        <span class="meta-heading">${msg("section.thisVersion")}</span>
+                     </div>
+                  </#if>
+                  <#if version_index == 1>
+                     <div class="info-sub-section">
+                        <span class="meta-heading">${msg("section.olderVersion")}</span>
+                     </div>
+                  </#if>
+                  <div id="${args.htmlid}-expand-div-${version_index}" class="info more <#if version_index != 0>collapsed<#else>expanded</#if>">
+                     <span class="meta-section-label">${msg("label.version")} ${version.version}</span>
+                     <span id="${args.htmlid}-createdDate-span-${version_index}" class="meta-value">&nbsp;</span>
+                  </div>
+                  <div id="${args.htmlid}-moreVersionInfo-div-${version_index}" class="moreInfo" <#if version_index != 0>style="display: none;"</#if>>
+                     <div class="info">
+                        <span class="meta-label">${msg("label.title")}</span>
+                        <span class="meta-value">${version.name?html}</span>
+                     </div>
+                     <div class="info">
+                        <span class="meta-label">${msg("label.creator")}</span>
+                        <span class="meta-value">${version.author?html}</span>
+                     </div>
+                     <#if version_index != 0>
+                     <div class="actions">
+                           <span id="${args.htmlid}-revert-span-${version_index}" class="revert"><a>${msg("link.revert")}</a></span>
+                     </div>
+                     </#if>
+                  </div>
+               </#list>
+               </#if>
 			   </div>
 			   <div class="yui-u">
 			      <div class="columnHeader">${msg("label.tags")}</div>
+               <div class="tags">
 			      <#if result.tags?? && result.tags?size &gt; 0>
 			         <#list result.tags as tag>
-			            <div><span class="tagDetails">${tag}</span></div>
+                     <div class="tag"><img src="${page.url.context}/components/images/tag-16.png" /> ${tag}</img></div>			           
 			         </#list>
                <#else>
                   ${msg("label.none")}
                </#if>
+               </div>
 			   </div>
 			   <div class="yui-u">
 			      <div class="columnHeader">${msg("label.linkedPages")}</div>
+               <div class="links">               
 			      <#if result.links??>
 			         <#list result.links as link>
 			            <div><span><a href="${page.url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${link?replace(" ", "_")}">${link}</a></span></div>
 			         </#list>
 			      </#if>
+               </div>
 			   </div>
 			</div><#-- end of yui-gb -->
 			</div>

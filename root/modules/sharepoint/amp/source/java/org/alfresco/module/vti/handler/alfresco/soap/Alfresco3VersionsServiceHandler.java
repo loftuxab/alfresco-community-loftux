@@ -34,6 +34,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.VtiDownloadContentServlet;
+import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.handler.soap.VersionsServiceHandler;
@@ -166,6 +167,7 @@ public class Alfresco3VersionsServiceHandler implements VersionsServiceHandler
             catch (Exception tex){}
             if (logger.isDebugEnabled())
                 logger.debug("Error: version was not restored. ", e);
+            throw new RuntimeException("Version was not restored. May be you don't have appropriate permissions.");
         }
 
         List<DocumentVersionBean> result = getVersions(documentFileInfo); 

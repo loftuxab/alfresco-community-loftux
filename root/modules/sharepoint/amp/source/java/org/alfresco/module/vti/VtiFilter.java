@@ -39,11 +39,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.module.vti.auth.VtiAuthException;
 import org.alfresco.module.vti.auth.VtiAuthService;
 import org.alfresco.module.vti.handler.VtiMethodHandler;
 import org.alfresco.module.vti.httpconnector.VtiServletContainer;
 import org.alfresco.module.vti.httpconnector.VtiSessionManager;
-import org.alfresco.module.vti.auth.VtiAuthException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -190,11 +190,9 @@ public class VtiFilter implements Filter
             {
                 decodedUrl = decodedUrl.substring(alfrescoContext.length() + 1);
             }
-            if (!vtiHandler.existResource(decodedUrl))
-            {
-                httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                httpResponse.getOutputStream().write("NOT FOUND".getBytes());
-                httpResponse.getOutputStream().close();
+            
+            if (!vtiHandler.existResource(decodedUrl, httpResponse))
+            {                
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Resource doesn't exist");

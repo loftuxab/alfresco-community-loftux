@@ -130,6 +130,13 @@
           */
          simpleView: false,
          
+         /**
+          * Maximum length of post to show in list view
+          *
+          * @property maxContentLength
+          * @type int
+          * @default 512
+          */
          maxContentLength: 512
       },
       
@@ -176,9 +183,31 @@
       
       /**
        * True if publishing actions should be displayed
+       *
+       * @property showPublishingActions
+       * @type boolean
+       * @default false
        */
       showPublishingActions: false,
       
+      /**
+       * Offset of first record on page
+       * 
+       * @property recordOffset
+       * @type int
+       * @default 0
+       */
+      recordOffset: 0,
+
+      /**
+       * Total number of posts in the current view (across all pages)
+       * 
+       * @property totalRecords
+       * @type int
+       * @default 0
+       */
+      totalRecords: 0,
+
       /**
        * Set multiple initialization options at once.
        *
@@ -241,6 +270,16 @@
             type: "link"
          });
 
+         // called by the paginator on state changes
+         var handlePagination = function BlogPostList_handlePagination(state, dt)
+         {
+            //me.currentPage = state.page;
+            me._updateBlogPostList(
+            {
+               page: state.page
+            });
+         };
+
          // YUI Paginator definition
          this.widgets.paginator = new YAHOO.widget.Paginator(
          {
@@ -252,6 +291,8 @@
             previousPageLinkLabel : this._msg("pagination.previousPageLinkLabel"),
             nextPageLinkLabel     : this._msg("pagination.nextPageLinkLabel")
          });
+         
+         this.widgets.paginator.subscribe("changeRequest", handlePagination);
 
          // initialize rss feed link
          this._generateRSSFeedUrl();
@@ -317,7 +358,7 @@
             ],
             metaFields:
             {
-               paginationRecordOffset: "startIndex",
+               recordOffset: "startIndex",
                totalRecords: "total",
                metadata: "metadata"
             }
@@ -432,7 +473,7 @@
             
             // finally add the content. We do this here to avoid a broken page layout, as
             // data.content isn't valid xhtml.
-            if (! me.options.simpleView)
+            if (!me.options.simpleView)
             {
                var contentElem = Dom.getElementsByClassName("content", "div", elCell);
                if (contentElem.length == 1)
@@ -452,22 +493,45 @@
             key: "blogposts", label: "BlogPosts", sortable: false, formatter: renderBlogPost
          }];
 
-         // called by the paginator on state changes
-         var handlePagination = function DL_handlePagination(state, dt)
-         {
-            //me.currentPage = state.page;
-            me._updateBlogPostList({ page : state.page });
-         };
-         
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-postlist", columnDefinitions, this.widgets.dataSource,
          {
             initialLoad: false,
-            paginationEventHandler: handlePagination,
             paginator: this.widgets.paginator,
+            dynamicData: true,
             MSG_EMPTY: this._msg("message.loading")
          });
+
+         // Update totalRecords on the fly with value from server
+         this.widgets.dataTable.handleDataReturnPayload = function DL_handleDataReturnPayload(oRequest, oResponse, oPayload)
+         {
+            // Save totalRecords for Paginator update later
+            me.recordOffset = oResponse.meta.recordOffset;
+            me.totalRecords = oResponse.meta.totalRecords;
+
+            oPayload = oPayload || {};
+            oPayload.recordOffset = oResponse.meta.recordOffset;
+            oPayload.totalRecords = oResponse.meta.totalRecords;
+            return oPayload;
+         }
+
+         // Prevent the DataTable from updating the Paginator widget
+         this.widgets.dataTable.doBeforePaginatorChange = function DL_doBeforePaginatorChange(oPaginatorState)
+         {
+            return false;
+         }
          
+         // Rendering complete event handler
+         this.widgets.dataTable.subscribe("renderEvent", function()
+         {
+            // Update the paginator if it's been created
+            this.widgets.paginator.setState(
+            {
+               recordOffset: this.recordOffset,
+               totalRecords: this.totalRecords
+            });
+         }, this, true);
+
          // Custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
 

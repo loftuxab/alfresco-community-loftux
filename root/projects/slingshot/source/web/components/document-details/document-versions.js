@@ -141,10 +141,10 @@
          var myThis = this;
          for (var i = 0; i < versions.length; i++)
          {
-            var deleteSpan = YAHOO.util.Dom.get(this.id + "-revert-span-" + i);
-            if(deleteSpan)
+            var revertSpan = YAHOO.util.Dom.get(this.id + "-revert-span-" + i);
+            if(revertSpan)
             {
-               YAHOO.util.Event.addListener(deleteSpan, "click",
+               YAHOO.util.Event.addListener(revertSpan, "click",
                        function (event, obj)
                        {
                           // Find the index of the version link by looking at its id
