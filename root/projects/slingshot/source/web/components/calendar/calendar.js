@@ -175,6 +175,11 @@
 
             this.calendar.cfg.setProperty("selected", dates.join(","));
             this.calendar.render();
+            
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.add.success", params.name)
+            });
          }
       },
       
@@ -239,7 +244,7 @@
        * @return {string} The custom message
        * @private
        */
-      _msg: function DL__msg(messageId)
+      _msg: function Calendar__msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
       }
