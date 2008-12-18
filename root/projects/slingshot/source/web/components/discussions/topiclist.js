@@ -60,7 +60,6 @@
       /* Initialise prototype properties */
       this.currentFilter = {};
       this.widgets = {};
-      this.modules = {};
       this.tagId =
       {
          id: 0,
@@ -110,8 +109,7 @@
          /**
           * Initially used filter name and id.
           */
-         initialFilter: {
-         },
+         initialFilter: {},
 
          /**
           * Number of items displayed per page
@@ -154,15 +152,7 @@
        * @type object
        */
       widgets : null,
-      
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-      
+
       /**
        * Object literal used to generate unique tag ids
        * 
@@ -231,7 +221,7 @@
        */
       onComponentsLoaded: function DiscussionsTopicList_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -244,17 +234,7 @@
       {
          // Reference to self used by inline functions
          var me = this;
-         
-         // Create new post button
-         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createTopic-button", this.onCreateTopic);
-         
-         // initialize rss feed link
-         this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null,
-         {
-            type: "link"
-         });
-         this._generateRSSFeedUrl();
-         
+
          // Simple view button
          this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
          
@@ -353,10 +333,10 @@
             // begin actions
             html += '<div class="nodeEdit">';
             html += '<' + tagName + ' class="onViewTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("action.view") + '</a></' + tagName + '>';   
-            /*if (data.permissions.edit)
+            if (data.permissions.edit)
             {
                html += '<' + tagName + ' class="onEditTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
-            }*/
+            }
             if (data.permissions['delete'])
             {
                html += '<' + tagName + ' class="onDeleteTopic"><a href="#" class="topic-action-link-' + tagName + '">' + me._msg("action.delete") + '</a></' + tagName + '>';
@@ -389,7 +369,7 @@
             var html = "";
             
             // detailed view
-            if (! me.options.simpleView)
+            if (!me.options.simpleView)
             {
                html += '<div class="node topic">';
 
@@ -480,6 +460,13 @@
                {
                   html += '<span class="nodeStatus">(' + me._msg("post.updated") + ')</span>';
                }
+               html += '<div class="published">';
+               html += '<span class="nodeAttrLabel">' + me._msg("post.createdOn") + ': </span>';
+               html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
+               html += '<span class="separator">&nbsp;</span>';
+               html += '<span class="nodeAttrLabel">' + me._msg("post.author") + ': </span>';
+               html += '<span class="nodeAttrValue">' + authorLink + '</span>';
+               html += '</div>';
                html += '</div>';
                html += '</div>';
             }
@@ -512,7 +499,6 @@
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-topiclist", columnDefinitions, this.widgets.dataSource,
          {
             initialLoad: false,
-            paginator: this.widgets.paginator,
             dynamicData: true,
             MSG_EMPTY: this._msg("message.loading")
          });
@@ -530,6 +516,12 @@
             return oPayload;
          }
 
+         // Prevent the DataTable from generating a second data request
+         this.widgets.dataTable.doBeforePaginatorChange = function DL_doBeforePaginatorChange(oPaginatorState)
+         {
+            return false;
+         }
+
          // Rendering complete event handler
          this.widgets.dataTable.subscribe("renderEvent", function()
          {
@@ -538,6 +530,7 @@
                recordOffset: this.recordOffset,
                totalRecords: this.totalRecords
             });
+            this.widgets.paginator.render();
          }, this, true);
 
          // Custom error messages
@@ -569,13 +562,7 @@
             {
                this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
             }
-            
-            // adapt the toolbar if we got permissions
-            if (oResponse.meta.forumPermissions)
-            {
-               me._updateToolbar(oResponse.meta.forumPermissions);
-            }
-            
+
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
@@ -593,44 +580,6 @@
             filterData: null
          }, this.options.initialFilter);
          YAHOO.Bubbling.fire("filterChanged", filterObj);
-      },
-      
-      /**
-       * Updates the toolbar using the provided forumPermissions.
-       */
-      _updateToolbar: function DiscussionsTopicList__updateToolbar(forumPermissions)
-      {
-         if (forumPermissions.create)
-         {
-            var elem = Dom.get(this.id + '-create-topic-container');
-            Dom.removeClass(elem, 'hidden');
-         }
-      },
-      
-      /**
-       * Generates the HTML mark-up for the RSS feed link
-       *
-       * @method _generateRSSFeedUrl
-       * @private
-       */
-      _generateRSSFeedUrl: function DiscussionsTopicList__generateRSSFeedUrl()
-      {
-         var url = Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/discussions/rss?site=" + this.options.siteId;
-         this.widgets.rssFeed.set("href", url);
-      },
-      
-      /**
-       * Action handler for the create post button
-       */
-      onCreateTopic: function DiscussionsTopicList_onCreateTopic(e, p_obj)
-      {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-createtopic?container={container}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
-         });
-         window.location = url;
-         Event.preventDefault(e);
       },
       
       /**
@@ -664,13 +613,13 @@
       onEditTopic: function DiscussionsTopicList_onEditTopic(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topicview?container={container}&topicId={topicId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-createtopic?container={container}&topicId={topicId}",
          {
             site: this.options.siteId,
             container: this.options.containerId,
             topicId: record.getData('name')
          });
-         window.location = url;
+         window.location = url;                  
       },
       
       /**
@@ -685,7 +634,8 @@
          var obj = args[1];
          if (obj && (obj.tagName !== null))
          {
-            var filterObj = {
+            var filterObj =
+            {
                filterId: obj.tagName,
                filterOwner: "Alfresco.DiscussionsTopicListTags",
                filterData: null
@@ -789,16 +739,15 @@
       onEventHighlightRow: function DiscussionsTopicList_onEventHighlightRow(oArgs)
       {
          // only highlight if we got actions to show
-         var record = this.widgets.dataTable.getRecord(oArgs.target);
+         var record = this.widgets.dataTable.getRecord(oArgs.target.id);
          var permissions = record.getData('permissions');
-         if (! (permissions.edit || permissions["delete"]))
+         if (!(permissions.edit || permissions["delete"]))
          {
             return;
          }
          
-         var target = oArgs.target;
-         var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         var elem = Dom.getElementsByClassName('topic', null, oArgs.target, null);
+         Dom.addClass(elem, 'overNode');
       },
 
       /**
@@ -810,9 +759,8 @@
        */
       onEventUnhighlightRow: function DiscussionsTopicList_onEventUnhighlightRow(oArgs)
       {
-         var target = oArgs.target;
-         var elem = YAHOO.util.Dom.getElementsByClassName('topic', null, target, null);
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         var elem = Dom.getElementsByClassName('topic', null, oArgs.target, null);
+         Dom.removeClass(elem, 'overNode');
       },
       
       /**
@@ -834,7 +782,10 @@
                filterOwner: obj.filterOwner,
                filterData: obj.filterData
             };
-            this._updateDiscussionsTopicList({ page: 1 });
+            this._updateDiscussionsTopicList(
+            {
+               page: 1
+            });
          }
       },
       
@@ -858,12 +809,12 @@
        */
       updateListTitle: function DiscussionsTopicList_updateListTitle()
       {
-         var elem = Dom.get(this.id + '-listtitle');
-         var title = this._msg("title.generic");
-
-         var filterOwner = this.currentFilter.filterOwner;
-         var filterId = this.currentFilter.filterId;
-         var filterData = this.currentFilter.filterData;
+         var elem = Dom.get(this.id + '-listtitle'),
+            title = this._msg("title.generic"),
+            filterOwner = this.currentFilter.filterOwner,
+            filterId = this.currentFilter.filterId,
+            filterData = this.currentFilter.filterData;
+         
          if (filterOwner == "Alfresco.TopicListFilter")
          {
             if (filterId == "new")
@@ -1031,12 +982,12 @@
        */
       _buildParams: function DiscussionsTopicList__buildParams(p_obj)
       {
-         var params = {
+         var params =
+         {
             contentLength: this.options.maxContentLength,
             tag: null,
-            
-            page: this.widgets.paginator.get("page") || "1",
-            pageSize: this.widgets.paginator.get("rowsPerPage")
+            page: this.widgets.paginator.getCurrentPage() || "1",
+            pageSize: this.widgets.paginator.getRowsPerPage()
          }
          
          // Passed-in overrides

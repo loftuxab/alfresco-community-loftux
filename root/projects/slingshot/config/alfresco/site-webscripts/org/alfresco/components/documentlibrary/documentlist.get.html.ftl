@@ -18,7 +18,7 @@
       containerId: "${args.container!"documentLibrary"}",
       initialPath: "${page.url.args["path"]!""}",
       <@initialFilter />
-      usePagination: true && ${(args.pagination!false)?string},
+      usePagination: ${(args.pagination!false)?string},
       highlightFile: "${page.url.args["file"]!""}"
    }).setMessages(
       ${messages}

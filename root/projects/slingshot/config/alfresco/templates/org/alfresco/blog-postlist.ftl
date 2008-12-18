@@ -19,6 +19,7 @@
       <div class="yui-t1" id="divPostListWrapper">
          <div id="yui-main">
             <div class="yui-b" id="divPostListPosts">
+               <@region id="toolbar" scope="template" protected=true />
                <@region id="postlist" scope="template" protected=true />
             </div>
          </div>

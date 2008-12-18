@@ -94,7 +94,24 @@
           * @property containerId
           * @type string
           */       
-         containerId: "discussions"
+         containerId: "discussions",
+
+         /**
+          * True if the component should be in edit mode.
+          *
+          * @property editMode
+          * @type boolean
+          */
+         editMode: false,
+
+         /**
+          * Id of the topic to edit. Only relevant if editMode is true
+          *
+          * @property topicId
+          * @type string
+          */
+         topicId: ""
+
       },
       
       /**
@@ -112,6 +129,15 @@
        * @type object
        */
       modules: null,
+
+      /**
+       * Stores the data of the currently edited blog post
+       *
+       * @property discussionsTopicData
+       * @type object
+       */
+      discussionsTopicData: null,
+
       
       /**
        * Set multiple initialization options at once.
@@ -156,27 +182,104 @@
        */
       onReady: function CreateTopic_onReady()
       {
-         // initialize the form
-         this._initFormValues();
+         if (this.options.editMode)
+         {
+            // load the topic data prior to initializing the form
+            this._loadDiscussionsTopicData();
+         }
+         else
+         {
+            // directly initialize the form
+            this._initializeDiscussionsTopicForm();
+         }
       },
-      
+
+      /**
+       * Loads the topic and refreshes the ui
+       */
+      _loadDiscussionsTopicData: function CreateTopic__loadDiscussionsTopicData()
+      {
+         // ajax request success handler
+         var me = this;
+         var loadTopicPostDataSuccess = function CreateTopic_loadTopicDataSuccess(response)
+         {
+            // set the topic data
+            var data = response.json.item;
+            me.discussionsTopicData = data;
+
+            // now initialize the form, which will use the data we just loaded
+            me._initializeDiscussionsTopicForm();
+         };
+
+         // construct the request url
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+         {
+            site : this.options.siteId,
+            container: this.options.containerId,
+            topicId: this.options.topicId
+         });
+
+         // execute ajax request
+         Alfresco.util.Ajax.request(
+         {
+            url: url,
+            method: "GET",
+            responseContentType : "application/json",
+            successCallback:
+            {
+               fn: loadTopicPostDataSuccess,
+               scope: this
+            },
+            failureMessage: this._msg("message.loadpostdata.failure")
+         });
+      },
+
       /**
        * Initializes the create topic form dom.
        * The html is already in the dom when the component gets loaded
        */
-      _initFormValues: function CreateTopic_initFormValues()
+      _initializeDiscussionsTopicForm: function CreateTopic_initializeDiscussionsTopicForm()
       {          
-         // insert current values into the form
-         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/site/{site}/{container}/posts",
+
+         var actionUrl, draft = true, title = "", content = "";
+         if (this.options.editMode)
          {
-            site: this.options.siteId,
-            container : this.options.containerId
-         });
-         Dom.get(this.id + "-form").setAttribute("action", actionUrl);
+            actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/post/site/{site}/{container}/{topicId}",
+            {
+               site: this.options.siteId,
+               container: this.options.containerId,
+               topicId: this.options.topicId
+            });
+         }
+         else
+         {
+            actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/forum/site/{site}/{container}/posts",
+            {
+               site: this.options.siteId,
+               container: this.options.containerId
+            });
+         }
+
+         // insert current values into the form
+         Dom.get(this.id + '-form').setAttribute("action", actionUrl);
          Dom.get(this.id + "-site").setAttribute("value", this.options.siteId);
          Dom.get(this.id + "-container").setAttribute("value", this.options.containerId);
-             
-         // and finally register the form handling
+
+         // title
+         if (this.options.editMode)
+         {
+            title = this.discussionsTopicData.title;
+         }
+         Dom.get(this.id + '-title').setAttribute("value", title);
+
+         // content
+         if (this.options.editMode)
+         {
+            content = Alfresco.util.stripUnsafeHTMLTags(this.discussionsTopicData.content);
+         }
+         Dom.get(this.id + '-content').value = content;
+
+          // and finally register the form handling
          this._registerCreateTopicForm();
       },
 
@@ -189,7 +292,13 @@
          this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
          this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
          this.modules.tagLibrary.initialize();
-         
+
+         // add the tags that are already set on the post
+         if (this.options.editMode && this.discussionsTopicData.tags.length > 0)
+         {
+            this.modules.tagLibrary.setTags(this.discussionsTopicData.tags);
+         }
+
          // register the okButton
          this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
          
@@ -226,6 +335,10 @@
                scope: this
             }
          });
+         if (this.options.editMode)
+         {
+             topicForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+         }
          topicForm.setSubmitAsJSON(true);
          topicForm.doBeforeFormSubmit =
          {

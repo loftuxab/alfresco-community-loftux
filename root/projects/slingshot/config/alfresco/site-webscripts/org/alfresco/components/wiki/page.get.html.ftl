@@ -71,26 +71,27 @@
 <#if action == "view">	    
 	        <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
 <#elseif action == "edit">	        
-	        <div>
-	            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
-	               <fieldset>
-	            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
-   	            <input type="hidden" name="context" value="${pageContext?html}" />
-   	            <input type="hidden" name="page" value="wiki-page" />
-                  <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
-              
-               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+           <div>
+	           <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
+	              <fieldset>
+                    <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
+                       <input type="hidden" name="context" value="${pageContext?html}" />
+                       <input type="hidden" name="page" value="wiki-page" />
+                       <label for="${htmlid}-pagecontent">${msg("label.text")}:</label>
+                       <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
+                       <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
+                       <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
                
-               <!-- Render the tag inputs -->
-               <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
-               <!-- end tags -->
-      			      <div>
-      	               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
-      				      <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
-      	            </div>
-                  </fieldset>
-	            </form>
-			</div> 
+                       <!-- Render the tag inputs -->
+                       <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
+                       <!-- end tags -->
+                       <div class="buttons">
+                          <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
+                          <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
+                       </div>
+                 </fieldset>
+              </form>
+           </div>
 <#elseif action == "details">	    		
 			<div>
    			<div class="details-wrapper">

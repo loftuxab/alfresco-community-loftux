@@ -1,5 +1,5 @@
 <webscript>
   <shortname>Create topic</shortname>
-  <description>Create topic form</description>
+  <description>Create or edit topic form</description>
   <url>/components/discussions/createtopic</url>
 </webscript>

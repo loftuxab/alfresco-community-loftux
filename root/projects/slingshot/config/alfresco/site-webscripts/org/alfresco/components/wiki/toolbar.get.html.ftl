@@ -1,7 +1,9 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiToolbar("${args.htmlid}").setSiteId(
-      "${page.url.templateArgs["site"]!""}"
-   ).setTitle("${page.url.args["title"]!""}").setMessages(
+   new Alfresco.WikiToolbar("${args.htmlid}").setOptions({
+      siteId: "${page.url.templateArgs["site"]!""}",
+      title: "${page.url.args["title"]!""}",
+      showBackLink: ${(args.showBackLink == "true")?string}
+   }).setMessages(
       ${messages}
    );
 //]]></script>
@@ -23,11 +25,12 @@
    </div>
 
    <div class="action-bar">
-      <div class="new-page"><a href="${page.url.context}/page/site/${page.url.templateArgs["site"]}/wiki-create<#if args.showBackLink != "true">?listViewLinkBack=true</#if>" id="${args.htmlid}-create-button">${msg("button.create")}</a></div>
-      <div class="separator">&nbsp;</div>
-      <div class="delete-page"><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
-      <div class="separator">&nbsp;</div>
-      <div class="rename-page"><button id="${args.htmlid}-rename-button">${msg("button.rename")}</button></div>
+      <#assign hide><#if (page.url.args["title"]! == "")>style="visibility: hidden;"</#if></#assign> 
+      <div class="new-page"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
+      <div class="separator" ${hide}>&nbsp;</div>
+      <div class="delete-page" ${hide}><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
+      <div class="separator" ${hide}>&nbsp;</div>
+      <div class="rename-page" ${hide}><button id="${args.htmlid}-rename-button">${msg("button.rename")}</button></div>
    </div>
 
    <div class="rss-feed">
@@ -55,3 +58,4 @@
    </div>   
 </div>
 <div class="clear"></div>
+        

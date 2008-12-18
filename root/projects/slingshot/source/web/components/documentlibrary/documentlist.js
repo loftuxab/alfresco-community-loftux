@@ -434,7 +434,7 @@
          }
 
          // Register History Manager path update callback
-         YAHOO.util.History.register("path", "", function(newPath)
+         YAHOO.util.History.register("path", bookmarkedPath, function(newPath)
          {
             Alfresco.logger.debug("HistoryManager: path changed:" + newPath);
             if (this.expectedHistoryEvent)
@@ -443,7 +443,8 @@
                this.expectedHistoryEvent = false;
                this._updateDocList.call(this,
                {
-                  path: (YAHOO.env.ua.gecko > 0) ? decodeURIComponent(newPath) : newPath
+                  path: (YAHOO.env.ua.gecko > 0) ? decodeURIComponent(newPath) : newPath,
+                  page: this.currentPage
                });
             }
             else
@@ -954,7 +955,7 @@
          {
             renderLoopSize: this.options.usePagination ? 16 : 32,
             initialLoad: false,
-            paginator: this.widgets.paginator,
+            dynamicData: true,
             MSG_EMPTY: this._msg("message.loading")
          });
 
@@ -965,12 +966,6 @@
             return oResponse.meta;
          }
 
-         // Prevent the DataTable from updating the Paginator widget
-         this.widgets.dataTable.doBeforePaginatorChange = function DL_doBeforePaginatorChange(oPaginatorState)
-         {
-            return false;
-         }
-         
          // Custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
 
@@ -1023,6 +1018,16 @@
          this.widgets.dataTable.subscribe("renderEvent", function()
          {
             Alfresco.logger.debug("DataTable renderEvent");
+            
+            if (this.widgets.dataTable.getRecordSet().getLength() == 0)
+            {
+               this.widgets.dataTable.set("renderLoopSize", 0);
+            }
+            else
+            {
+               this.widgets.dataTable.set("renderLoopSize", this.options.usePagination ? 16 : 32);
+            }
+            
             // Update the paginator if it's been created
             if (this.widgets.paginator)
             {
@@ -1033,6 +1038,7 @@
                   page: this.currentPage,
                   totalRecords: this.totalRecords
                });
+               this.widgets.paginator.render();
             }
             
             // Need to highlight a file now the data is available?
@@ -1090,12 +1096,10 @@
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
-               var action = owner.className;
-               var target = args[1].target;
-               if (typeof me[action] == "function")
+               if (typeof me[owner.className] == "function")
                {
                   args[1].stop = true;
-                  me[action].call(me, target.offsetParent, owner);
+                  me[owner.className].call(me, args[1].target.offsetParent, owner);
                }
             }
       		 
@@ -1325,13 +1329,13 @@
          // var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
 
          // elActions is the element id of the active table cell where we'll inject the actual links
-         var elActions = Dom.get(this.id + "-actions-" + (target.yuiRecordId || target.id));
+         var elActions = Dom.get(this.id + "-actions-" + target.id);
 
          // Inject the correct action elements into the actionsId element
          if (elActions.firstChild === null)
          {
             // Retrieve the actionSet for this asset
-            var record = this.widgets.dataTable.getRecord(target);
+            var record = this.widgets.dataTable.getRecord(target.id);
             var actionSet = record.getData("actionSet");
             
             // Clone the actionSet template node from the DOM
@@ -1978,7 +1982,7 @@
                   {
                      var objNav =
                      {
-                        path: (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(obj.path) : obj.path
+                        path: (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(obj.path || "/") : obj.path || "/"
                      };
                      
                      if (this.options.usePagination)
@@ -2286,7 +2290,7 @@
                }
             }
          };
-
+         
          // Update the DataSource
          var requestParams = this._buildDocListParams(p_obj || {});
          Alfresco.logger.debug("DataSource requestParams: ", requestParams);

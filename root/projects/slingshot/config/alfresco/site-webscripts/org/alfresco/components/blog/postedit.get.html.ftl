@@ -15,12 +15,14 @@
    );
 //]]></script>
 
+<div class="editBlogPostForm">
 <#if page.url.args.postId??>
    <h1>${msg("editPost")}</h1>
 <#else>
    <h1>${msg("createPost")}</h1>
 </#if>
-
+<hr/>
+</div>
 <div id="${args.htmlid}-div" class="editBlogPostForm hidden">
    <form id="${args.htmlid}-form" method="post" action="">
       <div>

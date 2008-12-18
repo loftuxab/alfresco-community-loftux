@@ -322,11 +322,12 @@
 
          // Make user enter-key-strokes also trigger a change
          var buttons = this.widgets.modeButtons.getButtons();
-         for(var i = 0; i < buttons.length; i++)
+         for (var i = 0; i < buttons.length; i++)
          {
             var bi = i;
-            buttons[i].addListener("keydown", function(e){
-               if(YAHOO.util.KeyListener.KEY.ENTER == e.keyCode)
+            buttons[i].addListener("keydown", function(e)
+            {
+               if (YAHOO.util.KeyListener.KEY.ENTER == e.keyCode)
                {
                   modeButtons.check(bi);
                }
@@ -517,14 +518,19 @@
             {
                this.options.siteId = obj.site;
                this._populateContainerPicker();
-               var sites = YAHOO.util.Selector.query("a", this.id + "-sitePicker");
-               var site;
-               for (var i = 0, j = sites.length; i < j; i++)
+               var sites = YAHOO.util.Selector.query("a", this.id + "-sitePicker"), site, i, j,
+                  picker = Dom.get(this.id + "-sitePicker");
+
+               for (i = 0, j = sites.length; i < j; i++)
                {
                   site = sites[i];
                   if (site.getAttribute("rel") == obj.site)
                   {
                      Dom.addClass(site, "selected");
+                     if (obj.scrollTo)
+                     {
+                        picker.scrollTop = Dom.getY(site) - Dom.getY(picker);
+                     }
                   }
                   else
                   {
@@ -554,14 +560,19 @@
                this._buildTree("");
                // Kick-off navigation to current path
                this.pathChanged(this.options.path);
-               var containers = YAHOO.util.Selector.query("a", this.id + "-containerPicker");
-               var container;
-               for (var i = 0, j = containers.length; i < j; i++)
+               var containers = YAHOO.util.Selector.query("a", this.id + "-containerPicker"), container, i, j,
+                  picker = Dom.get(this.id + "-containerPicker");
+               
+               for (i = 0, j = containers.length; i < j; i++)
                {
                   container = containers[i];
                   if (container.getAttribute("rel") == obj.container)
                   {
                      Dom.addClass(container, "selected");
+                     if (obj.scrollTo)
+                     {
+                        picker.scrollTop = Dom.getY(container) - Dom.getY(picker);
+                     }
                   }
                   else
                   {
@@ -587,7 +598,7 @@
        */
       onOK: function DLCT_onOK(e, p_obj)
       {
-         var files, multipleFiles = [], params;
+         var files, multipleFiles = [], params, i, j;
 
          // Single/multi files into array of nodeRefs
          if (YAHOO.lang.isArray(this.options.files))
@@ -598,7 +609,7 @@
          {
             files = [this.options.files];
          }
-         for (var i = 0, j = files.length; i < j; i++)
+         for (i = 0, j = files.length; i < j; i++)
          {
             multipleFiles.push(files[i].nodeRef);
          }
@@ -606,9 +617,9 @@
          // Success callback function
          var fnSuccess = function DLCT__onOK_success(p_data)
          {
-            var result;
-            var successCount = p_data.json.successCount;
-            var failureCount = p_data.json.failureCount;
+            var result,
+               successCount = p_data.json.successCount,
+               failureCount = p_data.json.failureCount;
 
             this.widgets.dialog.hide();
 
@@ -763,7 +774,7 @@
          Alfresco.logger.debug("DLCT_onExpandComplete");
 
          // Make sure the tree's DOM has been updated
-         this.widgets.treeview.draw();
+         this.widgets.treeview.render();
          // Redrawing the tree will clear the highlight
          this._showHighlight(true);
          
@@ -784,13 +795,17 @@
       /**
        * Fired by YUI TreeView when a node label is clicked
        * @method onNodeClicked
-       * @param node {YAHOO.widget.Node} the node clicked
+       * @param args.event {HTML Event} the event object
+       * @param args.node {YAHOO.widget.Node} the node clicked
        * @return allowExpand {boolean} allow or disallow node expansion
        */
-      onNodeClicked: function DLCT_onNodeClicked(node)
+      onNodeClicked: function DLCT_onNodeClicked(args)
       {
          Alfresco.logger.debug("DLCT_onNodeClicked");
-         var userAccess = node.data.userAccess;
+
+         var node = args.node,
+            userAccess = node.data.userAccess;
+         
          if ((userAccess && userAccess.create) || (node.data.nodeRef == "") || (node.data.nodeRef == "alfresco://company/home"))
          {
             this.pathChanged(node.data.path);
@@ -873,9 +888,9 @@
          
          var fnSuccess = function DLCT__pSP_fnSuccess(response, sitePicker)
          {
-            var sites = response.json;
-            var element, site, onclick;
-            for (var i = 0, j = sites.length; i < j; i++)
+            var sites = response.json, element, site, onclick, i, j;
+            
+            for (i = 0, j = sites.length; i < j; i++)
             {
                site = sites[i];
                element = document.createElement("div");
@@ -891,7 +906,8 @@
             // Select current site
             YAHOO.Bubbling.fire("copyTo-siteChanged",
             {
-               site: this.options.siteId
+               site: this.options.siteId,
+               scrollTo: true
             });
          }
          
@@ -923,9 +939,9 @@
          
          var fnSuccess = function DLCT__pSP_fnSuccess(response, containerPicker)
          {
-            var containers = response.json;
-            var element, container, onclick;
-            for (var i = 0, j = containers.length; i < j; i++)
+            var containers = response.json, element, container, onclick, i, j;
+            
+            for (i = 0, j = containers.length; i < j; i++)
             {
                container = containers[i];
                element = document.createElement("div");
@@ -941,7 +957,8 @@
             // Select current container
             YAHOO.Bubbling.fire("copyTo-containerChanged",
             {
-               container: this.options.containerId
+               container: this.options.containerId,
+               scrollTo: true
             });
          }
          
@@ -1003,11 +1020,11 @@
          }, tree.getRoot(), false);
 
          // Register tree-level listeners
-         tree.subscribe("labelClick", this.onNodeClicked, this, true);
+         tree.subscribe("clickEvent", this.onNodeClicked, this, true);
          tree.subscribe("expandComplete", this.onExpandComplete, this, true);
 
          // Render tree with this one top-level node
-         tree.draw();
+         tree.render();
       },
 
       _showHighlight: function DLCT__showHighlight(isVisible)

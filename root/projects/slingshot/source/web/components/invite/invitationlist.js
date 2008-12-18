@@ -170,9 +170,10 @@
          });
          
          // setup the datasource
-         this.widgets.dataSource = new YAHOO.util.DataSource( [ ] ); 
+         this.widgets.dataSource = new YAHOO.util.DataSource([]); 
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY; 
-         this.widgets.dataSource.responseSchema = { 
+         this.widgets.dataSource.responseSchema =
+         { 
             fields: ['id', 'firstName', 'lastName', 'email']
          };
          
@@ -267,14 +268,14 @@
                   onclick:
                   {
                      fn: me.onRoleSelect,
-                     obj: {
+                     obj:
+                     {
                         record: oRecord,
                         role: role
                      },
                      scope: me
                   }
-               }
-               );
+               });
             }
 
             // Insert the templateInstance to the column.
@@ -289,7 +290,10 @@
                label: me.getRoleLabel(oRecord),
                menu: rolesMenu
             });
-            me.listWidgets[id] = { button: button };
+            me.listWidgets[id] =
+            {
+               button: button
+            };
          };
 
          /**
@@ -306,7 +310,7 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             var desc =
-               '<span id="'+me.id+'-removeInvitee">' +
+               '<span id="' + me.id + '-removeInvitee">' +
                '  <a href="#" class="remove-item-button"><span class="removeIcon">&nbsp;</span></a>' +
                '</span>';
             elCell.innerHTML = desc;
@@ -327,8 +331,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-inviteelist", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
-            MSG_EMPTY: ""
+            MSG_EMPTY: this._msg("invitationlist.empty-list")
          });
       },
 
@@ -507,7 +510,8 @@
          {
             recs.push(recordSet.getRecord(i));
          }
-         var inviteData = {
+         var inviteData =
+         {
              recs: recs,
              size : recs.length,
              index: 0,
@@ -613,7 +617,10 @@
          
          // inform the user
          var message = this._msg("message.inviteresult", inviteData.successes.length, inviteData.failures.length);
-         Alfresco.util.PopupManager.displayMessage({text: message });
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: message
+         });
          
          // re-enable invite button
          this.widgets.inviteButton.set("disabled", false);

@@ -117,7 +117,7 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
             user.addAttribute("Login", userBean.getLogin());
             user.addAttribute("DisplayName", userBean.getDisplayName());
             user.addAttribute("Email", userBean.getEmail());
-            user.addAttribute("SiteUser", "0");
+            user.addAttribute("SiteUser", "1");
         }
 
         if (logger.isDebugEnabled())

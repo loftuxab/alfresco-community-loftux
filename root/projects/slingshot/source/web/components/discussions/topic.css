@@ -1,38 +1,3 @@
-.topicview-header
-{
-   background-color: #ebeff1;
-   border-bottom: 2px solid #929292;
-   margin: 0 -10px;
-   min-height: 2em;
-   padding-right: 10px;
-   width: auto;
-}
-
-.topicview-header .backLink
-{
-   padding-left: 5px;
-}
-
-.topicview-header .backLink a
-{
-   background-image:url(../images/forward-arrow-16.png);
-   background-repeat:no-repeat;
-   background-position: right center;
-   color:#333333;
-   padding:0 21px 0 5px;
-   font-size: 108%;
-}
-
-.topicview-header .listTitle
-{
-}
-
-.topicview-header .left-aligned-cell
-{
-  float: left;
-  padding: 6px 10px;
-}
-
 
 /* tag library */
 /* Tag lib */

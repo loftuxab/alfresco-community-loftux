@@ -1,17 +1,27 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.CreateTopic("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${args.container!'discussions'}"
+      topicId: "${page.url.args.topicId!''}",
+      siteId: "${page.url.templateArgs.site!''}",
+      containerId: "${page.url.args.containerId!'discussions'}",
+      <#if (page.url.args.topicId! == "")>
+      editMode: false
+      <#else>
+      editMode: true
+      </#if>
+
    }).setMessages(
       ${messages}
    );
 //]]></script>
-
-<h1>${msg("formTitle")}</h1>
+<div class="createTopicForm">
+   <h1><#if (page.url.args.topicId! == "")>${msg("header.create")}<#else>${msg("header.edit")}</#if></h1>
+   <hr/>
+</div>
 <div class="createTopicForm hidden" id ="${args.htmlid}-topic-create-div">
    <form id="${args.htmlid}-form" method="post" action="">
       <div>
+         <input type="hidden" id="${args.htmlid}-topicId" name="topic" value="" />
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
          <input type="hidden" id="${args.htmlid}-container" name="container" value="" />
          <input type="hidden" id="${args.htmlid}-page" name="page" value="discussions-topicview" />
@@ -20,7 +30,7 @@
          <input type="text" id="${args.htmlid}-title" name="title" size="80" value=""/>
                 
          <label for="${args.htmlid}-content">${msg("topicText")}:</label>
-         <textarea rows="8" cols="80" id="${args.htmlid}-content" name="content" class="yuieditor"></textarea> 
+         <textarea rows="8" cols="80" id="${args.htmlid}-content" name="content" class="yuieditor"></textarea>
          
          <label for="${htmlid}-tag-input-field">${msg("tags")}:</label>
          <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>

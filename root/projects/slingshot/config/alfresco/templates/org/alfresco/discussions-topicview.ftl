@@ -14,8 +14,9 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-       <@region id="topic" scope="template" protected=true />
-       <@region id="replies" scope="template" protected=true />
+      <@region id="toolbar" scope="template" protected=true />
+      <@region id="topic" scope="template" protected=true />
+      <@region id="replies" scope="template" protected=true />
    </div>
 </@>
 

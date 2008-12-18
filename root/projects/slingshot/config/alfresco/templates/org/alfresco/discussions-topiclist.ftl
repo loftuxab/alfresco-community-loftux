@@ -19,6 +19,7 @@
       <div class="yui-t1" id="divTopicListWrapper">
          <div id="yui-main">
             <div class="yui-b" id="divTopicListTopics">
+               <@region id="toolbar" scope="template" protected=true />
                <@region id="topiclist" scope="template" protected=true />
             </div>
          </div>
