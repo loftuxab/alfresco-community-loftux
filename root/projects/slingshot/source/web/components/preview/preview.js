@@ -273,16 +273,16 @@
          var ps = this.options.previews;
          var webpreview = "webpreview", imgpreview = "imgpreview";
          var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
-         var ticketAndNoCache = "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
+         var argsNoCache = "?c=force&noCacheToken=" + new Date().getTime();
          if (this.options.mimeType.match(/^image\/\w+/))
          {
             var preview = Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : (Alfresco.util.arrayContains(ps, webpreview) ? webpreview : null);
-            var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + ticketAndNoCache;
+            var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + argsNoCache;
             return {url: url, doNavigate: false};
          }
          else if (this.options.mimeType.match(/application\/x-shockwave-flash/))
          {
-            url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + ticketAndNoCache + "&a=true";
+            url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + argsNoCache + "&a=true";
             return {url: url, doNavigate: false};
          }
          else
@@ -290,11 +290,10 @@
             var preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
             if (preview != null)
             {
-               var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + ticketAndNoCache;
+               var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + argsNoCache;
                return {url: url, doNavigate: true};
             }
             return null;
-
          }
       },
 

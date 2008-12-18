@@ -69,7 +69,8 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
             if (logger.isDebugEnabled())
                 logger.debug("Authenticating user: " + user);
             
-            Response response = remoteClient.call("/api/login?u=" + URLEncoder.encode(user) + "&pw=" + pass);
+            Response response = remoteClient.call("/api/login?u=" +
+                    URLEncoder.encode(user) + "&pw=" + URLEncoder.encode(pass));
             
             // read back the ticket
             if (response.getStatus().getCode() == 200)

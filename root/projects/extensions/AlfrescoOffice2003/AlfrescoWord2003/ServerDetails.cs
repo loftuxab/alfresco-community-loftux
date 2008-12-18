@@ -374,8 +374,13 @@ namespace AlfrescoWord2003
          else
          {
             // Use WebDAV
-            fullPath = WebDAVURL + relativePath;
-            fullPath += "?ticket=" + Uri.EscapeDataString(getAuthenticationTicket(false));
+            string strAuthTicket = getAuthenticationTicket(false);
+            fullPath = WebDAVURL + relativePath + "?";
+            if (strAuthTicket != "" && strAuthTicket != "ntlm")
+            {
+               fullPath += "ticket=" + Uri.EscapeDataString(getAuthenticationTicket(false)) + "&";
+            }
+            fullPath += "vtiIgnore";
          }
 
          return fullPath;

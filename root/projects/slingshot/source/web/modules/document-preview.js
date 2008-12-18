@@ -463,7 +463,6 @@
        */
       _applyConfig: function DP__applyConfig()
       {
-
          // Set the panel title and image
          this.widgets.titleText["innerHTML"] = this.showConfig.fileName;
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.showConfig.icon32.substring(1);
@@ -479,12 +478,10 @@
 
          // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
          var nodeRef = this.showConfig.nodeRef.replace(":/", "");
-         var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRef + "/content/thumbnails/webpreview"
-         url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
+         var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRef + "/content/thumbnails/webpreview?c=force&noCacheToken=" + new Date().getTime();
 
          // Call the load function but wait a bit to make safari work
-         YAHOO.lang.later(1000, this, this._load, [url, 0], false);
-         //this.swfPlayer.load(url);
+         YAHOO.lang.later(500, this, this._load, [url, 0], false);
       },
 
       /**
@@ -503,7 +500,7 @@
          }
          catch(e)
          {
-            if (attempt < 7)
+            if (attempt < 8)
             {
                // The flash movie wasn't loaded, try againg in 0.5 sec
                YAHOO.lang.later(500, this, this._load, [url, ++attempt], false);
@@ -513,7 +510,7 @@
                // Give up something is probably wrong
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: "Flash movie doesn't seem to respond on load call."
+                  text: "Flash movie is unable to load."
                });
             }
          }

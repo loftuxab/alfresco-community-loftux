@@ -36,7 +36,7 @@ namespace AlfrescoExcel2003
            this.grpConfiguration = new System.Windows.Forms.GroupBox();
            this.btnDetailsOK = new System.Windows.Forms.Button();
            this.btnDetailsCancel = new System.Windows.Forms.Button();
-           this.groupBox1 = new System.Windows.Forms.GroupBox();
+           this.grpAuthentication = new System.Windows.Forms.GroupBox();
            this.chkRememberAuth = new System.Windows.Forms.CheckBox();
            this.txtPassword = new System.Windows.Forms.TextBox();
            this.label8 = new System.Windows.Forms.Label();
@@ -58,7 +58,7 @@ namespace AlfrescoExcel2003
            this.tipOptional = new System.Windows.Forms.ToolTip(this.components);
            this.pnlConfiguration.SuspendLayout();
            this.grpConfiguration.SuspendLayout();
-           this.groupBox1.SuspendLayout();
+           this.grpAuthentication.SuspendLayout();
            this.grpDetails.SuspendLayout();
            this.pnlWebBrowser.SuspendLayout();
            this.SuspendLayout();
@@ -103,7 +103,7 @@ namespace AlfrescoExcel2003
            // 
            this.grpConfiguration.Controls.Add(this.btnDetailsOK);
            this.grpConfiguration.Controls.Add(this.btnDetailsCancel);
-           this.grpConfiguration.Controls.Add(this.groupBox1);
+           this.grpConfiguration.Controls.Add(this.grpAuthentication);
            this.grpConfiguration.Controls.Add(this.label6);
            this.grpConfiguration.Controls.Add(this.grpDetails);
            this.grpConfiguration.Location = new System.Drawing.Point(0, 150);
@@ -135,19 +135,19 @@ namespace AlfrescoExcel2003
            this.btnDetailsCancel.UseVisualStyleBackColor = false;
            this.btnDetailsCancel.Click += new System.EventHandler(this.btnDetailsCancel_Click);
            // 
-           // groupBox1
+           // grpAuthentication
            // 
-           this.groupBox1.Controls.Add(this.chkRememberAuth);
-           this.groupBox1.Controls.Add(this.txtPassword);
-           this.groupBox1.Controls.Add(this.label8);
-           this.groupBox1.Controls.Add(this.txtUsername);
-           this.groupBox1.Controls.Add(this.label1);
-           this.groupBox1.Location = new System.Drawing.Point(12, 281);
-           this.groupBox1.Name = "groupBox1";
-           this.groupBox1.Size = new System.Drawing.Size(267, 153);
-           this.groupBox1.TabIndex = 6;
-           this.groupBox1.TabStop = false;
-           this.groupBox1.Text = "Authentication";
+           this.grpAuthentication.Controls.Add(this.chkRememberAuth);
+           this.grpAuthentication.Controls.Add(this.txtPassword);
+           this.grpAuthentication.Controls.Add(this.label8);
+           this.grpAuthentication.Controls.Add(this.txtUsername);
+           this.grpAuthentication.Controls.Add(this.label1);
+           this.grpAuthentication.Location = new System.Drawing.Point(12, 281);
+           this.grpAuthentication.Name = "grpAuthentication";
+           this.grpAuthentication.Size = new System.Drawing.Size(267, 153);
+           this.grpAuthentication.TabIndex = 6;
+           this.grpAuthentication.TabStop = false;
+           this.grpAuthentication.Text = "Authentication (Leave blank for NTLM)";
            // 
            // chkRememberAuth
            // 
@@ -352,12 +352,12 @@ namespace AlfrescoExcel2003
            this.ShowInTaskbar = false;
            this.Text = "Alfresco";
            this.TopMost = true;
-           this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AlfrescoPane_FormClosing);
            this.Load += new System.EventHandler(this.AlfrescoPane_Load);
+           this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AlfrescoPane_FormClosing);
            this.pnlConfiguration.ResumeLayout(false);
            this.grpConfiguration.ResumeLayout(false);
-           this.groupBox1.ResumeLayout(false);
-           this.groupBox1.PerformLayout();
+           this.grpAuthentication.ResumeLayout(false);
+           this.grpAuthentication.PerformLayout();
            this.grpDetails.ResumeLayout(false);
            this.grpDetails.PerformLayout();
            this.pnlWebBrowser.ResumeLayout(false);
@@ -384,7 +384,7 @@ namespace AlfrescoExcel2003
        private System.Windows.Forms.LinkLabel lnkBackToBrowser;
        private System.Windows.Forms.Button btnDetailsOK;
        private System.Windows.Forms.Button btnDetailsCancel;
-       private System.Windows.Forms.GroupBox groupBox1;
+       private System.Windows.Forms.GroupBox grpAuthentication;
        private System.Windows.Forms.Label label8;
        private System.Windows.Forms.TextBox txtUsername;
        private System.Windows.Forms.Label label1;

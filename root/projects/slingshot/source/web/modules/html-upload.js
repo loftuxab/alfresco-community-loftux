@@ -471,11 +471,15 @@
          var formEl = Dom.get(this.id + "-htmlupload-form");
          if (this.showConfig.uploadURL == null)
          {
-            formEl.action = Alfresco.constants.PROXY_URI + "api/upload.html?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+            // The .html suffix is required - it is not possible to do a multipart post using an ajax call.
+            // So it has to be a FORM submit, to make it feel like an ajax call a a hidden iframe is used.
+            // Since the component still needs to be called when the upload is finished, the script returns
+            // an html template with SCRIPT tags inside that which calls the component that triggered it.
+            formEl.action = Alfresco.constants.PROXY_URI + "api/upload.html";
          }
          else
          {
-            formEl.action = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL + "?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+            formEl.action = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL;
          }
 
          // Set the hidden parameters
