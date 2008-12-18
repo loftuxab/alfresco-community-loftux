@@ -5,21 +5,13 @@
       ${messages}
    );
 //]]></script>
-<div class="wikipage-header">
-	<div class="back-nav">
-		<span class="<#if (page.url.args.listViewLinkBack! == "true")>backLink<#else>forwardLink</#if>">
-			<a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki">
-				${msg("header.back")}
-			</a>
-		</span>
-	</div>
-</div>
 <div id="${args.htmlid}-pagecreate" class="wikipage">
-      <h1>${msg("header.create")}</h1>
+   <h1>${msg("header.create")}</h1>
+   <hr/>
       <#-- The "action" attribute is set dynamically upon form submission -->
       <form id="${args.htmlid}-form" action="" method="post">
          <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
-         <div class="leftcolumn" style="margin-top: 10px; margin-bottom: 10px;">
+         <div class="leftcolumn">
             <span class="label"><label for="${args.htmlid}-pageTitle">${msg("label.title")}:</label></span>
             <span class="input"><input type="text" maxlength="256" size="75" id="${args.htmlid}-pageTitle" name="pageTitle"/></span>
          </div>

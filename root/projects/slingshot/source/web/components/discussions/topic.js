@@ -369,7 +369,8 @@
        */
       onEditTopic: function DiscussionsTopic_onEditTopic()
       {
-         this._loadEditForm();
+         window.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/discussions-createtopic?container=" + this.options.containerId + "&topicId=" + this.options.topicId;
+         //this._loadEditForm();
       },
      
       /**

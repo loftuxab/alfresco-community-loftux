@@ -1162,7 +1162,7 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
  * @param silent {boolean} Determines whether the user should be informed upon failure
  * @static
  */
-Alfresco.forms.validation.nodeName = function number(field, args, event, form, silent)
+Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form, silent)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid node name");
@@ -1190,7 +1190,7 @@ Alfresco.forms.validation.nodeName = function number(field, args, event, form, s
  * @param silent {boolean} Determines whether the user should be informed upon failure
  * @static
  */
-Alfresco.forms.validation.email = function number(field, args, event, form, silent)
+Alfresco.forms.validation.email = function email(field, args, event, form, silent)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid email address");
@@ -1201,6 +1201,33 @@ Alfresco.forms.validation.email = function number(field, args, event, form, sile
    }
    
    args.pattern = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/;
+   args.match = true;
+
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
+};
+
+/**
+ * URL validation handler, tests that the given field's value is a valid URL
+ *
+ * @method url
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.forms.validation.url = function url(field, args, event, form, silent)
+{
+   if (Alfresco.logger.isDebugEnabled())
+      Alfresco.logger.debug("Validating field '" + field.id + "' is a valid URL");
+
+   if (!args)
+   {
+      args = {};
+   }
+   
+   args.pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
    args.match = true;
 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);

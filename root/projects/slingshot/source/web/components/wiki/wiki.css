@@ -67,6 +67,25 @@ table.versionHistory
    width: auto;
 }
 
+.wiki-page label
+{
+   display:block;
+   float:left;
+   font-weight:bold;
+   padding-right:1em;
+   padding-top:0.3em;
+   text-align:right;
+   width:5em;
+}
+
+.wiki-page .yui-editor-container,
+.wiki-page .buttons,
+.wiki-page .taglibrary
+{
+   margin-left:6em;
+   margin-bottom:1em;
+}
+
 /* VERSIONING */
 
 .wiki-page .info

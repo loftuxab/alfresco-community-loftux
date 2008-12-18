@@ -3,9 +3,7 @@
 *********/
 .createTopicForm {
   margin: 4px;
-  border: thin solid #000;
   padding: 4px;
-  background-color: #FAFAFA;
 }
 .createTopicForm label {
   width: 100px;

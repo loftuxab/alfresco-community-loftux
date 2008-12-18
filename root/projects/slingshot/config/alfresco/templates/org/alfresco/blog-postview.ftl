@@ -15,9 +15,10 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-       <@region id="postview" scope="template" protected=true />
-       <@region id="comments" scope="template" protected=true />
-       <@region id="createcomment" scope="template" protected=true />
+      <@region id="toolbar" scope="template" protected=true />
+      <@region id="postview" scope="template" protected=true />
+      <@region id="comments" scope="template" protected=true />
+      <@region id="createcomment" scope="template" protected=true />
    </div>
 </@>
 

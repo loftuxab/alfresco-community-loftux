@@ -1,7 +1,7 @@
 <#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
 <#assign DISPLAY_ITEMS = 999>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RssFeed("${args.htmlid}").setConfigOptions(
+   new Alfresco.RssFeed("${args.htmlid}").setOptions(
    {
       "componentId": "${instance.object.id}",
       "feedURL": "${uri}", 
@@ -14,12 +14,14 @@
        <a href="#" id="${args.htmlid}-configFeed-link">${msg("label.configure")}</a>
    </div>
    <div class="body scrollableList" id="${args.htmlid}-scrollableList">
-	<#if items?exists && items?size &gt; 0>
+	<#if items?? && items?size &gt; 0>
 		<#list items as item>
 		   <#if item_index &lt; limit?number><@feedLib.renderItem item=item target=target/><#else><#break></#if>
 		</#list>
 	<#else>
-      <div>${msg("label.noItems")}</div>      
+      <div class="detail-list-item first-item last-item">
+         <span>${msg("label.noItems")}</span>
+      </div>
 	</#if>
-	</div><#-- end of body -->
-</div><#-- end of dashlet -->
+	</div>
+</div>

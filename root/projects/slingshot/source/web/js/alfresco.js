@@ -527,7 +527,7 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
 }
 
 /**
- * Checkif flash is installed.
+ * Check if flash is installed.
  * Returns true if a flash player of the required version is installed
  *
  * @method Alfresco.util.isFlashInstalled
@@ -608,7 +608,6 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
       }
    }
    
-
    // Search/replace tokens
    var tokens;
    if ((arguments.length == 3) && (typeof arguments[2] == "object"))
@@ -864,6 +863,20 @@ Alfresco.util.toQueryString = function(p_params)
    
    // Return the string after removing the last character
    return qs.substring(0, qs.length - 1);
+}
+
+/**
+ * Checks the validity of a URL.
+ *
+ * @method isValidURL
+ * @param url {string} The URL to validate
+ * @return {boolean} Whether the URL passed the validity check
+ * @static
+ */
+Alfresco.util.isValidURL = function(url)
+{
+   var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+   return regexp.test(url);
 }
 
 

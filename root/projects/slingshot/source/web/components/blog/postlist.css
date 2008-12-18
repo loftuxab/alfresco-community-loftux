@@ -15,55 +15,15 @@
    float: left;
 }
 
-
-/* toolbar */
-
-.postlist-header .hidden
-{
-   display: none;
-}
-
-.postlist-header .toolbar
-{
-   clear: both;
-   height: 2em;
-   padding: 0.5em;
-   background-color: #e3eaec;
-   border-bottom: 2px solid #f0f3f4;
-}
-
-.toolbar .createPost button
-{
-   background: transparent url(../images/new-blog-16.png) no-repeat 12px 4px;
-   padding-left: 32px; 
-}
-
-.toolbar .configureBlog button
-{
-   background: transparent url(../images/configure-blog-16.png) no-repeat 12px 4px;
-   padding-left: 32px; 
-}
-
-.toolbar .rss-feed a
-{
-   background : transparent url(../images/feed-icon-16.png) no-repeat 12px 4px;
-   padding-left: 32px;
-}
-
-.toolbar .simple-view
-{
-   float: right;
-}
-
 /* infobar */
 
 .postlist-header .postlist-infobar
 {
-  width: auto;
-  height: 30px;
-  background-color: #ebeff1;
-  border-bottom: thin solid #fff;
-  padding: 0 0.5em;
+   width: auto;
+   height: 30px;
+   background-color: #ebeff1;
+   border-bottom: thin solid #C6C6C6;
+   padding:0.1em 0.5em;
 }
 
 .postlist-infobar .listTitle {
@@ -71,11 +31,16 @@
   font-weight: normal;
   font-size: 123.1%;
   color: #333333;
-  padding: 5px;
+  padding: 5px 10px;
 }
 
 .postlist-infobar .paginator {
   text-align: right;
+}
+
+.postlist-infobar .simple-view
+{
+   text-align: right;
 }
 
 

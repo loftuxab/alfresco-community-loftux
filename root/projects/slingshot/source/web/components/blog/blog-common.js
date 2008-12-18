@@ -57,7 +57,7 @@ Alfresco.util.blog.generatePublishingRestURL = function generatePublishingRestUR
  */
 Alfresco.util.blog.generateBlogPostViewUrl =  function generateBlogPostViewUrl(site, container, postId)
 {
-   var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postview?container={container}&postId={postId}",
+   var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postview?container={container}&postId={postId}&listViewLinkBack=true",
    {
       site: site,
       container: container,

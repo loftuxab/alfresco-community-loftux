@@ -1,8 +1,12 @@
 .wikipage
 {
-   background-color: #FAFAFA;
-   margin: 4px;
+   margin: 8px 4px;
    padding: 4px;
+}
+
+.wikipage h1
+{
+   margin-bottom: 0.5em;
 }
 
 .wikipage .label
@@ -14,44 +18,6 @@
    padding-top: 0.3em;
    text-align: right;
    width: 5em;
-}
-
-.wikipage-header
-{
-   background-color: #ebeff1;
-   border-bottom: 2px solid #929292;
-   height: 30px;
-   margin: 0 -10px;
-   padding-right: 10px;
-   width: auto;
-}
-
-.wikipage-header .back-nav
-{
-   color: #333333;
-   float: left;
-   font-size: 113.1%;
-   padding: 4px 10px;
-}
-
-.wikipage-header .backLink
-{
-   background-image: url(../images/back-arrow.png);
-   background-position: left center;
-   background-repeat: no-repeat;
-   color: #333333;
-   padding: 0 5px 0 19px;
-   margin-right:5px;
-}
-
-.wikipage-header .forwardLink
-{
-   background-image: url(../images/forward-arrow-16.png);
-   background-position: right center;
-   background-repeat: no-repeat;
-   color: #333333;
-   padding: 0 21px 0 5px;
-   margin-right:5px;
 }
 
 .wikipage input, wikipage textarea

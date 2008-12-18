@@ -59,7 +59,6 @@
       
       /* Initialise prototype properties */
       this.widgets = {};
-      this.modules = {};
       this.currentFilter = {};
       this.tagId =
       {
@@ -154,7 +153,7 @@
        * @property widgets
        * @type object
        */
-      widgets : null,
+      widgets: null,
       
       /**
        * Object container for storing module instances.
@@ -241,7 +240,7 @@
        */
       onComponentsLoaded: function BlogPostList_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -255,20 +254,8 @@
          // Reference to self used by inline functions
          var me = this;
           
-         // Create new post button
-         this.widgets.createPost = Alfresco.util.createYUIButton(this, "createPost-button", this.onCreatePost);
-
-         // Configure blog button
-         this.widgets.configureBlog =  Alfresco.util.createYUIButton(this, "configureBlog-button", this.onConfigureBlog);
-
          // Simple view button
          this.widgets.simpleView = Alfresco.util.createYUIButton(this, "simpleView-button", this.onSimpleView);
-
-         // RSS Feed link button
-         this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
-         {
-            type: "link"
-         });
 
          // called by the paginator on state changes
          var handlePagination = function BlogPostList_handlePagination(state, dt)
@@ -294,21 +281,16 @@
          
          this.widgets.paginator.subscribe("changeRequest", handlePagination);
 
-         // initialize rss feed link
-         this._generateRSSFeedUrl();
-
          // Hook action events for details view
          var fnActionHandlerDiv = function BlogPostList_fnActionHandlerDiv(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
-               var action = owner.className;
-               var target = args[1].target;
-               if (typeof me[action] == "function")
+               if (typeof me[owner.className] == "function")
                {
-                  me[action].call(me, target.offsetParent, owner);
                   args[1].stop = true;
+                  me[owner.className].call(me, args[1].target.offsetParent, owner);
                }
             }
       		 
@@ -400,7 +382,7 @@
                html += '<span class="nodeTitle"><a href="' + postViewUrl + '">' + $html(data.title) + '</a> ';
                html += '<span class="nodeStatus">' + statusLabel + '</span></span>';
                html += '<div class="published">';
-               if (! data.isDraft)
+               if (!data.isDraft)
                {
                   html += '<span class="nodeAttrLabel">' + me._msg("post.publishedOn") + ': </span>';
                   html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
@@ -464,6 +446,22 @@
                html += '<div class="nodeContent">';
                html += '<span class="nodeTitle"><a href="' + postViewUrl + '">' + $html(data.title) + '</a> ';
                html += '<span class="nodeStatus">' + statusLabel + '</span></span>';
+               html += '<div class="published">';
+               if (!data.isDraft)
+               {
+                  html += '<span class="nodeAttrLabel">' + me._msg("post.publishedOn") + ': </span>';
+                  html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.releasedOn) + '</span>';
+                  html += '<span class="separator">&nbsp;</span>';
+               }
+               html += '<span class="nodeAttrLabel">' + me._msg("post.author") + ': </span>';
+               html += '<span class="nodeAttrValue">' + authorLink + '</span>';
+               if (data.isPublished && data.postLink && data.postLink.length > 0)
+               {
+                  html += '<span class="separator">&nbsp;</span>';
+                  html += '<span class="nodeAttrLabel">' + me._msg("post.externalLink") + ': </span>';
+                  html += '<span class="nodeAttrValue"><a target="_blank" href="' + data.postLink + '">' + me._msg("post.clickHere") + '</a></span>';
+               }
+               html += '</div>';
                html += '</div>';
                html += '</div>';
             }
@@ -497,7 +495,6 @@
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-postlist", columnDefinitions, this.widgets.dataSource,
          {
             initialLoad: false,
-            paginator: this.widgets.paginator,
             dynamicData: true,
             MSG_EMPTY: this._msg("message.loading")
          });
@@ -530,6 +527,7 @@
                recordOffset: this.recordOffset,
                totalRecords: this.totalRecords
             });
+            this.widgets.paginator.render();
          }, this, true);
 
          // Custom error messages
@@ -560,13 +558,7 @@
             else if (oResponse.results && !me.options.usePagination)
             {
                this.renderLoopSize = oResponse.results.length >> YAHOO.env.ua.gecko ? 3 : 5;
-            }
-            
-            // extract the create permission and update the UI accordingly
-            if (oResponse.meta.metadata.blogPermissions)
-            {
-               me.updateToolbar(oResponse.meta.metadata.blogPermissions);
-            }
+            }            
             
             // set whether publishing actions should be available
             me.showPublishingActions = oResponse.meta.metadata.externalBlogConfig;
@@ -589,75 +581,8 @@
          YAHOO.Bubbling.fire("filterChanged", filterObj);
       },
       
-      /**
-       * Generates the HTML mark-up for the RSS feed link
-       *
-       * @method _generateRSSFeedUrl
-       * @private
-       */
-      _generateRSSFeedUrl: function BlogPostList__generateRSSFeedUrl()
-      {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/blog/rss?site={site}&amp;container={container}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
-         });
-         this.widgets.rssFeed.set("href", url);
-      },
-
-      /**
-       * Updates the toolbar using the passed permissions
-       */
-      updateToolbar : function BlogPostList_updateToolbar(blogPermissions)
-      {
-         if (blogPermissions.create)
-         {
-            Dom.removeClass(this.id + '-create-post-container', 'hidden');
-         }
-         if (blogPermissions.edit)
-         {
-            Dom.removeClass(this.id + '-configure-blog-container', 'hidden');
-         }
-      },
-
       // Actions
-      
-      /**
-       * Action handler for the create post button
-       */
-      onCreatePost: function BlogPostList_onCreatePost(e, p_obj)
-      {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/blog-postedit?container={container}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId
-         });
-         window.location = url;
-         Event.preventDefault(e);
-      },
-      
-      /**
-       * Action handler for the configure blog button
-       */
-      onConfigureBlog: function BlogPostList_onConfigureBlog(e, p_obj)
-      {         
-         // load the module if not yet done
-         if (!this.modules.configblog)
-         {
-            this.modules.configblog = new Alfresco.module.ConfigBlog(this.id + "-configblog");
-         }
-         
-         this.modules.configblog.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId
-         });
-         
-         this.modules.configblog.showDialog();
-         
-         Event.preventDefault(e);
-      },      
-      
+
       /**
        * Action handler for the simple view toggle button
        * 
@@ -782,7 +707,8 @@
          var obj = args[1];
          if (obj && (obj.tagName !== null))
          {
-            var filterObj = {
+            var filterObj =
+            {
                filterId: obj.tagName,
                filterOwner: "Alfresco.BlogPostListTags",
                filterData: null
@@ -1037,16 +963,15 @@
       onEventHighlightRow: function BlogPostList_onEventHighlightRow(oArgs)
       {
          // only highlight if we got actions to show
-         var record = this.widgets.dataTable.getRecord(oArgs.target);
+         var record = this.widgets.dataTable.getRecord(oArgs.target.id);
          var permissions = record.getData('permissions');
-         if (! (permissions.edit || permissions["delete"]))
+         if (!(permissions.edit || permissions["delete"]))
          {
             return;
          }
           
-         var target = oArgs.target;
-         var elem = YAHOO.util.Dom.getElementsByClassName('post', null, target, null);
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         var elem = Dom.getElementsByClassName('post', null, oArgs.target, null);
+         Dom.addClass(elem, 'overNode');
       },
 
       /**
@@ -1058,9 +983,8 @@
        */
       onEventUnhighlightRow: function BlogPostList_onEventUnhighlightRow(oArgs)
       {
-         var target = oArgs.target;
-         var elem = YAHOO.util.Dom.getElementsByClassName('post', null, target, null);
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         var elem = Dom.getElementsByClassName('post', null, oArgs.target, null);
+         Dom.removeClass(elem, 'overNode');
       },
       
       
@@ -1082,7 +1006,10 @@
                filterOwner: obj.filterOwner,
                filterData: obj.filterData
             };
-            this._updateBlogPostList({ page: 1 });
+            this._updateBlogPostList(
+            {
+               page: 1
+            });
          }
       },
       
@@ -1313,8 +1240,8 @@
             fromDate: null,
             toDate: null,
             tag: null,
-            page: this.widgets.paginator.get("page") || "1",
-            pageSize: this.widgets.paginator.get("rowsPerPage")
+            page: this.widgets.paginator.getCurrentPage() || "1",
+            pageSize: this.widgets.paginator.getRowsPerPage()
          };
          
          // Passed-in overrides

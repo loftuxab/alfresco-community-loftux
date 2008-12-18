@@ -23,30 +23,54 @@
 
    Alfresco.WikiToolbar.prototype =
    {
+
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type {object} object literal
+       */
+      options:
+      {
+         /**
         * Sets the current site for this component.
-        * 
+        *
         * @property siteId
         * @type string
         */
-      setSiteId: function(siteId)
-      {
-         this.siteId = siteId;
-         return this;
+         siteId: null,
+
+         /**
+           * The title of the current page.
+           *
+           * @property title
+           * @type string
+           */
+         title: null,
+
+         /**
+          * Indicating if back link is used
+          *
+          * @property showBackLink
+          * @type {string}
+          */
+         showBackLink: false         
       },
-      
+
+
       /**
-        * The title of the current page.
-        * 
-        * @property siteId
-        * @type string
-        */
-      setTitle: function(title)
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       */
+      setOptions: function DV_setOptions(obj)
       {
-         this.title = title;
+         this.options = YAHOO.lang.merge(this.options, obj);
          return this;
       },
-      
+
       /**
        * Set messages for this component.
        *
@@ -80,21 +104,11 @@
       init: function()
       {
          // Create button
-         var createButton = Alfresco.util.createYUIButton(this, "create-button", null,
-         {
-            type: "link"
-         });
+         var createButton = Alfresco.util.createYUIButton(this, "create-button", this.onNewPageClick);
 
          // Delete button
-         var opts = {};
-   
-         if (!this.title || this.title.length == 0)
-         {
-            opts["disabled"] = true;
-         }
-   
-         Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
-         Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
+         Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
+         Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick);
          Alfresco.util.createYUIButton(this, "rssFeed-button", null,
          {
             type: "link"
@@ -181,6 +195,23 @@
          YAHOO.Bubbling.on("deletePage", this.onDeletePage, this);
       },
 
+
+      /**
+       * Dispatches the browser to the create wiki page
+       *
+       * @method onNewPageClick
+       * @param e {object} DomEvent
+       */
+      onNewPageClick: function (e)
+      {
+         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-create";
+         if(!this.options.showBackLink)
+         {
+            url += "?listViewLinkBack=true";
+         }
+         window.location.href = url;
+      },
+
       /**
        * Kicks off a page delete confirmation dialog.
        * Fired when a delete link is clicked - 
@@ -194,7 +225,7 @@
          var title = args[1].title;
          if (title)
          {
-            this.title = title;
+            this.options.title = title;
             this.deleteDialog.show();
          }
       },
@@ -211,7 +242,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + this.title + "?page=wiki",
+            url: Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.options.siteId + "/" + this.options.title + "?page=wiki",
             successCallback:
             {
                fn: this.onPageDeleted,
@@ -244,7 +275,7 @@
       {
          this.deleteDialog.hide();
          // Redirect to the wiki landing page
-         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki";
+         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki";
       },
       
       /**
@@ -311,7 +342,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.POST,
-            url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.siteId + "/" + encodeURIComponent(this.title),
+            url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.options.siteId + "/" + encodeURIComponent(this.options.title),
             requestContentType: Alfresco.util.Ajax.JSON,
             dataObj: data,
             successCallback:
@@ -349,7 +380,7 @@
             if (!YAHOO.lang.isUndefined(response.name))
             {
                // Change the location bar
-               window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
+               window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=" + encodeURIComponent(response.name);
             } 
             else
             {
@@ -383,7 +414,31 @@
       onDeleteClick: function(e)
       {
          this.deleteDialog.show();
-      }
+      },
+
+
+      /**
+       * Action handler for the configure blog button
+       */
+      onConfigureBlog: function BlogPostList_onConfigureBlog(e, p_obj)
+      {
+         // load the module if not yet done
+         if (!this.modules.configblog)
+         {
+            this.modules.configblog = new Alfresco.module.ConfigBlog(this.id + "-configblog");
+         }
+
+         this.modules.configblog.setOptions(
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId
+         });
+
+         this.modules.configblog.showDialog();
+
+         Event.preventDefault(e);
+      }      
+
    };
 
 })();   

@@ -33,7 +33,7 @@ Alfresco.util.discussions = {};
  */
 Alfresco.util.discussions.getTopicViewPage = function(site, container, topicId)
 {
-   return YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topicview?container={container}&topicId={topicId}",
+   return YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/discussions-topicview?container={container}&topicId={topicId}&listViewLinkBack=true",
    {
       site: site,
       container: container,

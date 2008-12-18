@@ -413,7 +413,7 @@
        */
       onOK: function DLMT_onOK(e, p_obj)
       {
-         var files, multipleFiles = [];
+         var files, multipleFiles = [], i, j;
 
          // Single/multi files into array of nodeRefs
          if (YAHOO.lang.isArray(this.options.files))
@@ -424,7 +424,7 @@
          {
             files = [this.options.files];
          }
-         for (var i = 0, j = files.length; i < j; i++)
+         for (i = 0, j = files.length; i < j; i++)
          {
             multipleFiles.push(files[i].nodeRef);
          }
@@ -557,7 +557,7 @@
          Alfresco.logger.debug("DLMT_onExpandComplete");
 
          // Make sure the tree's DOM has been updated
-         this.widgets.treeview.draw();
+         this.widgets.treeview.render();
          // Redrawing the tree will clear the highlight
          this._showHighlight(true);
          
@@ -578,13 +578,17 @@
       /**
        * Fired by YUI TreeView when a node label is clicked
        * @method onNodeClicked
-       * @param node {YAHOO.widget.Node} the node clicked
+       * @param args.event {HTML Event} the event object
+       * @param args.node {YAHOO.widget.Node} the node clicked
        * @return allowExpand {boolean} allow or disallow node expansion
        */
-      onNodeClicked: function DLMT_onNodeClicked(node)
+      onNodeClicked: function DLMT_onNodeClicked(args)
       {
          Alfresco.logger.debug("DLMT_onNodeClicked");
-         var userAccess = node.data.userAccess;
+
+         var node = args.node,
+            userAccess = node.data.userAccess;
+
          if ((userAccess && userAccess.create) || (node.data.nodeRef == ""))
          {
             this.pathChanged(node.data.path);
@@ -680,11 +684,11 @@
          }, tree.getRoot(), false);
 
          // Register tree-level listeners
-         tree.subscribe("labelClick", this.onNodeClicked, this, true);
+         tree.subscribe("clickEvent", this.onNodeClicked, this, true);
          tree.subscribe("expandComplete", this.onExpandComplete, this, true);
 
          // Render tree with this one top-level node
-         tree.draw();
+         tree.render();
       },
 
       _showHighlight: function DLMT__showHighlight(isVisible)
