@@ -213,7 +213,11 @@
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.options.icon.substring(1);
 
          // Display the current frame status
-         var message = Alfresco.util.message("label.currentFrame", this.name, {"0": "0", "1": "0"});
+         var message = Alfresco.util.message("label.currentFrame", this.name,
+         {
+            "0": "0",
+            "1": "0"
+         });
          this.widgets.currentFrameSpan["innerHTML"] = message;
 
          // nodeRef is mandatory
@@ -222,12 +226,15 @@
              throw new Error("A nodeRef must be provided");
          }
 
-         if(Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
+         if (Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
          {
-            if(this._resolvePreview())
+            if (this._resolvePreview())
             {
                // Create and save a reference to the swfPlayer so we can call it later
-               this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div", {wmode: "transparent"});
+               this.swfPlayer = new YAHOO.widget.SWFPlayer(this.id + "-swfPlayer-div",
+               {
+                  wmode: "transparent"
+               });
                this.swfPlayer.subscribe("loadedSwfError", this.onLoadedSwfError, this, true);
                this.swfPlayer.subscribe("loadedSwfReady", this.onLoadedSwfReady, this, true);
                this.swfPlayer.subscribe("loadedSwfOnFrame", this.onLoadedSwfOnFrame, this, true);
@@ -237,7 +244,10 @@
             {
                // Cant find a preview
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true"; 
-               var message = Alfresco.util.message("label.noPreview", this.name, {"0": url});
+               var message = Alfresco.util.message("label.noPreview", this.name,
+               {
+                  "0": url
+               });
                this.widgets.swfPlayerMessage["innerHTML"] = message;
             }
          }
@@ -264,13 +274,13 @@
          var webpreview = "webpreview", imgpreview = "imgpreview";
          var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
          var ticketAndNoCache = "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
-         if(this.options.mimeType.match(/^image\/\w+/))
+         if (this.options.mimeType.match(/^image\/\w+/))
          {
             var preview = Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : (Alfresco.util.arrayContains(ps, webpreview) ? webpreview : null);
             var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + ticketAndNoCache;
             return {url: url, doNavigate: false};
          }
-         else if(this.options.mimeType.match(/application\/x-shockwave-flash/))
+         else if (this.options.mimeType.match(/application\/x-shockwave-flash/))
          {
             url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + ticketAndNoCache + "&a=true";
             return {url: url, doNavigate: false};
@@ -278,7 +288,7 @@
          else
          {
             var preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
-            if(preview != null)
+            if (preview != null)
             {
                var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + ticketAndNoCache;
                return {url: url, doNavigate: true};
@@ -295,14 +305,14 @@
        */
       onContentReady: function P_onContentReady(event)
       {
-         if(!this.contentReady)
+         if (!this.contentReady)
          {
             // Flash movie makes this call twice, make sure we only react on it once
             this.contentReady = true;
 
             // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
             var result = this._resolvePreview();
-            if(result)
+            if (result)
             {
                this.swfPlayer.load(result.url, result.doNavigate);
             }
@@ -356,7 +366,7 @@
          Dom.setStyle(this.id + "-fullscreen-div", "visibility", "");
 
          // Show the navigation controls if there are more pages than 1
-         if(parseInt(event.totalFrames) > 1)
+         if (parseInt(event.totalFrames) > 1)
          {
             Dom.setStyle(this.id + "-controls-div", "visibility", "");
          }

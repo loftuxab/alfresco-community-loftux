@@ -11,6 +11,14 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      Selector = YAHOO.util.Selector,
+      KeyListener = YAHOO.util.KeyListener;
+
+   /**
     * Constructor for a form.
     * 
     * @param {String} formId The HTML id of the form to be managed
@@ -190,13 +198,13 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        */
       init: function()
       {
-         var form = document.getElementById(this.formId);
-         if (form != null)
+         var form = Dom.get(this.formId);
+         if (form !== null)
          {
             if (form.getAttribute("forms-runtime") != "listening")
             {
                // add the event to the form and make the scope of the handler this form.
-               YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
+               Event.addListener(form, "submit", this._submitInvoked, this, true);
                form.setAttribute("forms-runtime", "listening");
                if (this.ajaxSubmit)
                {
@@ -219,9 +227,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   }
                }
                
-               var enterListener = new YAHOO.util.KeyListener(form,
+               var enterListener = new KeyListener(form,
                {
-                  keys: YAHOO.util.KeyListener.KEY.ENTER
+                  keys: KeyListener.KEY.ENTER
                },
                fnStopEvent, "keydown");
                enterListener.enable();
@@ -241,8 +249,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                if (this.submitElements.length == 0)
                {
                   // use a selector to find any submit elements for the form
-                  var nodes = YAHOO.util.Selector.query('#' + this.formId + ' > input[type="submit"]');
-                  for (var x = 0; x < nodes.length; x++)
+                  var nodes = Selector.query('#' + this.formId + ' > input[type="submit"]');
+                  for (var x = 0, xx = nodes.length; x < xx; x++)
                   {
                      var elem = nodes[x];
                      this.submitElements.push(elem.id);
@@ -426,7 +434,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        */
       addValidation: function(fieldId, validationHandler, validationArgs, when)
       {
-         var field = document.getElementById(fieldId);
+         var field = Dom.get(fieldId);
          if (field == null)
          {
             this._showInternalError("element with id of '" + fieldId + "' could not be located.");
@@ -434,7 +442,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          }
          
          // create object representation of validation
-         var validation = {
+         var validation =
+         {
             fieldId: fieldId,
             args: validationArgs,
             handler: validationHandler
@@ -450,11 +459,11 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                                   ", args: " + YAHOO.lang.dump(validationArgs));
       
          // if an event has been specified attach an event handler
-         if (when != null && when.length > 0)
+         if (when && when.length > 0)
          {
             // add the event to the field, pass the validation as a paramter 
             // to the handler and make the scope of the handler this form.
-            YAHOO.util.Event.addListener(field, when, this._validationEventFired, validation, this);
+            Event.addListener(field, when, this._validationEventFired, validation, this);
             
             if (Alfresco.logger.isDebugEnabled())
                Alfresco.logger.debug("Added field validation for field: " + fieldId +
@@ -477,7 +486,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          // TODO: Allow an error handler to be plugged in which
          //       would allow for custom error handling
          YAHOO.Bubbling.fire('formValidationError',{msg:msg,field:field});
-         if (this.errorContainer != null)
+         if (this.errorContainer !== null)
          {
             if (this.errorContainer === "alert")
             {
@@ -485,8 +494,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             }
             else
             {
-               var htmlNode = document.getElementById(this.errorContainer);
-               if (htmlNode != null)
+               var htmlNode = Dom.get(this.errorContainer);
+               if (htmlNode !== null)
                {
                   htmlNode.style.display = "block";
                   
@@ -510,13 +519,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          var label = null;
          
          // lookup the label using the "for" attribute (use the first if multiple found)
-         //var nodes = YAHOO.util.Selector.query('label[for="' + fieldId + '"]');
-         var nodes = YAHOO.util.Selector.query('label');
+         var nodes = Selector.query('label');
          // NOTE: there seems to be a bug in getting label using 'for' or 'htmlFor'
          //       for now get all labels and find the one we want
          if (nodes.length > 0)
          {
-            for (var x = 0; x < nodes.length; x++)
+            for (var x = 0, xx = nodes.length; x < xx; x++)
             {
                var elem = nodes[x];
                if (elem["htmlFor"] == fieldId)
@@ -550,7 +558,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             /**
              * Ensure the Tab key only focusses relevant fields
              */
-            var form = YAHOO.util.Dom.get(this.formId);
+            var form = Dom.get(this.formId);
             
             var fnTabFix = function(id, keyEvent)
             {
@@ -558,14 +566,14 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                var target = event.target;
                if (!target.hasAttribute("tabindex"))
                {
-                  YAHOO.util.Event.stopEvent(event);
-                  YAHOO.util.Selector.query("[tabindex]", form)[0].focus();
+                  Event.stopEvent(event);
+                  Selector.query("[tabindex]", form)[0].focus();
                }
             }
             
-            var tabListener = new YAHOO.util.KeyListener(form,
+            var tabListener = new KeyListener(form,
             {
-               keys: YAHOO.util.KeyListener.KEY.TAB
+               keys: KeyListener.KEY.TAB
             },
             fnTabFix, "keyup");
             tabListener.enable();
@@ -586,15 +594,14 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          var valid = this._runValidations(true);
          
          // make sure all submit elements show correct state
-         for (var x = 0; x < this.submitElements.length; x++)
+         for (var x = 0, xx = this.submitElements.length; x < xx; x++)
          {
             var currentItem = this.submitElements[x];
             
             if (typeof currentItem == "string")
             {
                // get the element with the id and set the disabled attribute
-               var elem = document.getElementById(currentItem);
-               elem.disabled = !valid;
+               Dom.get(currentItem).disabled = !valid;
             }
             else
             {
@@ -615,8 +622,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       {
          if (this.errorContainer !== "alert")
          {
-            var htmlNode = document.getElementById(this.errorContainer);
-            if (htmlNode != null)
+            var htmlNode = Dom.get(this.errorContainer);
+            if (htmlNode !== null)
             {
                htmlNode.style.display = "none";
                htmlNode.innerHTML = "";
@@ -656,7 +663,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          }
          
          // call handler
-         validation.handler(YAHOO.util.Event.getTarget(event), validation.args, event, this, silent);
+         validation.handler(Event.getTarget(event), validation.args, event, this, silent);
          
          // update submit elements state, if required
          if (this.showSubmitStateDynamically)
@@ -686,7 +693,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             {
                // validation was successful
                // get the form element
-               var form = document.getElementById(this.formId);
+               var form = Dom.get(this.formId);
 
                // call the pre-submit function, passing the form for last-chance processing
                this.doBeforeFormSubmit.fn.call(this.doBeforeFormSubmit.scope, form, this.doBeforeFormSubmit.obj);
@@ -696,7 +703,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                if (this.ajaxSubmit)
                {
                   // stop the browser from submitting the form
-                  YAHOO.util.Event.stopEvent(event);
+                  Event.stopEvent(event);
                   
                   // get the form's action URL
                   var submitUrl = form.attributes.action.nodeValue;
@@ -714,7 +721,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      var d = form.ownerDocument;
                      var iframe = d.createElement("iframe");
                      iframe.style.display = "none";
-                     YAHOO.util.Dom.generateId(iframe, "formAjaxSubmit");
+                     Dom.generateId(iframe, "formAjaxSubmit");
                      iframe.name = iframe.id;
                      document.body.appendChild(iframe);
 
@@ -750,7 +757,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                         config.failureCallback = this.ajaxSubmitHandlers.failureCallback;
                      }
                      
-                     if(this.ajaxSubmitHandlers.failureMessage)
+                     if (this.ajaxSubmitHandlers.failureMessage)
                      {
                         config.failureMessage = this.ajaxSubmitHandlers.failureMessage;
                      }
@@ -790,7 +797,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             else
             {
                // stop the event from continuing and sending the form.
-               YAHOO.util.Event.stopEvent(event);
+               Event.stopEvent(event);
             }
          }
          else
@@ -809,7 +816,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        */
       _buildAjaxForSubmit: function(form)
       {
-         if (form != null)
+         if (form !== null)
          {
             var formData = {};
             var length = form.elements.length;
@@ -859,7 +866,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   {
                      if (element.type == "select-multiple")
                      {
-                        for (var j = 0; j < element.options.length; j++)
+                        for (var j = 0, jj = element.options.length; j < jj; j++)
                         {
                            if (element.options[j].selected)
                            {
@@ -895,12 +902,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          var atLeastOneFailed = false;
          
          // iterate through the validations
-         for (var x = 0; x < this.validations.length; x++)
+         for (var x = 0, xx = this.validations.length; x < xx; x++)
          {
             var val = this.validations[x];
                   
-            var field = document.getElementById(val.fieldId);
-            if (field != null)
+            var field = Dom.get(val.fieldId);
+            if (field !== null)
             {
                if (!val.handler(field, val.args, null, this, silent))
                {
@@ -963,10 +970,10 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
       //       wouldn't a radio button normally have a default
       //       'checked' option?
       
-      var formElem = document.getElementById(form.formId);
-      var radios = formElem[field.name];
-      var anyChecked = false;
-      for (var x = 0; x < radios.length; x++)
+      var formElem = Dom.get(form.formId),
+         radios = formElem[field.name],
+         anyChecked = false;
+      for (var x = 0, xx = radios.length; x < xx; x++)
       {
          if (radios[x].checked)
          {

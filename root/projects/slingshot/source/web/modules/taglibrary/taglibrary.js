@@ -131,7 +131,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function TagLibrary_componentsLoaded()
+      onComponentsLoaded: function TagLibrary_onComponentsLoaded()
       {
       },
 
@@ -186,7 +186,10 @@
          "keypress").enable();
          
          // button to add tag to list
-         var addTagButton = new YAHOO.widget.Button(this.id + "-add-tag-button", {type: "button"});
+         var addTagButton = new YAHOO.widget.Button(this.id + "-add-tag-button",
+         {
+            type: "button"
+         });
          addTagButton.subscribe("click", this.onAddTagButtonClick, this, true);
       },
       
@@ -415,7 +418,10 @@
       _fireTagsChangedEvent: function TagLibrary__fireTagsChangedEvent()
       {
          // send out a message informing about the new set of tags
-         YAHOO.Bubbling.fire('onTagLibraryTagsChanged', {tags : this.currentTags});
+         YAHOO.Bubbling.fire('onTagLibraryTagsChanged',
+         {
+            tags : this.currentTags
+         });
       },
 
       /**

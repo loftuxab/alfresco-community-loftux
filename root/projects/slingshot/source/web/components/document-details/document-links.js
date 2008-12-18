@@ -125,7 +125,12 @@
          {
             this.widgets.downloadCopyButton = Alfresco.util.createYUIButton(this, "download-button", null,
             {
-               onclick: { fn: this._handleCopyClick, obj: "-download-url", scope: this}
+               onclick:
+               {
+                  fn: this._handleCopyClick,
+                  obj: "-download-url",
+                  scope: this
+               }
             });
          }
          
@@ -137,7 +142,12 @@
          {
             this.widgets.viewCopyButton = Alfresco.util.createYUIButton(this, "view-button", null,
             {
-               onclick: { fn: this._handleCopyClick, obj: "-view-url", scope: this}
+               onclick:
+               {
+                  fn: this._handleCopyClick,
+                  obj: "-view-url",
+                  scope: this
+               }
             });
          }
          
@@ -149,7 +159,12 @@
          {
             this.widgets.pageCopyButton = Alfresco.util.createYUIButton(this, "page-button", null,
             {
-               onclick: { fn: this._handleCopyClick, obj: "-page-url", scope: this}
+               onclick:
+               {
+                  fn: this._handleCopyClick,
+                  obj: "-page-url",
+                  scope: this
+               }
             });
          }
  

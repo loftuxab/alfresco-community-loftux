@@ -1,6 +1,6 @@
 // Check mandatory parameters
 var nodeRef = args.nodeRef; //page.url.args.nodeRef;
-if(nodeRef == null || nodeRef.length == 0)
+if (nodeRef == null || nodeRef.length == 0)
 {
    status.code = 400;
    status.message = "Parameter 'nodeRef' is missing.";
@@ -10,7 +10,7 @@ if(nodeRef == null || nodeRef.length == 0)
 
 // Call repo for node's metadata
 var json = remote.call("/api/metadata?nodeRef=" + nodeRef);
-if(json.toString().trim().length() != 0)
+if (json.toString().trim().length() != 0)
 {
    var node = {};
    var n = eval('(' + json + ')');

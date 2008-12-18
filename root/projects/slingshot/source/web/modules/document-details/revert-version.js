@@ -51,7 +51,10 @@
       this.name = "Alfresco.module.RevertVersion";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.RevertVersion already exists.");
@@ -207,7 +210,10 @@
          this.widgets.minorVersion = YAHOO.util.Dom.get(this.id + "-minorVersion-radioButton");
 
          // Create and save a reference to the buttons so we can alter them later
-         this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok-button", null, {type: "submit" });
+         this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
+         {
+            type: "submit"
+         });
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
          // Configure the forms runtime
@@ -217,14 +223,17 @@
          // The ok button is the submit button, and it should be enabled when the form is ready
          //form.setShowSubmitStateDynamically(true, false);
          form.setSubmitElements(this.widgets.okButton);
-         form.doBeforeFormSubmit = {
-            fn: function(){
+         form.doBeforeFormSubmit =
+         {
+            fn: function()
+            {
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
                this.widgets.panel.hide();
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
-                  text: Alfresco.util.message("message.reverting", this.name, {
+                  text: Alfresco.util.message("message.reverting", this.name,
+                  {
                      "0": this.showConfig.filename,
                      "1": this.showConfig.version
                   }),
@@ -306,8 +315,12 @@
          this.widgets.okButton.set("disabled", false);
 
          // Inform user that revert was successful
-         Alfresco.util.PopupManager.displayMessage({
-            text: Alfresco.util.message("message.failure", this.name, {"0": this.showConfig.filename})
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.failure", this.name, 
+            {
+               "0": this.showConfig.filename
+            })
          });
 
       },
@@ -340,7 +353,8 @@
          var Dom = YAHOO.util.Dom;
 
          // Set the panel section
-         var header = Alfresco.util.message("header.revert", this.name, {
+         var header = Alfresco.util.message("header.revert", this.name,
+         {
             "0": this.showConfig.filename,
             "1": this.showConfig.version
          });
@@ -380,7 +394,10 @@
 Alfresco.module.getRevertVersionInstance = function()
 {
    var instanceId = "alfresco-revertVersion-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];

@@ -173,7 +173,11 @@
                {
                   filterId: "bymonth",
                   filterOwner: me.name,
-                  filterData: { year: date.getFullYear(), month: date.getMonth() }
+                  filterData:
+                  {
+                     year: date.getFullYear(),
+                     month: date.getMonth()
+                  }
                });
             }
             return true;

@@ -48,7 +48,10 @@
       this.name = "Alfresco.module.EditSite";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.EditSite already exists.");
@@ -129,12 +132,12 @@
       {
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
-         if(this.showConfig.shortName === undefined)
+         if (this.showConfig.shortName === undefined)
          {
             throw new Error("A shortName must be provided");
          }
 
-         if(this.widgets.panel)
+         if (this.widgets.panel)
          {
             this.widgets.panel.destroy();
             this.widgets = {};
@@ -208,9 +211,10 @@
          // The ok button is the submit button, and it should be enabled when the form is ready
          editSiteForm.setShowSubmitStateDynamically(true, false);
          editSiteForm.setSubmitElements(this.widgets.okButton);
-         editSiteForm.doBeforeFormSubmit = {
-            fn: function(){
-
+         editSiteForm.doBeforeFormSubmit =
+         {
+            fn: function()
+            {
                var formEl = YAHOO.util.Dom.get(this.id + "-form");
                formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI + "api/sites/" + this.showConfig.shortName; 
 
@@ -325,12 +329,15 @@
          this.widgets.cancelButton.set("disabled", false);
          this.widgets.panel.show();
          var text = Alfresco.util.message("message.failure", this.name);
-         if(response.json.message)
+         if (response.json.message)
          {
             var tmp = Alfresco.util.message(response.json.message, this.name);
             text = tmp ? tmp : text;
          }
-         Alfresco.util.PopupManager.displayPrompt({text: text});
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            text: text
+         });
       },
 
       /**
@@ -372,7 +379,10 @@
 Alfresco.module.getEditSiteInstance = function()
 {
    var instanceId = "alfresco-editSite-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length != 0)
    {
       instance = instance[0];

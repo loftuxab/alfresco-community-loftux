@@ -149,7 +149,11 @@ Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventNa
       }
     
       // the mouse entered the element, fire an event to inform about it
-      YAHOO.Bubbling.fire(mouseOverEventName, {event : e, target : eventElem});
+      YAHOO.Bubbling.fire(mouseOverEventName,
+      {
+         event: e,
+         target: eventElem
+      });
    };
  
    var mouseOutHandler = function(e)

@@ -287,7 +287,10 @@
          }
          else
          {
-            Alfresco.util.PopupManager.displayPrompt({text: Alfresco.util.message("message.failure", this.name)});
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: Alfresco.util.message("message.failure", this.name)
+            });
          }
       },
       

@@ -1,12 +1,51 @@
-/*
- *** Alfresco.WikiDashlet
+/**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+ 
+/**
+ * Alfresco.WikiDashlet
  * Aggregates events from all the sites the user belongs to.
  * For use on the user's dashboard.
  *
+ * @namespace Alfresco
+ * @class Alfresco.WikiDashlet
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
+   /**
+    * WikiDashlet constructor.
+    * 
+    * @param {String} htmlId The HTML id of the parent element
+    * @return {Alfresco.WikiDashlet} The new WikiDashlet instance
+    * @constructor
+    */
    Alfresco.WikiDashlet = function(htmlId)
    {
       this.name = "Alfresco.WikiDashlet";
@@ -16,7 +55,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       
       this.parser = new Alfresco.WikiParser();
       
@@ -25,52 +64,37 @@
 
    Alfresco.WikiDashlet.prototype =
    {
-
       /**
-         * Object container for initialization options
-         *
-         * @property options
-         * @type object
-         */
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
       options:
       {
          /**
-            * The gui id.
-            *
-            * @property guid
-            * @type string
-            */
+          * The gui id.
+          *
+          * @property guid
+          * @type string
+          */
          guid: "",
 
          /**
-            * Current siteId.
-            *
-            * @property siteId
-            * @type string
-            */
+          * Current siteId.
+          *
+          * @property siteId
+          * @type string
+          */
          siteId: "",
 
          /**
-            * The pages on this sites wiki.
-            *
-            * @property pages
-            * @type Array
-            */
+          * The pages on this site's wiki.
+          *
+          * @property pages
+          * @type Array
+          */
          pages: []
-
-      },
-
-      /**
-         * Set multiple initialization options at once.
-         *
-         * @method setOptions
-         * @param obj {object} Object literal specifying a set of options
-         * @return {Alfresco.WikiDashlet} returns 'this' for method chaining
-         */
-      setOptions: function DLTB_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
       },
 
       /**
@@ -82,14 +106,27 @@
       configDialog: null,
 		
       /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.WikiDashlet} returns 'this' for method chaining
+       */
+      setOptions: function WikiDashlet_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
+
+      /**
 		 * Fired by YUILoaderHelper when required component script files have
 		 * been loaded into the browser.
 		 *
 		 * @method onComponentsLoaded
 	    */	
-      componentsLoaded: function()
+      onComponentsLoaded: function WikiDashlet_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
+         Event.onContentReady(this.id, this.init, this, true);
       },
       
       /**
@@ -98,27 +135,33 @@
 	    *
 	    * @method init
 	    */ 
-      init: function()
+      init: function WikiDashlet_init()
       {
-         var configFeedLink = document.getElementById(this.id + "-wiki-link");
-         YAHOO.util.Event.addListener(configFeedLink, "click", this.onConfigFeedClick, this, true);
+         Event.addListener(this.id + "-wiki-link", "click", this.onConfigFeedClick, this, true);
          
          this.parser.URL = this._getAbsolutePath();
-         var div = document.getElementById(this.id + "-scrollableList");
-         div.innerHTML = this.parser.parse(div.innerHTML, this.options.pages);
+         var wikiDiv = Dom.get(this.id + "-scrollableList");
+         wikiDiv.innerHTML = this.parser.parse(wikiDiv.innerHTML, this.options.pages);
       },
 		
       /**
 		 * Returns the absolute path (URL) to a wiki page, minus the title of the page.
 		 *
 		 * @method _getAbsolutePath
+		 * @private
 		 */
-      _getAbsolutePath: function()
+      _getAbsolutePath: function WikiDashlet__getAbsolutePath()
       {
          return Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";
       },
 		
-      onConfigFeedClick: function(e)
+      /**
+		 * Configuration click handler
+		 *
+		 * @method onConfigFeedClick
+		 * @param e {object} HTML event
+		 */
+      onConfigFeedClick: function WikiDashlet_onConfigFeedClick(e)
       {
          var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + encodeURIComponent(this.options.guid);
          
@@ -136,12 +179,11 @@
                      var obj = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
                      if (obj)
                      {
-                        var content = obj["content"];
-                        var div = document.getElementById(this.id + "-scrollableList");
-                        div.innerHTML = this.parser.parse(content, this.options.pages);
+                        // Update the content via the parser
+                        Dom.get(this.id + "-scrollableList").innerHTML = this.parser.parse(obj["content"], this.options.pages);
                         
                         // Update the title
-                        document.getElementById(this.id + "-title").innerHTML = obj["title"];
+                        Dom.get(this.id + "-title").innerHTML = obj["title"];
                      }
                   },
                   scope: this
@@ -158,7 +200,5 @@
          
          this.configDialog.show();
       }
-	
    };
-
 })();

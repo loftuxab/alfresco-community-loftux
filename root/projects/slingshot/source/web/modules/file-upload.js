@@ -68,7 +68,10 @@
       this.name = "Alfresco.module.FileUpload";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.FileUpload already exists.");
@@ -79,7 +82,7 @@
 
       // Create the appropriate uploader component
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45); // && !Alfresco.util.hasRequiredFlashPlayer(10, 0, 0);
-      if(this.hasRequiredFlashPlayer)        
+      if (this.hasRequiredFlashPlayer)        
       {
          this.uploader = Alfresco.module.getFlashUploadInstance();
       }
@@ -196,12 +199,12 @@
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
 
          // If flash isn't installed multi upload mode isn't supported
-         if(!this.hasRequiredFlashPlayer && this.showConfig.mode == this.MODE_MULTI_UPLOAD)
+         if (!this.hasRequiredFlashPlayer && this.showConfig.mode == this.MODE_MULTI_UPLOAD)
          {
             this.showConfig.mode = this.MODE_SINGLE_UPLOAD;
          }
 
-         if(this.hasRequiredFlashPlayer)
+         if (this.hasRequiredFlashPlayer)
          {
             this.showConfig.uploadURL = this.showConfig.flashUploadURL;
          }
@@ -221,7 +224,10 @@
 Alfresco.module.getFileUploadInstance = function()
 {
    var instanceId = "alfresco-fileupload-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];

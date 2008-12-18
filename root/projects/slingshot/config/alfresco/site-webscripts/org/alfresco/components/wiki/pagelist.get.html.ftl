@@ -1,5 +1,6 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiList("${args.htmlid}").setOptions({
+   new Alfresco.WikiList("${args.htmlid}").setOptions(
+   {
       siteId: "${page.url.templateArgs["site"]!""}",    
       pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
    });                                       

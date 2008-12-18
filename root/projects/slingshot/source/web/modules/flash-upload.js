@@ -68,7 +68,10 @@
       this.id = containerId;
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.FlashUpload already exists.");
@@ -636,10 +639,14 @@
             var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
-               if(data.size == 0)
+               if (data.size == 0)
                {
-                  Alfresco.util.PopupManager.displayMessage({
-                     text: Alfresco.util.message("message.zeroByteFileSelected", this.name, {"0": data.name})
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: Alfresco.util.message("message.zeroByteFileSelected", this.name,
+                     {
+                        "0": data.name
+                     })
                   });
                }
                else
@@ -835,7 +842,7 @@
          catch(e)
          {
             // The swf movie wasn't loaded, try seven times
-            if(attempt < 7)
+            if (attempt < 7)
             {
                // Try again after 0.5 sec
                YAHOO.lang.later(500, this, this._browse, [multiSelect, filter, ++attempt], false);
@@ -843,7 +850,10 @@
             else
             {
                // Give up
-               Alfresco.util.PopupManager.displayMessage({text: "Flash movie doesn't seem to load"});
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: "Flash movie doesn't seem to load"
+               });
             }
          }
       },
@@ -931,11 +941,17 @@
             if (noOfUploadedFiles > 0)
             {
                message = Alfresco.util.message("message.cancelStatus", this.name);
-               message = YAHOO.lang.substitute(message, {"0": noOfUploadedFiles});
+               message = YAHOO.lang.substitute(message,
+               {
+                  "0": noOfUploadedFiles
+               });
             }
 
             // Tell the document list to refresh itself if present
-            YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
+            YAHOO.Bubbling.fire("doclistRefresh",
+            {
+               currentPath: this.showConfig.path
+            });
          }
          else if (this.state === this.STATE_FINISHED)
          {
@@ -951,7 +967,7 @@
                   break;
                }
             }
-            if(fileName)
+            if (fileName)
             {
                YAHOO.Bubbling.fire("doclistRefresh",
                {
@@ -961,7 +977,10 @@
             }
             else
             {
-               YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
+               YAHOO.Bubbling.fire("doclistRefresh",
+               {
+                  currentPath: this.showConfig.path
+               });
             }
          }
 
@@ -987,7 +1006,10 @@
          // Inform the user if any files were uploaded before the rest was cancelled
          if (message)
          {
-            Alfresco.util.PopupManager.displayPrompt({text: message});
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: message
+            });
          }
       },
 
@@ -1048,7 +1070,10 @@
          {
 
             var tip = Alfresco.util.message("label.singleUpdateTip", this.name);
-            tip = YAHOO.lang.substitute(tip, {"0": this.showConfig.updateFilename});
+            tip = YAHOO.lang.substitute(tip,
+            {
+               "0": this.showConfig.updateFilename
+            });
             this.singleUpdateTip["innerHTML"] = tip;
 
             // Display the version input form
@@ -1101,7 +1126,7 @@
          // Check if flash player existed or if the no flash message is displayed
          var uploaderDiv = Dom.get(this.id + "-flashuploader-div");
          var p = Dom.getFirstChild(uploaderDiv);
-         if(p && p.tagName.toLowerCase() == "p")
+         if (p && p.tagName.toLowerCase() == "p")
          {
             // Flash isn't installed, make sure the no flash error message is displayed
             Dom.setStyle(uploaderDiv, "height", "30px");
@@ -1253,7 +1278,10 @@
             var fButton = Dom.getElementsByClassName("fileupload-file-button", "button", templateInstance);
             if (fButton.length == 1)
             {
-               var fileButton = new YAHOO.widget.Button(fButton[0], {type: "button"});
+               var fileButton = new YAHOO.widget.Button(fButton[0],
+               {
+                  type: "button"
+               });
                fileButton.subscribe("click", function(){ this._onFileButtonClickHandler(flashId, oRecord.getId()); }, this, true);
                this.fileStore[flashId].fileButton = fileButton;
             }
@@ -1456,7 +1484,8 @@
                // Upload has NOT been started for this file, start it now
                fileInfo.state = this.STATE_UPLOADING;
                
-               var attributes = {
+               var attributes =
+               {
                   siteId: this.showConfig.siteId,
                   containerId: this.showConfig.containerId,
                   username: this.showConfig.username
@@ -1529,7 +1558,10 @@
 Alfresco.module.getFlashUploadInstance = function()
 {
    var instanceId = "alfresco-flashupload-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];

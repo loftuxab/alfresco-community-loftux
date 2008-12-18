@@ -10,7 +10,7 @@
       this.options = {};
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.onComponentsLoaded, this);
       return this;
    };
    
@@ -68,7 +68,7 @@
        *
        * @method onComponentsLoaded
        */
-       componentsLoaded: function()
+       onComponentsLoaded: function()
        {
           YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
        },
@@ -129,7 +129,8 @@
              if (link)
              {
                 var tagName = link.firstChild.nodeValue;
-                YAHOO.Bubbling.fire("tagSelected", {
+                YAHOO.Bubbling.fire("tagSelected",
+                {
                    "tagname": tagName
                 });
              }

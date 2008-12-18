@@ -278,7 +278,8 @@
                });
 
                // we need to wrap the array inside a JSON object so the DataTable is happy
-               updatedResponse = {
+               updatedResponse =
+               {
                   "items": items
                };
             }
@@ -294,7 +295,10 @@
          
          // register the "enter" event on the search text field
          var searchIinput = Dom.get(this.id + "-term");
-         new YAHOO.util.KeyListener(searchIinput, { keys:13 }, 
+         new YAHOO.util.KeyListener(searchIinput,
+         {
+            keys:13
+         },
          {
             fn: function() 
             {
@@ -653,7 +657,10 @@
        */
       doDelete: function SiteFinder_doDelete(event, site)
       {
-         Alfresco.module.getDeleteSiteInstance().show({site: site});
+         Alfresco.module.getDeleteSiteInstance().show(
+         {
+            site: site
+         });
       },
 
       /**
@@ -759,7 +766,7 @@
          for (var i = 0; i < length; i++)
          {
             var record = rs.getRecord(i);
-            if(record.getData("shortName") == site.shortName)
+            if (record.getData("shortName") == site.shortName)
             {
                this.widgets.dataTable.deleteRow(record);
             }

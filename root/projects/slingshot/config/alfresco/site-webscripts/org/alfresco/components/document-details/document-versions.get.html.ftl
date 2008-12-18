@@ -1,12 +1,13 @@
 <script type="text/javascript">//<![CDATA[
-new Alfresco.DocumentVersions("${args.htmlid}").setOptions({
+new Alfresco.DocumentVersions("${args.htmlid}").setOptions(
+{
    versions: [
-   <#list versions as version>
-      {
-         label: '${version.label}',
-         createdDate: '${version.createdDate}'
-      }<#if (version_has_next)>,</#if>
-   </#list>
+<#list versions as version>
+   {
+      label: '${version.label}',
+      createdDate: '${version.createdDate}'
+   }<#if (version_has_next)>,</#if>
+</#list>
    ],
    filename: '${filename!}',
    nodeRef: '${nodeRef!}'

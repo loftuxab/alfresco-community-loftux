@@ -1,5 +1,6 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.BlogToolbar("${args.htmlid}").setOptions({
+   new Alfresco.BlogToolbar("${args.htmlid}").setOptions(
+   {
       siteId: "${page.url.templateArgs["site"]!""}",
       containerId: "${args.container!'blog'}",
       allowCreate: ${blog.permissions.create?string},

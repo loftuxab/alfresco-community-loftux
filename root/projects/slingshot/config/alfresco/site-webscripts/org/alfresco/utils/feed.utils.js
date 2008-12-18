@@ -61,7 +61,8 @@ function getRSSFeed(uri, limit)
     		      break;
     		   }
     		   
-    		   obj = {
+    		   obj =
+    		   {
     		      "title": item.title.toString(),
     		      "description": item.description.toString(),
     		      "link": item.link.toString()
@@ -85,7 +86,8 @@ function getRSSFeed(uri, limit)
                 		// Use the file extension to figure out what type it is for now
                 		var ext = filename.split(".");
 
-             		   obj["attachment"] = {
+             		   obj["attachment"] =
+             		   {
              		      "url": contenturl,
              		      "name": filename,
              		      "type": (ext[1] ? ext[1] : "_default")

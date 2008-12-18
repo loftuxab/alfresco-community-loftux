@@ -241,7 +241,10 @@
       registerCreateCommentForm: function CreateComment_registerCreateCommentForm()
       {
          // register the okButton
-         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
+         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit",
+         {
+            type: "submit"
+         });
          
          // instantiate the simple editor we use for the form
          this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
@@ -326,7 +329,10 @@
          this.widgets.editor.clearEditorDoc();
             
          // reload the comments list
-         YAHOO.Bubbling.fire("refreshComments", {reason: "created"});
+         YAHOO.Bubbling.fire("refreshComments",
+         {
+            reason: "created"
+         });
          
          this.enableInputs();
       },

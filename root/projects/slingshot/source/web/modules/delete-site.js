@@ -50,7 +50,10 @@
       this.name = "Alfresco.module.DeleteSite";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.DeleteSite already exists.");
@@ -141,7 +144,10 @@
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: Alfresco.util.message("title.deleteSite", this.name),
-            text: Alfresco.util.message("label.deleteSite", this.name, {"0": Alfresco.util.encodeHTML(c.site.title)}),
+            text: Alfresco.util.message("label.deleteSite", this.name,
+            {
+               "0": Alfresco.util.encodeHTML(c.site.title)
+            }),
             noEscape: true,
             buttons: [
                {
@@ -206,7 +212,10 @@
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + "modules/delete-site",
-            dataObj: { shortName: config.site.shortName },
+            dataObj:
+            {
+               shortName: config.site.shortName
+            },
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
@@ -217,7 +226,8 @@
                   feedbackMessage.destroy();
                   if (response.json && response.json.success)
                   {
-                     Alfresco.util.PopupManager.displayMessage({
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
                         text: Alfresco.util.message("message.siteDeleted", this.name)
                      });
                      
@@ -229,7 +239,8 @@
                   }
                   else
                   {
-                     Alfresco.util.PopupManager.displayMessage({
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
                         text: Alfresco.util.message("message.deleteFailed", this.name)
                      });
                   }
@@ -241,7 +252,8 @@
                fn: function(response)
                {
                   feedbackMessage.destroy();
-                  Alfresco.util.PopupManager.displayMessage({
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
                      text: Alfresco.util.message("message.deleteFailed", this.name)
                   });
                },
@@ -257,7 +269,10 @@
 Alfresco.module.getDeleteSiteInstance = function()
 {
    var instanceId = "alfresco-deletesite-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length != 0)
    {
       instance = instance[0];

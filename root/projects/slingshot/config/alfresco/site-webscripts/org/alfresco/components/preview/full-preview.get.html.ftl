@@ -1,6 +1,7 @@
 <#if (node?exists)>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.FullPreview("${args.htmlid}").setOptions({
+new Alfresco.FullPreview("${args.htmlid}").setOptions(
+{
    nodeRef: '${node.nodeRef}',
    name: '${node.name}',
    icon: '${node.icon}',

@@ -12,14 +12,14 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
 
       return this;
    };
 
    Alfresco.Footer.prototype =
    {
-      componentsLoaded: function()
+      onComponentsLoaded: function()
       {
          YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
       },

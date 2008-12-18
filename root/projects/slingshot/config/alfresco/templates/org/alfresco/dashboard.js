@@ -8,14 +8,18 @@
 model.gridClass = template.properties.gridClass;
 //[{components: 3}, {components: 3}, {components: 3}, {components: 3}];//parseInt(template.properties.column);
 var columns = [];
-for(var i = 0; true; i++)
+for (var i = 0; true; i++)
 {
    var noOfComponents = template.properties["gridColumn" + (i + 1)];
-   if(noOfComponents)
+   if (noOfComponents)
    {
-      columns[i] = {components: parseInt(noOfComponents)};
+      columns[i] =
+      {
+         components: parseInt(noOfComponents)
+      };
    }
-   else{
+   else
+   {
       break;
    }
 }

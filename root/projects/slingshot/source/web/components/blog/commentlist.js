@@ -274,12 +274,12 @@
             var startIndex = 0;
             var tr = p.getTotalRecords();
             var ps = this.options.pageSize;
-            if(obj.reason == "deleted")
+            if (obj.reason == "deleted")
             {
                // Make sure we dont use n invalid startIndex now that one is removed
                var newTotalPages = Math.floor((tr - 1) / ps) + (((tr - 1) % ps) > 0 ? 1 : 0);
                var currentPage = p.getCurrentPage();
-               if(newTotalPages < currentPage)
+               if (newTotalPages < currentPage)
                {
                   // the deletion was done of the last comment in the current page
                   currentPage = currentPage > 1 ? currentPage - 1 : 1;
@@ -287,7 +287,7 @@
                var record = p.getPageRecords(currentPage);
                startIndex = record ? record[0] : 0;
             }
-            if(obj.reason == "created")
+            if (obj.reason == "created")
             {
                startIndex = Math.floor(tr/ps) * ps;
             }                        
@@ -310,7 +310,8 @@
          Alfresco.util.Ajax.request(
          {
             url: url,
-            dataObj: {
+            dataObj:
+            {
                startIndex: startIndex,
                pageSize: this.options.pageSize
             },
@@ -345,7 +346,11 @@
          // update the list name
          if (comments.length > 0)
          {
-            titleDiv.innerHTML =  Alfresco.util.message("label.comments", this.name, {"0": comments.length, "1": response.json.total});
+            titleDiv.innerHTML =  Alfresco.util.message("label.comments", this.name,
+            {
+               "0": comments.length,
+               "1": response.json.total
+            });
          }
          else
          {
@@ -389,7 +394,7 @@
        */
       _updatePaginator: function BlogComment__updatePaginator(page, total)
       {
-         if(this.widgets && this.widgets.paginator)
+         if (this.widgets && this.widgets.paginator)
          {
             this.widgets.paginator.set('recordOffset', page);
             this.widgets.paginator.set('totalRecords', total);
@@ -467,7 +472,10 @@
             this._releaseBusy();
             
             // reload the comments list
-            YAHOO.Bubbling.fire("refreshComments", {reason: "deleted"});
+            YAHOO.Bubbling.fire("refreshComments",
+            {
+               reason: "deleted"
+            });
          };
          
          // ajax request success handler
@@ -532,7 +540,12 @@
             {
                fn: this.onFormLoaded,
                scope: this,
-               obj: {formId: formId, row: row, data: data}
+               obj:
+               {
+                  formId: formId,
+                  row: row,
+                  data: data
+               }
             },
             failureMessage: this._msg("message.loadeditform.failure"),
             execScripts: true
@@ -601,14 +614,18 @@
       _registerEditCommentForm: function BlogComment__registerEditCommentForm(row, data, formId)
       {
          // register the okButton
-         this.editData.widgets.okButton = new YAHOO.widget.Button(formId + "-submit", {type: "submit"});
+         this.editData.widgets.okButton = new YAHOO.widget.Button(formId + "-submit",
+         {
+            type: "submit"
+         });
          
          // register the cancel button
-         this.editData.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel", {type: "button"});
+         this.editData.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel");
          this.editData.widgets.cancelButton.subscribe("click", this.onEditFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.editData.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content', {
+         this.editData.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content',
+         {
             height: this.options.height + 'px',
             width: this.options.width + 'px',
             dompath: false, //Turns on the bar at the bottom

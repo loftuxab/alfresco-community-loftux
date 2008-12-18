@@ -352,7 +352,11 @@
             for (var j = 0; j < lis.length; j++)
             {
                var li = lis[j];
-               var dashlet = {url: li.getAttribute("dashletUrl"), regionId: "component-" + i + "-" + (j + 1)};
+               var dashlet =
+               {
+                  url: li.getAttribute("dashletUrl"),
+                  regionId: "component-" + i + "-" + (j + 1)
+               };
                var originalRegionId = li.getAttribute("originalRegionId");
                if (originalRegionId && originalRegionId.length > 0)
                {
@@ -373,7 +377,8 @@
             method: Alfresco.util.Ajax.POST,
             url: Alfresco.constants.URL_SERVICECONTEXT + "components/dashboard/customise-dashboard",
             dataObj: dataObj,
-            successCallback: {
+            successCallback:
+            {
                fn: function()
                {
                   // Send the user to the newly configured dashboard
@@ -382,7 +387,8 @@
                scope: this
             },
             failureMessage: Alfresco.util.message("message.saveFailure", this.name),
-            failureCallback: {
+            failureCallback:
+            {
                fn: function()
                {
                   // Hide spinner

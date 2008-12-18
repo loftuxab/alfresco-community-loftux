@@ -112,7 +112,12 @@
 
 .topiclist .row-separator
 {
-   border-bottom: 1px solid #c6c6c6;
+   border-bottom: 1px dashed #d9d9d9;
+}
+
+.topiclist tr.yui-dt-odd
+{
+   background-color: #fff;
 }
 
 .topiclist tr.yui-dt-odd .node
@@ -235,7 +240,6 @@ html>body .node, .reply, .comment
 {
    float: right;
    margin: 10px 0 0 15px;
-   position: relative;
    width: 6em;
 }
 

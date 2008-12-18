@@ -51,7 +51,10 @@
       this.name = "Alfresco.module.RevertWikiVersion";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      var instance = Alfresco.util.ComponentManager.find(
+      {
+         id: this.id
+      });
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.module.RevertWikiVersion already exists.");
@@ -238,7 +241,8 @@
          this.widgets.panel.hide();
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("message.reverting", this.name, {
+            text: Alfresco.util.message("message.reverting", this.name,
+            {
                "0": this.showConfig.pageTitle,
                "1": this.showConfig.version
             }),
@@ -263,7 +267,8 @@
          });
 
 		   var content = event.serverResponse.responseText;
-   		var obj = {
+   		var obj =
+   		{
    		   pagecontent: content,
    		   page: "wiki-page"
    	   };
@@ -279,7 +284,10 @@
 					fn: this.onRevertSuccess,
 					scope: this
 				},
-		      failureMessage: Alfresco.util.message("revertFailure", this.name, {"0": this.showConfig.pageTitle})
+		      failureMessage: Alfresco.util.message("revertFailure", this.name,
+		      {
+		         "0": this.showConfig.pageTitle
+		      })
 		   });
       },
 
@@ -305,13 +313,12 @@
          var objComplete =
          {
             successful: [
-               {
-                  siteId: this.showConfig.siteId,
-                  pageTitle: this.showConfig.pageTitle,
-                  version: this.showConfig.version,
-                  versionId: this.showConfig.versionId
-               }
-            ]
+            {
+               siteId: this.showConfig.siteId,
+               pageTitle: this.showConfig.pageTitle,
+               version: this.showConfig.version,
+               versionId: this.showConfig.versionId
+            }]
          };
 
          var callback = this.showConfig.onRevertWikiVersionComplete;
@@ -337,8 +344,12 @@
          this.widgets.okButton.set("disabled", false);
 
          // Inform user that revert was successful
-         Alfresco.util.PopupManager.displayMessage({
-            text: Alfresco.util.message("message.failure", this.name, {"0": this.showConfig.pageTitle})
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.failure", this.name,
+            {
+               "0": this.showConfig.pageTitle
+            })
          });
 
       },
@@ -371,7 +382,8 @@
          var Dom = YAHOO.util.Dom;
 
          // Set the panel section
-         var prompt = Alfresco.util.message("label.prompt", this.name, {
+         var prompt = Alfresco.util.message("label.prompt", this.name,
+         {
             "0": this.showConfig.pageTitle
          });
          this.widgets.promptText["innerHTML"] = prompt;
@@ -402,7 +414,10 @@
 Alfresco.module.getRevertWikiVersionInstance = function()
 {
    var instanceId = "alfresco-revertWikiVersion-instance";
-   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   var instance = Alfresco.util.ComponentManager.find(
+   {
+      id: instanceId
+   });
    if (instance !== undefined && instance.length > 0)
    {
       instance = instance[0];

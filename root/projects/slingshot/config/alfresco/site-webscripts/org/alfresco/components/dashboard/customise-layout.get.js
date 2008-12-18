@@ -1,7 +1,7 @@
 function getNoOfColumns(template)
 {
    var noOfColumns = 0;
-   while(template.properties["gridColumn" + (noOfColumns + 1)] !== null)
+   while (template.properties["gridColumn" + (noOfColumns + 1)] !== null)
    {
       noOfColumns++;
    }                                       
@@ -11,17 +11,22 @@ function getNoOfColumns(template)
 
 // Get current template
 var dashboardId;
-if(args.dashboardType == "user")
+if (args.dashboardType == "user")
 {                              
    dashboardId = "user/" + user.name + "/dashboard";
 }
-else if(args.dashboardType == "site")
+else if (args.dashboardType == "site")
 {
    dashboardId = "site/" + page.url.templateArgs.site + "/dashboard";   
 }
-var currentTemplate = sitedata.findTemplate(dashboardId);
-var currentNoOfColumns = getNoOfColumns(currentTemplate);
-var currentLayout = {templateId: currentTemplate.id, noOfColumns: currentNoOfColumns, description: currentTemplate.description};
+var currentTemplate = sitedata.findTemplate(dashboardId),
+   currentNoOfColumns = getNoOfColumns(currentTemplate),
+   currentLayout =
+   {
+      templateId: currentTemplate.id,
+      noOfColumns: currentNoOfColumns,
+      description: currentTemplate.description
+   };
 
 // Hardcoded templates until proper service exists
 var layouts = [

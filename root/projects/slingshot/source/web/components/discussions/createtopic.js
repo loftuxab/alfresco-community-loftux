@@ -290,7 +290,10 @@
       {
          // initialize the tag library
          this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
-         this.modules.tagLibrary.setOptions({ siteId: this.options.siteId });
+         this.modules.tagLibrary.setOptions(
+         {
+            siteId: this.options.siteId
+         });
          this.modules.tagLibrary.initialize();
 
          // add the tags that are already set on the post
@@ -300,14 +303,18 @@
          }
 
          // register the okButton
-         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
+         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit",
+         {
+            type: "submit"
+         });
          
          // register the cancel button
-         this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel", {type: "button"});
+         this.widgets.cancelButton = new YAHOO.widget.Button(this.id + "-cancel");
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
+         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
+         {
              height: '180px',
              width: '700px',
              dompath: false, //Turns on the bar at the bottom

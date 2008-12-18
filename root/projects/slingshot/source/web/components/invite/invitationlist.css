@@ -23,9 +23,14 @@
 {
    display: none;
 }
+.invitationlist .inviteelist table tr.yui-dt-odd
+{
+   background-color: #fff;
+}
 .invitationlist .inviteelist table td
 {
-   border: none;
+   border-bottom: 1px dashed #d9d9d9;
+   border-right: medium none;
 }
 .invitationlist .inviteelist table .yui-dt-empty
 {

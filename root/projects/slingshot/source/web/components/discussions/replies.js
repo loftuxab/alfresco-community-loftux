@@ -146,7 +146,7 @@
        */
       onComponentsLoaded: function TopicReplies_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
    
       /**
@@ -508,10 +508,11 @@
             {
                fn: this._onEditFormLoaded,
                scope: this,
-               obj : {
-                  isEdit : isEdit,
-                  nodeRef : nodeRef,
-                  formId : formId
+               obj:
+               {
+                  isEdit: isEdit,
+                  nodeRef: nodeRef,
+                  formId: formId
                }
             },
             failureMessage: this._msg("message.loadeditform.failure")
@@ -609,10 +610,16 @@
       _registerEditForm: function TopicReplies__registerEditForm(nodeRef, formId, isEdit)
       {
          // register the okButton
-         this.widgets.okButton = new YAHOO.widget.Button(formId + "-submit", {type: "submit"});
+         this.widgets.okButton = new YAHOO.widget.Button(formId + "-submit",
+         {
+            type: "submit"
+         });
          
          // register the cancel button
-         this.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel", {type: "button"});
+         this.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel",
+         {
+            type: "button"
+         });
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
@@ -645,7 +652,8 @@
             {
                fn: this.onFormSubmitSuccess,
                scope: this,
-               obj: {
+               obj:
+               {
                   nodeRef: nodeRef,
                   isEdit: isEdit
                }
@@ -895,22 +903,20 @@
          // only highlight if there are actions on the specific element
          var nodeRef = args[1].target.id.substring(('reply-').length);
          nodeRef = this.toNodeRef(nodeRef);
-         var data = this.findReplyDataObject(nodeRef);
-         var permissions = data.permissions;
-         if (! (permissions.edit || permissions.reply || permissions['delete']))
+         
+         var data = this.findReplyDataObject(nodeRef), permissions = data.permissions;
+         if (!(permissions.edit || permissions.reply || permissions['delete']))
          {
             return;
          }
          
-         var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         Dom.addClass(args[1].target, 'overNode');
       },
       
       /** Called whenever the mouse exits a list item. */
       onReplyElementMouseExited: function TopicReplies_onReplyElementMouseExited(layer, args)
       {
-         var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(args[1].target, 'overNode');
       },
 
       /**

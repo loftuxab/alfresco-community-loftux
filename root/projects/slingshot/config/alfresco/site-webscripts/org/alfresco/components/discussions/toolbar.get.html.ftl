@@ -1,5 +1,6 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DiscussionsToolbar("${args.htmlid}").setOptions({
+   new Alfresco.DiscussionsToolbar("${args.htmlid}").setOptions(
+   {
       siteId: "${page.url.templateArgs["site"]!""}",
       containerId: "${args.container!'discussions'}",
       allowCreate: ${forum.forumPermissions.create?string}

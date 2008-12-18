@@ -9,7 +9,7 @@
       this.id = containerId;
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       return this;
    };
    
@@ -32,7 +32,7 @@
        *
        * @method onComponentsLoaded
        */
-       componentsLoaded: function()
+       onComponentsLoaded: function()
        {
           YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
        },

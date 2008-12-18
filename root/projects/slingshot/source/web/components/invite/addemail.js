@@ -142,7 +142,10 @@
          // check whether we got enough information to proceed
          if (firstName.length < 1 || lastName.length < 1 || email.length < 1)
          {
-            Alfresco.util.PopupManager.displayMessage({ text: this._msg("addemail.mandatoryfieldsmissing") });
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("addemail.mandatoryfieldsmissing")
+            });
             return;
          }
          

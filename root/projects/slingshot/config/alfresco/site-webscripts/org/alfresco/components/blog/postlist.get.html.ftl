@@ -24,7 +24,7 @@
       <div class="yui-u">
          <div id="${args.htmlid}-paginator" class="paginator"></div>
       </div>
-      <div class="yui-u">
+      <div class="yui-u flat-button">
          <div class="simple-view"><button id="${args.htmlid}-simpleView-button" name="postlist-simpleView-button">${msg("header.simpleList")}</button></div>
       </div>
    </div>

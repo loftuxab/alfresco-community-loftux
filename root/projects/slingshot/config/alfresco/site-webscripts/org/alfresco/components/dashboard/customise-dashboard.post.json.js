@@ -12,30 +12,30 @@ sitedata.associateTemplate(templateId, dashboardPage);
 
 // Get existing dashlets/component bindings for the page
 var oldComponents = sitedata.findComponents("page", null, dashboardPage, null);
-if(oldComponents === undefined || oldComponents.length === 0)
+if (oldComponents === undefined || oldComponents.length === 0)
 {
    oldComponents = [];
 }
 
 // Unbind all components, old properties will be stored in the oldComponents list.
-for(var oi = 0; oi < oldComponents.length; oi++)
+for (var oi = 0; oi < oldComponents.length; oi++)
 {
    var oldComponent = oldComponents[oi];
    var regionId = oldComponent.properties["region-id"];
-   if(regionId.match("^component-\\d+-\\d+$"))
+   if (regionId.match("^component-\\d+-\\d+$"))
    {
       // Unbind the component if it has been delete or moved
       var existingDashlet = null;
-      for(var ni = 0; ni < newDashlets.length; ni++)
+      for (var ni = 0; ni < newDashlets.length; ni++)
       {
          var newDashlet = newDashlets[ni];
-         if(newDashlet.originalRegionId == regionId)
+         if (newDashlet.originalRegionId == regionId)
          {
             existingDashlet = newDashlet;
             break;
          }
       }
-      if(existingDashlet == null || existingDashlet.regionId != existingDashlet.originalRegionId)
+      if (existingDashlet == null || existingDashlet.regionId != existingDashlet.originalRegionId)
       {
          // Delete dashlet if it has been removed or moved         
          sitedata.unbindComponent("page", regionId, dashboardPage);
@@ -45,19 +45,19 @@ for(var oi = 0; oi < oldComponents.length; oi++)
 
 // Create bindings for new and moved dashlets.
 var newDashlets = clientJSON.dashlets;
-for(var ni = 0; ni < newDashlets.length; ni++)
+for (var ni = 0; ni < newDashlets.length; ni++)
 {
    var newDashlet = newDashlets[ni];
-   if(newDashlet.originalRegionId)
+   if (newDashlet.originalRegionId)
    {
-      if(newDashlet.originalRegionId != newDashlet.regionId)
+      if (newDashlet.originalRegionId != newDashlet.regionId)
       {
          // An existing/moved dashlet
          var existingDashlet = null;
-         for(var oi = 0; oi < oldComponents.length; oi++)
+         for (var oi = 0; oi < oldComponents.length; oi++)
          {
             var oldDashlet = oldComponents[oi];
-            if(oldDashlet.properties["region-id"] == newDashlet.originalRegionId)
+            if (oldDashlet.properties["region-id"] == newDashlet.originalRegionId)
             {
                existingDashlet = oldDashlet;
                break;
@@ -67,7 +67,7 @@ for(var ni = 0; ni < newDashlets.length; ni++)
          {
             // Its an old component that has been moved, use object from the list so we don't loose the properties            
             var comp = sitedata.newComponent("page", newDashlet.regionId, dashboardPage);
-            for(var propertyKey in existingDashlet.properties)
+            for (var propertyKey in existingDashlet.properties)
             {
                comp.properties[propertyKey] = existingDashlet.properties[propertyKey];
             }

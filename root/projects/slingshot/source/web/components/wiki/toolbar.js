@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+ 
 /*
  *** Alfresco.WikiToolbar
 */
@@ -10,13 +35,20 @@
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
 
+   /**
+   * WikiToolbar constructor.
+   * 
+   * @param {String} htmlId The HTML id of the parent element
+   * @return {Alfresco.WikiToolbar} The new WikiToolbar instance
+   * @constructor
+   */
    Alfresco.WikiToolbar = function(containerId)
    {
       this.name = "Alfresco.WikiToolbar";
       this.id = containerId;
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.onComponentsLoaded, this);
 
       return this;
    };
@@ -33,19 +65,19 @@
       options:
       {
          /**
-        * Sets the current site for this component.
-        *
-        * @property siteId
-        * @type string
-        */
+          * Sets the current site for this component.
+          *
+          * @property siteId
+          * @type string
+          */
          siteId: null,
 
          /**
-           * The title of the current page.
-           *
-           * @property title
-           * @type string
-           */
+          * The title of the current page.
+          *
+          * @property title
+          * @type string
+          */
          title: null,
 
          /**
@@ -57,15 +89,14 @@
          showBackLink: false         
       },
 
-
       /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       * @return {Alfresco.WikiToolbar} returns 'this' for method chaining
        */
-      setOptions: function DV_setOptions(obj)
+      setOptions: function WikiToolbar_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -76,9 +107,9 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.WikiToolbar} returns 'this' for method chaining
        */
-      setMessages: function(obj)
+      setMessages: function WikiToolbar_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -90,7 +121,7 @@
        *
        * @method onComponentsLoaded
        */
-      componentsLoaded: function()
+      onComponentsLoaded: function WikiToolbar_onComponentsLoaded()
       {
          Event.onContentReady(this.id, this.init, this, true);
       },
@@ -101,21 +132,16 @@
        *
        * @method init
        */
-      init: function()
+      init: function WikiToolbar_init()
       {
-         // Create button
-         var createButton = Alfresco.util.createYUIButton(this, "create-button", this.onNewPageClick);
-
-         // Delete button
+         // Register buttons with YUI
+         Alfresco.util.createYUIButton(this, "create-button", this.onNewPageClick);
          Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
          Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick);
          Alfresco.util.createYUIButton(this, "rssFeed-button", null,
          {
             type: "link"
          });
-         
-         // Labels
-         var confirmText = Alfresco.util.message("panel.confirm.delete-msg", this.name);
          
          this.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
          {
@@ -125,11 +151,11 @@
             draggable: false,
             modal: true,
             close: true,
-            text: '<div class="yui-u"><br />' + confirmText + '<br /><br /></div>',
+            text: '<div class="yui-u"><br />' + this._msg("panel.confirm.delete-msg") + '<br /><br /></div>',
             constraintoviewport: true,
             buttons: [
             {
-               text: Alfresco.util.message("button.delete", this.name),
+               text: this._msg("button.delete"),
                handler:
                {
                   fn: this.onConfirm,
@@ -137,7 +163,7 @@
                }
             },
             {
-               text: Alfresco.util.message("button.cancel", this.name),
+               text: this._msg("button.cancel"),
                handler:
                {
                   fn: this.onCancel,
@@ -147,13 +173,12 @@
             }]
          });
          
-         var headerText = Alfresco.util.message("panel.confirm.header", this.name);
-         this.deleteDialog.setHeader(headerText);
+         this.deleteDialog.setHeader(this._msg("panel.confirm.header"));
          this.deleteDialog.render(document.body);
          
          // Create the rename panel
-         var renamePanel = Dom.get(this.id + "-renamepanel");
-         var clonedRenamePanel = renamePanel.cloneNode(true);
+         var renamePanel = Dom.get(this.id + "-renamepanel"),
+            clonedRenamePanel = renamePanel.cloneNode(true);
          renamePanel.parentNode.removeChild(renamePanel);
          
          this.renamePanel = new YAHOO.widget.Panel(clonedRenamePanel,
@@ -202,10 +227,10 @@
        * @method onNewPageClick
        * @param e {object} DomEvent
        */
-      onNewPageClick: function (e)
+      onNewPageClick: function WikiToolbar_onNewPageClick(e)
       {
          var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-create";
-         if(!this.options.showBackLink)
+         if (!this.options.showBackLink)
          {
             url += "?listViewLinkBack=true";
          }
@@ -220,7 +245,7 @@
        * @method onDeletePage
        * @param e {object} DomEvent
        */      
-      onDeletePage: function(e, args)
+      onDeletePage: function WikiToolbar_onDeletePage(e, args)
       {
          var title = args[1].title;
          if (title)
@@ -237,7 +262,7 @@
        * @method onConfirm
        * @param e {object} DomEvent
        */
-      onConfirm: function(e)
+      onConfirm: function WikiToolbar_onConfirm(e)
       {
          Alfresco.util.Ajax.request(
          {
@@ -248,7 +273,7 @@
                fn: this.onPageDeleted,
                scope: this
             },
-            failureMessage: Alfresco.util.message("load.fail", this.name)
+            failureMessage: this._msg("load.fail")
          });
       },
       
@@ -259,7 +284,7 @@
        * @method onCancel
        * @param e {object} DomEvent
        */
-      onCancel: function(e)
+      onCancel: function WikiToolbar_onCancel(e)
       {
          this.deleteDialog.hide();
       },
@@ -271,9 +296,8 @@
        * @method onPageDeleted
        * @param e {object} DomEvent
        */
-      onPageDeleted: function(e)
+      onPageDeleted: function WikiToolbar_onPageDeleted(e)
       {
-         this.deleteDialog.hide();
          // Redirect to the wiki landing page
          window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki";
       },
@@ -285,12 +309,12 @@
        * @method onRenameClick
        * @param e {object} DomEvent
        */
-      onRenameClick: function(e)
+      onRenameClick: function WikiToolbar_onRenameClick(e)
       {
          this.renamePanel.show();
 
          // Clear the text field any previously entered values
-         var newNameField = document.getElementById(this.id + "-renameTo");
+         var newNameField = Dom.get(this.id + "-renameTo");
          newNameField.value = "";
          
          // Fix Firefox caret issue
@@ -328,11 +352,11 @@
        * @method onRenameSaveClick
        * @param e {object} DomEvent
        */      
-      onRenameSaveClick: function(e)
+      onRenameSaveClick: function WikiToolbar_onRenameSaveClick(e)
       {
          var data = {};
       
-         var newNameField = document.getElementById(this.id + "-renameTo");
+         var newNameField = Dom.get(this.id + "-renameTo");
          if (newNameField)
          {
             data["name"] = newNameField.value.replace(/\s+/g, "_");
@@ -354,8 +378,7 @@
          });
 
          // Undo Firefox caret issue
-         var formElement = Dom.get(this.id + "-renamePageForm");
-         Alfresco.util.undoCaretFix(formElement);
+         Alfresco.util.undoCaretFix(this.id + "-renamePageForm");
          
          if (this.escapeListener)
          {
@@ -372,7 +395,7 @@
        * @method onPageRenamed
        * @param e {object} DomEvent
        */      
-      onPageRenamed: function(e)
+      onPageRenamed: function WikiToolbar_onPageRenamed(e)
       {
          var response = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
          if (response)
@@ -400,7 +423,6 @@
                   text: errorMsg
                });
             }
-           
          }
       },
       
@@ -411,34 +433,23 @@
        * @method onDeleteClick
        * @param e {object} DomEvent
        */
-      onDeleteClick: function(e)
+      onDeleteClick: function WikiToolbar_onDeleteClick(e)
       {
          this.deleteDialog.show();
       },
 
-
       /**
-       * Action handler for the configure blog button
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
        */
-      onConfigureBlog: function BlogPostList_onConfigureBlog(e, p_obj)
+      _msg: function WikiToolbar__msg(messageId)
       {
-         // load the module if not yet done
-         if (!this.modules.configblog)
-         {
-            this.modules.configblog = new Alfresco.module.ConfigBlog(this.id + "-configblog");
-         }
-
-         this.modules.configblog.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId
-         });
-
-         this.modules.configblog.showDialog();
-
-         Event.preventDefault(e);
-      }      
-
+         return Alfresco.util.message.call(this, messageId, "Alfresco.WikiToolbar", Array.prototype.slice.call(arguments).slice(1));
+      }
    };
 
 })();   

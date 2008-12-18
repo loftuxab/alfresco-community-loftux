@@ -1,7 +1,10 @@
 function main()
 {
    // A default blog description
-   var blog = { permissions: {}};
+   var blog = 
+   {
+      permissions: {}
+   };
 
    // Call the repo to get the permissions for the user for this blog
    var result = remote.call("/api/blog/site/" + page.url.templateArgs.site + "/" + (args.container ? args.container : "blog"));

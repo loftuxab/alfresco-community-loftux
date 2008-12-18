@@ -32,6 +32,12 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
+   /**
     * Dashboard MySites constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -102,7 +108,7 @@
        */
       onComponentsLoaded: function MS_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
 
       /**
@@ -112,32 +118,29 @@
       onReady: function MS_onReady()
       {
          // Listen on clicks for the create site link
-         var createSiteLink = document.getElementById(this.id + "-createSite-button");
-         YAHOO.util.Event.addListener(createSiteLink, "click", this.onCreateSiteLinkClick, this, true);
+         Event.addListener(this.id + "-createSite-button", "click", this.onCreateSiteLinkClick, this, true);
 
          // Listen on clicks for delete site icons
-         var sites = this.options.sites;
-         for (var i = 0; i < sites.length; i++)
+         var sites = this.options.sites, i, j, deleteSpan;
+         for (i = 0, j = sites.length; i < j; i++)
          {
-            var deleteSpan = document.getElementById(this.id + "-delete-span-" + i);
-            if(deleteSpan)
+            deleteSpan = Dom.get(this.id + "-delete-span-" + i);
+            if (deleteSpan)
             {
-               YAHOO.util.Event.addListener(deleteSpan, "click",
-                       function (event, obj)
-                       {
-                          // Find the site by its index
-                          var site = sites[obj.selectedSiteIndex];
-
-                          // Find the site through the index and display the delete dialog for the site
-                          Alfresco.module.getDeleteSiteInstance().show({site: site});
-                       },
+               Event.addListener(deleteSpan, "click", function (event, obj)
+               {
+                  // Find the site through its index and display the delete dialog for the site
+                  Alfresco.module.getDeleteSiteInstance().show(
+                  {
+                     site: sites[obj.selectedSiteIndex]
+                  });
+               },
                {
                   selectedSiteIndex: i,
                   thisComponent: this
                });
             }
          }
-
       },
 
       /**
@@ -162,8 +165,7 @@
       {
          // Hide the site in this component
          var site = args[1].site;
-         YAHOO.util.Dom.setStyle(this.id + "-site-div-" + site.shortName, "display", "none");
+         Dom.setStyle(this.id + "-site-div-" + site.shortName, "display", "none");
       }      
-
    };
 })();

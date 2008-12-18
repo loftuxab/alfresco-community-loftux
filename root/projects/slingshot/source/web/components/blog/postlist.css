@@ -110,11 +110,16 @@
   margin-bottom: 4px;
 }
 
-.simple .nodeEdit
+.blog-postlist .simple .nodeEdit
 {
   width: 300px;
   text-align: right;
   margin: 4px;
+}
+
+.blog-postlist .simple .nodeContent
+{
+   min-height: 2em;
 }
 
 .nodeEdit .action-link

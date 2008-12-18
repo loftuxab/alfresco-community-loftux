@@ -284,7 +284,7 @@
                {
                   for (var i = 0; i < items.length; i++)
                   {
-                      if(items[i].userName == me.options.currentUser)
+                      if (items[i].userName == me.options.currentUser)
                       {
                          items.splice(i, 1);
                          break;

@@ -390,6 +390,11 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    overflow-x: hidden;
 }
 
+.treeview .ygtvchildren
+{
+   width: auto;
+}
+
 .copy-to .path .treeview
 {
    width: 16em;
