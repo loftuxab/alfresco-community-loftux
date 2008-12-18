@@ -143,7 +143,7 @@
        */
       templateLoaded: function EventInfo_templateLoaded(response)
       {
-         var div = document.getElementById("eventInfoPanel");
+         var div = Dom.get("eventInfoPanel");
          div.innerHTML = response.serverResponse.responseText;
 
          this.panel = new YAHOO.widget.Panel(div,

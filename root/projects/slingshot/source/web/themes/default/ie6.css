@@ -341,6 +341,10 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    height: 1em;
 }
 
+.sent-invites .search-bar
+{
+   height:2em;  
+}
 
 /**
  * Document Library

@@ -20,14 +20,15 @@
       to make sure it becomes the selected element.
 
    -->
-<div id="${args.htmlid}" class="customise-dashlets">
+<div class="customise-dashlets">
 
    <script type="text/javascript">//<![CDATA[
    new Alfresco.CustomiseDashlets("${args.htmlid}").setMessages(
       ${messages}
    ).setOptions(
    {
-      currentLayout: {
+      currentLayout:
+      {
          templateId: "${currentLayout.templateId}",
          noOfColumns: ${currentLayout.noOfColumns},
          description: "${currentLayout.description}",
@@ -38,12 +39,10 @@
    });
    //]]></script>
 
-
-
    <div id="${args.htmlid}-instructions-div" class="instructions">
 
       <h2>${msg("header.dashlets")}</h2>
-      <hr/>
+      <hr />
       
       <div>
          <div class="text">${msg("label.instructions")}</div>
@@ -58,17 +57,17 @@
 
       <div>
          <div class="text">
-            <a class="closeLink" href="javascript: var nothing;" id="${args.htmlid}-closeAddDashlets-link">${msg("link.close")}</a>
+            <a class="closeLink" href="#" id="${args.htmlid}-closeAddDashlets-link">${msg("link.close")}</a>
             <h3 class="padded">${msg("section.addDashlets")}</h3>
          </div>
          <ul id="${args.htmlid}-column-ul-0" class="availableList">
-            <#list availableDashlets as dashlet>
-               <li class="customisableDashlet available" dashletUrl="${dashlet.url}">
-                  <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif"></a>
-                  <span >${dashlet.shortName}</span>
-                  <div class="draggable" title="${dashlet.description}"></div>
-               </li>
-            </#list>
+         <#list availableDashlets as dashlet>
+            <li class="customisableDashlet available" dashletUrl="${dashlet.url}">
+               <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
+               <span >${dashlet.shortName}</span>
+               <div class="draggable" title="${dashlet.description}"></div>
+            </li>
+         </#list>
          </ul>
       </div>
 
@@ -83,13 +82,13 @@
             <div class="column" id="${args.htmlid}-column-div-${column_index + 1}" <#if (column_index >= currentLayout.noOfColumns)>style="display: none;"</#if>>
             <h3 class="padded">${msg("header.column", column_index + 1)}</h3>
             <ul id="${args.htmlid}-column-ul-${column_index + 1}" class="usedList">
-               <#list column as dashlet>
-                  <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
-                     <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif"></a>
-                     <span>${dashlet.shortName}</span>
-                     <div class="draggable" title="${dashlet.description}"></div>
-                  </li>
-               </#list>
+            <#list column as dashlet>
+               <li class="customisableDashlet used" dashletUrl="${dashlet.url}" originalRegionId="${dashlet.originalRegionId}">
+                  <a href="#"><img class="draggable" src="${url.context}/yui/assets/skins/default/transparent.gif" alt="" /></a>
+                  <span>${dashlet.shortName}</span>
+                  <div class="draggable" title="${dashlet.description}"></div>
+               </li>
+            </#list>
             </ul>
             </div>
          </#list>
@@ -103,7 +102,7 @@
 
 <div class="actions">
       
-   <hr/>
+   <hr />
       <div>
          <div class="buttons">
             <input id="${args.htmlid}-save-button" type="button" value="${msg("button.save")}" />
@@ -112,9 +111,10 @@
       </div>
    </div>
 
-
    <div style="display: none;">
-      <!-- The shadow dashlet that is used during drag n drop to "make space" for the dragged dashlet -->
-      <li class="shadow" id="${args.htmlid}-dashlet-li-shadow"></li>
+      <ul>
+         <!-- The shadow dashlet that is used during drag n drop to "make space" for the dragged dashlet -->
+         <li class="shadow" id="${args.htmlid}-dashlet-li-shadow"></li>
+      </ul>
    </div>
 </div>

@@ -237,7 +237,7 @@
       {
          if(Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
          {
-            if(this._resolvePreviewUrl())
+            if(this._resolvePreview())
             {
                if(this.swfPlayer == null)
                {
@@ -273,10 +273,10 @@
       /**
        * Helper method for deciding what preview to use, if any
        *
-       * @method _resolvePreviewUrl
-       * @return the name of the preview to use or nullif none is appropriate
+       * @method _resolvePreview
+       * @return an object describing the preview {url, doNavigate} or null if none is appropriate
        */
-      _resolvePreviewUrl: function FP__resolvePreviewUrl(event)
+      _resolvePreview: function FP__resolvePreview(event)
       {
          // Create the url to pass in to the flash movie (add a noCacheToken to avoid cache problems)
          var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
@@ -284,10 +284,10 @@
          // Try to prioritise usage of imgpreview for images and webpreview for other content
          var ps = this.options.previews;
          var preview, webpreview = "webpreview", imgpreview = "imgpreview";
-         if(this.options.mimeType.match(/image\/jpeg|image\/gif|image\/png/))
+         if(this.options.mimeType.match(/image\/jpeg|image\/gif|image\/png|application\/x-shockwave-flash/))
          {
-            var url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + "?a=true/";
-            return url;
+            var url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + "?a=true";
+            return {url: url, doNavigate: false};
          }
          else
          {
@@ -296,7 +296,7 @@
             {
                var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview;
                url += "?c=force&alf_ticket=" + Alfresco.constants.ALF_TICKET + "&noCacheToken=" + new Date().getTime();
-               return url;
+               return {url: url, doNavigate: true};
             }
          }
          return null;
@@ -314,8 +314,11 @@
             // Flash movie makes this call twice, make sure we only react on it once
             this.contentReady = true;
 
-
-            this.swfPlayer.load(this._resolvePreviewUrl());
+            var result = this._resolvePreview();
+            if(result)
+            {
+               this.swfPlayer.load(result.url, result.doNavigate);
+            }
          }
       },
 

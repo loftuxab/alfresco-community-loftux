@@ -1,4 +1,4 @@
-<div id="${args.htmlid}" class="customise-layout">
+<div class="customise-layout">
 
    <script type="text/javascript">//<![CDATA[
    new Alfresco.CustomiseLayout("${args.htmlid}").setOptions(
@@ -28,7 +28,6 @@
 
    <div id="${args.htmlid}-hideCurrentLayout-div" style="display: none;"></div>
 
-
    <div id="${args.htmlid}-currentLayout-div" class="currentLayout">
 
       <h2>${msg("section.currentLayout")}
@@ -38,9 +37,9 @@
 
       <div>
          <br />
-         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png"/>
+         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png" alt="current layout" />
          <div id="${args.htmlid}-changeButtonWrapper-div" class="buttons">
-            <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}"/>
+            <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}" />
          </div>
       </div>
 
@@ -60,8 +59,8 @@
                <div class="layoutDescription">${layout.description}</div>
                <div class="layoutBox">
                   <span>
-                     <img id="${args.htmlid}-select-img-${layout.templateId}" class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png"/>
-                     <input id="${args.htmlid}-select-button-${layout.templateId}" type="button" value="${msg("button.select")}"/>
+                     <img id="${args.htmlid}-select-img-${layout.templateId}" class="layoutIcon" src="${url.context}/components/dashboard/images/${layout.templateId}.png" alt="${layout.templateId}" />
+                     <input id="${args.htmlid}-select-button-${layout.templateId}" type="button" value="${msg("button.select")}" />
                   </span>
                </div>
             </li>
@@ -73,11 +72,10 @@
 
       <div>
          <div class="buttons">
-            <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.useCurrent")}"/>
+            <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.useCurrent")}" />
          </div>
       </div>
       
    </div>
-
 
 </div>

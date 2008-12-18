@@ -21,6 +21,7 @@
 {
    line-height: 1.5em;
    margin-left: 80px;
+   min-height: 1.5em;
 }
 
 .profile .row

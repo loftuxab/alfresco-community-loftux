@@ -1,29 +1,24 @@
 package 
 {
 
-	import flash.net.URLRequest;
-	import flash.net.URLRequestMethod;
-	import flash.net.URLVariables;
-	import flash.net.URLLoader;
+	import com.yahoo.yui.YUIAdapter;
+	
+	import flash.display.Bitmap;
+	import flash.display.DisplayObject;
+	import flash.display.Loader;
+	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.external.ExternalInterface;
+	import flash.net.URLRequest;
 	import flash.text.TextField;
-	import flash.text.TextFieldType;
-	import flash.display.MovieClip;
-	import flash.display.Loader;
-
+	
 	import mx.core.MovieClipAsset;
-
-	import com.yahoo.yui.YUIAdapter;
-	import flash.errors.IOError;
-	import flash.display.Bitmap;
-	import flash.display.DisplayObject;
    
   	/**  
 	 * @author Erik Winlof / Alfresco
 	 */
-	[SWF(backgroundColor=0xFFFFFF)]
+	[SWF(backgroundColor=0xCCCCCC, width="550", height="400")]
 	
 	public class SWFPlayer extends YUIAdapter {
 		 
@@ -39,7 +34,8 @@ package
 		private function test():void
 		{
 			init(true);
-			//load("http://localhost:8080/share/proxy/alfresco/api/node/workspace/SpacesStore/808fe496-3136-417d-82a0-cb817ff6931f/content/thumbnails/imgpreview?c=force&alf_ticket=TICKET_485029681eab75ce17cb6e857944f86bf6c38e65&noCacheToken=1219327173291");
+			//load("http://localhost:8080/share/proxy/alfresco/api/node/content/workspace/SpacesStore/d90b9295-0e9e-4241-894d-ff4685107f83?a=true&alf_ticket=TICKET_e2d2ec15744338d4ddedbba6634cb69f7add69a5", false);
+			load("http://localhost:8080/AVM2.swf", false);
 		}
 		
 		override protected function initializeComponent():void {
@@ -74,11 +70,11 @@ package
 		private var request:URLRequest;
 		private var loader:Loader;
 		private var url:String;	
-		  
+		private var doNavigation:Boolean;
+		
 		/**
 		 * The loaded external content/swf
-		 */
-		//private var mc:MovieClip;
+		 */		
 		private var content:DisplayObject;
 		private var padding:int = 0;				
 		
@@ -103,8 +99,8 @@ package
          	if(debug)
          	{
 	         	output.border = true; 
-	         	output.width = 500;
-	         	output.height = 500; 
+	         	output.width = stage.stageWidth;
+	         	output.height = stage.stageHeight; 
 	         	stage.addChild(output);         		
          	}
  	        	    
@@ -116,7 +112,7 @@ package
 	     * 
 	     * @param url The url to swf to load and display
 	     */
-		public function load(url:String):void 
+		public function load(url:String, doNavigation:Boolean=true):void 
 		{
     	    if(content != null && stage.contains(content))  
     	    {
@@ -135,6 +131,7 @@ package
     	    	stage.addChild(preloader);
     	    }
 			this.url = url;
+			this.doNavigation = doNavigation;
 			loadSwf(url);
 		}
 			
@@ -197,7 +194,7 @@ package
 			stage.removeEventListener(Event.ADDED,loadedSwfReady);
 			var newEvent:Object = new Object();
 			newEvent.type = "loadedSwfReady";
-			if(content is MovieClip)
+			if(doNavigation && content is MovieClip)
 			{
 				var mc:MovieClip = content as MovieClip;
 				newEvent.currentFrame = mc.currentFrame; 
@@ -220,7 +217,7 @@ package
       	public function loadedSwfOnFrame (event:Event) : void 
       	{
 			//t("loadedSwfOnFrame:" + currentFrame + "!=" +  mc.currentFrame);				
-      		if(content is MovieClip)
+      		if(doNavigation && content is MovieClip)
       		{
       			var mc:MovieClip = content as MovieClip;      		
       			if(currentFrame != mc.currentFrame)
@@ -263,21 +260,24 @@ package
 		{						
     	    if(stage.contains(preloader))
     	    {
-	    	    t("Remove preloader:" + url);    	        	    
+	    	    t("Remove preloader");    	        	    
 				stage.removeChild(preloader);
     	    }
     	    if(loader.content is MovieClip)
     	    {    
     	    	t("Cast external content to a movie clip");	        	        	   
 				var imc:MovieClip = MovieClip(loader.content);
-				content = imc;
-				imc.gotoAndStop(1);			
+				content = imc;				
+				if(doNavigation)
+				{ 
+					imc.gotoAndStop(1);
+				}
 				currentFrame = -1;	
-				scale(imc);
-				center(imc);
 				stage.addEventListener(Event.ADDED, loadedSwfReady);				
-    	    	t("Add movie clip to stage");	        	        	   
-	        	stage.addChild(imc); 
+				scale(imc); //, loader.contentLoaderInfo.width, loader.contentLoaderInfo.height);
+				center(imc);
+    	    	t("Add movie clip to stage as clip");
+	    		stage.addChild(imc);	
     	    }
     	    else if(event.currentTarget.loader.content is flash.display.Bitmap)
     	    {    
@@ -290,12 +290,18 @@ package
     	    	t("Add bitmap to stage");	        	        	   
 	        	stage.addChild(bm); 
     	    }
-    	    else
-    	    {
-    	    	t("Can't display url because loaded content is not a bitmap or AVM2 MovieClip.");
+    	    else if(event.target.actionScriptVersion == 2)
+	    	{
+    	    	content = loader.content;
+				//scale(content);
+				center(content);
+    	    	stage.addChild(content);    	    		
+    	    }
+    	    else{
+    	    	loadedSwfError("error.content");
+    	    	t("Can't display url because loaded content is not a bitmap or movieclip.");
 	    	    t("Description of loaded content:" + loader.content.toString());    	        	    
-	    	    t("Actionscript version of loaded content:" + event.target.actionScriptVersion);    	        	    
-	    	    loadedSwfError("error.contentNotAVM2MovieClip");
+	    	    t("Actionscript version of loaded content:" + event.target.actionScriptVersion);    	        	    	    	    	    	    
     	    }
 		}
 			
@@ -366,7 +372,7 @@ package
 		private function goTo(frame:Object, scene:String=null, play:Boolean=false):void 
 		{
 		    t("Do goTo?");  
-			if(content is MovieClip)
+			if(doNavigation && content is MovieClip)
       		{
       			t("Do goTo since its a movie clip");  
       			var mc:MovieClip = content as MovieClip;      		      		

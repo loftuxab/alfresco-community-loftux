@@ -32,9 +32,9 @@
 (function()
 {
 
-   var Dom = YAHOO.util.Dom;
-   var Event = YAHOO.util.Event;
-   var DDM = YAHOO.util.DragDropMgr;
+   var Dom = YAHOO.util.Dom, 
+      Event = YAHOO.util.Event,
+      DDM = YAHOO.util.DragDropMgr;
 
    /**
     * Alfresco.CustomisePages constructor.
@@ -47,6 +47,17 @@
    {
       this.name = "Alfresco.CustomisePages";
       this.id = htmlId;
+      
+      this.widgets =
+      {
+         /**
+          * Select buttons for each page
+          *
+          * @property selectButtons
+          * @type object Contains other objects of type {pageId: YAHOO.util.Button}
+          */
+         selectButtons: {}
+      }
 
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -55,28 +66,17 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
    Alfresco.CustomisePages.prototype =
    {
-
       /**
        * Object container for storing YUI widget instances.
        *
        * @property widgets
        * @type object
        */
-      widgets: {
-
-         /**
-          * Select buttons for each page
-          *
-          * @property selectButtons
-          * @type object Contains other objects of type {pageId: YAHOO.util.Button}
-          */
-         selectButtons: {}
-      },
-
+      widgets: null,
 
       /**
        * Object container for initialization options
@@ -149,8 +149,7 @@
          this.widgets.pagesDiv = Dom.get(this.id + "-pages-div");
 
          // Create references to control buttons and listen to events
-         var closeAddPagesLink = document.getElementById(this.id + "-closeAddPages-link");
-         YAHOO.util.Event.addListener(closeAddPagesLink, "click", this.onCloseAddPagesLinkClick, this, true);
+         Event.addListener(this.id + "-closeAddPages-link", "click", this.onCloseAddPagesLinkClick, this, true);
          this.widgets.addPagesButton = Alfresco.util.createYUIButton(this, "addPages-button", this.onAddPagesButtonClick);
          this.widgets.saveButton = Alfresco.util.createYUIButton(this, "save-button", this.onSaveButtonClick);
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -160,7 +159,7 @@
          for (var pageId in this.options.pages)
          {
             // Save a reference to each remove image button and listen for click event
-            YAHOO.util.Event.addListener(this.id + "-remove-link-" + pageId, "click", this.onRemoveButtonClick,
+            Event.addListener(this.id + "-remove-link-" + pageId, "click", this.onRemoveButtonClick,
             {
                selectedPageId: pageId,
                thisComponent: this
@@ -217,7 +216,7 @@
       onAddPagesButtonClick: function CP_onAddPageButtonClick(event, button)
       {
          // Hide add dashlets button and fade in available dashlets
-         YAHOO.util.Dom.setStyle(this.widgets.addPagesDiv, "display", "none");
+         Dom.setStyle(this.widgets.addPagesDiv, "display", "none");
          Alfresco.util.Anim.fadeIn(this.widgets.pagesDiv);
       },
 
@@ -231,8 +230,9 @@
       onCloseAddPagesLinkClick: function CP_onCloseAddPagesLinkClick(event)
       {
          // Show add pages button and hide available pages
-         YAHOO.util.Dom.setStyle(this.widgets.addPagesDiv, "display", "");
-         YAHOO.util.Dom.setStyle(this.widgets.pagesDiv, "display", "none");
+         Dom.setStyle(this.widgets.addPagesDiv, "display", "");
+         Dom.setStyle(this.widgets.pagesDiv, "display", "none");
+         Event.stop(event);
       },
 
       /**
@@ -253,6 +253,8 @@
 
          // Show or hide empty div labels
          obj.thisComponent._adjustEmptyMessages();
+         
+         Event.stop(event);
       },
 
 

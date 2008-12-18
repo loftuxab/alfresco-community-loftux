@@ -4,9 +4,11 @@
    new Alfresco.CustomisePages("${args.htmlid}").setOptions(
    {
       siteId: "${siteId}",
-      pages:{
+      pages:
+      {
       <#list pages as page>
-         "${page.pageId}":{
+         "${page.pageId}":
+         {
             pageId: "${page.pageId}",
             title: "${page.title}",
             description: "${page.description}",
@@ -20,7 +22,7 @@
    <div id="${args.htmlid}-currentPages-div" class="currentPages">
 
       <h2>${msg("section.currentPages")}</h2>
-      <hr/>
+      <hr />
       <div>
          <ul id="${args.htmlid}-currentPages-ul">
             <li id="${args.htmlid}-currentPages-empty-li" class="empty" style="display: none;">
@@ -30,14 +32,12 @@
             <li id="${args.htmlid}-currentPage-li-${page.pageId}" <#if (!page.used)>style="display: none;"</#if>>
                <div class="pageTitle"><h4>${page.title}</h4></div>
                <div class="pageIcon">
-                  <img src="${url.context}/components/site/images/page.png"/>
+                  <img src="${url.context}/components/site/images/page.png" alt="page icon" />
                </div>
                <div class="pageActions">
-                  <img src="${url.context}/components/site/images/info-16.png"
-                       title="${page.description}"/>
-                  <a id="${args.htmlid}-remove-link-${page.pageId}" href="javascript: var nothing;">
-                     <img src="${url.context}/components/site/images/generic-remove-16.png"
-                          title="${msg("button.remove")}"/>
+                  <img src="${url.context}/components/site/images/info-16.png" title="${page.description}" alt="${page.description}" />
+                  <a id="${args.htmlid}-remove-link-${page.pageId}" href="#">
+                     <img src="${url.context}/components/site/images/generic-remove-16.png" title="${msg("button.remove")}" alt="${msg("button.remove")}"/>
                   </a>
                </div>
             </li>
@@ -56,7 +56,7 @@
    <div id="${args.htmlid}-pages-div" class="pages" style="display: none;">
 
       <div class="text">
-         <a class="closeLink" href="javascript: var nothing;" id="${args.htmlid}-closeAddPages-link">${msg("link.close")}</a>
+         <a class="closeLink" href="#" id="${args.htmlid}-closeAddPages-link">${msg("link.close")}</a>
          <h3 class="padded">${msg("section.selectNewPages")}</h3>
       </div>
       <div>
