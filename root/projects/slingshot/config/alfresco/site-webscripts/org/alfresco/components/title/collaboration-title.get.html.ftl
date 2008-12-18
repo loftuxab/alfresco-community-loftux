@@ -1,5 +1,5 @@
 <#assign activePage = page.url.templateArgs.pageid!"">
-<#assign siteTitle><#if profile.title != "">${profile.title}<#else>${profile.shortName}</#if></#assign>
+<#assign siteTitle><#if profile.title != "">${profile.title?html}<#else>${profile.shortName}</#if></#assign>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.CollaborationTitle("${args.htmlid}").setOptions(
    {

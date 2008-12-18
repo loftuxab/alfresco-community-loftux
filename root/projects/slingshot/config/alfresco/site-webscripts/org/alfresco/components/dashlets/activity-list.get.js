@@ -34,7 +34,7 @@ if (activityFeed != null)
             fullName: fullName,
             itemPage: itemPageUrl(activity, summary),
             sitePage: sitePageUrl(activity, summary),
-            userProfile: userProfileUrl(activity),
+            userProfile: userProfileUrl(activity.postUserId),
             custom0: summary.custom0 || "",
             custom1: summary.custom1 || "",
             suppressSite: false
@@ -62,6 +62,7 @@ function specialize(item, activity, summary)
          item.custom0 = summary.role;
          item.fullName = trim(summary.memberFirstName + " " + summary.memberLastName);
          item.suppressSite = true;
+         item.userProfile = userProfileUrl(summary.memberUserName);
          break;
    }
    
@@ -110,9 +111,9 @@ function getActivities()
 /**
  * URL to user profile page
  */
-function userProfileUrl(activity)
+function userProfileUrl(userId)
 {
-   return url.context + "/page/user/" + encodeURI(activity.postUserId) + "/profile";
+   return url.context + "/page/user/" + encodeURI(userId) + "/profile";
 }
 
 /**

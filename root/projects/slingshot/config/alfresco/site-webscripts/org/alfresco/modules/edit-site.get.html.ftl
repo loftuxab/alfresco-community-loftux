@@ -6,11 +6,11 @@
          <input id="${args.htmlid}-shortName" type="hidden" name="shortName" value="${profile.shortName}"/>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-title">${msg("label.name")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" value="${profile.title}" tabindex="1"/>&nbsp;*</div>
+            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" value="${profile.title?html}" tabindex="1"/>&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
-            <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3" tabindex="3">${profile.description}</textarea></div>
+            <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3" tabindex="3">${profile.description?html}</textarea></div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-isPublic-checkbox">${msg("label.isPublic")}:</label></div>
