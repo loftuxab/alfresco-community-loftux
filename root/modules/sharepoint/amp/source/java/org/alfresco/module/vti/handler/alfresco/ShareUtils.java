@@ -32,6 +32,8 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Helper class to work with sites through REST API
@@ -40,6 +42,8 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
  */
 public class ShareUtils
 {
+    
+    private static Log logger = LogFactory.getLog(ShareUtils.class); 
     
     // constants
     public static final String SCHEME_PREFIX = "http://";
@@ -213,14 +217,68 @@ public class ShareUtils
         		"\"description\":\"" + description + "\",\"sitePreset\":\"" + sitePreset + "\"" +
         		(isPublic ? ",\"alfresco-createSite-instance-isPublic-checkbox\":\"on\"}" : "}");        
         createSiteMethod.setRequestEntity(new StringRequestEntity(createSiteBody, CONTENT_TYPE_TEXT_PLAIN, UTF_8));        
-        httpClient.executeMethod(createLoginMethod(login, password));
-        httpClient.executeMethod(createSiteMethod);
-        httpClient.executeMethod(createSiteDashboardMethod(shortName));
+        PostMethod loginMethod = createLoginMethod(login, password);
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to login into Share. URL: " + loginMethod.getURI());
+            
+            int loginStatus = httpClient.executeMethod(loginMethod);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Login method returned status: " + loginStatus);
+        }
+        catch(Exception e)
+        {
+            loginMethod.releaseConnection();
+            if (logger.isDebugEnabled())
+                logger.debug("Login into share failed. Message: " + e.getMessage());
+            throw new RuntimeException(e);            
+        }        
+        
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to create Site with name: " + shortName + ". URL: " + createSiteMethod.getURI());
+            
+            int createSiteStatus = httpClient.executeMethod(createSiteMethod);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Create method returned status: " + createSiteStatus);
+        }
+        catch(Exception e)
+        {
         createSiteMethod.releaseConnection();
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to create the Site with name: " + shortName + ". Message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        
+        GetMethod dashboard = createSiteDashboardMethod(shortName);
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to initialize dashboard for Site with name: " + shortName + ". URL: " + dashboard.getURI());
+            
+            int dashboardStatus = httpClient.executeMethod(createSiteDashboardMethod(shortName));
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Dashboard initialyzing finished with status: " + dashboardStatus);
+        }
+        catch(Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Dashboard initialyzing failed. Message: " + e.getMessage());
+            throw new RuntimeException(e);            
+        }
+        finally
+        {
+            dashboard.releaseConnection();
+        }
     }
     
     /**
-     * deletes site usuing REST API, http method is sent to appropriate web script
+     * deletes site using REST API, http method is sent to appropriate web script
      * 
      * @param login login that used to login into share
      * @param password password that used to login into share
@@ -237,9 +295,44 @@ public class ShareUtils
         // generate valid request body
         String deleteSiteBody = "{\"shortName\":\"" + shortName + "\"}";
         deleteSiteMethod.setRequestEntity(new StringRequestEntity(deleteSiteBody, CONTENT_TYPE_TEXT_PLAIN, UTF_8));
-        httpClient.executeMethod(createLoginMethod(login, password));
-        httpClient.executeMethod(deleteSiteMethod);
-        deleteSiteMethod.releaseConnection();               
+        PostMethod loginMethod = createLoginMethod(login, password);
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to login into Share. URL: " + loginMethod.getURI());
+            
+            int loginStatus = httpClient.executeMethod(loginMethod);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Login method returned status: " + loginStatus);
+        }
+        catch (Exception e)
+        {
+            loginMethod.releaseConnection();
+            if (logger.isDebugEnabled())
+                logger.debug("Login into share failed. Message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to delete Site with name: " + shortName + ". URL: " + deleteSiteMethod.getURI());
+            
+            int deleteSiteStatus = httpClient.executeMethod(deleteSiteMethod);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Delete method returned status: " + deleteSiteStatus);
+        }
+        catch(Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to delete the Site with name: " + shortName + ". Message: " + e.getMessage());
+            throw new RuntimeException(e);            
+        }
+        finally
+        {
+            deleteSiteMethod.releaseConnection();               
+        }
     }
 
 }

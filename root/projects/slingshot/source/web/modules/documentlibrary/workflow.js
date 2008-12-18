@@ -305,9 +305,11 @@
          // OK button submits the form
          this.modules.form.setSubmitElements(this.widgets.okButton);
 
-         // Hide dialog and disable ok button after submit and display a waitin message
-         this.modules.form.doBeforeFormSubmit = {
-            fn: function(){
+         // Hide dialog and disable ok button after submit and display a waiting message
+         this.modules.form.doBeforeFormSubmit =
+         {
+            fn: function()
+            {
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
                this.widgets.dialog.hide();

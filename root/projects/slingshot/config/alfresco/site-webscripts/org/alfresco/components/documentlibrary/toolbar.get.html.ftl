@@ -20,7 +20,7 @@
                <div class="bd">
                   <ul>
                      <li><a rel="" href="#"><span class="onActionCopyTo">${msg("menu.selected-items.copy")}</span></a></li>
-                     <li><a rel="" href="#"><span class="onActionMoveTo">${msg("menu.selected-items.move")}</span></a></li>
+                     <li><a rel="delete" href="#"><span class="onActionMoveTo">${msg("menu.selected-items.move")}</span></a></li>
                      <li><a rel="delete" href="#"><span class="onActionDelete">${msg("menu.selected-items.delete")}</span></a></li>
                      <li><a type="document" rel="" href="#"><span class="onActionAssignWorkflow">${msg("menu.selected-items.assign-workflow")}</span></a></li>
                      <li><a rel="permissions" href="#"><span class="onActionManagePermissions">${msg("menu.selected-items.manage-permissions")}</span></a></li>

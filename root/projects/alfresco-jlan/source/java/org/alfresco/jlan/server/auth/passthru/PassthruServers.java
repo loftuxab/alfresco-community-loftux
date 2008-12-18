@@ -87,6 +87,10 @@ public class PassthruServers
     
     private boolean m_debug;
     
+    // Null domain uses any available server option
+    
+    private boolean m_nullDomainUseAnyServer;
+    
     /**
      * Inner class used to periodically check offline servers to see if they are back online
      */
@@ -334,6 +338,16 @@ public class PassthruServers
     }
     
     /**
+     * Check if a null domain should use any available passthru server
+     * 
+     * @return boolean
+     */
+    public final boolean getNullDomainUseAnyServer()
+    {
+    	return m_nullDomainUseAnyServer;
+    }
+    
+    /**
      * Open a new session to an authentication server
      * 
      * @return AuthenticateSession
@@ -425,17 +439,58 @@ public class PassthruServers
      */
     protected PassthruServerDetails getAuthenticationServer()
     {
-        // Rotate the head of the list and return the new head of list server details
-
+        // Check if any available passthru server or a passthru server that does not have a domain name set
+        // should be used
+        
         PassthruServerDetails passthruServer = null;
 
-        synchronized ( m_onlineList)
+        if ( getNullDomainUseAnyServer())
         {
-            if ( m_onlineList.size() > 1)
-                m_onlineList.add(m_onlineList.remove(0));
-            if ( m_onlineList.size() > 0)
-                passthruServer = (PassthruServerDetails) m_onlineList.get(0);
+        	// Use the first available passthru server
+        
+	        synchronized ( m_onlineList)
+	        {
+	            // Rotate the head of the list and return the new head of list server details
+	        	
+	            if ( m_onlineList.size() > 1)
+	                m_onlineList.add(m_onlineList.remove(0));
+	            if ( m_onlineList.size() > 0)
+	                passthruServer = (PassthruServerDetails) m_onlineList.get(0);
+	        }
         }
+        else
+        {
+        	// Search for an online passthru server that does not have a domain name set
+        	
+            synchronized ( m_onlineList)
+            {
+              int idx = 0;
+              
+              while ( idx < m_onlineList.size() && passthruServer == null)
+              {
+                // Get the current passthru server details
+                
+                PassthruServerDetails curServer = m_onlineList.get( idx);
+                
+                if ( curServer.getDomain() == null || curServer.getDomain().length() == 0)
+                {
+                  // Use this passthru server
+                
+                  passthruServer = curServer;
+                  
+                  // Move to the back of the list
+                  
+                  m_onlineList.add( m_onlineList.remove( idx));
+                }
+                
+                // Update the server index
+                
+                idx++;
+              }
+            }
+        }
+        
+        // Return the selected passthru server, or null if not available
         
         return passthruServer;
     }
@@ -783,6 +838,16 @@ public class PassthruServers
     }
 
     /**
+     * Set the null domain to use any available server option
+     * 
+     * @param nullDomain boolean
+     */
+    public final void setNullDomainUseAnyServer( boolean nullDomain)
+    {
+    	m_nullDomainUseAnyServer = nullDomain;
+    }
+    
+    /**
      * Enable/disbale debug output
      * 
      * @param dbg boolean
@@ -829,6 +894,10 @@ public class PassthruServers
         str.append(getOnlineServerCount());
         str.append(",Offline=");
         str.append(getOfflineServerCount());
+        
+        str.append(",nullDomain=");
+        str.append( getNullDomainUseAnyServer() ? "On" : "Off");
+        
         str.append("]");
         
         return str.toString();

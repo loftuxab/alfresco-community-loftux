@@ -53,7 +53,7 @@
       {
          throw new Error("An instance of Alfresco.module.EditSite already exists.");
       }
-      
+
       // Register this component
       Alfresco.util.ComponentManager.register(this);
 
@@ -133,6 +133,13 @@
          {
             throw new Error("A shortName must be provided");
          }
+
+         if(this.widgets.panel)
+         {
+            this.widgets.panel.destroy();
+            this.widgets = {};
+         }
+
          /**
           * Load the gui and site info from the server and let the templateLoaded() method
           * handle the rest.
