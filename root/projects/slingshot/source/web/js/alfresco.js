@@ -167,9 +167,37 @@ Alfresco.util.dotNotationToObject = function(str, value)
          obj[property] = {};
          obj = obj[property];
       }
-      obj[properties[i]] = value || {};
+      obj[properties[i]] = value !== undefined ? value : null;
    }
    return object;
+};
+
+/**
+ * Finds the index of an object in an array
+ *
+ * @method Alfresco.util.findObjectPropertyByName
+ * @param obj {object} i.e. {org:{alfresco:{site:"share"}}}
+ * @param str {striog} i.e. "org.alfresco.site"
+ * @return {object} the value for the property specified by the string, in the example "share" would be returned
+ * @static
+ */
+Alfresco.util.findValueByDotNotation = function(obj, property)
+{
+   if(property && obj)
+   {
+      var currObj = obj;
+      var props = property.split(".");
+      for (var i = 0; i < props.length; i++)
+      {
+         currObj = currObj[props[i]];
+         if(currObj == undefined)
+         {
+            return null;
+         }
+      }
+      return currObj;
+   }
+   return null;
 };
 
 /**
@@ -1787,6 +1815,7 @@ Alfresco.util.Ajax = function()
             var contentType = serverResponse.getResponseHeader["Content-Type"] || config.responseContentType;
             // User provided a custom successHandler
             var json = null;
+
             if (/^\s*application\/json/.test(contentType))
             {
                // Decode the response since it should be json
@@ -1847,7 +1876,7 @@ Alfresco.util.Ajax = function()
             {
                // If the caller has defined an error message display that instead of displaying message about bad json syntax
                var displayBadJsonResult = true;
-               if (config.failureMessage)
+               if (config.failureMessage || config.failureCallback)
                {
                   displayBadJsonResult = false;
                }
@@ -2684,7 +2713,8 @@ Alfresco.service.BaseService.prototype =
        */
       set: function Preferences_set(name, value, responseConfig)
       {
-         this._jsonCall(Alfresco.util.Ajax.POST, this._url(), value, responseConfig);
+         var preference = Alfresco.util.dotNotationToObject(name, value);
+         this._jsonCall(Alfresco.util.Ajax.POST, this._url(), preference, responseConfig);
       },
 
       /**
@@ -2708,12 +2738,15 @@ Alfresco.service.BaseService.prototype =
                // Make sure the original succes callback is used
                rc.successCallback = originalSuccessCallback;
 
-               // Parse string to array, add the value and convert to string again
-               var preferences = response.json ? response.json : Alfresco.util.dotNotationToObject(n);
-               var preference = eval("preferences." + n);
-               var values = preference ? preference.split(",") : [];
+               // Get the value for the preference name
+               var preferences = Alfresco.util.dotNotationToObject(n, null);
+               preferences = YAHOO.lang.merge(preferences, response.json)
+               var values = Alfresco.util.findValueByDotNotation(preferences, n);
+
+               // Parse string to array, remove the value and convert to string again
+               var values = values ? values.split(",") : [];
                values.push(v);
-               eval("preferences." + n + " = '" + values.join(",") + "'");
+               preferences = Alfresco.util.dotNotationToObject(n, values.join(","));
 
                // Save preference with the new value
                this.set(name, preferences, rc);
@@ -2732,7 +2765,7 @@ Alfresco.service.BaseService.prototype =
        * @param value {object} The value of the property to set
        * @param responseConfig {object} A config object with only success and failure callbacks and messages
        */
-      remove: function Preferences_add(name, value, responseConfig)
+      remove: function Preferences_remove(name, value, responseConfig)
       {
          var n = name, v = value;
          var rc = responseConfig ? responseConfig : {};
@@ -2744,12 +2777,15 @@ Alfresco.service.BaseService.prototype =
                // Make sure the original succes callback is used
                rc.successCallback = originalSuccessCallback;
 
+               // Get the value for the preference name
+               var preferences = Alfresco.util.dotNotationToObject(n, null);
+               preferences = YAHOO.lang.merge(preferences, response.json)
+               var values = Alfresco.util.findValueByDotNotation(preferences, n);
+
                // Parse string to array, remove the value and convert to string again
-               var preferences = response.json ? response.json : Alfresco.util.createObjectFromString(n);
-               var preference = eval("preferences." + n);
-               var values = preference ? preference.split(",") : [];
-               values = Alfresco.util.arrayRemove(values, v);
-               eval("preferences." + n + " = '" + values.join(",") + "'");
+               var values = values ? values.split(",") : [];
+               values = Alfresco.util.arrayRemove(values, v);               
+               preferences = Alfresco.util.dotNotationToObject(n, values.join(","));
 
                // Save preference without value
                this.set(name, preferences, rc);

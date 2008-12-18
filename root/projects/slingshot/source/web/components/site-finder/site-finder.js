@@ -230,7 +230,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["url", "sitePreset", "shortName", "title", "description", "node", "tagScope", "isPublic", "button"]
+             fields: ["url", "sitePreset", "shortName", "title", "description", "isSiteManager", "node", "tagScope", "isPublic", "button"]
          };
          this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
          {
@@ -277,6 +277,21 @@
                   return (site1.title > site2.title) ? 1 : (site1.title < site2.title) ? -1 : 0;
                });
 
+               // Resolve what sites the user is site admin for
+               for(var i = 0; i < items.length; i++)
+               {
+                  items[i].isSiteManager = false;
+                  var siteManagers = items[i].siteManagers;
+                  for(var j = 0; siteManagers && j < siteManagers.length; j++)
+                  {
+                     if(siteManagers[j] == Alfresco.constants.USERNAME)
+                     {
+                        items[i].isSiteManager = true;
+                        break;
+                     }
+                  }
+               }
+
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {
@@ -285,7 +300,7 @@
             }
             
             return updatedResponse;
-         }
+         };
          
          // setup of the datatable.
          this._setupDataTable();
@@ -404,9 +419,10 @@
                if (isPublic)
                {
                   var shortName = oRecord.getData("shortName");
+                  var isSiteManager = oRecord.getData("isSiteManager");
                   var title = $html(oRecord.getData("title"));
                   var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
-                  if (shortName in me.memberOfSites)
+                  if (shortName in me.memberOfSites && isSiteManager)
                   {
                      action = '<span id="' + me.id + '-deleteButton-' + shortName + '"></span>&nbsp;' + action;
                   }

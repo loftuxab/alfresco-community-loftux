@@ -86,8 +86,13 @@ public class AuthenticationUtil
         // get user id from the session
         String userId = (String)request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
         
-        // return whether is non-null
-        return (userId != null);        
+        // return whether is non-null and not 'guest'
+        return (userId != null && !UserFactory.USER_GUEST.equals(userId));    	
+    }
+    
+    public static boolean isExternalAuthentication(HttpServletRequest request)
+    {
+        return (request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH) != null);
     }
     
     public static String getUserId(HttpServletRequest request)

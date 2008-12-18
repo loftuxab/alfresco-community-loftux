@@ -44,7 +44,7 @@
     * @return {Alfresco.MySites} The new component instance
     * @constructor
     */
-   Alfresco.MySites = function MS_constructor(htmlId)
+   Alfresco.MySites = function MySites_constructor(htmlId)
    {
       this.name = "Alfresco.MySites";
       this.id = htmlId;
@@ -55,10 +55,14 @@
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
 
+      // Initialise prototype properties
+      this.preferencesService = new Alfresco.service.Preferences();
+
+      // Listen for events from other components
       YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
 
       return this;
-   }
+   };
 
    Alfresco.MySites.prototype =
    {
@@ -95,9 +99,22 @@
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.DocumentList} returns 'this' for method chaining
        */
-      setOptions: function MS_setOptions(obj)
+      setOptions: function MySites_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
+
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.MySites} returns 'this' for method chaining
+       */
+      setMessages: function Header_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
          return this;
       },
 
@@ -106,7 +123,7 @@
        * been loaded into the browser.
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function MS_onComponentsLoaded()
+      onComponentsLoaded: function MySites_onComponentsLoaded()
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
@@ -115,31 +132,132 @@
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
-      onReady: function MS_onReady()
+      onReady: function MySites_onReady()
       {
          // Listen on clicks for the create site link
          Event.addListener(this.id + "-createSite-button", "click", this.onCreateSiteLinkClick, this, true);
 
          // Listen on clicks for delete site icons
-         var sites = this.options.sites, i, j, deleteSpan;
+         var sites = this.options.sites, i, j;
          for (i = 0, j = sites.length; i < j; i++)
          {
-            deleteSpan = Dom.get(this.id + "-delete-span-" + i);
-            if (deleteSpan)
+            if(sites[i].isSiteManager)
             {
-               Event.addListener(deleteSpan, "click", function (event, obj)
-               {
-                  // Find the site through its index and display the delete dialog for the site
-                  Alfresco.module.getDeleteSiteInstance().show(
-                  {
-                     site: sites[obj.selectedSiteIndex]
-                  });
-               },
-               {
-                  selectedSiteIndex: i,
-                  thisComponent: this
-               });
+               this._addDeleteHandling(i);               
             }
+            this._addFavouriteHandling(i);
+         }
+      },
+
+      /**
+       * Adds an event handler for bringing up the delete site dialog for the specific site
+       *
+       * @method _addDeleteHandling
+       * @param siteIndex {int} The index of the site in the this.options.sites array
+       * @private
+       */
+      _addDeleteHandling: function MySites__addDeleteHandling(siteIndex)
+      {
+         var me = this;
+         var deleteSpan = Dom.get(this.id + "-delete-span-" + siteIndex);
+         if (deleteSpan)
+         {
+            Event.addListener(deleteSpan, "click", function (event, obj)
+            {
+               // Find the site through its index and display the delete dialog for the site
+               Alfresco.module.getDeleteSiteInstance().show(
+               {
+                  site: me.options.sites[siteIndex]
+               });
+            });
+         }
+      },
+
+       /**
+        * Adds an event handler that adds or removes the site as favourite site
+        *
+        * @method _addFavouriteHandling
+        * @param siteIndex {int} The index of the site in the this.options.sites array
+        * @private
+        */
+       _addFavouriteHandling: function MySites__addFavouriteHandling(siteIndex)
+       {
+           var me = this;
+           var favouriteSpan = Dom.get(this.id + "-favourite-span-" + siteIndex);
+           if (favouriteSpan)
+           {
+               var favouriteClickHandler = function (event, obj)
+               {
+                   /**
+                    * We assume that the change of favourite site will work and therefore change
+                    * the gui immediatly after the server call.
+                    * If it doesn't we revoke the gui changes and display an error message
+                    */
+                   var responseConfig =
+                   {
+                       failureCallback:
+                       {
+                           fn: function(event, obj)
+                           {
+                               obj.thisComponent._addFavouriteHandling(obj.siteIndex);
+                               obj.thisComponent._toggleFavourite(obj.siteIndex);
+                               Alfresco.util.PopupManager.displayPrompt(
+                               {
+                                   text: Alfresco.util.message("message.siteFavourite.failure", obj.thisComponent.name)
+                               });
+                           },
+                           scope: this,
+                           obj:
+                           {
+                               siteIndex: siteIndex,
+                               thisComponent: me
+                           }
+                       },
+                       successCallback:
+                       {
+                           fn: function(event, obj)
+                           {
+                               obj.thisComponent._addFavouriteHandling(obj.siteIndex);
+                           },
+                           scope: this,
+                           obj:
+                           {
+                               siteIndex: siteIndex,
+                               thisComponent: me
+                           }
+                       }
+                   };
+
+                   // Remove listener so we don't do double submits
+                   Event.removeListener(favouriteSpan, "click", favouriteClickHandler);
+                   me._toggleFavourite(siteIndex);
+                   me.preferencesService.set(
+                           Alfresco.service.Preferences.FAVOURITE_SITES + "." + me.options.sites[siteIndex].shortName,
+                           me.options.sites[siteIndex].favourite,
+                           responseConfig);
+               };
+
+               // Add listener to favourite icons
+               Event.addListener(favouriteSpan, "click", favouriteClickHandler);
+           }
+       },
+
+       /**
+        * Helper method to change the gui and our local data model of sites
+        * @method _toggleFavourite
+        * @param siteIndex {integer} the index in our local data model
+       */
+      _toggleFavourite: function(siteIndex)
+      {
+         var span = YAHOO.util.Dom.get(this.id + "-favourite-span-" + siteIndex);
+         this.options.sites[siteIndex].favourite = !this.options.sites[siteIndex].favourite;
+         if(this.options.sites[siteIndex].favourite)
+         {
+            YAHOO.util.Dom.addClass(span, "enabled");
+         }
+         else
+         {
+            YAHOO.util.Dom.removeClass(span, "enabled");
          }
       },
 
@@ -148,7 +266,7 @@
        * @method onCreateSiteLinkClick
        * @param event {domEvent} DOM event
        */
-      onCreateSiteLinkClick: function MS_onCreateSiteLinkClick(event)
+      onCreateSiteLinkClick: function MySites_onCreateSiteLinkClick(event)
       {
          Alfresco.module.getCreateSiteInstance().show();         
       },
@@ -161,7 +279,7 @@
        * @param layer {object} Event fired (unused)
        * @param args {array} Event parameters (unused)
        */
-      onSiteDeleted: function MS_onSiteDeleted(layer, args)
+      onSiteDeleted: function MySites_onSiteDeleted(layer, args)
       {
          // Hide the site in this component
          var site = args[1].site;

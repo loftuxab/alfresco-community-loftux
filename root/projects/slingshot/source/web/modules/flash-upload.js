@@ -543,20 +543,8 @@
          // Create and save a reference to the cancelOkButton so we can alter it later
          this.widgets.cancelOkButton = Alfresco.util.createYUIButton(this, "cancelOk-button", this.onCancelOkButtonClick);
 
-         // Adjust the flash movie to fit the link
-         /*
-         var browseLink = YAHOO.util.Dom.getRegion(this.id + "-label-link");
-         var browseOverlay = YAHOO.util.Dom.get(this.id + "-flashuploader-div");
-         YAHOO.util.Dom.setStyle(browseOverlay, 'width', browseLink.right - browseLink.left + "px");
-         YAHOO.util.Dom.setStyle(browseOverlay, 'height', browseLink.bottom - browseLink.top + "px");
-         */
-
-
          // Create and save a reference to the uploader so we can call it later
          this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div", Alfresco.constants.URL_CONTEXT + "themes/" + Alfresco.constants.THEME + "/images/upload-button-sprite.png");
-
-         //this.uploader.addListener('contentReady', this.handleContentReady);
-
          this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
          this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
          this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
@@ -565,24 +553,8 @@
          this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
          this.uploader.subscribe("uploadError",this.onUploadError, this, true);
 
-         //this.uploader.subscribe('rollOver', this.handleRollOver, this, true);
-
-         // The contentReady event can't be used since it crashes FF2 on Mac
-         /*this.uploader.subscribe("contentReady", function()
-         {
-            alert('ready');
-            this.uploaderReady = true;
-            this._showPanel();
-            alert('ready:' + this.uploaderReady);
-         }, this, true);
-         */
-
          // Show panel and handle if flash is loaded later
          this._showPanel();
-      },
-
-      handleRollOver: function() {
-            alert('asdf');
       },
 
       /**
@@ -1134,7 +1106,8 @@
          }
          else
          {
-            this._applyUploaderConfig({
+            this._applyUploaderConfig(
+            {
                multiSelect: this.showConfig.mode === this.MODE_MULTI_UPLOAD,
                filter: this.showConfig.filter
             }, 0);
@@ -1154,9 +1127,13 @@
          {
             if(attempt == 7)
             {
-               Alfresco.util.PopupManager.displayMessage({text: Alfresco.util.message("message.flashConfigError", this.name)});
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.flashConfigError", this.name)
+               });
             }
-            else{
+            else
+            {
                YAHOO.lang.later(100, this, this._applyUploaderConfig, [obj, ++attempt]);
             }
          }
@@ -1186,7 +1163,8 @@
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         var formatLeftCell = function(el, oRecord, oColumn, oData) {
+         var formatLeftCell = function(el, oRecord, oColumn, oData)
+         {
             myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.left);
          };
 
@@ -1196,7 +1174,8 @@
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         var formatCenterCell = function(el, oRecord, oColumn, oData) {
+         var formatCenterCell = function(el, oRecord, oColumn, oData)
+         {
             myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.center);
          };
 
@@ -1206,7 +1185,8 @@
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         var formatRightCell = function(el, oRecord, oColumn, oData) {
+         var formatRightCell = function(el, oRecord, oColumn, oData)
+         {
             myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.right);
          };
 
@@ -1219,7 +1199,8 @@
           * @param oRecord Holds the file data object
           * @param template the template to display in the column
           */
-         this._formatCellElements = function(el, oRecord, template) {
+         this._formatCellElements = function(el, oRecord, template)
+         {
 
             // Set the state for this file(/row) if it hasn't been set
             var flashId = oRecord.getData()["id"];
@@ -1282,7 +1263,10 @@
                {
                   type: "button"
                });
-               fileButton.subscribe("click", function(){ this._onFileButtonClickHandler(flashId, oRecord.getId()); }, this, true);
+               fileButton.subscribe("click", function()
+               {
+                  this._onFileButtonClickHandler(flashId, oRecord.getId());
+               }, this, true);
                this.fileStore[flashId].fileButton = fileButton;
             }
 
@@ -1372,7 +1356,8 @@
        * @method _updateStatus
        * @private
        */
-      _updateStatus: function FU__updateStatus(){
+      _updateStatus: function FU__updateStatus()
+      {
          // Update the status label with the latest information about the upload progress
          var status = Alfresco.util.message("label.uploadStatus", this.name);
          status = YAHOO.lang.substitute(status,
@@ -1518,7 +1503,8 @@
       {
          // Cancel all uploads inside the flash movie
          var length = this.dataTable.getRecordSet().getLength();
-         for (var i = 0; i < length; i++){
+         for (var i = 0; i < length; i++)
+         {
             var record = this.dataTable.getRecordSet().getRecord(i);
             var flashId = record.getData("id");
             this.uploader.cancel(flashId);

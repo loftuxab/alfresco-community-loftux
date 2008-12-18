@@ -1671,6 +1671,11 @@
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.slingshot.yui}" 
              dest="${dir.project.slingshot.assemble}" />
+             
+      <!-- there seems to be a hidden __MACOSX folder in the YUI -->
+      <!-- distribution, remove it if present -->
+      <delete dir="${dir.project.slingshot.assemble}/__MACOSX" 
+              includeEmptyDirs="true" quiet="yes" />
 
       <!-- Copy our yui directory to apply YUI fixes -->
       <copy todir="${dir.project.slingshot.assemble}/yui">

@@ -470,7 +470,9 @@ public class NTLMAuthenticationFilter implements Filter
                 else if (Status.STATUS_OK == remoteRes.getStatus().getCode() ||
                          Status.STATUS_TEMPORARY_REDIRECT == remoteRes.getStatus().getCode())
                 {
-                    // Update the NTLM logon details in the session
+                    //
+                    // NTLM login successful - Update the NTLM logon details in the session
+                    //
                     if (ntlmDetails == null)
                     {
                         // No cached NTLM details
@@ -496,6 +498,9 @@ public class NTLMAuthenticationFilter implements Filter
                     
                     // Create User ID in session so the web-framework dispatcher knows we have logged in
                     session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userName);
+                    
+                    // Set the external auth flag so the UI knows we are using SSO etc.
+                    session.setAttribute(UserFactory.SESSION_ATTRIBUTE_EXTERNAL_AUTH, Boolean.TRUE);
                     
                     // Allow the user to access the requested page
                     chain.doFilter(req, res);

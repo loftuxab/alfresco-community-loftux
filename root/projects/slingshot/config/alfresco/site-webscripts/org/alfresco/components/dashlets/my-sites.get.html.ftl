@@ -2,16 +2,20 @@
 new Alfresco.MySites("${args.htmlid}").setOptions(
 {
    sites: [
-<#if sites??>
+      <#if sites??>
    <#list sites as site>
    {
       shortName: '${site.shortName?js_string}',
-      title: '${site.title?js_string}'
+      title: '${site.title?js_string}',
+      favourite: ${site.favourite?string},
+      isSiteManager: ${site.isSiteManager?string},
    }<#if (site_has_next)>,</#if>
    </#list>
 </#if>
    ]
-});
+}).setMessages(
+   ${messages}
+);
 //]]></script>
 
 <div class="dashlet my-sites">
@@ -23,12 +27,17 @@ new Alfresco.MySites("${args.htmlid}").setOptions(
 <#if sites??>
    <#list sites as site>
       <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if site_index = 0>first-item<#elseif !site_has_next>last-item</#if>">
-         <div>                                                                                        
+         <div>
+            <div class="my-actions">
+               <span id="${args.htmlid}-favourite-span-${site_index}" class="favourite <#if (site.favourite)>enabled</#if>" title="${msg("link.favouriteSite")}">&nbsp;</span>
+            </div>
             <div class="site">
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
             </div>
             <div class="actions">
+               <#if (site.isSiteManager)>
                <span id="${args.htmlid}-delete-span-${site_index}" class="delete" title="${msg("link.deleteSite")}">&nbsp;</span>
+               </#if>
             </div>
          </div>
       <#if site.description?exists && site.description != "">

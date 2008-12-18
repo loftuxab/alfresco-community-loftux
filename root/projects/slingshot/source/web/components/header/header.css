@@ -184,12 +184,45 @@
    color: #68A2D2;
 }
 
+.header .yuimenu .bd ul.separator
+{
+   border-bottom:1px dashed #DFE9ED;
+}
+
+
 .header .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
 {
    color: #68A2D2;
    cursor: pointer;
 	padding: 4px 15px;
 }
+
+.header .yuimenu .bd ul li.header.yuimenuitem-selected,
+.header .yuimenu .bd ul li.header
+{
+   font-weight: bold;
+   padding: 4px 15px;
+   cursor: default;
+   /*color:#038603;*/
+   color: #515D6B;   
+   background-color: #FFFFFF;
+}
+
+
+.header .yuimenu .bd ul.favourite-sites-list li
+{
+
+}
+
+.header .yuimenu .bd ul.favourite-sites-list li.yuimenuitem a.yuimenuitemlabel
+{
+   background-image:url(../images/star-selected_16x16.png);
+   background-repeat:no-repeat;
+   background-position:left 5px;
+   margin-left:15px;
+   padding-left:22px;
+}
+
 
 /* Menu: Selected state */
 
