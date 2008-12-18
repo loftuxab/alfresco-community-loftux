@@ -804,28 +804,32 @@
          }
      },
      
-     _createEventContainer: function(event, label)
-     {
-        label = label || event.name; // set default value if none specified
-        
-        var div = document.createElement("div");
-        var classes = ["cal-event-entry"];
-        for (var i=0; i < event.tags.length; i++)
-        {
-           classes.push("cal-" + event.tags[i]);
-        }
-        div.setAttribute("class", classes.join(" "));
-        div.innerHTML = '<a href="#">' + label + '</a>';
+      _createEventContainer: function(event, label)
+      {
+         label = label || event.name; // set default value if none specified
 
-        // Listen for clicks on the event div so we later can launch the event info panel
-        Event.addListener(div, 'click', this.onEventClick, {event: event, div: div}, this);
-        return div;
-     },
+         var div = document.createElement("div");
+         var classes = ["cal-event-entry"];
+         for (var i=0; i < event.tags.length; i++)
+         {
+            classes.push("cal-" + event.tags[i]);
+         }
+         div.setAttribute("class", classes.join(" "));
+         div.innerHTML = '<a href="#">' + $html(label) + '</a>';
 
-     /**
-      * Methods specific to the agenda view 
-      * of events.
-      */
+         // Listen for clicks on the event div so we later can launch the event info panel
+         Event.addListener(div, 'click', this.onEventClick,
+         {
+            event: event,
+            div: div
+         }, this);
+         return div;
+      },
+
+      /**
+       * Methods specific to the agenda view 
+       * of events.
+       */
 
       /**
        * Updates the agenda view. Currently displays ALL the events for a site.
