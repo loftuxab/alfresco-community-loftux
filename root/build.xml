@@ -246,6 +246,8 @@
          <exclude name="**/Base*Test.java" />
          <exclude name="**/Abstract*Test.java" />
          <exclude name="**/*SystemTest.java" />
+         <!-- CMIS Tests -->
+         <exclude name="**/org/alfresco/cmis/search/QueryTest.java" /> <!-- pending refactor -->
          <!-- Action Tests -->
          <exclude name="**/org/alfresco/repo/action/**/*Test.java" />
          <include name="**/org/alfresco/repo/action/ActionTestSuite.java" />
