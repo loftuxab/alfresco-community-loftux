@@ -32,6 +32,7 @@ import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.oncrpc.Rpc;
 import org.alfresco.jlan.server.NetworkServer;
 import org.alfresco.jlan.server.SrvSession;
+import org.alfresco.jlan.server.auth.ClientInfo;
 import org.alfresco.jlan.server.core.DeviceInterface;
 import org.alfresco.jlan.server.filesys.SearchContext;
 import org.alfresco.jlan.server.filesys.TreeConnection;
@@ -81,6 +82,10 @@ public class NFSSrvSession extends SrvSession {
 	private SearchContext[] m_search;
 	private int m_searchCount;
 			
+	// NFS client information
+	
+	private ClientInfo m_nfsClientInfo;
+	
 	/**
 	 * Class constructor
 	 * 
@@ -199,6 +204,24 @@ public class NFSSrvSession extends SrvSession {
 	 */	
 	public final long getLastAccess() {
 		return m_lastAccess;
+	}
+
+	/**
+	 * return the NFS client information
+	 * 
+	 * @return ClientInfo
+	 */
+	public final ClientInfo getNFSClientInformation() {
+		return m_nfsClientInfo;
+	}
+	
+	/**
+	 * Set the NFS client information
+	 * 
+	 * @param cInfo ClientInfo
+	 */
+	public final void setNFSClientInformation( ClientInfo cInfo) {
+		m_nfsClientInfo = cInfo;
 	}
 	
 	/**

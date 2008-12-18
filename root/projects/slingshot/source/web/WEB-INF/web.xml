@@ -59,18 +59,24 @@
          <param-name>container</param-name>
          <param-value>webframework.webscripts.container</param-value>
       </init-param>
+      <!--
+      <init-param>
+         <param-name>authenticator</param-name>
+         <param-value>webscripts.authenticator.basic</param-value>
+      </init-param>
+      -->
    </servlet>
    
    <servlet>
       <servlet-name>feedApiServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
+      <servlet-class>org.alfresco.web.site.servlet.WebScriptFeedServlet</servlet-class>
       <init-param>
          <param-name>container</param-name>
          <param-value>webframework.webscripts.container</param-value>
       </init-param>
       <init-param>
          <param-name>authenticator</param-name>
-         <param-value>webscripts.authenticator.basic</param-value>
+         <param-value>webscripts.authenticator.delegatingbasic</param-value>
       </init-param>
    </servlet>
 

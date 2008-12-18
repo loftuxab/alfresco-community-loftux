@@ -120,6 +120,20 @@ public class AlfrescoUserFactory extends UserFactory
     public User loadUser(RequestContext context, String userId)
         throws UserFactoryException
     {
+        return loadUser(context, userId, null);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, java.lang.String, java.lang.String)
+     */
+    public User loadUser(RequestContext context, String userId, String endpointId)
+        throws UserFactoryException
+    {
+        if (endpointId == null)
+        {
+            endpointId = ALFRESCO_ENDPOINT_ID;
+        }
+        
         AlfrescoUser user = null;
         try
         {
@@ -133,7 +147,7 @@ public class AlfrescoUserFactory extends UserFactory
             
             // get a connector whose connector session is bound to the current session
             Connector connector = FrameworkHelper.getConnector(
-                    context.getRequest().getSession(), currentUserId, ALFRESCO_ENDPOINT_ID);
+                    context.getRequest().getSession(), currentUserId, endpointId);
             
             // build the REST URL to retrieve user details
             String uri = "/webframework/content/metadata?user=" + URLEncoder.encode(userId);

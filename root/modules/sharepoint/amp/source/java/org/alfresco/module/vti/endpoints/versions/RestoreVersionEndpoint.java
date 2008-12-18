@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.vti.endpoints.versions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.module.vti.endpoints.EndpointUtils;
@@ -76,7 +77,7 @@ public class RestoreVersionEndpoint extends VtiEndpoint
         
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String dws = EndpointUtils.getDwsFromUri();
+        String dws = EndpointUtils.getDwsFromUri();        ;
 
         if (logger.isDebugEnabled())
             logger.debug("Getting fileName parameter from request.");
@@ -102,8 +103,15 @@ public class RestoreVersionEndpoint extends VtiEndpoint
 
         if (logger.isDebugEnabled())
             logger.debug("Restoring version " + fileVersion.getText() + " for file '" + dws + "/" + fileName.getText() + "'" );
-        List<DocumentVersionBean> versions = handler.restoreVersion(dws + "/" + fileName.getText(), fileVersion.getText());
+        List<DocumentVersionBean> notSortedVersions = handler.restoreVersion(dws + "/" + fileName.getText(), fileVersion.getText());
 
+        List<DocumentVersionBean> versions = new ArrayList<DocumentVersionBean>();
+        
+        versions.add(notSortedVersions.get(0));
+        for (int i = notSortedVersions.size() - 1; i > 0; --i) {
+            versions.add(notSortedVersions.get(i));
+        }
+        
         boolean isCurrent = true;
         for (DocumentVersionBean version : versions)
         {
@@ -128,7 +136,7 @@ public class RestoreVersionEndpoint extends VtiEndpoint
             result.addAttribute("size", String.valueOf(version.getSize()));
             result.addAttribute("comments", version.getComments());
         }
-
+        
         if (logger.isDebugEnabled()) {
             String versionsStr = "";
             for (DocumentVersionBean version : versions)

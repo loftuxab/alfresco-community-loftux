@@ -84,6 +84,22 @@ public abstract class UserFactory
     }
     
     /**
+     * Loads a user from the remote user store and store it into the session.
+     * 
+     * @param context
+     * @param request
+     * 
+     * @return User
+     * 
+     * @throws UserFactoryException
+     */
+    public User faultUser(RequestContext context, HttpServletRequest request, String endpoint)
+        throws UserFactoryException
+    {
+        return faultUser(context, request, endpoint, false);
+    }
+    
+    /**
      * Loads a user from the remote user store and stores it into the session.
      * 
      * If the force flag is set, the current in-session user
@@ -98,6 +114,26 @@ public abstract class UserFactory
      * @throws UserFactoryException
      */
     public User faultUser(RequestContext context, HttpServletRequest request, boolean force)
+        throws UserFactoryException
+    {
+        return faultUser(context, request, null, force);
+    }
+    
+    /**
+     * Loads a user from the remote user store and stores it into the session.
+     * 
+     * If the force flag is set, the current in-session user
+     * object will be purged, forcing the user object to reload.
+     * 
+     * @param context
+     * @param request
+     * @param force
+     * 
+     * @return User
+     * 
+     * @throws UserFactoryException
+     */
+    public User faultUser(RequestContext context, HttpServletRequest request, String endpoint, boolean force)
         throws UserFactoryException
     {
         User user = null;
@@ -119,7 +155,7 @@ public abstract class UserFactory
             if (user == null)
             {
                 // load the user from whatever store...
-                user = loadUser(context, userId);
+                user = loadUser(context, userId, endpoint);
                 
                 // if we got the user, set onto session
                 if (user != null)
@@ -151,12 +187,27 @@ public abstract class UserFactory
      * 
      * @param context
      * @param userId
+     * @param endpointId
      * 
      * @return User
      * 
      * @throws UserFactoryException
      */
     public abstract User loadUser(RequestContext context, String userId)
+        throws UserFactoryException;
+    
+    /**
+     * Load the user from a store
+     * 
+     * @param context
+     * @param userId
+     * @param endpointId
+     * 
+     * @return User
+     * 
+     * @throws UserFactoryException
+     */
+    public abstract User loadUser(RequestContext context, String userId, String endpointId)
         throws UserFactoryException;
     
     /**

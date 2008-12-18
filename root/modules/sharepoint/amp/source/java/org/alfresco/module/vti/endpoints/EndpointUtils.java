@@ -115,7 +115,7 @@ public class EndpointUtils
         TransportContext context = TransportContextHolder.getTransportContext();
         HttpServletConnection connection = (HttpServletConnection )context.getConnection();
         return connection.getHttpServletRequest();        
-    }
+    }   
     
     public static Pair<String, String> getCredentials()
     {

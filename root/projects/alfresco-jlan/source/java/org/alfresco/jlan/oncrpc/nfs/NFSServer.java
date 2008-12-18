@@ -4053,6 +4053,11 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
       break;
     }
 
+    // DEBUG
+    
+    if ( Debug.EnableDbg && hasDebugFlag( DBG_SESSION))
+    	Debug.println("[NFS] Found session " + sess);
+    
     // Setup the authentication context for the request
     
     try
@@ -4182,7 +4187,8 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
       
       //	Get the client information from the RPC
       
-      sess.setClientInformation(getRpcAuthenticator().getRpcClientInformation(sessKey, rpc));
+      sess.setNFSClientInformation(getRpcAuthenticator().getRpcClientInformation(sessKey, rpc));
+      sess.setClientInformation( sess.getNFSClientInformation());
       
       //	Add the new session to the session table
 
@@ -4192,6 +4198,12 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
       if (Debug.EnableInfo && hasDebugFlag(DBG_SESSION))
         Debug.println("[NFS] Added Unix session " + sess.getUniqueId());
+    }
+    else {
+    	
+    	// Set the thread local client information
+    	
+        sess.setClientInformation( sess.getNFSClientInformation());
     }
 
     //	Return the session

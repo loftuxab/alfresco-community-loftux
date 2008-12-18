@@ -41,7 +41,7 @@ import org.jaxen.dom4j.Dom4jXPath;
  */
 public class CreateFolderEndpoint extends VtiEndpoint
 {
-
+	
 	private final static Log logger = LogFactory.getLog(CreateFolderEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
@@ -86,7 +86,7 @@ public class CreateFolderEndpoint extends VtiEndpoint
         handler.createFolder(EndpointUtils.getDwsFromUri() + "/" + url.getText());
 
         createFolderResult.addElement("Result");
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}

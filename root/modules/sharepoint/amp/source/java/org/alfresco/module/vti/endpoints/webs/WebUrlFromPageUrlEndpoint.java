@@ -48,7 +48,7 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
     private static Log logger = LogFactory.getLog(WebUrlFromPageUrlEndpoint.class);
     
     // handler that provides methods for operating with documents and folders
-    private VtiMethodHandler handler;
+    private VtiMethodHandler handler;    
 
     // xml namespace prefix
     private static String prefix = "webs";
@@ -89,7 +89,7 @@ public class WebUrlFromPageUrlEndpoint extends VtiEndpoint
         String server = "http://" + EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
                 
-        String[] uris = handler.decomposeURL(pageUrl.replaceAll(server, ""), context);        
+        String[] uris = handler.decomposeURL(pageUrl.replaceAll(server, ""), context);
 
         // creating soap response
         Element responsElement = document.addElement("WebUrlFromPageUrlResponse", namespace);

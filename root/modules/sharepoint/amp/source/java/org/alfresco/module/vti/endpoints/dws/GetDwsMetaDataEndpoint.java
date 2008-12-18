@@ -48,7 +48,7 @@ import org.jaxen.dom4j.Dom4jXPath;
  */
 public class GetDwsMetaDataEndpoint extends VtiEndpoint
 {
-
+	
 	private final static Log logger = LogFactory.getLog(GetDwsMetaDataEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
@@ -109,7 +109,7 @@ public class GetDwsMetaDataEndpoint extends VtiEndpoint
         DwsMetadata dwsMetadata = handler.getDWSMetaData(URLDecoder.decode(doc, "UTF-8"), id.getText(), Boolean.valueOf(minimal.getText()));
 
         getDwsMetaDataResult.addText(dwsMetadata.toString());
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}

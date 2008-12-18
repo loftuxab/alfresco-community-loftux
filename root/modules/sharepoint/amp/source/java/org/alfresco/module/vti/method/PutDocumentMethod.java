@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PutDocumentMethod extends AbstractVtiMethod
 {
-
+    
     private static Log logger = LogFactory.getLog(PutDocumentMethod.class);
 
     /**

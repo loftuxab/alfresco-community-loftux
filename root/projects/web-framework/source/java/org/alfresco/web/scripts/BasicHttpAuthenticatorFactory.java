@@ -26,24 +26,29 @@ package org.alfresco.web.scripts;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
+import org.alfresco.connector.Response;
 import org.alfresco.connector.SimpleCredentials;
 import org.alfresco.util.Base64;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 import org.alfresco.web.scripts.servlet.WebScriptServletResponse;
-import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.UserFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
 /**
- * HTTP Basic Authentication for web-tier
+ * HTTP Basic Authentication for web-tier.
+ * 
+ * Provides either delegated or direct HTTP authentication to the designated endpoint.
+ * If delegation is used, the endpoint supplied must perform the handshake when called.
  * 
  * @author Kevin Roast
  */
@@ -53,10 +58,11 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
     
     private ConnectorService connectorService;
     private String endpointId;
+    private boolean delegate = false;
     
     
     /**
-     * Set the ConnectorService to use
+     * @param connectorService      the ConnectorService to use
      */
     public void setConnectorService(ConnectorService connectorService)
     {
@@ -64,12 +70,22 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
     }
     
     /**
-     * Set the EndPoint Id to use
+     * @param endpointId            EndPoint Id to use
      */
     public void setEndpointId(String endpointId)
     {
         this.endpointId = endpointId;
     }
+    
+    /**
+     * @param delegate              True to delegate actual auth to the connector framework
+     *                              False to perform the authentication directly
+     */
+    public void setDelegate(boolean delegate)
+    {
+        this.delegate = delegate;
+    }
+    
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory#create(org.alfresco.web.scripts.servlet.WebScriptServletRequest, org.alfresco.web.scripts.servlet.WebScriptServletResponse)
@@ -130,25 +146,34 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
                 
                 if (parts.length == 2)
                 {
+                    // assume username and password passed as the parts
                     String username = parts[0];
                     if (logger.isDebugEnabled())
                         logger.debug("Authenticating (BASIC HTTP) user " + parts[0]);
                     
-                    // assume username and password passed as the parts and
-                    // build an unauthenticated authentication connector then
-                    // apply the supplied credentials to it
                     try
                     {
-                        // apply the credentials to the 'guest' user as we have not logged in
+                        // generate the credentials based on the auth details provided
+                        HttpSession session = req.getSession();
                         Credentials credentials = new SimpleCredentials(endpointId);
                         credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
                         credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, parts[1]);
-                        CredentialVault vault = connectorService.getCredentialVault(req.getSession(true), "guest");
+                        CredentialVault vault = connectorService.getCredentialVault(session, username);
                         vault.store(credentials);
                         
-                        req.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
-                        
-                        authorized = true;
+                        if (delegate)
+                        {
+                            // the handshake will be performed by the Connector when a remote call is first made
+                            session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
+                            authorized = true;
+                        }
+                        else
+                        {
+                            // perform the authentication test directly using the connector
+                            Connector connector = connectorService.getConnector(endpointId, username, session);
+                            Response response = connector.call("/touch");
+                            authorized = (response.getStatus().getCode() != Status.STATUS_UNAUTHORIZED);
+                        }
                     }
                     catch (Throwable err)
                     {

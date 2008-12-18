@@ -470,7 +470,10 @@
          // Tell Dialog it's contents have changed, Currently used by container for IE6/Safari2 to sync underlay size
          this.widgets.calendar.renderEvent.subscribe(function()
          {
-            me.widgets.dialog.fireEvent("changeContent");
+            me.widgets.dialog.fireEvent("changeContent",
+            {
+               type: "changeContent"
+            });
          });
          this.widgets.calendar.selectEvent.subscribe(this.onDueDateSelected, this, true);
          

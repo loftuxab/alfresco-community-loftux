@@ -202,7 +202,7 @@ public class EndPointProxyServlet extends HttpServlet
                         // assume username and password passed as the parts and
                         // build an unauthenticated authentication connector then
                         // apply the supplied credentials to it
-                        connector = this.connectorService.getConnector(endpointId, values[0], req.getSession(true));
+                        connector = this.connectorService.getConnector(endpointId, values[0], req.getSession());
                         Credentials credentials = new SimpleCredentials(endpointId);
                         credentials.setProperty(Credentials.CREDENTIAL_USERNAME, values[0]);
                         credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, values[1]);

@@ -27,7 +27,6 @@ package org.alfresco.connector;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -41,8 +40,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Basic Connector implementation that can be used to perform simple HTTP and
- * HTTP communication with a remote endpoint. This connector supports basic
- * authentication.
+ * HTTP communication with a remote endpoint. This connector supports basic HTTP
+ * authentication via the RemoteClient.
  * 
  * @author muzquiano
  * @author kevinr
@@ -211,15 +210,14 @@ public class HttpConnector extends AbstractConnector
      */
     protected void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
     {
-        // TODO: is this necessary?
-        // support for basic authentication
+        // support for basic authentication (HTTP basic auth is performed by the RemoteClient)
         if (getCredentials() != null)
         {
             String user = (String) getCredentials().getProperty(Credentials.CREDENTIAL_USERNAME);
             String pass = (String) getCredentials().getProperty(Credentials.CREDENTIAL_PASSWORD);
             remoteClient.setUsernamePassword(user, pass);
         }        
-    }    
+    }
     
     /**
      * Retrieves headers from response and stores back onto Credentials
@@ -237,14 +235,12 @@ public class HttpConnector extends AbstractConnector
             // the server statup etc. if an endpoint is not currently available.
             this.endpointTimeouts.put(this.endpoint, System.currentTimeMillis());
         }
-        else
+        else if (getConnectorSession() != null)
         {
             Map<String, String> headers = response.getStatus().getHeaders();
-            Iterator<String> it = headers.keySet().iterator();
-            while (it.hasNext())
+            for (String headerName : headers.keySet())
             {
-                String headerName = it.next();
-                if (headerName.toLowerCase().equals("set-cookie"))
+                if (headerName.equalsIgnoreCase("set-cookie"))
                 {
                     String headerValue = headers.get(headerName);
                     
@@ -263,10 +259,7 @@ public class HttpConnector extends AbstractConnector
                         if (logger.isDebugEnabled())
                             logger.debug("Connector found set-cookie: " + cookieName + " = " + cookieValue);
                         
-                        if (getConnectorSession() != null)
-                        {
-                            getConnectorSession().setCookie(cookieName, cookieValue);
-                        }
+                        getConnectorSession().setCookie(cookieName, cookieValue);
                     }
                 }
             }
@@ -293,8 +286,6 @@ public class HttpConnector extends AbstractConnector
         
         // stamp headers onto the remote client
         applyRequestHeaders(remoteClient, context);
-        
-        // TODO: copy parameters
         
         // stamp credentials onto the remote client
         applyRequestAuthentication(remoteClient, context);

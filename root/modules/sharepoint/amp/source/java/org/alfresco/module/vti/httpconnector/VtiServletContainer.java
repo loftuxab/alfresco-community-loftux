@@ -212,7 +212,7 @@ public class VtiServletContainer
                     break;
                 }                
             }            
-        }
+        }        
         
         for (ServletPattern servletPattern : exactMatchServlets) {
             if (isMatch(uri, servletPattern.getPattern())) {

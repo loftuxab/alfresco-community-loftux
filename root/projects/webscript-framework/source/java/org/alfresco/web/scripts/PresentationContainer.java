@@ -49,12 +49,14 @@ public class PresentationContainer extends AbstractRuntimeContainer
     public void executeScript(WebScriptRequest scriptReq, WebScriptResponse scriptRes, Authenticator auth)
         throws IOException
     {
-        // TODO: handle authentication of scripts correctly on a case-by-case basis
-        //       currently we assume that if a webscript servlet has any authenticator
-        //       applied then it must be for some kind of remote user auth as supplied
-        if (auth == null || auth.authenticate(RequiredAuthentication.user, false))
+        // Handle authentication of scripts on a case-by-case basis.
+        // Currently we assume that if a webscript servlet has any authenticator
+        // applied then it must be for some kind of remote user auth as supplied.
+        WebScript script = scriptReq.getServiceMatch().getWebScript();
+        Description desc = script.getDescription();
+        RequiredAuthentication required = desc.getRequiredAuthentication();
+        if (auth == null || RequiredAuthentication.none == required || auth.authenticate(required, false))
         {
-            WebScript script = scriptReq.getServiceMatch().getWebScript();
             script.execute(scriptReq, scriptRes);
         }
     }

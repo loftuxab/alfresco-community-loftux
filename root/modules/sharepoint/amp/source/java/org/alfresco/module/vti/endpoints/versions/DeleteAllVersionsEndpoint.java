@@ -71,12 +71,12 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
-
+        
         if (logger.isDebugEnabled())
             logger.debug("Getting request params.");
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String dws = EndpointUtils.getDwsFromUri();
+        String dws = EndpointUtils.getDwsFromUri();        
         
         // getting fileName parameter from request
         XPath fileNamePath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/DeleteAllVersions/fileName"));
@@ -106,7 +106,7 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
         result.addAttribute("createdBy", current.getCreatedBy());
         result.addAttribute("size", String.valueOf(current.getSize()));
         result.addAttribute("comments", current.getComments());
-
+        
         if (logger.isDebugEnabled())
             logger.debug("Soap Method with name " + getName() + " is finished.");
         return root;

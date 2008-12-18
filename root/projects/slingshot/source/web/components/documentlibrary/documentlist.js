@@ -1005,7 +1005,10 @@
             // We don't get an renderEvent for an empty recordSet, but we'd like one anyway
             if (oResponse.results.length === 0)
             {
-               this.fireEvent("renderEvent");
+               this.fireEvent("renderEvent",
+               {
+                  type: "renderEvent"
+               });
             }
             
             // Must return true to have the "Loading..." message replaced by the error message

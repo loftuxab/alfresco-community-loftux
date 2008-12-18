@@ -24,14 +24,9 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,9 +71,18 @@ public class JaxRSUriIndex implements UriIndex
         Map<String, String> varsMatch = null;
         Match scriptMatch = null;
         String match = uri;
-        String matchNoExt = ((uri.indexOf('.') != -1) ? uri.substring(0, uri.indexOf('.')) : uri);
+        String matchNoExt = uri;
+        int extIdx = uri.indexOf('.');
+        if (extIdx != -1)
+        {
+            // format extension is only valid as the last URL element
+            if (uri.lastIndexOf('/') < extIdx)
+            {
+                matchNoExt = uri.substring(0, extIdx);
+            }
+        }
         method = method.toUpperCase();
-
+        
         // locate full match - on URI and METHOD
         for (IndexEntry entry : index.keySet())
         {

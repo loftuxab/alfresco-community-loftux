@@ -52,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
 public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler 
 {
 
-    private PersonService personService;
+    private PersonService personService;    
     private NodeService nodeService;
     private SiteService siteService;
     
@@ -73,7 +73,7 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
     public void setPersonService(PersonService personService)
     {
         this.personService = personService;
-    }
+    }   
 
     public void setNodeService(NodeService nodeService)
     {
@@ -84,10 +84,10 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
     {
         dws = VtiPathHelper.removeSlashes(dws);
         if (logger.isDebugEnabled())
-            logger.debug("Method with name 'addUserCollectionToRole' is started.");
+            logger.debug("Method with name 'addUserCollectionToRole' is started.");        
         
         
-            if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
             logger.debug("Getting siteInfo for '" + dws + "'.");
         SiteInfo siteInfo = siteService.getSite(dws);
 
@@ -96,7 +96,7 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
             if (logger.isDebugEnabled())
                 logger.debug("Error: Site info not found.");
             throw new WebServiceErrorCodeException(10);
-        }
+        }       
 
         for (UserBean userBean : usersList)
         {
@@ -192,7 +192,7 @@ public class Alfresco3UserGroupServiceHandler implements UserGroupServiceHandler
         }
         if (logger.isDebugEnabled())
             logger.debug("Method with name 'getUserLoginFromEmail' is finished.");
-
+        
         return result;
     }
     

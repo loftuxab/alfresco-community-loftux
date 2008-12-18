@@ -113,7 +113,7 @@ public class Alfresco3VersionsServiceHandler implements VersionsServiceHandler
             logger.debug("Method with name 'getVersions' is started.");
         
         FileInfo documentFileInfo = pathHelper.resolvePathFileInfo(fileName);
-
+        
         if (logger.isDebugEnabled())
             logger.debug("Asserting documentFileInfo for file '" + fileName + "'.");
         

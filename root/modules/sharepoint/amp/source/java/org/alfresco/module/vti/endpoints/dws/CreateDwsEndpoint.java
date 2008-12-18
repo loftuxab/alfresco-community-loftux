@@ -43,7 +43,7 @@ import org.jaxen.dom4j.Dom4jXPath;
 public class CreateDwsEndpoint extends VtiEndpoint
 {
 	private final static Log logger = LogFactory.getLog(CreateDwsEndpoint.class);
-
+	
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
     
@@ -84,11 +84,11 @@ public class CreateDwsEndpoint extends VtiEndpoint
         DwsBean dws = handler.createDws(parentDws, null, null, title.getTextTrim(), null);
 
         createDwsResult.addText(dws.toString());
-
+        
         if (logger.isDebugEnabled()) {
     		logger.debug("SOAP method with name " + getName() + " is finished.");
     	}
 
         return root;
-    }
+    }    
 }

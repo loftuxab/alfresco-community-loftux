@@ -84,7 +84,7 @@ public class VtiPropfindMethod extends PropFindMethod
     private int m_depth = DEPTH_INFINITY;
     private boolean containsCollblob = false;
     
-
+    
     public VtiPropfindMethod()
     {
         m_namespaces.put("urn:schemas-microsoft-com:office:office", "Office");

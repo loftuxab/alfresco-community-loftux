@@ -82,7 +82,7 @@ public class DeleteVersionEndpoint extends VtiEndpoint
         
         String host = EndpointUtils.getHost();
         String context = EndpointUtils.getContext();
-        String dws = EndpointUtils.getDwsFromUri();
+        String dws = EndpointUtils.getDwsFromUri();        
 
         // getting fileName parameter from request
         XPath fileNameXPath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/DeleteVersion/fileName"));

@@ -49,6 +49,12 @@ public interface RequestContextFactory
     public static final String SILENT_INIT = "alfSilentRequestInit";
     
     /**
+     * Request level marker to the factory impl to override the endpoint used to load user
+     * meta-data during the instantiation of the request context.
+     */
+    public static final String USER_ENDPOINT = "alfUserEndpoint";
+    
+    /**
      * Produces a new RequestContext instance for a given request. Always returns
      * a new RequestContext instance - or an exception is thrown.
      * 

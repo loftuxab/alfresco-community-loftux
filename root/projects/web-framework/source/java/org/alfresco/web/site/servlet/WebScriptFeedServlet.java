@@ -22,37 +22,37 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.action.evaluator;
+package org.alfresco.web.site.servlet;
 
-import javax.faces.context.FacesContext;
+import java.io.IOException;
 
-import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.web.bean.repository.Node;
-import org.alfresco.web.bean.repository.Repository;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.alfresco.web.scripts.servlet.WebScriptServlet;
+import org.alfresco.web.site.RequestContextFactory;
+
 
 /**
- * UI Action Evaluator - Checkout document.
+ * Entry point for Feed Web Scripts.
  * 
- * @author Kevin Roast
+ * Overrides the endpoint ID used to load in user-meta data. Only the basic HTTP feed
+ * endpoint can be used when routing webscript calls through this servlet.
+ * 
+ * @author kevinr
  */
-public class CheckoutDocEvaluator extends BaseActionEvaluator
+public class WebScriptFeedServlet extends WebScriptServlet
 {
-   private static final long serialVersionUID = 5510366635124591353L;
+    private static final long serialVersionUID = 4209812354069597860L;
 
-   /**
-    * @see org.alfresco.web.action.ActionEvaluator#evaluate(org.alfresco.web.bean.repository.Node)
-    */
-   public boolean evaluate(Node node)
-   {
-      DictionaryService dd = Repository.getServiceRegistry(
-            FacesContext.getCurrentInstance()).getDictionaryService();
-      
-      return dd.isSubClass(node.getType(), ContentModel.TYPE_CONTENT) && 
-             ((node.hasPermission(PermissionService.CHECK_OUT) &&
-              (node.isLocked() == false &&
-               node.hasAspect(ContentModel.ASPECT_WORKING_COPY) == false) &&
-               node.hasAspect(ContentModel.ASPECT_MULTILINGUAL_EMPTY_TRANSLATION) == false));
-   }
+    /* (non-Javadoc) 
+     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
+    {
+        req.setAttribute(RequestContextFactory.USER_ENDPOINT, "alfresco-feed");
+        super.service(req, res);
+    }
 }
