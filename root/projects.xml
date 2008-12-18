@@ -1727,6 +1727,20 @@
 
    <target name="package-webclient-war" 
            depends="assemble-webclient-war">
+      <!-- clean up previously generated properties files -->
+      <delete>
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
+            <include name="*_en_US.properties" />
+         </fileset>
+      </delete>
+
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages"/>
+         <mapper type="glob" 
+                 from="*.properties" 
+                 to="*_en_US.properties"/>
+      </copy>
+
       <mkdir dir="${dir.project.webclient.dist}" />
       <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
            webxml="${dir.project.webclient.src.webinf}/web.xml">
@@ -1840,20 +1854,6 @@
                   includes="${file.name.jar.remoteapi}" />
          <fileset dir="${dir.project.jlan.dist}" 
                   includes="${file.name.jar.jlan}" />
-      </copy>
-
-      <!-- clean up previously generated properties files -->
-      <delete>
-         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
-            <include name="*_en_US.properties" />
-         </fileset>
-      </delete>
-
-      <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
-         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages"/>
-         <mapper type="glob" 
-                 from="*.properties" 
-                 to="*_en_US.properties"/>
       </copy>
    </target>
 
