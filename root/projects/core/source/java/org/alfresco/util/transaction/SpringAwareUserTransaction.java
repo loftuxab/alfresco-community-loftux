@@ -44,6 +44,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttributeSource;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * A <code>UserTransaction</code> that will allow the thread using it to participate
@@ -374,6 +375,19 @@ public class SpringAwareUserTransaction
         if (internalStatus != Status.STATUS_NO_TRANSACTION)
         {
             throw new NotSupportedException("The UserTransaction may not be reused");
+        }
+        
+        // check 
+        
+        if( (propagationBehaviour != TransactionDefinition.PROPAGATION_REQUIRES_NEW))
+        {
+            if(!readOnly && 
+                    TransactionSynchronizationManager.isSynchronizationActive() &&  
+                    TransactionSynchronizationManager.isCurrentTransactionReadOnly()
+            )
+            {
+                throw new IllegalStateException("Nested writable transaction in a read only transaction");
+            }
         }
         
         // begin a transaction
