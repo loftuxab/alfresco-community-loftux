@@ -106,6 +106,7 @@
 
 .doclist .documents table
 {
+   border: medium none;
    width: 100%;
 }
 
@@ -119,7 +120,7 @@
    outline: none;
 }
 
-.doclist .documents .yui-dt-bd table
+.doclist .documents .yui-dt table
 {
    border: none;
 }
@@ -145,6 +146,11 @@
    border-bottom: 1px dashed #d9d9d9;
    border-right: medium none;
    vertical-align: top;
+}
+
+.doclist .documents.yui-dt tr.yui-dt-first td
+{
+   border-top: medium none;
 }
 
 .doclist .documents.yui-dt td.yui-dt-last
@@ -244,7 +250,7 @@
 {
    clear: left;
    float: left;
-   line-height: 1.5em;
+   line-height: 1.7em;
 }
 
 .doclist .documents .detail em
@@ -374,6 +380,10 @@
 .doclist div.simple a.simple-link span
 {
    display: none;
+}
+.doclist div.simple div.more-actions
+{
+   margin-left: -122px;
 }
 .doclist div.simple div.more-actions div
 {

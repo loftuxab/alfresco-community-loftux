@@ -35,7 +35,7 @@
    <script type="text/javascript" src="${url.context}/yui/connection/connection-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/element/element-beta-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/get/get-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-beta-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/button/button-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/container/container-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>

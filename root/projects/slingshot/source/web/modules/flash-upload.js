@@ -1206,7 +1206,6 @@
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
             scrollable: true,
-            height: "1px",
             width: "620px",
             renderLoopSize: 1
          });

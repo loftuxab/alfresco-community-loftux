@@ -88,6 +88,7 @@
 
 .topiclist
 {
+   clear: left;
    margin: 0 -8px;
 }
 

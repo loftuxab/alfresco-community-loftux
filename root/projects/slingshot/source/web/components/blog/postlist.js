@@ -71,7 +71,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "dom", "datasource", "datatable", "event", "element"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "dom", "datasource", "datatable", "paginator", "event", "element"], this.onComponentsLoaded, this);
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
@@ -452,9 +452,6 @@
             key: "blogposts", label: "BlogPosts", sortable: false, formatter: renderBlogPost
          }];
 
-         // Temporary "empty datatable" message
-         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.loading");
-
          // called by the paginator on state changes
          var handlePagination = function DL_handlePagination(state, dt)
          {
@@ -467,11 +464,12 @@
          {
             initialLoad: false,
             paginationEventHandler: handlePagination,
-            paginator: this.widgets.paginator
+            paginator: this.widgets.paginator,
+            MSG_EMPTY: this._msg("message.loading")
          });
          
          // Custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
 
          // Hook tableMsgShowEvent to clear out fixed-pixel width on <table> element (breaks resizer)
          this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
@@ -488,11 +486,11 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
-                  me._setDefaultDataTableErrors();
+                  me._setDefaultDataTableErrors(me.widgets.dataTable);
                }
             }
             else if (oResponse.results && !me.options.usePagination)
@@ -1161,12 +1159,13 @@
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function BlogPostList__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function BlogPostList__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.BlogPostList");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.BlogPostList");
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.BlogPostList"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.BlogPostList"));
       },
       
       /**
@@ -1183,7 +1182,7 @@
          }*/
           
          // Reset the custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // ajax request success handler
          var successHandler = function BlogPostList__updateBlogPostList_successHandler(sRequest, oResponse, oPayload)
@@ -1211,7 +1210,7 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                   if (oResponse.status == 404)
                   {
@@ -1221,7 +1220,7 @@
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
          };

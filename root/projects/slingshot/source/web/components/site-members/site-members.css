@@ -27,18 +27,13 @@
    width: 75%;
 }
 
-.site-members .yui-dt-bd
+.site-members .members-list table
 {
    border: 1px solid #a1a1a1;
-}
-
-.site-members .yui-dt-bd table
-{
 	width: 100%;
-	border: none;
 }
 
-.site-members .yui-dt-bd table thead
+.site-members .members-list table thead
 {
 	display: none;
 }

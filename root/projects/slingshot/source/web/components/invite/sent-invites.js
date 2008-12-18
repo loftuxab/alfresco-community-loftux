@@ -430,11 +430,11 @@
          }];
 
          // DataTable definition
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 8,
-            initialLoad: false
+            initialLoad: false,
+            MSG_EMPTY: ""
          });
 
          // Enable row highlighting
@@ -571,12 +571,13 @@
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function SentInvites__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function SentInvites__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.empty");
-         YAHOO.widget.DataTable.MSG_ERROR = this._msg("message.error");
+         dataTable.set("MSG_EMPTY", msg("message.empty"), "Alfresco.SentInvites");
+         dataTable.set("MSG_ERROR", msg("message.error"), "Alfresco.SentInvites");
       },
       
       /**
@@ -588,17 +589,17 @@
       _performSearch: function SentInvites__performSearch(searchTerm)
       {
          // Reset the custom error messages
-         this._setDefaultDataTableErrors();
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Don't display any message
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
+         this.widgets.dataTable.set("MSG_EMPTY", "");
          
          // Empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          
          var successHandler = function SentInvites__pS_successHandler(sRequest, oResponse, oPayload)
          {
-            this._setDefaultDataTableErrors();
+            this._setDefaultDataTableErrors(this.widgets.dataTable);
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
          
@@ -614,12 +615,12 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
          };

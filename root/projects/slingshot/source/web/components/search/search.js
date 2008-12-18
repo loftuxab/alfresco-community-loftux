@@ -397,19 +397,19 @@
             key: "summary", label: me._msg("message.desc"), sortable: false, formatter: renderCellDescription
          }];
 
-         // show initial message
-         this._setDefaultDataTableErrors();
-         if (this.options.initialSearchTerm.length == 0)
-         {
-            YAHOO.widget.DataTable.MSG_EMPTY = "";
-         }
-
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
             initialLoad: false
          });
+
+         // show initial message
+         this._setDefaultDataTableErrors(this.widgets.dataTable);
+         if (this.options.initialSearchTerm.length == 0)
+         {
+            this.widgets.dataTable.set("MSG_EMPTY", "");
+         }
          
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function Search_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -419,17 +419,17 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  me.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
-                  me._setDefaultDataTableErrors();
+                  me._setDefaultDataTableErrors(me.widgets.dataTable);
                }
             }
             else if (oResponse.results)
             {
                // clear the empty error message
-               YAHOO.widget.DataTable.MSG_EMPTY = "";
+               me.widgets.dataTable.set("MSG_EMPTY", "");
                
                // update the results count, update hasMoreResults.
                me.hasMoreResults = (oResponse.results.length > me.options.maxResults);
@@ -530,12 +530,13 @@
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
+       * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors()
+      _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.Search");
-         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.Search");
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.Search"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.Search"));
       },
       
       /**
@@ -550,7 +551,7 @@
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
           
          // update the ui to show that a search is on-going
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
+         this.widgets.dataTable.set("MSG_EMPTY", "");
          this.widgets.dataTable.render();
          
          function successHandler(sRequest, oResponse, oPayload)
@@ -575,12 +576,12 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  this._setDefaultDataTableErrors(this.widgets.dataTable);
                   this.widgets.dataTable.render();
                }
             }
