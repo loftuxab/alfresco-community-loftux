@@ -170,12 +170,13 @@ public class VtiServletContainer
     {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String uri = getUri(httpRequest);
+        String nodeId = request.getParameter("nodeId");        
         if (logger.isDebugEnabled()) {
             logger.debug("Find appropriate servlet by pattern for uri='" + uri + "'");
         }
         HttpServlet targetServlet = null;
         
-        String httpMethod = httpRequest.getMethod();
+        String httpMethod = httpRequest.getMethod();        
         if (httpMethod.equals(WebDAV.METHOD_PROPFIND))
         {
             for (ServletPattern servletPattern : exactMatchServlets) 
@@ -198,6 +199,30 @@ public class VtiServletContainer
                     break;
                 }                
             }            
+        }
+        
+        if (httpMethod.equals(VtiFilter.METHOD_GET) && (nodeId != null || uri.endsWith(".vti")))
+        {
+            for (ServletPattern servletPattern : exactMatchServlets) 
+            {         
+                if (servletPattern.getPattern().equals("browser_servlet"))
+                {
+                    targetServlet = servletPattern.getServlet();
+                    break;
+                }                
+            }            
+        }
+        
+        if (httpMethod.equals(VtiFilter.METHOD_POST) && nodeId != null)//&& nodeId.contains("_vti_bin/usergroup.asmx"))
+        {
+            for (ServletPattern servletPattern : exactMatchServlets) 
+            {         
+                if (servletPattern.getPattern().equals("/_vti_bin/usergroup.asmx"))
+                {
+                    targetServlet = servletPattern.getServlet();
+                    break;
+                }                
+            }                        
         }
         
         for (ServletPattern servletPattern : exactMatchServlets) {

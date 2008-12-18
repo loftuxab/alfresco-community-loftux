@@ -54,11 +54,14 @@ import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.site.AuthenticationUtil;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.RequestContextFactory;
+import org.alfresco.web.site.UserFactory;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.NDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -114,18 +117,32 @@ public class NTLMAuthenticationFilter implements Filter
      * @param sreq ServletRequest
      * @param sresp ServletResponse
      * @param chain FilterChain
+     * 
      * @exception IOException
      * @exception ServletException
      */
     public void doFilter(ServletRequest sreq, ServletResponse sresp, FilterChain chain)
         throws IOException, ServletException
     {
-        // initialize the request context
-        // it may already exist if an outer authentication filter has intercepted first
+        NDC.remove();
+        NDC.push(Thread.currentThread().getName());
+        
+        // Get the HTTP request/response/session
+        HttpServletRequest req = (HttpServletRequest)sreq;
+        HttpServletResponse res = (HttpServletResponse)sresp;
+        HttpSession session = req.getSession();
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Processing request " + req.getRequestURI() + " SID:" + session.getId());
+        
+        // initialize a new request context
         RequestContext context = null;
         try
         {
-            context = RequestUtil.getRequestContext(sreq);
+            // perform a "silent" init - i.e. no user creation or remote connections
+            req.setAttribute(RequestContextFactory.SILENT_INIT, Boolean.TRUE);
+            context = FrameworkHelper.initRequestContext(req);
+            req.removeAttribute(RequestContextFactory.SILENT_INIT);
         }
         catch (RequestContextException ex)
         {
@@ -142,24 +159,40 @@ public class NTLMAuthenticationFilter implements Filter
             return;
         }
         
-        // Get the HTTP request/response/session
-        HttpServletRequest req = (HttpServletRequest)sreq;
-        HttpServletResponse res = (HttpServletResponse)sresp;
-        HttpSession session = req.getSession(true);
-        
         // Check if there is an authorization header with an NTLM security blob
         String authHdr = req.getHeader("Authorization");
         boolean reqAuth = (authHdr != null && authHdr.startsWith(AUTH_NTLM));
         
-        // If user exists and we do not require re-authentication then continue to next filter
-        if (!reqAuth && AuthenticationUtil.isAuthenticated(req))
+        // touch the repo to ensure we still have an authenticated NTLM session
+        if (!reqAuth && session.getAttribute(NTLM_AUTH_DETAILS) != null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Authentication not required, chaining ...");
-            
-            // Chain to the next filter
-            chain.doFilter(sreq, sresp);
-            return;
+            try
+            {
+                Connector conn = connectorService.getConnector(this.endpoint, session);
+                Response remoteRes = conn.call("/touch", null, req, null);
+                if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
+                {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Repository session timed out - restarting auth process...");
+                    
+                    // restart NTLM login as the repo has timed us out
+                    restartAuthProcess(session, res);
+                    return;
+                }
+                else
+                {
+                    // we have local auth in the session and the repo session is also valid
+                    // this means we do not need to perform any further auth handshake
+                    if (logger.isDebugEnabled())
+                        logger.debug("Authentication not required, chaining ...");
+                    chain.doFilter(sreq, sresp);
+                    return;
+                }
+            }
+            catch (RemoteConfigException rerr)
+            {
+                throw new AlfrescoRuntimeException("Incorrectly configured endpoint ID: " + this.endpoint);
+            }
         }
         
         // Check if the login page is being accessed, do not intercept the login page
@@ -192,10 +225,7 @@ public class NTLMAuthenticationFilter implements Filter
                 logger.debug("New NTLM auth request from " + req.getRemoteHost() + " (" +
                              req.getRemoteAddr() + ":" + req.getRemotePort() + ")");
             
-            // Send back a request for NTLM authentication
-            res.setHeader(HEADER_WWWAUTHENTICATE, AUTH_NTLM);
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.flushBuffer();
+            restartAuthProcess(session, res);
         }
         else
         {
@@ -231,6 +261,20 @@ public class NTLMAuthenticationFilter implements Filter
      */
     public void destroy()
     {
+    }
+    
+    /**
+     * Restart the authentication process for NTLM - clear current security details
+     */
+    private void restartAuthProcess(HttpSession session, HttpServletResponse res) throws IOException
+    {
+        // Clear any cached logon details from the sessiom
+        session.removeAttribute(NTLM_AUTH_DETAILS);
+        
+        // restart the authentication process for NTLM
+        res.setHeader(HEADER_WWWAUTHENTICATE, AUTH_NTLM);
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.flushBuffer();
     }
 
     /**
@@ -390,9 +434,15 @@ public class NTLMAuthenticationFilter implements Filter
             if (logger.isDebugEnabled())
                 logger.debug("Using cached NTLM hash, authenticated = " + authenticated);
             
-            // Allow the user to access the requested page
-            chain.doFilter( req, res);
-            return;
+            if (!authenticated)
+            {
+                restartAuthProcess(session, res);
+            }
+            else
+            {
+                // Allow the user to access the requested page
+                chain.doFilter(req, res);
+            }
         }
         else
         {
@@ -445,7 +495,7 @@ public class NTLMAuthenticationFilter implements Filter
                         logger.debug("User logged on via NTLM, " + ntlmDetails);
                     
                     // Create User ID in session so the web-framework dispatcher knows we have logged in
-                    AuthenticationUtil.login(req, userName);
+                    session.setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userName);
                     
                     // Allow the user to access the requested page
                     chain.doFilter(req, res);

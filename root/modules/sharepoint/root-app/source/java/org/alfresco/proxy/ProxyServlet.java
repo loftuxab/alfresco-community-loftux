@@ -92,6 +92,12 @@ public class ProxyServlet extends HttpServlet implements Runnable
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
+        if (request.getRequestURI().contains("favicon.ico"))
+        {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getOutputStream().close();
+            return;
+        }
         if (targetHttpMethod != null)
         {
             try
@@ -121,7 +127,7 @@ public class ProxyServlet extends HttpServlet implements Runnable
             {
             }
         }
-
+        
         while (receiverBean == null || contextReceiver == null)
         {
             try
@@ -132,7 +138,6 @@ public class ProxyServlet extends HttpServlet implements Runnable
             catch (Exception e)
             {
             }
-            
             try
             {
                 Method method = alfrescoAppContext.getClass().getMethod("getBean", String.class);
@@ -141,9 +146,7 @@ public class ProxyServlet extends HttpServlet implements Runnable
             catch (Exception e)
             {
             }
-            
-            if (receiverBean == null || contextReceiver == null) 
-            {
+            if (receiverBean == null || contextReceiver == null) {
                 try
                 {
                     Thread.currentThread().sleep(RECONNECT_TIME);
@@ -161,7 +164,7 @@ public class ProxyServlet extends HttpServlet implements Runnable
         }
         catch (Exception e)
         {
-            throw new ServletException("Exception while retrieving context receiver bean", e);
+            throw new ServletException("Exception while setting Alfresco context to context receiver bean", e);
         }
         try
         {
@@ -170,7 +173,7 @@ public class ProxyServlet extends HttpServlet implements Runnable
         }
         catch (Exception e)
         {
-            throw new ServletException("Exception while retrieving context receiver bean", e);
+            throw new ServletException("Exception while setting Alfresco context to receiver bean", e);
         }
         try
         {

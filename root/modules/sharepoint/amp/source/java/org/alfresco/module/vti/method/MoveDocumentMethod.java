@@ -32,10 +32,13 @@ import java.util.List;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
 import org.alfresco.module.vti.metadata.dic.options.PutOption;
 import org.alfresco.module.vti.metadata.dic.options.RenameOption;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling MoveDocument Method
@@ -45,6 +48,8 @@ import org.alfresco.module.vti.metadata.dic.options.RenameOption;
 public class MoveDocumentMethod extends AbstractVtiMethod
 {
     
+    private static Log logger = LogFactory.getLog(MoveDocumentMethod.class);
+    
     private static final String METHOD_NAME = "move document";
     
     /** 
@@ -53,6 +58,10 @@ public class MoveDocumentMethod extends AbstractVtiMethod
     @Override
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         String serviceName  = request.getParameter("service_name", "");
         String oldUrl  = request.getParameter("oldUrl", "");
         String newUrl  = request.getParameter("newUrl", "");
@@ -60,7 +69,9 @@ public class MoveDocumentMethod extends AbstractVtiMethod
         EnumSet<RenameOption> renameOptionSet  = RenameOption.getOptions(request.getParameter("rename_option"));
         EnumSet<PutOption> putOptionSet  = PutOption.getOptions(request.getParameter("put_option"));
         boolean docopy  = request.getParameter("docopy", false);
-        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);
+        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);        
+        
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
         
         DocsMetaInfo docs = vtiHandler.moveDocument(serviceName, oldUrl, newUrl, urlList, renameOptionSet, putOptionSet, docopy, validateWelcomeNames);
 
@@ -97,6 +108,11 @@ public class MoveDocumentMethod extends AbstractVtiMethod
         response.endList();
         
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
     /*

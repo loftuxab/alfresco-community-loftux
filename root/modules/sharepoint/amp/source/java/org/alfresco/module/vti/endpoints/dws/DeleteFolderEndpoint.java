@@ -27,6 +27,8 @@ package org.alfresco.module.vti.endpoints.dws;
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.DwsServiceHandler;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -39,6 +41,8 @@ import org.jaxen.dom4j.Dom4jXPath;
  */
 public class DeleteFolderEndpoint extends VtiEndpoint
 {
+
+	private final static Log logger = LogFactory.getLog(DeleteFolderEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
@@ -62,6 +66,10 @@ public class DeleteFolderEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element element, Document document) throws Exception
     {
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is started.");
+    	}
+    	
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
@@ -75,9 +83,13 @@ public class DeleteFolderEndpoint extends VtiEndpoint
         Element root = document.addElement("DeleteFolderResponse", namespace);
         Element deleteFolderResult = root.addElement("DeleteFolderResult");
         
-        handler.deleteFolder(url.getText());
+        handler.deleteFolder(EndpointUtils.getDwsFromUri() + "/" + url.getText());
 
         deleteFolderResult.addElement("Result");
+
+        if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is finished.");
+    	}
 
         return root;
     }

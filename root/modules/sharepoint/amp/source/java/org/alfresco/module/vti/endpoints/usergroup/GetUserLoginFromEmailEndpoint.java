@@ -31,6 +31,8 @@ import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.UserGroupServiceHandler;
 import org.alfresco.module.vti.metadata.soap.usergroup.UserBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -50,9 +52,8 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
     // xml namespace prefix
     private static String prefix = "usergroup";
 
-    /**
-     * @param handler
-     */
+    private static Log logger = LogFactory.getLog(GetUserLoginFromEmailEndpoint.class);
+
     public GetUserLoginFromEmailEndpoint(UserGroupServiceHandler handler)
     {
         super();
@@ -66,6 +67,8 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element requestElement, Document responseDocument) throws Exception
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is started.");
      // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
@@ -74,7 +77,8 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
         XPath usersPath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/GetUserLoginFromEmail/emailXml/Users/User"));
         usersPath.setNamespaceContext(nc);
         List<Element> usersList = (List<Element>) usersPath.selectNodes(requestElement);
-
+        if (logger.isDebugEnabled())
+            logger.debug("Getting users emails from request.");
         List<String> emailList = new ArrayList<String>();
         for (Element userElement : usersList)
         {
@@ -88,7 +92,23 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
 
         Element getUserLoginFromEmail = result.addElement("GetUserLoginFromEmail");
 
+        if (logger.isDebugEnabled()) {
+            String emails = "";
+            for(String email : emailList) {
+                emails += email + " ";
+            }
+            logger.debug("Getting users from email list [ " + emails + "]");
+        }
+        
         List<UserBean> users = handler.getUserLoginFromEmail(null, emailList);
+
+        if (logger.isDebugEnabled()) {
+            String usernames = "";
+            for(UserBean user : users) {
+                usernames += user.getDisplayName() + " ";
+            }
+            logger.debug("Retreived users [ " + usernames + "]");
+        }
 
         for (int i = 0; i < users.size(); i++)
         {
@@ -100,6 +120,8 @@ public class GetUserLoginFromEmailEndpoint extends VtiEndpoint
             user.addAttribute("SiteUser", "0");
         }
 
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is finished.");
         return root;
     }
 

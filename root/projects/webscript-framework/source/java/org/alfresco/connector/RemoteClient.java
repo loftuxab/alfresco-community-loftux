@@ -74,8 +74,8 @@ public class RemoteClient extends AbstractClient
     private static final String CHARSETEQUALS = "charset=";
     private static final int BUFFERSIZE = 4096;
     
-    private static final int CONNECT_TIMEOUT = 1000;
-    private static final int READ_TIMEOUT = 30000;
+    private static final int CONNECT_TIMEOUT = 5000;
+    private static final int READ_TIMEOUT = 60000;
     
     private String defaultEncoding;
     private String ticket;
@@ -493,7 +493,7 @@ public class RemoteClient extends AbstractClient
             logger.debug("Executing " + "(" + requestMethod + ") " + url.toString());
             if (in != null)  logger.debug(" - InputStream supplied - will push...");
             if (out != null) logger.debug(" - OutputStream supplied - will stream response...");
-            if (req != null) logger.debug(" - Full Proxy mode, will apply headers and stream...");
+            if (req != null && res != null) logger.debug(" - Full Proxy mode between servlet request and response...");
         }
         
         HttpURLConnection connection = null;

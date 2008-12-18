@@ -305,6 +305,23 @@
          // OK button submits the form
          this.modules.form.setSubmitElements(this.widgets.okButton);
 
+         // Hide dialog and disable ok button after submit and display a waitin message
+         this.modules.form.doBeforeFormSubmit = {
+            fn: function(){
+               this.widgets.okButton.set("disabled", true);
+               this.widgets.cancelButton.set("disabled", true);
+               this.widgets.dialog.hide();
+               this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message("message.assigning", this.name),
+                  spanClass: "wait",
+                  displayTime: 0
+               });
+            },
+            obj: null,
+            scope: this
+         }
+
          // JSON submit type, but we'll be intercepting the actual Ajax request
          this.modules.form.setAJAXSubmit(true,
          {
@@ -555,9 +572,11 @@
        */
       onFailure: function DLW_onFailure(p_data)
       {
-         this._hideDialog();
-
-         Alfresco.util.PopupManager.displayMessage(
+         this.widgets.feedbackMessage.destroy();
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
+         this.widgets.dialog.show();
+         Alfresco.util.PopupManager.displayPrompt(
          {
             text: this._msg("message.workflow.failure")
          });
@@ -698,6 +717,10 @@
 
          // Clear comment
          Dom.get(this.id + "-comment").value = "";
+
+         // Enable buttons
+         this.widgets.okButton.set("disabled", false);
+         this.widgets.cancelButton.set("disabled", false);
 
          // Initialise the Forms Runtime
          this.modules.form.init();

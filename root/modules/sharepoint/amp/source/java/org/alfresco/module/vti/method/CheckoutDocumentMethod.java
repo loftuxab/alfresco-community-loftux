@@ -29,7 +29,10 @@ import java.io.IOException;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling CheckoutDocument Method
@@ -40,6 +43,8 @@ import org.alfresco.module.vti.metadata.DocMetaInfo;
 public class CheckoutDocumentMethod extends AbstractVtiMethod
 {
 
+    private static Log logger = LogFactory.getLog(CheckoutDocumentMethod.class);
+    
     public String getName()
     {
         return "checkout document";
@@ -50,11 +55,18 @@ public class CheckoutDocumentMethod extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
+        
         String serviceName  = request.getParameter("service_name", "");
         String documentName  = request.getParameter("document_name", "");
         int force  = request.getParameter("force", 0);
         int timeout  = request.getParameter("timeout", 10);
-        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);
+        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);        
+        
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
 
         DocMetaInfo docMetaInfo = vtiHandler.checkOutDocument(serviceName, documentName, force, timeout, validateWelcomeNames);
 
@@ -65,6 +77,11 @@ public class CheckoutDocumentMethod extends AbstractVtiMethod
         
         response.endList();
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
 }

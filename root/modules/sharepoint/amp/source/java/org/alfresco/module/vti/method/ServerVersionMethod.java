@@ -29,6 +29,8 @@ import java.io.IOException;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling ServerVersion Method
@@ -44,6 +46,8 @@ public class ServerVersionMethod extends AbstractVtiMethod
 
     public static final String version = major + "." + minor + "." + phase + "." + increment;
     
+    private static Log logger = LogFactory.getLog(ServerVersionMethod.class);
+    
     public String getName()
     {
         return "server version";
@@ -55,6 +59,10 @@ public class ServerVersionMethod extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
         response.beginVtiAnswer(getName(), version);
         response.beginList(getName());
         response.addParameter("major ver=" + major);
@@ -64,6 +72,11 @@ public class ServerVersionMethod extends AbstractVtiMethod
         response.endList();
         response.addParameter("source control=1");
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
 }

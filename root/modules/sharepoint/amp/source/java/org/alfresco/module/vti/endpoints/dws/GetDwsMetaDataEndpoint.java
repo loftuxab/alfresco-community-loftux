@@ -26,12 +26,13 @@
 package org.alfresco.module.vti.endpoints.dws;
 
 import java.net.URLDecoder;
-import java.util.Map;
 
 import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.DwsServiceHandler;
 import org.alfresco.module.vti.metadata.soap.dws.DwsMetadata;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -47,6 +48,8 @@ import org.jaxen.dom4j.Dom4jXPath;
  */
 public class GetDwsMetaDataEndpoint extends VtiEndpoint
 {
+
+	private final static Log logger = LogFactory.getLog(GetDwsMetaDataEndpoint.class);
 
     // handler that provides methods for operating with documents and folders
     private DwsServiceHandler handler;
@@ -74,6 +77,10 @@ public class GetDwsMetaDataEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element reqElement, Document document) throws Exception
     {
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is started.");
+    	}
+    	
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
@@ -97,15 +104,15 @@ public class GetDwsMetaDataEndpoint extends VtiEndpoint
         Element root = document.addElement("GetDwsMetaDataResponse", namespace);
 
         Element getDwsMetaDataResult = root.addElement("GetDwsMetaDataResult");
-        
-        String server = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext()+ "/";
-        Map<String, Object> session = sessionManager.getSession(EndpointUtils.getRequest());
-        session.put("dws", URLDecoder.decode(doc.substring(0, doc.lastIndexOf('/')).replaceAll(server, ""),"UTF-8"));
 
         //getting information about document workspace
         DwsMetadata dwsMetadata = handler.getDWSMetaData(URLDecoder.decode(doc, "UTF-8"), id.getText(), Boolean.valueOf(minimal.getText()));
 
         getDwsMetaDataResult.addText(dwsMetadata.toString());
+
+        if (logger.isDebugEnabled()) {
+    		logger.debug("SOAP method with name " + getName() + " is finished.");
+    	}
 
         return root;
     }

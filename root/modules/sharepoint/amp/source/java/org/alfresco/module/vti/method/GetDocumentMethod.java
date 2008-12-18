@@ -31,8 +31,11 @@ import java.util.EnumSet;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.Document;
 import org.alfresco.module.vti.metadata.dic.options.GetOption;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling GetDocument Method
@@ -42,6 +45,8 @@ import org.alfresco.module.vti.metadata.dic.options.GetOption;
  */
 public class GetDocumentMethod extends AbstractVtiMethod
 {
+    private static Log logger = LogFactory.getLog(GetDocumentMethod.class);
+            
     private static final String METHOD_NAME = "get document"; 
     
     /* (non-Javadoc)
@@ -49,6 +54,11 @@ public class GetDocumentMethod extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
+        
         String serviceName  = request.getParameter("service_name", "");
         String documentName  = request.getParameter("document_name", "");
         String effProtocolVer  = request.getParameter("effective_protocol_version", "");
@@ -57,8 +67,9 @@ public class GetDocumentMethod extends AbstractVtiMethod
         String docVersion  = request.getParameter("doc_version", "");
         EnumSet<GetOption> getOptionSet = GetOption.getOptions(request.getParameter("get_option"));
         int timeout  = request.getParameter("timeout", 10);
-        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);
+        boolean validateWelcomeNames  = request.getParameter("validateWelcomeNames", false);        
         
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
 
         Document document = vtiHandler.getDocument(serviceName, documentName, force, docVersion, getOptionSet, timeout);
         
@@ -85,6 +96,11 @@ public class GetDocumentMethod extends AbstractVtiMethod
             response.getOutputStream().write(bytearray, 0, bytesread); 
         }
         is.close();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
 

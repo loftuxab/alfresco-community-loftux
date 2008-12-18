@@ -86,6 +86,7 @@ public class VtiContextFilter implements Filter
         if (logger.isDebugEnabled()) {
             logger.debug("Checking request for VTI or not");
         }
+        
         if (sessionManager.getSession(httpRequest) == null) {
             if (!accessChecker.isRequestAcceptableForRoot(httpRequest)) {
                 if (logger.isDebugEnabled()) {

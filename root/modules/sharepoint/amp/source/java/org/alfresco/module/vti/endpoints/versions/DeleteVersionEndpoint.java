@@ -30,6 +30,8 @@ import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.VersionsServiceHandler;
 import org.alfresco.module.vti.metadata.soap.versions.DocumentVersionBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -50,11 +52,8 @@ public class DeleteVersionEndpoint extends VtiEndpoint
     // xml namespace prefix
     private static String prefix = "versions";
 
-    /**
-     * constructor
-     *
-     * @param handler that provides methods for operating with documents and folders
-     */
+    private static Log logger = LogFactory.getLog(DeleteVersionEndpoint.class);
+    
     public DeleteVersionEndpoint(VersionsServiceHandler handler)
     {
         this.handler = handler;
@@ -69,13 +68,22 @@ public class DeleteVersionEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element element, Document document) throws Exception
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is started.");
         if (true)
         {
+            if (logger.isWarnEnabled())
+                logger.debug("Return error 'This operation is not supported by server.'");
             throw new Exception("This operation is not supported by server.");
         }
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
+        
+        String host = EndpointUtils.getHost();
+        String context = EndpointUtils.getContext();
+        String dws = EndpointUtils.getDwsFromUri();
+        String sessionId = EndpointUtils.getVtiSessionId();
 
         // getting fileName parameter from request
         XPath fileNameXPath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/DeleteVersion/fileName"));
@@ -95,10 +103,10 @@ public class DeleteVersionEndpoint extends VtiEndpoint
 
         results.addElement("list").addAttribute("id", "");
         results.addElement("versioning").addAttribute("enabled", "1");
-        results.addElement("settings").addAttribute("url", "");
+        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText() + "&sessionId=" + sessionId);
 
         // deleting given file version
-        List<DocumentVersionBean> versions = handler.deleteVersion(fileName.getText(), fileVersion.getText());
+        List<DocumentVersionBean> versions = handler.deleteVersion(dws + "/" + fileName.getText(), fileVersion.getText());
 
         boolean isCurrent = true;
         for (DocumentVersionBean version : versions)
@@ -108,14 +116,14 @@ public class DeleteVersionEndpoint extends VtiEndpoint
             {
                 // prefix @ means that it is current working version, it couldn't be restored or deleted
                 result.addAttribute("version", "@" + version.getVersion());
-                String url = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + "/" + fileName.getTextTrim();
+                String url = "http://" + host + context + dws + "/" + fileName.getTextTrim();
                 result.addAttribute("url", url);
                 isCurrent = false;
             }
             else
             {
                 result.addAttribute("version", version.getVersion());
-                String url = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + version.getUrl();
+                String url = "http://" + host + context + version.getUrl();
                 result.addAttribute("url", url);
             }
             
@@ -124,7 +132,8 @@ public class DeleteVersionEndpoint extends VtiEndpoint
             result.addAttribute("size", String.valueOf(version.getSize()));
             result.addAttribute("comments", version.getComments());
         }
-
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is finished.");
         return root;
     }
 

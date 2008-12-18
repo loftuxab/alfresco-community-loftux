@@ -48,6 +48,8 @@ import org.alfresco.module.vti.httpconnector.VtiServletContainer;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
 import org.alfresco.module.vti.metadata.Document;
+import org.alfresco.module.vti.metadata.dic.VtiSort;
+import org.alfresco.module.vti.metadata.dic.VtiSortField;
 
 
 /**
@@ -215,6 +217,36 @@ public class VtiRequest extends HttpServletRequestWrapper
            }
         }        
         return value;
+    }
+    
+    /**
+     * @param paramName name of parameter
+     * @param defaultValue default value for parameter if not present
+     * @return VtiSort parameter from request or defaultValue if not present
+     */
+    public VtiSort getParameter(String paramName, VtiSort defaultValue)
+    {
+        String value = getParameter(paramName);        
+        if (value == null)
+        {
+            return defaultValue;
+        }
+        return VtiSort.value(checkForLineFeed(value));
+    }
+    
+    /**
+     * @param paramName name of parameter
+     * @param defaultValue default value for parameter if not present
+     * @return VtiSortField parameter from request or defaultValue if not present
+     */
+    public VtiSortField getParameter(String paramName, VtiSortField defaultValue)
+    {
+        String value = getParameter(paramName);        
+        if (value == null)
+        {
+            return defaultValue;
+        }
+        return VtiSortField.value(checkForLineFeed(value));
     }
     
     /**

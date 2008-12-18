@@ -65,6 +65,8 @@ public class VtiFilter implements Filter
     public static final String METHOD_PROPFIND = "PROPFIND";
 
     public final static String AUTHENTICATION_USER = "_vtiAuthTicket";
+    public final static String AUTHENTICATION_USERNAME = "_vtiUserName";
+    public final static String AUTHENTICATION_PASSWORD = "_vtiPassword";
 
     private VtiAuthService authService;
     
@@ -111,6 +113,7 @@ public class VtiFilter implements Filter
             } 
             else 
             {
+                if (request.getParameter("nodeId") == null && !httpRequest.getRequestURI().endsWith(".vti"))
                 session = sessionManager.createSession(httpRequest, httpResponse);
             }
         }
@@ -171,6 +174,12 @@ public class VtiFilter implements Filter
         if ((METHOD_GET.equals(httpMethod) || METHOD_HEAD.equals(httpMethod))  && !uri.equals("/_vti_inf.html") && !uri.contains("_vti_bin") && !uri.startsWith(alfrescoContext + "/history/a")
                 && !uri.startsWith(alfrescoContext + "/resources") && if_header == null)
         {
+            if (request.getParameter("nodeId") != null || uri.endsWith(".vti"))
+            {                
+                chain.doFilter(request, response);           
+                return;
+            }
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Checking is resource exist");
@@ -210,8 +219,11 @@ public class VtiFilter implements Filter
         {
             logger.debug("Check authentication");
         }
-
-        VtiUser user = (VtiUser) session.get(AUTHENTICATION_USER);
+        
+        VtiUser user = null;
+        
+        if (session != null)
+            user = (VtiUser) session.get(AUTHENTICATION_USER);
 
         if (user == null)
         {
@@ -238,6 +250,11 @@ public class VtiFilter implements Filter
                 {
                     username = basicAuth.substring(0, pos);
                     password = basicAuth.substring(pos + 1);
+                    if (session != null)
+                    {
+                        session.put(AUTHENTICATION_USERNAME, username);
+                        session.put(AUTHENTICATION_PASSWORD, password);
+                    }
                 }
                 else
                 {
@@ -253,7 +270,8 @@ public class VtiFilter implements Filter
                     // Authenticate the user
                     authService.authenticate(username, password.toCharArray());
                     user = new VtiUser(username, authService.getCurrentTicket());
-                    session.put(AUTHENTICATION_USER, user);
+                    if (session != null)
+                        session.put(AUTHENTICATION_USER, user);
                 }
                 catch (VtiAuthException ex)
                 {
@@ -270,7 +288,7 @@ public class VtiFilter implements Filter
                 if (logger.isDebugEnabled())
                     logger.debug("No user or ticket, force the client to prompt for logon details");
                 
-                httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Vti Server\"");
+                httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Server\"");
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 if (!METHOD_PROPFIND.equals(httpMethod))
                 {
@@ -304,7 +322,7 @@ public class VtiFilter implements Filter
                if (logger.isDebugEnabled())
                     logger.debug("Invalid ticket, force the client to prompt for logon details");
 
-               httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Vti Server\"");
+               httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Server\"");
                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
                 if (!METHOD_PROPFIND.equals(httpMethod))
@@ -320,7 +338,7 @@ public class VtiFilter implements Filter
             logger.debug("Request accepted");
         }
         // Chain other filters
-        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null && !uri.startsWith(alfrescoContext + "/history/a"))
+        if (!METHOD_PROPFIND.equals(httpMethod) && if_header == null && !uri.startsWith(alfrescoContext + "/history/a") && request.getParameter("nodeId") == null && request.getParameter("dialogview") == null)
         {
         response.getOutputStream().flush();
         }

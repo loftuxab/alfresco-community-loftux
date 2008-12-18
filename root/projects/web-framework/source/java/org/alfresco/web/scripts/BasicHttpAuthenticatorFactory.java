@@ -37,6 +37,7 @@ import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 import org.alfresco.web.scripts.servlet.WebScriptServletResponse;
 import org.alfresco.web.site.AuthenticationUtil;
+import org.alfresco.web.site.UserFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -145,7 +146,7 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
                         CredentialVault vault = connectorService.getCredentialVault(req.getSession(true), "guest");
                         vault.store(credentials);
                         
-                        AuthenticationUtil.login(req, username);
+                        req.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
                         
                         authorized = true;
                     }

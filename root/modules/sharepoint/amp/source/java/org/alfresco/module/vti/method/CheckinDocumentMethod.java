@@ -31,7 +31,10 @@ import java.util.Date;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling "checkin document"
@@ -41,6 +44,9 @@ import org.alfresco.module.vti.metadata.DocMetaInfo;
  */
 public class CheckinDocumentMethod extends AbstractVtiMethod
 {
+    
+    private static Log logger = LogFactory.getLog(CheckinDocumentMethod.class);
+            
     public String getName()
     {
         return "checkin document";
@@ -51,12 +57,19 @@ public class CheckinDocumentMethod extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
+        String serviceName = request.getParameter("service_name", "");
         String documentName  = request.getParameter("document_name", "");
         String comment  = request.getParameter("comment", "");
         boolean keepCheckedOut = request.getParameter("keep_checked_out", false);
-        Date timeCheckedout = request.getParameter("time_checked_out", (Date) null);
+        Date timeCheckedout = request.getParameter("time_checked_out", (Date) null);        
 
-        DocMetaInfo docMetaInfo = vtiHandler.checkInDocument("", documentName, comment, keepCheckedOut, timeCheckedout, false);
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
+        
+        DocMetaInfo docMetaInfo = vtiHandler.checkInDocument(serviceName, documentName, comment, keepCheckedOut, timeCheckedout, false);
 
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
         response.beginList("meta_info");
@@ -65,5 +78,10 @@ public class CheckinDocumentMethod extends AbstractVtiMethod
 
         response.endList();
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 }

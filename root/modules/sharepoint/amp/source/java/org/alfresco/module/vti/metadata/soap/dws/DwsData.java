@@ -59,6 +59,8 @@ public class DwsData implements Serializable
     private List<LinkBean> linksList;
     
     private boolean minimal;
+    
+    private String docLibUrl;
 
 
 
@@ -229,13 +231,28 @@ public class DwsData implements Serializable
             Map<String, Object> docAttr = new HashMap<String, Object>();
             docAttr.put("Name", "Documents");
             result.append(SoapUtils.startTag("List", docAttr));
-            result.append(SoapUtils.proccesTag("ID", ""));
+            //result.append(SoapUtils.proccesTag("ID", ""));
             if (documentsList != null)
             {
-                for (DocumentBean document : documentsList)
+                if (documentsList.size() > 99)
                 {
-                    result.append(document);
+                    docAttr.clear();
+                    docAttr.put("DefaultUrl", docLibUrl);
+                    result.append(SoapUtils.startTag("ID", docAttr));
+                    result.append(SoapUtils.endTag("ID"));
+                    docAttr.clear();
+                    docAttr.put("ID", "8");
+                    result.append(SoapUtils.startTag("Error", docAttr));
+                    result.append(SoapUtils.endTag("Error"));
                 }
+                else
+                {
+                    result.append(SoapUtils.proccesTag("ID", ""));
+                    for (DocumentBean document : documentsList)
+                    {
+                        result.append(document);
+                    }
+                }                
             }
             result.append(SoapUtils.endTag("List"));            
             
@@ -259,5 +276,10 @@ public class DwsData implements Serializable
     public void setMinimal(boolean minimal)
     {
         this.minimal = minimal;
+    }
+
+    public void setDocLibUrl(String docLibUrl)
+    {
+        this.docLibUrl = docLibUrl;
     }
 }

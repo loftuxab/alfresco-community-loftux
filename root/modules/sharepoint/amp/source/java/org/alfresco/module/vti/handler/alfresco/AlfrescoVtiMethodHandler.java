@@ -38,6 +38,19 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.vti.VtiException;
+import org.alfresco.module.vti.handler.VtiMethodHandler;
+import org.alfresco.module.vti.metadata.DocMetaInfo;
+import org.alfresco.module.vti.metadata.DocsMetaInfo;
+import org.alfresco.module.vti.metadata.Document;
+import org.alfresco.module.vti.metadata.dialog.DialogMetaInfo;
+import org.alfresco.module.vti.metadata.dialog.DialogsMetaInfo;
+import org.alfresco.module.vti.metadata.dic.VtiError;
+import org.alfresco.module.vti.metadata.dic.VtiSort;
+import org.alfresco.module.vti.metadata.dic.VtiSortField;
+import org.alfresco.module.vti.metadata.dic.options.GetOption;
+import org.alfresco.module.vti.metadata.dic.options.PutOption;
+import org.alfresco.module.vti.metadata.dic.options.RenameOption;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.version.VersionModel;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
@@ -63,15 +76,6 @@ import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.Pair;
-import org.alfresco.module.vti.VtiException;
-import org.alfresco.module.vti.handler.VtiMethodHandler;
-import org.alfresco.module.vti.metadata.DocMetaInfo;
-import org.alfresco.module.vti.metadata.DocsMetaInfo;
-import org.alfresco.module.vti.metadata.Document;
-import org.alfresco.module.vti.metadata.dic.VtiError;
-import org.alfresco.module.vti.metadata.dic.options.GetOption;
-import org.alfresco.module.vti.metadata.dic.options.PutOption;
-import org.alfresco.module.vti.metadata.dic.options.RenameOption;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -164,7 +168,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
         // listExplorerDocs ignored
 
         DocsMetaInfo result = new DocsMetaInfo();
-        FileInfo folderFileInfo = pathHelper.resolvePathFileInfo(initialURL);
+        FileInfo folderFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + initialURL);
         AlfrescoVtiMethodHandler.assertValidFileInfo(folderFileInfo);
         AlfrescoVtiMethodHandler.assertFolder(folderFileInfo);
         FileInfo sourceFileInfo = folderFileInfo;
@@ -210,7 +214,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
 
         for (String url : urlList)
         {
-            FileInfo fileInfo = pathHelper.resolvePathFileInfo(url);
+            FileInfo fileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + url);
 
             if (fileInfo != null && fileInfo.isLink() == false)
             {
@@ -240,7 +244,8 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
 
     public DocMetaInfo checkOutDocument(String serviceName, String documentName, int force, int timeout, boolean validateWelcomeNames)
     {
-        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(documentName);
+        
+        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + documentName);
         AlfrescoVtiMethodHandler.assertValidFileInfo(fileFileInfo);
         AlfrescoVtiMethodHandler.assertFile(fileFileInfo);
         FileInfo documentFileInfo = fileFileInfo;
@@ -257,9 +262,9 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
 
     public DocMetaInfo checkInDocument(String serviceName, String documentName, String comment, boolean keepCheckedOut, Date timeCheckedout, boolean validateWelcomeNames)
     {
-        // timeCheckedout ignored
-
-        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(documentName);
+        // timeCheckedout ignored        
+        
+        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + documentName);
         AlfrescoVtiMethodHandler.assertValidFileInfo(fileFileInfo);
         AlfrescoVtiMethodHandler.assertFile(fileFileInfo);
         FileInfo documentFileInfo = fileFileInfo;
@@ -321,8 +326,9 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
     }
 
     public boolean createDirectory(String serviceName, DocMetaInfo dir)
-    {
-        Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(dir.getPath());
+    {       
+        
+        Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(serviceName + "/" + dir.getPath());
 
         String parentName = parentChildPaths.getFirst();
         String childFolderName = parentChildPaths.getSecond();
@@ -370,17 +376,66 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
 
     public String[] decomposeURL(String url, String alfrescoContext)
     {       
+        if (!url.startsWith(alfrescoContext))
+            throw VtiException.create(VtiError.V_BAD_URL);
+        
         if (url.equalsIgnoreCase(alfrescoContext))
         {
-            // no path was provided then returned the fileUrl to user's home space
-            return new String[]{alfrescoContext, pathHelper.getUserHomeLocation()};
+            return new String[]{alfrescoContext, ""};
         }
-        return new String[]{alfrescoContext.length() == 0? "/": alfrescoContext, url.length() > alfrescoContext.length() ? url.substring(alfrescoContext.length() + 1) : ""};
+        
+        String webUrl = "";
+        String fileUrl = "";        
+        
+        String[] splitPath = url.replaceAll(alfrescoContext, "").substring(1).split("/");
+        
+        StringBuilder tempWebUrl = new StringBuilder();
+        
+        for (int i = splitPath.length; i > 0; i--)
+        {
+            tempWebUrl.delete(0, tempWebUrl.length());
+            
+            for (int j = 0; j < i; j++)
+            {
+                if ( j < i-1)
+                {
+                    tempWebUrl.append(splitPath[j] + "/");
+                }
+                else
+                {
+                    tempWebUrl.append(splitPath[j]);
+                }
+            }            
+            
+            FileInfo fileInfo = pathHelper.resolvePathFileInfo(tempWebUrl.toString());
+            
+            if (fileInfo != null)
+            {
+                if (nodeService.getType(fileInfo.getNodeRef()).equals(ContentModel.TYPE_FOLDER))
+                {
+                    webUrl = alfrescoContext + "/" + tempWebUrl;
+                    if (url.replaceAll(webUrl, "").startsWith("/"))
+                    {
+                        fileUrl = url.replaceAll(webUrl, "").substring(1);
+                    }
+                    else
+                    {
+                        fileUrl = url.replaceAll(webUrl, "");                        
+                    }
+                    return new String[]{webUrl, fileUrl};
+                }
+            }
+        }
+        if (webUrl.equals(""))
+        {
+            throw VtiException.create(VtiError.V_BAD_URL);
+        }
+        return new String[]{webUrl, fileUrl};
     }
 
     public Document getDocument(String serviceName, String documentName, boolean force, String docVersion, EnumSet<GetOption> getOptionSet, int timeout)
     {
-        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(documentName);
+        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + documentName);
         AlfrescoVtiMethodHandler.assertValidFileInfo(fileFileInfo);
         AlfrescoVtiMethodHandler.assertFile(fileFileInfo);
         FileInfo documentFileInfo = fileFileInfo;
@@ -534,7 +589,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
         // force ignored
         // timeCheckedOut ignored
 
-        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(documentName);
+        FileInfo fileFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + documentName);
         AlfrescoVtiMethodHandler.assertValidFileInfo(fileFileInfo);
         AlfrescoVtiMethodHandler.assertFile(fileFileInfo);
         FileInfo documentFileInfo = fileFileInfo;
@@ -619,7 +674,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
 
             for (String url : urlList)
             {
-                FileInfo fileInfo = pathHelper.resolvePathFileInfo(url);
+                FileInfo fileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + url);
                 AlfrescoVtiMethodHandler.assertValidFileInfo(fileInfo);
 
                 DocMetaInfo docMetaInfo = new DocMetaInfo(fileInfo.isFolder());
@@ -671,7 +726,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
         // urlList ignored
         // validateWelcomeNames ignored
 
-        FileInfo sourceFileInfo = pathHelper.resolvePathFileInfo(oldURL);
+        FileInfo sourceFileInfo = pathHelper.resolvePathFileInfo(serviceName + "/" + oldURL);
 
         AlfrescoVtiMethodHandler.assertValidFileInfo(sourceFileInfo);
 
@@ -683,7 +738,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
             }
         }
 
-        Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(newURL);
+        Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(serviceName + "/" + newURL);
         String destName = parentChildPaths.getSecond();
         if (destName.length() == 0)
         {
@@ -821,7 +876,7 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
         // 'overwrite' put-option           : implemented
         // 'thicket' put-option             : ignored
 
-        Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(document.getPath());
+        Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(serviceName + "/" + document.getPath());
         String documentName = parentChildPaths.getSecond();
         if (documentName.length() == 0)
         {
@@ -893,6 +948,11 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
             }
 
             NodeRef curDocumentNodeRef = curDocumentFileInfo.getNodeRef();
+            
+            if (nodeService.hasAspect(curDocumentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
+            {
+                nodeService.addAspect(curDocumentNodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+            }
 
             if (nodeService.hasAspect(curDocumentNodeRef, ContentModel.ASPECT_AUTHOR) == false)
             {
@@ -944,6 +1004,70 @@ public class AlfrescoVtiMethodHandler implements VtiMethodHandler
     public boolean existResource(String uri)
     {
         return pathHelper.resolvePathFileInfo(uri) != null;
+    }
+
+    public DialogsMetaInfo getFileOpen(String siteUrl, String location, List<String> fileDialogFilterValue, String rootFolder, VtiSortField sortField, VtiSort sortDir, String view)
+    {
+        FileInfo folderFileInfo;
+        folderFileInfo = pathHelper.resolvePathFileInfo(siteUrl + "/" + location);
+        
+        AlfrescoVtiMethodHandler.assertValidFileInfo(folderFileInfo);
+        AlfrescoVtiMethodHandler.assertFolder(folderFileInfo);
+        FileInfo sourceFileInfo = folderFileInfo;
+
+        DialogsMetaInfo result = new DialogsMetaInfo();        
+        
+        for (FileInfo fileInfo : fileFolderService.list(sourceFileInfo.getNodeRef()))
+        {      
+            if (fileInfo.isFolder())
+            {
+                result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));
+            }
+            else if (nodeService.hasAspect(fileInfo.getNodeRef(), ContentModel.ASPECT_WORKING_COPY) == false
+                    && VtiDocumentHepler.applyFilters(fileInfo.getName(), fileDialogFilterValue))
+            {
+                result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns DialogMetaInfo for FileInfo
+     *
+     * @param fileInfo file info
+     * @return dialog meta info
+     */
+    private DialogMetaInfo getDialogMetaInfo(FileInfo fileInfo)
+    {
+        DialogMetaInfo dialogMetaInfo = new DialogMetaInfo(fileInfo.isFolder());
+        dialogMetaInfo.setPath(pathHelper.toUrlPath(fileInfo));
+        dialogMetaInfo.setName(fileInfo.getName());
+        dialogMetaInfo.setModifiedBy((String) fileInfo.getProperties().get(ContentModel.PROP_MODIFIER));
+
+        if (fileInfo.isFolder() == false)
+        {
+            DocumentStatus documentStatus = documentHelper.getDocumentStatus(fileInfo.getNodeRef());
+
+            if (VtiDocumentHepler.isLongCheckedout(documentStatus))
+            {
+                NodeRef workingCopyNodeRef = checkOutCheckInService.getWorkingCopy(fileInfo.getNodeRef());
+                FileInfo workingCopyFileInfo = fileFolderService.getFileInfo(workingCopyNodeRef);
+                dialogMetaInfo.setModifiedTime(VtiUtils.formatVersionDate(workingCopyFileInfo.getModifiedDate()));
+                dialogMetaInfo.setCheckedOutTo((String) nodeService.getProperty(workingCopyNodeRef, ContentModel.PROP_WORKING_COPY_OWNER));
+            }
+            else
+            {
+                dialogMetaInfo.setModifiedTime(VtiUtils.formatVersionDate(fileInfo.getModifiedDate()));
+            }
+        }
+        else
+        {
+            dialogMetaInfo.setModifiedTime(VtiUtils.formatVersionDate(fileInfo.getModifiedDate()));
+        }
+        
+        return dialogMetaInfo;
     }
 
     /**

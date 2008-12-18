@@ -28,6 +28,8 @@ import org.alfresco.module.vti.endpoints.EndpointUtils;
 import org.alfresco.module.vti.endpoints.VtiEndpoint;
 import org.alfresco.module.vti.handler.soap.VersionsServiceHandler;
 import org.alfresco.module.vti.metadata.soap.versions.DocumentVersionBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.SimpleNamespaceContext;
@@ -48,11 +50,8 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
     // xml namespace prefix
     private static String prefix = "versions";
 
-    /**
-     * constructor
-     *
-     * @param handler that provides methods for operating with documents and folders
-     */
+    private static Log logger = LogFactory.getLog(DeleteAllVersionsEndpoint.class);
+
     public DeleteAllVersionsEndpoint(VersionsServiceHandler handler)
     {
         this.handler = handler;
@@ -67,10 +66,19 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
     @Override
     protected Element invokeInternal(Element element, Document document) throws Exception
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is started.");
         // mapping xml namespace to prefix
         SimpleNamespaceContext nc = new SimpleNamespaceContext();
         nc.addNamespace(prefix, namespace);
 
+        if (logger.isDebugEnabled())
+            logger.debug("Getting request params.");
+        String host = EndpointUtils.getHost();
+        String context = EndpointUtils.getContext();
+        String dws = EndpointUtils.getDwsFromUri();
+        String sessionId = EndpointUtils.getVtiSessionId();
+        
         // getting fileName parameter from request
         XPath fileNamePath = new Dom4jXPath(EndpointUtils.buildXPath(prefix, "/DeleteAllVersions/fileName"));
         fileNamePath.setNamespaceContext(nc);
@@ -84,20 +92,24 @@ public class DeleteAllVersionsEndpoint extends VtiEndpoint
 
         results.addElement("list").addAttribute("id", "");
         results.addElement("versioning").addAttribute("enabled", "1");
-        results.addElement("settings").addAttribute("url", "");
+        results.addElement("settings").addAttribute("url", "http://" + host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText() + "&sessionId=" + sessionId);
 
+        if (logger.isDebugEnabled())
+            logger.debug("Deleting all versions for " + dws + "/" + fileName.getText() + ".");
         // deleting all versions of given file
-        DocumentVersionBean current = handler.deleteAllVersions(fileName.getText());
+        DocumentVersionBean current = handler.deleteAllVersions(dws + "/" + fileName.getText());
 
         Element result = results.addElement("result");
         result.addAttribute("version", "@" + current.getVersion());
-        String url = "http://" + EndpointUtils.getHost() + EndpointUtils.getContext() + current.getUrl();
+        String url = "http://" + host + context + dws + "/" + fileName.getTextTrim();
         result.addAttribute("url", url);
         result.addAttribute("created", current.getCreatedTime());
         result.addAttribute("createdBy", current.getCreatedBy());
         result.addAttribute("size", String.valueOf(current.getSize()));
         result.addAttribute("comments", current.getComments());
 
+        if (logger.isDebugEnabled())
+            logger.debug("Soap Method with name " + getName() + " is finished.");
         return root;
     }
 

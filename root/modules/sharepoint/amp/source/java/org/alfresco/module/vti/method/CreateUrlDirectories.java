@@ -29,8 +29,11 @@ import java.io.IOException;
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.DocMetaInfo;
 import org.alfresco.module.vti.metadata.DocsMetaInfo;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling CreateUrlDirectories Method
@@ -40,6 +43,7 @@ import org.alfresco.module.vti.metadata.DocsMetaInfo;
  */
 public class CreateUrlDirectories extends AbstractVtiMethod
 {
+    private static Log logger = LogFactory.getLog(CreateUrlDirectories.class);
     
     private static final String METHOD_NAME = "create url-directories";
     
@@ -52,9 +56,15 @@ public class CreateUrlDirectories extends AbstractVtiMethod
      */
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
     {
-        String serviceName  = request.getParameter("service_name", "");
-        DocsMetaInfo urldirs = request.getParameter("urldirs", new DocsMetaInfo());  
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());            
+        }
         
+        String serviceName  = request.getParameter("service_name", "");
+        DocsMetaInfo urldirs = request.getParameter("urldirs", new DocsMetaInfo());          
+        
+        serviceName = VtiPathHelper.removeSlashes(serviceName.replaceFirst(request.getAlfrescoContextName(), ""));
         for (DocMetaInfo dir : urldirs.getFolderMetaInfoList())
         {
             vtiHandler.createDirectory(serviceName, dir);
@@ -63,6 +73,11 @@ public class CreateUrlDirectories extends AbstractVtiMethod
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
         response.addParameter("message=successfully created URL-directories");
         response.endVtiAnswer();
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
     }
 
     /* (non-Javadoc)

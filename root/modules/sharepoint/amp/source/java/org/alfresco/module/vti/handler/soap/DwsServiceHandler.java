@@ -25,18 +25,25 @@
 
 package org.alfresco.module.vti.handler.soap;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.vti.metadata.soap.dws.DwsBean;
 import org.alfresco.module.vti.metadata.soap.dws.DwsData;
 import org.alfresco.module.vti.metadata.soap.dws.DwsMetadata;
+import org.apache.commons.httpclient.HttpException;
 
 /**
  * @author AndreyAk
  *
  */
 public interface DwsServiceHandler
-{
+{	
+	
     /**
      * Returns information about a Document Workspace site and the lists it contains
      * 
@@ -99,5 +106,21 @@ public interface DwsServiceHandler
      * @param dwsUrl url of dws
      * @param id the ID of the user to be removed from the list of users
      */
-    public void removeDwsUser(String dwsUrl, String id);
+    public void removeDwsUser(String dwsUrl, String id);    
+    
+    /**
+	 * @return pages map
+	 */
+	public Map<String, String> getPagesMap();
+	
+	/**
+	 * redirect request to the appropriate page  
+	 * 
+	 * @param req
+	 * @param resp
+	 * @throws IOException 
+	 * @throws HttpException 
+	 */	 
+	public void handleRedirect(HttpServletRequest req, HttpServletResponse resp) throws HttpException, IOException;
+	
 }

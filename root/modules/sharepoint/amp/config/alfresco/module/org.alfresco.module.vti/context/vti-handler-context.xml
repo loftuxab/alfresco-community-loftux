@@ -18,8 +18,31 @@
     	<property name="transactionService" ref="TransactionService"/>
     	<property name="authenticationService" ref="AuthenticationService"/>
     	<property name="personService" ref="PersonService"/>
+    	<property name="authorityService" ref="AuthorityService" />
     	
-    	<property name="pathHelper" ref="vtiPathHelper"/>	
+    	<property name="pathHelper" ref="vtiPathHelper"/>
+    	<property name="pagesMap">
+    		<map>
+    			<entry key="siteInBrowser">
+    				<value>/alfresco/n/browse/workspace/SpacesStore/...</value>
+    			</entry>
+    			<entry key="siteSettings">
+    				<value>/alfresco</value>
+    			</entry>
+    			<entry key="siteGroupMembership">
+    				<value>/alfresco</value>
+    			</entry>
+    			<entry key="userInformation">
+    				<value>/alfresco</value>
+    			</entry>
+    			<entry key="documentLibrary">
+    				<value>/alfresco</value>
+    			</entry>  
+    			<entry key="documentDetails">
+    				<value>/alfresco</value>
+    			</entry>
+    		</map>
+    	</property>
     </bean>
     
     <bean id="userGroupServiceHandler" class="org.alfresco.module.vti.handler.alfresco.soap.AlfrescoUserGroupServiceHandler">

@@ -25,10 +25,23 @@
 package org.alfresco.module.vti.method;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.vti.VtiException;
 import org.alfresco.module.vti.VtiRequest;
 import org.alfresco.module.vti.VtiResponse;
+import org.alfresco.module.vti.metadata.dialog.DialogMetaInfo;
+import org.alfresco.module.vti.metadata.dialog.DialogMetaInfoComparator;
+import org.alfresco.module.vti.metadata.dialog.DialogsMetaInfo;
+import org.alfresco.module.vti.metadata.dic.VtiSort;
+import org.alfresco.module.vti.metadata.dic.VtiSortField;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for handling FileOpen Dialog
@@ -38,15 +51,66 @@ import org.alfresco.module.vti.VtiResponse;
  */
 public class FileOpenDialog extends AbstractVtiMethod
 {
+    private static Log logger = LogFactory.getLog(FileOpenDialog.class);
+    
     private static final String METHOD_NAME = "dialogview";
     
+    private static final String PAGE_PATH = "/jsp/vti/fileopen/fileOpen.jsp";
+        
     public String getName()
     {
         return METHOD_NAME;
     }
 
     protected void doExecute(VtiRequest request, VtiResponse response) throws VtiException, IOException
-    {        
-       
+    {   
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Start method execution. Method name: " + getName());
+        }
+        String location = request.getParameter("location", "");   
+        String site = getSiteUrl(request);
+        if (site.equals(""))
+        {
+            response.setStatus(HttpServletResponse.SC_GONE);
+            return;
+        }
+        List<String> fileDialogFilterValue = Arrays.asList(request.getParameter("FileDialogFilterValue").split(";"));
+        String rootFolder = request.getParameter("RootFolder", "");
+        VtiSortField sortField = request.getParameter("SortField", VtiSortField.TYPE);
+        VtiSort sort = request.getParameter("SortDir", VtiSort.ASC);
+        String view = request.getParameter("View", "");      
+        DialogsMetaInfo dialogInfo = vtiHandler.getFileOpen(site, location, fileDialogFilterValue, rootFolder, sortField, sort, view);
+        List<DialogMetaInfo> items = dialogInfo.getDialogMetaInfoList();
+        Collections.sort(items, new DialogMetaInfoComparator(sortField, sort));
+        request.setAttribute("VTIDialogsMetaInfoList", items);
+        try
+        {
+            request.getRequestDispatcher(PAGE_PATH).include(request, response);
+        }
+        catch (ServletException e)
+        {
+            throw new RuntimeException(e);
+        }
+        
+        if (logger.isDebugEnabled())        
+        {
+            logger.debug("End of method execution. Method name: " + getName());
+        }
+    }
+    
+    private String getSiteUrl(VtiRequest request)
+    {
+        String siteUrl;
+        siteUrl = request.getRequestURI().replaceAll(request.getContextPath(), "");
+        int pos = siteUrl.indexOf("/_vti_bin/");
+        if (pos != 0)        
+        {
+            return siteUrl.substring(1, pos);
+        }
+        else
+        {
+            return "";
+        }
     }
 }

@@ -48,7 +48,7 @@ public class AuthenticationUtil
     {
         login(request, null, userId);
     }
-
+    
     public static void login(HttpServletRequest request, HttpServletResponse response, String userId)
     {
         // check whether there is already a user logged in
@@ -58,7 +58,7 @@ public class AuthenticationUtil
             // log out the current user
             logout(request);
         }
-
+        
         // place user id onto the session
         request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
         
