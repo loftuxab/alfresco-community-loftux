@@ -34,7 +34,6 @@ package org.alfresco.previewer
 	import mx.collections.ArrayCollection;
 	import mx.containers.ApplicationControlBar;
 	import mx.containers.VBox;
-	import mx.controls.Alert;
 	import mx.controls.Button;
 	import mx.controls.Label;
 	import mx.controls.Menu;
@@ -89,7 +88,7 @@ package org.alfresco.previewer
 		/**
 		 * The snapPoints displayed in the snapPointsMenu.
 		 */
-		private var snapPoints:ArrayCollection = new ArrayCollection();
+		private var snapPoints:ArrayCollection = new ArrayCollection();		
 		
 		/**
 		 * The amount the scale/zoom shall change when the xoomInButton or zoomOutButton is clicked.
@@ -209,11 +208,10 @@ package org.alfresco.previewer
             zoomInButton.addEventListener(MouseEvent.CLICK, onZoomInClick);
             zoomOutButton.addEventListener(MouseEvent.CLICK, onZoomOutClick);
             
-            // The hidden button menu for snapPoints (show hide it with bogus data so it get's a size)            
-            snapPoints.addItem({label: "...", data: 1});
+            // The hidden button menu for snapPoints 
+            zoomPercentageTextInput.addEventListener(KeyboardEvent.KEY_DOWN, onZoomPercentageTextInputKeyDown);                        
 			snapPointsMenu = Menu.createMenu(this, snapPoints, false);
-            snapPointsMenu.show(-400, - 400);
-            snapPointsMenu.hide();            
+			snapPointsMenu.setStyle("openDuration", 0); 
             snapPointsMenu.addEventListener(ListEvent.CHANGE, onSnapPointsMenuChange);            
             snapPointsButton.addEventListener(MouseEvent.CLICK, onSnapPointsButtonClick);
 
@@ -238,7 +236,12 @@ package org.alfresco.previewer
             snapPoints.addItem({label: "Actual Size", data: 1});
             snapPoints.addItem({label: "Fit Page", data: event.fitToScreen});
             snapPoints.addItem({label: "Fit Width", data: event.fitToWidth});
-            snapPoints.addItem({label: "Fit Height", data: event.fitToHeight});                        			            
+            snapPoints.addItem({label: "Fit Height", data: event.fitToHeight});
+            
+            // Do show /hide the menu gets a size so its location later can be calculated
+            snapPointsMenu.show(-400, - 400);
+            snapPointsMenu.hide();            
+                        			            
                                     	
         	// Set the zoom of the content to the most appropriate
 			zoomSlider.value = event.fitByContentType;	
@@ -373,6 +376,47 @@ package org.alfresco.previewer
 		{			
 			zoomSlider.value = zoomSlider.value - zoomButtonStepAmount < zoomSlider.minimum ? zoomSlider.minimum : zoomSlider.value - zoomButtonStepAmount;
 			changeZoom();
+		}
+
+		/**
+		 * Called when the user has clicked the zoom out button (-).
+		 * Will make the content smaller.
+		 * 
+		 * @param event Describes the key event .
+		 */
+		public function onZoomPercentageTextInputKeyDown(event:KeyboardEvent):void
+		{		
+			if (event.keyCode == Keyboard.LEFT || 
+				event.keyCode == Keyboard.UP ||
+				event.keyCode == Keyboard.RIGHT || 
+				event.keyCode == Keyboard.DOWN)
+			{
+				/**
+				 *  Make sure navigationg inside the textfield doesn't bubble up 
+				 *  and cause a page change caused by arrow keys 
+				 * that was used to navigate inside the text input. 
+				 */
+            	event.stopImmediatePropagation();
+            }
+            else if(event.keyCode == Keyboard.ENTER)
+			{
+				var scale:Number;	
+				var str:String = zoomPercentageTextInput.text.split("%")[0];
+	        	var percentage:Number = new Number(str);        	           
+	        	if (percentage)
+	        	{
+	        		scale = percentage / 100; 
+	        		scale = Math.max(scale, zoomSlider.minimum);
+	        		scale = Math.min(scale, zoomSlider.maximum);
+	        	}
+	        	else
+	        	{
+	        		scale = snapPoints.getItemAt(1).data;
+	        	}
+	
+				zoomSlider.value = scale;
+				changeZoom();
+			}
 		}
 
 		/**
