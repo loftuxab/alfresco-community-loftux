@@ -145,6 +145,26 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler implements Asynch
 		// Get the length of the pending receive data, so we can allocate the correct sized buffer
 		
 		int rxlen = m_sessSock.available();
+
+		// Check if data is showing as available yet
+		
+		if ( rxlen == 0) {
+			int loop = 0;
+			
+			while ( loop++ < 50 && rxlen == 0) {
+				rxlen = m_sessSock.available();
+				if ( rxlen == 0) {
+					try {
+						Thread.sleep( 2);
+					}
+					catch (Exception e) {
+					}
+				}
+			}
+			if ( rxlen == 0 && hasDebug())
+				Debug.println("***** Still no data after 100ms *****");
+		}
+		
 		SMBSrvPacket pkt = getPacketPool().allocatePacket( rxlen + 8);
 		
 		// Receive an SMB/CIFS request packet via the Winsock NetBIOS socket
@@ -216,8 +236,48 @@ public class WinsockNetBIOSPacketHandler extends PacketHandler implements Asynch
 				}
 			}
 		}
-		catch (IOException ex) {
+		catch ( WinsockNetBIOSException ex) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println( ex);
 
+			// Check the Winsock error code
+			
+			if ( ex.getErrorCode() != 0) {
+				
+				// Release the packet back to the pool
+				
+				getPacketPool().releasePacket( pkt);
+				
+				// Clear the received packet to indicate error
+				
+				pkt = null;
+				
+				// Rethrow the exception
+				
+				throw ex;
+			}
+			else {
+
+				// DEBUG
+				
+				if ( Debug.EnableDbg && hasDebug())
+					Debug.println("Winsock error code zero, ignored, rxlen=" + rxlen + ", pktlen=" + pkt.getBuffer().length);
+				
+				// Indicate a zero length receive
+				
+				rxlen = 0;
+			}
+		}
+		catch ( IOException ex) {
+
+			// DEBUG
+			
+			if ( Debug.EnableDbg && hasDebug())
+				Debug.println( ex);
+			
 			// Release the packet back to the pool
 			
 			getPacketPool().releasePacket( pkt);

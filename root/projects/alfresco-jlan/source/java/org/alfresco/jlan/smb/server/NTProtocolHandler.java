@@ -6694,11 +6694,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 					
 					int respPktLen = NTTransPacket.calculateResponseLength( 0, response.getLength(), 1);
 					
-					if ( smbPkt.getLength() < respPktLen) {
+					if ( smbPkt.getBufferLength() < respPktLen) {
 
 						// Allocate a larger response packet
 						
-						SMBSrvPacket pkt = m_sess.getPacketPool().allocatePacket( respPktLen, smbPkt);
+						SMBSrvPacket pkt = m_sess.getPacketPool().allocatePacket( respPktLen, smbPkt, smbPkt.getLength());
 						
 						// Create a new NT transaction packet from the new buffer
 						
@@ -6735,7 +6735,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			// Send the IOCtl response
 
-			m_sess.sendResponseSMB(smbPkt);
+			m_sess.sendResponseSMB(respPkt);
 		}
 		else {
 
