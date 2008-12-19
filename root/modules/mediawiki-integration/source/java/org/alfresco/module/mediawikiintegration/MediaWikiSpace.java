@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Alfresco, Inc.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
 package org.alfresco.module.mediawikiintegration;
 
@@ -29,14 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.acegisecurity.Authentication;
-
 import org.alfresco.module.phpIntegration.PHPProcessorException;
 import org.alfresco.module.phpIntegration.lib.Folder;
 import org.alfresco.module.phpIntegration.lib.Repository;
 import org.alfresco.module.phpIntegration.lib.Session;
 import org.alfresco.module.phpIntegration.lib.Store;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -120,8 +119,7 @@ public class MediaWikiSpace extends Folder
         
         try
         {
-            // Get the current authentication context
-            Authentication authentication = AuthenticationUtil.getCurrentAuthentication();      
+            AuthenticationUtil.pushAuthentication();
             try
             {
                 // Try and validate the ticket
@@ -137,7 +135,7 @@ public class MediaWikiSpace extends Folder
             finally
             {
                 // Re-establish the previous authentication context
-                AuthenticationUtil.setCurrentAuthentication(authentication);
+                AuthenticationUtil.popAuthentication();
             }
         }
         catch (Exception excpetion)
@@ -168,46 +166,41 @@ public class MediaWikiSpace extends Folder
         return buffer.toString();
     }
     
-    public static Map<String, String> getConfigurationProperties(Repository repository, String nodeRefWikiSpace)
+    public static Map<String, String> getConfigurationProperties(Repository repository, final String nodeRefWikiSpace)
     {
-        NodeService nodeService = repository.getServiceRegistry().getNodeService();
-        NodeRef nodeRef = new NodeRef(nodeRefWikiSpace);
+        final NodeService nodeService = repository.getServiceRegistry().getNodeService();
+        final NodeRef nodeRef = new NodeRef(nodeRefWikiSpace);
         
-        Map<String, String> configProperties = new HashMap<String, String>(20);
+        final Map<String, String> configProperties = new HashMap<String, String>(20);
         
-        String currentUser = AuthenticationUtil.getCurrentUserName();
-        try
+        AuthenticationUtil.runAs(new RunAsWork<Object>()
         {
-            AuthenticationUtil.setSystemUserAsCurrentUser();      
-                    
-            List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, Constants.ASSOC_CONFIG, RegexQNamePattern.MATCH_ALL);
-            if (assocs.size() != 1)
+            public Object doWork() throws Exception
             {
-                throw new PHPProcessorException("MediaWiki configuration for " + nodeRefWikiSpace.toString() + " is not presnet.");
-            }
-            
-            NodeRef configNodeRef = assocs.get(0).getChildRef();
-            Map<QName, Serializable> properties = nodeService.getProperties(configNodeRef);
-            
-            for (Map.Entry<QName, Serializable> entry : properties.entrySet())                
-            {
-                if (entry.getKey().getNamespaceURI().equals(Constants.CONFIG_NAMESPACE) == true)
+                List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, Constants.ASSOC_CONFIG, RegexQNamePattern.MATCH_ALL);
+                if (assocs.size() != 1)
                 {
-                    String value = entry.getValue().toString();
-                    if (value != null && value.trim().length() != 0)
+                    throw new PHPProcessorException("MediaWiki configuration for " + nodeRefWikiSpace.toString() + " is not presnet.");
+                }
+                
+                NodeRef configNodeRef = assocs.get(0).getChildRef();
+                Map<QName, Serializable> properties = nodeService.getProperties(configNodeRef);
+                
+                for (Map.Entry<QName, Serializable> entry : properties.entrySet())                
+                {
+                    if (entry.getKey().getNamespaceURI().equals(Constants.CONFIG_NAMESPACE) == true)
                     {
-                        configProperties.put(entry.getKey().toString(), value);
+                        String value = entry.getValue().toString();
+                        if (value != null && value.trim().length() != 0)
+                        {
+                            configProperties.put(entry.getKey().toString(), value);
+                        }
                     }
                 }
-            }  
-        }
-        finally
-        {
-            if (currentUser != null)
-            {
-                AuthenticationUtil.setCurrentUser(currentUser);
+                
+                return null;
             }
-        }
+        }, AuthenticationUtil.getSystemUserName());
                     
         return configProperties;
     }
