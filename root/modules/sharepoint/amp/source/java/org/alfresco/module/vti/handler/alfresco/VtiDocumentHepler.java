@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -96,7 +96,7 @@ public class VtiDocumentHepler
                 {
                     // long-term checkout
                     String ownerUsername = (String) nodeService.getProperty(workingCopyNodeRef, ContentModel.PROP_WORKING_COPY_OWNER);
-                    if (ownerUsername.equals(AuthenticationUtil.getCurrentUserName()))
+                    if (ownerUsername.equals(AuthenticationUtil.getFullyAuthenticatedUser()))
                     {
                         status = DocumentStatus.LONG_CHECKOUT_OWNER;
                     }

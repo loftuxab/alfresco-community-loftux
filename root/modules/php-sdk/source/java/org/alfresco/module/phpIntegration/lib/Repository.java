@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Alfresco, Inc.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,13 +20,11 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
 package org.alfresco.module.phpIntegration.lib;
 
 import javax.servlet.ServletContext;
-
-import net.sf.acegisecurity.Authentication;
 
 import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -131,8 +129,7 @@ public class Repository implements ScriptObject
     	// Get the authentication service
     	AuthenticationService authenticationService = this.serviceRegistry.getAuthenticationService();
     	
-    	// Get the current authentication context
-    	Authentication authentication = AuthenticationUtil.getCurrentAuthentication();    	
+    	AuthenticationUtil.pushAuthentication();
         try
         {
         	// Try and authenticate with the provided user details
@@ -144,7 +141,7 @@ public class Repository implements ScriptObject
         finally
         {
         	// Re-establish the previous authentication context
-            AuthenticationUtil.setCurrentAuthentication(authentication);
+            AuthenticationUtil.popAuthentication();
         }
     	
     	return ticket;

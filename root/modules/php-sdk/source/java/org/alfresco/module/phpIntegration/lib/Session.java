@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005 Alfresco, Inc.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,15 +20,13 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
 package org.alfresco.module.phpIntegration.lib;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.acegisecurity.Authentication;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
@@ -379,8 +377,7 @@ public class Session implements ScriptObject
     	AuthenticationService authenticationService = getServiceRegistry().getAuthenticationService();
     	TransactionService transactionService = getServiceRegistry().getTransactionService();
     	
-    	// Get the current authentication context
-    	Authentication authentication = AuthenticationUtil.getCurrentAuthentication();    	
+    	AuthenticationUtil.pushAuthentication();
         try
         {
         	// Validate for the currently held ticket
@@ -399,7 +396,7 @@ public class Session implements ScriptObject
         finally
         {
         	// Re-establish the previous authentication context
-            AuthenticationUtil.setCurrentAuthentication(authentication);
+            AuthenticationUtil.popAuthentication();
         }
     	
     	return result;    	

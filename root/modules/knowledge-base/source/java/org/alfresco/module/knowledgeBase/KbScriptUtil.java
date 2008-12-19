@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.security.AuthorityService;
 
 /**
@@ -44,32 +45,32 @@ public class KbScriptUtil extends BaseProcessorExtension implements KbModel
         this.authorityService = authorityService;
     }
     
-    public String getUserVisibility(String userName)
+    public String getUserVisibility(final String userName)
     {
-        String result = VISIBILITY_TIER_3.getId();
-        String currentUser = AuthenticationUtil.getCurrentUserName();
-        AuthenticationUtil.setSystemUserAsCurrentUser();
-        try
-        {        
-            Set<String> authroities = this.authorityService.getAuthoritiesForUser(userName);
-            if (this.authorityService.isAdminAuthority(currentUser) == true || authroities.contains(GROUP_INTERNAL) == true)
-            {
-                result = VISIBILITY_INTERNAL.getId();
-            }
-            else if (authroities.contains(GROUP_TIER_1) == true) 
-            {
-                result = VISIBILITY_TIER_1.getId();
-            }
-            else if (authroities.contains(GROUP_TIER_2) == true)
-            {
-                result = VISIBILITY_TIER_2.getId();
-            }            
-        }
-        finally
-        {
-            AuthenticationUtil.setCurrentUser(currentUser);
-        }
+        final String currentUser = AuthenticationUtil.getFullyAuthenticatedUser();
         
-        return result;
+        return AuthenticationUtil.runAs(new RunAsWork<String>()
+        {
+            public String doWork() throws Exception
+            {
+                String result = VISIBILITY_TIER_3.getId();
+                
+                Set<String> authroities = authorityService.getAuthoritiesForUser(userName);
+                if (authorityService.isAdminAuthority(currentUser) == true || authroities.contains(GROUP_INTERNAL) == true)
+                {
+                    result = VISIBILITY_INTERNAL.getId();
+                }
+                else if (authroities.contains(GROUP_TIER_1) == true) 
+                {
+                    result = VISIBILITY_TIER_1.getId();
+                }
+                else if (authroities.contains(GROUP_TIER_2) == true)
+                {
+                    result = VISIBILITY_TIER_2.getId();
+                }
+                
+                return result;
+            }
+        }, AuthenticationUtil.getSystemUserName());
     }
 }
