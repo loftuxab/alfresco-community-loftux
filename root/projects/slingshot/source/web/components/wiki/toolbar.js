@@ -209,8 +209,7 @@
             {
                fn: this.onPageRenamed,
                scope: this
-            },
-            failureMessage: "Page rename failed"
+            }
          });        
          renameForm.setSubmitAsJSON(true);
          renameForm.applyTabFix();
