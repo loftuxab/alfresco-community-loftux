@@ -1404,47 +1404,50 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 				}
 	
 				// Process the received packet
-	
-				switch (m_state) {
-	
-					// NetBIOS session request pending
-	
-					case SMBSrvSessionState.NBSESSREQ:
-						procNetBIOSSessionRequest( smbPkt);
-						break;
-	
-					// SMB dialect negotiate
-	
-					case SMBSrvSessionState.SMBNEGOTIATE:
-						procSMBNegotiate( smbPkt);
-						break;
-	
-					// SMB session setup
-	
-					case SMBSrvSessionState.SMBSESSSETUP:
-						m_handler.runProtocol( smbPkt);
-						break;
-	
-					// SMB session main request processing
-	
-					case SMBSrvSessionState.SMBSESSION:
-	
-						// Run the main protocol handler
-	
-						runHandler( smbPkt);
-	
-						// Debug
-	
-						if ( Debug.EnableInfo && hasDebug(DBG_TIMING)) {
-							endTime = System.currentTimeMillis();
-							long duration = endTime - startTime;
-							if ( duration > 20)
-								debugPrintln("Processed packet " + PacketType.getCommandName( smbPkt.getCommand()) + " (0x"
-										+ Integer.toHexString( smbPkt.getCommand()) + ") in " + duration + "ms");
-						}
-						break;
+				
+				if ( smbPkt.getReceivedLength() > 0) {
+					
+					switch (m_state) {
+		
+						// NetBIOS session request pending
+		
+						case SMBSrvSessionState.NBSESSREQ:
+							procNetBIOSSessionRequest( smbPkt);
+							break;
+		
+						// SMB dialect negotiate
+		
+						case SMBSrvSessionState.SMBNEGOTIATE:
+							procSMBNegotiate( smbPkt);
+							break;
+		
+						// SMB session setup
+		
+						case SMBSrvSessionState.SMBSESSSETUP:
+							m_handler.runProtocol( smbPkt);
+							break;
+		
+						// SMB session main request processing
+		
+						case SMBSrvSessionState.SMBSESSION:
+		
+							// Run the main protocol handler
+		
+							runHandler( smbPkt);
+		
+							// Debug
+		
+							if ( Debug.EnableInfo && hasDebug(DBG_TIMING)) {
+								endTime = System.currentTimeMillis();
+								long duration = endTime - startTime;
+								if ( duration > 20)
+									debugPrintln("Processed packet " + PacketType.getCommandName( smbPkt.getCommand()) + " (0x"
+											+ Integer.toHexString( smbPkt.getCommand()) + ") in " + duration + "ms");
+							}
+							break;
+					}
 				}
-	
+				
 				// Release the current packet back to the pool
 				
 				getPacketPool().releasePacket( smbPkt);

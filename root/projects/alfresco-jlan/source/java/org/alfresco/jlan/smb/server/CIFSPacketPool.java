@@ -77,7 +77,7 @@ public class CIFSPacketPool {
 
 		byte[] buf = null;
 		
-		if ( reqSiz < m_maxPoolBufSize) {
+		if ( reqSiz <= m_maxPoolBufSize) {
 			
 			// Allocate the byte buffer for the CIFS packet
 			

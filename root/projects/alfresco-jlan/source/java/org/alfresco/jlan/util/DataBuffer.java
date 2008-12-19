@@ -280,6 +280,49 @@ public class DataBuffer {
 	}
 
 	/**
+	 * Get a fixed length string from the buffer
+	 * 
+	 * @param maxlen int
+	 * @param uni boolean
+	 * @return String
+	 */
+	public final String getFixedString(int len, boolean uni) {
+		
+		// Check for Unicode or ASCII
+
+		String ret = null;
+		int availLen = -1;
+
+		if ( uni) {
+
+			// Word align the current buffer position, calculate the available length
+
+			m_pos = DataPacker.wordAlign(m_pos);
+			availLen = (m_endpos - m_pos) / 2;
+			if ( availLen >= len) {
+				ret = DataPacker.getUnicodeString(m_data, m_pos, len);
+				if ( ret != null)
+					m_pos += len * 2;
+			}
+		}
+		else {
+
+			// Calculate the available length
+
+			availLen = m_endpos - m_pos;
+			if ( availLen >= len) {
+				ret = DataPacker.getString(m_data, m_pos, len);
+				if ( ret != null)
+					m_pos += len;
+			}
+		}
+
+		// Return the string
+
+		return ret != null ? ret : "";
+	}
+	
+	/**
 	 * Get a short from the buffer at the specified index
 	 * 
 	 * @param idx int
