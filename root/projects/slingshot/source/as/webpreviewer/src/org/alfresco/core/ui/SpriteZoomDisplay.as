@@ -381,6 +381,7 @@ package org.alfresco.core.ui
 			if (draggingEnabled)
 			{				
 				_sprite.startDrag(false, getSpriteDragRectangle());
+				Cursors.showGrabCursor(null);
 				_sprite.addEventListener(MouseEvent.MOUSE_MOVE, onSpriteMouseMove);							
 			}
 		}
@@ -407,6 +408,7 @@ package org.alfresco.core.ui
 		{
 			// Make sure the sprite isnt dragged anymore
 			_sprite.stopDrag();
+			Cursors.hideGrabCursor(null);
 					
 			// We don't need to listen for mouse movements anymore.
 			_sprite.removeEventListener(MouseEvent.MOUSE_MOVE, onSpriteMouseMove);

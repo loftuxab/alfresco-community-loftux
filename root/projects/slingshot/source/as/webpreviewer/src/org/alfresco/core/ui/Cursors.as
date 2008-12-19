@@ -28,6 +28,7 @@ package org.alfresco.core.ui
 	import flash.events.Event;
 	
 	import mx.managers.CursorManager;
+	import mx.managers.CursorManagerPriority;
 	
 	/**
 	 * Helper class for managing cursors.
@@ -70,7 +71,7 @@ package org.alfresco.core.ui
 		 */
 		public static function showHandCursor(event:Event):void 
 		{
-			handCursorIds.push(CursorManager.setCursor(handCursor));
+			handCursorIds.push(CursorManager.setCursor(handCursor, CursorManagerPriority.MEDIUM));
 		    CursorManager.showCursor();
 	   	}
 
@@ -91,7 +92,7 @@ package org.alfresco.core.ui
 		 */
 		public static function showGrabCursor(event:Event):void 
 		{
-			grabCursorIds.push(CursorManager.setCursor(grabCursor));
+			grabCursorIds.push(CursorManager.setCursor(grabCursor, CursorManagerPriority.HIGH));
 		    CursorManager.showCursor();
 	   	}
 	   	
