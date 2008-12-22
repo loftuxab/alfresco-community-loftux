@@ -20,7 +20,7 @@
          <table>
             <tr><td><b>${status.code} Description:</b></td><td> ${status.codeDescription}</td></tr>
             <tr><td>&nbsp;</td></tr>
-            <tr><td><b>Message:</b></td><td>${status.message!"<i>&lt;Not specified&gt;</i>"}</td></tr>
+            <tr><td><b>Message:</b></td><td><#if status.message??>${status.message?html}<#else><i>&lt;Not specified&gt;</i></#if></td></tr>
             <#if status.exception?exists>
             <tr><td></td><td>&nbsp;</td></tr>
             <@recursestack status.exception/>
@@ -41,7 +41,7 @@
       <@recursestack exception=exception.cause/>
    </#if>
    <#if exception.message?? && exception.message?is_string>
-   <tr><td><b>Exception:</b></td><td>${exception.class.name} - ${exception.message}</td></tr>
+   <tr><td><b>Exception:</b></td><td>${exception.class.name} - ${exception.message?html}</td></tr>
    <tr><td></td><td>&nbsp;</td></tr>
    <#if exception.cause?exists == false>
       <#list exception.stackTrace as element>

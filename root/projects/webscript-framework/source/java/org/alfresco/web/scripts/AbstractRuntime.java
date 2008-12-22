@@ -204,7 +204,7 @@ public abstract class AbstractRuntime implements Runtime
             // add status to model
             Status status = new Status();
             status.setCode(statusCode);
-            status.setMessage(e.getMessage());
+            status.setMessage(e.getMessage() != null ? e.getMessage() : e.toString());
             status.setException(e);
             statusModel.put("status", status);
 
