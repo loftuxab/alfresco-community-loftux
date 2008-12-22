@@ -115,10 +115,12 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
         catch (Exception e)
         {
             if ( log.isWarnEnabled() )
+            {
                 log.warn(
                   "WCM virtualization disabled "      + 
                   "(alfresco-jmxrmi.password and/or " +
-                  "alfresco-jmxrmi.access isn't on classpath)");
+                  "alfresco-jmxrmi.access isn't on classpath) due to: "+e);
+            }
         }
     }
 
@@ -347,6 +349,8 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
 
     public boolean verifyJmxRmiConnection()
     {
+        boolean result = false;
+        
         // Typically the JMXServiceURL looks something like this:
         //  "service:jmx:rmi://ignored/jndi/rmi://localhost:50501/alfresco/jmxrmi"
 
@@ -355,7 +359,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             if ( log.isWarnEnabled() )
                 log.warn("No virtualization servers have registered as listeners");
 
-            return false ; 
+            return result; 
         }
 
         if ( conn_ == null)
@@ -367,14 +371,48 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             }
             catch (Exception e)
             {
-                if ( log.isErrorEnabled() )
-                    log.error("Could not connect to virtualization server: " + 
+                if ( log.isWarnEnabled() )
+                    log.warn("Could not connect to virtualization server: " + 
                               getVirtServerJmxUrl() );
 
+                return result;
+            }
+        }
+        // If virtualization server have been terminated (E.g. Control+C in the console)
+        // virtServerJmxUrl_ is not null and conn_ is not null so it is impossible to detect terminated/refused
+        // connection. Just check connection to accessibility.
+        else
+        {
+            result = pingVirtServer();
+        }
+        return result;
+    }
+
+    /**
+     * Fast check of the accessibility of the virtualization server.
+     * 
+     * @see org.alfresco.linkvalidation.LinkValidationServiceImpl
+     * 
+     * @return Returns true if server is accessible.
+     */
+    public boolean pingVirtServer()
+    {
+        if (conn_ != null)
+        {
+            try
+            {
+                // Detects if the connection is connected/disconnected/terminated
+                // See javax.management.remote.rmi.RMIConnector.getConnectionId() implementation
+                conn_.getConnectionId();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                closeJmxRmiConnection();
                 return false;
             }
         }
-        return true;
+        return false;
     }
 
     protected boolean 

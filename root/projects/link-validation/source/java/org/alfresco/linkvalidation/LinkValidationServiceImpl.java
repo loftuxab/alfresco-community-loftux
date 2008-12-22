@@ -29,8 +29,6 @@ package org.alfresco.linkvalidation;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URI;
@@ -82,6 +80,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.MD5;
 import org.alfresco.util.NameMatcher;
 import org.alfresco.util.Pair;
+import org.alfresco.util.VmShutdownListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -138,7 +137,7 @@ import org.springframework.context.ApplicationContext;
 public class LinkValidationServiceImpl implements LinkValidationService,
                                                   Runnable
 {
-    private static Log log = LogFactory.getLog(LinkValidationServiceImpl.class);
+    final static private Log log = LogFactory.getLog(LinkValidationServiceImpl.class);
 
     //------------------------------------------------------------------------
     //                         ***************
@@ -154,31 +153,33 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //           o  New validation support for schemes/protocls (e.g.: ftp?)
     //
     //------------------------------------------------------------------------
-    static private final int Schema_version_  = 2;
+    final static private int Schema_version_  = 2;
 
-    // Shutdown flag for service
-    private boolean shutdown = false;
+    /** kept to notify the thread that it should quit */
+    private static VmShutdownListener vmShutdownListener = new VmShutdownListener("LinkValidation");
+	/** Flag to signal controlled shutdown of the context */
+	private volatile boolean shutdown = false;
+    
+    final static String HREF               = ".href";    // top level href key
+    final static String SCHEMA_VERSION     = "schema";   // vers # of  info schema
+    final static String BASE_VERSION       = "latest";   // vers # of  baseline
+    final static String BASE_VERSION_ALIAS = "-2";       // alias  for baseline
+    final static String UPDATE_VERSION     = "update";   // vers # of  update
 
-    static String HREF               = ".href";    // top level href key
-    static String SCHEMA_VERSION     = "schema";   // vers # of  info schema
-    static String BASE_VERSION       = "latest";   // vers # of  baseline
-    static String BASE_VERSION_ALIAS = "-2";       // alias  for baseline
-    static String UPDATE_VERSION     = "update";   // vers # of  update
+    final static String SOURCE_TO_HREF     = "source_to_href";  // key->map
+    final static String HREF_TO_SOURCE     = "href_to_source";  // key->map
 
-    static String SOURCE_TO_HREF     = "source_to_href";  // key->map
-    static String HREF_TO_SOURCE     = "href_to_source";  // key->map
+    final static String HREF_TO_STATUS     = "href_to_status";  // key->int
+    final static String STATUS_TO_HREF     = "status_to_href";  // key->map
 
-    static String HREF_TO_STATUS     = "href_to_status";  // key->int
-    static String STATUS_TO_HREF     = "status_to_href";  // key->map
-
-    static String MD5_TO_FILE        = "md5_to_file";     // key->string
-    static String MD5_TO_HREF        = "md5_to_href";     // key->string
+    final static String MD5_TO_FILE        = "md5_to_file";     // key->string
+    final static String MD5_TO_HREF        = "md5_to_href";     // key->string
 
     // All files on which a hyperlink depends
-    static String HREF_TO_FDEP       = "href_to_fdep";    // key->map
+    final static String HREF_TO_FDEP       = "href_to_fdep";    // key->map
 
     // All hyperinks dependent upon a given file
-    static String FILE_TO_HDEP       = "file_to_hdep";    // key->map
+    final static String FILE_TO_HDEP       = "file_to_hdep";    // key->map
 
 
     AVMRemote                    avm_;
@@ -206,6 +207,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     private Boolean virt_available = null; // null to ensure info/warn on startup
     
     int virt_retry_interval_ = 120000;
+
+    // The property to set if the service should be enabled/disabled on fail during link validation
+    private boolean disableOnFail = false;
 
     String jsse_trust_store_file_;
     String jsse_trust_store_password_;
@@ -359,10 +363,20 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     	sysAdminCache.put(KEY_SYSADMIN_LINKVALIDATION_DISABLED, new Boolean(disabled));
     }
     
+    /**
+     * Detects whether link validation is disabled viz:
+     *      1. poll_interval_ <= 0
+     *      2. virtServerJmxUrl is null
+     *      3. connection to the virt server is not established or refused
+     *      
+     * @return TRUE if link validation is DISABLED
+     */
     public boolean isLinkValidationDisabled()
     {
-    	Boolean disabled = (Boolean)sysAdminCache.get(KEY_SYSADMIN_LINKVALIDATION_DISABLED);
-    	return ((! isVirtServerAvailable()) || (disabled == null ? false : disabled.booleanValue()));
+        // TODO merge here with 2.2 JMX flag
+        //Boolean disabled = (Boolean)sysAdminCache.get(KEY_SYSADMIN_LINKVALIDATION_DISABLED);
+        //return ((! isVirtServerAvailable()) || (disabled == null ? false : disabled.booleanValue());
+        return (poll_interval_ <= 0 || (! isVirtServerAvailable()));
     }
 
 	// TODO - temporary workaround, can be removed when link validation is part of repo
@@ -371,6 +385,26 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     	this.repoServerMgmt.registerLinkValidationService(this);
     }
 
+    /**
+     * Indicates if the service will be disabled (terminated) on fail during link validation.
+     * Default is FALSE, so service will retry to check links in RetryInterval msec.
+     * 
+     * @return Boolean value 
+     */
+    public boolean isDisableOnFail()
+    {
+        return disableOnFail;
+    }
+
+    /**
+     * 
+     * @param disableOnFail TRUE if the service should be disabled when an error occurs during link validation
+     */
+    public void setDisableOnFail(boolean disableOnFail)
+    {
+        this.disableOnFail = disableOnFail;
+    }
+    
     //-------------------------------------------------------------------------
     /**
     *  Called by LinkValidationServiceBootstrap at startup time to ensure
@@ -404,11 +438,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
     }
 
-
+    /**
+     * Detects an accessibility of the virtualization server.
+     * 
+     * @return TRUE if the virtualization server is accessible
+     */
     private boolean isVirtServerAvailable()
     {
         // check virtualization server registered and available
-        String virtServerJmxUrl = virtreg_.getVirtServerJmxUrl();
+        final String virtServerJmxUrl = virtreg_.getVirtServerJmxUrl();
         if (virtServerJmxUrl == null)
         {
             if ((virt_available == null || virt_available == true))
@@ -417,7 +455,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 virt_available = false;
             }
         }
-        else if (virtreg_.verifyJmxRmiConnection())
+        // See implementation of VirtServerRegistry.pingVirtServer() method
+        // Have been changed from VirtServerRegistry.verifyJmxRmiConnection() because of
+        // such method could not detect a virt server stop. E.g. Control+C in console...
+        else if (virtreg_.pingVirtServer())
         {
             if (virt_available == null || virt_available == false)
             {
@@ -444,6 +485,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     public void run()
     {
+        // Moved to top to avoid unnecessary code invocations if disabled
+        if ( poll_interval_ <= 0 )
+        {
+            if ( log.isInfoEnabled() )                 // LinkValidationService
+                log.info("LinkValidationService disabled (pollInterval <= 0)");
+
+            return;
+        }
+
         // If WCM isn't installed (c.f:  wcm-bootstrap-context.xml), then
         // an attempt to fetch the "patch.wcmFolders" will fail, indicating
         // that there's no need to run the link validation service.
@@ -476,7 +526,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             return;
         }
-
 
         // Register transaction callbacks to build a cache that helps to
         // avoid unnecesary calls to the real AVM getLatestSnapshotID().
@@ -542,18 +591,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         System.setProperty("javax.net.ssl.trustStore",trust_store_file);
         System.setProperty("javax.net.ssl.trustStorePassword",password);
 
-
-        if ( poll_interval_ <= 0 )
-        {
-            if ( log.isWarnEnabled() )                 // LinkValidationService
-                log.warn(
-                "LinkValidationService disabled in " + 
-                "linkvalidation-service-context.xml  pollInterval " + 
-                 poll_interval_ + " <= 0");
-
-            return;
-        }
-
         create_version_txn_listener_.addCallback( store_latest_version_info_ );
         purge_version_txn_listener_.addCallback(  store_latest_version_info_ );
         purge_store_txn_listener_.addCallback(    store_latest_version_info_ );
@@ -579,28 +616,31 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         boolean linkValidationFailure = false;
         
         // polling thread
-        while ( true )
+        while (!shutdown && !vmShutdownListener.isVmShuttingDown() )
         {
-            synchronized (this)
-            {
-                if (shutdown)
-                {
-                    break;
-                }
-            }
-
             if (isLinkValidationDisabled())
             {
                 if ( log.isTraceEnabled() )
                 {
-                    log.trace("Link validation (polling) not performed - currently disabled");
+                    log.trace("Link validation (polling) not performed - currently disabled.");
+                }
+                if (poll_interval_ > 0) 
+                {
+                    if ( log.isTraceEnabled() )
+                    {
+                        log.trace("Trying to reconnect to the virtualization server...");
+                    }
+                    if (virtreg_.verifyJmxRmiConnection())
+                    {
+                        virt_available = true;
+                    }
                 }
             }
             else
             {               
                 if ( log.isTraceEnabled() )
                 {
-                    log.trace("LinkValidationService is polling webapps...");
+                    log.trace("Virtualization server is accessible. LinkValidationService is polling webapps...");
                 }
     
                 final HrefValidationProgress progress = new HrefValidationProgress();
@@ -636,10 +676,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     if (linkValidationFailure == false)
                     {
                         // log error once
-                        log.error("Could not validate links: ", t);
+                        log.error("Could not validate links due to the exception: ", t);
                         linkValidationFailure = true;
                     }
-                    
+                    /*
                     if (log.isDebugEnabled())
                     {
                         // After all these years, there's still no easy
@@ -656,19 +696,28 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                         
                         log.debug("Retry link validation in "+(linkValidationFailure == true ? virt_retry_interval_ : poll_interval_)+" msecs");
                     }
+                    */
                 }
             }
+            // Breaks main loop if an error occurs and disableOnFailFlag was set.
+            if (linkValidationFailure && this.disableOnFail)
+            {
+                return;
+            }
 
-            // Sleep regardless of whether the updateHrefInfo failed
-            try { Thread.sleep( (linkValidationFailure == true || virt_available == null || virt_available == false) ? virt_retry_interval_ : poll_interval_ ); }
+            // Sleep interval changes due to the state of the virtualization server or an error has been thrown 
+            try 
+            {
+                Thread.sleep( (linkValidationFailure == true || virt_available == null || virt_available == false) ? virt_retry_interval_ : poll_interval_ );
+            }
             catch (InterruptedException ie)
             {
                 /* nothing to do */
             }
             catch (Exception e)
             {
-                if ( log.isDebugEnabled() )
-                    log.debug("Troubled sleep(): " + e.getMessage());
+                if ( log.isWarnEnabled() )
+                    log.warn("Troubled sleep(): " + e.getMessage());
             }
         }
 
