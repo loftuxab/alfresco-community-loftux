@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,19 +25,35 @@
 package org.alfresco.module.vti.metadata.dic;
 
 /**
- * @author AndreyAk
+ * <p>Enum of the standard sorting fields.</p>
+ * 
  * @author PavelYur
  */
 public enum VtiSortField
 {
+    /**
+     * sort by name
+     */
     NAME ("BaseName"),
 
+    /**
+     * sort by type
+     */
     TYPE ("DocIcon"),
 
+    /**
+     * sort by modifier
+     */
     MODIFIEDBY ("Editor"),
 
+    /**
+     * sort by last modified date
+     */
     MODIFIED ("Last_x0020_Modified"),
 
+    /**
+     * sort by checked out username
+     */
     CHECKEDOUTTO ("CheckedOutTitle");
 
     private String value;

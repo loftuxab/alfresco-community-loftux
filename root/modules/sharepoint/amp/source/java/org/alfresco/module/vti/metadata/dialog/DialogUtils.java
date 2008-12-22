@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,9 +29,12 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.servlet.ServletContext;
+import org.alfresco.module.vti.metadata.dic.VtiSort;
+import org.alfresco.module.vti.metadata.dic.VtiSortField;
 
 /**
+ * <p>Utils class for dialogview method (FileOpen/Save).</p>
+ *  
  * @author PavelYur
  *
  */
@@ -44,7 +47,14 @@ public class DialogUtils
     
     private static final ReadWriteLock fileExtensionMapLock = new ReentrantReadWriteLock();
     
-    public static String getFileTypeImage(ServletContext sc, String fileName)
+    /**
+     * <p>Recognize image for the given file extension, if image was not found or extension
+     * is empty string then default image is returned.</p>  
+     * 
+     * @param fileName name of the file is being displayed 
+     * @return server path to the correct image
+     */
+    public static String getFileTypeImage(String fileName)
     {
         String image = null;
         int extIndex = fileName.lastIndexOf('.');
@@ -64,7 +74,7 @@ public class DialogUtils
             if (image == null)
             {
                 image = IMAGE_PREFIX + ext + IMAGE_POSTFIX;
-                if (sc != null && sc.getResourceAsStream(image) != null)
+                if (DialogUtils.class.getClassLoader().getResourceAsStream("../../" + image) != null)
                 {
                     try
                     {
@@ -81,10 +91,56 @@ public class DialogUtils
                     image = DEFAULT_IMAGE;
                 }
             }
-
         }
 
         return image;
     }
 
+    /**
+     * <p>According the current sorting field and sorting order return new sorting order.</p> 
+     * 
+     * @param sortFieldValue value of the sorting field
+     * @param currentSortField current sorting field value
+     * @param sort current sorting order
+     * @return new sorting order
+     */
+    public String getSortDir(String sortFieldValue, VtiSortField currentSortField, VtiSort sort)
+    {
+        VtiSortField sortField = VtiSortField.value(sortFieldValue);
+
+        if (sortField.equals(currentSortField))
+        {
+            if (sort.equals(VtiSort.ASC))
+            {
+                return VtiSort.DESC.toString();
+            }
+            if (sort.equals(VtiSort.DESC))
+            {
+                return VtiSort.ASC.toString();
+            }
+        }
+        return VtiSort.ASC.toString();
+        }
+
+    /**
+     * <p>Cast String to VtiSortField</p>
+     * 
+     * @param sortFieldValue
+     * @return
+     */
+    public VtiSortField getSortFieldValue(String sortFieldValue)
+    {
+        return VtiSortField.value(sortFieldValue);
+    }
+
+    /**
+     * <p>Cast String to VtiSort</p>
+     * 
+     * @param sortValue
+     * @return
+     */
+    public VtiSort getSortValue(String sortValue)
+    {
+        return VtiSort.value(sortValue);
+    }
 }

@@ -883,8 +883,6 @@
 			<fileset dir="${dir.module.fb.doclib.dist}"            includes="${file.name.amp.fb.doclib}" />
 			<fileset dir="${dir.module.gg.dist}"                   includes="${file.name.zip.gg}" />
          <fileset dir="${dir.module.sharepoint}/amp/build/dist" includes="vti-module.amp" />
-         <fileset dir="${dir.module.sharepoint}/share-amp/build/dist" includes="share-vti.amp" />
-         <fileset dir="${dir.module.sharepoint}/root-app/build/dist" includes="ROOT.war" />
 	   </copy>
 	</target>
 	
@@ -892,8 +890,6 @@
            description="Creates the distribution files for Sharepoint Protocol Support"
            depends="init">
       <ant dir="${dir.module.sharepoint}/amp" target="amp" />
-      <ant dir="${dir.module.sharepoint}/share-amp" target="amp" />
-      <ant dir="${dir.module.sharepoint}/root-app" target="war" />
    </target>
 
    <!-- ***************** -->

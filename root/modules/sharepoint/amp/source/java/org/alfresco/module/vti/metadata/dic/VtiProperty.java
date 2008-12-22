@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,9 +26,9 @@
 package org.alfresco.module.vti.metadata.dic;
 
 /**
+ * <p>Enum of the standard meta-keys of the frontpage protocol that is used in alfresco implementation.</p> 
  *
  * @author Michael Shavnev
- *
  *
  */
 public enum VtiProperty
@@ -64,8 +64,8 @@ public enum VtiProperty
     FILE_SOURCECONTROLVERSION ("vti_sourcecontrolversion"),
     FILE_AUTHOR("vti_author"),
     FILE_MODIFIEDBY("vti_modifiedby"),
-    // SERVICE
 
+    // SERVICE
     SERVICE_CASESENSITIVEURLS ("vti_casesensitiveurls"),
     SERVICE_LONGFILENAMES ("vti_longfilenames"),
     SERVICE_SHOWHIDDENPAGES ("vti_showhiddenpages"),

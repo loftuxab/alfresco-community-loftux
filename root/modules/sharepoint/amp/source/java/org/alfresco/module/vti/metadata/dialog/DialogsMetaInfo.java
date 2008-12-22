@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,7 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author AndreyAk
+ * <p>Custom type to storing list of the files and folders.
+ * Used in dialogview method (FileOpen/Save) to retrieve all items from current folder.</p>
+ * 
  * @author PavelYur
  */
 public class DialogsMetaInfo implements Serializable

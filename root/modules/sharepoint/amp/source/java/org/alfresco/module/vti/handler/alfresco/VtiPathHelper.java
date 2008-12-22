@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,14 +22,16 @@
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
-
 package org.alfresco.module.vti.handler.alfresco;
 
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -44,6 +46,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.AbstractLifecycleBean;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
@@ -73,42 +76,103 @@ public class VtiPathHelper extends AbstractLifecycleBean
 
     private String rootPath;
     private String storePath;
+    private String alfrescoContext;
     
+    /**
+     * Set authentication component
+     * 
+     * @param authenticationComponent the authentication component to set ({@link AuthenticationComponent})
+     */
     public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
     {
         this.authenticationComponent = authenticationComponent;
     }
 
+    /**
+     * Set node service
+     * 
+     * @param nodeService the node service to set ({@link NodeService})
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
 
+    /**
+     * Set file-folder service
+     * 
+     * @param fileFolderService the file-folder service to set ({@link FileFolderService})
+     */
     public void setFileFolderService(FileFolderService fileFolderService)
     {
         this.fileFolderService = fileFolderService;
     }
 
+    /**
+     * Set permission service
+     * 
+     * @param permissionService the permission service to set ({@link PermissionService})
+     */
     public void setPermissionService(PermissionService permissionService)
     {
         this.permissionService = permissionService;
     }
 
+    /**
+     * Set search service
+     * 
+     * @param searchService the search service to set ({@link SearchService})
+     */
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
     }
 
+    /**
+     * Set root path
+     * 
+     * @param rootPath the root path to set
+     */
     public void setRootPath(String rootPath)
     {
         this.rootPath = rootPath;
     }
 
+    /**
+     * Set store path
+     * 
+     * @param storePath the store path to set
+     */
     public void setStorePath(String storePath)
     {
         this.storePath = storePath;
     }
 
+    /**
+     * Set alfresco context
+     * 
+     * @param alfrescoContext the alfresco context to set
+     */
+    public void setAlfrescoContext(String alfrescoContext)
+    {
+        this.alfrescoContext = alfrescoContext;
+    }
+
+    /**
+     * Get alfresco context
+     * 
+     * @return alfresco context
+     */
+    public String getAlfrescoContext()
+    {
+        return alfrescoContext;
+    }
+    
+    /**
+     * Set namespace service
+     * 
+     * @param namespaceService the namespace service to set ({@link NamespaceService})
+     */
     public void setNamespaceService(NamespaceService namespaceService)
     {
         this.namespaceService = namespaceService;
@@ -118,7 +182,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
      * Resolve file info for file with URL path
      *
      * @param initialURL URL path
-     * @return file info null if file or folder doesn't exist
+     * @return FileInfo file info null if file or folder doesn't exist
      */
     public FileInfo resolvePathFileInfo(String initialURL)
     {
@@ -153,9 +217,9 @@ public class VtiPathHelper extends AbstractLifecycleBean
     /**
      * Resolves file info for file with URL path in parent directory with file info
      *
-     * @param parentFileInfo file info for parent directory
+     * @param parentFileInfo file info for parent directory ({@link FileInfo})
      * @param childName url path relative to parent directory
-     * @return resolved file info for childName or null, if it doesn't exist
+     * @return FileInfo resolved file info for childName or null, if it doesn't exist
      */
     public FileInfo resolvePathFileInfo(FileInfo parentFileInfo, String childName)
     {
@@ -176,7 +240,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
      * Split URL path to document name and path to parent folder of that document
      *
      * @param path URL path
-     * @return first item of pair - path to parent folder, second item - document name
+     * @return Pair<String, String> first item of pair - path to parent folder, second item - document name
      */
     public static Pair<String, String> splitPathParentChild(String path)
     {
@@ -198,7 +262,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     /**
      * Format FrontPageExtension URL path from file information
      *
-     * @param fileInfo file information
+     * @param fileInfo file information ({@link FileInfo})
      * @return URL path
      */
     public String toUrlPath(FileInfo fileInfo)
@@ -230,6 +294,11 @@ public class VtiPathHelper extends AbstractLifecycleBean
         return urlPath;
     }
 
+    /**
+     * Get home space for current user
+     * 
+     * @return String url to home space
+     */
     public String getUserHomeLocation()
     {
         NodeRef currentUser = personService.getPerson(authenticationComponent.getCurrentUserName());
@@ -249,7 +318,166 @@ public class VtiPathHelper extends AbstractLifecycleBean
         return toUrlPath(fileFolderService.getFileInfo(homeSpace));        
     }
 
-	@Override
+    /**
+     * Get Document Workspace site from document name
+     * 
+     * @param document document
+     * @param spaceType type of space
+     * @return url to Document Workspace site
+     */
+    public String getDwsFromDocumentName(String document, final QName spaceType)
+    {
+        final String alfrescoContext = getContextFromDocumentName(document);
+        final String uri = getPathFromDocumentName(document);
+        String[] parts = AuthenticationUtil.runAs(new RunAsWork<String[]>()
+                {
+
+                    public String[] doWork() throws Exception
+                    {
+                        if (!uri.startsWith(alfrescoContext))
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("Url must start with alfresco context.");
+                            }
+                            throw new VtiHandlerException(VtiHandlerException.BAD_URL);
+                        }
+                        
+                        if (uri.equalsIgnoreCase(alfrescoContext))
+                        {
+                            if (logger.isDebugEnabled())
+                            {
+                                logger.debug("WebUrl: " + alfrescoContext + ", fileUrl: ''");
+                            }
+                            return new String[]{alfrescoContext, ""};
+                        }
+                        
+                        String webUrl = "";
+                        String fileUrl = "";        
+                        
+                        String[] splitPath = uri.replaceAll(alfrescoContext, "").substring(1).split("/");
+                        
+                        StringBuilder tempWebUrl = new StringBuilder();
+                        
+                        for (int i = splitPath.length; i > 0; i--)
+                        {
+                            tempWebUrl.delete(0, tempWebUrl.length());
+                            
+                            for (int j = 0; j < i; j++)
+                            {
+                                if ( j < i-1)
+                                {
+                                    tempWebUrl.append(splitPath[j] + "/");
+                                }
+                                else
+                                {
+                                    tempWebUrl.append(splitPath[j]);
+                                }
+                            }            
+                            
+                            FileInfo fileInfo = resolvePathFileInfo(tempWebUrl.toString());
+                            
+                            if (fileInfo != null)
+                            {
+                                if (nodeService.getType(fileInfo.getNodeRef()).equals(spaceType))
+                                {
+                                    webUrl = alfrescoContext + "/" + tempWebUrl;
+                                    if (uri.replaceAll(webUrl, "").startsWith("/"))
+                                    {
+                                        fileUrl = uri.replaceAll(webUrl, "").substring(1);
+                                    }
+                                    else
+                                    {
+                                        fileUrl = uri.replaceAll(webUrl, "");                        
+                                    }
+                                    if (logger.isDebugEnabled())
+                                    {
+                                        logger.debug("WebUrl: " + webUrl + ", fileUrl: '" + fileUrl + "'");
+                                    }
+                                    return new String[]{webUrl, fileUrl};
+                                }
+                            }
+                        }
+                        if (webUrl.equals(""))
+                        {
+                            throw new VtiHandlerException(VtiHandlerException.BAD_URL);
+                        }
+                        return new String[]{webUrl, fileUrl};
+                    }
+            
+                },
+                authenticationComponent.getSystemUserName());   
+        return parts[0].substring(parts[0].lastIndexOf("/"));
+    }
+    
+    /**
+     * Get host from document name
+     * 
+     * @param document document
+     * @return host
+     */
+    public String getHostFromDocumentName(String document)
+    {       
+        try
+        {
+            URL url = new URL(URLDecoder.decode(document, "UTF-8"));            
+            return url.getProtocol() + "://" + url.getHost()+ ":" + url.getPort();
+        }
+        catch (Exception e)
+        {
+            throw new VtiHandlerException(VtiHandlerException.BAD_URL);
+        }        
+    }
+    
+    /**
+     * Get context form document name
+     * 
+     * @param document document
+     * @return context
+     */
+    public String getContextFromDocumentName(String document)
+    {                
+        try
+        {
+            URL url = new URL(URLDecoder.decode(document, "UTF-8"));
+            
+            if (url.getPath().startsWith(alfrescoContext))
+            {
+                return alfrescoContext;
+            }
+            else
+            {
+                throw new VtiHandlerException(VtiHandlerException.BAD_URL);
+            }            
+            
+        }
+        catch (Exception e)
+        {
+            throw new VtiHandlerException(VtiHandlerException.BAD_URL);
+        }        
+    }
+    
+    /**
+     * Get path from document name
+     * 
+     * @param document document
+     * @return path
+     */
+    public String getPathFromDocumentName(String document)    
+    {
+        try
+        {            
+            return new URL(URLDecoder.decode(document, "UTF-8")).getPath();
+        }
+        catch (Exception e)
+        {
+            throw new VtiHandlerException(VtiHandlerException.BAD_URL);
+        }
+    }
+    
+    /**
+     * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
+     */
 	protected void onBootstrap(ApplicationEvent event) 
 	{
 		rootNodeRef = AuthenticationUtil.runAs(new RunAsWork<NodeRef>() 
@@ -282,6 +510,12 @@ public class VtiPathHelper extends AbstractLifecycleBean
 		}, authenticationComponent.getSystemUserName());
 	}
 	
+	/**
+	 * Remove slashes from string
+	 * 
+	 * @param value input string
+	 * @return String output string
+	 */
 	public static String removeSlashes(String value)
 	{	    
 	    value = value.replaceAll("//", "/");
@@ -293,11 +527,16 @@ public class VtiPathHelper extends AbstractLifecycleBean
 	    return value;	    
 	}
 
-	@Override
+	/**
+     * @see org.alfresco.util.AbstractLifecycleBean#onShutdown(org.springframework.context.ApplicationEvent)
+     */
 	protected void onShutdown(ApplicationEvent event) {
 		// do nothing
 	}
 
+	/**
+	 * @return
+	 */
     public NodeRef getRootNodeRef()
     {
         return rootNodeRef;

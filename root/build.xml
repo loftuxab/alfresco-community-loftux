@@ -400,10 +400,8 @@
    -->
 
    <target name="build-sharepoint" 
-           depends="clean-sharepoint, incremental-webclient-tomcat, incremental-slingshot-tomcat">
+           depends="clean-sharepoint, incremental-webclient-tomcat">
       <ant dir="${dir.module.sharepoint}/amp" target="deploy" />
-      <ant dir="${dir.module.sharepoint}/share-amp" target="deploy" />
-      <ant dir="${dir.module.sharepoint}/root-app" target="deploy" />
    </target>
    
    <target name="generate-docs" 
@@ -510,11 +508,8 @@
    </target>
    
    <target name="clean-sharepoint" 
-           depends="clean-webclient-tomcat-deploy, clean-application-tomcat-deploy">
+           depends="clean-webclient-tomcat-deploy">
       <ant dir="${dir.module.sharepoint}/amp" target="clean" />
-      <ant dir="${dir.module.sharepoint}/share-amp" target="clean" />
-      <ant dir="${dir.module.sharepoint}/root-app" target="clean" />
-      <ant dir="${dir.module.sharepoint}/root-app" target="undeploy" />
    </target>
       
    <!--

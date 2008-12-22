@@ -3,8 +3,6 @@
 
 <beans>
 
-	<import resource="classpath:alfresco/module/org.alfresco.module.vti/context/vti-handler-3-context.xml"/>
-   <import resource="classpath:alfresco/module/org.alfresco.module.vti/context/vti-method-context.xml"/>
-   <import resource="classpath:alfresco/module/org.alfresco.module.vti/context/vti-web-context.xml"/>
+	<import resource="classpath:alfresco/module/org.alfresco.module.vti/context/*-context.xml"/>
 	
 </beans>

@@ -37,6 +37,7 @@
    <target name="jar" depends="compile">
       <jar destfile="${build.dir}/lib/${jar.file}" encoding="UTF-8">
          <fileset dir="${build.dir}/classes" includes="**/*.class" />
+	 <fileset dir="${src}" includes="**/*.ftl"/>
       </jar>
    </target>
    
@@ -44,8 +45,7 @@
       <zip destfile="${build.dir}/dist/${amp.file}" encoding="UTF-8">
          <fileset dir="${basedir}" includes="lib/*.jar" />
          <fileset dir="${build.dir}" includes="lib/*.jar" />
-         <fileset dir="${basedir}" includes="config/**/*.*" excludes="config/**/*.properties,config/**/vti-handler-context.xml" />
-         <fileset dir="${basedir}/source" includes="web/**/*.*" />
+         <fileset dir="${basedir}" includes="config/**/*.*" excludes="config/**/module.properties,config/**/file-mapping.properties,config/**/vti-handler-alfresco2-context.xml,config/**/vti-handler-alfresco2-context.xml.sample"/>			
          <fileset dir="${config}/alfresco/module/org.alfresco.module.vti" includes="*.properties" />
       </zip>
    </target>
