@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,14 +22,12 @@
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
-
 package org.alfresco.module.vti.handler.alfresco;
 
 /**
  * Helper for AlfrescoVtiMethodHandler
  *
  * @author Dmitry Lazurkin
- *
  */
 public class VtiExceptionUtils
 {
@@ -38,7 +36,7 @@ public class VtiExceptionUtils
      * If throwable isn't runtime then wraps it in runtime exception.
      *
      * @param throwable runtime or not runtime exception
-     * @return runtime exception
+     * @return RuntimeException runtime exception
      */
     public static RuntimeException createRuntimeException(Throwable throwable)
     {

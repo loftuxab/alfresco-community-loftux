@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,12 +22,12 @@
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
-
 package org.alfresco.module.vti.handler.alfresco;
 
 import java.util.List;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.vti.metadata.dic.DocumentStatus;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.coci.CheckOutCheckInService;
 import org.alfresco.service.cmr.lock.LockService;
@@ -37,8 +37,9 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 
 /**
- * @author Dmitry Lazurkin
+ * Helper for documents
  *
+ * @author Dmitry Lazurkin
  */
 public class VtiDocumentHepler
 {
@@ -46,16 +47,31 @@ public class VtiDocumentHepler
     private CheckOutCheckInService checkOutCheckInService;
     private LockService lockService;
 
+    /**
+     * Set node service
+     * 
+     * @param nodeService the node service to set ({@link NodeService})
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
 
+    /**
+     * Set checkout-checkin service
+     * 
+     * @param checkOutCheckInService the checkout-checkin service to set ({@link CheckOutCheckInService})
+     */
     public void setCheckOutCheckInService(CheckOutCheckInService checkOutCheckInService)
     {
         this.checkOutCheckInService = checkOutCheckInService;
     }
 
+    /**
+     * Lock service
+     * 
+     * @param lockService the lock service to set ({@link LockService})
+     */
     public void setLockService(LockService lockService)
     {
         this.lockService = lockService;
@@ -64,8 +80,8 @@ public class VtiDocumentHepler
     /**
      * Returns document status for node reference
      *
-     * @param nodeRef node reference
-     * @return document status
+     * @param nodeRef node reference ({@link NodeRef})
+     * @return DocumentStatus document status
      */
     public DocumentStatus getDocumentStatus(NodeRef nodeRef)
     {
@@ -119,8 +135,8 @@ public class VtiDocumentHepler
     /**
      * Determines short-term checkout on node reference
      *
-     * @param nodeRef node reference
-     * @return true if document is checked out else false
+     * @param nodeRef node reference ({@link NodeRef})
+     * @return <b>true</b> if document is checked out, <b>false</b> otherwise
      */
     public boolean isShortCheckedout(NodeRef nodeRef)
     {
@@ -142,8 +158,8 @@ public class VtiDocumentHepler
     /**
      * Determines long-term checkout on node reference
      *
-     * @param nodeRef node reference
-     * @return true if document is checked out else false
+     * @param nodeRef node reference ({@link NodeRef})
+     * @return <b>true</b> if document is checked out, <b>else</b> otherwise
      */
     public boolean isLongCheckedout(NodeRef nodeRef)
     {
@@ -162,8 +178,8 @@ public class VtiDocumentHepler
     /**
      * Returns original node reference for working copy node reference
      *
-     * @param workingCopyNodeRef node reference to working copy
-     * @return Returns node reference to node, which is source for working copy node. Null indicates error
+     * @param workingCopyNodeRef node reference to working copy ({@link NodeRef})
+     * @return NodeRef node reference to node, which is source for working copy node. Null indicates error
      */
     public NodeRef getOriginalNodeRef(NodeRef workingCopyNodeRef)
     {
@@ -181,8 +197,10 @@ public class VtiDocumentHepler
     }
 
     /**
-     * @param documentStatus status of document
-     * @return
+     * Check document on checkout
+     * 
+     * @param documentStatus status of document ({@link DocumentStatus})
+     * @return <i>true</i>, if document is checkout; otherwise, <i>false</i>
      */
     public static boolean isCheckedout(DocumentStatus documentStatus)
     {
@@ -190,8 +208,10 @@ public class VtiDocumentHepler
     }
 
     /**
-     * @param documentStatus status of document
-     * @return
+     * Check document on long term checkout
+     * 
+     * @param documentStatus status of document ({@link DocumentStatus})
+     * @return <i>true</i>, if document is long term checkout; otherwise, <i>false</i>
      */
     public static boolean isLongCheckedout(DocumentStatus documentStatus)
     {
@@ -199,8 +219,10 @@ public class VtiDocumentHepler
     }
 
     /**
-     * @param documentStatus status of document
-     * @return
+     * Check document on short term checkout
+     * 
+     * @param documentStatus status of document ({@link DocumentStatus})
+     * @return <i>true</i>, if document is short term checkout; otherwise, <i>false</i>
      */
     public static boolean isShortCheckedout(DocumentStatus documentStatus)
     {
@@ -208,8 +230,10 @@ public class VtiDocumentHepler
     }
 
     /**
-     * @param documentStatus status of document
-     * @return
+     * Check document on owner checkout
+     * 
+     * @param documentStatus status of document ({@link DocumentStatus})
+     * @return <i>true</i>, if document is owner checkout; otherwise, <i>false</i>
      */
     public static boolean isCheckoutOwner(DocumentStatus documentStatus)
     {
@@ -221,7 +245,7 @@ public class VtiDocumentHepler
      *
      * @param fileName file name
      * @param fileDialogFilterValue list of file filters
-     * @return if file name matches at least one file filter then true else false
+     * @return <i>true</i>, if file name matches at least one file filter; otherwise, <i>false</i>
      */
     public static boolean applyFilters(String fileName, List<String> fileDialogFilterValue)
     {
@@ -264,5 +288,4 @@ public class VtiDocumentHepler
 
         return false;
     }
-
 }

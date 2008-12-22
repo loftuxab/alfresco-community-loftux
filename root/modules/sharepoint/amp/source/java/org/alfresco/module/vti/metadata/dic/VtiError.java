@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +26,8 @@
 package org.alfresco.module.vti.metadata.dic;
 
 /**
+ * <p>Enum of the standard errors that may be raised while protocol usage.</p>
+ * 
  * @author Michael Shavnev
  * @author Dmitry Lazurkin
  *
@@ -47,9 +49,12 @@ public enum VtiError
     V_FILE_OPEN_FOR_WRITE (0x00020002, "The file cannot be opened for writing."),
     V_REMOVE_FILE (0x00020007, "The file could not be removed. "),
     V_REMOVE_DIRECTORY (0x00020004, "The directory could not be removed."),
+    V_HAS_ILLEGAL_CHARACTERS (0x00090070, "The file or folder name contains characters that are not permitted. Only alphanumeric characters and underscore allowed."),
 
     V_OWSSVR_ERRORACCESSDENIED (0x001E0002, "Access denied."),
-    V_OWSSVR_ERRORSERVERINCAPABLE (0x001E0006, "The server does not support this capability. ");
+    V_OWSSVR_ERRORSERVERINCAPABLE (0x001E0006, "The server does not support this capability. "),
+    
+    V_UNDIFUNED (0x0000000, "Undefined error");
 
     private final String messagePattern;
     private final int errorCode;

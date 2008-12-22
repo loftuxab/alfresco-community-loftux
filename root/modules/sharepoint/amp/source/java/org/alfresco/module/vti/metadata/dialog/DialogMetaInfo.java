@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +27,10 @@ package org.alfresco.module.vti.metadata.dialog;
 import java.io.Serializable;
 
 /**
- * @author AndreyAk
+ * <p>This class is a java bean that represents items in FileOpen/Save Dialogs. 
+ * Is used in dialogview method (FileOpen/Save).</p> 
+ * 
+ * @author PavelYur
  *
  */
 public class DialogMetaInfo implements Serializable
@@ -35,12 +38,22 @@ public class DialogMetaInfo implements Serializable
 
     private static final long serialVersionUID = -2507258363715335001L;
     
+    // name to display in dialog 
     private String name = "";
+    
+    // path relative to root node 
     private String path = "";
+    
+    // name of the user that was last modifier 
     private String modifiedBy = "";
+    
+    // last modified time
     private String modifiedTime = "";
+    
+    // name of the user that checked out document or empty string if document is not checked out
     private String checkedOutTo = "";
     
+    // isFolder?
     private boolean isFolder;
     
     /**

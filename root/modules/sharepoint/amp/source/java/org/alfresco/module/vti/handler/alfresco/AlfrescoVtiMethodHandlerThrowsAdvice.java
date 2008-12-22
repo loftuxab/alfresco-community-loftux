@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,32 +25,37 @@
 
 package org.alfresco.module.vti.handler.alfresco;
 
+import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
-import org.alfresco.module.vti.VtiException;
-import org.alfresco.module.vti.VtiInternalErrorException;
-import org.alfresco.module.vti.metadata.dic.VtiError;
 import org.springframework.aop.ThrowsAdvice;
 
 /**
- * @author Dmitry Lazurkin
+ * Adviser that should wrap all realizations of VtiHandlers. It transform 
+ * all obtained exceptions to VtiHandlerException.    
  *
+ * @author Dmitry Lazurkin
  */
 public class AlfrescoVtiMethodHandlerThrowsAdvice implements ThrowsAdvice
 {
 
+    /**
+     * Method that called after exception occurs
+     * 
+     * @param throwable source exception 
+     */
     public void afterThrowing(Throwable throwable)
     {
-        if (throwable instanceof VtiException)
+        if (throwable instanceof VtiHandlerException)
         {
-            throw (VtiException) throwable;
+            throw (VtiHandlerException) throwable;
         }
 
         if (throwable instanceof AccessDeniedException)
         {
-            throw VtiException.create(throwable, VtiError.V_OWSSVR_ERRORACCESSDENIED);
+            throw new VtiHandlerException(VtiHandlerException.OWSSVR_ERRORACCESSDENIED, throwable);
         }
 
-        throw new VtiInternalErrorException(throwable);
+        throw new VtiHandlerException(VtiHandlerException.UNDEFINED, throwable);
     }
 
 }

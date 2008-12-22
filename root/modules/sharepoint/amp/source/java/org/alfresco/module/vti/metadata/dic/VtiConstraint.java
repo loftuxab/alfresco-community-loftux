@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,13 +26,25 @@
 package org.alfresco.module.vti.metadata.dic;
 
 /**
+ * <p>Enum of the standard constraints for the parameters.</p>
  * 
  * @author Michael Shavnev
  */
 public enum VtiConstraint
 {
+    /**
+     * Read-only
+     */
     R ("R"),
+    
+    /**
+     * Write
+     */
     W ("W"),
+    
+    /**
+     * Ignore
+     */
     X ("X");
     
     private final String value;

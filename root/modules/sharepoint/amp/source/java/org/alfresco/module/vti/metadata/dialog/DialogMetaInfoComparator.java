@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +26,8 @@
 package org.alfresco.module.vti.metadata.dialog;
 
 /**
+ * <p>Custom comparator to compare DialogMetaInfo beans.</p>
+ * 
  * @author PavelYur
  */
 import java.util.Comparator;
@@ -39,12 +41,21 @@ public class DialogMetaInfoComparator implements Comparator<DialogMetaInfo>
     private VtiSortField sortField = VtiSortField.TYPE;
     private VtiSort sort = VtiSort.ASC;
     
+    /**
+     * Constructor
+     * 
+     * @param sortField field that is used as a key in sorting
+     * @param sort sorting type (ascending or descending)
+     */
     public DialogMetaInfoComparator(VtiSortField sortField, VtiSort sort)
     {
         this.sortField = sortField;
         this.sort = sort;
     }
     
+    /**
+     * Sort DialogMetaInfo beans as MS clients do that.
+     */
     public int compare(DialogMetaInfo o1, DialogMetaInfo o2)
     {         
         if (o1.isFolder() != o2.isFolder())
