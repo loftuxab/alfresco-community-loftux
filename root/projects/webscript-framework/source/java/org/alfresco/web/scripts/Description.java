@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -164,9 +165,9 @@ public interface Description
     public String getDescription();
     
     /**
-     * Gets the family of this service
+     * Gets the family(s) of this service in the order that they are defined
      */
-    public String getFamily();
+    public Set<String> getFamilys();
     
     /**
      * Gets the required authentication level for execution of this service
@@ -241,4 +242,22 @@ public interface Description
      */
     public Map<String, Serializable> getExtensions();
     
+    /**
+     * Enumeration of lifecycle which indicates the status of this web script
+     */
+    public enum Lifecycle
+    {
+    	none,
+    	sample,
+        draft,
+        draft_public_api,
+        public_api,
+        deprecated,
+        internal
+    }
+    
+    /**
+     * Get the lifecycle
+     */
+    Lifecycle getLifecycle();
 }

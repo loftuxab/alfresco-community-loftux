@@ -351,6 +351,7 @@
    <bean id="webscript.org.alfresco.indexall.get" class="org.alfresco.web.scripts.bean.IndexAll" parent="webscript" scope="prototype"/>
    <alias name="webscript.org.alfresco.index.get" alias="webscript.org.alfresco.indexfailures.get"/>
    <bean id="webscript.org.alfresco.indexfamily.get" class="org.alfresco.web.scripts.bean.IndexFamily" parent="webscript" scope="prototype" />
+   <bean id="webscript.org.alfresco.indexlifecycle.get" class="org.alfresco.web.scripts.bean.IndexLifecycle" parent="webscript" scope="prototype" />
    <bean id="webscript.org.alfresco.indexuri.get" class="org.alfresco.web.scripts.bean.IndexURI" parent="webscript" scope="prototype" />
    <bean id="webscript.org.alfresco.indexpackage.get" class="org.alfresco.web.scripts.bean.IndexPackage" parent="webscript" scope="prototype" />
    <bean id="webscript.org.alfresco.index.post" class="org.alfresco.web.scripts.bean.IndexUpdate" parent="webscript" scope="prototype" >

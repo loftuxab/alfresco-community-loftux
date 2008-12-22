@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,16 +28,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
-import org.alfresco.web.scripts.WebScriptRequest;
+import org.alfresco.web.scripts.Path;
 import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.WebScriptException;
+import org.alfresco.web.scripts.WebScriptRequest;
 
 
 /**
- * Index of all Web Scripts
+ * Index of a Web Script URI
  * 
- * @author davidc
+ * @author markr
  */
-public class Index extends DeclarativeWebScript
+public class IndexLifecycle extends DeclarativeWebScript
 {
 
     /* (non-Javadoc)
@@ -46,13 +48,26 @@ public class Index extends DeclarativeWebScript
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
     {
+        // extract web script package
+        String uriPath = req.getExtensionPath();
+        if (uriPath == null || uriPath.length() == 0)
+        {
+            uriPath = "/";
+        }
+        if (!uriPath.startsWith("/"))
+        {
+            uriPath = "/" + uriPath;
+        }
+        
+        // locate web script package
+        Path path = getContainer().getRegistry().getLifecycle(uriPath);
+        if (path == null)
+        {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, "Web Script URI '" + uriPath + "' not found");
+        }
+        
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);
-        model.put("webscripts",  getContainer().getRegistry().getWebScripts());
-        model.put("failures", getContainer().getRegistry().getFailures());
-        model.put("rooturl", getContainer().getRegistry().getUri("/"));
-        model.put("rootpackage", getContainer().getRegistry().getPackage("/"));
-        model.put("rootfamily", getContainer().getRegistry().getFamily("/"));
-        model.put("rootlifecycle", getContainer().getRegistry().getLifecycle("/"));
+        model.put("lifecycle",  path);
         return model;
     }
 

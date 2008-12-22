@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Path;
@@ -54,6 +55,7 @@ public class IndexAll extends DeclarativeWebScript
         String packageFilter = req.getParameter("package") != null ? req.getParameter("package") : "/";
         String urlFilter = req.getParameter("url") != null ? req.getParameter("url") : "/";
         String familyFilter = req.getParameter("family") != null ? req.getParameter("family") : "/";
+        String lifecycleFilter = req.getParameter("lifecycle") != null ? req.getParameter("lifecycle") : "/";
 
         // filter web scripts
     	Collection<WebScript> scripts = getContainer().getRegistry().getWebScripts();
@@ -130,15 +132,24 @@ public class IndexAll extends DeclarativeWebScript
     		return false;
     	}
     	
-		// is it in the family
-    	if (script.getDescription().getFamily() == null && !familyFilter.equals("/"))
+    	
+    	if(!familyFilter.equals("/"))
     	{
-    		return false;
+    		// Family filter is ON
+    		// 
+    		Set<String> familys = script.getDescription().getFamilys();
+    	
+    		// Do we have a family at all?
+    		if (familys == null || familys.size() == 0)
+    		{
+    			return false;
+    		}
+    		
+    		if(!familys.contains(familyFilter))
+    		{
+    			return false;
+    		}
     	}
-		if (script.getDescription().getFamily() != null && !script.getDescription().getFamily().startsWith(familyFilter))
-		{
-			return false;
-		}
 		
 		// is it in the url
 		String[] uris = script.getDescription().getURIs();
