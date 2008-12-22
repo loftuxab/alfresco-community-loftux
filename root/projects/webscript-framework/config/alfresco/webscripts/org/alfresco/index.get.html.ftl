@@ -34,6 +34,7 @@
       <form action="${url.serviceContext}${url.match}" method="post">
       <input type="hidden" name="reset" value="on"/>
       <table>
+   	 <tr><td><a href="${url.serviceContext}/index/lifecycle/">Browse by Web Script Lifecycle</a></td></tr>
          <#if failures?size &gt; 0>
          <tr><td><a href="${url.serviceContext}/index/failures">Browse failed Web Scripts</a></td></tr>
          </#if>

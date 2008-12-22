@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -45,7 +46,8 @@ public class DescriptionImpl implements Description
     private String kind;
     private String shortName;
     private String description;
-    private String family;
+    private Lifecycle lifecycle;
+    private Set<String>familys;
     private RequiredAuthentication requiredAuthentication;
     private String runAs;
     private RequiredTransaction requiredTransaction;
@@ -214,17 +216,17 @@ public class DescriptionImpl implements Description
     /**
      * @param family the family to set
      */
-    public void setFamily(String family)
+    public void setFamilys(Set<String> familys)
     {
-        this.family = family;
+        this.familys = familys;
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Description#getFamily()
      */
-    public String getFamily()
+    public Set<String> getFamilys()
     {
-        return this.family;
+        return this.familys;
     }
 
     /**
@@ -407,5 +409,18 @@ public class DescriptionImpl implements Description
     {
         return extensions;
     }
+
+    /**
+     * Gets the lifecycle attribute of this web script
+     */
+	public Lifecycle getLifecycle() 
+	{
+		return lifecycle;
+	}
+	
+	public void setLifecycle(Lifecycle lifecycle)
+	{
+		this.lifecycle = lifecycle;
+	}
 
 }

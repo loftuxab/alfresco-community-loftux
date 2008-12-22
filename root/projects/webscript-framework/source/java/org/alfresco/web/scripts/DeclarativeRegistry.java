@@ -33,9 +33,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.alfresco.web.scripts.Description.FormatStyle;
+import org.alfresco.web.scripts.Description.Lifecycle;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.Description.RequiredTransaction;
 import org.apache.commons.logging.Log;
@@ -85,6 +88,9 @@ public class DeclarativeRegistry
 
     // map of web script families by path
     private Map<String, PathImpl> familyByPath = new TreeMap<String, PathImpl>();
+    
+    // map of web script families by lifecycle
+    private Map<String, PathImpl> lifecycleByPath = new TreeMap<String, PathImpl>();
     
     // uri index for mapping a URI to a Web Script
     private UriIndex uriIndex;
@@ -190,6 +196,8 @@ public class DeclarativeRegistry
         uriByPath.put("/", new PathImpl("/"));
         familyByPath.clear();
         familyByPath.put("/", new PathImpl("/"));
+        lifecycleByPath.clear();
+        lifecycleByPath.put("/", new PathImpl("/"));
         
         // register services
         for (Store apiStore : searchPath.getStores())
@@ -324,6 +332,7 @@ public class DeclarativeRegistry
                     serviceDesc.setPackage(scriptPath);
                     registerURIs(serviceImpl);
                     registerFamily(serviceImpl);
+                    registerLifecycle(serviceImpl);
                 }
                 catch(WebScriptException e)
                 {
@@ -383,22 +392,47 @@ public class DeclarativeRegistry
     private void registerFamily(WebScript script)
     {
         Description desc = script.getDescription();
-        String family = desc.getFamily();
-        if (family != null && family.length() > 0)
+        Set<String> familys = desc.getFamilys();
+        for(String family : familys)
         {
-            PathImpl path = familyByPath.get("/");
-            String[] parts = family.split("/");
-            for (String part : parts)
+        	if (family != null && family.length() > 0)
+        	{
+        		PathImpl path = familyByPath.get("/");
+            	String[] parts = family.split("/");
+            	for (String part : parts)
+            	{
+                	PathImpl subpath = familyByPath.get(PathImpl.concatPath(path.getPath(), part));
+                	if (subpath == null)
+                	{
+                    	subpath = path.createChildPath(part);
+                    	familyByPath.put(subpath.getPath(), subpath);
+                	}      
+                	path = subpath;
+            	}
+            	path.addScript(script);
+        	}
+        }
+    }
+    
+    /**
+     * Register a lifecycle
+     * 
+     * @param script
+     */
+    private void registerLifecycle(WebScript script)
+    {
+        Description desc = script.getDescription();
+        Lifecycle lifecycle = desc.getLifecycle();
+       	if (lifecycle != Lifecycle.none)
+      	{
+            PathImpl path = lifecycleByPath.get("/");
+        	PathImpl subpath = lifecycleByPath.get(PathImpl.concatPath(path.getPath(), lifecycle.toString()));
+            if (subpath == null)
             {
-                PathImpl subpath = familyByPath.get(PathImpl.concatPath(path.getPath(), part));
-                if (subpath == null)
-                {
-                    subpath = path.createChildPath(part);
-                    familyByPath.put(subpath.getPath(), subpath);
-                }      
-                path = subpath;
-            }
-            path.addScript(script);
+                 subpath = path.createChildPath(lifecycle.toString());
+                 lifecycleByPath.put(subpath.getPath(), subpath);
+            }      	
+            subpath.addScript(script);
         }
     }
 
@@ -441,7 +475,8 @@ public class DeclarativeRegistry
      * 
      * @return  web script service description
      */
-    private DescriptionImpl createDescription(Store store, String serviceDescPath, InputStream serviceDoc)
+    @SuppressWarnings("unchecked")
+	private DescriptionImpl createDescription(Store store, String serviceDescPath, InputStream serviceDoc)
     {
         SAXReader reader = new SAXReader();
         try
@@ -492,13 +527,20 @@ public class DeclarativeRegistry
             {
                 description = descriptionElement.getTextTrim();
             }
-            
-            // retrieve family
-            String family = null;
-            Element familyElement = rootElement.element("family");
-            if (familyElement != null)
+                  
+            // retrieve family[]
+            Set<String> familys = new TreeSet<String>();
+            List<Element> familyElements = rootElement.elements("family");
+            if (familyElements == null || familyElements.size() > 0)
             {
-                family = familyElement.getTextTrim();
+                Iterator<Element> iterFamily = familyElements.iterator();
+                while(iterFamily.hasNext())
+                {
+                    // retrieve family element
+                    Element familyElement = (Element)iterFamily.next();
+                    String family = familyElement.getTextTrim();
+                    familys.add(family);
+                }
             }
             
             // retrieve urls
@@ -582,6 +624,27 @@ public class DeclarativeRegistry
                 }
             }
             
+            // retrieve lifecycle
+            Lifecycle lifecycle = Lifecycle.none;
+            
+            Element lifecycleElement = rootElement.element("lifecycle");
+            if (lifecycleElement != null)
+            {
+                String reqLifeStr = lifecycleElement.getTextTrim();
+                if (reqLifeStr == null || reqLifeStr.length() == 0)
+                {
+                    throw new WebScriptException("Expected <lifecycle> value");
+                }
+                try
+                {
+                    lifecycle = Lifecycle.valueOf(reqLifeStr);
+                }
+                catch (IllegalArgumentException e)
+                {
+                    throw new WebScriptException("Lifecycle '" + reqLifeStr + "' is not a valid value");
+                }
+            }
+
             // retrieve format
             String defaultFormat = "html";
             String defaultFormatMimetype = null; 
@@ -682,9 +745,10 @@ public class DeclarativeRegistry
             serviceDesc.setDescPath(serviceDescPath);
             serviceDesc.setId(id);
             serviceDesc.setKind(kind);
+            serviceDesc.setLifecycle(lifecycle);
             serviceDesc.setShortName(shortName);
             serviceDesc.setDescription(description);
-            serviceDesc.setFamily(family);
+            serviceDesc.setFamilys(familys);
             serviceDesc.setRequiredAuthentication(reqAuth);
             serviceDesc.setRunAs(runAs);
             serviceDesc.setRequiredTransaction(reqTrx);
@@ -768,5 +832,13 @@ public class DeclarativeRegistry
         
         return match;
     }
+
+    /**
+     * 
+     */
+	public Path getLifecycle(String lifecyclePath) 
+	{
+		return lifecycleByPath.get(lifecyclePath);
+	}
 
 }

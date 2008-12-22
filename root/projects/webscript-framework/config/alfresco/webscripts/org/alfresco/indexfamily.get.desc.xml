@@ -2,4 +2,5 @@
   <shortname>Web Script Family Index</shortname>
   <description>Provide an index of Web Scripts for the specified family</description>
   <url>/index/family/{family}</url>
+  <lifecycle>internal</lifecycle>
 </webscript>

@@ -64,6 +64,18 @@ public interface Registry
     public Path getFamily(String familyPath);
     
     /**
+     * Gets a Lifecycle Family, for example, all deprecated web scripts
+     * 
+     * NOTE:
+     * - To get all lifecycles, pass /
+     * - To get a specific lifecycle, pass /{lifecycleName}
+     * 
+     * @param lifecyclePath
+     * @return  web script path representing family
+     */
+    public Path getLifecycle(String lifecyclePath);
+    
+    /**
      * Gets all Web Scripts
      * 
      * @return  web scripts

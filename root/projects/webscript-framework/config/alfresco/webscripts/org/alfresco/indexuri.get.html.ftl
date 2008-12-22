@@ -37,6 +37,9 @@
       <tr><td>Authentication:<td>${desc.requiredAuthentication}
       <tr><td>Transaction:<td>${desc.requiredTransaction}
       <tr><td>Format Style:<td>${desc.formatStyle}
+      <#if desc.lifecycle != 'none'>
+      <tr><td>Lifecycle:</td><td>${desc.lifecycle}</td></tr>
+      </#if>
       <tr><td>Default Format:<td>${desc.defaultFormat!"<i>Determined at run-time</i>"}
       <tr><td>
       <tr><td>Id:<td><a href="${url.serviceContext}/script/${desc.id}">${desc.id}</a>

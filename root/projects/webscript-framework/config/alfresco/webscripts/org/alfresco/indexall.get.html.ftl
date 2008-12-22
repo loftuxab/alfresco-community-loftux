@@ -32,6 +32,9 @@
                <tr><td>Transaction:</td><td>${desc.requiredTransaction}</td></tr>
                <tr><td>Format Style:</td><td>${desc.formatStyle}</td></tr>
                <tr><td>Default Format:</td><td>${desc.defaultFormat!"<i>Determined at run-time</i>"}</td></tr>
+      	<#if desc.lifecycle != 'none'>
+      	    <tr><td>Lifecycle:</td><td>${desc.lifecycle}</td></tr>
+        </#if>
                <tr><td></td></tr>
                <tr><td>Id:</td><td><a href="${url.serviceContext}/script/${desc.id}">${desc.id}</a></td></tr>
                <tr><td>Descriptor:</td><td><a href="${url.serviceContext}/description/${desc.id}">${desc.storePath}/${desc.descPath}</a></td></tr>
