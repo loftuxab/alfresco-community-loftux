@@ -68,6 +68,7 @@ public abstract class AbstractWebScript implements WebScript
     
     // service resources
     private Map<Locale, ResourceBundle> resources = new HashMap<Locale, ResourceBundle>(4);
+    private Map<Locale, String> jsonResources = new HashMap<Locale, String>(4);
     
     // Status Template cache
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
@@ -800,29 +801,41 @@ public abstract class AbstractWebScript implements WebScript
      * 
      * @return JSON object string
      */
-    private static String renderJSONResources(ResourceBundle resources)
+    private String renderJSONResources(ResourceBundle resources)
     {
-        if (resources == null) return "{}";
+        String result = "{}";
         
-        StringBuilderWriter buf = new StringBuilderWriter(256);
-        JSONWriter out = new JSONWriter(buf);
-        try
+        if (resources != null)
         {
-            out.startObject();
-            Enumeration<String> keys = resources.getKeys();
-            while (keys.hasMoreElements())
+            synchronized (jsonResources)
             {
-                String key = keys.nextElement();
-                out.writeValue(key, resources.getString(key));
+                result = jsonResources.get(resources.getLocale());
+                if (result == null)
+                {
+                    StringBuilderWriter buf = new StringBuilderWriter(256);
+                    JSONWriter out = new JSONWriter(buf);
+                    try
+                    {
+                        out.startObject();
+                        Enumeration<String> keys = resources.getKeys();
+                        while (keys.hasMoreElements())
+                        {
+                            String key = keys.nextElement();
+                            out.writeValue(key, resources.getString(key));
+                        }
+                        out.endObject();
+                    }
+                    catch (IOException jsonErr)
+                    {
+                        throw new WebScriptException("Error rendering I18N resources.", jsonErr);
+                    }
+                    result = buf.toString();
+                    jsonResources.put(resources.getLocale(), result);
+                }
             }
-            out.endObject();
-        }
-        catch (IOException jsonErr)
-        {
-            throw new WebScriptException("Error rendering I18N resources.", jsonErr);
         }
         
-        return buf.toString();
+        return result;
     }
     
     /* (non-Javadoc)
