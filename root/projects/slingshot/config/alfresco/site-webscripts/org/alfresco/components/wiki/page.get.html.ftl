@@ -19,18 +19,18 @@
       pageTitle: "${page.url.args["title"]!""}",
       mode: "${page.url.args["action"]!"view"}",
       tags: [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>],
-      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>],
+      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name?js_string}"<#if p_has_next>, </#if></#list></#if>],
       versions: [
       <#if result.versionhistory??>
          <#list result.versionhistory as version>
          {
-            title: '${version.name}',
-            label: '${version.version}',
-            versionId: '${version.versionId}',
-            createdDate: '${version.date}'
+            title: "${version.name?js_string}",
+            label: "${version.version?js_string}",
+            versionId: "${version.versionId}",
+            createdDate: "${version.date}"
          }<#if (version_has_next)>,</#if>
          </#list>
-      </#if>              
+      </#if>
       ]
    }).setMessages(
       ${messages}
