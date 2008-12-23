@@ -274,6 +274,27 @@ Alfresco.util.assertNotEmpty = function(param, message)
 };
 
 /**
+ * Append multiple parts of a path, ensuring duplicate path separators are removed
+ *
+ * @method Alfresco.util.combinePaths
+ * @param path1 {string} First path
+ * @param path2 {string} Second path
+ * @param ...
+ * @param pathN {string} Nth path
+ * @return {string} A string containing the combined paths
+ * @static
+ */
+Alfresco.util.combinePaths = function()
+{
+   var path = "", i, ii;
+   for (var i = 0, ii = arguments.length; i < ii; i++)
+   {
+      path += arguments[i] + "/";
+   }
+   return path.substring(0, path.length - 1).replace(/\/{2,}/g, "/");
+};
+
+/**
  * Converts a file size in bytes to human readable form
  *
  * @method Alfresco.util.formatFileSize
@@ -1527,6 +1548,7 @@ Alfresco.util.Ajax = function()
          failureCallback: null,// Object literal representing callback upon failed operation
          failureMessage: null,  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
          execScripts: false,    // Whether embedded <script> tags will be executed within the successful response
+         noReloadOnAuthFailure: false, // Default to reloading the page on HTTP 401 response, which will redirect through the login page
          object: null           // An object that can be passed to be used by the success or failure handlers
       },
 
@@ -1597,6 +1619,7 @@ Alfresco.util.Ajax = function()
        *    failureCallback: {object},     // Callback for failed request, should have the following form: {fn: failureHandler, scope: scopeForFailureHandler}
        *    failureMessage: {string},      // Will be displayed by Alfresco.util.displayPrompt if no failureCallback isn't provided
        *    execScripts: {boolean},        // Whether embedded <script> tags will be executed within the successful response
+       *    noReloadOnAuthFailure: {boolean}, // Set to TRUE to prevent an automatic page refresh on HTTP 401 response
        *    object: {object}               // An object that can be passed to be used by the success or failure handlers
        * }
        */
@@ -1861,13 +1884,13 @@ Alfresco.util.Ajax = function()
          var config = serverResponse.argument.config;
 
          // Our session has likely timed-out, so refresh to offer the login page
-         if (serverResponse.status == 401)
+         if (serverResponse.status == 401 && !config.noReloadOnAuthFailure)
          {
             window.location.reload(true);
             return;
          }
 
-         // Invokde the callback
+         // Invoke the callback
          var callback = config.failureCallback, json = null;
          
          if ((callback && typeof callback.fn == "function") || (config.failureMessage))
@@ -2280,7 +2303,7 @@ Alfresco.logger.debug = function(p1, p2)
    
    var msg;
    
-   if (typeof p1 == "string" && p2 !== null)
+   if (typeof p1 == "string" && p2 !== null && p2 !== undefined)
    {
       msg = p1 + " " + YAHOO.lang.dump(p2);
    }
@@ -2692,13 +2715,13 @@ Alfresco.service.BaseService.prototype =
       },
 
       /**
-       * Gets a user specific property
+       * Requests a user specific property
        *
-       * @method get
+       * @method request
        * @param name {string} The name of the property to get, or null or no param for all
        * @param responseConfig {object} A config object with only success and failure callbacks and messages
        */
-      get: function Preferences_get(name, responseConfig)
+      request: function Preferences_request(name, responseConfig)
       {
          this._jsonCall(Alfresco.util.Ajax.GET, this._url() + (name ? "?pf=" + name : ""), null, responseConfig);
       },
@@ -2753,7 +2776,7 @@ Alfresco.service.BaseService.prototype =
             },
             scope: this
          };
-         this.get(name, rc);
+         this.request(name, rc);
       },
 
       /**
@@ -2792,7 +2815,7 @@ Alfresco.service.BaseService.prototype =
             },
             scope: this
          };
-         this.get(name, rc);
+         this.request(name, rc);
       }
    });
    

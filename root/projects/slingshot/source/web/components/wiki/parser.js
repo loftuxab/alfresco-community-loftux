@@ -38,7 +38,7 @@
       parse: function(text, pages)
       {
          pages = pages == null ? [] : pages;
-         var text = this._renderLinks(text, pages);
+         text = this._renderLinks(text, pages);
          text = this._renderEmphasizedText(text);
          return text;
       },
@@ -54,7 +54,12 @@
       _renderEmphasizedText: function(s)
       {
          var re = /\*([^\*]+)\*/g;
-         return s.replace(re, "<em>$1</em>");
+         
+         if (typeof s == "string")
+         {
+            return s.replace(re, "<em>$1</em>");
+         }
+         return s;
       },
       
       /**
@@ -67,32 +72,37 @@
        */
       _renderLinks: function(s, pages)
       {
-         var result = s.split("[[");
-         
-         if (result.length > 1)
+         if (typeof s == "string")
          {
-            var re = /^([^\|\]]+)(?:\|([^\]]+))?\]\]/;
-            var uri, text = result[0], i, ii, str, matches, page, exists;
-            
-            for (i = 1, ii = result.length; i < ii; i++)
+            var result = s.split("[["), text = s;
+         
+            if (result.length > 1)
             {
-               str = result[i];
-               if (re.test(str))
+               var re = /^([^\|\]]+)(?:\|([^\]]+))?\]\]/;
+               var uri, i, ii, str, matches, page, exists;
+               text = result[0];
+            
+               for (i = 1, ii = result.length; i < ii; i++)
                {
-                  matches = re.exec(str);
-                  // Replace " " charcter in page URL with "_"
-                  page = matches[1].replace(/\s+/g, "_");
-                  exists = Alfresco.util.arrayContains(pages, page);
-                  uri = '<a href="' + this.URL + page + '"' + (!exists ? ' class="wiki-missing-page"' : '') + '>';
-                  uri += (matches[2] ? matches[2] : matches[1]);
-                  uri += '</a>';
+                  str = result[i];
+                  if (re.test(str))
+                  {
+                     matches = re.exec(str);
+                     // Replace " " charcter in page URL with "_"
+                     page = matches[1].replace(/\s+/g, "_");
+                     exists = Alfresco.util.arrayContains(pages, page);
+                     uri = '<a href="' + this.URL + page + '"' + (!exists ? ' class="wiki-missing-page"' : '') + '>';
+                     uri += (matches[2] ? matches[2] : matches[1]);
+                     uri += '</a>';
                   
-                  text += uri;
-                  text += str.substring(matches[0].length);
+                     text += uri;
+                     text += str.substring(matches[0].length);
+                  }
                }
-            }
-         }   
-         return text;
+            }   
+            return text;
+         }
+         return s;
       }
       
    };

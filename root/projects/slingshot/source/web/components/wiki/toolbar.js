@@ -298,7 +298,15 @@
       onPageDeleted: function WikiToolbar_onPageDeleted(e)
       {
          // Redirect to the wiki landing page
-         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki";
+         var landingPage = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki";
+         if (window.location.pathname == landingPage)
+         {
+            window.location.reload(true);
+         }
+         else
+         {
+            window.location = landingPage;
+         }
       },
       
       /**
