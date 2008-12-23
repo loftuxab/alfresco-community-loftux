@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -719,7 +720,8 @@ public final class ScriptSiteData extends ScriptBase
             Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
             for (WebScript webscript : registry.getWebScripts())
             {
-                if (family.equals(webscript.getDescription().getFamilys()))
+            	Set<String>familys = webscript.getDescription().getFamilys();
+                if (familys != null && familys.contains(family))
                 {
                     values.add(webscript.getDescription());
                 }
