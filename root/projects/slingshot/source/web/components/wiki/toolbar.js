@@ -373,7 +373,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.POST,
-            url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.options.siteId + "/" + encodeURIComponent(this.options.title),
+            url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.options.siteId + "/" + this.options.title,
             requestContentType: Alfresco.util.Ajax.JSON,
             dataObj: data,
             successCallback:
