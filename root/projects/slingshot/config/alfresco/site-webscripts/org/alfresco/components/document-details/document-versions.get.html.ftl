@@ -4,13 +4,13 @@ new Alfresco.DocumentVersions("${args.htmlid}").setOptions(
    versions: [
 <#list versions as version>
    {
-      label: '${version.label}',
-      createdDate: '${version.createdDate}'
+      label: "${version.label}",
+      createdDate: "${version.createdDate}"
    }<#if (version_has_next)>,</#if>
 </#list>
    ],
-   filename: '${filename!}',
-   nodeRef: '${nodeRef!}'
+   filename: "${filename!}",
+   nodeRef: "${nodeRef!}"
 }).setMessages(
       ${messages}
 );

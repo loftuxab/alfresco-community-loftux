@@ -61,7 +61,7 @@
       this.widgets = {};
 
       return this;
-   }
+   };
 
    Alfresco.FullPreview.prototype =
    {

@@ -53,9 +53,13 @@
          <div class="yui-b" id="divDocLibraryFilters">
             <@region id="filter" scope="template" protected=true />
             <@region id="tree" scope="template" protected=true />
-            <@region id="tags" scope="template" protected=true />
+            <@region id="tags" scope="template" protected=true />            
          </div>
       </div>
+
+      <@region id="html-upload" scope="template" protected=true />
+      <@region id="flash-upload" scope="template" protected=true />
+      <@region id="file-upload" scope="template" protected=true />
    </div>
 </@>
 

@@ -33,7 +33,7 @@
  *
  * A multi file upload scenario could look like:
  *
- * var htmlUpload = Alfresco.module.getHtmlUploadInstance();
+ * var htmlUpload = Alfresco.getHtmlUploadInstance();
  * var multiUploadConfig =
  * {
  *    siteId: siteId, *    containerId: doclibContainerId,
@@ -43,8 +43,8 @@
  * }
  * this.htmlUpload.show(multiUploadConfig);
  *
- * @namespace Alfresco.module
- * @class Alfresco.module.HtmlUpload
+ * @namespace Alfresco
+ * @class Alfresco.HtmlUpload
  */
 (function()
 {
@@ -53,27 +53,17 @@
     * HtmlUpload constructor.
     *
     * HtmlUpload is considered a singleton so constructor should be treated as private,
-    * please use Alfresco.module.getHtmlUploadInstance() instead.
+    * please use Alfresco.getHtmlUploadInstance() instead.
     *
     * @param {string} htmlId The HTML id of the parent element
-    * @return {Alfresco.module.HtmlUpload} The new HtmlUpload instance
+    * @return {Alfresco.HtmlUpload} The new HtmlUpload instance
     * @constructor
     * @private
     */
-   Alfresco.module.HtmlUpload = function(containerId)
+   Alfresco.HtmlUpload = function(containerId)
    {
-      this.name = "Alfresco.module.HtmlUpload";
-      this.id = containerId;
-
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
-      if (instance !== undefined && instance.length > 0)
-      {
-         throw new Error("An instance of Alfresco.module.HtmlUpload already exists.");
-      }
-
+      this.name = "Alfresco.HtmlUpload";
+      this.id = containerId; 
 
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -82,9 +72,9 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
-   Alfresco.module.HtmlUpload.prototype =
+   Alfresco.HtmlUpload.prototype =
    {
 
       /**
@@ -158,7 +148,7 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.HtmlUpload} returns 'this' for method chaining
+       * @return {Alfresco.HtmlUpload} returns 'this' for method chaining
        */
       setMessages: function HU_setMessages(obj)
       {
@@ -331,7 +321,7 @@
             },
             obj: null,
             scope: this
-         }
+         };
 
          // Submit as an ajax submit (not leave the page), in json format
          form.setAJAXSubmit(true, {});
@@ -532,21 +522,3 @@
 
 })();
 
-
-Alfresco.module.getHtmlUploadInstance = function()
-{
-   var instanceId = "alfresco-htmlupload-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length > 0)
-   {
-      instance = instance[0];
-   }
-   else
-   {
-      instance = new Alfresco.module.HtmlUpload(instanceId);
-   }
-   return instance;
-}

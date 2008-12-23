@@ -10,6 +10,9 @@
    </div>
    <div id="bd">
       <@region id="user-profile" scope="template"  protected=true />
+      <@region id="html-upload" scope="template" protected=true />
+      <@region id="flash-upload" scope="template" protected=true />
+      <@region id="file-upload" scope="template" protected=true />
    </div>
 </@>
 

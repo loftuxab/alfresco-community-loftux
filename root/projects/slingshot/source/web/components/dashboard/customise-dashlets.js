@@ -1095,7 +1095,7 @@
 
          a.onComplete.subscribe(function()
          {
-            var srcShadow = srcShadow;
+            var srcShadow = myThis.srcShadow;
 
             // Hide proxy
             Dom.setStyle(proxy, "visibility", "hidden");

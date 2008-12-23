@@ -148,44 +148,44 @@
          <component>
             <scope>page</scope>
             <region-id>title</region-id>
-            <source-id>site/${workspaceid}/dashboard</source-id>
+            <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/title/collaboration-title</url>
          </component>
          <!-- navigation -->
          <component>
             <scope>page</scope>
             <region-id>navigation</region-id>
-            <source-id>site/${workspaceid}/dashboard</source-id>
+            <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/navigation/collaboration-navigation</url>
          </component>
          <!-- dashboard components -->
          <component>
             <scope>page</scope>
             <region-id>component-1-1</region-id>
-            <source-id>site/${workspaceid}/dashboard</source-id>
+            <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/site-welcome</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-1-2</region-id>
-            <source-id>site/${workspaceid}/dashboard</source-id>
+            <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/docsummary</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-2-1</region-id>
-            <source-id>site/${workspaceid}/dashboard</source-id>
+            <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/site-profile</url>
          </component>
          <component>
             <scope>page</scope>
             <region-id>component-2-2</region-id>
-            <source-id>site/${workspaceid}/dashboard</source-id>
+            <source-id>site/${siteid}/dashboard</source-id>
             <url>/components/dashlets/colleagues</url>
          </component>
       </components>
       <pages>
-         <page id="site/${workspaceid}/dashboard">
+         <page id="site/${siteid}/dashboard">
             <title>Document Workspace Dashboard</title>
             <description>Document Workspace dashboard page</description>
             <template-instance>dashboard-2-columns-wide-left</template-instance>

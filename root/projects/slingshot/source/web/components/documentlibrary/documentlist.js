@@ -271,7 +271,7 @@
        * FileUpload module instance.
        * 
        * @property fileUpload
-       * @type Alfresco.module.FileUpload
+       * @type Alfresco.FileUpload
        */
       fileUpload: null,
 
@@ -434,7 +434,7 @@
          }
 
          // Register History Manager path update callback
-         YAHOO.util.History.register("path", bookmarkedPath, function(newPath)
+         YAHOO.util.History.register("path", bookmarkedPath, function DL_onHistoryManagerPathChanged(newPath)
          {
             Alfresco.logger.debug("HistoryManager: path changed:" + newPath);
             
@@ -480,7 +480,7 @@
             this.currentPage = parseInt(bookmarkedPage || this.options.initialPage, 10);
 
             // Register History Manager page update callback
-            YAHOO.util.History.register("page", bookmarkedPage, function(newPage)
+            YAHOO.util.History.register("page", bookmarkedPage, function DL_onHistoryManagerPageChanged(newPage)
             {
                Alfresco.logger.debug("HistoryManager: page changed:" + newPage);
                // Update the DocList
@@ -1756,8 +1756,7 @@
 
          if (this.fileUpload === null)
          {
-            this.fileUpload = Alfresco.module.getFileUploadInstance();
-            // this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
+            this.fileUpload = Alfresco.getFileUploadInstance();
          }
 
          // Show uploader for multiple files
@@ -2262,7 +2261,7 @@
             
             Alfresco.logger.debug("currentPath was [" + this.currentPath + "] now [" + successPath + "]");
             Alfresco.logger.debug("currentPage was [" + this.currentPage + "] now [" + successPage + "]");
-            this.currentPath = successPath;
+            this.currentPath = successPath == "/" ? "" : successPath;
             this.currentPage = successPage;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };

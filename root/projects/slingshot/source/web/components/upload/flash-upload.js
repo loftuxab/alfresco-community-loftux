@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,6 @@
  * FLOSS exception.  You should have recieved a copy of the text describing
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
- */
 
 
 /**
@@ -33,7 +32,7 @@
  *
  * A multi file upload scenario could look like:
  *
- * var flashUpload = Alfresco.module.getFlashUploadInstance();
+ * var flashUpload = Alfresco.component.getFlashUploadInstance();
  * var multiUploadConfig =
  * {
  *    siteId: siteId,
@@ -45,7 +44,7 @@
  * this.flashUpload.show(multiUploadConfig);
  *
  * @namespace Alfresco.module
- * @class Alfresco.module.FlashUpload
+ * @class Alfresco.component.FlashUpload
  */
 (function()
 {
@@ -54,42 +53,46 @@
     * FlashUpload constructor.
     *
     * FlashUpload is considered a singleton so constructor should be treated as private,
-    * please use Alfresco.module.getFlashUploadInstance() instead.
+    * please use Alfresco.component.getFlashUploadInstance() instead.
     *
     * @param {string} htmlId The HTML id of the parent element
-    * @return {Alfresco.module.FlashUpload} The new FlashUpload instance
+    * @return {Alfresco.component.FlashUpload} The new FlashUpload instance
     * @constructor
     * @private
     */
-   Alfresco.module.FlashUpload = function(containerId)
+   Alfresco.FlashUpload = function(containerId)
    {
-
-      this.name = "Alfresco.module.FlashUpload";
+      this.name = "Alfresco.FlashUpload";
       this.id = containerId;
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
-
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
-      if (instance !== undefined && instance.length > 0)
-      {
-         throw new Error("An instance of Alfresco.module.FlashUpload already exists.");
-      }
-
-
+      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
+      
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "cookie", "uploader"], this.onComponentsLoaded, this);
+      if(this.hasRequiredFlashPlayer)
+      {
+         // Load YUI Components if flash player is installed
+         Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "cookie", "uploader"], this.onComponentsLoaded, this);
+      }
+
 
       return this;
    };
 
-   Alfresco.module.FlashUpload.prototype =
+   Alfresco.FlashUpload.prototype =
    {
 
+
+      /**
+       * The flash move will dispatch the contentReady event twice,
+       * make sure we only react on it twice.
+       *
+       * @property contentReady
+       * @type boolean
+       */
+      contentReady: false,
+      
       /**
        * The user is browsing and adding files to the file list
        *
@@ -375,10 +378,10 @@
 
       /**
        * Set messages for this module.
-       *       
+       *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.FlashUpload} returns 'this' for method chaining
+       * @return {Alfresco.component.FlashUpload} returns 'this' for method chaining
        */
       setMessages: function FU_setMessages(obj)
       {
@@ -394,110 +397,15 @@
        */
       onComponentsLoaded: function FU_onComponentsLoaded()
       {
+         var Dom = YAHOO.util.Dom;
+
          // Tell the YUI class where the swf is
          YAHOO.widget.Uploader.SWFURL = this.swf;
 
-         // Shortcut for dummy instance
-         if (this.id === null)
-         {
-            //return;
-         }
-         /*
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/flash-upload?htmlid=" + this.id,
-            successCallback:
-            {
-               fn: this.onTemplateLoaded,
-               scope: this
-            },
-            failureMessage: "Could not load file upload template",
-            execScripts: true
-         });
-         */
-      },
+         Dom.removeClass(this.id + "-dialog", "hidden");
 
-      /**
-       * Show can be called multiple times and will display the uploader dialog
-       * in different ways depending on the config parameter.      
-       *
-       * @method show
-       * @param config {object} describes how the upload dialog should be displayed
-       * The config object is in the form of:
-       * {
-       *    siteId: {string},        // site to upload file(s) to
-       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
-       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
-       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
-       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
-       *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
-       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
-       *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to overwrite a versionable file with the existing name
-       *                             // If false and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to append a number to the versionable filename to avoid
-       *                             // an overwrite and a new version
-       * }
-       */
-      show: function FU_show(config)
-      {
-
-         // Merge the supplied config with default config and check mandatory properties
-         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
-         if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
-         {
-             throw new Error("An updateNodeRef OR uploadDirectory must be provided");
-         }
-         if (this.showConfig.uploadDirectory !== null && this.showConfig.uploadDirectory.length === 0)
-         {
-            this.showConfig.uploadDirectory = "/";
-         }
-         // Check if the uploader has been showed before
-         if (this.panel)
-         {
-            this._showPanel();
-         }
-         else
-         {
-
-            // If it hasn't load the gui (template) from the server
-            Alfresco.util.Ajax.request(
-            {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/flash-upload?htmlid=" + this.id,
-               successCallback:
-               {
-                  fn: this.onTemplateLoaded,
-                  scope: this
-               },
-               failureMessage: "Could not load file upload template",
-               execScripts: true
-            });
-
-         }
-      },
-
-
-      /**
-       * Called when the uploader html template has been returned from the server.
-       * Creates the YIU gui objects such as the data table and panel,
-       * saves references to HTMLElements inside the template for easy access
-       * during upload progress and finally shows the panel with the gui inside.
-       *
-       * @method onTemplateLoaded
-       * @param response {object} a Alfresco.util.Ajax.request response object
-       */
-      onTemplateLoaded: function FU_onTemplateLoaded(response)
-      {
-         var Dom = YAHOO.util.Dom;
-
-         // Inject the template from the XHR request into a new DIV element
-         var containerDiv = document.createElement("div");
-         containerDiv.innerHTML = response.serverResponse.responseText;         
-
-         // Create the panel from the HTML returned in the server reponse
-         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
-         this.panel = new YAHOO.widget.Panel(dialogDiv,
+         // Create the panel
+         this.panel = new YAHOO.widget.Panel(this.id + "-dialog",
          {
             modal: true,
             draggable: false,
@@ -505,12 +413,6 @@
             visible: false,
             close: false
          });
-
-         /**
-          * Render the server reponse so the contents get inserted in the Dom.
-          * Scripts in the template, such as setMessage(),  will also get run
-          * at this moment. 
-          */
          this.panel.render(document.body);
 
          // Save a reference to the file row template that is hidden inside the markup
@@ -552,9 +454,95 @@
          this.uploader.subscribe("uploadCancel",this.onUploadCancel, this, true);
          this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
          this.uploader.subscribe("uploadError",this.onUploadError, this, true);
+         this.uploader.subscribe("contentReady", this.onContentReady, this, true);
+      },
 
-         // Show panel and handle if flash is loaded later
-         this._showPanel();
+
+      /**
+       * Called when the "wrapping" SWFPlayer-flash movie is loaded
+       *
+       * @method onContentReady
+       */
+      onContentReady: function FP_onContentReady(event)
+      {
+         //alert('contentReady');
+         this.uploader.enable();
+         this.uploader.setAllowMultipleFiles(this.showConfig.mode === this.MODE_MULTI_UPLOAD);
+         this.uploader.setFileFilters(this.showConfig.filter);         
+      },
+
+      /**
+       * Show can be called multiple times and will display the uploader dialog
+       * in different ways depending on the config parameter.      
+       *
+       * @method show
+       * @param config {object} describes how the upload dialog should be displayed
+       * The config object is in the form of:
+       * {
+       *    siteId: {string},        // site to upload file(s) to
+       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
+       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
+       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
+       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
+       *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
+       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
+       *    onFileUploadComplete: null, // Callback after upload
+       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to overwrite a versionable file with the existing name
+       *                             // If false and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to append a number to the versionable filename to avoid
+       *                             // an overwrite and a new version
+       * }
+       */
+      show: function FU_show(config)
+      {
+         if(!this.hasRequiredFlashPlayer)
+         {
+
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: Alfresco.util.message("label.noFlash", this.name)
+            });
+         }
+
+         // Merge the supplied config with default config and check mandatory properties
+         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
+         if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
+         {
+             throw new Error("An updateNodeRef OR uploadDirectory must be provided");
+         }
+         if (this.showConfig.uploadDirectory !== null && this.showConfig.uploadDirectory.length === 0)
+         {
+            this.showConfig.uploadDirectory = "/";
+         } 
+
+
+         // Apply the config before it is showed
+         this._resetGUI();
+
+         // Apply the config before it is showed
+         this._applyConfig();
+
+         // Show the upload panel
+         this.panel.show();
+         
+      },
+
+      _resetGUI: function FU__resetGUI()
+      {
+         // Reset references and the gui before showing it
+         this.state = this.STATE_BROWSING;
+         this.noOfFailedUploads = 0;
+         this.noOfSuccessfulUploads = 0;
+         this.noOfUnrenderedRows = 0;
+         this.statusText["innerHTML"] = "&nbsp;";
+         this.description.value = "";
+         this.minorVersion.checked = true;
+         this.widgets.uploadButton.set("label", Alfresco.util.message("button.upload", this.name));
+         this.widgets.uploadButton.set("disabled", true);
+         this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
+         this.widgets.cancelOkButton.set("disabled", false);
+
       },
 
       /**
@@ -574,6 +562,17 @@
          if (this.noOfUnrenderedRows === 0)
          {
             this.widgets.uploadButton.set("disabled", false);
+         }
+         if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+         {
+            if(this.dataTable.getRecordSet().getLength() == 0)
+            {
+               this.uploader.enable();
+            }
+            else
+            {
+               this.uploader.disable();
+            }
          }
       },
 
@@ -611,7 +610,7 @@
             var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
-               if (data.size == 0)
+               if (data.size == 0)           
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
@@ -782,55 +781,6 @@
       },
 
       /**
-       * Fired when the user clicks the browse button.
-       * Opens the file picker in.
-       *
-       * @method onBrowseButtonClick
-       * @param event {object} an Uploader "browseButtonClick" event
-       */
-      onBrowseButtonClick: function FU_onBrowseButtonClick(event)
-      {
-         // Make sure we know have gone into browsing state
-         this.state = this.STATE_BROWSING;
-
-         // Tell the flash movie to display the OS's file selector dialog
-         var multiSelect = this.showConfig.mode === this.MODE_MULTI_UPLOAD;
-         this._browse(multiSelect, this.showConfig.filter, 0);
-      },
-
-      /**
-       * Do repeated checks if the browse method was successfyully invoked
-       *
-       * @method _browse
-       * @private
-       */
-      _browse: function FU__browse(multiSelect, filter, attempt)
-      {
-         try
-         {
-            // Try and call browse
-            this.uploader.browse(multiSelect, filter);
-         }
-         catch(e)
-         {
-            // The swf movie wasn't loaded, try seven times
-            if (attempt < 7)
-            {
-               // Try again after 0.5 sec
-               YAHOO.lang.later(500, this, this._browse, [multiSelect, filter, ++attempt], false);
-            }
-            else
-            {
-               // Give up
-               Alfresco.util.PopupManager.displayMessage(
-               {
-                  text: "Flash movie doesn't seem to load"
-               });
-            }
-         }
-      },
-
-      /**
        * Called by an anonymous function which that redirects the call to here
        * when the user clicks the file remove button.
        * Removes the file and cancels it if it was being uploaded
@@ -857,9 +807,7 @@
             {
                // If it was the last file, disable the gui since no files exist.
                this.widgets.uploadButton.set("disabled", true);
-               // todo enable!!
                this.uploader.enable();
-               //this.widgets.browseButton.set("disabled", false);
             }
          }
          else if (this.state === this.STATE_UPLOADING)
@@ -958,20 +906,7 @@
 
          // Hide the panel
          this.panel.hide();
-         
-         // Firefox 2 isn't always great at hiding the panel
-
-
-         //Since panel is set to null it will make the panel load its template
-         //from the server everytime show() is called. Find another solution...
-
-         if (YAHOO.env.ua.gecko == 1.8)
-         {
-            this.panel.destroy();
-            this.panel = null;
-         }
-         
-
+                  
          // Remove all files and references for this upload "session"
          this._clear();
 
@@ -1002,9 +937,7 @@
             {
                this.state = this.STATE_UPLOADING;
                this.widgets.uploadButton.set("disabled", true);
-               // todo disable!!
                this.uploader.disable();
-               //this.widgets.browseButton.set("disabled", true);
                this._updateStatus();
             }
             // And start uploading from the queue
@@ -1069,7 +1002,15 @@
             Dom.addClass(this.singleUpdateTip, "hidden");
 
             // Make the file list long
-            this.dataTable.set("height", "204px");
+            this.dataTable.set("height", "204px", true);
+            /*
+            var h = "204px";
+            if(this.dataTable.get("height") != h)
+            {
+               alert('change h');
+               this.dataTable.set("height", h, true);
+               alert('changed h');
+            }*/
          }
          else
          {
@@ -1310,35 +1251,6 @@
       },
 
       /**
-       * Prepares the gui and shows the panel.
-       *
-       * @method _showPanel
-       * @private
-       */
-      _showPanel: function FU__showPanel()
-      {
-         // Reset references and the gui before showing it
-         this.state = this.STATE_BROWSING;
-         this.noOfFailedUploads = 0;
-         this.noOfSuccessfulUploads = 0;
-         this.noOfUnrenderedRows = 0;
-         this.statusText["innerHTML"] = "&nbsp;";
-         this.description.value = "";
-         this.minorVersion.checked = true;
-         this.widgets.uploadButton.set("label", Alfresco.util.message("button.upload", this.name));
-         this.widgets.uploadButton.set("disabled", true);
-         this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
-         this.widgets.cancelOkButton.set("disabled", false);
-
-         // Apply the config before it is showed
-         this._applyConfig();
-
-         // Show the upload panel
-         this.panel.show();
-
-      },
-
-      /**
        * Helper function to create a unique file token from the file data object
        *
        * @method _getUniqueFileToken
@@ -1534,23 +1446,4 @@
    };
 
 })();
-
-
-Alfresco.module.getFlashUploadInstance = function()
-{
-   var instanceId = "alfresco-flashupload-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length > 0)
-   {
-      instance = instance[0];
-   }
-   else
-   {
-      instance = new Alfresco.module.FlashUpload(instanceId);
-   }
-   return instance;
-};
 
