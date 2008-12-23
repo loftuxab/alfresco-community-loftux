@@ -635,7 +635,7 @@
          });
          // render the editor - we use the private function as we want this to happen
          // prior of displaying the form. Otherwise we get quite ugly ui behavior
-         this.widgets.editor._render();
+         this.widgets.editor.render();
          
          // create the form that does the validation/submit
          var replyForm = new Alfresco.forms.Form(formId + "-form");

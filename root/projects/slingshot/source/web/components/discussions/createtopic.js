@@ -68,7 +68,7 @@
       Alfresco.util.YUILoaderHelper.require(["datasource", "json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
            
       return this;
-   }
+   };
    
    Alfresco.CreateTopic.prototype =
    {
@@ -370,7 +370,7 @@
                });
             },
             scope: this
-         }
+         };
          
          topicForm.init();
          

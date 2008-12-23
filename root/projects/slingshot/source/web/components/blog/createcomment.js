@@ -118,9 +118,12 @@
       
       /**
        * States whether the view has already been initialized
+       *
+       * @property initialized
+       * @type boolean
        */
       initialized: false,
-      
+
       /**
        * Set multiple initialization options at once.
        *
@@ -256,16 +259,22 @@
             markup: "xhtml",
             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.widgets.editor._render();
+         this.widgets.editor.render();
          
          // Add validation to the yui editor
          this.widgets.validateOnZero = 0;
          this.widgets.editor.subscribe("editorKeyUp", function (e)
          {
-            // Only bother checking if length is short, otherwise HTML cleanup slows the UI down undesirably
-            // NOTE: Don't check for zero-length, due to HTML <br>, <span> tags, etc. possibly being present.
-            if (this.widgets.editor.getEditorHTML().length < 20)
+            /**
+             * Doing a form validation on every key stroke is process consuming, below we try to make sure we only do
+             * a form validation if it's necessarry.
+             * NOTE: Don't check for zero-length in commentsLength, due to HTML <br>, <span> tags, etc. possibly
+             * being present. Only a "Select all" followed by delete will clean all tags, otherwise leftovers will
+             * be there even if the form looks empty.
+             */                       
+            if (this.widgets.editor.getEditorHTML().length < 20 || this.widgets.okButton.get("disabled"))
             {
+               // Submit was disabled and something has been typed, validate and submit will be enabled
                this.widgets.editor.saveHTML();
                this.widgets.commentForm.updateSubmitElements();
             }
