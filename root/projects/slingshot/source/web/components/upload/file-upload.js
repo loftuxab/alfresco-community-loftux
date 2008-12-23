@@ -89,7 +89,7 @@
       }
       else
       {
-         uploadType = "Alfresco.FlashUpload";
+         uploadType = "Alfresco.HtmlUpload";
       }
       var fuinstance = Alfresco.util.ComponentManager.find(
       {

@@ -73,7 +73,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Currently selected tags.
@@ -92,6 +92,24 @@
       parser: null,
       
       /**
+       * Flag to indicate the user is forcing a save (newer version overwrite)
+       * 
+       * @property forceSave
+       * @type bool
+       * @default false
+       */
+      forceSave: false,
+      
+      /**
+       * Saving page dialog popup
+       * 
+       * @property savingPagePopup
+       * @type object
+       * @default null
+       */
+      savingPagePopup: null,
+      
+      /**
        * Object container for initialization options
        *
        * @property options
@@ -105,8 +123,8 @@
          tags: [],
          pages: [],
          versions: []
-      },      
-
+      },
+      
       /**
        * Set multiple initialization options at once.
        *
@@ -154,6 +172,20 @@
          if (this.options.mode === "edit")
          {
             this._setupEditForm();
+            
+            var me = this;
+            window.onbeforeunload = function(e)
+            {
+               var e = e || window.event;
+               if (me.pageEditor.editorDirty)
+               {
+                  if (e)
+                  {
+                     e.returnValue = me._msg("message.confirmNavigation");
+                  }
+                  return me._msg("message.confirmNavigation");
+               }
+            };
          }
          else if (this.options.mode === "details")
          {
@@ -259,7 +291,7 @@
       },
 
       /**
-       * Fired by the Revert Version component after a successfull revert.
+       * Fired by the Revert Version component after a successful revert.
        *
        * @method onRevertWikiVersionComplete
        */
@@ -267,47 +299,20 @@
       {
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("message.revertComplete", this.name)
+            text: this._msg("message.revertComplete", this.name)
          });
 
          window.location.reload();
       },
 
-      /* REMOVE */
-      onRevert: function(e)
-      {
-         // Make a PUT request 
-         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/page/{site}/{title}",
-         {
-            site: this.options.siteId,
-            title: this.options.pageTitle
-         });
-         
-         var div = Dom.get(this.id + "-pagecontent");
-         var obj =
-         {
-            pagecontent: div.innerHTML,
-            page: "wiki-page"
-         };
-            
-         Alfresco.util.Ajax.request(
-         {
-            method: Alfresco.util.Ajax.PUT,
-            url: actionUrl,
-            dataObj: obj,
-            requestContentType: Alfresco.util.Ajax.JSON,
-            successCallback:
-            {
-               fn: this.onPageUpdated,
-               scope: this
-            },
-            failureMessage: "Could not update page"
-         });
-      },
-      
+      /**
+       * Called via init if the page is in edit mode
+       *
+       * @method _setupEditForm
+       */
       _setupEditForm: function Wiki__setupEditForm()
       {
-         var width = Dom.get(this.id + "-form").offsetWidth - 316; //860
+         var width = Dom.get(this.id + "-form").offsetWidth - 400;
          var height = YAHOO.env.ua.ie > 0 ? document.body.clientHeight : document.height;
          this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
          this.tagLibrary.setOptions(
@@ -319,7 +324,7 @@
          {
             this.tagLibrary.setTags(this.options.tags);
          }
-                
+         
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
          {
             height: Math.min(height - 450, 300) + 'px',
@@ -349,7 +354,72 @@
                fn: this.onPageUpdated,
                scope: this
             },
-            failureMessage: "Page update failed"
+            failureCallback:
+            {
+               fn: function(data, form)
+               {
+                  // Remove the Saving... popup
+                  if (this.savingPagePopup)
+                  {
+                     this.savingPagePopup.destroy();
+                     this.savingPagePopup = null;
+                  }
+
+                  // See if the error was a versino conflict
+                  if (data.serverResponse.status == 409)
+                  {
+                     var me = this;
+                     
+                     // Version conflict, so let the user decide what to do
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        text: this._msg("message.confirm.newerVersion"),
+                        buttons: [
+                        {
+                           text: this._msg("button.savechanges"),
+                           handler: function Wiki_submit_forceSave()
+                           {
+                              // Set the "force save" flag and re-submit
+                              this.destroy();
+                              me.forceSave = true;
+                              saveButton.fireEvent('click',
+                              {
+                                 type: 'click'
+                              });
+                           }
+                        },
+                        {
+                           text: this._msg("button.cancel"),
+                           handler: function Wiki_submit_cancel()
+                           {
+                              this.destroy();
+                           },
+                           isDefault: true
+                        }]
+                     });
+                  }
+                  else if (data.serverResponse.status == 401)
+                  {
+                     // Unauthenticated, which is probably due to a web-tier timeout or restart
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this._msg("message.sessionTimeout.title"),
+                        text: this._msg("message.sessionTimeout.text")
+                     });
+                  }
+                  else
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this._msg("message.failure", this.name),
+                        text: data.json.message
+                     });
+                  }
+               },
+               scope: this,
+               obj: form
+            },
+            noReloadOnAuthFailure: true
          });
        
          form.setSubmitAsJSON(true);
@@ -359,10 +429,10 @@
             fn: function(form, obj)
             {
                // Display pop-up to indicate that the page is being saved
-               var savingMessage = Alfresco.util.PopupManager.displayMessage(
+               this.savingPagePopup = Alfresco.util.PopupManager.displayMessage(
                {
                   displayTime: 0,
-                  text: '<span class="wait">' + $html(Alfresco.util.message("message.saving", this.name)) + '</span>',
+                  text: '<span class="wait">' + $html(this._msg("message.saving", this.name)) + '</span>',
                   noEscape: true
                });
                   
@@ -377,6 +447,20 @@
                {
                   tagInputElem.disabled = true;
                }
+            },
+            scope: this
+         };
+         form.doBeforeAjaxRequest =
+         {
+            fn: function(config, obj)
+            {
+               if (this.forceSave)
+               {
+                  // Set the "force save" flag on the JSON request
+                  this.forceSave = false;
+                  config.dataObj["forceSave"] = true;
+               }
+               return true;
             },
             scope: this
          };
@@ -452,11 +536,11 @@
          var versionHeaderSpan = Dom.get(this.id + "-version-header");
          if (versionHeaderSpan)
          {
-            versionHeaderSpan.innerHTML = Alfresco.util.message("label.shortVersion", this.name) + this.options.versions[obj.index].label;
+            versionHeaderSpan.innerHTML = this._msg("label.shortVersion", this.name) + this.options.versions[obj.index].label;
          }
 
          // Update the label in the version select menu
-         var label = this.options.versions[obj.index].label + " (" + (obj.index == 0 ?  Alfresco.util.message("label.latest", this.name) : Alfresco.util.message("label.earlier", this.name)) + ")";
+         var label = this.options.versions[obj.index].label + " (" + this._msg(obj.index == 0 ? "label.latest" : "label.earlier", this.name) + ")";
          this.widgets.versionSelect.set("label", label);
       },
       
@@ -479,6 +563,7 @@
        */
       onCancelSelect: function Wiki_onCancelSelect(e)
       {
+         this.pageEditor.editorDirty = null;
          this._redirect();
       },
       
@@ -491,6 +576,7 @@
        */
       onPageUpdated: function Wiki_onPageUpdated(e)
       {
+         this.pageEditor.editorDirty = null;
          this._redirect();
       },
       
@@ -503,9 +589,19 @@
       {
          var url = this._getAbsolutePath() + this.options.pageTitle;
          window.location = url;   
+      },
+      
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function Wiki__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.Wiki", Array.prototype.slice.call(arguments).slice(1));
       }
-         
    };   
-
 })();
-

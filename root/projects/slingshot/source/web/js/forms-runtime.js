@@ -742,25 +742,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
 
                   if (this.ajaxSubmitHandlers)
                   {
-                     if (this.ajaxSubmitHandlers.successCallback)
-                     {
-                        config.successCallback = this.ajaxSubmitHandlers.successCallback;
-                     }
-                     
-                     if (this.ajaxSubmitHandlers.successMessage)
-                     {
-                        config.successMessage = this.ajaxSubmitHandlers.successMessage;
-                     }
-
-                     if (this.ajaxSubmitHandlers.failureCallback)
-                     {
-                        config.failureCallback = this.ajaxSubmitHandlers.failureCallback;
-                     }
-                     
-                     if (this.ajaxSubmitHandlers.failureMessage)
-                     {
-                        config.failureMessage = this.ajaxSubmitHandlers.failureMessage;
-                     }
+                     config = YAHOO.lang.merge(config, this.ajaxSubmitHandlers);
                   }
                   if (this.submitAsJSON)
                   {

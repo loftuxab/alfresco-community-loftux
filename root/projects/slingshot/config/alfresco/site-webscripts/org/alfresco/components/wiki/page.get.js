@@ -24,9 +24,9 @@ function main()
       var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title;
       var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + page.url.args.title + "?context=" + escape(context);
 
-      var result = doGetCall(uri);
+      var result = doGetCall(uri, true);
       result.pagetext = result.pagetext ? stringUtils.stripUnsafeHTML(result.pagetext) : null;
-      if(result.versionhistory !== undefined)
+      if (result.versionhistory != undefined)
       {
          result.versionhistory.sort(sortByLabel);
       }
@@ -42,5 +42,5 @@ function main()
       status.location = page.url.service + "?title=Main_Page";
    }
 }
-
+ 
 main();
