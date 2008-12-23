@@ -2,11 +2,11 @@
 <script type="text/javascript">//<![CDATA[
 new Alfresco.Preview("${args.htmlid}").setOptions(
 {
-   nodeRef: '${node.nodeRef}',
-   name: '${node.name}',
-   icon: '${node.icon}',
-   mimeType: '${node.mimeType}',
-   previews: [<#list node.previews as p>'${p}'<#if (p_has_next)>, </#if></#list>]
+   nodeRef: "${node.nodeRef}",
+   name: "${node.name?html}",
+   icon: "${node.icon}",
+   mimeType: "${node.mimeType}",
+   previews: [<#list node.previews as p>"${p}"<#if (p_has_next)>, </#if></#list>]
 }).setMessages(
    ${messages}
       );

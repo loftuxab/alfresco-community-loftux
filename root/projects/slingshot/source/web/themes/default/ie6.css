@@ -191,6 +191,16 @@ div.dashlet .body .clear
    width: 650px;
 }
 
+.fileUpload-filelist-table tbody .col-right div.fileupload-right-div
+{
+   height: 33px;
+   margin-top: 7px;
+}
+
+.fileupload-fileButton-span
+{
+   position: static;
+}
 
 /**
  * Fix for 1 column dashboard layout
@@ -456,3 +466,4 @@ body.masked div.mask.full-preview-mask
 {
    height:2em;
 }
+

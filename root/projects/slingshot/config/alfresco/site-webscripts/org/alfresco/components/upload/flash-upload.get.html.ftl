@@ -1,4 +1,4 @@
-<div id="${args.htmlid}-dialog" class="flash-upload">
+<div id="${args.htmlid}-dialog" class="flash-upload hidden">
    <div class="hd">
       <span id="${args.htmlid}-title-span"></span>
    </div>
@@ -20,7 +20,7 @@
          <span id="${args.htmlid}-status-span" class="status"></span>
       </div>
 
-      <div id="${args.htmlid}-versionSection-div">
+      <div id="${args.htmlid}-versionSection-div"> 
          <div class="yui-g">
             <h2>${msg("section.version")}</h2>
          </div>
@@ -78,7 +78,10 @@
          </div>
    </div>
 </div>
-
 <script type="text/javascript">//<![CDATA[
-Alfresco.util.addMessages(${messages}, "Alfresco.module.FlashUpload");
+new Alfresco.FlashUpload("${args.htmlid}").setMessages(
+   ${messages}
+);
 //]]></script>
+
+

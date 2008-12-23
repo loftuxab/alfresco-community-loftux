@@ -1,4 +1,9 @@
-<div id="${args.htmlid}-dialog" class="html-upload">
+<script type="text/javascript">//<![CDATA[
+new Alfresco.HtmlUpload("${args.htmlid}").setMessages(
+   ${messages}
+);
+//]]></script>
+<div id="${args.htmlid}-dialog" class="html-upload hidden">
    <div class="hd">
       <span id="${args.htmlid}-title-span"></span>
    </div>
@@ -58,7 +63,7 @@
             <div class="yui-gd">
                <div class="yui-u first">
                   <label for="${args.htmlid}-minorVersion-radioButton">${msg("label.version")}</label>
-               </div>
+               </div> 
                <div class="yui-u">
                   <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" value="false"/> ${msg("label.minorVersion")}
                </div>
@@ -90,6 +95,3 @@
    </div>
 </div>
 
-<script type="text/javascript">//<![CDATA[
-Alfresco.util.addMessages(${messages}, "Alfresco.module.HtmlUpload");
-//]]></script>

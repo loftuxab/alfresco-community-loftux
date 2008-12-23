@@ -57,7 +57,7 @@
       Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
       
       return this;
-   }
+   };
    
    Alfresco.UserProfile.prototype =
    {
@@ -218,7 +218,7 @@
       {
          if (this.fileUpload === null)
          {
-            this.fileUpload = Alfresco.module.getFileUploadInstance();
+            this.fileUpload = Alfresco.getFileUploadInstance();
          }
          
          // Show uploader for single file select - override the upload URL to use avatar upload service
@@ -233,7 +233,7 @@
                fn: this.onFileUploadComplete,
                scope: this
             }
-         }
+         };
          this.fileUpload.show(uploadConfig);
          Event.preventDefault(e);
       },

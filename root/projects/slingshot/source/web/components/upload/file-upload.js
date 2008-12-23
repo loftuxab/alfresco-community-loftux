@@ -32,7 +32,7 @@
  *
  * A multi file upload scenario could look like:
  *
- * var fileUpload = Alfresco.module.getFileUploadInstance();
+ * var fileUpload = Alfresco.getFileUploadInstance();
  * var multiUploadConfig =
  * {
  *    siteId: siteId,
@@ -47,7 +47,7 @@
  * If flash isn't installed it would use the HtmlUpload in single upload mode instead.
  *
  * @namespace Alfresco.module
- * @class Alfresco.module.FileUpload
+ * @class Alfresco.component.FileUpload
  */
 (function()
 {
@@ -56,16 +56,16 @@
     * FileUpload constructor.
     *
     * FileUpload is considered a singleton so constructor should be treated as private,
-    * please use Alfresco.module.getFileUploadInstance() instead.
+    * please use Alfresco.getFileUploadInstance() instead.
     *
     * @param {string} htmlId The HTML id of the parent element
-    * @return {Alfresco.module.FileUpload} The new FileUpload instance
+    * @return {Alfresco.FileUpload} The new FileUpload instance
     * @constructor
     * @private
     */
-   Alfresco.module.FileUpload = function(containerId)
+   Alfresco.FileUpload = function(containerId)
    {
-      this.name = "Alfresco.module.FileUpload";
+      this.name = "Alfresco.FileUpload";
       this.id = containerId;
 
       var instance = Alfresco.util.ComponentManager.find(
@@ -74,7 +74,7 @@
       });
       if (instance !== undefined && instance.length > 0)
       {
-         throw new Error("An instance of Alfresco.module.FileUpload already exists.");
+         throw new Error("An instance of Alfresco.FileUpload already exists.");
       }
 
       /* Register this component */
@@ -82,26 +82,39 @@
 
       // Create the appropriate uploader component
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45); // && !Alfresco.util.hasRequiredFlashPlayer(10, 0, 0);
+      var uploadType = null;
       if (this.hasRequiredFlashPlayer)        
       {
-         this.uploader = Alfresco.module.getFlashUploadInstance();
+         uploadType = "Alfresco.FlashUpload";
       }
       else
       {
-         this.uploader = Alfresco.module.getHtmlUploadInstance();
+         uploadType = "Alfresco.FlashUpload";
+      }
+      var fuinstance = Alfresco.util.ComponentManager.find(
+      {
+         name: uploadType
+      });
+      if (fuinstance !== undefined && fuinstance.length > 0)
+      {
+         this.uploader = fuinstance[0];
+      }
+      else
+      {
+         throw new Error("No instance of uploader type '" + uploadType + "' exists.");            
       }
 
       return this;
    };
 
-   Alfresco.module.FileUpload.prototype =
+   Alfresco.FileUpload.prototype =
    {
 
       /**
        * The uploader instance
        *
        * @property uploader
-       * @type Alfresco.module.FlashUpload or Alfresco.module.HtmlUpload
+       * @type Alfresco.FlashUpload or Alfresco.HtmlUpload
        */
       uploader: null,
 
@@ -220,7 +233,7 @@
 })();
 
 
-Alfresco.module.getFileUploadInstance = function()
+Alfresco.getFileUploadInstance = function()
 {
    var instanceId = "alfresco-fileupload-instance";
    var instance = Alfresco.util.ComponentManager.find(
@@ -233,9 +246,8 @@ Alfresco.module.getFileUploadInstance = function()
    }
    else
    {
-      instance = new Alfresco.module.FileUpload(instanceId);
+      instance = new Alfresco.FileUpload(instanceId);
    }
    return instance;
 };
-/* Create the instance to load optional YUI components and SWF early */
-Alfresco.module.getFileUploadInstance();
+

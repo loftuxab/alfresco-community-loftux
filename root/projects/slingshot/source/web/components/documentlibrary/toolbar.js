@@ -149,7 +149,7 @@
        * FileUpload module instance.
        * 
        * @property fileUpload
-       * @type Alfresco.module.FileUpload
+       * @type Alfresco.FileUpload
        */
       fileUpload: null,
 
@@ -360,7 +360,7 @@
       {
          if (this.fileUpload === null)
          {
-            this.fileUpload = Alfresco.module.getFileUploadInstance(); //new Alfresco.module.FileUpload(this.id + "-fileUpload");
+            this.fileUpload = Alfresco.getFileUploadInstance(); 
          }
          
          // Show uploader for multiple files

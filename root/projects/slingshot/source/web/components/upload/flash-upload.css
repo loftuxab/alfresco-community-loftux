@@ -1,5 +1,6 @@
 /* Style YUI components */
 
+.flash-upload.hidden,
 .flash-upload .hidden
 {
    display: none;
@@ -238,7 +239,12 @@
 {
    text-align: center;
    height: 40px;
+}
+
+.fileUpload-filelist-table tbody .col-right
+{
    background-color: #FAF9F9;
+   border-style: none;
 }
 
 .fileupload-fileButton-span
@@ -250,7 +256,12 @@
 .flash-upload .fileupload-fileButton-span button
 {
    padding-left: 2.5em;
-   background: url(images/remove-16.png) 10% 50% no-repeat;
+   background: url(../images/remove-16.png) 10% 50% no-repeat;
+}
+
+.yui-skin-default .fileUpload-filelist-table.yui-dt.yui-dt-scrollable tbody.yui-dt-data tr.yui-dt-last td
+{
+   border-bottom:medium none;
 }
 
 /* General styling */
