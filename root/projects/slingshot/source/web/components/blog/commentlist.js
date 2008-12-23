@@ -618,11 +618,11 @@
          {
             type: "submit"
          });
-         
+
          // register the cancel button
          this.editData.widgets.cancelButton = new YAHOO.widget.Button(formId + "-cancel");
          this.editData.widgets.cancelButton.subscribe("click", this.onEditFormCancelButtonClick, this, true);
-         
+
          // instantiate the simple editor we use for the form
          this.editData.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content',
          {
@@ -632,8 +632,8 @@
             animate: false, //Animates the opening, closing and moving of Editor windows
             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         this.editData.widgets.editor._render();
-         
+         this.editData.widgets.editor.render();
+
          // create the form that does the validation/submit
          var commentForm = new Alfresco.forms.Form(formId + "-form");
          commentForm.setShowSubmitStateDynamically(true, false);
@@ -661,7 +661,7 @@
             {
                this.editData.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
-                  text: Alfresco.util.message("message.creating", this.name),
+                  text: Alfresco.util.message("message.savecomment", this.name),
                   spanClass: "wait",
                   displayTime: 0
                });

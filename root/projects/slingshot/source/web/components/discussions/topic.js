@@ -51,7 +51,7 @@
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
            
       return this;
-   }
+   };
    
    Alfresco.DiscussionsTopic.prototype =
    {
@@ -189,7 +189,7 @@
                }
             }
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("topic-action-link-div", fnActionHandlerDiv);
          
          // register tag action handler, which will issue tagSelected bubble events.
@@ -583,7 +583,7 @@
          });
          // render the editor - we use the private function as we want this to happen
          // prior of displaying the form. Otherwise we get quite ugly ui behavior
-         this.widgets.editor._render();
+         this.widgets.editor.render();
          
          // create the form that does the validation/submit
          var editForm = new Alfresco.forms.Form(formId + "-form");
@@ -629,7 +629,7 @@
                });
             },
             scope: this
-         }
+         };
          
          editForm.init();
          
@@ -740,7 +740,7 @@
             topicRef: this.topicData.nodeRef,
             topicTitle: this.topicData.title,
             topicId: this.topicData.name
-         }
+         };
          YAHOO.Bubbling.fire("topicDataChanged", eventData);
       },
       
