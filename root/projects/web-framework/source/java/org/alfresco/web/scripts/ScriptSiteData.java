@@ -719,7 +719,7 @@ public final class ScriptSiteData extends ScriptBase
             Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
             for (WebScript webscript : registry.getWebScripts())
             {
-                if (family.equals(webscript.getDescription().getFamily()))
+                if (family.equals(webscript.getDescription().getFamilys()))
                 {
                     values.add(webscript.getDescription());
                 }
