@@ -197,22 +197,25 @@ package org.alfresco.previewer
 		 */ 
 		private function onDocumentPageScopeChange(event:DocumentZoomDisplayEvent):void
 		{
-			// Save the values from the event
-			this.nextVisiblePages = event.visiblePages;
-			this.nextPage = event.page;
-			if (this.prevPage != this.nextPage || this.prevVisiblePages != this.nextVisiblePages)
+			if(doc.getNoOfPages() > pageLoader.getPoolSize())
 			{
-				/**
-				 * A new page or a new number of visible pages has been requested.
-				 * Make sure we reset the time we need to wait until the pages shall
-				 * be loaded.
-				 */ 				
-				lastMove = new Date();
-				if (!running)
-				{				
-					// The timer is not active, start it  
-					delay = millisToWaitUntilActionTest;
-					start();
+				// Save the values from the event
+				this.nextVisiblePages = event.visiblePages;
+				this.nextPage = event.page;
+				if (this.prevPage != this.nextPage || this.prevVisiblePages != this.nextVisiblePages)
+				{
+					/**
+					 * A new page or a new number of visible pages has been requested.
+					 * Make sure we reset the time we need to wait until the pages shall
+					 * be loaded.
+					 */ 				
+					lastMove = new Date();
+					if (!running)
+					{				
+						// The timer is not active, start it  
+						delay = millisToWaitUntilActionTest;
+						start();
+					}
 				}
 			}
 		}
@@ -274,7 +277,18 @@ class PageLoaderThread extends PseudoThread
 	 */
 	public function add(mc:MovieClip):void
 	{
-		movieClipPool.push(mc);		
+		movieClipPool.push(mc);
+		loadAndDisplayPage(movieClipPool.length - 1, movieClipPool.length);		
+	}
+	
+	/**
+	 * Returns the number of movie clips in the pool.
+	 * 
+	 * @return the number of movie clips in the pool.
+	 */
+	public function getPoolSize():int
+	{
+		return movieClipPool ? movieClipPool.length : 0;
 	}
 	
 	/**
@@ -325,7 +339,6 @@ class PageLoaderThread extends PseudoThread
 				mc = movieClipPool[j];
 				if (mc.currentFrame == (page))
 				{				
-					 trace("loaded");
 					// The page was already loaded, make sure it's displayed.					  
 					loadAndDisplayPage(j, page);					
 					loaded = true;
@@ -352,7 +365,6 @@ class PageLoaderThread extends PseudoThread
 						 * We found a movie clip that currently displays a frame we 
 						 * are NOT interested in.
 						 */
-						 trace("load");
 						loadAndDisplayPage(j, page);
 						loaded = true;
 						break;
@@ -479,7 +491,7 @@ class PageLoaderThread extends PseudoThread
     		 */    		
     		mc.gotoAndStop(page);	
     	}    	
-    	
+    	    	
     	// Find the page in the document and make it display the movie clip
     	var p:Page = dpc.doc.getChildAt(page - 1) as Page;			
 		p.content = mc;

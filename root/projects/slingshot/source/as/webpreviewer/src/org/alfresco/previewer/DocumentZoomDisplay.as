@@ -304,7 +304,8 @@ package org.alfresco.previewer
 			// Reset the pages	
 			pages = null;
 			pmclm = null;
-						
+			
+	    	var p:Page;			
     	    if (loader.content is MovieClip && paging)
     	    {   
 				// Create the document with padding around and between the pages 		
@@ -316,9 +317,25 @@ package org.alfresco.previewer
     	    	// We will create a multi paged document with a page for each fram in the loaded movie
     	    	contentType = MOVIE_CLIP;    	    			    
 				var mmc:MovieClip = MovieClip(loader.content);
-				    	    	
+    	    	
+    	    	// Create all pages and put them in the document
+				pages = new Array();							
+				for(var i:int = 0; i < mmc.totalFrames; i++) 
+				{		
+					mmc.gotoAndStop(i + 1);						
+					p = new Page(mmc.width, mmc.height, true, (i + 1) + "");				
+					pages.push(p);
+				}
+				doc.pages = pages;
+				
+				/**
+				 * Make sure the document's default position is top so the first pages is 
+				 * visible and aligned to the top border of the display area
+				 */
+				verticalDefaultPosition = "top";			
+					
     	    	/**
-    	    	 * 10 instances of the movie clip should cover most scenarios of resolution 
+    	    	 * 11 instances of the movie clip should cover most scenarios of resolution 
     	    	 * and page sizes. If a very high resolution is used in combination with 
     	    	 * "landscape" pages it might be necessary to use some more. 
     	    	 * 
@@ -329,12 +346,11 @@ package org.alfresco.previewer
  				pmclm = new DocumentPageController(doc, this);
     	    	pmclm.add(mmc);  
     	    	
-				createMultiPageDocument(Math.min(9, mmc.totalFrames));	
+				createMultiPageDocument(Math.min(10, mmc.totalFrames - 1));	
     	    }
     	    else
     	    {
-    	    	var p:Page,
-    	    		content:DisplayObject;
+	    		var content:DisplayObject;
     	    		
     	    	// Find out what we have loaded and add it as page to the single paged document
 		    	if (loader.content is MovieClip)
@@ -392,8 +408,8 @@ package org.alfresco.previewer
     		createMovieClipInstance(
     			loader, 
     			function movieClipCreated(mc:MovieClip, obj:Object):void{
-    				
-    				trace(System.totalMemory);
+    				// Instance created, decrease the counter
+    				obj.yetToCreate = obj.yetToCreate - 1;
     				
     				// Add movice clip to the content pool so it can be used for several pages
     				mc.gotoAndStop(obj.yetToCreate);
@@ -402,12 +418,17 @@ package org.alfresco.previewer
 					if (obj.yetToCreate > 0)
 					{
 						// Create more instances/frames/pages 
-						createMultiPageDocument(obj.yetToCreate - 1);
+						createMultiPageDocument(obj.yetToCreate);
 					}	
 					else
 					{	
-						// All insteancs have been created now create the document that will display them
-						createMultiPageDocument2(mc);											
+						// All instances have been created
+						
+						// Add the document to the document zoom display
+						sprite = doc;
+			
+						// Make sure necessarry taks are taken now that the document is loaded and created
+						documentComplete();																	
 					}
 	    		}, 
 	    		{
@@ -444,35 +465,6 @@ package org.alfresco.previewer
 			
 			// Load the representation into the loader, but from the array instead of from the network
 			l.loadBytes(ba);
-		}
-
-		/**
-		 * Called when a unique instance has been created for each page/frame in the loaded move clip.
-		 */  
-		private function createMultiPageDocument2(mc:MovieClip):void
-		{	
-			// Create all pages and put them in the document
-			pages = new Array();			
-			var p:Page;
-			for(var i:int = 0; i < mc.totalFrames; i++) 
-			{
-				mc.gotoAndStop(i + 1);				
-				p = new Page(mc.width, mc.height, true, (i + 1) + "");				
-				pages.push(p);
-			}
-			doc.pages = pages;
-												
-			/**
-			 *  Make sure the document's default position is top so the first pages is 
-			 * visible and aligned to the top border of the display area
-			 */
-			verticalDefaultPosition = "top";
-			
-			// Add the document to the document zoom display
-			sprite = doc;
-			
-			// Make sure necessarry taks are taken now that the document is loaded and created
-			documentComplete();							
 		}
 		
 		/**
