@@ -29,7 +29,9 @@ package org.alfresco.previewer
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.MouseEvent;		
+	import flash.events.MouseEvent;
+	import flash.text.TextField;
+	import flash.text.TextFormat;		
 	
 	/**
 	 * Adds padding to the display object inside but the most important  
@@ -48,61 +50,106 @@ package org.alfresco.previewer
 	 */
 	public class Page extends Sprite
 	{
+
 		/**
-		 * The backgound color to display if padding i used.
+		 * The wiheightdth if the page (excl border).
+		 * Since mc not will be present all the time this value will tell it's height.
 		 */
-		public var backgroundColor:uint = 0x0054B9F8;  
-		
+		public var contentHeight:Number = 0;  
+
+		/**
+		 * The width if the page (excl border).
+		 * Since mc not will be present all the time this value will tell it's width.
+		 */
+		public var contentWidth:Number = 0;  
+				
 		/**
 		 * The wrapped display object.
 		 */
-		private var mc:DisplayObject;
-		
-		/**
-		 * The border around mc; top, left, right and bottom.
-		 */
-		private var _padding:Number = 0;
+		private var _content:DisplayObject;		
 		
 		/**
 		 * True if page should appear as interactive
 		 */
 		private var _interactive:Boolean = false;
+			
+		/**
+		 * True if page should appear as a placeholder with background color and a text
+		 */
+		private var _placeHolder:Boolean = false;
+
+		/**
+		 * Textfild to display the text in center if page is a place holder
+		 */
+		private var _text:TextField;  
+		
+		/**
+		 * The border color to display if border is larger than 0.
+		 */
+		public var borderColor:uint;  
+
+		/**
+		 * The border around mc; top, left, right and bottom.
+		 */
+		private var borderThickness:Number;
+
+		/**
+		 * The color to display if mc isn't present and page is a place holder.
+		 */
+		public var defaultPageColor:uint;  
 		
 		/**
 		 * Constructor
 		 */		
-		public function Page()
+		public function Page(dpw:Number, dph:Number, placeHolder:Boolean=false, text:String="", dpc:uint=0x00FFFFFF, bc:uint=0x0054B9F8, bt:Number=15)
 		{
-			super();				
-			addEventListener(MouseEvent.MOUSE_OVER, onPageMouseOver);			
-		}	
-	
-		/**
-		 * Returns the padding used used for top, left, right and bottom.
-		 * 
-		 * @return the padding used used for top, left, right and bottom
-		 */
-		public function get padding():Number 
-		{
-			return _padding;
-		}
-		
-		/**
-		 * Sets the padding to be used for top, left, right and bottom.
-		 * 
-		 * @param the padding to be used for top, left, right and bottom.
-		 */
-		public function set padding(padding:Number):void
-		{
-			if (_padding != padding)
+			super();	
+			
+			// Set size of component			
+			contentWidth = dpw;
+			contentHeight = dph;
+
+			this._placeHolder = placeHolder;
+			/**
+			 *  Display a text representation of the page that is visible when 
+			 *  the page isn't loaded.
+			 */
+			 
+			if (this._placeHolder)
 			{
-				_padding = padding;
+				// The style of the text
+				var format:TextFormat = new TextFormat();
+	            format.font = "Verdana";
+	            format.color = 0xCCCCCC;            
+	            format.size = 500;
+	            
+	            // The actual text
+				_text = new TextField();
+	            _text.defaultTextFormat = format;
+				_text.text = text;
+				_text.width = _text.textWidth
+				_text.height = _text.textHeight
 				
-				// Make sure we layout the pages according to the new padding.
-				redrawChild();				
+				// Add and position the text
+				addChild(_text);						
+				_text.x = bt + (dpw / 2) - (_text.textWidth / 2);
+				_text.y = bt + (dph / 2) - (_text.textHeight / 2);
+
+				/**
+				 * Make sure we notice if the mouse is over so we can listen 
+				 * for clicks and paint the border.
+				 */
+				addEventListener(MouseEvent.MOUSE_OVER, onPageMouseOver);
 			}
-		}
-		
+												
+			// Color of the page
+			defaultPageColor = dpc;
+			borderColor = bc;
+			borderThickness = bt;
+			
+			// Paint the page
+			redrawChild();			
+		}		
 		
 		/**
 		 * Returns true if the page appears as interactive and dispatches events
@@ -134,15 +181,10 @@ package org.alfresco.previewer
 		 */
         private function redrawChild():void 
         {
-        	if (mc)
-        	{
-	        	// Position child with regards to padding               	    
-	        	mc.x = _padding;
-				mc.y = _padding;
-				
-				// Fill background with transparent graphics so the Pages dimensions include the padding			
-	        	doFillBackground(0);
-	        }
+
+			// Fill background with transparent graphics so the Pages dimensions include the border			
+        	doFillBackground(0);
+	        
         }
 			
 		/**
@@ -182,32 +224,36 @@ package org.alfresco.previewer
 			removeEventListener(MouseEvent.CLICK, onPageMouseClick);			
 		}
 		
-		public override function addChild(child:DisplayObject):DisplayObject
+		public function set content(content:DisplayObject):void
 		{
-			// Remove old child if any
-			var prevMcIndex:int = mc ? getChildIndex(mc) : -1;
-			if (prevMcIndex > -1)
+			// Remove old child if any			
+			var prevIndex:int = _content && contains(_content) ? getChildIndex(_content) : -1;
+			if (prevIndex > -1)
 			{
-				removeChildAt(prevMcIndex);
+				removeChildAt(prevIndex);
 			}
 			
 			// Add new child
-			mc = child;
-			super.addChild(mc);		
-			
-			// Make sure child is positioned
-			redrawChild();
-			
-			// Return child to caller 
-			return mc;
+			_content = content;
+			super.addChild(_content);					
+			_content.x = borderThickness;
+			_content.y = borderThickness;			
 		}
 		
 		private function doFillBackground(alpha:Number):void
 		{			
 			graphics.clear();
-			graphics.beginFill(backgroundColor, _interactive ? alpha : 0);
-	        graphics.drawRect(0, 0, mc.width + _padding * 2, mc.height + _padding * 2);	        
-	        graphics.endFill();					
+						
+			graphics.beginFill(borderColor, _interactive ? alpha : 0);	        
+	        graphics.drawRect(0, 0, contentWidth + borderThickness * 2, contentHeight + borderThickness * 2);	        
+	        graphics.endFill();
+	        
+	        if(this._placeHolder)
+	        {
+	        	graphics.beginFill(defaultPageColor, 1);
+	        	graphics.drawRect(borderThickness, borderThickness, contentWidth, contentHeight);		                
+	        	graphics.endFill();					        	        			        	
+	        }        						
 		}
 				
 	}

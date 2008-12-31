@@ -209,8 +209,8 @@ package org.alfresco.previewer
             zoomOutButton.addEventListener(MouseEvent.CLICK, onZoomOutClick);
             
             // The hidden button menu for snapPoints 
-            zoomPercentageTextInput.addEventListener(KeyboardEvent.KEY_DOWN, onZoomPercentageTextInputKeyDown);                        
-			snapPointsMenu = Menu.createMenu(this, snapPoints, false);
+            zoomPercentageTextInput.addEventListener(KeyboardEvent.KEY_DOWN, onZoomPercentageTextInputKeyDown);
+			snapPointsMenu = Menu.createMenu(this, new ArrayCollection(), false);
 			snapPointsMenu.setStyle("openDuration", 0); 
             snapPointsMenu.addEventListener(ListEvent.CHANGE, onSnapPointsMenuChange);            
             snapPointsButton.addEventListener(MouseEvent.CLICK, onSnapPointsButtonClick);
@@ -231,14 +231,15 @@ package org.alfresco.previewer
 		 */
 		public function onDocumentSnapPointsChange(event:DocumentZoomDisplayEvent):void
 		{	
-			// Remove older snapPoints, menu will update since snapPoints is dataProivder to snapPointsMenu								            
-            snapPoints.removeAll();            
+			// Remove older snapPoints, menu will update since snapPoints is dataProivder to snapPointsMenu
+			snapPoints = new ArrayCollection();								                        
             snapPoints.addItem({label: "Actual Size", data: 1});
             snapPoints.addItem({label: "Fit Page", data: event.fitToScreen});
             snapPoints.addItem({label: "Fit Width", data: event.fitToWidth});
             snapPoints.addItem({label: "Fit Height", data: event.fitToHeight});
             
             // Do show /hide the menu gets a size so its location later can be calculated
+            snapPointsMenu.dataProvider = snapPoints;
             snapPointsMenu.show(-400, - 400);
             snapPointsMenu.hide();            
                         			            

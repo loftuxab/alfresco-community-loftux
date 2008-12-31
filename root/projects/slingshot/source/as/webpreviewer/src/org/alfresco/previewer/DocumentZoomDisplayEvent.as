@@ -110,6 +110,11 @@ package org.alfresco.previewer
 		public var page:int;		
 		
 		/** 
+		 * THe number of pages visible in the display area.
+		 */
+		public var visiblePages:int;
+		
+		/** 
 		 * The new scale of the document
 		 */
 		public var documentScale:Number;		

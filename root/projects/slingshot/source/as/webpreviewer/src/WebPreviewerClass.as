@@ -1,6 +1,7 @@
 package
 {
 	import flash.external.ExternalInterface;
+	import flash.system.System;
 	
 	import mx.core.Application;
 	import mx.events.FlexEvent;
@@ -62,6 +63,7 @@ package
 			previewer.paging = (paging == "true" || paging == "TRUE");
 			previewer.fileName = fileName;
 			
+			trace(System.totalMemory);
 			// Start the loading the content in to the previewer				
 			previewer.url = url; 			
 		}
