@@ -25,7 +25,7 @@
 		<mx:VRule id="pagingSeparator" styleName="headerSeparator" width="2" height="14"/>
 		<mx:Button id="previousButton" styleName="previousButton" icon="@Embed(source='assets/left.png')" width="22" height="22" buttonMode="true"/>
 		<mx:Label id="pageLabel" text="Page"/>
-		<mx:TextInput id="pageTextInput" styleName="pageTextInput" width="22" height="22"/>
+		<mx:TextInput id="pageTextInput" styleName="pageTextInput" width="30" height="22"/>
 		<mx:Label id="ofLabel" text="of" styleName="of"/>
 		<mx:Label id="noOfPagesLabel" styleName="noOfPagesLabel"/>
 		<mx:Button id="nextButton" styleName="nextButton" icon="@Embed(source='assets/right.png')" width="22" height="22" buttonMode="true"/>

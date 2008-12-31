@@ -27,15 +27,18 @@ package org.alfresco.previewer
 {
 	import flash.display.AVM1Movie;
 	import flash.display.Bitmap;
+	import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.KeyboardEvent;
 	import flash.net.URLRequest;
+	import flash.system.System;
 	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 	
+	import mx.controls.Alert;
 	import mx.core.MovieClipAsset;
 	import mx.events.ResizeEvent;
 	
@@ -80,6 +83,11 @@ package org.alfresco.previewer
 		private var _page:int = -1;		
 		
 		/**
+		 * The number of pages that currently are displayed.
+		 */
+		private var _visiblePages:int = 0;				
+		
+		/**
 		 * If true clicks on pages will dispatch events.  
 		 */
 		private var _interactive:Boolean = false;
@@ -109,6 +117,11 @@ package org.alfresco.previewer
 		 * before they are added as pages in the document.  
 		 */
 		private var pages:Array;
+
+		/**
+		 * An array to store the loaded content, only used for multi-paged documents.  
+		 */
+		private var pmclm:DocumentPageController;
 		
 		/**
 		 * Describes the contentType of the loaded content.
@@ -289,33 +302,57 @@ package org.alfresco.previewer
 		private function onLoaderComplete(event:Event):void 
 		{	
 			// Reset the pages	
-			pages = new Array();
+			pages = null;
+			pmclm = null;
 						
     	    if (loader.content is MovieClip && paging)
     	    {   
+				// Create the document with padding around and between the pages 		
+				doc = new Document();
+				doc.addEventListener(DocumentEvent.DOCUMENT_PAGE_CLICK, onDocumentPageClick);
+				doc.padding = 5;
+				doc.gap = 5;
+    	    	
     	    	// We will create a multi paged document with a page for each fram in the loaded movie
-    	    	contentType = MOVIE_CLIP;		    	
-				var mc:MovieClip = MovieClip(loader.content);
-				createMultiPageDocument(mc.totalFrames);	
+    	    	contentType = MOVIE_CLIP;    	    			    
+				var mmc:MovieClip = MovieClip(loader.content);
+				    	    	
+    	    	/**
+    	    	 * 10 instances of the movie clip should cover most scenarios of resolution 
+    	    	 * and page sizes. If a very high resolution is used in combination with 
+    	    	 * "landscape" pages it might be necessary to use some more. 
+    	    	 * 
+    	    	 * TODO: Ideally a smart method that looks on System.totalMemory and the 
+    	    	 * size of the movie clip should find a maximum no of instances for a client 
+    	    	 * with little RAM.
+    	    	 */
+ 				pmclm = new DocumentPageController(doc, this);
+    	    	pmclm.add(mmc);  
+    	    	
+				createMultiPageDocument(Math.min(9, mmc.totalFrames));	
     	    }
     	    else
     	    {
-    	    	var p:Page = new Page();
+    	    	var p:Page,
+    	    		content:DisplayObject;
+    	    		
     	    	// Find out what we have loaded and add it as page to the single paged document
 		    	if (loader.content is MovieClip)
 	    	    {    
-	    	    	contentType = MOVIE_CLIP;	    	    	
-	    	    	p.addChild(MovieClip(loader.content));		        	        	   											
+	    	    	contentType = MOVIE_CLIP;
+	    	    	var mc:MovieClip = MovieClip(loader.content);
+	    	    	content = mc;
 	    	    }
 	    	    else if (event.currentTarget.loader.content is flash.display.Bitmap)
 	    	    {    
 	        		contentType = IMAGE;
-	    	    	p.addChild(Bitmap(loader.content));		        	        	   													    
+	        		var img:Bitmap = Bitmap(loader.content);
+	        		content = img;
 	    	    }
 	    	    else if (event.target.actionScriptVersion == 2)
 		    	{
 		    		contentType = AVM1_MOVIE;
-	    	    	p.addChild(AVM1Movie(loader.content));	    	    	
+		    		var am1:AVM1Movie = AVM1Movie(loader.content);
 	    	    }
 	    	    else
 	    	    {
@@ -326,10 +363,15 @@ package org.alfresco.previewer
 					return;    	    	    	    	
 	    	    }									
 	    	    
-	    	    // Create the document and add the page to it
+	    	    // Create the page and the document a
+    	    	p = new Page(content.width, content.height, false);	    	    	   	    	
+    	    	p.content = content;		            	    		        	   											
 				doc = new Document();
+				doc.addChild(p);
+				
+				pages = new Array();
 				pages.push(p);				
-				doc.addChild(p);						
+										
 				
 				// Add the document as the sprite/document of the document zoom display 										
 				sprite = doc;
@@ -350,13 +392,12 @@ package org.alfresco.previewer
     		createMovieClipInstance(
     			loader, 
     			function movieClipCreated(mc:MovieClip, obj:Object):void{
-    				/**
-    				 * Create a new Page containing the new unique move clip instance
-    				 * and add it to the page array
-    				 */
-	    			var p:Page = new Page();	    			
-	    			p.addChild(mc);
-					pages.push(p);
+    				
+    				trace(System.totalMemory);
+    				
+    				// Add movice clip to the content pool so it can be used for several pages
+    				mc.gotoAndStop(obj.yetToCreate);
+	    			pmclm.add(mc);
 												
 					if (obj.yetToCreate > 0)
 					{
@@ -366,7 +407,7 @@ package org.alfresco.previewer
 					else
 					{	
 						// All insteancs have been created now create the document that will display them
-						createMultiPageDocument2();											
+						createMultiPageDocument2(mc);											
 					}
 	    		}, 
 	    		{
@@ -408,26 +449,19 @@ package org.alfresco.previewer
 		/**
 		 * Called when a unique instance has been created for each page/frame in the loaded move clip.
 		 */  
-		private function createMultiPageDocument2():void
+		private function createMultiPageDocument2(mc:MovieClip):void
 		{	
-			// Create the document with padding around and between the pages 		
-			doc = new Document();
-			doc.addEventListener(DocumentEvent.DOCUMENT_PAGE_CLICK, onDocumentPageClick);
-			doc.padding = 5;
-			doc.gap = 5;
-			
-			// Add clips/frames/pages from the pages array to the document
-			var page:Page, 
-				mc:MovieClip;
-			for (var j:Number = 0; j < pages.length; j++)
+			// Create all pages and put them in the document
+			pages = new Array();			
+			var p:Page;
+			for(var i:int = 0; i < mc.totalFrames; i++) 
 			{
-				page = pages[j] as Page;
-				page.padding = 15;
-    			mc = page.getChildAt(0) as MovieClip;
-				mc.gotoAndStop(j + 1);
-				doc.addChild(page);	
+				mc.gotoAndStop(i + 1);				
+				p = new Page(mc.width, mc.height, true, (i + 1) + "");				
+				pages.push(p);
 			}
-						
+			doc.pages = pages;
+												
 			/**
 			 *  Make sure the document's default position is top so the first pages is 
 			 * visible and aligned to the top border of the display area
@@ -605,55 +639,87 @@ package org.alfresco.previewer
             if (_sprite && pages && pages.length > 1)
             {	
             	// Find out what page is displayed in the display areas top
-            	var zcy:Number = Math.abs(_sprite.y);            
-            	var cp:int = 1;
+            	var zcy:Number = Math.abs(_sprite.y);            	            
+            	var cp:int = 1, visiblePages:int = 1;
+            	            	            	
             	for (var pageIndex:Number = 0; pageIndex < doc.getNoOfPages(); pageIndex++)
             	{
             		/**
             		 * Need to floor them and add a pixel to sprite's position since the pixels 
             		 * can appear as 1200.32 and 1200.38 when scaled and all the numbers will 
             		 * not be "fraction"-exact as expected.
-            		 */  
+            		 */            		 
             		if ((Math.floor(zcy) + 1) < Math.floor(doc.getPageEnd(pageIndex) * spritePrevZoom))
             		{
+            			// Ok we found the current page
             			cp = pageIndex + 1;
+            			
+            			// Now continue and see how many pages that are visible
+            			zcy = Math.abs(_sprite.y) + this.height;
+		            	while (pageIndex < doc.getNoOfPages())
+    		        	{
+    						visiblePages = pageIndex - (cp - 1);
+            				if ((Math.floor(zcy) + 1) > Math.floor(doc.getPageStart(pageIndex) * spritePrevZoom))
+            				{            		
+        						// Lets see if the next one also is visible
+        						pageIndex++            					
+            				}
+            				else
+            				{
+            					break;
+            				}
+            			}
             			break;
             		}
-            	}    
-            	if (_page != cp)
+            	} 
+            	 
+            	if (_page != cp || _visiblePages != visiblePages)
             	{
-            		dispatchPageScopeChange(cp);
+            	            		 
+            		dispatchPageScopeChange(cp, visiblePages);
             	}
             	
             }
             else if (_page != 0 && (!doc || doc.getNoOfPages() == 0))
             {
-            	dispatchPageScopeChange(0);
+            	dispatchPageScopeChange(0, 0);
             }
             else if (_page != 1 && _sprite && doc && doc.getNoOfPages() == 1)
             {            	
-            	dispatchPageScopeChange(1);	
+            	dispatchPageScopeChange(1, 1);	
             }    
         }
         
         /**
     	 * Dispatches a documentPageScopeChange event with event-page set to page. 
          */
-		private function dispatchPageScopeChange(page:int):void
+		private function dispatchPageScopeChange(page:int, visiblePages:int):void
 		{
+			
 			// Set the page in the local model
 			this._page = page;
-			
+			this._visiblePages = visiblePages;
+						
 			// Create and dispatch the event
 			var e:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_PAGE_SCOPE_CHANGE);
 			e.page = this._page;
+			e.visiblePages = this._visiblePages;
 			e.noOfPages = pages ? pages.length : 0;			
 			dispatchEvent(e);
+
+			// Make sure current page is displayed
+			/*
+			if (pmclm)
+			{
+				pmclm.loadClipsForPage(page, visiblePages);
+			}
+			*/
+
 		}
 		
 		/**
-		 * Called when ththis component is resized.
-		 * Makes sure the new snapPoints for the display area is dispatched.
+		 * Called when this component is resized.
+		 * Makes sure the new snapPoints for the display area are dispatched.
 		 * 
 		 * @param event Describes the resizing of this component.
 		 */

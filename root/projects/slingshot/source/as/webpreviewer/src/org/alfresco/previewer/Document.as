@@ -48,12 +48,12 @@ package org.alfresco.previewer
 		/**
 		 * The width of the widest page/child.
 		 */
-		private var _maximumPageWidth:Number;
+		private var _maximumPageWidth:Number = 0;
 		
 		/**
 		 * The height if the highest page/child.
 		 */	
-		private var _maximumPageHeight:Number;
+		private var _maximumPageHeight:Number = 0;
 		
 		/**
 		 * "start"-y-position for all the pages/children.
@@ -83,16 +83,14 @@ package org.alfresco.previewer
         	_pageEnds = new Array();
         	_pageStarts = new Array();
             var obj:DisplayObject;
-            var top:Number = 0, left:Number = 0;            
+            var top:Number = 0, w:Number = 0;            
             top += _padding; // padding top
-            left += _padding; // padding left
-            var widest:Number = 0;
-            var highest:Number = 0;
+            w += _padding; // padding left
             for (var i:Number = 0; i < numChildren; i++)
             {
             	// Position each child/page.
             	obj = getChildAt(i);
-            	obj.x = left;            	
+            	obj.x = _padding + ((_maximumPageWidth / 2) - (obj.width / 2));            	
             	obj.y = top;
             	_pageStarts.push(top);
             	top += obj.height;
@@ -104,21 +102,15 @@ package org.alfresco.previewer
             		top += _gap;
             	}
             	
-            	// Save the width/height of the widest/highest page/child.
-            	widest = Math.max(obj.width, widest);     
-            	highest = Math.max(obj.height, highest);            	            	
             }
             top += _padding; // padding bottom
-            left += widest; // widest page
-            left += _padding; // padding right      
+            w += _maximumPageWidth; // widest page
+            w += _padding; // padding right      
                         
             graphics.beginFill(0xFFCC00, 0); // alpha set to 0 so the yellow "padding" isn't "visible"
-            graphics.drawRect(0, 0, left, top);
+            graphics.drawRect(0, 0, w, top);
             graphics.endFill();
             
-            // Set variables for use by getters later
-            _maximumPageWidth = widest;
-            _maximumPageHeight = highest;
         }
 		
 		/**
@@ -126,7 +118,7 @@ package org.alfresco.previewer
 		 * 
 		 * @param child A page in the document.
 		 */
-		override public function addChild(child:DisplayObject):DisplayObject {			
+		/*override public function addChild(child:DisplayObject):DisplayObject {			
 			if (child is Page)
 			{			
 				// Call super class addChild.
@@ -146,6 +138,43 @@ package org.alfresco.previewer
 				throw Error("A child to a Document must be of type Child.");
 			}
         }
+		*/
+		public function set pages(pages:Array):void 
+		{
+			var p:Page;
+            var widest:Number = 0;
+            var highest:Number = 0;
+
+			for (var i:int = 0; i < pages.length; i++)
+			{			
+				p = pages[i];
+				if (p is Page)
+				{			
+					// Call super class addChild.
+		            super.addChild(p);
+		                  
+                	// Save the width/height of the widest/highest page/child.
+	            	widest = Math.max(p.width, widest);     
+    	        	highest = Math.max(p.height, highest);            	            	            
+		            
+		            // Add event listener for page clicks
+		            p.addEventListener(MouseEvent.CLICK, onPageClick);	            
+				}
+				else
+				{
+					throw Error("A child to a Document must be of type Child.");
+				}
+			}
+			
+	        // Set variables for access later
+            _maximumPageWidth = widest;
+            _maximumPageHeight = highest;
+
+            // Layout all the pages in the document.       
+			redrawChildren();			           
+        }
+		
+		
 		
 		/**
 		 * Returns the padding used used for top, left, right and bottom.
