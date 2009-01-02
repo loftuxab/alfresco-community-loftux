@@ -96,11 +96,18 @@ public class Target implements Serializable
      * autoFix - does meta validation auto fix data
      */
     private boolean autoFix = true;
-
+   
     /**
      * Runnables that will be invoked after commit.
      */
-    private List<FSDeploymentRunnable> fRunnables;
+    private List<FSDeploymentRunnable> postCommitRunnables;
+    
+    /**
+     * Runnables that will be invoked during prepare phase.
+     */
+    private List<FSDeploymentRunnable> prepareRunnables;
+    
+    
 
     /**
      * Make one up.
@@ -111,14 +118,16 @@ public class Target implements Serializable
     public Target(String name,
                   String root,
                   String metadata,
-                  List<FSDeploymentRunnable> runnables,
+                  List<FSDeploymentRunnable> prepareRunnables,
+                  List<FSDeploymentRunnable> postCommitRunnables,
                   String user,
                   String password)
     {
         fTargetName = name;
         fRootDirectory = root;
         fMetaDataDirectory = metadata;
-        fRunnables = runnables;
+        this.prepareRunnables = prepareRunnables;
+        this.postCommitRunnables = postCommitRunnables;
         fUser = user;
         fPassword = password;
     
@@ -592,17 +601,45 @@ public class Target implements Serializable
             }
         }
     }
+    
+    /**
+     * run prepare programs
+     * @param deployment the deployment that is being prepared.
+     * @throws DeploymentException
+     */
+    
+    public void runPrepare(Deployment deployment) throws DeploymentException
+    {
+        if (prepareRunnables != null && prepareRunnables.size() > 0)
+        {
+            for (FSDeploymentRunnable runnable : prepareRunnables)
+            {
+                try
+                {
+                    runnable.init(deployment);
+                    runnable.run();
+                }
+                catch (Throwable t)
+                {
+                	throw new DeploymentException("Error thrown in prepare", t);
+                }
+            }
+        }
+    }
 
     /**
-     * run post commit programs
+     * Run post commit programs.
+     * 
+     * It is too late to throw exceptions to abort the deployment.
+     * 
      * @param deployment the deployment that has just completed.
      */
     
     public void runPostCommit(Deployment deployment)
     {
-        if (fRunnables != null && fRunnables.size() > 0)
+        if (postCommitRunnables != null && postCommitRunnables.size() > 0)
         {
-            for (FSDeploymentRunnable runnable : fRunnables)
+            for (FSDeploymentRunnable runnable : postCommitRunnables)
             {
                 try
                 {

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.deployment.FSDeploymentRunnable;
+import org.alfresco.deployment.impl.DeploymentException;
 
 import junit.framework.TestCase;
 
@@ -74,7 +75,7 @@ public class TargetTest extends TestCase
 		String user="Master";	
 		String password="vampire";
 		
-		Target t = new Target(name, root, metadata, null, user, password);
+		Target t = new Target(name, root, metadata, null, null, user, password);
 		
 		assertTrue("name not equal", t.getName().equals(name));
 		assertTrue("root not equal", t.getRootDirectory().equals(root));
@@ -95,7 +96,8 @@ public class TargetTest extends TestCase
 	}
 	
 	/**
-	 * Test 
+	 * Test postCommitCallback
+	 * the exception should be swallowed and not thrown.
 	 */
 	
 	public void testPostCommit()
@@ -103,7 +105,7 @@ public class TargetTest extends TestCase
 		List<FSDeploymentRunnable> runnables = new ArrayList<FSDeploymentRunnable>(); 
 		
 		FSRunnableTester tester = new FSRunnableTester();
-		
+		tester.throwException = true;
 		
 		String name="testTarget";
 		String root="hellmouth";
@@ -111,7 +113,7 @@ public class TargetTest extends TestCase
 		String user="Master";	
 		String password="vampire";
 		
-		Target t = new Target(name, root, metadata, runnables, user, password);
+		Target t = new Target(name, root, metadata, null, runnables, user, password);
 		Deployment deployment = null;
 		try {
 			deployment = new Deployment(t, ".");
@@ -129,10 +131,58 @@ public class TargetTest extends TestCase
 		assertNotNull("init method not called", tester.getDeployment());
 		assertTrue("run called", tester.isRunCalled());
 		
-
-		
 	}
 	
+	
+	/**
+	 * Test the prepare callback 
+	 */
+	public void testPrepare()
+	{
+		List<FSDeploymentRunnable> runnables = new ArrayList<FSDeploymentRunnable>(); 
+		
+		FSRunnableTester tester = new FSRunnableTester();
+		
+		
+		String name="testTarget";
+		String root="hellmouth";
+		String metadata="metadata";
+		String user="Master";	
+		String password="vampire";
+		
+		Target t = new Target(name, root, metadata, runnables, null, user, password);
+		Deployment deployment = null;
+		try {
+			deployment = new Deployment(t, ".");
+		} catch (IOException e) {
+			e.printStackTrace();
+			fail("unable to create deployment");
+		}
+		
+		// should do nothing
+		t.runPrepare(deployment);
+		
+		// add the tester
+		runnables.add(tester);
+		t.runPrepare(deployment);
+		
+		assertNotNull("init method not called", tester.getDeployment());
+		assertTrue("run called", tester.isRunCalled());
+		
+		// set the tester to throw and exception - this should not be swallowed
+		tester.throwException = true;
+		
+		try{
+			t.runPrepare(deployment);
+			fail("exception not thrown");
+		} catch (DeploymentException de) {
+		
+		}
+	}
+	
+	/**
+	 * Test class for 
+	 */
 	private class FSRunnableTester implements FSDeploymentRunnable
 	{
 
@@ -143,6 +193,8 @@ public class TargetTest extends TestCase
 		
 		Deployment deployment;
 		boolean runCalled = false;
+		boolean throwException;
+		
 		
 		public void init(Deployment deployment) 
 		{
@@ -153,6 +205,11 @@ public class TargetTest extends TestCase
 		{
 			System.out.println("called run");
 			runCalled = true;
+			
+			if(throwException)
+			{
+				throw new DeploymentException("test exception");
+			}
 		}
 		
 		public Deployment getDeployment()

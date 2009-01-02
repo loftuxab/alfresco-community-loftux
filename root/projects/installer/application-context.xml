@@ -1,7 +1,24 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
+<!--  FSR DEPLOYMENT SERVER CONFIGURATION -->
 <beans>
+
+     <!-- Sample FSDeploymentRunnable implementation - add others here -->
+     <bean id="sampleRunnable" class="org.alfresco.deployment.SampleRunnable"/>
+     
+     <bean id="sampleProgramRunnable" class="org.alfresco.deployment.ProgramRunnable">
+         <property name="program"><value>/bin/cp</value></property>
+         <!-- Arguments that get appended to the final command line -->
+         <property name="arguments">
+             <list>
+                 <value>/Users/britt/dump.txt</value>
+             </list>
+         </property>
+         <!-- The directory that the program runs in. -->
+         <property name="directory"><value>/</value></property>
+     </bean>
+
     <bean id="properties" 
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders">
@@ -24,19 +41,34 @@
         </property>
         <property name="metaDataDirectory">
             <value>${dep.metadatadir}</value>
-        </property>
+        </property>  
+        
         <!-- Target Configuration. Modify for your site. -->
         <property name="targetData">
             <map>
+                <!-- Default target -->
             	<entry key="default">
             	    <map>
             	    	<entry key="root"><value>@@DEPTARGET@@</value></entry>
             	    	<entry key="user"><value>@@DEPUSER@@</value></entry>
             	    	<entry key="password"><value>@@DEPPWD@@</value></entry>
-            	    	<entry key="runnable"><value>org.alfresco.deployment.SampleRunnable</value></entry>
-            	    	<!-- 
-            	    	<entry key="program"><value>/path/to/program</value></entry>
-            	    	 -->
+            	    	<entry key="autoFix"><value>true</value></entry>
+            	    	
+            	    	<!-- Define post commit callbacks here 
+            	    	<entry key="postCommit">
+                            <list>
+                               <ref bean="sampleRunnable"/>
+                            </list>
+                     	</entry>
+                     	-->
+                        <!--  Define prepare callbacks here
+                        <entry key="prepare">
+                         <list>
+                             <ref bean="sampleRunnable"/>
+                             <!-- <ref bean="sampleProgramRunnable"/> 
+                         </list>
+                         </entry>
+                        -->
             	    </map>
             	</entry>
             </map>
@@ -48,6 +80,17 @@
         <property name="configuration">
             <ref bean="configuration"/>
         </property>
+        
+        <!-- Will an error be thrown if the FSR overwrites files outside its control -->
+        <property name="errorOnOverwrite"><value>false</value></property>
+        
+        <!-- Define your content transformers here 
+        <property name="transformers"> 
+            <list>
+            </list>
+        </property>
+        -->
+        
     </bean>
     
     <bean id="deploymentReceiverTransport" class="org.alfresco.deployment.impl.server.DeploymentReceiverTransportImpl">

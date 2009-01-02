@@ -51,7 +51,7 @@ Setting up the Alfresco File System Receiver
     your choosing. (Note: The user name and password does not need to be an os or alfresco
     user and password.)
     
-4. Define your custom runnables
+4. Define your custom runnables for prepare and postCommit callbacks
    If you have any custom runnables, use the configuration of the sampleProgramRunnable as a template.
    
    Define your runnable bean
@@ -63,7 +63,7 @@ Setting up the Alfresco File System Receiver
      
     add your runnable beans to the target, like so
      
-                     <entry key="runnables">
+                     <entry key="postCommit">
                          <list>
                              <ref bean="sampleRunnable"/>
                              <ref bean="myBean"/>
@@ -71,8 +71,9 @@ Setting up the Alfresco File System Receiver
                          </list>
                      </entry>
 
+5. Define any transport adapters.  
   
-5. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
+6. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
    content to be owned by.
    
    

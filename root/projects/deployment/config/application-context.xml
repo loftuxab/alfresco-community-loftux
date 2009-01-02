@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
-
+<!--  FSR DEPLOYMENT SERVER CONFIGURATION - DEPLOYMENT PROJECT-->
 <beans>
      <!-- Sample FSDeploymentRunnable implementation - add others here -->
      <bean id="sampleRunnable" class="org.alfresco.deployment.SampleRunnable"/>
@@ -40,6 +40,7 @@
         <property name="metaDataDirectory">
             <value>${dep.metadatadir}</value>
         </property>
+        
         <!-- Target Configuration. Modify for your site. -->
         <property name="targetData">
             <map>
@@ -48,6 +49,7 @@
             	    	<entry key="root"><value>target</value></entry>
             	    	<entry key="user"><value>admin</value></entry>
             	    	<entry key="password"><value>admin</value></entry>
+            	    	<entry key="autoFix"><value>true</value></entry>   	
             	    </map>
             	</entry>
                <entry key="sampleTarget">
@@ -55,7 +57,9 @@
                      <entry key="root"><value>target</value></entry>
                      <entry key="user"><value>Giles</value></entry>
                      <entry key="password"><value>Watcher</value></entry>
-                     <entry key="runnables">
+                     <entry key="autoFix"><value>true</value></entry>
+                     
+                     <entry key="postCommit">
                          <list>
                              <ref bean="sampleRunnable"/>
                              <!-- <ref bean="sampleProgramRunnable"/> -->
@@ -72,6 +76,17 @@
         <property name="configuration">
             <ref bean="configuration"/>
         </property>
+        
+        <!-- Will an error be thrown if the FSR overwrites files outside its control -->
+        <property name="errorOnOverwrite"><value>false</value></property>
+        
+        <!-- Define your content transformers here 
+        <property name="transformers"> 
+            <list>
+            </list>
+        </property>
+        -->
+         
     </bean>
     
     <bean id="deploymentReceiverTransport" class="org.alfresco.deployment.impl.server.DeploymentReceiverTransportImpl">
