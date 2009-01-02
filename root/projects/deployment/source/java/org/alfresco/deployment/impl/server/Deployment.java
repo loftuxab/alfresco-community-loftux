@@ -186,14 +186,14 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      * @throws IOException
      */
     public void prepare()
-        throws IOException
+        throws IOException, DeploymentException
     {
-//        fOut.flush();
-//        fFileOut.getChannel().force(true);
-//        fOut.close();
+
         fCanBeStale = false;
         fTarget.cloneMetaData(this);
         fState = DeploymentState.PREPARING;
+        // Call the prepare callbacks.
+    	fTarget.runPrepare(this);
     }
 
     /**
@@ -203,6 +203,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void finishPrepare()
         throws IOException
     {
+
+    	
         fState = DeploymentState.COMMITTING;
     }
 

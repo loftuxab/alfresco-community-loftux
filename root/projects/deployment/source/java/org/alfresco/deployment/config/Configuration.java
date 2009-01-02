@@ -140,11 +140,23 @@ public class Configuration
             	autoFix = Boolean.valueOf(autoFixStr).booleanValue();
             }
             
-            
-            List<FSDeploymentRunnable> runnables = (List<FSDeploymentRunnable>)targetEntry.get("runnables");
-            if (runnables == null)
+            List<FSDeploymentRunnable> prepareCallbacks = (List<FSDeploymentRunnable>)targetEntry.get("prepare");
+            if (prepareCallbacks == null)
             {
-                runnables = new ArrayList<FSDeploymentRunnable>();
+                prepareCallbacks = new ArrayList<FSDeploymentRunnable>();
+            }
+            
+            List<FSDeploymentRunnable> postCommitCallbacks = (List<FSDeploymentRunnable>)targetEntry.get("postCommit");
+            if (postCommitCallbacks == null)
+            {
+                prepareCallbacks = new ArrayList<FSDeploymentRunnable>();
+            }
+            
+            // runnables is a historical old way of configuring the FSR. 
+            List<FSDeploymentRunnable> runnables = (List<FSDeploymentRunnable>)targetEntry.get("runnables");
+            if (runnables != null && runnables.size() > 0)
+            {
+                postCommitCallbacks.addAll(runnables);
             }
             
             // Create the root directory if it does not already exist
@@ -157,7 +169,8 @@ public class Configuration
             Target newTarget = new Target(targetName,
                     root,
                     fMetaDataDirectory + File.separator + targetName + ".md",
-                    runnables,
+                    prepareCallbacks,
+                    postCommitCallbacks,
                     user,
                     password);
             newTarget.setAutoFix(autoFix);
