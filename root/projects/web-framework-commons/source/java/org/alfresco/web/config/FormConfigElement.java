@@ -93,6 +93,9 @@ public class FormConfigElement extends ConfigElementAdapter
     private List<FieldVisibilityRule> visibilityRules = new ArrayList<FieldVisibilityRule>();
 
     private Map<String, FormSet> sets = new HashMap<String, FormSet>();
+    
+    // We must maintain the order of the specified field IDs from <field-visibility>
+    private List<String> fieldVisibilityIDs = new ArrayList<String>();
     private Map<String, FormField> fields = new HashMap<String, FormField>();
     
     public FormConfigElement()
@@ -408,6 +411,7 @@ public class FormConfigElement extends ConfigElementAdapter
         {
             attrs.put(attributeNames.get(i), attributeValues.get(i));
         }
+        fieldVisibilityIDs.add(fieldId);
         fields.put(fieldId, new FormField(attrs));
     }
 
@@ -577,7 +581,7 @@ public class FormConfigElement extends ConfigElementAdapter
     private List<String> getFieldNamesVisibleInMode(Mode mode)
     {
     	List<String> result = new ArrayList<String>();
-        for (String fieldId : this.fields.keySet())
+        for (String fieldId : fieldVisibilityIDs)
         {
             if (this.isFieldVisible(fieldId, mode))
             {

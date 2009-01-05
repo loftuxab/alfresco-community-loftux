@@ -400,6 +400,17 @@ public class FormConfigTest extends BaseTest
         assertFalse("Field should be invisible.", formConfigElement
                 .isFieldVisible("rubbish", Mode.VIEW));
     }
+    
+    public void testVisibleFieldsMustBeCorrectlyOrdered()
+    {
+    	List<String> fieldNames = formConfigElement.getVisibleViewFieldNames();
+    	
+    	List<String> expectedFieldNames = new ArrayList<String>();
+    	expectedFieldNames.add("name");
+    	expectedFieldNames.add("title");
+    	expectedFieldNames.add("quota");
+    	assertEquals("Visible fields wrong.", expectedFieldNames, fieldNames);
+    }
 
     public void testGetSetsFromForm()
     {
