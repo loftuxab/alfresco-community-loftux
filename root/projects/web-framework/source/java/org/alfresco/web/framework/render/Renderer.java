@@ -1,16 +1,13 @@
 package org.alfresco.web.framework.render;
 
 import org.alfresco.web.framework.exception.RendererExecutionException;
-import org.alfresco.web.framework.exception.RendererInitializationException;
 
 public interface Renderer 
 {
     /**
      * Called upon initialization of the renderer
-     * 
-     * @throws RendererInitializationException the renderer initialization exception
      */
-    public void init() throws RendererInitializationException;
+    public void init();
     
     /**
      * Executes the renderer in the given focus

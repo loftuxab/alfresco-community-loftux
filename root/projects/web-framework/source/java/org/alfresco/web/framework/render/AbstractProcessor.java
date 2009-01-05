@@ -24,27 +24,53 @@
  */
 package org.alfresco.web.framework.render;
 
-import org.alfresco.web.framework.exception.ProcessorExecutionException;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.render.ProcessorContext.ProcessorDescriptor;
 import org.alfresco.web.site.FrameworkHelper;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
-public abstract class AbstractProcessor implements Processor 
+public abstract class AbstractProcessor implements Processor, ApplicationListener, ApplicationContextAware
 {
-    protected ApplicationContext applicationContext = null;
+    private ApplicationContext applicationContext = null;
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.framework.render.Dispatcher#init(org.alfresco.web.framework.render.DispatcherContext)
+     * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
      */
-    public void init(ApplicationContext applicationContext)
-        throws ProcessorExecutionException
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ContextRefreshedEvent)
+        {
+            ContextRefreshedEvent refreshEvent = (ContextRefreshedEvent)event;
+            ApplicationContext refreshContext = refreshEvent.getApplicationContext();
+            if (refreshContext != null && refreshContext.equals(applicationContext))
+            {
+                init(applicationContext);
+            }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext applicationContext)
+        throws BeansException
     {
         this.applicationContext = applicationContext;
-        
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.render.Processor#init(org.alfresco.web.framework.render.DispatcherContext)
+     */
+    public void init(ApplicationContext applicationContext)
+    {
         if (FrameworkHelper.getLogger().isDebugEnabled())
         {
-            FrameworkHelper.getLogger().debug("Dispatcher [" + this.getClass().getName() + "] init");
+            FrameworkHelper.getLogger().debug(this.getClass().getName() + " init");
         }
     }
     

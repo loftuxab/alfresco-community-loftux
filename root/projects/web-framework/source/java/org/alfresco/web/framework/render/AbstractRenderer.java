@@ -28,8 +28,14 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.exception.RendererExecutionException;
-import org.alfresco.web.framework.exception.RendererInitializationException;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * An abstract implementation of the Renderer interface that can be
@@ -37,9 +43,11 @@ import org.alfresco.web.framework.exception.RendererInitializationException;
  * 
  * @author muzquiano
  */
-public abstract class AbstractRenderer implements Renderer
-{    
+public abstract class AbstractRenderer implements Renderer, ApplicationListener, ApplicationContextAware
+{
+    protected ApplicationContext applicationContext = null;
     protected Processor processor = null;
+    
     
     public void setProcessor(Processor processor)
     {
@@ -52,15 +60,35 @@ public abstract class AbstractRenderer implements Renderer
     }
     
     /* (non-Javadoc)
+     * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
+     */
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ContextRefreshedEvent)
+        {
+            ContextRefreshedEvent refreshEvent = (ContextRefreshedEvent)event;
+            ApplicationContext refreshContext = refreshEvent.getApplicationContext();
+            if (refreshContext != null && refreshContext.equals(applicationContext))
+            {
+                init();
+            }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext applicationContext)
+        throws BeansException
+    {
+        this.applicationContext = applicationContext;
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderer#init()
      */
     public void init()
-        throws RendererInitializationException
     {
-        if (this.processor == null)
-        {
-            throw new RendererInitializationException("Unable to init renderer: null processor");
-        }
     }
     
     /* (non-Javadoc)

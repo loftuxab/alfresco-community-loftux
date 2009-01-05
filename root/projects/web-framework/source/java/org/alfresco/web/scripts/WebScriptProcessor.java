@@ -34,6 +34,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.Config;
+import org.alfresco.config.ConfigService;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
@@ -42,7 +43,6 @@ import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.render.AbstractProcessor;
 import org.alfresco.web.framework.render.ProcessorContext;
 import org.alfresco.web.framework.render.RenderContext;
-import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.uri.UriUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -96,7 +96,8 @@ public class WebScriptProcessor extends AbstractProcessor
     public void init(ApplicationContext applicationContext)
     {        
         // Setup the external access URL server properties - i.e. external hostname for absolute URLs
-        Config config = FrameworkHelper.getConfigService().getConfig("Server");
+        ConfigService configService = (ConfigService)applicationContext.getBean("web.config");
+        Config config = configService.getConfig("Server");
         serverProperties = (ServerConfigElement)config.getConfigElement(ServerConfigElement.CONFIG_ELEMENT_ID);
     }
     

@@ -55,6 +55,7 @@ public class FreemarkerProcessor extends AbstractProcessor
     public void init(ApplicationContext applicationContext)
     {
         this.templateStore.init();
+        this.scriptProcessor.init();
     }
     
     /**
@@ -240,7 +241,7 @@ public class FreemarkerProcessor extends AbstractProcessor
         }
         catch (Exception ex)
         {
-            throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
+            throw new RendererExecutionException("FreemarkerProcessor failed to process template: " + templateName, ex);
         }
     }
 }

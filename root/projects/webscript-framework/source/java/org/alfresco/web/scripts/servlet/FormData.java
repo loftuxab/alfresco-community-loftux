@@ -200,13 +200,25 @@ public class FormData implements Serializable
         }
         
         /**
-         * @return  field value (for file, attempts conversion to string)
+         * @return field value (for form fields)
+         *         for file upload fields, the file name is returned - use getContent() instead.
          */
         public String getValue()
         {
             try
             {
-                return (file.isFormField() && encoding != null) ? file.getString(encoding) : file.getString();
+                String value;
+                if (file.isFormField())
+                {
+                    value = (encoding != null ? file.getString(encoding) : file.getString());
+                }
+                else
+                {
+                    // For large/binary files etc. we never immediately load the content directly into memory!
+                    // This would be extremely bad for say large binary file uploads etc.
+                    value = file.getName();
+                }
+                return value;
             }
             catch (UnsupportedEncodingException e)
             {
@@ -223,7 +235,7 @@ public class FormData implements Serializable
             {
                 return new InputStreamContent(file.getInputStream(), getMimetype(), null);
             }
-            catch(IOException e)
+            catch (IOException e)
             {
                 return null;
             }

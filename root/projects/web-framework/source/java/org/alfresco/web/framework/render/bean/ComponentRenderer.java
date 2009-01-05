@@ -28,7 +28,6 @@ import java.io.IOException;
 
 import org.alfresco.web.framework.exception.ComponentRendererExecutionException;
 import org.alfresco.web.framework.exception.RendererExecutionException;
-import org.alfresco.web.framework.exception.RendererInitializationException;
 import org.alfresco.web.framework.model.Chrome;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.render.AbstractRenderer;
@@ -51,17 +50,6 @@ import org.alfresco.web.site.WebFrameworkConstants;
  */
 public class ComponentRenderer extends AbstractRenderer
 {
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.render.Renderer#init()
-     */
-    public void init()
-        throws RendererInitializationException
-    {
-        super.init();
-        
-        // additional initialization (if necessary)
-    }
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#header(org.alfresco.web.framework.render.RenderContext)
      */
@@ -102,7 +90,6 @@ public class ComponentRenderer extends AbstractRenderer
                 Timer.stop(context, "ComponentRenderer-Header-" + component.getId());
         }    
     }
-    
     
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#body(org.alfresco.web.framework.render.RendererContext)
@@ -169,5 +156,4 @@ public class ComponentRenderer extends AbstractRenderer
         throws IOException
     {
     }
-    
 }
