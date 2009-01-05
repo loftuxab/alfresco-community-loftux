@@ -24,7 +24,6 @@
  */
 package org.alfresco.connector;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,13 +31,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,9 +42,19 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.Base64;
+import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.FileCopyUtils;
 
 /**
  * Remote client for for accessing data from remote URLs.
@@ -488,7 +494,9 @@ public class RemoteClient extends AbstractClient
             HttpServletRequest req, HttpServletResponse res, ResponseStatus status)
         throws IOException
     {
-        if (logger.isDebugEnabled())
+        final boolean trace = logger.isTraceEnabled();
+        final boolean debug = logger.isDebugEnabled();
+        if (debug)
         {
             logger.debug("Executing " + "(" + requestMethod + ") " + url.toString());
             if (in != null)  logger.debug(" - InputStream supplied - will push...");
@@ -496,14 +504,40 @@ public class RemoteClient extends AbstractClient
             if (req != null && res != null) logger.debug(" - Full Proxy mode between servlet request and response...");
         }
         
-        HttpURLConnection connection = null;
+        HttpClient client = new HttpClient();
+        
+        final HttpClientParams params = client.getParams();
+        params.setBooleanParameter("http.connection.stalecheck", false);
+        params.setBooleanParameter("http.tcp.nodelay", true);
+        if (!debug)
+        {
+            params.setIntParameter("http.connection.timeout", CONNECT_TIMEOUT);
+            params.setIntParameter("http.socket.timeout", READ_TIMEOUT);
+        }
+        
+        final org.apache.commons.httpclient.HttpMethod method;
+        switch (this.requestMethod)
+        {
+            default:
+            case GET:
+                method = new GetMethod(url.toString());
+                break;
+            case PUT:
+                method = new PutMethod(url.toString());
+                break;
+            case POST:
+                method = new PostMethod(url.toString());
+                break;
+            case DELETE:
+                method = new DeleteMethod(url.toString());
+                break;
+            case HEAD:
+                method = new HeadMethod(url.toString());
+                break;
+        }
+        
         try
         {
-            // open the URL connection and apply timeouts
-            connection = (HttpURLConnection)url.openConnection();
-            connection.setConnectTimeout(CONNECT_TIMEOUT);
-            connection.setReadTimeout(READ_TIMEOUT);
-            
             // proxy over any headers from the request stream to proxied request
             if (req != null)
             {
@@ -513,10 +547,11 @@ public class RemoteClient extends AbstractClient
                     String key = headers.nextElement();
                     if (key != null)
                     {
-                        connection.setRequestProperty(key, req.getHeader(key));
+                        method.setRequestHeader(key, req.getHeader(key));
+                        if (trace) logger.trace("Proxy request header: " + key + "=" + req.getHeader(key));
                     }
                 }
-            }            
+            }
             
             // apply request properties, allows for the assignment of specific header properties
             if (this.requestProperties != null && this.requestProperties.size() != 0)
@@ -524,7 +559,9 @@ public class RemoteClient extends AbstractClient
                 for (Map.Entry<String, String> entry : requestProperties.entrySet())
                 {
                     String headerName = entry.getKey();
-                    connection.addRequestProperty(headerName, this.requestProperties.get(headerName));
+                    String headerValue = this.requestProperties.get(headerName);
+                    method.addRequestHeader(headerName, headerValue);
+                    if (trace) logger.trace("Added request header: " + headerName + "=" + headerValue);
                 }
             }
             
@@ -532,110 +569,116 @@ public class RemoteClient extends AbstractClient
             if (this.username != null && this.password != null)
             {
                 String auth = this.username + ':' + this.password;
-                connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
+                method.addRequestHeader("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
+                if (debug) logger.debug("Applied HTTP Basic Authorization");
             }
             
-            // set the request method - the default of GET will be used if not explicitly set
-            connection.setRequestMethod(this.requestMethod.toString());
-            
-            // perform a POST/PUT to the connection if input supplied
+            // prepare the POST/PUT entity data if input supplied
             if (in != null)
             {
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-                connection.setUseCaches(false);
-                connection.setRequestProperty ("Content-Type", this.requestContentType);
+                method.setRequestHeader("Content-Type", this.requestContentType);
                 
-                FileCopyUtils.copy(in, new BufferedOutputStream(connection.getOutputStream()));
+                // apply content-length here if known (i.e. from proxied req)
+                // if this is not set, then the content will be buffered in memory
+                int contentLength = InputStreamRequestEntity.CONTENT_LENGTH_AUTO;
+                if (req != null)
+                {
+                    contentLength = req.getContentLength();
+                }
+                
+                if (debug) logger.debug("Setting content-type=" + this.requestContentType + " content-length=" + contentLength);
+                
+                ((EntityEnclosingMethod)method).setRequestEntity(new InputStreamRequestEntity(in, contentLength));
             }
             
-            // prepare to write the connection result to the output stream
-            // at this point - if the remote server returned an error status code
-            // this call will trigger an IOException which is handled below
-            boolean caughtError = false;            
-            String errorMessage = null;            
-            InputStream input;
-            try
-            {
-                input = connection.getInputStream();
-            }
-            catch (IOException ioErr)
-            {
-                // caught an IO exception - record exception and error message
-                // we record all status codes later regardless
-                status.setException(ioErr);
-                status.setMessage(ioErr.getMessage());
-                errorMessage = ioErr.getMessage();
-                
-                // now use the error response stream instead - if there is one
-                input = connection.getErrorStream();
-                caughtError = true;
-                
-                if (logger.isDebugEnabled())
-                    logger.debug(" --- Caught error: " + errorMessage);
-            }
-            
-            // get the response code - this can throw IO exception if unable to connect
-            int responseCode = connection.getResponseCode();
+            // execute the method to get the response code and proxy over if required
+            final int responseCode = client.executeMethod(method);
             if (res != null)
             {
                 res.setStatus(responseCode);
             }
+            status.setCode(responseCode);
+            if (debug) logger.debug("Response status code: " + responseCode);
             
             // walk over headers that are returned from the connection
             // if we have a servlet response, proxy the headers back to the response
             // otherwise, store headers on status
-            Map<String, List<String>> headers = connection.getHeaderFields();
-            for (String key : headers.keySet())
+            Header contentType = null;
+            Header contentLength = null;
+            for (Header header : method.getResponseHeaders())
             {
                 // NOTE: Tomcat does not appear to be obeying the servlet spec here.
                 //       If you call setHeader() the spec says it will "clear existing values" - i.e. not
                 //       add additional values to existing headers - but for Server and Transfer-Encoding
                 //       if we set them, then two values are received in the response...
                 // In addition handle the fact that the key can be null.
-                if (key != null &&
-                    !key.equalsIgnoreCase("Server") && !key.equalsIgnoreCase("Transfer-Encoding"))
+                final String key = header.getName();
+                if (key != null)
                 {
-                    if (res != null)
+                    if (!key.equalsIgnoreCase("Server") && !key.equalsIgnoreCase("Transfer-Encoding"))
                     {
-                        res.setHeader(key, connection.getHeaderField(key));
+                        if (res != null)
+                        {
+                            res.setHeader(key, header.getValue());
+                        }
+                        
+                        // store headers back onto status
+                        status.setHeader(key, header.getValue());
+                        
+                        if (trace) logger.trace("Response header: " + key + "=" + header.getValue()); 
                     }
                     
-                    // store headers back onto status
-                    status.setHeader(key, connection.getHeaderField(key));
+                    // grab a reference to the the content-type header here if we find it
+                    if (contentType == null && key.equalsIgnoreCase("Content-Type"))
+                    {
+                        contentType = header;
+                    }
+                    // grab a reference to the content-length header here if we find it
+                    else if (contentLength == null && key.equalsIgnoreCase("Content-Length"))
+                    {
+                        contentLength = header;
+                    }
                 }
             }
             
             // locate response encoding from the headers
             String encoding = null;
-            String ct = connection.getContentType();
-            if (ct != null)
+            String ct = null;
+            if (contentType != null)
             {
+                ct = contentType.getValue();
                 int csi = ct.indexOf(CHARSETEQUALS);
                 if (csi != -1)
                 {
                     encoding = ct.substring(csi + CHARSETEQUALS.length());
                 }
             }
-            if (logger.isDebugEnabled())
-                logger.debug("Response encoding: " + ct);
+            if (debug) logger.debug("Response encoding: " + contentType);
             
             // perform the stream write from the response to the output
-            boolean trace = logger.isTraceEnabled();
+            int bufferSize = BUFFERSIZE;
+            if (contentLength != null)
+            {
+                int length = Integer.parseInt(contentLength.getValue());
+                if (length < bufferSize)
+                {
+                    bufferSize = length;
+                }
+            }
             StringBuilder traceBuf = null;
             if (trace)
             {
-                traceBuf = new StringBuilder(4096);
-                traceBuf.append('\n');
+                traceBuf = new StringBuilder(bufferSize);
             }
             boolean responseCommit = false;
             if (responseCode != HttpServletResponse.SC_NOT_MODIFIED)
             {
+                InputStream input = method.getResponseBodyAsStream();
                 if (input != null)
                 {
                     try
                     {
-                        byte[] buffer = new byte[BUFFERSIZE];
+                        byte[] buffer = new byte[bufferSize];
                         int read = input.read(buffer);
                         if (read != -1) responseCommit = true;
                         while (read != -1)
@@ -658,22 +701,27 @@ public class RemoteClient extends AbstractClient
                     }
         		    finally
         		    {
-                        if (trace)
+                        if (trace && traceBuf.length() != 0)
                         {
-                            logger.trace("Output from: " + url.toString());
+                            logger.trace("Output (" + (traceBuf.length()) + " bytes) from: " + url.toString());
                             logger.trace(traceBuf.toString());
                         }
                         try
                         {
-                            input.close();
-                            if (responseCommit)
+                            try
                             {
-                                if (out != null)
+                                input.close();
+                            }
+                            finally
+                            {
+                                if (responseCommit)
                                 {
-                                    out.close();
+                                    if (out != null)
+                                    {
+                                        out.close();
+                                    }
                                 }
                             }
-                            connection.disconnect();
                         }
                         catch (IOException e)
                         {
@@ -684,17 +732,16 @@ public class RemoteClient extends AbstractClient
                 }
             }
             
-            // record status code
-            status.setCode(responseCode);
-            if (res != null && caughtError && !responseCommit)
+            // apply error response message if required
+            if (res != null && responseCode != HttpServletResponse.SC_OK && !responseCommit)
             {
-                res.sendError(responseCode, errorMessage);
+                res.sendError(responseCode, method.getStatusText());
             }
             
             // if we get here call was successful
             return encoding;
         }
-        catch (SocketTimeoutException timeErr)
+        catch (ConnectTimeoutException timeErr)
         {
             // caught a socket timeout IO exception - apply internal error code
             status.setCode(SC_REMOTE_CONN_TIMEOUT);
@@ -752,6 +799,7 @@ public class RemoteClient extends AbstractClient
         finally
         {
             // reset state values
+            method.releaseConnection();
             this.requestContentType = "application/octet-stream";
             this.requestMethod = HttpMethod.GET;
         }

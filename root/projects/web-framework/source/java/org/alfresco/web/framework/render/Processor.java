@@ -24,7 +24,6 @@
  */
 package org.alfresco.web.framework.render;
 
-import org.alfresco.web.framework.exception.ProcessorExecutionException;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.springframework.context.ApplicationContext;
 
@@ -38,8 +37,7 @@ public interface Processor
      * 
      * @param applicationContext the application context
      */
-    public void init(ApplicationContext applicationContext)
-        throws ProcessorExecutionException;
+    public void init(ApplicationContext applicationContext);
     
     /**
      * Executes the given focus of the processor output using the

@@ -25,7 +25,6 @@
 package org.alfresco.web.framework.render.bean;
 
 import org.alfresco.web.framework.exception.RendererExecutionException;
-import org.alfresco.web.framework.exception.RendererInitializationException;
 import org.alfresco.web.framework.model.Chrome;
 import org.alfresco.web.framework.render.AbstractRenderer;
 import org.alfresco.web.framework.render.RenderContext;
@@ -40,17 +39,6 @@ import org.alfresco.web.site.Timer;
  */
 public class ChromeRenderer extends AbstractRenderer
 {
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.render.Renderer#init()
-     */
-    public void init()
-        throws RendererInitializationException
-    {
-        super.init();
-        
-        // additional initialization (if necessary)
-    }
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractRenderer#body(org.alfresco.web.framework.render.RendererContext)
      */
