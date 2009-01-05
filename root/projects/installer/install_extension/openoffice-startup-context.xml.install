@@ -15,10 +15,19 @@
    </bean>
 
    <bean id="openOfficeStartupCommand" class="org.alfresco.util.exec.RuntimeExec">
-      <property name="commandMap">
+      <property name="commandsAndArguments">
           <map>
               <entry key=".*">
-                  <value><![CDATA["@@ALF_OO@@/program/soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///@@ALF_OO@@" -nologo -headless -nofirststartwizard -nocrashrep -norestore]]></value>
+                  <list>
+                      <value>${ooo.exe}</value>
+                      <value>"-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager"</value>
+                      <value>"-env:UserInstallation=file:///${ooo.user}"</value>
+                      <value>-nologo</value>
+                      <value>-headless</value>
+                      <value>-nofirststartwizard</value>
+                      <value>-nocrashrep</value>
+                      <value>-norestore</value>
+                  </list>
               </entry>
           </map>
       </property>

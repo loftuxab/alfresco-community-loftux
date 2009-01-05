@@ -9,6 +9,12 @@ dir.root=@@ALF_DATA@@
 dir.indexes=@@ALF_INDEXES@@
 
 #
+# External locations
+#
+ooo.exe=@@ALF_OO@@/program/soffice
+ooo.user=${dir.root}/oouser
+
+#
 # Sample database connection properties
 #
 db.name=@@DB_NAME@@
