@@ -9,16 +9,30 @@
               <entry key="Windows.*">
                   <list>
                       <value>dir</value>
-                      <value>c:</value>
                   </list>
               </entry>
               <entry key=".*">
                   <list>
                       <value>ls</value>
-                      <value>/</value>
                   </list>
               </entry>
           </map>
+      </property>
+      <property name="processProperties">
+          <map>
+              <entry key="env.prop1">
+                  <value>value1</value>
+              </entry>
+              <entry key="env.prop2">
+                  <value>null</value>
+              </entry>
+              <entry key="env.prop3">
+                  <value>${env.prop3.unsubstituted}</value>
+              </entry>
+          </map>
+      </property>
+      <property name="processDirectory">
+          <value>.</value>
       </property>
       <property name="waitForCompletion">
           <value>true</value>

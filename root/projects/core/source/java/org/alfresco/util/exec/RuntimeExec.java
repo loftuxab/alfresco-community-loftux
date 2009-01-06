@@ -25,6 +25,7 @@
 package org.alfresco.util.exec;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -51,6 +52,10 @@ import org.apache.commons.logging.LogFactory;
  * of commands keyed by the <i>os.name</i> Java system property.  In this map,
  * the default key that is used when no match is found is the
  * <b>{@link #KEY_OS_DEFAULT *}</b> key.
+ * <p>
+ * Use the {@link #setProcessDirectory(String) processDirectory} property to change the default location
+ * from which the command executes.  The process's environment can be configured using the
+ * {@link #setProcessProperties(Map) processProperties} property.
  * <p>
  * Commands may use placeholders, e.g.
  * <pre><code>
@@ -102,6 +107,8 @@ public class RuntimeExec
     private Charset charset;
     private boolean waitForCompletion;
     private Map<String, String> defaultProperties;
+    private String[] processProperties;
+    private File processDirectory;
     private Set<Integer> errCodes;
 
     /**
@@ -112,6 +119,9 @@ public class RuntimeExec
         this.charset = Charset.defaultCharset();
         this.waitForCompletion = true;
         defaultProperties = Collections.emptyMap();
+        processProperties = new String[0];
+        processDirectory = null;
+        
         // set default error codes
         this.errCodes = new HashSet<Integer>(2);
         errCodes.add(1);
@@ -123,6 +133,8 @@ public class RuntimeExec
         StringBuffer sb = new StringBuffer(256);
         sb.append("RuntimeExec:\n")
           .append("   command:    ").append(command).append("\n")
+          .append("   env props:  ").append(processProperties).append("\n")
+          .append("   dir:        ").append(processDirectory).append("\n")
           .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n");
         return sb.toString();
     }
@@ -265,8 +277,9 @@ public class RuntimeExec
     }
     
     /**
-     * Set the default properties to use when executing the command.  The properties
-     * supplied during execution will overwrite the default properties.
+     * Set the default command-line properties to use when executing the command.
+     * These are properties that substitute variables defined in the command string itself.
+     * Properties supplied during execution will overwrite the default properties.
      * <p>
      * <code>null</code> properties will be treated as an empty string for substitution
      * purposes.
@@ -277,7 +290,75 @@ public class RuntimeExec
     {
         this.defaultProperties = defaultProperties;
     }
-    
+
+    /**
+     * Set additional runtime properties (environment properties) that will used
+     * by the executing process.
+     * <p>
+     * Any keys or properties that start and end with <b>${...}</b> will be removed on the assumption
+     * that these are unset properties.  <tt>null</tt> values are translated to empty strings.
+     * All keys and values are trimmed of leading and trailing whitespace.
+     * 
+     * @param processProperties     Runtime process properties
+     * 
+     * @see Runtime#exec(String, String[], java.io.File)
+     */
+    public void setProcessProperties(Map<String, String> processProperties)
+    {
+        ArrayList<String> processPropList = new ArrayList<String>(processProperties.size());
+        for (Map.Entry<String, String> entry : processProperties.entrySet())
+        {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            if (key == null)
+            {
+                continue;
+            }
+            if (value == null)
+            {
+                value = "";
+            }
+            key = key.trim();
+            value = value.trim();
+            if (key.startsWith(VAR_OPEN) && key.endsWith(VAR_CLOSE))
+            {
+                continue;
+            }
+            if (value.startsWith(VAR_OPEN) && value.endsWith(VAR_CLOSE))
+            {
+                continue;
+            }
+            processPropList.add(key + "=" + value);
+        }
+        this.processProperties = processPropList.toArray(this.processProperties);
+    }
+
+    /**
+     * Set the runtime location from which the command is executed.
+     * <p>
+     * If the value is an unsubsititued variable (<b>${...}</b>) then it is ignored.
+     * If the location is not visible at the time of setting, a warning is issued only.
+     * 
+     * @param processDirectory          the runtime location from which to execute the command
+     */
+    public void setProcessDirectory(String processDirectory)
+    {
+        if (processDirectory.startsWith(VAR_OPEN) && processDirectory.endsWith(VAR_CLOSE))
+        {
+            this.processDirectory = null;
+        }
+        else
+        {
+            this.processDirectory = new File(processDirectory);
+            if (!this.processDirectory.exists())
+            {
+                logger.warn(
+                        "The runtime process directory is not visible when setting property 'processDirectory': \n" +
+                        this);
+            }
+        }
+    }
+
     /**
      * A comma or space separated list of values that, if returned by the executed command,
      * indicate an error value.  This defaults to <b>"1, 2"</b>.
@@ -341,7 +422,14 @@ public class RuntimeExec
         {
             // execute the command with full property replacement
             commandToExecute = getCommand(properties);
-            process = runtime.exec(commandToExecute);
+            if (processDirectory == null)
+            {
+                process = runtime.exec(commandToExecute, processProperties);
+            }
+            else
+            {
+                process = runtime.exec(commandToExecute, processProperties, processDirectory);
+            }
         }
         catch (IOException e)
         {
