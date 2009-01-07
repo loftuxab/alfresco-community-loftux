@@ -30,12 +30,12 @@
       <div class="detail-list-item">
          <h4>${msg("header.onlineHelp")}</h4>
          <div>${msg("text.onlineHelp")}</div>
-         <div><a href="http://www.alfresco.com/help/3/EUHelp" target="_blank">${msg("link.onlineHelp")}</a></div>
+         <div><a href="http://www.alfresco.com/help/3/labs/DMShareHelp" target="_blank">${msg("link.onlineHelp")}</a></div>
       </div>
       <div class="detail-list-item last-item">
          <h4>${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
-         <div><a href="http://www.alfresco.com/help/3/Tutorial" target="_blank">${msg("link.featureTour")}</a></div>
+         <div><a href="http://www.alfresco.com/help/3/labs/ShareTutorial" target="_blank">${msg("link.featureTour")}</a></div>
       </div>
 </#if>
       <div class="clear"></div>

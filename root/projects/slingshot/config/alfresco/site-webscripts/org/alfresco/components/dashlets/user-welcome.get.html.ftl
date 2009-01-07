@@ -11,7 +11,7 @@ new Alfresco.UserWelcome("${args.htmlid}");
       <div class="detail-list-item">
          <h4>${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
-         <div><a href="http://www.alfresco.com/help/301/enterprise/ShareTutorial" target="_blank">${msg("link.featureTour")}</a></div>
+         <div><a href="http://www.alfresco.com/help/3/labs/ShareTutorial" target="_blank">${msg("link.featureTour")}</a></div>
       </div>
       <div class="detail-list-item">
          <h4>${msg("header.userProfile")}</h4>

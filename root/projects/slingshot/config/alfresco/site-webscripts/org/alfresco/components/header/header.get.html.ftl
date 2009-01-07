@@ -34,7 +34,7 @@
       </#if>
 
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
-         <span class="menu-item"><a href="http://www.alfresco.com/help/3/EUHelp" rel="_blank">${msg("link.help")}</a></span>
+         <span class="menu-item"><a href="http://www.alfresco.com/help/3/labs/DMShareHelp" rel="_blank">${msg("link.help")}</a></span>
          <#if !isGuest>
          <span class="menu-item-separator">&nbsp;</span>
          <#if !context.externalAuthentication>
