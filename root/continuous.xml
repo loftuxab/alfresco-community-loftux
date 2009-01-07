@@ -293,7 +293,6 @@
                                restart_alf.bat,
                                alf_stop.bat,
                                apply_amps.bat,
-                               README_mysql.txt,
                                README.txt" />
          <zipfileset dir="${dir.project.installer}/install_extension"
                      prefix="install_extension" />
@@ -336,12 +335,11 @@
          <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**,amps/**" />
          <tarfileset dir="${dir.project.installer.linux}"
-                     includes="**/*.sh"
+                     includes="alfresco.sh,
+                     	       apply_amps.sh" 
                      mode="755" />
          <tarfileset dir="${dir.project.installer.linux}"
-                     includes="README.txt,
-                               README_mysql.txt,
-                               README_osx.txt" />
+                     includes="README.txt" />
          <tarfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.bat" />
@@ -381,6 +379,9 @@
            depends="init, set-build-number">
       <mkdir dir="${dir.continuous.dist}" />
 
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.continuous.assemble.tomcat}" />
       <unzip src="${dir.name.binaries}/tomcat/${file.name.distro.tomcat}"
              dest="${dir.continuous.assemble}" />
       <move file="${dir.continuous.assemble}/${dir.name.distro.tomcat}" 
@@ -409,6 +410,13 @@
          <fileset dir="${dir.project.slingshot.dist}"
                   includes="${file.name.war.slingshot}" />
       </copy>
+
+      <!-- place latest Xalan jars to ensure they are used -->
+      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
+            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
+      <copy todir="${dir.continuous.assemble.tomcat}/endorsed"
+            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
+
       <!-- Copy any required common libs -->
       <copy todir="${dir.continuous.assemble.tomcat}/lib" 
             file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
@@ -456,10 +464,7 @@
                      prefix="extras"
                      excludes="**/*.sh" />
          <zipfileset dir="${dir.project.installer}"
-                     includes="licenses/**,
-                               README_war.txt" />
-         <zipfileset dir="${dir.project.installer}"
-                     includes="README_mysql.txt" />
+                     includes="licenses/**" />
          <zipfileset dir="${dir.project.webclient.dist}"
                      includes="${file.name.war.webclient}" />
          <zipfileset dir="${dir.project.slingshot.dist}"
@@ -486,11 +491,9 @@
                      prefix="extras"
                      excludes="**/*.bat" />
          <tarfileset dir="${dir.project.installer}"
-                     includes="licenses/**,
-                               README_war.txt" />
-         <tarfileset dir="${dir.project.installer}"
-                     includes="README_mysql_linux.txt"
-                     fullpath="README_mysql.txt" />
+                     includes="licenses/**" />
+         <tarfileset dir="${dir.project.installer.linux}"
+                     includes="README.txt" />
          <tarfileset dir="${dir.project.webclient.dist}"
                      includes="${file.name.war.webclient}" />
          <tarfileset dir="${dir.project.slingshot.dist}"
