@@ -41,7 +41,7 @@ import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.SimpleCredentials;
+import org.alfresco.connector.CredentialsImpl;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.Base64;
 import org.alfresco.web.config.RemoteConfigElement;
@@ -203,7 +203,7 @@ public class EndPointProxyServlet extends HttpServlet
                         // build an unauthenticated authentication connector then
                         // apply the supplied credentials to it
                         connector = this.connectorService.getConnector(endpointId, values[0], req.getSession());
-                        Credentials credentials = new SimpleCredentials(endpointId);
+                        Credentials credentials = new CredentialsImpl(endpointId);
                         credentials.setProperty(Credentials.CREDENTIAL_USERNAME, values[0]);
                         credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, values[1]);
                         connector.setCredentials(credentials);

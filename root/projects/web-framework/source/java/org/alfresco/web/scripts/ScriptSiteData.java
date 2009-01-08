@@ -33,6 +33,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.CredentialVault;
+import org.alfresco.connector.User;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.framework.ModelObject;
@@ -1152,7 +1154,10 @@ public final class ScriptSiteData extends ScriptBase
     // returns the credential vault for the current user
     public ScriptCredentialVault getCredentialVault()
     {
-        return new ScriptCredentialVault(this.context);
+        CredentialVault vault = this.context.getCredentialVault();
+        User user = this.context.getUser();
+        
+        return new ScriptCredentialVault(vault, user);
     }
     
     public ScriptModelObject getChrome(String objectId)

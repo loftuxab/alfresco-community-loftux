@@ -22,30 +22,22 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.config;
-
-import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
-import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
-import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+package org.alfresco.connector.exception;
 
 /**
+ * Thrown if a connector could not be provided.
+ * 
  * @author muzquiano
  */
-public interface RemoteConfigProperties
+public class ConnectorProviderException extends Exception
 {
-    // remote connectors
-    public String[] getConnectorIds();
-    public ConnectorDescriptor getConnectorDescriptor(String id);
+    public ConnectorProviderException(String message)
+    {
+        super(message);
+    }
 
-    // remote authenticators
-    public String[] getAuthenticatorIds();
-    public AuthenticatorDescriptor getAuthenticatorDescriptor(String id);
-
-    // remote endpoints
-    public String[] getEndpointIds();
-    public EndpointDescriptor getEndpointDescriptor(String id);
-        
-    // defaults
-    public String getDefaultEndpointId();
-    public String getDefaultCredentialVaultProviderId();
+    public ConnectorProviderException(String message, Exception ex)
+    {
+        super(message, ex);
+    }
 }

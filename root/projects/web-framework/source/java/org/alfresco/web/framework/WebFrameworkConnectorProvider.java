@@ -24,13 +24,19 @@
  */
 package org.alfresco.web.framework;
 
+import javax.servlet.http.HttpSession;
+
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorProvider;
-import org.alfresco.connector.exception.RemoteConfigException;
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.web.site.FrameworkHelper;
+import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.CredentialVault;
+import org.alfresco.connector.User;
+import org.alfresco.connector.exception.ConnectorProviderException;
+import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThreadLocalRequestContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An implementation of connector provider that provides access to the
@@ -41,13 +47,27 @@ import org.alfresco.web.site.ThreadLocalRequestContext;
  */
 public class WebFrameworkConnectorProvider implements ConnectorProvider
 {    
+    private static final Log logger = LogFactory.getLog(WebFrameworkConnectorProvider.class);
+
+    private ConnectorService connectorService;
+    
+    /**
+     * Sets the connector service.
+     * 
+     * @param connectorService
+     */
+    public void setConnectorService(ConnectorService connectorService)
+    {
+        this.connectorService = connectorService;
+    }
+    
     /**
      * Implementation of the contract to provide a Connector for our remote store.
      * This allows lazy providing of the Connector object only if the remote store actually needs
      * it. Otherwise acquiring the Connector when rarely used is an expensive overhead as most
      * objects are cached by the persister in which case the remote store isn't actually called.
      */
-    public Connector provide(String endpoint)
+    public Connector provide(String endpoint) throws ConnectorProviderException
     {
         Connector conn = null;
         RequestContext rc = ThreadLocalRequestContext.getRequestContext();
@@ -56,11 +76,48 @@ public class WebFrameworkConnectorProvider implements ConnectorProvider
         {
             try
             {
-                conn = FrameworkHelper.getConnector(rc, endpoint);
+                // check whether we have a credential vault set up
+                CredentialVault vault = rc.getCredentialVault();
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("Found credential vault: " + vault);
+    
+                // check whether we have a current user
+                User user = rc.getUser();
+                if (user == null || vault == null)
+                {
+                    if (logger.isDebugEnabled())
+                        logger.debug("No user was found, creating unauthenticated connector");
+    
+                    // return the non-credential'ed connector to this endpoint
+                    conn = connectorService.getConnector(endpoint);                       
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                        logger.debug("User '" + user.getId() + "' was found, creating authenticated connector");
+    
+                    // return the credential'ed connector to this endpoint
+                    HttpSession httpSession = rc.getRequest().getSession(true);
+                    conn = connectorService.getConnector(endpoint, rc.getUserId(), httpSession);
+                }
             }
-            catch (RemoteConfigException rce)
+            catch(ConnectorServiceException cse)
             {
-                throw new AlfrescoRuntimeException("Failed to bind connector to remote store.", rce);
+                throw new ConnectorProviderException("Unable to provision connector for endpoint: " + endpoint, cse);
+            }
+        }
+        else
+        {
+            // if we don't have a request context, we can still provision
+            // a non-credential'd connector
+            try
+            {
+                conn = connectorService.getConnector(endpoint);
+            }
+            catch(ConnectorServiceException cse)
+            {
+                throw new ConnectorProviderException("Unable to provision non-credential'd connector for endpoint: " + endpoint, cse);
             }
         }
 

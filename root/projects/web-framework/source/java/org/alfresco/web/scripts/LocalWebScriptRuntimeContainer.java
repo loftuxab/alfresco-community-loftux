@@ -78,21 +78,6 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
 
         // populate the root script properties
         ProcessorModelHelper.populateScriptModel(context, params);
-
-        /**
-         * Override the "remote" object with a slightly better 
-         * implementation that takes into account the credential
-         * vault which is under management by the web framework
-         * 
-         * This allows script developers to make calls like:
-         * 
-         * var myRemote = remote.connect("alfresco");
-         * var json = myRemote.call("/content/get?nodeRef=abc");
-         * 
-         * All while in the context of the current user
-         */
-        WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-        params.put("remote", remote);
         
         return params;
     }

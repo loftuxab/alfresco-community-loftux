@@ -99,19 +99,11 @@
     			<identity>user</identity>
    			</endpoint>
 
-			<!-- Credential Vaults -->
-			<credential-vault>
-				<id>default</id>
-				<name>Default Credential Vault</name>
-				<description>Implementation of simple, non-persistent credential vault</description>
-				<class>org.alfresco.connector.SimpleCredentialVault</class>
-			</credential-vault>
-
 			<!-- The default endpoint -->
 			<default-endpoint-id>alfresco</default-endpoint-id>
 
 			<!-- The default credential vault -->
-			<default-credential-vault-id>default</default-credential-vault-id>
+			<default-credential-vault-provider-id>credential.vault.provider</default-credential-vault-provider-id>
 
 		</remote>
 	</config>

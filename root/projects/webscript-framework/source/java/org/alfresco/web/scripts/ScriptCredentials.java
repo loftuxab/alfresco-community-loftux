@@ -28,35 +28,34 @@ import java.io.Serializable;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
-import org.alfresco.web.site.RequestContext;
 
 /*
  * @author muzquiano
  */
-public final class ScriptCredentials extends ScriptBase
+public final class ScriptCredentials implements Serializable
 {
     final private CredentialVault vault;
     final private Credentials credentials;
     final private boolean hideNonPersistent;
+    
+    protected ScriptableMap<String, Serializable> properties;
 
-    public ScriptCredentials(RequestContext context, CredentialVault vault, Credentials credentials)
+    public ScriptCredentials(CredentialVault vault, Credentials credentials)
     {
-        this(context, vault, credentials, false);
+        this(vault, credentials, false);
     }
     
-    public ScriptCredentials(RequestContext context, CredentialVault vault, Credentials credentials, boolean hideNonPersistent)
+    public ScriptCredentials(CredentialVault vault, Credentials credentials, boolean hideNonPersistent)
     {
-        super(context);
-        
         this.vault = vault;
         this.credentials = credentials;
         this.hideNonPersistent = hideNonPersistent;
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebFrameworkScriptBase#buildProperties()
+    /**
+     * Returns the properties of the credentials
      */
-    protected ScriptableMap<String, Serializable> buildProperties()
+    public ScriptableMap<String, Serializable> getProperties()
     {
         if (this.properties == null)
         {
@@ -93,4 +92,3 @@ public final class ScriptCredentials extends ScriptBase
         return credentials.isPersistent();
     }
 }
-

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans-2.0.dtd'>
 
 <beans>
 
@@ -44,6 +44,8 @@
    </bean>
    
    
+   
+   
    <!--                                                     -->
    <!-- Configuration of Abstract Store Implementations     -->
    <!--                                                     -->
@@ -73,7 +75,9 @@
    <!-- ClassPath Store Abstract -->
    <bean id="webframework.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" init-method="init" />   
    
-   
+
+
+
    <!--                                                     -->
    <!-- Additional Configuration for Remote Store           -->
    <!--                                                     -->
@@ -81,10 +85,14 @@
    <!-- Remote Store Context for Web Framework -->
    <bean id="webframework.context.remotestore" class="org.alfresco.web.framework.WebFrameworkRemoteStoreContext" />
 
-   <!-- Remote Store Connector Provider -->   
-   <bean id="webframework.connector.provider" class="org.alfresco.web.framework.WebFrameworkConnectorProvider" />
+   <!-- Web Framework Connector Provider -->   
+   <bean id="webframework.connector.provider" class="org.alfresco.web.framework.WebFrameworkConnectorProvider">
+      <property name="connectorService" ref="connector.service" />
+   </bean>
+
+
    
-   
+
    <!--                                                     -->
    <!-- Configuration of the Web Script Runtime / Container -->
    <!--                                                     -->
@@ -132,7 +140,12 @@
       <property name="templateProcessor" ref="webframework.webscripts.templateprocessor" />
       <property name="scriptProcessor" ref="webframework.webscripts.scriptprocessor" />
       <property name="configService" ref="web.config" />
-   </bean>
+      <property name="scriptObjects">
+         <map merge="true">
+            <entry key="remote" value-ref="webframework.script.remote" />
+         </map>
+      </property>
+   </bean>   
    
    <bean id="webframework.webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
       <property name="container" ref="webframework.webscripts.container" />
@@ -141,7 +154,7 @@
       <property name="defaultWebScript"><value>webscript.default</value></property>
    </bean>
    
-   
+
    <!--                                                    -->
    <!-- Configuration of the FreeMarker Template Processor -->
    <!--                                                    -->
@@ -177,7 +190,7 @@
          </list>
       </property>
    </bean>
-   
+
    
    <!--                                                     -->
    <!-- Configuration of the Script and Template Processors -->
@@ -192,22 +205,22 @@
    <bean id="webframework.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
       <property name="searchPath" ref="webframework.templates.searchpath" />
    </bean>
-   
-   
+
+
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
  
    <!--  I18N resources and messages Web Script -->
-   <bean id="webscript.org.alfresco.web.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" singleton="false" />
+   <bean id="webscript.org.alfresco.web.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" scope="prototype" />
 
    <!--  Declarative Site Web Script -->
-   <bean id="webscript.site" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWebScript" singleton="false" />
+   <bean id="webscript.site" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWebScript" scope="prototype" />
 
    <!--  Dynamic Wizard Web Script -->
-   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false" />
-   
-   
+   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" scope="prototype" />
+
+
    <!--                           -->
    <!-- Web Script Authenticators -->
    <!--                           -->
@@ -224,8 +237,8 @@
       <property name="endpointId" value="alfresco-feed" />
       <property name="delegate" value="true" />
    </bean>
-   
-   
+
+
    <!-- Web Framework Manager -->
    <bean id="webframework.manager" class="org.alfresco.web.framework.WebFrameworkManager" init-method="init">
       <property name="configService" ref="web.config" />
@@ -282,7 +295,7 @@
    </bean>
    
    <bean id="webframework.processor.jsp" class="org.alfresco.web.framework.render.bean.JSPProcessor" />
-   
+
    <!-- Web Framework - Model Object Renderers -->
    <bean id="webframework.renderer.chrome" class="org.alfresco.web.framework.render.bean.ChromeRenderer" />
    <bean id="webframework.renderer.component" class="org.alfresco.web.framework.render.bean.ComponentRenderer" />
@@ -293,4 +306,10 @@
    <!-- RendererContext Provider Implementation -->
    <bean id="webframework.rendercontext.provider" class="org.alfresco.web.framework.render.bean.DefaultRenderContextProvider" />
    
+   <!-- Declare the Web Framework Script Remote instance to inject Web Framework Connector Provider -->
+   <bean id="webframework.script.remote" class="org.alfresco.web.scripts.ScriptRemote">
+      <property name="configService" ref="web.config"/>
+      <property name="connectorProvider" ref="webframework.connector.provider"/>
+   </bean>
+      
 </beans>
