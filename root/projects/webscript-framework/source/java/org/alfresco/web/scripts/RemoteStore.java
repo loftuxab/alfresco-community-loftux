@@ -126,12 +126,14 @@ public class RemoteStore implements Store
     	this.connectorProvider = connectorProvider;
     }
     
+    /**
+     * @return the connector provider
+     */
     public ConnectorProvider getConnectorProvider()
     {
     	return this.connectorProvider;
     }
     
-
     /**
      * @param api the WebScript API path to set for the remote store i.e. "/remotestore"
      */
@@ -488,7 +490,7 @@ public class RemoteStore implements Store
             	int x = fullPath.indexOf(storePath);
             	if (x != -1)
             	{
-            		fullPath = fullPath.substring(x + storePath.length());
+            		fullPath = fullPath.substring(x + storePath.length() + 1);
             	}
             	list.add(fullPath);
             }
@@ -532,7 +534,7 @@ public class RemoteStore implements Store
             	int x = fullPath.indexOf(storePath);
             	if (x != -1)
             	{
-            		fullPath = fullPath.substring(x + storePath.length());
+            		fullPath = fullPath.substring(x + storePath.length() + 1);
             	}
             	list.add(fullPath);
             }
