@@ -1,41 +1,41 @@
 <div class="dashlet site-welcome">
    <div class="title">${msg("header.userWelcome")}</div>
    <div class="body">
-      <div class="detail-list-item-alt">
+      <div class="detail-list-item-alt theme-bg-color-2">
          <h4>${msg("header.siteDashboard")}</h4>
          <div>${msg("text.siteDashboard")}</div>
       </div>
 <#if userIsSiteManager>
       <div class="detail-list-item">
-         <h4>${msg("header.joinSite")}</h4>
+         <h4 class="theme-color-1">${msg("header.joinSite")}</h4>
          <div>${msg("text.joinSite")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/invite">${msg("link.joinSite")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/invite" class="theme-color-1">${msg("link.joinSite")}</a></div>
       </div>
       <div class="detail-list-item">
-         <h4>${msg("header.customiseDashboard")}</h4>
+         <h4 class="theme-color-1">${msg("header.customiseDashboard")}</h4>
          <div>${msg("text.customiseDashboard")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard">${msg("link.customiseDashboard")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard" class="theme-color-1">${msg("link.customiseDashboard")}</a></div>
       </div>
       <div class="detail-list-item last-item">
-         <h4>${msg("header.customiseSite")}</h4>
+         <h4 class="theme-color-1">${msg("header.customiseSite")}</h4>
          <div>${msg("text.customiseSite")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site">${msg("link.customiseSite")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site" class="theme-color-1">${msg("link.customiseSite")}</a></div>
       </div>         
 <#else>
       <div class="detail-list-item">
-         <h4>${msg("header.siteMembers")}</h4>
+         <h4 class="theme-color-1">${msg("header.siteMembers")}</h4>
          <div>${msg("text.siteMembers")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/site-members">${msg("link.siteMembers")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/site-members" class="theme-color-1">${msg("link.siteMembers")}</a></div>
       </div>
       <div class="detail-list-item">
-         <h4>${msg("header.onlineHelp")}</h4>
+         <h4 class="theme-color-1">${msg("header.onlineHelp")}</h4>
          <div>${msg("text.onlineHelp")}</div>
-         <div><a href="http://www.alfresco.com/help/3/labs/DMShareHelp" target="_blank">${msg("link.onlineHelp")}</a></div>
+         <div><a href="http://www.alfresco.com/help/3/labs/DMShareHelp" class="theme-color-1" target="_blank">${msg("link.onlineHelp")}</a></div>
       </div>
       <div class="detail-list-item last-item">
-         <h4>${msg("header.featureTour")}</h4>
+         <h4 class="theme-color-1">${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
-         <div><a href="http://www.alfresco.com/help/3/labs/ShareTutorial" target="_blank">${msg("link.featureTour")}</a></div>
+         <div><a href="http://www.alfresco.com/help/3/labs/ShareTutorial" class="theme-color-1" target="_blank">${msg("link.featureTour")}</a></div>
       </div>
 </#if>
       <div class="clear"></div>

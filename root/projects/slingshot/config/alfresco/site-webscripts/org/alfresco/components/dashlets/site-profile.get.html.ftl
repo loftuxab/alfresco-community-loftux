@@ -11,7 +11,7 @@
 	   <#assign customValue=profile.customProperties[prop].value>	
 	   <#if customValue?starts_with('alfresco-php://') == true>
 			<p>
-				<a href="${url.context}/proxy/alfresco-php/${customValue?substring(15)}" target="_blank">${profile.customProperties[prop].title}</a>
+				<a href="${url.context}/proxy/alfresco-php/${customValue?substring(15)}" target="_blank" class="theme-color-1">${profile.customProperties[prop].title}</a>
 			</p>
 	   <#else>	
 		 <p>
@@ -25,7 +25,7 @@
          <p>
             <span class="label">${msg("label.siteAdmin")}</span>
    <#list sitemanagers as sitemanager>
-            <a href="${url.context}/page/user/${sitemanager.person.userName?url}/profile">${sitemanager.person.firstName?html}<#if sitemanager.person.lastName != ""> ${sitemanager.person.lastName?html}</#if></a><#if sitemanager_has_next>, </#if>
+            <a href="${url.context}/page/user/${sitemanager.person.userName?url}/profile" class="theme-color-1">${sitemanager.person.firstName?html}<#if sitemanager.person.lastName != ""> ${sitemanager.person.lastName?html}</#if></a><#if sitemanager_has_next>, </#if>
    </#list>
          </p>
 </#if>

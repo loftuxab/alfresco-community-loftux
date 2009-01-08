@@ -14,13 +14,13 @@
       <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details&amp;listViewLinkBack=true">${msg("link.details")}</a></div>
       <div class="deletePage"><a href="#" class="delete-link" title="${p.name}">${msg("link.delete")}</a></div>
    </div>
-   <div class="pageTitle"><a class="pageTitle" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&listViewLinkBack=true">${p.title}</a></div>
+   <div class="pageTitle"><a class="pageTitle theme-color-1" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&listViewLinkBack=true">${p.title}</a></div>
    <div class="publishedDetails">
-      <span class="attrLabel">${msg("label.creator")}</span> <span class="attrValue"><a href="${url.context}/page/user/${p.createdByUser?url}/profile">${p.createdBy}</a></span>
+      <span class="attrLabel">${msg("label.creator")}</span> <span class="attrValue"><a href="${url.context}/page/user/${p.createdByUser?url}/profile" class="theme-color-1" >${p.createdBy}</a></span>
 		<span class="spacer">&nbsp;</span>
 		<span class="attrLabel">${msg("label.createDate")}</span> <span class="attrValue">${p.createdOn}</span>
 		<span class="spacer">&nbsp;</span>
-		<span class="attrLabel">${msg("label.modifier")}</span> <span class="attrValue"><a href="${url.context}/page/user/${p.modifiedByUser?url}/profile">${p.modifiedBy}</a></span>
+		<span class="attrLabel">${msg("label.modifier")}</span> <span class="attrValue"><a href="${url.context}/page/user/${p.modifiedByUser?url}/profile" class="theme-color-1">${p.modifiedBy}</a></span>
 		<span class="spacer">&nbsp;</span><br/>
 		<span class="attrLabel">${msg("label.modifiedDate")}</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>

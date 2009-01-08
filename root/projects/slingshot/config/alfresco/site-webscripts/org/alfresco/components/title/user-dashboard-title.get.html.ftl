@@ -1,6 +1,6 @@
 <#assign activePage = page.url.templateArgs.pageid!"customise-user-dashboard">
 <#assign userName>${user.properties["firstName"]?html} <#if user.properties["lastName"]??>${user.properties["lastName"]?html}</#if></#assign>
-<div class="page-title"><!-- ${activePage} -->
+<div class="page-title theme-bg-color-1"><!-- ${activePage} -->
    <div class="title">
       <h1>${msg("header.dashboard", "<span>${userName}</span>")}</h1>
    </div>

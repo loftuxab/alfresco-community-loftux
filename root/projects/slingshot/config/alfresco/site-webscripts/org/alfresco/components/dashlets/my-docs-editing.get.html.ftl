@@ -1,5 +1,5 @@
 <#macro doclibUrl doc>
-   <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?url}&amp;filter=editingMe">${doc.displayName?html}</a>
+   <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?url}&amp;filter=editingMe" class="theme-color-1">${doc.displayName?html}</a>
 </#macro>
 <div class="dashlet">
    <div class="title">${msg("header")}</div>

@@ -11,7 +11,7 @@
 <div class="dashlet rssfeed">
    <div class="title">${title!msg("label.header")}</div>
    <div class="toolbar">
-       <a href="#" id="${args.htmlid}-configFeed-link">${msg("label.configure")}</a>
+       <a href="#" id="${args.htmlid}-configFeed-link" class="theme-color-1">${msg("label.configure")}</a>
    </div>
    <div class="body scrollableList" id="${args.htmlid}-scrollableList">
 	<#if items?? && items?size &gt; 0>

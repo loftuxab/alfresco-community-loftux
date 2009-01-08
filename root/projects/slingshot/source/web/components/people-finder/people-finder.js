@@ -395,7 +395,7 @@
             {
                userid: userName
             });
-            desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + '>' + $html(name) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+            desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + ' class="theme-color-1">' + $html(name) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
             if (title.length != 0)
             {
                if (me.options.compactMode)

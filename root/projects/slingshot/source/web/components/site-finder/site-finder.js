@@ -395,7 +395,7 @@
             var isPublic = oRecord.getData("isPublic");
             
             // title/link to site page
-            var details = '<h3 class="sitename"><a href="' + url + '">' + $html(title) + '</a></h3>';
+            var details = '<h3 class="sitename"><a href="' + url + '" class="theme-color-1">' + $html(title) + '</a></h3>';
             // description
             details += '<div class="sitedescription">' + $html(desc) + '</div>';
             

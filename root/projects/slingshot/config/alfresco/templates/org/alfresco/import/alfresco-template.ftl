@@ -21,8 +21,11 @@
 
 <!-- Site-wide YUI Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
-   <link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/${theme}/skin.css" />
-
+   <#if theme = 'default'>
+   <link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
+   <#else>
+   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/yui/assets/skin.css" />   
+   </#if>
 <#-- Selected components preloaded here for better UI experience. -->
 <#if DEBUG>
 <!-- Common YUI components: DEBUG -->
@@ -53,6 +56,7 @@
 
 <!-- Site-wide Common Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
+   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
    <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
    <script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></script>
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
