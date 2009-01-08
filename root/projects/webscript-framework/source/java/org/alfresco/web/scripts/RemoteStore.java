@@ -39,9 +39,11 @@ import java.util.StringTokenizer;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.ConnectorProvider;
+import org.alfresco.connector.ConnectorProviderImpl;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
+import org.alfresco.connector.exception.ConnectorProviderException;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLEncoder;
@@ -675,9 +677,9 @@ public class RemoteStore implements Store
             Connector con = getConnector();
             return con.call(uri, null, in);
         }
-        catch (RemoteConfigException re)
+        catch (ConnectorProviderException cpe)
         {
-            throw new AlfrescoRuntimeException("Unable to find config for remote store.", re);
+            throw new AlfrescoRuntimeException("Unable to find config for remote store.", cpe);
         }
     }
 
@@ -691,9 +693,9 @@ public class RemoteStore implements Store
             Connector con = getConnector();
             return con.call(uri);
         }
-        catch (RemoteConfigException re)
+        catch (ConnectorProviderException cpe)
         {
-            throw new AlfrescoRuntimeException("Unable to find config for remote store.", re);
+            throw new AlfrescoRuntimeException("Unable to find config for remote store.", cpe);
         }
     }
     
@@ -708,9 +710,9 @@ public class RemoteStore implements Store
             ConnectorContext context = new ConnectorContext(HttpMethod.DELETE, null, null);
             return con.call(uri, context);
         }
-        catch (RemoteConfigException re)
+        catch (ConnectorProviderException cpe)
         {
-            throw new AlfrescoRuntimeException("Unable to find config for remote store.", re);
+            throw new AlfrescoRuntimeException("Unable to find config for remote store.", cpe);
         }
     }
 
@@ -723,20 +725,19 @@ public class RemoteStore implements Store
      * 
      * @throws RemoteConfigException
      */
-    private Connector getConnector() throws RemoteConfigException
+    private Connector getConnector() throws ConnectorProviderException
     {
     	Connector conn = null;
     	
-    	if (getConnectorProvider() != null)
+    	// use a default connector provider if none injected
+    	if (connectorProvider == null)
     	{
-    		conn = getConnectorProvider().provide(this.getEndpoint());
+    	    connectorProvider = new ConnectorProviderImpl();
     	}
+
+    	// provision connector
+   		conn = getConnectorProvider().provide(this.getEndpoint());
         
-        if (conn == null)
-        {
-        	// grab an unauthenticated connector
-            conn = this.connectorService.getConnector(this.getEndpoint());
-        }
         return conn; 
     }
     

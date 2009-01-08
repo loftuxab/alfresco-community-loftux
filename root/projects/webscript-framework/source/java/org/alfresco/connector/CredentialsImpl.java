@@ -40,7 +40,7 @@ import java.util.Iterator;
  * 
  * @author muzquiano
  */
-public class SimpleCredentials implements Credentials, Serializable
+public class CredentialsImpl implements Credentials, Serializable
 {
     protected boolean persistent;
     protected String endpointId;
@@ -51,7 +51,7 @@ public class SimpleCredentials implements Credentials, Serializable
      * 
      * @param endpointId the endpoint id
      */
-    public SimpleCredentials(String endpointId)
+    public CredentialsImpl(String endpointId)
     {
         this.endpointId = endpointId;
     }

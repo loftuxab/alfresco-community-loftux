@@ -40,7 +40,7 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.jlan.server.auth.ntlm.NTLM;
 import org.alfresco.jlan.server.auth.ntlm.NTLMLogonDetails;
@@ -189,7 +189,7 @@ public class NTLMAuthenticationFilter implements Filter
                     return;
                 }
             }
-            catch (RemoteConfigException rerr)
+            catch (ConnectorServiceException cse)
             {
                 throw new AlfrescoRuntimeException("Incorrectly configured endpoint ID: " + this.endpoint);
             }
@@ -373,7 +373,7 @@ public class NTLMAuthenticationFilter implements Filter
                     redirectToLoginPage(req, res);
                 }
             }
-            catch (RemoteConfigException rerr)
+            catch (ConnectorServiceException cse)
             {
                 throw new AlfrescoRuntimeException("Incorrectly configured endpoint ID: " + this.endpoint);
             }
@@ -512,7 +512,7 @@ public class NTLMAuthenticationFilter implements Filter
                     redirectToLoginPage(req, res);
                 }
             }
-            catch (RemoteConfigException rerr)
+            catch (ConnectorServiceException cse)
             {
                 throw new AlfrescoRuntimeException("Incorrectly configured endpoint: " + this.endpoint);
             }

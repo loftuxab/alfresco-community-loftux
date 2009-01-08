@@ -30,7 +30,6 @@ import java.util.Iterator;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.User;
-import org.alfresco.web.site.RequestContext;
 
 /**
  * Represents the credential vault to the script engine
@@ -38,28 +37,32 @@ import org.alfresco.web.site.RequestContext;
  * 
  * @author muzquiano
  */
-public final class ScriptCredentialVault extends ScriptBase
+public final class ScriptCredentialVault
 {    
     final private CredentialVault vault;
     final private User user;
     
+    protected ScriptableMap<String, Serializable> properties;
+    
     /**
-     * Constructs a new ScriptRequestContext object.
+     * Constructs a new ScriptCredentialVault object.
      * 
-     * @param context   The RequestContext instance for the current request
+     * @param vault   The credential vault instance
+     * @param user    The user to whom the credential vault belongs
      */
-    public ScriptCredentialVault(RequestContext context)
+    public ScriptCredentialVault(CredentialVault vault, User user)
     {
-        super(context);
-        
-        this.vault = context.getCredentialVault();
-        this.user = context.getUser();
+        this.vault = vault;
+        this.user = user;
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebFrameworkScriptBase#buildProperties()
+    // --------------------------------------------------------------
+    // JavaScript Properties
+
+    /**
+     * Returns the properties of the credential vault
      */
-    protected ScriptableMap buildProperties()
+    public ScriptableMap<String, Serializable> getProperties()
     {
         if (this.properties == null)
         {
@@ -70,17 +73,13 @@ public final class ScriptCredentialVault extends ScriptBase
             for(int i = 0; i < ids.length; i++)
             {
                 Credentials credentials = this.vault.retrieve(ids[i]);
-                ScriptCredentials scriptCredentials = new ScriptCredentials(this.context, this.vault, credentials, true);
+                ScriptCredentials scriptCredentials = new ScriptCredentials(this.vault, credentials, true);
                 this.properties.put(ids[i], scriptCredentials);
             }
         }
         
         return this.properties;
     }
-
-    
-    // --------------------------------------------------------------
-    // JavaScript Properties
     
     /**
      * Returns the user to whom this credential vault belongs
@@ -117,7 +116,7 @@ public final class ScriptCredentialVault extends ScriptBase
             this.vault.save();
             
             // update our properties map
-            scriptCredentials = new ScriptCredentials(this.context, this.vault, creds);
+            scriptCredentials = new ScriptCredentials(this.vault, creds);
             getProperties().put(endpointId, scriptCredentials);
         }
         
@@ -183,8 +182,7 @@ public final class ScriptCredentialVault extends ScriptBase
         // persist the vault (if needed)
         this.vault.save();
         
-        // reload our properties array
+        // null our properties map so it reloads on next access
         this.properties = null;
-        buildProperties();
     }
 }

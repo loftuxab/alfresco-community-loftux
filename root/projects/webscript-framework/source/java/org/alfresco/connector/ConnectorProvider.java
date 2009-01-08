@@ -24,6 +24,8 @@
  */
 package org.alfresco.connector;
 
+import org.alfresco.connector.exception.ConnectorProviderException;
+
 /**
  * Contract to be implemented by any object that can provide a Connector to another object.
  * <p>
@@ -42,5 +44,5 @@ public interface ConnectorProvider
 	 * 
 	 * @return the connector object
 	 */
-    public Connector provide(String endpoint);
+    public Connector provide(String endpoint) throws ConnectorProviderException;
 }

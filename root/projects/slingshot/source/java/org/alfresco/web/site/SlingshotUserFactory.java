@@ -31,7 +31,7 @@ import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.util.StringBuilderWriter;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.json.JSONWriter;
@@ -122,9 +122,9 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
         {
             throw new UserFactoryException("IO error during User save: " + ioErr.getMessage(), ioErr);
         }
-        catch (RemoteConfigException err)
+        catch (ConnectorServiceException cse)
         {
-            throw new UserFactoryException("Configuration error during User save: " + err.getMessage(), err);
+            throw new UserFactoryException("Configuration error during User save: " + cse.getMessage(), cse);
         }
     }
 }

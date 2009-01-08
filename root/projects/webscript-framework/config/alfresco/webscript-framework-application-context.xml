@@ -282,16 +282,26 @@
       <property name="scriptProcessor" ref="webscripts.web.scriptprocessor" />
       <property name="scriptObjects">
          <map merge="true">
-            <entry key="remote">
-               <bean class="org.alfresco.web.scripts.ScriptRemote">
-                  <property name="connectorService" ref="connector.service"/>
-                  <property name="configService" ref="web.config"/>
-               </bean>
-            </entry>         
+            <entry key="remote" value-ref="webscripts.script.remote" />
          </map>
       </property>
    </bean>
-
+      
+   <!--                             -->
+   <!-- Web Scripts Remote Instance -->
+   <!--                             -->
+   <bean id="webscripts.script.remote" class="org.alfresco.web.scripts.ScriptRemote">
+      <property name="configService" ref="web.config"/>
+      <property name="connectorProvider" ref="webscripts.connector.provider"/>
+   </bean>
+   
+   <!--                                -->
+   <!-- Web Scripts Connector Provider -->
+   <!--                                -->
+   <bean id="webscripts.connector.provider" class="org.alfresco.connector.ConnectorProviderImpl">
+      <property name="connectorService" ref="connector.service" />
+   </bean>
+   
 
    <!--                      -->
    <!--  Web Script Registry -->
@@ -327,6 +337,18 @@
    <bean id="connector.service" class="org.alfresco.connector.ConnectorService">
       <property name="configService" ref="web.config" />
    </bean>
+   
+   <!--                            -->
+   <!-- Credential Vault Providers -->
+   <!--                            -->
+   <bean id="credential.vault.provider" class="org.alfresco.connector.SimpleCredentialVaultProvider" />
+
+   <bean id="credential.vault.provider.xml" class="org.alfresco.connector.XMLCredentialVaultProvider">
+      <property name="configService" ref="web.config" />
+      <property name="location" value="/alfresco/xml" />
+   </bean>
+   
+
    
 
 

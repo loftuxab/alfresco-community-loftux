@@ -33,7 +33,7 @@ import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.SimpleCredentials;
+import org.alfresco.connector.CredentialsImpl;
 import org.alfresco.util.Base64;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
@@ -155,7 +155,7 @@ public class BasicHttpAuthenticatorFactory implements ServletAuthenticatorFactor
                     {
                         // generate the credentials based on the auth details provided
                         HttpSession session = req.getSession();
-                        Credentials credentials = new SimpleCredentials(endpointId);
+                        Credentials credentials = new CredentialsImpl(endpointId);
                         credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
                         credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, parts[1]);
                         CredentialVault vault = connectorService.getCredentialVault(session, username);

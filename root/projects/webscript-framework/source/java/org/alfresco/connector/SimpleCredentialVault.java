@@ -28,8 +28,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
-
 /**
  * A simple implementation of a credential vault that does not persist anything
  * to disk or database.
@@ -48,18 +46,14 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
     public String id;
     public Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(8, 1.0f);
     
-    public final CredentialVaultDescriptor descriptor;
-    
     /**
      * Instantiates a new simple credential vault.
      * 
      * @param id the id
-     * @param descriptor the descriptor
      */    
-    public SimpleCredentialVault(String id, CredentialVaultDescriptor descriptor)
+    public SimpleCredentialVault(String id)
     {
         this.id = id;
-        this.descriptor = descriptor;
     }
     
     /* (non-Javadoc)
@@ -107,7 +101,7 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
      */
     public Credentials newCredentials(String endpointId)
     {
-        SimpleCredentials credentials = new SimpleCredentials(endpointId);
+        CredentialsImpl credentials = new CredentialsImpl(endpointId);
         store(credentials);
         
         return credentials;

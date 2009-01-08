@@ -34,13 +34,15 @@ import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.ConnectorSession;
 import org.alfresco.connector.CredentialVault;
-import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.connector.exception.ConnectorServiceException;
+import org.alfresco.connector.exception.CredentialVaultProviderException;
 import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.framework.PresetsManager;
 import org.alfresco.web.framework.WebFrameworkManager;
+import org.alfresco.web.scripts.ScriptRemote;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
@@ -58,6 +60,7 @@ public final class FrameworkHelper
     private static final String WEBFRAMEWORK_MANAGER_ID = "webframework.manager";
     private static final String CONNECTOR_SERVICE_ID = "connector.service";
     private static final String PRESETS_MANAGER_ID = "webframework.presets.manager";
+    private static final String SCRIPT_REMOTE_ID = "webframework.script.remote";
     
     private static final String FRAMEWORK_TITLE = "Alfresco Surf";
     private static final String FRAMEWORK_VERSION = "3.0";
@@ -69,6 +72,7 @@ public final class FrameworkHelper
     private static ConnectorService connectorService = null;
     private static PresetsManager presetManager = null;
     private static ConfigService configService = null;
+    private static ScriptRemote scriptRemote = null;
     private static RemoteConfigElement remoteConfig = null;
     private static WebFrameworkConfigElement webFrameworkConfig = null;
     private static UserFactory userFactory = null;
@@ -100,6 +104,7 @@ public final class FrameworkHelper
             webFrameworkManager = (WebFrameworkManager)applicationContext.getBean(WEBFRAMEWORK_MANAGER_ID);
             connectorService = (ConnectorService)applicationContext.getBean(CONNECTOR_SERVICE_ID);
             presetManager = (PresetsManager)applicationContext.getBean(PRESETS_MANAGER_ID);
+            scriptRemote = (ScriptRemote)applicationContext.getBean(SCRIPT_REMOTE_ID);
             
             
             // init config caches
@@ -249,26 +254,31 @@ public final class FrameworkHelper
         return presetManager;
     }
     
+    public static ScriptRemote getScriptRemote()
+    {
+        return scriptRemote;
+    }
+    
     public static EndpointDescriptor getEndpoint(String endpointId)
     {
         return getRemoteConfig().getEndpointDescriptor(endpointId);
     }
     
     public static Connector getConnector(String endpointId)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         return getConnectorService().getConnector(endpointId);
     }
     
     public static Connector getConnector(RequestContext context, String endpointId)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         HttpSession httpSession = context.getRequest().getSession();
         return getConnector(httpSession, context.getUserId(), endpointId);
     }
     
     public static Connector getConnector(HttpSession httpSession, String userId, String endpointId)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         return getConnectorService().getConnector(endpointId, userId, httpSession);
     }
@@ -285,9 +295,9 @@ public final class FrameworkHelper
         {
             vault = getConnectorService().getCredentialVault(httpSession, userId);
         }
-        catch (RemoteConfigException rce)
+        catch (CredentialVaultProviderException cvpe)
         {
-            logger.error("Unable to retrieve credential vault for user: " + userId, rce);
+            logger.error("Unable to retrieve credential vault for user: " + userId, cvpe);
         }
         
         return vault;

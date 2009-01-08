@@ -44,16 +44,14 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
     private static final String REMOTE_ENDPOINT = "endpoint";
     private static final String REMOTE_AUTHENTICATOR = "authenticator";
     private static final String REMOTE_CONNECTOR = "connector";
-    private static final String REMOTE_CREDENTIAL_VAULT = "credential-vault";
     private static final String CONFIG_ELEMENT_ID = "remote";
 
     protected HashMap<String, ConnectorDescriptor> connectors = null;
     protected HashMap<String, AuthenticatorDescriptor> authenticators = null;
     protected HashMap<String, EndpointDescriptor> endpoints = null;
-    protected HashMap<String, CredentialVaultDescriptor> credentialVaults = null;
 
     protected String defaultEndpointId;
-    protected String defaultCredentialVaultId;
+    protected String defaultCredentialVaultProviderId;
 
     /**
      * Constructs a new Remote Config Element
@@ -65,7 +63,6 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         connectors = new HashMap<String, ConnectorDescriptor>(10);
         authenticators = new HashMap<String, AuthenticatorDescriptor>(10);
         endpoints = new HashMap<String, EndpointDescriptor>(10);
-        credentialVaults = new HashMap<String, CredentialVaultDescriptor>(10);
     }
 
     /* (non-Javadoc)
@@ -82,13 +79,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         combinedElement.connectors.putAll(this.connectors);
         combinedElement.authenticators.putAll(this.authenticators);
         combinedElement.endpoints.putAll(this.endpoints);
-        combinedElement.credentialVaults.putAll(this.credentialVaults);
 
         // override with things from the merging object
         combinedElement.connectors.putAll(configElement.connectors);
         combinedElement.authenticators.putAll(configElement.authenticators);
         combinedElement.endpoints.putAll(configElement.endpoints);
-        combinedElement.credentialVaults.putAll(configElement.credentialVaults);
 
         // default endpoint id
         combinedElement.defaultEndpointId = this.defaultEndpointId;
@@ -97,11 +92,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
             combinedElement.defaultEndpointId = configElement.defaultEndpointId;
         }
 
-        // default credential vault id
-        combinedElement.defaultCredentialVaultId = this.defaultCredentialVaultId;
-        if(configElement.defaultCredentialVaultId != null)
+        // default credential vault provider id
+        combinedElement.defaultCredentialVaultProviderId = this.defaultCredentialVaultProviderId;
+        if(configElement.defaultCredentialVaultProviderId != null)
         {
-            combinedElement.defaultCredentialVaultId = configElement.defaultCredentialVaultId;
+            combinedElement.defaultCredentialVaultProviderId = configElement.defaultCredentialVaultProviderId;
         }
 
         // return the combined element
@@ -141,17 +136,6 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         return (EndpointDescriptor) this.endpoints.get(id);
     }
 
-    // credential vaults
-    public String[] getCredentialVaultIds()
-    {
-        return this.credentialVaults.keySet().toArray(new String[this.credentialVaults.size()]);
-    }
-
-    public CredentialVaultDescriptor getCredentialVaultDescriptor(String id)
-    {
-        return (CredentialVaultDescriptor) this.credentialVaults.get(id);
-    }
-
     // defaults
     public String getDefaultEndpointId()
     {
@@ -162,13 +146,13 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         return defaultEndpointId;
     }
 
-    public String getDefaultCredentialVaultId()
+    public String getDefaultCredentialVaultProviderId()
     {
-        if(defaultCredentialVaultId == null)
+        if(defaultCredentialVaultProviderId == null)
         {
-            return "simple";
+            return "credential.vault.provider";
         }
-        return defaultCredentialVaultId;
+        return defaultCredentialVaultProviderId;
     }
 
 
@@ -406,42 +390,6 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
     }
 
     /**
-     * The Class CredentialVaultDescriptor.
-     */
-    public static class CredentialVaultDescriptor extends Descriptor
-    {
-        private static final String CLAZZ = "class";
-        private static final String DESCRIPTION = "description";
-        private static final String NAME = "name";
-
-        /**
-         * Instantiates a new credential vault descriptor.
-         * 
-         * @param elem the elem
-         */
-        CredentialVaultDescriptor(Element el)
-        {
-            super(el);
-        }
-
-        public String getImplementationClass() 
-        {
-            return getStringProperty(CLAZZ);
-        }
-
-        public String getDescription() 
-        {
-            return getStringProperty(DESCRIPTION);
-        }
-
-        public String getName() 
-        {
-            return getStringProperty(NAME);
-        } 
-    }
-
-
-    /**
      * New instance.
      * 
      * @param elem the elem
@@ -479,25 +427,16 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
             configElement.endpoints.put(descriptor.getId(), descriptor);
         }
 
-        // credential vaults    	
-        List credentialVaults = elem.elements(REMOTE_CREDENTIAL_VAULT);
-        for(int i = 0; i < credentialVaults.size(); i++)
-        {
-            Element el = (Element) credentialVaults.get(i);
-            CredentialVaultDescriptor descriptor = new CredentialVaultDescriptor(el);
-            configElement.credentialVaults.put(descriptor.getId(), descriptor);
-        }
-
         String _defaultEndpointId = elem.elementTextTrim("default-endpoint-id");
         if(_defaultEndpointId != null && _defaultEndpointId.length() > 0)
         {
             configElement.defaultEndpointId = _defaultEndpointId;
         }
 
-        String _defaultCredentialVaultId = elem.elementTextTrim("default-credential-vault-id");
-        if(_defaultCredentialVaultId != null && _defaultCredentialVaultId.length() > 0)
+        String _defaultCredentialVaultProviderId = elem.elementTextTrim("default-credential-vault-provider-id");
+        if(_defaultCredentialVaultProviderId != null && _defaultCredentialVaultProviderId.length() > 0)
         {
-            configElement.defaultCredentialVaultId = _defaultCredentialVaultId;
+            configElement.defaultCredentialVaultProviderId = _defaultCredentialVaultProviderId;
         }
 
         return configElement;

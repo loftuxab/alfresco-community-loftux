@@ -26,9 +26,10 @@ package org.alfresco.web.scripts;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.ConnectorProvider;
+import org.alfresco.connector.ConnectorProviderImpl;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.connector.exception.ConnectorProviderException;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.apache.commons.logging.Log;
@@ -49,23 +50,26 @@ public class ScriptRemote
     private static final Log logger = LogFactory.getLog(ScriptRemote.class);
 
     private ConfigService configService;
-    private ConnectorService connectorService;
-
+    private ConnectorProvider connectorProvider;
 
     /**
+     * Sets the configuration service.
+     * 
      * @param configService
      */
     public void setConfigService(ConfigService configService)
     {
         this.configService = configService;
     }
-    
+        
     /**
-     * @param connectorService
+     * Sets the connector provider.
+     * 
+     * @param connectorProvider
      */
-    public void setConnectorService(ConnectorService connectorService)
+    public void setConnectorProvider(ConnectorProvider connectorProvider)
     {
-        this.connectorService = connectorService;
+        this.connectorProvider = connectorProvider;
     }
 
     /**
@@ -117,27 +121,22 @@ public class ScriptRemote
             }
             else
             {
-                // construct a connector to this endpoint
+                // if a connector provider has not been assigned, we can use a
+                // default provider which provides simple stateless access
+                if(connectorProvider == null)
+                {
+                    connectorProvider = new ConnectorProviderImpl();                    
+                }
+                
                 try
                 {
-                    // TODO: Load current user credentials from the vault
-                    // At present, this does not seem possible to do since
-                    // the web script framework does not maintain any
-                    // notion of the current user
-                    //
-                    // The best we can do is construct anonymous connections
-                    // or connections to endpoints that have "declared" user
-                    // settings (which is to say, forced usernames and
-                    // passwords within the configuration file)
-                    
-                    // Note - we can only properly do this if the container
-                    // provides us with a reference to the application context
-                    Connector connector = connectorService.getConnector(endpointId);
+                    // construct a connector to this endpoint
+                    Connector connector = connectorProvider.provide(endpointId);
                     remoteConnector = new ScriptRemoteConnector(connector);
                 }
-                catch (RemoteConfigException rce)
+                catch (ConnectorProviderException cpe)
                 {
-                    logger.error("Unable to open connection to endpoint: " + endpointId,rce);
+                    logger.error("Unable to provision connector for endpoint: " + endpointId);
                 }
             }
         }
@@ -243,6 +242,30 @@ public class ScriptRemote
 
         return persistent;
     }    
+
+    /**
+     * Returns the configured URL for the given endpoint
+     * 
+     * @param id the id
+     * 
+     * @return the endpoint url
+     */
+    public String getEndpointURL(String id)
+    {
+        String url = null;
+        
+        RemoteConfigElement remoteConfig = getRemoteConfig();
+        if (remoteConfig != null)
+        {
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if (descriptor != null)
+            {
+                url = descriptor.getEndpointUrl();
+            }
+        }
+
+        return url;
+    }
     
     /**
      * @return RemoteConfigElement

@@ -27,18 +27,19 @@ package org.alfresco.connector;
 import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigService;
-import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.connector.exception.ConnectorServiceException;
+import org.alfresco.connector.exception.CredentialVaultProviderException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
-import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.IdentityType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -54,7 +55,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * @author muzquiano
  * @author kevinr
  */
-public class ConnectorService implements ApplicationListener
+public class ConnectorService implements ApplicationListener, ApplicationContextAware
 {
     private static final String PREFIX_CONNECTOR_SESSION = "_alfwsf_consession_";
     private static final String PREFIX_VAULT_SESSION     = "_alfwsf_vaults_";
@@ -63,6 +64,7 @@ public class ConnectorService implements ApplicationListener
     
     private ConfigService configService;
     private RemoteConfigElement remoteConfig;
+    private ApplicationContext applicationContext;
 
     
     /**
@@ -73,6 +75,16 @@ public class ConnectorService implements ApplicationListener
     public void setConfigService(ConfigService configService)
     {
         this.configService = configService;
+    }
+    
+    /**
+     * Sets the application config
+     * 
+     * @param applicationContxt the application context
+     */
+    public void setApplicationContext(ApplicationContext applicationContext)
+    {
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -129,7 +141,7 @@ public class ConnectorService implements ApplicationListener
      * @return the connector
      */
     public Connector getConnector(String endpointId)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         if (endpointId == null)
         {
@@ -156,7 +168,7 @@ public class ConnectorService implements ApplicationListener
      * @return the connector
      */    
     public Connector getConnector(String endpointId, HttpSession session)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         if (endpointId == null)
         {
@@ -184,7 +196,7 @@ public class ConnectorService implements ApplicationListener
      * @return the connector
      */
     public Connector getConnector(String endpointId, String userId, HttpSession session)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         if (endpointId == null)
         {
@@ -195,11 +207,22 @@ public class ConnectorService implements ApplicationListener
             throw new IllegalArgumentException("HttpSession cannot be null.");
         }
         
-        // set credentials
+        // retrieve credentials from the vault
         Credentials credentials = null;
         if (userId != null)
         {
-            credentials = this.getCredentialVault(session, userId).retrieve(endpointId);
+            try
+            {
+                CredentialVault vault = (CredentialVault) this.getCredentialVault(session, userId);
+                if(vault != null)
+                {
+                    credentials = vault.retrieve(endpointId);
+                }
+            }
+            catch(CredentialVaultProviderException cvpe)
+            {
+                throw new ConnectorServiceException("Unable to acquire credential vault", cvpe);
+            }
         }        
         
         // get connector session and build user context
@@ -223,10 +246,10 @@ public class ConnectorService implements ApplicationListener
      * 
      * @return the connector
      * 
-     * @throws RemoteConfigException the remote config exception
+     * @throws ConnectorServiceException
      */
     public Connector getConnector(String endpointId, UserContext userContext, HttpSession session)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         if (endpointId == null)
         {
@@ -237,7 +260,7 @@ public class ConnectorService implements ApplicationListener
         EndpointDescriptor endpointDescriptor = remoteConfig.getEndpointDescriptor(endpointId);
         if (endpointDescriptor == null)
         {
-            throw new RemoteConfigException(
+            throw new ConnectorServiceException(
                     "Unable to find endpoint definition for endpoint id: " + endpointId);
         }
 
@@ -245,13 +268,13 @@ public class ConnectorService implements ApplicationListener
         String connectorId = (String)endpointDescriptor.getConnectorId();
         if (connectorId == null)
         {
-            throw new RemoteConfigException(
+            throw new ConnectorServiceException(
                     "The connector id property on the endpoint definition '" + endpointId + "' was empty");
         }
         ConnectorDescriptor connectorDescriptor = remoteConfig.getConnectorDescriptor(connectorId);
         if (connectorDescriptor == null)
         {
-            throw new RemoteConfigException(
+            throw new ConnectorServiceException(
                     "Unable to find connector definition for connector id: " + connectorId + " on endpoint id: " + endpointId);
         }
 
@@ -262,7 +285,7 @@ public class ConnectorService implements ApplicationListener
         Connector connector = buildConnector(connectorDescriptor, url);
         if (connector == null)
         {
-            throw new RemoteConfigException(
+            throw new ConnectorServiceException(
                     "Unable to construct Connector for class: " + connectorDescriptor.getImplementationClass() + ", connector id: " + connectorId);
         }
 
@@ -275,7 +298,7 @@ public class ConnectorService implements ApplicationListener
             AuthenticatorDescriptor authDescriptor = remoteConfig.getAuthenticatorDescriptor(authId);
             if (authDescriptor == null)
             {
-                throw new RemoteConfigException(
+                throw new ConnectorServiceException(
                         "Unable to find authenticator definition for authenticator id: " + authId + " on connector id: " + connectorId);
             }
             String authClass = authDescriptor.getImplementationClass();
@@ -307,14 +330,25 @@ public class ConnectorService implements ApplicationListener
                     String username = (String) endpointDescriptor.getUsername();
                     String password = (String) endpointDescriptor.getPassword();
                     
-                    credentials = new SimpleCredentials(endpointId);
+                    credentials = new CredentialsImpl(endpointId);
                     credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
                     credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
                     
                     // store credentials in vault if we persisting against a user session
                     if (session != null)
                     {
-                        getCredentialVault(session, username).store(credentials);
+                        try
+                        {
+                            CredentialVault vault = getCredentialVault(session, username);
+                            if(vault != null)
+                            {
+                                vault.store(credentials);
+                            }
+                        }
+                        catch(CredentialVaultProviderException cvpe)
+                        {
+                            throw new ConnectorServiceException("Unable to acquire credential vault", cvpe);
+                        }
                     }
                 }
                 connector.setCredentials(credentials);
@@ -379,9 +413,9 @@ public class ConnectorService implements ApplicationListener
      * 
      * @return the authenticator
      * 
-     * @throws RemoteConfigException the remote config exception
+     * @throws ConnectorServiceException
      */
-    public Authenticator getAuthenticator(String id) throws RemoteConfigException
+    public Authenticator getAuthenticator(String id) throws ConnectorServiceException
     {
         if (id == null)
         {
@@ -391,7 +425,7 @@ public class ConnectorService implements ApplicationListener
         AuthenticatorDescriptor descriptor = remoteConfig.getAuthenticatorDescriptor(id);
         if (descriptor == null)
         {
-            throw new RemoteConfigException(
+            throw new ConnectorServiceException(
                     "Unable to find authenticator for id: " + id);
         }
         
@@ -449,27 +483,27 @@ public class ConnectorService implements ApplicationListener
      * 
      * @return the credential vault
      * 
-     * @throws RemoteConfigException the remote config exception
+     * @throws CredentialVaultProviderException the credential vault provider exception
      */
     public CredentialVault getCredentialVault(HttpSession session, String userId) 
-        throws RemoteConfigException
+        throws CredentialVaultProviderException
     {
         return getCredentialVault(session, userId, null);
     }
 
     /**
      * Retrieves the user-scoped CredentialVault for the given user id
-     * and with the given vault id
+     * and given vault id
      * 
      * @param userId the user id
      * @param vaultId the vault id
      * 
      * @return the credential vault
      * 
-     * @throws RemoteConfigException the remote config exception
+     * @throws CredentialVaultProviderException the credential vault provider exception
      */
     public CredentialVault getCredentialVault(HttpSession session, String userId, String vaultId)
-        throws RemoteConfigException
+        throws CredentialVaultProviderException
     {
         if (userId == null)
         {
@@ -477,7 +511,8 @@ public class ConnectorService implements ApplicationListener
         }
         if (vaultId == null)
         {
-            vaultId = remoteConfig.getDefaultCredentialVaultId();
+            //vaultId = remoteConfig.getDefaultCredentialVaultProviderId();
+            vaultId = "unspecified";
         }
         
         // session binding key
@@ -486,23 +521,18 @@ public class ConnectorService implements ApplicationListener
         // pull the credential vault from session
         CredentialVault vault = (CredentialVault)session.getAttribute(cacheKey);
         
-        // if no vault, build a new one
+        // if no existing vault, build a new one
         if (vault == null)
         {
-            // load the vault descriptor
-            CredentialVaultDescriptor descriptor = remoteConfig.getCredentialVaultDescriptor(vaultId);
-            if (descriptor == null)
+            String vaultProviderId = this.getRemoteConfig().getDefaultCredentialVaultProviderId();
+            
+            CredentialVaultProvider provider = (CredentialVaultProvider) applicationContext.getBean(vaultProviderId);
+            if(provider == null)
             {
-                throw new RemoteConfigException(
-                        "Unable to find credential vault definition for id: " + vaultId);
+                throw new CredentialVaultProviderException("Unable to find credential vault provider: " + vaultProviderId); 
             }
             
-            // build the vault instance - it should always succeed
-            vault = buildCredentialVault(userId, descriptor);
-            if (vault == null)
-            {
-                throw new RemoteConfigException("Unable to instantiate configured class: " + descriptor.getImplementationClass());
-            }
+            vault = (CredentialVault) provider.provide(vaultId);            
             
             // load the vault
             vault.load();
@@ -523,12 +553,12 @@ public class ConnectorService implements ApplicationListener
      * @return the authenticator
      */
     private static Authenticator buildAuthenticator(String className)
-        throws RemoteConfigException
+        throws ConnectorServiceException
     {
         Authenticator auth = (Authenticator)ReflectionHelper.newObject(className);
         if (auth == null)
         {
-            throw new RemoteConfigException("Unable to instantiate Authenticator: " + className);
+            throw new ConnectorServiceException("Unable to instantiate Authenticator: " + className);
         }
         return auth;
     }
@@ -550,25 +580,6 @@ public class ConnectorService implements ApplicationListener
         return (Connector) ReflectionHelper.newObject(
                 descriptor.getImplementationClass(), argTypes, args);
     }
-
-    /**
-     * Internal method for building a CredentialVault.
-     * 
-     * CredentialVaults built here are not cached.  They are purely
-     * instantiated and handed back.
-     * 
-     * @param id the id of the vault
-     * @param descriptor the descriptor
-     * 
-     * @return the credential vault
-     */
-    private static CredentialVault buildCredentialVault(String id, CredentialVaultDescriptor descriptor)
-    {
-        Class[] argTypes = new Class[] { id.getClass(), descriptor.getClass() };
-        Object[] args = new Object[] { id, descriptor };
-        return (CredentialVault) ReflectionHelper.newObject(
-                descriptor.getImplementationClass(), argTypes, args);
-    }
     
     /**
      * Internal method for building a endpoint key for storage within the session
@@ -581,4 +592,15 @@ public class ConnectorService implements ApplicationListener
     {
         return PREFIX_CONNECTOR_SESSION + endpointId;        
     }
+    
+    /**
+     * @return RemoteConfigElement
+     */
+    private RemoteConfigElement getRemoteConfig()
+    {
+        RemoteConfigElement remoteConfig = (RemoteConfigElement)configService.getConfig(
+                "Remote").getConfigElement("remote");
+        return remoteConfig;
+    }    
+    
 }

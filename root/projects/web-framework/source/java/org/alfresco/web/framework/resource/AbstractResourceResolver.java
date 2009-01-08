@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 import org.alfresco.connector.Response;
 import org.alfresco.web.framework.exception.ResourceMetadataException;
 import org.alfresco.web.scripts.ScriptRemoteConnector;
-import org.alfresco.web.scripts.WebFrameworkScriptRemote;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -122,10 +122,8 @@ public abstract class AbstractResourceResolver implements ResourceResolver
             throws ResourceMetadataException
     {
         String metadata = null;
-
-        WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-        ScriptRemoteConnector connector = remote.connect(this.resource
-                .getEndpoint());
+        
+        ScriptRemoteConnector connector = FrameworkHelper.getScriptRemote().connect(this.resource.getEndpoint());
 
         Response response = connector.get(this.getMetadataURI(context));
         if (response.getStatus().getCode() != 200)
