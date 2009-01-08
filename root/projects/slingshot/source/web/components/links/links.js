@@ -85,7 +85,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "resize"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "paginator", "json", "resize"], this.onComponentsLoaded, this);
 
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("linksListRefresh", this.onLinksListRefresh, this);
@@ -121,7 +121,6 @@
           * @type string
           */
          siteId: "",
-
 
          /**
           * Initially used filter name and id.
@@ -162,14 +161,12 @@
          /**
           * Minimal length of filter panel
           */
-
-         MIN_FILTER_PANEL_WIDTH : 150,
+         MIN_FILTER_PANEL_WIDTH: 150,
 
          /**
           * Maximal length of filter panel
           */
-
-         MAX_FILTER_PANEL_WIDTH : 640 - ((YAHOO.env.ua.ie > 0) && (YAHOO.env.ua.ie < 7) ? 160 : 0),
+         MAX_FILTER_PANEL_WIDTH: 640 - ((YAHOO.env.ua.ie > 0) && (YAHOO.env.ua.ie < 7) ? 160 : 0),
 
          /**
           * The pagination flag.
@@ -178,12 +175,12 @@
           * @type: boolean
           * @default: true
           */
-         usePagination : true,
+         usePagination: true,
 
          /**
           * Minimal height of filter panel
           */
-         MAX_FILTER_PANEL_HEIGHT : 200,
+         MAX_FILTER_PANEL_HEIGHT: 200,
 
          /**
           * ContainerId representing root container
@@ -194,6 +191,24 @@
          containerId: ""
       },
 
+      /**
+       * Offset of first record on page
+       * 
+       * @property recordOffset
+       * @type int
+       * @default 0
+       */
+      recordOffset: 0,
+
+      /**
+       * Total number of posts in the current view (across all pages)
+       * 
+       * @property totalRecords
+       * @type int
+       * @default 0
+       */
+      totalRecords: 0,
+      
       /**
        * Set multiple initialization options at once.
        *
@@ -240,7 +255,7 @@
        * @method createDataSource
        * @return {Alfresco.Links} returns 'this' for method chaining
        */
-      createDataSource : function Links_createDataSource()
+      createDataSource: function Links_createDataSource()
       {
          var uriResults = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/links/site/{site}/{container}",
          {
@@ -295,7 +310,7 @@
        *
        * @method createDataTable
        */
-      createDataTable : function Links_createDataTable()
+      createDataTable: function Links_createDataTable()
       {
          var me = this;
 
@@ -487,10 +502,6 @@
             }
          ];
 
-         YAHOO.widget.DataTable.CLASS_SELECTED = "links-selected-row";
-
-         YAHOO.widget.DataTable.MSG_EMPTY = '<span class="datatable-msg-empty">' + this._msg("links.empty") + '</span>';
-
          this.widgets.paginator = new YAHOO.widget.Paginator(
          {
             containers: [this.id + "-paginator"],
@@ -515,9 +526,10 @@
          {
             renderLoopSize: 32,
             initialLoad: false,
-            paginationEventHandler: handlePagination,
-            paginator: this.widgets.paginator
+            MSG_EMPTY: '<span class="datatable-msg-empty">' + this._msg("links.empty") + '</span>'
          });
+
+         YAHOO.widget.DataTable.CLASS_SELECTED = "links-selected-row";
 
          this.widgets.dataTable.doBeforeLoadData = function Links_doBeforeLoadData(sRequest, oResponse, oPayload)
          {
@@ -526,7 +538,7 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  me.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
@@ -541,6 +553,37 @@
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          };
+
+         // Update totalRecords on the fly with value from server
+         this.widgets.dataTable.handleDataReturnPayload = function Links_handleDataReturnPayload(oRequest, oResponse, oPayload)
+         {
+            // Save totalRecords for Paginator update later
+            me.recordOffset = oResponse.meta.recordOffset;
+            me.totalRecords = oResponse.meta.totalRecords;
+
+            oPayload = oPayload || {};
+            oPayload.recordOffset = oResponse.meta.recordOffset;
+            oPayload.totalRecords = oResponse.meta.totalRecords;
+            return oPayload;
+         }
+
+         // Prevent the DataTable from updating the Paginator widget
+         this.widgets.dataTable.doBeforePaginatorChange = function Links_doBeforePaginatorChange(oPaginatorState)
+         {
+            return false;
+         }
+
+         // Rendering complete event handler
+         this.widgets.dataTable.subscribe("renderEvent", function()
+         {
+            // Update the paginator if it's been created
+            this.widgets.paginator.setState(
+            {
+               recordOffset: this.recordOffset,
+               totalRecords: this.totalRecords
+            });
+            this.widgets.paginator.render();
+         }, this, true);
 
          this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
          {
@@ -586,7 +629,7 @@
       */
       generateLinksViewUrl: function Links_generateLinksViewUrl(site, container, linkId)
       {
-         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-view?linkId={linkId}&listViewLinkBack=true",
          {
             site: site,
             container: container,
@@ -613,7 +656,10 @@
                filterOwner: obj.filterOwner,
                filterData: obj.filterData
             };
-            this.updateLinks({ page: 1 });
+            this.updateLinks(
+            {
+               page: 1
+            });
          }
       },
 
@@ -634,9 +680,8 @@
        *
        * @method updateLinks
        */
-      updateLinks:function Links_updateLinks(p_obj)
+      updateLinks: function Links_updateLinks(p_obj)
       {
-
          function successHandler(sRequest, oResponse, oPayload)
          {
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
@@ -650,7 +695,6 @@
 
          function failureHandler(sRequest, oResponse)
          {
-
             if (oResponse.status == 401)
             {
                // Our session has likely timed-out, so refresh to offer the login page
@@ -661,7 +705,7 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
                   if (oResponse.status == 404)
                   {
@@ -740,7 +784,7 @@
        * activation of components
        * @method activate.
        */
-      activate : function Links_activate()
+      activate: function Links_activate()
       {
          this.attachButtons();
          Dom.setStyle(this.id + '-links-header', 'visibility', 'visible');
@@ -756,7 +800,7 @@
        * @method onTopicListResize.
        * @param width {int}
        */
-      onTopicListResize : function Links_onTopicListResize(width)
+      onTopicListResize: function Links_onTopicListResize(width)
       {
          if (width)
          {
@@ -770,7 +814,7 @@
       * @method onMenuItemClick.
       * @param sType, aArgs, p_obj
       */
-      onMenuItemClick:function Links_onMenuItemClick(sType, aArgs, p_obj)
+      onMenuItemClick: function Links_onMenuItemClick(sType, aArgs, p_obj)
       {
          var me = this;
          switch (aArgs[1]._oAnchor.className.split(" ")[0])
@@ -784,7 +828,7 @@
                this.showConfirmDialog(this._msg("dialog.confirm.message.delete.selected"), callback);
                break;
                
-            case "deselect-item" :
+            case "deselect-item":
                this.deselectAll();
                this.linksMenu.set("disabled", true);
                break;
@@ -797,7 +841,7 @@
       * @method deselectAll.
       * @param no params
       */
-      deselectAll : function Links_deselectAll()
+      deselectAll: function Links_deselectAll()
       {
          var rows = this.widgets.dataTable.getTbodyEl().rows;
          for (var i = 0; i < rows.length; i++)
@@ -811,7 +855,7 @@
        * init links buttons
        * @method attachButtons.
        */
-      attachButtons : function Links_attachButtons()
+      attachButtons: function Links_attachButtons()
       {
          var me = this;
          this.newLinkBtn = Alfresco.util.createYUIButton(this, "create-link-button", this.showCreateLinkDlg,
@@ -822,7 +866,7 @@
 
          this.linksMenu = Alfresco.util.createYUIButton(this, "selected-i-dd", this.onMenuItemClick,
          {
-            disabled : true,
+            disabled: true,
             type: "menu",
             menu:"selectedItems-menu"
          });
@@ -852,7 +896,7 @@
        * @param p_obj
        * @method onSelectItemClick
        */
-      onSelectItemClick : function Links_onSelectItemClick(sType, aArgs, p_obj)
+      onSelectItemClick: function Links_onSelectItemClick(sType, aArgs, p_obj)
       {
          var elem = YAHOO.env.ua.ie ? aArgs[0].srcElement : aArgs[0].target;
          if (elem.tagName.toLocaleLowerCase() != "span")
@@ -861,17 +905,17 @@
          }
          switch (elem.className.split(" ")[0])
          {
-            case "links-action-deselect-all" :
+            case "links-action-deselect-all":
                this.deselectAll();
                this.linksMenu.set("disabled", true);
                break;
 
-            case "links-action-select-all" :
+            case "links-action-select-all":
                this.selectAll();
                this.linksMenu.set("disabled", !this.getSelectedLinks().length);
                break;
 
-            case "links-action-invert-selection" :
+            case "links-action-invert-selection":
                this.invertAll();
                break;
          }
@@ -881,7 +925,7 @@
        * Invert All Selection on the page
        * @method invertAll
        */
-      invertAll : function Links_invertAll()
+      invertAll: function Links_invertAll()
       {
          var isDisable = false;
          var rows = this.widgets.dataTable.getTbodyEl().rows;
@@ -898,7 +942,7 @@
        * select All Tags on the page
        * @method selectAll
        */
-      selectAll : function Links_selectAll()
+      selectAll: function Links_selectAll()
       {
          var rows = this.widgets.dataTable.getTbodyEl().rows;
          for (var i = 0; i < rows.length; i++)
@@ -911,7 +955,7 @@
        * show 'Create Link' dialog
        * @method showCreateLinkDlg.
        */
-      showCreateLinkDlg : function Links_showCreateLinkDlg()
+      showCreateLinkDlg: function Links_showCreateLinkDlg()
       {
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit",
          {
@@ -924,7 +968,7 @@
        * change list view
        * @method changeListView.
        */
-      changeListView : function Links_changeListView()
+      changeListView: function Links_changeListView()
       {
          var records = this.widgets.dataTable.getRecordSet().getRecords();
          var rows = this.widgets.dataTable.getTbodyEl().rows;
@@ -988,7 +1032,7 @@
          {
             url: url,
             method: "POST",
-            requestContentType : "application/json",
+            requestContentType: "application/json",
             successMessage: this._msg("message.delete.success"),
             successCallback:
             {
@@ -1005,9 +1049,9 @@
                },
                scope: this
             },
-            dataObj :
+            dataObj:
             {
-               items : ids
+               items: ids
             }
          });
 
@@ -1021,7 +1065,10 @@
        */
       createLink: function Links_createLink(data)
       {
-         this.updateLinks({ page: 1 });
+         this.updateLinks(
+         {
+            page: 1
+         });
       },
 
       /**
@@ -1100,7 +1147,7 @@
        * activation of resize
        * @method _attachResize.
        */
-      _attachResize : function Links__attachResize()
+      _attachResize: function Links__attachResize()
       {
          this.widgets.horizResize = new YAHOO.util.Resize("divLinkFilters",
          {
@@ -1126,7 +1173,7 @@
        * @param tagName {string} Tag name
        * @return {string} A unique DOM-safe ID for the tag
        */
-      _generateTagId : function Links__generateTagId(tagName)
+      _generateTagId: function Links__generateTagId(tagName)
       {
          var id = 0;
          var tagId = this.tagId;
@@ -1149,14 +1196,14 @@
        */
       _buildLinksParams: function Links_buildLinksParams(p_obj)
       {
-         var params = {
+         var params =
+         {
             contentLength: this.options.maxContentLength,
             fromDate: null,
             toDate: null,
             tag: null,
-
-            page: this.widgets.paginator.get("page") || "1",
-            pageSize: this.widgets.paginator.get("rowsPerPage")
+            page: this.widgets.paginator.getCurrentPage() || "1",
+            pageSize: this.widgets.paginator.getRowsPerPage()
          };
 
          // Passed-in overrides
@@ -1289,7 +1336,7 @@
        * @param tagName {string} the tag to create a link for
        * @return {string} the markup for a tag
        */
-      _generateTagLink : function Links_generateTagLink(tagName)
+      _generateTagLink: function Links_generateTagLink(tagName)
       {
          var encodedTagName = $html(tagName);
          var html = '';
