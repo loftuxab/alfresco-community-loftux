@@ -11,7 +11,7 @@
 }
 
 
-.links-body .yui-dt-bd table
+.links-body .yui-dt table
 {
    width: 100%;
    border: none;
@@ -22,7 +22,7 @@
    width: 1em;    
 }
 
-.links-body .yui-dt-bd table thead
+.links-body .yui-dt table thead
 {
    display: none;
 }
