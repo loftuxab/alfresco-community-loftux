@@ -58,11 +58,17 @@ import org.alfresco.catalina.host.AVMHost;
 
 public class VirtServerRegistrationThread extends Thread
 {
+	private enum ServerStatus
+	{
+		NOT_AVAILABLE,
+		AVAILABLE,
+	}
+	
     private static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( VirtServerRegistrationThread.class );
 
     ApplicationContext springContext_;
-    JMXServiceURL      url_;
+    JMXServiceURL      url_;         // URL of the JMX service on Alfresco
     Map<String,Object> env_;
     String             virt_url_;
     String             virt_domain_;
@@ -72,7 +78,12 @@ public class VirtServerRegistrationThread extends Thread
     ObjectName         virt_registry_;
     Attribute          virt_server_attrib_;
     boolean            done_  = false;
-    JMXConnector       conn_;
+    JMXConnector       conn_;       // Connection to Alfresco JMX
+    
+    /**
+     * Assume the server is available until we know otherwise
+     */
+	ServerStatus alfrescoStatus = ServerStatus.AVAILABLE;
 
     public VirtServerRegistrationThread()
     {
@@ -193,6 +204,8 @@ public class VirtServerRegistrationThread extends Thread
                                   "/alfresco/jmxrmi";
 
             url_ = new JMXServiceURL( avm_jmx_url );
+            
+            System.out.println("MER url_ is " + avm_jmx_url);
 
             env_ = new HashMap<String,Object>();
 
@@ -261,7 +274,6 @@ public class VirtServerRegistrationThread extends Thread
 
     private void registerVirtServer()
     {
-        // System.out.println("Re-registering url: " + virt_url_ );
         try
         {
             if (conn_ == null  ) 
@@ -285,13 +297,18 @@ public class VirtServerRegistrationThread extends Thread
                                          "java.lang.Integer"
                                        }
                        );
+            
+            alfrescoStatus = ServerStatus.AVAILABLE;
 
         }
         catch (Exception e)
         {
-            log.error("Connection failure to remote Alfresco JMX Server: " + e.getMessage());
-            log.info("Connection failure to remote Alfresco JMX server may be transient.  Retrying...");
-
+        	if(alfrescoStatus == ServerStatus.AVAILABLE)
+        	{
+        	    alfrescoStatus = ServerStatus.NOT_AVAILABLE;
+        		log.error("Connection failure to remote Alfresco JMX Server: " + url_ + e.getMessage());
+        	}
+        	
             // The server isn't responding.  If the server crashed,
             // we could get stuck in a network timeout here that's 
             // much longer than our normal periodic retry
