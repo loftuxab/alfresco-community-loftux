@@ -8,9 +8,11 @@
 //]]></script>
 <div class="dashlet wiki">
    <div class="title" id="${args.htmlid}-title">${msg("label.header-prefix")} - ${pageTitle!msg("label.header")}</div>
+<#if userIsSiteManager>
    <div class="toolbar">
-       <a href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
+      <a href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
    </div>
+</#if>
    <div class="body scrollableList">
       <div id="${args.htmlid}-scrollableList" class="rich-content">
 <#if wikipage?exists>

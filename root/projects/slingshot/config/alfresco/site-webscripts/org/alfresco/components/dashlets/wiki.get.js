@@ -16,4 +16,18 @@ if (wikipage)
 
    // Get all pages for the site so we can display links correctly
    model.pageList = doGetCall("/slingshot/wiki/pages/" + page.url.templateArgs.site);
+   
+   // Call the repository to see if the user is site manager or not
+   var userIsSiteManager = false;
+   var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
+   if (json.status == 200)
+   {
+      var obj = eval('(' + json + ')');
+      if (obj.role)
+      {
+         userIsSiteManager = (obj.role == "SiteManager");
+      }
+   }
+   model.userIsSiteManager = userIsSiteManager;
+
 }
