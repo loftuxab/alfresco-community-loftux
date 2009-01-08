@@ -173,6 +173,12 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
 
     String reverse_proxy_binding_;
+    
+	private enum ServerStatus
+	{
+		NOT_AVAILABLE,
+		AVAILABLE,
+	}
 
 
     public AVMHost()
@@ -340,6 +346,8 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
     public void init() 
     {
+    	ServerStatus alfrescoStatus = ServerStatus.AVAILABLE; 
+    		
         if( initialized ) return;
         initialized=true;
 
@@ -407,6 +415,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                     ((ClientTicketHolder)(Context_.getBean("clientTicketHolder"))).setTicket(authService.getCurrentTicket());
 
                     done_trying = true;
+                    alfrescoStatus = ServerStatus.AVAILABLE;
                 }
                 catch (org.springframework.beans.factory.BeanCreationException e)
                 {
@@ -428,12 +437,18 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                              (cause instanceof java.rmi.NotBoundException )
                            )
                         { 
-                            retry_op = true; break;
+                            retry_op = true; 
+                            break;
                         }
                     }
                     if ( ! retry_op )
                     {
-                        log.error("Bean creation error: " + e.getClass().getName() );
+                    	if(alfrescoStatus == ServerStatus.AVAILABLE)
+                    	{
+                    		alfrescoStatus = ServerStatus.NOT_AVAILABLE;
+                            log.error("Bean creation error: " + e.getClass().getName() );
+                    	}
+                        
                         throw e;
                     }
 
@@ -442,16 +457,18 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                 catch ( AuthenticationException auth_ex )
                 {
                     retry_count ++;
-
-                    log.error("Authentication error (may be transient): " + 
-                              auth_ex.getMessage());
-
+                    
+                	if(alfrescoStatus == ServerStatus.AVAILABLE)
+                	{
+                		alfrescoStatus = ServerStatus.NOT_AVAILABLE;
+                        log.error("Authentication error (may be transient): " + 
+                                auth_ex.getMessage());
+                	}
                     sleepBeforeRetryingConnection();
                 }
             }
 
-            log.info("Succeeded connecting to authentication service");
-
+            log.debug("Succeeded connecting to authentication service");
 
             // Initialize RPC to talk to AVM 
             AVMFileDirContext.InitAVMRemote(Service_);
@@ -490,9 +507,11 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         }
 
         // Clean the entire work dir for this virtual host
-        if(log.isInfoEnabled())
-            log.info("Deleting: " + absWorkDir.getAbsolutePath() );
-
+        if(log.isDebugEnabled())
+        {
+            log.debug("Deleting: " + absWorkDir.getAbsolutePath() );
+        }
+        
         // Note: This must happen *after* InitAVMRemote(); 
         //       if it's done beforehand, AVMRemote ops will fail, 
         //       due to static initializer issues. 
@@ -660,7 +679,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
     void sleepBeforeRetryingConnection()
     {
-        log.warn("Retrying connection...");
         try { Thread.currentThread().sleep( 5000 ); }
         catch (Exception te) { /* ignored */ }
 
