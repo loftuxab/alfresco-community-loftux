@@ -2,6 +2,7 @@
 <#import "import/alfresco-layout.ftl" as layout />
 <@template.header "transitional">
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />
+   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard-presentation.css" />   
 </@>
 
 <@template.body>

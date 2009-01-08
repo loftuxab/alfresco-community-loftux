@@ -328,7 +328,7 @@
             var url = me._getBrowseUrlForRecord(oRecord);
             
             // title/link to view page
-            var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
+            var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '" class="theme-color-1">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
             
             // type information
             desc += '<div class="details">';

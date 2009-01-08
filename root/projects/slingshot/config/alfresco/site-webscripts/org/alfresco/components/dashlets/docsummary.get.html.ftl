@@ -1,5 +1,5 @@
 <#macro doclibUrl doc>
-   <a href="${url.context}/page/site/${doc.location.site}/document-details?nodeRef=${doc.nodeRef}">${doc.displayName?html}</a>
+   <a href="${url.context}/page/site/${doc.location.site}/document-details?nodeRef=${doc.nodeRef}" class="theme-color-1">${doc.displayName?html}</a>
 </#macro>
 <div class="dashlet">
    <div class="title">${msg("header.docSummary")}</div>
@@ -15,7 +15,7 @@
       </div>
       <#else>
          <#list docs.items as doc>
-            <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>
+            <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile" class="theme-color-1">${doc.modifiedBy?html}</a></#assign>
       <div class="detail-list-item <#if doc_index = 0>first-item<#elseif !doc_has_next>last-item</#if>">
          <div>
             <div class="icon">

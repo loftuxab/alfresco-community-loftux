@@ -2,9 +2,9 @@
    <#assign mode = args.mode!"">
    <#assign lastDate = "3000-01-01"?date("yyyy-MM-dd") lastHour = -1>
    <#list activities as activity>
-      <#assign userLink="<a href=\"${activity.userProfile}\">${activity.fullName?html}</a>">
+      <#assign userLink="<a href=\"${activity.userProfile}\" class="theme-color-1">${activity.fullName?html}</a>">
       <#assign itemLink="<a href=\"${activity.itemPage}\">${activity.title?html}</a>">
-      <#assign siteLink="<a href=\"${activity.sitePage}\">${activity.siteId}</a>">
+      <#assign siteLink="<a href=\"${activity.sitePage}\" class="theme-color-1">${activity.siteId}</a>">
       <#if dateCompare(lastDate?date, activity.date.fullDate?date) == 1>
          <#assign lastDate = activity.date.fullDate lastHour = activity.date.hour>
 <div class="new-day <#if activity_index = 0>first</#if>"><div class="ruler"></div><span>${lastHour?string("00")}:00, ${lastDate?date?string.medium}</span></div>

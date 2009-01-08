@@ -1,4 +1,4 @@
-<div class="page-title search-title">
+<div class="page-title search-title theme-bg-color-1">
 	<h1><span>${msg("header.searchresults")}</span></h1>	
 	<#if page.url.templateArgs.site??>
       <div>

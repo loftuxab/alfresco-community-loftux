@@ -21,7 +21,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions(
 <div class="dashlet my-sites">
    <div class="title">${msg("header.mySites")}</div>
    <div class="toolbar">
-      <a href="#" id="${args.htmlid}-createSite-button">${msg("link.createSite")}</a>
+      <a href="#" id="${args.htmlid}-createSite-button" class="theme-color-1">${msg("link.createSite")}</a>
    </div>
    <div class="body scrollableList">
 <#if sites??>
@@ -32,7 +32,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions(
                <span id="${args.htmlid}-favourite-span-${site_index}" class="favourite <#if (site.isFavourite)>enabled</#if>" title="${msg("link.favouriteSite")}">&nbsp;</span>
             </div>
             <div class="site">
-               <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
+               <a href="${url.context}/page/site/${site.shortName}/dashboard" class="theme-color-1">${site.title?html}</a>
             </div>
             <div class="actions">
                <#if (site.isSiteManager)>

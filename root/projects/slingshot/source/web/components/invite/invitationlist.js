@@ -227,7 +227,7 @@
                 userName = "(" + oRecord.getData("userName") + ")";
             }
             var email = oRecord.getData("email");
-            elCell.innerHTML = '<h3 class="itemname">' + $html(name) + ' <span class="lighter">' + $html(userName) + '</span></h3><div class="detail">' + $html(email) + '</div>';
+            elCell.innerHTML = '<h3 class="itemname">' + $html(name) + ' <span class="lighter" class="theme-color-1">' + $html(userName) + '</span></h3><div class="detail">' + $html(email) + '</div>';
          };
 
          /**

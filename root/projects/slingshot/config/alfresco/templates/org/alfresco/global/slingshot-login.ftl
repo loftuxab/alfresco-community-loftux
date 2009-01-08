@@ -1,16 +1,7 @@
 <#import "../import/alfresco-template.ftl" as template />
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/login/login.css" />
-   <style type="text/css">
-      .login-logo
-      {
-         position: absolute;
-         top: 16px;
-         height: 64px;
-         width: 450px;
-         background: transparent url("${url.context}/themes/${theme}/images/logo.png") no-repeat;
-      }
-   </style>
+   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/login.css" />
 </@>
 <@template.body>
    <div id="alflogin" class="login-panel">
