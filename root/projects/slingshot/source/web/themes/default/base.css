@@ -189,6 +189,12 @@ span.navigation-item-alt
    margin: 0px;
 }
 
+span.navigation-item,
+span.navigation-item-alt
+{
+   padding:0 0 0 6px;
+}
+
 span.navigation-item a,
 span.navigation-item a:visited   
 {
