@@ -3883,7 +3883,7 @@ InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type actio
 InstallComponent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -setup Install -type action -conditions {895E7578-265C-44C3-8943-CF6D99925B9F 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 895E7578-265C-44C3-8943-CF6D99925B9F -active Yes -parent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 895E7578-265C-44C3-8943-CF6D99925B9F
 Condition 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293 -active Yes -parent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -title {String Is Condition} -component StringIsCondition -TreeObject::id 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293
-InstallComponent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -setup Install -type action -conditions {8C84F652-D836-4749-A91D-892366F14735 638BA725-B209-4B92-B603-09E568B32EEF} -title {Launch Application Checkbutton} -component AddWidget -command insert -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
+InstallComponent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -setup Install -type action -conditions {8C84F652-D836-4749-A91D-892366F14735 638BA725-B209-4B92-B603-09E568B32EEF} -title {Launch Application Checkbutton} -component AddWidget -command reorder -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 8C84F652-D836-4749-A91D-892366F14735 -active Yes -parent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C84F652-D836-4749-A91D-892366F14735
 Condition 638BA725-B209-4B92-B603-09E568B32EEF -active Yes -parent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -title {String Is Condition} -component StringIsCondition -TreeObject::id 638BA725-B209-4B92-B603-09E568B32EEF
 InstallComponent 11D931E9-F589-4F10-AEFF-734DE33E8488 -setup Install -type action -conditions {801A25C3-DE59-469C-88AD-41BF330BCD3F 33613CE2-AD68-4419-9786-8D72A8B04979} -title {Desktop Shortcut Checkbutton} -component AddWidget -command insert -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
@@ -3956,7 +3956,7 @@ InstallComponent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -setup Install -type actio
 Condition 82B93F75-2DE4-43F5-A54C-CDC155048FA3 -active Yes -parent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -title {String Is Condition} -component StringIsCondition -TreeObject::id 82B93F75-2DE4-43F5-A54C-CDC155048FA3
 Condition 7132E75E-0CA4-41E8-9BA6-B3D52D57281E -active Yes -parent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -title {String Is Condition} -component StringIsCondition -TreeObject::id 7132E75E-0CA4-41E8-9BA6-B3D52D57281E
 Condition 28605D41-F3CF-4045-B4B9-1CE425EBDC03 -active Yes -parent 4489F0C1-C985-41F0-B4A9-90868A73FE8E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 28605D41-F3CF-4045-B4B9-1CE425EBDC03
-InstallComponent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -setup Install -type action -conditions {4C5B630E-A819-4C8D-A223-F10643DC1CDA 0E2B711C-DEBF-49E5-A966-C2D5177AE431} -title {Launch Web Browser} -component LaunchWebBrowser -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
+InstallComponent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -setup Install -type action -conditions {4C5B630E-A819-4C8D-A223-F10643DC1CDA 0E2B711C-DEBF-49E5-A966-C2D5177AE431} -title {Launch Web Browser} -component LaunchWebBrowser -command reorder -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 4C5B630E-A819-4C8D-A223-F10643DC1CDA -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 4C5B630E-A819-4C8D-A223-F10643DC1CDA
 Condition 0E2B711C-DEBF-49E5-A966-C2D5177AE431 -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 0E2B711C-DEBF-49E5-A966-C2D5177AE431
 InstallComponent 3615204F-29E3-473F-A769-A74E859BE866 -setup Install -type action -conditions 48130794-42B9-4D0A-9248-BAF8F2A1E9AF -title {Delete File} -component DeleteFile -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
@@ -4278,7 +4278,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-46936111
+46977085
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4573,7 +4573,7 @@ derby
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-100329916
+100484677
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -4892,7 +4892,7 @@ No
 <%InstallDir%>
 
 666422B8-43C2-EAB3-8AA3-C7EECE0E23B7,FileSize
-35749343
+35758730
 
 666422B8-43C2-EAB3-8AA3-C7EECE0E23B7,Name
 {Program Files OSX}
@@ -6228,7 +6228,7 @@ FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,FileSize
-1441279
+1441290
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Name
 Samples
