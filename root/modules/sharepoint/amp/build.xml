@@ -30,7 +30,7 @@
       <mkdir dir="${build.dir}/lib" />
    </target>
    
-   <target name="compile" depends="clean">	
+   <target name="compile">	
       <javac classpathref="class.path" srcdir="${src}" destdir="${build.dir}/classes" debug="true" />
    </target>
    
