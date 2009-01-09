@@ -105,4 +105,4 @@ YAHOO.extend(YAHOO.widget.SWFPlayer, YAHOO.widget.FlashAdapter,
 	}
 
 });
-YAHOO.register("sfwplayer", YAHOO.widget.SWFPlayer, {version: "2.5.2", build: "1076"});
+YAHOO.register("swfplayer", YAHOO.widget.SWFPlayer, {version: "2.6.0", build: "1321"});
