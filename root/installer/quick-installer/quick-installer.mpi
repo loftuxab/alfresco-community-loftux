@@ -2,8 +2,14 @@ array set info {
 ALF_DB
 derby
 
+ALF_IMG
+<%InstallDir%>
+
 ALF_RMIPORT
 50500
+
+ALF_SWF
+<%InstallDir%>/bin
 
 ALF_TOMCATPORT
 8080
@@ -540,6 +546,7 @@ File ::15777FA6-3573-4828-BD63-407DD2D34EB6 -type dir -name mt -parent 3521827F-
 File ::9368386E-C8EC-49D9-A9DE-6CE5A5915B6B -name mt-admin-context.xml.sample -parent 15777FA6-3573-4828-BD63-407DD2D34EB6
 File ::6D32FEA8-209A-4699-8CB5-2378158142F1 -name mt-contentstore-context.xml.sample -parent 15777FA6-3573-4828-BD63-407DD2D34EB6
 File ::48B344EB-3D8B-49FA-9C20-DC2FC173456A -name mt-context.xml.sample -parent 15777FA6-3573-4828-BD63-407DD2D34EB6
+File ::F179358E-39D1-4EC0-BF20-F0B58D2956C8 -name web-studio-preview-context.xml.sample -parent 3521827F-0B4B-4595-BA17-C94ACA01C633
 File ::1AF4D464-5129-4717-ABBE-8BCDCBEC7D90 -type dir -name messages -parent B4F5C6B1-CA90-43B0-BDF5-177048F4F5F3
 File ::5CD8B15B-133B-4691-A0A9-4CDCF058DC72 -name bpm-messages_fi_FI.properties -parent 1AF4D464-5129-4717-ABBE-8BCDCBEC7D90
 File ::7765CC7B-76CF-4F56-835C-5B923E6F3637 -name copy-service_fi_FI.properties -parent 1AF4D464-5129-4717-ABBE-8BCDCBEC7D90
@@ -3348,6 +3355,10 @@ InstallComponent 2521C09F-C692-49D8-BD76-C69BFFEF1F24 -setup Install -type actio
 InstallComponent D05A76C6-7FC5-416A-A4D0-45D5C7B9E0C1 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -title {Write Text To File} -component WriteTextToFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In File} -component ReplaceTextInFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+Condition 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -active Yes -parent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -title {Platform Condition} -component PlatformCondition -TreeObject::id A4BB2D56-7848-464D-90C1-B75693CDD06E
+InstallComponent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -setup Install -type action -conditions A4BB2D56-7848-464D-90C1-B75693CDD06E -title {Replace Text In File} -component ReplaceTextInFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+Condition A4BB2D56-7848-464D-90C1-B75693CDD06E -active Yes -parent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -title {Platform Condition} -component PlatformCondition -TreeObject::id A4BB2D56-7848-464D-90C1-B75693CDD06E
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
 InstallComponent 8DF4772F-BB98-471E-99C9-CB3FEDD66C60 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 InstallComponent AD2005D2-4400-4C05-834A-D0827D100FF7 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
@@ -3415,6 +3426,16 @@ No
 
 05F74B3F-2FC4-4C99-AC27-099896306EC9,String
 <%JavaFound%>
+
+09BD7C92-04FB-4B0F-9553-DA08F4B6E59E,Conditions
+{1 condition}
+
+09BD7C92-04FB-4B0F-9553-DA08F4B6E59E,Files
+<%ExtensionDir%>/custom-repository.properties
+
+09BD7C92-04FB-4B0F-9553-DA08F4B6E59E,StringMap
+{"@@ALF_SWF@@" "<%Dir <%InstallDir%> forward%>/bin"
+"@@ALF_IMG@@" "<%Dir <%InstallDir%> forward%>"}
 
 0E2B711C-DEBF-49E5-A966-C2D5177AE431,CheckCondition
 {Before Action is Executed}
@@ -3487,6 +3508,16 @@ CreateDesktopShortcut
 
 19F5E6E0-ED74-42E9-8A17-93EF7879CF50,TrueValue
 No
+
+1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3,Conditions
+{1 condition}
+
+1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3,Files
+<%ExtensionDir%>/custom-repository.properties
+
+1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3,StringMap
+{"@@ALF_SWF@@" "<%Dir <%ALF_SWF%> forward%>"
+"@@ALF_IMG@@" "/usr/local"}
 
 1ACD65CD-7FED-4D7F-A23D-E1CA0A766E81,Alias
 {Startup Actions}
@@ -3648,7 +3679,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-29925943
+46910524
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -3937,7 +3968,7 @@ derby
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-99339809
+100459191
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -4185,6 +4216,12 @@ Yes
 
 6536F752-3C9F-4917-83E0-2E66D8F985E0,Prompt
 <%UninstallStartupText%>
+
+6605D03A-DFC5-49F9-9F75-BBDC0D3483C9,CheckCondition
+{Before Action is Executed}
+
+6605D03A-DFC5-49F9-9F75-BBDC0D3483C9,Platform
+Windows
 
 6657D0E3-3C45-4822-BA93-EE9F73FD839C,CheckCondition
 {Before Action is Executed}
@@ -4820,6 +4857,12 @@ A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Message,subst
 A35F8054-51C6-471B-8E45-0BE8AAFEA82B,NextButton,subst
 1
 
+A4BB2D56-7848-464D-90C1-B75693CDD06E,CheckCondition
+{Before Action is Executed}
+
+A4BB2D56-7848-464D-90C1-B75693CDD06E,Platform
+Linux-x86
+
 A4F1E663-DD6F-4CFB-B8C8-496149F89359,Description,subst
 1
 
@@ -5193,7 +5236,7 @@ D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Conditions
 {2 conditions}
 
 D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,URL
-http://wiki.alfresco.com/wiki/Release_3.0_SP1
+http://wiki.alfresco.com/wiki/Alfresco_Labs_3
 
 D425AAA6-9AE6-42BF-812A-9648213060EF,Comment
 {Do not display this pane if this is an upgrade install unless there is more than one installation present}
@@ -5458,7 +5501,7 @@ FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,FileSize
-879260
+880664
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Name
 Samples
