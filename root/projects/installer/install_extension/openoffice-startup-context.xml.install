@@ -20,8 +20,8 @@
               <entry key=".*">
                   <list>
                       <value>${ooo.exe}</value>
-                      <value>"-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager"</value>
-                      <value>"-env:UserInstallation=file:///${ooo.user}"</value>
+                      <value>-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager</value>
+                      <value>-env:UserInstallation=file:///${ooo.user}</value>
                       <value>-nologo</value>
                       <value>-headless</value>
                       <value>-nofirststartwizard</value>
