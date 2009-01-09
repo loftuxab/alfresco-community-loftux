@@ -38,7 +38,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 
 /**
  * Helper for documents
- *
+ * 
  * @author Dmitry Lazurkin
  */
 public class VtiDocumentHepler
@@ -79,7 +79,7 @@ public class VtiDocumentHepler
 
     /**
      * Returns document status for node reference
-     *
+     * 
      * @param nodeRef node reference ({@link NodeRef})
      * @return DocumentStatus document status
      */
@@ -94,7 +94,7 @@ public class VtiDocumentHepler
             if (LockType.valueOf((String) nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_TYPE)).equals(LockType.WRITE_LOCK) == true)
             {
                 // short-term checkout
-                if(lockStatus.equals(LockStatus.LOCKED))
+                if (lockStatus.equals(LockStatus.LOCKED))
                 {
                     status = DocumentStatus.SHORT_CHECKOUT;
                 }
@@ -134,7 +134,7 @@ public class VtiDocumentHepler
 
     /**
      * Determines short-term checkout on node reference
-     *
+     * 
      * @param nodeRef node reference ({@link NodeRef})
      * @return <b>true</b> if document is checked out, <b>false</b> otherwise
      */
@@ -146,7 +146,7 @@ public class VtiDocumentHepler
 
         if (lockStatus.equals(LockStatus.LOCKED) || lockStatus.equals(LockStatus.LOCK_OWNER))
         {
-            if(LockType.valueOf((String) nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_TYPE)).equals(LockType.WRITE_LOCK) == true)
+            if (LockType.valueOf((String) nodeService.getProperty(nodeRef, ContentModel.PROP_LOCK_TYPE)).equals(LockType.WRITE_LOCK) == true)
             {
                 isShortCheckedout = true;
             }
@@ -157,7 +157,7 @@ public class VtiDocumentHepler
 
     /**
      * Determines long-term checkout on node reference
-     *
+     * 
      * @param nodeRef node reference ({@link NodeRef})
      * @return <b>true</b> if document is checked out, <b>else</b> otherwise
      */
@@ -177,7 +177,7 @@ public class VtiDocumentHepler
 
     /**
      * Returns original node reference for working copy node reference
-     *
+     * 
      * @param workingCopyNodeRef node reference to working copy ({@link NodeRef})
      * @return NodeRef node reference to node, which is source for working copy node. Null indicates error
      */
@@ -242,7 +242,7 @@ public class VtiDocumentHepler
 
     /**
      * Checks match filename for file filters
-     *
+     * 
      * @param fileName file name
      * @param fileDialogFilterValue list of file filters
      * @return <i>true</i>, if file name matches at least one file filter; otherwise, <i>false</i>

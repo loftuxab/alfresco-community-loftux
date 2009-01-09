@@ -30,6 +30,7 @@ import java.util.EnumSet;
 
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
+import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.metadata.dic.GetOption;
 import org.alfresco.module.vti.metadata.model.Document;
 import org.apache.commons.logging.Log;
@@ -80,7 +81,7 @@ public class GetDocumentMethod extends AbstractMethod
 
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
 
-        response.addParameter("message=successfully retrieved document '" + documentName + "' from '" + documentName + "'");
+        response.addParameter("message=successfully retrieved document '" + VtiUtils.htmlEncode(documentName) + "' from '" + VtiUtils.htmlEncode(documentName) + "'");
         response.beginList("document");
 
         response.addParameter("document_name", document.getPath());

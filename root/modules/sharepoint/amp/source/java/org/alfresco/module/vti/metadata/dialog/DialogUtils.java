@@ -95,7 +95,7 @@ public class DialogUtils
 
         return image;
     }
-
+    
     /**
      * <p>According the current sorting field and sorting order return new sorting order.</p> 
      * 
@@ -120,7 +120,7 @@ public class DialogUtils
             }
         }
         return VtiSort.ASC.toString();
-        }
+    }
 
     /**
      * <p>Cast String to VtiSortField</p>

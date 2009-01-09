@@ -78,7 +78,7 @@ public class VtiDownloadContentAction implements VtiAction
     {
         this.nodeService = nodeService;
     }
-
+    
     /**
      * <p>Write content to response for documents that are located in version history.</p> 
      *

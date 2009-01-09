@@ -25,7 +25,6 @@
 package org.alfresco.module.vti.handler.alfresco;
 
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -147,7 +146,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     {
         this.storePath = storePath;
     }
-
+    
     /**
      * Set alfresco context
      * 
@@ -317,7 +316,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
         
         return toUrlPath(fileFolderService.getFileInfo(homeSpace));        
     }
-
+    
     /**
      * Get Document Workspace site from document name
      * 
@@ -420,7 +419,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     {       
         try
         {
-            URL url = new URL(URLDecoder.decode(document, "UTF-8"));            
+            URL url = new URL(document);            
             return url.getProtocol() + "://" + url.getHost()+ ":" + url.getPort();
         }
         catch (Exception e)
@@ -439,7 +438,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     {                
         try
         {
-            URL url = new URL(URLDecoder.decode(document, "UTF-8"));
+            URL url = new URL(document);
             
             if (url.getPath().startsWith(alfrescoContext))
             {
@@ -467,7 +466,7 @@ public class VtiPathHelper extends AbstractLifecycleBean
     {
         try
         {            
-            return new URL(URLDecoder.decode(document, "UTF-8")).getPath();
+            return new URL(document).getPath();
         }
         catch (Exception e)
         {

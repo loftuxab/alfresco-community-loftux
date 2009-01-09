@@ -52,7 +52,7 @@ public class UrlToWebUrlMethod extends AbstractMethod
         {
             logger.debug("Start method execution. Method name: " + getName());
         }
-        String url = request.getParameter("url");
+        String url = request.getParameter("url", "");
 
         if (url != null && url.length() > 0)
         {

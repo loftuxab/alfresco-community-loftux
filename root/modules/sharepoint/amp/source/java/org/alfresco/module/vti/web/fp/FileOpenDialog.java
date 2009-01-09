@@ -42,6 +42,7 @@ import org.alfresco.module.vti.metadata.dialog.DialogsMetaInfo;
 import org.alfresco.module.vti.metadata.dic.VtiSort;
 import org.alfresco.module.vti.metadata.dic.VtiSortField;
 import org.alfresco.module.vti.web.VtiRequestDispatcher;
+import org.alfresco.util.URLEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -111,7 +112,7 @@ public class FileOpenDialog extends AbstractMethod
         freeMarkerMap.put("host", request.getHeader("Host"));
         freeMarkerMap.put("items", items);
         freeMarkerMap.put("alfContext", (String) request.getAttribute(VtiRequestDispatcher.VTI_ALFRESCO_CONTEXT));
-        freeMarkerMap.put("location", location);
+        freeMarkerMap.put("location", URLEncoder.encode(location));
         freeMarkerMap.put("request", request);
         freeMarkerMap.put("DialogUtils", new DialogUtils());
 

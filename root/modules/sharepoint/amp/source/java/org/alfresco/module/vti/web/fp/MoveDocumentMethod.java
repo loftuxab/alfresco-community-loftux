@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
+import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.metadata.dic.PutOption;
 import org.alfresco.module.vti.metadata.dic.RenameOption;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
@@ -85,9 +86,9 @@ public class MoveDocumentMethod extends AbstractMethod
 
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
 
-        response.addParameter("message=successfully renamed URL '" + oldUrl + "' as '" + newUrl + "'");
-        response.addParameter("oldUrl", oldUrl);
-        response.addParameter("newUrl", newUrl);
+        response.addParameter("message=successfully renamed URL '" + VtiUtils.htmlEncode(oldUrl) + "' as '" + VtiUtils.htmlEncode(newUrl) + "'");
+        response.addParameter("oldUrl", VtiUtils.htmlEncode(oldUrl));
+        response.addParameter("newUrl", VtiUtils.htmlEncode(newUrl));
         response.beginList("document_list");
         response.endList();
 

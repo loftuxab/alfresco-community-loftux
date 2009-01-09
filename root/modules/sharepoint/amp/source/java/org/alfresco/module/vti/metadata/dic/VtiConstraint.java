@@ -35,17 +35,17 @@ public enum VtiConstraint
     /**
      * Read-only
      */
-    R ("R"),
+    R ("R"),  
     
     /**
      * Write
      */
-    W ("W"),
+    W ("W"),  
     
     /**
      * Ignore
      */
-    X ("X");
+    X ("X");  
     
     private final String value;
     
