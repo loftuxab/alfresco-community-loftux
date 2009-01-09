@@ -321,7 +321,7 @@ public class PropfindMethod extends PropFindMethod
      * @param node NodeRef
      * @param path String
      */
-    private void generateResponseForNode(XMLWriter xml, FileInfo nodeInfo, String path) throws Exception
+    protected void generateResponseForNode(XMLWriter xml, FileInfo nodeInfo, String path) throws Exception
     {
         NodeRef nodeRef = nodeInfo.getNodeRef();
         boolean isFolder = nodeInfo.isFolder();
@@ -369,7 +369,7 @@ public class PropfindMethod extends PropFindMethod
      * @param node NodeRef
      * @param isDir boolean
      */
-    private void generateAllPropertiesResponse(XMLWriter xml, NodeRef node, boolean isDir) throws Exception
+    protected void generateAllPropertiesResponse(XMLWriter xml, NodeRef node, boolean isDir) throws Exception
     {
         // Get the properties for the node
 
@@ -555,7 +555,7 @@ public class PropfindMethod extends PropFindMethod
      * @param node NodeRef
      * @param isDir boolean
      */
-    private void generateLockDiscoveryResponse(XMLWriter xml, NodeRef node, boolean isDir) throws Exception
+    protected void generateLockDiscoveryResponse(XMLWriter xml, NodeRef node, boolean isDir) throws Exception
     {
         // Get the lock status for the node
 
@@ -582,7 +582,7 @@ public class PropfindMethod extends PropFindMethod
      * 
      * @param xml XMLWriter
      */
-    private void writeLockTypes(XMLWriter xml)
+    protected void writeLockTypes(XMLWriter xml)
     {
         try
         {
