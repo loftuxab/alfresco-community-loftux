@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts;
 
 import org.alfresco.connector.Connector;
+import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.web.framework.ImportTask;
 import org.alfresco.web.framework.Task;
@@ -118,7 +119,7 @@ public final class ScriptImporter extends ScriptBase
             taskId = WebStudio.getTaskManager().addTask(task);
             
         }
-        catch(RemoteConfigException rce)
+        catch (ConnectorServiceException rce)
         {
             FrameworkHelper.getLogger().warn("Unable to load 'alfresco' endpoint connector for script import", rce);
         }
