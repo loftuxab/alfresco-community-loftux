@@ -446,6 +446,28 @@
                     clean-webclient, 
                     clean-webserviceclient,
                     clean-webstudio" />
+                    
+   <target name="clean-webclient-projects" 
+           description="Cleans all projects related to the slingshot project" 
+           depends="clean-core,
+                    clean-jlan, 
+                    clean-mbeans,
+                    clean-deployment, 
+                    clean-repository, 
+                    clean-remoteapi, 
+                    clean-jndi, 
+                    clean-catalinavirtual, 
+                    clean-linkvalidation, 
+                    clean-webscriptframework,
+                    clean-webclient" />
+                    
+   <target name="clean-slingshot-projects" 
+           description="Cleans all projects related to the slingshot project" 
+           depends="clean-core,
+                    clean-webscriptframework,
+                    clean-webframework,
+                    clean-webframeworkcommons,
+                    clean-slingshot" />
    
    <target name="clean-modules"
            description="Cleans all modules"
@@ -530,20 +552,24 @@
    
    <target name="-deploy-tomcat-common" depends="init">
 
+      <available file="${home.tomcat}/common/lib" type="dir" property="tomcat5.present" />
+      
+      <fail if="tomcat5.present" message="Deployment using these scripts requires Tomcat 6." />
+
       <!-- ensure mysql drivers and xalan files are present -->
       <delete>
-         <fileset dir="${home.tomcat}/common/lib" 
+         <fileset dir="${home.tomcat}/lib" 
                   includes="mysql-connector*" 
                   excludes="${file.name.jar.mysql.connector}" />
       </delete>
 
-      <copy todir="${home.tomcat}/common/lib"      
+      <copy todir="${home.tomcat}/lib"      
             file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
 
-      <copy todir="${home.tomcat}/common/endorsed" 
+      <copy todir="${home.tomcat}/endorsed" 
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
 
-      <copy todir="${home.tomcat}/common/endorsed" 
+      <copy todir="${home.tomcat}/endorsed" 
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
 
       <!-- copy the hotspot_compiler file to bin directory -->
