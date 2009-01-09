@@ -325,12 +325,12 @@ public class VtiFpRequest extends HttpServletRequestWrapper
         
         try
         {
-            return URLDecoder.decode(value);
+            value = URLDecoder.decode(value);
         }
         catch (Exception e)
         {
-            return value;
         }
+        return checkForIllegalSlashes(value);
     }
 
     /**
@@ -351,11 +351,11 @@ public class VtiFpRequest extends HttpServletRequestWrapper
             if (vectorString.indexOf(OBRACKET) == 0 && vectorString.lastIndexOf(CBRACKET) == (vectorString.length() - 1))
             {
                 vectorString = vectorString.substring(1, vectorString.length() - 1);
-                String[] urls = vectorString.split(";");
+                String[] urls = split(vectorString, LISTSEP);
                 vector = new ArrayList<String>();
                 for (String url : urls)
                 {
-                    vector.add(url);
+                    vector.add(checkForIllegalSlashes(url));
                 }
                 return vector;
             }
@@ -379,18 +379,18 @@ public class VtiFpRequest extends HttpServletRequestWrapper
         if (mapString.indexOf(OBRACKET) == 0 && mapString.lastIndexOf(CBRACKET) == (mapString.length() - 1))
         {
             mapString = mapString.substring(1, mapString.length() - 1);
-            String[] urls = mapString.split("\\]\\]");
+            String[] urls = split(mapString, "\\]\\]");
             for (String url : urls)
             {
                 DocMetaInfo folder = new DocMetaInfo(true);
-                String folder_name = url.substring(0, url.indexOf(LISTSEP)).substring(url.indexOf("=") + 1);
-                folder.setPath(folder_name);
-                String meta_info = url.substring(url.indexOf(LISTSEP) + 1);
+                String folder_name = url.substring(0, url.lastIndexOf(";meta_info")).substring(url.indexOf("=") + 1);
+                folder.setPath(checkForIllegalSlashes(folder_name));
+                String meta_info = url.substring(url.lastIndexOf(";meta_info") + 1);
                 meta_info = meta_info.substring(meta_info.indexOf("[") + 1);
                 if (!meta_info.equals(""))
                 {
                     Map<String, String> properties = new HashMap<String, String>();
-                    String[] meta_keys = meta_info.split(LISTSEP);
+                    String[] meta_keys = split(meta_info, LISTSEP);
                     for (int i = 0; i < meta_keys.length; i += 2)
                     {
                         properties.put(meta_keys[i], meta_keys[i + 1].substring(meta_keys[i + 1].indexOf("|") + 1));
@@ -422,14 +422,14 @@ public class VtiFpRequest extends HttpServletRequestWrapper
             {
                 result.setInputStream(this.getInputStream());
                 mapString = mapString.substring(1, mapString.length() - 1);
-                String document_name = mapString.substring(0, mapString.indexOf(LISTSEP)).substring(mapString.indexOf("=") + 1);
-                result.setPath(document_name);
-                String meta_info = mapString.substring(mapString.indexOf(LISTSEP) + 1);
+                String document_name = mapString.substring(0, mapString.lastIndexOf(";meta_info")).substring(mapString.indexOf("=") + 1);
+                result.setPath(checkForIllegalSlashes(document_name));
+                String meta_info = mapString.substring(mapString.lastIndexOf(";meta_info") + 1);
                 meta_info = meta_info.substring(meta_info.indexOf("[") + 1, meta_info.indexOf("]"));
                 if (!meta_info.equals(""))
                 {
                     Map<String, String> properties = new HashMap<String, String>();
-                    String[] meta_keys = meta_info.split(LISTSEP);
+                    String[] meta_keys = split(meta_info, LISTSEP);
                     for (int i = 0; i < meta_keys.length; i += 2)
                     {
                         properties.put(meta_keys[i], meta_keys[i + 1].substring(meta_keys[i + 1].indexOf("|") + 1));
@@ -468,7 +468,7 @@ public class VtiFpRequest extends HttpServletRequestWrapper
                         if (tokenizer.hasMoreTokens())
                         {
                             value = tokenizer.nextToken();
-                            dictionary.put(key, value);
+                            dictionary.put(key, checkForIllegalSlashes(value));
                         }
                         else
                         {
@@ -532,7 +532,7 @@ public class VtiFpRequest extends HttpServletRequestWrapper
                                 }
                                 else if (typeString.equals(METADICT_VALUE_STRING))
                                 {
-                                    metaDictionary.put(key, valueString);
+                                    metaDictionary.put(key, checkForIllegalSlashes(valueString));
                                 }
                                 else if (typeString.equals(METADICT_VALUE_DOUBLE))
                                 {
@@ -572,6 +572,48 @@ public class VtiFpRequest extends HttpServletRequestWrapper
         }
         return value;
     }
+    
+    private String checkForIllegalSlashes(String value)
+    {
+        if (value != null)
+        {
+            value =  value.replace("\\", "");
+        }
+        
+        return value;
+    }
+    
+    private static String[] split(String value, String separator)
+    {            
+        String[] parts = value.split(separator);
+        List<Integer> indexes = new ArrayList<Integer>();        
+        
+        for (int i = 0; i < parts.length; i++)
+        {            
+            
+            if (parts[i].endsWith("\\") && i < parts.length - 1)
+            {
+                parts[i+1] = parts[i] + separator + parts[i+1];
+                
+            }
+            else
+            {
+                indexes.add(new Integer(i));
+            }
+            
+        }  
+        
+        String[] result = new String[indexes.size()];
+        int pos = 0;
+        Iterator<Integer> it = indexes.iterator();
+       
+        while (it.hasNext())
+        {
+            result[pos] = parts[it.next().intValue()];  
+            pos++;
+        }
+        return result;
+    }
 
     /**
      * @return context name
@@ -580,5 +622,4 @@ public class VtiFpRequest extends HttpServletRequestWrapper
     {
         return alfrescoContextName;
     }
-
 }

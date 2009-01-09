@@ -64,7 +64,7 @@ public enum VtiProperty
     FILE_SOURCECONTROLVERSION ("vti_sourcecontrolversion"),
     FILE_AUTHOR("vti_author"),
     FILE_MODIFIEDBY("vti_modifiedby"),
-
+    
     // SERVICE
     SERVICE_CASESENSITIVEURLS ("vti_casesensitiveurls"),
     SERVICE_LONGFILENAMES ("vti_longfilenames"),

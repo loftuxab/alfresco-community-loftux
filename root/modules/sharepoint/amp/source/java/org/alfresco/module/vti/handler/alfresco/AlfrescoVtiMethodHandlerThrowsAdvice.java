@@ -32,12 +32,12 @@ import org.springframework.aop.ThrowsAdvice;
 /**
  * Adviser that should wrap all realizations of VtiHandlers. It transform 
  * all obtained exceptions to VtiHandlerException.    
- *
+ * 
  * @author Dmitry Lazurkin
  */
 public class AlfrescoVtiMethodHandlerThrowsAdvice implements ThrowsAdvice
 {
-
+    
     /**
      * Method that called after exception occurs
      * 

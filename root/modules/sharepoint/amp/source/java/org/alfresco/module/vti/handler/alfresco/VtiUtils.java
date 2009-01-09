@@ -26,14 +26,16 @@ package org.alfresco.module.vti.handler.alfresco;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Utils class for alfresco handlers that implement frontpage protocol
- *
+ * 
  * @author Dmitry Lazurkin
  */
 public class VtiUtils
@@ -41,19 +43,28 @@ public class VtiUtils
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
     private static final SimpleDateFormat propfindDateFormate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     private static final SimpleDateFormat versionDateFormat = new SimpleDateFormat("M/d/yyyy h:mm a", Locale.ENGLISH);
+    
+    private static Map<String, String> encodingMap = new HashMap<String, String>();
 
-    private static Pattern validNamePattern = Pattern.compile("[^!@#$%\\^&*\\(\\)+=~`:;/\\\\\\[\\]\\{\\}|,\"'\\?<>]+");
-
+    private static Pattern validNamePattern = Pattern.compile("[^#]+");
+    
     static
     {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         propfindDateFormate.setTimeZone(TimeZone.getTimeZone("GMT"));
+        
+        encodingMap.put("=", "&#61;");
+        encodingMap.put("{", "&#123;");
+        encodingMap.put("}", "&#125;");
+        encodingMap.put("&", "&#38;");
+        encodingMap.put(";", "&#59;");
+        encodingMap.put("'", "&#39;");
     }
 
     /**
      * Convert FrontPageExtension version string to alfresco version label. For FrontPageExtension version string minor number is optional, but for alfresco version label it's
      * required
-     *
+     * 
      * @param docVersion FrontPageExtension version string
      * @return alfresco version label
      */
@@ -69,7 +80,7 @@ public class VtiUtils
 
     /**
      * Convert FrontPageExtension lock timeout to Alfresco lock timeout. FrontPageExtension timeout is number of minutes, but Alfresco timeout is number of seconds.
-     *
+     * 
      * @param timeout FrontPageExtension lock timeout
      * @return Alfresco lock timeout
      */
@@ -99,7 +110,7 @@ public class VtiUtils
     {
         return versionDateFormat.format(date);
     }
-    
+
     /**
      * Format propfind date
      * 
@@ -122,11 +133,37 @@ public class VtiUtils
     {
         return dateString.replaceAll("-0000", "+0000").equals(dateFormat.format(date));
     }
-
+    
     public static boolean hasIllegalCharacter(String value)
     {
         Matcher matcher = validNamePattern.matcher(value);
         return !matcher.matches();
     }
-
+    
+    public static String htmlEncode(String value)
+    {
+        if (value == null)        
+        {
+            return null;
+        }
+        
+        StringBuilder sb = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i ++)
+        {
+            char current = value.charAt(i);
+            
+            String replacement = encodingMap.get("" + current);
+            
+            if (replacement != null)
+            {
+                sb.append(replacement);
+            }
+            else
+            {
+                sb.append(current);
+            }
+        }
+        return sb.toString();        
+    } 
+    
 }

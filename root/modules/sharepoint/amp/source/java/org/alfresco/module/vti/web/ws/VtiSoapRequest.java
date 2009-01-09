@@ -55,6 +55,7 @@ public class VtiSoapRequest extends HttpServletRequestWrapper
         try
         {
             SAXReader reader = new SAXReader();
+            reader.setValidation(false);
             document = reader.read(request.getInputStream());
         }
         catch (Exception e)

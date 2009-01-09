@@ -27,7 +27,7 @@ package org.alfresco.module.vti.metadata.dic;
 
 /**
  * <p>Enum of the standard sorting types.</p>
- *
+ * 
  * @author PavelYur
  */
 public enum VtiSort

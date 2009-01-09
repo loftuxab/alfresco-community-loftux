@@ -34,27 +34,27 @@ public enum VtiSortField
     /**
      * sort by name
      */
-    NAME ("BaseName"),
+    NAME ("BaseName"),                     
 
     /**
      * sort by type
      */
-    TYPE ("DocIcon"),
+    TYPE ("DocIcon"),                      
 
     /**
      * sort by modifier
      */
-    MODIFIEDBY ("Editor"),
+    MODIFIEDBY ("Editor"),                 
 
     /**
      * sort by last modified date
      */
-    MODIFIED ("Last_x0020_Modified"),
+    MODIFIED ("Last_x0020_Modified"),      
 
     /**
      * sort by checked out username
      */
-    CHECKEDOUTTO ("CheckedOutTitle");
+    CHECKEDOUTTO ("CheckedOutTitle");      
 
     private String value;
     

@@ -28,7 +28,6 @@ package org.alfresco.module.vti.web;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLDecoder;
 import java.util.Enumeration;
 
 import javax.servlet.Filter;
@@ -47,6 +46,7 @@ import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.util.URLDecoder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -297,7 +297,7 @@ public class VtiFilter implements Filter
             {
                 logger.debug("Checking is resource exist");
             }
-            String decodedUrl = URLDecoder.decode(httpRequest.getRequestURI(), "UTF-8");
+            String decodedUrl = URLDecoder.decode(httpRequest.getRequestURI());
             if (decodedUrl.length() > alfrescoContext.length())
             {
                 decodedUrl = decodedUrl.substring(alfrescoContext.length() + 1);

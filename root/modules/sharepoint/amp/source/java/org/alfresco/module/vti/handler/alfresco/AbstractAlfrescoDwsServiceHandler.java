@@ -440,6 +440,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      */
     public void createFolder(String url)
     {
+        
         for (String part : VtiPathHelper.removeSlashes(url).split("/"))
         {
             if (VtiUtils.hasIllegalCharacter(part))
