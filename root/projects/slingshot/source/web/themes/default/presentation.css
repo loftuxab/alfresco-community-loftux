@@ -21,11 +21,9 @@ a:hover
 
 h1
 {
-/*   font-family: Helvetica, Arial, sans-serif;
+   font-family: Helvetica, Arial, sans-serif;
    font-size: 146.5%;
    font-weight: normal;
-*/ 
-   font:normal 146.5% Helvetica, Arial, sans-serif;
 }
 
 h2
