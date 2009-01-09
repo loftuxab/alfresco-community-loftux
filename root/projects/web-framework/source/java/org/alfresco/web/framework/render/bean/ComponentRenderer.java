@@ -56,7 +56,10 @@ public class ComponentRenderer extends AbstractRenderer
     public void header(RenderContext parentContext)
         throws RendererExecutionException
     {
-        super.header(parentContext);
+        if (logger.isDebugEnabled())
+        {
+            super.header(parentContext);
+        }
         
         Component component = (Component) parentContext.getObject();
 

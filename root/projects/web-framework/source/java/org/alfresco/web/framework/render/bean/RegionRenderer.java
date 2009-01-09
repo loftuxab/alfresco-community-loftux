@@ -57,7 +57,10 @@ public class RegionRenderer extends AbstractRenderer
     public void header(RenderContext parentContext)
         throws RendererExecutionException
     {
-        super.header(parentContext);
+        if (logger.isDebugEnabled())
+        {
+            super.header(parentContext);
+        }
         
         TemplateInstance template = (TemplateInstance) parentContext.getObject();
 

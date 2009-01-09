@@ -291,10 +291,10 @@ public class WrappedRequestContext implements RequestContext
         return this.context.getRequest();
     }
     
-        
+    
     @Override
     public String toString()
     {
-        return "Wrapped" + this.context.toString();
+        return "Wrapped: " + this.context.toString();
     }    
 }

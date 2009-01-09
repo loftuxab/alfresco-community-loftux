@@ -221,21 +221,6 @@ public class RenderHelper
     }
     
     /**
-     * Renders the BODY focus for the given model object using the 
-     * provided renderContext settings
-     * 
-     * @param renderContext
-     * @throws RendererExecutionException
-     */
-    /*
-    public static void renderModelObject(RenderContext renderContext)
-        throws RendererExecutionException
-    {
-        renderModelObject(renderContext, RenderFocus.BODY);
-    }
-    */
-    
-    /**
      * Renders the specific focus for the given model object
      * 
      * @param renderContext

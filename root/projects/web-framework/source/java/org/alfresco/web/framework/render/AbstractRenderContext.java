@@ -48,7 +48,7 @@ import org.alfresco.web.site.WrappedRequestContext;
 public abstract class AbstractRenderContext extends WrappedRequestContext implements RenderContext, Serializable
 {
     // the provider
-    protected RenderContextProvider provider;
+    protected final RenderContextProvider provider;
     
     // other attributes
     protected ModelObject object;
@@ -81,7 +81,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#getRenderMode()
      */
-    public RenderMode getRenderMode()
+    public final RenderMode getRenderMode()
     {
         return this.mode;
     }
@@ -89,7 +89,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#setRenderMode(org.alfresco.web.framework.render.RenderMode)
      */
-    public void setRenderMode(RenderMode mode)
+    public final void setRenderMode(RenderMode mode)
     {
         this.mode = mode;
     }
@@ -97,7 +97,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#getRequest()
      */
-    public HttpServletRequest getRequest()
+    public final HttpServletRequest getRequest()
     {
         return this.request;
     }
@@ -105,7 +105,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#setRequest(javax.servlet.http.HttpServletRequest)
      */
-    public void setRequest(HttpServletRequest request)
+    public final void setRequest(HttpServletRequest request)
     {
         this.request = request;
     }
@@ -113,7 +113,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#getResponse()
      */
-    public HttpServletResponse getResponse()
+    public final HttpServletResponse getResponse()
     {
         return this.response;
     }
@@ -121,7 +121,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#setResponse(javax.servlet.http.HttpServletResponse)
      */
-    public void setResponse(HttpServletResponse response)
+    public final void setResponse(HttpServletResponse response)
     {
         this.response = response;
     }
@@ -145,7 +145,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#getRenderId()
      */
-    public String getRenderId()
+    public final String getRenderId()
     {
         synchronized (AbstractRenderContext.class)
         {
@@ -161,7 +161,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.site.RequestContext#getId()
      */
-    public String getId()
+    public final String getId()
     {
         if (this.object != null)
         {
@@ -173,7 +173,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#getProvider()
      */
-    public RenderContextProvider getProvider()
+    public final RenderContextProvider getProvider()
     {
         return this.provider;
     }
@@ -195,7 +195,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#setPassiveMode(boolean)
      */
-    public void setPassiveMode(boolean passiveMode)
+    public final void setPassiveMode(boolean passiveMode)
     {
         this.passiveMode = passiveMode;
     }
@@ -203,7 +203,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#isPassiveMode()
      */
-    public boolean isPassiveMode()
+    public final boolean isPassiveMode()
     {
         return this.passiveMode;
     }

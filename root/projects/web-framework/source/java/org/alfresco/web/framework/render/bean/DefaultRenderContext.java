@@ -27,14 +27,12 @@ package org.alfresco.web.framework.render.bean;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 
 import org.alfresco.web.framework.render.AbstractRenderContext;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.render.RenderContextProvider;
 import org.alfresco.web.framework.render.RenderMode;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.WrappedRequestContext;
 
 /**
  * A render context instance is available to all rendering engines
@@ -45,9 +43,14 @@ import org.alfresco.web.site.WrappedRequestContext;
  */
 public class DefaultRenderContext extends AbstractRenderContext
 {
-    protected Map<String, Serializable> ourValuesMap;
-    protected Map<String, Serializable> normalizedValuesMap;
+    private final Map<String, Serializable> ourValuesMap;
     
+    /**
+     * Constructor
+     * 
+     * @param provider      RenderContextProvider
+     * @param context       RequestContext to wrap
+     */
     public DefaultRenderContext(RenderContextProvider provider, RequestContext context)
     {
         super(provider, context);
@@ -68,20 +71,16 @@ public class DefaultRenderContext extends AbstractRenderContext
         this.ourValuesMap = new HashMap<String, Serializable>(4, 1.0f);
     }
     
+    @Override
     public void setValue(String key, Serializable value)
     {
-        this.ourValuesMap.put(key, value);
-
-        // remove from our normalized depth map as well
-        if (this.normalizedValuesMap != null)
-        {
-            this.normalizedValuesMap.remove(key);
-        }        
+        this.ourValuesMap.put(key, value);   
     }
 
+    @Override
     public Serializable getValue(String key)
     {
-        Serializable value = (Serializable) this.ourValuesMap.get(key);
+        Serializable value = (Serializable)this.ourValuesMap.get(key);
         if (value == null)
         {
             // check if a wrapped context has the value
@@ -90,58 +89,24 @@ public class DefaultRenderContext extends AbstractRenderContext
         return value;
     }
 
+    @Override
     public void removeValue(String key)
     {
         this.ourValuesMap.remove(key);
-        
-        // remove from our normalized depth map as well
-        if (this.normalizedValuesMap != null)
-        {
-            this.normalizedValuesMap.remove(key);
-        }
     }
     
+    @Override
     public boolean hasValue(String key)
     {
         return this.ourValuesMap.containsKey(key);
     }
     
+    @Override
     public synchronized Map<String, Serializable> getValuesMap()
     {
-        if (this.normalizedValuesMap == null)
-        {
-            this.normalizedValuesMap = new HashMap<String, Serializable>(16, 1.0f);
-            
-            RequestContext rc = (RequestContext) this;
-            
-            // build the stack
-            Stack<RequestContext> stack = new Stack<RequestContext>();
-            boolean build = true;
-            while (build)
-            {
-                stack.push(rc);
-                
-                if (rc instanceof WrappedRequestContext)
-                {
-                    rc = ((WrappedRequestContext)rc).getOriginalContext();
-                }
-                else
-                {
-                    build = false;
-                }
-            }
-            
-            // pop out the stack and populate variables
-            while (stack.size() != 0)
-            {
-                rc = (RequestContext) stack.peek();
-                this.normalizedValuesMap.putAll(rc.getValuesMap());
-                
-                stack.pop();
-            }
-        }
-        
-        return this.normalizedValuesMap;
+        Map<String, Serializable> normalizedValuesMap = new HashMap<String, Serializable>(this.ourValuesMap);
+        normalizedValuesMap.putAll(this.getOriginalContext().getValuesMap());
+        return normalizedValuesMap;
     }
 }
     
