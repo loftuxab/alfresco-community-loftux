@@ -94,7 +94,12 @@ hr
    width: 28%;
 }
 
-
+.yui-skin-default .yui-panel .hd,
+.yui-skin-default .yui-panel .bdft,
+.yui-skin-default .yui-panel .ft
+{
+   text-align:center;
+}
 /* Style the default message  */
 
 .yui-skin-default #message
