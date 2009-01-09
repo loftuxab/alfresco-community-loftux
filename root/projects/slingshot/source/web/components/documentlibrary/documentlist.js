@@ -40,7 +40,16 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
+
+   /**
+    * Preferences
+    */
+   var PREFERENCES_ROOT = "org.alfresco.share.documentList",
+      PREF_SHOW_FOLDERS = "org.alfresco.share.documentList.showFolders",
+      PREF_SIMPLE_VIEW = "org.alfresco.share.documentList.simpleView";
+
    
    /**
     * DocumentList constructor.
@@ -64,6 +73,7 @@
          filterData: ""
       };
       this.modules = {};
+      this.services = {};
       this.actions = {};
       this.selectedFiles = {};
       this.tagId =
@@ -145,6 +155,7 @@
           * 
           * @property usePagination
           * @type boolean
+          * @default false
           */
          usePagination: false,
 
@@ -229,8 +240,24 @@
           * @property previewTooltips
           * @type array
           */
-         previewTooltips: null
+         previewTooltips: null,
          
+         /**
+          * Valid online edit mimetypes
+          * Currently allowed are Microsoft Office 2003 and 2007 mimetypes for Excel, PowerPoint and Word only
+          *
+          * @property onlineEditMimetypes
+          * @type object
+          */
+         onlineEditMimetypes:
+         {
+            "application/vnd.excel": true,
+            "application/vnd.powerpoint": true,
+            "application/msword": true,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": true,
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation": true,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": true 
+         }
       },
       
       /**
@@ -290,6 +317,14 @@
        * @type object
        */
       modules: null,
+
+      /**
+       * Object container for storing service instances.
+       * 
+       * @property services
+       * @type object
+       */
+      services: null,
 
       /**
        * Object container for storing action markup elements.
@@ -424,24 +459,12 @@
          while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath))){}
          
          this.currentPath = bookmarkedPath || this.options.initialPath || "";
-         if ((this.currentPath.length > 0) && (this.currentPath.charAt(0) != "/"))
-         {
-            this.currentPath = "/" + this.currentPath;
-         }
-         else if (this.currentPath == "/")
-         {
-            this.currentPath = "";
-         }
+         this.currentPath = $combine("/", this.currentPath);
 
          // Register History Manager path update callback
          YAHOO.util.History.register("path", bookmarkedPath, function DL_onHistoryManagerPathChanged(newPath)
          {
             Alfresco.logger.debug("HistoryManager: path changed:" + newPath);
-            
-            if (newPath == "/")
-            {
-               newPath = "";
-            }
             
             if (this.expectedHistoryEvent)
             {
@@ -532,19 +555,22 @@
          });
          
 
+         // Preferences service
+         this.services.preferences = new Alfresco.service.Preferences();
+
+         
          // DataSource definition
          var uriDocList = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriDocList);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
+               "index", "nodeRef", "type", "isLink", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
-               "activeWorkflows", "location", "permissions"
+               "activeWorkflows", "location", "permissions", "onlineEditUrl"
             ],
             metaFields:
             {
@@ -580,11 +606,12 @@
           * Generate "pathChanged" event onClick mark-up
           *
           * @method generatePathOnClick
-          * @param path {string} New path to navigate to
+          * @param locn {object} Location object containing path and folder name to navigate to
           * @return {string} Mark-up for use in onClick attribute
           */
-         var generatePathOnClick = function DL_generatePathOnClick(path)
+         var generatePathOnClick = function DL_generatePathOnClick(locn)
          {
+            var path = $combine(locn.path, locn.file);
             return "YAHOO.Bubbling.fire('pathChanged', {path: '" + path.replace(/[']/g, "\\'") + "'}); return false;";
          };
          
@@ -728,6 +755,9 @@
          var renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
             var name = oRecord.getData("fileName"),
+               type = oRecord.getData("type"),
+               isLink = oRecord.getData("isLink"),
+               locn = oRecord.getData("location"),
                extn = name.substring(name.lastIndexOf(".")),
                docDetailsUrl;
 
@@ -740,15 +770,15 @@
                Dom.setStyle(elCell, "width", oColumn.width + "px");
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-               if (oRecord.getData("type") == "folder")
+               if (type == "folder")
                {
-                  elCell.innerHTML = '<a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + name) + '"><span class="folder-small"></span></a>';
+                  elCell.innerHTML = '<span id="' + id + '" class="folder-small">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
                }
                else
                {
                   var id = me.id + '-preview-' + oRecord.getId();
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
-                  elCell.innerHTML = '<span id="' + id + '" class="icon32"><a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" /></a></span>';
                   
                   // Preview tooltip
                   me.previewTooltips.push(id);
@@ -763,14 +793,14 @@
                Dom.setStyle(elCell, "width", oColumn.width + "px");
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-               if (oRecord.getData("type") == "folder")
+               if (type == "folder")
                {
-                  elCell.innerHTML = '<a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + name) + '"><span class="folder"></span></a>';
+                  elCell.innerHTML = '<span id="' + id + '" class="folder">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
                }
                else
                {
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
-                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="thumbnail"><a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="thumbnail">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></a></span>';
                }
             }
          };
@@ -787,13 +817,22 @@
          var renderCellDescription = function DL_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             var desc = "", description, docDetailsUrl, tags, i, j;
+            var type = oRecord.getData("type"),
+               isLink = oRecord.getData("isLink"),
+               locn = oRecord.getData("location");
             
-            if (oRecord.getData("type") == "folder")
+            // Link handling
+            if (isLink)
+            {
+               oRecord.setData("displayName", me._msg("details.link-to", oRecord.getData("displayName")));
+            }
+            
+            if (type == "folder")
             {
                /**
                 * Folders
                 */
-               desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(me.currentPath + "/" + oRecord.getData("fileName")) + '">';
+               desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
                desc += $html(oRecord.getData("displayName")) + '</a></h3>';
 
                if (me.options.simpleView)
@@ -837,7 +876,7 @@
             else
             {
                /**
-                * Documents
+                * Documents and Links
                 */
                docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
                 
@@ -938,6 +977,16 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
+            
+            /**
+             * Configure the Online Edit URL if conditions met
+             */
+            if (me.doclistMetadata.onlineEditing && (oRecord.getData("mimetype") in me.options.onlineEditMimetypes))
+            {
+               var loc = oRecord.getData("location"), path;
+               
+               oRecord.setData("onlineEditUrl", window.location.protocol + "//" + window.location.hostname + ":7070/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
+            }
          };
 
 
@@ -1278,6 +1327,8 @@
       {
          this.options.showFolders = !this.options.showFolders;
          p_obj.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
+         
+         this.services.preferences.set(PREF_SHOW_FOLDERS, this.options.showFolders);
 
          YAHOO.Bubbling.fire("doclistRefresh");
          Event.preventDefault(e);
@@ -1294,6 +1345,8 @@
       {
          this.options.simpleView = !this.options.simpleView;
          p_obj.set("label", this._msg(this.options.simpleView ? "button.view.detailed" : "button.view.simple"));
+
+         this.services.preferences.set(PREF_SIMPLE_VIEW, this.options.simpleView);
 
          YAHOO.Bubbling.fire("doclistRefresh");
          Event.preventDefault(e);
@@ -1371,6 +1424,13 @@
              */
             // Trim the items in the clone depending on the user's access
             var userAccess = record.getData("permissions").userAccess;
+            
+            // Inject a special-case permission if online editing is configured, we've got a valid edit URL and the browser allows it
+            if (this.doclistMetadata.onlineEditing && record.getData("onlineEditUrl") && (YAHOO.env.ua.ie > 0))
+            {
+               userAccess["online-edit"] = true;
+            }
+            
             var actions = YAHOO.util.Selector.query("div", clone);
             var actionPermissions, i, ii, j, jj;
             for (i = 0, ii = actions.length; i < ii; i++)
@@ -1564,10 +1624,12 @@
       onActionDelete: function DL_onActionDelete(row)
       {
          var me = this;
-         var record = this.widgets.dataTable.getRecord(row);
+         var record = this.widgets.dataTable.getRecord(row),
+            displayName = record.getData("displayName");
+         
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: this._msg("message.confirm.delete", record.getData("fileName")),
+            text: this._msg("message.confirm.delete", displayName),
             buttons: [
             {
                text: this._msg("button.delete"),
@@ -1597,10 +1659,10 @@
        */
       _onActionDeleteConfirm: function DL__onActionDeleteConfirm(record)
       {
-         var fileType = record.getData("type");
-         var fileName = record.getData("fileName");
-         var filePath = this.currentPath + "/" + fileName;
-         var displayName = record.getData("displayName");
+         var fileType = record.getData("type"),
+            fileName = record.getData("fileName"),
+            filePath = $combine(this.currentPath, fileName),
+            displayName = record.getData("displayName");
          
          this.modules.actions.genericAction(
          {
@@ -1633,15 +1695,8 @@
             },
             webscript:
             {
-               name: "file/site/{site}/{container}{path}/{file}",
+               name: $combine("file/site", this.options.siteId, this.options.containerId, this.currentPath, fileName),
                method: Alfresco.util.Ajax.DELETE
-            },
-            params:
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: this.currentPath,
-               file: fileName
             }
          });
       },
@@ -1729,17 +1784,24 @@
             },
             webscript:
             {
-               name: "checkout/site/{site}/{container}{path}/{file}",
+               name: $combine("checkout/site", this.options.siteId, this.options.containerId, this.currentPath, fileName),
                method: Alfresco.util.Ajax.POST
-            },
-            params:
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: this.currentPath,
-               file: fileName
             }
          });
+      },
+      
+      /**
+       * Edit Online.
+       *
+       * @method onActionEditOnline
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionEditOnline: function DL_onActionEditOnline(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row);
+         window.open(record.getData("onlineEditUrl"), "_blank");
+         // Really, we'd need to refresh after the document has been opened, but we dn't know when/if this occurs
+         YAHOO.Bubbling.fire("doclistRefresh");
       },
 
       /**
@@ -1989,10 +2051,6 @@
                   
                   var bookmarkedState = YAHOO.util.History.getBookmarkedState("path");
                   while (bookmarkedState != (bookmarkedState = decodeURIComponent(bookmarkedState))){}
-                  if (bookmarkedState == "/")
-                  {
-                     bookmarkedState = "";
-                  }
                   if (obj.path != bookmarkedState)
                   {
                      var objNav =
@@ -2261,7 +2319,7 @@
             
             Alfresco.logger.debug("currentPath was [" + this.currentPath + "] now [" + successPath + "]");
             Alfresco.logger.debug("currentPage was [" + this.currentPage + "] now [" + successPage + "]");
-            this.currentPath = successPath == "/" ? "" : successPath;
+            this.currentPath = successPath;
             this.currentPage = successPage;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
@@ -2360,7 +2418,7 @@
             type: encodeURIComponent(obj.type),
             site: encodeURIComponent(obj.site),
             container: encodeURIComponent(obj.container),
-            path: encodeURI(obj.path)
+            path: $combine("/", encodeURI(obj.path))
          });
 
          // Filter parameters

@@ -38,6 +38,12 @@
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
 
+   /**
+    * Alfresco Slingshot aliases
+    */
+    var $html = Alfresco.util.encodeHTML,
+       $combine = Alfresco.util.combinePaths;
+
    Alfresco.module.DoclibMoveTo = function(htmlId)
    {
       // Mandatory properties
@@ -285,7 +291,7 @@
                         var tempNode = new YAHOO.widget.TextNode(
                         {
                            label: item.name,
-                           path: nodePath + "/" + item.name,
+                           path: $combine(nodePath, item.name),
                            nodeRef: item.nodeRef,
                            description: item.description,
                            userAccess: item.userAccess,
@@ -508,18 +514,12 @@
             },
             webscript:
             {
-               name: "move-to/site/{site}/{container}{path}",
+               name: $combine("move-to/site", this.options.siteId, this.options.containerId, this.selectedNode.data.path),
                method: Alfresco.util.Ajax.POST
             },
             wait:
             {
                message: this._msg("message.please-wait")
-            },
-            params:
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: this.selectedNode.data.path
             },
             config:
             {
@@ -607,11 +607,8 @@
       {
          Alfresco.logger.debug("DLMT_onPathChanged");
 
-         // ensure path starts with leading slash if not the root node
-         if ((path != "") && (path.charAt(0) != "/"))
-         {
-            path = "/" + path;
-         }
+         // ensure path starts with leading slash
+         path = $combine("/", path);
          this.currentPath = path;
          
          // Search the tree to see if this path's node is expanded
@@ -635,6 +632,11 @@
           * eventually display the current path's node
           */
          var paths = path.split("/");
+         // Check for root path special case
+         if (path === "/")
+         {
+            paths = ["/"];
+         }
          var expandPath = "";
          for (var i = 0; i < paths.length; i++)
          {
@@ -647,7 +649,7 @@
          }
          
          // Kick off the expansion process by expanding the root node
-         node = this.widgets.treeview.getNodeByProperty("path", "");
+         node = this.widgets.treeview.getNodeByProperty("path", "/");
          if (node !== null)
          {
             node.expand();
@@ -679,7 +681,7 @@
          var tempNode = new YAHOO.widget.TextNode(
          {
             label: Alfresco.util.message("node.root", this.name),
-            path: "",
+            path: "/",
             nodeRef: ""
          }, tree.getRoot(), false);
 

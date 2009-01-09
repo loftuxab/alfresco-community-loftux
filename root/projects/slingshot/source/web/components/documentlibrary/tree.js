@@ -41,7 +41,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+    var $html = Alfresco.util.encodeHTML,
+       $combine = Alfresco.util.combinePaths;
 
    /**
     * DocumentList TreeView constructor.
@@ -247,17 +248,17 @@
             {
                success: function DLT_lND_success(oResponse)
                {
-                  var results = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, tempNode;
 
                   if (results.items)
                   {
                      for (var i = 0, j = results.items.length; i < j; i++)
                      {
-                        var item = results.items[i];
-                        var tempNode = new YAHOO.widget.TextNode(
+                        item = results.items[i];
+                        tempNode = new YAHOO.widget.TextNode(
                         {
                            label: item.name,
-                           path: nodePath + "/" + item.name,
+                           path: $combine(nodePath, item.name),
                            nodeRef: item.nodeRef,
                            description: item.description
                         }, node, false);
@@ -434,13 +435,10 @@
       onPathChanged: function DLT_onPathChanged(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.path !== null))
+         if (obj && (obj.path !== null))
          {
             // ensure path starts with leading slash if not the root node
-            if ((obj.path !== "") && (obj.path.charAt(0) != "/"))
-            {
-               obj.path = "/" + obj.path;
-            }
+            obj.path = $combine("/", obj.path);
             // Defer if event received before we're ready
             if (!this.isReady)
             {
@@ -482,6 +480,11 @@
              * eventually display the current path's node
              */
             var paths = obj.path.split("/");
+            // Check for root path special case
+            if (obj.path === "/")
+            {
+               paths = ["/"];
+            }
             var expandPath = "";
             for (var i = 0; i < paths.length; i++)
             {
@@ -494,7 +497,7 @@
             }
             
             // Kick off the expansion process by expanding the root node
-            node = this.widgets.treeview.getNodeByProperty("path", "");
+            node = this.widgets.treeview.getNodeByProperty("path", "/");
             if (node !== null)
             {
                node.expand();
@@ -536,22 +539,13 @@
        */
       onFolderCopied: function DLT_onFolderCopied(layer, args)
       {
-         var destPath;
          var obj = args[1];
          if (obj !== null)
          {
             if (obj.nodeRef && obj.destination)
             {
-               destPath = obj.destination;
-               
-               // ensure path starts with leading slash if not the root node
-               if ((destPath !== "") && (destPath.charAt(0) != "/"))
-               {
-                  destPath = "/" + destPath;
-               }
-               
                // Do we have the parent of the node's copy loaded?
-               var nodeDest = this.widgets.treeview.getNodeByProperty("path", destPath);
+               var nodeDest = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.destination));
                if (nodeDest)
                {
                   if (nodeDest.expanded)
@@ -579,14 +573,10 @@
       onFolderCreated: function DLT_onFolderCreated(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.path !== null))
+         if (obj && (obj.path !== null))
          {
-            // ensure path starts with leading slash if not the root node
-            if ((obj.parentPath !== "") && (obj.parentPath.charAt(0) != "/"))
-            {
-               obj.parentPath = "/" + obj.parentPath;
-            }
-            var parentNode = this.widgets.treeview.getNodeByProperty("path", obj.parentPath);
+            // ensure path starts with leading slash
+            var parentNode = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.parentPath));
             this._sortNodeChildren(parentNode);
          }
       },
@@ -606,12 +596,8 @@
             
             if (obj.path)
             {
-               // ensure path starts with leading slash if not the root node
-               if ((obj.path !== "") && (obj.path.charAt(0) != "/"))
-               {
-                  obj.path = "/" + obj.path;
-               }
-               node = this.widgets.treeview.getNodeByProperty("path", obj.path);
+               // ensure path starts with leading slash
+               node = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.path));
             }
             else if (obj.nodeRef)
             {
@@ -655,13 +641,6 @@
             if (typeof obj.nodeRef !== "undefined" && typeof obj.destination !== "undefined")
             {
                var nodeSrc = null;
-               var dest = obj.destination;
-
-               // ensure path starts with leading slash if not the root node
-               if ((dest !== "") && (dest.charAt(0) != "/"))
-               {
-                  dest = "/" + dest;
-               }
                
                // we should be able to find the original node
                nodeSrc = this.widgets.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
@@ -680,7 +659,7 @@
                      }
                   }
                   // Do we have the node's new parent loaded?
-                  var nodeDest = this.widgets.treeview.getNodeByProperty("path", dest);
+                  var nodeDest = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.destination));
                   if (nodeDest)
                   {
                      if (nodeDest.isLeaf)
@@ -731,7 +710,7 @@
              */
             if ((this.currentFilter.filterOwner === null) && (obj.filterId != "path"))
             {
-               var node = this.widgets.treeview.getNodeByProperty("path", "");
+               var node = this.widgets.treeview.getNodeByProperty("path", "/");
                if (node !== null)
                {
                   node.expand();
@@ -777,7 +756,7 @@
          var tempNode = new YAHOO.widget.TextNode(
          {
             label: Alfresco.util.message("node.root", this.name),
-            path: "",
+            path: "/",
             nodeRef: ""
          }, root, false);
 
@@ -849,7 +828,7 @@
                            var tempNode = new YAHOO.widget.TextNode(
                            {
                               label: item.name,
-                              path: oResponse.argument.node.data.path + "/" + item.name,
+                              path: $combine(oResponse.argument.node.data.path, item.name),
                               nodeRef: item.nodeRef,
                               description: item.description
                            });
@@ -950,16 +929,8 @@
        */
        _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
        {
-          var uriTemplate = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode/site/{site}/{container}{path}";
-
-          var url = YAHOO.lang.substitute(uriTemplate,
-          {
-             site: encodeURIComponent(this.options.siteId),
-             container: encodeURIComponent(this.options.containerId),
-             path: encodeURI(path)
-          });
-
-          return url;
+          var uriTemplate ="slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), encodeURI(path));
+          return  Alfresco.constants.PROXY_URI + uriTemplate;
        }
    };
 })();
