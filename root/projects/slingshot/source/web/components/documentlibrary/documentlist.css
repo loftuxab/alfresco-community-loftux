@@ -201,6 +201,16 @@
    min-height: 32px;
 }
 
+.doclist .documents .icon32 span,
+.doclist .documents .folder-small span
+{
+   background: url(images/link-16.png) no-repeat;
+   display: block;
+   height: 16px;
+   width: 16px;
+   position: absolute;
+}
+
 .doclist .documents .thumbnail
 {
    cursor: pointer;
@@ -209,20 +219,23 @@
    padding-top: 2px;
 }
 
-.doclist .documents .folder
+.doclist .documents .thumbnail span,
+.doclist .documents .folder span
+{
+   background: url(images/link-32.png) no-repeat;
+   display: block;
+   height: 32px;
+   width: 32px;
+   position: absolute;
+}
+
+.doclist .documents .folder .maybe
 {
    background: url(images/folder-48.png) no-repeat;
    display: block;
    margin-left: 24px;
    height: 48px;
    width: 48px;
-}
-.doclist .documents .folder-small
-{
-   background: url(images/folder-32.png) no-repeat;
-   display: block;
-   height: 32px;
-   width: 32px;
 }
 
 .doclist .documents h3.filename
@@ -431,6 +444,11 @@
 .doclist .onActionEditOffline a
 {
    background-image: url(images/edit-16.png);
+}
+
+.doclist .onActionEditOnline a
+{
+   background-image: url(images/edit-online-16.png);
 }
 
 .doclist .onActionCancelEditing a

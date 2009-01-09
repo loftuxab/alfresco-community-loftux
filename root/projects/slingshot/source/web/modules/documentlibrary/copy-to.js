@@ -41,7 +41,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+    var $html = Alfresco.util.encodeHTML,
+       $combine = Alfresco.util.combinePaths;
 
    Alfresco.module.DoclibCopyTo = function(htmlId)
    {
@@ -825,7 +826,7 @@
          Alfresco.logger.debug("DLCT_onPathChanged");
 
          // ensure path starts with leading slash if not the root node
-         if ((path != "") && (path.charAt(0) != "/"))
+         if (path.charAt(0) != "/")
          {
             path = "/" + path;
          }
@@ -864,7 +865,7 @@
          }
          
          // Kick off the expansion process by expanding the root node
-         node = this.widgets.treeview.getNodeByProperty("path", "");
+         node = this.widgets.treeview.getNodeByProperty("path", "/");
          if (node !== null)
          {
             node.expand();
@@ -1015,7 +1016,7 @@
          var tempNode = new YAHOO.widget.TextNode(
          {
             label: this._msg(rootLabel),
-            path: "",
+            path: "/",
             nodeRef: p_rootNodeRef
          }, tree.getRoot(), false);
 

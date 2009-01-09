@@ -379,7 +379,6 @@
             }
          };
          this.fileUpload.show(multiUploadConfig);
-         Event.preventDefault(e);
       },
       
       /**
@@ -541,7 +540,7 @@
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: confirmTitle,
-            text: Alfresco.util.decodeHTML(confirmMsg),
+            text: confirmMsg,
             noEscape: true,
             modal: true,
             buttons: [
@@ -822,6 +821,11 @@
             
             // Enable/disable the Folder Up button
             var paths = this.currentPath.split("/");
+            // Check for root path special case
+            if (this.currentPath === "/")
+            {
+               paths = ["/"];
+            }
             this.widgets.folderUp.set("disabled", paths.length < 2);
          }
       },
@@ -1016,6 +1020,11 @@
          divBC.innerHTML = "";
          
          var paths = this.currentPath.split("/");
+         // Check for root path special case
+         if (this.currentPath === "/")
+         {
+            paths = ["/"];
+         }
          // Clone the array and re-use the root node name from the DocListTree
          var displayPaths = paths.concat();
          displayPaths[0] = Alfresco.util.message("node.root", "Alfresco.DocListTree");
