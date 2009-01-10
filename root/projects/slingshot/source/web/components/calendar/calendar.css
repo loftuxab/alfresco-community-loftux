@@ -354,7 +354,7 @@ color:#999;
 height:100%;
 }
 .calendar  td {
-position:relative;
+/*position:relative;*/
 }
 .calendar.monthview  td {
 /* position:absolute; */
@@ -665,9 +665,9 @@ tr.alldayRow td  {
 	height:52px;
 }
 .calendar.weekview tbody td{
-	border-left:1px solid #EAEAEA;
-	border-bottom:2px solid #EAEAEA;
-}
+/*  border-left:1px solid #EAEAEA;
+  border-bottom:2px solid #EAEAEA;
+*/}
 .calendar.weekview tbody tr.alldayRow td.last {
     border-right:none;
 }
@@ -748,14 +748,14 @@ position:absolute;
     cursor:hand;
 }
 .weekview tr {
-  border-bottom:2px solid #EAEAEA;
+/*  border-bottom:2px solid #EAEAEA;*/
 }
 .hourSegment {
 	min-height:50%;
   height:25px;
   cursor:pointer;
 	border-bottom:1px solid #EAEAEA;
-	position:relative;
+/* position:relative;*/
 	
 }
 .hourSegment.last {
@@ -763,6 +763,8 @@ position:absolute;
 }
 .weekview div.day,.dayview div.day {
 /*  height:3.5em;*/
+  border:1px solid #EAEAEA;
+  border-width:0 1px 2px 1px;
 }
 div.vevent.allday {
 	position:static;
@@ -967,6 +969,9 @@ div.hourSegment .vevent {
 }
 .yui-skin-default div.calendar-currentMonth .yui-link-button a {
   color:#464646;
+}
+tr#collapseTrigger {
+  border:1px solid #EAEAEA;
 }
 tr#collapseTrigger td {
   padding:0.5em;

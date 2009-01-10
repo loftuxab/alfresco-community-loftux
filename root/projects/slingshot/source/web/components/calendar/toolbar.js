@@ -19,7 +19,7 @@
    {
       this.name = "Alfresco.CalendarToolbar";
       this.id = containerId;
-      
+
       this.navButtonGroup = null;
       this.nextButton = null;
       this.prevButton = null;
@@ -92,15 +92,15 @@
          this.todayButton = Alfresco.util.createYUIButton(this, "today-button", this.onTodayNav);
 
          this.navButtonGroup = new YAHOO.widget.ButtonGroup(this.id + "-navigation");
-		 
-		   var view = Alfresco.util.getQueryStringParameter('view') || 'month';
+     
+         var view = Alfresco.util.getQueryStringParameter('view') || 'month';
          var views = [Alfresco.CalendarView.VIEWTYPE_DAY,Alfresco.CalendarView.VIEWTYPE_WEEK,Alfresco.CalendarView.VIEWTYPE_MONTH,Alfresco.CalendarView.VIEWTYPE_AGENDA];
          for (var i=0;i<views.length;i++)
          {
              if (views[i]==view)
              {
                   this.navButtonGroup.check(i);
-                  this.disableButtons(i)
+                  this.disableButtons(i);
                   break;
              }
          }
@@ -132,24 +132,24 @@
          YAHOO.Bubbling.fire("viewChanged",
          {
             activeView: e.newValue.index
-         })
+         });
       },
       disableButtons : function(butIndex) 
       {
          var selectedButton = this.navButtonGroup.getButtons()[butIndex];
          // disable buttons for agenda view only
-      	if ( selectedButton.get('label') === Alfresco.util.message('label.agenda','Alfresco.CalendarView') )
-      	{
-      		this.todayButton.set('disabled',true);
-            this.nextButton.set('disabled',true);
-            this.prevButton.set('disabled',true);	
-  		   }
-  		   else
-  		   {
-      		this.todayButton.set('disabled',false);
-            this.nextButton.set('disabled',false);
-            this.prevButton.set('disabled',false);				
-  		   }          
+        if ( selectedButton.get('label') === Alfresco.util.message('label.agenda','Alfresco.CalendarView') ) 
+        {
+          this.todayButton.set('disabled',true);
+          this.nextButton.set('disabled',true);
+          this.prevButton.set('disabled',true); 
+        }
+        else 
+        {
+          this.todayButton.set('disabled',false);
+          this.nextButton.set('disabled',false);
+          this.prevButton.set('disabled',false);        
+        }          
       },
       _fireEvent: function(type)
       {
@@ -167,7 +167,7 @@
        * @param e {object} DomEvent
        * @param obj {object} Object passed back from addListener method
        * @method  onButtonClick
-       */
+       */     
       onButtonClick: function(e)
       {
          // TODO: look at caching this
