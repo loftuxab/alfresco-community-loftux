@@ -476,6 +476,8 @@
 
                 if (targetEl)
                 {
+
+                    YAHOO.util.Dom.setStyle(targetEl,'position','relative');
                     targetEl.appendChild(vEventEl);                
                 }
                 Dom.setStyle(vEventEl,'top',offsetTop+'px');              
@@ -722,7 +724,8 @@
             event = this.events[id];
         }
         
-        var eventEl = event.getEl();          
+        var eventEl = event.getEl();
+        var p = YAHOO.util.Dom.getAncestorByClassName(eventEl,'hourSegment','div');          
         var targetEl = null;
         var dateParts = data.dtstart.split('T');
         var hour = dateParts[1].split(':')[0];
@@ -762,6 +765,11 @@
               var index = (parseInt(min,10)>=30) ? 1 : 0;
               targetEl = Dom.get(id);
               targetEl = Dom.getElementsByClassName('hourSegment','div',targetEl)[index];
+
+              if (p) {
+                YAHOO.util.Dom.setStyle(p,'position','static');
+              }
+              YAHOO.util.Dom.setStyle(targetEl,'position','relative');
               targetEl.appendChild(eventEl);
               
               data.duration = Alfresco.CalendarHelper.getDuration(Alfresco.util.fromISO8601(data.dtstart),Alfresco.util.fromISO8601(data.dtend));
@@ -796,7 +804,6 @@
         
         var data = YAHOO.lang.JSON.parse(e.serverResponse.responseText).event;
 
-        
         var dtStartDate = Alfresco.util.fromISO8601(data.from+'T'+data.start);
         var dtEndDate = Alfresco.util.fromISO8601(data.to+'T'+data.end);
         data.duration = Alfresco.CalendarHelper.getDuration(dtStartDate,dtEndDate);
@@ -831,6 +838,7 @@
             var min = data.from.split('T')[1].split(':')[1];
             var segments  = Dom.getElementsByClassName('hourSegment','div',targetEl);
             targetEl = (parseInt(min,10)>=30) ? segments[1] : segments[0];
+            YAHOO.util.Dom.setStyle(targetEl,'position','relative');
             targetEl.appendChild(vEventEl);
         }
         
@@ -1665,6 +1673,11 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
         {
             var delta  =  YAHOO.util.Dom.getY(el)-YAHOO.util.Dom.getY(targetEl);
             //move el
+            var p = YAHOO.util.Dom.getAncestorByClassName(el,'hourSegment','div');
+            if (p) {
+              YAHOO.util.Dom.setStyle(p,'position','static');
+            }
+            YAHOO.util.Dom.setStyle(targetEl,'position','relative');
             targetEl.appendChild(el);
             //reset to 0,0 origin
             YAHOO.util.DDM.moveToEl(el,targetEl);

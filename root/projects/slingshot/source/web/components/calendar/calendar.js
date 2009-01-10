@@ -175,7 +175,7 @@
 
             this.calendar.cfg.setProperty("selected", dates.join(","));
             this.calendar.render();
-            
+
             Alfresco.util.PopupManager.displayMessage(
             {
                text: this._msg("message.add.success", params.name)
