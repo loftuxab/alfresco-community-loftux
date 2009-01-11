@@ -34,11 +34,9 @@ package org.alfresco.previewer
 	import flash.events.IOErrorEvent;
 	import flash.events.KeyboardEvent;
 	import flash.net.URLRequest;
-	import flash.system.System;
 	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
 	
-	import mx.controls.Alert;
 	import mx.core.MovieClipAsset;
 	import mx.events.ResizeEvent;
 	

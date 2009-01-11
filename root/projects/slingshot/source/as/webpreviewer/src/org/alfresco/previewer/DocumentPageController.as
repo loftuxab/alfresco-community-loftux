@@ -82,7 +82,7 @@ package org.alfresco.previewer
 		 * The number of milliseconds to wait until the page loading actually starts
 		 * to avoid unneccessarry loading of pages.
 		 */
-		private var millisToWaitUntilAction:int = 250;
+		private var millisToWaitUntilAction:int = 100;
 		
 		/**
 		 * The number of milliseconds to wait until making the check if the time
@@ -255,14 +255,51 @@ import org.alfresco.previewer.Page;
  */
 class PageLoaderThread extends PseudoThread
 {
+	/**
+	 * Reference to the page controller that contains info
+	 * about which page and how many pages that the user
+	 * would like to see.
+	 */ 
 	private var dpc:DocumentPageController;
+	
+	/**
+	 * The pool of the movie clips that we can use to display as pages.
+	 */
 	private var movieClipPool:Array = new Array();
+	
+	/**
+	 * Keeps track of which of the visible pages we currently are loading.
+	 */
 	private var visiblePageIndex:int = 0;
 	
+	/**
+	 * The previous page the user asked for, if we compare it to the
+	 * new page the user is asking for we know if he is scrolling up or down.
+	 */
 	private var lastPage:int = 0;
-	private var usedMovieClipIndexes:Object = {};
-
 	
+	/**
+	 * Keeps track of which movie clips in the pool that we have used
+	 * to display the current page and the one below.
+	 */
+	private var usedMovieClipIndexes:Object = {};
+	
+	/**
+	 * Gets set when the loading actually starts.
+	 */
+	private var loadDestinationFrame:int = 0;
+	
+	/**
+	 * The number of frames to load each time part of the movie is loaded.
+	 * The smaller value the more times the loader thread will listen for changes in the ui.
+	 * Just don't make it too small so too much time is spent checking for changes.
+	 */
+	private var loadFrameStep:int = 12;
+	
+	/**
+	 * The pool index to the movie clip that is loading.
+	 */ 
+	private var loadingMovieClipIndex:int = 0;
 	
 	/**
 	 * Constructor
@@ -313,6 +350,9 @@ class PageLoaderThread extends PseudoThread
 	 */ 
     protected override function work():void 
     {
+    	// Continue loading if it was interupted
+    	load();
+    	
 		var mc:MovieClip;
 		var j:int = 0;
 		
@@ -476,24 +516,67 @@ class PageLoaderThread extends PseudoThread
     		return;
     	}
     	
-    	// Mark this clip as used
-    	usedMovieClipIndexes[i] = true;
-    	
-    	var mc:MovieClip = movieClipPool[i];
-    	
-    	// Only load it if the frame differs from the current frame
-    	if (mc.currentFrame != page)
-    	{
-    		/**
-    		 * Make the movie clip display the correct frame.
-    		 * This takes longer if the new frame differs a lot from
-    		 * the movie clip's current frame.
-    		 */    		
-    		mc.gotoAndStop(page);	
-    	}    	
-    	    	
-    	// Find the page in the document and make it display the movie clip
-    	var p:Page = dpc.doc.getChildAt(page - 1) as Page;			
-		p.content = mc;
+    	// Remember the movie clip to use and the page to go to
+    	loadingMovieClipIndex = i;    	    	
+    	usedMovieClipIndexes[loadingMovieClipIndex] = true;
+	 	loadDestinationFrame = page;
+	 	
+	 	// Start loading...	 			
+		load();	
     }
+    
+    /**
+	 * Does the actual loading, in other words moves makes the chosen movie clip
+	 * in the pool display the frame/page.
+	 * 
+	 * If a movie clip's current fram is 300 and the frame to display is 250 it 
+	 * can take up to 2.5 seconds depending on how many frames that exists.
+	 * 
+	 * Instead of making the clip display that directly and not be able to 
+	 * react to ui changes, such as scrolling or paging, it loads (moves the "frame cursor")
+	 * only parts of the frames at a time.
+     */
+    private function load():void 
+    {
+    	// Find the movie clip to use
+    	var mc:MovieClip = movieClipPool[loadingMovieClipIndex];
+    	
+    	// Load as long as we have been given time from the thread
+    	while(loadDestinationFrame > 0 && this.active)
+    	{    		
+    		if(dpc.prevPage != dpc.nextPage 
+				|| dpc.prevVisiblePages != dpc.nextVisiblePages)
+			{
+				// The current page has changed, interrupt loading
+				loadDestinationFrame = 0;
+				return;				
+			}						
+			else if(mc.currentFrame == loadDestinationFrame)
+			{
+				// We are finished loading, display the page
+				var p:Page = dpc.doc.getChildAt(loadDestinationFrame - 1) as Page;			
+				p.content = mc;
+				loadDestinationFrame = 0;
+				return;
+			}
+			else
+			{				
+				// Loading another part of the frames
+				var nextFrame:int = mc.currentFrame + loadFrameStep;
+				if(mc.currentFrame < loadDestinationFrame && loadDestinationFrame <= nextFrame)
+				{
+					// We are close to the destination frame, load it
+					nextFrame = loadDestinationFrame;
+				} 
+				else if(nextFrame > mc.totalFrames)
+				{
+					// We have reached the end of the move, start from the beginning
+					nextFrame = 1;
+				}				
+				// Do the actual loading
+				mc.gotoAndStop(nextFrame);	
+			}    		
+    	}	
+    }
+    
 }
