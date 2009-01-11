@@ -368,6 +368,9 @@
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
+      </exec>
       <move todir="${dir.continuous.dist}" failonerror="no">
          <fileset dir="${dir.project.installer.builder}/quick-installer/output">
             <include name="**/*"/>
