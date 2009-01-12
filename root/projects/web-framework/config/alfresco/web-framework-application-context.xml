@@ -44,8 +44,6 @@
    </bean>
    
    
-   
-   
    <!--                                                     -->
    <!-- Configuration of Abstract Store Implementations     -->
    <!--                                                     -->
@@ -76,8 +74,6 @@
    <bean id="webframework.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" init-method="init" />   
    
 
-
-
    <!--                                                     -->
    <!-- Additional Configuration for Remote Store           -->
    <!--                                                     -->
@@ -89,10 +85,8 @@
    <bean id="webframework.connector.provider" class="org.alfresco.web.framework.WebFrameworkConnectorProvider">
       <property name="connectorService" ref="connector.service" />
    </bean>
-
-
    
-
+   
    <!--                                                     -->
    <!-- Configuration of the Web Script Runtime / Container -->
    <!--                                                     -->
@@ -154,7 +148,7 @@
       <property name="defaultWebScript"><value>webscript.default</value></property>
    </bean>
    
-
+   
    <!--                                                    -->
    <!-- Configuration of the FreeMarker Template Processor -->
    <!--                                                    -->

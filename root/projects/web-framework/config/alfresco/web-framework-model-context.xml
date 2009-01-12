@@ -26,7 +26,7 @@
    <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.chrome" />
+            <!-- <ref bean="webframework.remotestore.chrome" /> -->
             <!-- <ref bean="webframework.localstore.chrome" /> -->
             <ref bean="webframework.classpathstore.chrome.custom" />
             <ref bean="webframework.classpathstore.chrome" />
@@ -58,7 +58,7 @@
    <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.component" />
+            <!-- <ref bean="webframework.remotestore.component" /> -->
             <!-- <ref bean="webframework.localstore.component" /> -->
             <ref bean="webframework.classpathstore.component.custom" />
 			<ref bean="webframework.classpathstore.component" />
@@ -90,8 +90,8 @@
    <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.componenttype" />
-            <!--  <ref bean="webframework.localstore.componenttype" /> -->
+            <!-- <ref bean="webframework.remotestore.componenttype" /> -->
+            <!-- <ref bean="webframework.localstore.componenttype" /> -->
             <ref bean="webframework.classpathstore.componenttype.custom" />
 			<ref bean="webframework.classpathstore.componenttype" />
          </list>
@@ -122,7 +122,7 @@
    <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.configuration" />
+            <!-- <ref bean="webframework.remotestore.configuration" /> -->
             <!-- <ref bean="webframework.localstore.configuration" /> -->
             <ref bean="webframework.classpathstore.configuration.custom" />
 			<ref bean="webframework.classpathstore.configuration" />
@@ -154,14 +154,13 @@
    <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.contentassociation" />
+            <!-- <ref bean="webframework.remotestore.contentassociation" /> -->
             <!-- <ref bean="webframework.localstore.contentassociation" /> -->
          	<ref bean="webframework.classpathstore.contentassociation.custom" />
 			<ref bean="webframework.classpathstore.contentassociation" />
          </list>
       </property>
    </bean>
-
 
    
    <!--
@@ -187,7 +186,7 @@
    <bean id="webframework.searchpath.page" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.page" />
+            <!-- <ref bean="webframework.remotestore.page" /> -->
             <!-- <ref bean="webframework.localstore.page" /> -->
             <ref bean="webframework.classpathstore.page.custom" />
 			<ref bean="webframework.classpathstore.page" />
@@ -219,7 +218,7 @@
    <bean id="webframework.searchpath.pageassociation" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.pageassociation" />
+            <!-- <ref bean="webframework.remotestore.pageassociation" /> -->
             <!-- <ref bean="webframework.localstore.pageassociation" /> -->
 			<ref bean="webframework.classpathstore.pageassociation.custom" />
 			<ref bean="webframework.classpathstore.pageassociation" />
@@ -251,7 +250,7 @@
    <bean id="webframework.searchpath.pagetype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.pagetype" />
+            <!-- <ref bean="webframework.remotestore.pagetype" /> -->
             <!-- <ref bean="webframework.localstore.pagetype" /> -->
             <ref bean="webframework.classpathstore.pagetype.custom" />
 			<ref bean="webframework.classpathstore.pagetype" />
@@ -283,7 +282,7 @@
    <bean id="webframework.searchpath.templateinstance" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.templateinstance" />
+            <!-- <ref bean="webframework.remotestore.templateinstance" /> -->
             <!-- <ref bean="webframework.localstore.templateinstance" /> -->
             <ref bean="webframework.classpathstore.templateinstance.custom" />
 			<ref bean="webframework.classpathstore.templateinstance" />
@@ -315,7 +314,7 @@
    <bean id="webframework.searchpath.templatetype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.templatetype" />
+            <!-- <ref bean="webframework.remotestore.templatetype" /> -->
             <!-- <ref bean="webframework.localstore.templatetype" /> -->
             <ref bean="webframework.classpathstore.templatetype.custom" />
 			<ref bean="webframework.classpathstore.templatetype" />
@@ -347,7 +346,7 @@
    <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="webframework.remotestore.theme" />
+            <!-- <ref bean="webframework.remotestore.theme" /> -->
             <!-- <ref bean="webframework.localstore.theme" /> -->
             <ref bean="webframework.classpathstore.theme.custom" />
             <ref bean="webframework.classpathstore.theme" />
