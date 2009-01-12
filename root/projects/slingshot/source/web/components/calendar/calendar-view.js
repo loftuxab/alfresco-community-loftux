@@ -49,7 +49,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["calendar", "button"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["calendar", "button","resize"], this.componentsLoaded, this);
       
       return this;
    };
@@ -824,30 +824,33 @@
         //render into allday section
         if(data.allday)
         {
-
-        }
-        if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
-        {
-            targetEl = Dom.get('cal-'+data.from.split('T')[0]);
-            targetEl = Dom.getElementsByClassName('day','div',targetEl)[0];
-            var vEventEl = this._addEventInMonthView(targetEl,data);
-            
+          this.renderAllDayEvents(targetEl,data);
         }
         else {
-            var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
-            var min = data.from.split('T')[1].split(':')[1];
-            var segments  = Dom.getElementsByClassName('hourSegment','div',targetEl);
-            targetEl = (parseInt(min,10)>=30) ? segments[1] : segments[0];
-            YAHOO.util.Dom.setStyle(targetEl,'position','relative');
-            targetEl.appendChild(vEventEl);
-        }
+          if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
+          {
+              targetEl = Dom.get('cal-'+data.from.split('T')[0]);
+              targetEl = Dom.getElementsByClassName('day','div',targetEl)[0];
+              var vEventEl = this._addEventInMonthView(targetEl,data);
+            
+          }
+          else {
+              var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
+              var min = data.from.split('T')[1].split(':')[1];
+              var segments  = Dom.getElementsByClassName('hourSegment','div',targetEl);
+              targetEl = (parseInt(min,10)>=30) ? segments[1] : segments[0];
+              YAHOO.util.Dom.setStyle(targetEl,'position','relative');
+              targetEl.appendChild(vEventEl);
+          }
         
-        var id = Event.generateId(vEventEl);
-        var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
-        this.events[id]=newCalEvent;
+          var id = Event.generateId(vEventEl);
+          var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
+          this.events[id]=newCalEvent;
 
-        newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
-        this.adjustHeightByHour(vEventEl);
+          newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
+          this.adjustHeightByHour(vEventEl);
+          
+        }
         
         YAHOO.Bubbling.fire("eventSaved",data);
         // Refresh the tag component
