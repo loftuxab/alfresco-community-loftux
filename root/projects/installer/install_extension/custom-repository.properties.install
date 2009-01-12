@@ -9,17 +9,6 @@ dir.root=@@ALF_DATA@@
 dir.indexes=@@ALF_INDEXES@@
 
 #
-# External locations
-#
-ooo.exe=@@ALF_OO@@/program/soffice
-ooo.user=${dir.root}/oouser
-img.root=@@ALF_IMG@@
-img.dyn=${img.root}/lib
-img.win.exe=${img.root}/bin/imconvert
-img.exe=${img.root}/bin/convert
-swf.exe=@@ALF_SWF@@/pdf2swf
-
-#
 # Sample database connection properties
 #
 db.name=@@DB_NAME@@
@@ -27,6 +16,14 @@ db.username=@@DB_USER@@
 db.password=@@DB_USERPWD@@
 #db.pool.initial=10
 #db.pool.max=100
+
+#
+# External locations
+#
+ooo.exe=@@ALF_OO@@/program/soffice
+ooo.user=${dir.root}/oouser
+img.root=@@ALF_IMG@@
+swf.exe=@@ALF_SWF@@/pdf2swf
 
 #
 # Property to control whether schema updates are performed automatically.
