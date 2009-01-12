@@ -305,7 +305,10 @@
                      prefix="bin" />
          <zipfileset dir="${dir.name.binaries.installer.win32}"
                      prefix="bin"
-                     includes="imconvert.exe, pdf2swf.exe" />
+                     includes="pdf2swf.exe" />
+         <zipfileset dir="${dir.name.binaries.installer.win32}"
+                     prefix="ImageMagick/bin"
+                     includes="convert.exe" />
          <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
          <zipfileset dir="${dir.continuous.dist}"
@@ -364,6 +367,9 @@
       </exec>
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
+      </exec>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
@@ -459,7 +465,7 @@
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
          <zipfileset dir="${dir.project.jlan}/jni"
-                     prefix="bin"/>
+                     prefix="commands/bin"/>
          <zipfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.sh" />
@@ -482,6 +488,21 @@
          <zipfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}"
                      includes="${file.name.jar.xalan},${file.name.jar.serializer}"
                      prefix="endorsed" />
+         <zipfileset dir="${dir.project.installer.windows}"
+                     includes="alfresco.bat,
+                               alf_start.bat,
+                               restart_alf.bat,
+                               alf_stop.bat,
+                               apply_amps.bat"
+                     prefix="commands" />
+         <zipfileset dir="${dir.project.installer.binwin}"
+                     prefix="commands/bin" />
+         <zipfileset dir="${dir.name.binaries.installer.win32}"
+                     prefix="commands/bin"
+                     includes="pdf2swf.exe" />
+         <zipfileset dir="${dir.name.binaries.installer.win32}"
+                     prefix="commands/ImageMagick/bin"
+                     includes="convert.exe" />
       </zip>
 
       <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
@@ -512,6 +533,11 @@
                      includes="${file.name.jar.xalan},
                                ${file.name.jar.serializer}"
                      prefix="endorsed" />
+         <tarfileset dir="${dir.project.installer.linux}"
+                     includes="alfresco.sh,
+                     	       apply_amps.sh" 
+                     prefix="commands"
+                     mode="755" />
       </tar>
    </target>
 
