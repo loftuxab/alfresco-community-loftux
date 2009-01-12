@@ -1,7 +1,7 @@
 <div>Test 01 as executed ${url.match} the htmlid for the component: ${args.htmlid}</div>
 <div>Test 01 JSON message bundle: ${messages}</div>
 <div>Test 01 args: <#list args?keys as key>${key}=${args[key]} </#list></div>
-<div>Test 01 component url model: ${url.context} and ${url.full} and ${url.args}</div>
+<div>Test 01 component url model: url.context=${url.context} and url.serviceContext=${url.serviceContext} and url.full=${url.full} and url.args=${url.args}</div>
 <div>Test 01 page url model:</div>
 <ul>
 <li>page.url.context: ${page.url.context}</li>

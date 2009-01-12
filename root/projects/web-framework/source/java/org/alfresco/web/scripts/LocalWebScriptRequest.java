@@ -55,7 +55,7 @@ public class LocalWebScriptRequest extends WebScriptRequestURLImpl
     public LocalWebScriptRequest(Runtime runtime, String scriptUrl,
             Match match, Map<String, String> parameters, ServerProperties serverProps, HttpServletRequest request, LocalWebScriptContext context)
     {
-        super(runtime, scriptUrl, match);
+        super(runtime, splitURL(request.getContextPath().length() != 0, scriptUrl),  match);
         this.parameters = parameters;
         this.serverProperties = serverProps;
         this.request = request;
