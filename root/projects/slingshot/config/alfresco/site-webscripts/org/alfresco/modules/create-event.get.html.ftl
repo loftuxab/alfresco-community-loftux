@@ -16,15 +16,15 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-title">${msg("label.what")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="what" value="${event.what?html!""}" tabindex="1" class="wide"/> * </div>
+            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="what" value="${event.what!""}" tabindex="1" class="wide"/> * </div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-location">${msg("label.where")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-location" type="text" name="where" value="${event.location?html!""}" tabindex="2" class="wide"/></div>
+            <div class="yui-u"><input id="${args.htmlid}-location" type="text" name="where" value="${event.location!""}" tabindex="2" class="wide"/></div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
-            <div class="yui-u"><textarea id="${args.htmlid}-description" name="desc" rows="3" cols="20" class="wide" tabindex="3">${event.description?html!""}</textarea></div>
+            <div class="yui-u"><textarea id="${args.htmlid}-description" name="desc" rows="3" cols="20" class="wide" tabindex="3">${event.description!""}</textarea></div>
          </div>
          <div class="yui-g">
             <h2>${msg("section.time")}</h2>
@@ -63,7 +63,7 @@
                         <#if tag_has_next><#assign tags = tags + ' '></#if>
                      </#list>
                   </#if>
-                  <input type="text" size="30" class="rel_left" id="${args.htmlid}-tag-input-field" value="${tags?html}"/>
+                  <input type="text" size="30" class="rel_left" id="${args.htmlid}-tag-input-field" value="${tags}"/>
                   <input type="button" id="${args.htmlid}-add-tag-button" value="Add" />
                   <div class="bottom_taglist tags_box">
                      <a href="#" id="${args.htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
