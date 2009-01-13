@@ -166,7 +166,6 @@
          var inviteeSearchUrl = Alfresco.constants.PROXY_URI + "api/invites?";
          this.widgets.dataSource = new YAHOO.util.DataSource(inviteeSearchUrl);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "invites",
@@ -434,7 +433,7 @@
          {
             renderLoopSize: 8,
             initialLoad: false,
-            MSG_EMPTY: ""
+            MSG_EMPTY: this._msg("message.empty")
          });
 
          // Enable row highlighting
@@ -454,7 +453,10 @@
          if (this.widgets.dataTable)
          {
             var recordCount = this.widgets.dataTable.getRecordSet().getLength();
-            this.widgets.dataTable.deleteRows(0, recordCount);
+            if (recordCount > 0)
+            {
+               this.widgets.dataTable.deleteRows(0, recordCount);
+            }
          }
          Dom.get(this.id + "-search-text").value = "";
       },
@@ -576,8 +578,8 @@
       _setDefaultDataTableErrors: function SentInvites__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         dataTable.set("MSG_EMPTY", msg("message.empty"), "Alfresco.SentInvites");
-         dataTable.set("MSG_ERROR", msg("message.error"), "Alfresco.SentInvites");
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.SentInvites"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.SentInvites"));
       },
       
       /**
@@ -592,15 +594,22 @@
          this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Don't display any message
-         this.widgets.dataTable.set("MSG_EMPTY", "");
+         // this.widgets.dataTable.set("MSG_EMPTY", "");
          
          // Empty results table
-         this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+         var recordCount = this.widgets.dataTable.getRecordSet().getLength();
+         if (recordCount > 0)
+         {
+            this.widgets.dataTable.deleteRows(0, recordCount);
+         }
          
          var successHandler = function SentInvites__pS_successHandler(sRequest, oResponse, oPayload)
          {
             this._setDefaultDataTableErrors(this.widgets.dataTable);
-            this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            if (oResponse.results.length > 0)
+            {
+               this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            }
          };
          
          var failureHandler = function SentInvites__pS_failureHandler(sRequest, oResponse)
@@ -642,9 +651,10 @@
        */
       _buildSearchParams: function SentInvites__buildSearchParams(searchTerm)
       {
-         // TODO: add searchTerm
-          
-         return "siteShortName=" + encodeURIComponent(this.options.siteId);
+         return YAHOO.lang.substitute("siteShortName={siteShortName}",
+         {
+            siteShortName: encodeURIComponent(this.options.siteId)
+         })
       },
       
       /**
