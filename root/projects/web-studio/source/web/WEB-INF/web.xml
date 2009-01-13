@@ -16,11 +16,7 @@
       </param-value>
       <description>Spring config file locations</description>
    </context-param>
-   
-   <listener>
-      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-   </listener>
-   
+      
    <filter>
       <filter-name>UrlRewriteFilter</filter-name>
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
@@ -30,6 +26,10 @@
       <filter-name>UrlRewriteFilter</filter-name>
       <url-pattern>/alfresco/*</url-pattern>
    </filter-mapping>
+   
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
    
 
    <!-- Surf Platform Core -->
@@ -208,7 +208,7 @@
 
       
    <session-config>
-      <session-timeout>20</session-timeout>
+      <session-timeout>60</session-timeout>
    </session-config>
 
    <!-- welcome file list precedence order is index.jsp, then index.html -->

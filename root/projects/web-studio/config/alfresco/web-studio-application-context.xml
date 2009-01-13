@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans-2.0.dtd'>
 
 <beans>
 
@@ -16,6 +16,7 @@
             <!-- Web Framework -->
             <value>classpath:alfresco/web-framework-config.xml</value>
             <value>classpath:alfresco/web-framework-config-remote.xml</value>
+            <value>classpath:alfresco/web-framework-config-commons.xml</value>
             <value>classpath:alfresco/web-framework-config-application.xml</value>
             <value>classpath:alfresco/web-extension/web-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
@@ -33,12 +34,26 @@
    <!-- 
       Web Script Declarations      
    -->
-   <bean id="webscript.webstudio" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWebScript" singleton="false" />
-   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWizardWebScript" singleton="false" />
+   <bean id="webscript.webstudio" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWebScript" scope="prototype" />
+   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebStudioWizardWebScript" scope="prototype" />
 
 
-   <!-- Override remote store implementation for Labs 3C -->
-   <bean id="webscripts.remotestore" class="org.alfresco.web.scripts.WebStudioRemoteStore" abstract="true" />
+   <!-- 
+      Override remote store implementation (for Labs 3D)
+      Point to Remote API /avmstore 
+   -->
+   <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
+      <property name="endpoint">
+         <value>alfresco</value>
+      </property>
+      <property name="api">
+         <value>/avmstore</value>
+      </property>
+      <property name="connectorService" ref="connector.service" />
+      <property name="storeContext" ref="webframework.context.remotestore"/>
+      <property name="connectorProvider" ref="webframework.connector.provider" />      
+   </bean>
+
    
 
    <!-- Override: Remote Store Context for Web Studio -->
@@ -114,6 +129,107 @@
    <bean id="webframework.taskmanager" class="org.alfresco.web.framework.TaskManager" init-method="init">
       <property name="threadPoolSize"><value>5</value></property>
    </bean>
+   
+   
+   <!-- Model Object Search Paths -->
+   <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.remotestore.chrome" />
+         	<ref bean="webframework.classpathstore.chrome.custom" />
+            <ref bean="webframework.classpathstore.chrome" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.component" />
+         	<ref bean="webframework.classpathstore.component.custom" />
+            <ref bean="webframework.classpathstore.component" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.componenttype" />
+         	<ref bean="webframework.classpathstore.componenttype.custom" />
+            <ref bean="webframework.classpathstore.componenttype" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.configuration" />
+         	<ref bean="webframework.classpathstore.configuration.custom" />
+            <ref bean="webframework.classpathstore.configuration" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.contentassociation" />
+         	<ref bean="webframework.classpathstore.contentassociation.custom" />
+            <ref bean="webframework.classpathstore.contentassociation" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.page" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.page" />
+         	<ref bean="webframework.classpathstore.page.custom" />
+            <ref bean="webframework.classpathstore.page" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.pageassociation" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.pageassociation" />
+         	<ref bean="webframework.classpathstore.pageassociation.custom" />
+            <ref bean="webframework.classpathstore.pageassociation" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.pagetype" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.pagetype" />
+         	<ref bean="webframework.classpathstore.pagetype.custom" />
+			<ref bean="webframework.classpathstore.pagetype" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.templateinstance" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+         	<ref bean="webframework.remotestore.templateinstance" />
+         	<ref bean="webframework.classpathstore.templateinstance.custom" />
+			<ref bean="webframework.classpathstore.templateinstance" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.templatetype" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+	        <ref bean="webframework.remotestore.templatetype" />
+	        <ref bean="webframework.classpathstore.templatetype.custom" />
+            <ref bean="webframework.classpathstore.templatetype" />
+         </list>
+      </property>
+   </bean>   
+   <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.remotestore.theme" />
+            <ref bean="webframework.classpathstore.theme.custom" />
+            <ref bean="webframework.classpathstore.theme" />
+         </list>
+      </property>
+   </bean>
       
 </beans>
-

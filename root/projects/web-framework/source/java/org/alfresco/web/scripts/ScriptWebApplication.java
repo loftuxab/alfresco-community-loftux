@@ -83,7 +83,7 @@ public final class ScriptWebApplication extends ScriptBase
             builder.append("/proxy/alfresco");
             
             // remote store
-            builder.append("/remotestore/get");
+            builder.append("/avmstore/get");
             
             // throw down the store id (if applicable)
             String storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);

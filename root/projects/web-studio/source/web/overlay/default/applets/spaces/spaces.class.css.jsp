@@ -4,7 +4,7 @@
 
 .icon-spaces-root { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/spacestree/companyhome.gif);
 	background-repeat:no-repeat;
@@ -13,7 +13,7 @@
 
 .icon-spaces-folder { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/spacestree/folder.gif);
 	background-repeat:no-repeat;
@@ -22,7 +22,7 @@
 
 .icon-spaces-item { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/spacestree/file.gif);
 	background-repeat:no-repeat;

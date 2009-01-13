@@ -19,24 +19,16 @@
 	OverlayUtil.include(request, buffer, "/overlay/default/js/jquery/plugins/jquery.flyout.js");
 
 	// Include YUI Core (all minimized)
-	OverlayUtil.include(request, buffer, "/yui/yahoo/yahoo-min.js");
-	OverlayUtil.include(request, buffer, "/yui/yahoo-dom-event/yahoo-dom-event.js");
-	OverlayUtil.include(request, buffer, "/yui/animation/animation-min.js");
-	OverlayUtil.include(request, buffer, "/yui/dragdrop/dragdrop-min.js");
-	OverlayUtil.include(request, buffer, "/yui/container/container-min.js");
-	OverlayUtil.include(request, buffer, "/yui/element/element-beta-min.js");
-	OverlayUtil.include(request, buffer, "/yui/connection/connection-min.js");
-	OverlayUtil.include(request, buffer, "/yui/editor/editor-beta-min.js");
-
-	// Include YUI Elements for Web Studio Core (all minimized)
-	OverlayUtil.include(request, buffer, "/yui/treeview/treeview-min.js");		
-	OverlayUtil.include(request, buffer, "/yui/resize/resize-beta-min.js");				
-	OverlayUtil.include(request, buffer, "/yui/datasource/datasource-beta-min.js");
-	OverlayUtil.include(request, buffer, "/yui/datatable/datatable-beta-min.js");		
-	OverlayUtil.include(request, buffer, "/yui/menu/menu-min.js");		
-	OverlayUtil.include(request, buffer, "/yui/button/button-min.js");
 	OverlayUtil.include(request, buffer, "/yui/utilities/utilities.js");
-	
+	OverlayUtil.include(request, buffer, "/yui/container/container-min.js");
+	OverlayUtil.include(request, buffer, "/yui/menu/menu-min.js");
+	OverlayUtil.include(request, buffer, "/yui/button/button-min.js");
+	OverlayUtil.include(request, buffer, "/yui/datasource/datasource-min.js");
+	OverlayUtil.include(request, buffer, "/yui/datatable/datatable-min.js");
+	OverlayUtil.include(request, buffer, "/yui/editor/editor-min.js");
+	OverlayUtil.include(request, buffer, "/yui/resize/resize-min.js");
+	OverlayUtil.include(request, buffer, "/yui/treeview/treeview-min.js");
+		
 	// Now Include Web Studio Scripts
 	if(WebStudio.getConfig().isDeveloperMode())
 	{

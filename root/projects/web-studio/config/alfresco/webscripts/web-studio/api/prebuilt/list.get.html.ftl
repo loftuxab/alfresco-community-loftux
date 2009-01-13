@@ -5,7 +5,9 @@
 <#list sites?keys as id>
 
 	<#assign site = sites[id]>
-
+	
+	<#if id != "toJSONString">
+	
 		<#if first == false>,</#if>
 	
 		"${id}" : {
@@ -18,6 +20,8 @@
 		}
 		
 		<#assign first = false>
+	
+	</#if>
 		
 </#list>
 

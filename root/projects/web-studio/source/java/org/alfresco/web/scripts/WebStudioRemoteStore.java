@@ -53,19 +53,26 @@ import org.apache.commons.logging.LogFactory;
 import freemarker.cache.TemplateLoader;
 
 /**
- * Temporary implementation of RemoteStore that uses an expensive
- * lookup in place of a Lucene search
+ * A replacement of RemoteStore which is intended to be temporary.
+ * 
+ * This replacement is necessary because the current RemoteStore implementation
+ * relies upon Lucene to perform lookups of objects based on pattern matching.
+ * 
+ * This doesn't work against user sandboxes in WCM at the present moment.
+ * 
+ * As such, this implementation overrides a few methods so as to perform
+ * late filtering of a complete result set.
  * 
  * @author muzquiano
  */
-public class WebStudioRemoteStore extends RemoteStore
+public class WebStudioRemoteStore implements Store
 {
-	private static Log logger = LogFactory.getLog(WebStudioRemoteStore.class);
+    private static Log logger = LogFactory.getLog(RemoteStore.class);
     
-    public static final String DEFAULT_API = "/remotestore";
+    public static final String DEFAULT_API = "/avmstore";
     public static final String DEFAULT_ENDPOINT_ID = "alfresco";
     
-    //private static final String API_LISTPATTERN = "listpattern";
+    private static final String API_LISTPATTERN = "listpattern";
     private static final String API_LISTALL = "listall";
     private static final String API_GET = "get";
     private static final String API_CREATE = "create";
@@ -126,12 +133,14 @@ public class WebStudioRemoteStore extends RemoteStore
         this.connectorProvider = connectorProvider;
     }
     
+    /**
+     * @return the connector provider
+     */
     public ConnectorProvider getConnectorProvider()
     {
         return this.connectorProvider;
     }
     
-
     /**
      * @param api the WebScript API path to set for the remote store i.e. "/remotestore"
      */
@@ -488,7 +497,7 @@ public class WebStudioRemoteStore extends RemoteStore
                 int x = fullPath.indexOf(storePath);
                 if (x != -1)
                 {
-                    fullPath = fullPath.substring(x + storePath.length());
+                    fullPath = fullPath.substring(x + storePath.length() + 1);
                 }
                 list.add(fullPath);
             }
@@ -500,10 +509,22 @@ public class WebStudioRemoteStore extends RemoteStore
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getDocumentPaths(java.lang.String, boolean, java.lang.String)
+    
+//////////////////////////////
+// OVERRIDES BEGIN HERE
+//////////////////////////////
+
+    /**
+     * Override this method so that it doesn't use any filtering based on the
+     * "m" argument as it usually does.
+     * 
+     * The reason is that the repository side will resort to a Lucene query if
+     * we provide this argument.  Lucene queries do not work against user
+     * sandboxes within WCM.
+     * 
+     * Instead, we have to pull back everything and do filtering on the
+     * Surf side.  This is inefficient but allows for user sandbox support.
      */
-    // TEMPORARY - ignore pattern
     public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
     {
         Map<String, String> args = new HashMap<String, String>(1, 1.0f);
@@ -543,14 +564,16 @@ public class WebStudioRemoteStore extends RemoteStore
             return new String[0];
         }
     }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
+    
+    /**
+     * Override this to do a late filter of the returned objects.
      */
     public String[] getDescriptionDocumentPaths()
     {
         String[] paths = getDocumentPaths("", true, "*.desc.xml");
         
+
+        // late-filter of the response
         ArrayList<String> list = new ArrayList<String>();
         for(int i = 0; i < paths.length; i++)
         {
@@ -564,8 +587,8 @@ public class WebStudioRemoteStore extends RemoteStore
         return (String[]) list.toArray(new String[list.size()]);        
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
+    /**
+     * Override this to do a late filter of the returned objects.
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
@@ -583,7 +606,12 @@ public class WebStudioRemoteStore extends RemoteStore
         }
         
         return (String[]) list.toArray(new String[list.size()]);                
-    }
+    }    
+
+    
+//////////////////////////////
+// OVERRIDES END HERE
+//////////////////////////////
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getScriptLoader()
@@ -754,7 +782,7 @@ public class WebStudioRemoteStore extends RemoteStore
         {
             connectorProvider = new ConnectorProviderImpl();
         }
-        
+
         // provision connector
         conn = getConnectorProvider().provide(this.getEndpoint());
         

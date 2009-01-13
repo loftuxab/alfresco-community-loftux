@@ -603,7 +603,9 @@ WebStudio.Applications.WebDesigner.prototype.bindToRegion = function(regionId, r
 	config["binding"]["regionScopeId"] = regionScopeId;
 	
 	// fire the event
-	var params = { "json" : Json.toString(config) };
+	var _json = Json.toString(config);
+	_json = Alf.urlEncode(_json);
+	var params = { "json" : _json };
 	var url = WebStudio.ws.studio("/incontext/components", params);
 	
 	var myAjax = new Ajax(url, {

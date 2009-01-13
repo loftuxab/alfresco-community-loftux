@@ -1612,8 +1612,6 @@ WebStudio.Application.prototype.blockNotify = function(msg)
 			fixedcenter: true,
 			close: false, 
 			draggable: false,
-			width: 250,
-			height: 0,
 			modal: true,
 			visible: false,
 			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5} 			

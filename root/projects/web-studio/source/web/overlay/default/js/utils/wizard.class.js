@@ -54,6 +54,9 @@ WebStudio.Wizard.prototype.loadFormData = function(url, json)
 {
 	var _this = this;
 	
+	var _json = Json.toString(json);
+	_json = Alf.urlEncode(_json);
+	
 	// TODO: Not happy with this, need to fix the way that
 	// URLs are constructed
 	if(url.indexOf("?") > -1)
@@ -64,7 +67,7 @@ WebStudio.Wizard.prototype.loadFormData = function(url, json)
 	{
 		url = url + "?";
 	}
-	url = url + "json=" + Json.toString(json);
+	url = url + "json=" + _json;
 	
 	this.call = YAHOO.util.Connect.asyncRequest('GET', url, {
 	
@@ -229,8 +232,8 @@ WebStudio.WizardPage.prototype.parseFormData = function(formData)
 	var buttons = formData.buttons || [];
 	var data = {};
 	
-      	for(var i=0;i<elements.length;i++)
-      	{
+	for(var i=0;i<elements.length;i++)
+    {
 		var el = elements[i];
 		var elementType = this.getElementFormatValue(formData, el.name, "type");
 		var elementValue = el.value;
@@ -271,7 +274,8 @@ WebStudio.WizardPage.prototype.parseFormData = function(formData)
 			d["title"] = el.title;
 			d["text"] = "text";
 			d["type"] = "combo";
-			d["content"] = "body";			
+			d["content"] = "body";
+			d["selectedValue"] = property[i].value;		
 			var emptyText = this.getElementFormatValue(formData, el.name, "emptyText");
 			if(emptyText)
 			{
@@ -446,7 +450,6 @@ WebStudio.Wizard.prototype.buildWaitWindow = function()
 
    this.waitWindow.setTemplateByDOMObject(WebStudio.App.AlfrescoMessageBoxProgressBar.el);
    this.waitWindow.activate();
-//   this.waitWindow.AWMessageContainerPB.el.setHTML("Please wait...");
    WebStudio.util.pushHTML(this.waitWindow.AWMessageContainerPB.el, "Please wait...");
    this.waitWindow.hide();
 };
@@ -471,7 +474,6 @@ WebStudio.WizardPage.prototype._init = function(data)
 	this.wizard.config = this.parseWizardConfig(data);
 
 	this.window = new WebStudio.Window(this.config.id);
-	//this.window.injectObject = WebStudio.App.generalLayer;
 	this.window.disableResize(false);
 
 	this.window.onClose = function(){
@@ -498,7 +500,6 @@ WebStudio.WizardPage.prototype._init = function(data)
 			this.window.setTemplateByDOMObject(WebStudio.App.AlfrescoMessageBoxTmplate.el);
 			this.window.activate();
 			
-//			this.window.MessageContainer.el.setHTML(this.config.message);
 			WebStudio.util.pushHTML(this.window.MessageContainer.el, this.config.message);			
 			
 			this.window.setTitle(this.config.title);

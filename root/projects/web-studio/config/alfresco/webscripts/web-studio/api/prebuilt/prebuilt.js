@@ -25,10 +25,6 @@ function getSites()
 		}
 	}
 	
-	// add in green energy
-	//var baseUrl = "https://network.alfresco.com/extranet/proxy/alfresco-noauth/api/path/content/workspace/SpacesStore/Company%20Home/WebStudio";
-	//addSite(sites, "green1", "Green Energy V1", "Green Energy V1", baseUrl + "/green1/green-energy-250.png", baseUrl + "/green1/green-energy.zip");
-
 	return sites;	
 }
 

@@ -384,6 +384,15 @@
                     package-webframeworkcommons-jar,
                     package-slingshot-jar,
                     deploy-slingshot-tomcat-exploded" />
+
+   <target name="incremental-webstudio-tomcat" 
+           description="Performs an incremental build and deployment of the webstudio WAR"
+           depends="incremental-core, 
+                    package-webscriptframework-jar, 
+                    package-webframework-jar,
+                    package-webframeworkcommons-jar,
+                    incremental-webstudio,
+                    deploy-webstudio-tomcat" />
    
    <!--
    <target name="build-jboss" 
