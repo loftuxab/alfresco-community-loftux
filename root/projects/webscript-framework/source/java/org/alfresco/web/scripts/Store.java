@@ -45,7 +45,7 @@ public interface Store
 	 * Initialise Store (called once) 
 	 */
 	public void init();
-    	
+    
     /**
      * Determines whether the store actually exists
      * 

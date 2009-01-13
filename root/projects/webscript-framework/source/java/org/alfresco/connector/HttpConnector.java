@@ -50,7 +50,7 @@ public class HttpConnector extends AbstractConnector
 {
     private static Log logger = LogFactory.getLog(HttpConnector.class);
     
-    private static final int RECONNECT_TIMEOUT = 10000;
+    private static final int RECONNECT_TIMEOUT = 20000;
     
     private static ConcurrentMap<String, Long> endpointTimeouts = new ConcurrentHashMap<String, Long>();
     
