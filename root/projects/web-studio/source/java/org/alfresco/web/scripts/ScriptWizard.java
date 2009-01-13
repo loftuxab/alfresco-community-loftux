@@ -120,6 +120,12 @@ public final class ScriptWizard implements Serializable
         // arguments
         Map args = (Map) getModel().get("args");
         String json = (String) args.get("json");
+        
+        // if we have json, url decode it
+        if(json != null)
+        {
+            json = org.alfresco.tools.EncodingUtil.decode(json);
+        }
 
         // debug handling
         String debug = (String) args.get("debug");

@@ -27,6 +27,10 @@ package org.alfresco.web.scripts;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.alfresco.connector.Response;
+import org.alfresco.connector.ResponseStatus;
+import org.alfresco.connector.exception.ConnectorProviderException;
+
 import freemarker.cache.TemplateLoader;
 
 
@@ -172,5 +176,5 @@ public interface Store
      * 
      * @return  script loader
      */
-    public ScriptLoader getScriptLoader();
+    public ScriptLoader getScriptLoader();    
 }

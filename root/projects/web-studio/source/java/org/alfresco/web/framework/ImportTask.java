@@ -201,7 +201,7 @@ public class ImportTask extends AbstractTask
                         String path = zipEntryName;
 
                         // post to "alfresco" directory location
-                        String uri = "/remotestore/create" + alfrescoPath + "/"
+                        String uri = "/avmstore/create" + alfrescoPath + "/"
                                 + path + "?s=" + storeId + "&w=" + webappId;
 
                         post(zf, zipEntry, uri);
@@ -211,7 +211,7 @@ public class ImportTask extends AbstractTask
                         String path = zipEntryName.substring(9);
 
                         // post to "alfresco" directory location
-                        String uri = "/remotestore/create/" + path + "?s="
+                        String uri = "/avmstore/create/" + path + "?s="
                                 + storeId + "&w=" + webappId;
 
                         post(zf, zipEntry, uri);

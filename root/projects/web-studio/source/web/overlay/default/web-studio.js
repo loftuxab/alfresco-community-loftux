@@ -834,5 +834,4 @@ WebStudio.components = WebStudio.components ||
 		
 		return config;	
 	}	
-	
 };

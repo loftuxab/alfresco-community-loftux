@@ -4,7 +4,7 @@
 
 .icon-web-components-root { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/comptree/site.gif);
 	background-repeat:no-repeat;
@@ -13,7 +13,7 @@
 
 .icon-web-components-folder { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/folder.gif);
 	background-repeat:no-repeat;
@@ -22,7 +22,7 @@
 
 .icon-web-components-item { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/comptree/component.gif);
 	background-repeat:no-repeat;

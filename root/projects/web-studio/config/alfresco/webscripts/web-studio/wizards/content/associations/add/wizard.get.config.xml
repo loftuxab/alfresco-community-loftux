@@ -7,17 +7,17 @@
 		</buttons>
 		<data>
 			<element id="contentId" type="String" defaultValue="" />
-			<element id="assocType" type="String" defaultValue="" />
 			<element id="formatId" type="String" defaultValue="" />
 			<element id="templateId" type="String" defaultValue="" />
+			<element id="assocType" type="String" defaultValue="" />
 		</data>
 	</page>
 	<page id="submit" end="true" type="form">
 		<data>
 			<element id="contentId" type="String" />
-			<element id="assocType" type="String" />
 			<element id="formatId" type="String" />
 			<element id="templateId" type="String" />
+			<element id="assocType" type="String" />
 		</data>
 	</page>	
 </wizard>

@@ -93,6 +93,14 @@ YAHOO.extend(WebStudio.Combobox, YAHOO.widget.Button,
 	getSelectedItemValue: function()
 	{
 		return this._configs.selectedMenuItem.value.value;
+	},
+	
+	/**
+	 * Sets the selected item
+	 */
+	setSelectedItem: function(i)
+	{
+		this._setSelectedMenuItem(i);
 	}
 }); 
 

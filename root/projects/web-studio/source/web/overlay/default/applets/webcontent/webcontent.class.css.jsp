@@ -4,7 +4,7 @@
 
 .icon-web-content-root { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/contenttree/webapproot.gif);
 	background-repeat:no-repeat;
@@ -13,7 +13,7 @@
 
 .icon-web-content-folder { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/contenttree/folder.gif);
 	background-repeat:no-repeat;
@@ -22,7 +22,7 @@
 
 .icon-web-content-file { 
 	display:block;
-	height:22px;
+	height:16px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/contenttree/file.gif);
 	background-repeat:no-repeat;

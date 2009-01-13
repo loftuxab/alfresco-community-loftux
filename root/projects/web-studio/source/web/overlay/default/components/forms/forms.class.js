@@ -106,18 +106,20 @@ WebStudio.Form.prototype.buildFormFields = function(data)
 	
 	// Add table to container.
 	WebStudio.util.injectInside(this.BodyContent.el, formTable);	
-			
+
 	// Loop through fields for form and add them to the table.
+	var count = 0;
 	for(var field in data)
 	{
 		if(data.hasOwnProperty(field))
 		{
-			this.buildFormCurrentField(data[field], formTBody);
+			this.buildFormCurrentField(data[field], formTBody, count);
+			count++;
 		}
 	}	
 };
 
-WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
+WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody, count)
 {
 	var _this = this;
 	
@@ -163,42 +165,36 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 			{	
 				// Create TR element
 				var tr = document.createElement("tr");
+				$(tr).addClass("alf-form-row");
 	
 				// Add to Form's Table Body element.
 				WebStudio.util.injectInside(formTBody, tr);
 				
 				// Create TD for field label
 				var labelTD = document.createElement("td");			
+				$(labelTD).addClass("alf-form-label");
+							
+				// Set up field label
+				var tn = document.createTextNode(item.label);
+				WebStudio.util.injectInside(labelTD, tn);
 				
 				// Add to TR
 				WebStudio.util.injectInside(tr, labelTD);
-				
-				// Create tD for form field element
+								
+
+				// Create TD for form field element
 				var fieldTD = document.createElement("td");
+				$(fieldTD).addClass("alf-form-field-container");
+				
+				// Set up field value
+				var ifn = document.createElement("input");
+				ifn.name = item.name;
+				ifn.type = "text";
+				ifn.value = item.value;
+				WebStudio.util.injectInside(fieldTD, ifn);
 				
 				// Add to TR
 				WebStudio.util.injectInside(tr, fieldTD);
-				
-				// Create text node.
-				var tn = document.createElement('text');			
-				
-				// Set text.
-				WebStudio.util.pushHTML(tn, item.label);
-				
-				// Add to label TD.
-				WebStudio.util.injectInside(labelTD, tn);				
-						
-				// Create input field node
-				var ifn = document.createElement('input');
-				
-				// Set name of input field
-				ifn.name = item.name;
-				
-				// Set input field value
-				ifn.value = item.value;						
-				
-				// Add input field node to fieldTD.
-				WebStudio.util.injectInside(fieldTD, ifn);
 			};
 			
 			// call the function right away
@@ -212,27 +208,27 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 			{
 				// Create TR element
 				var tr = document.createElement("tr");
+				$(tr).addClass("alf-form-row");
 	
 				// Add to Form's Table Body element.
 				WebStudio.util.injectInside(formTBody, tr);
 				
 				// Create TD for field label
-				var labelTD = document.createElement("td");			
+				var labelTD = document.createElement("td");
+				$(labelTD).addClass("alf-form-label");			
 				
 				// Add to TR
 				WebStudio.util.injectInside(tr, labelTD);
 				
 				// Create tD for form field element
 				var fieldTD = document.createElement("td");
+				$(fieldTD).addClass("alf-form-field-container");
 				
 				// Add to TR
 				WebStudio.util.injectInside(tr, fieldTD);
 				
 				// Create text node.
-				var tn = document.createElement('text');			
-				
-				// Set text.
-				WebStudio.util.pushHTML(tn, item.label);
+				var tn = document.createTextNode(item.label);
 				
 				// Add to label TD.
 				WebStudio.util.injectInside(labelTD, tn);				
@@ -256,19 +252,50 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 		if(item.type == 'hidden')
 		{
 			// wrap in a function so that variables are kept in
+			// wrap in a function so that variables are kept in
 			// a local scope		
 			var f3 = function()
 			{		
-				var hf = document.createElement('input');
-				hf.type = "hidden";
-				hf.name = item.name;
-				hf = $(hf);
-				hf.value = item.value;
-				WebStudio.util.injectInside(this.BodyContent.el, hf);
+				// Create TR element
+				var tr = document.createElement("tr");
+	
+				// Add to Form's Table Body element.
+				WebStudio.util.injectInside(formTBody, tr);
+				
+				// Create TD for field label
+				var labelTD = document.createElement("td");			
+				
+				// Add to TR
+				WebStudio.util.injectInside(tr, labelTD);
+				
+				// Create TD for form field element
+				var fieldTD = document.createElement("td");
+				
+				// Add to TR
+				WebStudio.util.injectInside(tr, fieldTD);
+				
+				// Create text node.
+				var tn = document.createTextNode(item.label);			
+				
+				// Add to label TD.
+				WebStudio.util.injectInside(labelTD, tn);				
+						
+				// Create input field node
+				var ifn = document.createElement('input');
+				ifn.type = "hidden";
+				
+				// Set name of input field
+				ifn.name = item.name;
+				
+				ifn = $(ifn);
+				ifn.value = item.value;
+				
+				// Add input field node to fieldTD.
+				WebStudio.util.injectInside(fieldTD, ifn);
 			};
 			
 			// call the function right away
-			f3.bind(this).attempt();
+			f3.bind(this).attempt();		
 		}
 		if(item.type == 'radio')
 		{
@@ -279,8 +306,10 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 				if (item.controls)
 				{
 					var control = WebStudio.util.clone(this.AlfFormRadio.el);
-	
-					WebStudio.util.injectInside(this.BodyContent.el, control);
+					
+					// formTBody
+					control = control.getElementsBySelector(".alf-form-row");
+					WebStudio.util.injectInside(formTBody, control);
 					
 					var label = control.getElementsBySelector(".alf-form-label")[0];
 					var container = control.getElementsBySelector(".alf-form-field-container")[0];
@@ -312,10 +341,7 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 		      		else
 		      		{
 						WebStudio.util.pushHTML(label, "");	      			
-		      		}
-		      		
-					var br = document.createElement("br");
-					WebStudio.util.injectInside(this.BodyContent.el, br);				
+		      		}		      		
 				}
 				this.radioBtns.push(radioGroup);
 			};
@@ -329,16 +355,18 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 			// a local scope				
 			var f5 = function()
 			{	
-
-				var control = WebStudio.util.clone(this.AlfFormCombo.el);			
+				var control = WebStudio.util.clone(this.AlfFormCombo.el);						
 				
-				WebStudio.util.injectInside(this.BodyContent.el, control);
+				// formTBody
+				control = control.getElementsBySelector(".alf-form-row")[0];
+				WebStudio.util.injectInside(formTBody, control);
 				
 				var label = control.getElementsBySelector(".alf-form-label")[0];
 	
 				var container = control.getElementsBySelector(".alf-form-field-container")[0];
 
-				// build the dropdown list	
+				// build the dropdown list
+				var selectedIndex = -1;
 				var dropdownlist = [];							
 				for (var i = 0; i < item.value.length; i++)
 				{
@@ -351,6 +379,12 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 							fn: _this.comboButtonClick.bind(_this)
 						}
 					};
+					
+					if(item.value[i][0] == item.selectedValue)
+					{
+						selectedIndex = i;
+					}
+					
 					dropdownlist.push(menuitem);
 				}				
 
@@ -371,7 +405,7 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 				{
 					combolist.label = item.emptytext; 
 				}
-	
+					
 				WebStudio.util.pushHTML(label, "");
 				
 				if(item.name)
@@ -382,7 +416,13 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 				{
 					WebStudio.util.pushHTML(label, item.title);				
 				}
+				
 				var nm = new WebStudio.Combobox(combolist);
+				
+				if(selectedIndex != -1)
+				{
+					nm.setSelectedItem(selectedIndex);
+				}
 				
 				this.comboEls.push(nm);
 				
@@ -394,10 +434,7 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 					// menu item
 					var mi = dropdownlist[t];
 					mi["onclick"] = { fn: _this.comboButtonClick.bind(nm) };
-				}
-								
-				var br9 = document.createElement("br");
-				WebStudio.util.injectInside(this.BodyContent.el, br9);
+				}								
 			};
 			
 			// call the function right away
@@ -417,7 +454,7 @@ WebStudio.Form.prototype.buildFormCurrentField = function(item, formTBody)
 				}
 			});	
 			
-			WebStudio.util.injectInside(this.BodyContent.el, fu);			
+			WebStudio.util.injectInside(this.BodyContent.el, fu);		
 		}
 		if('html' == item.type)
 		{

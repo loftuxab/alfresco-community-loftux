@@ -53,7 +53,7 @@ public class AlfrescoWebProjectResourceResolver extends
 
         if (FrameworkHelper.getConfig().isWebStudioEnabled())
         {
-            builder.append("/remotestore/get");
+            builder.append("/avmstore/get");
 
             // append the store id
             ModelPersistenceContext mpc = context.getModel().getObjectManager()

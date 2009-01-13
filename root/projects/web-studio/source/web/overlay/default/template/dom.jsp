@@ -197,13 +197,13 @@
 		<div id="AlfrescoForm" class="alf-form yui-skin-sam" height="600px">
 			<div class="alf-form-caption"></div>
 			<div class="alf-form-body">
-				<table border="0" cellpadding="0" cellspacing="0">
+				<table border="0" cellpadding="0" cellspacing="0" width="100%">
 					<tr>
 						<td align="left" valign="top" class="alf-form-body-content" nowrap>
 							<table id="AlfFormFieldText" width="100%" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
-										<td class="alf-form-label" valign="top" align="left"></td>
+										<td class="alf-form-label" valign="top" align="left" nowrap></td>
 										<td class="alf-form-field-container" align="left">
 											<input type="text" class="alf-form-field"/>
 										</td>
@@ -213,7 +213,7 @@
 							<table id="AlfFormFieldTextArea" width="100%" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
-										<td class="alf-form-label" valign="top" align="left"></td>
+										<td class="alf-form-label" valign="top" align="left" nowrap></td>
 										<td class="alf-form-field-container" align="left">
 											<textarea class="alf-form-field"></textarea>
 										</td>
@@ -224,14 +224,14 @@
 								<tbody>
 									<tr class="alf-form-row" align="left">
 										<td class="alf-form-label" valign="top" align="left" nowrap></td>
-										<td class="alf-form-field-container" align="left" nowrap></td>
+										<td class="alf-form-field-container" align="left"></td>
 									</tr>
 								</tbody>
 							</table>
 							<table id="AlfFormRadio" width="100%" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
-										<td class="alf-form-label" valign="top" align="left"></td>
+										<td class="alf-form-label" valign="top" align="left" nowrap></td>
 										<td class="alf-form-field-container" align="left"></td>
 									</tr>
 								</tbody>
@@ -267,7 +267,7 @@
 					
 						<table width="100%" cellpadding="1" cellspacing="0">
 							<tr>
-								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
+								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px" nowrap>
 									<span class="FloatingMenuOptions">
 										<img src="<%=rootPath%>/images/arrow-right.gif">
 										Options

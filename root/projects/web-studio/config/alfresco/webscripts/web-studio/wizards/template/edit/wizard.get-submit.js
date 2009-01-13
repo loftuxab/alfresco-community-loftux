@@ -1,16 +1,34 @@
 <import resource="/include/support.js">
 
+// incoming template id
+var templateId = wizard.request("templateId");
+
 // get the existing template
 var completed = false;
 var template = sitedata.getObject("template-instance", templateId);
 if(template != null)
 {	
 	// do updates
-	template.setProperty("title", templateName);
-	template.setProperty("description", templateDescription);
-    template.setProperty("template-layout-type", templateLayoutType);
-    template.setProperty("height", templateHeight);
-    template.setProperty("width", templateWidth);    
+	if(templateName != null && templateName != "")
+	{
+		template.setProperty("title", templateName);
+	}
+	if(templateDescription != null && templateDescription != "")
+	{
+		template.setProperty("description", templateDescription);
+	}
+	if(templateLayoutType != null && templateLayoutType != "")
+	{
+    	template.setProperty("template-layout-type", templateLayoutType);
+    }
+    if(templateHeight != null && templateHeight != "")
+    {
+    	template.setProperty("height", templateHeight);
+    }
+    if(templateWidth != null && templateWidth != "")
+    {
+    	template.setProperty("width", templateWidth);
+    }    
     	
 	// do saves
 	save(template);

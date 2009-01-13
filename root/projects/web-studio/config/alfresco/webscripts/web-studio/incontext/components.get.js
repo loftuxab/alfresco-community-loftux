@@ -143,7 +143,12 @@ function pushComponentResources(component, resources)
 }
 
 // the json object
-var input = eval('(' + args["json"] + ')');
+var _json = args["json"];
+if(_json != null)
+{
+	_json = sitedata.decode(_json);
+}
+var input = eval('(' + _json + ')');
 
 // the operation
 var operation = input["operation"];
