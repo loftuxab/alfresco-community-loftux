@@ -4,20 +4,9 @@
 <!--  FSR DEPLOYMENT SERVER CONFIGURATION -->
 <beans>
 
-     <!-- Sample FSDeploymentRunnable implementation - add others here -->
+     <!-- Sample FSDeploymentRunnable implementation - add your program definitions here
      <bean id="sampleRunnable" class="org.alfresco.deployment.SampleRunnable"/>
-     
-     <bean id="sampleProgramRunnable" class="org.alfresco.deployment.ProgramRunnable">
-         <property name="program"><value>/bin/cp</value></property>
-         <!-- Arguments that get appended to the final command line -->
-         <property name="arguments">
-             <list>
-                 <value>/Users/britt/dump.txt</value>
-             </list>
-         </property>
-         <!-- The directory that the program runs in. -->
-         <property name="directory"><value>/</value></property>
-     </bean>
+     -->     
 
     <bean id="properties" 
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -54,18 +43,17 @@
             	    	<entry key="password"><value>@@DEPPWD@@</value></entry>
             	    	<entry key="autoFix"><value>true</value></entry>
             	    	
-            	    	<!-- Define post commit callbacks here 
+            	    	<!-- Add references to post commit callbacks here 
             	    	<entry key="postCommit">
                             <list>
                                <ref bean="sampleRunnable"/>
                             </list>
                      	</entry>
                      	-->
-                        <!--  Define prepare callbacks here
+                        <!-- Add references to prepare callbacks here
                         <entry key="prepare">
                          <list>
                              <ref bean="sampleRunnable"/>
-                             <!-- <ref bean="sampleProgramRunnable"/> 
                          </list>
                          </entry>
                         -->
@@ -84,7 +72,7 @@
         <!-- Will an error be thrown if the FSR overwrites files outside its control -->
         <property name="errorOnOverwrite"><value>false</value></property>
         
-        <!-- Define your content transformers here 
+        <!-- Define your content transformers here
         <property name="transformers"> 
             <list>
             </list>
