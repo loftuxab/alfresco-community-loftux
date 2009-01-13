@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,9 +18,9 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
 package org.alfresco.web.scripts;
 
@@ -43,7 +43,6 @@ import org.alfresco.connector.ConnectorProviderImpl;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.ResponseStatus;
 import org.alfresco.connector.exception.ConnectorProviderException;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -67,8 +66,6 @@ public class RemoteStore implements Store
     
     public static final String DEFAULT_API = "/remotestore";
     public static final String DEFAULT_ENDPOINT_ID = "alfresco";
-    
-    public static final long READY_CHECK_RETRY_PERIOD = 30000;
 	
     private static final String API_LISTPATTERN = "listpattern";
     private static final String API_LISTALL = "listall";
@@ -88,8 +85,6 @@ public class RemoteStore implements Store
     private String path;
     private String api;
     private String webappId;
-    
-    private boolean ready = false;
         
     /**
      * @param service   The ConnectorService bean
@@ -319,52 +314,6 @@ public class RemoteStore implements Store
             logger.debug("RemoteStore initialised with endpoint id '" + this.getEndpoint() + "' API path '" +
                          this.getApi() + "' path prefix '" + this.getStorePath() + "'.");
         }
-        
-        // start a thread that will patiently wait for the remote server
-        // to come online
-        Thread readyThread = new Thread() 
-        {
-            public void run() 
-            {
-                do
-                {
-                    // call over to the remote server to ensure that it is
-                    // online and ready to process requests
-                    try
-                    {
-                        Connector con = getConnector();
-                        Response resp = con.call("/index");
-                        if (resp.getStatus().getCode() == ResponseStatus.STATUS_OK)
-                        {
-                            ready = true;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // likely due to Spring init not completing
-                    }
-
-                    // if the server is offline or not responding to our call
-                    // then we will sleep and try again after the retry period
-                    if(!ready)
-                    {
-                        try
-                        {
-                            Thread.sleep(READY_CHECK_RETRY_PERIOD);
-                        }
-                        catch(InterruptedException ie)
-                        {
-                            if (logger.isDebugEnabled())
-                                logger.debug("RemoteStore ready check thread interrupted exception", ie);
-                        }
-                    }
-                    
-                } while (!ready);
-            }
-        };
-        
-        // start the thread
-        readyThread.start();
     }
 
     /* (non-Javadoc)
@@ -380,6 +329,8 @@ public class RemoteStore implements Store
      */
     public boolean exists()
     {
+        // always return true - even if a remote store appears to be down we cannot
+        // assume this is always the case and must retry until it is restored
         return true;
     }
 
@@ -390,17 +341,14 @@ public class RemoteStore implements Store
     {
         boolean hasDocument = false;
         
-        if(ready())
-        {        
-            Response res = callGet(buildEncodeCall(API_HAS, documentPath));
-            if (Status.STATUS_OK == res.getStatus().getCode())
-            {
-                hasDocument = Boolean.parseBoolean(res.getResponse());
-            }
-            
-            if (logger.isDebugEnabled())
-                logger.debug("RemoteStore.hasDocument() " + documentPath + " = " + hasDocument);
+        Response res = callGet(buildEncodeCall(API_HAS, documentPath));
+        if (Status.STATUS_OK == res.getStatus().getCode())
+        {
+            hasDocument = Boolean.parseBoolean(res.getResponse());
         }
+        
+        if (logger.isDebugEnabled())
+            logger.debug("RemoteStore.hasDocument() " + documentPath + " = " + hasDocument);
         
         return hasDocument;
     }
@@ -410,12 +358,6 @@ public class RemoteStore implements Store
      */
     public long lastModified(String documentPath) throws IOException
     {
-        if(!ready())
-        {
-            throw new IOException("Store not ready - Unable to get lastModified date of document path: " + documentPath +
-                    " in remote store: " + this.getEndpoint());
-        }
-
         Response res = callGet(buildEncodeCall(API_LASTMODIFIED, documentPath));
         if (Status.STATUS_OK == res.getStatus().getCode())
         {
@@ -446,19 +388,13 @@ public class RemoteStore implements Store
      */
     public void updateDocument(String documentPath, String content) throws IOException
     {
-        if(!ready())
-        {
-            throw new IOException("Store not ready - unable to update document path: " + documentPath +
-                    " in remote store: " + this.getEndpoint());
-        }
-        
         ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
         Response res = callPost(buildEncodeCall(API_UPDATE, documentPath), in);
         
         if (logger.isDebugEnabled())
             logger.debug("RemoteStore.updateDocument() " + documentPath + " = " + res.getStatus().getCode());
         
-        if (res != null && Status.STATUS_OK != res.getStatus().getCode())
+        if (Status.STATUS_OK != res.getStatus().getCode())
         {
             throw new IOException("Unable to update document path: " + documentPath +
                     " in remote store: " + this.getEndpoint() +
@@ -471,12 +407,6 @@ public class RemoteStore implements Store
      */
     public boolean removeDocument(String documentPath) throws IOException
     {
-        if(!ready())
-        {
-            throw new IOException("Store not ready - unable to remove document: " + documentPath +
-                    " in remote store: " + this.getEndpoint());
-        }
-        
         Response res = callDelete(buildEncodeCall(API_DELETE, documentPath));
         
         if (logger.isDebugEnabled())
@@ -491,12 +421,6 @@ public class RemoteStore implements Store
      */
     public void createDocument(String documentPath, String content) throws IOException
     {
-        if(!ready())
-        {
-            throw new IOException("Store not ready - Unable to create document path: " + documentPath +
-                    " in remote store: " + this.getEndpoint());
-        }
-        
         ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
         Response res = callPost(buildEncodeCall(API_CREATE, documentPath), in);
         
@@ -522,12 +446,6 @@ public class RemoteStore implements Store
     private Response getDocumentResponse(String path)
         throws IOException
     {
-        if(!ready())
-        {
-            throw new IOException("Store not ready - Unable to retrieve document path: " + path +
-                    " in remote store: " + this.getEndpoint());
-        }
-        
         Response res = callGet(buildEncodeCall(API_GET, path));
         
         if (logger.isDebugEnabled())
@@ -550,11 +468,6 @@ public class RemoteStore implements Store
      */
     public String[] getAllDocumentPaths()
     {
-        if(!ready())
-        {
-            return new String[0];
-        }
-        
         Response res = callGet(buildEncodeCall(API_LISTALL, ""));
         
         if (logger.isDebugEnabled())
@@ -596,11 +509,6 @@ public class RemoteStore implements Store
      */
     public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
     {
-        if(!ready())
-        {
-            return new String[0];
-        }
-        
         Map<String, String> args = new HashMap<String, String>(1, 1.0f);
         args.put("m", documentPattern);
         Response res = callGet(buildEncodeCall(API_LISTPATTERN, path, args));
@@ -833,6 +741,7 @@ public class RemoteStore implements Store
         return conn; 
     }
     
+    
     /**
      * Remote Store implementation of a Script Loader
      * 
@@ -1027,10 +936,5 @@ public class RemoteStore implements Store
         {
             return false;
         }
-    }    
-    
-    protected boolean ready()
-    {
-        return this.ready;
     }
 }

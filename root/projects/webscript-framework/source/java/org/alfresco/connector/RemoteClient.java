@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
@@ -754,6 +755,20 @@ public class RemoteClient extends AbstractClient
             }            
             
             throw timeErr;
+        }
+        catch (SocketTimeoutException socketErr)
+        {
+            // caught a socket timeout IO exception - apply internal error code
+            status.setCode(SC_REMOTE_CONN_TIMEOUT);
+            status.setException(socketErr);
+            status.setMessage(socketErr.getMessage());
+            if (res != null)
+            {
+                // externally just return a generic 500 server error
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, socketErr.getMessage());
+            }            
+            
+            throw socketErr;
         }
         catch (UnknownHostException hostErr)
         {

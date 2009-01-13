@@ -89,7 +89,7 @@ public class AlfrescoConnector extends HttpConnector
             // otherwise, if we don't have an alfresco ticket
             // we can slip into "guest mode"
             String unauthenticatedMode = this.descriptor.getUnauthenticatedMode();
-            if(UNAUTHENTICATED_MODE_GUEST.equalsIgnoreCase(unauthenticatedMode))
+            if (UNAUTHENTICATED_MODE_GUEST.equalsIgnoreCase(unauthenticatedMode))
             {
                 remoteClient.setTicketName("guest");
                 remoteClient.setTicket("true");
