@@ -65,11 +65,14 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * <p>
  * <b>Logging:</b><br/>
  * To dump exceptions during commits, turn debugging on for this class.<br/>
- * To check that all trasactions are cleaned either committed or rolled back by client code,
- * add <i>.trace</i> to the usual classname-based debug category.  This will hamper
- * performance but is useful when it appears that something is eating connections or
- * holding onto resources - usually a sign that client code hasn't handled all possible
- * exception conditions.
+ * To log leaked transactions i.e. a begin() is not matched by a commit() or rollback(),
+ * add <i>.trace</i> to the usual classname-based debug category and set to WARN log
+ * level. This will log the first detection of a leaked transaction and automatically enable
+ * transaction call stack logging for subsequent leaked transactions.  To enforce
+ * call stack logging from the start set the <i>.trace</i> log level to DEBUG. Call stack
+ * logging will hamper performance but is useful when it appears that something is eating
+ * connections or holding onto resources - usually a sign that client code hasn't handled all
+ * possible exception conditions.
  * 
  * @see org.springframework.transaction.PlatformTransactionManager
  * @see org.springframework.transaction.support.DefaultTransactionDefinition
@@ -92,17 +95,34 @@ public class SpringAwareUserTransaction
     private static final String NAME = "UserTransaction";
     
     private static final Log logger = LogFactory.getLog(SpringAwareUserTransaction.class);
+    
+    
+    /*
+     * Leaked Transaction Logging
+     */
     private static final Log traceLogger = LogFactory.getLog(SpringAwareUserTransaction.class.getName() + ".trace");
+    private static volatile boolean isCallStackTraced = false;
+    
     static
     {
         if (traceLogger.isDebugEnabled())
         {
-            traceLogger.warn("Trace logging is enabled and will affect performance");
+            isCallStackTraced = true;
+            traceLogger.warn("Logging of transaction call stack is enforced and will affect performance");
         }
     }
+    
+    
+    static boolean isCallStackTraced()
+    {
+        return isCallStackTraced;
+    }
+    
+    /** stores whether begin() & commit()/rollback() methods calls are balanced */ 
+    private boolean isBeginMatched = true;
+    /** stores the begin() call stack when auto tracing */
+    private StackTraceElement[] beginCallStack;
 
-    /** stores the begin() call stack trace when DEBUG is on for tracing */
-    private StackTraceElement[] traceDebugBeginTrace;
     
     private boolean readOnly;
     private int isolationLevel;
@@ -361,12 +381,13 @@ public class SpringAwareUserTransaction
      */
     public synchronized void begin() throws NotSupportedException, SystemException
     {
-        if (traceLogger.isDebugEnabled())
+        isBeginMatched = false;
+        if (isCallStackTraced)
         {
             // get the stack trace
             Exception e = new Exception();
             e.fillInStackTrace();
-            traceDebugBeginTrace = e.getStackTrace();
+            beginCallStack = e.getStackTrace();
         }
         
         // make sure that the status and info align - the result may or may not be null
@@ -462,11 +483,9 @@ public class SpringAwareUserTransaction
                 // make sure that we clean up the stack
                 cleanupTransactionInfo(txnInfo);
                 finalized = true;
-                // clean up debug
-                if (traceLogger.isDebugEnabled())
-                {
-                    traceDebugBeginTrace = null;
-                }
+                // clean up leaked transaction logging
+                isBeginMatched = true;
+                beginCallStack = null;
             }
         }
         
@@ -516,11 +535,9 @@ public class SpringAwareUserTransaction
                 // make sure that we clean up the stack
                 cleanupTransactionInfo(txnInfo);
                 finalized = true;
-                // clean up debug
-                if (traceLogger.isDebugEnabled())
-                {
-                    traceDebugBeginTrace = null;
-                }
+                // clean up leaked transaction logging
+                isBeginMatched = true;
+                beginCallStack = null;
             }
         }
 
@@ -554,15 +571,32 @@ public class SpringAwareUserTransaction
     @Override
     protected void finalize() throws Throwable
     {
-        if (traceLogger.isDebugEnabled() && traceDebugBeginTrace != null)
+        if (!isBeginMatched)
         {
-            StringBuilder sb = new StringBuilder(1024);
-            StackTraceUtil.buildStackTrace(
-                    "UserTransaction being garbage collected without a commit() or rollback().",
-                    traceDebugBeginTrace,
-                    sb,
-                    -1);
-            traceLogger.error(sb);
+            if (isCallStackTraced)
+            {
+                if (beginCallStack == null)
+                {
+                    traceLogger.error("UserTransaction being garbage collected without a commit() or rollback(). " + 
+                                      "NOTE: Prior to transaction call stack logging.");
+                }
+                else
+                {
+                    StringBuilder sb = new StringBuilder(1024);
+                    StackTraceUtil.buildStackTrace(
+                            "UserTransaction being garbage collected without a commit() or rollback().",
+                            beginCallStack,
+                            sb,
+                            -1);
+                    traceLogger.error(sb);
+                }
+            }
+            else
+            {
+                traceLogger.error("Detected first UserTransaction which is being garbage collected without a commit() or rollback()");
+                traceLogger.error("Logging of transaction call stack is now enabled and will affect performance");
+                isCallStackTraced = true;
+            }
         }
     }
 }
