@@ -3436,7 +3436,7 @@ No
 
 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E,StringMap
 {"@@ALF_SWF@@" "<%Dir <%InstallDir%> forward%>/bin"
-"@@ALF_IMG@@" "<%Dir <%ALF_IMG%> forward%>"}
+"@@ALF_IMG@@" "<%Dir <%InstallDir%> forward%>/ImageMagick"}
 
 0E2B711C-DEBF-49E5-A966-C2D5177AE431,CheckCondition
 {Before Action is Executed}
