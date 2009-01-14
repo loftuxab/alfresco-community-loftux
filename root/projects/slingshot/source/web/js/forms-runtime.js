@@ -225,13 +225,16 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      me._submitInvoked(event);
                      form.attributes.action.nodeValue = "";
                   }
+                  Event.stopEvent(event);
+                  return false;
                }
                
                var enterListener = new KeyListener(form,
                {
                   keys: KeyListener.KEY.ENTER
                },
-               fnStopEvent, "keydown");
+               
+               fnStopEvent, KeyListener.KEYDOWN);
                enterListener.enable();
             }
             
