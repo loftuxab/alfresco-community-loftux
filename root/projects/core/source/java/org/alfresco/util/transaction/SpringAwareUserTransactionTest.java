@@ -244,6 +244,58 @@ public class SpringAwareUserTransactionTest extends TestCase
 
         checkNoStatusOnThread();
     }
+
+    /**
+     * Test for leaked transactions (no guarantee it will succeed due to reliance
+     * on garbage collector), so disabled by default.
+     * 
+     * Also, if it succeeds, transaction call stack tracing will be enabled
+     * potentially hitting the performance of all subsequent tests.
+     * 
+     * @throws Exception
+     */
+    public void xtestLeakedTransactionLogging() throws Exception
+    {
+        assertFalse(SpringAwareUserTransaction.isCallStackTraced());
+        
+        TrxThread t1 = new TrxThread();
+        t1.start();
+        System.gc();
+        Thread.sleep(1000);
+
+        TrxThread t2 = new TrxThread();
+        t2.start();
+        System.gc();
+        Thread.sleep(1000);
+        
+        assertTrue(SpringAwareUserTransaction.isCallStackTraced());
+        
+        TrxThread t3 = new TrxThread();
+        t3.start();
+        System.gc();
+        Thread.sleep(3000);
+        System.gc();
+        Thread.sleep(3000);
+    }
+    
+    private class TrxThread extends Thread
+    {
+        public void run()
+        {
+            try
+            {
+                getTrx();
+            }
+            catch (Exception e) {}
+        }
+        
+        public void getTrx() throws Exception
+        {
+            UserTransaction txn = getTxn();
+            txn.begin();
+            txn = null;
+        }
+    }
     
     /**
      * Used to check that the transaction manager is being called correctly
