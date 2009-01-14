@@ -393,7 +393,6 @@
                     package-webframeworkcommons-jar,
                     incremental-webstudio,
                     deploy-webstudio-tomcat" />
-                                                            
    
    <!--
    <target name="build-jboss" 
@@ -445,25 +444,13 @@
       
    <target name="clean-projects" 
            description="Cleans all projects" 
-           depends="clean-core,
-	                 clean-jlan, 
-                    clean-mbeans,
-                    clean-deployment, 
-                    clean-repository, 
-                    clean-remoteapi, 
-                    clean-jndi, 
-                    clean-catalinavirtual, 
-                    clean-linkvalidation, 
-                    clean-webscriptframework,
-                    clean-webframework,
-                    clean-webframeworkcommons,
-                    clean-slingshot,
-                    clean-webclient, 
+           depends="clean-webclient-projects,
+                    clean-slingshot-projects,
                     clean-webserviceclient,
                     clean-webstudio" />
                     
    <target name="clean-webclient-projects" 
-           description="Cleans all projects related to the slingshot project" 
+           description="Cleans all projects related to the webclient project" 
            depends="clean-core,
                     clean-jlan, 
                     clean-mbeans,
