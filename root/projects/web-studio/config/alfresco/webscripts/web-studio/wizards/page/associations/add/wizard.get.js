@@ -17,7 +17,7 @@ wizard.addElementFormat("templateId", "Template", "combo", 220);
 //
 // FORMAT ID dropdown
 //
-wizard.addElementFormatKeyPair("formatId", "emptyText", "Please select a Format ID");
+wizard.addElementFormatKeyPair("formatId", "emptyText", "Please select a Format");
 wizard.addElementFormatKeyPair("formatId", "title", "Formats");
 wizard.addElementSelectionValue("formatId", "default", "Default");
 wizard.addElementSelectionValue("formatId", "print", "Print");
@@ -26,6 +26,7 @@ wizard.addElementSelectionValue("formatId", "wap", "Wireless (WAP)");
 //
 // TEMPLATE ID dropdown
 //
+wizard.addElementFormatKeyPair("templateId", "emptyText", "Please select a Template");
 wizard.addElementFormatKeyPair("templateId", "title", "Templates");
 for(var i = 0; i < templates.length; i++)
 {

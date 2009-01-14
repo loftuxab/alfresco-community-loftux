@@ -14,6 +14,7 @@ wizard.addElementFormat("templateId", "Template", "combo", 220);
 //
 // Format ID
 //
+wizard.addElementFormatKeyPair("formatId", "emptyText", "Please select a Format");
 wizard.addElementFormatKeyPair("formatId", "title", "Formats");
 wizard.addElementSelectionValue("formatId", "default", "Default Format");
 wizard.addElementSelectionValue("formatId", "wireless", "Wireless Format");
@@ -23,6 +24,7 @@ wizard.addElementSelectionValue("formatId", "print", "Print Format");
 //
 // Template ID
 //
+wizard.addElementFormatKeyPair("templateId", "emptyText", "Please select a Template");
 wizard.addElementFormatKeyPair("templateId", "title", "Templates");
 var templates = sitedata.getTemplates();
 for(var i = 0; i < templates.length; i++)

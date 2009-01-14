@@ -25,12 +25,17 @@
 package org.alfresco.web.scripts;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.site.FrameworkHelper;
@@ -57,10 +62,11 @@ public class LocalFileSystemStore implements Store
     
     protected File getRootDir()
     {
-        if (rootDir == null && FrameworkHelper.isInitialized())
+        if (this.rootDir == null)
         {
             this.rootDir = new File(getBasePath());
         }
+        
         return this.rootDir;
     }
     
@@ -222,7 +228,22 @@ public class LocalFileSystemStore implements Store
      */
     public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
     {
-        throw new AlfrescoRuntimeException("getDocumentPaths() not supported by local file system store.");
+        PatternFileFilter filter = new PatternFileFilter(documentPattern);
+        
+        String absParentPath = toAbsolutePath(path);
+        int absParentPathLen = absParentPath.length();
+        File f = new File(absParentPath);
+        
+        List<File> fileList = listPath(f, filter, includeSubPaths);
+        
+        String[] paths = new String[fileList.size()];
+        for(int i = 0; i < fileList.size(); i++)
+        {
+            String thePath = ((File)fileList.get(i)).getPath();
+            paths[i] = thePath.substring(absParentPathLen);
+        }
+        
+        return paths;
     }
     
     /* (non-Javadoc)
@@ -230,7 +251,7 @@ public class LocalFileSystemStore implements Store
      */
     public String[] getDescriptionDocumentPaths()
     {
-        throw new AlfrescoRuntimeException("getDescriptionDocumentPaths() not supported by remote store.");
+        return getDocumentPaths("/", true, "*.desc.xml");
     }
 
     /* (non-Javadoc)
@@ -238,7 +259,8 @@ public class LocalFileSystemStore implements Store
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
-        throw new AlfrescoRuntimeException("getScriptDocumentPaths() not supported by remote store.");
+        String scriptPaths = script.getDescription().getId() + ".*";
+        return getDocumentPaths("/", false, scriptPaths);
     }
 
     /* (non-Javadoc)
@@ -246,7 +268,7 @@ public class LocalFileSystemStore implements Store
      */
     public ScriptLoader getScriptLoader()
     {
-        throw new AlfrescoRuntimeException("getScriptLoader() not supported by remote store.");
+        return new LocalFileSystemStoreScriptLoader();
     }
 
     /* (non-Javadoc)
@@ -254,7 +276,7 @@ public class LocalFileSystemStore implements Store
      */
     public TemplateLoader getTemplateLoader()
     {
-        throw new AlfrescoRuntimeException("getTemplateLoader() not supported by remote store.");
+        return new LocalFileSystemStoreTemplateLoader();
     }
 
     /* (non-Javadoc)
@@ -263,11 +285,25 @@ public class LocalFileSystemStore implements Store
     public String getBasePath()
     {
         String fullPath = this.path;
-        if (this.root != null && root.startsWith("."))
+        
+        if (this.root != null)
         {
-            // make relative to the web app real path
-            fullPath = FrameworkHelper.getRealPath(this.root.substring(1)) + this.path;
+            if(!root.endsWith("/"))
+            {
+                root += "/";
+            }
+            
+            if (root.startsWith("."))
+            {
+                // make relative to the web app real path
+                fullPath = FrameworkHelper.getRealPath(this.root.substring(1)) + this.path;
+            }
+            else
+            {
+                fullPath = this.root + this.path;
+            }
         }
+        
         return fullPath;
     }
     
@@ -294,6 +330,264 @@ public class LocalFileSystemStore implements Store
                     String childAbsPath = absPath + File.separatorChar + childDocumentPaths[i];
                     gatherAbsolutePaths(childAbsPath, list);
                 }
+            }
+        }
+    }
+    
+    
+    
+    /**
+     * Local File System Store implementation of a Script Loader
+     * 
+     * @author muzquiano
+     */
+    protected class LocalFileSystemStoreScriptLoader implements ScriptLoader
+    {
+        /**
+         * @see org.alfresco.web.scripts.ScriptLoader#getScript(java.lang.String)
+         */
+        public ScriptContent getScript(String path)
+        {
+            ScriptContent sc = null;
+            if (hasDocument(path))
+            {
+                sc = new LocalFileSystemStoreScriptContent(path);
+            }
+            return sc;
+        }
+    }
+    
+    
+    /**
+     * Local File System Store implementation of a Template Loader
+     * 
+     * @author muzquiano
+     */
+    private class LocalFileSystemStoreTemplateLoader implements TemplateLoader
+    {
+        /**
+         * @see freemarker.cache.TemplateLoader#closeTemplateSource(java.lang.Object)
+         */
+        public void closeTemplateSource(Object templateSource) throws IOException
+        {
+            // nothing to do - we return a reader to fully retrieved in-memory data
+        }
+
+        /**
+         * @see freemarker.cache.TemplateLoader#findTemplateSource(java.lang.String)
+         */
+        public Object findTemplateSource(String name) throws IOException
+        {
+            LocalFileSystemStoreTemplateSource source = null;
+            if (hasDocument(name))
+            {
+                source = new LocalFileSystemStoreTemplateSource(name);
+            }
+            return source;
+        }
+
+        /**
+         * @see freemarker.cache.TemplateLoader#getLastModified(java.lang.Object)
+         */
+        public long getLastModified(Object templateSource)
+        {
+            return ((LocalFileSystemStoreTemplateSource)templateSource).lastModified();
+        }
+
+        /**
+         * @see freemarker.cache.TemplateLoader#getReader(java.lang.Object, java.lang.String)
+         */
+        public Reader getReader(Object templateSource, String encoding) throws IOException
+        {
+            return ((LocalFileSystemStoreTemplateSource)templateSource).getReader(encoding);
+        }
+    }
+    
+    
+    /**
+     * Template Source - loads from a Local File System Store.
+     * 
+     * @author muzquiano
+     */
+    private class LocalFileSystemStoreTemplateSource
+    {
+        private String templatePath;
+        
+        private LocalFileSystemStoreTemplateSource(String path)
+        {
+            this.templatePath = path;
+        }
+        
+        private long lastModified()
+        {
+            try
+            {
+                return LocalFileSystemStore.this.lastModified(templatePath);
+            }
+            catch (IOException e)
+            {
+                return -1;
+            }
+        }
+        
+        private Reader getReader(String encoding)
+            throws IOException
+        {
+            Reader reader = null;
+            
+            File f = new File(toAbsolutePath(templatePath));
+            if (f.exists())
+            {
+                reader = new FileReader(f);
+            }
+            
+            return reader;
+        }
+    }
+    
+    
+    /**
+     * Script Content - loads from a Local File System Store.
+     * 
+     * @author muzquiano
+     */
+    private class LocalFileSystemStoreScriptContent implements ScriptContent
+    {
+        private String scriptPath;
+        
+        /**
+         * Constructor
+         * 
+         * @param path  Path to remote script content
+         */
+        private LocalFileSystemStoreScriptContent(String path)
+        {
+            this.scriptPath = path;
+        }
+        
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#getPath()
+         */
+        public String getPath()
+        {
+            return getBasePath() + '/' + this.scriptPath;
+        }
+
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#getPathDescription()
+         */
+        public String getPathDescription()
+        {
+            return getBasePath() + '/' + this.scriptPath;
+        }
+        
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#getInputStream()
+         */
+        public InputStream getInputStream()
+        {
+            InputStream is = null;
+            
+            try
+            {
+                File f = new File(toAbsolutePath(scriptPath));
+                if (f.exists())
+                {
+                    is = new FileInputStream(f);
+                }            
+            }
+            catch (IOException e)
+            {
+                throw new AlfrescoRuntimeException("Unable to load script: " + scriptPath, e);
+            }
+            
+            return is;
+        }
+
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#getReader()
+         */
+        public Reader getReader()
+        {
+            Reader reader = null;
+            
+            try
+            {
+                File f = new File(toAbsolutePath(scriptPath));
+                if (f.exists())
+                {
+                    reader = new FileReader(f);
+                }
+            }
+            catch (IOException e)
+            {
+                throw new AlfrescoRuntimeException("Unable to load script: " + scriptPath, e);
+            }
+            
+            return reader;
+        }
+
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#isSecure()
+         */
+        public boolean isSecure()
+        {
+            return false;
+        }
+    }
+    
+    private class PatternFileFilter implements FileFilter 
+    {
+        Pattern pattern;
+        
+        public PatternFileFilter(String pat) {
+            
+            pat = pat.replaceAll("\\*", ".*");
+            
+            this.pattern = Pattern.compile(pat);
+        }
+        
+        public boolean accept(File pathname)
+        {
+            if(pathname.isDirectory())
+            {
+                return false;
+            }
+            else
+            {
+                return pattern.matcher(pathname.getName()).matches();
+            }
+        }
+    }
+    
+    private List<File> listPath(File path, FileFilter filter, boolean listChildren)
+    {
+        List<File> results = new ArrayList<File>();
+        
+        listPath(path, filter, results, listChildren);
+        
+        return results;
+    }
+    
+    private void listPath(File path, FileFilter filter, List<File> results, boolean listChildren) 
+    {
+        // list of files in this dir
+        File files[] = path.listFiles(filter);
+        
+        // Sort with help of Collections API
+        Arrays.sort(files);
+        
+        // delve into subdirectories?
+        for (int i = 0; i < files.length; i++) 
+        {
+            // place into results
+            results.add(files[i]);
+            
+            // walk through children if deemed to be thus
+            if (files[i].isDirectory() && listChildren) 
+            {
+                // recursively descend dir tree
+                listPath(files[i], filter, results, listChildren);
             }
         }
     }

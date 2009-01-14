@@ -1498,6 +1498,7 @@
                          windowtitle="Alfresco Web Framework" 
                          projectdir="${dir.project.webframework}"/>
    </target>
+           
    
    <!-- *********************************** -->
    <!-- ** Web Framework Commons Project ** -->
@@ -3118,5 +3119,45 @@
                          windowtitle="Alfresco Web Studio" 
                          projectdir="${dir.project.webstudio}"/>
    </target>
+
+
+   <!-- ****************************************** -->
+   <!-- ** Web Framework Project - Empty Webapp ** -->
+   <!-- ****************************************** -->
+   
+   <target name="incremental-webframework-empty" 
+           depends="package-webframework-empty" />
+           
+   <target name="package-webframework-empty" 
+           depends="package-webframework-war-empty" />
+
+   <target name="package-webframework-war-empty" 
+           depends="assemble-webframework-war">
+           
+      <!-- Remove test objects -->
+      <delete includeemptydirs="true">
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts"
+      	          includes="**/*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates"
+      	          includes="**/*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/components"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/content-associations"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/page-associations"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/pages"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/template-instances"
+      	          includes="**/*.*" defaultexcludes="false" />
+      </delete>
+            
+      <!-- Package WAR -->      
+      <war warfile="${dir.project.webframework.dist}/surf-app.war" 
+           webxml="${dir.project.webframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </war>
+   </target>
+   
    
 </project>
