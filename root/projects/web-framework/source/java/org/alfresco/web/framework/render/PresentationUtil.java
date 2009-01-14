@@ -87,7 +87,7 @@ public class PresentationUtil
         catch (RendererExecutionException ex)
         {
             handlePageRenderProblem(context, ex,
-                    context.getPage().getId());
+                    context.getPageId());
         }
     }
     
@@ -198,7 +198,7 @@ public class PresentationUtil
         catch (RendererExecutionException ex)
         {
             handlePageRenderProblem(context, ex,
-                    context.getPage().getId());
+                    context.getPageId());
         }
     }
     

@@ -499,7 +499,7 @@ public final class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String objectId, String formatId)
     {
-        String pageId = context.getPage().getId();
+        String pageId = context.getPageId();
         String url = context.getLinkBuilder().page(context, pageId, formatId);
         if (url != null)
         {
@@ -628,11 +628,11 @@ public final class RenderUtil
         }
         else if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
         {
-            sourceId = context.getTemplate().getId();
+            sourceId = context.getTemplateId();
         }
         else if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
         {
-            sourceId = context.getPage().getId();
+            sourceId = context.getPageId();
         }
         else if (WebFrameworkConstants.REGION_SCOPE_URI.equalsIgnoreCase(scopeId))
         {
