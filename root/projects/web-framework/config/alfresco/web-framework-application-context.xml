@@ -48,6 +48,9 @@
    <!-- Configuration of Abstract Store Implementations     -->
    <!--                                                     -->
 
+   <!-- ClassPath Store Abstract -->
+   <bean id="webframework.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" init-method="init" />   
+
    <!-- Remote Store Abstract -->
    <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
       <property name="endpoint">
@@ -60,19 +63,6 @@
       <property name="storeContext" ref="webframework.context.remotestore"/>
       <property name="connectorProvider" ref="webframework.connector.provider" />      
    </bean>
-
-   <!-- Local Store Abstract (disabled) -->   
-   <!--
-   <bean id="webframework.localstore" class="org.alfresco.web.scripts.LocalFileSystemStore" abstract="true" init-method="init">
-      <property name="root">
-         <value>./WEB-INF/classes/alfresco</value>
-      </property>
-   </bean>
-   -->
-   
-   <!-- ClassPath Store Abstract -->
-   <bean id="webframework.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" init-method="init" />   
-   
 
    <!--                                                     -->
    <!-- Additional Configuration for Remote Store           -->
