@@ -106,11 +106,11 @@ public class RegionTag extends TagBase
             String chromeId = getChrome();
             if (!isChromeless())
             {
-                PresentationUtil.renderRegion(context, RenderFocus.BODY, context.getTemplate().getId(), getName(), getScope(), chromeId);
+                PresentationUtil.renderRegion(context, RenderFocus.BODY, context.getTemplateId(), getName(), getScope(), chromeId);
             }
             else
             {
-                PresentationUtil.renderChromelessRegion(context, RenderFocus.BODY, context.getTemplate().getId(), getName(), getScope());
+                PresentationUtil.renderChromelessRegion(context, RenderFocus.BODY, context.getTemplateId(), getName(), getScope());
             }            
         }
         catch (Throwable t)

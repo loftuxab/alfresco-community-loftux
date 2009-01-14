@@ -114,7 +114,16 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_ADD);
 				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_EDIT);
 				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_COPY);
-				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_DELETE);
+				_this.treeView.menu.setDisabled('roots', _this.INDEX_BUTTON_DELETE);
+				
+				// only allow delete if the current node doesn't have any children
+				if(_this.treeView.activeNode.children)
+				{
+					if(_this.treeView.activeNode.children.length === 0)
+					{
+						_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_DELETE);
+					}
+				}
 			}
 		};
 		

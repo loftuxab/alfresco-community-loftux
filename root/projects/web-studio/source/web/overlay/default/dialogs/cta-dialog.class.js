@@ -180,6 +180,7 @@ WebStudio.CTADialog.prototype.popup = function()
 			draggable: false, 
 			modal: true,
 			visible: false,
+			constraintoviewport: true,
 			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}		
 		};
 
