@@ -191,7 +191,7 @@
             <template-instance>dashboard-2-columns-wide-left</template-instance>
             <authentication>user</authentication>
             <properties>
-               <sitePages>[{"pageId":"documentlibrary"}]</sitePages>
+               <sitePages>[{"pageId":"documentlibrary"}, {"pageId":"links"}]</sitePages>
             </properties>
          </page>
       </pages>
