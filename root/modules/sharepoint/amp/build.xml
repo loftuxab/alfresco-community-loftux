@@ -25,12 +25,15 @@
       <delete dir="${build.dir}/dist" />
       <delete dir="${build.dir}/classes" />
       <delete dir="${build.dir}/lib" />
+   </target>
+   
+   <target name="mkdirs">				
       <mkdir dir="${build.dir}/classes" />		
       <mkdir dir="${build.dir}/dist" />
       <mkdir dir="${build.dir}/lib" />
    </target>
-   
-   <target name="compile">	
+
+   <target name="compile" depends="mkdirs">	
       <javac classpathref="class.path" srcdir="${src}" destdir="${build.dir}/classes" debug="true" />
    </target>
    
