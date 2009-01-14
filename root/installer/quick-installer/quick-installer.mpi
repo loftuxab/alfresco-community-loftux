@@ -315,7 +315,7 @@ File ::C51E5CAA-5BFC-4407-887F-D632AAF0826F -type dir -name prop-base -parent 27
 File ::78ACE50E-C49F-43B3-9520-0148915DD6E7 -type dir -name props -parent 2726D1D4-6017-4F0F-A281-3F07D5F93D5A
 File ::FD1B0E47-EE37-46C2-93A3-BA8BB66D66C8 -type dir -name text-base -parent 2726D1D4-6017-4F0F-A281-3F07D5F93D5A
 File ::AE0710F6-0F0D-4065-AE8A-E9072DAF4B9E -directory <%InstallDir%>/bin -name W:/HEAD/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
-File ::09B268EE-C341-4587-80D3-1DF532DA173F -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -active 0 -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
+File ::09B268EE-C341-4587-80D3-1DF532DA173F -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::19E1346C-800D-4A2A-AF02-AB97E9AC7412 -type dir -name W:/HEAD/root/projects/installer/licenses -location ../../projects/installer/licenses -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::A3EC7267-851F-4036-B155-C9202887A570 -name FLOSS-exception.txt -parent 19E1346C-800D-4A2A-AF02-AB97E9AC7412
 File ::B3C7B734-6190-4BE4-B97A-39FEE60549F8 -name gpl.txt -parent 19E1346C-800D-4A2A-AF02-AB97E9AC7412
@@ -3257,7 +3257,7 @@ Condition 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 -active Yes -parent 3D88EE52-1868
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
 InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -active Yes -parent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 448A4C99-13E3-42B0-AE70-2BFA0854ECBE
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
 Condition 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3
 Condition 87245761-D5F3-470A-9E78-B56E97ADD1AF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 87245761-D5F3-470A-9E78-B56E97ADD1AF
 InstallComponent 8486C21D-3367-4AFE-BF4E-6CDB5F670858 -setup Install -type pane -conditions B6592AC2-4C85-49CA-BBA7-CD5A2CA80995 -title {Check Port} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
@@ -3352,8 +3352,8 @@ InstallComponent 2DF8D0C6-12F2-41FA-AC9C-BEEDFA5B1B1A -setup Install -type actio
 InstallComponent 80D7849E-9103-4EA2-B202-F23CC339309D -setup Install -type actiongroup -title {Config Actions} -alias {Config Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 9F007B25-0D36-4E27-81D9-CAA6FE600D60 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
-InstallComponent 2521C09F-C692-49D8-BD76-C69BFFEF1F24 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent D05A76C6-7FC5-416A-A4D0-45D5C7B9E0C1 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 2521C09F-C692-49D8-BD76-C69BFFEF1F24 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -title {Write Text To File} -component WriteTextToFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In File} -component ReplaceTextInFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
@@ -3680,7 +3680,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-6584166
+47013344
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -3969,7 +3969,7 @@ derby
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-92324
+101269110
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
