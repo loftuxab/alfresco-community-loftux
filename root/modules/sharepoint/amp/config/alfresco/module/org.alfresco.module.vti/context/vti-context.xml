@@ -182,6 +182,7 @@
         		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/DeleteDws"> <ref bean="deleteDwsEndpoint"/> </entry>
         		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RenameDws"> <ref bean="renameDwsEndpoint"/> </entry>
         		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/RemoveDwsUser"> <ref bean="removeDwsUserEndpoint"/> </entry>
+        		<entry key="http://schemas.microsoft.com/sharepoint/soap/dws/UpdateDwsData"> <ref bean="updateDwsDataEndpoint"/> </entry>
         	</map>
 		</property>
 	</bean>   
@@ -390,6 +391,16 @@
             <value>RemoveDwsUser</value>
         </property>
         <property name="namespace">
+            <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
+        </property>
+    </bean>
+    
+    <bean id="updateDwsDataEndpoint" class="org.alfresco.module.vti.web.ws.UpdateDwsDataEndpoint">
+    	<constructor-arg ref="dwsServiceHandler"/>
+    	<property name="name">
+    		<value>UpdateDwsData</value>
+    	</property>
+    	<property name="namespace">
             <value>http://schemas.microsoft.com/sharepoint/soap/dws/</value>
         </property>
     </bean>

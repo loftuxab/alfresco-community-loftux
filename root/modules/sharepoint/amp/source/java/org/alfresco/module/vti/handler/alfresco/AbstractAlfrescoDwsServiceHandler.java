@@ -26,7 +26,6 @@ package org.alfresco.module.vti.handler.alfresco;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.DwsServiceHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
+import org.alfresco.module.vti.metadata.dic.CAMLMethod;
 import org.alfresco.module.vti.metadata.dic.Permission;
 import org.alfresco.module.vti.metadata.dic.WorkspaceType;
 import org.alfresco.module.vti.metadata.model.AssigneeBean;
@@ -43,6 +43,7 @@ import org.alfresco.module.vti.metadata.model.DocumentBean;
 import org.alfresco.module.vti.metadata.model.DwsBean;
 import org.alfresco.module.vti.metadata.model.DwsData;
 import org.alfresco.module.vti.metadata.model.DwsMetadata;
+import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.ListInfoBean;
 import org.alfresco.module.vti.metadata.model.MemberBean;
 import org.alfresco.module.vti.metadata.model.SchemaBean;
@@ -51,6 +52,7 @@ import org.alfresco.module.vti.metadata.model.UserBean;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessStatus;
@@ -79,6 +81,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     protected PermissionService permissionService;
     protected AuthenticationService authenticationService;
     protected PersonService personService;
+    protected ContentService contentService;
 
     protected VtiPathHelper pathHelper;
 
@@ -175,6 +178,16 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     }
 
     /**
+     * Set content service
+     * 
+     * @param contentService the content service to set ({@link ContentService})
+     */
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+        
+    /**
      * @see org.alfresco.module.vti.handler.DwsServiceHandler#getDWSMetaData(java.lang.String, java.lang.String, boolean)
      */
     public DwsMetadata getDWSMetaData(String document, String id, boolean minimal) throws Exception
@@ -214,7 +227,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
 
             List<String> choices = new ArrayList<String>();
 
-            List<SchemaFieldBean> fields = new ArrayList<SchemaFieldBean>();
+            List<SchemaFieldBean> fields = new ArrayList<SchemaFieldBean>(5);
             fields.add(new SchemaFieldBean("FileLeafRef", "Invalid", true, choices));
             fields.add(new SchemaFieldBean("_SourceUrl", "Text", false, choices));
             fields.add(new SchemaFieldBean("_SharedFileIndex", "Text", false, choices));
@@ -222,11 +235,27 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
             fields.add(new SchemaFieldBean("Title", "Text", false, choices));
             schemaItems.add(doCreateDocumentSchemaBean(dwsNode, fields));
 
+            // set Links schema
+            List<SchemaFieldBean> linkFields = new ArrayList<SchemaFieldBean>(4);
+            linkFields.add(new SchemaFieldBean("Attachments", "Attachments", false, choices));
+            linkFields.add(new SchemaFieldBean("Order", "Number", false, choices));
+            linkFields.add(new SchemaFieldBean("URL", "URL", true, choices));
+            linkFields.add(new SchemaFieldBean("Comments", "Note", false, choices));
+            SchemaBean linkSchema = doCreateLinkSchemaBean(dwsNode, linkFields);
+            if (linkSchema != null)
+            {
+                schemaItems.add(linkSchema);
+            }
+            
             dwsMetadata.setSchemaItems(schemaItems);
 
             // set Documents listInfo for documents list
             List<ListInfoBean> listInfoItems = new ArrayList<ListInfoBean>();
             listInfoItems.add(new ListInfoBean("Documents", false, permissions));
+            
+            // set Documents listInfo for documents list            
+            listInfoItems.add(new ListInfoBean("Links", false, permissions));
+            
             dwsMetadata.setListInfoItems(listInfoItems);
         }
 
@@ -286,8 +315,11 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         List<DocumentBean> dwsContent = new ArrayList<DocumentBean>();
 
         doGetDwsContentRecursive(dwsInfo, dwsContent);
-
         dwsData.setDocumentsList(dwsContent);
+
+        // setting the Links list for current document workspace site
+        List<LinkBean> linksList = doGetDwsLinks(dwsInfo);
+        dwsData.setLinksList(linksList);
 
         dwsData.setDocLibUrl(host + context + dws + "/documentLibrary.vti");
 
@@ -711,6 +743,14 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     protected abstract void doGetDwsContentRecursive(FileInfo fileInfo, List<DocumentBean> dwsContent);
 
     /**
+     * Get document workspace site links
+     * 
+     * @param fileInfo document workspace site file info ({@link FileInfo})
+     * @return linksList list of beans with document workspace site links ({@link LinkBean})
+     */
+    protected abstract List<LinkBean> doGetDwsLinks(FileInfo fileInfo);
+
+    /**
      * Get type of alfresco document workspace site (Folder or Site)
      * 
      * @return QName type of alfresco document workspace site
@@ -733,6 +773,15 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * @return SchemaBean document schema
      */
     protected abstract SchemaBean doCreateDocumentSchemaBean(FileInfo dwsFileInfo, List<SchemaFieldBean> fields);
+
+    /**
+     * Create link schema
+     * 
+     * @param dwsFileInfo document workspace site file info ({@link FileInfo})
+     * @param fields system fields of the link ({@link SchemaFieldBean})
+     * @return SchemaBean link schema
+     */
+    protected abstract SchemaBean doCreateLinkSchemaBean(FileInfo dwsFileInfo, List<SchemaFieldBean> fields);
 
     /**
      * Get current user
@@ -763,8 +812,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     {
 
         List<FileInfo> fileInfoList = fileFolderService.list(dwsInfo.getNodeRef());
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
+        
         for (FileInfo fileInfo : fileInfoList)
         {
             // do not show working copies
@@ -776,9 +824,9 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
             String progID = "";
             String fileRef = documetnLibraryURL + fileInfo.getName();
             String objType = (fileInfo.isFolder()) ? "1" : "0";
-            String created = format.format(fileInfo.getCreatedDate());
+            String created = VtiUtils.formatPropfindDate(fileInfo.getCreatedDate());
             String author = (String) nodeService.getProperty(fileInfo.getNodeRef(), ContentModel.PROP_AUTHOR);
-            String modified = format.format(fileInfo.getModifiedDate());
+            String modified = VtiUtils.formatPropfindDate(fileInfo.getModifiedDate());
             String editor = (String) nodeService.getProperty(fileInfo.getNodeRef(), ContentModel.PROP_MODIFIER);
 
             result.add(new DocumentBean(id, progID, fileRef, objType, created, author, modified, editor));
@@ -807,4 +855,52 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     {
         return value.replaceAll("[!@#$%\\^&*\\(\\)\\-+=~`:;/\\\\\\[\\]\\{\\}|.,\"'\\s\\?<>]+", "_");
     }
+    
+    /**
+     * @see org.alfresco.module.vti.handler.DwsServiceHandler#updateDwsData(org.alfresco.module.vti.metadata.model.LinkBean, CAMLMethod, java.lang.String))
+     */
+    public LinkBean updateDwsData(LinkBean linkBean, CAMLMethod method, String dws)
+    {
+        if (method.toString().equals("New"))
+        {
+            return doUpdateDwsDataNew(linkBean, dws);
+        }
+        
+        if (method.toString().equals("Update"))
+        {
+            doUpdateDwsDataUpdate(linkBean, dws);
+        }
+        
+        if(method.toString().equals("Delete"))
+        {
+            doUpdateDwsDataDelete(linkBean, dws);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Creates new link in site links container
+     * 
+     * @param linkBean linkBean that should be created
+     * @param dws site name
+     * @return linkBean that was created
+     */
+    protected abstract LinkBean doUpdateDwsDataNew(LinkBean linkBean, String dws);
+    
+    /**
+     * Updates given link in site links container
+     * 
+     * @param linkBean linkBean that should be updated
+     * @param dws site name     
+     */
+    protected abstract void doUpdateDwsDataUpdate(LinkBean linkBean, String dws);
+    
+    /**
+     * Deletes link in site links container
+     * 
+     * @param linkBean linkBean that should be deleted
+     * @param dws site name     
+     */
+    protected abstract void doUpdateDwsDataDelete(LinkBean linkBean, String dws);
 }

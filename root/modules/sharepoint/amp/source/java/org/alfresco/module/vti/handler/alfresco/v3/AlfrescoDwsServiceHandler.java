@@ -25,31 +25,44 @@
 package org.alfresco.module.vti.handler.alfresco.v3;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler;
+import org.alfresco.module.vti.handler.alfresco.VtiExceptionUtils;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
+import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.metadata.dic.Permission;
 import org.alfresco.module.vti.metadata.model.DocumentBean;
 import org.alfresco.module.vti.metadata.model.DwsBean;
+import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.MemberBean;
 import org.alfresco.module.vti.metadata.model.SchemaBean;
 import org.alfresco.module.vti.metadata.model.SchemaFieldBean;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.site.SiteService;
 import org.alfresco.service.cmr.model.FileInfo;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
@@ -63,6 +76,11 @@ import org.apache.commons.logging.LogFactory;
 public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
 {
     private static Log logger = LogFactory.getLog(AlfrescoDwsServiceHandler.class);
+
+    private static final QName TYPE_LINK = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "link");
+    private static final QName PROP_LINK_TITLE = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "title");
+    private static final QName PROP_LINK_URL = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "url");
+    private static final QName PROP_LINK_DESCRIPTION = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "description");    
 
     private AuthenticationComponent authenticationComponent;
     private SiteService siteService;
@@ -206,6 +224,48 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     }
 
     /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doGetDwsLinks(org.alfresco.service.cmr.model.FileInfo)
+     */
+    public List<LinkBean> doGetDwsLinks(FileInfo fileInfo)
+    { 
+        
+        if (!siteService.hasContainer(fileInfo.getName(), "links"))
+        {            
+            siteService.createContainer(fileInfo.getName(), "links", ContentModel.TYPE_FOLDER, null);            
+        }
+        
+        List<LinkBean> linkList = new ArrayList<LinkBean>();
+        
+        NodeRef linksContainer = siteService.getContainer(fileInfo.getName(), "links");
+        List<FileInfo> containerContent = fileFolderService.list(linksContainer);
+        
+        for (FileInfo item : containerContent)
+        {
+            if (nodeService.getType(item.getNodeRef()).equals(TYPE_LINK))
+            {
+                Map<QName, Serializable> props = nodeService.getProperties(item.getNodeRef());
+                String url = (String) props.get(PROP_LINK_URL);
+                String description = (String) props.get(PROP_LINK_TITLE);
+                String comments = (String) props.get(PROP_LINK_DESCRIPTION);
+                String created = VtiUtils.formatPropfindDate((Date) props.get(ContentModel.PROP_CREATED));
+                String author = getFullUsername((String) props.get(ContentModel.PROP_CREATOR));
+                String modified = VtiUtils.formatPropfindDate((Date)props.get(ContentModel.PROP_MODIFIED));
+                String editor = getFullUsername((String) props.get(ContentModel.PROP_MODIFIER));
+                int owshiddenversion = 0;
+                String id = (String) props.get(ContentModel.PROP_NAME);
+                LinkBean link = new LinkBean(url, description, comments, created, author, modified, editor, owshiddenversion, id);
+                linkList.add(link);
+            }
+            else
+            {
+                continue;
+            }
+        }
+        
+        return linkList;
+    }
+
+    /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doListDwsMembers(org.alfresco.service.cmr.model.FileInfo)
      */
     public List<MemberBean> doListDwsMembers(FileInfo dwsFileInfo)
@@ -283,6 +343,14 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     }
 
     /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateLinkSchemaBean(org.alfresco.service.cmr.model.FileInfo, java.util.List)
+     */
+    protected SchemaBean doCreateLinkSchemaBean(FileInfo dwsFileInfo, List<SchemaFieldBean> fields)
+    {
+        return new SchemaBean("Links", "", fields);
+    }
+
+    /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doDeleteDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String)
      */
     protected void doDeleteDws(FileInfo dwsFileInfo, String username, String password) throws HttpException, IOException
@@ -326,5 +394,249 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         dwsBean.setUrl(host + context + dwsUrl);
         dwsBean.setParentWeb(parentUrl);
         return dwsBean;
+    }
+
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doUpdateDwsDataDelete(org.alfresco.module.vti.metadata.model.LinkBean, java.lang.String)
+     */
+    protected void doUpdateDwsDataDelete(LinkBean linkBean, String dws)
+    {        
+        NodeRef linksContainer = null;        
+
+        linksContainer = siteService.getContainer(dws, "links");        
+        
+        if (linksContainer == null)
+        {
+            throw new VtiHandlerException(VtiHandlerException.LIST_NOT_FOUND);
+        }
+        
+        NodeRef linkRef = nodeService.getChildByName(linksContainer, ContentModel.ASSOC_CONTAINS, linkBean.getId());
+        
+        if (linkRef == null)
+        {
+            throw new VtiHandlerException(VtiHandlerException.ITEM_NOT_FOUND);            
+        }
+        
+        UserTransaction tx = transactionService.getUserTransaction(false);
+        try
+        {
+            tx.begin();
+            
+            nodeService.deleteNode(linkRef);
+            
+            tx.commit();
+        }
+        catch (Throwable t)
+        {
+            try
+            {
+                tx.rollback();
+            }
+            catch (Exception e)
+            {
+            }
+            
+            if (t instanceof AccessDeniedException)
+            {
+                throw new VtiHandlerException(VtiHandlerException.NOT_PERMISSIONS);
+            }
+
+            throw VtiExceptionUtils.createRuntimeException(t);
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Link with name '" + linkBean.getDescription() + "' was deleted.");
+        }
+    }
+
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doUpdateDwsDataNew(org.alfresco.module.vti.metadata.model.LinkBean, java.lang.String)
+     */
+    protected LinkBean doUpdateDwsDataNew(LinkBean linkBean, String dws)
+    {
+        LinkBean result = null;
+        
+        NodeRef linksContainer = null;        
+
+        if (siteService.hasContainer(dws, "links"))
+        {
+            linksContainer = siteService.getContainer(dws, "links");
+        }
+        else
+        {
+            linksContainer = siteService.createContainer(dws, "links", ContentModel.TYPE_FOLDER, null);
+        }
+        
+        if (linksContainer == null)
+        {
+            throw new VtiHandlerException(VtiHandlerException.LIST_NOT_FOUND);
+        }
+
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>();
+        
+        String name = getUniqueName(linksContainer);
+        props.put(ContentModel.PROP_NAME, name);
+        props.put(PROP_LINK_URL, linkBean.getUrl());
+        props.put(PROP_LINK_TITLE, linkBean.getDescription());
+        props.put(PROP_LINK_DESCRIPTION, linkBean.getComments());      
+        
+        UserTransaction tx = transactionService.getUserTransaction(false);
+        try
+        {
+            tx.begin();            
+            
+            ChildAssociationRef association = nodeService.createNode(linksContainer, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_PREFIX, name), TYPE_LINK, props);
+                        
+            ContentWriter writer = contentService.getWriter(association.getChildRef(), ContentModel.PROP_CONTENT, true);
+            writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            writer.setEncoding("UTF-8");
+            String text = linkBean.getUrl();
+            writer.putContent(text);     
+            
+            result = buildLinkBean(association.getChildRef());
+            
+            tx.commit();
+        }
+        catch (Exception e)
+        {
+            try
+            {
+                tx.rollback();
+            }
+            catch (Exception tex)
+            {
+            }
+            
+            if (e instanceof AccessDeniedException)
+            {
+                throw new VtiHandlerException(VtiHandlerException.NOT_PERMISSIONS);
+            }
+
+            throw VtiExceptionUtils.createRuntimeException(e);
+        }        
+            
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Link with name '" + linkBean.getDescription() + "' was created.");
+        }            
+        return result;
+    }
+
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doUpdateDwsDataUpdate(org.alfresco.module.vti.metadata.model.LinkBean, java.lang.String)
+     */
+    protected void doUpdateDwsDataUpdate(LinkBean linkBean, String dws)
+    {          
+        NodeRef linksContainer = null;        
+
+        linksContainer = siteService.getContainer(dws, "links");                
+        
+        if (linksContainer == null)
+        {
+            throw new VtiHandlerException(VtiHandlerException.LIST_NOT_FOUND);
+        }
+        
+        NodeRef linkRef = nodeService.getChildByName(linksContainer, ContentModel.ASSOC_CONTAINS, linkBean.getId());
+        
+        if (linkRef == null)
+        {
+            throw new VtiHandlerException(VtiHandlerException.ITEM_NOT_FOUND);
+        }
+
+        UserTransaction tx = transactionService.getUserTransaction(false);
+        try
+        {
+            tx.begin();
+            nodeService.setProperty(linkRef, PROP_LINK_URL, linkBean.getUrl());
+            nodeService.setProperty(linkRef, PROP_LINK_TITLE, linkBean.getDescription());
+            nodeService.setProperty(linkRef, PROP_LINK_DESCRIPTION, linkBean.getComments());
+            
+            ContentWriter writer = contentService.getWriter(linkRef, ContentModel.PROP_CONTENT, true);
+            writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            writer.setEncoding("UTF-8");
+            String text = linkBean.getUrl();
+            writer.putContent(text);
+            
+            tx.commit();
+        }
+        catch (Throwable t)
+        {
+            try
+            {
+                tx.rollback();
+            }
+            catch (Exception e)
+            {
+            }
+            
+            if (t instanceof AccessDeniedException)
+            {
+                throw new VtiHandlerException(VtiHandlerException.NOT_PERMISSIONS);
+            }
+
+            throw VtiExceptionUtils.createRuntimeException(t);
+        }
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Link with name '" + linkBean.getDescription() + "' was updated.");
+        }
+    }
+    
+    /**
+     * Generate a unique name that can be used to create a child of the given parentNode.
+     * 
+     * @param linkFolderRef parentNode
+     * @return unique name that can be used to create a child of the given parentNode.
+     */
+    private String getUniqueName(NodeRef linkFolderRef)
+    {
+        String name = "link-" + System.currentTimeMillis();
+        String finalName = name + "_" + (int) Math.floor(Math.random() * 1000);
+        int count = 0;
+        while (nodeService.getChildByName(linkFolderRef, ContentModel.ASSOC_CONTAINS, finalName) != null && count < 100)
+        {
+            finalName = name + "_" + (int) Math.floor(Math.random() * 1000);
+            count++;
+        }
+        return finalName;
+    }
+    
+    /*
+     *  build LinkBean from NodeRef
+     */    
+    private LinkBean buildLinkBean(NodeRef linkNodeRef)
+    {
+        LinkBean result = new LinkBean();
+        Map<QName, Serializable> props= nodeService.getProperties(linkNodeRef);
+        result.setId((String)props.get(ContentModel.PROP_NAME));
+        result.setUrl((String)props.get(PROP_LINK_URL));
+        result.setDescription((String)props.get(PROP_LINK_TITLE));
+        result.setComments((String)props.get(PROP_LINK_DESCRIPTION));
+        result.setAuthor(getFullUsername((String)props.get(ContentModel.PROP_CREATOR)));
+        result.setEditor(getFullUsername((String)props.get(ContentModel.PROP_MODIFIER)));
+        result.setModified(VtiUtils.formatPropfindDate((Date)props.get(ContentModel.PROP_MODIFIED)));
+        result.setCreated(VtiUtils.formatPropfindDate((Date)props.get(ContentModel.PROP_CREATED))); 
+        result.setOwshiddenversion(0);
+        return result;
+    }
+    
+    /*
+     * gets full username by the given short name
+     */
+    private String getFullUsername(String username)
+    {
+        NodeRef person = personService.getPerson(username);
+        
+        if (person == null)        
+        {
+            return username;
+        }
+        
+        String firstname = (String) nodeService.getProperty(person, ContentModel.PROP_FIRSTNAME);
+        String lastname = (String) nodeService.getProperty(person, ContentModel.PROP_LASTNAME);
+        
+        return firstname + " " + lastname;
     }
 }

@@ -19,6 +19,7 @@
     	<property name="authenticationService" ref="AuthenticationService"/>
     	<property name="authenticationComponent" ref="AuthenticationComponent" />
     	<property name="personService" ref="PersonService"/>    	 
+    	<property name="contentService" ref="ContentService" />    	 
     	<property name="siteService" ref="SiteService" />
     	<property name="shareUtils" ref="shareUtils" />  
     	<property name="pathHelper" ref="vtiPathHelper"/>
