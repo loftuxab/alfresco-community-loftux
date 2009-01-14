@@ -134,7 +134,7 @@
          YAHOO.Bubbling.on("nextNav", this.onNav, this);
          YAHOO.Bubbling.on("prevNav", this.onNav, this);
          YAHOO.Bubbling.on("viewChanged", this.onViewChanged, this);
-         
+         YAHOO.Bubbling.on("dateChanged",this.onCalSelect,this);
          this.calendarView = this.options.view;
          this.startDate = (YAHOO.lang.isString(this.options.startDate)) ? Alfresco.util.fromISO8601(this.options.startDate): this.options.startDate;
          this.container = Dom.get(this.id);
@@ -942,7 +942,21 @@
         var newLoc = window.location.href.split('?')[0] + Alfresco.util.toQueryString(params);
         window.location = newLoc;
       },
-
+      /**
+       * Handler for when date mini calendar is selected
+       * 
+       * @method onNav 
+       * @param e {object}
+       *  
+       */
+      onCalSelect : function(e,args) 
+      {
+        var date = args[1].date;
+        var params = Alfresco.util.getQueryStringParameters();
+        params.date = Alfresco.util.formatDate(date,'yyyy-mm-dd');
+        var newLoc = window.location.href.split('?')[0] + Alfresco.util.toQueryString(params);
+        window.location = newLoc;
+      },       
       /**
        * Handler for when a tag is selected
        * 
