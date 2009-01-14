@@ -238,8 +238,7 @@
             dataObj:
             {
                htmlid: this.id + "-peoplefinder",
-               site: this.options.siteId,
-               minSearchTermLength: 0
+               site: this.options.siteId
             },
             successCallback:
             {

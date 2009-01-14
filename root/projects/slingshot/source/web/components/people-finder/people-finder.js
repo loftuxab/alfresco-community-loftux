@@ -326,7 +326,7 @@
          var enterListener = new YAHOO.util.KeyListener(searchText,
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
-         }, onKeyEnter, "keydown");
+         }, onKeyEnter, "keyup");
          enterListener.enable();
       },
       
