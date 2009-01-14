@@ -37,18 +37,24 @@ public class LinkBean implements Serializable
     private static final long serialVersionUID = -7781309737681728753L;
     
     private String url;
+    private String description;
     private String comments;
     private String created;
     private String author;
     private String modified;
     private String editor;
     private int owshiddenversion;
-    private int id;
+    private String id;
     
-    public LinkBean(String url, String comments, String created, String author, String modified, String editor, int owshiddenversion, int id)
+    public LinkBean()
+    {
+    }
+    
+    public LinkBean(String url, String description, String comments, String created, String author, String modified, String editor, int owshiddenversion, String id)
     {
         super();
         this.url = url;
+        this.description = description;
         this.comments = comments;
         this.created = created;
         this.author = author;
@@ -75,6 +81,25 @@ public class LinkBean implements Serializable
     public void setUrl(String url)
     {
         this.url = url;
+    }
+
+    /**
+     * 
+     * @return the description
+     */
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    /**
+     * <p>Sets the description for link.</p>
+     * 
+     * @param description the description to set
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     /**
@@ -189,7 +214,7 @@ public class LinkBean implements Serializable
      * 
      * @return the id
      */
-    public int getId()
+    public String getId()
     {
         return id;
     }
@@ -198,7 +223,7 @@ public class LinkBean implements Serializable
      * 
      * @param id the id ti set
      */
-    public void setId(int id)
+    public void setId(String id)
     {
         this.id = id;
     }

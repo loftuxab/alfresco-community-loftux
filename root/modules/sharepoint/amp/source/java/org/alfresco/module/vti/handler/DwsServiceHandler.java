@@ -30,10 +30,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.module.vti.metadata.dic.CAMLMethod;
 import org.alfresco.module.vti.metadata.model.DocumentBean;
 import org.alfresco.module.vti.metadata.model.DwsBean;
 import org.alfresco.module.vti.metadata.model.DwsData;
 import org.alfresco.module.vti.metadata.model.DwsMetadata;
+import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.UserBean;
 import org.apache.commons.httpclient.HttpException;
 
@@ -130,4 +132,13 @@ public interface DwsServiceHandler
      */
     public void handleRedirect(HttpServletRequest req, HttpServletResponse resp) throws HttpException, IOException;
 
+    /**
+     * Update document workspace site data such as links
+     * 
+     * @param linkBean ({@link LinkBean})
+     * @param method 
+     * @param dws document workspace site name 
+     * @return linkBean that was changed
+     */
+    public LinkBean updateDwsData(LinkBean linkBean, CAMLMethod method, String dws);
 }

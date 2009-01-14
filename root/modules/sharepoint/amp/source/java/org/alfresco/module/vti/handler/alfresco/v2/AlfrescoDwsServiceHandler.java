@@ -39,6 +39,7 @@ import org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandle
 import org.alfresco.module.vti.metadata.dic.Permission;
 import org.alfresco.module.vti.metadata.model.DocumentBean;
 import org.alfresco.module.vti.metadata.model.DwsBean;
+import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.MemberBean;
 import org.alfresco.module.vti.metadata.model.SchemaBean;
 import org.alfresco.module.vti.metadata.model.SchemaFieldBean;
@@ -116,6 +117,14 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     {
         String rootPath = pathHelper.toUrlPath(fileInfo);
         addDwsContentRecursive(fileInfo, dwsContent, rootPath);
+    }
+
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doGetDwsLinks(org.alfresco.service.cmr.model.FileInfo)
+     */
+    public List<LinkBean> doGetDwsLinks(FileInfo fileInfo)
+    {
+        return null;        
     }
 
     /**
@@ -252,6 +261,14 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     }
 
     /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateLinkSchemaBean(org.alfresco.service.cmr.model.FileInfo, java.util.List)
+     */
+    protected SchemaBean doCreateLinkSchemaBean(FileInfo dwsFileInfo, List<SchemaFieldBean> fields)
+    {
+        return null;
+    }
+
+    /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doDeleteDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String)
      */
     protected void doDeleteDws(FileInfo dwsFileInfo, String username, String password) throws HttpException, IOException
@@ -298,5 +315,27 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         dwsBean.setUrl(host + context);
         dwsBean.setParentWeb(parentUrl);
         return dwsBean;
+    }
+
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doUpdateDwsDataDelete(org.alfresco.module.vti.metadata.model.LinkBean, java.lang.String)
+     */
+    protected void doUpdateDwsDataDelete(LinkBean linkBean, String dws)
+    {
+    }
+    
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doUpdateDwsDataNew(org.alfresco.module.vti.metadata.model.LinkBean, java.lang.String)
+     */
+    protected LinkBean doUpdateDwsDataNew(LinkBean linkBean, String dws)
+    {        
+        return null;
+    }
+
+    /**
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doUpdateDwsDataUpdate(org.alfresco.module.vti.metadata.model.LinkBean, java.lang.String)
+     */
+    protected void doUpdateDwsDataUpdate(LinkBean linkBean, String dws)
+    {
     }
 }

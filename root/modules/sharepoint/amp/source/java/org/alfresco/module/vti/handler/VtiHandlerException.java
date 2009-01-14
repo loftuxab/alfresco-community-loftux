@@ -33,6 +33,8 @@ public class VtiHandlerException extends RuntimeException
 {
 
     public static final String NOT_FOUND = "Not found";
+    public static final String ITEM_NOT_FOUND = "Could not find the specified item";
+    public static final String LIST_NOT_FOUND = "Could not find the specified list";
     public static final String NOT_PERMISSIONS = "Does not permissions";
     public static final String ALREADY_EXISTS = "Already exists";
     public static final String DOESNOT_EXIST = "Doesn't exist";

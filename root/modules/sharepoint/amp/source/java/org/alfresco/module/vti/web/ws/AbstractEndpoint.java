@@ -423,7 +423,7 @@ public abstract class AbstractEndpoint implements VtiEndpoint
             Map<String, Object> docAttr = new HashMap<String, Object>();
             docAttr.put("Name", "Documents");
             result.append(startTag("List", docAttr));
-            //result.append(SoapUtils.proccesTag("ID", ""));
+            
             if (dwsData.getDocumentsList() != null)
             {
                 if (dwsData.getDocumentsList().size() > 99)
@@ -447,6 +447,19 @@ public abstract class AbstractEndpoint implements VtiEndpoint
                 }
             }
             result.append(endTag("List"));
+
+            if (dwsData.getLinksList() != null)
+            {
+                docAttr.clear();
+                docAttr.put("Name", "Links");
+                result.append(startTag("List", docAttr));
+                result.append(proccesTag("ID", ""));
+                for (LinkBean link : dwsData.getLinksList())
+                {
+                    result.append(generateXml(link));
+                }
+                result.append(endTag("List"));                
+            }
 
         }
 
@@ -505,7 +518,7 @@ public abstract class AbstractEndpoint implements VtiEndpoint
         StringBuilder result = new StringBuilder("");
         Map<String, Object> attributes = new LinkedHashMap<String, Object>();
 
-        attributes.put("ows_URL", linkBean.getUrl() + ", " + linkBean.getUrl());
+        attributes.put("ows_URL", linkBean.getUrl() + ", " + linkBean.getDescription());
         attributes.put("ows_Comments", linkBean.getComments());
         attributes.put("ows_Created", linkBean.getCreated());
         attributes.put("ows_Author", linkBean.getAuthor());
