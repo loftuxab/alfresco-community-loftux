@@ -1433,7 +1433,7 @@
       onFormValidationError : function(e,args)
       {
         var args = args[1];
-        YAHOO.util.Dom.addClass(args.field,'error');
+        // YAHOO.util.Dom.addClass(args.field,'error');
       },
       
       /**
@@ -2173,8 +2173,6 @@ Alfresco.util.DialogManager = ( function () {
                    // Setup date validation
                    form.addValidation("td", this.options._onDateValidation, { "obj": this }, "focus");
                    form.addValidation("fd", this.options._onDateValidation, { "obj": this }, "focus");
-                   form.addValidation(this.id + "-start", this.options._onDateValidation, { "obj": this }, "blur");
-                   form.addValidation(this.id + "-end", this.options._onDateValidation, { "obj": this }, "blur");
 
                    // form.setShowSubmitStateDynamically(true);
                    form.setSubmitElements(this.okButton);
