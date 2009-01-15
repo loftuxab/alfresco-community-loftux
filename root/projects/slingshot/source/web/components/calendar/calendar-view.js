@@ -702,6 +702,20 @@
       },
       
       /**
+       * Tests if event is valid for view must be within startdate and (enddate-1 second) of current view
+       * 
+       * @method date {object} Date to validate
+       * 
+       * @return true|false
+       * 
+       */
+      //
+      isValidDateForView : function(date) 
+      {
+        return (date.getTime()>this.options.startDate.getTime()) && (date.getTime()<this.options.endDate.getTime())
+      },
+
+      /**
        * Handler for eventEdited event. Updates event in DOM in response to updated event data.
        * 
        * @method  onEventEdited
@@ -731,8 +745,9 @@
         var hour = dateParts[1].split(':')[0];
         var min =  dateParts[1].split(':')[1];
         var id = 'cal-'+dateParts[0];
-        //test if event is valid for view must be within startdate and (enddate-1 second) of current view
+
         var evDate = Alfresco.util.fromISO8601(data.dtstart);
+        // if event is valid for view must be within startdate and (enddate-1 second) of current view
         if ( (evDate.getTime()<this.options.startDate.getTime()) | (evDate.getTime()>this.options.endDate.getTime()))
         {
           if (this.events[eventEl.id])
@@ -805,51 +820,54 @@
         var data = YAHOO.lang.JSON.parse(e.serverResponse.responseText).event;
 
         var dtStartDate = Alfresco.util.fromISO8601(data.from+'T'+data.start);
-        var dtEndDate = Alfresco.util.fromISO8601(data.to+'T'+data.end);
-        data.duration = Alfresco.CalendarHelper.getDuration(dtStartDate,dtEndDate);
-
-        //tagname
-        data.el = 'div';  
-        //tag with enclosing brackets
-        data.contEl = 'div';
-        data.hidden ='';
-        data.tags = data.tags.join(' ');
-        data.allday = (YAHOO.lang.isUndefined(data.allday)) ? '' : data.allday;
-
-        data.from = data.from +'T'+data.start;
-        data.to = data.to +'T'+data.end;
-
-        //get containing date TD cell for event
-        var targetEl = Dom.get('cal-'+data.from.split(':')[0]+':00');
-        //render into allday section
-        if(data.allday)
+        if (this.isValidDateForView(dtStartDate))
         {
-          this.renderAllDayEvents(targetEl,data);
-        }
-        else {
-          if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
+          var dtEndDate = Alfresco.util.fromISO8601(data.to+'T'+data.end);
+          data.duration = Alfresco.CalendarHelper.getDuration(dtStartDate,dtEndDate);
+
+          //tagname
+          data.el = 'div';  
+          //tag with enclosing brackets
+          data.contEl = 'div';
+          data.hidden ='';
+          data.tags = data.tags.join(' ');
+          data.allday = (YAHOO.lang.isUndefined(data.allday)) ? '' : data.allday;
+
+          data.from = data.from +'T'+data.start;
+          data.to = data.to +'T'+data.end;
+
+          //get containing date TD cell for event
+          var targetEl = Dom.get('cal-'+data.from.split(':')[0]+':00');
+          //render into allday section
+          if(data.allday)
           {
-              targetEl = Dom.get('cal-'+data.from.split('T')[0]);
-              targetEl = Dom.getElementsByClassName('day','div',targetEl)[0];
-              var vEventEl = this._addEventInMonthView(targetEl,data);
-            
+            this.renderAllDayEvents(targetEl,data);
           }
           else {
-              var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
-              var min = data.from.split('T')[1].split(':')[1];
-              var segments  = Dom.getElementsByClassName('hourSegment','div',targetEl);
-              targetEl = (parseInt(min,10)>=30) ? segments[1] : segments[0];
-              YAHOO.util.Dom.setStyle(targetEl,'position','relative');
-              targetEl.appendChild(vEventEl);
-          }
+            if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
+            {
+                targetEl = Dom.get('cal-'+data.from.split('T')[0]);
+                targetEl = Dom.getElementsByClassName('day','div',targetEl)[0];
+                var vEventEl = this._addEventInMonthView(targetEl,data);
+            
+            }
+            else {
+                var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
+                var min = data.from.split('T')[1].split(':')[1];
+                var segments  = Dom.getElementsByClassName('hourSegment','div',targetEl);
+                targetEl = (parseInt(min,10)>=30) ? segments[1] : segments[0];
+                YAHOO.util.Dom.setStyle(targetEl,'position','relative');
+                targetEl.appendChild(vEventEl);
+            }
         
-          var id = Event.generateId(vEventEl);
-          var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
-          this.events[id]=newCalEvent;
+            var id = Event.generateId(vEventEl);
+            var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
+            this.events[id]=newCalEvent;
 
-          newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
-          this.adjustHeightByHour(vEventEl);
+            newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
+            this.adjustHeightByHour(vEventEl);
           
+          }
         }
         
         YAHOO.Bubbling.fire("eventSaved",data);
