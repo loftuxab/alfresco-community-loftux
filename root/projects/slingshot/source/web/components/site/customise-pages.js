@@ -232,7 +232,7 @@
          // Show add pages button and hide available pages
          Dom.setStyle(this.widgets.addPagesDiv, "display", "");
          Dom.setStyle(this.widgets.pagesDiv, "display", "none");
-         Event.stop(event);
+         Event.stopEvent(event);
       },
 
       /**
@@ -254,7 +254,7 @@
          // Show or hide empty div labels
          obj.thisComponent._adjustEmptyMessages();
          
-         Event.stop(event);
+         Event.stopEvent(event);
       },
 
 

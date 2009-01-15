@@ -327,7 +327,7 @@
          // Show add dashlets button and hide available dashlets
          Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "");
          Dom.setStyle(this.widgets.availableDiv, "display", "none");
-         Event.stop(event);
+         Event.stopEvent(event);
       },
 
       /**
