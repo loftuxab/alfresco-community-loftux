@@ -128,7 +128,7 @@ Alfresco.util.rollover = {};
  */
 Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventName, mouseOutEventName)
 {  
-   var eventElem = elem;
+   var eventElem = elem, relTarg;
      
    var mouseOverHandler = function(e)
    {
@@ -138,7 +138,7 @@ Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventNa
       {
          e = window.event;
       }
-      var relTarg = e.relatedTarget || e.fromElement;
+      relTarg = (e.relatedTarget !== undefined) ? e.relatedTarget : e.fromElement;
       while (relTarg && relTarg != eventElem && relTarg.nodeName != 'BODY')
       {
          relTarg = relTarg.parentNode;
@@ -164,7 +164,7 @@ Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventNa
       {
          e = window.event;         
       }
-      var relTarg = e.relatedTarget || e.toElement;
+      relTarg = (e.relatedTarget !== undefined) ? e.relatedTarget : e.toElement;
       while (relTarg !== null && relTarg != eventElem && relTarg.nodeName != 'BODY')
       {
          relTarg = relTarg.parentNode;
