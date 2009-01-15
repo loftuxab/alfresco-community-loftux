@@ -712,7 +712,7 @@
       //
       isValidDateForView : function(date) 
       {
-        return (date.getTime()>this.options.startDate.getTime()) && (date.getTime()<this.options.endDate.getTime())
+        return (date.getTime()>this.options.startDate.getTime()) && (date.getTime()<this.options.endDate.getTime());
       },
 
       /**
@@ -1060,6 +1060,9 @@
        *  
        */
       showAddDialog : function(elTarget) {
+
+          var displayDate;
+          //if from toolbar add event
           if (YAHOO.lang.isUndefined(elTarget))
           {
               if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
@@ -1070,14 +1073,10 @@
               {
                   elTarget = Dom.get('cal-'+Alfresco.util.toISO8601(this.options.startDate).split(':')[0]+':00');
               }
+              this.currentDate = displayDate = (Alfresco.util.getQueryStringParameter('date')) ? Alfresco.util.fromISO8601(Alfresco.util.getQueryStringParameter('date')) : new Date();
           }
-          if (this.calendarView !== Alfresco.CalendarView.VIEWTYPE_AGENDA)
-          {
-            this.currentDate = this.getClickedDate(elTarget);
-          }
-          else 
-          {
-            this.currentDate = this.options.startDate;
+          else { // from cell
+            this.currentDate = displayDate = this.getClickedDate(elTarget);
           }
           if (!this.eventDialog)
           {
@@ -1092,7 +1091,7 @@
           var options = 
           {
                site : this.options.siteId,
-               displayDate : this.currentDate,
+               displayDate : displayDate,
                actionUrl : Alfresco.constants.PROXY_URI+ "/calendar/create",
                templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
                templateRequestParams : {
@@ -2143,9 +2142,9 @@ Alfresco.util.DialogManager = ( function () {
                 fn : function (form)
                 {
                     var Dom = YAHOO.util.Dom;
-                    var today = new Date();
+                    var date = new Date();
                     // Pretty formatting
-                    var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
+                    var dateStr = Alfresco.util.formatDate(this.options.displayDate, "dddd, d mmmm yyyy");
                     Dom.get("fd").value = dateStr;
                     Dom.get("td").value = dateStr;
                     Dom.get(this.id+"-from").value = Dom.get("fd").value;
