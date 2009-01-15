@@ -52,7 +52,7 @@
          <li id="${htmlid}-onRemoveTag-${tag?html}">
             <a href="#" class="taglibrary-action">
                <span>${tag?html}</span>
-               <span class="remove" alt="remove tag">&nbsp;</span>
+               <span class="remove" alt="${msg("taglibrary.tip.removeTag")}">&nbsp;</span>
             </a>
          </li>
       </#list>
@@ -62,7 +62,7 @@
    <br class="clear" />
    <div class="title rel_left">${msg("taglibrary.typetag")}:&nbsp;</div>
    <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
-   <input type="button" id="${htmlid}-add-tag-button" value="Add" />
+   <input type="button" id="${htmlid}-add-tag-button" value="${msg("button.add")}" />
    <br class="clear" />
    <div class="bottom_taglist tags_box">
       <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
@@ -86,7 +86,7 @@
    <br class="clear" />
    <div class="title rel_left">${msg("taglibrary.typetag")}:&nbsp;</div>
    <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" />
-   <input type="button" id="${htmlid}-add-tag-button" value="Add" />
+   <input type="button" id="${htmlid}-add-tag-button" value="${msg("button.add")}" />
    <br class="clear" />
    <div class="bottom_taglist tags_box">
       <a href="#" id="${htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
