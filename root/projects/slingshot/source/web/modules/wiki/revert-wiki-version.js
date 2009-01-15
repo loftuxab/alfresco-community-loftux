@@ -159,7 +159,7 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
-               failureMessage: Alfresco.util.message("message.temaplateFailure", this.name),
+               failureMessage: Alfresco.util.message("message.templateFailure", this.name),
                execScripts: true
             });
          }
@@ -215,7 +215,8 @@
        *
        * @method onOkButtonClick
        */
-      onOkButtonClick: function RevertWikiVersion_onOkButtonClick() {
+      onOkButtonClick: function RevertWikiVersion_onOkButtonClick()
+      {
          this.widgets.okButton.set("disabled", true);
          this.widgets.cancelButton.set("disabled", true);
 
@@ -270,7 +271,8 @@
    		var obj =
    		{
    		   pagecontent: content,
-   		   page: "wiki-page"
+   		   page: "wiki-page",
+   		   forceSave: true
    	   };
 
 		   Alfresco.util.Ajax.request(
@@ -284,10 +286,11 @@
 					fn: this.onRevertSuccess,
 					scope: this
 				},
-		      failureMessage: Alfresco.util.message("revertFailure", this.name,
+		      failureCallback:
 		      {
-		         "0": this.showConfig.pageTitle
-		      })
+					fn: this.onRevertFailure,
+					scope: this
+		      }
 		   });
       },
 
@@ -384,7 +387,8 @@
          // Set the panel section
          var prompt = Alfresco.util.message("label.prompt", this.name,
          {
-            "0": this.showConfig.pageTitle
+            "0": this.showConfig.pageTitle,
+            "1": this.showConfig.version
          });
          this.widgets.promptText["innerHTML"] = prompt;
 

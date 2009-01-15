@@ -540,7 +540,11 @@
          }
 
          // Update the label in the version select menu
-         var label = this.options.versions[obj.index].label + " (" + this._msg(obj.index == 0 ? "label.latest" : "label.earlier", this.name) + ")";
+         var label = this.options.versions[obj.index].label;
+         if (obj.index == 0)
+         {
+            label += " (" + this._msg("label.latest") + ")";
+         }
          this.widgets.versionSelect.set("label", label);
       },
       
