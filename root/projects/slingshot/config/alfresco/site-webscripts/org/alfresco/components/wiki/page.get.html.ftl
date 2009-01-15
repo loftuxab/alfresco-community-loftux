@@ -118,7 +118,7 @@
                   <input type="button" id="${args.htmlid}-selectVersion-button" name="selectButton" value="${version.version} (${msg("label.latest")})">
                   <select id="${args.htmlid}-selectVersion-menu" name="selectVersion">
                   </#if>
-                     <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})<#else>(${msg("label.earlier")})</#if></option>
+                     <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})</#if></option>
                   </#list>
                   </select>
                   </div>
