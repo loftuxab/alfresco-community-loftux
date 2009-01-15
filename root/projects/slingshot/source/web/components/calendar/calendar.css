@@ -686,6 +686,7 @@ ul.dayEvents li.hidden,
 .agendaview .vevent .location,
 .agendaview .vevent .duration,
 .agendaview .vevent .description,
+.agendaview .vevent .category,
 div.vevent.allday p.dates
 {
 	position:absolute;
