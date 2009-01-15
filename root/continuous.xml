@@ -920,6 +920,7 @@
    <target name="distribute-sharepoint" 
            description="Creates the distribution files for Sharepoint Protocol Support"
            depends="continuous-init">
+      <ant dir="${dir.module.sharepoint}/amp" target="clean" />
       <ant dir="${dir.module.sharepoint}/amp" target="amp" />
    </target>
 
