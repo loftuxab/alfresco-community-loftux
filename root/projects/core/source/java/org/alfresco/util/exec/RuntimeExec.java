@@ -119,7 +119,7 @@ public class RuntimeExec
         this.charset = Charset.defaultCharset();
         this.waitForCompletion = true;
         defaultProperties = Collections.emptyMap();
-        processProperties = new String[0];
+        processProperties = null;
         processDirectory = null;
         
         // set default error codes
@@ -330,7 +330,7 @@ public class RuntimeExec
             }
             processPropList.add(key + "=" + value);
         }
-        this.processProperties = processPropList.toArray(this.processProperties);
+        this.processProperties = processPropList.toArray(new String[processPropList.size()]);
     }
 
     /**
@@ -422,14 +422,7 @@ public class RuntimeExec
         {
             // execute the command with full property replacement
             commandToExecute = getCommand(properties);
-            if (processDirectory == null)
-            {
-                process = runtime.exec(commandToExecute, processProperties);
-            }
-            else
-            {
-                process = runtime.exec(commandToExecute, processProperties, processDirectory);
-            }
+            process = runtime.exec(commandToExecute, processProperties, processDirectory);
         }
         catch (IOException e)
         {
