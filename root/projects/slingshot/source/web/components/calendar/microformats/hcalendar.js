@@ -80,7 +80,8 @@ hcalendar = {
        {
           if (node!==null && parsedData!=null)
           {
-            node.innerHTML = Alfresco.util.formatDate(parsedData,'HH:MMtt');
+            
+            node.innerHTML = Alfresco.util.formatDate(parsedData,'HH:MM');
           }
 
        },
@@ -95,7 +96,7 @@ hcalendar = {
        {           
            if (node!==null && parsedData!=null)
            {
-            node.innerHTML = Alfresco.util.formatDate(parsedData,'HH:MMtt');
+            node.innerHTML = Alfresco.util.formatDate(parsedData,'HH:MM');
            }
 
        },
