@@ -289,7 +289,7 @@ File ::856F9D63-92CC-4CC8-9763-81D2B573AE51 -name custom-remote-avm-test-context
 File ::466FDC0C-A034-4B38-B70D-699458E3EA30 -name custom-repository.properties.install -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
 File ::362FA558-36CB-475A-84DF-DB82539EB6AD -name custom-tomcat-server.xml.properties.install -active 0 -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
 File ::91D8C18D-88B5-4939-86BB-99B7688C623F -name custom-web-client-config-wcm.xml.properties.install -active 0 -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
-File ::40D03617-F7E4-4755-943A-9CD74CE399E8 -name openoffice-startup-context.xml.install -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
+File ::40D03617-F7E4-4755-943A-9CD74CE399E8 -name openoffice-startup-context.xml.install -active 0 -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
 File ::F1149A8C-C522-4155-AED3-5E1DBE42A87F -type dir -name .svn -active 0 -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
 File ::FABAFD54-BCDD-465B-8DCC-F91CC13ADCEB -name entries -parent F1149A8C-C522-4155-AED3-5E1DBE42A87F
 File ::4597339F-80AC-4D80-A93F-E7DC1146847E -name format -parent F1149A8C-C522-4155-AED3-5E1DBE42A87F
@@ -3055,8 +3055,8 @@ File ::C03F2E7D-DFD2-4BC8-A873-19BB12893450 -type dir -name work -parent 9A097E7
 File ::0996CA9C-803B-4009-ACBD-1F0C0DE9386C -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -parent 33087B4E-DFD2-42AB-A812-338D015C210B
 FileGroup ::B2ED123B-F320-4F2D-A38A-7091403BDEB7 -setup Install -alias {Java File} -active Yes -platforms {Windows ZipArchive} -name {Java File} -parent FileGroups
 File ::7C7CC5EC-84E6-4572-A398-45D02DFE9959 -directory <%InstallDir%> -name W:/resources/jdk-i586-p.exe -location ../../../../ALF-BINARIES/installer/win32 -parent B2ED123B-F320-4F2D-A38A-7091403BDEB7
-FileGroup ::E181E06B-BC95-4065-80E8-8614EE6074B7 -setup Install -alias {OpenOffice File} -active No -platforms {Windows ZipArchive} -name {OpenOffice File} -parent FileGroups
-File ::41F36F34-B692-4D83-9FBF-2ACE7C26FEF1 -type dir -name W:/ALF-BINARIES/installer/win32/OpenOfficeInstallFiles -location ../../../../ALF-BINARIES/installer/win32/OpenOfficeInstallFiles -parent E181E06B-BC95-4065-80E8-8614EE6074B7
+FileGroup ::E181E06B-BC95-4065-80E8-8614EE6074B7 -setup Install -alias {OpenOffice File} -active Yes -platforms {Windows ZipArchive} -name {OpenOffice File} -parent FileGroups
+File ::41F36F34-B692-4D83-9FBF-2ACE7C26FEF1 -type dir -name W:/ALF-BINARIES/installer/win32/OpenOfficeInstallFiles -location ../../../../ALF-BINARIES/installer/win32/OpenOfficeInstallFiles -active 0 -parent E181E06B-BC95-4065-80E8-8614EE6074B7
 File ::75B20EE4-AF22-4572-88B5-430F7F80FDA9 -name alfsetup.bat -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
 File ::97832F6B-E6CD-48D6-8F40-14E3DF37A589 -name instmsia.exe -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
 File ::18D09C47-48A4-46C2-9571-42BDED13A69C -name instmsiw.exe -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
@@ -3118,6 +3118,7 @@ File ::D25BAC96-F628-4BCC-BAB6-A988A5A840FD -type dir -name tmp -parent 9A7A7C7A
 File ::681F4844-5F7D-4499-BB51-7E87203BB37C -type dir -name prop-base -parent D25BAC96-F628-4BCC-BAB6-A988A5A840FD
 File ::61AC9F9E-4428-4595-9695-D3EBCF79A591 -type dir -name props -parent D25BAC96-F628-4BCC-BAB6-A988A5A840FD
 File ::07EFC439-F6E5-43F1-BDE1-15C6E7E01505 -type dir -name text-base -parent D25BAC96-F628-4BCC-BAB6-A988A5A840FD
+File ::4B58BAE9-06F6-4D30-ACA1-0645DF315D7A -name W:/ALF-BINARIES/installer/win32/OpenOfficeInstallFiles.zip -location ../../../../ALF-BINARIES/installer/win32 -parent E181E06B-BC95-4065-80E8-8614EE6074B7
 FileGroup ::E1D94860-98A3-46D1-A57A-AA0AED090F50 -setup Install -active Yes -platforms {Windows ZipArchive} -name {Temp Files Win} -parent FileGroups
 File ::F715539B-2586-45A9-A2B3-C1AE3C01AB21 -type dir -name W:/HEAD/root/projects/installer/windows/mysqltcl -location ../../projects/installer/windows/mysqltcl -parent E1D94860-98A3-46D1-A57A-AA0AED090F50
 File ::53B0BDAD-FF48-4D0C-AF82-43E4D9A3EAB7 -name libmySQL.dll -parent F715539B-2586-45A9-A2B3-C1AE3C01AB21
@@ -3200,7 +3201,7 @@ Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -pla
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Samples -parent Components
 Component ::3599937E-10E1-4029-8ACB-CCE5D85D306D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name WCM -parent Components
 Component ::EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 -setup Install -alias Java -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Java -parent Components
-Component ::751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 -setup Install -alias OpenOffice -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name OpenOffice -parent Components
+Component ::751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 -setup Install -alias OpenOffice -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name OpenOffice -parent Components
 SetupType ::8CD15942-AC97-4AD0-BEB3-9AC3290C20B2 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Typical -parent SetupTypes
 SetupType ::CE9BD412-8B2C-422C-A23F-5572EB5F6410 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
 
@@ -3242,9 +3243,10 @@ Condition D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -active Yes -parent 8172F70F-8736
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
-InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -title {Delete File} -component DeleteFile -command insert -active No -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-Condition 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A
+InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active No -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
+InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type action -title {Unzip File} -component UnzipFile -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
+InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
+Condition 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding Samples} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
@@ -3578,7 +3580,7 @@ CreateQuickLaunchShortcut
 {Unable to locate OpenOffice program}
 
 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3,Filename
-<%ALF_OO%>/program/soffice.exe
+<%ALF_OO%>/program/soffice.bin
 
 2521C09F-C692-49D8-BD76-C69BFFEF1F24,Conditions
 {0 conditions}
@@ -3673,6 +3675,12 @@ Windows
 2F0CB899-1C48-4F91-9AD0-327063548555,Filename
 <%InstallDir%>/amps/amp-samples.txt
 
+2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D,CheckCondition
+{Before Action is Executed}
+
+2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D,Filename
+<%ALF_OO%>/program/soffice.bin
+
 319487D5-991A-4544-9CB7-69BDA7BC5617,Conditions
 {0 conditions}
 
@@ -3713,7 +3721,7 @@ Yes
 Yes
 
 350E9DA1-539D-4270-834E-96641B5D4D3B,Value
-{<%Dir "<%InstallDir%>/openoffice/OpenOffice.org 3" platfom%>}
+{<%Dir "<%InstallDir%>/OpenOffice.org" platfom%>}
 
 350E9DA1-539D-4270-834E-96641B5D4D3B,VirtualText
 ALF_OO
@@ -3736,14 +3744,11 @@ WCM
 3615204F-29E3-473F-A769-A74E859BE866,Files
 <%JavaInstaller%>
 
-36A8B144-D246-4AD7-8299-C14C811E3BF9,Active
-No
-
 36A8B144-D246-4AD7-8299-C14C811E3BF9,Conditions
 {1 condition}
 
 36A8B144-D246-4AD7-8299-C14C811E3BF9,Files
-{<%Dir <%OOFiles%> %>}
+{<%Dir <%OOFiles%> %>.zip}
 
 36C9B383-8DF0-4A65-922A-CF06624F256B,CheckCondition
 {Before Action is Executed}
@@ -4197,12 +4202,6 @@ Cancel
 6167A49E-551C-4CF3-944D-1FDBDD9C0106,WorkingDirectory
 <%InstallDir%>
 
-61E5C9E8-070C-4201-AA1B-F1B3F2FD424A,CheckCondition
-{Before Action is Executed}
-
-61E5C9E8-070C-4201-AA1B-F1B3F2FD424A,String1
-<%ExternalProgramResult%>
-
 638BA725-B209-4B92-B603-09E568B32EEF,CheckCondition
 {Before Action is Executed}
 
@@ -4392,6 +4391,9 @@ mysql
 7132E75E-0CA4-41E8-9BA6-B3D52D57281E,String
 <%ViewReadme%>
 
+71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5,Active
+No
+
 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5,Conditions
 {0 conditions}
 
@@ -4452,9 +4454,6 @@ OOLocation
 
 73EBD608-2E51-4D77-A456-569367970EA1,VirtualText
 ALF_OO
-
-751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7,Active
-No
 
 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7,Alias
 OpenOffice
@@ -4646,7 +4645,7 @@ Yes
 <%ProgramReadme%>
 
 8C05E8E9-4358-4BBB-B89A-57FA88483ABA,Filename
-{<%Dir <%OOFiles%>/<%OOInstaller%> %>}
+<%OOFiles%>.zip
 
 8C84F652-D836-4749-A91D-892366F14735,CheckCondition
 {Before Action is Executed}
@@ -4917,6 +4916,18 @@ A6A7CCC8-86CA-4C86-8275-D8A2242ECC9D,String1
 
 A6A7CCC8-86CA-4C86-8275-D8A2242ECC9D,String2
 Custom
+
+A7CCD851-05EF-4236-8321-7766DF06A256,Conditions
+{0 conditions}
+
+A7CCD851-05EF-4236-8321-7766DF06A256,Destination
+<%InstallDir%>
+
+A7CCD851-05EF-4236-8321-7766DF06A256,StatusText,subst
+1
+
+A7CCD851-05EF-4236-8321-7766DF06A256,ZipFile
+<%OOFiles%>.zip
 
 A88563D5-3EDB-4933-A42D-D51B94ED8D72,Alias
 Samples
@@ -5296,9 +5307,6 @@ DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB,CheckCondition
 DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB,Script
 lappend\ ::auto_path\ <%Temp%>\npackage\ require\ mysqltcl\n\nif\ \{\[catch\ \{\n\ \ \ if\ \{\ <%DB_ROOTPASS%>\ !=\ \"\"\ \}\ \{\n\tset\ conn(handle)\ \[::mysql::connect\ -user\ root\ \ -password\ <%DB_ROOTPASS%>\ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \}\ else\ \{\n\tset\ conn(handle)\ \[::mysql::connect\ -user\ root\ \ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \}\n\tset\ db\ \$::conn(handle)\n\t\n\t::mysql::exec\ \$db\ \"create\ database\ <%DB_NAME%>\"\n\ \ \ \ \ \ \t::mysql::exec\ \$db\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ \\'<%DB_USER%>\\'@\\'<%DB_HOST%>\\'\ identified\ by\ \\'<%DB_USERPWD%>\\'\ with\ grant\ option\;\"\n\ \ \ \ \ \ \t::mysql::exec\ \$db\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ \\'<%DB_USER%>\\'@\\'<%DB_HOST%>.localdomain\\'\ identified\ by\ \\'<%DB_USERPWD%>\\'\ with\ grant\ option\;\"\n\ \ \ \ \}\ err\]\}\ \{\n\tset\ answer\ \[tk_messageBox\ -message\ \"\$err\ \"\ -type\ ok\ -icon\ error\ -title\ \"Database\ Configuration\"\]\n\treturn\ false\;\n\t\n\ \ \ \ \}\ else\ \{\n\t\n\tset\ answer\ \[tk_messageBox\ -message\ \"Connection\ established\ and\ '<%DB_NAME%>'\ has\ been\ created.\"\ -type\ ok\ -title\ \"Database\ Configuration\"\]\n\ \treturn\ true\;\ \ \ \n\t\}\ \t\n\n\}\n
 
-E181E06B-BC95-4065-80E8-8614EE6074B7,Active
-No
-
 E181E06B-BC95-4065-80E8-8614EE6074B7,Alias
 {OpenOffice File}
 
@@ -5306,7 +5314,7 @@ E181E06B-BC95-4065-80E8-8614EE6074B7,Destination
 <%InstallDir%>
 
 E181E06B-BC95-4065-80E8-8614EE6074B7,FileSize
-158363642
+148155013
 
 E181E06B-BC95-4065-80E8-8614EE6074B7,Name
 {OpenOffice File}
