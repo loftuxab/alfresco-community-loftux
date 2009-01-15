@@ -162,7 +162,7 @@
             },
             [events]);
          }
-         this.isShowingEarlyRows = false;
+         this.isShowingEarlyRows = true;
          this.titleEl = Dom.get('calTitle');
          switch(this.calendarView)
          {
