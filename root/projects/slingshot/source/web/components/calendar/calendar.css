@@ -733,8 +733,9 @@ div.vevent {
 }
 .weekview .vevent {
 /* 		padding:0.5em 0 0.5em 0.5em; */
-position:absolute;
+   position:absolute;
 	background-color:#2B6EB5;
+	overflow:hidden;
 }
 
 /* for week view and non allday events */
@@ -745,6 +746,7 @@ position:absolute;
 	position:static;
 	font-weight:bold;
 }
+
 .ie .hourSegment {
     height:26px;
     cursor:hand;
