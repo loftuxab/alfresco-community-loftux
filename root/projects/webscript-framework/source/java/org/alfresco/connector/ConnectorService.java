@@ -496,27 +496,26 @@ public class ConnectorService implements ApplicationListener, ApplicationContext
      * and given vault id
      * 
      * @param userId the user id
-     * @param vaultId the vault id
+     * @param vaultProviderId the vault provider id
      * 
      * @return the credential vault
      * 
      * @throws CredentialVaultProviderException the credential vault provider exception
      */
-    public CredentialVault getCredentialVault(HttpSession session, String userId, String vaultId)
+    public CredentialVault getCredentialVault(HttpSession session, String userId, String vaultProviderId)
         throws CredentialVaultProviderException
     {
         if (userId == null)
         {
             throw new IllegalArgumentException("UserId is mandatory.");
         }
-        if (vaultId == null)
+        if (vaultProviderId == null)
         {
-            //vaultId = remoteConfig.getDefaultCredentialVaultProviderId();
-            vaultId = "unspecified";
+        	vaultProviderId = this.getRemoteConfig().getDefaultCredentialVaultProviderId();
         }
         
         // session binding key
-        String cacheKey = PREFIX_VAULT_SESSION + vaultId;
+        String cacheKey = PREFIX_VAULT_SESSION + vaultProviderId + userId;
         
         // pull the credential vault from session
         CredentialVault vault = (CredentialVault)session.getAttribute(cacheKey);
@@ -524,15 +523,13 @@ public class ConnectorService implements ApplicationListener, ApplicationContext
         // if no existing vault, build a new one
         if (vault == null)
         {
-            String vaultProviderId = this.getRemoteConfig().getDefaultCredentialVaultProviderId();
-            
             CredentialVaultProvider provider = (CredentialVaultProvider) applicationContext.getBean(vaultProviderId);
             if(provider == null)
             {
                 throw new CredentialVaultProviderException("Unable to find credential vault provider: " + vaultProviderId); 
             }
             
-            vault = (CredentialVault) provider.provide(vaultId);            
+            vault = (CredentialVault) provider.provide(userId);            
             
             // load the vault
             vault.load();
