@@ -434,11 +434,12 @@
          };
          
          // get the url to call
-         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}",
+         var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/post/site/{site}/{container}/{postId}?page={page}",
          {
             site: this.options.siteId,
             container: this.options.containerId,
-            postId: postId
+            postId: postId,
+            page: "blog-postlist"
          });
          
          // execute ajax request
@@ -456,7 +457,10 @@
             failureMessage: this._msg("message.delete.failure"),
             failureCallback:
             {
-               fn: function(response) { this._releaseBusy(); },
+               fn: function(response)
+               {
+                  this._releaseBusy();
+               },
                scope: this
             }
          });

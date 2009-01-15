@@ -243,6 +243,15 @@
          previewTooltips: null,
          
          /**
+          * Number of multi-file uploads before grouping the Activity Post
+          *
+          * @property groupActivitiesAt
+          * @type int
+          * @default 5
+          */
+         groupActivitiesAt: 5,
+         
+         /**
           * Valid online edit mimetypes
           * Currently allowed are Microsoft Office 2003 and 2007 mimetypes for Excel, PowerPoint and Word only
           *
@@ -1853,7 +1862,34 @@
        */
       onNewVersionUploadComplete: function DL_onNewVersionUploadComplete(complete)
       {
-         // Do something after the new version is uploaded
+         var success = complete.successful.length, activityData, file;
+         if (success > 0)
+         {
+            if (success < this.options.groupActivitiesAt)
+            {
+               // Below cutoff for grouping Activities into one
+               for (var i = 0; i < success; i++)
+               {
+                  file = complete.successful[i];
+                  activityData =
+                  {
+                     fileName: file.fileName,
+                     nodeRef: file.nodeRef
+                  };
+                  this.modules.actions.postActivity(this.options.siteId, "file-updated", "document-details", activityData);
+               }
+            }
+            else
+            {
+               // grouped into one message
+               activityData =
+               {
+                  fileCount: success,
+                  path: this.currentPath
+               };
+               this.modules.actions.postActivity(this.options.siteId, "files-updated", "documentlibrary", activityData);
+            }
+         }
       },
 
       /**
