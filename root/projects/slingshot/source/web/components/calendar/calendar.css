@@ -593,6 +593,7 @@ div.vevent p.dates {
   padding-top:0;
   display:inline;
   font-weight:bold;
+  *vertical-align:middle;
 }
 .dayview div.vevent div {
     height:100%;
