@@ -2251,7 +2251,6 @@ Alfresco.util.DialogManager = ( function () {
                    var elem = Dom.get(prettyId);
                    elem.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
                    elem.focus();
-                   document.getElementsByName('from')[0].value = elem.value;                   
 
                    if(prettyId == "fd")
                    {
@@ -2264,6 +2263,11 @@ Alfresco.util.DialogManager = ( function () {
                          tdEl.value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
                          document.getElementsByName('to')[0].value = tdEl.value;
                       }
+                      document.getElementsByName('from')[0].value = elem.value;
+                   }
+                   else
+                   {
+                     document.getElementsByName('to')[0].value = elem.value;                   
                    }
                 }
                 oCalendarMenu.hide();
@@ -2275,7 +2279,6 @@ Alfresco.util.DialogManager = ( function () {
                 // Check that the end date is after the start date
                 var start = Alfresco.util.formatDate(Dom.get("fd").value, "yyyy/mm/dd");
                 var startDate = new Date(start + " " + Dom.get(args.obj.id + "-start").value);
-
                 var to = Alfresco.util.formatDate(Dom.get("td").value, "yyyy/mm/dd");
                 var toDate = new Date(to + " " + Dom.get(args.obj.id + "-end").value);
                 
