@@ -49,10 +49,20 @@ package org.alfresco.core.ui
 		public var screenWidth:Number;
 		
 		/**
-		 * The hight of the display area excluding the horizontal srollbar.
+		 * The height of the display area excluding the horizontal srollbar.
 		 */
 		public var screenHeight:Number;
-
+		
+		/**
+		 * The width of the display area including any vertical scrollbar.
+		 */
+		public var screenWidthIncl:Number;
+		
+		/**
+		 * The height of the display area including any horizontal scrollbar.
+		 */
+		public var screenHeightIncl:Number;
+		
 		/** 
 		 * Constructor
 		 */ 
