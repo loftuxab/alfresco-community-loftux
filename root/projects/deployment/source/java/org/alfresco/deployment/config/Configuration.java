@@ -149,7 +149,7 @@ public class Configuration
             List<FSDeploymentRunnable> postCommitCallbacks = (List<FSDeploymentRunnable>)targetEntry.get("postCommit");
             if (postCommitCallbacks == null)
             {
-                prepareCallbacks = new ArrayList<FSDeploymentRunnable>();
+                postCommitCallbacks = new ArrayList<FSDeploymentRunnable>();
             }
             
             // runnables is a historical old way of configuring the FSR. 
