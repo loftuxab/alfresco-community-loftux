@@ -1262,10 +1262,23 @@
        */
       updateEvent : function(calEvent)
       {
-
+        
         var eventUri = Dom.getElementsByClassName('summary','a',calEvent.getEl())[0].href;
         var dts  = Alfresco.util.fromISO8601(calEvent.getData('dtstart'));
         var dte  = Alfresco.util.fromISO8601(calEvent.getData('dtend'));
+        // IE's slowness sometimes means that dtend is incorrectly parsed when an
+        // event is quickly resized.
+        // so we must add a recheck. Interim fix. 
+        if (YAHOO.lang.isNull(dte))
+        {          
+          var dtendData = YAHOO.util.Dom.getElementsByClassName('dtend','span',calEvent.getElement())[0];
+          var endTime = dtendData.innerHTML.split(':')
+          dte = new Date();
+          dte.setTime(dts.getTime());
+          dte.setHours(endTime[0]);
+          dte.setMinutes(endTime[1]);
+          calEvent.update({dtend:Alfresco.util.toISO8601(dte)});
+        }
         var dataObj = {
             "site" : this.options.siteId,
             "page":"calendar",
@@ -1280,6 +1293,7 @@
             "end":calEvent.getData('dtend').split('T')[1].substring(0,5),
             'tags':calEvent.getData('category')
         };
+
         Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.PUT,
