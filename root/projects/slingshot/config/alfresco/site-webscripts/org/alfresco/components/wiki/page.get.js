@@ -22,7 +22,7 @@ function main()
    if (title)
    {
       var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title;
-      var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + page.url.args.title + "?context=" + escape(context);
+      var uri = "/slingshot/wiki/page/" + encodeURIComponent(page.url.templateArgs.site) + "/" + encodeURIComponent(page.url.args.title) + "?context=" + escape(context);
 
       var result = doGetCall(uri, true);
       result.pagetext = result.pagetext ? stringUtils.stripUnsafeHTML(result.pagetext) : null;
