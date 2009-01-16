@@ -67,7 +67,7 @@
                     distribute-bm-remote,
                     distribute-amps,
                     distribute-tomcat,
-                    distribute-war, 
+                    distribute-war,
                     distribute-wcm,
                     distribute-sdk, 
                     distribute-webserviceclient,
@@ -369,6 +369,9 @@
       </exec>
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
+      </exec>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" --platform Linux-x86 -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
