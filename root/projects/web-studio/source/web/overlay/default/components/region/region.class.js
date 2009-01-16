@@ -257,36 +257,33 @@ WebStudio.Region.prototype.setupForm = function()
 	html += "<div width='100%' align='center'>";
 	html += "<input id=\"formCancelButton\" type=\"button\" value=\"Cancel\" />";
 	html += "&nbsp;&nbsp;";
-	html += "<input type=\"submit\" value=\"Save\" />";
+	html += "<input id=\"formSubmitButton\" type=\"submit\" value=\"Save\" />";
 	html += "</div>";		
 	html += "</form>";
-
-	/*
-	jQuery(this.Body.el).load(function() {
-		//alert("The form was loaded");
-	});
-	*/
 	
 	Alf.setHTML(this.Body.el, html);
 	
 	var bindForm = function()
 	{
 		// bind in events (on-click)
-		$(formId).addEvent('submit', function(e) {
-		
+		$('formSubmitButton').addEvent('click', function(e) {
+
 			// stop the event
 			e = new Event(e).stop();
-		
-			// post the form in the background	
-			$(formId).send({
+			
+			// post the form
+			var config = {
+				dataType: "html",
 				onSuccess: _this.saveFormSuccess,
 				onFailure: _this.saveFormError,
-				evalScripts: true,
 				headers: {
 					'Content-Type' : 'multipart/form-data',
 					'encoding': 'utf-8'			
 				}
-			});
+			};
+			
+			Alf.post($(formId), config);
+						
 		});
 		
 		$('formCancelButton').addEvent('click', function(e) {

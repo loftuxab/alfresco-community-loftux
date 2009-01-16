@@ -300,3 +300,72 @@ Alf.urlDecode = function(string)
 {
 	return Alf._utf8_decode(unescape(string));
 };
+
+Alf.post = function(formElement, config)
+{
+	// Collect form input fields
+	var inputs = {};
+	jQuery(':input', formElement).each(function() 
+	{
+		// Ignore inputs without a name
+		if (this.name !== "") 
+		{
+			if ((this.type == "radio" || this.type == "checkbox") && !this.checked) 
+			{
+				// ignore this item
+	        } 
+	        else 
+	        {
+	        	inputs[this.name] = this.value;
+			}
+		}
+	});
+	
+	// config for request
+	var callConfig = {
+		data: inputs,
+		url:  formElement.getAttribute('action'),
+		type: formElement.getAttribute('method')
+	};
+	
+	if(config.onSuccess)
+	{
+		callConfig.complete = config.onSuccess;
+	}
+
+	if(config.onComplete)
+	{
+		callConfig.complete = config.onComplete;
+	}
+	
+	if(config.onFailure)
+	{
+		callConfig.error = config.onFailure;
+	}
+	
+	if(config.dataType)
+	{
+		callConfig.dataType = config.dataType;
+	}
+	
+	if(config.headers)
+	{
+		callConfig.beforeSend = function(xmlHttpRequest)
+		{
+			for(var key in config.headers)
+			{
+				if(config.headers.hasOwnProperty(key))
+				{
+					var value = config.headers[key];
+					if(value)
+					{
+						xmlHttpRequest.setRequestHeader(key, value);
+					}
+				}
+			}
+		};
+	}
+		
+	// Send the request
+	jQuery.ajax(callConfig);
+};
