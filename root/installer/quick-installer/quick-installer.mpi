@@ -87,7 +87,7 @@ DefaultLanguage
 English
 
 Ext
-.exe
+{}
 
 ExtensionDir
 <%InstallDir%>/tomcat/shared/classes/alfresco/extension/
@@ -315,7 +315,6 @@ File ::C51E5CAA-5BFC-4407-887F-D632AAF0826F -type dir -name prop-base -parent 27
 File ::78ACE50E-C49F-43B3-9520-0148915DD6E7 -type dir -name props -parent 2726D1D4-6017-4F0F-A281-3F07D5F93D5A
 File ::FD1B0E47-EE37-46C2-93A3-BA8BB66D66C8 -type dir -name text-base -parent 2726D1D4-6017-4F0F-A281-3F07D5F93D5A
 File ::AE0710F6-0F0D-4065-AE8A-E9072DAF4B9E -directory <%InstallDir%>/bin -name W:/HEAD/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
-File ::09B268EE-C341-4587-80D3-1DF532DA173F -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::19E1346C-800D-4A2A-AF02-AB97E9AC7412 -type dir -name W:/HEAD/root/projects/installer/licenses -location ../../projects/installer/licenses -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::A3EC7267-851F-4036-B155-C9202887A570 -name FLOSS-exception.txt -parent 19E1346C-800D-4A2A-AF02-AB97E9AC7412
 File ::B3C7B734-6190-4BE4-B97A-39FEE60549F8 -name gpl.txt -parent 19E1346C-800D-4A2A-AF02-AB97E9AC7412
@@ -3197,6 +3196,8 @@ FileGroup ::6120050F-B3AE-4857-9845-470CBD79B31E -setup Install -active Yes -pla
 File ::141E54D8-E7B7-4B24-A8B0-954EC4DEA922 -name W:/HEAD/root/projects/installer/linux/installer/virtual_stop.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 File ::2F0DE958-728D-47ED-BAA2-E94074D0DD67 -name W:/HEAD/root/projects/installer/linux/installer/virtual_alf.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 File ::1342AA2D-1979-41D0-9C0D-7FBB6B566B0F -name W:/HEAD/root/projects/installer/linux/installer/virtual_start.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
+FileGroup ::DC43C49C-C9EF-4C4F-B2DA-32B67341C839 -setup Install -alias jdbc -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name {JDBC Drivers} -parent FileGroups
+File ::9A944292-02A8-4CFD-9304-3DA0AB9959A9 -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -parent DC43C49C-C9EF-4C4F-B2DA-32B67341C839
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Samples -parent Components
 Component ::3599937E-10E1-4029-8ACB-CCE5D85D306D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name WCM -parent Components
@@ -3257,7 +3258,7 @@ Condition 5019D322-283D-49A4-9FF6-CB74EEB5F0BA -active Yes -parent 3E64C4C8-6089
 InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB} -title {Configure MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
-InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command reorder -alias jdbcpanel -active No -parent StandardInstall
 Condition 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -active Yes -parent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 448A4C99-13E3-42B0-AE70-2BFA0854ECBE
 InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
 Condition 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3
@@ -3367,6 +3368,7 @@ InstallComponent 8DF4772F-BB98-471E-99C9-CB3FEDD66C60 -setup Install -type actio
 InstallComponent AD2005D2-4400-4C05-834A-D0827D100FF7 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 InstallComponent 98F0A364-9B78-44FF-A037-1D91A85A5700 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 InstallComponent 350E9DA1-539D-4270-834E-96641B5D4D3B -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
+InstallComponent E9DDB129-2903-4953-BF7D-17F89C097A2F -setup Install -type action -title {Modify Object} -component ModifyObject -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
 InstallComponent 22CAB51D-2BE9-4A02-AB71-E92A6961538E -setup Uninstall -type pane -title Uninstall -component Uninstall -active Yes -parent StandardUninstall
 InstallComponent B716583C-3192-4A30-9CDC-9E6AA61D80BB -setup Uninstall -type action -title {Modify Widget} -component ModifyWidget -active Yes -parent 22CAB51D-2BE9-4A02-AB71-E92A6961538E
 InstallComponent 5EF13DF8-C897-46E2-AE83-BAE5C01F920D -setup Uninstall -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 22CAB51D-2BE9-4A02-AB71-E92A6961538E
@@ -3688,7 +3690,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-47013344
+47356041
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -3974,7 +3976,7 @@ derby
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-101269110
+100581404
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -4836,8 +4838,8 @@ A2841CF3-EEB2-479E-9284-330E06D1E1A7,NextButton,subst
 A2C4506D-7B3F-4F25-A656-7C86AB8838AD,Conditions
 {1 condition}
 
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Active
-Yes
+A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Alias
+jdbcpanel
 
 A35F8054-51C6-471B-8E45-0BE8AAFEA82B,BackButton,subst
 1
@@ -4870,7 +4872,7 @@ A4F1E663-DD6F-4CFB-B8C8-496149F89359,DisplayName,subst
 1
 
 A4F1E663-DD6F-4CFB-B8C8-496149F89359,FileGroups
-{44D20E51-7275-41FD-BF5C-790496A2FDB2 E1D94860-98A3-46D1-A57A-AA0AED090F50 332AF528-112D-43AC-B934-361D5E8E8AD6 8F9CD740-BE57-45DF-B176-5C11E746846B}
+{44D20E51-7275-41FD-BF5C-790496A2FDB2 E1D94860-98A3-46D1-A57A-AA0AED090F50 332AF528-112D-43AC-B934-361D5E8E8AD6 8F9CD740-BE57-45DF-B176-5C11E746846B DC43C49C-C9EF-4C4F-B2DA-32B67341C839}
 
 A4F1E663-DD6F-4CFB-B8C8-496149F89359,Name
 {Default Component}
@@ -5307,6 +5309,15 @@ DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB,CheckCondition
 DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB,Script
 lappend\ ::auto_path\ <%Temp%>\npackage\ require\ mysqltcl\n\nif\ \{\[catch\ \{\n\ \ \ if\ \{\ <%DB_ROOTPASS%>\ !=\ \"\"\ \}\ \{\n\tset\ conn(handle)\ \[::mysql::connect\ -user\ root\ \ -password\ <%DB_ROOTPASS%>\ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \}\ else\ \{\n\tset\ conn(handle)\ \[::mysql::connect\ -user\ root\ \ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \}\n\tset\ db\ \$::conn(handle)\n\t\n\t::mysql::exec\ \$db\ \"create\ database\ <%DB_NAME%>\"\n\ \ \ \ \ \ \t::mysql::exec\ \$db\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ \\'<%DB_USER%>\\'@\\'<%DB_HOST%>\\'\ identified\ by\ \\'<%DB_USERPWD%>\\'\ with\ grant\ option\;\"\n\ \ \ \ \ \ \t::mysql::exec\ \$db\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ \\'<%DB_USER%>\\'@\\'<%DB_HOST%>.localdomain\\'\ identified\ by\ \\'<%DB_USERPWD%>\\'\ with\ grant\ option\;\"\n\ \ \ \ \}\ err\]\}\ \{\n\tset\ answer\ \[tk_messageBox\ -message\ \"\$err\ \"\ -type\ ok\ -icon\ error\ -title\ \"Database\ Configuration\"\]\n\treturn\ false\;\n\t\n\ \ \ \ \}\ else\ \{\n\t\n\tset\ answer\ \[tk_messageBox\ -message\ \"Connection\ established\ and\ '<%DB_NAME%>'\ has\ been\ created.\"\ -type\ ok\ -title\ \"Database\ Configuration\"\]\n\ \treturn\ true\;\ \ \ \n\t\}\ \t\n\n\}\n
 
+DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Alias
+jdbc
+
+DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Destination
+<%InstallDir%>
+
+DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Name
+{JDBC Drivers}
+
 E181E06B-BC95-4065-80E8-8614EE6074B7,Alias
 {OpenOffice File}
 
@@ -5366,6 +5377,15 @@ E81B8A81-D03D-498A-9FEB-EDA61D16E117,Subtitle,subst
 
 E81B8A81-D03D-498A-9FEB-EDA61D16E117,Title,subst
 1
+
+E9DDB129-2903-4953-BF7D-17F89C097A2F,Conditions
+{0 conditions}
+
+E9DDB129-2903-4953-BF7D-17F89C097A2F,ObjectID
+jdbc
+
+E9DDB129-2903-4953-BF7D-17F89C097A2F,ObjectState
+Active
 
 EA551630-2C10-4F67-A450-D945DBFEE92F,Conditions
 {1 condition}
@@ -5510,7 +5530,7 @@ FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,FileSize
-882023
+890718
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Name
 Samples
