@@ -97,6 +97,13 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 					childDiv.ondblclick = _this.nodeDoubleClickHandler.bind(childNode);
 				}
 			}
+			
+			// if this has child nodes, block the "remove" button
+			_this.treeView.menu.setDisabled('roots', _this.INDEX_BUTTON_DELETE);
+			if(node.children.length == 0)
+			{
+				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_DELETE);
+			}
 		});
 		
 		// set up a handler for changes to active node state
