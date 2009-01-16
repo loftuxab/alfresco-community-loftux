@@ -1,5 +1,5 @@
-Alfresco Labs Release 3D
-========================
+Alfresco Labs 3 Stable
+======================
 
 For information on what is included in this release, refer to:
 
