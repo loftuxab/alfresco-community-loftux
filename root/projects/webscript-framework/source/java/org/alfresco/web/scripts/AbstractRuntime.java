@@ -232,8 +232,9 @@ public abstract class AbstractRuntime implements Runtime
             {
                 container.getTemplateProcessor().process(statusTemplate.getPath(), statusModel, res.getWriter());
             }
-            catch (IOException e1)
+            catch (Exception e1)
             {
+                logger.error("Internal error", e1);
                 throw new WebScriptException("Internal error", e1);
             }
         }

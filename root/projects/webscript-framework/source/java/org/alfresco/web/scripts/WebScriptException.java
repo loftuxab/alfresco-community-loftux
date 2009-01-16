@@ -36,13 +36,12 @@ import org.alfresco.error.AlfrescoRuntimeException;
  * 
  * @author David Caruana
  */
-public class WebScriptException extends AlfrescoRuntimeException
+public class WebScriptException extends AlfrescoRuntimeException implements StatusTemplateFactory
 {
     private static final long serialVersionUID = -7338963365877285084L;
 
     private int status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-    private StatusTemplate statusTemplate = null;
-    private Map<String, Object> statusModel = Collections.emptyMap();
+    private StatusTemplateFactory statusTemplateFactory;
 
 
     public WebScriptException(String msgId)
@@ -94,14 +93,36 @@ public class WebScriptException extends AlfrescoRuntimeException
      * 
      * @param template  status template
      * @param model  template model
+     * @deprecated
      */
-    public void setStatusTemplate(StatusTemplate statusTemplate, Map<String, Object> statusModel)
+    public void setStatusTemplate(final StatusTemplate statusTemplate, final Map<String, Object> statusModel)
     {
-        this.statusTemplate = statusTemplate;
-        if (statusModel != null)
+        setStatusTemplateFactory(new StatusTemplateFactory()
         {
-            this.statusModel = statusModel;
-        }
+
+            public Map<String, Object> getStatusModel()
+            {
+                return statusModel;
+            }
+
+            public StatusTemplate getStatusTemplate()
+            {
+                return statusTemplate;
+            }
+        });
+    }
+
+    
+    /**
+     * Associates a factory for the lazy retrieval of an advanced description of the status code associated with this
+     * exception
+     * 
+     * @param statusTemplateFactory
+     *            the factory to set
+     */
+    public void setStatusTemplateFactory(StatusTemplateFactory statusTemplateFactory)
+    {
+        this.statusTemplateFactory = statusTemplateFactory;
     }
 
     /**
@@ -121,7 +142,7 @@ public class WebScriptException extends AlfrescoRuntimeException
      */
     public StatusTemplate getStatusTemplate()
     {
-        return statusTemplate;
+        return this.statusTemplateFactory == null ? null : this.statusTemplateFactory.getStatusTemplate();
     }
 
     /**
@@ -131,7 +152,12 @@ public class WebScriptException extends AlfrescoRuntimeException
      */
     public Map<String, Object> getStatusModel()
     {
-        return statusModel;
+        Map <String,Object> statusModel = null;
+        if (this.statusTemplateFactory != null)
+        {
+            statusModel = this.statusTemplateFactory.getStatusModel();
+        }
+        return statusModel == null ? Collections.<String, Object> emptyMap() : statusModel;
     }
 
 }
