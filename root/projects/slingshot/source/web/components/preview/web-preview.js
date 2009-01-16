@@ -218,29 +218,41 @@
        */
       _resolvePreview: function WP__resolvePreview(event)
       {
-         // Try to prioritise usage of imgpreview for images and webpreview for other content
          var ps = this.options.previews;
          var webpreview = "webpreview", imgpreview = "imgpreview";
          var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
          var argsNoCache = "?c=force&noCacheToken=" + new Date().getTime();
+         var preview, url;
          if (this.options.mimeType.match(/^image\/\w+/))
          {
-            var preview = Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : (Alfresco.util.arrayContains(ps, webpreview) ? webpreview : null);
-            var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + argsNoCache;
-            return {url: url, paging: false};
+            /* Matched an image mimetype */
+            url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content" + argsNoCache;
+            return (
+            {
+               url: url,
+               paging: false
+            });
          }
          else if (this.options.mimeType.match(/application\/x-shockwave-flash/))
          {
             url = Alfresco.constants.PROXY_URI + "api/node/content/" + nodeRefAsLink + argsNoCache + "&a=true";
-            return {url: url, paging: false};
+            return (
+            {
+               url: url,
+               paging: false
+            });
          }
          else
          {
-            var preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
+            preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
             if (preview != null)
             {
-               var url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + argsNoCache;
-               return {url: url, paging: true};
+               url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + argsNoCache;
+               return (
+               {
+                  url: url,
+                  paging: true
+               });
             }
             return null;
          }

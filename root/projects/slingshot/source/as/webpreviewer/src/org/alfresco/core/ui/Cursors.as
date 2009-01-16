@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,12 +38,12 @@ package org.alfresco.core.ui
 		/** 
 		 * Array of ids to all the current hand cursors that are in use.
 		 */ 
-		private static var handCursorIds:Array = new Array;
+		private static var handCursorId:int = 0;
 
 		/** 
 		 * Array of ids to all the current grab cursors that are in use.
 		 */ 
-		private static var grabCursorIds:Array = new Array;
+		private static var grabCursorId:int = 0;
 		
 		/**
 		 * Constructor
@@ -71,8 +71,11 @@ package org.alfresco.core.ui
 		 */
 		public static function showHandCursor(event:Event):void 
 		{
-			handCursorIds.push(CursorManager.setCursor(handCursor, CursorManagerPriority.MEDIUM));
-		    CursorManager.showCursor();
+			if (handCursorId == 0)
+			{
+				handCursorId = CursorManager.setCursor(handCursor);
+			    CursorManager.showCursor();
+			}
 	   	}
 
 		/**
@@ -82,7 +85,12 @@ package org.alfresco.core.ui
 		 */
 	   	public static function hideHandCursor(event:Event):void 
 	   	{
-        	CursorManager.removeCursor(handCursorIds.pop());
+			if (handCursorId != 0)
+			{
+        		CursorManager.removeCursor(handCursorId);
+        		handCursorId = 0;
+		    	CursorManager.showCursor();
+		 	}
 	   	}
 		
 		/**
@@ -92,8 +100,11 @@ package org.alfresco.core.ui
 		 */
 		public static function showGrabCursor(event:Event):void 
 		{
-			grabCursorIds.push(CursorManager.setCursor(grabCursor, CursorManagerPriority.HIGH));
-		    CursorManager.showCursor();
+			if (grabCursorId == 0)
+			{
+				grabCursorId = CursorManager.setCursor(grabCursor, CursorManagerPriority.HIGH);
+		    	CursorManager.showCursor();
+		 	}
 	   	}
 	   	
 		/**
@@ -103,7 +114,12 @@ package org.alfresco.core.ui
 		 */	   	
 	   	public static function hideGrabCursor(event:Event):void 
 	   	{
-        	CursorManager.removeCursor(grabCursorIds.pop());
+	   		if (grabCursorId != 0)
+	   		{
+	        	CursorManager.removeCursor(grabCursorId);
+	        	grabCursorId = 0;
+			    CursorManager.showCursor();
+	   		}
 	   	}
 	}
 }

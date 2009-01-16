@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,21 +38,21 @@ package org.alfresco.previewer
 	 * amount of instances of the movie clip and re use those instances and make sure 
 	 * they display the correct frame depending on which page that is showed.
 	 * 
-	 * This class is constanlty told by the DocumentZoomDisplay class which page that
+	 * This class is constantly told by the DocumentZoomDisplay class which page that
 	 * is the current page and how many pages that currenlty is visible.
-	 * This page will then take a movie clip instance form the pool, make sure it 
-	 * displays the frame corresponding to the page ad then assign that movie clip to
-	 * the page so its showed to the user.
+	 * This page will then take a movie clip instance from the pool, make sure it 
+	 * displays the frame corresponding to the page no then assign that movie clip to
+	 * the page so it's showed to the user.
 	 * 
 	 * NOTE ABOUT PERFORMANCE! 
 	 * 
 	 * The time it takes to change what frame a movie clip displays (by using 
 	 * goToAndPlay) varies a lot depending if the new frame is before or after the 
 	 * movie clips current frame. If a greater frame shall be displayed (after) it is
-	 * much faster thatn if lower frame (earlier) frame shall be displayed.  
+	 * much faster than if lower frame (earlier) frame shall be displayed.  
 	 * 
-	 * The Flash Player runtime doesnät have thread support, which means that when a 
-	 * slow operatation is made, such as changing a bunch of movie clip instance's 
+	 * The Flash Player runtime doesn't have thread support, which means that when a 
+	 * slow operatation is made, such as changing a bunch of movie clip instances 
 	 * frames from example values like 355 to 300 may freeze the ui in the browser.
 	 * 
 	 * Therefore imagine a situation where a user scrolls the document from the bottom
@@ -60,7 +60,7 @@ package org.alfresco.previewer
 	 * This class would get called for each time the page is changed. 
 	 * If this class would try to load all visible pages for each of those events
 	 * the browser would freeze on the first event and the scroll thumb would no longer
-	 * respond since the heavy goToAndPlay operations in the no threaded runtime would 
+	 * respond since the heavy goToAndPlay operations in the unthreaded runtime would 
 	 * freeze the flash ui.  
 	 * 
 	 * Therefore a couple of decisions has been taken to handle this:
@@ -131,7 +131,7 @@ package org.alfresco.previewer
 		 */
 		public function DocumentPageController(doc:Document, dzd:DocumentZoomDisplay)
 		{
-			// Make sure timer doesnät repeat itself
+			// Make sure timer doesn't repeat itself
 			super(1, 0);
 			
 			// Save referecnce to the document and make sure we listen for changes in the display
@@ -142,7 +142,7 @@ package org.alfresco.previewer
 			this.addEventListener(TimerEvent.TIMER, onTimer);
 			
 			// Create the thread that will do the page loading
-			pageLoader = new PageLoaderThread(this);			
+			this.pageLoader = new PageLoaderThread(this);			
 		}
 		
 		/**
@@ -151,14 +151,14 @@ package org.alfresco.previewer
 		 */
 		private function onTimer(event:TimerEvent):void
 		{
-			// MArk this timer as stopped so the running flag says false
+			// Mark this timer as stopped so the running flag says false
 			stop();
 			
-			// Check if the page or number of visible pages has changed since the tier was started
+			// Check if the page or number of visible pages has changed since the timer was started
 			if (this.prevPage != this.nextPage || this.prevVisiblePages != this.nextVisiblePages)
 			{
 				// Nothing has changed, have we waited long enough?
-				if (new Date().time - lastMove.time > millisToWaitUntilAction)
+				if (new Date().time - this.lastMove.time > this.millisToWaitUntilAction)
 				{	
 					// Yes we have, the user has stopped the scrolling, paging or zooming
 					this.prevPage = this.nextPage;
@@ -181,23 +181,33 @@ package org.alfresco.previewer
 		 * 
 		 * @param mc A movie clip instance to add to the page pool.
 		 */		
-		public function add(mc:MovieClip):void
+		public function addPageMovieClip(mc:MovieClip):void
 		{
-			pageLoader.add(mc);		
+			pageLoader.addPageMovieClip(mc);		
 		}
 		
 		/**
-		 * The listener for changes in the document zoom display.
-		 * Will see if the pages that shall be displayed has changed, if it has
+	 	* Returns the movie clip page pool.
+	 	* 
+	 	* @return An array of movie clips.
+	 	*/
+		public function getPageMovieClips():Array
+		{
+			return pageLoader.getPageMovieClips();	
+		}
+				
+		/**
+		 * The listener for changes in the document page display.
+		 * Will see if the pages that shall be displayed have changed, if they have
 		 * this class's timer availabilities will be used to postpone the decision if 
-		 * the pages shall be laoded, since the user might be scrolling to a new page
+		 * the pages shall be loaded, since the user might be scrolling to a new page
 		 * in a couple of milliseconds.
 		 * 
-		 * @param event DEscribes the new page and the new number of visible pages.
+		 * @param event Describes the new page and the new number of visible pages.
 		 */ 
 		private function onDocumentPageScopeChange(event:DocumentZoomDisplayEvent):void
 		{
-			if(doc.getNoOfPages() > pageLoader.getPoolSize())
+			if (this.doc.getNoOfPages() > this.pageLoader.getPoolSize())
 			{
 				// Save the values from the event
 				this.nextVisiblePages = event.visiblePages;
@@ -209,15 +219,29 @@ package org.alfresco.previewer
 					 * Make sure we reset the time we need to wait until the pages shall
 					 * be loaded.
 					 */ 				
-					lastMove = new Date();
-					if (!running)
+					this.lastMove = new Date();
+					if (!this.running)
 					{				
 						// The timer is not active, start it  
-						delay = millisToWaitUntilActionTest;
+						this.delay = millisToWaitUntilActionTest;
 						start();
 					}
 				}
 			}
+/*
+			else
+			{
+				/**
+				 * Less pages than in the pool, so just set-up the correct page variables
+				 * and kick off the pseudo thread
+				 /
+				this.nextVisiblePages = event.visiblePages;
+				this.nextPage = event.page;
+				this.prevVisiblePages = this.nextVisiblePages;
+				this.prevPage = this.nextPage;
+				this.pageLoader.start();
+			}
+*/
 		}
 		
 	}
@@ -230,12 +254,12 @@ import flash.display.MovieClip;
 import org.alfresco.previewer.Page;
 	
 /**
- * This class handles the actual page loading, in other words
- * Finds an unused movie clip instance, makes it display the
- * correct frame (page) and places it in the page in the doment.
+ * This class handles the actual page loading.
+ * It finds an unused movie clip instance, makes it display the
+ * correct frame (page) and places it in the page in the document.
  * 
  * It loads one page/frame at a time and before it tries to load 
- * a new one it checks if the user has'nt requested a new page or 
+ * a new one it checks that the user hasn't requested a new page or 
  * that the time it has been given to load pages without stalling 
  * the ui hasn't been exceeded.
  * 
@@ -250,8 +274,8 @@ import org.alfresco.previewer.Page;
  * When "active" is false it means that the pseudo thread thinks 
  * that the work method has taken too long time to process.
  * 
- * The work method the visiblePageIndex to know what movie clip to load next.
- *  
+ * The work method uses the visiblePageIndex to know what movie clip to
+ * load next.
  */
 class PageLoaderThread extends PseudoThread
 {
@@ -276,7 +300,7 @@ class PageLoaderThread extends PseudoThread
 	 * The previous page the user asked for, if we compare it to the
 	 * new page the user is asking for we know if he is scrolling up or down.
 	 */
-	private var lastPage:int = 0;
+	private var prevPage:int = 0;
 	
 	/**
 	 * Keeps track of which movie clips in the pool that we have used
@@ -312,12 +336,22 @@ class PageLoaderThread extends PseudoThread
 	/**
 	 * Add a movie clip to the movie clip pool.
 	 */
-	public function add(mc:MovieClip):void
+	public function addPageMovieClip(mc:MovieClip):void
 	{
 		movieClipPool.push(mc);
 		loadAndDisplayPage(movieClipPool.length - 1, movieClipPool.length);		
 	}
-	
+
+	/**
+	 * Returns the movie clip page pool.
+	 * 
+	 * @return An array of movie clips.
+	 */
+	public function getPageMovieClips():Array
+	{
+		return movieClipPool;	
+	}
+		
 	/**
 	 * Returns the number of movie clips in the pool.
 	 * 
@@ -325,17 +359,17 @@ class PageLoaderThread extends PseudoThread
 	 */
 	public function getPoolSize():int
 	{
-		return movieClipPool ? movieClipPool.length : 0;
+		return this.movieClipPool ? this.movieClipPool.length : 0;
 	}
 	
 	/**
-	 * Called by the psedu thread before work is called repeatedly 
+	 * Called by the pseudo thread before work is called repeatedly 
 	 * until the thread is stopped.
 	 */
     protected override function initialize():void 
     {    	    	
         this.visiblePageIndex = 0;		
-     	usedMovieClipIndexes = {};
+     	this.usedMovieClipIndexes = {};
     } 
 	
 	/**
@@ -351,7 +385,7 @@ class PageLoaderThread extends PseudoThread
     protected override function work():void 
     {
     	// Continue loading if it was interupted
-    	load();
+    	this.load();
     	
 		var mc:MovieClip;
 		var j:int = 0;
@@ -364,19 +398,19 @@ class PageLoaderThread extends PseudoThread
 		 * requested a new page.
 		 */
 		while (this.active 
-				&& visiblePageIndex < movieClipPool.length 
-				&& visiblePageIndex < dpc.nextVisiblePages
-				&& dpc.prevPage == dpc.nextPage 
-				&& dpc.prevVisiblePages == dpc.nextVisiblePages)
+				&& this.visiblePageIndex < this.movieClipPool.length 
+				&& this.visiblePageIndex < this.dpc.nextVisiblePages
+				&& this.dpc.prevPage == this.dpc.nextPage 
+				&& this.dpc.prevVisiblePages == this.dpc.nextVisiblePages)
 		{
 			var loaded:Boolean = false;
 			var savedPossibleFuturePagePoolIndex:int = -1;
-			var page:int = dpc.nextPage + visiblePageIndex; 
+			var page:int = this.dpc.nextPage + this.visiblePageIndex; 
 			
 			// First see if the page is loaded
-			for (; j < movieClipPool.length; j++)
+			for (j = 0; j < this.movieClipPool.length; j++)
 			{
-				mc = movieClipPool[j];
+				mc = this.movieClipPool[j];
 				if (mc.currentFrame == (page))
 				{				
 					// The page was already loaded, make sure it's displayed.					  
@@ -389,7 +423,7 @@ class PageLoaderThread extends PseudoThread
 			if (!loaded)
 			{				
 				// The page was not loaded, now find a free movie clip 
-				for (j = 0; j < movieClipPool.length; j++)
+				for (j = 0; j < this.movieClipPool.length; j++)
 				{
 					mc = movieClipPool[j];
 					
@@ -397,9 +431,9 @@ class PageLoaderThread extends PseudoThread
 					 * Try to find a movie cilp that currently doesn't already 
 					 * display one of the other pages we will display later.
 					 */
-					if (mc.currentFrame < dpc.nextPage - 1 
-						|| mc.currentFrame > (dpc.nextPage + dpc.nextVisiblePages)						
-						|| (dpc.nextVisiblePages > movieClipPool.length && mc.currentFrame > dpc.nextPage + visiblePageIndex))
+					if (mc.currentFrame < this.dpc.nextPage - 1 
+						|| mc.currentFrame > (this.dpc.nextPage + this.dpc.nextVisiblePages)						
+						|| (this.dpc.nextVisiblePages > this.movieClipPool.length && mc.currentFrame > this.dpc.nextPage + this.visiblePageIndex))
 					{
 						/**
 						 * We found a movie clip that currently displays a frame we 
@@ -409,11 +443,11 @@ class PageLoaderThread extends PseudoThread
 						loaded = true;
 						break;
 					}
-					else if (mc.currentFrame == (dpc.nextPage - 1) || mc.currentFrame == (dpc.nextPage + dpc.nextVisiblePages))
+					else if (mc.currentFrame == (this.dpc.nextPage - 1) || mc.currentFrame == (this.dpc.nextPage + this.dpc.nextVisiblePages))
 					{
 						/**
 						 * This clip can be used to display the page, but hopefully we 
-						 * can save it since it already displays antother page that we 
+						 * can save it since it already displays antther page that we 
 						 * will need to display later.
 						 */ 
 						savedPossibleFuturePagePoolIndex = j;
@@ -423,7 +457,7 @@ class PageLoaderThread extends PseudoThread
 				if (!loaded && savedPossibleFuturePagePoolIndex != -1)
 				{
 					/**
-					 * We still haven't loaded the page, we will need to use the move 
+					 * We still haven't loaded the page, we will need to use the movie 
 					 * clip we hoped to be able to save for the page it currently displays.
 					 */					
 					loadAndDisplayPage(savedPossibleFuturePagePoolIndex, page);
@@ -434,46 +468,46 @@ class PageLoaderThread extends PseudoThread
 			}
 			
 			// Increase the index to load so we don't try to this page again
-			visiblePageIndex++;
+			this.visiblePageIndex++;
 		}
 		
 		/**
 		 * We come here when we have loaded all visible pages, when the movie clip pool is empty 
 		 * or when the thread has become inactive. 
-		 * If we have time and movie clips left load the clip before the first visisble clip 
+		 * If we have time and movie clips left load the clip before the first visible clip 
 		 * and the clip after the last visible clip. 
 		 */		 			
-		if (visiblePageIndex < movieClipPool.length 			
-			&& dpc.prevPage == dpc.nextPage 
-			&& dpc.prevVisiblePages == dpc.nextVisiblePages)
+		if (this.visiblePageIndex < this.movieClipPool.length
+			&& this.dpc.prevPage == this.dpc.nextPage
+			&& this.dpc.prevVisiblePages == this.dpc.nextVisiblePages)
 		{
 			// Load as long as the thread is active and we have loaded all visible clips
 			while (this.active 
-				&& (visiblePageIndex == dpc.nextVisiblePages 
-					|| visiblePageIndex == dpc.nextVisiblePages + 1))
+				&& (this.visiblePageIndex == this.dpc.nextVisiblePages 
+					|| this.visiblePageIndex == this.dpc.nextVisiblePages + 1))
 			{				
 				// Try to find a free clip...	
-				for (j = 0; j < movieClipPool.length; j++)
+				for (j = 0; j < this.movieClipPool.length; j++)
 				{
 					// ... that hasn't been used
-					if (!usedMovieClipIndexes[j])
+					if (!this.usedMovieClipIndexes[j])
 					{
 						var preloadPage:int = 0;						
-						if (visiblePageIndex == dpc.nextVisiblePages)
+						if (this.visiblePageIndex == this.dpc.nextVisiblePages)
 						{
 							/**
-							 * First priority: decided what page depending if the user
-							 * selected an eralier or later page than before
+							 * First priority: decide which page depending if the user
+							 * selected an earlier or later page than before
 							 */
-							 preloadPage = dpc.nextPage < this.lastPage ? dpc.nextPage - 1 : dpc.nextPage + dpc.nextVisiblePages;
+							 preloadPage = this.dpc.nextPage < this.prevPage ? this.dpc.nextPage - 1 : this.dpc.nextPage + this.dpc.nextVisiblePages;
 						}
 						else
 						{
 							/**
-							 * Second priority: decided what page depending if the user
-							 * selected an eralier or later page than before
+							 * Second priority: decide which page depending if the user
+							 * selected an earlier or later page than before
 							 */
-							 preloadPage = dpc.nextPage < this.lastPage ? dpc.nextPage + dpc.nextVisiblePages : dpc.nextPage - 1 ;
+							 preloadPage = this.dpc.nextPage < this.prevPage ? this.dpc.nextPage + this.dpc.nextVisiblePages : this.dpc.nextPage - 1 ;
 						}
 						loadAndDisplayPage(j, preloadPage);						
 						break;
@@ -481,21 +515,21 @@ class PageLoaderThread extends PseudoThread
 				}
 				
 				// Increase index so we don't try to load this page again
-				visiblePageIndex++;
+				this.visiblePageIndex++;
 			}
 		}
 		
 		/**
 		 * We come here when we have loaded ALL pages (both visisble and hidden) or when 
 		 * the thread has become inactive. Stop the thread if the user has requested a 
-		 * new page, the movie clip pool is empty or ALL pages are laoded.		 
+		 * new page, the movie clip pool is empty or ALL pages are loaded.		 
 		 */
-		if (dpc.prevPage != dpc.nextPage 
-			|| dpc.prevVisiblePages != dpc.nextVisiblePages 
-			|| visiblePageIndex >= movieClipPool.length 
-			|| visiblePageIndex >= dpc.nextVisiblePages + 2)
+		if (this.dpc.prevPage != this.dpc.nextPage 
+			|| this.dpc.prevVisiblePages != this.dpc.nextVisiblePages 
+			|| this.visiblePageIndex >= this.movieClipPool.length 
+			|| this.visiblePageIndex >= this.dpc.nextVisiblePages + 2)
 		{
-			this.lastPage = dpc.nextPage;
+			this.prevPage = this.dpc.nextPage;
 			this.stop();
 		}
 
@@ -511,26 +545,26 @@ class PageLoaderThread extends PseudoThread
     */
     private function loadAndDisplayPage(i:int, page:int):void
     {
-    	if(page < 1)
+    	if (page < 1)
     	{
     		return;
     	}
     	
     	// Remember the movie clip to use and the page to go to
-    	loadingMovieClipIndex = i;    	    	
-    	usedMovieClipIndexes[loadingMovieClipIndex] = true;
-	 	loadDestinationFrame = page;
+    	this.loadingMovieClipIndex = i;    	    	
+    	this.usedMovieClipIndexes[i] = true;
+	 	this.loadDestinationFrame = page;
 	 	
 	 	// Start loading...	 			
 		load();	
     }
     
     /**
-	 * Does the actual loading, in other words moves makes the chosen movie clip
+	 * Does the actual loading, in other words makes the chosen movie clip
 	 * in the pool display the frame/page.
 	 * 
-	 * If a movie clip's current fram is 300 and the frame to display is 250 it 
-	 * can take up to 2.5 seconds depending on how many frames that exists.
+	 * If a movie clip's current frame is 300 and the frame to display is 250 it 
+	 * can take up to 2.5 seconds depending on how many frames exist.
 	 * 
 	 * Instead of making the clip display that directly and not be able to 
 	 * react to ui changes, such as scrolling or paging, it loads (moves the "frame cursor")
@@ -539,44 +573,43 @@ class PageLoaderThread extends PseudoThread
     private function load():void 
     {
     	// Find the movie clip to use
-    	var mc:MovieClip = movieClipPool[loadingMovieClipIndex];
+    	var mc:MovieClip = this.movieClipPool[this.loadingMovieClipIndex];
     	
     	// Load as long as we have been given time from the thread
-    	while(loadDestinationFrame > 0 && this.active)
+    	while (this.loadDestinationFrame > 0 && this.active) // || mc.totalFrames < 11))
     	{    		
-    		if(dpc.prevPage != dpc.nextPage 
-				|| dpc.prevVisiblePages != dpc.nextVisiblePages)
+    		if (this.dpc.prevPage != this.dpc.nextPage 
+				|| this.dpc.prevVisiblePages != this.dpc.nextVisiblePages)
 			{
 				// The current page has changed, interrupt loading
-				loadDestinationFrame = 0;
-				return;				
+				this.loadDestinationFrame = 0;
+				return;
 			}						
-			else if(mc.currentFrame == loadDestinationFrame)
+			else if (mc.currentFrame == this.loadDestinationFrame)
 			{
 				// We are finished loading, display the page
-				var p:Page = dpc.doc.getChildAt(loadDestinationFrame - 1) as Page;			
+				var p:Page = this.dpc.doc.getChildAt(this.loadDestinationFrame - 1) as Page;			
 				p.content = mc;
-				loadDestinationFrame = 0;
+				this.loadDestinationFrame = 0;
 				return;
 			}
 			else
 			{				
 				// Loading another part of the frames
-				var nextFrame:int = mc.currentFrame + loadFrameStep;
-				if(mc.currentFrame < loadDestinationFrame && loadDestinationFrame <= nextFrame)
+				var nextFrame:int = mc.currentFrame + this.loadFrameStep;
+				if (mc.currentFrame < this.loadDestinationFrame && this.loadDestinationFrame <= nextFrame)
 				{
 					// We are close to the destination frame, load it
-					nextFrame = loadDestinationFrame;
+					nextFrame = this.loadDestinationFrame;
 				} 
-				else if(nextFrame > mc.totalFrames)
+				else if (nextFrame > mc.totalFrames)
 				{
-					// We have reached the end of the move, start from the beginning
+					// We have reached the end of the movie, start from the beginning
 					nextFrame = 1;
 				}				
 				// Do the actual loading
 				mc.gotoAndStop(nextFrame);	
-			}    		
-    	}	
+			}
+    	}
     }
-    
 }
