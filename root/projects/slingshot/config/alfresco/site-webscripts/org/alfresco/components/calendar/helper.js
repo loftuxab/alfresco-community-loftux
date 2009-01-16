@@ -226,7 +226,17 @@ var CalendarScriptHelper  = ( function()
             var d = d || this.getContextDate(this.getDefaultDate());
             var uri = "/calendar/events/user?from=" + encodeURIComponent(toISOString(d,{selector:'date'}));
             var eventList = doGetCall(uri).events;
-            return eventList;
+            var site = page.url.templateArgs.site;
+            var siteEvents = [];
+            
+            for (var i=0;i<eventList.length;i++) {
+              var ev = eventList[i];
+              if (ev.site==site){
+                siteEvents.push(ev);
+              }
+            }
+            
+            return siteEvents;
         },
         getDefaultDate : function()
         {
