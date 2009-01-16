@@ -1,5 +1,0 @@
-<webscript>
-  <shortname>Full Preview</shortname>
-  <description>Displays a browser window maximized flash preview of a document.</description>
-  <url>/components/preview/full-preview</url>
-</webscript>

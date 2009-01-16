@@ -60,7 +60,7 @@ package
 			jsCallback = Application.application.parameters.jsCallback;
 						
 			// Set variables on the preview component							
-			previewer.paging = (paging == "true" || paging == "TRUE");
+			previewer.paging = (paging.toLowerCase() == "true");
 			previewer.fileName = fileName;
 			
 			trace(System.totalMemory);
@@ -75,7 +75,7 @@ package
 		 */
 		private function onDocumentDisplayError(event:DocumentZoomDisplayEvent):void
 		{
-			if(ExternalInterface.available && jsCallback != null)
+			if (ExternalInterface.available && jsCallback != null)
 			{		
 				var code:String = "error";
 				code = event.type == DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR ? "error.io" : code;

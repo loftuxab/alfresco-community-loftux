@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -118,17 +118,16 @@ package org.alfresco.previewer
 		 * 
 		 * @param child A page in the document.
 		 */
-		/*override public function addChild(child:DisplayObject):DisplayObject {			
+		override public function addChild(child:DisplayObject):DisplayObject
+		{			
 			if (child is Page)
 			{			
 				// Call super class addChild.
 	            super.addChild(child);                  
 	            
-	            // Add event listener for page clicks
-	            child.addEventListener(MouseEvent.CLICK, onPageClick);
-	            
-	            // Layout all the pages in the document.       
-				redrawChildren();			           
+		        // Set variables for access later
+	            _maximumPageWidth = child.width;
+	            _maximumPageHeight = child.height;
 				
 				// Return the child/page.
 	            return child;	            				
@@ -138,7 +137,7 @@ package org.alfresco.previewer
 				throw Error("A child to a Document must be of type Child.");
 			}
         }
-		*/
+		
 		public function set pages(pages:Array):void 
 		{
 			var p:Page;

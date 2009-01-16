@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -342,7 +342,7 @@ package org.alfresco.previewer
     	    	 * with little RAM.
     	    	 */
  				pmclm = new DocumentPageController(doc, this);
-    	    	pmclm.add(mmc);  
+    	    	pmclm.addPageMovieClip(mmc);
     	    	
 				createMultiPageDocument(Math.min(10, mmc.totalFrames - 1));	
     	    }
@@ -403,15 +403,15 @@ package org.alfresco.previewer
 		private function createMultiPageDocument(yetToCreate:Number):void
 		{
 			// Create a unique instance of the movie clip an set it to display the page/frame specified bt yetToCreate
-    		createMovieClipInstance(
-    			loader, 
-    			function movieClipCreated(mc:MovieClip, obj:Object):void{
-    				// Instance created, decrease the counter
-    				obj.yetToCreate = obj.yetToCreate - 1;
-    				
-    				// Add movice clip to the content pool so it can be used for several pages
-    				mc.gotoAndStop(obj.yetToCreate);
-	    			pmclm.add(mc);
+    		createMovieClipInstance(
+    			loader, 
+    			function movieClipCreated(mc:MovieClip, obj:Object):void{    				
+    				// Add movice clip to the content pool so it can be used for several pages
+    				mc.gotoAndStop(obj.yetToCreate);
+	    			pmclm.addPageMovieClip(mc);
+	    			
+    				// Instance created, decrease the counter
+					obj.yetToCreate = obj.yetToCreate - 1;
 												
 					if (obj.yetToCreate > 0)
 					{
@@ -419,8 +419,17 @@ package org.alfresco.previewer
 						createMultiPageDocument(obj.yetToCreate);
 					}	
 					else
-					{	
+					{							
 						// All instances have been created
+						var p:Page, 
+							pmc:MovieClip;
+						var pmcs:Array = pmclm.getPageMovieClips();
+						for (var i:int = 0; i < pmcs.length; i++)
+						{	
+							pmc = pmcs[i];
+							p = doc.getChildAt(pmc.currentFrame - 1) as Page;			
+							p.content = pmc;
+						}	
 						
 						// Add the document to the document zoom display
 						sprite = doc;
@@ -428,10 +437,10 @@ package org.alfresco.previewer
 						// Make sure necessarry taks are taken now that the document is loaded and created
 						documentComplete();																	
 					}
-	    		}, 
-	    		{
-	    			yetToCreate: yetToCreate
-    			}
+	    		}, 
+	    		{
+	    			yetToCreate: yetToCreate
+    			}
 			);	
 		}
 		
@@ -498,7 +507,7 @@ package org.alfresco.previewer
 				fitToWidth = this.width / w;
 						
 				// Get info how these values will appear on the screen		
-				var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext(w * fitToWidth, h * fitToWidth);
+				var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext(w * fitToWidth, h * fitToWidth);
 				
 				// Get an exact value that considers scrollbars
 				fitToWidth = ctx.screenWidth / w;												
@@ -511,7 +520,7 @@ package org.alfresco.previewer
 				fitToHeight = this.height / h;				
 				
 				// Get info how these values appear on the screen	
-				ctx = getZoomSpriteDisplatyContext(w * fitToHeight, h * fitToHeight);
+				ctx = getZoomSpriteDisplayContext(w * fitToHeight, h * fitToHeight);
 				
 				// Get an exact value that considers scrollbars
 				fitToHeight = ctx.screenHeight / h;																			
@@ -536,7 +545,7 @@ package org.alfresco.previewer
 			}
 			else if (contentType == IMAGE)
 			{
-				if (fitToScreen > 1)
+				if (e.fitToScreen > 1)
 				{
 					// The image's real size is smaller than the screen size, use the real size so we don't distort it
 					e.fitByContentType = 1;

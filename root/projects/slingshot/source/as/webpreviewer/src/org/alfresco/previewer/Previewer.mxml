@@ -2,8 +2,9 @@
 <previewer:PreviewerClass xmlns="*" 
 		xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:previewer="org.alfresco.previewer.*" 
 		xmlns:containers="org.alfresco.lib.containers.*"
-		styleName="previewer"><mx:ApplicationControlBar id="headerApplicationControlBar" styleName="headerApplicationControlBar" 
-		width="100%">
+		styleName="previewer">
+	
+	<mx:ApplicationControlBar id="headerApplicationControlBar" styleName="headerApplicationControlBar" width="100%">
 		
 		<!-- FILENAME -->
 		<mx:Label id="fileNameLabel" styleName="fileNameLabel" text="Hello.doc" includeInLayout="false" visible="false"/>

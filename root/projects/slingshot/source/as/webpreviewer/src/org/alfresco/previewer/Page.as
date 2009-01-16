@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -181,10 +181,8 @@ package org.alfresco.previewer
 		 */
         private function redrawChild():void 
         {
-
 			// Fill background with transparent graphics so the Pages dimensions include the border			
         	doFillBackground(0);
-	        
         }
 			
 		/**
@@ -248,7 +246,7 @@ package org.alfresco.previewer
 	        graphics.drawRect(0, 0, contentWidth + borderThickness * 2, contentHeight + borderThickness * 2);	        
 	        graphics.endFill();
 	        
-	        if(this._placeHolder)
+	        if (this._placeHolder)
 	        {
 	        	graphics.beginFill(defaultPageColor, 1);
 	        	graphics.drawRect(borderThickness, borderThickness, contentWidth, contentHeight);		                

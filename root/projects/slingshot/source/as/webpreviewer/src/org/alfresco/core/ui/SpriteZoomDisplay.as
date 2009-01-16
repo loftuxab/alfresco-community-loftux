@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -112,7 +112,7 @@ package org.alfresco.core.ui
 		 * The fortcoming scale of the sprite
 		 */
 		protected var spriteNewZoom:Number = 1;
-				
+		
 		/**
 		 * The fortcoming x position of the sprite.
 		 * Normally the move is done directly in the changing method such as moveSprite
@@ -148,6 +148,12 @@ package org.alfresco.core.ui
 		 * the sprite shall be appropriatly positoned in updateDisplayList
 		 */ 				
 		protected var displayResized:Boolean = false;
+		
+		/**
+		 * The original screen size on a resize event
+		 */
+		protected var prevScreenHeight:Number = -1;
+		protected var prevScreenWidth:Number = -1;
 				
 		/**
 		 * Constructor
@@ -174,7 +180,7 @@ package org.alfresco.core.ui
 			// And set new one			
 			_sprite = sprite;
 			
-			if(_sprite)
+			if (_sprite)
 			{
 				// Make sure we have the sprite original dimensions
 				spriteOrgWidth = _sprite.width;
@@ -184,21 +190,20 @@ package org.alfresco.core.ui
 				
 				// Add drag n drop event listeners		
 	   			sprite.addEventListener(MouseEvent.MOUSE_DOWN, startSpriteDrag);
-	            stage.addEventListener(MouseEvent.MOUSE_UP, stopSpriteDrag, true);
 				
 				// Show mouse cursor as hand if		
 				sprite.addEventListener(MouseEvent.ROLL_OVER, function (event:Event):void
 				{				
-					if(draggingEnabled)
+					if (draggingEnabled)
 					{
-						Cursors.showHandCursor(null);
+						Cursors.showHandCursor(event);
 					}
 				});
 	   			sprite.addEventListener(MouseEvent.ROLL_OUT, function (event:Event):void
 				{				
-					if(draggingEnabled)
+					if (draggingEnabled)
 					{
-						 Cursors.hideHandCursor(null);
+						 Cursors.hideHandCursor(event);
 					}
 				});
 	            
@@ -335,7 +340,8 @@ package org.alfresco.core.ui
 		{	
 			// Make sure sprite is moved in relation to the new scrollbar position		
 			vsbUpdated = true;
-			invalidateDisplayList();			
+			invalidateDisplayList();
+			trace(this._sprite.y);	
 		}		
 
 
@@ -380,8 +386,11 @@ package org.alfresco.core.ui
 		{
 			if (draggingEnabled)
 			{				
+				Cursors.showGrabCursor(mouseDown);
 				_sprite.startDrag(false, getSpriteDragRectangle());
-				Cursors.showGrabCursor(null);
+				// Swap mouse listeners for in-drag interest ones
+	   			_sprite.removeEventListener(MouseEvent.MOUSE_DOWN, startSpriteDrag);
+	            stage.addEventListener(MouseEvent.MOUSE_UP, stopSpriteDrag, true);
 				_sprite.addEventListener(MouseEvent.MOUSE_MOVE, onSpriteMouseMove);							
 			}
 		}
@@ -408,10 +417,12 @@ package org.alfresco.core.ui
 		{
 			// Make sure the sprite isnt dragged anymore
 			_sprite.stopDrag();
-			Cursors.hideGrabCursor(null);
+			Cursors.hideGrabCursor(mouseUp);
 					
-			// We don't need to listen for mouse movements anymore.
+			// Remove in-drag mouse event listeners
 			_sprite.removeEventListener(MouseEvent.MOUSE_MOVE, onSpriteMouseMove);
+	        stage.removeEventListener(MouseEvent.MOUSE_UP, stopSpriteDrag);
+	   		_sprite.addEventListener(MouseEvent.MOUSE_DOWN, startSpriteDrag);
 		} 
 		
 		/**
@@ -423,7 +434,7 @@ package org.alfresco.core.ui
 		private function getSpriteDragRectangle():Rectangle
 		{
 			// Get info about hwo the display area looks based on the sprite's size.
-			var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext();
+			var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
 			
 			// Define the sprites draggable area based on if scrollbars are used or not.
 			return new Rectangle(
@@ -452,23 +463,27 @@ package org.alfresco.core.ui
 	        graphics.drawRect(0, 0, this.width, this.height);
 	        graphics.endFill();
 			
+			// Save the current screen size
+			this.prevScreenHeight = (event.oldHeight == 0 ? this.height : event.oldHeight);
+			this.prevScreenWidth = (event.oldWidth == 0 ? this.width : event.oldWidth);
+			
 			// Make sure the sprite is updated to the new display area
 			displayResized = true;
 			invalidateDisplayList();				
 		}	
 		   	   	
 		/**
-         * Helpoer method that creates an object that describes the dimensions  
+         * Helper method that creates an object that describes the dimensions  
          * of the display area and if scrollbars are used or not.
          * 
          * @param w The width of the sprite to base the context on (default is the sprites current width)
          * @param h The height of the sprite to base the context on (default is the sprites current height) 
 		 */
-		public function getZoomSpriteDisplatyContext(w:Number=-1, h:Number=-1):SpriteZoomDisplayContext
+		public function getZoomSpriteDisplayContext(w:Number=-1, h:Number=-1):SpriteZoomDisplayContext
 		{			
 			var ctx:SpriteZoomDisplayContext = new SpriteZoomDisplayContext();
 			
-			// If no "virtual" values are siupplied use the sprites current values
+			// If no "virtual" values are supplied use the sprites current values
 			h = Math.floor(h != -1 ? h : _sprite.height);
 			w = Math.floor(w != -1 ? w : _sprite.width);
 			
@@ -599,7 +614,7 @@ package org.alfresco.core.ui
         	_sprite.scaleY = spriteNewZoom;
         	
         	// Get screen context after updating objects dimensions
-        	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext();
+        	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
         		            	
     		/**
     		 * The content is higher than the screen height, 
@@ -607,14 +622,17 @@ package org.alfresco.core.ui
     		 * vertically centered (suitable for an images) or 
     		 * aligned to the top (suitable for a documents).
     		 */
-        	if (ctx.overflowY && this.verticalDefaultPosition == "top")
+        	if (ctx.overflowY)
         	{
-        		_sprite.y = 0;
-        	}
-        	else
-        	{
-            	_sprite.y = (ctx.screenHeight / 2) - (_sprite.height / 2)	            			            		            	
-        	}
+        		if (this.verticalDefaultPosition == "top")
+	        	{
+	        		_sprite.y = 0;
+	        	}
+	        	else
+	        	{
+	            	_sprite.y = (ctx.screenHeight / 2) - (_sprite.height / 2)	            			            		            	
+	        	}
+	        }
         	// Center the object on the screen
 			_sprite.x = (ctx.screenWidth / 2) - (_sprite.width / 2);										
         }
@@ -622,13 +640,14 @@ package org.alfresco.core.ui
 		
         /**
          * Helper method called from updateDisplayList to position and size
-         * sprite approppriatly after the disply area has changed.
+         * sprite approppriately after the disply area has changed.
 		 */	        
         private function doResizePosition():void
         {
         	// Center object to the middle and simply keep the old y position
-        	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext();
-        	_sprite.x = (ctx.screenWidth / 2) - (_sprite.width / 2);
+        	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
+        	
+        	_sprite.x = (ctx.screenWidth - _sprite.width) / 2;
         	
         	// Make sure content outside screen area is hidden
         	this.scrollRect = new Rectangle(0, 0, this.width, this.height);	            	
@@ -643,17 +662,20 @@ package org.alfresco.core.ui
         	// Remember the sprites dimension before the scale
         	var prevZoomWidth:Number = _sprite.width;
         	var prevZoomHeight:Number = _sprite.height;
-        			        			        	
+        	
         	// Adjust size (this will have immidiate effect on the width and height properties)
         	_sprite.scaleX = spriteNewZoom;
         	_sprite.scaleY = spriteNewZoom;
+        	
+        	var intWidth:int = new int(_sprite.width).valueOf();
+        	var intHeight:int = new int(_sprite.height).valueOf();
         	 
     		// Get screen context after updating objects dimensions
-        	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext();
+        	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
         			        	      
     		// Find the new x position after the zoom 	 	        	
         	var newX:Number;										
-			if (_sprite.width <= ctx.screenWidth)
+			if (Math.floor(_sprite.width) <= ctx.screenWidth)
 			{
 				// object is smaller than the screen area, simply center it.
 				newX = (ctx.screenWidth / 2) - (_sprite.width / 2);						
@@ -686,7 +708,7 @@ package org.alfresco.core.ui
 								
 			// Find the new y position after zoom							        																	
 			var newY:Number;										
-			if (_sprite.height <= ctx.screenHeight)
+			if (Math.floor(_sprite.height) <= ctx.screenHeight)
 			{
 				// object is smaller than the screen area, simply center it.
 				newY = (ctx.screenHeight / 2) - (_sprite.height / 2);						
@@ -694,15 +716,14 @@ package org.alfresco.core.ui
 			else
 			{
 				// Make sure it feels like we zoom in and out of the center of the screen
-				var currHeightCenterOffsett:Number = _sprite.y - (ctx.screenHeight / 2);
-				var futureHeightCenterOffset:Number = currHeightCenterOffsett * (spriteNewZoom / spritePrevZoom)
-				newY = Math.round(_sprite.y + (-1 * (currHeightCenterOffsett - futureHeightCenterOffset)));
+				var currHeightCenterOffset:Number = _sprite.y - (ctx.screenHeight / 2);
+				var futureHeightCenterOffset:Number = currHeightCenterOffset * (spriteNewZoom / spritePrevZoom);
+				newY = Math.round(_sprite.y + (-1 * (currHeightCenterOffset - futureHeightCenterOffset)));
 				
 				// but also make sure object doesn't go out of bounds
 				if (spriteNewZoom < spritePrevZoom)
 				{					
-					newY = Math.max(newY, ctx.screenHeight - _sprite.height);
-					newY = Math.min(newY, 0);
+					newY = Math.min(Math.max(newY, ctx.screenHeight - _sprite.height), 0);
 				}
 			}
 			// We have the new position now make sure its used	
@@ -715,7 +736,7 @@ package org.alfresco.core.ui
 		 */
 		private function doUpdateScrollbarsBasedOnSpritePosition():void
 		{
-			var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext();
+			var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
         	
         	// Adjust horizontal scrollbar	            	            	
         	if (ctx.overflowX)
@@ -768,7 +789,7 @@ package org.alfresco.core.ui
 		 */
 		private function doUpdateSpritePositionBasedOnScrollbarPosition():void
 		{
-    		var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplatyContext();
+    		var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
     		    		      
         	if (ctx.overflowY && vsbUpdated)
         	{
