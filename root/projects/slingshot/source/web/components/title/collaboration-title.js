@@ -295,8 +295,8 @@
          // Hide the feedback message
          this.widgets.feedbackMessage.destroy();
 
-         // Reload page to make sure all previous member actions on the current page are removed for the user
-         document.location.reload();
+         // Reload user dashboard as they are no longer a member of this site
+         document.location.href = Alfresco.constants.URL_PAGECONTEXT + "user/" + this.options.user + "/dashboard";
       },
 
       /**
