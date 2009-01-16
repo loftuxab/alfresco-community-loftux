@@ -891,7 +891,7 @@
         var id = arguments[1][1].id;
         if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
         {
-          var evt = this.events[id].getEl();
+          var evt = this.events[id].getElement();
           var el = Dom.getNextSibling(evt);
           if (Dom.hasClass(el,'hidden') ) {
               Dom.removeClass(el,'hidden');
@@ -1491,6 +1491,7 @@
  * 
  */
 Alfresco.calendarEvent = function(id, sGroup, config) {
+    this.el = YAHOO.util.Dom.get(id);
     if (config.draggable)
     {
       Alfresco.calendarEvent.superclass.constructor.apply(this, arguments);
@@ -1528,6 +1529,12 @@ Alfresco.calendarEvent = function(id, sGroup, config) {
 };
 
 YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
+    /**
+     *  Get event dom element
+     */ 
+     getElement : function() {
+       return this.el;
+     },
     /**
      * Initialises custom events
      * 
