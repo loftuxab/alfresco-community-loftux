@@ -130,10 +130,23 @@ public class RuntimeExec
     
     public String toString()
     {
+        
         StringBuffer sb = new StringBuffer(256);
         sb.append("RuntimeExec:\n")
-          .append("   command:    ").append(command).append("\n")
-          .append("   env props:  ").append(processProperties).append("\n")
+          .append("   command:    ");
+        if (command == null)
+        {
+            sb.append(command).append("\n");
+        }
+        else
+        {
+            for (String cmdStr : command)
+            {
+                sb.append(cmdStr).append(" ");
+            }
+            sb.append("\n");
+        }
+        sb.append("   env props:  ").append(processProperties).append("\n")
           .append("   dir:        ").append(processDirectory).append("\n")
           .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n");
         return sb.toString();
