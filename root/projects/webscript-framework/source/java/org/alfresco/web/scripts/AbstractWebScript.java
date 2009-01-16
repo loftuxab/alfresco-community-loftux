@@ -582,10 +582,10 @@ public abstract class AbstractWebScript implements WebScript
      * @param res  web script response
      * @return  web script exception with associated template message and model
      */
-    final protected WebScriptException createStatusException(Throwable e, WebScriptRequest req, WebScriptResponse res)
+    final protected WebScriptException createStatusException(Throwable e, final WebScriptRequest req, final WebScriptResponse res)
     {
         // decorate exception with template message
-        WebScriptException we;
+        final WebScriptException we;
         if (e instanceof WebScriptException)
         {
             we = (WebScriptException)e;
@@ -593,15 +593,24 @@ public abstract class AbstractWebScript implements WebScript
         else
         {
             we = new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Wrapped Exception (with status template): " + e.getMessage(), e);
-        }
-        
+        }       
         // find status template and construct model for it
-        Map<String, Object> statusModel = createTemplateParameters(req, res, null);
-        int statusCode = we.getStatus();
-        String format = req.getFormat();
-        String scriptId = getDescription().getId();
-        StatusTemplate statusTemplate = getStatusTemplate(scriptId, statusCode, (format == null) ? "" : format);
-        we.setStatusTemplate(statusTemplate, statusModel);
+        we.setStatusTemplateFactory(new StatusTemplateFactory()
+        {
+
+            public Map<String, Object> getStatusModel()
+            {
+                return createTemplateParameters(req, res, null);
+            }
+
+            public StatusTemplate getStatusTemplate()
+            {
+                int statusCode = we.getStatus();
+                String format = req.getFormat();
+                String scriptId = getDescription().getId();
+                return AbstractWebScript.this.getStatusTemplate(scriptId, statusCode, (format == null) ? "" : format);
+            }
+        });
         return we;
     }
     
