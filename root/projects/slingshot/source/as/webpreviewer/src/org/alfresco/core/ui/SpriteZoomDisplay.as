@@ -490,6 +490,8 @@ package org.alfresco.core.ui
 			// Let's first assume no scrollbars are needed
 			ctx.screenWidth = this.width;
 			ctx.screenHeight = this.height;
+			ctx.screenWidthIncl = this.width;
+			ctx.screenHeightIncl = this.height;
 			 
         	// Is the child bigger than a screen area without scrollbars?
         	ctx.overflowX = w > ctx.screenWidth;
@@ -716,9 +718,16 @@ package org.alfresco.core.ui
 			else
 			{
 				// Make sure it feels like we zoom in and out of the center of the screen
-				var currHeightCenterOffset:Number = _sprite.y - (ctx.screenHeight / 2);
-				var futureHeightCenterOffset:Number = currHeightCenterOffset * (spriteNewZoom / spritePrevZoom);
-				newY = Math.round(_sprite.y + (-1 * (currHeightCenterOffset - futureHeightCenterOffset)));
+				if (this.prevScreenHeight != ctx.screenHeightIncl)
+				{
+					newY = Math.round(_sprite.y * (spriteNewZoom / spritePrevZoom));
+				}
+				else
+				{
+					var currHeightCenterOffset:Number = _sprite.y - (ctx.screenHeight / 2);
+					var futureHeightCenterOffset:Number = currHeightCenterOffset * (spriteNewZoom / spritePrevZoom);
+					newY = Math.round(_sprite.y + futureHeightCenterOffset - currHeightCenterOffset);
+				}
 				
 				// but also make sure object doesn't go out of bounds
 				if (spriteNewZoom < spritePrevZoom)
