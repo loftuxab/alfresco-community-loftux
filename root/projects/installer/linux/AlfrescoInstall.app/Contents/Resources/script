@@ -1,0 +1,3 @@
+#!/bin/sh
+chmod +x "$1/Contents/Resources/Alfresco-MacOSX-Install"
+"$1/Contents/Resources/Alfresco-MacOSX-Install"
