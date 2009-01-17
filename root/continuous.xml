@@ -360,7 +360,7 @@
    </target>
 
    <target name="distribute-installers"
-           depends="continuous-init, assemble-tomcat, assemble-virtual">
+           depends="continuous-init, set-build-number">
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/quick-installer/output" />
@@ -376,6 +376,17 @@
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
       </exec>
+      <tar destfile="${dir.continuous.dist}/AlfrescoMacOSXInstall.tar.gz"
+           longfile="gnu"
+           compression="gzip">
+         <tarfileset dir="${dir.project.installer.linux}/AlfrescoInstall.app"
+                     prefix="AlfrescoInstall.app" />
+         <tarfileset dir="${dir.project.installer.builder}/quick-installer/output"
+                     includes="Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install"
+                     fullpath="AlfrescoInstall.app/Contents/resources/Alfresco-MacOSX-Install" />
+      </tar>
+      <delete quiet="yes"
+              file="${dir.project.installer.builder}/quick-installer/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
       <move todir="${dir.continuous.dist}" failonerror="no">
          <fileset dir="${dir.project.installer.builder}/quick-installer/output">
             <include name="**/*"/>
