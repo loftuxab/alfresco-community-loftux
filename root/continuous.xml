@@ -376,14 +376,12 @@
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
       </exec>
-      <tar destfile="${dir.continuous.dist}/AlfrescoMacOSXInstall.tar.gz"
+      <tar destfile="${dir.continuous.dist}/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOSXInstall.tar.gz"
            longfile="gnu"
            compression="gzip">
-         <tarfileset dir="${dir.project.installer.linux}/AlfrescoInstall.app"
-                     prefix="AlfrescoInstall.app" />
          <tarfileset dir="${dir.project.installer.builder}/quick-installer/output"
                      includes="Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install"
-                     fullpath="AlfrescoInstall.app/Contents/resources/Alfresco-MacOSX-Install" />
+                     mode="755" />
       </tar>
       <delete quiet="yes"
               file="${dir.project.installer.builder}/quick-installer/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
