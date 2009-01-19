@@ -85,16 +85,20 @@ public class DefaultRequestContextFactory implements RequestContextFactory
                 context.setValue(parameterName, (Serializable)parameterValue);
             }
             
-            // Construct/load the user and place them onto the request context
-            UserFactory userFactory = FrameworkHelper.getUserFactory();
-            User user = userFactory.faultUser(context, (HttpServletRequest)request);
-            context.setUser(user);
+            // Construct/load the user and place them onto the request context if required
+            if (request.getAttribute(SILENT_INIT) == null)
+            {
+                String userEndpointId = (String)request.getAttribute(USER_ENDPOINT);
+                UserFactory userFactory = FrameworkHelper.getUserFactory();
+                User user = userFactory.faultUser(context, (HttpServletRequest)request, userEndpointId);
+                context.setUser(user);
+            }
             
             initEnvironment(context, (HttpServletRequest) request);
             
             // Bind the model into the requestcontext
             initModel(context, (HttpServletRequest) request);
-
+            
             /**
              * Execute the configured page mapper
              * 
@@ -185,7 +189,6 @@ public class DefaultRequestContextFactory implements RequestContextFactory
         {
             context.setValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME, repositoryWebappId);
         }
-    
     }
     
     /**

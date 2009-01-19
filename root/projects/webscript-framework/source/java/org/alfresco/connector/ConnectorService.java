@@ -214,12 +214,12 @@ public class ConnectorService implements ApplicationListener, ApplicationContext
             try
             {
                 CredentialVault vault = (CredentialVault) this.getCredentialVault(session, userId);
-                if(vault != null)
+                if (vault != null)
                 {
                     credentials = vault.retrieve(endpointId);
                 }
             }
-            catch(CredentialVaultProviderException cvpe)
+            catch (CredentialVaultProviderException cvpe)
             {
                 throw new ConnectorServiceException("Unable to acquire credential vault", cvpe);
             }
@@ -509,13 +509,20 @@ public class ConnectorService implements ApplicationListener, ApplicationContext
         {
             throw new IllegalArgumentException("UserId is mandatory.");
         }
+        
         if (vaultProviderId == null)
         {
         	vaultProviderId = this.getRemoteConfig().getDefaultCredentialVaultProviderId();
         }
         
-        // session binding key
-        String cacheKey = PREFIX_VAULT_SESSION + vaultProviderId + userId;
+        CredentialVaultProvider provider = (CredentialVaultProvider)applicationContext.getBean(vaultProviderId);
+        if (provider == null)
+        {
+            throw new CredentialVaultProviderException("Unable to find credential vault provider: " + vaultProviderId); 
+        }
+        
+        // session cache binding key
+        String cacheKey = PREFIX_VAULT_SESSION + provider.generateKey(vaultProviderId, userId);
         
         // pull the credential vault from session
         CredentialVault vault = (CredentialVault)session.getAttribute(cacheKey);
@@ -523,13 +530,7 @@ public class ConnectorService implements ApplicationListener, ApplicationContext
         // if no existing vault, build a new one
         if (vault == null)
         {
-            CredentialVaultProvider provider = (CredentialVaultProvider) applicationContext.getBean(vaultProviderId);
-            if(provider == null)
-            {
-                throw new CredentialVaultProviderException("Unable to find credential vault provider: " + vaultProviderId); 
-            }
-            
-            vault = (CredentialVault) provider.provide(userId);            
+            vault = (CredentialVault)provider.provide(userId);
             
             // load the vault
             vault.load();
