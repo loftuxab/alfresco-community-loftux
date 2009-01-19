@@ -353,8 +353,17 @@
                   //                       filterThreshold = YAHOO.widget.DateMath.getWeekNumber(this.options.startDate);
                   //                   }
                   var data = YAHOO.lang.JSON.parse(o.serverResponse.responseText).events;
+                  var siteEvents = [];
                   var events = [];
                   var comparisonFn = null;
+                  var site = this.options.siteId;
+                  for (var i=0;i<data.length;i++) {
+                    var ev = data[i];
+                    if (ev.site==site){
+                      siteEvents.push(ev);
+                    }
+                  }
+                  data = siteEvents;
                   switch(this.calendarView)
                   {
                     case Alfresco.CalendarView.VIEWTYPE_DAY:
