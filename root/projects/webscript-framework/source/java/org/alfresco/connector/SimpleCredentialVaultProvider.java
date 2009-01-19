@@ -33,12 +33,26 @@ import org.alfresco.connector.exception.CredentialVaultProviderException;
  */
 public class SimpleCredentialVaultProvider implements CredentialVaultProvider
 {
+    /**
+     * Reflection constructor
+     */
     public SimpleCredentialVaultProvider()
     {
     }
     
+    /**
+     * Provide a Simple Credential Vault
+     */
     public CredentialVault provide(String id) throws CredentialVaultProviderException
     {
         return new SimpleCredentialVault(id);
+    }
+
+    /**
+     * Generate a caching key
+     */
+    public String generateKey(String id, String userId)
+    {
+        return id;
     }
 }

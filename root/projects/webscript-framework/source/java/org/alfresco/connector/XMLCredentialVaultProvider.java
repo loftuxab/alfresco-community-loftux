@@ -71,4 +71,12 @@ public class XMLCredentialVaultProvider implements CredentialVaultProvider
 
         return vault;
     }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.connector.CredentialVaultProvider#generateKey(java.lang.String, java.lang.String)
+     */
+    public String generateKey(String id, String userId)
+    {
+        return id + userId;
+    }
 }
