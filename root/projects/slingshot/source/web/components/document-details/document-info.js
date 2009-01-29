@@ -117,6 +117,7 @@
          //Dom.get(this.id + "-meta-encoding").innerHTML = $html(docData.encoding);
          Dom.get(this.id + "-meta-title").innerHTML = $html(docData.title);
          Dom.get(this.id + "-meta-description").innerHTML = $html(docData.description);
+         Dom.get(this.id + "-meta-author").innerHTML = $html(docData.author);
          //Dom.get(this.id + "-meta-owner").innerHTML = $html(docData.owner);
          Dom.get(this.id + "-meta-size").innerHTML = $html(Alfresco.util.formatFileSize(docData.size));
          Dom.get(this.id + "-meta-creator").innerHTML = $html(docData.createdBy);
