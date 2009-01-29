@@ -29,6 +29,10 @@
          <span class="meta-label">${msg("document-info.description")}:</span>
          <span id="${args.htmlid}-meta-description" class="meta-value"></span>
       </div>
+      <div class="info">
+         <span class="meta-label">${msg("document-info.author")}:</span>
+         <span id="${args.htmlid}-meta-author" class="meta-value"></span>
+      </div>
       <!--
       <div class="info">
          <span class="meta-label">${msg("document-info.owner")}:</span>
