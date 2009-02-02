@@ -376,7 +376,7 @@ var CalendarScriptHelper  = ( function()
                 {
                     var eventDate=  new Date();
                     var ev = events[i];
-                    eventDate.setTime(Date.parse(ev.when));
+                    eventDate.setTime(fromISOString(ev.when));
                     if ((eventDate.getTime() > firstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime()))
                     {
                       var key = 'ev_'+eventDate.getDate();
