@@ -408,7 +408,7 @@
                   }
                   for (var i=0;i<data.length;i++){
                     var ev = data[i];
-                    var date = new Date(Date.parse(ev.when));
+                    var date = Alfresco.util.fromISO8601(ev.when);
                     if (comparisonFn(date))
                     {
                         var datum = {};
