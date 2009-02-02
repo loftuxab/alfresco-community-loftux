@@ -115,9 +115,9 @@ public class VtiSoapAction implements VtiAction
     /**
      * <p>
      * Dispatch among set of VtiEndpoints.
-     *
+     * 
      * @param request {@link VtiSoapRequest}
-     */    
+     */
     protected VtiEndpoint dispatchRequest(VtiSoapRequest request)
     {
         String soapAction = request.getHeader("SOAPAction");

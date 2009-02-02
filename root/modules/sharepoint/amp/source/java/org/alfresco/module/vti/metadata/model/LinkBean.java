@@ -45,7 +45,7 @@ public class LinkBean implements Serializable
     private String editor;
     private int owshiddenversion;
     private String id;
-    
+
     public LinkBean()
     {
     }

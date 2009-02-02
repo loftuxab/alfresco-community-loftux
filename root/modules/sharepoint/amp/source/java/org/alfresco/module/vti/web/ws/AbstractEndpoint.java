@@ -188,6 +188,16 @@ public abstract class AbstractEndpoint implements VtiEndpoint
     }
     
     /**
+     * Get current DWS name for DWS creation from requested URI 
+     * 
+     * @param request Vti Soap Request ({@link VtiSoapRequest})      
+     */
+    public static String getDwsForCreationFromUri(VtiSoapRequest request)
+    {
+        return "";
+    }
+    
+    /**
      * Get current user credentials 
      * 
      * @param request Vti Soap Request ({@link VtiSoapRequest})      
@@ -447,7 +457,7 @@ public abstract class AbstractEndpoint implements VtiEndpoint
                 }
             }
             result.append(endTag("List"));
-
+            
             if (dwsData.getLinksList() != null)
             {
                 docAttr.clear();

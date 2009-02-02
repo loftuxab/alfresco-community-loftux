@@ -45,6 +45,7 @@ import org.alfresco.module.vti.handler.alfresco.VtiExceptionUtils;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.metadata.dic.Permission;
+import org.alfresco.module.vti.metadata.dic.WorkspaceType;
 import org.alfresco.module.vti.metadata.model.DocumentBean;
 import org.alfresco.module.vti.metadata.model.DwsBean;
 import org.alfresco.module.vti.metadata.model.LinkBean;
@@ -56,6 +57,7 @@ import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.site.SiteInfo;
 import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.site.SiteService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -76,7 +78,7 @@ import org.apache.commons.logging.LogFactory;
 public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
 {
     private static Log logger = LogFactory.getLog(AlfrescoDwsServiceHandler.class);
-
+    
     private static final QName TYPE_LINK = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "link");
     private static final QName PROP_LINK_TITLE = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "title");
     private static final QName PROP_LINK_URL = QName.createQName("http://www.alfresco.org/model/linksmodel/1.0", "url");
@@ -222,7 +224,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
 
         addDwsContentRecursive(docLibFileInfo, dwsContent, "documentLibrary/");
     }
-
+    
     /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doGetDwsLinks(org.alfresco.service.cmr.model.FileInfo)
      */
@@ -341,7 +343,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     {
         return new SchemaBean("Documents", "documentLibrary", fields);
     }
-
+    
     /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateLinkSchemaBean(org.alfresco.service.cmr.model.FileInfo, java.util.List)
      */
@@ -362,10 +364,21 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String,
      *      java.lang.String)
      */
-    protected void doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException
+    protected String doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException
     {
-        shareUtils.createSite(username, password, "document-workspace", title, title, "", true);
+        SiteInfo siteInfo = null;
+        String newTitle = null;
+        int i = 0;
+        do {
+            newTitle = title + (i == 0 ? "" : "_" + i);
+            siteInfo = siteService.getSite(newTitle);
+            i++;
+        } while (siteInfo != null);
+        
+        shareUtils.createSite(username, password, "document-workspace", newTitle, newTitle, "", true);
+        return newTitle;
     }
+
 
     /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doGetDwsCreationUrl(java.lang.String, java.lang.String)
@@ -639,4 +652,18 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         
         return firstname + " " + lastname;
     }
+    
+    public WorkspaceType getWorkspaceType(FileInfo dwsNode) {
+        SiteInfo siteInfo = siteService.getSite(dwsNode.getName());
+        WorkspaceType result = WorkspaceType.EMPTY;
+        if (siteInfo != null && siteInfo.getSitePreset() != null) {
+            if (siteInfo.getSitePreset().equals("site-dashboard")) {
+                result = WorkspaceType.SPS;
+            } else if (siteInfo.getSitePreset().equals("document-workspace")) {
+                result = WorkspaceType.DWS;
+            }
+        }
+        return result;
+    }
+
 }
