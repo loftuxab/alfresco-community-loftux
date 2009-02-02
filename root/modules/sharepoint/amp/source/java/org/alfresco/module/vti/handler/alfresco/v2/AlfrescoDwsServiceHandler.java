@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler;
 import org.alfresco.module.vti.metadata.dic.Permission;
+import org.alfresco.module.vti.metadata.dic.WorkspaceType;
 import org.alfresco.module.vti.metadata.model.DocumentBean;
 import org.alfresco.module.vti.metadata.model.DwsBean;
 import org.alfresco.module.vti.metadata.model.LinkBean;
@@ -118,7 +119,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         String rootPath = pathHelper.toUrlPath(fileInfo);
         addDwsContentRecursive(fileInfo, dwsContent, rootPath);
     }
-
+    
     /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doGetDwsLinks(org.alfresco.service.cmr.model.FileInfo)
      */
@@ -259,7 +260,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     {
         return new SchemaBean("Documents", pathHelper.toUrlPath(dwsFileInfo), fields);
     }
-
+    
     /**
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateLinkSchemaBean(org.alfresco.service.cmr.model.FileInfo, java.util.List)
      */
@@ -280,9 +281,10 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
      * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String,
      *      java.lang.String)
      */
-    protected void doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException
+    protected String doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException
     {
         fileFolderService.create(parentFileInfo.getNodeRef(), title, ContentModel.TYPE_FOLDER);
+        return title;
     }
 
     /**
@@ -338,4 +340,9 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     protected void doUpdateDwsDataUpdate(LinkBean linkBean, String dws)
     {
     }
+    
+    public WorkspaceType getWorkspaceType(FileInfo dwsNode) {
+        return WorkspaceType.DWS;
+    }
+
 }

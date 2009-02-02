@@ -263,7 +263,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         dwsMetadata.setPermissions(permissions);
         dwsMetadata.setHasUniquePerm(true);
         // set the type of document workspace site
-        dwsMetadata.setWorkspaceType(WorkspaceType.DWS);
+        dwsMetadata.setWorkspaceType(getWorkspaceType(dwsNode));
         dwsMetadata.setADMode(false);
         // set url to currently opened document
         dwsMetadata.setDocUrl(document);
@@ -280,6 +280,8 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
 
         return dwsMetadata;
     }
+    
+    public abstract WorkspaceType getWorkspaceType(FileInfo dwsNode);
 
     /**
      * @see org.alfresco.module.vti.handler.DwsServiceHandler#getDwsData(java.lang.String, java.lang.String)
@@ -316,7 +318,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
 
         doGetDwsContentRecursive(dwsInfo, dwsContent);
         dwsData.setDocumentsList(dwsContent);
-
+        
         // setting the Links list for current document workspace site
         List<LinkBean> linksList = doGetDwsLinks(dwsInfo);
         dwsData.setLinksList(linksList);
@@ -359,13 +361,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
             String password)
     {
         String dwsUrl = doGetDwsCreationUrl(parentDwsUrl, title);
-
-        FileInfo dwsFileInfo = pathHelper.resolvePathFileInfo(dwsUrl);
-
-        if (dwsFileInfo != null)
-        {
-            throw new VtiHandlerException(VtiHandlerException.ALREADY_EXISTS);
-        }
+        String createdDwsUrl = "";
 
         Pair<String, String> parentChildPaths = VtiPathHelper.splitPathParentChild(dwsUrl);
 
@@ -387,7 +383,8 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         {
             tx.begin();
 
-            doCreateDws(parentFileInfo, dwsName, username, password);
+            String createdDwsName = doCreateDws(parentFileInfo, dwsName, username, password);
+            createdDwsUrl = doGetDwsCreationUrl(parentDwsUrl, createdDwsName);
 
             tx.commit();
         }
@@ -414,7 +411,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
             logger.debug("Document workspace with name '" + title + "' was successfully created.");
         }
 
-        return doGetResultBean(parentDwsUrl, dwsUrl, host, context);
+        return doGetResultBean(parentDwsUrl, createdDwsUrl, host, context);
     }
 
     /**
@@ -694,7 +691,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * @throws HttpException
      * @throws IOException
      */
-    protected abstract void doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException;
+    protected abstract String doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException;
 
     /**
      * Get new document workspace site description
@@ -741,7 +738,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * @param dwsContent list of beans with document workspace site content informations ({@link DocumentBean})
      */
     protected abstract void doGetDwsContentRecursive(FileInfo fileInfo, List<DocumentBean> dwsContent);
-
+    
     /**
      * Get document workspace site links
      * 
@@ -773,7 +770,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * @return SchemaBean document schema
      */
     protected abstract SchemaBean doCreateDocumentSchemaBean(FileInfo dwsFileInfo, List<SchemaFieldBean> fields);
-
+    
     /**
      * Create link schema
      * 
@@ -812,7 +809,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     {
 
         List<FileInfo> fileInfoList = fileFolderService.list(dwsInfo.getNodeRef());
-        
+
         for (FileInfo fileInfo : fileInfoList)
         {
             // do not show working copies
