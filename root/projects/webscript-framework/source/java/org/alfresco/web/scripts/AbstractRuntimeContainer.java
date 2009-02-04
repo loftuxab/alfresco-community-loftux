@@ -229,9 +229,7 @@ public abstract class AbstractRuntimeContainer
             scriptProcessor.reset();
             templateProcessor.reset();
             getRegistry().reset();
-            
-            // TODO: test this before uncommenting
-            // configService.reset();
+            configService.reset();
         }
         finally
         {
