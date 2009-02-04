@@ -26,8 +26,12 @@ package org.alfresco.web.config;
 
 import junit.framework.TestCase;
 
+/**
+ * @deprecated Do not use this class. Scheduled for deletion.
+ */
 public class StringPairTest extends TestCase
 {
+    //TODO svn delete this class.
     private final StringPair pairA = new StringPair("name", "Fred");
     private final StringPair pairAduplicate = new StringPair("name", "Fred");
     private final StringPair pairB = new StringPair("name", "Barney");

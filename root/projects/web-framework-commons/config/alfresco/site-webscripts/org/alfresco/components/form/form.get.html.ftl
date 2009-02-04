@@ -1,19 +1,23 @@
-<script type="text/javascript">//<![CDATA[
-   new Alfresco.FormUI("");
-//]]></script>
+<#if form?exists>
 
-<!--dollar{args.htmlid} -->
-
-<div id="-form" class="form">
+   <script type="text/javascript">//<![CDATA[
+      new Alfresco.FormUI("");
+   //]]></script>
    
-   <form method="POST" action="${form.submissionUrl}">
-      <#list form.items as item>
+   <div id="-form" class="form">
+      
+      <form method="POST" action="${url.context}/proxy/alfresco${form.submissionUrl}"
+            <#if page.url.args.submitMode == "multipart">enctype="multipart/form-data"</#if> accept-charset="utf-8">
          <!-- TODO: See if we can use absolute template paths/urls. -->
-         <#include "${item.control.template}" />
-      </#list>
-      <hr/>
-      <input type="submit" value="Submit" />&nbsp;&nbsp;
-      <input type="button" value="Cancel" /> 
-   </form>
-   
-</div>
+         <#list form.items as item>
+            <#if item.control.template?exists>
+               <#include "${item.control.template}" />
+            </#if>
+         </#list>
+         <hr/>
+         <input type="submit" value="Submit" />
+      </form>
+      
+   </div>
+
+</#if>

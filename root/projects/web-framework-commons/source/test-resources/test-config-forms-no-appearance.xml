@@ -41,33 +41,18 @@
             <!-- This comment is here to test the FormReader -->
             <show id="name" />
             <show id="title" for-mode="view, create" />
-         </field-visibility>
-         <appearance>
-            <set id="details" appearance="fieldset" />
-            <set id="user" parent="details" appearance="panel" />
 
-            <field id="name" label="Name" label-id="field_label_name" disabled="true" set="details"
-                     help-text="This is the name of the node" help-text-id="field_help_name" >
-               <control template="alfresco/extension/formcontrols/my-name.ftl">
-                  <control-param name="foo">bar</control-param>
-               </control>
-               <constraint-message type="REGEX" message="The name can not contain the character '{0}'"
-                                                    message-id="field_error_name" />
-            </field>
-            <field id="title" label="My Title" set="details" />
-            <field id="username" set="user" />
-            <field id="quota" set="user" requires-role="Coordinator" /> 
-            <field id="fieldWithMixedCtrlParams" >
-               <control template="test.ftl">
-                  <control-param name="one">un</control-param>
-                  <control-param name="two">deux</control-param>
-                  <!-- This third param intentionally has no value -->
-                  <control-param name="three"></control-param>
-                  <control-param name="four">quatre</control-param>
-               </control>
-            </field>
-         </appearance>
+            <show id="cm:name" />
+            <show id="cm:title" />
+            <show id="cm:description" />
+            <show id="cm:content" />
+            <show id="my:text" />
+            <show id="my:mltext" />
+            <show id="my:date" />
+         </field-visibility>
+         <model-override>
+            <property name="fields.title.mandatory">true</property>
+         </model-override>
       </form>
    </config>
-   
 </alfresco-config>

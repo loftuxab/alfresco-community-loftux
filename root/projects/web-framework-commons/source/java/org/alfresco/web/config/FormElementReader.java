@@ -80,31 +80,36 @@ public class FormElementReader implements ConfigElementReader
         parseSubmissionURL(formElement, result);
         
         // Using xpath expressions to select nodes under <form> and their attributes.
-        parseForms(formElement, result);
+        parseFormTag(formElement, result);
 
-        parseFieldVisibilities(formElement, result);
+        parseFieldVisibilityTag(formElement, result);
 
-        parseSets(formElement, result);
+        parseAppearanceTag(formElement, result);
 
-        parseFields(formElement, result);
-
-        parseModelOverrides(formElement, result);
+//        parseModelOverrideTag(formElement, result);
 
         return result;
     }
 
-    private void parseModelOverrides(Element formElement, FormConfigElement result)
+    private void parseAppearanceTag(Element formElement, FormConfigElement result)
     {
-        for (Object propObj : formElement.selectNodes("./model-override/property")) {
-            Element propertyElem = (Element)propObj;
-            String propName = propertyElem.attributeValue(ATTR_NAME);
-            String propValue = propertyElem.getTextTrim();
-            result.addModelOverrides(propName, propValue);
-        }
+        parseSetTags(formElement, result);
+
+        parseFieldTags(formElement, result);
     }
 
+//    private void parseModelOverrideTag(Element formElement, FormConfigElement result)
+//    {
+//        for (Object propObj : formElement.selectNodes("./model-override/property")) {
+//            Element propertyElem = (Element)propObj;
+//            String propName = propertyElem.attributeValue(ATTR_NAME);
+//            String propValue = propertyElem.getTextTrim();
+//            result.addModelOverrides(propName, propValue);
+//        }
+//    }
+
     @SuppressWarnings("unchecked")
-    private void parseFields(Element formElement, FormConfigElement result)
+    private void parseFieldTags(Element formElement, FormConfigElement result)
     {
         for (Object fieldObj : formElement.selectNodes("./appearance/field")) {
             Element fieldElem = (Element)fieldObj;
@@ -163,7 +168,7 @@ public class FormElementReader implements ConfigElementReader
         }
     }
 
-    private void parseSets(Element formElement, FormConfigElement result)
+    private void parseSetTags(Element formElement, FormConfigElement result)
     {
         for (Object setObj : formElement.selectNodes("./appearance/set")) {
             Element setElem = (Element)setObj;
@@ -175,7 +180,7 @@ public class FormElementReader implements ConfigElementReader
         }
     }
 
-    private void parseFieldVisibilities(Element formElement,
+    private void parseFieldVisibilityTag(Element formElement,
             FormConfigElement result)
     {
         for (Object obj : formElement.selectNodes("./field-visibility/show|./field-visibility/hide")) {
@@ -188,7 +193,7 @@ public class FormElementReader implements ConfigElementReader
         }
     }
 
-    private void parseForms(Element formElement, FormConfigElement result)
+    private void parseFormTag(Element formElement, FormConfigElement result)
     {
         for (Object obj : formElement.selectNodes("./edit-form|./view-form|./create-form")) {
             Element editOrViewOrCreateFormElem = (Element)obj;

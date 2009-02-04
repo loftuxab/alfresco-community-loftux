@@ -12,6 +12,7 @@
 
 .form label
 {
+   clear: both;
    display: block;
    font-weight: bold;
    margin-top: 12px;
@@ -20,6 +21,30 @@
 
 .form input
 {
-   display: block;
+   //display: block;
+   clear: both;
    margin: 12px;
+}
+
+.form textarea
+{
+   margin: 12px;
+}
+
+.datepicker
+{ 
+   display: none; 
+   position: absolute; 
+   z-index: 1;
+   left: 25px;
+} 
+
+.datepicker-icon
+{
+   vertical-align: -4px;
+}
+
+.yui-calcontainer .title
+{
+   position: relative;
 }

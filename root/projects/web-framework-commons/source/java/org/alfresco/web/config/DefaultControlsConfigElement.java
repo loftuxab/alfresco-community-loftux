@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -26,8 +26,7 @@ package org.alfresco.web.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,10 +44,9 @@ import org.alfresco.config.element.ConfigElementAdapter;
 public class DefaultControlsConfigElement extends ConfigElementAdapter
 {
     public static final String CONFIG_ELEMENT_ID = "default-controls";
-
-    private final List<String> itemNames = new ArrayList<String>();
-    private final Map<String, DefaultControl> datatypeDefCtrlMappings = new HashMap<String, DefaultControl>();
     private static final long serialVersionUID = -6758804774427314050L;
+
+    private final Map<String, DefaultControl> datatypeDefCtrlMappings = new LinkedHashMap<String, DefaultControl>();
 
     /**
      * This constructor creates an instance with the default name.
@@ -71,6 +69,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     /**
      * @see org.alfresco.config.ConfigElement#getChildren()
      */
+    @Override
     public List<ConfigElement> getChildren()
     {
         throw new ConfigException(
@@ -80,12 +79,11 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     /**
      * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
      */
+    @Override
     public ConfigElement combine(ConfigElement configElement)
     {
-        // There is an assumption here that it is only like-with-like
-        // combinations
-        // that are allowed. i.e. Only an instance of a
-        // DefaultControlsConfigElement
+        // There is an assumption here that it is only like-with-like combinations
+        // that are allowed. i.e. Only an instance of a DefaultControlsConfigElement
         // can be combined with this.
         DefaultControlsConfigElement otherDCCElement = (DefaultControlsConfigElement) configElement;
 
@@ -120,8 +118,6 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     /* package */void addDataMapping(String dataType, String template,
             List<ControlParam> parameters)
     {
-    	itemNames.add(dataType);
-    	
         if (parameters == null)
         {
             parameters = Collections.emptyList();
@@ -136,7 +132,9 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     
     public List<String> getItemNames()
     {
-    	return Collections.unmodifiableList(itemNames);
+        Set<String> result = datatypeDefCtrlMappings.keySet();
+        List<String> resultList = new ArrayList<String>(result);
+    	return Collections.unmodifiableList(resultList);
     }
     
     public Map<String, DefaultControl> getItems()
@@ -147,6 +145,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode()
     {
         return datatypeDefCtrlMappings.hashCode();
@@ -155,6 +154,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object otherObj)
     {
         if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
@@ -262,6 +262,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         /**
          * @see java.lang.Object#hashCode()
          */
+        @Override
         public int hashCode()
         {
             return name.hashCode() + 7 * template.hashCode() + 13
@@ -271,6 +272,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         /**
          * @see java.lang.Object#equals(java.lang.Object)
          */
+        @Override
         public boolean equals(Object otherObj)
         {
             if (otherObj == this)
@@ -291,6 +293,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         /**
          * @see java.lang.Object#toString()
          */
+        @Override
         public String toString()
         {
             StringBuilder result = new StringBuilder();
@@ -347,6 +350,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         /**
          * @see java.lang.Object#toString()
          */
+        @Override
         public String toString()
         {
             StringBuilder result = new StringBuilder();
@@ -357,6 +361,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         /**
          * @see java.lang.Object#hashCode()
          */
+        @Override
         public int hashCode()
         {
             return name.hashCode() + 7 * value.hashCode();
@@ -365,6 +370,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         /**
          * @see java.lang.Object#equals(java.lang.Object)
          */
+        @Override
         public boolean equals(Object otherObj)
         {
             if (otherObj == this)

@@ -25,10 +25,10 @@
 package org.alfresco.web.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,7 +53,7 @@ public class FormConfigElement extends ConfigElementAdapter
     public enum Mode
     {
         VIEW, EDIT, CREATE;
-        public static Mode fromString(String modeString)
+        public static Mode modeFromString(String modeString)
         {
             if (modeString.equalsIgnoreCase("create")) {
                 return Mode.CREATE;
@@ -71,32 +71,40 @@ public class FormConfigElement extends ConfigElementAdapter
                 return null;
             }
         }
+        
+        public static List<Mode> modesFromString(String commaSeparatedModesString)
+        {
+            if (commaSeparatedModesString == null)
+            {
+                return Collections.emptyList();
+            }
+            List<Mode> result = new ArrayList<Mode>();
+            StringTokenizer st = new StringTokenizer(commaSeparatedModesString, ",");
+            while (st.hasMoreTokens())
+            {
+                String nextToken = st.nextToken().trim();
+                Mode nextMode = Mode.modeFromString(nextToken);
+                result.add(nextMode);
+            }
+            return result;
+        }
     }
     
     public static final String FORM_ID = "form";
     private String submissionURL;
-    private List<StringPair> modelOverrides = new ArrayList<StringPair>();
+//    private List<StringPair> modelOverrides = new ArrayList<StringPair>();
     
-    // We need to maintain the order of templates - per mode.
-    private List<String> createTemplates = new ArrayList<String>();
-    private List<String> editTemplates = new ArrayList<String>();
-    private List<String> viewTemplates = new ArrayList<String>();
-
     /**
      * Map of the required roles for create-form templates.
      * Key = the template String. Value = the requires-role String.
      */
-    private Map<String, String> rolesForCreateTemplates = new HashMap<String, String>();
-    private Map<String, String> rolesForEditTemplates = new HashMap<String, String>();
-    private Map<String, String> rolesForViewTemplates = new HashMap<String, String>();
+    private Map<String, String> rolesForCreateTemplates = new LinkedHashMap<String, String>();
+    private Map<String, String> rolesForEditTemplates = new LinkedHashMap<String, String>();
+    private Map<String, String> rolesForViewTemplates = new LinkedHashMap<String, String>();
     
-    private List<FieldVisibilityRule> visibilityRules = new ArrayList<FieldVisibilityRule>();
-
-    private Map<String, FormSet> sets = new HashMap<String, FormSet>();
-    
-    // We must maintain the order of the specified field IDs from <field-visibility>
-    private List<String> fieldVisibilityIDs = new ArrayList<String>();
-    private Map<String, FormField> fields = new HashMap<String, FormField>();
+    FieldVisibilityManager fieldVisibilityManager = new FieldVisibilityManager();
+    private Map<String, FormSet> sets = new LinkedHashMap<String, FormSet>();
+    private Map<String, FormField> fields = new LinkedHashMap<String, FormField>();
     
     public FormConfigElement()
     {
@@ -111,6 +119,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see org.alfresco.config.ConfigElement#getChildren()
      */
+    @Override
     public List<ConfigElement> getChildren()
     {
         throw new ConfigException(
@@ -120,6 +129,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
      */
+    @Override
     public ConfigElement combine(ConfigElement otherConfigElement)
     {
         FormConfigElement otherFormElem = (FormConfigElement)otherConfigElement;
@@ -135,11 +145,7 @@ public class FormConfigElement extends ConfigElementAdapter
         
         combineFields(otherFormElem, result);
         
-        //TODO field-controls
-        
-        //TODO constraint-for-field
-        
-        combineModelOverrides(otherFormElem, result);
+//        combineModelOverrides(otherFormElem, result);
         
         return result;
     }
@@ -147,48 +153,48 @@ public class FormConfigElement extends ConfigElementAdapter
     private void combineFields(FormConfigElement otherFormElem,
             FormConfigElement result)
     {
-        for (String nextFieldId : fields.keySet())
+        Map<String, FormField> newFields = new LinkedHashMap<String, FormField>();
+        for (String nextFieldId : this.fields.keySet())
         {
-            FormField nextField = fields.get(nextFieldId);
-            Map<String, String> nextAttributes = nextField.getAttributes();
-            
-            List<String> attributeNames = new ArrayList<String>(nextAttributes.size());
-            List<String> attributeValues = new ArrayList<String>(nextAttributes.size());
-            for (String nextAttrName : nextAttributes.keySet())
+            FormField nextFieldFromThis = this.fields.get(nextFieldId);
+            if (otherFormElem.getFields().containsKey(nextFieldId))
             {
-                attributeNames.add(nextAttrName);
-                attributeValues.add(nextAttributes.get(nextAttrName));
+                FormField combinedField = nextFieldFromThis
+                    .combine(otherFormElem.getFields().get(nextFieldId));
+                newFields.put(nextFieldId, combinedField);
             }
-            result.addField(nextFieldId, attributeNames, attributeValues);
+            else
+            {
+                newFields.put(nextFieldId, nextFieldFromThis);
+            }
         }
+
         for (String nextFieldId : otherFormElem.fields.keySet())
         {
-            FormField nextField = otherFormElem.fields.get(nextFieldId);
-            Map<String, String> nextAttributes = nextField.getAttributes();
-            
-            List<String> attributeNames = new ArrayList<String>(nextAttributes.size());
-            List<String> attributeValues = new ArrayList<String>(nextAttributes.size());
-            for (String nextAttrName : nextAttributes.keySet())
+            if (!this.fields.containsKey(nextFieldId))
             {
-                attributeNames.add(nextAttrName);
-                attributeValues.add(nextAttributes.get(nextAttrName));
+                newFields.put(nextFieldId, otherFormElem.fields.get(nextFieldId));
             }
-            result.addField(nextFieldId, attributeNames, attributeValues);
+            else
+            {
+                // handled by above loop.
+            }
         }
+        result.setFields(newFields);
     }
 
-    private void combineModelOverrides(FormConfigElement otherFormElem,
-            FormConfigElement result)
-    {
-        for (StringPair override : modelOverrides)
-        {
-            result.addModelOverrides(override.getName(), override.getValue());
-        }
-        for (StringPair override : otherFormElem.modelOverrides)
-        {
-            result.addModelOverrides(override.getName(), override.getValue());
-        }
-    }
+//    private void combineModelOverrides(FormConfigElement otherFormElem,
+//            FormConfigElement result)
+//    {
+//        for (StringPair override : modelOverrides)
+//        {
+//            result.addModelOverrides(override.getName(), override.getValue());
+//        }
+//        for (StringPair override : otherFormElem.modelOverrides)
+//        {
+//            result.addModelOverrides(override.getName(), override.getValue());
+//        }
+//    }
 
     private void combineSets(FormConfigElement otherFormElem,
             FormConfigElement result)
@@ -214,51 +220,40 @@ public class FormConfigElement extends ConfigElementAdapter
     private void combineFieldVisibilities(FormConfigElement otherFormElem,
             FormConfigElement result)
     {
-        List<FieldVisibilityRule> combinedInstructions = new ArrayList<FieldVisibilityRule>();
-        combinedInstructions.addAll(this.visibilityRules);
-
-        //If there are already instructions pertaining to a particular
-        // field id, we can just leave them in place as the new should override the old.
-        //TODO Test this is true.
-        combinedInstructions.addAll(otherFormElem.visibilityRules);
-        for (FieldVisibilityRule fvi : combinedInstructions)
-        {
-            result.addFieldVisibility(fvi.isShow() ? "show" : "hide"
-                , fvi.getFieldId(), fvi.getModes());
-        }
+        fieldVisibilityManager = fieldVisibilityManager.combine(otherFormElem.fieldVisibilityManager);
     }
 
     private void combineTemplates(FormConfigElement otherFormElem,
             FormConfigElement result)
     {
-        for (String s : this.createTemplates)
+        for (String s : rolesForCreateTemplates.keySet())
         {
             String reqsRole = this.rolesForCreateTemplates.get(s);
             result.addFormTemplate("create-form", s, reqsRole);
         }
-        for (String s : otherFormElem.createTemplates)
+        for (String s : otherFormElem.rolesForCreateTemplates.keySet())
         {
             String reqsRole = otherFormElem.rolesForCreateTemplates.get(s);
             result.addFormTemplate("create-form", s, reqsRole);
         }
         
-        for (String s : this.editTemplates)
+        for (String s : this.rolesForEditTemplates.keySet())
         {
             String reqsRole = this.rolesForEditTemplates.get(s);
             result.addFormTemplate("edit-form", s, reqsRole);
         }
-        for (String s : otherFormElem.editTemplates)
+        for (String s : otherFormElem.rolesForEditTemplates.keySet())
         {
             String reqsRole = otherFormElem.rolesForEditTemplates.get(s);
             result.addFormTemplate("edit-form", s, reqsRole);
         }
         
-        for (String s : this.viewTemplates)
+        for (String s : this.rolesForViewTemplates.keySet())
         {
             String reqsRole = this.rolesForViewTemplates.get(s);
             result.addFormTemplate("view-form", s, reqsRole);
         }
-        for (String s : otherFormElem.viewTemplates)
+        for (String s : otherFormElem.rolesForViewTemplates.keySet())
         {
             String reqsRole = otherFormElem.rolesForViewTemplates.get(s);
             result.addFormTemplate("view-form", s, reqsRole);
@@ -287,15 +282,42 @@ public class FormConfigElement extends ConfigElementAdapter
         return Collections.unmodifiableSet(this.sets.keySet());
     }
     
-    public List<FieldVisibilityRule> getFieldVisibilityRules()
+    /**
+     * This method returns a Map of those &lt;set&gt;s which have no declared parentID
+     * i&#46;e&#46; those that are 'roots' in the tree of sets.
+     * @return
+     */
+    public Map<String, FormSet> getRootSets()
     {
-        return Collections.unmodifiableList(this.visibilityRules);
+        Map<String, FormSet> result = new LinkedHashMap<String, FormSet>();
+        for (Iterator<String> iter = sets.keySet().iterator(); iter.hasNext(); )
+        {
+            String nextKey = iter.next();
+            FormSet nextSet = sets.get(nextKey);
+            String nextParentID = nextSet.getParentId();
+            if (nextParentID == null || nextParentID.trim().length() == 0)
+            {
+                result.put(nextKey, nextSet);
+            }
+        }
+        return result;
     }
     
-    //TODO This is all fields. need getVisFields(Role)
     public Map<String, FormField> getFields()
     {
         return Collections.unmodifiableMap(this.fields);
+    }
+    
+    /**
+     * This method returns true if the config XML contains any show tags under the
+     * field-visibility tag. This is important as the presence of any show tags
+     * changes the field visibility algorithm from one that manages which fields are
+     * hidden to one that manages which fields are shown.
+     * @return true if the field-visibility tag contains one or more show tags else false.
+     */
+    public boolean getFieldVisibilityContainsShow()
+    {
+        return !fieldVisibilityManager.isManagingHiddenFields();
     }
     
     public Map<String, FormField> getVisibleCreateFields()
@@ -339,10 +361,10 @@ public class FormConfigElement extends ConfigElementAdapter
         return Collections.unmodifiableMap(this.rolesForViewTemplates);
     }
     
-    public List<StringPair> getModelOverrideProperties()
-    {
-        return Collections.unmodifiableList(modelOverrides);
-    }
+//    public List<StringPair> getModelOverrideProperties()
+//    {
+//        return Collections.unmodifiableList(modelOverrides);
+//    }
 
     /* package */void setSubmissionURL(String newURL)
     {
@@ -359,26 +381,14 @@ public class FormConfigElement extends ConfigElementAdapter
         
         if (nodeName.equals("create-form"))
         {
-            if (!createTemplates.contains(template))
-            {
-                createTemplates.add(template);
-            }
             rolesForCreateTemplates.put(template, requiredRole);
         }
         else if (nodeName.equals("edit-form"))
         {
-            if (!editTemplates.contains(template))
-            {
-                editTemplates.add(template);
-            }
             rolesForEditTemplates.put(template, requiredRole);
         }
         else if (nodeName.equals("view-form"))
         {
-            if (!viewTemplates.contains(template))
-            {
-                viewTemplates.add(template);
-            }
             rolesForViewTemplates.put(template, requiredRole);
         }
         else
@@ -394,36 +404,111 @@ public class FormConfigElement extends ConfigElementAdapter
     /* package */void addFieldVisibility(String showOrHide, String fieldId,
             String mode)
     {
-        FieldVisibilityRule instruc = new FieldVisibilityRule(showOrHide, fieldId, mode);
-        this.visibilityRules.add(instruc);
+        fieldVisibilityManager.addInstruction(showOrHide, fieldId, mode);
     }
 
     /* package */void addSet(String setId, String parentSetId, String appearance)
     {
-        sets.put(setId, new FormSet(setId, parentSetId, appearance));
+        FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance);
+        
+        // I am disallowing the declaration of sets whose parents do not already exist.
+        // The reason for this is to ensure that cycles within the parent structure
+        // are not possible.
+        if (parentSetId != null &&
+                parentSetId.trim().length() != 0 &&
+                !sets.containsKey(parentSetId))
+        {
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Set [").append(setId).append("] has undefined parent [")
+                .append(parentSetId).append("].");
+            throw new ConfigException(errorMsg.toString());
+        }
+        
+        sets.put(setId, newFormSetObject);
+        
+        // Set parent/child references
+        if (parentSetId != null && parentSetId.trim().length() != 0)
+        {
+            FormSet parentObject = sets.get(parentSetId);
+            
+            newFormSetObject.setParent(parentObject);
+            parentObject.addChild(newFormSetObject);
+        }
     }
 
     /* package */void addField(String fieldId, List<String> attributeNames,
             List<String> attributeValues)
     {
-        Map<String, String> attrs = new HashMap<String, String>();
+        if (attributeNames == null)
+        {
+            attributeNames = Collections.emptyList();
+        }
+        if (attributeValues == null)
+        {
+            attributeValues = Collections.emptyList();
+        }
+        if (attributeNames.size() < attributeValues.size()
+                && logger.isWarnEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("field ")
+                .append(fieldId)
+                .append(" has ")
+                .append(attributeNames.size())
+                .append(" xml attribute names and ")
+                .append(attributeValues.size())
+                .append(" xml attribute values. The trailing extra data will be ignored.");
+            logger.warn(msg.toString());
+        }
+        
+        Map<String, String> attrs = new LinkedHashMap<String, String>();
         for (int i = 0; i < attributeNames.size(); i++)
         {
             attrs.put(attributeNames.get(i), attributeValues.get(i));
         }
-        fieldVisibilityIDs.add(fieldId);
-        fields.put(fieldId, new FormField(attrs));
+        fields.put(fieldId, new FormField(fieldId, attrs));
+    }
+    
+    /* package */ void setFields(Map<String, FormField> newFieldsMap)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Setting new fields map " + newFieldsMap);
+        }
+        this.fields = newFieldsMap;
     }
 
-    /* package */void addControlForField(String fieldId, String template,
+    /* package */ void addControlForField(String fieldId, String template,
             List<String> controlParamNames, List<String> controlParamValues)
     {
+        if (controlParamNames == null)
+        {
+            controlParamNames = Collections.emptyList();
+        }
+        if (controlParamValues == null)
+        {
+            controlParamValues = Collections.emptyList();
+        }
+        if (controlParamNames.size() < controlParamValues.size()
+                && logger.isWarnEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("field ")
+                .append(fieldId)
+                .append(" has ")
+                .append(controlParamNames.size())
+                .append(" control-param names and ")
+                .append(controlParamValues.size())
+                .append(" control-param values. The trailing extra data will be ignored.");
+            logger.warn(msg.toString());
+        }
+        
         FormField field = fields.get(fieldId);
         field.setTemplate(template);
         for (int i = 0; i < controlParamNames.size(); i++)
         {
-            field.addControlParam(new StringPair(controlParamNames.get(i),
-                    controlParamValues.get(i)));
+            field.addControlParam(controlParamNames.get(i),
+                    controlParamValues.get(i));
         }
     }
 
@@ -436,50 +521,49 @@ public class FormConfigElement extends ConfigElementAdapter
         field.setConstraintMessageId(messageId);
     }
 
-    /* package */void addModelOverrides(String name, String value)
-    {
-        StringPair modelOverride = new StringPair(name, value);
-        //TODO Consider using a different collection type here.
-        for (Iterator<StringPair> iter = modelOverrides.iterator(); iter.hasNext(); )
-        {
-            if (iter.next().getName().equals(name))
-            {
-                iter.remove();
-            }
-        }
-        modelOverrides.add(modelOverride);
-    }
+//    /* package */void addModelOverrides(String name, String value)
+//    {
+//        StringPair modelOverride = new StringPair(name, value);
+//        //TODO Consider using a different collection type here.
+//        for (Iterator<StringPair> iter = modelOverrides.iterator(); iter.hasNext(); )
+//        {
+//            if (iter.next().getName().equals(name))
+//            {
+//                iter.remove();
+//            }
+//        }
+//        modelOverrides.add(modelOverride);
+//    }
     
-    private String findFirstMatchingTemplate(List<String> templates,
-            Map<String, String> templatesToRoles, List<String> currentRoles)
+    /**
+     * @param templatesToRoles e.g. {/foo/create=Manager, /foo/view=Consumer, /foo/edit=}
+     * @param currentRoles e.g. ["Consumer", "Manager"]
+     * @return
+     */
+    private String findFirstMatchingTemplate(Map<String, String> templatesToRoles, List<String> currentRoles)
     {
-        // If there is no current role, we can only return templates that require no role.
-        if (currentRoles == null || currentRoles.isEmpty())
-        {
-            for (String template : templates)
-            {
-                String requiredRolesForThisTemplate = templatesToRoles.get(template);
-                if (requiredRolesForThisTemplate.trim().length() == 0)
-                {
-                    return template;
-                }
-            }
-            return null;
-        }
-        
-        // Here there is at least one current role.
-        for (String template : templates)
-        {
-            String requiredRolesForThisTemplate = templatesToRoles.get(template);
-            for (String role : currentRoles)
-            {
-                if (requiredRolesForThisTemplate.contains(role))
-                {
-                    return template;
-                }
-            }
-        }
-        return null;
+    	if (currentRoles == null)
+    	{
+    		currentRoles = Collections.emptyList();
+    	}
+    	// If currentRoles is empty, return first template that requires no role.
+    	// If currentRoles is not empty, return first template that either
+    	// requires no role, or requires one of the currentRoles.
+    	for (String template : templatesToRoles.keySet())
+    	{
+    		String requiredRolesForThisTemplate = templatesToRoles.get(template);
+    		if (currentRoles.isEmpty() && requiredRolesForThisTemplate.trim().length() == 0)
+			{
+				return template;
+			}
+    		for (String role : currentRoles)
+    		{
+    			if (requiredRolesForThisTemplate.trim().length() == 0 ||
+    					requiredRolesForThisTemplate.contains(role))
+    			return template;
+    		}
+    	}
+    	return null;
     }
     
     /**
@@ -492,77 +576,23 @@ public class FormConfigElement extends ConfigElementAdapter
     {
         switch (m)
         {
-        case CREATE: return findFirstMatchingTemplate(createTemplates, rolesForCreateTemplates, roles);
-        case EDIT: return findFirstMatchingTemplate(editTemplates, rolesForEditTemplates, roles);
-        case VIEW: return findFirstMatchingTemplate(viewTemplates, rolesForViewTemplates, roles);
+        case CREATE: return findFirstMatchingTemplate(rolesForCreateTemplates, roles);
+        case EDIT: return findFirstMatchingTemplate(rolesForEditTemplates, roles);
+        case VIEW: return findFirstMatchingTemplate(rolesForViewTemplates, roles);
         default: return null;
         }
     }
-
+    
     /**
      * This method checks whether the specified field is visible in the specified mode.
-     * The algorithm for determining visibility works as follows
-     * <ul>
-     *   <li>If there is no field-visibility configuration (show or hide tags) then
-     *       all fields are visible in all modes.</li>
-     *   <li>If there are one or more hide tags then the specified fields will be hidden
-     *       in the specified modes. All other fields remain visible as before.</li>
-     *   <li>However, as soon as a single show tag appears in the config xml, this is
-     *       taken as a signal that all field visibility is to be manually configured.
-     *       At that point, all fields default to hidden and only those explicitly
-     *       configured to be shown (with a show tag) will actually be shown.</li>
-     *   <li>Show and hide rules will be applied in sequence with later rules
-     *       invalidating previous rules.</li>
-     *   <li>Show or hide rules which only apply for specified modes have an implicit
-     *       element. e.g. <show id="name" for-mode="view"/> would show the name field
-     *       in view mode and by implication, hide it in other modes.</li>
-     * </ul>
+     * 
      * @param fieldId
      * @param m
      * @return
      */
     public boolean isFieldVisible(String fieldId, Mode m)
     {
-        if (visibilityRules.isEmpty())
-        {
-            return true;
-        }
-        else
-        {
-            boolean listContainsAtLeastOneShow = false;
-            // true means show, false means hide, null means 'no answer'.
-            Boolean latestInstructionToShow = null;
-            for (FieldVisibilityRule instruc : visibilityRules)
-            {
-                if (instruc.isShow())
-                {
-                    listContainsAtLeastOneShow = true;
-                }
-                if (instruc.getFieldId().equals(fieldId))
-                {
-                    // This matters
-                    if (instruc.getListOfModes().contains(m))
-                    {
-                        latestInstructionToShow = instruc.isShow() ?
-                                Boolean.TRUE : Boolean.FALSE;
-                    }
-                    else
-                    {
-                        latestInstructionToShow = instruc.isShow() ?
-                                Boolean.FALSE : Boolean.TRUE;
-                    }
-                }
-            }
-            if (latestInstructionToShow == null)
-            {
-                // We really on the 'default' behaviour
-                return !listContainsAtLeastOneShow;
-            }
-            else
-            {
-                return latestInstructionToShow.booleanValue();
-            }
-        }
+        return fieldVisibilityManager.isFieldVisible(fieldId, m);
     }
     
     private Map<String, FormField> getFieldsVisibleInMode(Mode mode)
@@ -580,235 +610,8 @@ public class FormConfigElement extends ConfigElementAdapter
 
     private List<String> getFieldNamesVisibleInMode(Mode mode)
     {
-    	List<String> result = new ArrayList<String>();
-        for (String fieldId : fieldVisibilityIDs)
-        {
-            if (this.isFieldVisible(fieldId, mode))
-            {
-            	result.add(fieldId);
-            }
-        }
+        List<String> result = fieldVisibilityManager.getFieldNamesVisibleInMode(mode);
         return result;
-    }
-
-    /**
-     * This inner class represents a &lt;set&gt; element within a &lt;form&gt;
-     * element.
-     * 
-     * @author Neil McErlean.
-     */
-    public static class FormSet
-    {
-        private final String setId;
-        private final String parentId;
-        private final String appearance;
-        public FormSet(String setId, String parentId, String appearance)
-        {
-            this.setId = setId;
-            this.parentId = parentId;
-            this.appearance = appearance;
-        }
-        public String getSetId()
-        {
-            return setId;
-        }
-        public String getParentId()
-        {
-            return parentId;
-        }
-        public String getAppearance()
-        {
-            return appearance;
-        }
-
-        @Override
-        public boolean equals(Object otherObj)
-        {
-            if (otherObj == null
-                    || !otherObj.getClass().equals(this.getClass()))
-            {
-                return false;
-            }
-            FormSet otherSet = (FormSet) otherObj;
-            return this.setId.equals(otherSet.setId)
-                    && this.parentId.equals(otherSet.parentId)
-                    && this.appearance.equals(otherSet.appearance);
-        }
-        
-        @Override
-        public int hashCode()
-        {
-            return setId.hashCode()
-                    + 7 * parentId.hashCode() + 13 * appearance.hashCode();
-        }
-    }
-
-    public static class FormField
-    {
-        
-        //TODO I think I'll have to add explicit methods for all params e.g. getRequiredRoles():String
-        // Maps of attributes are not enough as they leave too much work up to the client.
-        
-        private final Map<String, String> attributes;
-        private String template;
-        private final List<StringPair> controlParams = new ArrayList<StringPair>();
-        private String constraintType;
-        private String constraintMessage;
-        private String constraintMessageId;
-        public FormField(Map<String, String> attributes)
-        {
-            this.attributes = attributes;
-        }
-        public void setTemplate(String template)
-        {
-            this.template = template;
-        }
-        public void setConstraintType(String constraintType)
-        {
-            this.constraintType = constraintType;
-        }
-        public void setConstraintMessage(String constraintMessage)
-        {
-            this.constraintMessage = constraintMessage;
-        }
-        public void setConstraintMessageId(String constraintMessageId)
-        {
-            this.constraintMessageId = constraintMessageId;
-        }
-        public void addControlParam(StringPair nameValue)
-        {
-            this.controlParams.add(nameValue);
-        }
-        public Map<String, String> getAttributes()
-        {
-            return Collections.unmodifiableMap(attributes);
-        }
-        public List<String> getAttributeNames()
-        {
-        	List<String> result = new ArrayList<String>(attributes.size());
-        	for (Iterator<String> iter = attributes.keySet().iterator(); iter.hasNext(); )
-        	{
-        		result.add(iter.next());
-        	}
-            return Collections.unmodifiableList(result);
-        }
-        public String getTemplate()
-        {
-            return template;
-        }
-        public List<StringPair> getControlParams()
-        {
-            return Collections.unmodifiableList(controlParams);
-        }
-        public String getConstraintType()
-        {
-            return constraintType;
-        }
-        public String getConstraintMessage()
-        {
-            return constraintMessage;
-        }
-        public String getConstraintMessageId()
-        {
-            return constraintMessageId;
-        }
-    }
-    
-    public static class FieldVisibilityRule
-    {
-        private final boolean show;
-        private final String fieldId;
-        private final List<Mode> forModes;
-        public FieldVisibilityRule(String showOrHide, String fieldId, String modesString)
-        {
-            if (showOrHide.equals("show"))
-            {
-                this.show = true;
-            }
-            else
-            {
-                this.show = false;
-            }
-            this.fieldId = fieldId;
-            this.forModes = new ArrayList<Mode>();
-            if (modesString == null)
-            {
-                forModes.addAll(Arrays.asList(Mode.values()));
-            }
-            else
-                {
-                StringTokenizer st = new StringTokenizer(modesString, ",");
-                while (st.hasMoreTokens())
-                {
-                    String nextToken = st.nextToken().trim();
-                    Mode nextMode = Mode.fromString(nextToken);
-                    forModes.add(nextMode);
-                }
-            }
-        }
-        
-        public boolean isShow()
-        {
-            return show;
-        }
-        
-        public boolean isHide()
-        {
-            return !isShow();
-        }
-        
-        public String getFieldId()
-        {
-            return fieldId;
-        }
-        
-        public List<Mode> getListOfModes()
-        {
-            return Collections.unmodifiableList(forModes);
-        }
-        
-        public String getModes()
-        {
-            StringBuilder result = new StringBuilder();
-            for (Iterator<Mode> iter = forModes.iterator(); iter.hasNext(); )
-            {
-                result.append(iter.next());
-                if (iter.hasNext())
-                {
-                    result.append(", ");
-                }
-            }
-            return result.toString();
-        }
-        
-        public String toString()
-        {
-            StringBuilder result = new StringBuilder();
-            result.append(show ? "show" : "hide");
-            result.append(" ").append(fieldId).append(" ").append(forModes);
-            return result.toString();
-        }
-
-        @Override
-        public boolean equals(Object otherObj)
-        {
-            if (otherObj == null
-                    || !otherObj.getClass().equals(this.getClass()))
-            {
-                return false;
-            }
-            FieldVisibilityRule otherFVI = (FieldVisibilityRule) otherObj;
-            return this.show == otherFVI.show
-                    && this.fieldId.equals(otherFVI.fieldId)
-                    && this.forModes.equals(otherFVI.forModes);
-        }
-        
-        @Override
-        public int hashCode()
-        {
-            return show ? 1 : 0
-                    + 7 * fieldId.hashCode() + 13 * forModes.hashCode();
-        }
     }
 }
 

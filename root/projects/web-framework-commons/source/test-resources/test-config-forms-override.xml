@@ -38,9 +38,6 @@
             <hide id="quota" for-mode="edit" />
          </field-visibility>
          <appearance>
-            <set id="details" appearance="fieldset" />
-            <set id="user" parent="details" appearance="panel" />
-
             <field id="name" label="Name" label-id="field_label_name" disabled="true" set="details"
                      help-text="This is the name of the node" help-text-id="field_help_name" >
                <control template="alfresco/extension/formcontrols/my-name.ftl">

@@ -11,12 +11,32 @@
    <config>
       <default-controls>
          <type name="d:text" template="controls/textfield.ftl">
-            <control-param name="size">50</control-param>
+            <control-param name="width">100px</control-param>
+            <control-param name="maxLength">1024</control-param>
          </type>
-         <type name="d:long" template="controls/textfield.ftl">
-            <control-param name="size">20</control-param>
+         <type name="d:mltext" template="controls/textarea.ftl">
+            <control-param name="rows">3</control-param>
+            <control-param name="columns">32</control-param>
          </type>
+         <type name="d:int" template="controls/textfield.ftl" />
+         <type name="d:float" template="controls/textfield.ftl" />
+         <type name="d:double" template="controls/textfield.ftl" />
+         <type name="d:long" template="controls/textfield.ftl" />
+         <!--<type name="d:long" template="/alfresco/extension/mytextfield.ftl" />-->
          <type name="d:boolean" template="controls/checkbox.ftl" />
+         <type name="d:date" template="controls/date.ftl" />
+         <type name="d:datetime" template="controls/date.ftl" />
+         <type name="d:any" template="controls/textfield.ftl" />
+         <type name="association" template="controls/association.ftl" />
+         <!-- Data types that should always be rendered read-only -->
+         <type name="d:content" template="controls/readonly.ftl" />
+         <type name="d:qname" template="controls/readonly.ftl" />
+         <type name="d:noderef" template="controls/readonly.ftl" />
+         <type name="d:category" template="controls/readonly.ftl" />
+         <type name="d:childassocref" template="controls/readonly.ftl" />
+         <type name="d:assocref" template="controls/readonly.ftl" />
+         <type name="d:path" template="controls/readonly.ftl" />
+         <type name="d:locale" template="controls/readonly.ftl" />
       </default-controls>
       <constraint-handlers>
          <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" 
@@ -32,14 +52,6 @@
             <show id="cm:title" />
             <show id="cm:description" />
          </field-visibility>
-         <appearance>
-            <!-- NOTE: Currently the fields have to be repeated here, they shouldn't have to be -->
-            <field id="cm:name"  >
-               <constraint-message type="REGEX" message="The document name can not contain the character '{0}'" />
-            </field>
-            <field id="cm:title" />
-            <field id="cm:description" />
-         </appearance>
       </form>
    </config>
    
@@ -51,14 +63,6 @@
             <show id="cm:title" />
             <hide id="cm:description" />
          </field-visibility>
-         <appearance>
-            <!-- NOTE: Currently the fields have to be repeated here, they shouldn't have to be -->
-            <field id="cm:name" >
-               <constraint-message type="REGEX" message="The space name can not contain the character '{0}'" />
-            </field>
-            <field id="cm:title" />
-            <field id="cm:description" />
-         </appearance>
       </form>
    </config>
 
