@@ -29,9 +29,12 @@ package org.alfresco.web.config;
  * value is allowed, but a null name is not.
  * 
  * @author Neil McErlean.
+ * @deprecated Do not use this class. Scheduled for deletion.
  */
 public class StringPair implements Comparable<StringPair>
 {
+    //TODO svn delete this class.
+    
     private final String name;
     private final String value;
     

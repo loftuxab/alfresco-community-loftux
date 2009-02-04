@@ -26,9 +26,10 @@ package org.alfresco.web.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
@@ -36,12 +37,20 @@ import org.alfresco.config.element.ConfigElementAdapter;
 
 public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 {
+    private static final long serialVersionUID = 2266042608444782740L;
     public static final String CONFIG_ELEMENT_ID = "constraint-handlers";
     
-    private List<String> itemTypes = new ArrayList<String>();
-    private Map<String, ItemDefinition> items = new HashMap<String, ItemDefinition>();
-
-    private static final long serialVersionUID = 1L;
+    /*
+     * LinkedHashMap is an extension of HashMap which maintains insertion order of the
+     * entries. We are interested here in the insertion order of key/value pairs and
+     * later in this class, we are traversing the keys with the assumption that they
+     * will be iterated in insertion order.
+     * Sun's javadoc is interesting here as it makes it clear that the <i>values</i> will have
+     * their order maintained.
+     * TODO The insertion order of keys is observed to be maintained in Apple's 1.5 VM,
+     * but it's not clear that this is a contractual obligation w.r.t. the class API.
+     */
+    private Map<String, ItemDefinition> items = new LinkedHashMap<String, ItemDefinition>();
 
     /**
      * This constructor creates an instance with the default name.
@@ -64,6 +73,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /**
      * @see org.alfresco.config.ConfigElement#getChildren()
      */
+    @Override
     public List<ConfigElement> getChildren()
     {
         throw new ConfigException(
@@ -73,6 +83,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /**
      * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
      */
+    @Override
     public ConfigElement combine(ConfigElement configElement)
     {
         // There is an assumption here that it is only like-with-like combinations
@@ -82,7 +93,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 
         ConstraintHandlersConfigElement result = new ConstraintHandlersConfigElement();
 
-        for (String nextType : itemTypes)
+        for (String nextType : items.keySet())
         {
             String nextValidationHandler = getValidationHandlerFor(nextType);
             String nextMessage = getMessageFor(nextType);
@@ -91,7 +102,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
                     nextMessageId);
         }
 
-        for (String nextType : otherCHCElement.itemTypes)
+        for (String nextType : otherCHCElement.items.keySet())
         {
             String nextValidationHandler = otherCHCElement
                     .getValidationHandlerFor(nextType);
@@ -107,7 +118,6 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /* package */void addDataMapping(String type, String validationHandler,
             String message, String messageID)
     {
-    	//TODO Is this how we should handle null values?
     	if (message == null)
     	{
     		message = "";
@@ -117,13 +127,13 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     		messageID = "";
     	}
     	
-        itemTypes.add(type);
         items.put(type, new ItemDefinition(type, validationHandler, message, messageID));
     }
 
     /**
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode()
     {
         return items.hashCode();
@@ -132,6 +142,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object otherObj)
     {
         if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
@@ -148,7 +159,10 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
      */
     List<String> getConstraintTypes()
     {
-        return Collections.unmodifiableList(itemTypes);
+        Set<String> result = items.keySet();
+        // See the comment above on ordering in LinkedHashMaps' keys.
+        List<String> listResult = new ArrayList<String>(result);
+        return Collections.unmodifiableList(listResult);
     }
 
     /**
@@ -189,7 +203,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 
     public List<String> getItemNames()
     {
-    	return Collections.unmodifiableList(itemTypes);
+    	return this.getConstraintTypes();
     }
     
     public Map<String, ItemDefinition> getItems()
@@ -206,10 +220,10 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     	
     	public ItemDefinition(String type, String validationHandler, String msg, String msgId)
     	{
-    		this.type = type;
-    		this.validationHandler = validationHandler;
-    		this.message = msg;
-    		this.messageId = msgId;
+            this.type              = type              == null ? "" : type;
+            this.validationHandler = validationHandler == null ? "" : validationHandler;
+            this.message           = msg               == null ? "" : msg;
+            this.messageId         = msgId             == null ? "" : msgId;
     	}
     	
 		public String getType() {
@@ -224,5 +238,43 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 		public String getMessageId() {
 			return messageId;
 		}
+
+        @Override
+        public boolean equals(Object otherObj)
+        {
+            if (otherObj == this)
+            {
+                return true;
+            }
+            else if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
+            {
+                return false;
+            }
+            ItemDefinition otherItem = (ItemDefinition)otherObj;
+            return otherItem.type.equals(this.type) &&
+                otherItem.validationHandler.equals(this.validationHandler) &&
+                otherItem.message.equals(this.message) &&
+                otherItem.messageId.equals(this.messageId);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return type.hashCode()
+                    + 3 * validationHandler.hashCode()
+                    + 7 * message.hashCode()
+                    + 13 * messageId.hashCode();
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder result = new StringBuilder();
+            result.append(type).append(", ")
+                .append(validationHandler).append(", ")
+                .append(message).append(", ")
+                .append(messageId);
+            return result.toString();
+        }
     }
 }
