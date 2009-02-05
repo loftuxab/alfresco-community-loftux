@@ -9,5 +9,6 @@
 <#if form.mode == "view">
 <span class="field"><#if isTrue>Yes<#else>No</#if></span>
 <#else>
-<input id="${item.id}" type="checkbox" name="${item.name}"<#if isTrue> value="true" checked="checked"</#if> />
+<input id="${item.id}" type="checkbox" name="${item.name}" <#if item.description?exists>title="${item.description}"</#if>
+       <#if isTrue> value="true" checked="checked"</#if> <#if item.protectedField>disabled="true"</#if> />
 </#if>

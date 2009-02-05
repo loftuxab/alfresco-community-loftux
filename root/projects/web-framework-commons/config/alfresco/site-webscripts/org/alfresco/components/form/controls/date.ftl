@@ -6,11 +6,13 @@
 <span class="field"><#if item.value != "">${item.value?datetime("yyyy-mm-dd'T'HH:MM:ss")?string("EEEE, MMMM dd yyyy")}</#if></span>
 <#else>
 
-<input id="${item.id}-entry" type="text" title="Enter date in format: MM/DD/YYYY" />
-<a id="${item.id}-icon" class="datepicker-icon" href="javascript:${item.id}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" /></a>
-<div id="${item.id}-cal" class="datepicker"></div>
-
 <input id="${item.id}" type="hidden" name="${item.name}" value="${item.value}" />
+<input id="${item.id}-entry" type="text" <#if item.description?exists>title="${item.description}"</#if> <#if item.protectedField>disabled="true"</#if> />
+
+<#if item.protectedField == false>
+<a id="${item.id}-icon" class="datepicker-icon" href="javascript:${item.id}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" /></a>
+</#if>
+<div id="${item.id}-cal" class="datepicker"></div>
 
 <script type="text/javascript">
    function ${item.id}_selHandler(type,args,obj) 
@@ -28,9 +30,6 @@
       var changedDate = YAHOO.util.Dom.get("${item.id}-entry").value;
       if (changedDate.length > 0)
       {
-         //var dateParts = changedDate.split("/");
-         //var newDate = new Date(dateParts[2], dateParts[0], dateParts[1]);
-         
          ${item.id}_cal.select(changedDate);
          var selectedDates = ${item.id}_cal.getSelectedDates();
          if (selectedDates.length > 0)
