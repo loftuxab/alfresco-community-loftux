@@ -75,6 +75,9 @@ public abstract class AbstractRequestContext implements RequestContext
     protected Map<String, Serializable> valuesMap;
     protected Map<String, Serializable> parametersMap;
     
+    protected Page rootPage;
+    protected Configuration siteConfiguration;
+    
     protected Page currentPage;
     protected TemplateInstance currentTemplate;
     protected ResourceContent currentObject;
@@ -128,14 +131,18 @@ public abstract class AbstractRequestContext implements RequestContext
     }
     
     /**
-     * If the site has a configuration XML, then this will return it
+     * Returns the site's configuration object
+     * 
      * @return Configuration instance for the site
      */
     public Configuration getSiteConfiguration()
     {
-        // get the default site configuration
-        String defaultSiteConfigurationId = getConfig().getDefaultSiteConfigurationId();
-        return getModel().getConfiguration(defaultSiteConfigurationId);
+        if(this.siteConfiguration == null)
+        {
+            this.siteConfiguration = SiteUtil.getSiteConfiguration(this);
+        }
+        
+        return this.siteConfiguration;
     }
     
     /**
@@ -249,7 +256,12 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Page getRootPage()
     {
-        return SiteUtil.getRootPage(this, getSiteConfiguration());
+        if(this.rootPage == null)
+        {
+            this.rootPage = SiteUtil.getRootPage(this);
+        }
+        
+        return this.rootPage;
     }
 
     /**

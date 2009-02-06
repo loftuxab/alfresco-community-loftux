@@ -3141,27 +3141,66 @@
                          projectdir="${dir.project.webstudio}"/>
    </target>
 
-
-   <!-- ****************************************** -->
-   <!-- ** Web Framework Project - Empty Webapp ** -->
-   <!-- ****************************************** -->
    
-   <target name="incremental-webframework-empty" 
-           depends="package-webframework-empty" />
-           
-   <target name="package-webframework-empty" 
-           depends="package-webframework-war-empty" />
+   <!-- ************************************* -->
+   <!-- ** Web Framework (Surf) Project ** -->
+   <!-- ************************************* -->
 
-   <target name="package-webframework-war-empty" 
-           depends="assemble-webframework-war">
+   <!-- Builds an empty Surf application -->
+   <target name="incremental-surf" 
+           depends="build-surf-empty">
+                    
+      <war warfile="${dir.project.webframework.dist}/surf.war" 
+           webxml="${dir.project.webframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </war>
+                    
+   </target>
            
-      <!-- Remove test objects -->
+   <!-- Builds a starter Surf application -->
+   <target name="incremental-surf-starter" 
+           depends="build-surf-empty">
+
+      <!-- copy all required files from project: web-framework-samples -->
+      <copy todir="${dir.project.webframework.assemble}">
+         <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
+      </copy>
+      <copy todir="${dir.project.webframework.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/web-extension/**" />
+      </copy>
+      
+      <war warfile="${dir.project.webframework.dist}/surf.war" 
+           webxml="${dir.project.webframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </war>      
+      
+   </target>
+   
+   <!-- Inits the environment for a surf app build -->
+   <target name="clean-surf"
+           depends="clean-webscriptframework,
+                    clean-webframework" />   
+   
+   <target name="build-surf-empty"
+           depends="clean-surf,
+                    incremental-core,
+                    package-webscriptframework-jar, 
+                    package-webframework-jar, 
+                    package-webframeworkcommons-jar,
+                    assemble-surf-war" />
+
+   <target name="assemble-surf-war" 
+           depends="assemble-webframework-war">
+
+      <!-- Removing any and all test objects -->
       <delete includeemptydirs="true">
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts"
       	          includes="**/*" defaultexcludes="false" />
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates"
       	          includes="**/*" defaultexcludes="false" />
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/components"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/configurations"
       	          includes="**/*.*" defaultexcludes="false" />
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/content-associations"
       	          includes="**/*.*" defaultexcludes="false" />
@@ -3172,12 +3211,7 @@
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/template-instances"
       	          includes="**/*.*" defaultexcludes="false" />
       </delete>
-            
-      <!-- Package WAR -->      
-      <war warfile="${dir.project.webframework.dist}/surf-app.war" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframework.assemble}" />
-      </war>
+      
    </target>
    
    
