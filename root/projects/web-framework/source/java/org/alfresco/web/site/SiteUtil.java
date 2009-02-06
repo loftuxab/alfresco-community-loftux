@@ -116,8 +116,8 @@ public class SiteUtil
                 {
                     configuration = (Configuration) configs.values().iterator().next();
                     
-                    if (configuration != null && context.getLogger().isWarnEnabled())
-                        context.getLogger().warn("Site configuration '" + configuration.getId() + "' discovered via exhaustive lookup.  Please adjust configuration files to optimize performance.");
+                    if (configuration != null && context.getLogger().isDebugEnabled())
+                        context.getLogger().debug("Site configuration '" + configuration.getId() + "' discovered via exhaustive lookup.  Please adjust configuration files to optimize performance.");
                 }                
             }
         }

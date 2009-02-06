@@ -2998,6 +2998,26 @@
          <fileset dir="${dir.project.webstudio.config}" excludes="**/web-extension/**" />
       </copy>
 
+      <!-- Removing any and all test objects (from alfwf) -->
+      <delete includeemptydirs="true">
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-webscripts"
+      	          includes="**/*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/templates"
+      	          includes="**/*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/components"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/configurations"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/content-associations"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/page-associations"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/pages"
+      	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/template-instances"
+      	          includes="**/*.*" defaultexcludes="false" />
+      </delete>
+
       <!-- copy all required files from project: web-framework-samples -->
       <copy todir="${dir.project.webstudio.assemble}">
          <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
