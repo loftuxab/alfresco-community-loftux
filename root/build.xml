@@ -383,7 +383,8 @@
                     package-webframework-jar, 
                     package-webframeworkcommons-jar,
                     package-slingshot-jar,
-                    deploy-slingshot-tomcat-exploded" />
+                    deploy-slingshot-tomcat-exploded,
+                    minimize-slingshot-deployed-javascript" />
 
    <target name="incremental-webstudio-tomcat" 
            description="Performs an incremental build and deployment of the webstudio WAR"
@@ -781,6 +782,24 @@
          <fileset dir="${dir.project.slingshot.src.web}/yui" />
       </copy>
 
+   </target>
+
+   <target name="minimize-slingshot-deployed-javascript" depends="init">
+      <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.slingshot}">
+         <fileset dir="${dir.deploy.tomcat.application.slingshot}">
+            <include name="**/*.js" />
+            <exclude name="**/*-min.js" />
+            <exclude name="**/WEB-INF/**" />
+            <exclude name="**/tiny_mce/**" />
+            <exclude name="**/yui/**" />
+         </fileset>
+         <arg line="-jar"/>
+         <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile />
+         <srcfile />
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
    </target>
    
    <target name="deploy-webstudio-tomcat" depends="init" 

@@ -1620,7 +1620,8 @@
    </target>
 
    <target name="package-slingshot-war" 
-           depends="assemble-slingshot-war">
+           depends="assemble-slingshot-war,
+                    minimize-slingshot-javascript">
       <war warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" 
            webxml="${dir.project.slingshot.src.webinf}/web.xml">
          <fileset dir="${dir.project.slingshot.assemble}" />
@@ -1684,6 +1685,26 @@
       </copy>
    </target>  
    
+   <target name="minimize-slingshot-javascript"
+           depends="init">
+      <echo>Compressing Slingshot Javascript...</echo>
+      <apply executable="java" parallel="false" dest="${dir.project.slingshot.assemble}">
+         <fileset dir="${dir.project.slingshot.assemble}">
+            <include name="**/*.js" />
+            <exclude name="**/*-min.js" />
+            <exclude name="**/WEB-INF/**" />
+            <exclude name="**/tiny_mce/**" />
+            <exclude name="**/yui/**" />
+         </fileset>
+         <arg line="-jar"/>
+         <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile />
+         <srcfile />
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
+   </target>
+
    <target name="test-slingshot" 
            depends="compile-slingshot">
       <run-tests projectdir="${dir.project.slingshot}" />
