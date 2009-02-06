@@ -1,10 +1,10 @@
-<#import "import/alfresco-template.ftl" as template />
-<@template.header>
+<#include "include/alfresco-template.ftl" />
+<@templateHeader>
    <!-- General Links Assets -->
-   <script type="text/javascript" src="${page.url.context}/components/links/linksdiscuss-common.js"></script>
+   <@script type="text/javascript" src="${page.url.context}/components/links/linksdiscuss-common.js"></@script>
 </@>
 
-<@template.body>
+<@templateBody>
    <div id="hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />
@@ -26,7 +26,7 @@
 </div>	
 </@>
 
-<@template.footer>
+<@templateFooter>
    <div id="ft">
       <@region id="footer" scope="global" protected=true />
    </div>
