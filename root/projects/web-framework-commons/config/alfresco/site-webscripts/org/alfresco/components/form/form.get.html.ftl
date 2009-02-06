@@ -1,23 +1,38 @@
 <#if form?exists>
 
+   <#assign formId=args.htmlid + "-form">
+   <#assign formVar=formId?replace("-", "_")>
+   
+   <#-- Do we really need the client side JS component, can we just manually include the required files --> 
+   
    <script type="text/javascript">//<![CDATA[
-      new Alfresco.FormUI("");
+      new Alfresco.FormUI("${formId}");
    //]]></script>
    
-   <div id="-form" class="form">
+   <div id="${formId}-container" class="form-container">
       
-      <form method="POST" action="${url.context}/proxy/alfresco${form.submissionUrl}"
-            <#if page.url.args.submitMode == "multipart">enctype="multipart/form-data"</#if> accept-charset="utf-8">
-         <!-- TODO: See if we can use absolute template paths/urls. -->
+      <form id="${formId}" method="POST" action="${url.context}/proxy/alfresco${form.submissionUrl}" accept-charset="utf-8"
+            <#if page.url.args.submitMode == "multipart">enctype="multipart/form-data"</#if> >
          <#list form.items as item>
             <#if item.control.template?exists>
-               <#include "${item.control.template}" />
+               <#assign field=item>
+               <#include "${field.control.template}" />
             </#if>
          </#list>
          <hr/>
-         <input type="submit" value="Submit" />
+         <#if form.mode != "view"><input type="submit" value="Submit" /></#if>
       </form>
       
    </div>
-
+   
+   <#if form.mode != "view">      
+      <script type="text/javascript">//<![CDATA[
+         var ${formVar} = new Alfresco.forms.Form("${formId}");
+         <#if page.url.args.submitMode == "json">
+         ${formVar}.setAJAXSubmit(true);
+         ${formVar}.setSubmitAsJSON(true);
+         </#if>
+         ${formVar}.init();
+      //]]></script>
+   </#if>
 </#if>

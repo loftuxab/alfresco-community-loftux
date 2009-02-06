@@ -10,19 +10,12 @@
 
    <config>
       <default-controls>
-         <type name="d:text" template="controls/textfield.ftl">
-            <control-param name="width">100px</control-param>
-            <control-param name="maxLength">1024</control-param>
-         </type>
-         <type name="d:mltext" template="controls/textarea.ftl">
-            <control-param name="rows">3</control-param>
-            <control-param name="columns">32</control-param>
-         </type>
+         <type name="d:text" template="controls/textfield.ftl" />
+         <type name="d:mltext" template="controls/textarea.ftl" />
          <type name="d:int" template="controls/textfield.ftl" />
          <type name="d:float" template="controls/textfield.ftl" />
          <type name="d:double" template="controls/textfield.ftl" />
          <type name="d:long" template="controls/textfield.ftl" />
-         <!--<type name="d:long" template="/alfresco/extension/mytextfield.ftl" />-->
          <type name="d:boolean" template="controls/checkbox.ftl" />
          <type name="d:date" template="controls/date.ftl" />
          <type name="d:datetime" template="controls/date.ftl" />

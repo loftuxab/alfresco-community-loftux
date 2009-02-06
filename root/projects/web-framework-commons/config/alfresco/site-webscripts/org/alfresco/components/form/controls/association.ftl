@@ -1,7 +1,10 @@
-<label>${item.label?html}:</label>
-
 <#if form.mode == "view">
-<span class="field">${item.value?html}</span>
+<div class="viewmode-field">
+   <span class="viewmode-label">${field.label?html}:</span>
+   <span class="viewmode-value">${field.value?html}</span>
+</div>
 <#else>
-<input type="text" value="${item.value}" disabled="true" title="${msg("form.field.not.editable")}" style="width: 300px;" />
+<label for="${args.htmlid}_${field.id}">${field.label?html}:</label>
+<input id="${args.htmlid}_${field.id}" type="text" value="${field.value}" disabled="true" 
+       title="${msg("form.field.not.editable")}" style="width: 300px;" />
 </#if>

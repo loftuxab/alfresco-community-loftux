@@ -5,8 +5,8 @@ var defaultControls = null;
 var defaultConstraintHandlers = null;
          
 /* constants */
-const PROP_PREFIX = "prop:"
-const ASSOC_PREFIX = "assoc:";
+const PROP_PREFIX = "prop_"
+const ASSOC_PREFIX = "assoc_";
 
 /**
  * Main entrypoint for component webscript logic
@@ -100,7 +100,7 @@ function main()
             {
                formUIItems.push(fieldDef);
                
-               logger.log(fieldName + " = " + jsonUtils.toJSONString(fieldDef));
+               logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
             }
          }
       }
@@ -162,8 +162,6 @@ function setupCaches(formModel)
  */
 function setupField(formModel, fieldName, fieldConfig)
 {
-   logger.log("setting up field " + fieldName);
-   
    var fieldDef = null;
    
    // look in both caches for the field
@@ -177,9 +175,10 @@ function setupField(formModel, fieldName, fieldConfig)
    {
       logger.log("WARN: \"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
       fieldDef = {};
-      fieldDef.name = fieldName;
       fieldDef.kind = "field";
-      fieldDef.id = fieldDef.name.replace(":", "_");
+      fieldDef.configName = fieldName;
+      fieldDef.name = fieldName.replace(/:/g, "_");
+      fieldDef.id = fieldDef.name;
       fieldDef.control = {};
       fieldDef.control.template = "controls/ambiguous.ftl";
    }
@@ -212,8 +211,10 @@ function setupField(formModel, fieldName, fieldConfig)
       {
          // setup the basic properties
          fieldDef.kind = "field";
-         fieldDef.name = (fieldDef.type === "association") ? ASSOC_PREFIX + fieldName : PROP_PREFIX + fieldName;
-         fieldDef.id = fieldDef.name.replace(/:/g, "_");
+         fieldDef.configName = fieldName;
+         var name = (fieldDef.type === "association") ? ASSOC_PREFIX + fieldName : PROP_PREFIX + fieldName;
+         fieldDef.name = name.replace(/:/g, "_");
+         fieldDef.id = fieldDef.name;
          
          // setup appearance of field i.e. the control, label etc.
          setupAppearance(fieldDef, fieldConfig);
@@ -247,66 +248,76 @@ function setupAppearance(fieldDef, fieldConfig)
    setupControl(fieldDef, fieldConfig);
    
    // TODO: update this function when the FormField class gets explicit accessors
-   //       for now exit if there are no attributes for the field
-   if (typeof fieldConfig.attributes === "undefined" || fieldConfig.attributes === null)
-   {
-      return;
-   }
    
    // override the label if necessary
-   var configLabel = null;
-   if (fieldConfig.attributes["label-id"] !== null)
+   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
    {
-      configLabel = msg.get(fieldConfig.attributes["label-id"]);
-   }
-   else if (fieldConfig.attributes["label"] !== null)
-   {
-      configLabel = fieldConfig.attributes["label"];
-   }
-   if (configLabel !== null)
-   {
-      fieldDef.label = configLabel;
+      var configLabel = null;
+      if (fieldConfig.attributes["label-id"] !== null)
+      {
+         configLabel = msg.get(fieldConfig.attributes["label-id"]);
+      }
+      else if (fieldConfig.attributes["label"] !== null)
+      {
+         configLabel = fieldConfig.attributes["label"];
+      }
+      if (configLabel !== null)
+      {
+         fieldDef.label = configLabel;
+      }
    }
    
    // override the description if necessary
-   var configTitle = null;
-   if (fieldConfig.attributes["title-id"] !== null)
+   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
    {
-      configTitle = msg.get(fieldConfig.attributes["title-id"]);
-   }
-   else if (fieldConfig.attributes["title"] !== null)
-   {
-      configTitle = fieldConfig.attributes["title"];
-   }
-   if (configTitle !== null)
-   {
-      fieldDef.description = configTitle;
+      var configTitle = null;
+      if (fieldConfig.attributes["title-id"] !== null)
+      {
+         configTitle = msg.get(fieldConfig.attributes["title-id"]);
+      }
+      else if (fieldConfig.attributes["title"] !== null)
+      {
+         configTitle = fieldConfig.attributes["title"];
+      }
+      if (configTitle !== null)
+      {
+         fieldDef.description = configTitle;
+      }
    }
    
    // find help text, if any
-   var configHelp = null;
-   if (fieldConfig.attributes["help-text-id"] !== null)
+   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
    {
-      configHelp = msg.get(fieldConfig.attributes["help-text-id"]);
-   }
-   else if (fieldConfig.attributes["help-text"] !== null)
-   {
-      configHelp = fieldConfig.attributes["help-text"];
-   }
-   if (configHelp !== null)
-   {
-      fieldDef.help = configHelp;
+      var configHelp = null;
+      if (fieldConfig.attributes["help-text-id"] !== null)
+      {
+         configHelp = msg.get(fieldConfig.attributes["help-text-id"]);
+      }
+      else if (fieldConfig.attributes["help-text"] !== null)
+      {
+         configHelp = fieldConfig.attributes["help-text"];
+      }
+      if (configHelp !== null)
+      {
+         fieldDef.help = configHelp;
+      }
    }
    
-   // configure read-only state
-   if (!fieldDef.protectedField && fieldConfig.attributes["read-only"] !== null)
+   // configure read-only state (and removed protectedField property)
+   var disabled = fieldDef.protectedField;
+   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
    {
-      var readOnly = fieldConfig.attributes["read-only"];
-      if (readOnly === "true")
+      if (!fieldDef.protectedField && fieldConfig.attributes["read-only"] !== null)
       {
-         fieldDef.protectedField = true;
+         var readOnly = fieldConfig.attributes["read-only"];
+         if (readOnly === "true")
+         {
+            disabled = true;
+         }
       }
-   }   
+   }
+   fieldDef.disabled = disabled;
+   delete fieldDef.protectedField;
 }
 
 /**

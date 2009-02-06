@@ -1,14 +1,12 @@
-<#if item.value?exists>
-<#assign isTrue=item.value>
-<#else>
-<#assign isTrue=false>
-</#if>
-
-<label>${item.label?html}:</label>
+<#if field.value?exists><#assign isTrue=field.value><#else><#assign isTrue=false></#if>
 
 <#if form.mode == "view">
-<span class="field"><#if isTrue>Yes<#else>No</#if></span>
+<div class="viewmode-field">
+   <span class="viewmode-label">${field.label?html}:</span>
+   <span class="viewmode-value"><#if isTrue>Yes<#else>No</#if></span>
+</div>
 <#else>
-<input id="${item.id}" type="checkbox" name="${item.name}" <#if item.description?exists>title="${item.description}"</#if>
-       <#if isTrue> value="true" checked="checked"</#if> <#if item.protectedField>disabled="true"</#if> />
+<label for="${args.htmlid}_${field.id}">${field.label?html}:</label>
+<input id="${field.id}" type="checkbox" name="${field.name}" <#if field.description?exists>title="${field.description}"</#if>
+       <#if isTrue> value="true" checked="checked"</#if> <#if field.disabled>disabled="true"</#if> />
 </#if>

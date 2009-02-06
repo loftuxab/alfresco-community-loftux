@@ -1,15 +1,17 @@
-<#if item.control.params.rows?exists><#assign rows=item.control.params.rows><#else><#assign rows=3></#if>
-<#if item.control.params.columns?exists><#assign columns=item.control.params.columns><#else><#assign columns=32></#if>
-
-<label>${item.label?html}:</label>
+<#if field.control.params.rows?exists><#assign rows=field.control.params.rows><#else><#assign rows=3></#if>
+<#if field.control.params.columns?exists><#assign columns=field.control.params.columns><#else><#assign columns=32></#if>
 
 <#if form.mode == "view">
-<span class="field">${item.value?html}</span>
+<div class="viewmode-field">
+   <span class="viewmode-label">${field.label?html}:</span>
+   <span class="viewmode-value">${field.value?html}</span>
+</div>
 <#else>
-<textarea id="${item.id}" name="${item.name}" rows="${rows}" columns="${columns}"
-          <#if item.description?exists>title="${item.description}"</#if>
-          <#if item.control.params.width?exists>style="width: ${item.control.params.width};"</#if>
-          <#if item.protectedField>disabled="true"</#if>>
-${item.value}
+<label for="${args.htmlid}_${field.id}">${field.label?html}:</label>
+<textarea id="${args.htmlid}_${field.id}" name="${field.name}" rows="${rows}" columns="${columns}"
+          <#if field.description?exists>title="${field.description}"</#if>
+          <#if field.control.params.width?exists>style="width: ${field.control.params.width};"</#if>
+          <#if field.disabled>disabled="true"</#if>>
+${field.value}
 </textarea>
 </#if>
