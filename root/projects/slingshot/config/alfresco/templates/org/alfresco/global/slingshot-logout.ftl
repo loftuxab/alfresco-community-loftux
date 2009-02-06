@@ -1,7 +1,6 @@
-<#import "../import/alfresco-template.ftl" as template />
-<@template.header>
-</@>
-<@template.body>
+<#include "../include/alfresco-template.ftl" />
+<@templateHeader />
+<@templateBody>
 <div id="alflogout">
    Logged out.
 </div>

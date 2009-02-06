@@ -332,6 +332,9 @@ public final class ProcessorModelHelper
                     model.put(MODEL_URL, urlHelper);
                 }                
             }
+
+            // add in the config service accessor
+            model.put(MODEL_CONFIG, new TemplateConfigModel(FrameworkHelper.getConfigService(), null));
         }
         
         /**
@@ -359,7 +362,7 @@ public final class ProcessorModelHelper
         addDirective(context, model, "anchor", "org.alfresco.web.site.taglib.ObjectAnchorTag");
         addDirective(context, model, "edit", "org.alfresco.web.site.taglib.ObjectEditTag");
         addDirective(context, model, "print", "org.alfresco.web.site.taglib.ObjectPrintTag");
-        addDirective(context, model, "link", "org.alfresco.web.site.taglib.ObjectLinkTag");
+        addDirective(context, model, "pagelink", "org.alfresco.web.site.taglib.ObjectLinkTag");
     }
     
     private static void addDirective(RenderContext context, Map<String, Object> model, String name, String className)

@@ -1,21 +1,21 @@
-<#import "import/alfresco-template.ftl" as template />
-<@template.header>
-<script type="text/javascript">//<![CDATA[
-YAHOO.util.Event.onContentReady("bd", function()
-{
-   // Find the People Finder by name
-   var peopleFinder = Alfresco.util.ComponentManager.findFirst("Alfresco.PeopleFinder");
-   
-   // Set the correct options for our use
-   peopleFinder.setOptions(
+<#include "include/alfresco-template.ftl" />
+<@templateHeader>
+   <script type="text/javascript">//<![CDATA[
+   YAHOO.util.Event.onContentReady("bd", function()
    {
-      peopleListMode: true
+      // Find the People Finder by name
+      var peopleFinder = Alfresco.util.ComponentManager.findFirst("Alfresco.PeopleFinder");
+   
+      // Set the correct options for our use
+      peopleFinder.setOptions(
+      {
+         peopleListMode: true
+      });
    });
-});
-//]]></script>
+   //]]></script>
 </@>
 
-<@template.body>
+<@templateBody>
    <div id="hd">
       <@region id="header" scope="global" protected=true/>
       <@region id="title" scope="template" protected=true />
@@ -25,7 +25,7 @@ YAHOO.util.Event.onContentReady("bd", function()
    </div>
 </@>
 
-<@template.footer>
+<@templateFooter>
    <div id="ft">
       <@region id="footer" scope="global" protected=true />
    </div>

@@ -1,5 +1,13 @@
 <alfresco-config>
 
+   <config>
+      
+      <flags>
+         <debug>false</debug>
+      </flags>
+      
+   </config>
+
    <!-- Add in additional Slingshot elements -->
    <config evaluator="string-compare" condition="WebFramework">
       

@@ -1,9 +1,9 @@
-<#import "../import/alfresco-template.ftl" as template />
-<@template.header>
-   <link rel="stylesheet" type="text/css" href="${url.context}/templates/login/login.css" />
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/login.css" />
+<#include "../include/alfresco-template.ftl" />
+<@templateHeader>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/login/login.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/login.css" />
 </@>
-<@template.body>
+<@templateBody>
    <div id="alflogin" class="login-panel">
       <div class="login-logo"></div>
       <form id="loginform" accept-charset="UTF-8" method="post" action="${url.context}/login" onsubmit="return alfLogin();">
@@ -29,7 +29,7 @@
                </span>
             </div>
             <input type="hidden" id="success" name="success" value="${successUrl}"/>
-            <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${url.servletContext}${link?html}&amp;error=true"/>
+            <input type="hidden" name="failure" value="<#assign link><@pagelink pageType='login'/></#assign>${url.servletContext}${link?html}&amp;error=true"/>
          </fieldset>
       </form>
    </div>

@@ -1,1 +1,2 @@
-<!-- Content Viewer Assets -->
+<#include "../component.head.inc">
+<!-- Content Viewer -->

@@ -1,9 +1,9 @@
-<#import "import/alfresco-template.ftl" as template />
-<@template.header>
-<link rel="stylesheet" type="text/css" href="${url.context}/templates/calendar/calendar.css" />
+<#include "include/alfresco-template.ftl" />
+<@templateHeader>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/calendar/calendar.css" />
 </@>
 
-<@template.body>
+<@templateBody>
    <div id="hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />
@@ -25,7 +25,7 @@
    </div>
 </@>
 
-<@template.footer>
+<@templateFooter>
    <div id="ft">
       <@region id="footer" scope="global" protected=true />
    </div>

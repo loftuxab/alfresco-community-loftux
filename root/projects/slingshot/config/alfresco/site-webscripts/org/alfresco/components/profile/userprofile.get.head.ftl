@@ -1,13 +1,6 @@
-<!-- UserProfile Assets -->
-<link rel="stylesheet" type="text/css" href="${page.url.context}/components/profile/profile.css" />
-<script type="text/javascript" src="${page.url.context}/components/profile/profile.js"></script>
-<!-- Simple Dialog Assets -->
-<script type="text/javascript" src="${page.url.context}/modules/simple-dialog.js"></script>
-<!-- File-Upload Assets -->
-<!--
-<link rel="stylesheet" type="text/css" href="${page.url.context}/modules/flash-upload.css" />
-<script type="text/javascript" src="${page.url.context}/modules/flash-upload.js"></script>
-<link rel="stylesheet" type="text/css" href="${page.url.context}/modules/html-upload.css" />
-<script type="text/javascript" src="${page.url.context}/modules/html-upload.js"></script>
-<script type="text/javascript" src="${page.url.context}/modules/file-upload.js"></script>
--->
+<#include "../component.head.inc">
+<!-- User Profile -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/components/profile/profile.css" />
+<@script type="text/javascript" src="${page.url.context}/components/profile/profile.js"></@script>
+<!-- Simple Dialog -->
+<@script type="text/javascript" src="${page.url.context}/modules/simple-dialog.js"></@script>
