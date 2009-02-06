@@ -1,9 +1,9 @@
 <import resource="/components/common/js/component.js">
 
 // bind core properties and source
-WebStudio.Component.bind();
+Surf.Component.bind();
 
 // bind custom properties
-WebStudio.Component.bindProperty("mimetype");
-WebStudio.Component.bindProperty("player");
+Surf.Component.bindProperty("mimetype");
+Surf.Component.bindProperty("player");
 

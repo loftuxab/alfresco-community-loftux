@@ -1,54 +1,54 @@
-if (typeof WebStudio == "undefined")
+if (typeof Surf == "undefined")
 {
-	var WebStudio = {};
+	var Surf = {};
 }
 
-WebStudio.Mimetypes = function()
+Surf.Mimetypes = function()
 {
 	this.test = "hello";
 }
 
-WebStudio.Mimetypes.prototype.getIcon16 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon16 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 16);
 }
 
-WebStudio.Mimetypes.prototype.getIcon24 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon24 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 24);
 }
 
-WebStudio.Mimetypes.prototype.getIcon32 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon32 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 32);
 }
 
-WebStudio.Mimetypes.prototype.getIcon48 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon48 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 48);
 }
 
-WebStudio.Mimetypes.prototype.getIcon64 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon64 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 64);
 }
 
-WebStudio.Mimetypes.prototype.getIcon72 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon72 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 72);
 }
 
-WebStudio.Mimetypes.prototype.getIcon96 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon96 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 96);
 }
 
-WebStudio.Mimetypes.prototype.getIcon128 = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIcon128 = function(filename, mimetype)
 {
 	return this.getIcon(filename, mimetype, 128);
 }
 
-WebStudio.Mimetypes.prototype.getIcon = function(filename, mimetype, size)
+Surf.Mimetypes.prototype.getIcon = function(filename, mimetype, size)
 {
 	var path = this.getIconRoot(filename, mimetype);
 	
@@ -57,7 +57,7 @@ WebStudio.Mimetypes.prototype.getIcon = function(filename, mimetype, size)
 	return path;
 }
 
-WebStudio.Mimetypes.prototype.getIconRoot = function(filename, mimetype)
+Surf.Mimetypes.prototype.getIconRoot = function(filename, mimetype)
 {
 	var core = null;
 	
@@ -84,7 +84,7 @@ WebStudio.Mimetypes.prototype.getIconRoot = function(filename, mimetype)
 	return url.context + "/images/common/filetypes/" + core;
 }
 
-WebStudio.Mimetypes.prototype.getIconByExtension = function(ext)
+Surf.Mimetypes.prototype.getIconByExtension = function(ext)
 {
 	var core = null;
 	
@@ -240,7 +240,7 @@ WebStudio.Mimetypes.prototype.getIconByExtension = function(ext)
 	return core
 }
 
-WebStudio.Mimetypes.prototype.getIconByMimetype = function(mimetype)
+Surf.Mimetypes.prototype.getIconByMimetype = function(mimetype)
 {
 	var core = "default";
 	
@@ -279,4 +279,3 @@ WebStudio.Mimetypes.prototype.getIconByMimetype = function(mimetype)
 	
 	return core;
 }
-

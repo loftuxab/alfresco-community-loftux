@@ -1,7 +1,7 @@
 <import resource="/components/common/js/mimetypes.js">
 <import resource="/components/common/js/component.js">
 
-var sourceContent = WebStudio.Component.getSourceContent();
+var sourceContent = Surf.Component.getSourceContent();
 if(sourceContent == null)
 {
 	model.ready = false;
@@ -10,7 +10,7 @@ if(sourceContent == null)
 else
 {
 	// load the JSON object
-	model.container = WebStudio.Component.getSourceContentData();
+	model.container = Surf.Component.getSourceContentData();
 
 	// property: view
 	var view = instance.object.properties["view"];
@@ -28,7 +28,7 @@ else
 	}
 
 	// set up mimetype icons
-	var mimetypes = new WebStudio.Mimetypes();
+	var mimetypes = new Surf.Mimetypes();
 	for(var i = 0; i < model.container.children.length; i++)
 	{
 		var child = model.container.children[i];

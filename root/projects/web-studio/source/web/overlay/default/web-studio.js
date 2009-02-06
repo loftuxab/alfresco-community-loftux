@@ -754,7 +754,7 @@ WebStudio.components = WebStudio.components ||
 		return config;
 	}
 	,
-	newInclude: function(type, endpoint, value, mimetype)
+	newInclude: function(type, endpoint, path, mimetype)
 	{
 		var config = this.newBinding();
 		config["binding"]["componentType"] = "/component/common/include";

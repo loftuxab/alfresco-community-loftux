@@ -1,9 +1,9 @@
 <import resource="/components/common/js/component.js">
 
 // bind core properties and source
-WebStudio.Component.bind();
+Surf.Component.bind();
 
 // bind custom properties
-WebStudio.Component.bindProperty("previewImageUrl");
-WebStudio.Component.bindProperty("fileext");
+Surf.Component.bindProperty("previewImageUrl");
+Surf.Component.bindProperty("fileext");
 

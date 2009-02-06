@@ -1,15 +1,15 @@
 <import resource="/components/common/js/component.js">
 
 // bind core properties and source
-WebStudio.Component.bind();
+Surf.Component.bind();
 
 // bind custom properties
-WebStudio.Component.bindProperty("style");
-WebStudio.Component.bindProperty("orientation");
+Surf.Component.bindProperty("style");
+Surf.Component.bindProperty("orientation");
 
-WebStudio.Component.bindProperty("startingPage");
-WebStudio.Component.bindProperty("topPage");
-WebStudio.Component.bindProperty("childSiblings");
+Surf.Component.bindProperty("startingPage");
+Surf.Component.bindProperty("topPage");
+Surf.Component.bindProperty("childSiblings");
 
 
 // default values

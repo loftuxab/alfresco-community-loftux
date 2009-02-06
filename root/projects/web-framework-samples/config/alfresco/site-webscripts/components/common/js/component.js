@@ -1,18 +1,18 @@
 <import resource="/include/support.js">
 
-if (typeof WebStudio == "undefined")
+if (typeof Surf == "undefined")
 {
-	var WebStudio = {};
+	var Surf = {};
 }
 
-WebStudio.Component = function()
+Surf.Component = function()
 {
 }
 
 /**
  *  Returns the "source" resource for a component
  */
-WebStudio.Component.getSource = function(modelObject)
+Surf.Component.getSource = function(modelObject)
 {
 	if(modelObject == null)
 	{
@@ -33,7 +33,7 @@ WebStudio.Component.getSource = function(modelObject)
  *  Returns the "source" content for a component
  *  This is a wrapper around the "source" resource object
  */
-WebStudio.Component.getSourceContent = function(modelObject)
+Surf.Component.getSourceContent = function(modelObject)
 {
 	if(modelObject == null)
 	{
@@ -62,7 +62,7 @@ WebStudio.Component.getSourceContent = function(modelObject)
 /**
  *  Returns the content data as JSON
  */
-WebStudio.Component.getSourceContentData = function(modelObject)
+Surf.Component.getSourceContentData = function(modelObject)
 {
 	if(modelObject == null)
 	{
@@ -86,7 +86,7 @@ WebStudio.Component.getSourceContentData = function(modelObject)
 
 
 
-WebStudio.Component.bind = function(modelObject)
+Surf.Component.bind = function(modelObject)
 {
 	if(modelObject == null)
 	{
@@ -106,7 +106,7 @@ WebStudio.Component.bind = function(modelObject)
 	model.description = form.bind("description", properties["description"], "");
 }
 
-WebStudio.Component.bindProperty = function(propertyName, modelObject)
+Surf.Component.bindProperty = function(propertyName, modelObject)
 {
 	if(modelObject == null)
 	{
@@ -116,7 +116,7 @@ WebStudio.Component.bindProperty = function(propertyName, modelObject)
 	model[propertyName] = form.bind(propertyName, modelObject.properties[propertyName], "");
 }
 
-WebStudio.Component.persist = function(modelObject)
+Surf.Component.persist = function(modelObject)
 {
 	if(modelObject == null)
 	{

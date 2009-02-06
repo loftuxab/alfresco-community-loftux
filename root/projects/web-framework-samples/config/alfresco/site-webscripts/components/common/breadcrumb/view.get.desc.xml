@@ -1,4 +1,4 @@
-<webscript kind="webstudio">
+<webscript>
   <shortname>Breadcrumb</shortname>
   <description>Displays a horizontal breadcrumb trail</description>
   <family>component</family>
