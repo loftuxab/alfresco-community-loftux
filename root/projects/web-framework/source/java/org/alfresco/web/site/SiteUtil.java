@@ -24,7 +24,10 @@
  */
 package org.alfresco.web.site;
 
+import java.util.Map;
+
 import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 
@@ -35,11 +38,28 @@ import org.alfresco.web.framework.model.Page;
  */
 public class SiteUtil
 {
-    public static Page getDefaultRootPage(RequestContext context)
+    private static final String DEFAULT_SITE_CONFIGURATION_ID = "default.site.configuration";
+
+    /**
+     * Returns the root page for the current request context
+     * 
+     * @param context the context
+     * 
+     * @return the root page
+     */
+    public static Page getRootPage(RequestContext context)
     {
-        return getRootPage(context, getDefaultSiteConfiguration(context));
+        return getRootPage(context, getSiteConfiguration(context));        
     }
     
+    /**
+     * Returns the root page for the given site configuration
+     * 
+     * @param context
+     * @param siteConfiguration
+     * 
+     * @return the root page instance
+     */
     public static Page getRootPage(RequestContext context, Configuration siteConfiguration)
     {
         Page rootPage = null;
@@ -61,12 +81,55 @@ public class SiteUtil
         return rootPage;
     }
 
-    public static Configuration getDefaultSiteConfiguration(RequestContext context)
+    /**
+     * Returns the site configuration object to use for the current request.
+     * 
+     * At present, this is a very simple calculation since we either look to
+     * the current application default site id or we use a default.
+     * 
+     * In the future, we will seek to support multiple site configurations
+     * per web application (i.e. one might be for html, another for wireless,
+     * another for print channel).
+     * 
+     * @param context the context
+     * 
+     * @return the site configuration
+     */
+    public static Configuration getSiteConfiguration(RequestContext context)
     {
-        String defaultSiteConfigurationId = getConfig().getDefaultSiteConfigurationId();
-        return (Configuration) context.getModel().getConfiguration(defaultSiteConfigurationId);
+        // try to load the site configuration id specified by the application default
+        String siteConfigId = getConfig().getDefaultSiteConfigurationId();
+        
+        Configuration configuration = (Configuration) context.getModel().getConfiguration(siteConfigId);
+        if (configuration == null)
+        {
+            // if nothing was found, try to load the "stock" configuration id
+            siteConfigId = DEFAULT_SITE_CONFIGURATION_ID;
+            
+            configuration = (Configuration) context.getModel().getConfiguration(siteConfigId);            
+            if (configuration == null)
+            {
+                // if we still haven't found an object, then we can do an exhaustive lookup
+                // this is a last resort effort to find the site config object                
+                Map<String,ModelObject> configs = context.getModel().findConfigurations("site");
+                if (configs != null && configs.size() > 0)
+                {
+                    configuration = (Configuration) configs.values().iterator().next();
+                    
+                    if (configuration != null && context.getLogger().isWarnEnabled())
+                        context.getLogger().warn("Site configuration '" + configuration.getId() + "' discovered via exhaustive lookup.  Please adjust configuration files to optimize performance.");
+                }                
+            }
+        }
+        
+        return configuration;
     }
         
+    /**
+     * Returns the web framework configuration element
+     * 
+     * @return the config
+     */
     protected static WebFrameworkConfigElement getConfig()
     {
         return FrameworkHelper.getConfig();

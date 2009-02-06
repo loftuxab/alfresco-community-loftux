@@ -412,11 +412,6 @@
       <ant dir="${dir.module.sharepoint}/amp" target="deploy" />
    </target>
    
-   <target name="build-surfapp" 
-           depends="incremental-core,
-                    package-webscriptframework-jar,
-                    incremental-webframework-empty" />   
-   
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
            depends="generate-javadocs-core, 

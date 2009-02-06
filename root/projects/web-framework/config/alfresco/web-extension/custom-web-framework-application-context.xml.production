@@ -18,8 +18,7 @@
    <!-- Local Store Abstract  -->   
    <bean id="webframework.localstore" class="org.alfresco.web.scripts.LocalFileSystemStore" abstract="true" init-method="init">
       <property name="root">
-         <value>/dir/subdir/</value>
-         <!-- <value>./webappsubdir/</value> -->
+         <value>/surf/ROOT/WEB-INF/classes</value>
       </property>
    </bean>
    
@@ -85,7 +84,7 @@
             <!-- <ref bean="webframework.remotestore.component" /> -->
             <ref bean="webframework.localstore.component" />
             <ref bean="webframework.classpathstore.component.custom" />
-			<ref bean="webframework.classpathstore.component" />
+            <ref bean="webframework.classpathstore.component" />
          </list>
       </property>
    </bean>
@@ -100,7 +99,7 @@
             <!-- <ref bean="webframework.remotestore.componenttype" /> -->
             <ref bean="webframework.localstore.componenttype" />
             <ref bean="webframework.classpathstore.componenttype.custom" />
-			<ref bean="webframework.classpathstore.componenttype" />
+            <ref bean="webframework.classpathstore.componenttype" />
          </list>
       </property>
    </bean>
@@ -115,7 +114,7 @@
             <!-- <ref bean="webframework.remotestore.configuration" /> -->
             <ref bean="webframework.localstore.configuration" />
             <ref bean="webframework.classpathstore.configuration.custom" />
-			<ref bean="webframework.classpathstore.configuration" />
+            <ref bean="webframework.classpathstore.configuration" />
          </list>
       </property>
    </bean>
@@ -129,8 +128,8 @@
          <list>
             <!-- <ref bean="webframework.remotestore.contentassociation" /> -->
             <ref bean="webframework.localstore.contentassociation" />
-         	<ref bean="webframework.classpathstore.contentassociation.custom" />
-			<ref bean="webframework.classpathstore.contentassociation" />
+            <ref bean="webframework.classpathstore.contentassociation.custom" />
+            <ref bean="webframework.classpathstore.contentassociation" />
          </list>
       </property>
    </bean>
@@ -145,7 +144,7 @@
             <!-- <ref bean="webframework.remotestore.page" /> -->
             <ref bean="webframework.localstore.page" />
             <ref bean="webframework.classpathstore.page.custom" />
-			<ref bean="webframework.classpathstore.page" />
+            <ref bean="webframework.classpathstore.page" />
          </list>
       </property>
    </bean>
@@ -159,8 +158,8 @@
          <list>
             <!-- <ref bean="webframework.remotestore.pageassociation" /> -->
             <ref bean="webframework.localstore.pageassociation" />
-			<ref bean="webframework.classpathstore.pageassociation.custom" />
-			<ref bean="webframework.classpathstore.pageassociation" />
+            <ref bean="webframework.classpathstore.pageassociation.custom" />
+            <ref bean="webframework.classpathstore.pageassociation" />
          </list>
       </property>
    </bean>
@@ -175,7 +174,7 @@
             <!-- <ref bean="webframework.remotestore.pagetype" /> -->
             <ref bean="webframework.localstore.pagetype" />
             <ref bean="webframework.classpathstore.pagetype.custom" />
-			<ref bean="webframework.classpathstore.pagetype" />
+            <ref bean="webframework.classpathstore.pagetype" />
          </list>
       </property>
    </bean>
@@ -190,7 +189,7 @@
             <!-- <ref bean="webframework.remotestore.templateinstance" /> -->
             <ref bean="webframework.localstore.templateinstance" />
             <ref bean="webframework.classpathstore.templateinstance.custom" />
-			<ref bean="webframework.classpathstore.templateinstance" />
+            <ref bean="webframework.classpathstore.templateinstance" />
          </list>
       </property>
    </bean>
@@ -205,7 +204,7 @@
             <!-- <ref bean="webframework.remotestore.templatetype" /> -->
             <ref bean="webframework.localstore.templatetype" />
             <ref bean="webframework.classpathstore.templatetype.custom" />
-			<ref bean="webframework.classpathstore.templatetype" />
+            <ref bean="webframework.classpathstore.templatetype" />
          </list>
       </property>
    </bean>
