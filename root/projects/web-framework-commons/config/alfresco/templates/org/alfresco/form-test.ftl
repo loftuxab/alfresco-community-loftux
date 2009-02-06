@@ -27,7 +27,6 @@
             &nbsp;&nbsp;
             <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
             <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
-            <input id="mode-create" type="radio" name="mode" value="create"<#if mode == "create"> checked</#if>>&nbsp;Create
             <br/>
             <label for="submitMode-multi">Submit Type:</label>
             <input id="submitMode-multi" type="radio" name="submitMode" value="multipart"<#if submitMode == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;

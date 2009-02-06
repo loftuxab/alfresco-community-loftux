@@ -1,70 +1,75 @@
 <!-- determine if the time should be shown too -->
 
-<label>${item.label?html}:</label>
+<#assign dpId=args.htmlid + "_" + field.id>
+<#assign dpVar=dpId?replace("-", "_")>
 
 <#if form.mode == "view">
-<span class="field"><#if item.value != "">${item.value?datetime("yyyy-mm-dd'T'HH:MM:ss")?string("EEEE, MMMM dd yyyy")}</#if></span>
+<div class="viewmode-field">
+   <span class="viewmode-label">${field.label?html}:</span>
+   <span class="viewmode-value"><#if field.value != "">${field.value?datetime("yyyy-mm-dd'T'HH:MM:ss")?string("EEEE, MMMM dd yyyy")}</#if></span>
+</div>
 <#else>
 
-<input id="${item.id}" type="hidden" name="${item.name}" value="${item.value}" />
-<input id="${item.id}-entry" type="text" <#if item.description?exists>title="${item.description}"</#if> <#if item.protectedField>disabled="true"</#if> />
+<label for="${dpId}">${field.label?html}:</label>
+<input id="${dpId}" type="hidden" name="${field.name}" value="${field.value}" />
+<input id="${dpId}-entry" type="text" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 
-<#if item.protectedField == false>
-<a id="${item.id}-icon" class="datepicker-icon" href="javascript:${item.id}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" /></a>
+<#if field.disabled == false>
+<a id="${dpId}-icon" class="datepicker-icon" href="javascript:${dpVar}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" /></a>
 </#if>
-<div id="${item.id}-cal" class="datepicker"></div>
+<div id="${dpId}-cal" class="datepicker"></div>
 
-<script type="text/javascript">
-   function ${item.id}_selHandler(type,args,obj) 
+<script type="text/javascript">//<![CDATA[
+   function ${dpVar}_selHandler(type,args,obj) 
    {
       var selected = args[0];
       var selDate = this.toDate(selected[0]);
       var entry = (selDate.getMonth() + 1) + "/" + selDate.getDate() + "/" + selDate.getFullYear();
-      YAHOO.util.Dom.get("${item.id}").value = Alfresco.util.toISO8601(selDate);
-      YAHOO.util.Dom.get("${item.id}-entry").value = entry;
-      ${item.id}_cal.hide();
+      YAHOO.util.Dom.get("${dpId}").value = Alfresco.util.toISO8601(selDate);
+      YAHOO.util.Dom.get("${dpId}-entry").value = entry;
+      ${dpVar}_cal.hide();
    };
    
-   function ${item.id}_changed(event)
+   function ${dpVar}_changed(event)
    {
-      var changedDate = YAHOO.util.Dom.get("${item.id}-entry").value;
+      var changedDate = YAHOO.util.Dom.get("${dpId}-entry").value;
       if (changedDate.length > 0)
       {
-         ${item.id}_cal.select(changedDate);
-         var selectedDates = ${item.id}_cal.getSelectedDates();
+         ${dpVar}_cal.select(changedDate);
+         var selectedDates = ${dpVar}_cal.getSelectedDates();
          if (selectedDates.length > 0)
          {
             var firstDate = selectedDates[0];
-            YAHOO.util.Dom.get("${item.id}").value = Alfresco.util.toISO8601(firstDate);
-            ${item.id}_cal.cfg.setProperty("pagedate", (firstDate.getMonth()+1) + "/" + firstDate.getFullYear());
-            ${item.id}_cal.render();
+            YAHOO.util.Dom.get("${dpId}").value = Alfresco.util.toISO8601(firstDate);
+            ${dpVar}_cal.cfg.setProperty("pagedate", (firstDate.getMonth()+1) + "/" + firstDate.getFullYear());
+            ${dpVar}_cal.render();
          }
       }
       else
       {
-         YAHOO.util.Dom.get("${item.id}").value = "";
+         YAHOO.util.Dom.get("${dpId}").value = "";
       }
    };
 
    // setup data
-   var ${item.id}_date = Alfresco.util.fromISO8601("${item.value}");
-   var ${item.id}_page = (${item.id}_date.getMonth() + 1) + "/" + ${item.id}_date.getFullYear();
-   var ${item.id}_sel = (${item.id}_date.getMonth() + 1) + "/" + ${item.id}_date.getDate() + "/" + ${item.id}_date.getFullYear();
-   <#if item.value?exists>
-   YAHOO.util.Dom.get("${item.id}-entry").value = ${item.id}_sel;
+   var ${dpVar}_date = Alfresco.util.fromISO8601("${field.value}");
+   var ${dpVar}_page = (${dpVar}_date.getMonth() + 1) + "/" + ${dpVar}_date.getFullYear();
+   var ${dpVar}_sel = (${dpVar}_date.getMonth() + 1) + "/" + ${dpVar}_date.getDate() + "/" + ${dpVar}_date.getFullYear();
+   <#if field.value?exists>
+   YAHOO.util.Dom.get("${dpId}-entry").value = ${dpVar}_sel;
    </#if>
    
    // setup calendar control
-   var ${item.id}_cal = new YAHOO.widget.Calendar("${item.id}-cal", "${item.id}-cal", { title:"Choose a date:", close:true });
-   ${item.id}_cal.cfg.setProperty("pagedate", ${item.id}_page);
-   ${item.id}_cal.cfg.setProperty("selected", ${item.id}_sel);
+   var ${dpVar}_cal = new YAHOO.widget.Calendar("${dpId}-cal", "${dpId}-cal", { title:"Choose a date:", close:true });
+   ${dpVar}_cal.cfg.setProperty("pagedate", ${dpVar}_page);
+   ${dpVar}_cal.cfg.setProperty("selected", ${dpVar}_sel);
    
    // setup events
-   ${item.id}_cal.selectEvent.subscribe(${item.id}_selHandler, ${item.id}_cal, true);
-   YAHOO.util.Event.addListener("${item.id}-entry", "change", ${item.id}_changed);
+   ${dpVar}_cal.selectEvent.subscribe(${dpVar}_selHandler, ${dpVar}_cal, true);
+   YAHOO.util.Event.addListener("${dpId}-entry", "change", ${dpVar}_changed);
    
    // render the calendar control
-   ${item.id}_cal.render();
-</script>
+   ${dpVar}_cal.render();
+//]]></script>
 
 </#if>

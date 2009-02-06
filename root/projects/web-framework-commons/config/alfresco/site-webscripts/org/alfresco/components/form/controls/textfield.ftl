@@ -1,12 +1,14 @@
-<label>${item.label?html}:</label>
-
 <#if form.mode == "view">
-<span class="field">${item.value?html}</span>
+<div class="viewmode-field">
+   <span class="viewmode-label">${field.label?html}:</span>
+   <span class="viewmode-value">${field.value?html}</span>
+</div>
 <#else>
-<input id="${item.id}" type="text" name="${item.name}" value="${item.value}" 
-       <#if item.description?exists>title="${item.description}"</#if>
-       <#if item.control.params.maxLength?exists>maxlength="${item.control.params.maxLength}"</#if>
-       <#if item.control.params.width?exists>style="width: ${item.control.params.width};"</#if> 
-       <#if item.control.params.size?exists>size="${item.control.params.size}"</#if> 
-       <#if item.protectedField>disabled="true"</#if> />
+<label for="${args.htmlid}_${field.id}">${field.label?html}:</label>
+<input id="${args.htmlid}_${field.id}" type="text" name="${field.name}" value="${field.value}" 
+       <#if field.description?exists>title="${field.description}"</#if>
+       <#if field.control.params.maxLength?exists>maxlength="${field.control.params.maxLength}"</#if>
+       <#if field.control.params.width?exists>style="width: ${field.control.params.width};"</#if> 
+       <#if field.control.params.size?exists>size="${field.control.params.size}"</#if> 
+       <#if field.disabled>disabled="true"</#if> />
 </#if>

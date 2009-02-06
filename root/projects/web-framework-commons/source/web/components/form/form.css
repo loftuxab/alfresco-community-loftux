@@ -1,16 +1,16 @@
 /* FormUI Component */
 
-.form
+.form-container
 {
    padding-top: 10px;
 }
 
-.form form
+.form-container form
 {
    margin: 3px;
 }
 
-.form label
+.form-container label
 {
    clear: both;
    display: block;
@@ -19,16 +19,32 @@
    margin-left: 12px;
 }
 
-.form input
+.form-container input
 {
    //display: block;
    clear: both;
    margin: 12px;
 }
 
-.form textarea
+.form-container textarea
 {
    margin: 12px;
+}
+
+.form-container .viewmode-field
+{
+   margin-bottom: 12px;
+   margin-left: 12px;
+}
+
+.form-container .viewmode-label
+{
+   font-weight: bold;
+   margin-right: 5px;
+}
+
+.form-container .viewmode-value
+{
 }
 
 .datepicker
