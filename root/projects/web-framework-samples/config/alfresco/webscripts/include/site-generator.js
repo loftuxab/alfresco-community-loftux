@@ -41,7 +41,7 @@ function createSite(name, description)
 	siteConfiguration.setTitle(name);
 	siteConfiguration.setDescription(description);	
 	siteConfiguration.setProperty("root-page", rootPage.id);
-	siteConfiguration.setId("studio.site.configuration");	
+	siteConfiguration.setId("default.site.configuration");	
 	siteConfiguration.save();
 	
 	return siteConfiguration;	
