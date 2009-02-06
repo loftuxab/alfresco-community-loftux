@@ -511,7 +511,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 			}
 			
 			/** HTML **/
-			if (mimetype == "text/html" && mimetype == "text/shtml") 
+			if (mimetype == "text/html" || mimetype == "text/shtml") 
 			{
 				config = WebStudio.components.newInclude(sourceType, sourceEndpoint, sourcePath, mimetype);
 			}

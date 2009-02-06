@@ -1,6 +1,6 @@
 <import resource="/components/common/js/component.js">
 
-var source = WebStudio.Component.getSource();
+var source = Surf.Component.getSource();
 if(source == null)
 {
 	model.ready = false;

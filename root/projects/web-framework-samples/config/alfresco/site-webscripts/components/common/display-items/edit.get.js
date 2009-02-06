@@ -1,9 +1,9 @@
 <import resource="/components/common/js/component.js">
 
 // bind core properties and source
-WebStudio.Component.bind();
+Surf.Component.bind();
 
 // bind custom properties
-WebStudio.Component.bindProperty("view");
-WebStudio.Component.bindProperty("iconSize");
+Surf.Component.bindProperty("view");
+Surf.Component.bindProperty("iconSize");
 

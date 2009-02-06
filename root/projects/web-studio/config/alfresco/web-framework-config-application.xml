@@ -57,11 +57,6 @@
 				<user-factory>alfresco</user-factory>
 			</framework-defaults>
 			
-			<!-- Override -->
-			<application-defaults>
-				<site-configuration>studio.site.configuration</site-configuration>
-			</application-defaults>
-			
 			<!-- object model -->
 			<model-type>
 				<id>chrome</id>

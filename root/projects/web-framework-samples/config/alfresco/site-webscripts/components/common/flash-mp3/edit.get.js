@@ -1,8 +1,8 @@
 <import resource="/components/common/js/component.js">
 
 // bind core properties and source
-WebStudio.Component.bind();
+Surf.Component.bind();
 
 // bind custom properties
-WebStudio.Component.bindProperty("appearance");
-WebStudio.Component.bindProperty("songTitle");
+Surf.Component.bindProperty("appearance");
+Surf.Component.bindProperty("songTitle");
