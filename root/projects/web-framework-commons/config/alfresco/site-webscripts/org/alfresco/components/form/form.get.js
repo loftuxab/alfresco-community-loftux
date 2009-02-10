@@ -173,7 +173,10 @@ function setupField(formModel, fieldName, fieldConfig)
    // used to uniquely identify the field
    if (typeof propFieldDef !== "undefined" && typeof assocFieldDef !== "undefined")
    {
-      logger.log("WARN: \"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
+      if (logger.isWarnLoggingEnabled())
+      {
+         logger.warn("\"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
+      }
       fieldDef = {};
       fieldDef.kind = "field";
       fieldDef.configName = fieldName;
@@ -363,7 +366,10 @@ function setupControl(fieldDef, fieldConfig)
          }
          else
          {
-            logger.log("WARN: no default control found for data type \"" + fieldDef.dataType + "\"");
+            if (logger.isWarnLoggingEnabled())
+            {
+               logger.warn("No default control found for data type \"" + fieldDef.dataType + "\" whilst processing field \"" + fieldDef.configName + "\"");
+            }
          }
       }
       else
@@ -374,7 +380,10 @@ function setupControl(fieldDef, fieldConfig)
          }
          else
          {
-            logger.log("WARN: no default control found for associations");
+            if (logger.isWarnLoggingEnabled())
+            {
+               logger.warn("No default control found for associations" + "\" whilst processing field \"" + fieldDef.configName + "\"");
+            }
          }
       }
    }
