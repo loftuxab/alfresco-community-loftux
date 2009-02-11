@@ -348,10 +348,7 @@
            depends="incremental-webclient-depends,
                     incremental-webclient,
                     deploy-webclient-tomcat" />
-   
-   <!-- temporary target for mac dev env to call for backwards compatibility -->
-   <target name="incremental-tomcat-exploded" depends="incremental-webclient-tomcat-exploded" />
-   
+
    <target name="incremental-webclient-tomcat-exploded" 
            depends="incremental-webclient-depends,
                     package-webclient-jar,
