@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have received a copy of the text describing 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -39,14 +39,12 @@ import org.dom4j.Element;
  * 
  * Examples:
  * 
- * <resource id="abc1" type="space"
- * endpoint="alfresco">workspace://...</resource> <resource id="abc2"
- * type="space" endpoint="alfresco">/Company Home/Data Dictionary/...</resource>
- * <resource id="abc3" type="uri">/a/b/c.gif</resource> <resource
- * id="abc4" type="uri" endpoint="alfresco">/a/b/c.gif</resource>
- * <resource id="abc5" type="site" site="mysite"
- * endpoint="alfresco">/document_library/abc.doc</resource> <resource
- * id="abc6" type="webapp">/a/b/c.gif</resource>
+ * <resource id="abc1" type="space" endpoint="alfresco">workspace...</resource>
+ * <resource id="abc2" type="space" endpoint="alfresco">/Company Home/Data Dictionary/...</resource>
+ * <resource id="abc3" type="uri">/a/b/c.gif</resource>
+ * <resource id="abc4" type="uri" endpoint="alfresco">/a/b/c.gif</resource>
+ * <resource id="abc5" type="site" site="mysite" endpoint="alfresco">/document_library/abc.doc</resource>
+ * <resource id="abc6" type="webapp">/a/b/c.gif</resource>
  * 
  * @author muzquiano
  */
@@ -55,25 +53,26 @@ public class ModelObjectResourceProvider implements ResourceProvider
     protected ModelObject object;
     protected Map<String, Resource> resources;
 
+    /**
+     * Instantiates a new model object resource provider.
+     * 
+     * @param object the object
+     */
     public ModelObjectResourceProvider(ModelObject object)
     {
         this.object = object;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceContainer#getResource(java.lang.String)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceProvider#getResource(java.lang.String)
      */
     public Resource getResource(String id)
     {
         return getResourcesMap().get(id);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceContainer#getResources()
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceProvider#getResources()
      */
     public Resource[] getResources()
     {
@@ -81,9 +80,7 @@ public class ModelObjectResourceProvider implements ResourceProvider
         return map.values().toArray(new Resource[map.size()]);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String)
      */
     public Resource addResource(String id)
@@ -91,11 +88,8 @@ public class ModelObjectResourceProvider implements ResourceProvider
         return addResource(id, null);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String,
-     *      java.lang.String)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceProvider#addResource(java.lang.String, java.lang.String)
      */
     public synchronized Resource addResource(String id, String type)
     {
@@ -116,11 +110,8 @@ public class ModelObjectResourceProvider implements ResourceProvider
         return resource;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceProvider#updateResource(java.lang.String,
-     *      org.alfresco.web.framework.resource.Resource)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceProvider#updateResource(java.lang.String, org.alfresco.web.framework.resource.Resource)
      */
     public void updateResource(String id, Resource resource)
     {
@@ -139,9 +130,7 @@ public class ModelObjectResourceProvider implements ResourceProvider
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /* (non-Javadoc)
      * @see org.alfresco.web.framework.resource.ResourceProvider#removeResource(java.lang.String)
      */
     public void removeResource(String id)
@@ -158,10 +147,8 @@ public class ModelObjectResourceProvider implements ResourceProvider
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceContainer#getResourcesMap()
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceProvider#getResourcesMap()
      */
     public synchronized Map<String, Resource> getResourcesMap()
     {
@@ -185,6 +172,13 @@ public class ModelObjectResourceProvider implements ResourceProvider
         return this.resources;
     }
 
+    /**
+     * Gets the resources element.
+     * 
+     * @param object the object
+     * 
+     * @return the resources element
+     */
     protected static Element getResourcesElement(ModelObject object)
     {
         Element result = null;
@@ -204,6 +198,14 @@ public class ModelObjectResourceProvider implements ResourceProvider
         return result;
     }
 
+    /**
+     * Gets the resource element.
+     * 
+     * @param object the object
+     * @param id the id
+     * 
+     * @return the resource element
+     */
     protected static Element getResourceElement(ModelObject object, String id)
     {
         Element result = null;
@@ -224,6 +226,14 @@ public class ModelObjectResourceProvider implements ResourceProvider
         return result;
     }
 
+    /**
+     * Load resource.
+     * 
+     * @param object the object
+     * @param id the id
+     * 
+     * @return the resource
+     */
     protected static Resource loadResource(ModelObject object, String id)
     {
         ResourceStore store = new ModelObjectResourceStore(object);

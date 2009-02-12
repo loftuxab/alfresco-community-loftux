@@ -13,30 +13,12 @@
       Note: If you intend to connect to Alfresco WCM backed stores, the
       current user *must* be authenticated to the Alfresco endpoint.
    -->
-   
-   <!-- Remote Store Abstract -->
-   <!-- Use this to connect to an arbitrary AVM store -->
-   <!--
-   <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
-      <property name="endpoint">
-         <value>alfresco</value>
-      </property>
-      <property name="api">
-         <value>/remotestore</value>
-      </property>
-      <property name="storeId">
-         <value>TODO_REQUIRED_STORE_ID (i.e. sitestore)</value>
-      </property>
-      <property name="connectorService" ref="connector.service" />
-      <property name="connectorProvider" ref="webframework.connector.provider" />      
-   </bean>
-   -->
-   
+      
    <!-- Remote Store Abstract -->
    <!-- Use this to connect to a WCM sandbox AVM store -->
    <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
       <property name="endpoint">
-         <value>alfresco</value>
+         <value>alfresco-system</value>
       </property>
       <property name="api">
          <value>/avmstore</value>
@@ -87,6 +69,9 @@
    </bean>   
 
    <!-- Model Object: Chrome -->
+   <bean id="webframework.remotestore.chrome" parent="webframework.remotestore">
+      <property name="path"><value>alfresco/site-data/chrome</value></property>
+   </bean>   
    <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -98,6 +83,9 @@
    </bean>
 	
    <!-- Model Object: Component -->
+   <bean id="webframework.remotestore.component" parent="webframework.remotestore">
+      <property name="path"><value>alfresco/site-data/components</value></property>
+   </bean>   
    <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -109,6 +97,9 @@
    </bean>
 
    <!-- Model Object: Component Type -->
+   <bean id="webframework.remotestore.component-types" parent="webframework.remotestore">
+      <property name="path"><value>alfresco/site-data/component-types</value></property>
+   </bean>   
    <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -120,6 +111,9 @@
    </bean>
 	  	  
    <!-- Model Object: Configuration -->
+   <bean id="webframework.remotestore.configurations" parent="webframework.remotestore">
+      <property name="path"><value>alfresco/site-data/configurations</value></property>
+   </bean>   
    <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -131,6 +125,9 @@
    </bean>
 
    <!-- Model Object: Content Association -->
+   <bean id="webframework.remotestore.content-associations" parent="webframework.remotestore">
+      <property name="path"><value>alfresco/site-data/content-associations</value></property>
+   </bean>   
    <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -185,7 +182,7 @@
       </property>
    </bean>
 
-   <!-- Template Type -->
+   <!-- Model Object: Template Type -->
    <bean id="webframework.searchpath.templatetype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -196,7 +193,7 @@
       </property>
    </bean>
 
-   <!-- Themes -->
+   <!-- Model Object: Themes -->
    <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>

@@ -156,7 +156,7 @@ public abstract class AbstractResource implements Resource
      * 
      * @see org.alfresco.web.framework.resource.Resource#getContent(org.alfresco.web.site.RequestContext)
      */
-    public synchronized ResourceContent getContent(RequestContext context)
+    public ResourceContent getContent(RequestContext context)
     {
         if (this.content == null)
         {
