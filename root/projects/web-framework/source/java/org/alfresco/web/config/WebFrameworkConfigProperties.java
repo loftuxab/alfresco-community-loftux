@@ -30,6 +30,7 @@ import org.alfresco.web.config.WebFrameworkConfigElement.LinkBuilderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.PageMapperDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.RequestContextDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.ResourceLoaderDescriptor;
+import org.alfresco.web.config.WebFrameworkConfigElement.ResourceResolverDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.SystemPageDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.TagLibraryDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.TypeDescriptor;
@@ -98,6 +99,10 @@ public interface WebFrameworkConfigProperties
     // resource loaders
     public String[] getResourceLoaderIds();
     public ResourceLoaderDescriptor getResourceLoaderDescriptor(String id);
+    
+    // resource resolvers
+    public String[] getResourceResolverIds();
+    public ResourceResolverDescriptor getResourceResolverDescriptor(String id);
 
     // web studio settings
     public boolean isWebStudioEnabled();

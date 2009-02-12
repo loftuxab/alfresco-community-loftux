@@ -10,6 +10,22 @@
 
 		<web-framework>
 
+			<!-- Webapp Resource Resolver -->
+			<resource-resolver>
+				<id>webapp</id>
+				<name>Alfresco Web Application Resource Resolver</name>
+				<description>Resolves data access for web application assets</description>
+				<class>org.alfresco.web.framework.resource.AlfrescoWebProjectResourceResolver</class>
+				<alias-uri>/assets</alias-uri>
+				<store-id>TODO</store-id>
+			</resource-resolver>
+
+			<!-- persister config -->
+			<persisters>
+			   <cache-enabled>false</cache-enabled>			   
+			   <cache-check-delay>0</cache-check-delay>
+			</persisters>			
+
 			<!-- object model -->
 			<model-type>
 				<id>chrome</id>

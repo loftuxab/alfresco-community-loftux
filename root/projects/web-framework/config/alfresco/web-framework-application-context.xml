@@ -295,5 +295,5 @@
       <property name="configService" ref="web.config"/>
       <property name="connectorProvider" ref="webframework.connector.provider"/>
    </bean>
-      
+
 </beans>

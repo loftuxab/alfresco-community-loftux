@@ -25,13 +25,20 @@
 package org.alfresco.web.framework.resource;
 
 import org.alfresco.web.framework.exception.ResourceMetadataException;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
+ * Generic implementation of a resource
+ * 
  * @author muzquiano
  */
 public class ResourceImpl extends AbstractResource
 {
+    private static Log logger = LogFactory.getLog(ResourceImpl.class);
+    
     protected ResourceResolver resolver = null;
     protected String metadata = null;
     protected String rawMetadata = null;
@@ -48,27 +55,11 @@ public class ResourceImpl extends AbstractResource
         super(store, id);
 
         this.init(type);
-
     }
 
     protected void init(String type)
     {
-        if ("site".equals(type))
-        {
-            resolver = new AlfrescoSiteResourceResolver(this);
-        }
-        else if ("space".equals(type))
-        {
-            resolver = new AlfrescoSpaceResourceResolver(this);
-        }
-        else if ("webapp".equals(type))
-        {
-            resolver = new AlfrescoWebProjectResourceResolver(this);
-        }
-        else
-        {
-            resolver = new URIResourceResolver(this);
-        }
+        resolver = FrameworkHelper.getResourceResolver(this);
     }
 
     /*

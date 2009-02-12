@@ -10,6 +10,12 @@
 
 		<web-framework>
 
+			<!-- persister config -->
+			<persisters>
+			   <cache-enabled>false</cache-enabled>			   
+			   <cache-check-delay>600</cache-check-delay>
+			</persisters>			
+
 			<!-- object model -->
 			<model-type>
 				<id>chrome</id>
@@ -20,6 +26,8 @@
 				<class>org.alfresco.web.framework.model.Chrome</class>
 				<search-path-id>webframework.searchpath.chrome</search-path-id>
 				<default-store-id>webframework.localstore.chrome</default-store-id>
+				<!--<cache-enabled>true</cache-enabled>-->
+				<!--<cache-check-delay>10</cache-check-delay>-->				
 			</model-type>
 			<model-type>
 				<id>component</id>
@@ -121,6 +129,16 @@
 				<search-path-id>webframework.searchpath.theme</search-path-id>
 				<default-store-id>webframework.localstore.theme</default-store-id>
 			</model-type>
+
+			<!-- Webapp Resource Resolver -->
+			<resource-resolver>
+				<id>webapp</id>
+				<name>Alfresco Web Application Resource Resolver</name>
+				<description>Resolves data access for web application assets</description>
+				<class>org.alfresco.web.framework.resource.AlfrescoWebProjectResourceResolver</class>
+				<alias-uri>/files</alias-uri>
+				<store-id>STORE_ID</store-id>
+			</resource-resolver>
 
 		</web-framework>
 

@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.web.framework.render.RenderContext;
-import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.mozilla.javascript.Scriptable;
 

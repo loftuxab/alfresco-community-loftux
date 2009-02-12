@@ -50,6 +50,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected HashMap<String, String> pageTypes = null;
     protected HashMap<String, TypeDescriptor> types = null;
     protected HashMap<String, ResourceLoaderDescriptor> resourceLoaders = null;
+    protected HashMap<String, ResourceResolverDescriptor> resourceResolvers = null;
 
     protected boolean isTimerEnabled = false;
     
@@ -92,6 +93,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         pageTypes = new HashMap<String, String>();
         types = new HashMap<String, TypeDescriptor>();
         resourceLoaders = new HashMap<String, ResourceLoaderDescriptor>();
+        resourceResolvers = new HashMap<String, ResourceResolverDescriptor>();
 
         isTimerEnabled = false;
     }
@@ -117,6 +119,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.userFactories.putAll(this.userFactories);
         combinedElement.types.putAll(this.types);
         combinedElement.resourceLoaders.putAll(this.resourceLoaders);
+        combinedElement.resourceResolvers.putAll(this.resourceResolvers);
         combinedElement.pageTypes.putAll(this.pageTypes);
 
         // override with things from the merging object
@@ -130,6 +133,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.userFactories.putAll(configElement.userFactories);
         combinedElement.types.putAll(configElement.types);
         combinedElement.resourceLoaders.putAll(configElement.resourceLoaders);
+        combinedElement.resourceResolvers.putAll(configElement.resourceResolvers);
         combinedElement.pageTypes.putAll(configElement.pageTypes);
 
         // other properties
@@ -333,6 +337,17 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     public ResourceLoaderDescriptor getResourceLoaderDescriptor(String id)
     {
         return (ResourceLoaderDescriptor) this.resourceLoaders.get(id);        
+    }
+
+    // resource resolvers
+    public String[] getResourceResolverIds()
+    {
+        return this.resourceResolvers.keySet().toArray(new String[this.resourceResolvers.size()]);
+    }
+    
+    public ResourceResolverDescriptor getResourceResolverDescriptor(String id)
+    {
+        return (ResourceResolverDescriptor) this.resourceResolvers.get(id);        
     }
     
     // debug
@@ -810,6 +825,36 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
     }
 
+    public static class ResourceResolverDescriptor extends Descriptor
+    {
+        private static final String CLAZZ = "class";
+        private static final String DESCRIPTION = "description";
+        private static final String NAME = "name";
+        private static final String ENDPOINT = "endpoint";
+
+        ResourceResolverDescriptor(Element el)
+        {
+            super(el);
+        }
+
+        public String getImplementationClass() 
+        {
+            return getStringProperty(CLAZZ);
+        }
+        public String getDescription() 
+        {
+            return getStringProperty(DESCRIPTION);
+        }
+        public String getName() 
+        {
+            return getStringProperty(NAME);
+        }
+        public String getEndpoint() 
+        {
+            return getStringProperty(ENDPOINT);
+        }
+    }
+    
     protected static WebFrameworkConfigElement newInstance(Element elem)
     {
         WebFrameworkConfigElement configElement = new WebFrameworkConfigElement();
@@ -997,6 +1042,19 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             Element el = (Element) loaders.get(i);
             ResourceLoaderDescriptor descriptor = new ResourceLoaderDescriptor(el);
             configElement.resourceLoaders.put(descriptor.getId(), descriptor);
+        }
+
+        
+        //////////////////////////////////////////////////////
+        // Resource Resolvers
+        //////////////////////////////////////////////////////
+
+        List resolvers = elem.elements("resource-resolver");
+        for(int i = 0; i < resolvers.size(); i++)
+        {
+            Element el = (Element) resolvers.get(i);
+            ResourceResolverDescriptor descriptor = new ResourceResolverDescriptor(el);
+            configElement.resourceResolvers.put(descriptor.getId(), descriptor);
         }
 
         

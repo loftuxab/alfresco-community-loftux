@@ -108,7 +108,7 @@
 	
 	<!-- Object Handling Tags / Links -->
 	<tag> 
-		<name>link</name> 
+		<name>pagelink</name> 
 		<tagclass>org.alfresco.web.site.taglib.ObjectLinkTag</tagclass>
 		<bodycontent>jsp</bodycontent>
 		<info>Renders a URL for a given page or object</info> 

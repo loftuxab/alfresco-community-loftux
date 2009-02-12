@@ -28,6 +28,7 @@ import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.config.WebFrameworkConfigElement.ResourceResolverDescriptor;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
@@ -53,7 +54,7 @@ public final class ScriptWebApplication extends ScriptBase
     }
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebFrameworkScriptBase#buildProperties()
+     * @see org.alfresco.web.scripts.ScriptBase#buildProperties()
      */
     protected ScriptableMap<String, Serializable> buildProperties()
     {
@@ -71,14 +72,15 @@ public final class ScriptWebApplication extends ScriptBase
     {        
         StringBuilder builder = new StringBuilder(512);
         
-        // append the path to the application server hosted web application
-        // on the production tier, this will be the correct context
-        HttpServletRequest request = this.context.getRequest();        
-        builder.append(request.getContextPath());
-
+        HttpServletRequest request = this.context.getRequest();
+        
         // on the preview tier, we'll plug in a passthru to the AVM remote store
         if (FrameworkHelper.getConfig().isWebStudioEnabled())
         {
+            // append the path to the application server hosted web application
+            // on the production tier, this will be the correct context        
+            builder.append(request.getContextPath());
+
             // assume proxy to alfresco
             builder.append("/proxy/alfresco");
             
@@ -100,6 +102,37 @@ public final class ScriptWebApplication extends ScriptBase
                 builder.append("/w/");
                 builder.append(webappId);
             }            
+        }
+        else
+        {
+            ResourceResolverDescriptor descriptor = FrameworkHelper.getConfig().getResourceResolverDescriptor("webapp");
+            if (descriptor != null)
+            {
+                String aliasUri = descriptor.getStringProperty("alias-uri");
+                
+                // if the alias uri is empty, we'll just use the context path
+                if (aliasUri == null)
+                {
+                    builder.append(request.getContextPath());
+                }
+                else
+                {
+                    if (aliasUri.startsWith("/"))
+                    {
+                        // if the alias uri starts with "/", then
+                        // we'll assume it is root-relative
+                        builder.append(aliasUri);
+                    }
+                    else
+                    {
+                        // if the alias uri doesn't start with "/", then
+                        // we'll assume it is relative to the context path
+                        builder.append(request.getContextPath());
+                        builder.append("/");
+                        builder.append(aliasUri);
+                    }
+                }
+            }
         }
         
         return builder.toString();
