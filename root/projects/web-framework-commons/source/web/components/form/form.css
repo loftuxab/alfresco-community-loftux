@@ -21,7 +21,6 @@
 
 .form-container input
 {
-   //display: block;
    clear: both;
    margin: 12px;
 }
@@ -29,6 +28,14 @@
 .form-container textarea
 {
    margin: 12px;
+}
+
+.form-container .mandatory-indicator
+{
+   color: green;
+   margin-left: 5px;
+   font-size: 1.2em;
+   vertical-align: -5px;
 }
 
 .form-container .viewmode-field
