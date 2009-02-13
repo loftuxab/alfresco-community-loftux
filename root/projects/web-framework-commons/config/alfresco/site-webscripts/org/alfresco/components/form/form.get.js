@@ -26,8 +26,6 @@ function main()
       
       var json = remote.call("/api/forms/node/" + nodeRef.replace(":/", ""));
       
-      // TODO: test for response status and potential errors
-      
       if (logger.isLoggingEnabled())
       {
          logger.log("json = " + json);
@@ -35,87 +33,94 @@ function main()
       
       formModel = eval('(' + json + ')');
       
-      // setup caches
-      setupCaches(formModel);
-      
-      // determine what mode we are in from the arguments
-      var mode = context.properties.mode;
-      if (mode === null)
+      if (json.status == 200)
       {
-      	mode = "edit";
-      }
-      
-      // create and setup form ui model basics
-      formUIModel = {};
-      formUIModel.mode = mode;
-      formUIModel.submissionUrl = formModel.data.submissionUrl;
-      
-      // query for configuration for item
-      var nodeConfig = config.scoped[formModel.data.type];
-      
-      if (nodeConfig != null)
-      {
-         // get the visible fields for the current mode
-         var formConfig = nodeConfig.form;
+         // setup caches
+         setupCaches(formModel);
          
-         var visibleFields = null;
-         
-         // TODO: deal with hidden vs. show mode and no config
-         
-         switch (mode)
+         // determine what mode we are in from the arguments
+         var mode = context.properties.mode;
+         if (mode === null)
          {
-            case "view":
-               visibleFields = formConfig.visibleViewFieldNames;
-               break;
-            case "edit":
-               visibleFields = formConfig.visibleEditFieldNames;
-               break;
-            case "create":
-               visibleFields = formConfig.visibleCreateFieldNames;
-               break;
-            default:
-               visibleFields = formConfig.visibleViewFieldNames;
-               break;
+         	mode = "edit";
          }
          
-         logger.log("visible fields for " + formUIModel.mode + " mode = " + visibleFields);
+         // create and setup form ui model basics
+         formUIModel = {};
+         formUIModel.mode = mode;
+         formUIModel.submissionUrl = formModel.data.submissionUrl;
          
-         // iterate round each visible field name, retrieve all data and
-         // add to the form ui model
-         var configuredFields = formConfig.fields;
-         var formUIItems = [];
+         // query for configuration for item
+         var nodeConfig = config.scoped[formModel.data.type];
          
-         for (var f = 0; f < visibleFields.size(); f++)
+         if (nodeConfig != null)
          {
-            var fieldName = visibleFields.get(f);            
-            var fieldConfig = configuredFields[fieldName];
+            // get the visible fields for the current mode
+            var formConfig = nodeConfig.form;
             
-            if (fieldConfig === null)
+            var visibleFields = null;
+            
+            // TODO: deal with hidden vs. show mode and no config
+            
+            switch (mode)
             {
-               // if the field does not appear in the appearance section
-               // there won't be any config so create empty object
-               fieldConfig = {};
+               case "view":
+                  visibleFields = formConfig.visibleViewFieldNames;
+                  break;
+               case "edit":
+                  visibleFields = formConfig.visibleEditFieldNames;
+                  break;
+               case "create":
+                  visibleFields = formConfig.visibleCreateFieldNames;
+                  break;
+               default:
+                  visibleFields = formConfig.visibleViewFieldNames;
+                  break;
             }
             
-            // setup the field
-            var fieldDef = setupField(formModel, fieldName, fieldConfig);
+            logger.log("visible fields for " + formUIModel.mode + " mode = " + visibleFields);
             
-            // if a field was created add to the list to be displayed
-            if (fieldDef !== null)
+            // iterate round each visible field name, retrieve all data and
+            // add to the form ui model
+            var configuredFields = formConfig.fields;
+            var formUIItems = [];
+            
+            for (var f = 0; f < visibleFields.size(); f++)
             {
-               formUIItems.push(fieldDef);
+               var fieldName = visibleFields.get(f);            
+               var fieldConfig = configuredFields[fieldName];
                
-               logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+               if (fieldConfig === null)
+               {
+                  // if the field does not appear in the appearance section
+                  // there won't be any config so create empty object
+                  fieldConfig = {};
+               }
+               
+               // setup the field
+               var fieldDef = setupField(formModel, fieldName, fieldConfig);
+               
+               // if a field was created add to the list to be displayed
+               if (fieldDef !== null)
+               {
+                  formUIItems.push(fieldDef);
+                  
+                  logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+               }
             }
          }
+         
+         // TODO: deal with 'sets', the fields must be within their appropriate set
+         //       and structured with the correct hierarchy, should this be done in
+         //       here or is it up to the config service to determine the hierarchy?
+         
+         formUIModel.items = formUIItems;
+         formUIModel.constraints = formUIConstraints;
       }
-      
-      // TODO: deal with 'sets', the fields must be within their appropriate set
-      //       and structured with the correct hierarchy, should this be done in
-      //       here or is it up to the config service to determine the hierarchy?
-      
-      formUIModel.items = formUIItems;
-      formUIModel.constraints = formUIConstraints;
+      else
+      {
+         model.error = formModel.message;
+      }
    }
    
    // log the model

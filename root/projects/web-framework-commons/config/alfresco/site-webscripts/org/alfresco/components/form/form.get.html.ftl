@@ -1,4 +1,6 @@
-<#if form?exists>
+<#if error?exists>
+   <div class="error">${error}</div>
+<#elseif form?exists>
 
    <#assign formId=args.htmlid + "-form">
    <#assign formVar=formId?replace("-", "_")>
