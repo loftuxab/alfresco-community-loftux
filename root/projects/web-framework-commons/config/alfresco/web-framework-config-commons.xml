@@ -32,8 +32,9 @@
          <type name="d:locale" template="controls/readonly.ftl" />
       </default-controls>
       <constraint-handlers>
+         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" />
          <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" 
-                     message="The name can not contain the character '{0}'"/>
+                     message="The field contains an invalid character" />
       </constraint-handlers>
    </config>
    

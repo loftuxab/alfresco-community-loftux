@@ -3,7 +3,7 @@
    <#assign formId=args.htmlid + "-form">
    <#assign formVar=formId?replace("-", "_")>
    
-   <#-- Do we really need the client side JS component, can we just manually include the required files --> 
+   <#-- Do we really need the client side JS component, can we just manually include the required files? --> 
    
    <script type="text/javascript">//<![CDATA[
       new Alfresco.FormUI("${formId}");
@@ -20,7 +20,7 @@
             </#if>
          </#list>
          <hr/>
-         <#if form.mode != "view"><input type="submit" value="Submit" /></#if>
+         <#if form.mode != "view"><input id="${formId}-submit" type="submit" value="Submit" /></#if>
       </form>
       
    </div>
@@ -28,10 +28,17 @@
    <#if form.mode != "view">      
       <script type="text/javascript">//<![CDATA[
          var ${formVar} = new Alfresco.forms.Form("${formId}");
+         ${formVar}.setShowSubmitStateDynamically(true, false);
+         
          <#if page.url.args.submitMode == "json">
          ${formVar}.setAJAXSubmit(true);
          ${formVar}.setSubmitAsJSON(true);
          </#if>
+         
+         <#list form.constraints as constraint>
+         ${formVar}.addValidation("${args.htmlid}_${constraint.fieldId}", ${constraint.validationHandler}, null, "${constraint.event}");
+         </#list>
+         
          ${formVar}.init();
       //]]></script>
    </#if>

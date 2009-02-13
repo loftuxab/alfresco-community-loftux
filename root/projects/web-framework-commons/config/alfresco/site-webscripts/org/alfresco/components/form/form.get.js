@@ -3,6 +3,7 @@ var propertyFields = null;
 var associationFields = null;
 var defaultControls = null;
 var defaultConstraintHandlers = null;
+var formUIConstraints = null;
          
 /* constants */
 const PROP_PREFIX = "prop_"
@@ -65,12 +66,16 @@ function main()
          {
             case "view":
                visibleFields = formConfig.visibleViewFieldNames;
+               break;
             case "edit":
                visibleFields = formConfig.visibleEditFieldNames;
+               break;
             case "create":
                visibleFields = formConfig.visibleCreateFieldNames;
+               break;
             default:
                visibleFields = formConfig.visibleViewFieldNames;
+               break;
          }
          
          logger.log("visible fields for " + formUIModel.mode + " mode = " + visibleFields);
@@ -110,10 +115,11 @@ function main()
       //       here or is it up to the config service to determine the hierarchy?
       
       formUIModel.items = formUIItems;
+      formUIModel.constraints = formUIConstraints;
    }
    
    // log the model
-   //dumpFormUIModel(formUIModel);
+   dumpFormUIModel(formUIModel);
    
    // pass form ui model to FTL
    model.form = formUIModel;
@@ -128,6 +134,7 @@ function setupCaches(formModel)
 {
    propertyFields = {};
    associationFields = {};
+   formUIConstraints = [];
    
    // iterate over fields array and cache the properties and associations separately
    for (var d = 0; d < formModel.data.definition.fields.length; d++)
@@ -221,6 +228,9 @@ function setupField(formModel, fieldName, fieldConfig)
          
          // setup appearance of field i.e. the control, label etc.
          setupAppearance(fieldDef, fieldConfig);
+         
+         // setup constraints for the field
+         setupConstraints(fieldDef, fieldConfig);
          
          // set the value for the field
          fieldDef.value = "";
@@ -412,6 +422,71 @@ function setupControl(fieldDef, fieldConfig)
 }
 
 /**
+ * Sets up the constraints for the field, if it has any
+ *
+ * @method setupConstraints
+ * @param fieldDef Object representing the field definition 
+ * @param fieldConfig Object representing the UI configuration
+ */
+function setupConstraints(fieldDef, fieldConfig)
+{
+   logger.log(jsonUtils.toJSONString(fieldDef));
+   
+   // setup mandatory constraint if field is marked as such
+   if (fieldDef.mandatory && fieldDef.disabled == false)
+   {
+      var defaultConstraintConfig = defaultConstraintHandlers.items["MANDATORY"];
+      if (defaultConstraintConfig !== null)
+      {
+         var constraint = {};
+         constraint.fieldId = fieldDef.id;
+         constraint.validationHandler = defaultConstraintConfig.validationHandler;
+         constraint.params = {};
+         constraint.event = "keyup";
+         
+         // look for an overridden message in the field's constraint config, 
+         // if none found look in the default constraint config
+         var constraintMsg = null;
+         if (typeof fieldConfig.constraintMessageId !== "undefined" && 
+             fieldConfig.constraintMessageId !== null)
+         {
+            constraintMsg = msg.get(fieldConfig.constraintMessageId);
+         }
+         else if (typeof fieldConfig.constraintMessage !== "undefined" && 
+                  fieldConfig.constraintMessage !== null)
+         {
+            constraintMsg = fieldConfig.constraintMessage;
+         }
+         else if (typeof defaultConstraintConfig.messageId !== "undefined" && 
+                  defaultConstraintConfig.messageId !== null && 
+                  defaultConstraintConfig.messageId.length > 0)
+         {
+            // TODO: change constraint config so null is returned if no message present
+            constraintMsg = msg.get(defaultConstraintConfig.messageId);
+         }
+         else if (typeof defaultConstraintConfig.message !== "undefined" && 
+                  defaultConstraintConfig.message !== null && 
+                  defaultConstraintConfig.message.length > 0)
+         {
+            // TODO: change constraint config so null is returned if no message present
+            constraintMsg = defaultConstraintConfig.message;
+         }
+         
+         // add the message if there is one
+         if (constraintMsg != null)
+         {
+            constraint.message = constraintMsg;
+         }
+         
+         // add the constraint to the global list
+         formUIConstraints.push(constraint);
+      }
+   }
+   
+   // TODO: look for model defined constraints on the field definition
+}
+
+/**
  * Dumps the form UI model, but only if logging is active
  *
  * @method dumpFormUIModel
@@ -425,7 +500,7 @@ function dumpFormUIModel(model)
       var debug = "null";
       if (model != null)
       {
-         debug = jsonUtils.toJSONString(model)
+         debug = jsonUtils.toJSONString(model);
       }
       logger.log("formUIModel = " + debug);
    }

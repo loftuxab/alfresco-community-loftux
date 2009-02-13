@@ -4,7 +4,7 @@
    <span class="viewmode-value">${field.value?html}</span>
 </div>
 <#else>
-<label for="${args.htmlid}_${field.id}">${field.label?html}:</label>
+<label for="${args.htmlid}_${field.id}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">*</span></#if></label>
 <input id="${args.htmlid}_${field.id}" type="text" name="${field.name}" value="${field.value}" 
        <#if field.description?exists>title="${field.description}"</#if>
        <#if field.control.params.maxLength?exists>maxlength="${field.control.params.maxLength}"</#if>

@@ -10,7 +10,7 @@
 </div>
 <#else>
 
-<label for="${dpId}">${field.label?html}:</label>
+<label for="${dpId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">*</span></#if></label>
 <input id="${dpId}" type="hidden" name="${field.name}" value="${field.value}" />
 <input id="${dpId}-entry" type="text" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 
