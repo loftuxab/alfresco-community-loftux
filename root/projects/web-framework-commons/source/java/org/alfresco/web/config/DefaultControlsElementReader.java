@@ -31,7 +31,6 @@ import java.util.List;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
-import org.alfresco.web.config.DefaultControlsConfigElement.ControlParam;
 import org.dom4j.Element;
 
 /**

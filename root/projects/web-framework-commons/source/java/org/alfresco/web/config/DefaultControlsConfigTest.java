@@ -33,7 +33,6 @@ import java.util.Map;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
-import org.alfresco.web.config.DefaultControlsConfigElement.ControlParam;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in to the web client

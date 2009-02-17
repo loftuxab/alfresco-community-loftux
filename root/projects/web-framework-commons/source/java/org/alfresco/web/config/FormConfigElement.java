@@ -98,12 +98,12 @@ public class FormConfigElement extends ConfigElementAdapter
      * Map of the required roles for create-form templates.
      * Key = the template String. Value = the requires-role String.
      */
-    private Map<String, String> rolesForCreateTemplates = new LinkedHashMap<String, String>();
-    private Map<String, String> rolesForEditTemplates = new LinkedHashMap<String, String>();
-    private Map<String, String> rolesForViewTemplates = new LinkedHashMap<String, String>();
+    private final Map<String, String> rolesForCreateTemplates = new LinkedHashMap<String, String>();
+    private final Map<String, String> rolesForEditTemplates = new LinkedHashMap<String, String>();
+    private final Map<String, String> rolesForViewTemplates = new LinkedHashMap<String, String>();
     
     FieldVisibilityManager fieldVisibilityManager = new FieldVisibilityManager();
-    private Map<String, FormSet> sets = new LinkedHashMap<String, FormSet>();
+    private final Map<String, FormSet> sets = new LinkedHashMap<String, FormSet>();
     private Map<String, FormField> fields = new LinkedHashMap<String, FormField>();
     
     public FormConfigElement()
@@ -516,9 +516,7 @@ public class FormConfigElement extends ConfigElementAdapter
             String message, String messageId)
     {
         FormField field = fields.get(fieldId);
-        field.setConstraintType(type);
-        field.setConstraintMessage(message);
-        field.setConstraintMessageId(messageId);
+        field.addConstraintMessage(type, message, messageId);
     }
 
 //    /* package */void addModelOverrides(String name, String value)

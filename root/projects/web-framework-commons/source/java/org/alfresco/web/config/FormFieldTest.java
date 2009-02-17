@@ -24,12 +24,15 @@
  */
 package org.alfresco.web.config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
+
 
 public class FormFieldTest extends TestCase
 {
@@ -79,20 +82,41 @@ public class FormFieldTest extends TestCase
         assertEquals("test1.ftl", fieldID1.getTemplate());
         assertEquals("test2.ftl", fieldID2.getTemplate());
         
-        assertEquals("Test message", fieldID1.getConstraintMessage());
-        assertEquals(null, fieldID2.getConstraintMessage());
+        assertEquals("Test message", fieldID1.getConstraintMessages().get(0).getMessage());
+        assertEquals(Collections.emptyList(), fieldID2.getConstraintMessages());
         
-        assertEquals("Test msg ID", fieldID1.getConstraintMessageId());
-        assertEquals(null, fieldID2.getConstraintMessageId());
+        assertEquals("Test msg ID", fieldID1.getConstraintMessages().get(0).getMessageId());
+        assertEquals(Collections.emptyList(), fieldID2.getConstraintMessages());
 
-        assertEquals("REGEX", fieldID1.getConstraintType());
-        assertEquals(null, fieldID2.getConstraintType());
+        assertEquals("REGEX", fieldID1.getConstraintMessages().get(0).getType());
+        assertEquals(Collections.emptyList(), fieldID2.getConstraintMessages());
 
-        Map<String, String> expectedCPs = new LinkedHashMap<String, String>();
-        expectedCPs.put("cp1", "CP1");
-        expectedCPs.put("cp2", "CP2");
+        List<ControlParam> expectedCPs = new ArrayList<ControlParam>();
+        expectedCPs.add(new ControlParam("cp1", "CP1"));
+        expectedCPs.add(new ControlParam("cp2", "CP2"));
         assertEquals(expectedCPs, fieldID1.getControlParams());
-        assertEquals(Collections.emptyMap(), fieldID2.getControlParams());
+        assertEquals(Collections.emptyList(), fieldID2.getControlParams());
+    }
+    
+    public void testGetAttributesViaExplicitGetters()
+    {
+        FormConfigElement testElement = new FormConfigElement();
+        testElement.addField("name",
+                Arrays.asList(new String[]{"id",   "label", "label-id",
+                		"disabled", "set",     "help-text",
+                		"help-text-id"}),
+                Arrays.asList(new String[]{"name", "Name",  "field_label_name",
+                		"true",     "details", "This is the name of the node",
+                		"field_help_name"}));
+        
+        FormField testField = testElement.getFields().get("name");
+        assertEquals("name", testField.getId());
+        assertEquals("Name", testField.getLabel());
+        assertEquals("field_label_name", testField.getLabelId());
+        assertEquals(true, testField.isDisabled());
+        assertEquals("details", testField.getSet());
+        assertEquals("This is the name of the node", testField.getHelpText());
+        assertEquals("field_help_name", testField.getHelpTextId());
     }
     
     public void testConstructionWithNulls()
@@ -105,9 +129,7 @@ public class FormFieldTest extends TestCase
         FormField recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
         assertEquals("Expected no template.", null, recoveredFce.getTemplate());
-        assertEquals("Expected no control params.", Collections.emptyMap(), recoveredFce.getControlParams());
-        assertEquals("Expected no constraint msg.", null, recoveredFce.getConstraintMessage());
-        assertEquals("Expected no constraint msg id.", null, recoveredFce.getConstraintMessageId());
+        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControlParams());
 
         fce = new FormConfigElement();
         fce.addField("id1", null, null);
@@ -115,9 +137,8 @@ public class FormFieldTest extends TestCase
         recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
         assertEquals("Expected no template.", null, recoveredFce.getTemplate());
-        assertEquals("Expected no control params.", Collections.emptyMap(), recoveredFce.getControlParams());
-        assertEquals("Expected no constraint msg.", null, recoveredFce.getConstraintMessage());
-        assertEquals("Expected no constraint msg id.", null, recoveredFce.getConstraintMessageId());
+        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControlParams());
+        assertEquals("Expected no constraint msg.", Collections.emptyList(), recoveredFce.getConstraintMessages());
     }
     
     public void testExtraControlParamValueIsIgnored()
@@ -127,11 +148,11 @@ public class FormFieldTest extends TestCase
         fce.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
                 Arrays.asList(new String[]{"CP1", "CP2", "CP3"}));
-        Map<String, String> params = fce.getFields().get("id1").getControlParams();
+        List<ControlParam> params = fce.getFields().get("id1").getControlParams();
         assertEquals(2, params.size());
-        Map<String, String> expectedParams = new LinkedHashMap<String, String>(2);
-        expectedParams.put("cp1", "CP1");
-        expectedParams.put("cp2", "CP2");
+        List<ControlParam> expectedParams = new ArrayList<ControlParam>(2);
+        expectedParams.add(new ControlParam("cp1", "CP1"));
+        expectedParams.add(new ControlParam("cp2", "CP2"));
         assertEquals(expectedParams, params);
     }
     
@@ -160,9 +181,7 @@ public class FormFieldTest extends TestCase
         FormField secondInstance = new FormField("name", attrs2);
         secondInstance.setTemplate("test.ftl");
         secondInstance.addControlParam("foo", "bar");
-        secondInstance.setConstraintType("REGEX");
-        secondInstance.setConstraintMessage("msg");
-        secondInstance.setConstraintMessageId("msg-id");
+        secondInstance.addConstraintMessage("REGEX", "msg", "msg-id");
         
         FormField combinedField = firstInstance.combine(secondInstance);
         
@@ -193,9 +212,7 @@ public class FormFieldTest extends TestCase
         FormField firstInstance = new FormField("name", attrs1);
         firstInstance.setTemplate("test.ftl");
         firstInstance.addControlParam("foo", "bar");
-        firstInstance.setConstraintType("REGEX");
-        firstInstance.setConstraintMessage("msg");
-        firstInstance.setConstraintMessageId("msg-id");
+        firstInstance.addConstraintMessage("REGEX", "msg", "msg-id");
         
         Map<String, String> attrs2 = new LinkedHashMap<String, String>();
         attrs2.put("label", "Name");
@@ -203,9 +220,7 @@ public class FormFieldTest extends TestCase
         FormField secondInstance = new FormField("name", attrs2);
         secondInstance.setTemplate("newtest.ftl");
         secondInstance.addControlParam("foo", "barrr");
-        secondInstance.setConstraintType("REGEX");
-        secondInstance.setConstraintMessage("newmsg");
-        secondInstance.setConstraintMessageId("newmsg-id");
+        secondInstance.addConstraintMessage("REGEX", "newmsg", "newmsg-id");
         
         FormField combinedField = firstInstance.combine(secondInstance);
         

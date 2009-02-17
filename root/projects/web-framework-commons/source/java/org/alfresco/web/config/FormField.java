@@ -24,8 +24,10 @@
  */
 package org.alfresco.web.config;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.config.ConfigException;
@@ -40,15 +42,20 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FormField
 {
-    private static Log logger = LogFactory.getLog(FormField.class);
+    private static final String ATTR_HELP_TEXT_ID = "help-text-id";
+	private static final String ATTR_HELP_TEXT = "help-text";
+	private static final String ATTR_SET = "set";
+	private static final String ATTR_DISABLED = "disabled";
+	private static final String ATTR_LABEL_ID = "label-id";
+	private static final String ATTR_LABEL = "label";
+
+	private static Log logger = LogFactory.getLog(FormField.class);
     
     private final String id;
     private final Map<String, String> attributes;
     private String template;
-    private final Map<String, String> controlParams = new LinkedHashMap<String, String>();
-    private String constraintType;
-    private String constraintMessage;
-    private String constraintMessageId;
+    private final List<ControlParam> controlParams = new ArrayList<ControlParam>();
+    private final List<ConstraintMessage> constraintMessages = new ArrayList<ConstraintMessage>();
     
     /**
      * 
@@ -79,49 +86,83 @@ public class FormField
     {
         this.template = template;
     }
-    void setConstraintType(String constraintType)
-    {
-        this.constraintType = constraintType;
-    }
-    void setConstraintMessage(String constraintMessage)
-    {
-        this.constraintMessage = constraintMessage;
-    }
-    void setConstraintMessageId(String constraintMessageId)
-    {
-        this.constraintMessageId = constraintMessageId;
-    }
     void addControlParam(String name, String value)
     {
-        this.controlParams.put(name, value);
+    	for (ControlParam cp : this.controlParams)
+    	{
+    		if (cp.getName().equals(name))
+    		{
+    			// The value for this control-param is being overridden.
+    			cp.setValue(value);
+    			return;
+    		}
+    	}
+    	this.controlParams.add(new ControlParam(name, value));
+    }
+    void addConstraintMessage(String type, String message, String messageId)
+    {
+    	for (ConstraintMessage cm : this.constraintMessages)
+    	{
+    		if (cm.getType().equals(type))
+    		{
+    			// The value for this constraint-message is being overridden.
+    			cm.setMessage(message);
+    			cm.setMessageId(messageId);
+    			return;
+    		}
+    	}
+    	this.constraintMessages.add(new ConstraintMessage(type, message, messageId));
     }
     public Map<String, String> getAttributes()
     {
         return Collections.unmodifiableMap(attributes);
     }
+    
     public String getId()
     {
         return this.id;
     }
+    
+    // The following are convenience accessor methods for certain known attributes.
+    public String getLabel()
+    {
+    	return attributes.get(ATTR_LABEL);
+    }
+    public String getLabelId()
+    {
+    	return attributes.get(ATTR_LABEL_ID);
+    }
+    public boolean isDisabled()
+    {
+    	Object disabledValue = attributes.get(ATTR_DISABLED);
+    	return disabledValue instanceof String
+    	    && "true".equalsIgnoreCase((String)disabledValue);
+    }
+    public String getSet()
+    {
+    	return attributes.get(ATTR_SET);
+    }
+    public String getHelpText()
+    {
+    	return attributes.get(ATTR_HELP_TEXT);
+    }
+    public String getHelpTextId()
+    {
+    	return attributes.get(ATTR_HELP_TEXT_ID);
+    }
+    // End of convenience accessor methods.
+    
     public String getTemplate()
     {
         return template;
     }
-    public Map<String, String> getControlParams()
+    public List<ControlParam> getControlParams()
     {
-        return Collections.unmodifiableMap(controlParams);
+    	return Collections.unmodifiableList(this.controlParams);
     }
-    public String getConstraintType()
+    public List<ConstraintMessage> getConstraintMessages()
     {
-        return constraintType;
-    }
-    public String getConstraintMessage()
-    {
-        return constraintMessage;
-    }
-    public String getConstraintMessageId()
-    {
-        return constraintMessageId;
+    	return Collections.unmodifiableList(this.constraintMessages);
     }
     
     public FormField combine(FormField otherField)
@@ -161,46 +202,25 @@ public class FormField
         {
             result.setTemplate(otherField.template);
         }
-
+        
         // Combine control-params
-        for (String nextCPName : this.getControlParams().keySet())
+        for (ControlParam cp : this.controlParams)
         {
-            // If any control-param appears in the otherField, we should use that one.
-            // We are choosing to put name-values from the other object in this loop
-            // as we want to maintain the ordering of control params.
-            if (otherField.controlParams.containsKey(nextCPName))
-            {
-                result.addControlParam(nextCPName, otherField.controlParams.get(nextCPName));
-            }
-            else
-            {
-                result.addControlParam(nextCPName, this.controlParams.get(nextCPName));
-            }
+        	result.addControlParam(cp.getName(), cp.getValue());
         }
-        // Any additional control-params are appended to the map.
-        for (String nextCPName : otherField.getControlParams().keySet())
+        for (ControlParam cp : otherField.controlParams)
         {
-            if (!this.controlParams.containsKey(nextCPName))
-            {
-                result.addControlParam(nextCPName, otherField.controlParams.get(nextCPName));
-            }
+        	result.addControlParam(cp.getName(), cp.getValue());
         }
         
         // Combine constraint-message data
-        result.setConstraintType(this.constraintType);
-        if (otherField.constraintType != null)
+        for (ConstraintMessage cp : this.constraintMessages)
         {
-            result.setConstraintType(otherField.constraintType);
+        	result.addConstraintMessage(cp.getType(), cp.getMessage(), cp.getMessageId());
         }
-        result.setConstraintMessage(this.constraintMessage);
-        if (otherField.constraintMessage != null)
+        for (ConstraintMessage cp : otherField.constraintMessages)
         {
-            result.setConstraintMessage(otherField.constraintMessage);
-        }
-        result.setConstraintMessageId(this.constraintMessageId);
-        if (otherField.constraintMessageId != null)
-        {
-            result.setConstraintMessageId(otherField.constraintMessageId);
+        	result.addConstraintMessage(cp.getType(), cp.getMessage(), cp.getMessageId());
         }
 
         return result;
@@ -218,10 +238,8 @@ public class FormField
         return this.id.equals(otherFormField.id) &&
             this.attributes.equals(otherFormField.attributes) &&
             this.template == null ? otherFormField.template == null : this.template.equals(otherFormField.template) &&
-            this.controlParams == null ? otherFormField.controlParams == null : this.controlParams.equals(otherFormField.controlParams) &&
-            this.constraintType == null ? otherFormField.constraintType == null : this.constraintType.equals(otherFormField.constraintType) &&
-            this.constraintMessage == null ? otherFormField.constraintMessage == null : this.constraintMessage.equals(otherFormField.constraintMessage) &&
-            this.constraintMessageId == null ? otherFormField.constraintMessageId == null : this.constraintMessageId.equals(otherFormField.constraintMessageId);
+            this.controlParams.equals(otherFormField.controlParams) &&
+            this.constraintMessages.equals(otherFormField.constraintMessages);
     }
     
     @Override
@@ -231,17 +249,13 @@ public class FormField
         int component2 = attributes.hashCode();
         int component3 = template == null ? 0 : template.hashCode();
         int component4 = controlParams == null ? 0 : controlParams.hashCode();
-        int component5 = constraintType == null ? 0 : constraintType.hashCode();
-        int component6 = constraintMessage == null ? 0 : constraintMessage.hashCode();
-        int component7 = constraintMessageId == null ? 0 : constraintMessageId.hashCode();
+        int component5 = constraintMessages == null ? 0 : constraintMessages.hashCode();
 
         return component1
             + 3 * component2
             + 7 * component3
             + 11 * component4
-            + 13 * component5
-            + 17 * component6
-            + 19 * component7;
+            + 13 * component5;
     }
     
     @Override
@@ -276,20 +290,16 @@ public class FormField
 
         msg = new StringBuilder();
         msg.append("Combining control-params ")
-            .append(controlParams.keySet())
+            .append(controlParams)
             .append(" and ")
-            .append(otherField.controlParams.keySet());
+            .append(otherField.controlParams);
         logger.debug(msg.toString());
         msg = new StringBuilder();
 
-        msg.append("Combining constraint type,message,message-id '")
-            .append(constraintType).append(",")
-            .append(constraintMessage).append(",")
-            .append(constraintMessageId).append(",")
-            .append("' and '")
-            .append(otherField.constraintType).append(",")
-            .append(otherField.constraintMessage).append(",")
-            .append(otherField.constraintMessageId).append("'");
+        msg.append("Combining constraint-messages")
+            .append(constraintMessages)
+            .append(" and ")
+            .append(otherField.constraintMessages);
         logger.debug(msg.toString());
     }
 }
