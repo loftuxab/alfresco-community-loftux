@@ -53,6 +53,8 @@
                </control>
                <constraint-message type="REGEX" message="The name can not contain the character '{0}'"
                                                     message-id="field_error_name" />
+               <constraint-message type="apples" message="Pink Lady" message-id="" />
+               <constraint-message type="oranges" message="" message-id="Mandarin" />
             </field>
             <field id="title" label="My Title" set="details" />
             <field id="username" set="user" />

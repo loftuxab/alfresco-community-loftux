@@ -27,7 +27,6 @@ package org.alfresco.web.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -185,22 +184,23 @@ public class FormConfigTest extends AbstractFormConfigTest
         assertEquals("name field had incorrect template.",
                 "alfresco/extension/formcontrols/my-name.ftl", nameTemplate);
 
-        Map<String, String> controlParams = nameField.getControlParams();
+        List<ControlParam> controlParams = nameField.getControlParams();
         assertNotNull("name field should have control params.", controlParams);
         assertEquals("name field has incorrect number of control params.", 1,
                 controlParams.size());
 
-        String firstCPName = controlParams.keySet().iterator().next();
-        assertEquals("Control param has wrong name.", "foo", firstCPName);
-        assertEquals("Control param has wrong value.", "bar", controlParams.get(firstCPName));
+        ControlParam firstCP = controlParams.iterator().next();
+        assertEquals("Control param has wrong name.", "foo", firstCP.getName());
+        assertEquals("Control param has wrong value.", "bar", firstCP.getValue());
 
-        assertEquals("name field had incorrect type.", "REGEX", nameField
-                .getConstraintType());
+        assertEquals("name field had incorrect type.", "REGEX",
+        		nameField.getConstraintMessages().get(0).getType());
         assertEquals("name field had incorrect message.",
-                "The name can not contain the character '{0}'", nameField
-                        .getConstraintMessage());
+                "The name can not contain the character '{0}'",
+        		nameField.getConstraintMessages().get(0).getMessage());
         assertEquals("name field had incorrect message-id.",
-                "field_error_name", nameField.getConstraintMessageId());
+                "field_error_name",
+        		nameField.getConstraintMessages().get(0).getMessageId());
     }
 
     public void testControlParamSequenceThatIncludesValuelessParamsParsesCorrectly()
@@ -210,25 +210,36 @@ public class FormConfigTest extends AbstractFormConfigTest
 
         FormField testField = fields.get("fieldWithMixedCtrlParams");
 
-        Map<String, String> controlParams = testField.getControlParams();
+        List<ControlParam> controlParams = testField.getControlParams();
         assertNotNull("field should have control params.", controlParams);
         assertEquals("field has incorrect number of control params.", 4,
                 controlParams.size());
 
-        Set<String> expectedCPNames = new LinkedHashSet<String>();
-        expectedCPNames.add("one");
-        expectedCPNames.add("two");
-        expectedCPNames.add("three");
-        expectedCPNames.add("four");
+        List<ControlParam> expectedCPs = new ArrayList<ControlParam>();
+        expectedCPs.add(new ControlParam("one", "un"));
+        expectedCPs.add(new ControlParam("two", "deux"));
+        expectedCPs.add(new ControlParam("three", ""));
+        expectedCPs.add(new ControlParam("four", "quatre"));
         
-        assertEquals(expectedCPNames, controlParams.keySet());
-        
-        assertEquals("Control param has wrong value.", "un", controlParams.get("one"));
-        assertEquals("Control param has wrong value.", "deux", controlParams.get("two"));
-        assertEquals("Control param has wrong value.", "", controlParams.get("three"));
-        assertEquals("Control param has wrong value.", "quatre", controlParams.get("four"));
+        assertEquals(expectedCPs, controlParams);
     }
+    
+    public void testFormsShouldSupportMultipleConstraintMessageTags()
+    {
+    	FormField nameField = formConfigElement.getFields().get("name");
+    	assertEquals(3, nameField.getConstraintMessages().size());
+    	
+    	ConstraintMessage regexField = nameField.getConstraintMessages().get(0);
+    	ConstraintMessage applesField = nameField.getConstraintMessages().get(1);
+    	ConstraintMessage orangesField = nameField.getConstraintMessages().get(2);
 
+    	assertEquals("REGEX", regexField.getType());
+    	assertEquals("apples", applesField.getType());
+    	assertEquals("oranges", orangesField.getType());
+    	
+    	assertEquals("Pink Lady", applesField.getMessage());
+    	assertEquals("", applesField.getMessageId());
+    }
     
     public void testFormConfigElementShouldHaveNoChildren()
     {
