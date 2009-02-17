@@ -90,13 +90,6 @@ function main()
                var fieldName = visibleFields.get(f);            
                var fieldConfig = configuredFields[fieldName];
                
-               if (fieldConfig === null)
-               {
-                  // if the field does not appear in the appearance section
-                  // there won't be any config so create empty object
-                  fieldConfig = {};
-               }
-               
                // setup the field
                var fieldDef = setupField(formModel, fieldName, fieldConfig);
                
@@ -169,7 +162,8 @@ function setupCaches(formModel)
  * @method setupField
  * @param formModel The form model returned from the server
  * @param fieldName The name of the field to setup
- * @param fieldConfig Object representing the UI configuration
+ * @param fieldConfig Object representing the UI configuration 
+                      or null if there isn't any configuration 
  * @return Object representing the field 
  */
 function setupField(formModel, fieldName, fieldConfig)
@@ -259,61 +253,52 @@ function setupField(formModel, fieldName, fieldConfig)
  * @method setupAppearance
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
+                      or null if there isn't any configuration
  */
 function setupAppearance(fieldDef, fieldConfig)
 {
    // setup the control object
    setupControl(fieldDef, fieldConfig);
    
-   // TODO: update this function when the FormField class gets explicit accessors
-   
-   // override the label if necessary
-   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
+   // setup textual properties
+   if (fieldConfig !== null)
    {
       var configLabel = null;
-      if (fieldConfig.attributes["label-id"] !== null)
+      if (fieldConfig.labelId !== null)
       {
-         configLabel = msg.get(fieldConfig.attributes["label-id"]);
+         configLabel = msg.get(fieldConfig.labelId);
       }
-      else if (fieldConfig.attributes["label"] !== null)
+      else if (fieldConfig.label !== null)
       {
-         configLabel = fieldConfig.attributes["label"];
+         configLabel = fieldConfig.label;
       }
       if (configLabel !== null)
       {
          fieldDef.label = configLabel;
       }
-   }
-   
-   // override the description if necessary
-   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
-   {
-      var configTitle = null;
-      if (fieldConfig.attributes["title-id"] !== null)
+
+      var configDesc = null;
+      if (fieldConfig.descriptionId !== null)
       {
-         configTitle = msg.get(fieldConfig.attributes["title-id"]);
+         configDesc = msg.get(fieldConfig.descriptionId);
       }
-      else if (fieldConfig.attributes["title"] !== null)
+      else if (fieldConfig.description !== null)
       {
-         configTitle = fieldConfig.attributes["title"];
+         configDesc = fieldConfig.description;
       }
-      if (configTitle !== null)
+      if (configDesc !== null)
       {
-         fieldDef.description = configTitle;
+         fieldDef.description = configDesc;
       }
-   }
-   
-   // find help text, if any
-   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
-   {
+      
       var configHelp = null;
-      if (fieldConfig.attributes["help-text-id"] !== null)
+      if (fieldConfig.helpTextId !== null)
       {
-         configHelp = msg.get(fieldConfig.attributes["help-text-id"]);
+         configHelp = msg.get(fieldConfig.helpTextId);
       }
-      else if (fieldConfig.attributes["help-text"] !== null)
+      else if (fieldConfig.helpText !== null)
       {
-         configHelp = fieldConfig.attributes["help-text"];
+         configHelp = fieldConfig.helpText;
       }
       if (configHelp !== null)
       {
@@ -321,18 +306,11 @@ function setupAppearance(fieldDef, fieldConfig)
       }
    }
    
-   // configure read-only state (and removed protectedField property)
+   // configure read-only state (and remove protectedField property)
    var disabled = fieldDef.protectedField;
-   if (typeof fieldConfig.attributes !== "undefined" && fieldConfig.attributes !== null)
+   if (!fieldDef.protectedField && fieldConfig !== null && fieldConfig.readOnly)
    {
-      if (!fieldDef.protectedField && fieldConfig.attributes["read-only"] !== null)
-      {
-         var readOnly = fieldConfig.attributes["read-only"];
-         if (readOnly === "true")
-         {
-            disabled = true;
-         }
-      }
+      disabled = true;
    }
    fieldDef.disabled = disabled;
    delete fieldDef.protectedField;
@@ -344,6 +322,7 @@ function setupAppearance(fieldDef, fieldConfig)
  * @method setupControl
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
+                      or null if there isn't any configuration
  */
 function setupControl(fieldDef, fieldConfig)
 {
@@ -367,7 +346,7 @@ function setupControl(fieldDef, fieldConfig)
    
    // see if the fieldConfig already has a template defined, if not 
    // retrive the default template for the field's data type
-   if (typeof fieldConfig.template !== "undefined" && fieldConfig.template !== null)
+   if (fieldConfig !== null && fieldConfig.template !== null)
    {
       control.template = fieldConfig.template;
    }
@@ -414,12 +393,12 @@ function setupControl(fieldDef, fieldConfig)
    }
    
    // get overridden control parameters (if there are any)
-   if (typeof fieldConfig.controlParams !== "undefined")
+   if (fieldConfig !== null)
    {
-      var fieldControlParams = fieldConfig.controlParams;
-      for (p in fieldControlParams)
+      var paramsConfig = fieldConfig.controlParams;
+      for (var p = 0; p < paramsConfig.size(); p++)
       {
-         control.params[p] = fieldControlParams[p];
+         control.params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
       }
    }
    
@@ -432,6 +411,7 @@ function setupControl(fieldDef, fieldConfig)
  * @method setupConstraints
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
+                      or null if there isn't any configuration
  */
 function setupConstraints(fieldDef, fieldConfig)
 {
@@ -447,33 +427,45 @@ function setupConstraints(fieldDef, fieldConfig)
          constraint.fieldId = fieldDef.id;
          constraint.validationHandler = defaultConstraintConfig.validationHandler;
          constraint.params = {};
-         constraint.event = "keyup";
+         if (defaultConstraintConfig.event !== null && defaultConstraintConfig.event.length > 0)
+         {
+            constraint.event = defaultConstraintConfig.event;
+         }
+         else
+         {
+            constraint.event = "blur";
+         }
          
          // look for an overridden message in the field's constraint config, 
          // if none found look in the default constraint config
+         
+         // TODO: change constraint config so null is returned if no message present
+         
          var constraintMsg = null;
-         if (typeof fieldConfig.constraintMessageId !== "undefined" && 
-             fieldConfig.constraintMessageId !== null)
+         if (fieldConfig !== null && fieldConfig.constraintMessageMap["MANDATORY"] !== null)
          {
-            constraintMsg = msg.get(fieldConfig.constraintMessageId);
-         }
-         else if (typeof fieldConfig.constraintMessage !== "undefined" && 
-                  fieldConfig.constraintMessage !== null)
-         {
-            constraintMsg = fieldConfig.constraintMessage;
+            var fieldConstraintConfig = fieldConfig.constraintMessageMap["MANDATORY"];
+            if (fieldConstraintConfig.messageId !== null && 
+                fieldConstraintConfig.messageId.length > 0)
+            {
+               constraintMsg = msg.get(fieldConstraintConfig.messageId);
+            }
+            else if (fieldConstraintConfig.message !== null && 
+                fieldConstraintConfig.message.length > 0)
+            {
+               constraintMsg = fieldConstraintConfig.message;
+            }
          }
          else if (typeof defaultConstraintConfig.messageId !== "undefined" && 
                   defaultConstraintConfig.messageId !== null && 
                   defaultConstraintConfig.messageId.length > 0)
          {
-            // TODO: change constraint config so null is returned if no message present
             constraintMsg = msg.get(defaultConstraintConfig.messageId);
          }
          else if (typeof defaultConstraintConfig.message !== "undefined" && 
                   defaultConstraintConfig.message !== null && 
                   defaultConstraintConfig.message.length > 0)
          {
-            // TODO: change constraint config so null is returned if no message present
             constraintMsg = defaultConstraintConfig.message;
          }
          

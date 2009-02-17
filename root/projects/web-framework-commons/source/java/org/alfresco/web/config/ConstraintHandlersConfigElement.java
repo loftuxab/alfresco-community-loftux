@@ -98,8 +98,9 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
             String nextValidationHandler = getValidationHandlerFor(nextType);
             String nextMessage = getMessageFor(nextType);
             String nextMessageId = getMessageIdFor(nextType);
+            String nextEvent = getEventFor(nextType);
             result.addDataMapping(nextType, nextValidationHandler, nextMessage,
-                    nextMessageId);
+                    nextMessageId, nextEvent);
         }
 
         for (String nextType : otherCHCElement.items.keySet())
@@ -108,15 +109,16 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
                     .getValidationHandlerFor(nextType);
             String nextMessage = otherCHCElement.getMessageFor(nextType);
             String nextMessageId = otherCHCElement.getMessageIdFor(nextType);
+            String nextEvent = otherCHCElement.getEventFor(nextType);
             result.addDataMapping(nextType, nextValidationHandler, nextMessage,
-                    nextMessageId);
+                    nextMessageId, nextEvent);
         }
 
         return result;
     }
 
     /* package */void addDataMapping(String type, String validationHandler,
-            String message, String messageID)
+            String message, String messageID, String event)
     {
     	if (message == null)
     	{
@@ -127,7 +129,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     		messageID = "";
     	}
     	
-        items.put(type, new ItemDefinition(type, validationHandler, message, messageID));
+        items.put(type, new ItemDefinition(type, validationHandler, message, messageID, event));
     }
 
     /**
@@ -200,6 +202,18 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     {
     	return items.get(type).getMessageId();
     }
+    
+    /**
+     * This method returns an event String associated with the specified constraint
+     * type.
+     * 
+     * @param type the constraint type.
+     * @return the event when the constraint will be triggered
+     */
+    String getEventFor(String type)
+    {
+        return items.get(type).getEvent();
+    }
 
     public List<String> getItemNames()
     {
@@ -217,26 +231,41 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     	private final String validationHandler;
     	private final String message;
     	private final String messageId;
+    	private final String event;
     	
-    	public ItemDefinition(String type, String validationHandler, String msg, String msgId)
+    	public ItemDefinition(String type, String validationHandler, 
+    	                      String msg, String msgId, String event)
     	{
             this.type              = type              == null ? "" : type;
             this.validationHandler = validationHandler == null ? "" : validationHandler;
             this.message           = msg               == null ? "" : msg;
             this.messageId         = msgId             == null ? "" : msgId;
+            this.event             = event             == null ? "" : event;
     	}
     	
-		public String getType() {
+		public String getType() 
+		{
 			return type;
 		}
-		public String getValidationHandler() {
+		
+		public String getValidationHandler() 
+		{
 			return validationHandler;
 		}
-		public String getMessage() {
+		
+		public String getMessage() 
+		{
 			return message;
 		}
-		public String getMessageId() {
+		
+		public String getMessageId() 
+		{
 			return messageId;
+		}
+		
+		public String getEvent()
+		{
+		    return event;
 		}
 
         @Override
@@ -254,7 +283,8 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
             return otherItem.type.equals(this.type) &&
                 otherItem.validationHandler.equals(this.validationHandler) &&
                 otherItem.message.equals(this.message) &&
-                otherItem.messageId.equals(this.messageId);
+                otherItem.messageId.equals(this.messageId) &&
+                otherItem.event.equals(this.event);
         }
 
         @Override
@@ -263,7 +293,8 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
             return type.hashCode()
                     + 3 * validationHandler.hashCode()
                     + 7 * message.hashCode()
-                    + 13 * messageId.hashCode();
+                    + 11 * messageId.hashCode()
+                    + 13 * event.hashCode();
         }
 
         @Override
@@ -273,7 +304,8 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
             result.append(type).append(", ")
                 .append(validationHandler).append(", ")
                 .append(message).append(", ")
-                .append(messageId);
+                .append(messageId).append(", ")
+                .append(event);
             return result.toString();
         }
     }

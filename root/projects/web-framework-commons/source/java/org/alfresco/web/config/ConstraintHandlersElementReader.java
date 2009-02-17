@@ -44,6 +44,7 @@ public class ConstraintHandlersElementReader implements ConfigElementReader
    public static final String ATTR_VALIDATOR_HANDLER = "validation-handler";
    public static final String ATTR_MESSAGE = "message";
    public static final String ATTR_MESSAGE_ID = "message-id";
+   public static final String ATTR_EVENT = "event";
    
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -74,8 +75,9 @@ public class ConstraintHandlersElementReader implements ConfigElementReader
            String validationHandler = nextNode.attributeValue(ATTR_VALIDATOR_HANDLER);
            String message = nextNode.attributeValue(ATTR_MESSAGE);
            String messageId = nextNode.attributeValue(ATTR_MESSAGE_ID);
+           String event = nextNode.attributeValue(ATTR_EVENT);
            
-           result.addDataMapping(type, validationHandler, message, messageId);
+           result.addDataMapping(type, validationHandler, message, messageId, event);
 	   }
 	   
 	   return result;

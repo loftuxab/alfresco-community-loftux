@@ -32,8 +32,8 @@
          <type name="d:locale" template="controls/readonly.ftl" />
       </default-controls>
       <constraint-handlers>
-         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" />
-         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" 
+         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
+         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" event="blur"
                      message="The field contains an invalid character" />
       </constraint-handlers>
    </config>

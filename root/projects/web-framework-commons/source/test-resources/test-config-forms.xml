@@ -22,6 +22,7 @@
          </type>
       </default-controls>
       <constraint-handlers>
+         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
          <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
          <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
                      message="Test Message" message-id="regex_error" />
@@ -46,8 +47,8 @@
             <set id="details" appearance="fieldset" />
             <set id="user" parent="details" appearance="panel" />
 
-            <field id="name" label="Name" label-id="field_label_name" disabled="true" set="details"
-                     help-text="This is the name of the node" help-text-id="field_help_name" >
+            <field id="name" label="Name" label-id="field_label_name" read-only="true" set="details"
+                     help="This is the name of the node" help-id="field_help_name" >
                <control template="alfresco/extension/formcontrols/my-name.ftl">
                   <control-param name="foo">bar</control-param>
                </control>

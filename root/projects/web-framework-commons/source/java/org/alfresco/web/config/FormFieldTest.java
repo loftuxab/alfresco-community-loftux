@@ -103,8 +103,8 @@ public class FormFieldTest extends TestCase
         FormConfigElement testElement = new FormConfigElement();
         testElement.addField("name",
                 Arrays.asList(new String[]{"id",   "label", "label-id",
-                		"disabled", "set",     "help-text",
-                		"help-text-id"}),
+                		"read-only", "set",     "help",
+                		"help-id"}),
                 Arrays.asList(new String[]{"name", "Name",  "field_label_name",
                 		"true",     "details", "This is the name of the node",
                 		"field_help_name"}));
@@ -113,7 +113,7 @@ public class FormFieldTest extends TestCase
         assertEquals("name", testField.getId());
         assertEquals("Name", testField.getLabel());
         assertEquals("field_label_name", testField.getLabelId());
-        assertEquals(true, testField.isDisabled());
+        assertEquals(true, testField.isReadOnly());
         assertEquals("details", testField.getSet());
         assertEquals("This is the name of the node", testField.getHelpText());
         assertEquals("field_help_name", testField.getHelpTextId());
