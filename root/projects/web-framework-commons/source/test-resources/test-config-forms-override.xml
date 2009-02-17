@@ -38,8 +38,8 @@
             <hide id="quota" for-mode="edit" />
          </field-visibility>
          <appearance>
-            <field id="name" label="Name" label-id="field_label_name" disabled="true" set="details"
-                     help-text="This is the name of the node" help-text-id="field_help_name" >
+            <field id="name" label="Name" label-id="field_label_name" read-only="true" set="details"
+                     help="This is the name of the node" help-id="field_help_name" >
                <control template="alfresco/extension/formcontrols/my-name.ftl">
                   <control-param name="foo">bar</control-param>
                </control>
@@ -50,9 +50,6 @@
             <field id="username" set="user" />
             <field id="quota" set="user" requires-role="Coordinator" /> 
          </appearance>
-         <model-override>
-            <property name="fields.title.mandatory">false</property>
-         </model-override>
       </form>
    </config>
    

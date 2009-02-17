@@ -54,6 +54,8 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         // Test that the constraint-handlers' constraints are read from the
         // config file
         Map<String, String> expectedValidationHandlers = new HashMap<String, String>();
+        expectedValidationHandlers.put("MANDATORY",
+                "Alfresco.forms.validation.mandatory");
         expectedValidationHandlers.put("REGEX",
                 "Alfresco.forms.validation.regexMatch");
         expectedValidationHandlers.put("NUMERIC",
@@ -81,6 +83,7 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         // Test that the constraint-handlers' messages are read from the config
         // file
         Map<String, String> expectedMessages = new HashMap<String, String>();
+        expectedMessages.put("MANDATORY", "");
         expectedMessages.put("REGEX", "");
         expectedMessages.put("NUMERIC", "Test Message");
 
@@ -96,6 +99,7 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         // Test that the constraint-handlers' message-ids are read from the
         // config file
         Map<String, String> expectedMessageIDs = new HashMap<String, String>();
+        expectedMessageIDs.put("MANDATORY", "");
         expectedMessageIDs.put("REGEX", "");
         expectedMessageIDs.put("NUMERIC", "regex_error");
 
@@ -107,6 +111,10 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
             assertEquals("Incorrect message-id for " + nextKey + ".",
                     nextExpectedValue, nextActualValue);
         }
+        
+        // Test that the MANDATORY constraint has the correct event
+        assertEquals("Incorrect event for MANDATORY constraint", "blur", 
+                    chConfigElement.getEventFor("MANDATORY"));
     }
 
     public void testConstraintHandlerElementShouldHaveNoChildren()
@@ -130,11 +138,11 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
     public void testCombineConstraintHandlersWithAddedParam()
     {
         ConstraintHandlersConfigElement basicElement = new ConstraintHandlersConfigElement();
-        basicElement.addDataMapping("REGEX", "foo.regex", null, null);
+        basicElement.addDataMapping("REGEX", "foo.regex", null, null, null);
 
         // This element is the same as the above, but adds message & message-id.
         ConstraintHandlersConfigElement elementWithAdditions = new ConstraintHandlersConfigElement();
-        elementWithAdditions.addDataMapping("REGEX", "foo.regex", "msg", "msg-id");
+        elementWithAdditions.addDataMapping("REGEX", "foo.regex", "msg", "msg-id", null);
 
         ConfigElement combinedElem = basicElement.combine(elementWithAdditions);
         assertEquals("Combined elem incorrect.", elementWithAdditions,
@@ -148,11 +156,11 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
     public void testCombineConstraintHandlersWithModifiedParam()
     {
         ConstraintHandlersConfigElement initialElement = new ConstraintHandlersConfigElement();
-        initialElement.addDataMapping("REGEX", "foo.regex", null, null);
+        initialElement.addDataMapping("REGEX", "foo.regex", null, null, null);
 
         // This element is the same as the above, but adds message & message-id.
         ConstraintHandlersConfigElement modifiedElement = new ConstraintHandlersConfigElement();
-        modifiedElement.addDataMapping("REGEX", "bar.regex", "msg", "msg-id");
+        modifiedElement.addDataMapping("REGEX", "bar.regex", "msg", "msg-id", null);
 
         ConfigElement combinedElem = initialElement.combine(modifiedElement);
         assertEquals("Combined elem incorrect.", modifiedElement, combinedElem);
@@ -165,11 +173,11 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
     public void testCombineConstraintHandlersWithDeletedParam()
     {
         ConstraintHandlersConfigElement initialElement = new ConstraintHandlersConfigElement();
-        initialElement.addDataMapping("REGEX", "bar.regex", "msg", "msg-id");
+        initialElement.addDataMapping("REGEX", "bar.regex", "msg", "msg-id", null);
 
         // This element is the same as the above, but adds message & message-id.
         ConstraintHandlersConfigElement modifiedElement = new ConstraintHandlersConfigElement();
-        modifiedElement.addDataMapping("REGEX", "bar.regex", null, null);
+        modifiedElement.addDataMapping("REGEX", "bar.regex", null, null, null);
 
         ConfigElement combinedElem = initialElement.combine(modifiedElement);
         assertEquals("Combined elem incorrect.", modifiedElement, combinedElem);

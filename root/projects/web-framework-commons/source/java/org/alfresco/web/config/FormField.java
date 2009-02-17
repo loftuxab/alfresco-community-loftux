@@ -26,6 +26,7 @@ package org.alfresco.web.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +43,14 @@ import org.apache.commons.logging.LogFactory;
  */
 public class FormField
 {
-    private static final String ATTR_HELP_TEXT_ID = "help-text-id";
-	private static final String ATTR_HELP_TEXT = "help-text";
+    private static final String ATTR_LABEL_ID = "label-id";
+    private static final String ATTR_LABEL = "label";
+    private static final String ATTR_DESCRIPTION_ID = "description-id";
+    private static final String ATTR_DESCRIPTION = "description";
+    private static final String ATTR_HELP_TEXT_ID = "help-id";
+	private static final String ATTR_HELP_TEXT = "help";
 	private static final String ATTR_SET = "set";
-	private static final String ATTR_DISABLED = "disabled";
-	private static final String ATTR_LABEL_ID = "label-id";
-	private static final String ATTR_LABEL = "label";
+    private static final String ATTR_READ_ONLY = "read-only";
 
 	private static Log logger = LogFactory.getLog(FormField.class);
     
@@ -128,24 +131,39 @@ public class FormField
     {
     	return attributes.get(ATTR_LABEL);
     }
+    
     public String getLabelId()
     {
     	return attributes.get(ATTR_LABEL_ID);
     }
-    public boolean isDisabled()
+    
+    public String getDescription()
     {
-    	Object disabledValue = attributes.get(ATTR_DISABLED);
+        return attributes.get(ATTR_DESCRIPTION);
+    }
+    
+    public String getDescriptionId()
+    {
+        return attributes.get(ATTR_DESCRIPTION_ID);
+    }
+    
+    public boolean isReadOnly()
+    {
+    	Object disabledValue = attributes.get(ATTR_READ_ONLY);
     	return disabledValue instanceof String
     	    && "true".equalsIgnoreCase((String)disabledValue);
     }
+    
     public String getSet()
     {
     	return attributes.get(ATTR_SET);
     }
+    
     public String getHelpText()
     {
     	return attributes.get(ATTR_HELP_TEXT);
     }
+    
     public String getHelpTextId()
     {
     	return attributes.get(ATTR_HELP_TEXT_ID);
@@ -156,13 +174,27 @@ public class FormField
     {
         return template;
     }
+    
     public List<ControlParam> getControlParams()
     {
     	return Collections.unmodifiableList(this.controlParams);
     }
+    
     public List<ConstraintMessage> getConstraintMessages()
     {
     	return Collections.unmodifiableList(this.constraintMessages);
+    }
+    
+    public Map<String, ConstraintMessage> getConstraintMessageMap()
+    {
+        Map<String, ConstraintMessage> msgs = new HashMap<String, ConstraintMessage>(4);
+        
+        for (ConstraintMessage msg : this.constraintMessages)
+        {
+            msgs.put(msg.getType(), msg);
+        }
+        
+        return Collections.unmodifiableMap(msgs);
     }
     
     public FormField combine(FormField otherField)

@@ -50,9 +50,6 @@
             <show id="my:mltext" />
             <show id="my:date" />
          </field-visibility>
-         <model-override>
-            <property name="fields.title.mandatory">true</property>
-         </model-override>
       </form>
    </config>
 </alfresco-config>
