@@ -94,9 +94,12 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             String nextTemplate = getTemplateFor(nextDataType);
             DefaultControl nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
                     .get(nextDataType);
-            List<ControlParam> nextControlParams = nextDefaultControls
-                    .getControlParams();
-
+            List<ControlParam> nextControlParams = null;
+            if (nextDefaultControls != null)
+            {
+                nextControlParams = nextDefaultControls.getControlParams();
+            }
+            
             result.addDataMapping(nextDataType, nextTemplate,
                             nextControlParams);
         }
@@ -106,9 +109,12 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             String nextTemplate = otherDCCElement.getTemplateFor(nextDataType);
             DefaultControl nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
                     .get(nextDataType);
-            List<ControlParam> nextControlParams = nextDefaultControls
-                    .getControlParams();
-
+            List<ControlParam> nextControlParams = null;
+            if (nextDefaultControls != null)
+            {
+                nextControlParams = nextDefaultControls.getControlParams();
+            }
+            
             result.addDataMapping(nextDataType, nextTemplate, nextControlParams);
         }
 

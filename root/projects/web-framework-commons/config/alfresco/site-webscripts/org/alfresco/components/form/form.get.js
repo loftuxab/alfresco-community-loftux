@@ -22,7 +22,10 @@ function main()
    if (context.properties.nodeRef != null && context.properties.nodeRef != "")
    {
       var nodeRef = context.properties.nodeRef;
-      logger.log("nodeRef = " + nodeRef);
+      if (logger.isLoggingEnabled())
+      {
+         logger.log("nodeRef = " + nodeRef);
+      }
       
       var json = remote.call("/api/forms/node/" + nodeRef.replace(":/", ""));
       
@@ -78,7 +81,10 @@ function main()
                   break;
             }
             
-            logger.log("visible fields for " + formUIModel.mode + " mode = " + visibleFields);
+            if (logger.isLoggingEnabled())
+            {
+               logger.log("Visible fields for " + formUIModel.mode + " mode = " + visibleFields);
+            }
             
             // iterate round each visible field name, retrieve all data and
             // add to the form ui model
@@ -87,7 +93,7 @@ function main()
             
             for (var f = 0; f < visibleFields.size(); f++)
             {
-               var fieldName = visibleFields.get(f);            
+               var fieldName = visibleFields.get(f);
                var fieldConfig = configuredFields[fieldName];
                
                // setup the field
@@ -98,7 +104,10 @@ function main()
                {
                   formUIItems.push(fieldDef);
                   
-                  logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+                  if (logger.isLoggingEnabled())
+                  {
+                     logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+                  }
                }
             }
          }
@@ -109,8 +118,6 @@ function main()
          
          formUIModel.items = formUIItems;
          formUIModel.constraints = formUIConstraints;
-         
-         logger.log("Added constraints: " + jsonUtils.toJSONString(formUIModel.constraints));
       }
       else
       {
@@ -240,9 +247,9 @@ function setupField(formModel, fieldName, fieldConfig)
             fieldDef.value = formModel.data.formData[fieldDef.name];
          }
       }
-      else
+      else if (logger.isWarnLoggingEnabled())
       {
-         logger.log("Ignoring field \"" + fieldName + "\" as a field definition could not be located");
+         logger.warn("Ignoring field \"" + fieldName + "\" as a field definition could not be located");
       }
    }
    
@@ -526,6 +533,11 @@ function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
       if (constraintMsg != null)
       {
          constraint.message = constraintMsg;
+      }
+      
+      if (logger.isLoggingEnabled())
+      {
+         logger.log("Built constraint: " + jsonUtils.toJSONString(constraint));
       }
    }
    else if (logger.isWarnLoggingEnabled())
