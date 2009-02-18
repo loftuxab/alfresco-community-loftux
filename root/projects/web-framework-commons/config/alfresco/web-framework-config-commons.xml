@@ -33,7 +33,8 @@
       </default-controls>
       <constraint-handlers>
          <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
-         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" event="blur"
+         <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
+         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup"
                      message="The field contains an invalid character" />
       </constraint-handlers>
    </config>

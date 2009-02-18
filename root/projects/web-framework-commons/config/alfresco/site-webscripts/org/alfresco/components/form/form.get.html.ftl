@@ -38,7 +38,7 @@
          </#if>
          
          <#list form.constraints as constraint>
-         ${formVar}.addValidation("${args.htmlid}_${constraint.fieldId}", ${constraint.validationHandler}, null, "${constraint.event}");
+         ${formVar}.addValidation("${args.htmlid}_${constraint.fieldId}", ${constraint.validationHandler}, ${constraint.params}, "${constraint.event}");
          </#list>
          
          ${formVar}.init();

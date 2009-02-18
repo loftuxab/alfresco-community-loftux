@@ -1018,14 +1018,24 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
    
    if (args.min)
    {
-      min = args.min;
+      min = parseInt(args.min);
+   }
+   
+   if (args.minLength)
+   {
+      min = parseInt(args.minLength);
    }
    
    if (args.max)
    {
-      max = args.max;
+      max = parseInt(args.max);
    }
    
+   if (args.maxLength)
+   {
+      max = parseInt(args.maxLength);
+   }
+
    var length = field.value.length;
    
    if (min != -1 && length < min)
@@ -1115,12 +1125,22 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
          
          if (args.min)
          {
-            min = args.min;
+            min = parseInt(args.min);
+         }
+         
+         if (args.minValue)
+         {
+            min = parseInt(args.minValue);
          }
          
          if (args.max)
          {
-            max = args.max;
+            max = parseInt(args.max);
+         }
+         
+         if (args.maxValue)
+         {
+            max = parseInt(args.maxValue);
          }
          
          if (min != -1 && value < min)
@@ -1128,7 +1148,7 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
             valid = false;
          }
          
-         if (max != -1 && length > max)
+         if (max != -1 && value > max)
          {
             valid = false;
          }
@@ -1283,3 +1303,27 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, event, f
    
    return valid;
 };
+
+
+/**
+ * Repository regular expression handler, simply used as a pass through to the 
+ * standard regexMatch handler after converting the paramater names.
+ *
+ * @method repoRegexMatch
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, event, form, silent)
+{
+   // convert parameters
+   args.pattern = args.expression;
+   args.match = !args.requiresMatch;
+
+   // call the standard regex handler
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
+};
+

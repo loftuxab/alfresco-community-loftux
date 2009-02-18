@@ -98,7 +98,7 @@ function main()
                {
                   formUIItems.push(fieldDef);
                   
-                  logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+                  //logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
                }
             }
          }
@@ -163,7 +163,7 @@ function setupCaches(formModel)
  * @param formModel The form model returned from the server
  * @param fieldName The name of the field to setup
  * @param fieldConfig Object representing the UI configuration 
-                      or null if there isn't any configuration 
+ *                    or null if there isn't any configuration 
  * @return Object representing the field 
  */
 function setupField(formModel, fieldName, fieldConfig)
@@ -253,7 +253,7 @@ function setupField(formModel, fieldName, fieldConfig)
  * @method setupAppearance
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
-                      or null if there isn't any configuration
+ *                    or null if there isn't any configuration
  */
 function setupAppearance(fieldDef, fieldConfig)
 {
@@ -322,7 +322,7 @@ function setupAppearance(fieldDef, fieldConfig)
  * @method setupControl
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
-                      or null if there isn't any configuration
+ *                    or null if there isn't any configuration
  */
 function setupControl(fieldDef, fieldConfig)
 {
@@ -358,12 +358,9 @@ function setupControl(fieldDef, fieldConfig)
          {
             control.template = defaultControlConfig.template;
          }
-         else
+         else if (logger.isWarnLoggingEnabled())
          {
-            if (logger.isWarnLoggingEnabled())
-            {
-               logger.warn("No default control found for data type \"" + fieldDef.dataType + "\" whilst processing field \"" + fieldDef.configName + "\"");
-            }
+            logger.warn("No default control found for data type \"" + fieldDef.dataType + "\" whilst processing field \"" + fieldDef.configName + "\"");
          }
       }
       else
@@ -372,12 +369,9 @@ function setupControl(fieldDef, fieldConfig)
          {
             control.template = defaultControlConfig.template;
          }
-         else
+         else if (logger.isWarnLoggingEnabled())
          {
-            if (logger.isWarnLoggingEnabled())
-            {
-               logger.warn("No default control found for associations" + "\" whilst processing field \"" + fieldDef.configName + "\"");
-            }
+            logger.warn("No default control found for associations" + "\" whilst processing field \"" + fieldDef.configName + "\"");
          }
       }
    }
@@ -411,77 +405,121 @@ function setupControl(fieldDef, fieldConfig)
  * @method setupConstraints
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
-                      or null if there isn't any configuration
+ *                    or null if there isn't any configuration
  */
 function setupConstraints(fieldDef, fieldConfig)
 {
-   logger.log(jsonUtils.toJSONString(fieldDef));
-   
    // setup mandatory constraint if field is marked as such
    if (fieldDef.mandatory && fieldDef.disabled == false)
    {
-      var defaultConstraintConfig = defaultConstraintHandlers.items["MANDATORY"];
-      if (defaultConstraintConfig !== null)
+      var constraint = buildConstraint("MANDATORY", {}, fieldDef, fieldConfig);
+      
+      if (constraint !== null)
       {
-         var constraint = {};
-         constraint.fieldId = fieldDef.id;
-         constraint.validationHandler = defaultConstraintConfig.validationHandler;
-         constraint.params = {};
-         if (defaultConstraintConfig.event !== null && defaultConstraintConfig.event.length > 0)
-         {
-            constraint.event = defaultConstraintConfig.event;
-         }
-         else
-         {
-            constraint.event = "blur";
-         }
-         
-         // look for an overridden message in the field's constraint config, 
-         // if none found look in the default constraint config
-         
-         // TODO: change constraint config so null is returned if no message present
-         
-         var constraintMsg = null;
-         if (fieldConfig !== null && fieldConfig.constraintMessageMap["MANDATORY"] !== null)
-         {
-            var fieldConstraintConfig = fieldConfig.constraintMessageMap["MANDATORY"];
-            if (fieldConstraintConfig.messageId !== null && 
-                fieldConstraintConfig.messageId.length > 0)
-            {
-               constraintMsg = msg.get(fieldConstraintConfig.messageId);
-            }
-            else if (fieldConstraintConfig.message !== null && 
-                fieldConstraintConfig.message.length > 0)
-            {
-               constraintMsg = fieldConstraintConfig.message;
-            }
-         }
-         else if (typeof defaultConstraintConfig.messageId !== "undefined" && 
-                  defaultConstraintConfig.messageId !== null && 
-                  defaultConstraintConfig.messageId.length > 0)
-         {
-            constraintMsg = msg.get(defaultConstraintConfig.messageId);
-         }
-         else if (typeof defaultConstraintConfig.message !== "undefined" && 
-                  defaultConstraintConfig.message !== null && 
-                  defaultConstraintConfig.message.length > 0)
-         {
-            constraintMsg = defaultConstraintConfig.message;
-         }
-         
-         // add the message if there is one
-         if (constraintMsg != null)
-         {
-            constraint.message = constraintMsg;
-         }
-         
          // add the constraint to the global list
          formUIConstraints.push(constraint);
       }
    }
    
-   // TODO: look for model defined constraints on the field definition
+   // TODO: setup number constraint if field is a number
+   
+   // look for model defined constraints on the field definition
+   if (typeof fieldDef.constraints !== "undefined")
+   {
+      for (var c = 0; c < fieldDef.constraints.length; c++)
+      {
+         var obj = fieldDef.constraints[c];
+         var constraint = buildConstraint(obj.type, obj.params, fieldDef, fieldConfig);
+      
+         if (constraint !== null)
+         {
+            // add the constraint to the global list
+            formUIConstraints.push(constraint);
+         }
+      }
+   }
 }
+
+/**
+ * Creates an object representing the constraint with the given
+ * id for the given field definition and configuration
+ *
+ * @method setupConstraints
+ * @param constraintId The contstraint identifier, for example "REGEX"
+ * @param constraintParams Object representing parameters to pass to the client side handler
+ * @param fieldDef Object representing the field definition 
+ * @param fieldConfig Object representing the UI configuration
+ *                    or null if there isn't any configuration
+ * @return An object representing the constraint or null if it could
+ *         not be constructed
+ */
+function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
+{
+   var constraint = null;
+   
+   var defaultConstraintConfig = defaultConstraintHandlers.items[constraintId];
+   if (defaultConstraintConfig !== null)
+   {
+      constraint = {};
+      constraint.fieldId = fieldDef.id;
+      constraint.validationHandler = defaultConstraintConfig.validationHandler;
+      constraint.params = jsonUtils.toJSONString(constraintParams);
+      if (defaultConstraintConfig.event !== null && defaultConstraintConfig.event !== "")
+      {
+         constraint.event = defaultConstraintConfig.event;
+      }
+      else
+      {
+         constraint.event = "blur";
+      }
+      
+      // look for an overridden message in the field's constraint config, 
+      // if none found look in the default constraint config
+      
+      // TODO: change constraint config so null is returned if no message present
+      
+      var constraintMsg = null;
+      if (fieldConfig !== null && fieldConfig.constraintMessageMap[constraintId] !== null)
+      {
+         var fieldConstraintConfig = fieldConfig.constraintMessageMap[constraintId];
+         if (fieldConstraintConfig.messageId !== null && 
+               fieldConstraintConfig.messageId.length > 0)
+         {
+            constraintMsg = msg.get(fieldConstraintConfig.messageId);
+         }
+         else if (fieldConstraintConfig.message !== null && 
+               fieldConstraintConfig.message.length > 0)
+         {
+            constraintMsg = fieldConstraintConfig.message;
+         }
+      }
+      else if (typeof defaultConstraintConfig.messageId !== "undefined" && 
+               defaultConstraintConfig.messageId !== null && 
+               defaultConstraintConfig.messageId.length > 0)
+      {
+         constraintMsg = msg.get(defaultConstraintConfig.messageId);
+      }
+      else if (typeof defaultConstraintConfig.message !== "undefined" && 
+               defaultConstraintConfig.message !== null && 
+               defaultConstraintConfig.message.length > 0)
+      {
+         constraintMsg = defaultConstraintConfig.message;
+      }
+      
+      // add the message if there is one
+      if (constraintMsg != null)
+      {
+         constraint.message = constraintMsg;
+      }
+   }
+   else if (logger.isWarnLoggingEnabled())
+   {
+      logger.warn("No default constraint configuration found for \"" + constraintId + "\" constraint whilst processing field \"" + fieldDef.configName + "\"");
+   }
+   
+   return constraint;
+}
+
 
 /**
  * Dumps the form UI model, but only if logging is active
