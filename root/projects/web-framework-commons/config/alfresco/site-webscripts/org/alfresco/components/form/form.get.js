@@ -98,7 +98,7 @@ function main()
                {
                   formUIItems.push(fieldDef);
                   
-                  //logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+                  logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
                }
             }
          }
@@ -109,6 +109,8 @@ function main()
          
          formUIModel.items = formUIItems;
          formUIModel.constraints = formUIConstraints;
+         
+         logger.log("Added constraints: " + jsonUtils.toJSONString(formUIModel.constraints));
       }
       else
       {
@@ -117,7 +119,7 @@ function main()
    }
    
    // log the model
-   dumpFormUIModel(formUIModel);
+   //dumpFormUIModel(formUIModel);
    
    // pass form ui model to FTL
    model.form = formUIModel;
@@ -421,7 +423,18 @@ function setupConstraints(fieldDef, fieldConfig)
       }
    }
    
-   // TODO: setup number constraint if field is a number
+   // setup number constraint if field is a number
+   if (fieldDef.dataType === "d:int" || fieldDef.dataType === "d:long" || 
+       fieldDef.dataType === "d:double" || fieldDef.dataType === "d:float" )
+   {
+      var constraint = buildConstraint("NUMBER", {}, fieldDef, fieldConfig);
+      
+      if (constraint !== null)
+      {
+         // add the constraint to the global list
+         formUIConstraints.push(constraint);
+      }
+   }
    
    // look for model defined constraints on the field definition
    if (typeof fieldDef.constraints !== "undefined")
@@ -438,6 +451,9 @@ function setupConstraints(fieldDef, fieldConfig)
          }
       }
    }
+   
+   // remove the constraints property from the fieldDef object
+   delete fieldDef.constraints;
 }
 
 /**
