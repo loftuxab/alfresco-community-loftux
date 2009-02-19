@@ -30,6 +30,11 @@
    margin: 12px;
 }
 
+.form-container select
+{
+   margin: 12px;
+}
+
 .form-container .mandatory-indicator
 {
    color: green;
