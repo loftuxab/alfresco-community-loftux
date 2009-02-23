@@ -18,7 +18,9 @@
          <type name="d:long" template="controls/textfield.ftl" />
          <type name="d:boolean" template="controls/checkbox.ftl" />
          <type name="d:date" template="controls/date.ftl" />
-         <type name="d:datetime" template="controls/date.ftl" />
+         <type name="d:datetime" template="controls/date.ftl">
+            <control-param name="showTime">true</control-param>
+         </type>
          <type name="d:any" template="controls/textfield.ftl" />
          <type name="association" template="controls/association.ftl" />
          <!-- Data types that should always be rendered read-only -->

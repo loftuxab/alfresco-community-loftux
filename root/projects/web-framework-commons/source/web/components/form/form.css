@@ -59,6 +59,8 @@
 {
 }
 
+/* Date picker related classes */
+
 .datepicker
 { 
    display: none; 
@@ -70,6 +72,40 @@
 .datepicker-icon
 {
    vertical-align: -4px;
+}
+
+.form-container .date-entry
+{
+   width: 75px;
+   margin-right: 6px;
+   margin-bottom: 4px;
+}
+
+.form-container .date-format
+{
+   font-size: 0.7em;
+   color: #aaa;
+   margin-left: 14px;
+}
+
+.form-container .time-entry
+{
+   width: 45px;
+   margin-bottom: 4px;
+}
+
+.form-container .time-format
+{
+   font-size: 0.7em;
+   color: #aaa;
+   margin-left: 62px;
+}
+
+.form-container .time-format-disabled
+{
+   font-size: 0.7em;
+   color: #aaa;
+   margin-left: 42px;
 }
 
 .yui-calcontainer .title
