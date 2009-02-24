@@ -61,54 +61,69 @@ function main()
             // get the visible fields for the current mode
             var formConfig = nodeConfig.form;
             
-            var visibleFields = null;
-            
-            // TODO: deal with hidden vs. show mode and no config
-            
-            switch (mode)
+            if (formConfig != null)
             {
-               case "view":
-                  visibleFields = formConfig.visibleViewFieldNames;
-                  break;
-               case "edit":
-                  visibleFields = formConfig.visibleEditFieldNames;
-                  break;
-               case "create":
-                  visibleFields = formConfig.visibleCreateFieldNames;
-                  break;
-               default:
-                  visibleFields = formConfig.visibleViewFieldNames;
-                  break;
-            }
-            
-            if (logger.isLoggingEnabled())
-            {
-               logger.log("Visible fields for " + formUIModel.mode + " mode = " + visibleFields);
-            }
-            
-            // iterate round each visible field name, retrieve all data and
-            // add to the form ui model
-            var configuredFields = formConfig.fields;
-            var formUIItems = [];
-            
-            for (var f = 0; f < visibleFields.size(); f++)
-            {
-               var fieldName = visibleFields.get(f);
-               var fieldConfig = configuredFields[fieldName];
+               var visibleFields = null;
                
-               // setup the field
-               var fieldDef = setupField(formModel, fieldName, fieldConfig);
+               // TODO: deal with hidden vs. show mode and no config
                
-               // if a field was created add to the list to be displayed
-               if (fieldDef !== null)
+               switch (mode)
                {
-                  formUIItems.push(fieldDef);
-                  
-                  if (logger.isLoggingEnabled())
+                  case "view":
+                     visibleFields = formConfig.visibleViewFieldNames;
+                     break;
+                  case "edit":
+                     visibleFields = formConfig.visibleEditFieldNames;
+                     break;
+                  case "create":
+                     visibleFields = formConfig.visibleCreateFieldNames;
+                     break;
+                  default:
+                     visibleFields = formConfig.visibleViewFieldNames;
+                     break;
+               }
+               
+               if (logger.isLoggingEnabled())
+               {
+                  logger.log("Visible fields for " + formUIModel.mode + " mode = " + visibleFields);
+               }
+               
+               // iterate round each visible field name, retrieve all data and
+               // add to the form ui model
+               var configuredFields = formConfig.fields;
+               var formUIItems = [];
+               
+               if (visibleFields != null)
+               {
+                  for (var f = 0; f < visibleFields.size(); f++)
                   {
-                     logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+                     var fieldName = visibleFields.get(f);
+                     var fieldConfig = configuredFields[fieldName];
+                     
+                     // setup the field
+                     var fieldDef = setupField(formModel, fieldName, fieldConfig);
+                     
+                     // if a field was created add to the list to be displayed
+                     if (fieldDef !== null)
+                     {
+                        formUIItems.push(fieldDef);
+                        
+                        if (logger.isLoggingEnabled())
+                        {
+                           logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+                        }
+                     }
                   }
                }
+               else
+               {
+                  model.error = "No fields to render for node type \"" + formModel.data.type + "\".";
+               }
+            }
+            else
+            {
+               // TODO: This should just show all properties instead
+               model.error = "No configuration found for node type \"" + formModel.data.type + "\".";
             }
          }
          
