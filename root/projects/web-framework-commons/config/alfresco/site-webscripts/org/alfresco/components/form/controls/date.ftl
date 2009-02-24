@@ -9,7 +9,7 @@
 <#if form.mode == "view">
 <div class="viewmode-field">
    <span class="viewmode-label">${field.label?html}:</span>
-   <span class="viewmode-value"><#if field.value != "">${field.value?datetime("yyyy-mm-dd'T'HH:MM:ss")?string("EEEE, MMMM dd yyyy")}</#if></span>
+   <span class="viewmode-value"><#if field.value != "">${field.value?datetime("yyyy-MM-dd'T'HH:mm:ss")?string("EEEE, MMMM dd yyyy")}</#if></span>
 </div>
 <#else>
 

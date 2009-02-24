@@ -29,11 +29,37 @@
    
    <#if form.mode != "view">      
       <script type="text/javascript">//<![CDATA[
+         function onJsonPostSuccess(response)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: response.serverResponse.responseText
+            });
+         }
+         
+         function onJsonPostFailure(response)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: "ERROR: Failed to submit JSON data, see logs for details."
+            });
+         }
+         
          var ${formVar} = new Alfresco.forms.Form("${formId}");
          ${formVar}.setShowSubmitStateDynamically(true, false);
          
          <#if page.url.args.submitMode == "json">
-         ${formVar}.setAJAXSubmit(true);
+         ${formVar}.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+               fn: onJsonPostSuccess            
+            },
+            failureCallback:
+            {
+               fn: onJsonPostFailure
+            }
+         });
          ${formVar}.setSubmitAsJSON(true);
          </#if>
          
