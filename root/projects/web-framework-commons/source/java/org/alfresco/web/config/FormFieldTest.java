@@ -185,7 +185,12 @@ public class FormFieldTest extends TestCase
         
         FormField combinedField = firstInstance.combine(secondInstance);
         
-        assertEquals(secondInstance, combinedField);
+        assertEquals("name", combinedField.getId());
+        assertEquals("Name", combinedField.getLabel());
+        assertEquals(null, combinedField.getLabelId());
+        assertEquals(null, combinedField.getSet());
+        assertEquals(null, combinedField.getHelpText());
+        assertEquals(null, combinedField.getHelpTextId());
     }
 
     public void testCombineFormFieldsWithModificationChanges()
@@ -224,6 +229,11 @@ public class FormFieldTest extends TestCase
         
         FormField combinedField = firstInstance.combine(secondInstance);
         
-        assertEquals(secondInstance, combinedField);
+        assertEquals("name", combinedField.getId());
+        assertEquals("Name", combinedField.getLabel());
+        assertEquals(null, combinedField.getLabelId());
+        assertEquals(null, combinedField.getSet());
+        assertEquals(null, combinedField.getHelpText());
+        assertEquals(null, combinedField.getHelpTextId());
     }
 }

@@ -120,39 +120,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /* package */void addDataMapping(String type, String validationHandler,
             String message, String messageID, String event)
     {
-    	if (message == null)
-    	{
-    		message = "";
-    	}
-    	if (messageID == null)
-    	{
-    		messageID = "";
-    	}
-    	
         items.put(type, new ItemDefinition(type, validationHandler, message, messageID, event));
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return items.hashCode();
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object otherObj)
-    {
-        if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
-        {
-            return false;
-        }
-        ConstraintHandlersConfigElement otherCHCE = (ConstraintHandlersConfigElement) otherObj;
-        return this.items.equals(otherCHCE.items);
     }
 
     /**
@@ -236,11 +204,11 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     	public ItemDefinition(String type, String validationHandler, 
     	                      String msg, String msgId, String event)
     	{
-            this.type              = type              == null ? "" : type;
-            this.validationHandler = validationHandler == null ? "" : validationHandler;
-            this.message           = msg               == null ? "" : msg;
-            this.messageId         = msgId             == null ? "" : msgId;
-            this.event             = event             == null ? "" : event;
+            this.type              = type == null ? "" : type;
+            this.validationHandler = validationHandler;
+            this.message           = msg;
+            this.messageId         = msgId;
+            this.event             = event;
     	}
     	
 		public String getType() 
@@ -267,35 +235,6 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 		{
 		    return event;
 		}
-
-        @Override
-        public boolean equals(Object otherObj)
-        {
-            if (otherObj == this)
-            {
-                return true;
-            }
-            else if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
-            {
-                return false;
-            }
-            ItemDefinition otherItem = (ItemDefinition)otherObj;
-            return otherItem.type.equals(this.type) &&
-                otherItem.validationHandler.equals(this.validationHandler) &&
-                otherItem.message.equals(this.message) &&
-                otherItem.messageId.equals(this.messageId) &&
-                otherItem.event.equals(this.event);
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return type.hashCode()
-                    + 3 * validationHandler.hashCode()
-                    + 7 * message.hashCode()
-                    + 11 * messageId.hashCode()
-                    + 13 * event.hashCode();
-        }
 
         @Override
         public String toString()

@@ -27,6 +27,10 @@ package org.alfresco.web.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.util.BaseTest;
 import org.alfresco.web.config.FormConfigElement.Mode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,11 +42,16 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Neil McErlean
  */
-public class FormConfigNoAppearanceTest extends AbstractFormConfigTest
+public class FormConfigNoAppearanceTest extends BaseTest
 {
     private static Log logger = LogFactory.getLog(FormConfigNoAppearanceTest.class);
+    protected XMLConfigService configService;
+    protected Config globalConfig;
+    protected ConfigElement globalDefaultControls;
+    protected ConfigElement globalConstraintHandlers;
+    protected FormConfigElement formConfigElement;
+    protected DefaultControlsConfigElement defltCtrlsConfElement;
     
-    @Override
     protected String getConfigXmlFile()
     {
         return "test-config-forms-no-appearance.xml";
@@ -90,5 +99,44 @@ public class FormConfigNoAppearanceTest extends AbstractFormConfigTest
         expectedFieldNames.add("my:date");
         
         assertEquals("Visible fields wrong.", expectedFieldNames, fieldNames);
+    }
+
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        configService = initXMLConfigService(getConfigXmlFile());
+        assertNotNull("configService was null.", configService);
+    
+        Config contentConfig = configService.getConfig("content");
+        assertNotNull("contentConfig was null.", contentConfig);
+    
+        ConfigElement confElement = contentConfig.getConfigElement("form");
+        assertNotNull("confElement was null.", confElement);
+        assertTrue("confElement should be instanceof FormConfigElement.",
+                confElement instanceof FormConfigElement);
+        formConfigElement = (FormConfigElement) confElement;
+    
+        globalConfig = configService.getGlobalConfig();
+    
+        globalDefaultControls = globalConfig
+                .getConfigElement("default-controls");
+        assertNotNull("global default-controls element should not be null",
+                globalDefaultControls);
+        assertTrue(
+                "config element should be an instance of DefaultControlsConfigElement",
+                (globalDefaultControls instanceof DefaultControlsConfigElement));
+        defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
+    
+        globalConstraintHandlers = globalConfig
+                .getConfigElement("constraint-handlers");
+        assertNotNull("global constraint-handlers element should not be null",
+                globalConstraintHandlers);
+        assertTrue(
+                "config element should be an instance of ConstraintHandlersConfigElement",
+                (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
     }
 }

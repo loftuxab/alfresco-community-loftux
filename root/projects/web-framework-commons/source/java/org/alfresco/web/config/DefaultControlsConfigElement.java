@@ -149,30 +149,6 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     }
 
     /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return datatypeDefCtrlMappings.hashCode();
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object otherObj)
-    {
-        if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
-        {
-            return false;
-        }
-        DefaultControlsConfigElement otherDCCE = (DefaultControlsConfigElement) otherObj;
-        return this.datatypeDefCtrlMappings
-                .equals(otherDCCE.datatypeDefCtrlMappings);
-    }
-
-    /**
      * This method returns a String representing the path of the template associated
      * with the given dataType.
      * 
@@ -263,37 +239,6 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         public List<ControlParam> getControlParams()
         {
             return Collections.unmodifiableList(controlParams);
-        }
-
-        /**
-         * @see java.lang.Object#hashCode()
-         */
-        @Override
-        public int hashCode()
-        {
-            return name.hashCode() + 7 * template.hashCode() + 13
-                    * controlParams.size();
-        }
-
-        /**
-         * @see java.lang.Object#equals(java.lang.Object)
-         */
-        @Override
-        public boolean equals(Object otherObj)
-        {
-            if (otherObj == this)
-            {
-                return true;
-            }
-            else if (otherObj == null
-                    || !otherObj.getClass().equals(this.getClass()))
-            {
-                return false;
-            }
-            DefaultControl otherDC = (DefaultControl) otherObj;
-            return otherDC.name.equals(this.name)
-                    && otherDC.template.equals(this.template)
-                    && otherDC.controlParams.equals(this.controlParams);
         }
 
         /**

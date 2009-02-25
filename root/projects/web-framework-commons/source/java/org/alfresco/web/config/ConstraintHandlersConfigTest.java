@@ -24,13 +24,17 @@
  */
 package org.alfresco.web.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
+import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.util.BaseTest;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in to the web client
@@ -40,9 +44,15 @@ import org.alfresco.config.ConfigException;
  * 
  * @author Neil McErlean
  */
-public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
+public class ConstraintHandlersConfigTest extends BaseTest
 {
-    @Override
+    protected XMLConfigService configService;
+    protected Config globalConfig;
+    protected ConfigElement globalDefaultControls;
+    protected ConfigElement globalConstraintHandlers;
+    protected FormConfigElement formConfigElement;
+    protected DefaultControlsConfigElement defltCtrlsConfElement;
+
     protected String getConfigXmlFile()
     {
         return "test-config-forms.xml";
@@ -83,8 +93,8 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         // Test that the constraint-handlers' messages are read from the config
         // file
         Map<String, String> expectedMessages = new HashMap<String, String>();
-        expectedMessages.put("MANDATORY", "");
-        expectedMessages.put("REGEX", "");
+        expectedMessages.put("MANDATORY", null);
+        expectedMessages.put("REGEX", null);
         expectedMessages.put("NUMERIC", "Test Message");
 
         // Test that the types map to the expected message.
@@ -99,8 +109,8 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         // Test that the constraint-handlers' message-ids are read from the
         // config file
         Map<String, String> expectedMessageIDs = new HashMap<String, String>();
-        expectedMessageIDs.put("MANDATORY", "");
-        expectedMessageIDs.put("REGEX", "");
+        expectedMessageIDs.put("MANDATORY", null);
+        expectedMessageIDs.put("REGEX", null);
         expectedMessageIDs.put("NUMERIC", "regex_error");
 
         // Test that the types map to the expected message-id.
@@ -144,9 +154,13 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         ConstraintHandlersConfigElement elementWithAdditions = new ConstraintHandlersConfigElement();
         elementWithAdditions.addDataMapping("REGEX", "foo.regex", "msg", "msg-id", null);
 
-        ConfigElement combinedElem = basicElement.combine(elementWithAdditions);
-        assertEquals("Combined elem incorrect.", elementWithAdditions,
-                combinedElem);
+        ConstraintHandlersConfigElement combinedElem
+                = (ConstraintHandlersConfigElement)basicElement.combine(elementWithAdditions);
+        
+        assertEquals("foo.regex", combinedElem.getItems().get("REGEX").getValidationHandler());
+        assertEquals("msg", combinedElem.getItems().get("REGEX").getMessage());
+        assertEquals("msg-id", combinedElem.getItems().get("REGEX").getMessageId());
+        assertEquals(null, combinedElem.getItems().get("REGEX").getEvent());
     }
 
     /**
@@ -162,8 +176,13 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         ConstraintHandlersConfigElement modifiedElement = new ConstraintHandlersConfigElement();
         modifiedElement.addDataMapping("REGEX", "bar.regex", "msg", "msg-id", null);
 
-        ConfigElement combinedElem = initialElement.combine(modifiedElement);
-        assertEquals("Combined elem incorrect.", modifiedElement, combinedElem);
+        ConstraintHandlersConfigElement combinedElem
+                = (ConstraintHandlersConfigElement)initialElement.combine(modifiedElement);
+
+        assertEquals("bar.regex", combinedElem.getItems().get("REGEX").getValidationHandler());
+        assertEquals("msg", combinedElem.getItems().get("REGEX").getMessage());
+        assertEquals("msg-id", combinedElem.getItems().get("REGEX").getMessageId());
+        assertEquals(null, combinedElem.getItems().get("REGEX").getEvent());
     }
     
     /**
@@ -179,7 +198,51 @@ public class ConstraintHandlersConfigTest extends AbstractFormConfigTest
         ConstraintHandlersConfigElement modifiedElement = new ConstraintHandlersConfigElement();
         modifiedElement.addDataMapping("REGEX", "bar.regex", null, null, null);
 
-        ConfigElement combinedElem = initialElement.combine(modifiedElement);
-        assertEquals("Combined elem incorrect.", modifiedElement, combinedElem);
+        ConstraintHandlersConfigElement combinedElem
+                = (ConstraintHandlersConfigElement)initialElement.combine(modifiedElement);
+
+        assertEquals("bar.regex", combinedElem.getItems().get("REGEX").getValidationHandler());
+        assertEquals(null, combinedElem.getItems().get("REGEX").getMessage());
+        assertEquals(null, combinedElem.getItems().get("REGEX").getMessageId());
+        assertEquals(null, combinedElem.getItems().get("REGEX").getEvent());
+    }
+
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        configService = initXMLConfigService(getConfigXmlFile());
+        assertNotNull("configService was null.", configService);
+    
+        Config contentConfig = configService.getConfig("content");
+        assertNotNull("contentConfig was null.", contentConfig);
+    
+        ConfigElement confElement = contentConfig.getConfigElement("form");
+        assertNotNull("confElement was null.", confElement);
+        assertTrue("confElement should be instanceof FormConfigElement.",
+                confElement instanceof FormConfigElement);
+        formConfigElement = (FormConfigElement) confElement;
+    
+        globalConfig = configService.getGlobalConfig();
+    
+        globalDefaultControls = globalConfig
+                .getConfigElement("default-controls");
+        assertNotNull("global default-controls element should not be null",
+                globalDefaultControls);
+        assertTrue(
+                "config element should be an instance of DefaultControlsConfigElement",
+                (globalDefaultControls instanceof DefaultControlsConfigElement));
+        defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
+    
+        globalConstraintHandlers = globalConfig
+                .getConfigElement("constraint-handlers");
+        assertNotNull("global constraint-handlers element should not be null",
+                globalConstraintHandlers);
+        assertTrue(
+                "config element should be an instance of ConstraintHandlersConfigElement",
+                (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
     }
 }
