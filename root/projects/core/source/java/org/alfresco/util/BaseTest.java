@@ -73,17 +73,22 @@ public abstract class BaseTest extends TestCase
     
     protected XMLConfigService initXMLConfigService(String xmlConfigFile, String overridingXmlConfigFile)
     {
-        String mainConfigFile = getResourcesDir() + xmlConfigFile;
-        String overridingConfigFile = getResourcesDir()
-                + overridingXmlConfigFile;
-        assertFileIsValid(mainConfigFile);
-        assertFileIsValid(overridingConfigFile);
-    
+        List<String> files = new ArrayList<String>(2);
+        files.add(xmlConfigFile);
+        files.add(overridingXmlConfigFile);
+        return initXMLConfigService(files);
+    }
+
+    protected XMLConfigService initXMLConfigService(List<String> xmlConfigFilenames)
+    {
         List<String> configFiles = new ArrayList<String>();
-        configFiles.add(mainConfigFile);
-        configFiles.add(overridingConfigFile);
-        XMLConfigService svc = new XMLConfigService(new FileConfigSource(
-                configFiles));
+        for (String filename : xmlConfigFilenames)
+        {
+            String path = getResourcesDir() + filename;
+            assertFileIsValid(path);
+            configFiles.add(path);
+        }
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
         svc.initConfig();
         return svc;
     }

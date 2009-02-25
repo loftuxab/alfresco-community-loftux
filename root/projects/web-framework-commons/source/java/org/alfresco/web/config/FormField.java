@@ -149,9 +149,9 @@ public class FormField
     
     public boolean isReadOnly()
     {
-    	Object disabledValue = attributes.get(ATTR_READ_ONLY);
-    	return disabledValue instanceof String
-    	    && "true".equalsIgnoreCase((String)disabledValue);
+        Object disabledValue = attributes.get(ATTR_READ_ONLY);
+        return disabledValue instanceof String
+            && "true".equalsIgnoreCase((String)disabledValue);
     }
     
     public String getSet()
@@ -258,38 +258,6 @@ public class FormField
         return result;
     }
 
-    @Override
-    public boolean equals(Object otherObj)
-    {
-        if (otherObj == null || !otherObj.getClass().equals(this.getClass()))
-        {
-            return false;
-        }
-        FormField otherFormField = (FormField)otherObj;
-        
-        return this.id.equals(otherFormField.id) &&
-            this.attributes.equals(otherFormField.attributes) &&
-            this.template == null ? otherFormField.template == null : this.template.equals(otherFormField.template) &&
-            this.controlParams.equals(otherFormField.controlParams) &&
-            this.constraintMessages.equals(otherFormField.constraintMessages);
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        int component1 = id.hashCode();
-        int component2 = attributes.hashCode();
-        int component3 = template == null ? 0 : template.hashCode();
-        int component4 = controlParams == null ? 0 : controlParams.hashCode();
-        int component5 = constraintMessages == null ? 0 : constraintMessages.hashCode();
-
-        return component1
-            + 3 * component2
-            + 7 * component3
-            + 11 * component4
-            + 13 * component5;
-    }
-    
     @Override
     public String toString()
     {

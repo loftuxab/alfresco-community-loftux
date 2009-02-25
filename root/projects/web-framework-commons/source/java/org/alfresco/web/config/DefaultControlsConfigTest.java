@@ -31,8 +31,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
+import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.util.BaseTest;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in to the web client
@@ -42,9 +45,15 @@ import org.alfresco.config.ConfigException;
  * 
  * @author Neil McErlean
  */
-public class DefaultControlsConfigTest extends AbstractFormConfigTest
+public class DefaultControlsConfigTest extends BaseTest
 {
-    @Override
+    protected XMLConfigService configService;
+    protected Config globalConfig;
+    protected ConfigElement globalDefaultControls;
+    protected ConfigElement globalConstraintHandlers;
+    protected FormConfigElement formConfigElement;
+    protected DefaultControlsConfigElement defltCtrlsConfElement;
+
     protected String getConfigXmlFile()
     {
         return "test-config-forms.xml";
@@ -137,9 +146,14 @@ public class DefaultControlsConfigTest extends AbstractFormConfigTest
         parameterisedElement.addDataMapping("text", "path/textbox.ftl",
                 testParams);
 
-        ConfigElement combinedElem = basicElement.combine(parameterisedElement);
-        assertEquals("Combined elem incorrect.", parameterisedElement,
-                combinedElem);
+        DefaultControlsConfigElement combinedElem
+                = (DefaultControlsConfigElement)basicElement.combine(parameterisedElement);
+        
+        assertEquals("path/textbox.ftl", combinedElem.getItems().get("text").getTemplate());
+        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getControlParams();
+        assertEquals("Wrong count of control-params", 1, actualControlParams.size());
+        assertEquals("A", actualControlParams.get(0).getName());
+        assertEquals("1", actualControlParams.get(0).getValue());
     }
 
     /**
@@ -161,8 +175,14 @@ public class DefaultControlsConfigTest extends AbstractFormConfigTest
         modifiedElement.addDataMapping("text", "path/textbox.ftl",
                 modifiedTestParams);
 
-        ConfigElement combinedElem = initialElement.combine(modifiedElement);
-        assertEquals("Combined elem incorrect.", modifiedElement, combinedElem);
+        DefaultControlsConfigElement combinedElem
+               = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
+
+        assertEquals("path/textbox.ftl", combinedElem.getItems().get("text").getTemplate());
+        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getControlParams();
+        assertEquals("Wrong count of control-params", 1, actualControlParams.size());
+        assertEquals("A", actualControlParams.get(0).getName());
+        assertEquals("5", actualControlParams.get(0).getValue());
     }
 
     /**
@@ -181,7 +201,50 @@ public class DefaultControlsConfigTest extends AbstractFormConfigTest
         DefaultControlsConfigElement modifiedElement = new DefaultControlsConfigElement();
         modifiedElement.addDataMapping("text", "path/textbox.ftl", null);
 
-        ConfigElement combinedElem = initialElement.combine(modifiedElement);
-        assertEquals("Combined elem incorrect.", modifiedElement, combinedElem);
+        DefaultControlsConfigElement combinedElem
+               = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
+
+        assertEquals("path/textbox.ftl", combinedElem.getItems().get("text").getTemplate());
+        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getControlParams();
+        assertEquals("Wrong count of control-params", 0, actualControlParams.size());
+    }
+
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        configService = initXMLConfigService(getConfigXmlFile());
+        assertNotNull("configService was null.", configService);
+    
+        Config contentConfig = configService.getConfig("content");
+        assertNotNull("contentConfig was null.", contentConfig);
+    
+        ConfigElement confElement = contentConfig.getConfigElement("form");
+        assertNotNull("confElement was null.", confElement);
+        assertTrue("confElement should be instanceof FormConfigElement.",
+                confElement instanceof FormConfigElement);
+        formConfigElement = (FormConfigElement) confElement;
+    
+        globalConfig = configService.getGlobalConfig();
+    
+        globalDefaultControls = globalConfig
+                .getConfigElement("default-controls");
+        assertNotNull("global default-controls element should not be null",
+                globalDefaultControls);
+        assertTrue(
+                "config element should be an instance of DefaultControlsConfigElement",
+                (globalDefaultControls instanceof DefaultControlsConfigElement));
+        defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
+    
+        globalConstraintHandlers = globalConfig
+                .getConfigElement("constraint-handlers");
+        assertNotNull("global constraint-handlers element should not be null",
+                globalConstraintHandlers);
+        assertTrue(
+                "config element should be an instance of ConstraintHandlersConfigElement",
+                (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
     }
 }

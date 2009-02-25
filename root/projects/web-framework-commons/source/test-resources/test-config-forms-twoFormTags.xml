@@ -1,0 +1,62 @@
+<!-- This config file is based on the vanilla file.
+     It adds a second form tag within a second config tag for testing purposes -->
+<alfresco-config>
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
+         <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
+         <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>
+      </element-readers>
+   </plug-ins>
+
+   <config>
+      <default-controls>
+         <type name="d:long" template="/form-controls/mytextfield.ftl" />
+         <type name="d:text" template="/form-controls/mytextfield.ftl">
+            <control-param name="size">50</control-param>
+         </type>
+         <type name="d:test" template="/form-controls/test.ftl">
+            <control-param name="a">Hello</control-param>
+            <control-param name="b"></control-param>
+         </type>
+      </default-controls>
+      <constraint-handlers>
+         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
+         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
+         <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
+                     message="Test Message" message-id="regex_error" />
+      </constraint-handlers>
+   </config>
+   
+   <config evaluator="string-compare" condition="my:example">
+      <form submission-url="submission/url">
+         <field-visibility>
+            <show id="cm:name" />
+            <show id="my:text" />
+            <show id="my:mltext" />
+         </field-visibility>
+         <appearance>
+            <field id="cm:name">
+               <control template="/form-controls/mytextfield.ftl" />
+            </field>
+            <field id="my:text" label="Custom Text" description="This is a custom model text field">
+               <control>
+                  <control-param name="width">500px</control-param>
+               </control>
+            </field>
+            <field id="my:duplicate" label="Duplicate" read-only="true" help="This is a test for duplicate props and assocs" />
+            <field id="my:date" label="Custom Date" description-id="form.field.dateformat" />
+            <field id="my:dateTime" label="Custom Date Time" description-id="form.field.dateformat" />
+         </appearance>
+      </form>
+   </config>
+
+   <config evaluator="string-compare" condition="cm:content">
+      <form>
+         <appearance>
+            <field id="cm:name" label="Name From Config" />
+         </appearance>
+      </form>
+   </config>
+</alfresco-config>
+     

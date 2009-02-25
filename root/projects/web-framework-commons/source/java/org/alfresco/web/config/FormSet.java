@@ -70,28 +70,4 @@ public class FormSet
 
         return result.toString();
     }
-
-    @Override
-    public boolean equals(Object otherObj)
-    {
-        if (otherObj == null
-                || !otherObj.getClass().equals(this.getClass()))
-        {
-            return false;
-        }
-        FormSet otherSet = (FormSet) otherObj;
-        boolean component1 = setId == null ? otherSet.setId == null : this.setId.equals(otherSet.setId);
-        boolean component2 = parentId == null ? otherSet.parentId == null : this.parentId.equals(otherSet.parentId);
-        boolean component3 = appearance == null ? otherSet.appearance == null : this.appearance.equals(otherSet.appearance);
-        return component1 && component2 && component3;
-    }
-    
-    @Override
-    public int hashCode()
-    {
-        int component1 = setId == null ? 0 : setId.hashCode();
-        int component2 = parentId == null ? 0 : parentId.hashCode();
-        int component3 = appearance == null ? 0 : appearance.hashCode();
-        return component1 + 7 * component2 + 13 * component3;
-    }
 }

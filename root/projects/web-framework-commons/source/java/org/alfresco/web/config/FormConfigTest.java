@@ -31,7 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
+import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.util.BaseTest;
 import org.alfresco.web.config.FormConfigElement.Mode;
 
 /**
@@ -42,9 +46,15 @@ import org.alfresco.web.config.FormConfigElement.Mode;
  * 
  * @author Neil McErlean
  */
-public class FormConfigTest extends AbstractFormConfigTest
+public class FormConfigTest extends BaseTest
 {
-    @Override
+    protected XMLConfigService configService;
+    protected Config globalConfig;
+    protected ConfigElement globalDefaultControls;
+    protected ConfigElement globalConstraintHandlers;
+    protected FormConfigElement formConfigElement;
+    protected DefaultControlsConfigElement defltCtrlsConfElement;
+
     protected String getConfigXmlFile()
     {
         return "test-config-forms.xml";
@@ -55,16 +65,6 @@ public class FormConfigTest extends AbstractFormConfigTest
         assertEquals("Submission URL was incorrect.", "submission/url",
                 formConfigElement.getSubmissionURL());
     }
-    
-//    public void testModelOverrideProps()
-//    {
-//        List<StringPair> expectedModelOverrideProperties = new ArrayList<StringPair>();
-//        expectedModelOverrideProperties.add(new StringPair(
-//                "fields.title.mandatory", "true"));
-//        assertEquals("Expected property missing.",
-//                expectedModelOverrideProperties, formConfigElement
-//                        .getModelOverrideProperties());
-//    }
     
     @SuppressWarnings("unchecked")
     public void testGetFormTemplatesWithoutRoles()
@@ -251,5 +251,44 @@ public class FormConfigTest extends AbstractFormConfigTest
         {
             // intentionally empty
         }
+    }
+
+    /**
+     * @see junit.framework.TestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        configService = initXMLConfigService(getConfigXmlFile());
+        assertNotNull("configService was null.", configService);
+    
+        Config contentConfig = configService.getConfig("content");
+        assertNotNull("contentConfig was null.", contentConfig);
+    
+        ConfigElement confElement = contentConfig.getConfigElement("form");
+        assertNotNull("confElement was null.", confElement);
+        assertTrue("confElement should be instanceof FormConfigElement.",
+                confElement instanceof FormConfigElement);
+        formConfigElement = (FormConfigElement) confElement;
+    
+        globalConfig = configService.getGlobalConfig();
+    
+        globalDefaultControls = globalConfig
+                .getConfigElement("default-controls");
+        assertNotNull("global default-controls element should not be null",
+                globalDefaultControls);
+        assertTrue(
+                "config element should be an instance of DefaultControlsConfigElement",
+                (globalDefaultControls instanceof DefaultControlsConfigElement));
+        defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
+    
+        globalConstraintHandlers = globalConfig
+                .getConfigElement("constraint-handlers");
+        assertNotNull("global constraint-handlers element should not be null",
+                globalConstraintHandlers);
+        assertTrue(
+                "config element should be an instance of ConstraintHandlersConfigElement",
+                (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
     }
 }
