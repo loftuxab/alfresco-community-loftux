@@ -58,6 +58,7 @@ public class StringUtils
         safeTags.add("i");
         safeTags.add("/i");
         safeTags.add("br");
+        safeTags.add("br/");
         safeTags.add("ul");
         safeTags.add("/ul");
         safeTags.add("ol");
