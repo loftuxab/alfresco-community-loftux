@@ -8,6 +8,9 @@
 	<classpathentry exported="true" kind="lib" path="alfresco-web-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="alfresco-deployment.jar"/>
 	<classpathentry exported="true" kind="lib" path="alfresco-linkvalidation.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco-jndi-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco-mbeans.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco-repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/antlr-2.7.5H3.jar"/>
@@ -82,7 +85,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-jpdl-3.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-identity-3.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/springmodules-jbpm31.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-dbcp-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-dbcp-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-pool-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jooconverter-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/cglib-nodep-2.2_beta1.jar"/>
@@ -93,10 +96,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/pdfbox-0.7.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/quartz-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xalan-2.7.0/xalan.jar"/>
-	<classpathentry exported="true" kind="lib" path="alfresco-jndi-client.jar"/>
-	<classpathentry exported="true" kind="lib" path="alfresco-mbeans.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xercesImpl-2.8.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="alfresco-repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R7.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-httpclient-3.1.jar"/>
@@ -105,5 +105,6 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/hsqldb.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/icu4j_3_6_1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/truezip.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/ibatis-2.3.4.726.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

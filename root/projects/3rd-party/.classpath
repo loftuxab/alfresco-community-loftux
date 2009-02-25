@@ -58,7 +58,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-fileupload-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/hsqldb.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl-2.8.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons/commons-pool-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jooconverter-2.1.0.jar" sourcepath="src/jooconverter-2.1.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2.6-patched.jar" sourcepath="src/hibernate-3.2.6-patched-src.zip"/>
@@ -91,7 +90,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/bliki-3.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-httpclient-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibatis-2.3.0.677.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.4.1-patched.jar" sourcepath="src/ehcache-1.4.1-src-patched.zip"/>
 	<classpathentry kind="lib" path="lib/jgroups/jgroups-2.6.2.jar" sourcepath="src/jgroups-2.6.2.src.zip"/>
 	<classpathentry kind="lib" path="lib/jsr107cache-1.0.jar"/>
@@ -126,5 +124,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0.jar" sourcepath="src/tm-extractors-1.0.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.1.jar" sourcepath="src/poi-3.0.2-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/ibatis-2.3.4.726.jar" sourcepath="src/ibatis-2.3.4.726-src.zip" />
+	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
