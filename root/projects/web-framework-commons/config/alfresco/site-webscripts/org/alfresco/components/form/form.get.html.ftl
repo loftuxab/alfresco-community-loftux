@@ -13,8 +13,9 @@
    
    <div id="${formId}-container" class="form-container">
       
-      <form id="${formId}" method="POST" action="${url.context}/proxy/alfresco${form.submissionUrl}" accept-charset="utf-8"
-            <#if page.url.args.submitMode == "multipart">enctype="multipart/form-data"</#if> >
+      <form id="${formId}" method=<#if page.url.args.submitMode == "urlencoded">"GET"<#else>"POST"</#if> action="${url.context}/proxy/alfresco${form.submissionUrl}" accept-charset="utf-8"
+            <#if page.url.args.submitMode == "multipart">enctype="multipart/form-data"</#if>
+            <#if page.url.args.submitMode == "urlencoded">enctype="application/x-www-form-urlencoded"</#if> >
          <#list form.items as item>
             <#if item.control.template?exists>
                <#assign field=item>
