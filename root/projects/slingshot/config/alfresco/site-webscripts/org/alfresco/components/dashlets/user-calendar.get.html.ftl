@@ -1,6 +1,9 @@
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
+//]]></script>
 <div class="dashlet">
    <div class="title">${msg("label.header")}</div>
-   <div class="body scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
 <#if eventList??>
    <#if eventList?size &gt; 0>
       <#list eventList as event>

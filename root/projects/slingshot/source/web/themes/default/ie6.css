@@ -424,6 +424,23 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 }
 
 
+/**
+ * Blog
+ */
+.postlist-infobar div.yui-u
+{
+   width: 28%;
+}
+
+
+/**
+ * Discussions
+ */
+.topiclist-infobar div.yui-u
+{
+   width: 28%;
+}
+
 
 /**
  * Profile
@@ -444,8 +461,8 @@ div.dashlet.cmis div.body div,
 div.dashlet.rssfeed div.body,
 div.dashlet.calendar div.body
 {                          
-   padding-left:8px;
-   padding-right:8px;
+   padding-left: 8px;
+   padding-right: 8px;
 }
 
 .toolbar,
@@ -464,6 +481,10 @@ body.masked div.mask.full-preview-mask
 
 .site-finder .search-bar
 {
-   height:2em;
+   height: 2em;
 }
 
+.toolbar .hide
+{
+   display: none;
+}

@@ -1,10 +1,12 @@
 <#import "/org/alfresco/utils/feed.utils.ftl" as feedLib/>
 <#assign DISPLAY_ITEMS = 5>
 <#assign target="_blank">
-
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
+//]]></script>
 <div class="dashlet cmis">
    <div class="title">${msg("label.title")}</div>
-   <div class="body scrollableList" id="${args.htmlid}-scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if> id="${args.htmlid}-scrollableList">
    
    <div>${msg("label.body")} <a href="${msg("label.link")}" target="${target}">${msg("label.linkText")}</a></div>
    <hr/>

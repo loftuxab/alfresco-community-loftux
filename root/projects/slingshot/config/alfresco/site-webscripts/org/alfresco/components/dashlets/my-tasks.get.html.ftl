@@ -9,6 +9,7 @@
    new Alfresco.MyTasks("${args.htmlid}").setMessages(
       ${messages}
    );
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 
 <div class="dashlet my-tasks">
@@ -25,6 +26,6 @@
          <option value="no-due-date">${msg("filter.no-due-date")}</option>                
       </select>
    </div>
-   <div id="${args.htmlid}-taskList" class="body scrollableList">
+   <div id="${args.htmlid}-taskList" class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
    </div>
 </div>

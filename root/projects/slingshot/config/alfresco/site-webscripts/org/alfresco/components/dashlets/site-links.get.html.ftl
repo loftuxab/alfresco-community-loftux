@@ -1,19 +1,21 @@
 <script type="text/javascript">//<![CDATA[
-new Alfresco.SiteLinks("${args.htmlid}").setOptions({
-   siteId: "${page.url.templateArgs.site!''}",
-   links: [
-   <#if links??>
-	   <#list links as link>
+   new Alfresco.SiteLinks("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!''}",
+      links: [
+<#if links??>
+   <#list links as link>
       {
          id: '${link.name?js_string}',
          title: '${link.title?js_string}',
          url: '${link.url?js_string}',
          description: '${link.description?js_string}'
       }<#if (link_has_next)>,</#if>
-	   </#list>
-   </#if>
-   ]
-});
+   </#list>
+</#if>
+      ]
+   });
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 
 <#assign site=page.url.templateArgs.site>
@@ -23,7 +25,7 @@ new Alfresco.SiteLinks("${args.htmlid}").setOptions({
    <div class="toolbar">
       <a id="${args.htmlid}-createLink-button" class="create-link" >${msg("link.createLink")}</a>
    </div>
-   <div class="body scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
 <#if links??>
    <#list links as link>
       <#assign linkUrl=link.url >

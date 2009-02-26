@@ -7,13 +7,14 @@
       "feedURL": "${uri}", 
       "limit": "<#if limit?number != DISPLAY_ITEMS>${limit}<#else>all</#if>"      
    });
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 <div class="dashlet rssfeed">
    <div class="title">${title!msg("label.header")}</div>
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-configFeed-link" class="theme-color-1">${msg("label.configure")}</a>
    </div>
-   <div class="body scrollableList" id="${args.htmlid}-scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if> id="${args.htmlid}-scrollableList">
 	<#if items?? && items?size &gt; 0>
 		<#list items as item>
 		   <#if item_index &lt; limit?number><@feedLib.renderItem item=item target=target/><#else><#break></#if>

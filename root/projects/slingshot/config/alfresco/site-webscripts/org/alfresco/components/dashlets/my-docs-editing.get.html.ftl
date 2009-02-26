@@ -1,9 +1,12 @@
 <#macro doclibUrl doc>
    <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?url}&amp;filter=editingMe" class="theme-color-1">${doc.displayName?html}</a>
 </#macro>
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
+//]]></script>
 <div class="dashlet">
    <div class="title">${msg("header")}</div>
-   <div class="body scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
    <#if docs.message?exists>
       <div class="detail-list-item first-item last-item">
          <span class="error">${msg(docs.message)}</span>

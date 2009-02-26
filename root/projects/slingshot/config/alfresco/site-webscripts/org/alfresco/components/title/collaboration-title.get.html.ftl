@@ -8,6 +8,7 @@
    }).setMessages(
       ${messages}
    );
+   Alfresco.constants.DASHLET_RESIZE = ${userIsSiteManager?string};
 //]]></script>
 <div class="page-title theme-bg-color-1">
    <div class="title">

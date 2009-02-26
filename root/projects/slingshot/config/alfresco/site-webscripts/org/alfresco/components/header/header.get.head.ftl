@@ -6,4 +6,4 @@
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/create-site.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/create-site.js"></@script>
 <!-- YUI Patch for Favourite Sites Menu behaviour -->
-<script type="text/javascript" src="${page.url.context}/yui/menu/menu-patch.js"></script>
+   <script type="text/javascript" src="${page.url.context}/yui/menu/menu-patch.js"></script>
