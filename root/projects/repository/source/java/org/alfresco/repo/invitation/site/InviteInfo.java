@@ -22,13 +22,13 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.web.scripts.invite;
+package org.alfresco.repo.invitation.site;
 
 import java.io.Serializable;
 import java.util.Date;
 
 import org.alfresco.repo.template.TemplateNode;
-import org.alfresco.repo.site.SiteInfo;
+import org.alfresco.service.cmr.site.SiteInfo;
 
 /**
  * Holds properties pertaining to an invitation that has been sent out by a Site Manager (Inviter)

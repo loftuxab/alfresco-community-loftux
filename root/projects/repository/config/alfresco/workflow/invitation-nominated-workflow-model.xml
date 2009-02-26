@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--  Nominated Invitation Workflow Model -->
+
 <model name="wf:invite-workflow-model" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
    <imports>
@@ -9,8 +11,8 @@
    </imports>
 
    <types>
+      
       <!--  Custom Tasks -->
-
       <type name="wf:inviteToSiteTask">
          <parent>bpm:startTask</parent>
          <properties>
@@ -41,7 +43,10 @@
             <property name="wf:inviteeGenPassword">
                <type>d:text</type>
             </property>
-            <property name="wf:siteShortName">
+            <property name="wf:resourceType">
+               <type>d:text</type>
+            </property>
+            <property name="wf:resourceName">
                <type>d:text</type>
             </property>
             <property name="wf:inviteeSiteRole">

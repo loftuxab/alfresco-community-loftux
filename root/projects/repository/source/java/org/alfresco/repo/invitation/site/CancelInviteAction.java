@@ -22,31 +22,39 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.web.scripts.invite;
+package org.alfresco.repo.invitation.site;
 
+import org.alfresco.repo.invitation.WorkflowModelNominatedInvitation;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.site.SiteService;
+import org.alfresco.repo.site.SiteModel;
 import org.alfresco.repo.workflow.jbpm.JBPMSpringActionHandler;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.invitation.InvitationExceptionForbidden;
+import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.site.SiteService;
+import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.springframework.beans.factory.BeanFactory;
 
 /**
  * This class contains logic that gets executed when
- * the wf:invitePendingTask in the invite workflow gets completed
- * along the "accept" transition
+ * the wf:invitePendingTask in the invite workflow gets cancelled
+ * along the "cancel" transition
  * 
  * @author glen johnson at alfresco com
  */
-public class AcceptInviteAction extends JBPMSpringActionHandler
+public class CancelInviteAction extends JBPMSpringActionHandler
 {
-    private static final long serialVersionUID = 8133039174866049136L;
-
-    private SiteService siteService;
+    private static final long serialVersionUID = 776961141883350908L;
+    
     private MutableAuthenticationDao mutableAuthenticationDao;
+    private PersonService personService;
+    private WorkflowService workflowService;
+    private SiteService siteService;
 
+    private final String MSG_NOT_SITE_MANAGER = "invitation.cancel.not_site_manager";
+    
     /* (non-Javadoc)
      * @see org.alfresco.repo.workflow.jbpm.JBPMSpringActionHandler#initialiseHandler(org.springframework.beans.factory.BeanFactory)
      */
@@ -55,7 +63,9 @@ public class AcceptInviteAction extends JBPMSpringActionHandler
     {
         ServiceRegistry services = (ServiceRegistry)factory.getBean(ServiceRegistry.SERVICE_REGISTRY);
         mutableAuthenticationDao = (MutableAuthenticationDao) factory.getBean("authenticationDao");
-        siteService = services.getSiteService();
+        personService = (PersonService) services.getPersonService();
+        workflowService = (WorkflowService) services.getWorkflowService();
+        siteService = (SiteService) services.getSiteService();
     }
 
     /* (non-Javadoc)
@@ -64,31 +74,27 @@ public class AcceptInviteAction extends JBPMSpringActionHandler
     @SuppressWarnings("unchecked")
     public void execute(final ExecutionContext executionContext) throws Exception
     {
-        final String inviteeUserName = (String) executionContext.getVariable("wf_inviteeUserName");
-        final String siteShortName = (String) executionContext.getVariable("wf_siteShortName");
-        final String inviterUserName = (String) executionContext.getVariable("wf_inviterUserName");
-        final String inviteeSiteRole = (String) executionContext.getVariable("wf_inviteeSiteRole");
+        // get the invitee user name and site short name variables off the execution context
+        final String inviteeUserName = (String) executionContext.getVariable(
+                WorkflowModelNominatedInvitation.wfVarInviteeUserName);
+        final String siteShortName = (String) executionContext.getVariable(
+                WorkflowModelNominatedInvitation.wfVarResourceName);
+        final String inviteId = (String) executionContext.getVariable(
+                WorkflowModelNominatedInvitation.wfVarWorkflowInstanceId);
         
-        // if there is already a user account for the invitee and that account
-        // is disabled, then enable the account because he/she has accepted the
-        // site invitation
-        if ((this.mutableAuthenticationDao.userExists(inviteeUserName))
-            && (this.mutableAuthenticationDao.getEnabled(inviteeUserName) == false))
+        String currentUserName = AuthenticationUtil.getFullyAuthenticatedUser();
+        String currentUserSiteRole = this.siteService.getMembersRole(siteShortName, currentUserName);
+        if ((currentUserSiteRole == null) || (currentUserSiteRole.equals(SiteModel.SITE_MANAGER) == false))
         {
-            this.mutableAuthenticationDao.setEnabled(inviteeUserName, true);
+        	// The current user is not the site manager
+        	Object[] args = {currentUserName, inviteId, siteShortName};
+            throw new InvitationExceptionForbidden(MSG_NOT_SITE_MANAGER, args);
         }
-
-        // add Invitee to Site with the site role that the inviter "started" the invite process with
-        AuthenticationUtil.runAs(new RunAsWork<Object>()
-        {
-            public Object doWork() throws Exception
-            {
-                AcceptInviteAction.this.siteService.setMembership(siteShortName,
-                        inviteeUserName, inviteeSiteRole);
-
-                return null;
-            }
-            
-        }, inviterUserName);
+        
+        // clean up invitee's user account and person node if they are not in use i.e.
+        // account is still disabled and there are no pending invites outstanding for the
+        // invitee
+        InviteHelper.cleanUpStaleInviteeResources(inviteeUserName, mutableAuthenticationDao, personService,
+                workflowService);
     }
 }
