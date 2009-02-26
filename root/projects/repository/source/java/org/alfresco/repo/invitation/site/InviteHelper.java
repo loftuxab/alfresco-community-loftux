@@ -22,22 +22,23 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.web.scripts.invite;
+package org.alfresco.repo.invitation.site;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.invitation.WorkflowModelNominatedInvitation;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.MutableAuthenticationDao;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.site.SiteInfo;
-import org.alfresco.repo.site.SiteService;
 import org.alfresco.repo.template.TemplateNode;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.site.SiteInfo;
+import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.workflow.WorkflowService;
 import org.alfresco.service.cmr.workflow.WorkflowTask;
 import org.alfresco.service.cmr.workflow.WorkflowTaskQuery;
@@ -69,7 +70,7 @@ public class InviteHelper
 
         // filter to find only the invite start task
         wfTaskQuery.setTaskState(WorkflowTaskState.COMPLETED);
-        wfTaskQuery.setTaskName(InviteWorkflowModel.WF_INVITE_TASK_INVITE_TO_SITE);
+        wfTaskQuery.setTaskName(WorkflowModelNominatedInvitation.WF_INVITE_TASK_INVITE_TO_SITE);
 
         // query for invite workflow task associate
         List<WorkflowTask> inviteStartTasks = workflowService
@@ -98,17 +99,17 @@ public class InviteHelper
             
             // set process name to "wf:invite" so that only tasks associated with
             // invite workflow instances are returned by query
-            wfTaskQuery.setProcessName(InviteWorkflowModel.WF_PROCESS_INVITE);
+            wfTaskQuery.setProcessName(WorkflowModelNominatedInvitation.WF_PROCESS_INVITE);
             
             // set query to only pick up invite workflow instances
             // associated with the given invitee user name
             Map<QName, Object> processCustomProps = new HashMap<QName, Object>(1, 1.0f);
-            processCustomProps.put(InviteWorkflowModel.WF_PROP_INVITEE_USER_NAME, inviteeUserName);
+            processCustomProps.put(WorkflowModelNominatedInvitation.WF_PROP_INVITEE_USER_NAME, inviteeUserName);
             wfTaskQuery.setProcessCustomProps(processCustomProps);
 
             // set query to only pick up in-progress invite pending tasks 
             wfTaskQuery.setTaskState(WorkflowTaskState.IN_PROGRESS);
-            wfTaskQuery.setTaskName(InviteWorkflowModel.WF_INVITE_TASK_INVITE_PENDING);
+            wfTaskQuery.setTaskName(WorkflowModelNominatedInvitation.WF_INVITE_TASK_INVITE_PENDING);
 
             // query for invite workflow task associate
             List<WorkflowTask> inviteStartTasks = workflowService
@@ -134,13 +135,13 @@ public class InviteHelper
         
         // get the inviter, invitee, role and site short name
         final String inviterUserNameProp = (String) startInviteTask.properties.get(
-                InviteWorkflowModel.WF_PROP_INVITER_USER_NAME);
+                WorkflowModelNominatedInvitation.WF_PROP_INVITER_USER_NAME);
         final String inviteeUserNameProp = (String) startInviteTask.properties.get(
-                InviteWorkflowModel.WF_PROP_INVITEE_USER_NAME);
+                WorkflowModelNominatedInvitation.WF_PROP_INVITEE_USER_NAME);
         final String role = (String) startInviteTask.properties.get(
-                InviteWorkflowModel.WF_PROP_INVITEE_SITE_ROLE);
+                WorkflowModelNominatedInvitation.WF_PROP_INVITEE_SITE_ROLE);
         final String siteShortNameProp = (String) startInviteTask.properties.get(
-                InviteWorkflowModel.WF_PROP_SITE_SHORT_NAME);
+                WorkflowModelNominatedInvitation.WF_PROP_RESOURCE_NAME);
 
         // get the site info
         SiteInfo siteInfo = siteService.getSite(siteShortNameProp);
@@ -253,7 +254,7 @@ public class InviteHelper
 
         // set process name to "wf:invite" so that only
         // invite workflow instances are considered by this query
-        wfTaskQuery.setProcessName(InviteWorkflowModel.WF_PROCESS_INVITE);
+        wfTaskQuery.setProcessName(WorkflowModelNominatedInvitation.WF_PROCESS_INVITE);
 
         // query for invite workflow tasks with the constructed query
         List<WorkflowTask> wf_invite_tasks = workflowService

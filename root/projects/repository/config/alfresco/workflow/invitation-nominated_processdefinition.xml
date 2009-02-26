@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<!--  Nominated invitation -->
+
 <process-definition xmlns="urn:jbpm.org:jpdl-3.1" name="wf:invite">
 
    <swimlane name="initiator"/>
    
    <start-state name="start">
+   
       <task name="wf:inviteToSiteTask" swimlane="initiator" />
+
       <transition name="sendInvite" to="invitePending">
          <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
             <script>
                var workflowId = workflowinstanceid;
                var inviterPerson = people.getPerson(wf_inviterUserName);
                var inviteePerson = people.getPerson(wf_inviteeUserName);
-               var site = siteService.getSite(wf_siteShortName);
+               var site = siteService.getSite(wf_resourceName);
                var siteName = site.shortName;
                if (site.title.length() > 0)
                {
@@ -20,7 +24,7 @@
                }
                var params = "?inviteId=" + workflowId +
                             "&amp;inviteeUserName=" + wf_inviteeUserName +
-                            "&amp;siteShortName=" + wf_siteShortName +
+                            "&amp;siteShortName=" + wf_resourceName +
                             "&amp;inviteTicket=" + wf_inviteTicket;
                var acceptLink = wf_serverPath + wf_acceptUrl + params;
                var rejectLink = wf_serverPath + wf_rejectUrl + params;
@@ -59,13 +63,13 @@
    <task-node name="invitePending">
       <task name="wf:invitePendingTask" swimlane="assignee" />
       <transition name="accept" to="inviteAccepted">
-         <action class="org.alfresco.repo.web.scripts.invite.AcceptInviteAction"/>
+         <action class="org.alfresco.repo.invitation.site.AcceptInviteAction"/>
       </transition>
       <transition name="reject" to="inviteRejected">
-         <action class="org.alfresco.repo.web.scripts.invite.RejectInviteAction"/>
+         <action class="org.alfresco.repo.invitation.site.RejectInviteAction"/>
       </transition>
       <transition name="cancel" to="end">
-         <action class="org.alfresco.repo.web.scripts.invite.CancelInviteAction"/>
+         <action class="org.alfresco.repo.invitation.site.CancelInviteAction"/>
       </transition>
    </task-node>
 

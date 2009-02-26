@@ -1,9 +1,37 @@
-package org.alfresco.repo.web.scripts.invite;
+/*
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing"
+ */
+
+package org.alfresco.repo.invitation;
 
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
-public interface InviteWorkflowModel {
+/**
+ * Workflow Model for a Nominated Invitation
+ */
+public interface WorkflowModelNominatedInvitation {
 
     // process name
     public static final QName WF_PROCESS_INVITE = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "invite");
@@ -34,13 +62,18 @@ public interface InviteWorkflowModel {
     public static final QName WF_PROP_INVITEE_USER_NAME = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "inviteeUserName");
     public static final QName WF_PROP_INVITEE_FIRSTNAME = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "inviteeFirstName");
     public static final QName WF_PROP_INVITEE_LASTNAME = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "inviteeLastName");
-    public static final QName WF_PROP_SITE_SHORT_NAME = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "siteShortName");
+    public static final QName WF_PROP_RESOURCE_TYPE = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "resourceType");
+    public static final QName WF_PROP_RESOURCE_NAME = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "resourceName");
     public static final QName WF_PROP_INVITEE_SITE_ROLE = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "inviteeSiteRole");
     public static final QName WF_PROP_SENT_INVITE_DATE = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "sentInviteDate");
     public static final QName WF_PROP_INVITEE_GEN_PASSWORD = QName.createQName(NamespaceService.WORKFLOW_MODEL_1_0_URI, "inviteeGenPassword");
     
     // workflow execution context variable names
     public static final String wfVarInviteeUserName = "wf_inviteeUserName";
-    public static final String wfVarSiteShortName = "wf_siteShortName";
+    public static final String wfVarInviterUserName = "wf_inviterUserName";
+    public static final String wfVarResourceName = "wf_resourceName";
+    public static final String wfVarResourceType = "wf_resourceType";
     public static final String wfVarWorkflowInstanceId = "workflowinstanceid";
+    public static final String wfVarRole =  "wf_inviteeSiteRole";
+    
 }
