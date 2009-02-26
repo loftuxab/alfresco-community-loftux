@@ -2,7 +2,8 @@
 <#import "import/alfresco-layout.ftl" as layout />
 <@templateHeader "transitional">
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard-presentation.css" />   
+   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard-presentation.css" />
+   <@script type="text/javascript" src="${url.context}/js/dashlet-resizer.js"></@script>
 </@>
 
 <@templateBody>

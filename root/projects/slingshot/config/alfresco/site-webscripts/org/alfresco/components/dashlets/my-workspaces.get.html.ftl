@@ -1,23 +1,25 @@
 <script type="text/javascript">//<![CDATA[
-new Alfresco.MySites("${args.htmlid}").setOptions({
-   sites: [
-   <#if sites??>
-      <#list sites as site>
-         {
-            shortName: '${site.shortName?js_string}',
-            title: '${site.title?js_string}',
-            sitePreset: '${site.sitePreset?js_string}',
-            isSiteManager: ${site.isSiteManager?string}
-         }<#if (site_has_next)>,</#if>
-      </#list>
-   </#if>
-   ]
-});
+   new Alfresco.MySites("${args.htmlid}").setOptions(
+   {
+      sites: [
+<#if sites??>
+   <#list sites as site>
+      {
+         shortName: '${site.shortName?js_string}',
+         title: '${site.title?js_string}',
+         sitePreset: '${site.sitePreset?js_string}',
+         isSiteManager: ${site.isSiteManager?string}
+      }<#if (site_has_next)>,</#if>
+   </#list>
+</#if>
+      ]
+   });
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 
 <div class="dashlet my-sites">
    <div class="title">${msg("header.myWorkspaces")}</div>    
-   <div class="body scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
 <#if sites??>
    <#list sites as site>
       <#if site.sitePreset == "document-workspace">

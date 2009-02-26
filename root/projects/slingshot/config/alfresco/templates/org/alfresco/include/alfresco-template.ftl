@@ -8,8 +8,12 @@
    Currently only client-side JavaScript files are compressed during build.
 -->
 <#assign minJS=(config.global.flags.childrenMap["debug"][0].value = "true")?string(".js", "-min.js")>
-<#macro script type src><script type="${type}" src="${src?replace(".js", minJS)}"></script></#macro>
-<#macro link rel type href><link rel="${rel}" type="${type}" href="${href}" /></#macro>
+<#macro script type src>
+   <script type="${type}" src="${src?replace(".js", minJS)}"></script>
+</#macro>
+<#macro link rel type href><#-- Compressing CSS not currently supported -->
+   <link rel="${rel}" type="${type}" href="${href}" />
+</#macro>
 
 
 <#--
@@ -66,8 +70,8 @@
 </#if>
 
 <!-- Site-wide Common Assets -->
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
    <@script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></@script>
    <@script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></@script>
    <#-- NOTE: Do not attempt to load -min.js version of messages.js -->
@@ -88,11 +92,11 @@
    //]]></script>
    <@common.uriTemplate />
 
-<!-- Component Assets -->
-${head}
-
 <!-- Template Assets -->
 <#nested>
+
+<!-- Component Assets -->
+${head}
 
 <!-- MSIE CSS fix overrides -->
    <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie6.css" /><![endif]-->

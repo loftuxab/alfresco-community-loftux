@@ -1,6 +1,9 @@
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
+//]]></script>
 <div class="dashlet">
    <div class="title">${msg("header.colleagues")}</div>
-   <div class="body scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
 <#if (memberships?size > 0)>
    <#list memberships as m>
       <div class="detail-list-item <#if m_index = 0>first-item<#elseif !m_has_next>last-item</#if>">

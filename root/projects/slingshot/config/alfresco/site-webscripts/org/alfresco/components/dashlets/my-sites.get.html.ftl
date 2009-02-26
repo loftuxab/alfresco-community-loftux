@@ -1,21 +1,22 @@
 <script type="text/javascript">//<![CDATA[
-new Alfresco.MySites("${args.htmlid}").setOptions(
-{
-   sites: [
+   new Alfresco.MySites("${args.htmlid}").setOptions(
+   {
+      sites: [
 <#if sites??>
    <#list sites as site>
-   {
-      shortName: '${site.shortName?js_string}',
-      title: '${site.title?js_string}',
-      isFavourite: ${site.isFavourite?string},
-      isSiteManager: ${site.isSiteManager?string}
-   }<#if (site_has_next)>,</#if>
+      {
+         shortName: '${site.shortName?js_string}',
+         title: '${site.title?js_string}',
+         isFavourite: ${site.isFavourite?string},
+         isSiteManager: ${site.isSiteManager?string}
+      }<#if (site_has_next)>,</#if>
    </#list>
 </#if>
-   ]
-}).setMessages(
-   ${messages}
-);
+      ]
+   }).setMessages(
+      ${messages}
+   );
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 
 <div class="dashlet my-sites">
@@ -23,7 +24,7 @@ new Alfresco.MySites("${args.htmlid}").setOptions(
    <div class="toolbar">
       <a href="#" id="${args.htmlid}-createSite-button" class="theme-color-1">${msg("link.createSite")}</a>
    </div>
-   <div class="body scrollableList">
+   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
 <#if sites??>
    <#list sites as site>
       <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if site_index = 0>first-item<#elseif !site_has_next>last-item</#if>">

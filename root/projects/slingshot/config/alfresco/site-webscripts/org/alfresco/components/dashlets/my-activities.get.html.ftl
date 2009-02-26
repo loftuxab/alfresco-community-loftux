@@ -6,6 +6,7 @@
    }).setMessages(
       ${messages}
    );
+   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>
 
 <div class="dashlet activities">
@@ -20,6 +21,6 @@
          <option value="28">${msg("filter.28days")}</option>
       </select>
    </div>
-   <div id="${args.htmlid}-activityList" class="body scrollableList">
+   <div id="${args.htmlid}-activityList" class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
    </div>
 </div>

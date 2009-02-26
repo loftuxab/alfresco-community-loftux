@@ -2,9 +2,14 @@
 
 .dashlet
 {
-   padding: 0px;
-   margin:20px 0;
    background-color: white;
+   margin: 20px 0;
+   padding: 0;
+}
+
+.dashlet.resizable
+{
+   padding-bottom: 6px !important;
 }
 
 .dashlet .title

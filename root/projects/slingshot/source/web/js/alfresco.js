@@ -1187,6 +1187,7 @@ Alfresco.util.ComponentManager = function()
       register: function CM_register(p_oComponent)
       {
          components.push(p_oComponent);
+         components[p_oComponent.id] = p_oComponent;
       },
 
       /**
@@ -1201,7 +1202,7 @@ Alfresco.util.ComponentManager = function()
          var found = [];
          var bMatch, component;
          
-         for (var i = 0; i< components.length; i++)
+         for (var i = 0, j = components.length; i < j; i++)
          {
             component = components[i];
             bMatch = true;
@@ -1235,6 +1236,18 @@ Alfresco.util.ComponentManager = function()
          });
          
          return (typeof found[0] == "object" ? found[0] : null);
+      },
+
+      /**
+       * Get component by Id
+       * e.g. get("global_x002e_header-sites-menu")
+       * @method get
+       * @param p_sId {string} Id of registered component to return
+       * @return {object|null} Component with given Id
+       */
+      get: function(p_sId)
+      {
+         return (components[p_sId]);
       }
    };
 }();
