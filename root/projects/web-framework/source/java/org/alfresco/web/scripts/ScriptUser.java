@@ -291,7 +291,7 @@ public final class ScriptUser extends ScriptBase
     {
         this.user.setCompanyAddress3(value);
     }
-    
+        
     /**
      * Persist user changes
      */
@@ -311,7 +311,6 @@ public final class ScriptUser extends ScriptBase
     {
         try
         {
-            //RequestContext context = ThreadLocalRequestContext.getRequestContext();
             User user = FrameworkHelper.getUserFactory().loadUser(this.context, userId);
             return new ScriptUser(this.context, user);
         }

@@ -135,59 +135,108 @@ public class DefaultRequestContextFactory implements RequestContextFactory
     public void initEnvironment(RequestContext context, HttpServletRequest request)
         throws WebFrameworkServiceException
     {
-        // Was a store id set by request parameter?
-        String repositoryStoreId = request.getParameter(WebFrameworkConstants.STORE_ID_REQUEST_PARAM_NAME);
-        if (repositoryStoreId == null)
+        // Determine which store id we should bind to
+        // If none is selected, then we will use the default store id in the remote store persister
+        String storeId = null;
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
         {
-            // if we didn't get an explicitly fed store id, we can attempt
-            // to infer one from the virtualization server name
-            String serverName = request.getServerName();
-            if (serverName != null && serverName.indexOf("--") > -1)
+            // if we're in preview mode, then we allow the bound store id to switch
+            storeId = request.getParameter(WebFrameworkConstants.STORE_ID_REQUEST_PARAM_NAME);
+            if (storeId != null)
             {
-                // could be a virtual server host name...
-                String realPath = request.getSession().getServletContext().getRealPath("/");
-                if (realPath != null && realPath.indexOf("--") > -1)
+                // push value into session
+                request.getSession(true).setAttribute(WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME, storeId);
+            }
+            else
+            {
+                // if we didn't get an explicitly fed store id, we can attempt
+                // to infer one from the virtualization server name
+                String serverName = request.getServerName();
+                if (serverName != null && serverName.indexOf("--") > -1)
                 {
-                    // let's assume it is a virtual store id since it mapped
-                    // down to a likely real path (mounted disk)
-                    int x1 = realPath.indexOf(File.separator);
-                    if (x1 > -1)
+                    // could be a virtual server host name...
+                    String realPath = request.getSession().getServletContext().getRealPath("/");
+                    if (realPath != null && realPath.indexOf("--") > -1)
                     {
-                        int x2 = realPath.indexOf(File.separator, x1+1);
-                        if (x2 > -1)
+                        // let's assume it is a virtual store id since it mapped
+                        // down to a likely real path (mounted disk)
+                        int x1 = realPath.indexOf(File.separator);
+                        if (x1 > -1)
                         {
-                            repositoryStoreId = (String) realPath.substring(x1, x2);
+                            int x2 = realPath.indexOf(File.separator, x1+1);
+                            if (x2 > -1)
+                            {
+                                storeId = (String) realPath.substring(x1, x2);
+                            }
                         }
                     }
                 }
             }
-        }
-        if (repositoryStoreId == null)
-        {
-            // Otherwise, check to see if we have one in session
-            if (request.getSession(false) != null)
+            
+            if (storeId == null)
             {
-                repositoryStoreId = (String)request.getSession().getAttribute(WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME);
+                // get value from session
+                if (request.getSession(false) != null)
+                {
+                    storeId = (String)request.getSession().getAttribute(WebFrameworkConstants.STORE_ID_SESSION_ATTRIBUTE_NAME);
+                }
             }
-        }
-        if (repositoryStoreId != null)
-        {
-            context.setValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME, repositoryStoreId);
-        }
-        
-        // Was a web application id set by request parameter?
-        String repositoryWebappId = request.getParameter(WebFrameworkConstants.WEBAPP_ID_REQUEST_PARAM_NAME);
-        if (repositoryWebappId == null)
-        {
-            // Otherwise, check to see if we have one in session
-            if (request.getSession(false) != null)
+            
+            if (storeId == null)
             {
-                repositoryWebappId = (String)request.getSession().getAttribute(WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME);
+                // see if there is a default set in our preview config
+                storeId = FrameworkHelper.getConfig().getPreviewDefaultStoreId();
             }            
         }
-        if (repositoryWebappId != null)
+        
+        // set the value onto the request context
+        if (storeId != null)
         {
-            context.setValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME, repositoryWebappId);
+            context.setValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME, storeId);
+        }
+        
+
+        
+        // Determine which webapp id we should bind to
+        // If none is selected, then we will use the default webapp id in the remote store persister
+        String webappId = null;
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
+        {
+            // if we're in preview mode, then we allow the bound webapp id to switch            
+            webappId = request.getParameter(WebFrameworkConstants.WEBAPP_ID_REQUEST_PARAM_NAME);
+            if (webappId != null)
+            {
+                // push value into session                
+                request.getSession(true).setAttribute(WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME, webappId);
+            }
+            
+            if (webappId == null)
+            {
+                // get value from session                
+                if (request.getSession(false) != null)
+                {
+                    webappId = (String)request.getSession().getAttribute(WebFrameworkConstants.WEBAPP_ID_SESSION_ATTRIBUTE_NAME);
+                }
+            }
+            
+            if (webappId == null)
+            {
+                // see if there is a default set in our preview config
+                webappId = FrameworkHelper.getConfig().getPreviewDefaultWebappId();
+            }                        
+        }
+        
+        // set the value onto the request context            
+        if (webappId != null)
+        {
+            context.setValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME, webappId);
+        }  
+        
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Context[" + context.getId() + "] storeId = " + storeId);
+            logger.debug("Context[" + context.getId() + "] webappId = " + webappId);
         }
     }
     

@@ -35,7 +35,11 @@ import org.alfresco.web.site.RequestContext;
 public interface ResourceResolver
 {
     /**
-     * Returns the download URI for the given resource
+     * Returns the download URI for the given resource.
+     * 
+     * This describes the URI necessary to retrieve the asset from the server
+     * in which it is located.  The Surf application server can use this
+     * to pull the asset from the repository tier, for example.
      * 
      * @param request
      * @return
@@ -43,15 +47,24 @@ public interface ResourceResolver
     public String getDownloadURI(RequestContext context);
 
     /**
-     * Returns the proxied download URI for the given resource
+     * Returns the end-user browser friendly URI for retrieving the
+     * given resource.
+     * 
+     * This is a full URI to the resource which can be invoked by the
+     * web browser.
      * 
      * @param request
      * @return
      */
-    public String getProxiedDownloadURI(RequestContext context);
+    public String getBrowserDownloadURI(RequestContext context);
 
     /**
      * Returns the metadata URI for the given resource
+     * 
+     * This describes the URI necessary to retrieve the asset metadata
+     * from the server in which it is located.  The Surf application 
+     * server can use this to pull the asset metadata from the 
+     * repository tier, for example.
      * 
      * @param request
      * @return
@@ -59,12 +72,18 @@ public interface ResourceResolver
     public String getMetadataURI(RequestContext context);
 
     /**
+     * Returns the end-user browser friendly URI for retrieving the
+     * given resource metadata.
+     * 
+     * This is a full URI to the resource metadata which can be invoked 
+     * by the web browser.
+
      * Returns the metadata URI for the given resource
      * 
      * @param request
      * @return
      */
-    public String getProxiedMetadataURI(RequestContext context);
+    public String getBrowserMetadataURI(RequestContext context);
 
     /**
      * Retrieves the container-formatted metadata for the current

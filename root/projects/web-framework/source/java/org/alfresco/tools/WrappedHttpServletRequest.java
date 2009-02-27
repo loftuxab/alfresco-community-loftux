@@ -43,4 +43,36 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper
     {
         super(request);
     }
+    
+    private String requestUri;
+    
+    /**
+     * Allows for the request URI to be manually overridden
+     * 
+     * @param requestUri the new request uri
+     */
+    public void setRequestURI(String requestUri)
+    {
+        this.requestUri = requestUri;
+    }
+    
+    /* (non-Javadoc)
+     * @see javax.servlet.http.HttpServletRequestWrapper#getRequestURI()
+     */
+    public String getRequestURI()
+    {
+        String value = null;
+        
+        if (requestUri != null)
+        {
+            value = requestUri;
+        }
+        else
+        {
+            value = super.getRequestURI();
+        }
+        
+        return value;
+    }
+    
 }

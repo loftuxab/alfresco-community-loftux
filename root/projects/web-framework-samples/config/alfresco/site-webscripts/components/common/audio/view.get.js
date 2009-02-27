@@ -9,12 +9,7 @@ if(source == null)
 else
 {
 	// set up the source
-	var src = source.downloadURI;
-	if(src.substring(0,1) == "/")
-	{
-		src = url.context + source.proxiedDownloadURI;
-	}
-	model.src = src;
+	model.src = source.browserDownloadURI;
 
 	// mimetype
 	model.mimetype = instance.object.properties["mimetype"];

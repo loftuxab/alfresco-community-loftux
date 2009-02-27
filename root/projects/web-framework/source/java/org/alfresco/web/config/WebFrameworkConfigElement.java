@@ -74,6 +74,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected String webStudioLocation = null;
     protected boolean webStudioEnabled = false;
     
+    protected String previewMode;
+    protected String previewDefaultStoreId = null;
+    protected String previewDefaultWebappId = null;
+    protected boolean previewEnabled = false;
+    
 
     /**
      * Default Constructor
@@ -223,6 +228,28 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if (configElement.webStudioEnabled)
         {
             combinedElement.webStudioEnabled = configElement.webStudioEnabled;
+        }
+
+
+        combinedElement.previewMode = this.previewMode;
+        if (configElement.previewMode != null)
+        {
+            combinedElement.previewMode = configElement.previewMode;
+        }
+        combinedElement.previewEnabled = this.previewEnabled;
+        if (configElement.previewEnabled)
+        {
+            combinedElement.previewEnabled = configElement.previewEnabled;
+        }
+        combinedElement.previewDefaultStoreId = this.previewDefaultStoreId;
+        if (configElement.previewDefaultStoreId != null)
+        {
+            combinedElement.previewDefaultStoreId = configElement.previewDefaultStoreId;
+        }
+        combinedElement.previewDefaultWebappId = this.previewDefaultWebappId;
+        if (configElement.previewDefaultWebappId != null)
+        {
+            combinedElement.previewDefaultWebappId = configElement.previewDefaultWebappId;
         }
         
         return combinedElement;
@@ -481,6 +508,26 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     }
     
 
+    public String getPreviewMode()
+    {
+        return this.previewMode;
+    }
+    
+    public boolean isPreviewEnabled()
+    {
+        return this.previewEnabled;
+    }
+    
+    public String getPreviewDefaultStoreId()
+    {
+        return this.previewDefaultStoreId;        
+    }
+    
+    public String getPreviewDefaultWebappId()
+    {
+        return this.previewDefaultWebappId;
+    }
+    
 
     /**
      * Base for all Descriptor classes. Defines a basic get/put property bag
@@ -1092,6 +1139,9 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
                 if ("enabled".equalsIgnoreCase(_webStudioMode))
                 {
                     configElement.webStudioEnabled = true;
+                    
+                    // turn on deployment preview mode as well
+                    configElement.previewEnabled = true;
                 }
             }
             String _webStudioLocation = webStudio.elementTextTrim("location");
@@ -1100,8 +1150,33 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
                 configElement.webStudioLocation = _webStudioLocation;
             }
         }
+
         
         
+        //////////////////////////////////////////////////////
+        // Preview Mode Configuration
+        //////////////////////////////////////////////////////
+        Element previewConfig = elem.element("preview");
+        if (previewConfig != null)
+        {
+            String _previewMode = previewConfig.elementTextTrim("mode");
+            if ("enabled".equalsIgnoreCase(_previewMode))
+            {
+                configElement.previewEnabled = true;
+            }
+            
+            String _defaultStoreId = previewConfig.elementTextTrim("default-store-id");
+            if (_defaultStoreId != null)
+            {
+                configElement.previewDefaultStoreId = _defaultStoreId;
+            }
+            String _defaultWebappId = previewConfig.elementTextTrim("default-webapp-id");
+            if (_defaultWebappId != null)
+            {
+                configElement.previewDefaultWebappId = _defaultWebappId;
+            }
+        }
+                
         return configElement;
-    }
+    }    
 }

@@ -26,7 +26,11 @@ package org.alfresco.web.scripts;
 
 import java.io.Serializable;
 
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.Response;
+import org.alfresco.connector.ResponseStatus;
 import org.alfresco.web.framework.resource.ResourceContent;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -148,5 +152,27 @@ public final class ScriptContentObject extends ScriptBase
         }
         
         return this.scriptResource;
+    } 
+    
+    public String getText()
+    {
+        return getResource().getText();
+    }
+    
+    public String getXml()
+    {
+        String text = getText();
+        
+        // strip out the xml declaration if it is there
+        if (text != null)
+        {
+            int i = text.indexOf("?>");
+            if (i > -1)
+            {
+                text = text.substring(i + 2);
+            }
+        }
+        
+        return text;        
     }
 }

@@ -18,13 +18,10 @@
    <!-- Use this to connect to a WCM sandbox AVM store -->
    <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
       <property name="endpoint">
-         <value>alfresco-system</value>
+         <value>alfresco-webuser</value>
       </property>
       <property name="api">
          <value>/avmstore</value>
-      </property>
-      <property name="storeId">
-         <value>TODO_REQUIRED_STORE_ID</value>
       </property>
       <property name="connectorService" ref="connector.service" />
       <property name="storeContext" ref="webframework.context.remotestore"/>

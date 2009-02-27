@@ -18,12 +18,16 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have received a copy of the text describing 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.framework.resource;
 
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.Response;
+import org.alfresco.connector.ResponseStatus;
+import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.web.framework.exception.ResourceMetadataException;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
@@ -42,6 +46,7 @@ public class ResourceImpl extends AbstractResource
     protected ResourceResolver resolver = null;
     protected String metadata = null;
     protected String rawMetadata = null;
+    protected byte[] bytes = null;
 
     public ResourceImpl(ResourceStore store, String id)
     {
@@ -72,14 +77,12 @@ public class ResourceImpl extends AbstractResource
         return resolver.getDownloadURI(context);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.Resource#getProxiedDownloadURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getBrowserDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedDownloadURI(RequestContext context)
+    public String getBrowserDownloadURI(RequestContext context)
     {
-        return resolver.getProxiedDownloadURI(context);
+        return resolver.getBrowserDownloadURI(context);
     }
 
     /*
@@ -92,14 +95,12 @@ public class ResourceImpl extends AbstractResource
         return resolver.getMetadataURI(context);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.Resource#getProxiedMetadataURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getBrowserMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedMetadataURI(RequestContext context)
+    public String getBrowserMetadataURI(RequestContext context)
     {
-        return resolver.getProxiedMetadataURI(context);
+        return resolver.getBrowserMetadataURI(context);
     }
 
     /*
@@ -133,4 +134,53 @@ public class ResourceImpl extends AbstractResource
 
         return this.metadata;
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getBytes(org.alfresco.web.site.RequestContext)
+     */
+    public byte[] getBytes(RequestContext context)
+    {
+        if (bytes == null)
+        {
+            reload(context);
+        }
+        
+        return bytes;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#reload(org.alfresco.web.site.RequestContext)
+     */
+    public void reload(RequestContext context)
+    {
+        bytes = null;
+        
+        String browserDownloadUri = this.getBrowserDownloadURI(context);
+        
+        // escape the string
+        String uri = browserDownloadUri.replace(" ", "%20");
+        
+        // use the http endpoint
+        // TODO: use the specific endpoint defined by the resource
+        String endpointId = "http";
+        
+        // open a connector
+        Connector connector = null;
+        try
+        {
+            connector = FrameworkHelper.getConnector(context, endpointId);
+
+            // fetch the result
+            Response response = connector.call(uri);
+            if (response.getStatus().getCode() == ResponseStatus.STATUS_OK)
+            {
+                bytes = response.getResponse().getBytes();
+            }            
+        }
+        catch (ConnectorServiceException cse)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Unable to establish connector for endpoint: " + endpointId + " while loading resource with uri: " + uri, cse);            
+        }
+    }    
 }

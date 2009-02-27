@@ -17,6 +17,20 @@
       <description>Spring config file locations</description>
    </context-param>
    
+   <filter>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+      <init-param>
+         <param-name>logLevel</param-name>
+         <param-value>DEBUG</param-value>
+      </init-param>
+   </filter>
+   
+   <filter-mapping>
+      <filter-name>UrlRewriteFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
+   
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
@@ -57,6 +71,17 @@
       <servlet-name>componentDispatcherServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.ComponentDispatcherServlet</servlet-class>
    </servlet>
+   
+   <!-- Virtualized Content Retrieval Servlet -->
+   <servlet>
+      <servlet-name>virtualizedContentRetrievalServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.VirtualizedContentRetrievalServlet</servlet-class>
+   </servlet>
+   
+   <servlet-mapping>
+      <servlet-name>virtualizedContentRetrievalServlet</servlet-name>
+      <url-pattern>/v/*</url-pattern>
+   </servlet-mapping>
 
    <servlet-mapping>
       <servlet-name>componentDispatcherServlet</servlet-name>

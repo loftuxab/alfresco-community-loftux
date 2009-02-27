@@ -1,25 +1,25 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have received a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.framework.resource;
@@ -27,9 +27,15 @@ package org.alfresco.web.framework.resource;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.Response;
+import org.alfresco.connector.ResponseStatus;
+import org.alfresco.connector.exception.ConnectorServiceException;
 import org.alfresco.web.framework.exception.ResourceMetadataException;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
 /**
@@ -40,6 +46,8 @@ import org.json.JSONObject;
  */
 public class TransientResourceImpl implements Resource
 {
+    private static Log logger = LogFactory.getLog(TransientResourceImpl.class);
+    
     public static final String TYPE_WEBAPP = "webapp";
     public static final String TYPE_SPACE = "space";
     public static final String TYPE_SITE = "site";
@@ -51,6 +59,7 @@ public class TransientResourceImpl implements Resource
     protected String value;
 
     protected ResourceContent content = null;
+    protected byte[] bytes = null;
 
     protected Map<String, String> attributes;
 
@@ -186,14 +195,12 @@ public class TransientResourceImpl implements Resource
         return resolver.getDownloadURI(context);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.Resource#getProxiedDownloadURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getBrowserDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedDownloadURI(RequestContext context)
+    public String getBrowserDownloadURI(RequestContext context)
     {
-        return resolver.getProxiedDownloadURI(context);
+        return resolver.getBrowserDownloadURI(context);
     }
 
     /*
@@ -206,14 +213,12 @@ public class TransientResourceImpl implements Resource
         return resolver.getMetadataURI(context);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.Resource#getProxiedMetadataURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getBrowserMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedMetadataURI(RequestContext context)
+    public String getBrowserMetadataURI(RequestContext context)
     {
-        return resolver.getProxiedMetadataURI(context);
+        return resolver.getBrowserMetadataURI(context);
     }
 
     /*
@@ -275,4 +280,52 @@ public class TransientResourceImpl implements Resource
         return this.content;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#getBytes(org.alfresco.web.site.RequestContext)
+     */
+    public byte[] getBytes(RequestContext context)
+    {
+        if (bytes == null)
+        {
+            reload(context);
+        }
+        
+        return bytes;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.Resource#reload(org.alfresco.web.site.RequestContext)
+     */
+    public void reload(RequestContext context)
+    {
+        bytes = null;
+        
+        String browserDownloadUri = this.getBrowserDownloadURI(context);
+        
+        // escape the string
+        String uri = browserDownloadUri.replace(" ", "%20");
+        
+        // use the http endpoint
+        // TODO: use the specific endpoint defined by the resource
+        String endpointId = "http";
+        
+        // open a connector
+        Connector connector = null;
+        try
+        {
+            connector = FrameworkHelper.getConnector(context, endpointId);
+
+            // fetch the result
+            Response response = connector.call(uri);
+            if (response.getStatus().getCode() == ResponseStatus.STATUS_OK)
+            {
+                bytes = response.getResponse().getBytes();
+            }            
+        }
+        catch (ConnectorServiceException cse)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Unable to establish connector for endpoint: " + endpointId + " while loading resource with uri: " + uri, cse);            
+        }
+    }        
 }

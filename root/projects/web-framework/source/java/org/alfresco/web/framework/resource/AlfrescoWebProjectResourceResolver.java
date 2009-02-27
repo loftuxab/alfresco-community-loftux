@@ -1,33 +1,34 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have received a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.framework.resource;
 
+import org.alfresco.tools.WebUtil;
 import org.alfresco.web.config.WebFrameworkConfigElement.ResourceResolverDescriptor;
-import org.alfresco.web.framework.ModelPersistenceContext;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
  * Resolves URI references to Alfresco Repository objects hosted within Alfresco
@@ -40,6 +41,11 @@ public class AlfrescoWebProjectResourceResolver extends
 {
     private static final String AVM_WEBAPPS_PREFIX = "/www/avm_webapps";
 
+    /**
+     * Instantiates a new alfresco web project resource resolver.
+     * 
+     * @param resource the resource
+     */
     public AlfrescoWebProjectResourceResolver(Resource resource)
     {
         super(resource);
@@ -54,25 +60,13 @@ public class AlfrescoWebProjectResourceResolver extends
     {
         StringBuilder builder = new StringBuilder(512);
 
-        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
         {
-            builder.append("/avmstore/get");
-
-            // append the store id
-            ModelPersistenceContext mpc = context.getModel().getObjectManager().getContext();
-            String storeId = (String) mpc.getValue(ModelPersistenceContext.REPO_STOREID);
-            builder.append("/s");
-            builder.append("/");
-            builder.append(storeId);
-
-            // append in the webapp id
-            String webappId = (String) mpc.getValue(ModelPersistenceContext.REPO_WEBAPPID);
-            if (webappId != null)
-            {
-                builder.append("/w");
-                builder.append("/");
-                builder.append(webappId);
-            }
+            // path to web application
+            builder.append(context.getRequest().getContextPath());
+            
+            // virtualized content retrieval proxy
+            builder.append("/v");            
 
             // append in the URI path
             String value = this.resource.getValue();
@@ -121,9 +115,9 @@ public class AlfrescoWebProjectResourceResolver extends
         
         // determine the webappId
         String webappId = null;
-        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
         {
-            webappId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_WEBAPPID);
+            webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
         }
         else
         {
@@ -137,9 +131,9 @@ public class AlfrescoWebProjectResourceResolver extends
         
         // determine the storeId
         String storeId = null;
-        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
         {
-            storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
+            storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
         }
         else
         {
@@ -160,69 +154,59 @@ public class AlfrescoWebProjectResourceResolver extends
         builder.append(storeId);
         builder.append("/");
         builder.append(webappId);
-        builder.append("/");
+        
+        if (!relativePath.startsWith("/"))
+        {
+            builder.append("/");
+        }
+        
         builder.append(relativePath);
 
         return builder.toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getProxiedDownloadURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getBrowserDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedDownloadURI(RequestContext context)
+    public String getBrowserDownloadURI(RequestContext context)
     {
         String url = getDownloadURI(context);
 
-        url = "/proxy/{endpoint}" + url;
-
-        String ep = this.resource.getEndpoint();
-        if (ep == null)
-        {
-            ep = "alfresco";
-        }
-        url = url.replace("{endpoint}", ep);
+        // if the URL starts with "/", then make it absolute
+        url = WebUtil.toFullyQualifiedURL(context, url);            
 
         return url;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getProxiedMetadataURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.AbstractResourceResolver#getBrowserMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedMetadataURI(RequestContext context)
+    public String getBrowserMetadataURI(RequestContext context)
     {
         String url = getMetadataURI(context);
-
-        url = "/proxy/{endpoint}" + url;
-
-        String ep = this.resource.getEndpoint();
-        if (ep == null)
-        {
-            ep = "alfresco";
-        }
-        url = url.replace("{endpoint}", ep);
-
+        
+        // if the URL starts with "/", then make it absolute
+        url = WebUtil.toFullyQualifiedURL(context, url);            
+        
         return url;
     }
 
     /**
      * Converts an avm object id to a webapp relative path
      * 
-     * Input can be of the form: 
+     * Input can be of the form:
      * 
      * - avm://storeId/<version>;<comma-delimited-path>
-     *   avm://storeId/-1;www;avm_webapps;ROOT;products;product.xml
+     * avm://storeId/-1;www;avm_webapps;ROOT;products;product.xml
      * 
      * - /www/avm_webapps/ROOT/<relativePath>
-     *   /www/avm_webapps/ROOT/products/product.xml
+     * /www/avm_webapps/ROOT/products/product.xml
      * 
      * Output will be of the form:
-     *  - <relativePath> /products/product.xml
+     * - <relativePath> /products/product.xml
      * 
-     * @param objectId
+     * @param objectId the object id
+     * 
      * @return the relative path to the object
      */
     protected static String convertToRelativePath(String objectId)
@@ -262,9 +246,10 @@ public class AlfrescoWebProjectResourceResolver extends
     }
 
     /**
-     * Extracts the store id from the avm:// object id
+     * Extracts the store id from the avm:// object id.
      * 
      * @param objectId the object id
+     * 
      * @return the store id
      */
     protected static String extractStoreId(String objectId)
@@ -284,9 +269,10 @@ public class AlfrescoWebProjectResourceResolver extends
     }    
 
     /**
-     * Extracts the webapp id from the avm:// object id
+     * Extracts the webapp id from the avm:// object id.
      * 
      * @param objectId the object id
+     * 
      * @return the webapp id
      */
     protected static String extractWebappId(String objectId)
@@ -309,5 +295,4 @@ public class AlfrescoWebProjectResourceResolver extends
         
         return webappId;
     }    
-    
 }

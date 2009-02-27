@@ -126,12 +126,12 @@ public interface Resource extends Serializable
     public String getDownloadURI(RequestContext context);
 
     /**
-     * Provides the Proxied URI required to retrieve the content
-     * stream
+     * Provides the browser-friendly URI required to retrieve the 
+     * content stream of the resource
      * 
      * @return
      */
-    public String getProxiedDownloadURI(RequestContext context);
+    public String getBrowserDownloadURI(RequestContext context);
 
     /**
      * Provides the URI required to access the metadata of the
@@ -142,12 +142,12 @@ public interface Resource extends Serializable
     public String getMetadataURI(RequestContext context);
 
     /**
-     * Provides the URI required to access the metadata of the
-     * resource
+     * Provides the browser-friendly URI required to access the metadata 
+     * of the resource
      * 
      * @return
      */
-    public String getProxiedMetadataURI(RequestContext context);
+    public String getBrowserMetadataURI(RequestContext context);
 
     /**
      * Fetches the raw metadata from the remote storage location
@@ -178,4 +178,26 @@ public interface Resource extends Serializable
      */
     public ResourceContent getContent(RequestContext context);
 
+    /**
+     * Returns the byte array of the content payload described by this
+     * resource.
+     * 
+     * Note: This is a potentially heavy operation and should be used
+     * sparringly.  It is implemented down here in the Java API and then
+     * lightened up in the ScriptResource wrapped implementation which Rhino
+     * utilizes so that people can't trip up on themselves as easily.
+     *  
+     * @param context
+     * 
+     * @return the byte array
+     */
+    public byte[] getBytes(RequestContext context);
+    
+    /**
+     * Tells the resource to reload the byte array of the content payload
+     * described by this resource.
+     * 
+     * @param context
+     */
+    public void reload(RequestContext context);
 }
