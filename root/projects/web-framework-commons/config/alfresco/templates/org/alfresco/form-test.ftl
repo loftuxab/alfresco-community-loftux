@@ -8,7 +8,7 @@
       <@region id="title" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div style="padding: 10px; margin-bottom: 10px; margin-top: 10px; background-color: #eee; border: 1px dotted #c0c0c0;">
+      <div style="padding: 10px; margin-top: 10px; background-color: #eee; border: 1px dotted #c0c0c0;">
          <h2>Form Test Page</h2>
          <#if url.args.mode?exists>
             <#assign mode="${url.args.mode}">
@@ -40,7 +40,9 @@
          </form>
       </div>
       
-      <@region id="form-ui" scope="template" />
+      <div style="margin-left: 1em; margin-top: 0.8em;">
+         <@region id="form-ui" scope="template" />
+      </div>
       
       <#if url.args.fr?exists>
          <div style="padding: 10px; margin-bottom: 10px; margin-top: 10px; background-color: #eee; border: 1px dotted #c0c0c0;">

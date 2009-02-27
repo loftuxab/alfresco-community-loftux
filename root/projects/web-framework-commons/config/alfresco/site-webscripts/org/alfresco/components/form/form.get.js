@@ -42,16 +42,26 @@ function main()
          setupCaches(formModel);
          
          // determine what mode we are in from the arguments
-         var mode = context.properties.mode;
+         var mode = args.mode;
          if (mode === null)
          {
-         	mode = "edit";
+            mode = context.properties.mode;
+            if (mode === null)
+            {
+         	   mode = "edit";
+            }
          }
          
          // create and setup form ui model basics
          formUIModel = {};
          formUIModel.mode = mode;
          formUIModel.submissionUrl = formModel.data.submissionUrl;
+         
+         // TODO: remove the heading and replace with sets
+         if (args.heading !== null)
+         {
+            formUIModel.heading = args.heading;
+         }
          
          // query for configuration for item
          var nodeConfig = config.scoped[formModel.data.type];

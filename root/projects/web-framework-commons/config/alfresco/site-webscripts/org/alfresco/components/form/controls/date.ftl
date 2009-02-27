@@ -2,6 +2,7 @@
 <#-- TODO: Try and find a way to share as much as possible between all instances of control on page -->
 
 <#if field.control.params.showTime?exists && field.control.params.showTime == "true"><#assign showTime=true><#else><#assign showTime=false></#if>
+<#if showTime><#assign viewFormat>${msg("form.view.time.format")}</#assign><#else><#assign viewFormat>${msg("form.view.date.format")}</#assign></#if>
 
 <#assign dpId=args.htmlid + "_" + field.id>
 <#assign dpVar=dpId?replace("-", "_")>
@@ -9,7 +10,7 @@
 <#if form.mode == "view">
 <div class="viewmode-field">
    <span class="viewmode-label">${field.label?html}:</span>
-   <span class="viewmode-value"><#if field.value != "">${field.value?datetime("yyyy-MM-dd'T'HH:mm:ss")?string("EEEE, MMMM dd yyyy")}</#if></span>
+   <span class="viewmode-value"><#if field.value != "">${field.value?datetime("yyyy-MM-dd'T'HH:mm:ss")?string(viewFormat)}</#if></span>
 </div>
 <#else>
 
@@ -18,7 +19,7 @@
 <input id="${dpId}-date" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 
 <#if field.disabled == false>
-<a id="${dpId}-icon" class="datepicker-icon" href="javascript:${dpVar}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" /></a>
+<a id="${dpId}-icon" href="javascript:${dpVar}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
 </#if>
 
 <div id="${dpId}-cal" class="datepicker"></div>
@@ -27,7 +28,7 @@
 <input id="${dpId}-time" type="text" class="time-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 </#if>
 
-<div>
+<div class="format-info">
 <span class="date-format">${msg("form.display.date.format")}</span>
 <#if showTime><span class="time-format<#if field.disabled>-disabled</#if>">${msg("form.display.time.format")}</span></#if>
 </div>

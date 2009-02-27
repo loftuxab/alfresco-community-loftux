@@ -28,6 +28,7 @@
          </div>
          <div class="yui-g"> 
             <div class="yui-u first">
+               <@region id="document-metadata" scope="template" protected=true />
                <@region id="document-info" scope="template" protected=true />
                <@region id="document-versions" scope="template" protected=true />
             </div>
