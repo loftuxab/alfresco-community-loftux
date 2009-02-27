@@ -111,20 +111,6 @@
       {
          var docData = args[1];
          
-         // render the core metadata values
-         Dom.get(this.id + "-meta-name").innerHTML = $html(docData.fileName);
-         Dom.get(this.id + "-meta-content-type").innerHTML = $html(this._getMimetypeLabel(docData.mimetype));
-         //Dom.get(this.id + "-meta-encoding").innerHTML = $html(docData.encoding);
-         Dom.get(this.id + "-meta-title").innerHTML = $html(docData.title);
-         Dom.get(this.id + "-meta-description").innerHTML = $html(docData.description);
-         Dom.get(this.id + "-meta-author").innerHTML = $html(docData.author);
-         //Dom.get(this.id + "-meta-owner").innerHTML = $html(docData.owner);
-         Dom.get(this.id + "-meta-size").innerHTML = $html(Alfresco.util.formatFileSize(docData.size));
-         Dom.get(this.id + "-meta-creator").innerHTML = $html(docData.createdBy);
-         Dom.get(this.id + "-meta-createdon").innerHTML = $html(Alfresco.util.formatDate(docData.createdOn));
-         Dom.get(this.id + "-meta-modifier").innerHTML = $html(docData.modifiedBy);
-         Dom.get(this.id + "-meta-modifiedon").innerHTML = $html(Alfresco.util.formatDate(docData.modifiedOn));
-         
          // render tags values
          var tags = docData.tags;
          var tagsHtml = "";

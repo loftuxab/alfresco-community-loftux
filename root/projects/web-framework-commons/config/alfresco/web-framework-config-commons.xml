@@ -47,8 +47,16 @@
       <form>
          <field-visibility>
             <show id="cm:name" />
+            <!-- <show id="mimetype" /> TODO: Need to extract from content property -->
             <show id="cm:title" />
             <show id="cm:description" />
+            <show id="cm:author" />
+            <!-- <show id="size" /> TODO: Need to extract from content property -->
+            <show id="cm:description" />
+            <show id="cm:creator" />
+            <show id="cm:created" />
+            <show id="cm:modifier" />
+            <show id="cm:modified" />
          </field-visibility>
       </form>
    </config>
