@@ -114,10 +114,10 @@ public class ResourceTag extends TagBase
                     ResourceProvider provider = (ResourceProvider) object;
                     Resource resource = provider.getResource(this.id);
                 
-                    String uri = resource.getProxiedDownloadURI(this.getRequestContext());                
+                    String uri = resource.getBrowserDownloadURI(this.getRequestContext());                
                     if ("metadata".equalsIgnoreCase(this.target))
                     {
-                        uri = resource.getProxiedMetadataURI(this.getRequestContext());
+                        uri = resource.getBrowserMetadataURI(this.getRequestContext());
                     }
                 
                     this.getOut().write(uri);
@@ -149,10 +149,10 @@ public class ResourceTag extends TagBase
                     resource.setEndpoint(ep);
                     
                     // construct the proxied uri
-                    String uri = resource.getProxiedDownloadURI(this.getRequestContext());                
+                    String uri = resource.getBrowserDownloadURI(this.getRequestContext());                
                     if ("metadata".equalsIgnoreCase(this.target))
                     {
-                        uri = resource.getProxiedMetadataURI(this.getRequestContext());
+                        uri = resource.getBrowserMetadataURI(this.getRequestContext());
                     }
                 
                     this.getOut().write(uri);

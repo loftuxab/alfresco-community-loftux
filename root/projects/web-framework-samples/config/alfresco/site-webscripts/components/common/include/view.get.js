@@ -1,5 +1,10 @@
 <import resource="/components/common/js/component.js">
 
+function startsWith(str, car)
+{
+	return (str.indexOf(car) == 0);
+}
+
 var source = Surf.Component.getSource();
 if(source == null)
 {
@@ -9,12 +14,7 @@ if(source == null)
 else
 {
 	// set up the source
-	var src = source.downloadURI;
-	if(src.substring(0,1) == "/")
-	{
-		src = url.context + source.proxiedDownloadURI;
-	}
-	model.src = src;
+	model.src = source.browserDownloadURI;
 
 	model.title = instance.properties["title"];
 	if(model.title == null)
@@ -33,7 +33,28 @@ else
 	{
 		model.container = "div";
 	}
+	
+	// load the content (if container is a div)
+	if (model.container == "div")
+	{
+		model.src = source.downloadURI;
+
+		// if the src starts with "/", then it is a server side include
+		if (startsWith(model.src, "/"))
+		{			
+			// TODO: this should use the source.endpoint
+			// TODO: app.include(source.value, source.endpoint);
+			// TODO: leave out for now since Web Studio doesn't yet make this easy
+			var data = app.include(source.value);
+			model.data = data.toString() + "";
+		}
+		else
+		{
+			var conn = remote.connect("http");
+			var data = conn.get(model.src);
+			model.data = data.toString() + "";
+		}
+	}
 
 	model.ready = true;
 }
-

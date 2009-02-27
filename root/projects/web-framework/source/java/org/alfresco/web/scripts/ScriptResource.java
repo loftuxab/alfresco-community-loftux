@@ -108,9 +108,9 @@ public final class ScriptResource extends ScriptBase
         return this.resource.getDownloadURI(context);
     }
 
-    public String getProxiedDownloadURI()
+    public String getBrowserDownloadURI()
     {
-        return this.resource.getProxiedDownloadURI(context);
+        return this.resource.getBrowserDownloadURI(context);
     }
     
     public String getMetadataURI()
@@ -118,9 +118,9 @@ public final class ScriptResource extends ScriptBase
         return this.resource.getMetadataURI(context);
     }    
 
-    public String getProxiedMetadataURI()
+    public String getBrowserMetadataURI()
     {
-        return this.resource.getProxiedMetadataURI(context);
+        return this.resource.getBrowserMetadataURI(context);
     }    
     
     public String getMetadata()
@@ -149,5 +149,23 @@ public final class ScriptResource extends ScriptBase
         }
         
         return this.scriptContentObject;        
+    }
+    
+    public String getText()
+    {
+        String data = null;
+        
+        byte[] bytes = this.resource.getBytes(context);        
+        if (bytes != null)
+        {
+            data = new String(bytes);
+        }
+        
+        return data;
+    }
+    
+    public void reload()
+    {
+        this.resource.reload(context);
     }
 }

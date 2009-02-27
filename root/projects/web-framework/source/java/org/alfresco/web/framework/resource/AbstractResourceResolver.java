@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have received a copy of the text describing 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -27,18 +27,29 @@ package org.alfresco.web.framework.resource;
 import java.util.StringTokenizer;
 
 import org.alfresco.connector.Response;
+import org.alfresco.tools.WebUtil;
 import org.alfresco.web.framework.exception.ResourceMetadataException;
 import org.alfresco.web.scripts.ScriptRemoteConnector;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract implementation of a resource resolver
+ * 
+ * This provides default methods for retrieving the browser-friendly URIs
+ * of resources by assuming that they are located behind something
+ * accessible via the endpoint proxy servlet.
  * 
  * @author muzquiano
  */
 public abstract class AbstractResourceResolver implements ResourceResolver
 {
+    private static final String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";
+
+    private static Log logger = LogFactory.getLog(AbstractResourceResolver.class);
+    
     protected Resource resource;
 
     public AbstractResourceResolver(Resource resource)
@@ -46,40 +57,56 @@ public abstract class AbstractResourceResolver implements ResourceResolver
         this.resource = resource;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedDownloadURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getBrowserDownloadURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedDownloadURI(RequestContext context)
+    public String getBrowserDownloadURI(RequestContext context)
     {
-        String url = "/proxy/{endpoint}" + getDownloadURI(context);
+        String url = context.getRequest().getContextPath() + "/proxy/{endpoint}" + getDownloadURI(context);
 
         String ep = this.resource.getEndpoint();
         if (ep == null)
         {
-            ep = "alfresco";
+            ep = FrameworkHelper.getRemoteConfig().getDefaultEndpointId();
+        }
+        if (ep == null)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Unable to determine endpoint binding, resorting to fixed: " + DEFAULT_ALFRESCO_ENDPOINT_ID);
+            
+            ep = DEFAULT_ALFRESCO_ENDPOINT_ID;
         }
         url = url.replace("{endpoint}", ep);
 
+        // if the URL starts with "/", then make it absolute
+        url = WebUtil.toFullyQualifiedURL(context, url);
+        
         return url;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.web.framework.resource.ResourceResolver#getProxiedMetadataURI(org.alfresco.web.site.RequestContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.framework.resource.ResourceResolver#getBrowserMetadataURI(org.alfresco.web.site.RequestContext)
      */
-    public String getProxiedMetadataURI(RequestContext context)
+    public String getBrowserMetadataURI(RequestContext context)
     {
-        String url = "/proxy/{endpoint}" + getMetadataURI(context);
+        String url = context.getRequest().getContextPath() + "/proxy/{endpoint}" + getMetadataURI(context);
 
         String ep = this.resource.getEndpoint();
         if (ep == null)
         {
-            ep = "alfresco";
+            ep = FrameworkHelper.getRemoteConfig().getDefaultEndpointId();
+        }        
+        if (ep == null)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Unable to determine endpoint binding, resorting to fixed: " + DEFAULT_ALFRESCO_ENDPOINT_ID);
+
+            ep = DEFAULT_ALFRESCO_ENDPOINT_ID;
         }
         url = url.replace("{endpoint}", ep);
+        
+        // if the URL starts with "/", then make it absolute
+        url = WebUtil.toFullyQualifiedURL(context, url);        
 
         return url;
     }

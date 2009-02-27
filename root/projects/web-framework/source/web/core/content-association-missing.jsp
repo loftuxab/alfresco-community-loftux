@@ -32,6 +32,11 @@
 			The content being viewed is not associated to a display page.
 			<br/>
 			<br/>
+			The content type is:<br/>
+			<%=object.getTypeId()%>
+			
+			<br/>
+			<br/>
 			<a href="javascript:window.history.back()">Go back to previous page</a>
 			<br/>
 			<br/>

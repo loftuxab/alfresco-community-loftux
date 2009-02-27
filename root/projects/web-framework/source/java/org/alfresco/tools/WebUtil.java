@@ -31,6 +31,8 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.RequestContext;
+
 /**
  * Static helper methods for working with query strings and maps.
  * 
@@ -138,4 +140,50 @@ public class WebUtil
         }
         return result;
     }
+    
+    /**
+     * Converts a relative URI to a fully qualified URL 
+     * If the URI is already fully qualified, it is simply returned
+     * 
+     * @param context
+     * @param uri
+     * 
+     * @return the fully qualified url
+     */
+    public static String toFullyQualifiedURL(RequestContext context, String uri)
+    {
+        return toFullyQualifiedURL(context.getRequest(), uri);
+    }
+
+    /**
+     * Converts a relative URI to a fully qualified URL 
+     * If the URI is already fully qualified, it is simply returned
+     *  
+     * @param request
+     * @param uri
+     * 
+     * @return the fully qualified url
+     */
+    public static String toFullyQualifiedURL(HttpServletRequest request, String uri)
+    {
+        StringBuilder builder = new StringBuilder(128);
+        
+        if (uri.startsWith("/"))
+        {                    
+            builder.append(request.getScheme());
+            builder.append("://");
+            builder.append(request.getServerName());
+            
+            if (request.getServerPort() != 80)
+            {
+                builder.append(":");
+                builder.append(request.getServerPort());
+            }
+        }
+        
+        builder.append(uri);
+        
+        return builder.toString();
+    }
+    
 }

@@ -27,6 +27,7 @@ package org.alfresco.web.framework;
 import org.alfresco.web.scripts.RemoteStoreContextImpl;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThreadLocalRequestContext;
+import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
  * An implementation class for RemoteStoreContext which empowers
@@ -41,17 +42,23 @@ public class WebFrameworkRemoteStoreContext extends RemoteStoreContextImpl
      */
     public String getStoreId()
     {
-        String storeId = null;
+        String _storeId = null;
         
         // retrieve the request context
         RequestContext context = ThreadLocalRequestContext.getRequestContext();
         if (context != null)
         {
             // pull back request-context model store id 
-            storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
+            _storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
         }
         
-        return storeId;
+        // if we couldn't find a dynamic one, then use our default value        
+        if (_storeId == null)
+        {
+            _storeId = this.storeId;
+        }
+        
+        return _storeId;
     }
 
     /* (non-Javadoc)
@@ -59,17 +66,23 @@ public class WebFrameworkRemoteStoreContext extends RemoteStoreContextImpl
      */
     public String getWebappId()
     {
-        String webappId = null;
+        String _webappId = null;
         
         // retrieve the request context
         RequestContext context = ThreadLocalRequestContext.getRequestContext();
         if (context != null)
         {
-            // pull back request-context model store id 
-            webappId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_WEBAPPID);
+            // pull back request-context model store id
+            _webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
         }
         
-        return webappId;
+        // if we couldn't find a dynamic one, then use our default value
+        if (_webappId == null)
+        {
+            _webappId = this.webappId;
+        }
+        
+        return _webappId;
     }
 
     /* (non-Javadoc)

@@ -28,10 +28,14 @@ import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.Response;
 import org.alfresco.web.config.WebFrameworkConfigElement.ResourceResolverDescriptor;
 import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.resource.TransientResourceImpl;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.site.servlet.VirtualizedContentRetrievalServlet;
 
 /**
  * Helper object for dealing with the web application's environment.
@@ -75,33 +79,13 @@ public final class ScriptWebApplication extends ScriptBase
         HttpServletRequest request = this.context.getRequest();
         
         // on the preview tier, we'll plug in a passthru to the AVM remote store
-        if (FrameworkHelper.getConfig().isWebStudioEnabled())
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
         {
-            // append the path to the application server hosted web application
-            // on the production tier, this will be the correct context        
+            // path to web application
             builder.append(request.getContextPath());
-
-            // assume proxy to alfresco
-            builder.append("/proxy/alfresco");
             
-            // remote store
-            builder.append("/avmstore/get");
-            
-            // throw down the store id (if applicable)
-            String storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
-            if (storeId != null)
-            {
-                builder.append("/s/");
-                builder.append(storeId);
-            }
-            
-            // throw down the webapp id (if applicable)
-            String webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
-            if (webappId != null)
-            {
-                builder.append("/w/");
-                builder.append(webappId);
-            }            
+            // virtualized content retrieval proxy
+            builder.append("/v");            
         }
         else
         {
@@ -136,5 +120,82 @@ public final class ScriptWebApplication extends ScriptBase
         }
         
         return builder.toString();
-    }        
+    }  
+
+    /**
+     * Performs a server-side include of a web asset
+     * 
+     * This uses the default endpoint
+     * 
+     * @param path
+     * 
+     * @return
+     */    
+    public String include(String path)
+    {
+        return include(path, null);
+    }
+    
+    /**
+     * Performs a server-side include of a web asset
+     * 
+     * If this is running in a preview tier, this turns into a remote call
+     * over to the avmstore look up.
+     * 
+     * Otherwise, it turns into a wrapped server-side include.
+     * 
+     * The result string is returned.
+     * 
+     * Value paths are:
+     * 
+     *    /a/b/c.gif
+     *    /images/test.jpg
+     * 
+     * @param path
+     * @param endpointId
+     * 
+     * @return
+     */
+    public String include(String path, String endpointId)
+    {
+        String buffer = null;
+        
+        HttpServletRequest request = context.getRequest();
+                
+        try
+        {            
+            if (FrameworkHelper.getConfig().isPreviewEnabled())
+            {
+                String storeId = (String) context.getValue(WebFrameworkConstants.STORE_ID_REQUEST_CONTEXT_NAME);
+                String webappId = (String) context.getValue(WebFrameworkConstants.WEBAPP_ID_REQUEST_CONTEXT_NAME);
+                
+                // virtualized content retrieval
+                buffer = VirtualizedContentRetrievalServlet.retrieveAsString(context, path, endpointId, storeId, webappId);
+            }
+            else
+            {
+                // construct a transient resource to represent this asset
+                TransientResourceImpl res = new TransientResourceImpl(path, "webapp");
+                res.setValue(path);
+                res.setEndpoint(endpointId);
+                String uri = res.getBrowserDownloadURI(context);
+                
+                // create a connector to the resource
+                Connector connector = FrameworkHelper.getConnector(context, "http");
+
+                // pull back the data
+                Response response = connector.call(uri);
+                buffer = response.getResponse();    
+            }
+            
+            // some post treatment of the buffer
+            buffer = buffer.replace("${app.context}", this.getContext());
+        }
+        catch (Exception ex)
+        {
+            FrameworkHelper.getLogger().warn("Unable to include '" + path + "', " + ex.getMessage());
+        }
+        
+        return buffer;
+    }
 }

@@ -90,7 +90,7 @@ public interface WebFrameworkConfigProperties
     public String getDefaultLinkBuilderId();
     public String getDefaultRequestContextId();
     public String getDefaultUserFactoryId();
-    
+        
     // types (model files)
     public String[] getTypeIds();
     public TypeDescriptor getTypeDescriptor(String id);
@@ -107,5 +107,11 @@ public interface WebFrameworkConfigProperties
     // web studio settings
     public boolean isWebStudioEnabled();
     public String getWebStudioMode();
-    public String getWebStudioLocation();    
+    public String getWebStudioLocation();
+    
+    // preview mode configuration
+    public boolean isPreviewEnabled();
+    public String getPreviewMode();
+    public String getPreviewDefaultStoreId();
+    public String getPreviewDefaultWebappId();
 }

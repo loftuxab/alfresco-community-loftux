@@ -129,9 +129,38 @@
 				<search-path-id>webframework.searchpath.theme</search-path-id>
 				<default-store-id>webframework.remotestore.theme</default-store-id>
 			</model-type>
+			
+			<!-- Preview Mode Configuration -->
+			<preview>
+			   <mode>enabled</mode>
+			   <default-store-id></default-store-id>
+			   <default-webapp-id></default-webapp-id>
+			</preview>
 
 		</web-framework>
 
+	</config>	
+	
+	<config evaluator="string-compare" condition="Remote">
+	
+		<remote>
+		
+			<!-- The default endpoint -->
+			<default-endpoint-id>alfresco-webuser</default-endpoint-id>
+		
+			<endpoint>
+				<id>alfresco-webuser</id>
+				<name>Alfresco - Web Project user</name>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://localhost:8080/alfresco/s</endpoint-url>
+				<identity>declared</identity>
+				<username>admin</username>
+				<password>admin</password>
+				<unsecure>false</unsecure>
+			</endpoint>		
+
+		</remote>
+		
 	</config>	
 	
 </alfresco-config>

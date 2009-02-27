@@ -9,12 +9,7 @@ if(source == null || source.value == null || source.value == "")
 else
 {
 	// set up the source
-	var src = source.downloadURI;
-	if(src.substring(0,1) == "/")
-	{
-		src = url.context + source.proxiedDownloadURI;
-	}
-	model.src = src;
+	model.src = source.browserDownloadURI;
 	
 	var fileext = instance.object.properties["fileext"];
 	if(fileext == null || fileext == "")
