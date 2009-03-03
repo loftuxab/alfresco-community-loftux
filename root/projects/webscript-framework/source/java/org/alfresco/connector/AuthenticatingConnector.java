@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -69,6 +69,8 @@ public class AuthenticatingConnector implements Connector
     protected Connector connector = null;
     protected Authenticator authenticator = null;
     
+    private static final String GUEST_MODE = "guest=true";
+    
     /**
      * Instantiates a new authenticating connector.
      * 
@@ -112,7 +114,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            handshake();
+            uri = handshakeOrGuest(uri);
             
             // now that we've authenticated, try again
             response = this.connector.call(uri);
@@ -156,8 +158,8 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            handshake();
-
+            uri = handshakeOrGuest(uri);
+            
             // now that we've authenticated, try again
             response = this.connector.call(uri, context);
         }
@@ -200,7 +202,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            handshake();
+            uri = handshakeOrGuest(uri);
 
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, in);
@@ -244,8 +246,8 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            handshake();
-
+            uri = handshakeOrGuest(uri);
+            
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, in, out);
         }
@@ -288,7 +290,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            handshake();
+            uri = handshakeOrGuest(uri);
             
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, req, res);
@@ -299,6 +301,25 @@ public class AuthenticatingConnector implements Connector
                     (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
+    }
+    
+    private String handshakeOrGuest(String uri)
+    {
+        boolean hResult = handshake();
+        if (! hResult)
+        {
+            StringBuilder guestUri = new StringBuilder(uri);
+            if (uri.lastIndexOf('?') != -1)
+            {
+                guestUri.append('&').append(GUEST_MODE);
+            }
+            else
+            {
+                guestUri.append('?').append(GUEST_MODE);
+            }
+            return guestUri.toString();
+        }
+        return uri;
     }
     
     /* (non-Javadoc)
