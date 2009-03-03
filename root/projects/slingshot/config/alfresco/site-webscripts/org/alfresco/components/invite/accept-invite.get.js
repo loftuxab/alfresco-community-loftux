@@ -8,6 +8,8 @@ function main()
    // fetch the user information from the url
    var inviteId = page.url.args.inviteId;
    var inviteTicket = page.url.args.inviteTicket;
+   var inviteeUserName = page.url.args.inviteeUserName;
+   
    if ((inviteId == undefined) || (inviteTicket == undefined))
    {
       model.error = "Parameters missing!";
@@ -16,6 +18,13 @@ function main()
              
    // do invite request and redirect if it succeedes, show error otherwise
    var url = '/api/invite/' + inviteId + '/' + inviteTicket + '/accept';
+   
+   // for MT share
+   if (inviteeUserName != undefined)
+   {
+      url = url + '?inviteeUserName=' + inviteeUserName;
+   }
+   
    var connector = remote.connect("alfresco-noauth");
    var result = connector.put(url, "{}", "application/json");
    if (result.status != status.STATUS_OK)
