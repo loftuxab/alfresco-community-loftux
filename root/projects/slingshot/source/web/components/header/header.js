@@ -55,11 +55,7 @@
       
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
-
-      // Give the search component a chance to tell the header that it has been loaded
-      // (and thus no page reload is required for a new search)
-      YAHOO.Bubbling.on("searchComponentExists", this.onSearchComponentExists, this);
-
+      
       // Notifications that the favourite sites have been updated
       YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
       YAHOO.Bubbling.on("favouriteSiteRemoved", this.onFavouriteSiteRemoved, this);
@@ -256,19 +252,6 @@
       {
          this.options.searchType = newVal;
          this.defaultSearchText();
-      },
-      
-      /**
-       * Called by the Search component to tell the header that
-       * no page refresh is required for a new search
-       *
-       * @method onSearchComponentExists
-       * @param layer {object} Unused
-       * @param args {object} Unused
-       */
-      onSearchComponentExists: function Header_onSearchComponentExists(layer, args)
-      {
-         this.searchExists = true;
       },
       
       /**

@@ -35,8 +35,13 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+       Event = YAHOO.util.Event,
+       Element = YAHOO.util.Element;
+   
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
    
    /**
     * Search constructor.
@@ -63,7 +68,7 @@
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onSearch", this.onSearch, this);
-   
+      
       return this;
    }
    
@@ -219,7 +224,9 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["index", "nodeRef", "type", "name", "displayName", "title", "browseUrl", "site", "container", "tags"]
+             fields: ["index", "nodeRef", "type", "name", "displayName", "description",
+                      "modifiedOn", "modifiedByUser", "modifiedBy", "size",
+                      "title", "browseUrl", "site", "container", "tags"]
          };
          
          // setup of the datatable.
@@ -235,10 +242,6 @@
          // Hook action events
          Alfresco.util.registerDefaultActionHandler(this.id, "search-tag", "span", this);
          Alfresco.util.registerDefaultActionHandler(this.id, "search-scope-toggle", "a", this);
-
-         // tell the header that the search component exists on this page and therefore no
-         // page refresh is required for new search terms
-         YAHOO.Bubbling.fire("searchComponentExists", {});
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -305,7 +308,7 @@
             
             // Render the cell
             var name = oRecord.getData("displayName");
-            var htmlName = Alfresco.util.encodeHTML(name);
+            var htmlName = $html(name);
             elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + htmlName + '" title="' + htmlName + '" /></a></span>';
          };
 
@@ -328,12 +331,19 @@
             var url = me._getBrowseUrlForRecord(oRecord);
             
             // title/link to view page
-            var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '" class="theme-color-1">' + Alfresco.util.encodeHTML(oRecord.getData("displayName")) + '</a></h3>';
+            var desc = '<h3 class="itemname"><a href="' + encodeURI(url) + '" class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a></h3>';
+            
+            // description (if any)
+            var txt = oRecord.getData("description");
+            if (txt !== undefined && txt !== "")
+            {
+               desc += '<div class="details">';
+               desc += $html(txt);
+               desc += '</div>';
+            }
             
             // type information
             desc += '<div class="details">';
-            desc += me._msg("message.type");
-            desc += ': ';
             switch (oRecord.getData("type"))
             {
                case "file":
@@ -363,26 +373,31 @@
                default:
                   desc += me._msg("label.unknown");
             }
-            desc += '</div>';
             
-            // link to the site
-            desc += '<div class="detail">';
-            desc += me._msg("message.insite");
-            desc += ': <a href="' + Alfresco.constants.URL_PAGECONTEXT + "site/" + Alfresco.util.encodeHTML(site.shortName) + '/dashboard">' + Alfresco.util.encodeHTML(site.title) + '</a>';
+            // link to the site and other meta-data details
+            desc += ' ' + me._msg("message.insite");
+            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + $html(site.shortName) + '/dashboard">' + $html(site.title) + '</a>';
+            if (oRecord.getData("size") !== -1)
+            {
+               desc += ' ' + me._msg("message.ofsize");
+               desc += ' ' + Alfresco.util.formatFileSize(oRecord.getData("size"));
+            }
+            desc += ' ' + me._msg("message.modifiedby");
+            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + '/user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedByUser")) + '</a> ';
+            desc += me._msg("message.modifiedon");
+            desc += ' ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"));
             desc += '</div>';
             
             // tags (if any)
             var tags = oRecord.getData("tags");
-            if (tags.length != 0)
+            if (tags.length !== 0)
             {
-               desc += '<div class="details">';
-               desc += me._msg("message.tags");
-               desc += ': ';
+               desc += '<div class="details"><span class="tags">' + me._msg("message.tags") + ': ';
                for (var x=0; x < tags.length; x++)
                {
-                   desc += '<span id="' + me.id + '-searchByTag-' + Alfresco.util.encodeHTML(tags[x]) + '"><a class="search-tag" href="#">' + Alfresco.util.encodeHTML(tags[x]) + '</a> </span>';
+                   desc += '<span id="' + me.id + '-searchByTag-' + $html(tags[x]) + '"><a class="search-tag" href="#">' + $html(tags[x]) + '</a></span> ';
                }
-               desc += '</div>';
+               desc += '</span></div>';
             }
             
             elCell.innerHTML = desc;
@@ -474,8 +489,7 @@
        */
       searchByTag: function Search_searchTag(param)
       {
-         // send a search bubble event to load the list
-         YAHOO.Bubbling.fire("onSearch",
+         this.refreshSearch(
          {
             searchTerm : param
          });
@@ -486,12 +500,41 @@
        */
       onToggleSearchScope: function Search_onToggleSearchScope()
       {
-         var searchAll = ! this.searchAll;
-         // send a search bubble event to load the list
-         YAHOO.Bubbling.fire("onSearch",
+         var searchAll = !this.searchAll;
+         this.refreshSearch(
          {
             searchAll : searchAll
          });
+      },
+      
+      /**
+       * Refresh the search page by full URL refresh
+       *
+       * @method refreshSearch
+       * @param args {object} search args
+       */
+      refreshSearch: function Search_refreshSearch(args)
+      {
+         var searchTerm = this.searchTerm;
+         if (args["searchTerm"] !== undefined)
+         {
+            searchTerm = args["searchTerm"];
+         }
+         var searchAll= this.searchAll;
+         if (args["searchAll"] !== undefined)
+         {
+            searchAll = args["searchAll"];
+         }
+         
+         // redirect to the search page
+         var url = Alfresco.constants.URL_CONTEXT + "page/";
+         if (this.options.siteId.length != 0)
+         {
+            url += "site/" + this.options.siteId + "/";
+         }
+         url += "search?t=" + encodeURIComponent(searchTerm);
+         url += "&a=" + searchAll;
+         window.location = url;
       },
 
       /**
@@ -500,7 +543,7 @@
        */
 
       /**
-       * Path Changed event handler
+       * Execute Search event handler
        *
        * @method onSearch
        * @param layer {object} Event fired
@@ -603,7 +646,7 @@
       _updateSearchInfo: function Search__updateSearchInfo()
       {
          // update the search results field
-         var searchFor = '<b>' + Alfresco.util.encodeHTML(this.searchTerm) + '</b>';
+         var searchFor = '<b>' + $html(this.searchTerm) + '</b>';
          var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + this.options.siteName+ '</b>'));
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
