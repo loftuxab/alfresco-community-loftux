@@ -49,6 +49,7 @@ import org.alfresco.jlan.server.auth.ntlm.Type1NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type2NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type3NTLMMessage;
 import org.alfresco.util.Base64;
+import org.alfresco.util.log.NDC;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.scripts.Status;
@@ -61,7 +62,6 @@ import org.alfresco.web.site.UserFactory;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.NDC;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
