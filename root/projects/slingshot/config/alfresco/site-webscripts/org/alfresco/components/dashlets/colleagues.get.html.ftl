@@ -8,7 +8,7 @@
    <#list memberships as m>
       <div class="detail-list-item <#if m_index = 0>first-item<#elseif !m_has_next>last-item</#if>">
          <div class="avatar">
-            <img src="${url.context}<#if m.avatar??>/proxy/alfresco/api/node/${m.avatar?replace(':/','')}/content/thumbnails/avatar?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="Avatar" />
+            <img src="${url.context}<#if m.person.avatar??>/proxy/alfresco/${m.person.avatar}?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="Avatar" />
          </div>
          <div class="person">
             <h4><a href="${url.context}/page/user/${m.person.userName?url}/profile" class="theme-color-1">${m.person.firstName?html} <#if m.person.lastName??>${m.person.lastName?html}</#if></a></h4>

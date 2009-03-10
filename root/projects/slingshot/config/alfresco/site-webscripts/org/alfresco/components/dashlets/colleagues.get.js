@@ -6,7 +6,7 @@ function sortByName(membership1, membership2)
 }
 
 // Call the repo for the site memberships
-var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships");
+var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100");
 
 var memberships = [];
 
@@ -21,14 +21,8 @@ if (json.status == 200)
       for (var i = 0, j = memberships.length; i < j; i++)
       {
          member = memberships[i];
-         userObj = user.getUser(member.person.userName);
-         if (userObj != null)
-         {
-            member.avatar = userObj.properties.avatar;
-         }
       }
       memberships.sort(sortByName);
-
    }
 }
 

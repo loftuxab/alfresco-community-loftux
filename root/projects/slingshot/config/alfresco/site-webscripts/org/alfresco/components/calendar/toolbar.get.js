@@ -1,25 +1,15 @@
-<import resource="classpath:alfresco/site-webscripts/org/alfresco/callutils.js">
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/components/calendar/helper.js">
+
 // Check whether the current user is a member of the site first and then if they are
 // the role of the user - until there is a method of doing this check on the web tier 
 // we have to make a call back to the repo to get this information.
 
-var obj = doGetCall("/api/sites/" + page.url.templateArgs.site + "/memberships");
-
-var currentUser = user.name;
 var role = null;
-
-// iterate round the members of the site and see if current user is present
-// TODO: when we have a pattern for doing isXXX checks this should be refined
-if (obj != null)
+var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
+if (json.status == 200)
 {
-	for (var x = 0; x < obj.length; x++)
-	{
-	   if (obj[x].person.userName == currentUser)
-	   {
-	      role = obj[x].role;
-	   }
-	}
+   var obj = eval('(' + json + ')');
+   role = obj.role;
 }
 
 // set role appropriately
