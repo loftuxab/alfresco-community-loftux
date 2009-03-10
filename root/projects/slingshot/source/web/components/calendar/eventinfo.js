@@ -268,6 +268,12 @@
                           Dom.get("td").value = dateStr;
                           Dom.get(this.id+"-from").value = Dom.get("fd").value;
                           Dom.get(this.id+"-to").value = Dom.get("td").value;
+                          var a = ['what','where','desc'];
+                          for (var i=0;i<a.length;i++)
+                          {
+                            var el = document.getElementsByName(a[i])[0];
+                            el.value = Alfresco.util.decodeHTML(el.value);
+                          }
                           
                           //init taglib
                           this.tagLibrary.initialize();
