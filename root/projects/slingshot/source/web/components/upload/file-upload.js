@@ -81,7 +81,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       // Create the appropriate uploader component
-      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45); // && !Alfresco.util.hasRequiredFlashPlayer(10, 0, 0);
+      this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
       var uploadType = null;
       if (this.hasRequiredFlashPlayer)        
       {
@@ -109,7 +109,6 @@
 
    Alfresco.FileUpload.prototype =
    {
-
       /**
        * The uploader instance
        *

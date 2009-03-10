@@ -21,7 +21,7 @@
  * FLOSS exception.  You should have recieved a copy of the text describing
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
-
+ */
 
 /**
  * FlashUpload component.
@@ -48,6 +48,11 @@
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Element = YAHOO.util.Element;
 
    /**
     * FlashUpload constructor.
@@ -70,20 +75,17 @@
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
-      if(this.hasRequiredFlashPlayer)
+      if (this.hasRequiredFlashPlayer)
       {
          // Load YUI Components if flash player is installed
          Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "cookie", "uploader"], this.onComponentsLoaded, this);
       }
-
 
       return this;
    };
 
    Alfresco.FlashUpload.prototype =
    {
-
-
       /**
        * The flash move will dispatch the contentReady event twice,
        * make sure we only react on it twice.
@@ -397,8 +399,6 @@
        */
       onComponentsLoaded: function FU_onComponentsLoaded()
       {
-         var Dom = YAHOO.util.Dom;
-
          // Tell the YUI class where the swf is
          YAHOO.widget.Uploader.SWFURL = this.swf;
 
@@ -428,10 +428,10 @@
          this.multiUploadTip = Dom.get(this.id + "-multiUploadTip-span");
          this.singleUpdateTip = Dom.get(this.id + "-singleUpdateTip-span");
          this.statusText = Dom.get(this.id + "-status-span");
-         this.description = YAHOO.util.Dom.get(this.id + "-description-textarea");
+         this.description = Dom.get(this.id + "-description-textarea");
 
          // Save reference to version radio so we can reset and get its value later
-         this.minorVersion = YAHOO.util.Dom.get(this.id + "-minorVersion-radioButton");
+         this.minorVersion = Dom.get(this.id + "-minorVersion-radioButton");
 
          // Save a reference to browseButton so wa can change it later
          //this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
@@ -496,9 +496,8 @@
        */
       show: function FU_show(config)
       {
-         if(!this.hasRequiredFlashPlayer)
+         if (!this.hasRequiredFlashPlayer)
          {
-
             Alfresco.util.PopupManager.displayPrompt(
             {
                text: Alfresco.util.message("label.noFlash", this.name)
@@ -516,16 +515,14 @@
             this.showConfig.uploadDirectory = "/";
          } 
 
-
-         // Apply the config before it is showed
+         // Apply the config before it is shown
          this._resetGUI();
 
-         // Apply the config before it is showed
+         // Apply the config before it is shown
          this._applyConfig();
 
          // Show the upload panel
          this.panel.show();
-         
       },
 
       _resetGUI: function FU__resetGUI()
@@ -639,7 +636,6 @@
       onUploadStart: function FU_onUploadStart(event)
       {
          // Get the reference to the files gui components
-         var Dom = YAHOO.util.Dom;
          var fileInfo = this.fileStore[event["id"]];
 
          // Hide the contentType drop down if it wasn't hidden already
@@ -671,7 +667,7 @@
 
          // Set progress position
          var left = (-400 + (percentage * 400));
-         YAHOO.util.Dom.setStyle(fileInfo.progress, "left", left + "px");
+         Dom.setStyle(fileInfo.progress, "left", left + "px");
       },
 
       /**
@@ -721,7 +717,7 @@
          fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");
 
          // Move the progress bar to "full" progress
-         YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
+         Dom.setStyle(fileInfo.progress, "left", 0 + "px");
          fileInfo.progressPercentage["innerHTML"] = "100%";
          this.noOfSuccessfulUploads++;
 
@@ -767,7 +763,7 @@
             fileInfo.progress.setAttribute("class", "fileupload-progressFailure-span");
 
             // Set the progress bar to "full" progress
-            YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
+            Dom.setStyle(fileInfo.progress, "left", 0 + "px");
 
             // Disable the remove button
             fileInfo.fileButton.set("disabled", true);
@@ -953,8 +949,6 @@
        */
       _applyConfig: function FU__applyConfig()
       {
-         var Dom = YAHOO.util.Dom;
-
          // Set the panel title
          var title;
          if (this.showConfig.mode === this.MODE_SINGLE_UPLOAD)
@@ -1088,9 +1082,6 @@
        */
       _createEmptyDataTable: function FU__createEmptyDataTable()
       {
-
-         var Dom = YAHOO.util.Dom;
-
          /**
           * Save a reference of 'this' so that the formatter below can use it
           * later (since the formatter method gets called with another scope
@@ -1156,7 +1147,7 @@
             }
 
             // create an instance from the template and give it a uniqueue id.
-            var cell = new YAHOO.util.Element(el);
+            var cell = new Element(el);
             var templateInstance = template.cloneNode(true);
             templateInstance.setAttribute("id", templateInstance.getAttribute("id") + flashId);
 
