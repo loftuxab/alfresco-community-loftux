@@ -175,12 +175,32 @@ public class ContentUtils
      */
     @SuppressWarnings("deprecation")
     public static String putContent(File file, String host, int port, String mimetype, String encoding)
+    {
+        return putContent(file, host, port, WebServiceFactory.getEndpointWebapp(), mimetype, encoding);
+    }
+    
+    /**
+     * Streams content into the repository.  Once done a content details string is returned and this can be used to update 
+     * a content property in a CML statement.
+     * 
+     * @param file  the file to stream into the repository
+     * @param host  the host name of the destination repository
+     * @param port  the port name of the destination repository
+     * @param webAppName        the name of the target web application (default 'alfresco')
+     * @param mimetype the mimetype of the file, ignored if null
+     * @param encoding the encoding of the file, ignored if null
+     * @return      the content data that can be used to set the content property in a CML statement  
+     */
+    @SuppressWarnings("deprecation")
+    public static String putContent(File file, String host, int port, String webAppName, String mimetype, String encoding)
     {      
         String result = null;
         
         try 
         {
-            String url = "/alfresco/upload/" + 
+            String url = "/" +
+                         webAppName +
+                         "/upload/" + 
                          URLEncoder.encode(file.getName(), "UTF-8") + 
                          "?ticket=" + AuthenticationUtils.getTicket();
             if (mimetype != null)
