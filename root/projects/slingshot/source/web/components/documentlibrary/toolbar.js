@@ -1133,7 +1133,7 @@
             }
             params += "&format=rss";
             
-            this.widgets.rssFeed.set("href", Alfresco.constants.PROXY_FEED_URI + "slingshot/doclib/doclist/" + params);
+            this.widgets.rssFeed.set("href", Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/documentlibrary/feed/" + params);
          }
       },
       
