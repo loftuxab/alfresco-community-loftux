@@ -66,10 +66,14 @@ public final class WebServiceFactory
     /** Property file name */
     private static final String PROPERTY_FILE_NAME = "alfresco/webserviceclient.properties";
     private static final String REPO_LOCATION = "repository.location";
+    private static final String REPO_WEBAPP = "repository.webapp";
     
+    private static volatile boolean loadedProperties = false;
     /** Default endpoint address **/
     private static final String DEFAULT_ENDPOINT_ADDRESS = "http://localhost:8080/alfresco/api";
-    private static String endPointAddress;
+    private static String endPointAddress = DEFAULT_ENDPOINT_ADDRESS;
+    private static final String DEFAULT_REPO_WEBAPP = "alfresco";
+    private static String endPointWebapp = DEFAULT_REPO_WEBAPP;
     
     /** Default timeout **/
     private static int timeoutMilliseconds = 60000;
@@ -499,43 +503,62 @@ public final class WebServiceFactory
 
         return dictionaryService;
     }
+
+    private static synchronized void loadProperties(String propertyFileName)
+    {
+        if (loadedProperties)
+        {
+            return;
+        }
+        Properties props = new Properties();
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROPERTY_FILE_NAME);
+        if (is != null)
+        {
+            // Load from the file
+            try
+            {
+                props.load(is);            
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just use the default endpoint
+                logger.debug("Unable to load webservice client properties from " + propertyFileName + ": " + e.getMessage());
+            }
+        }
+        // Add defaults for any properties not set
+        
+        if (props.getProperty(REPO_LOCATION) != null)
+        {
+            endPointAddress = props.getProperty(REPO_LOCATION);
+        }
+        if (props.getProperty(REPO_WEBAPP) != null)
+        {
+            endPointWebapp = props.getProperty(REPO_WEBAPP);
+        }
+        loadedProperties = true;
+    }
     
     /**
-     * Gets the end point address from the properties file
-     * 
-     * @return
+     * Gets the configured end-point address
      */
-    private static String getEndpointAddress()
+    public static String getEndpointAddress()
     {
-    	if (endPointAddress == null)
-    	{
-    		endPointAddress = DEFAULT_ENDPOINT_ADDRESS;
-	
-	        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROPERTY_FILE_NAME); 
-	        if (is != null)
-	        {
-	            Properties props = new Properties();
-	            try
-	            {
-	                props.load(is);            
-	                endPointAddress = props.getProperty(REPO_LOCATION);
-	                
-	                if (logger.isDebugEnabled() == true)
-	                {
-	                    logger.debug("Using endpoint " + endPointAddress);
-	                }
-	            }
-	            catch (Exception e)
-	            {
-	                // Do nothing, just use the default endpoint
-	                if (logger.isDebugEnabled() == true)
-	                {
-	                    logger.debug("Unable to file web service client proerties file.  Using default.");
-	                }
-	            }
-	        }
-    	}
-        
+        if (!loadedProperties)
+        {
+            loadProperties(PROPERTY_FILE_NAME);
+        }
         return endPointAddress;
+    }
+    
+    /**
+     * Gets the configured end-point webapp name
+     */
+    public static String getEndpointWebapp()
+    {
+        if (!loadedProperties)
+        {
+            loadProperties(PROPERTY_FILE_NAME);
+        }
+        return endPointWebapp;
     }
 }
