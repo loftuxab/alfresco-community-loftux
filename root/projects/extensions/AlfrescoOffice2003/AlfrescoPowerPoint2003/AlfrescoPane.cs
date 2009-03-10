@@ -181,9 +181,27 @@ namespace AlfrescoPowerPoint2003
             string theURI = string.Format(@"{0}{1}myAlfresco?p=&e=ppt", m_ServerDetails.WebClientURL, m_TemplateRoot);
             // We don't prompt the user if the document is closing
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
+            /**
+             * Long ticket fix - the encoded ticket is 2426 characters long, therefore has to be sent
+             * as an HTTP header to avoid the IE6 and IE7 2048 character limit on a GET URL
+             */
+            if ((strAuthTicket == "") && !isClosing)
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
+            }
+
+            string strAuthHeader = "";
             if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
-               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+               if ((Uri.EscapeDataString(strAuthTicket).Length + theURI.Length) > 1024)
+               {
+                  strAuthHeader = "ticket: " + strAuthTicket;
+               }
+               else
+               {
+                  theURI += "&ticket=" + strAuthTicket;
+               }
             }
 
             if ((strAuthTicket == "") && !isClosing)
@@ -200,7 +218,7 @@ namespace AlfrescoPowerPoint2003
 
             webBrowser.ObjectForScripting = this;
             UriBuilder uriBuilder = new UriBuilder(theURI);
-            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
             PanelMode = PanelModes.WebBrowser;
          }
       }
@@ -235,9 +253,26 @@ namespace AlfrescoPowerPoint2003
             }
             string theURI = string.Format(@"{0}{1}documentDetails?p={2}&e=ppt", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
+            /**
+             * Long ticket fix - the encoded ticket is 2426 characters long, therefore has to be sent
+             * as an HTTP header to avoid the IE6 and IE7 2048 character limit on a GET URL
+             */
+            string strAuthHeader = "";
             if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
-               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+               if ((Uri.EscapeDataString(strAuthTicket).Length + theURI.Length) > 1024)
+               {
+                  strAuthHeader = "ticket: " + strAuthTicket;
+               }
+               else
+               {
+                  theURI += "&ticket=" + strAuthTicket;
+               }
+            }
+            if (strAuthTicket == "")
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
             }
 
             if (strAuthTicket == "")
@@ -254,7 +289,7 @@ namespace AlfrescoPowerPoint2003
 
             webBrowser.ObjectForScripting = this;
             UriBuilder uriBuilder = new UriBuilder(theURI);
-            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
             PanelMode = PanelModes.WebBrowser;
          }
       }
@@ -263,7 +298,7 @@ namespace AlfrescoPowerPoint2003
       {
          object missingValue = Type.Missing;
          // WebDAV or CIFS?
-         string strFullPath = m_ServerDetails.getFullPath(documentPath, "");
+         string strFullPath = m_ServerDetails.getFullPath(documentPath, "", false);
          try
          {
             PowerPoint.Presentation pres = m_PowerPointApplication.Presentations.Open(
@@ -295,7 +330,7 @@ namespace AlfrescoPowerPoint2003
             }
 
             // WebDAV or CIFS?
-            string strFullPath = m_ServerDetails.getFullPath(relativePath, m_PowerPointApplication.ActivePresentation.FullName);
+            string strFullPath = m_ServerDetails.getFullPath(relativePath, m_PowerPointApplication.ActivePresentation.FullName, true);
             string strExtn = Path.GetExtension(relativePath).ToLower();
 
             // Store the active pane to restore it later
@@ -438,7 +473,7 @@ namespace AlfrescoPowerPoint2003
          relativeDirectory += documentName;
 
          // CIFS or WebDAV path?
-         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath);
+         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath, false);
 
          try
          {

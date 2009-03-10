@@ -339,7 +339,7 @@ namespace AlfrescoExcel2003
          }
       }
 
-      public string getFullPath(string relativePath, string currentDocPath)
+      public string getFullPath(string relativePath, string currentDocPath, bool omitTicket)
       {
          // CIFS or WebDAV path?
          string fullPath = "";
@@ -375,12 +375,14 @@ namespace AlfrescoExcel2003
          {
             // Use WebDAV
             string strAuthTicket = getAuthenticationTicket(false);
-            fullPath = WebDAVURL + relativePath + "?";
-            if (strAuthTicket != "" && strAuthTicket != "ntlm")
+            fullPath = WebDAVURL + relativePath;
+            /* Work out if the ticket can be added or not */
+            string ticket = "?ticket=" + Uri.EscapeDataString(strAuthTicket);
+            if (!omitTicket && strAuthTicket != "" && strAuthTicket != "ntlm" && (fullPath.Length + ticket.Length) < 255)
             {
-               fullPath += "ticket=" + Uri.EscapeDataString(getAuthenticationTicket(false)) + "&";
+               // OK to add ticket onto document path
+               fullPath += ticket;
             }
-            fullPath += "vtiIgnore";
          }
 
          return fullPath;
@@ -407,7 +409,8 @@ namespace AlfrescoExcel2003
             else
             {
                // Try WebDAV
-               m_DefaultToCIFS = false;
+               /* Only reset flag if no CIFS config present */
+               m_DefaultToCIFS = (this.CIFSServer.Length > 0);
                IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
                strAuthTicket = myAuthTicket.GetAuthenticationTicket();
                if (strAuthTicket != "401")

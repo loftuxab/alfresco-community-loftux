@@ -173,11 +173,22 @@ namespace AlfrescoWord2003
             string theURI = string.Format(@"{0}{1}myAlfresco?p=&e=doc", m_ServerDetails.WebClientURL, m_TemplateRoot);
             // We don't prompt the user if the document is closing
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
+            /**
+             * Long ticket fix - the encoded ticket is 2426 characters long, therefore has to be sent
+             * as an HTTP header to avoid the IE6 and IE7 2048 character limit on a GET URL
+             */
+            string strAuthHeader = "";
             if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
-               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+               if ((Uri.EscapeDataString(strAuthTicket).Length + theURI.Length)  > 1024)
+               {
+                  strAuthHeader = "ticket: " + strAuthTicket;
+               }
+               else
+               {
+                  theURI += "&ticket=" + strAuthTicket;
+               }
             }
-
             if ((strAuthTicket == "") && !isClosing)
             {
                PanelMode = PanelModes.Configuration;
@@ -192,7 +203,7 @@ namespace AlfrescoWord2003
 
             webBrowser.ObjectForScripting = this;
             UriBuilder uriBuilder = new UriBuilder(theURI);
-            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
             PanelMode = PanelModes.WebBrowser;
          }
       }
@@ -227,11 +238,22 @@ namespace AlfrescoWord2003
             }
             string theURI = string.Format(@"{0}{1}documentDetails?p={2}&e=doc", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
+            /**
+             * Long ticket fix - the encoded ticket is 2426 characters long, therefore has to be sent
+             * as an HTTP header to avoid the IE6 and IE7 2048 character limit on a GET URL
+             */
+            string strAuthHeader = "";
             if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
-               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+               if ((Uri.EscapeDataString(strAuthTicket).Length + theURI.Length) > 1024)
+               {
+                  strAuthHeader = "ticket: " + strAuthTicket;
+               }
+               else
+               {
+                  theURI += "&ticket=" + strAuthTicket;
+               }
             }
-
             if (strAuthTicket == "")
             {
                PanelMode = PanelModes.Configuration;
@@ -246,7 +268,7 @@ namespace AlfrescoWord2003
             
             webBrowser.ObjectForScripting = this;
             UriBuilder uriBuilder = new UriBuilder(theURI);
-            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
             PanelMode = PanelModes.WebBrowser;
          }
       }
@@ -255,7 +277,7 @@ namespace AlfrescoWord2003
       {
          object missingValue = Type.Missing;
          // WebDAV or CIFS?
-         string strFullPath = m_ServerDetails.getFullPath(documentPath, "");
+         string strFullPath = m_ServerDetails.getFullPath(documentPath, "", false);
          object file = strFullPath;
          try
          {
@@ -310,7 +332,7 @@ namespace AlfrescoWord2003
             object range = m_WordApplication.Selection.Range;
 
             // WebDAV or CIFS?
-            string strFullPath = m_ServerDetails.getFullPath(relativePath, m_WordApplication.ActiveDocument.FullName);
+            string strFullPath = m_ServerDetails.getFullPath(relativePath, m_WordApplication.ActiveDocument.FullName, true);
             string strExtn = Path.GetExtension(relativePath).ToLower();
 
             if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
@@ -390,7 +412,7 @@ namespace AlfrescoWord2003
          relativeDirectory += documentName;
 
          // CIFS or WebDAV path?
-         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath);
+         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath, false);
 
          // Box into object - Word requirement
          object file = savePath;

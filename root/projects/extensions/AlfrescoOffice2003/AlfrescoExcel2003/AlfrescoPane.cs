@@ -172,9 +172,27 @@ namespace AlfrescoExcel2003
             string theURI = string.Format(@"{0}{1}myAlfresco?p=&e=xls", m_ServerDetails.WebClientURL, m_TemplateRoot);
             // We don't prompt the user if the document is closing
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
+            /**
+             * Long ticket fix - the encoded ticket is 2426 characters long, therefore has to be sent
+             * as an HTTP header to avoid the IE6 and IE7 2048 character limit on a GET URL
+             */
+            if ((strAuthTicket == "") && !isClosing)
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
+            }
+
+            string strAuthHeader = "";
             if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
-               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+               if ((Uri.EscapeDataString(strAuthTicket).Length + theURI.Length) > 1024)
+               {
+                  strAuthHeader = "ticket: " + strAuthTicket;
+               }
+               else
+               {
+                  theURI += "&ticket=" + strAuthTicket;
+               }
             }
 
             if ((strAuthTicket == "") && !isClosing)
@@ -193,7 +211,7 @@ namespace AlfrescoExcel2003
             {
                webBrowser.ObjectForScripting = this;
                UriBuilder uriBuilder = new UriBuilder(theURI);
-               webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+               webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
                PanelMode = PanelModes.WebBrowser;
             }
          }
@@ -229,9 +247,27 @@ namespace AlfrescoExcel2003
             }
             string theURI = string.Format(@"{0}{1}documentDetails?p={2}&e=xls", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
+            /**
+             * Long ticket fix - the encoded ticket is 2426 characters long, therefore has to be sent
+             * as an HTTP header to avoid the IE6 and IE7 2048 character limit on a GET URL
+             */
+            if (strAuthTicket == "")
+            {
+               PanelMode = PanelModes.Configuration;
+               return;
+            }
+
+            string strAuthHeader = "";
             if ((strAuthTicket != "") && (strAuthTicket != "ntlm"))
             {
-               theURI += "&ticket=" + Uri.EscapeDataString(strAuthTicket);
+               if ((Uri.EscapeDataString(strAuthTicket).Length + theURI.Length) > 1024)
+               {
+                  strAuthHeader = "ticket: " + strAuthTicket;
+               }
+               else
+               {
+                  theURI += "&ticket=" + strAuthTicket;
+               }
             }
 
             if (strAuthTicket == "")
@@ -248,7 +284,7 @@ namespace AlfrescoExcel2003
 
             webBrowser.ObjectForScripting = this;
             UriBuilder uriBuilder = new UriBuilder(theURI);
-            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
             PanelMode = PanelModes.WebBrowser;
          }
       }
@@ -260,7 +296,7 @@ namespace AlfrescoExcel2003
          object falseValue = false;
 
          // WebDAV or CIFS?
-         string strFullPath = m_ServerDetails.getFullPath(documentPath, "");
+         string strFullPath = m_ServerDetails.getFullPath(documentPath, "", false);
          try
          {
             Excel.Workbook book = m_ExcelApplication.Workbooks.Open(
@@ -284,25 +320,25 @@ namespace AlfrescoExcel2003
          object trueValue = true;
          object falseValue = false;
 
-         // Create a new document if no document currently open
-         if (m_ExcelApplication.ActiveWorkbook == null)
+         try
          {
-            m_ExcelApplication.Workbooks.Add(missingValue);
-         }
+            // Create a new document if no document currently open
+            if (m_ExcelApplication.ActiveWorkbook == null)
+            {
+               m_ExcelApplication.Workbooks.Add(missingValue);
+            }
 
-         // WebDAV or CIFS?
-         string strFullPath = m_ServerDetails.getFullPath(relativePath, m_ExcelApplication.ActiveWorkbook.FullName);
-         string strExtn = Path.GetExtension(relativePath).ToLower();
+            // WebDAV or CIFS?
+            string strFullPath = m_ServerDetails.getFullPath(relativePath, m_ExcelApplication.ActiveWorkbook.FullName, true);
+            string strExtn = Path.GetExtension(relativePath).ToLower();
 
-         Excel.Worksheet worksheet = (Excel.Worksheet)m_ExcelApplication.ActiveSheet;
-         Excel.Shapes shapes = worksheet.Shapes;
-         Excel.Range range = (Excel.Range)m_ExcelApplication.Selection;
-         object top = range.Top;
-         object left = range.Left;
+            Excel.Worksheet worksheet = (Excel.Worksheet)m_ExcelApplication.ActiveSheet;
+            Excel.Shapes shapes = worksheet.Shapes;
+            Excel.Range range = (Excel.Range)m_ExcelApplication.Selection;
+            object top = range.Top;
+            object left = range.Left;
 
-         if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
-         {
-            try
+            if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
             {
                Excel.Shape picture = shapes.AddPicture(strFullPath, Microsoft.Office.Core.MsoTriState.msoFalse, Microsoft.Office.Core.MsoTriState.msoTrue,
                   1, 2, 3, 4);
@@ -311,27 +347,27 @@ namespace AlfrescoExcel2003
                picture.ScaleWidth(1, Microsoft.Office.Core.MsoTriState.msoTrue, missingValue);
                picture.ScaleHeight(1, Microsoft.Office.Core.MsoTriState.msoTrue, missingValue);
             }
-            catch (Exception e)
+            else
             {
-               MessageBox.Show(e.Message, Properties.Resources.MessageBoxTitle);
+               object iconFilename = Type.Missing;
+               object iconIndex = Type.Missing;
+               object iconLabel = Path.GetFileName(strFullPath);
+               string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
+               if (defaultIcon.Contains(","))
+               {
+                  string[] iconData = defaultIcon.Split(new char[] { ',' });
+                  iconFilename = iconData[0];
+                  iconIndex = iconData[1];
+               }
+               object filename = strFullPath;
+               object size = 32;
+               Excel.Shape shape = shapes.AddOLEObject(missingValue, filename, falseValue, trueValue,
+                  iconFilename, iconIndex, iconLabel, left, top, size, size);
             }
          }
-         else
+         catch (Exception e)
          {
-            object iconFilename = Type.Missing;
-            object iconIndex = Type.Missing;
-            object iconLabel = Path.GetFileName(strFullPath);
-            string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
-            if (defaultIcon.Contains(","))
-            {
-               string[] iconData = defaultIcon.Split(new char[] { ',' });
-               iconFilename = iconData[0];
-               iconIndex = iconData[1];
-            }
-            object filename = strFullPath;
-            object size = 32;
-            Excel.Shape shape = shapes.AddOLEObject(missingValue, filename, falseValue, trueValue,
-               iconFilename, iconIndex, iconLabel, left, top, size, size);
+            MessageBox.Show(Properties.Resources.UnableToInsert + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
          }
       }
 
@@ -369,7 +405,7 @@ namespace AlfrescoExcel2003
          relativeDirectory += documentName;
 
          // CIFS or WebDAV path?
-         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath);
+         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath, false);
 
          // Box into object - Word requirement
          object file = savePath;

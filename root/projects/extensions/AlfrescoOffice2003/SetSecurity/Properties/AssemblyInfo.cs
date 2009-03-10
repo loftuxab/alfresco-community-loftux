@@ -12,7 +12,7 @@ using System.Security.Permissions;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Alfresco")]
 [assembly: AssemblyProduct("")]
-[assembly: AssemblyCopyright("Copyright © Alfresco 2008")]
+[assembly: AssemblyCopyright("Copyright © Alfresco 2007-2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -31,5 +31,5 @@ using System.Security.Permissions;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("3.0.*")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.1.*")]
+[assembly: AssemblyFileVersion("3.1.0.0")]
