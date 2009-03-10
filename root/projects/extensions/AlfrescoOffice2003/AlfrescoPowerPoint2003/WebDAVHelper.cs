@@ -39,7 +39,7 @@ namespace AlfrescoPowerPoint2003
          string strTicket = "";
 
          XmlDocument xmlResponse = new XmlDocument();
-         xmlResponse.InnerXml = SendWebDAVRequest(m_AlfrescoServer + "?vtiIgnore", "", Username, Password);
+         xmlResponse.InnerXml = SendWebDAVRequest(m_AlfrescoServer, "", Username, Password);
 
          // Did we get an HTTP 401 error?
          if ((xmlResponse.InnerXml.Contains("<ntlm />")) || (m_WebAuthenticationHeader == "NTLM"))

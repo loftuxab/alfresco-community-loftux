@@ -33,7 +33,7 @@ namespace AlfrescoPowerPoint2003
          m_AppWatcher.OnWindowLostFocus += new WindowLostFocus(AppWatcher_OnWindowLostFocus);
          m_AppWatcher.Start(Application.HWND);
          
-         // Add the Alfresco button to the Office toolbar
+         // Add the button to the Office toolbar
          AddToolbar();
       }
 
@@ -83,13 +83,13 @@ namespace AlfrescoPowerPoint2003
          object falseValue = false;
          object trueValue = true;
 
-         // Try to get a handle to an existing Alfresco CommandBar
+         // Try to get a handle to an existing COMMANDBAR_NAME CommandBar
          try
          {
             m_CommandBar = Application.CommandBars[COMMANDBAR_NAME];
 
             // If we found the CommandBar, then it's a permanent one we need to delete
-            // Note: if the user has manually created a toolbar called "Alfresco" it will get torched here
+            // Note: if the user has manually created a toolbar called COMMANDBAR_NAME it will get torched here
             if (m_CommandBar != null)
             {
                m_CommandBar.Delete();
@@ -100,7 +100,7 @@ namespace AlfrescoPowerPoint2003
             // Benign - the CommandBar didn't exist
          }
 
-         // Create a temporary CommandBar named "Alfresco"
+         // Create a temporary CommandBar named COMMANDBAR_NAME
          m_CommandBar = Application.CommandBars.Add(COMMANDBAR_NAME, Office.MsoBarPosition.msoBarTop, falseValue, trueValue);
 
          if (m_CommandBar != null)

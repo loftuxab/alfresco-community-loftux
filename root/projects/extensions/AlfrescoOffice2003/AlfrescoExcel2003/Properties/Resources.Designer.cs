@@ -79,6 +79,15 @@ namespace AlfrescoExcel2003.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to insert from Alfresco.
+        /// </summary>
+        internal static string UnableToInsert {
+            get {
+                return ResourceManager.GetString("UnableToInsert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to open the workbook from Alfresco.
         /// </summary>
         internal static string UnableToOpen {

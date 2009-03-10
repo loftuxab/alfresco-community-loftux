@@ -123,6 +123,12 @@
   <data name="UnableToAuthenticate" xml:space="preserve">
     <value>Couldn't authenticate with Alfresco server</value>
   </data>
+  <data name="UnableToAuthenticate" xml:space="preserve">
+    <value>Couldn't authenticate with Alfresco server</value>
+  </data>
+  <data name="UnableToInsert" xml:space="preserve">
+    <value>Unable to insert from Alfresco</value>
+  </data>
   <data name="UnableToOpen" xml:space="preserve">
     <value>Unable to open the workbook from Alfresco</value>
   </data>
