@@ -10,6 +10,7 @@ if (args['uri'])
 else
 {
 	model.event = {};
+	model.event.what = model.event.location = model.event.description = '';
 	model.edit =false;
 }
 
