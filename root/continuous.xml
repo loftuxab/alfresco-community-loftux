@@ -76,6 +76,7 @@
                     distribute-sample-extensions,
                     distribute-installers,
                     distribute-docs,
+                    distribute-enterprise-examples,
                     revert-changes" />
 
    <target name="set-build-number"
@@ -655,6 +656,16 @@
                      includes="o2003pia.msi" />
       </zip>
    </target>
+
+   <!-- ************************ -->
+   <!-- ** Enterprise targets ** -->
+   <!-- ************************ -->
+   <target name="distribute-enterprise-examples" depends="continuous-init" if="dir.enterpriseproject.examples.config">
+      <copy todir="${dir.continuous.dist}/">
+         <fileset dir="${dir.enterpriseproject.examples.config}/hyperic"/>
+      </copy>
+   </target>
+      
 
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->
