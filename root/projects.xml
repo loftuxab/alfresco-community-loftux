@@ -137,8 +137,10 @@
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="spring-*.jar" />
             <include name="jug-*.jar" />
-	    <include name="log4j-*.jar" />
          </fileset> 
+        <fileset dir="${dir.project.3rdparty.lib}/optional">
+            <include name="log4j-*.jar" />
+        </fileset> 
          <fileset dir="${dir.project.3rdparty.lib}/commons">
             <filename name="commons-logging-*.jar" />
          </fileset>
@@ -403,6 +405,8 @@
          <lib dir="${dir.project.3rdparty.lib}" 
               includes="*.jar" 
               excludes="${dir.name.devenv}/**,jcr-1.0.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/optional" 
+             includes="*.jar" />
          <lib dir="${dir.project.3rdparty.lib}/jibx" 
               includes="*.jar" />
          <lib dir="${dir.project.3rdparty.lib}/openoffice" 
@@ -1391,6 +1395,8 @@
                   includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera" 
@@ -1472,6 +1478,8 @@
       <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
@@ -1561,6 +1569,8 @@
       <copy todir="${dir.project.webframeworkcommons.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
@@ -1652,6 +1662,8 @@
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
@@ -1849,6 +1861,8 @@
                   excludes="${dir.name.devenv}/**" />
          <fileset dir="${dir.project.webclient.dist}" 
                   includes="${file.name.jar.webclient}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jibx" 
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/openoffice" 
@@ -3030,6 +3044,8 @@
       <copy todir="${dir.project.webstudio.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                  includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  

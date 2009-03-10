@@ -39,6 +39,8 @@
       <path id="classpath.compile">
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="**/*.jar" />
+         	<!-- Avoid compile-time dependencies against optional components, e.g. log4j -->
+            <exclude name="optional/**" />
          </fileset>
          <fileset dir="${dir.projects}">
             <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
@@ -199,7 +201,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/jsr107cache-1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jta.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jug-lgpl-2.0.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/log4j-1.2.15.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/optional/log4j-1.2.15.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/lucene-analyzers-2.1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/lucene-core-2.1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/lucene-snowball-2.1.0.jar" />
@@ -649,6 +651,7 @@
       <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty.lib}" includes="*.jar" 
                   excludes="${dir.name.devenv}/**" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" includes="*.jar" /> 
          <fileset dir="${dir.project.3rdparty.lib}/jibx" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/openoffice" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jmagick" includes="*.jar" />
@@ -753,6 +756,8 @@
       <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/optional" 
+                 includes="${includes.webscriptframework.libs.optional}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
