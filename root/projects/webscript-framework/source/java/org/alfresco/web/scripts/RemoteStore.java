@@ -928,7 +928,15 @@ public class RemoteStore implements Store
                 throw new AlfrescoRuntimeException("Unable to load script: " + scriptPath, e);
             }
         }
-
+        
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#isCachable()
+         */
+        public boolean isCachable()
+        {
+            return false;
+        }
+        
         /**
          * @see org.alfresco.web.scripts.ScriptContent#isSecure()
          */

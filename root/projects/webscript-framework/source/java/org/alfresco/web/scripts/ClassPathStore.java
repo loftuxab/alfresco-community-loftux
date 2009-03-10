@@ -552,6 +552,14 @@ public class ClassPathStore implements Store
         }
         
         /* (non-Javadoc)
+         * @see org.alfresco.web.scripts.ScriptContent#isCachable()
+         */
+        public boolean isCachable()
+        {
+            return true;
+        }
+
+        /* (non-Javadoc)
          * @see org.alfresco.web.scripts.ScriptContent#isSecure()
          */
         public boolean isSecure()
