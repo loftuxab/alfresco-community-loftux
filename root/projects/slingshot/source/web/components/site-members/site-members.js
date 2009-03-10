@@ -237,51 +237,44 @@
                // create a data format that the DataTable can use
                for (var x = 0; x < oFullResponse.length; x++)
                {
-                  var lowerSearchTerm = me.searchTerm.toLowerCase();
                   var memberData = oFullResponse[x];
-                  var firstName = memberData.person.firstName;
-                  var lastName = memberData.person.lastName;
                   
-                  // Determine if member matches search term
-                  if (firstName.toLowerCase().indexOf(lowerSearchTerm) != -1 ||
-                      lastName.toLowerCase().indexOf(lowerSearchTerm) != -1)
+                  // create object to represent member
+                  var member =
                   {
-                     // create object to represent member
-                     var member =
-                     {
-                        "userName": memberData.person.userName,
-                        "firstName": firstName,
-                        "lastName": lastName,
-                        "role": memberData.role
-                     };
-                     
-                     // add optional metadata
-                     if (memberData.person.avatar !== undefined)
-                     {
-                        member.avatar = memberData.person.avatar;
-                     }
-                     
-                     if (memberData.person.jobtitle !== undefined)
-                     {
-                        member.jobtitle = memberData.person.jobtitle;
-                     }
-                     
-                     if (memberData.person.organization !== undefined)
-                     {
-                        member.organization = memberData.person.organization;
-                     }
-                     
-                     // add member to list
-                     items.push(member);
+                     "userName": memberData.person.userName,
+                     "firstName": memberData.person.firstName,
+                     "lastName": memberData.person.lastName,
+                     "role": memberData.role
+                  };
+                  
+                  // add optional metadata
+                  if (memberData.person.avatar !== undefined)
+                  {
+                     member.avatar = memberData.person.avatar;
                   }
+                  
+                  if (memberData.person.jobtitle !== undefined)
+                  {
+                     member.jobtitle = memberData.person.jobtitle;
+                  }
+                  
+                  if (memberData.person.organization !== undefined)
+                  {
+                     member.organization = memberData.person.organization;
+                  }
+                  
+                  // add member to list
+                  items.push(member);
                }
+               
                // Sort the memeber list by name
                items.sort(function (membership1, membership2){
                   var name1 = membership1.firstName + membership1.lastName;
                   var name2 = membership2.firstName + membership2.lastName;
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
                });
-
+               
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {
@@ -802,11 +795,12 @@
        */
       _buildSearchParams: function SiteMembers__buildSearchParams(searchTerm)
       {
-         var params = YAHOO.lang.substitute("size={maxResults}",
+         var params = YAHOO.lang.substitute("size={maxResults}&nf={term}",
          {
-            maxResults : this.options.maxResults
+            maxResults : this.options.maxResults,
+            term : encodeURIComponent(searchTerm)
          });
-
+         
          return params;
       },
       
