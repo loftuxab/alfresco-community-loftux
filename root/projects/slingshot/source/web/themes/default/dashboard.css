@@ -68,6 +68,13 @@
     margin-right: 1px;
 }
 
+.dashlet .scrollablePanel
+{
+    height: 208px;
+    overflow: auto;
+    margin-right: 1px;
+}
+
 .dashlet .body>div
 {
    padding-left: 8px;

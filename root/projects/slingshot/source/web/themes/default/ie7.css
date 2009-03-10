@@ -65,7 +65,8 @@ textarea
 /**
  * Dashlets / position:relative and overflow:auto bug
  */
-.dashlet .scrollableList
+.dashlet .scrollableList,
+.dashlet .scrollablePanel
 {
    position: relative;
 }

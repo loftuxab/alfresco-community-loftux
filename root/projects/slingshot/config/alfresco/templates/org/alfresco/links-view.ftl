@@ -1,6 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@script type="text/javascript" src="${url.context}/templates/links/links-view.css"></@script>
+   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/links/links-view.css" />
    <@script type="text/javascript" src="${url.context}/templates/links/links-view.js"></@script>
 
    <!-- General Links Assets -->
