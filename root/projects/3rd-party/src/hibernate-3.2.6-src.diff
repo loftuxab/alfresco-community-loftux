@@ -1,55 +1,50 @@
-Index: src/org/hibernate/jdbc/BorrowedConnectionProxy.java
-===================================================================
---- src/org/hibernate/jdbc/BorrowedConnectionProxy.java	(revision 15795)
-+++ src/org/hibernate/jdbc/BorrowedConnectionProxy.java	(working copy)
-@@ -65,7 +65,7 @@
- 	public static Connection generateProxy(ConnectionManager connectionManager) {
- 		BorrowedConnectionProxy handler = new BorrowedConnectionProxy( connectionManager );
- 		return ( Connection ) Proxy.newProxyInstance(
--				getProxyClassLoader(),
-+				BorrowedConnectionProxy.class.getClassLoader(),
- 		        PROXY_INTERFACES,
- 		        handler
- 		);
 Index: src/org/hibernate/dialect/DialectFactory.java
 ===================================================================
 --- src/org/hibernate/dialect/DialectFactory.java	(revision 15795)
 +++ src/org/hibernate/dialect/DialectFactory.java	(working copy)
-@@ -35,10 +35,12 @@
- 	public static Dialect buildDialect(Properties props, String databaseName, int databaseMajorVersion)
- 	        throws HibernateException {
- 		String dialectName = props.getProperty( Environment.DIALECT );
--		if ( dialectName == null ) {
-+		if ( dialectName == null || dialectName.length() == 0) {
- 			return determineDialect( databaseName, databaseMajorVersion );
- 		}
- 		else {
-+            // Push the dialect onto the system properties
-+            System.setProperty(Environment.DIALECT, dialectName);
- 			return buildDialect( dialectName );
- 		}
- 	}
-@@ -63,6 +65,8 @@
- 		}
+@@ -1,8 +1,11 @@
+ // $Id$
+ package org.hibernate.dialect;
  
- 		String dialectName = mapper.getDialectClass( databaseMajorVersion );
-+        // Push the dialect onto the system properties
-+        System.setProperty(Environment.DIALECT, dialectName);
- 		return buildDialect( dialectName );
- 	}
++import java.io.InputStream;
+ import java.util.HashMap;
++import java.util.Iterator;
+ import java.util.Map;
++import java.util.Map.Entry;
+ import java.util.Properties;
  
-@@ -152,5 +156,13 @@
+ import org.hibernate.HibernateException;
+@@ -152,5 +155,32 @@
  			        }
  		        }
  		);
 +        
-+        MAPPERS.put( "MySQL", new VersionInsensitiveMapper( "org.hibernate.dialect.MySQLInnoDBDialect" ) );
-+        MAPPERS.put( "DB2/NT64", new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ) );
-+        MAPPERS.put( "DB2/LINUX", new VersionInsensitiveMapper( "org.hibernate.dialect.DB2Dialect" ) );
-+        MAPPERS.put( "Microsoft SQL Server Database", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect" ) );
-+        MAPPERS.put( "Microsoft SQL Server", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect" ) );
-+        MAPPERS.put( "Sybase SQL Server", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoSybaseAnywhereDialect" ) );
-+        MAPPERS.put( "Oracle", new VersionInsensitiveMapper( "org.alfresco.repo.domain.hibernate.dialect.AlfrescoOracle9Dialect" ) );
++        // Now override with config picked up from the classpath
++        InputStream is = DialectFactory.class.getResourceAsStream("alfresco/domain/hibernate-dialects.properties");
++        if (is != null)
++        {
++            try
++            {
++                Properties props = new Properties();
++                props.load(is);
++                Iterator keys = props.keySet().iterator();
++                while (keys.hasNext())
++                {
++                    String key = (String) keys.next();
++                    String value = props.getProperty(key);
++                    VersionInsensitiveMapper mapper = new VersionInsensitiveMapper(value);
++                    MAPPERS.put(key, mapper);
++                }
++            }
++            catch (Throwable e)
++            {
++                // Just ignore
++            }
++            finally
++            {
++                try { is.close(); } catch (Throwable e) {}
++            }
++        }
  	}
  }
 Index: src/org/hibernate/cfg/Configuration.java
