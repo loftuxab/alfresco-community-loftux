@@ -203,8 +203,7 @@ public class WebStudioJsServlet extends BaseServlet
                 // By default, include a JSP from disk so that we can
                 // at least be pretty flexible
                 // about some of the core stuff that gets included
-                OverlayUtil.include(request, buffer,
-                        "/overlay/default/core.js.jsp");
+                OverlayUtil.include(request, response, buffer, "/overlay/default/core.js.jsp");
 
                 // cache back (if not in developer mode)
                 if (!WebStudio.getConfig().isDeveloperMode())
@@ -226,8 +225,7 @@ public class WebStudioJsServlet extends BaseServlet
             // user state information which can change between
             // requests
             StringBuilder dynamicBuffer = new StringBuilder(65536);
-            OverlayUtil.include(request, dynamicBuffer,
-                    "/overlay/default/web-studio-init.js.jsp");
+            OverlayUtil.include(request, response, dynamicBuffer, "/overlay/default/web-studio-init.js.jsp");
 
             // commit to response
             bufferCommitSize += dynamicBuffer.length();

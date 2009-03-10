@@ -68,8 +68,7 @@ public class WebStudioCssServlet extends BaseServlet
             // By default, include a JSP from disk so that we can at
             // least be pretty flexible
             // about some of the core stuff that gets included
-            OverlayUtil.include(request, buffer,
-                    "/overlay/default/core.css.jsp");
+            OverlayUtil.include(request, response, buffer, "/overlay/default/core.css.jsp");
 
             // TODO: Include stuff from the application
 

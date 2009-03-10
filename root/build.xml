@@ -225,7 +225,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/saaj.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/saxpath.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/shale-test-1.0.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/spring-2.0.6.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/spring-2.0.8.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/standard.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/stax-utils-20060502.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/subetha-smtp.jar" />

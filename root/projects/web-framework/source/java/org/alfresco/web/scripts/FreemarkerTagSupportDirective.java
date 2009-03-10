@@ -86,6 +86,6 @@ public abstract class FreemarkerTagSupportDirective implements TemplateDirective
         RenderContextRequest request = new RenderContextRequest(context);
         
         // execute the tag
-        return TagUtil.execute(tag, request, bodyContent);
+        return TagUtil.execute(tag, request, context.getResponse(), bodyContent);
     }
 }

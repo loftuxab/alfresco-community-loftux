@@ -26,6 +26,7 @@ package org.alfresco.tools;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
@@ -45,13 +46,14 @@ public class TagUtil
      * 
      * @param tag the tag
      * @param request the request
+     * @param realResponse the response
      * 
      * @return the string
      */
-    public static String execute(Tag tag, HttpServletRequest request)
+    public static String execute(Tag tag, HttpServletRequest request, HttpServletResponse realResponse)
         throws TagExecutionException
     {
-        return execute(tag, request, null);
+        return execute(tag, request, realResponse, null);
     }
 
     /**
@@ -65,17 +67,18 @@ public class TagUtil
      * 
      * @param tag the tag
      * @param request the request
+     * @param realResponse the response
      * @param bodyContentString the body content string
      * 
      * @return the string
      */
-    public static String execute(Tag tag, HttpServletRequest request, String bodyContentString)
-        throws TagExecutionException
+    public static String execute(Tag tag, HttpServletRequest request, HttpServletResponse realResponse,
+            String bodyContentString) throws TagExecutionException
     {
         // Extract the servlet context from the request (session)
         // Then proceed into the workhorse method
         ServletContext context = request.getSession().getServletContext();
-        return execute(tag, context, request, bodyContentString);
+        return execute(tag, context, request, realResponse, bodyContentString);
     }
 
     /**
@@ -85,13 +88,14 @@ public class TagUtil
      * @param tag the tag
      * @param context the context
      * @param request the request
+     * @param realResponse the response
      * 
      * @return the string
      */
-    public static String execute(Tag tag, ServletContext context, HttpServletRequest request)
-        throws TagExecutionException
+    public static String execute(Tag tag, ServletContext context, HttpServletRequest request,
+            HttpServletResponse realResponse) throws TagExecutionException
     {
-        return execute(tag, context, request, null);
+        return execute(tag, context, request, realResponse, null);
     }
     
     /**
@@ -111,19 +115,20 @@ public class TagUtil
      * @param tag the tag
      * @param context the context
      * @param request the request
+     * @param realResponse the response
      * @param bodyContentString the body content string
      * 
      * @return the string
      */
-    public static String execute(Tag tag, ServletContext context,
-            HttpServletRequest request, String bodyContentString)
+    public static String execute(Tag tag, ServletContext context, HttpServletRequest request,
+            HttpServletResponse realResponse, String bodyContentString)
         throws TagExecutionException
     {
         // Manufacture a request implementation within which the tag will run
         WrappedHttpServletRequest tagRequest = new WrappedHttpServletRequest(request);
         
         // Manufacture a response implementation within which the tag will run
-        FakeHttpServletResponse tagResponse = new FakeHttpServletResponse();
+        FakeHttpServletResponse tagResponse = new FakeHttpServletResponse(realResponse);
         
         // Execute the tag.  This proceeds by "running" the tag as per the JSP tag mechanism.
         String response = null;

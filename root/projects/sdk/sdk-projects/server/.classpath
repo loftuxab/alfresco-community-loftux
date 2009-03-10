@@ -47,7 +47,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/servlet.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/spring-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/spring-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/spring-mock-2.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/standard.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/tlddoc.jar"/>
