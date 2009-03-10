@@ -27,6 +27,7 @@ package org.alfresco.web.studio;
 import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
@@ -46,15 +47,16 @@ public class OverlayUtil
      * Performs a wrapped include of a resource and writes results to a buffer
      * 
      * @param request
+     * @param realResponse
      * @param buffer
      * @param path
      */
-    public static void include(HttpServletRequest request,
-            StringBuilder buffer, String path)
+    public static void include(HttpServletRequest request, HttpServletResponse realResponse, StringBuilder buffer,
+            String path)
     {
         WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
                 request);
-        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(
+        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(realResponse, 
                 false);
 
         try

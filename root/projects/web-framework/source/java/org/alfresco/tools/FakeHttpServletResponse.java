@@ -44,153 +44,164 @@ import java.util.Set;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 /**
- * Implementation of a Fake HttpServletResponse object which can be used to trap
- * output from dispatched objects into a buffer and then deal with results at a
- * later time.
- * 
- * Useful for page caching or nested components where the output
- * stream must be committed to real response at a undetermined point in the
- * future.
+ * Implementation of a Fake HttpServletResponse object which can be used to trap output from dispatched objects into a
+ * buffer and then deal with results at a later time. Useful for page caching or nested components where the output
+ * stream must be committed to real response at a undetermined point in the future.
  * 
  * @author muzquiano
  */
-public class FakeHttpServletResponse implements HttpServletResponse
+public class FakeHttpServletResponse extends HttpServletResponseWrapper
 {
-    public FakeHttpServletResponse()
+    public FakeHttpServletResponse(HttpServletResponse wrapped)
     {
-        this(false);
+        this(wrapped, false);
     }
-    
-    public FakeHttpServletResponse(boolean fakeOutputStream)
+
+    public FakeHttpServletResponse(HttpServletResponse wrapped, boolean fakeOutputStream)
     {
+        super(wrapped);
         if (!fakeOutputStream)
         {
-            content = new ByteArrayOutputStream(1024);
-            outputStream = new DelegatingServletOutputStream(this.content);
+            this.content = new ByteArrayOutputStream(1024);
+            this.outputStream = new DelegatingServletOutputStream(this.content);
         }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#setCharacterEncoding(java.lang.String)
      */
+    @Override
     public void setCharacterEncoding(String characterEncoding)
     {
         this.characterEncoding = characterEncoding;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#getCharacterEncoding()
      */
+    @Override
     public String getCharacterEncoding()
     {
-        return characterEncoding;
+        return this.characterEncoding;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#getOutputStream()
      */
+    @Override
     public ServletOutputStream getOutputStream()
     {
-        return outputStream;
+        return this.outputStream;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#getWriter()
      */
+    @Override
     public PrintWriter getWriter() throws UnsupportedEncodingException
     {
-        if (writer == null)
+        if (this.writer == null)
         {
             Writer targetWriter;
             if (this.outputStream != null)
             {
                 // create a writer wrapping the underlying content output stream
-                targetWriter = (characterEncoding != null ? new OutputStreamWriter(
-                        content, characterEncoding) : new OutputStreamWriter(content));
+                targetWriter = this.characterEncoding != null ? new OutputStreamWriter(this.content,
+                        this.characterEncoding) : new OutputStreamWriter(this.content);
             }
             else
             {
                 // create a "fake" or dummy writer as we have no output stream
                 targetWriter = new Writer()
                 {
+                    @Override
                     public void write(char[] cbuf, int off, int len) throws IOException
                     {
                     }
 
+                    @Override
                     public void flush() throws IOException
                     {
                     }
 
+                    @Override
                     public void close() throws IOException
                     {
                     }
                 };
             }
-            
-            writer = new PrintWriter(targetWriter, true);
+
+            this.writer = new PrintWriter(targetWriter, true);
         }
-        
-        return writer;
+
+        return this.writer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#flushBuffer()
      */
+    @Override
     public void flushBuffer()
     {
-        if (writer != null)
+        if (this.writer != null)
         {
-            writer.flush();
+            this.writer.flush();
         }
 
-        if (outputStream != null)
+        if (this.outputStream != null)
         {
             try
             {
-                outputStream.flush();
+                this.outputStream.flush();
             }
             catch (IOException ex)
             {
-                throw new IllegalStateException(
-                        "Could not flush OutputStream: " + ex.getMessage());
+                throw new IllegalStateException("Could not flush OutputStream: " + ex.getMessage());
             }
         }
 
-        committed = true;
+        this.committed = true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#sendError(int, java.lang.String)
      */
-    public void sendError(int newStatus, String newErrorMessage)
-            throws IOException
+    @Override
+    public void sendError(int newStatus, String newErrorMessage) throws IOException
     {
-        if (committed)
+        if (this.committed)
         {
-            throw new IllegalStateException(
-                    "Cannot set error status - response is already committed");
+            throw new IllegalStateException("Cannot set error status - response is already committed");
         }
 
-        status = newStatus;
-        errorMessage = newErrorMessage;
-        committed = true;
+        this.status = newStatus;
+        this.errorMessage = newErrorMessage;
+        this.committed = true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#sendError(int)
      */
+    @Override
     public void sendError(int newStatus) throws IOException
     {
-        if (committed)
+        if (this.committed)
         {
-            throw new IllegalStateException(
-                    "Cannot set error status - response is already committed");
+            throw new IllegalStateException("Cannot set error status - response is already committed");
         }
 
-        status = newStatus;
-        committed = true;
+        this.status = newStatus;
+        this.committed = true;
     }
 
     /**
@@ -201,23 +212,24 @@ public class FakeHttpServletResponse implements HttpServletResponse
     public String getErrorMessage()
     {
 
-        return errorMessage;
+        return this.errorMessage;
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#sendRedirect(java.lang.String)
      */
+    @Override
     public void sendRedirect(String url) throws IOException
     {
-        if (committed)
+        if (this.committed)
         {
-            throw new IllegalStateException(
-                    "Cannot send redirect - response is already committed");
+            throw new IllegalStateException("Cannot send redirect - response is already committed");
         }
 
-        redirectedUrl = url;
-        committed = true;
+        this.redirectedUrl = url;
+        this.committed = true;
     }
 
     /**
@@ -227,20 +239,24 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public String getRedirectedUrl()
     {
-        return redirectedUrl;
+        return this.redirectedUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#setStatus(int)
      */
+    @Override
     public void setStatus(int status)
     {
         this.status = status;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#setStatus(int, java.lang.String)
      */
+    @Override
     public void setStatus(int status, String errorMessage)
     {
         this.status = status;
@@ -254,7 +270,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public int getStatus()
     {
-        return status;
+        return this.status;
     }
 
     /**
@@ -265,26 +281,27 @@ public class FakeHttpServletResponse implements HttpServletResponse
     public byte[] getContentAsByteArray()
     {
         flushBuffer();
-        return content.toByteArray();
+        return this.content.toByteArray();
     }
 
     /**
      * Gets the content as string.
      * 
      * @return the content as string
-     * 
      * @throws UnsupportedEncodingException
      *             the unsupported encoding exception
      */
     public String getContentAsString() throws UnsupportedEncodingException
     {
         flushBuffer();
-        return (characterEncoding != null) ? content.toString(characterEncoding) : content.toString();
+        return this.characterEncoding != null ? this.content.toString(this.characterEncoding) : this.content.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#setContentLength(int)
      */
+    @Override
     public void setContentLength(int contentLength)
     {
         this.contentLength = contentLength;
@@ -297,49 +314,57 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public int getContentLength()
     {
-        return contentLength;
+        return this.contentLength;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#setContentType(java.lang.String)
      */
+    @Override
     public void setContentType(String contentType)
     {
         this.contentType = contentType;
 
         if (contentType != null)
         {
-            int charsetIndex = contentType.toLowerCase().indexOf(CHARSET_PREFIX);
+            int charsetIndex = contentType.toLowerCase().indexOf(FakeHttpServletResponse.CHARSET_PREFIX);
             if (charsetIndex != -1)
             {
-                String encoding = contentType.substring(charsetIndex + CHARSET_PREFIX.length());
+                String encoding = contentType.substring(charsetIndex + FakeHttpServletResponse.CHARSET_PREFIX.length());
                 setCharacterEncoding(encoding);
             }
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#getContentType()
      */
+    @Override
     public String getContentType()
     {
-        return contentType;
+        return this.contentType;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#setBufferSize(int)
      */
+    @Override
     public void setBufferSize(int bufferSize)
     {
         this.bufferSize = bufferSize;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#getBufferSize()
      */
+    @Override
     public int getBufferSize()
     {
-        return bufferSize;
+        return this.bufferSize;
     }
 
     /**
@@ -353,68 +378,79 @@ public class FakeHttpServletResponse implements HttpServletResponse
         this.committed = committed;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#isCommitted()
      */
+    @Override
     public boolean isCommitted()
     {
-        return committed;
+        return this.committed;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#resetBuffer()
      */
+    @Override
     public void resetBuffer()
     {
-        if (committed)
+        if (this.committed)
         {
-            throw new IllegalStateException(
-                    "Cannot reset buffer - response is already committed");
+            throw new IllegalStateException("Cannot reset buffer - response is already committed");
         }
-        if (content != null)
+        if (this.content != null)
         {
-            content.reset();
+            this.content.reset();
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#reset()
      */
+    @Override
     public void reset()
     {
         resetBuffer();
-        characterEncoding = null;
-        contentLength = 0;
-        contentType = null;
-        locale = null;
-        cookies.clear();
-        headers.clear();
-        status = HttpServletResponse.SC_OK;
-        errorMessage = null;
+        this.characterEncoding = null;
+        this.contentLength = 0;
+        this.contentType = null;
+        this.locale = null;
+        this.cookies.clear();
+        this.headers.clear();
+        this.status = HttpServletResponse.SC_OK;
+        this.errorMessage = null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#setLocale(java.util.Locale)
      */
+    @Override
     public void setLocale(Locale locale)
     {
         this.locale = locale;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.ServletResponse#getLocale()
      */
+    @Override
     public Locale getLocale()
     {
-        return locale;
+        return this.locale;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#addCookie(javax.servlet.http.Cookie)
      */
+    @Override
     public void addCookie(Cookie cookie)
     {
-        cookies.add(cookie);
+        this.cookies.add(cookie);
     }
 
     /**
@@ -424,7 +460,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public Cookie[] getCookies()
     {
-        return (Cookie[]) cookies.toArray(new Cookie[cookies.size()]);
+        return (Cookie[]) this.cookies.toArray(new Cookie[this.cookies.size()]);
     }
 
     /**
@@ -432,12 +468,11 @@ public class FakeHttpServletResponse implements HttpServletResponse
      * 
      * @param name
      *            the name
-     * 
      * @return the cookie
      */
     public Cookie getCookie(String name)
     {
-        for (Iterator it = cookies.iterator(); it.hasNext();)
+        for (Iterator it = this.cookies.iterator(); it.hasNext();)
         {
             Cookie cookie = (Cookie) it.next();
             if (name.equals(cookie.getName()))
@@ -449,84 +484,104 @@ public class FakeHttpServletResponse implements HttpServletResponse
         return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#encodeUrl(java.lang.String)
      */
+    @Override
     public String encodeUrl(String url)
     {
         return url;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#encodeURL(java.lang.String)
      */
+    @Override
     public String encodeURL(String url)
     {
         return url;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#encodeRedirectUrl(java.lang.String)
      */
+    @Override
     public String encodeRedirectUrl(String url)
     {
         return url;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#encodeRedirectURL(java.lang.String)
      */
+    @Override
     public String encodeRedirectURL(String url)
     {
         return url;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#addHeader(java.lang.String, java.lang.String)
      */
+    @Override
     public void addHeader(String name, String value)
     {
         doAddHeader(name, value);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#setHeader(java.lang.String, java.lang.String)
      */
+    @Override
     public void setHeader(String name, String value)
     {
-        headers.put(name, value);
+        this.headers.put(name, value);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#addDateHeader(java.lang.String, long)
      */
+    @Override
     public void addDateHeader(String name, long value)
     {
         doAddHeader(name, new Long(value));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#setDateHeader(java.lang.String, long)
      */
+    @Override
     public void setDateHeader(String name, long value)
     {
-        headers.put(name, new Long(value));
+        this.headers.put(name, new Long(value));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#addIntHeader(java.lang.String, int)
      */
+    @Override
     public void addIntHeader(String name, int value)
     {
         doAddHeader(name, new Integer(value));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#setIntHeader(java.lang.String, int)
      */
+    @Override
     public void setIntHeader(String name, int value)
     {
-        headers.put(name, new Integer(value));
+        this.headers.put(name, new Integer(value));
     }
 
     /**
@@ -539,7 +594,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     private void doAddHeader(String name, Object value)
     {
-        Object oldValue = headers.get(name);
+        Object oldValue = this.headers.get(name);
 
         if (oldValue instanceof List)
         {
@@ -551,20 +606,22 @@ public class FakeHttpServletResponse implements HttpServletResponse
             List list = new LinkedList();
             list.add(oldValue);
             list.add(value);
-            headers.put(name, list);
+            this.headers.put(name, list);
         }
         else
         {
-            headers.put(name, value);
+            this.headers.put(name, value);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see javax.servlet.http.HttpServletResponse#containsHeader(java.lang.String)
      */
+    @Override
     public boolean containsHeader(String name)
     {
-        return headers.containsKey(name);
+        return this.headers.containsKey(name);
     }
 
     /**
@@ -574,7 +631,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public Set getHeaderNames()
     {
-        return headers.keySet();
+        return this.headers.keySet();
     }
 
     /**
@@ -582,12 +639,11 @@ public class FakeHttpServletResponse implements HttpServletResponse
      * 
      * @param name
      *            the name
-     * 
      * @return the header
      */
     public Object getHeader(String name)
     {
-        return headers.get(name);
+        return this.headers.get(name);
     }
 
     /**
@@ -595,12 +651,11 @@ public class FakeHttpServletResponse implements HttpServletResponse
      * 
      * @param name
      *            the name
-     * 
      * @return the headers
      */
     public List getHeaders(String name)
     {
-        Object value = headers.get(name);
+        Object value = this.headers.get(name);
 
         if (value instanceof List)
         {
@@ -634,7 +689,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public String getForwardedUrl()
     {
-        return forwardedUrl;
+        return this.forwardedUrl;
     }
 
     /**
@@ -655,57 +710,57 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public String getIncludedUrl()
     {
-        return includedUrl;
+        return this.includedUrl;
     }
 
     /** The Constant CHARSET_PREFIX. */
     private static final String CHARSET_PREFIX = "charset=";
-    
+
     /** The character encoding. */
     private String characterEncoding = "UTF-8";
 
     /** The content. */
     private ByteArrayOutputStream content;
-    
+
     /** The output stream. */
     private DelegatingServletOutputStream outputStream;
 
     /** The writer. */
     private PrintWriter writer;
-    
+
     /** The content length. */
     private int contentLength = 0;
-    
+
     /** The content type. */
     private String contentType;
-    
+
     /** The buffer size. */
     private int bufferSize = 4096;
-    
+
     /** The committed. */
     private boolean committed;
-    
+
     /** The locale. */
     private Locale locale = Locale.getDefault();
-    
+
     /** The cookies. */
     private final List cookies = new ArrayList(24);
-    
+
     /** The headers. */
     private final Map headers = new HashMap(24, 1.0f);
-    
+
     /** The status. */
     private int status = HttpServletResponse.SC_OK;
-    
+
     /** The error message. */
     private String errorMessage;
-    
+
     /** The redirected url. */
     private String redirectedUrl;
-    
+
     /** The forwarded url. */
     private String forwardedUrl;
-    
+
     /** The included url. */
     private String includedUrl;
 
@@ -714,7 +769,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
      */
     public class DelegatingServletOutputStream extends ServletOutputStream
     {
-        
+
         /**
          * Instantiates a new delegating servlet output stream.
          * 
@@ -734,33 +789,39 @@ public class FakeHttpServletResponse implements HttpServletResponse
          */
         public OutputStream getTargetStream()
         {
-            return proxy;
+            return this.proxy;
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
          * @see java.io.OutputStream#write(int)
          */
+        @Override
         public void write(int b) throws IOException
         {
-            proxy.write(b);
+            this.proxy.write(b);
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
          * @see java.io.OutputStream#flush()
          */
+        @Override
         public void flush() throws IOException
         {
             super.flush();
-            proxy.flush();
+            this.proxy.flush();
         }
 
-        /* (non-Javadoc)
+        /*
+         * (non-Javadoc)
          * @see java.io.OutputStream#close()
          */
+        @Override
         public void close() throws IOException
         {
             super.close();
-            proxy.close();
+            this.proxy.close();
         }
 
         /** The proxy. */

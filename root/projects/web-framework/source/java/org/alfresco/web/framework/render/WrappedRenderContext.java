@@ -61,7 +61,7 @@ final public class WrappedRenderContext
         _request = new WrappedHttpServletRequest(request);
         
         // fake the response object
-        _response = new FakeHttpServletResponse();
+        _response = new FakeHttpServletResponse(renderContext.getResponse());
     }
     
     public String getContentAsString()

@@ -661,11 +661,18 @@
    <!-- ** Enterprise targets ** -->
    <!-- ************************ -->
    <target name="distribute-enterprise-examples" depends="continuous-init" if="dir.enterpriseproject.examples.config">
+	  <!-- Hyperic plugin -->
       <copy todir="${dir.continuous.dist}/">
          <fileset dir="${dir.enterpriseproject.examples.config}/hyperic"/>
       </copy>
-   </target>
-      
+	  <!-- Weblogic .ear -->
+      <ear destfile="${dir.continuous.dist}/${file.name.ear.alfresco}" 
+           appxml="${dir.enterpriseproject.examples.src.metainf}/application.xml" >
+         <fileset dir="${dir.project.webclient.dist}" includes="${file.name.war.webclient}" />
+         <fileset dir="${dir.project.slingshot.dist}" includes="${file.name.war.slingshot}" />
+         <metainf dir="${dir.enterpriseproject.examples.src.metainf}" excludes="application.xml"/>
+      </ear>
+   </target>      
 
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->
@@ -837,7 +844,7 @@
       <copy todir="${dir.continuous.assemble.bm-remote}/lib" 
             flatten="false">
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/spring-2.0.6.jar" />
+                  includes="**/spring-2.0.8.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/ehcache-1.4.1-patched.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
