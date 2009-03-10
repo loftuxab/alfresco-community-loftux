@@ -280,7 +280,7 @@
          html += '<div class="nodeTitle"><a href="' + linksViewUrl + '">' + $html(data.title) + '</a></div>';
 
          html += '<div class="nodeURL">';
-         html += '<span class="nodeAttrLabel">' + this._msg("link.url") + ": </span><a " + (data.internal ? "" : "target='_blank' class='external'") + " href='" + (data.url.substring(0, 1) != '/' || data.url.indexOf("://") == -1 ? 'http://' : '') + data.url + "'>" + $html(data.url) + '</a>';
+         html += '<span class="nodeAttrLabel">' + this._msg("link.url") + ": </span><a " + (data.internal ? "" : "target='_blank' class='external'") + " href='" + (data.url.substring(0, 1) === "/" || data.url.indexOf("://") !== -1 ? '' : "http://") + data.url + "'>" + $html(data.url) + '</a>';
          html += '</div>';
 
          html += '<div class="detail">';

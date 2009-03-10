@@ -135,8 +135,7 @@
 }
 .links-header
 {
-   width: 100%;
-   margin: 0 -3px;
+   margin: 0 -10px;
 }
 
 .links-header .links-infobar
@@ -145,7 +144,6 @@
    border-bottom: 1px dashed #C0C0C0;
    height: 2em;
    padding: 0.5em;
-   width: 100%;
 }
 
 .links-selected-row
@@ -179,7 +177,6 @@
    clear:both;
    height:2em;
    padding:0.5em;
-   width: 100%;
 }
 
 .links-infobar .paginator
@@ -251,7 +248,6 @@
    background-color:#E9EDEF;
    border-bottom:2px solid #C7CCCE;
    height:2em;
-   width: 100%;
    padding: 0.5em;
 }
 
@@ -297,21 +293,6 @@
    min-height: 16px;
    padding: 2px 0 1px 24px;
    font-size:93%;
-}
-
-.links-main {
-   width: auto;
-}
-
-.links-right-panel {
-   margin-left: -50em;
-   float: right;
-   width: 100%;
-}
-
-#divLinkFilters {
-   float: left;
-   width: 150px;
 }
 
 .cover {

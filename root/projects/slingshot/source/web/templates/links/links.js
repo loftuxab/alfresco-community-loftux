@@ -24,61 +24,47 @@
  */
 
 /**
- * LinksViewTemplate template.
+ * Links template.
  *
  * @namespace Alfresco
- * @class Alfresco.LinksViewTemplate
+ * @class Alfresco.Links
  */
 (function()
 {
    /**
-    * LinksViewTemplate constructor.
+    * Links constructor.
     *
-    * @return {Alfresco.LinksViewTemplate} The new LinksViewTemplate instance
+    * @return {Alfresco.Links} The new Links instance
     * @constructor
     */
-   Alfresco.LinksViewTemplate = function LinksViewTemplate_constructor()
+   Alfresco.LinksTemplate = function Links_constructor()
    {
-      // Load YUI Components
-      //Alfresco.util.YUILoaderHelper.require(["json"], this.onComponentsLoaded, this);
-
+      Alfresco.LinksTemplate.superclass.constructor.call(this);
       return this;
    };
 
-   Alfresco.LinksViewTemplate.prototype =
+   YAHOO.extend(Alfresco.LinksTemplate, Alfresco.widget.Resizer,
    {
       /**
-       * Object container for storing YUI widget instances.
+       * DOM ID of left-hand container DIV
        *
-       * @property widgets
-       * @type object
+       * @property divLeft
+       * @type string
+       * @default "divLeft"
        */
-       widgets: {},
+      divLeft: "divLinkFilters",
 
       /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
+       * DOM ID of right-hand container DIV
        *
-       * @method onComponentsLoaded
+       * @property divRight
+       * @type string
+       * @default "divRight"
        */
-      onComponentsLoaded: function LinksViewTemplate_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onDOMReady(this.onReady, this, true);
-      },
-
-      /**
-       * Fired by YUI when parent element is available for scripting.
-       * Template initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
-       */
-      onReady: function LinksViewTemplate_onReady()
-      {
-
-      }
-   };
+      divRight: "divLinkList"
+   });
 
 })();
 
-// Instantiate the Discussions View Topics template
-new Alfresco.LinksViewTemplate();
+// Instantiate the Links template
+new Alfresco.LinksTemplate();
