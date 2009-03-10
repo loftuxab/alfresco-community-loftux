@@ -576,6 +576,14 @@ public class LocalFileSystemStore implements Store
         {
             return false;
         }
+
+        /**
+         * @see org.alfresco.web.scripts.ScriptContent#isCachable()
+         */
+        public boolean isCachable()
+        {
+            return false;
+        }
     }
 
     private class PatternFileFilter implements FileFilter

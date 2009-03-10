@@ -43,6 +43,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrapFactory;
+import org.mozilla.javascript.WrappedException;
 import org.springframework.util.FileCopyUtils;
 
 
@@ -113,7 +114,11 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         {
             // test the cache for a pre-compiled script matching our path
             String path = location.getPath();
-            Script script = this.scriptCache.get(path);
+            Script script = null;
+            if (location.isCachable())
+            {
+                script = this.scriptCache.get(path);
+            }
             if (script == null)
             {
                 if (logger.isDebugEnabled())
@@ -135,16 +140,20 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
                     // We do not worry about more than one user thread compiling the same script.
                     // If more than one request thread compiles the same script and adds it to the
                     // cache that does not matter - the results will be the same. Therefore we
-                    // rely on the ConcurrentHashMap impl to both deal with ensuring the safety of the
+                    // rely on the ConcurrentHashMap impl to deal both with ensuring the safety of the
                     // underlying structure with asynchronous get/put operations and for fast
                     // multi-threaded access to the common cache.
-                    this.scriptCache.put(path, script);
+                    if (location.isCachable())
+                    {
+                        this.scriptCache.put(path, script);
+                    }
                 }
                 finally
                 {
                     Context.exit();
                 }
             }
+            
             return executeScriptImpl(script, model, location.isSecure());
         }
         catch (Throwable e)
@@ -255,6 +264,11 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             // execute the script and return the result
             Object result = script.exec(cx, scope);
             return result;
+        }
+        catch (WrappedException w)
+        {
+            Throwable err = w.getWrappedException();
+            throw new WebScriptException(err.getMessage(), err);
         }
         catch (Throwable e)
         {

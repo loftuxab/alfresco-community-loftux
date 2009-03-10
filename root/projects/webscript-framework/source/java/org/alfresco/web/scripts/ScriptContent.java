@@ -64,6 +64,14 @@ public interface ScriptContent
     public String getPathDescription();
     
     /**
+     * Returns true if the script content is considered cachedable - i.e. classpath located or similar.
+     * Else the content will be compiled/interpreted on every execution i.e. repo content.
+     * 
+     * @return true if the script content is considered cachedable, false otherwise
+     */
+    boolean isCachable();
+    
+    /**
      * Returns true if the script location is considered secure - i.e. on the app-server classpath.
      * Secure scripts may access java.* libraries and instantiate pure Java objects directly. Unsecure
      * scripts only have access to pre-configure host objects and cannot access java.* libs.

@@ -432,4 +432,11 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     {
         return executeScript(script, null, model);
     }
+
+    /**
+     * @see org.alfresco.service.cmr.repository.ScriptProcessor#reset()
+     */
+    public void reset()
+    {
+    }
 }
