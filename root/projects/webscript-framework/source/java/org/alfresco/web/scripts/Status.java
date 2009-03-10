@@ -176,7 +176,8 @@ public class Status
      */
     public String getCodeName()
     {
-        return I18NUtil.getMessage("webscript.code." + code + ".name");
+        String codeName =  I18NUtil.getMessage("webscript.code." + code + ".name");
+        return codeName == null ? "" : codeName;
     }
     
     /**
@@ -204,7 +205,8 @@ public class Status
      */
     public String getCodeDescription()
     {
-        return I18NUtil.getMessage("webscript.code." + code + ".description");
+        String codeDescription = I18NUtil.getMessage("webscript.code." + code + ".description");
+        return codeDescription == null ? "" : codeDescription;
     }
 
     @Override
