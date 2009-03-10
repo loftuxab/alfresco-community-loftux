@@ -51,10 +51,18 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.core.Constants;
 import org.springframework.core.io.Resource;
 
 /**
- * XML based configuration service
+ * XML based configuration service.
+ * <p/>
+ * The sytem properties can be used; to override entries in the properties files, act as fallback values or be ignored.
+ * <ul>
+ *   <li><b>SYSTEM_PROPERTIES_MODE_NEVER:             </b>Don't use system properties at all.</li>
+ *   <li><b>SYSTEM_PROPERTIES_MODE_FALLBACK:          </b>Fallback to a system property only for undefined properties.</li>
+ *   <li><b>SYSTEM_PROPERTIES_MODE_OVERRIDE: (DEFAULT)</b>Use a system property if it is available.</li>
+ * </ul>
  * 
  * @author gavinc
  */
@@ -62,7 +70,10 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 {
     private static final Log logger = LogFactory.getLog(XMLConfigService.class);
 
+    private static final Constants constants = new Constants(PropertyPlaceholderConfigurer.class);
+
     private Resource[] propertyLocations;
+    private int systemPropertiesMode = PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_OVERRIDE;
     private PropertyConfigurer propertyConfigurer;
     private Map<String, ConfigElementReader> elementReaders;
     
@@ -86,7 +97,19 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 	{
 	    this.propertyLocations = locations;
 	}
-    
+
+    /**
+     * Set the system property mode by the name of the corresponding constant,
+     * e.g. "SYSTEM_PROPERTIES_MODE_OVERRIDE".
+     * @param constantName name of the constant
+     * @throws java.lang.IllegalArgumentException if an invalid constant was specified
+     * @see #setSystemPropertiesMode
+     */
+    public void setSystemPropertiesModeName(String constantName) throws IllegalArgumentException
+    {
+        this.systemPropertiesMode = constants.asNumber(constantName).intValue();
+    }
+
 	public List<ConfigDeployment> initConfig()
     {
         if (logger.isDebugEnabled())
@@ -101,6 +124,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
            PropertyConfigurer configurer = new PropertyConfigurer();
            configurer.setLocations(propertyLocations);
            configurer.setIgnoreUnresolvablePlaceholders(true);
+           configurer.setSystemPropertiesMode(systemPropertiesMode);
            configurer.init();
            propertyConfigurer = configurer;
         }
@@ -159,10 +183,11 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             }
 
             // parse each config section in turn
-            Iterator configElements = rootElement.elementIterator(ELEMENT_CONFIG);
+            @SuppressWarnings("unchecked")
+            Iterator<Element> configElements = rootElement.elementIterator(ELEMENT_CONFIG);
             while (configElements.hasNext())
             {
-                Element configElement = (Element) configElements.next();
+                Element configElement = configElements.next();
                 parsedConfigSections.add(parseConfigElement(parsedElementReaders, configElement, currentArea));
             }
         }
@@ -225,12 +250,12 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     {
         if (evaluatorsElement != null)
         {
-        	Map<String, Evaluator> parsedEvaluators = new HashMap<String, Evaluator>();
-        	
-            Iterator evaluators = evaluatorsElement.elementIterator();
+            Map<String, Evaluator> parsedEvaluators = new HashMap<String, Evaluator>();
+            @SuppressWarnings("unchecked")
+            Iterator<Element> evaluators = evaluatorsElement.elementIterator();
             while (evaluators.hasNext())
             {
-                Element evaluatorElement = (Element) evaluators.next();
+                Element evaluatorElement = evaluators.next();
                 String evaluatorName = evaluatorElement.attributeValue(ATTR_ID);
                 String evaluatorClass = evaluatorElement.attributeValue(ATTR_CLASS);
 
@@ -265,12 +290,12 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     {
         if (readersElement != null)
         {
-        	Map<String, ConfigElementReader> parsedElementReaders = new HashMap<String, ConfigElementReader>();
-        	
-            Iterator readers = readersElement.elementIterator();
+            Map<String, ConfigElementReader> parsedElementReaders = new HashMap<String, ConfigElementReader>();
+            @SuppressWarnings("unchecked")
+            Iterator<Element> readers = readersElement.elementIterator();
             while (readers.hasNext())
             {
-                Element readerElement = (Element) readers.next();
+                Element readerElement = readers.next();
                 String readerElementName = readerElement.attributeValue(ATTR_ELEMENT_NAME);
                 String readerElementClass = readerElement.attributeValue(ATTR_CLASS);
 
@@ -318,10 +343,11 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             ConfigSectionImpl section = new ConfigSectionImpl(evaluatorName, condition, replace);
 
             // retrieve the config elements for the section
-            Iterator children = configElement.elementIterator();
+            @SuppressWarnings("unchecked")
+            Iterator<Element> children = configElement.elementIterator();
             while (children.hasNext())
             {
-                Element child = (Element) children.next();
+                Element child = children.next();
                 String elementName = child.getName();
 
                 // get the element reader for the child
@@ -392,6 +418,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
         try
         {
+            @SuppressWarnings("unchecked")
             Class clazz = Class.forName(className);
             elementReader = (ConfigElementReader) clazz.newInstance();
         }
