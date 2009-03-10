@@ -1,8 +1,3 @@
-<script type="text/javascript">//<![CDATA[
-new Alfresco.HtmlUpload("${args.htmlid}").setMessages(
-   ${messages}
-);
-//]]></script>
 <div id="${args.htmlid}-dialog" class="html-upload hidden">
    <div class="hd">
       <span id="${args.htmlid}-title-span"></span>
@@ -94,4 +89,8 @@ new Alfresco.HtmlUpload("${args.htmlid}").setMessages(
 
    </div>
 </div>
-
+<script type="text/javascript">//<![CDATA[
+new Alfresco.HtmlUpload("${args.htmlid}").setMessages(
+   ${messages}
+);
+//]]></script>

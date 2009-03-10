@@ -83,5 +83,3 @@ new Alfresco.FlashUpload("${args.htmlid}").setMessages(
    ${messages}
 );
 //]]></script>
-
-

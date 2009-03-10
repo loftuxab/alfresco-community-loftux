@@ -287,9 +287,9 @@ public class StringUtils
                     String matchTag = tag;
                     if (endMatchIndex != -1)
                     {
-                        matchTag = s.substring(i + 1, endMatchIndex).toLowerCase();
+                        matchTag = s.substring(i + 1, endMatchIndex);
                     }
-                    if (safeTags.contains(matchTag))
+                    if (safeTags.contains(matchTag.toLowerCase()))
                     {
                         // safe tag - append to buffer
                         buf.append('<').append(tag).append('>');

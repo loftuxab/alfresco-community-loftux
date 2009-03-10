@@ -23,7 +23,6 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-
 /**
  * HtmlUpload component.
  *
@@ -48,6 +47,10 @@
  */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom;
 
    /**
     * HtmlUpload constructor.
@@ -76,7 +79,6 @@
 
    Alfresco.HtmlUpload.prototype =
    {
-
       /**
        * Shows uploader in single upload mode.
        *
@@ -164,91 +166,10 @@
        */
       onComponentsLoaded: function HU_onComponentsLoaded()
       {
-         // Shortcut for dummy instance
-         if (this.id === null)
-         {
-            return;
-         }
-      },
+         Dom.removeClass(this.id + "-dialog", "hidden");
 
-      /**
-       * Show can be called multiple times and will display the uploader dialog
-       * in different ways depending on the config parameter.
-       *
-       * @method show
-       * @param config {object} describes how the upload dialog should be displayed
-       * The config object is in the form of:
-       * {
-       *    siteId: {string},        // site to upload file(s) to
-       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
-       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
-       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
-       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
-       *    mode: {int},             // MODE_SINGLE_UPLOAD or MODE_SINGLE_UPDATE
-       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
-       *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to overwrite a versionable file with the existing name
-       *                             // If false and in mode MODE_XXX_UPLOAD it tells
-       *                             // the backend to append a number to the versionable filename to avoid
-       *                             // an overwrite and a new version
-       * }
-       */
-      show: function HU_show(config)
-      {
-         // Merge the supplied config with default config and check mandatory properties
-         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
-         if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
-         {
-             throw new Error("An updateNodeRef OR uploadDirectory must be provided");
-         }
-         if (this.showConfig.uploadDirectory !== null && this.showConfig.uploadDirectory.length === 0)
-         {
-            this.showConfig.uploadDirectory = "/";
-         }
-         // Check if the uploader has been shoed before
-         if (this.widgets.panel)
-         {
-            this._showPanel();
-         }
-         else
-         {
-            // If it hasn't load the gui (template) from the server
-            Alfresco.util.Ajax.request(
-            {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/html-upload?htmlid=" + this.id,
-               successCallback:
-               {
-                  fn: this.onTemplateLoaded,
-                  scope: this
-               },
-               failureMessage: "Could not load html upload template",
-               execScripts: true
-            });
-         }
-      },
-
-
-      /**
-       * Called when the uploader html template has been returned from the server.
-       * Creates the YIU gui objects such as the panel,
-       * saves references to HTMLElements inside the template for easy access
-       * during upload progress and finally shows the panel with the gui inside.
-       *
-       * @method onTemplateLoaded
-       * @param response {object} a Alfresco.util.Ajax.request response object
-       */
-      onTemplateLoaded: function HU_onTemplateLoaded(response)
-      {
-         var Dom = YAHOO.util.Dom;
-
-         // Inject the template from the XHR request into a new DIV element
-         var containerDiv = document.createElement("div");
-         containerDiv.innerHTML = response.serverResponse.responseText;
-
-         // Create the panel from the HTML returned in the server reponse
-         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
-         this.widgets.panel = new YAHOO.widget.Panel(dialogDiv,
+         // Create the panel
+         this.widgets.panel = new YAHOO.widget.Panel(this.id + "-dialog",
          {
             modal: true,
             draggable: false,
@@ -284,8 +205,8 @@
          this.widgets.failureScope = Dom.get(this.id + "-failureScope-hidden");
 
          // Save reference to version section elements so we can set its values later
-         this.widgets.description = YAHOO.util.Dom.get(this.id + "-description-textarea");
-         this.widgets.minorVersion = YAHOO.util.Dom.get(this.id + "-minorVersion-radioButton");
+         this.widgets.description = Dom.get(this.id + "-description-textarea");
+         this.widgets.minorVersion = Dom.get(this.id + "-minorVersion-radioButton");
          this.widgets.versionSection = Dom.get(this.id + "-versionSection-div");
 
          // Create and save a reference to the buttons so we can alter them later
@@ -330,8 +251,44 @@
          // We're in a popup, so need the tabbing fix
          form.applyTabFix();
          form.init();
+      },
 
-         // Show panel
+      /**
+       * Show can be called multiple times and will display the uploader dialog
+       * in different ways depending on the config parameter.
+       *
+       * @method show
+       * @param config {object} describes how the upload dialog should be displayed
+       * The config object is in the form of:
+       * {
+       *    siteId: {string},        // site to upload file(s) to
+       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
+       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
+       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
+       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
+       *    mode: {int},             // MODE_SINGLE_UPLOAD or MODE_SINGLE_UPDATE
+       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
+       *    onFileUploadComplete: null, // Callback after upload
+       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to overwrite a versionable file with the existing name
+       *                             // If false and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to append a number to the versionable filename to avoid
+       *                             // an overwrite and a new version
+       * }
+       */
+      show: function HU_show(config)
+      {
+         // Merge the supplied config with default config and check mandatory properties
+         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
+         if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
+         {
+             throw new Error("An updateNodeRef OR uploadDirectory must be provided");
+         }
+         if (this.showConfig.uploadDirectory !== null && this.showConfig.uploadDirectory.length === 0)
+         {
+            this.showConfig.uploadDirectory = "/";
+         }
+
          this._showPanel();
       },
 
@@ -407,8 +364,6 @@
        */
       _applyConfig: function HU__applyConfig()
       {
-         var Dom = YAHOO.util.Dom;
-
          // Set the panel title
          var title;
          if (this.showConfig.mode === this.MODE_SINGLE_UPLOAD)
@@ -423,7 +378,6 @@
 
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
-
             var tip = Alfresco.util.message("label.singleUpdateTip", this.name,
             {
                "0": this.showConfig.updateFilename
