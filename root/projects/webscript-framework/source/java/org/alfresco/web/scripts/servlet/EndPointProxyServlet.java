@@ -257,6 +257,11 @@ public class EndPointProxyServlet extends HttpServlet
             if (logger.isDebugEnabled())
             {
                 logger.debug("Return code: " + response.getStatus().getCode());
+                if (response.getStatus().getCode() == 500)
+                {
+                    logger.debug("Error detected: " + response.getStatus().getMessage() + "\n" +
+                            response.getStatus().getException().toString());
+                }
             }
         }
         catch (Throwable err)
