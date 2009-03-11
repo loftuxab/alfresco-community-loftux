@@ -14,12 +14,12 @@
    display: none;
 }
 
-.details .yui-gd .yui-u.first
-{
-   width: 18% !important;
-}
-
 .details .yui-gd .yui-u
 {
    width: 70% !important;
+}
+
+.details .yui-gd .yui-u.first
+{
+   width: 18% !important;
 }

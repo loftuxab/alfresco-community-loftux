@@ -141,3 +141,9 @@ body.masked div.mask.full-preview-mask
    width: 30em;
 }
 
+/* Prevent ghost border on first row for DataTables */
+table .yui-dt-empty
+{
+   border: none !important;
+}
+
