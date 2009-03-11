@@ -226,9 +226,13 @@ var CalendarScriptHelper  = ( function()
             var d = d || this.getContextDate(this.getDefaultDate());
             var uri = "/calendar/events/" + encodeURIComponent(page.url.templateArgs.site) +
                       "/user?from=" + encodeURIComponent(toISOString(d,{selector:'date'}));
-            var eventList = doGetCall(uri).events;
-            
-            return eventList;
+            var connector = remote.connect("alfresco");
+            var result = connector.get(uri);
+            if (result.status == status.STATUS_OK)
+            {
+               var eventList = eval('(' + result.response + ')').events;
+               return eventList;
+            }
         },
         
         getDefaultDate : function()

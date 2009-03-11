@@ -3,7 +3,16 @@
    {
       siteId: "${page.url.templateArgs["site"]!""}",
       <#if error??>error: true,</#if>
-      pages: [<#if pagelist?? && pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
+      pages: [<#if pageList?? && pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>],
+      <#if pageList?? && pageList.permissions??>
+         <#assign permissions = pageList.permissions>
+      <#else>
+         <#assign permissions = {}>
+      </#if>
+      permissions:
+      {
+         "create": ${(permissions["create"]!false)?string}
+      }
    });                                       
 //]]></script>
 <div id="${args.htmlid}-pagelist" class="yui-navset pagelist"> 

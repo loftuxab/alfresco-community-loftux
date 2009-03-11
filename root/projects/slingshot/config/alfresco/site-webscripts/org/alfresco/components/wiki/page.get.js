@@ -23,15 +23,26 @@ function main()
    {
       var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title;
       var uri = "/slingshot/wiki/page/" + encodeURIComponent(page.url.templateArgs.site) + "/" + encodeURIComponent(page.url.args.title) + "?context=" + escape(context);
-
-      var result = doGetCall(uri, true);
       
-      result.pagetext = result.pagetext ? stringUtils.stripUnsafeHTML(result.pagetext) : null;
-      if (result.versionhistory != undefined)
+      var connector = remote.connect("alfresco");
+      var result = connector.get(uri);
+      // we allow 200 and 404 as valid responses - any other error then cannot show page
+      // the 404 response means we can create a new page for the title
+      if (result.status.code == status.STATUS_OK || result.status.code == status.STATUS_NOT_FOUND)
       {
-         result.versionhistory.sort(sortByLabel);
+         var response = eval('(' + result.response + ')');
+         
+         response.pagetext = response.pagetext ? stringUtils.stripUnsafeHTML(response.pagetext) : null;
+         if (response.versionhistory != undefined)
+         {
+            response.versionhistory.sort(sortByLabel);
+         }
+         model.result = response;
       }
-      model.result = result;
+      else
+      {
+         model.result = {"pagetext" : null};
+      }
    }
    else
    {

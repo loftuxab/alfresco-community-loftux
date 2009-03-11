@@ -81,8 +81,8 @@ public class RemoteClient extends AbstractClient
     private static final String CHARSETEQUALS = "charset=";
     private static final int BUFFERSIZE = 4096;
     
-    private static final int CONNECT_TIMEOUT = 5000;
-    private static final int READ_TIMEOUT = 60000;
+    private static final int CONNECT_TIMEOUT = 5000;  // 5 seconds
+    private static final int READ_TIMEOUT = 90000;    // 90 seconds 
     
     private String defaultEncoding;
     private String ticket;
