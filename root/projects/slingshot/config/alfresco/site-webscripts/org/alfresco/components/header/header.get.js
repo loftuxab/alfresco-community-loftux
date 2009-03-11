@@ -23,16 +23,31 @@ function main()
          favourites = {};
       }
       
-      // Call the repo for sites the user is a member of - we only want to show favourites that the user is a current member of
-      // TODO: Replace with API to only return a specific list of site metadata i.e. those in the fav list
-      //       and check if the current user is a member of each before adding to fav list
-      result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/sites");
+      // Call the repo to return a specific list of site metadata i.e. those in the fav list
+      // and ensure the current user is a member of each before adding to fav list
+      var query = {
+         "shortName" :
+         {
+            "match" : "exact-membership",
+            "values" : []
+         }
+      };
+      var shortName;
+      for (shortName in favourites)
+      {
+         query.shortName.values.push(shortName);
+      }
+      
+      var connector = remote.connect("alfresco");
+      result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
+      
       if (result.status == 200)
       {
          var i, ii;
          
          // Create javascript objects from the server response
-         var sites = eval('(' + result + ')'), site;
+         // Each item is a favoriate site that the user is a member of
+         var sites = eval('(' + result + ')');
          
          if (sites.length != 0)
          {
@@ -41,13 +56,7 @@ function main()
             
             for (i = 0, ii = sites.length; i < ii; i++)
             {
-               site = sites[i];
-               
-               // Is this site a user favourite?
-               if (!!(favourites[site.shortName]))
-               {
-                  favouriteSites.push(site);
-               }
+               favouriteSites.push(sites[i]);
             }
          }
       }

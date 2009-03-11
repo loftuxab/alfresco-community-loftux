@@ -707,14 +707,47 @@
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          
+         // loading message function
+         var loadingMessage = null;
+         var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
+         {
+            loadingMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               displayTime: 0,
+               text: '<span class="wait">' + $html(this._msg("message.loading")) + '</span>',
+               noEscape: true
+            });
+         };
+         
+         // slow data webscript message
+         var timerShowLoadingMessage = YAHOO.lang.later(2000, this, fnShowLoadingMessage);
+         
          function successHandler(sRequest, oResponse, oPayload)
          {
+            if (timerShowLoadingMessage)
+            {
+               timerShowLoadingMessage.cancel();
+            }
+            if (loadingMessage)
+            {
+               loadingMessage.destroy();
+            }
+            
             this.searchTerm = searchTerm;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
          function failureHandler(sRequest, oResponse)
          {
+            if (timerShowLoadingMessage)
+            {
+               timerShowLoadingMessage.cancel();
+            }
+            if (loadingMessage)
+            {
+               loadingMessage.destroy();
+            }
+            
             if (oResponse.status == 401)
             {
                // Our session has likely timed-out, so refresh to offer the login page
