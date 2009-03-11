@@ -161,6 +161,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.site.RequestContext#getId()
      */
+    @Override
     public final String getId()
     {
         if (this.object != null)
