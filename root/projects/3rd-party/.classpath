@@ -125,5 +125,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.1.jar" sourcepath="src/poi-3.0.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibatis-2.3.4.726.jar" sourcepath="src/ibatis-2.3.4.726-src.zip" />
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
+	<classpathentry kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

@@ -416,6 +416,12 @@ public class Convert
             return;
         }
         
+        // Ignore folders
+        if (file.isDirectory())
+        {
+            return;
+        }
+        
         if (file.length() > (1024 * 1024))              // 1MB.  TODO: Make an option
         {
             System.out.println(" (Too big)");
