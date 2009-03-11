@@ -69,6 +69,9 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
    
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+
       return this;
    };
    
@@ -118,7 +121,12 @@
          /**
           * Holds the list of roles available in the site
           */
-         roles: []
+         roles: [],
+
+         /**
+          * Set to an error string is an error occurred
+          */
+         error: null
       },
 
       /**
@@ -300,7 +308,7 @@
          
          // register the "enter" event on the search text field
          var searchInput = Dom.get(this.id + "-term");
-         var escapeListener = new YAHOO.util.KeyListener(searchInput,
+         var enterListener = new YAHOO.util.KeyListener(searchInput,
          {
             keys:13
          },
@@ -311,7 +319,17 @@
             },
             scope: this,
             correctScope: true
-         }, "keydown").enable();
+         }, "keydown");
+         enterListener.enable();
+         
+         if (this.options.error)
+         {
+            enterListener.disable();
+            this.widgets.dataTable.set("MSG_ERROR", this.options.error);
+            this.widgets.dataTable.showTableMessage(this.options.error, YAHOO.widget.DataTable.CLASS_ERROR);
+            // Deactivate controls
+            YAHOO.Bubbling.fire("deactivateAllControls");
+         }
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -475,7 +493,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellUninvite = function InvitationList_renderCellUninvite(elCell, oRecord, oColumn, oData)
+         var renderCellUninvite = function SiteMembers_renderCellUninvite(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
@@ -716,6 +734,25 @@
                   scope: this
                }
             });
+         }
+      },
+
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function SiteMembers_onDeactivateAllControls(layer, args)
+      {
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
+         {
+            if (this.widgets.hasOwnProperty(index))
+            {
+               fnDisable(this.widgets[index]);
+            }
          }
       },
 

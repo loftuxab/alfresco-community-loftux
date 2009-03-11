@@ -25,6 +25,7 @@ function main()
       var uri = "/slingshot/wiki/page/" + encodeURIComponent(page.url.templateArgs.site) + "/" + encodeURIComponent(page.url.args.title) + "?context=" + escape(context);
 
       var result = doGetCall(uri, true);
+      
       result.pagetext = result.pagetext ? stringUtils.stripUnsafeHTML(result.pagetext) : null;
       if (result.versionhistory != undefined)
       {

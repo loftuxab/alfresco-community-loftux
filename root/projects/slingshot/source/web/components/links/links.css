@@ -10,7 +10,6 @@
    font-size: 108%;
 }
 
-
 .links-body .yui-dt table
 {
    width: 100%;
@@ -19,7 +18,7 @@
 
 .links-body .yui-dt-msg
 {
-   width: 1em;    
+   width: 1em;
 }
 
 .links-body .yui-dt table thead
@@ -73,9 +72,9 @@
 
 .links-body .edit-link-over
 {
-    background-color: #FFF;
-    border: 1px solid #2B6EB5;
-    cursor:pointer;
+   background-color: #FFF;
+   border: 1px solid #2B6EB5;
+   cursor: pointer;
 }
 
 .links-body .edit-link a,
@@ -94,8 +93,8 @@
    background: url( ../images/delete-link-16.png ) no-repeat scroll 10% 50%;
    border: 1px solid #E4F3FA;
    padding: 2px 0px 2px 30px;
-
 }
+
 .links-body .simple-view .edit-link,
 .links-body .simple-view .delete-link
 {
@@ -104,6 +103,7 @@
    height: 20px;
    padding: 0px;
 }
+
 .links-body .simple-view .edit-link a,
 .links-body .simple-view .delete-link a
 {
@@ -118,9 +118,9 @@
 
 .links-body .delete-link-over
 {
-    background-color: #FFF;
-    border: 1px solid #2B6EB5;
-    cursor: pointer;
+   background-color: #FFF;
+   border: 1px solid #2B6EB5;
+   cursor: pointer;
 }
 
 .links-filter h2
@@ -128,6 +128,7 @@
    margin-top: 1em;
    padding-left: 1em;
 }
+
 .links-header
 {
    margin: 0 -10px;
@@ -152,6 +153,15 @@
    padding-bottom: 0.5em;
 }
 
+.links-body .yui-dt-error
+{
+   background: red;
+   color: white;
+   font-weight: bold;
+   margin: 1em auto;
+   padding: 1em;
+}
+
 .yui-skin-default tr.links-selected-row td,
 .yui-skin-default tr.yui-dt-selected td.yui-dt-asc,
 .yui-skin-default tr.yui-dt-selected td.yui-dt-desc
@@ -167,42 +177,42 @@
 
 .links-header .links-toolbar
 {
-   background-color:#E3EAEC;
-   border-bottom:2px solid #F0F3F4;
-   clear:both;
-   height:2em;
-   padding:0.5em;
+   background-color: #E3EAEC;
+   border-bottom: 2px solid #F0F3F4;
+   clear: both;
+   height: 2em;
+   padding: 0.5em;
 }
 
 .links-infobar .paginator
 {
-   text-align:right;
-   float:right;
+   text-align: right;
+   float: right;
 }
 
 .links-titlebar .list-title
 {
-   color:#333333;
-   float:left;
-   font-family:Helvetica,Trebuchet,sans-serif;
-   font-size:123.1%;
-   font-weight:normal;
-   padding:4px 10px;
+   color: #333333;
+   float: left;
+   font-family: Helvetica,Trebuchet,sans-serif;
+   font-size: 123.1%;
+   font-weight: normal;
+   padding: 4px 10px;
 }
 
 .links-filter
 {
-
+   
 }
 
 .links-filter h2
 {
-   background:transparent url(../images/expanded.png) no-repeat scroll 0% 50%;
-   margin-top:1em;
-   padding-left:1em;
-   font-size:123.1%;
-   font-weight:bold;
-    color: #515D6B;
+   background: transparent url(../images/expanded.png) no-repeat scroll 0% 50%;
+   margin-top: 1em;
+   padding-left: 1em;
+   font-size: 123.1%;
+   font-weight: bold;
+   color: #515D6B;
 }
 
 .links-body .checkbox-column
@@ -217,69 +227,73 @@
 
 .links-header .spaser
 {
-   float:left
+   float: left
 }
 
 .links-header .left-menu-controls
 {
-   float:left;
-   width:300px
+   float: left;
+   width: 300px
 }
 
 .links-infobar .vm-button-container
 {
-   float:right;
-   margin-right:10px
+   float: right;
+   margin-right: 10px
 }
 
 .links-infobar  .select-button-container
 {
-   float:left;
-   padding-left:5px;
+   float: left;
+   padding-left: 5px;
 }
 
 .links-header .links-titlebar
 {
-   background-color:#E9EDEF;
-   border-bottom:2px solid #C7CCCE;
-   height:2em;
+   background-color: #E9EDEF;
+   border-bottom: 2px solid #C7CCCE;
+   height: 2em;
    padding: 0.5em;
 }
 
 .links-action-delete
 {
-   background-repeat:no-repeat;
+   background-repeat: no-repeat;
    background-image: url(images/remove-16.png);
 }
 
 .links-action-deselect-all
 {
-   background-repeat:no-repeat;
+   background-repeat: no-repeat;
    background-image: url(images/select-none-16.png);
 }
 
-.links-action-invert-selection {
-   background-repeat:no-repeat;
+.links-action-invert-selection
+{
+   background-repeat: no-repeat;
    background-image: url(images/select-invert-16.png);
 }
 
-.links-action-select-all {
-   background-repeat:no-repeat;
+.links-action-select-all
+{
+   background-repeat: no-repeat;
    background-image: url(images/select-all-16.png);
 }
 
-.btn-selected-items .yuimenuitemlabel span {
+.btn-selected-items .yuimenuitemlabel span
+{
    background-position: 2px 50%;
    background-repeat: no-repeat;
    cursor: pointer;
    display: block;
    margin-left: -4px;
    min-height: 2em;
-   font-size:93%;
+   font-size: 93%;
    padding: 2px 0 1px 24px;
 }
 
-.select-button-container .yuimenuitemlabel span {
+.select-button-container .yuimenuitemlabel span
+{
    background-position: 2px 50%;
    background-repeat: no-repeat;
    cursor: pointer;
@@ -287,10 +301,11 @@
    margin-left: -4px;
    min-height: 16px;
    padding: 2px 0 1px 24px;
-   font-size:93%;
+   font-size: 93%;
 }
 
-.cover {
+.cover
+{
    position: absolute;
    top: 0px;
    left: 0px;
@@ -300,36 +315,47 @@
    filter: alpha(opacity=0);
 }
 
-.bd .yuimenuitemlabel {
+.bd .yuimenuitemlabel
+{
    cursor: pointer;
 }
 
-.nodeStatus-isUpdate {
-  font-family: Trebuchet, sans-serif;
-  font-weight: normal;
-  font-size: 131%;
-  line-height: 130%;
-  color: #669966;
+.nodeStatus-isUpdate
+{
+   font-family: Trebuchet, sans-serif;
+   font-weight: normal;
+   font-size: 131%;
+   line-height: 130%;
+   color: #669966;
 }
 
-.name-links-and-url {
-  font-size:large;
+.name-links-and-url
+{
+   font-size: large;
 }
 
-.links-toolbar .rss-feed {
+.links-toolbar .rss-feed
+{
    float: right;
 }
 
-.links-header .separator {
+.links-header .separator
+{
    border-right: 1px dotted #457A9C;
    margin: 4px 10px 0 6px;
    padding: 2px 0 0 4px;
    height: 18px;
 }
 
-.links-toolbar .rss-feed a {
+.links-toolbar .rss-feed a
+{
    background: url(../images/feed-icon-16.png) no-repeat scroll 12px 4px;
-   padding-left:32px;
+   padding-left: 32px;
+}
+
+.links-toolbar .rss-feed .yui-button-disabled a
+{
+   background-image: url(../images/feed-icon-disabled-16.png);
 }
 
 .links-toolbar div.hideable
@@ -342,7 +368,8 @@
    float: right;
 }
 
-.links-toolbar .createLink button {
+.links-toolbar .createLink button
+{
    background: transparent url( ../images/new-link-16.png ) no-repeat scroll 12px 4px;
    padding-left: 32px;
 }
@@ -362,31 +389,36 @@
    font-weight: normal;
 }
 
-.links-body .detail {
+.links-body .detail
+{
    clear: left;
    float: left;
    line-height: 1.5em;
 }
 
-.links-body .detail span.item {
+.links-body .detail span.item
+{
    float: left;
    padding-right: 2em;
 }
 
-.links-body .detail em {
+.links-body .detail em
+{
    color: #606060;
    font-style: normal;
    font-weight: normal;
 }
 
-.links-body .link-title {
+.links-body .link-title
+{
    float: left;
    font-size: 123%;
    font-weight: normal;
    padding-bottom: 0.1em;
 }
 
-.yui-skin-default .yui-dt table {
+.yui-skin-default .yui-dt table
+{
    border-collapse: separate;
    border-spacing: 0;
    font-family: arial;

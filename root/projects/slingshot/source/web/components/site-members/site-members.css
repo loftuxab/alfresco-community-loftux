@@ -43,6 +43,15 @@
    border-right: medium none;
 }
 
+.site-members .yui-dt-error
+{
+   background: red;
+   color: white;
+   font-weight: bold;
+   margin: 1em auto;
+   padding: 1em;
+}
+
 .site-members .yui-dt-first
 {
    width: 70px;

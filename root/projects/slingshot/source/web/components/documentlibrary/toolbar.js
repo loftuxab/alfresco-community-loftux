@@ -906,12 +906,12 @@
        */
       onDeactivateAllControls: function DLTB_onDeactivateAllControls(layer, args)
       {
-         var widget;
-         for (widget in this.widgets)
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
          {
-            if (this.widgets.hasOwnProperty(widget))
+            if (this.widgets.hasOwnProperty(index))
             {
-               this.widgets[widget].set("disabled", true);
+               fnDisable(this.widgets[index]);
             }
          }
       },

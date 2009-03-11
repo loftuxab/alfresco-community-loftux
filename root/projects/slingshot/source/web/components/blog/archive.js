@@ -276,7 +276,7 @@
        */ 
       onArchiveRefresh_success: function BlogPostListArchive_onArchiveRefresh_successs(response)
       {
-         if (response && !YAHOO.lang.isUndefined(response.json.items))
+         if (response && response.json && !YAHOO.lang.isUndefined(response.json.items))
          {
             var html = "";
             var items = response.json.items;

@@ -21,6 +21,9 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.onComponentsLoaded, this);
 
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+
       return this;
    };
 
@@ -77,7 +80,7 @@
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.DocumentList} returns 'this' for method chaining
        */
-      setOptions: function DV_setOptions(obj)
+      setOptions: function DToolbar_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
@@ -90,7 +93,7 @@
        * @param obj {object} Object literal specifying a set of messages
        * @return {Alfresco.DocListTree} returns 'this' for method chaining
        */
-      setMessages: function(obj)
+      setMessages: function DToolbar_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -102,18 +105,18 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function()
+      onComponentsLoaded: function DToolbar_onComponentsLoaded()
       {
-         Event.onContentReady(this.id, this.init, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
 
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initialises components, including YUI widgets.
        *
-       * @method init
+       * @method onReady
        */
-      init: function()
+      onReady: function DToolbar_onReady()
       {
          // Create button
          this.widgets.createButton = Alfresco.util.createYUIButton(this, "create-button", this.onNewTopicClick,
@@ -137,9 +140,28 @@
        * @method onNewTopicClick
        * @param e {object} DomEvent
        */
-      onNewTopicClick: function (e)
+      onNewTopicClick: function DToolbar_onNewTopicClick(e)
       {         
          window.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/discussions-createtopic";
+      },
+
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function DToolbar_onDeactivateAllControls(layer, args)
+      {
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
+         {
+            if (this.widgets.hasOwnProperty(index))
+            {
+               fnDisable(this.widgets[index]);
+            }
+         }
       },
 
       /**

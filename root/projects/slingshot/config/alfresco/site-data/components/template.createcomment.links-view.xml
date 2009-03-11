@@ -3,7 +3,7 @@
    <scope>template</scope>
    <region-id>createcomment</region-id>
    <source-id>links-view</source-id>
-   <url>/components/links/createcomment</url>
+   <url>/components/blog/createcomment</url>
    <properties>
       <container>links</container>
       <editorHeight>150</editorHeight>

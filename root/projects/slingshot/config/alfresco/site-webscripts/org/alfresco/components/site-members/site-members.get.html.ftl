@@ -4,6 +4,7 @@
       siteId: "${page.url.templateArgs.site!""}",
       currentUser: "${user.id}",
       currentUserRole: "${currentUserRole}",
+      <#if error??>error: "${error}",</#if>
       roles:
       [
          <#list siteRoles as siteRole>"${siteRole}"<#if siteRole_has_next>,</#if></#list>

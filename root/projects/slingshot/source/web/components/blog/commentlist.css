@@ -1,7 +1,8 @@
 /** Comment list */
 
-.commentFooter {
-	margin-top: 20px;
+.commentFooter
+{
+   margin-top: 20px;
 }
 
 .comment
@@ -12,16 +13,17 @@
    display: inline-block;
 }
 
-html>body .comment {
-  display: block;
+html>body .comment
+{
+   display: block;
 }
 
 .comment-list .commentsListTitle
 {
    float: left;
    background: transparent url(../images/comment-16.png) no-repeat scroll 20px 50%;
-	font-size: 116%;
-	padding: 20px 0pt 20px 40px;
+   font-size: 116%;
+   padding: 20px 0pt 20px 40px;
 }
 
 .comment-list .paginator
@@ -32,7 +34,7 @@ html>body .comment {
 
 .comment-list .hidden
 {
-  display: none;
+   display: none;
 }
 
 .comment-list .align-right
@@ -42,30 +44,40 @@ html>body .comment {
 
 .comment-list .yui-pg-container
 {
-   padding:20px 25px 20px 0;
+   padding: 20px 25px 20px 0;
 }
 
 .editCommentForm
 {
-	margin: 20px;
-	padding: 20px;
-	border-top: 1px solid #b1b1b1;
-	background-color: #fafafa;
+   margin: 20px;
+   padding: 20px;
+   border-top: 1px solid #b1b1b1;
+   background-color: #fafafa;
 }
 
 /* YUI WYSIWYG editor styles */
-.yuieditor strong {
-  font-weight: bold;
+
+.yuieditor strong
+{
+   font-weight: bold;
 }
-.yuieditor em {
-  font-style: italic; 
+
+.yuieditor em
+{
+   font-style: italic;
 }
-.yuieditor ul, .yuieditor ol {
-  padding-left: 40px;
+
+.yuieditor ul, .yuieditor ol
+{
+   padding-left: 40px;
 }
-.yuieditor ul li {
-  list-style-type: disc; 
+
+.yuieditor ul li
+{
+   list-style-type: disc;
 }
-.yuieditor ol li {
-  list-style-type: decimal; 
+
+.yuieditor ol li
+{
+   list-style-type: decimal;
 }

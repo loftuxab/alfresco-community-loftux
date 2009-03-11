@@ -36,6 +36,7 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
       YAHOO.Bubbling.on("setCanCreateComment", this.onSetCanCreateComment, this);
+
       return this;
    };
    
@@ -161,7 +162,7 @@
       /**
        * Called by a bubble event to set the node for which comments should be displayed
        */
-      onSetCommentedNode: function CommentList_onSetCommentedNode(layer, args)
+      onSetCommentedNode: function CreateComment_onSetCommentedNode(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.nodeRef !== null) && (obj.title !== null) && (obj.page !== null))
@@ -177,9 +178,8 @@
       /**
        * Called by a bubble event to set whether the user is allowed to comment.
        */
-      onSetCanCreateComment: function CommentList_onSetCanCreateComment(layer, args)
+      onSetCanCreateComment: function CreateComment_onSetCanCreateComment(layer, args)
       {
-
          var obj = args[1];
          if ((obj !== null) && (obj.canCreateComment !== null))
          {
@@ -205,17 +205,16 @@
             return;
          }
          this.initialized = true;
-         
-          
+
          // action url
-         var form = Dom.get(this.id + '-form');         
+         var form = Dom.get(this.id + '-form');
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{nodeRef}/comments",
          {
             nodeRef: this.options.itemNodeRef.replace(':/', '')
          });
          form.setAttribute("action", actionUrl);
 
-         // nodeRef            
+         // nodeRef
          Dom.get(this.id + '-nodeRef').setAttribute("value", this.options.itemNodeRef);
          
          // site
@@ -271,7 +270,6 @@
                this.widgets.editor.save();
                this.widgets.commentForm.updateSubmitElements();
             }
-         
          }, this, true);
 
          // create the form that does the validation/submit
@@ -320,8 +318,7 @@
          this.widgets.commentForm.init();
          
          // finally show the form
-         var contanerElem = Dom.get(this.id + '-form-container');
-         Dom.removeClass(contanerElem, 'hidden');
+         Dom.removeClass(this.id + '-form-container', 'hidden');
       },
 
       /**
@@ -347,7 +344,6 @@
       enableInputs: function CreateComment_enableInputs()
       {
          this.widgets.feedbackMessage.destroy();
-         this.widgets.okButton.set("disabled", false);
          this.widgets.editor.enable();
       },
 

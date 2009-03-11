@@ -8,7 +8,7 @@ json = remote.call(theUrl);
 membership = eval('(' + json + ')');
 
 // add the role to the model
-model.currentUserRole = membership.role;
+model.currentUserRole = membership.role ? membership.role : "";
 
 // get the roles available in the current site
 theUrl = "/api/sites/" + siteId + "/roles";
@@ -17,10 +17,18 @@ data = eval('(' + json + ')');
 
 // add all roles except "None"
 model.siteRoles = [];
-for (var i = 0, j = data.siteRoles.length; i < j; i++)
+
+if (json.status == 200 && data.siteRoles)
 {
-   if (data.siteRoles[i] != "None")
+   for (var i = 0, j = data.siteRoles.length; i < j; i++)
    {
-      model.siteRoles.push(data.siteRoles[i]);
+      if (data.siteRoles[i] != "None")
+      {
+         model.siteRoles.push(data.siteRoles[i]);
+      }
    }
+}
+else
+{
+   model.error = membership.message;
 }

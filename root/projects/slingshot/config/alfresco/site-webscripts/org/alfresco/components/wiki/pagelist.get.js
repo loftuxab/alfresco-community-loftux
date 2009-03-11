@@ -9,4 +9,12 @@ if (filter)
    theUrl += "?filter=" + filter;
 }
 
-model.pageList = doGetCall(theUrl);
+var response = doGetCall(theUrl, true);
+if (response.status.code != 200)
+{
+   model.error = response.message;
+}
+else
+{
+   model.pageList = response;   
+}

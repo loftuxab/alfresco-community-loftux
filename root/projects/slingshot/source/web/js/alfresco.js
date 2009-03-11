@@ -660,6 +660,37 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
 };
 
 /**
+ * Wrapper to disable a YUI Button, including link buttons.
+ * Link buttons aren't disabled by YUI; see http://developer.yahoo.com/yui/button/#apiref
+ *
+ * @method Alfresco.util.disableYUIButton
+ * @param p_button {YUI.widget.Button} Button instance
+ * @static
+ */
+Alfresco.util.disableYUIButton = function(p_button)
+{
+   if (p_button.set && p_button.get)
+   {
+      p_button.set("disabled", true);
+      if (p_button.get("type") == "link")
+      {
+         /**
+          * Note the non-optimal use of a "private" variable, which is why it's tested before use.
+          */
+         p_button.set("href", "");
+         if (p_button._button && p_button._button.setAttribute)
+         {
+            p_button._button.setAttribute("onclick", "return false;");
+         }
+         p_button.addStateCSSClasses("disabled");
+         p_button.removeStateCSSClasses("hover");
+         p_button.removeStateCSSClasses("active");
+         p_button.removeStateCSSClasses("focus");
+      }
+   }
+}
+
+/**
  * Find an event target's class name, ignoring YUI classes.
  *
  * @method Alfresco.util.findEventClass
@@ -2869,31 +2900,39 @@ Alfresco.service.BaseService.prototype =
  * Manager object for managing adapters for HTML editors.
  *  
  */
-Alfresco.util.RichEditorManager = (function() {
-  var editors = [];
-  return {
-    /**
-     * @method addEditor store a reference to specified editor
+Alfresco.util.RichEditorManager = (function()
+{
+   var editors = [];
+   return (
+   {
+      /**
+      * Store a reference to a specified editor
+      *
+      * @method addEditor
+      * @param editorName {string} Name of html editor to use, including namespace eg YAHOO.widget.SimpleEditor
+      * @param editor {object} reference to editor
+      */
+      addEditor: function (editorName, editor)
+      {
+         editors[editorName] = editor;
+      },
 
-     * @param editorName {string} Name of html editor to use, including namespace eg YAHOO.widget.SimpleEditor
-     * @param reference to editor
-     * 
-     */
-    addEditor : function (editorName,editor) {
-      editors[editorName] = editor;
-    },
-    /**
-     * @method getEditor Returns a reference to specified editor.
-     * 
-     * @param editorName {string}  name of editor to retrieve
-     */
-    getEditor : function (editorName) {
-      if (editors[editorName]) {
-        return editors[editorName];
+      /**
+      * Retrieve a previously added editor
+      *
+      * @method getEditor
+      * @param editorName {string}  name of editor to retrieve
+      * @return {object} Returns a reference to specified editor.
+      */
+      getEditor: function (editorName)
+      {
+         if (editors[editorName])
+         {
+            return editors[editorName];
+         }
+         return null;
       }
-      return null;
-    }
-  }
+   });
 })();
 
 /**
@@ -2908,10 +2947,8 @@ Alfresco.util.RichEditorManager = (function() {
  * 
  * @param editorName {String} Name of editor to use. Must be same as one registered with
  * Alfresco.util.RichEditManager.
- *
  * @param id {String} Optional Id of textarea to turn into rich text editor
  * @param config {String} Optional config object literal to use to configure editor.
- * 
  */
 Alfresco.util.RichEditor = function(editorName,id,config) 
 {
@@ -2921,36 +2958,38 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       var ed = new editor();
       
       YAHOO.lang.augmentObject(ed,
-        {
-          unsubscribe : function() 
-          {
-          },
-          subscribe : function(event,fn,scope) 
-          {
-              var edtr = ed.getEditor();
-              //yui custom events
-              if (edtr.subscribe)
-              {
-                edtr.subscribe(event,fn,scope,true);
-              }
-              else if (edtr[event]) {
-                edtr[event].add(function() 
-                  {
-                    fn.apply(scope,arguments);
-                  });
-              }
-              YAHOO.Bubbling.on(event, fn, scope);
-              
-          },
-          on : function(event,fn,scope) 
-          {
+      {
+         unsubscribe: function() 
+         {
+         },
+
+         subscribe : function(event, fn, scope) 
+         {
+            var edtr = ed.getEditor();
+            //yui custom events
+            if (edtr.subscribe)
+            {
+               edtr.subscribe(event, fn, scope, true);
+            }
+            else if (edtr[event])
+            {
+               edtr[event].add(function() 
+               {
+                  fn.apply(scope,arguments);
+               });
+            }
             YAHOO.Bubbling.on(event, fn, scope);
-          }
-        }
-      );
+         },
+
+         on: function(event, fn, scope) 
+         {
+            YAHOO.Bubbling.on(event, fn, scope);
+         }
+      });
+
       if (id && config)
       {
-        ed.init(id,config);
+         ed.init(id,config);
       }
       return ed;
    }

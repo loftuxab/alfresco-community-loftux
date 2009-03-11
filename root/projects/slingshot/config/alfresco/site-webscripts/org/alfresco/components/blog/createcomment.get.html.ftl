@@ -19,21 +19,21 @@
          //Tiny MCE
          height: ${args.editorHeight!250},
          width: ${args.editorWidth!538},
-         theme:'advanced',
-         theme_advanced_buttons1 : "bold,italic,underline,|,bullist,numlist,|,forecolor,backcolor,|,undo,redo,removeformat",
-         theme_advanced_toolbar_location : "top",
-         theme_advanced_toolbar_align : "left",
-         theme_advanced_statusbar_location : "bottom",
-         theme_advanced_resizing : true,
-         theme_advanced_buttons2 : null,
-         theme_advanced_buttons3 : null,
-         language:'${locale?substring(0, 2)}'         
+         theme: 'advanced',
+         theme_advanced_buttons1: "bold,italic,underline,|,bullist,numlist,|,forecolor,backcolor,|,undo,redo,removeformat",
+         theme_advanced_toolbar_location: "top",
+         theme_advanced_toolbar_align: "left",
+         theme_advanced_statusbar_location: "bottom",
+         theme_advanced_resizing: true,
+         theme_advanced_buttons2: null,
+         theme_advanced_buttons3: null,
+         theme_advanced_path: false,
+         language: '${locale?substring(0, 2)}'         
       }
    }).setMessages(
       ${messages}
    );
 //]]></script>
-
 <div id="${args.htmlid}-form-container" class="addCommentForm hidden">
 	<div class="commentFormTitle">
 		<label for="${htmlid}-content">${msg("addComment")}:</label>

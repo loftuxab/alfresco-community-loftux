@@ -20,9 +20,9 @@
       </div>
    </div>
    <div class="yui-u">
-      <div id="${args.htmlid}-paginator" class="paginator"></div>
+      <div id="${args.htmlid}-paginator" class="paginator">&nbsp;</div>
    </div>
-   <div class="yui-u flat-button">
+   <div class="yui-u align-right flat-button">
       <div class="simple-view">
          <button id="${args.htmlid}-simpleView-button" name="topiclist-simpleView-button">${msg("header.simpleList")}</button>
       </div>

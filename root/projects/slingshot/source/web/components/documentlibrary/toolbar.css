@@ -214,6 +214,10 @@
    background: transparent url(images/feed-icon-16.png) no-repeat 12px 4px;
    padding-left: 32px;
 }
+.toolbar .rss-feed .yui-button-disabled a
+{
+   background-image: url(images/feed-icon-disabled-16.png);
+}
 
 .toolbar .folder-up button
 {

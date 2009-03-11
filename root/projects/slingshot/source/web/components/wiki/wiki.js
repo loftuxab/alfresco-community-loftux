@@ -119,7 +119,8 @@
       {
          siteId: "",
          pageTitle: "",
-         mode: "view", // default is "view" mode
+         mode: "view", // default is "view" mode,
+         error: null,
          tags: [],
          pages: [],
          versions: [],
@@ -170,6 +171,13 @@
        */
       init: function Wiki_init()
       {
+         if (this.options.error)
+         {
+            // Site or container not found - deactivate controls
+            YAHOO.Bubbling.fire("deactivateAllControls");
+            return;
+         }
+
          if (this.options.mode === "edit")
          {
             this._setupEditForm();

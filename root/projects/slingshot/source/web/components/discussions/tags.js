@@ -285,7 +285,7 @@
        */ 
       onTagRefresh_success: function TopicListTags_onTagRefresh_success(response)
       {
-         if (response && !YAHOO.lang.isUndefined(response.json.tags))
+         if (response && response.json && !YAHOO.lang.isUndefined(response.json.tags))
          {
             var html = "";
             var tags = response.json.tags;

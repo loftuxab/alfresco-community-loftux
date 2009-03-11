@@ -74,12 +74,16 @@ hr
 {
    background: white !important;
    color: red !important;
+   font-weight: bold;
+   padding: 0.2em 1em;
 }
 
 .error-alt
 {
    background-color: red !important;
    color: white !important;
+   font-weight: bold;
+   padding: 0.2em 1em;
 }
 
 .light
