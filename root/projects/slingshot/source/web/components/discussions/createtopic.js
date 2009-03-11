@@ -313,14 +313,7 @@
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
-         {
-             height: '180px',
-             width: '700px',
-             dompath: false, //Turns on the bar at the bottom
-             animate: false, //Animates the opening, closing and moving of Editor windows
-             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
+         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);         
          this.widgets.editor.render();    
          
          // create the form that does the validation/submit
@@ -356,7 +349,7 @@
                this.widgets.cancelButton.set("disabled", false);
                 
                //Put the HTML back into the text area
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
                
                // update the tags set in the form
                this.modules.tagLibrary.updateForm(this.id + '-form', 'tags');

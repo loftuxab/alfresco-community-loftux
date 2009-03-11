@@ -3,6 +3,7 @@
    <@link rel="stylesheet" type="text/css" href="${url.context}/templates/wiki/wiki.css" />
    <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
    <@script type="text/javascript" src="${url.context}/templates/wiki/wiki.js"></@script>
+   <@template.htmlEditorAssets />     
 </@>
 
 <@templateBody>

@@ -31,7 +31,8 @@
          }<#if (version_has_next)>,</#if>
          </#list>
       </#if>
-      ]
+      ],
+      locale:'${locale?substring(0, 2)}'
    }).setMessages(
       ${messages}
    );    

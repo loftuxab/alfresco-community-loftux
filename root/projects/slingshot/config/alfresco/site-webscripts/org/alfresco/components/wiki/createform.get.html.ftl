@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.WikiCreateForm("${args.htmlid}").setSiteId(
+   new Alfresco.WikiCreateForm("${args.htmlid}").setOptions(
+      {
+         locale:'${locale?substring(0, 2)}'
+      }).setSiteId(
       "${page.url.templateArgs["site"]!""}"
    ).setMessages(
       ${messages}

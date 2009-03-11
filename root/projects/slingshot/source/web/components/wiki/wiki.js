@@ -324,15 +324,29 @@
          {
             this.tagLibrary.setTags(this.options.tags);
          }
-         
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
+         // {
+         //             height: Math.min(height - 450, 300) + 'px',
+         //             width: width + 'px',
+         //             dompath: false, // Turns on the bar at the bottom
+         //             animate: false, // Animates the opening, closing and moving of Editor windows
+         //             markup: "xhtml",
+         //             siteId: this.options.siteId
+         //          }
          {
-            height: Math.min(height - 450, 300) + 'px',
-            width: width + 'px',
-            dompath: false, // Turns on the bar at the bottom
-            animate: false, // Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            siteId: this.options.siteId
+        //Tiny MCE
+         height: 300,
+         width: 600,
+         theme:'advanced',
+         theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,forecolor,backcolor",
+         theme_advanced_buttons2 :"bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,imagelibrary,image,cleanup,help,code,removeformat",
+         theme_advanced_toolbar_location : "top",
+         theme_advanced_toolbar_align : "left",
+         theme_advanced_statusbar_location : "bottom",
+         theme_advanced_resizing : true,
+         theme_advanced_buttons3 : null,
+         siteId: this.options.siteId,
+         language:this.options.locale         
          });
          this.pageEditor.render();
 
@@ -437,7 +451,7 @@
                });
                   
                // Put the HTML back into the text area
-               this.pageEditor.saveHTML();
+               this.pageEditor.save();
                // Update the tags set in the form
                this.tagLibrary.updateForm(this.id + "-form", "tags");
                

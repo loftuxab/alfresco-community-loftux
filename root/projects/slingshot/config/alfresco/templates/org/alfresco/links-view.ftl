@@ -6,6 +6,7 @@
    <!-- General Links Assets -->
    <@script type="text/javascript" src="${page.url.context}/components/links/linksdiscuss-common.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/components/links/links-common.js"></@script>
+   <@template.htmlEditorAssets />      
 </@>
 
 <@templateBody>
