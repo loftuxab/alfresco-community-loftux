@@ -2180,7 +2180,12 @@ Alfresco.util.DialogManager = ( function () {
                     Dom.get(this.id+"-from").value = Dom.get("fd").value;
                     Dom.get(this.id+"-to").value = Dom.get("td").value;
                     this.tagLibrary.initialize();
-                    form.errorContainer=null;
+                    form.errorContainer=null;     
+                    //hide mini-cal
+                    this.dialog.hideEvent.subscribe(function() {
+                     Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
+                    },this,true);     
+                                                  
                 },
                scope: Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView')
            },
