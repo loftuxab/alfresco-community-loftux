@@ -3,6 +3,11 @@
    margin: 0 -10px;
 }
 
+.noWikiPages
+{
+   padding: 1em;
+}
+
 .wikipage
 {
    border-bottom: 1px dashed #D9D9D9;

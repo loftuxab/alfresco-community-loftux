@@ -148,11 +148,14 @@
                         div.innerHTML = response.serverResponse.responseText;
                         var iframe = Dom.getFirstChildBy(div, function(node)
                         {
-                           return (node.tagName == "IFRAME");
+                           return (node.tagName.toUpperCase() == "IFRAME");
                         });
                         if (iframe && iframe.attributes["name"])
                         {
-                           Dom.get(this.id + "-title-link").innerHTML = iframe.attributes["name"].value;
+                           var titleLink = Dom.get(this.id + "-title-link"),
+                              linkHref = iframe.attributes["name"].value;
+                           titleLink.attributes["href"].value = linkHref;
+                           titleLink.innerHTML = $html(linkHref);
                         }
                      }
                   },

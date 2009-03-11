@@ -39,7 +39,8 @@
 
 .site-members .yui-dt td
 {
-   border: none;
+   border-bottom: 1px dashed #D7D7D7;
+   border-right: medium none;
 }
 
 .site-members .yui-dt-first

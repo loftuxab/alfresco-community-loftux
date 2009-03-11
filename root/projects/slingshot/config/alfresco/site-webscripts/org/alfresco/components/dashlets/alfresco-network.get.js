@@ -4,5 +4,4 @@
 var includeNews = conf.notifications.news;
 var includeDownloads = conf.notifications.downloads;*/
 
-var url = "https://network.alfresco.com/extranet/s/c/service.networknews-dashlet1";
-model.url = url;
+model.url = "https://network.alfresco.com/extranet/s/c/service.networknews-dashlet1";

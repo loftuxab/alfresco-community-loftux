@@ -41,27 +41,28 @@ function convertPostsJSONData(data)
 
 function main()
 {
+   var site, container, theUrl, connector, result, data;
+   
    // gather all required data
-   var site = args["site"];
-   var container = (args["container"] != undefined) ? args["container"] : "blog";
+   site = args["site"];
+   container = (args["container"] != undefined) ? args["container"] : "blog";
    
-   var url = '/api/blog/site/' + site + '/' + container + "/posts?contentLength=512";
+   theUrl = '/api/blog/site/' + site + '/' + container + "/posts?contentLength=512";
    
-   var connector = remote.connect("alfresco-feed");
-   var result = connector.get(url);
+   connector = remote.connect("alfresco-feed");
+   result = connector.get(theUrl);
    if (result.status != status.STATUS_OK)
    {
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
                      "status: " + result.status + ", response: " + result.response);
       return null;
    }
-   var data = eval('(' + result.response + ')');
+   data = eval('(' + result.response + ')');
    convertPostsJSONData(data);
    model.items = data.items;
 
    // set additional properties
-   var lang = "en-us";
-   model.lang = lang;
+   model.lang = "en-us";
    model.site = site;
    model.container = container;
 }

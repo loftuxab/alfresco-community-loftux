@@ -224,7 +224,8 @@
                fn: this.onListLoadFailed,
                scope: this
             },
-            scope: this
+            scope: this,
+            noReloadOnAuthFailure: true
          });
       },
       

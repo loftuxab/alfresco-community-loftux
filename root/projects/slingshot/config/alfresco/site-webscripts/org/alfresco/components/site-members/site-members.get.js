@@ -1,24 +1,26 @@
-var siteId = page.url.templateArgs.site;
+var siteId, theUrl, json, membership, data;
+
+siteId = page.url.templateArgs.site;
 
 // get the membership info for the current user in the current site
-var url = "/api/sites/" + siteId + "/memberships/" + stringUtils.urlEncode(user.name);
-var json = remote.call(url);
-var membership = eval('(' + json + ')');
+theUrl = "/api/sites/" + siteId + "/memberships/" + stringUtils.urlEncode(user.name);
+json = remote.call(theUrl);
+membership = eval('(' + json + ')');
 
 // add the role to the model
 model.currentUserRole = membership.role;
 
 // get the roles available in the current site
-url = "/api/sites/" + siteId + "/roles";
-json = remote.call(url);
-var data = eval('(' + json + ')');
+theUrl = "/api/sites/" + siteId + "/roles";
+json = remote.call(theUrl);
+data = eval('(' + json + ')');
 
 // add all roles except "None"
 model.siteRoles = [];
-for (var x=0; x < data.siteRoles.length; x++)
+for (var i = 0, j = data.siteRoles.length; i < j; i++)
 {
-   if (data.siteRoles[x] != "None")
+   if (data.siteRoles[i] != "None")
    {
-      model.siteRoles.push(data.siteRoles[x]);
+      model.siteRoles.push(data.siteRoles[i]);
    }
 }

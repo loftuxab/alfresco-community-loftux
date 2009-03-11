@@ -4,9 +4,9 @@ function main()
 {
    // check that we got all required information
    var check = ["inviteId", "inviteeUserName", "siteShortName", "inviteTicket"];
-   for (var x=0; x < check.length; x++)
+   for (var i = 0, j = check.length; i < j; i++)
    {
-      if (page.url.args[check[x]] == undefined)
+      if (page.url.args[check[i]] == undefined)
       {
          // redirect to error page
          status.code = 400;
@@ -15,14 +15,16 @@ function main()
       }
    }
    
-   //fetch the invite information, which gives us all information required to display the page
-   var url = "/api/invite/" + page.url.args.inviteId + "/" + page.url.args.inviteTicket;
-   var connector = remote.connect("alfresco-noauth");
-   var json = connector.call(url);
+   // fetch the invite information, which gives us all information required to display the page
+   var theUrl, connector, json, data;
+   
+   theUrl = "/api/invite/" + page.url.args.inviteId + "/" + page.url.args.inviteTicket;
+   connector = remote.connect("alfresco-noauth");
+   json = connector.call(theUrl);
    if (json.status == 200)
    {
       // Create javascript objects from the repo response
-      var data = eval('(' + json + ')');
+      data = eval('(' + json + ')');
       model.invite = data.invite;
    }
    else

@@ -2,8 +2,8 @@
 
 function getTags(site, container)
 {
-    var url = "/api/tagscopes/site/" + site + "/" + container + "/tags";
-    var data = doGetCall(url);
+    var theUrl = "/api/tagscopes/site/" + site + "/" + container + "/tags";
+    var data = doGetCall(theUrl);
     if (data === null)
     {
         return null;
@@ -11,10 +11,9 @@ function getTags(site, container)
     return data;
 }
 
-var site = page.url.templateArgs.site;
-var container = args.container;
-    
-var tags = [];
+var site = page.url.templateArgs.site,
+   container = args.container,
+   tags = [];
 
 var data = getTags(site, container);
 if (data != null)
