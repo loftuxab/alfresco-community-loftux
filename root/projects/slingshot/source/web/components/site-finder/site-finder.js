@@ -260,13 +260,8 @@
                      if (me.options.showPrivateSites ||
                          (!me.options.showPrivateSites && isPublic))
                      {
-                        // Determine if site matches search term
-                        if (shortName.toLowerCase().indexOf(me.searchTerm.toLowerCase()) != -1 ||
-                            title.toLowerCase().indexOf(me.searchTerm.toLowerCase()) != -1)
-                        {
-                           // add site to list
-                           items.push(siteData);
-                        }
+                        // add site to list
+                        items.push(siteData);
                      }
                   }
                }
@@ -756,14 +751,14 @@
        */
       _buildSearchParams: function SiteFinder__buildSearchParams(searchTerm)
       {
-         var params = YAHOO.lang.substitute("size={maxResults}",
+         var params = YAHOO.lang.substitute("size={maxResults}&nf={term}",
          {
-            maxResults : this.options.maxResults
+            maxResults : this.options.maxResults,
+            term : encodeURIComponent(searchTerm)
          });
 
          return params;
       },
-
 
       /**
        * Fired any another component, DeleteSite, to let other components know
@@ -787,7 +782,6 @@
                this.widgets.dataTable.deleteRow(record);
             }
          }
-
       },
 
       /**

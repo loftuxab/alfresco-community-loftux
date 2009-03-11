@@ -788,7 +788,7 @@
       },
 
       /**
-       * Build URI parameter string for finding sites
+       * Build URI parameter string for finding site members
        *
        * @method _buildSearchParams
        * @param searchTerm {string} Path to query
