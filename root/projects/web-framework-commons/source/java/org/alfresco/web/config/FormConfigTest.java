@@ -36,7 +36,6 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
-import org.alfresco.web.config.FormConfigElement.Mode;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in to the web client

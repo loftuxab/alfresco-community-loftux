@@ -31,7 +31,6 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
-import org.alfresco.web.config.FormConfigElement.Mode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

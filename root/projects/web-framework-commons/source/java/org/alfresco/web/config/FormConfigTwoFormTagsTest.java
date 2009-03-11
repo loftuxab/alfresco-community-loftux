@@ -27,6 +27,7 @@ package org.alfresco.web.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,16 +65,47 @@ public class FormConfigTwoFormTagsTest extends FormConfigBasicTest
         cmContentFormConfigElement = (FormConfigElement)formConfigObj;
     }
     
-    public void testSecondFormConfigElement()
+    public void testGetVisibleFieldsForFormWithoutFieldVisibilityReturnsNull()
     {
         assertNotNull(cmContentFormConfigElement);
         assertNull(cmContentFormConfigElement.getSubmissionURL());
-
-        Set<String> expectedFields = new HashSet<String>(1);
-        expectedFields.add("cm:name");
         
-        assertEquals(expectedFields, cmContentFormConfigElement.getVisibleCreateFields().keySet());
-        assertEquals(expectedFields, cmContentFormConfigElement.getVisibleEditFields().keySet());
-        assertEquals(expectedFields, cmContentFormConfigElement.getVisibleViewFields().keySet());
+        assertEquals(null, cmContentFormConfigElement.getVisibleCreateFieldNames());
+        assertEquals(null, cmContentFormConfigElement.getVisibleEditFieldNames());
+        assertEquals(null, cmContentFormConfigElement.getVisibleViewFieldNames());
+    }
+    
+    public void testFieldVisibilityForTwoCombinedFormTags()
+    {
+        Config myExampleConfigObj = configService.getConfig("my:example");
+        assertNotNull(myExampleConfigObj);
+
+        Config cmContentConfigObj = configService.getConfig("cm:content");
+        assertNotNull(cmContentConfigObj);
+        
+        FormConfigElement myExampleFormConfig = (FormConfigElement)myExampleConfigObj.getConfigElement("form");
+        assertNotNull(myExampleFormConfig);
+        
+        ConfigElement cmContentFormConfig = cmContentConfigObj.getConfigElement("form");
+        assertNotNull(cmContentFormConfig);
+        
+        FormConfigElement combinedConfig = (FormConfigElement)myExampleFormConfig.combine(cmContentFormConfig);
+        
+        Set<String> expectedFields = new LinkedHashSet<String>();
+        expectedFields.add("cm:name");
+        expectedFields.add("my:text");
+        expectedFields.add("my:mltext");
+        expectedFields.add("my:date");
+        expectedFields.add("my:duplicate");
+        expectedFields.add("my:int");
+        expectedFields.add("my:broken");
+        
+        assertEquals(new ArrayList<String>(expectedFields), myExampleFormConfig.getVisibleCreateFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleFormConfig.getVisibleEditFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleFormConfig.getVisibleViewFieldNames());
+
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleCreateFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleEditFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleViewFieldNames());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +24,6 @@
  */
 package org.alfresco.web.config;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +31,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
@@ -50,46 +48,6 @@ public class FormConfigElement extends ConfigElementAdapter
     private static final long serialVersionUID = -7008510360503886308L;
     private static Log logger = LogFactory.getLog(FormConfigElement.class);
 
-    public enum Mode
-    {
-        VIEW, EDIT, CREATE;
-        public static Mode modeFromString(String modeString)
-        {
-            if (modeString.equalsIgnoreCase("create")) {
-                return Mode.CREATE;
-            }
-            else if (modeString.equalsIgnoreCase("edit"))
-            {
-                return Mode.EDIT;
-            }
-            else if (modeString.equalsIgnoreCase("view"))
-            {
-                return Mode.VIEW;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        
-        public static List<Mode> modesFromString(String commaSeparatedModesString)
-        {
-            if (commaSeparatedModesString == null)
-            {
-                return Collections.emptyList();
-            }
-            List<Mode> result = new ArrayList<Mode>();
-            StringTokenizer st = new StringTokenizer(commaSeparatedModesString, ",");
-            while (st.hasMoreTokens())
-            {
-                String nextToken = st.nextToken().trim();
-                Mode nextMode = Mode.modeFromString(nextToken);
-                result.add(nextMode);
-            }
-            return result;
-        }
-    }
-    
     public static final String FORM_ID = "form";
     private String submissionURL;
 //    private List<StringPair> modelOverrides = new ArrayList<StringPair>();
@@ -220,7 +178,9 @@ public class FormConfigElement extends ConfigElementAdapter
     private void combineFieldVisibilities(FormConfigElement otherFormElem,
             FormConfigElement result)
     {
-        fieldVisibilityManager = fieldVisibilityManager.combine(otherFormElem.fieldVisibilityManager);
+        FieldVisibilityManager combinedManager
+                = this.fieldVisibilityManager.combine(otherFormElem.fieldVisibilityManager);
+        result.fieldVisibilityManager = combinedManager;
     }
 
     private void combineTemplates(FormConfigElement otherFormElem,
@@ -320,19 +280,6 @@ public class FormConfigElement extends ConfigElementAdapter
         return !fieldVisibilityManager.isManagingHiddenFields();
     }
     
-    public Map<String, FormField> getVisibleCreateFields()
-    {
-        return getFieldsVisibleInMode(Mode.CREATE);
-    }
-    public Map<String, FormField> getVisibleEditFields()
-    {
-        return getFieldsVisibleInMode(Mode.EDIT);
-    }
-    public Map<String, FormField> getVisibleViewFields()
-    {
-        return getFieldsVisibleInMode(Mode.VIEW);
-    }
-
     public List<String> getVisibleCreateFieldNames()
     {
     	return getFieldNamesVisibleInMode(Mode.CREATE);
@@ -591,19 +538,6 @@ public class FormConfigElement extends ConfigElementAdapter
     public boolean isFieldVisible(String fieldId, Mode m)
     {
         return fieldVisibilityManager.isFieldVisible(fieldId, m);
-    }
-    
-    private Map<String, FormField> getFieldsVisibleInMode(Mode mode)
-    {
-        Map<String, FormField> result = new HashMap<String, FormField>();
-        for (String fieldId : this.fields.keySet())
-        {
-            if (this.isFieldVisible(fieldId, mode))
-            {
-                result.put(fieldId, fields.get(fieldId));
-            }
-        }
-        return result;
     }
 
     private List<String> getFieldNamesVisibleInMode(Mode mode)

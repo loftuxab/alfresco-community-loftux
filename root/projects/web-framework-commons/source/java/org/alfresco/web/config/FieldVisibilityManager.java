@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,15 +25,11 @@
 package org.alfresco.web.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.web.config.FormConfigElement.Mode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,98 +50,57 @@ import org.apache.commons.logging.LogFactory;
  *       At that point, all fields default to hidden and only those explicitly
  *       configured to be shown (with a show tag) will actually be shown.</li>
  *   <li>Show and hide rules will be applied in sequence with later rules
- *       invalidating previous rules.</li>
+ *       potentially invalidating previous rules.</li>
  *   <li>Show or hide rules which only apply for specified modes have an implicit
  *       element. e.g. <show id="name" for-mode="view"/> would show the name field
  *       in view mode and by implication, hide it in other modes.</li>
  * </ul>
+ * 
+ * @author Neil McErlean
  */
 class FieldVisibilityManager
 {
+    // Implementation note
+    // The show/hide instructions are read in sequentially during the configuration
+    // read. There may be instructions spread across multiple <config> elements and
+    // multiple configuration files.
+    // At any time, a <show> tag will change the meaning of all previous instructions.
+    //
+    // Two approaches to this class have been attempted.
+    // 1. Read in the show/hide instructions and produce the lists of what is visible
+    //    across modes, applying the above algorithm during this read.
+    //    The individual instructions may then be discarded as they are read.
+    //    When a call to isFieldVisible is made, look up the lists for the answer.
+    // 2. Read in the show/hide instructions and store this sequence of instructions.
+    //    When a call to isFieldVisible is made, apply the algorithm to the stored
+    //    sequence of instructions and return the result.
+    //
+    // The former leads to more complicated code, but less runtime computation.
+    // The latter leads to more readable code, but requires the application of the
+    // algorithm on each call to isFieldVisible.
+    //
+    // The latter has been adopted for maintainability, extensibility reasons.
+    
     private static Log logger = LogFactory.getLog(FieldVisibilityManager.class);
-    
-    public enum Instruction
-    {
-        SHOW, HIDE;
-        public static Instruction instructionFromString(String modeString)
-        {
-            if (modeString.equalsIgnoreCase("show")) {
-                return Instruction.SHOW;
-            }
-            else if (modeString.equalsIgnoreCase("hide"))
-            {
-                return Instruction.HIDE;
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
 
-    /**
-     * This Map of Sets - one for each of the Modes - manages the visibility status
-     * for each field, as specified in the config.xml.
-     * Following the algorithm described above, the list is initially empty. Then as 'hide'
-     * elements are added to the xml, the fieldIDs are added to the appropriate Set
-     * within this Map.
-     * As soon as the first 'show' element appears, the Sets are all cleared and are then
-     * reused to manage the fieldIds of those fields that should be shown.
-     * In other words the meaning of this Map is inverted by the addition of the first
-     * 'show' instruction.
-     */
-    private Map<Mode, Set<String>> instructions = new HashMap<Mode, Set<String>>();
-    private boolean managingHiddenFields = true;
-    
-    public FieldVisibilityManager()
-    {
-        // Initialise the data sets.
-        instructions.put(Mode.CREATE, new LinkedHashSet<String>());
-        instructions.put(Mode.EDIT, new LinkedHashSet<String>());
-        instructions.put(Mode.VIEW, new LinkedHashSet<String>());
-    }
+    // We can't store 3 separate Lists for each of the 3 modes as the presence
+    // of a <show> tag in any mode has repercussions for field-visibility in all modes.
+    private List<FieldVisibilityInstruction> newInstructions = new ArrayList<FieldVisibilityInstruction>();
     
     void addInstruction(String showOrHide, String fieldId, String modesString)
     {
-        boolean show = showOrHide.equals("show") ? true : false;
-        List<Mode> modes = Mode.modesFromString(modesString);
-        if (modes.isEmpty())
+        if (logger.isDebugEnabled())
         {
-            // If there is no modesString, this means 'all modes'
-            modes = Arrays.asList(Mode.values());
+            StringBuilder msg = new StringBuilder();
+            msg.append(showOrHide)
+                .append(" ")
+                .append(fieldId)
+                .append(" ")
+                .append(modesString);
+            logger.debug(msg.toString());
         }
-        for (Mode m : modes)
-        {
-            if (show)
-            {
-                if (managingHiddenFields)
-                {
-                    // As soon as the first 'show' instruction is encountered, everything
-                    // becomes hidden by default and we need only track what is to be shown.
-                    // So we will clear all the previous instructions-to-hide and will
-                    // now track instructions-to-show.
-                    this.managingHiddenFields = false;
-                    for (Mode m2 : Arrays.asList(Mode.values()))
-                    {
-                        instructions.get(m2).clear();
-                    }
-                }
-                instructions.get(m).add(fieldId);
-            }
-            else
-            {
-                // It is an instruction-to-hide, which only has meaning if there was a
-                // previous instruction-to-show.
-                if (managingHiddenFields)
-                {
-                    instructions.get(m).add(fieldId);
-                }
-                else
-                {
-                    instructions.get(m).remove(fieldId);
-                }
-            }
-        }
+        
+        this.newInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString));
     }
     
     public FieldVisibilityManager combine(FieldVisibilityManager otherFVM)
@@ -156,49 +111,85 @@ class FieldVisibilityManager
         }
         FieldVisibilityManager result = new FieldVisibilityManager();
         
-        // Copy in this sets of strings.
-        for (Mode m : this.instructions.keySet())
-        {
-            Set<String> fieldIdsFromThis = this.instructions.get(m);
-            String showOrHide = managingHiddenFields ? "hide" : "show";
-            for (String f : fieldIdsFromThis)
-            {
-                result.addInstruction(showOrHide, f, m.toString());
-            }
-        }
-        
-        // merge in the second set.
-        for (Mode m : otherFVM.instructions.keySet())
-        {
-            Set<String> fieldIdsFromThat = otherFVM.instructions.get(m);
-            String showOrHide = otherFVM.managingHiddenFields ? "hide" : "show";
-            for (String f : fieldIdsFromThat)
-            {
-                result.addInstruction(showOrHide, f, m.toString());
-            }
-        }
+        result.newInstructions.addAll(this.newInstructions);
+        result.newInstructions.addAll(otherFVM.newInstructions);
 
         return result;
     }
     
     /**
      * This method checks whether the specified field is visible in the specified mode.
+     * 
      * @param fieldId
-     * @param m
-     * @return
+     * @param m the mode
+     * @return true if the field is visible in the specified mode, else false.
      */
     public boolean isFieldVisible(String fieldId, Mode m)
     {
-        Set<String> instructionsForSpecifiedMode = instructions.get(m);
-        
-        if (this.isManagingHiddenFields() )
+        // First attempt: the brute force simple impl.
+        // TODO Could refactor later to have less loop iteration.
+
+        if (this.newInstructions.isEmpty())
         {
-            return !instructionsForSpecifiedMode.contains(fieldId);
+            return true;
+        }
+        
+        // The most important thing to understand is whether there are *any* <show>
+        // tags present as this changes everything.
+        int indexOfFirstShow = getIndexOfFirstShow();
+        
+        if (indexOfFirstShow != -1)
+        {
+            // There is at least one "show" tag.
+            
+            // We need to ignore all those instructions that precede the first 'show'.
+            List<FieldVisibilityInstruction> relevantInstructions
+                    = newInstructions.subList(indexOfFirstShow, newInstructions.size());
+            
+            // With any show tag present, show/hide is explicitly config managed,
+            // so we default to HIDE.
+            boolean showCurrentField = false;
+            
+            for (FieldVisibilityInstruction fvi : relevantInstructions)
+            {
+                if (fvi.getFieldId().equals(fieldId)
+                        && fvi.getModes().contains(m))
+                {
+                    // We override the show/hide as we go.
+                    showCurrentField = fvi.getShowOrHide().equals(Visibility.SHOW);
+                }
+            }
+
+            return showCurrentField;
         }
         else
         {
-            return instructionsForSpecifiedMode.contains(fieldId);
+            // There are no "show" tags, only hides.
+            for (FieldVisibilityInstruction fvi : newInstructions)
+            {
+                if (fvi.getFieldId().equals(fieldId)
+                        && fvi.getShowOrHide().equals(Visibility.HIDE) // Always true.
+                        && fvi.getModes().contains(m))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
+    }
+    
+    /**
+     * Finds the index of the first "show" instruction.
+     * 
+     * @return an int index of the first "show" instruction, or -1 if none exists.
+     */
+    public int getIndexOfFirstShow()
+    {
+        for (int i = 0; i < newInstructions.size(); i++)
+        {
+            if (newInstructions.get(i).getShowOrHide().equals(Visibility.SHOW)) return i;
+        }
+        return -1;
     }
 
     /**
@@ -207,7 +198,7 @@ class FieldVisibilityManager
      */
     public boolean isManagingHiddenFields()
     {
-        return this.managingHiddenFields;
+        return this.getIndexOfFirstShow() != -1;
     }
 
     /**
@@ -221,19 +212,35 @@ class FieldVisibilityManager
      */
     public List<String> getFieldNamesVisibleInMode(Mode mode)
     {
-        if (managingHiddenFields)
+        int indexOfFirstShow = getIndexOfFirstShow();
+        if (indexOfFirstShow == -1)
         {
             // Visible fields for any mode are not knowable
             return null;
         }
         else
         {
-            List<String> result = new ArrayList<String>();
-            for (Iterator<String> iter = instructions.get(mode).iterator(); iter.hasNext(); )
+            Set<String> result = new LinkedHashSet<String>();
+
+            List<FieldVisibilityInstruction> relevantInstructions
+                   = newInstructions.subList(indexOfFirstShow, newInstructions.size());
+            
+            for (FieldVisibilityInstruction fvi : relevantInstructions)
             {
-                result.add(iter.next());
+                if (fvi.getModes().contains(mode))
+                {
+                    if (fvi.getShowOrHide().equals(Visibility.SHOW))
+                    {
+                        result.add(fvi.getFieldId());
+                    }
+                    else if (fvi.getShowOrHide().equals(Visibility.HIDE))
+                    {
+                        result.remove(fvi.getFieldId());
+                    }
+                }
             }
-            return result;
+            
+            return Collections.unmodifiableList(new ArrayList<String>(result));
         }
     }
 }
