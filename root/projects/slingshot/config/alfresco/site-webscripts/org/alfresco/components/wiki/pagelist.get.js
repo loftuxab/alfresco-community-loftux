@@ -1,20 +1,18 @@
-<import resource="classpath:alfresco/site-webscripts/org/alfresco/callutils.js">
-
-// Grab the wiki pages for the (current) site
-var theUrl = "/slingshot/wiki/pages/" + page.url.templateArgs.site,
-   filter = page.url.args.filter;
-
+// retrieve the wiki pages for the current site
+var uri = "/slingshot/wiki/pages/" + page.url.templateArgs.site;
+var filter = page.url.args.filter;
 if (filter)
 {
-   theUrl += "?filter=" + filter;
+   uri += "?filter=" + filter;
 }
 
-var response = doGetCall(theUrl, true);
-if (response.status.code != 200)
+var connector = remote.connect("alfresco");
+var result = connector.get(uri);
+if (result.status.code == status.STATUS_OK)
 {
-   model.error = response.message;
+   model.pageList = eval('(' + result.response + ')');
 }
 else
 {
-   model.pageList = response;   
+   model.error = "Error during remote call. Server code " + result.status + ".";
 }

@@ -54,8 +54,15 @@
           * @property error
           * @type boolean
           */
-         error: false
-
+         error: false,
+         
+         /**
+          * Widget permissions.
+          *
+          * @property permissions
+          * @type object
+          */
+         permissions: {}
       },
 
       /**
@@ -159,6 +166,12 @@
           });
 
           YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
+          
+          // Fire permissions event to allow other components to update their UI accordingly
+          YAHOO.Bubbling.fire("userAccess",
+          {
+            userAccess: this.options.permissions
+          });
        },
        
        onTagSelected: function WikiList_onTagSelected(e, args)

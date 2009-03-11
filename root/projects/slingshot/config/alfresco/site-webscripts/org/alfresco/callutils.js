@@ -117,8 +117,8 @@ function doPutCall(url, paramsJSON, suppressError)
    var result = connector.put(url, paramsJSON, "application/json");
    if ((result.status != status.STATUS_OK) && !suppressError)
    {
-      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
-                     "status: " + result.status + ", response: " + result.response);
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Error during remote call. " +
+                     "Status: " + result.status + ", Response: " + result.response);
       return null;
    }
    return eval('(' + result.response + ')');
@@ -135,7 +135,7 @@ function doGetCall(url, suppressError)
    if ((result.status != status.STATUS_OK) && !suppressError)
    {
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Error during remote call. " +
-                     "status: " + result.status + ", response: " + result.response);
+                     "Status: " + result.status + ", Response: " + result.response);
       return null;
    }
    return eval('(' + result.response + ')');
