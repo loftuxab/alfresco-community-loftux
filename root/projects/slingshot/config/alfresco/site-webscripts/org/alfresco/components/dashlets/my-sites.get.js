@@ -23,21 +23,15 @@ function main()
 
          // Call the repo for the user's favourite sites
          result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
-         if (result.status == 200)
+         if (result.status == 200 && result != "{}")
          {
             var prefs = eval('(' + result + ')');
-            try
+            
+            // Populate the favourites object literal for easy look-up later
+            favourites = eval('(prefs.' + PREF_FAVOURITE_SITES + ')');
+            if (typeof favourites != "object")
             {
-               // Populate the favourites object literal for easy look-up later
-               favourites = eval('(prefs.' + PREF_FAVOURITE_SITES + ')');
-               if (typeof favourites != "object")
-               {
-                  favourites = {};
-               }
-            }
-            catch (e)
-            {
-               
+               favourites = {};
             }
          }
 

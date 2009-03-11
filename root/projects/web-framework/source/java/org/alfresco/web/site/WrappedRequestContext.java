@@ -52,7 +52,7 @@ public class WrappedRequestContext implements RequestContext
         this.context = context;
     }
     
-    public RequestContext getOriginalContext()
+    final public RequestContext getOriginalContext()
     {
         return this.context;
     }
