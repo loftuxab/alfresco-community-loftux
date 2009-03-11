@@ -211,6 +211,7 @@ var CalendarScriptHelper  = ( function()
              	return result; // Date or null
              };
         }();
+        
     return {
         /**
          * Retrieves user events for specified date
@@ -222,26 +223,19 @@ var CalendarScriptHelper  = ( function()
          */
         getUserEvents : function(d)
         {
-            //TOOD change call to getRetrieveByX
             var d = d || this.getContextDate(this.getDefaultDate());
-            var uri = "/calendar/events/user?from=" + encodeURIComponent(toISOString(d,{selector:'date'}));
+            var uri = "/calendar/events/" + encodeURIComponent(page.url.templateArgs.site) +
+                      "/user?from=" + encodeURIComponent(toISOString(d,{selector:'date'}));
             var eventList = doGetCall(uri).events;
-            var site = page.url.templateArgs.site;
-            var siteEvents = [];
             
-            for (var i=0;i<eventList.length;i++) {
-              var ev = eventList[i];
-              if (ev.site==site){
-                siteEvents.push(ev);
-              }
-            }
-            
-            return siteEvents;
+            return eventList;
         },
+        
         getDefaultDate : function()
         {
           var d = new Date();
-          switch (this.getView()){
+          switch (this.getView())
+          {
             case 'agenda':
             case 'day' : // today
               return d;
@@ -251,6 +245,7 @@ var CalendarScriptHelper  = ( function()
                 return new Date(d.getTime() - ((d.getDay()-1) * DAY));
           }  
         },
+        
         /**
          *  Gets the current date
          * 
@@ -259,10 +254,12 @@ var CalendarScriptHelper  = ( function()
         getCurrentDate : function() {
             return now;
         },
+        
         getView : function()
         {
             return getPageUrlParam('view','month').toLowerCase();
         },
+        
         /**
          * Gets the requested date for the request or the specified default date (for the current view) if not specified
          *  
@@ -271,9 +268,9 @@ var CalendarScriptHelper  = ( function()
          */
         getContextDate : function(defaultDate)
         {
-
             return fromISOString(getPageUrlParam('date',defaultDate.getFullYear() + "-" + zeroPad(defaultDate.getMonth()+1) + "-" + zeroPad(defaultDate.getDate())));
         },
+        
         /**
          * Initialises data used to render the week view
          *
@@ -312,11 +309,13 @@ var CalendarScriptHelper  = ( function()
             viewArgs.startDate = toISOString(startDate).split('+')[0];
             viewArgs.titleDate = toISOString(endOfWeekDate).split('+')[0]; 
             viewArgs.endDate = toISOString(new Date(((startDate.getTime() + (DAY*7))))).split('+')[0];
-            if (currentDateMs > startTime && currentDateMs < endOfWeekDate.getTime()) {
-              viewArgs.dayOfWeek = currentDate.getDay();
+            if (currentDateMs > startTime && currentDateMs < endOfWeekDate.getTime())
+            {
+               viewArgs.dayOfWeek = currentDate.getDay();
             }
-            else {
-              viewArgs.dayOfWeek = -1;
+            else
+            {
+               viewArgs.dayOfWeek = -1;
             }
             
             viewArgs.columnHeaders = [];
@@ -332,19 +331,17 @@ var CalendarScriptHelper  = ( function()
             	startDate.setTime(startDate.getTime() + DAY);
             }
             
-            // viewArgs.events = this.getUserEvents(startDate);
             return viewArgs;
         },
+        
         /**
          * Initialises data used to render the month view
          *
          * @returns {Object} month view relevant data
-         *  
          */
         initialiseMonthView : function(d)
         {
             var viewArgs = {};
-            
 
             //the first day in month as a Date object - actually first day to render in view (so could be a day in the previous month)
             var firstDayOfMonth = new Date(d.getTime() - ((d.getDate()-1) * DAY));

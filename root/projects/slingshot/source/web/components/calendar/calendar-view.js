@@ -331,9 +331,9 @@
        */
       getEvents : function()
       {
-          Alfresco.util.Ajax.request(
-          {
-            url: Alfresco.constants.PROXY_URI + "calendar/events/user",
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "calendar/events/" + encodeURIComponent(this.options.siteId) + "/user",
             dataObj:
             {
                from: Alfresco.util.toISO8601(this.options.startDate).split('T')[0]
