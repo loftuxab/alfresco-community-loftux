@@ -177,6 +177,10 @@ public class CIFSConfigSection extends ConfigSection {
   
   private boolean m_win32NBUseWinsock = true;
 
+  // Disable use of native code on Windows, do not use any JNI calls
+  
+  private boolean m_disableNativeCode = false;
+  
   /**
    * Class constructor
    * 
@@ -559,6 +563,16 @@ public class CIFSConfigSection extends ConfigSection {
    */
   public final int getSocketTimeout() {
 	  return m_clientSocketTimeout;
+  }
+
+  /**
+   * Check if native code calls are disabled
+   * 
+   * @return boolean
+   */
+  public final boolean isNativeCodeDisabled()
+  {
+  	return m_disableNativeCode;
   }
   
   /**
@@ -1384,6 +1398,15 @@ public class CIFSConfigSection extends ConfigSection {
 	  //  Return the change status
     
 	  return sts;
+  }
+
+  /**
+   * Set the native code disabled flag, to prevent calls to the Win32NetBIOS DLL
+   * 
+   * @param noNative boolean
+   */
+  public final void setNativeCodeDisabled(boolean noNative) {
+	  m_disableNativeCode = noNative;
   }
   
   /**
