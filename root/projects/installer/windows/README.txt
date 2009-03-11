@@ -1,23 +1,16 @@
-Alfresco Labs 3 Stable
-======================
-
-For information on what is included in this release, refer to:
-
-http://wiki.alfresco.com/wiki/Alfresco_Labs_3
+Alfresco Enterprise 3.1 Release
+_______________________________
 
 For Release Notes, refer to:
+http://wiki.alfresco.com/wiki/Release_3.1
 
-http://wiki.alfresco.com/wiki/Alfresco_Labs_3d_Release_Notes
 
 For Installation instructions, refer to:
+Alfresco Enterprise 3.1, Administering a Production Environment at either:
 
-Installing and configuring Alfresco Labs guide in:
+http://partners.alfresco.com or http://customers.alfresco.com in:
 
-share.alfresco.com
+Company Home -> Downloads -> 3.1 Releases
 
-Document Library > Documents > Documentation > Labs 3d
-
-For support, refer to:
-
-http://forums.alfresco.com
-
+For Support, your named contact can log an issue at http://support.alfresco.com
+or email act@alfresco.com. If this is a severity 1 issue, please call us.
