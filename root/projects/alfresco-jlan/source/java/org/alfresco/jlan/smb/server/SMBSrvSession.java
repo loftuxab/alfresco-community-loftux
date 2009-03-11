@@ -1106,6 +1106,11 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 			CifsAuthenticator auth = getSMBServer().getCIFSConfiguration().getAuthenticator();
 
+			// Check if the authenticator supports extended security, override the client setting
+			
+			if ( auth.hasExtendedSecurity() == false)
+				extendedSecurity = false;
+			
 			// NT dialect negotiate response
 
 			NTParameterPacker nt = new NTParameterPacker( smbPkt.getBuffer());
@@ -1488,6 +1493,20 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 				if ( smbPkt != null)
 					getSMBServer().getPacketPool().releasePacket( smbPkt);
 			}
+		}
+		
+		// Check if there is an active transaction
+		
+		if ( hasTransaction()) {
+		
+			// DEBUG
+			
+			if ( Debug.EnableError)
+				debugPrintln("** Active transaction after packet processing, cleaning up **");
+			
+			// Close the active transaction
+			
+			endTransaction();
 		}
 		
 		// Check if the session has been closed, either cleanly or due to an exception

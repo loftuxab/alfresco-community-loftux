@@ -301,13 +301,15 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 
 				// Build the mechListMIC principle
 				//
-				// Note: This field is not as specified
+				// Note: This field is not as specified, only seem sto be used by Samba clients (Linux/Mac/Unix)
 
 				String mecListMIC = null;
 
 				StringBuffer mic = new StringBuffer();
+				
+				mic.append("cifs/");
 				mic.append(cifsConfig.getServerName().toLowerCase());
-				mic.append("$@");
+				mic.append("@");
 				mic.append(m_krbRealm);
 
 				mecListMIC = mic.toString();
