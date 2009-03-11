@@ -7,6 +7,7 @@ APPSERVER="${ALF_HOME}/tomcat"
 export JAVA_HOME="@@JAVA_HOME@@"
 # Set any default JVM values
 export JAVA_OPTS='-Xms128m -Xmx512m -XX:MaxPermSize=128m -server'
+export JAVA_OPTS="${JAVA_OPTS} -Dalfresco.home=${ALF_HOME} -Dcom.sun.management.jmxremote"
 # Following only needed for Sun JVMs before to 1.5 update 8
 export JAVA_OPTS="${JAVA_OPTS} -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader\$1,doBody -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo\$Merger,mergeIndexes -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo\$Merger,mergeDeletions"
 #

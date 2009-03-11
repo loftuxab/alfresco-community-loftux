@@ -87,7 +87,7 @@ DefaultLanguage
 English
 
 Ext
-{}
+.exe
 
 ExtensionDir
 <%InstallDir%>/tomcat/shared/classes/alfresco/extension/
@@ -3051,72 +3051,10 @@ File ::0D3EC648-5295-47D0-B82A-6B67D8A237F0 -type dir -name util -parent 772F602
 File ::E0EE89ED-ED72-436E-9F62-1A1AD291CE61 -name HTMLFilter.class -parent 0D3EC648-5295-47D0-B82A-6B67D8A237F0
 File ::B37AF9A9-CFBE-49F8-9198-53A068644D0E -name HTMLFilter.java -parent 0D3EC648-5295-47D0-B82A-6B67D8A237F0
 File ::C03F2E7D-DFD2-4BC8-A873-19BB12893450 -type dir -name work -parent 9A097E76-EAB8-4376-AC72-7002A2E5B50A
-File ::0996CA9C-803B-4009-ACBD-1F0C0DE9386C -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -parent 33087B4E-DFD2-42AB-A812-338D015C210B
+File ::0996CA9C-803B-4009-ACBD-1F0C0DE9386C -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -active 0 -parent 33087B4E-DFD2-42AB-A812-338D015C210B
 FileGroup ::B2ED123B-F320-4F2D-A38A-7091403BDEB7 -setup Install -alias {Java File} -active Yes -platforms {Windows ZipArchive} -name {Java File} -parent FileGroups
 File ::7C7CC5EC-84E6-4572-A398-45D02DFE9959 -directory <%InstallDir%> -name W:/resources/jdk-i586-p.exe -location ../../../../ALF-BINARIES/installer/win32 -parent B2ED123B-F320-4F2D-A38A-7091403BDEB7
 FileGroup ::E181E06B-BC95-4065-80E8-8614EE6074B7 -setup Install -alias {OpenOffice File} -active Yes -platforms {Windows ZipArchive} -name {OpenOffice File} -parent FileGroups
-File ::41F36F34-B692-4D83-9FBF-2ACE7C26FEF1 -type dir -name W:/ALF-BINARIES/installer/win32/OpenOfficeInstallFiles -location ../../../../ALF-BINARIES/installer/win32/OpenOfficeInstallFiles -active 0 -parent E181E06B-BC95-4065-80E8-8614EE6074B7
-File ::75B20EE4-AF22-4572-88B5-430F7F80FDA9 -name alfsetup.bat -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::97832F6B-E6CD-48D6-8F40-14E3DF37A589 -name instmsia.exe -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::18D09C47-48A4-46C2-9571-42BDED13A69C -name instmsiw.exe -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::B63FE4D6-EE06-4801-A947-89F6A6F54482 -name openofficeorg1.cab -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::52EAE343-C13E-4EB5-81C7-D234A3310132 -name openofficeorg30.msi -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::BEF10C4D-D1EF-4984-AE07-86F889F5A2C5 -name setup.exe -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::32074FE5-7BA4-46D0-85C0-D6390CD9C618 -name setup.ini -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::0FE697A2-A64B-409D-A090-EB3180FA478A -type dir -name .svn -active 0 -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::7690D34E-3D0D-42FD-A6CD-C9DA93ADA566 -name entries -parent 0FE697A2-A64B-409D-A090-EB3180FA478A
-File ::F3A99EAA-1224-40A6-8437-7B6C0917289D -name format -parent 0FE697A2-A64B-409D-A090-EB3180FA478A
-File ::3D2795A3-111C-4686-B881-ACAEAAEDBDDA -type dir -name prop-base -parent 0FE697A2-A64B-409D-A090-EB3180FA478A
-File ::6FA0D6BB-6EC6-4D59-BCC9-A0502E3D72BE -type dir -name props -parent 0FE697A2-A64B-409D-A090-EB3180FA478A
-File ::9DCAB9B5-2CC1-421D-99C2-A71542E5FA0E -name instmsia.exe.svn-work -parent 6FA0D6BB-6EC6-4D59-BCC9-A0502E3D72BE
-File ::A00943B4-45EE-4A11-AFF3-DD639479297B -name instmsiw.exe.svn-work -parent 6FA0D6BB-6EC6-4D59-BCC9-A0502E3D72BE
-File ::6D7A3CFC-46D7-458B-A9F6-8D16A1B0A98E -name openofficeorg1.cab.svn-work -parent 6FA0D6BB-6EC6-4D59-BCC9-A0502E3D72BE
-File ::B6052471-0E09-4D23-A36B-06776F6D63F6 -name openofficeorg30.msi.svn-work -parent 6FA0D6BB-6EC6-4D59-BCC9-A0502E3D72BE
-File ::779985F0-078B-4F66-AAD7-63828037DF30 -name setup.exe.svn-work -parent 6FA0D6BB-6EC6-4D59-BCC9-A0502E3D72BE
-File ::1500832A-C08F-4D31-BE04-710AFE0DCE1A -type dir -name text-base -parent 0FE697A2-A64B-409D-A090-EB3180FA478A
-File ::7DFEF2E5-B75B-47A5-A2C0-929FD569B656 -type dir -name tmp -parent 0FE697A2-A64B-409D-A090-EB3180FA478A
-File ::B83FFE7F-58FA-4F8B-9F6A-A5854BEC05FA -type dir -name prop-base -parent 7DFEF2E5-B75B-47A5-A2C0-929FD569B656
-File ::FBB33887-B93B-48E4-9FC0-7E66B7B631FD -type dir -name props -parent 7DFEF2E5-B75B-47A5-A2C0-929FD569B656
-File ::C576EAF0-BEFE-4E6C-946B-10083EF6CBD9 -type dir -name text-base -parent 7DFEF2E5-B75B-47A5-A2C0-929FD569B656
-File ::FF2BF994-47B4-4200-A33C-5B2907C010CD -type dir -name java -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::48C5C352-BC10-47E5-BFB7-771D9ABDC5A4 -name jre-6u7-windows-i586-p.exe -parent FF2BF994-47B4-4200-A33C-5B2907C010CD
-File ::7B9E72FF-2CED-462C-87C6-E40C8BE8199B -type dir -name .svn -active 0 -parent FF2BF994-47B4-4200-A33C-5B2907C010CD
-File ::8529B750-72E0-4373-9F0B-753DA08B355C -name entries -parent 7B9E72FF-2CED-462C-87C6-E40C8BE8199B
-File ::51603C9B-08AC-4530-B4B1-DC71B1403F7A -name format -parent 7B9E72FF-2CED-462C-87C6-E40C8BE8199B
-File ::D6B2F345-B23D-444A-9654-7874B86AB33F -type dir -name prop-base -parent 7B9E72FF-2CED-462C-87C6-E40C8BE8199B
-File ::369B4D7B-0DEF-4D56-B5BD-8B29F296DDB8 -type dir -name props -parent 7B9E72FF-2CED-462C-87C6-E40C8BE8199B
-File ::E85CD02D-E4BC-42A3-92A1-D82FB9B7F5AA -name jre-6u7-windows-i586-p.exe.svn-work -parent 369B4D7B-0DEF-4D56-B5BD-8B29F296DDB8
-File ::1AC9FC2F-0380-4477-A31E-40859492C9F9 -type dir -name text-base -parent 7B9E72FF-2CED-462C-87C6-E40C8BE8199B
-File ::C680C639-C73E-47EB-9F54-807AE562EA5E -type dir -name tmp -parent 7B9E72FF-2CED-462C-87C6-E40C8BE8199B
-File ::6BCD1A9C-F727-44DC-8D3E-0F13B27A446C -type dir -name prop-base -parent C680C639-C73E-47EB-9F54-807AE562EA5E
-File ::3F7A2D60-1D60-431C-8643-DF6CE78497CD -type dir -name props -parent C680C639-C73E-47EB-9F54-807AE562EA5E
-File ::63676FF4-A465-4B6E-9879-F902A96DFBF1 -type dir -name text-base -parent C680C639-C73E-47EB-9F54-807AE562EA5E
-File ::DAB96511-2180-4598-9AA3-9620F56F87B7 -type dir -name licenses -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::7F89D0FF-7F5A-4642-9520-968912941A60 -name license_en-US.html -parent DAB96511-2180-4598-9AA3-9620F56F87B7
-File ::491CEF3E-AA00-4944-A4BD-7C97747234EA -name license_en-US.txt -parent DAB96511-2180-4598-9AA3-9620F56F87B7
-File ::0BA96E69-E594-4524-B4A5-7FA244434D7F -type dir -name .svn -active 0 -parent DAB96511-2180-4598-9AA3-9620F56F87B7
-File ::6E0D0231-28F0-4950-A1DC-E7E381AD965B -name entries -parent 0BA96E69-E594-4524-B4A5-7FA244434D7F
-File ::0B4856C6-CAB7-4749-B274-7D93FF44435B -name format -parent 0BA96E69-E594-4524-B4A5-7FA244434D7F
-File ::C1A790B3-C2DB-4034-8A6C-9ED6645E3FF1 -type dir -name prop-base -parent 0BA96E69-E594-4524-B4A5-7FA244434D7F
-File ::4F79459D-8403-4D24-AF6B-9F84B352122F -type dir -name props -parent 0BA96E69-E594-4524-B4A5-7FA244434D7F
-File ::CC52D514-BFE1-4B75-A164-1A7D0AD32D80 -type dir -name text-base -parent 0BA96E69-E594-4524-B4A5-7FA244434D7F
-File ::FD7AE478-D732-4990-A5D8-4947D0F26D3C -type dir -name tmp -parent 0BA96E69-E594-4524-B4A5-7FA244434D7F
-File ::6F12B492-4E3B-4086-95C7-373748D761FE -type dir -name prop-base -parent FD7AE478-D732-4990-A5D8-4947D0F26D3C
-File ::5C2B21B3-F7B3-4A98-A131-55D4EEF38CBD -type dir -name props -parent FD7AE478-D732-4990-A5D8-4947D0F26D3C
-File ::F4C23738-4E0D-437A-B6F7-60AA65E9F648 -type dir -name text-base -parent FD7AE478-D732-4990-A5D8-4947D0F26D3C
-File ::D5EFDE62-2C13-417C-AF2F-87DA577B9077 -type dir -name readmes -parent 41F36F34-B692-4D83-9FBF-2ACE7C26FEF1
-File ::528CFD25-5261-4BBD-BE9C-7DE99D97887B -name readme_en-US.html -parent D5EFDE62-2C13-417C-AF2F-87DA577B9077
-File ::C2FD2647-ADDC-4026-8F07-BC28EA603FBC -name readme_en-US.txt -parent D5EFDE62-2C13-417C-AF2F-87DA577B9077
-File ::9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60 -type dir -name .svn -active 0 -parent D5EFDE62-2C13-417C-AF2F-87DA577B9077
-File ::F2B28B70-84D0-48F5-8754-1886B6860CC1 -name entries -parent 9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60
-File ::BB0174B8-0FE4-475F-9959-9DCC26D3AF14 -name format -parent 9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60
-File ::1BE01E89-4C0C-4983-B294-5F492F550BA8 -type dir -name prop-base -parent 9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60
-File ::4B8B2BF4-ABBE-4902-A475-B993E5E5257A -type dir -name props -parent 9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60
-File ::8DB0D7CB-1FEC-421A-BFEE-0A986009122C -type dir -name text-base -parent 9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60
-File ::D25BAC96-F628-4BCC-BAB6-A988A5A840FD -type dir -name tmp -parent 9A7A7C7A-15C2-4AA7-944F-F9A5A0020B60
-File ::681F4844-5F7D-4499-BB51-7E87203BB37C -type dir -name prop-base -parent D25BAC96-F628-4BCC-BAB6-A988A5A840FD
-File ::61AC9F9E-4428-4595-9695-D3EBCF79A591 -type dir -name props -parent D25BAC96-F628-4BCC-BAB6-A988A5A840FD
-File ::07EFC439-F6E5-43F1-BDE1-15C6E7E01505 -type dir -name text-base -parent D25BAC96-F628-4BCC-BAB6-A988A5A840FD
 File ::4B58BAE9-06F6-4D30-ACA1-0645DF315D7A -name W:/ALF-BINARIES/installer/win32/OpenOfficeInstallFiles.zip -location ../../../../ALF-BINARIES/installer/win32 -parent E181E06B-BC95-4065-80E8-8614EE6074B7
 FileGroup ::E1D94860-98A3-46D1-A57A-AA0AED090F50 -setup Install -active Yes -platforms {Windows ZipArchive} -name {Temp Files Win} -parent FileGroups
 File ::F715539B-2586-45A9-A2B3-C1AE3C01AB21 -type dir -name W:/HEAD/root/projects/installer/windows/mysqltcl -location ../../projects/installer/windows/mysqltcl -parent E1D94860-98A3-46D1-A57A-AA0AED090F50
@@ -3167,7 +3105,6 @@ File ::02FFD79E-8289-4CDB-B350-9786B0532B71 -directory <%InstallDir%>/bin -name 
 File ::47B3E066-8DFE-4842-9096-2715A1284B87 -directory <%InstallDir%>/bin -name W:/HEAD/root/projects/alfresco-jlan/jni/Win32NetBIOSx64.dll -location ../../projects/alfresco-jlan/jni -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::73EC3550-4BD1-4D53-AA51-27A09A17ACAF -directory <%InstallDir%>/bin -name W:/HEAD/root/projects/alfresco-jlan/jni/Win32Utils.dll -location ../../projects/alfresco-jlan/jni -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::4E3FE006-33E5-40D0-A403-12BEBDB0E834 -directory <%InstallDir%>/bin -name W:/HEAD/root/projects/3rd-party/distro/pdf2swf.exe -location ../../../../ALF-BINARIES/installer/win32 -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
-File ::CEFAA5FC-F4C0-4EBD-BCF0-3F02E8974B19 -directory <%InstallDir%>/bin -name W:/HEAD/root/projects/3rd-party/distro/imconvert.exe -location ../../../../ALF-BINARIES/installer/win32 -active 0 -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::75B624EC-95BF-4063-9C59-13EE5F1FFA0A -directory <%InstallDir%>/bin -name W:/HEAD/root/installer/resources/alfresco.ico -location ../resources -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::9771A411-D69D-4E8D-B55F-951BE674BC8D -directory <%ALF_IMG%>/bin -name W:/ALF-BINARIES/installer/win32/convert.exe -location ../../../../ALF-BINARIES/installer/win32 -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 FileGroup ::8F9CD740-BE57-45DF-B176-5C11E746846B -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc TarArchive} -name {Program Files Linux} -parent FileGroups
@@ -3197,7 +3134,7 @@ File ::141E54D8-E7B7-4B24-A8B0-954EC4DEA922 -name W:/HEAD/root/projects/installe
 File ::2F0DE958-728D-47ED-BAA2-E94074D0DD67 -name W:/HEAD/root/projects/installer/linux/installer/virtual_alf.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 File ::1342AA2D-1979-41D0-9C0D-7FBB6B566B0F -name W:/HEAD/root/projects/installer/linux/installer/virtual_start.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 FileGroup ::DC43C49C-C9EF-4C4F-B2DA-32B67341C839 -setup Install -alias jdbc -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name {JDBC Drivers} -parent FileGroups
-File ::9A944292-02A8-4CFD-9304-3DA0AB9959A9 -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -parent DC43C49C-C9EF-4C4F-B2DA-32B67341C839
+File ::9A944292-02A8-4CFD-9304-3DA0AB9959A9 -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -active 0 -parent DC43C49C-C9EF-4C4F-B2DA-32B67341C839
 Component ::A4F1E663-DD6F-4CFB-B8C8-496149F89359 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Default Component} -parent Components
 Component ::A88563D5-3EDB-4933-A42D-D51B94ED8D72 -setup Install -alias Samples -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Samples -parent Components
 Component ::3599937E-10E1-4029-8ACB-CCE5D85D306D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name WCM -parent Components
@@ -3239,10 +3176,10 @@ InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane 
 Condition 6AD46333-4FF3-48A6-A054-61D16F32A431 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6AD46333-4FF3-48A6-A054-61D16F32A431
 Condition D4D47D94-3A94-47CD-AD89-6101CC515BE4 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {String Is Condition} -component StringIsCondition -TreeObject::id D4D47D94-3A94-47CD-AD89-6101CC515BE4
 InstallComponent C106AE81-88CA-44E9-8B7C-37C6579863FF -setup Install -type action -title {Execute JDK Install} -component ExecuteExternalProgram -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 8172F70F-8736-44D8-879E-694FF48D4E0A -setup Install -type action -conditions D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
+InstallComponent 8172F70F-8736-44D8-879E-694FF48D4E0A -setup Install -type action -conditions D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -active Yes -parent 8172F70F-8736-44D8-879E-694FF48D4E0A -title {File Exists Condition} -component FileExistsCondition -TreeObject::id D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
 InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active No -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type action -title {Unzip File} -component UnzipFile -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
@@ -3260,7 +3197,8 @@ Condition 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 -active Yes -parent 3D88EE52-1868
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
 InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command insert -alias jdbcpanel -active No -parent StandardInstall
 Condition 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -active Yes -parent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 448A4C99-13E3-42B0-AE70-2BFA0854ECBE
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {8945FF90-FE58-47F6-A4C7-97F8E8DDC075 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
+Condition 8945FF90-FE58-47F6-A4C7-97F8E8DDC075 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8945FF90-FE58-47F6-A4C7-97F8E8DDC075
 Condition 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3
 Condition 87245761-D5F3-470A-9E78-B56E97ADD1AF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 87245761-D5F3-470A-9E78-B56E97ADD1AF
 InstallComponent 8486C21D-3367-4AFE-BF4E-6CDB5F670858 -setup Install -type pane -conditions B6592AC2-4C85-49CA-BBA7-CD5A2CA80995 -title {Check Port} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
@@ -3357,7 +3295,7 @@ InstallComponent 9F007B25-0D36-4E27-81D9-CAA6FE600D60 -setup Install -type actio
 InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent D05A76C6-7FC5-416A-A4D0-45D5C7B9E0C1 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 2521C09F-C692-49D8-BD76-C69BFFEF1F24 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
-InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 15E76997-58C5-43F5-91FB-06A703497E56 -title {Write Text To File} -component WriteTextToFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 15E76997-58C5-43F5-91FB-06A703497E56 -title {Write Text To File} -component WriteTextToFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition 15E76997-58C5-43F5-91FB-06A703497E56 -active Yes -parent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 15E76997-58C5-43F5-91FB-06A703497E56
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In File} -component ReplaceTextInFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
@@ -3700,7 +3638,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-47356041
+30132799
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -3709,7 +3647,7 @@ WCM
 <%InstallDir%>
 
 332AF528-112D-43AC-B934-361D5E8E8AD6,FileSize
-8441280
+8441339
 
 332AF528-112D-43AC-B934-361D5E8E8AD6,Name
 {Program Files Win}
@@ -3989,7 +3927,7 @@ derby
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-100581404
+101432536
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -4450,7 +4388,7 @@ OOLocation
 1
 
 73EBD608-2E51-4D77-A456-569367970EA1,Conditions
-{2 conditions}
+{3 conditions}
 
 73EBD608-2E51-4D77-A456-569367970EA1,DestinationLabel,subst
 0
@@ -4653,6 +4591,12 @@ Yes
 887B6B37-97DD-4CFB-AA40-3852EDD8F1F2,NextButton,subst
 1
 
+8945FF90-FE58-47F6-A4C7-97F8E8DDC075,Filename
+<%ALF_OO%>/program/soffice.bin
+
+8945FF90-FE58-47F6-A4C7-97F8E8DDC075,Operator
+{does not exist}
+
 895E7578-265C-44C3-8943-CF6D99925B9F,CheckCondition
 {Before Action is Executed}
 
@@ -4702,7 +4646,7 @@ ALF_DATA
 <%InstallDir%>
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,FileSize
-2236
+2327
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,Name
 {Program Files Linux}
@@ -5331,6 +5275,9 @@ jdbc
 DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Destination
 <%InstallDir%>
 
+DC43C49C-C9EF-4C4F-B2DA-32B67341C839,FileSize
+703265
+
 DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Name
 {JDBC Drivers}
 
@@ -5341,7 +5288,7 @@ E181E06B-BC95-4065-80E8-8614EE6074B7,Destination
 <%InstallDir%>
 
 E181E06B-BC95-4065-80E8-8614EE6074B7,FileSize
-148155013
+117527445
 
 E181E06B-BC95-4065-80E8-8614EE6074B7,Name
 {OpenOffice File}
@@ -5546,7 +5493,7 @@ FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,FileSize
-890718
+890774
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Name
 Samples
