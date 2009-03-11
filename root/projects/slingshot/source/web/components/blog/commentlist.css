@@ -16,10 +16,6 @@ html>body .comment {
   display: block;
 }
 
-.comment.overNode
-{
-	background-color: #f4faff;
-}
 .comment-list .commentsListTitle
 {
    float: left;
@@ -47,11 +43,6 @@ html>body .comment {
 .comment-list .yui-pg-container
 {
    padding:20px 25px 20px 0;
-}
-
-.comment .userLink a
-{
-   color: #2B6EB5;
 }
 
 .editCommentForm

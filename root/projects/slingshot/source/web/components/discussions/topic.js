@@ -719,7 +719,7 @@
             return;
          } 
          
-         Dom.addClass(args[1].target, 'overNode');
+         Dom.addClass(args[1].target, 'over');
       },
      
       /**
@@ -727,7 +727,7 @@
        */
       onTopicElementMouseExited: function DiscussionsTopicList_onTopicElementMouseExited(layer, args)
       {
-         Dom.removeClass(args[1].target, 'overNode');
+         Dom.removeClass(args[1].target, 'over');
       },
 
       /**

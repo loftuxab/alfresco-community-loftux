@@ -785,14 +785,14 @@
          }
           
          var elem = args[1].target;
-         Dom.addClass(elem, 'overNode');
+         Dom.addClass(elem, 'over');
       },
       
       /** Called whenever the mouse exits a list item. */
       onCommentElementMouseExited: function CommentList_onCommentElementMouseExited(layer, args)
       {
          var elem = args[1].target;
-         Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(elem, 'over');
       },
 
    

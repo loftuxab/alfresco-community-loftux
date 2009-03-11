@@ -747,7 +747,7 @@
          }
          
          var elem = Dom.getElementsByClassName('topic', null, oArgs.target, null);
-         Dom.addClass(elem, 'overNode');
+         Dom.addClass(elem, 'over');
       },
 
       /**
@@ -760,7 +760,7 @@
       onEventUnhighlightRow: function DiscussionsTopicList_onEventUnhighlightRow(oArgs)
       {
          var elem = Dom.getElementsByClassName('topic', null, oArgs.target, null);
-         Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(elem, 'over');
       },
       
       /**

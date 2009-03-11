@@ -10,7 +10,7 @@
       <#assign overdue = ((task.dueDate != "") && (dateCompare(date?date, task.dueDate?date("yyyy-MM-dd")) == 1))>
    <div class="detail-list-item <#if task_index = 0>first-item<#elseif !task_has_next>last-item</#if>">
       <div class="task-icon">
-         <span class="priority<#if overdue> overdue</#if>">${task.priority}</span>
+         <span class="priority<#if overdue> overdue</#if> theme-color-1 theme-border-2 theme-bg-color-3">${task.priority}</span>
       </div>
       <div class="task-details">
          <h4>${task.description?html}<#if overdue> <span class="light">(${msg("status.overdue")})</span></#if></h4>
@@ -27,7 +27,7 @@
          </div>
          <div class="task-transitions">
       <#list task.transitions as transition>
-            <span class="${task.id} ${transition.id}"><a href="#" class="task-transition">${transition.label?html}</a></span>
+            <span class="${task.id} ${transition.id}"><a href="#" class="task-transition theme-color-1">${transition.label?html}</a></span>
          <#if transition_has_next><span class="separator">|</span></#if>
       </#list>
          </div>

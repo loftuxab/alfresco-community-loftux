@@ -136,14 +136,8 @@ table.versionHistory
 .wiki-page .meta-section-label,
 .wiki-page .meta-label
 {
-   color: #606060;
    font-size: 100%;
    padding-right: 0.3em;
-}
-
-.wiki-page .meta-section-label
-{
-   color:#4683BB;
 }
 
 .wiki-page .meta-value

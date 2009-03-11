@@ -9,7 +9,7 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar flat-button">
+<div id="${args.htmlid}-body" class="toolbar flat-button theme-bg-2">
 
    <div class="navigation-bar <#if (args.showNavigationBar == "false")>hide</#if>">
       <div>
@@ -19,7 +19,7 @@
       </div>
    </div>
 
-   <div class="action-bar">
+   <div class="action-bar theme-bg-1">
       <div class="new-blog"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
       <div class="separator">&nbsp;</div>
       <div class="configure-blog"><button id="${args.htmlid}-configure-button" name="postlist-configure-button">${msg("button.configure")}</button></div>

@@ -8,7 +8,7 @@
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar">
 
-   <div id="${args.htmlid}-headerBar" class="header-bar flat-button">
+   <div id="${args.htmlid}-headerBar" class="header-bar flat-button theme-bg-2">
       <div class="left">
          <div class="new-folder hideable DocListTree"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
          <div class="separator hideable DocListTree">&nbsp;</div>
@@ -37,7 +37,7 @@
       </div>
    </div>
 
-   <div id="${args.htmlid}-navBar" class="nav-bar flat-button">
+   <div id="${args.htmlid}-navBar" class="nav-bar flat-button theme-bg-4">
       <div class="nav-bar-left">
          <div class="folder-up hideable DocListTree"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
          <div class="separator hideable DocListTree">&nbsp;</div>

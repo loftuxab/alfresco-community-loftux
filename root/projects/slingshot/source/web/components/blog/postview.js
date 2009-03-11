@@ -641,13 +641,13 @@
             return;
          }
           
-         Dom.addClass(args[1].target, 'overNode');
+         Dom.addClass(args[1].target, 'over');
       },
       
       /** Called whenever the mouse exits a list item. */
       onPostElementMouseExited: function BlogPostView_onListElementMouseExited(layer, args)
       {
-         Dom.removeClass(args[1].target, 'overNode');
+         Dom.removeClass(args[1].target, 'over');
       },
 
    

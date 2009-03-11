@@ -27,7 +27,6 @@
 .search .resultbar
 { 
 	padding: 8px 10px;
-	background-color: #E3EAEC;
 	border-bottom: 1px solid #F0F3F4;
 	border-top: 1px solid #F0F3F4;
 	height: 1.25em;
@@ -36,7 +35,6 @@
 .search .itemname a
 {
    font-size: 116%;
-   color: #276FB6;
 }
 
 .search tr.yui-dt-odd, tr.yui-dt-even

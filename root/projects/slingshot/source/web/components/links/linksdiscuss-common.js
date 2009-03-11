@@ -49,7 +49,7 @@ Alfresco.util.people.generateUserLink = function generateUserLink(person)
    var link = Alfresco.util.people.generateUserProfileUrl(person);
    var name = Alfresco.util.people.generateUserDisplayName(person);
    
-   return '<a href="' + link + '">' + Alfresco.util.encodeHTML(name) + '</a>';
+   return '<a href="' + link + '" class="theme-color-1">' + Alfresco.util.encodeHTML(name) + '</a>';
 };
          
 /**

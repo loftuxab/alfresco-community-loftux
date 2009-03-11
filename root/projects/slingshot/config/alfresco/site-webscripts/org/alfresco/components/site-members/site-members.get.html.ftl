@@ -17,7 +17,7 @@
    
    <div class="heading"><label for="${args.htmlid}-term">${msg("site-members.heading")}</label></div>
    
-   <div class="search-controls">
+   <div class="search-controls theme-bg-color-3">
       <input id="${args.htmlid}-term" type="text" class="search-term" />
       <input id="${args.htmlid}-button" type="button" value="${msg("site-members.search-button")}" />
    </div>

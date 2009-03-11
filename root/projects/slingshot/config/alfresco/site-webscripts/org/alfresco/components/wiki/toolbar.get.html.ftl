@@ -8,9 +8,9 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar flat-button">
+<div id="${args.htmlid}-body" class="toolbar flat-button theme-bg-2">
 
-   <div class="navigation-bar">
+   <div class="navigation-bar theme-bg-1">
       <div>
          <#if args.showBackLink == "true">
          <span class="<#if (page.url.args.listViewLinkBack! == "true")>backLink<#else>forwardLink</#if>">

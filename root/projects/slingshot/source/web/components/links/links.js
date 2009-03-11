@@ -379,10 +379,10 @@
             {
                tagsStr = me._msg("dialog.tags.none");
             }
-            var innerHtml = '<h3 class="link-title"><a href="' + linksViewUrl + '">' + $html(name) + '</a></h3>';
+            var innerHtml = '<h3 class="link-title"><a href="' + linksViewUrl + '" class="theme-color-1">' + $html(name) + '</a></h3>';
             
             innerHtml += '<div class="detail"><span class="item"><em style="padding-right: 2px; float: left">' + me._msg("details.url") + ':</em> ' +
-                         '<a style="float: left;"' +  (internal ? '' : ' target="_blank" class="external"') + ' href=' + (url.indexOf("://") === -1 || url[0] === '/' ? 'http://' : '') +
+                         '<a style="float: left;" class="theme-color-1"' +  (internal ? '' : ' target="_blank" class="external"') + ' href=' + (url.indexOf("://") === -1 || url[0] === '/' ? 'http://' : '') +
                          $html(url) + '>' + $html(url) + '</a></span></div>';
 
             if (!me.options.simpleView)
@@ -413,8 +413,8 @@
                permissions = oRecord.getData("permissions");
                
             elCell.style.display = "none";
-            elCell.innerHTML = "<div class='" + me.EDITEDCLASS + "'><a id='edit-" + prefix + "'><span>" + me._msg("links.edit") + "</a></span></div>" +
-               "<div class='" + me.DELETEDCLASS + "'><a id='delete-" + prefix + "'><span>" + me._msg("links.delete") + "</a></span></div>";
+            elCell.innerHTML = "<div class='" + me.EDITEDCLASS +  "'><a id='edit-" + prefix + "'><span class='theme-color-1'>" + me._msg("links.edit") + "</a></span></div>" +
+               "<div class='" + me.DELETEDCLASS + "'><a id='delete-" + prefix + "'><span class='theme-color-1'>" + me._msg("links.delete") + "</a></span></div>";
 
             var elink = elCell.getElementsByTagName("a")[0];
             var ec = elCell.childNodes[0];

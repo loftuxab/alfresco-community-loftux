@@ -206,6 +206,11 @@
              this.eventDialog.tagLibrary = new Alfresco.module.TagLibrary( this.eventDialog.id);
              this.eventDialog.tagLibrary.setOptions({ siteId: this.options.siteId });
           }
+          this.eventDialog.tags = [];
+             YAHOO.Bubbling.on('onTagLibraryTagsChanged',function(e,o) { 
+               this.tags=o[1].tags;
+             },
+             this.eventDialog);
          
          var options = 
          {
@@ -240,17 +245,14 @@
             },
             doBeforeAjaxRequest : {
                 fn : function(p_config, p_obj) 
-                     {
-                         p_config.method = Alfresco.util.Ajax.PUT;
-                         if (p_config.dataObj.tags)
-                         {
-                           p_config.dataObj.tags = p_config.dataObj.tags.join(' ');
-                         }
+                 {
+                     p_config.method = Alfresco.util.Ajax.PUT;
+                     p_config.dataObj.tags = this.tags.join(' ');
 
-                         this.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
-                         
-                         return true;
-                     },
+                     this.form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+                   
+                     return true;
+                 },
                 scope : this.eventDialog
             },
             doBeforeDialogShow : {
