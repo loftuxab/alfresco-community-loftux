@@ -120,7 +120,9 @@ public class VirtualizedContentRetrievalServlet extends BaseServlet
         throws UnsupportedEncodingException, IOException, ServletException
     {
         WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(context.getRequest());
-        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(false);
+// HACK FOR MERGE: Fill in the null!
+//        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(false);
+        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(null/*HACK*/, false);
 
         // process retrieval        
         retrieve(context, wrappedRequest, fakeResponse, path, endpointId, storeId, webappId, false);
