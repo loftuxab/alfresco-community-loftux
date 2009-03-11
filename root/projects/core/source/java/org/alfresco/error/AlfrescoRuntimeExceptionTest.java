@@ -76,4 +76,15 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
         AlfrescoRuntimeException exception5 = new AlfrescoRuntimeException(NON_I18NED_MSG);
         assertEquals(NON_I18NED_MSG, exception5.getMessage());
     }
+    
+    public void testMakeRuntimeException()
+    {
+        Throwable e = new RuntimeException("sfsfs");
+        RuntimeException ee = AlfrescoRuntimeException.makeRuntimeException(e, "Test");
+        assertTrue("Exception should not have been changed", ee == e);
+        
+        e = new Exception();
+        ee = AlfrescoRuntimeException.makeRuntimeException(e, "Test");
+        assertTrue("Expected an AlfrescoRuntimeException instance", ee instanceof AlfrescoRuntimeException);
+    }
 }

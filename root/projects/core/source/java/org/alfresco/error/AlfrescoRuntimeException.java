@@ -55,6 +55,22 @@ public class AlfrescoRuntimeException extends RuntimeException
     }
     
     /**
+     * Utility to convert a general Throwable to a RuntimeException.  No conversion is done if the
+     * throwable is already a <tt>RuntimeException</tt>.
+     * 
+     * @see #create(Throwable, String, Object...)
+     */
+    public static RuntimeException makeRuntimeException(Throwable e, String msgId, Object ...objects)
+    {
+        if (e instanceof RuntimeException)
+        {
+            return (RuntimeException) e;
+        }
+        // Convert it
+        return AlfrescoRuntimeException.create(e, msgId, objects);
+    }
+    
+    /**
      * Constructor
      * 
      * @param msgId     the message id
