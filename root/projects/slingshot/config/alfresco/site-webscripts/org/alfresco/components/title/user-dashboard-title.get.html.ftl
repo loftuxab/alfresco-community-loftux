@@ -3,9 +3,9 @@
 <script type="text/javascript">//<![CDATA[
    Alfresco.constants.DASHLET_RESIZE = ${((page.url.templateArgs.userid!"-") = (user.name!""))?string};
 //]]></script>
-<div class="page-title theme-bg-color-1"><!-- ${activePage} -->
+<div class="page-title theme-bg-color-1 theme-border-1"><!-- ${activePage} -->
    <div class="title">
-      <h1>${msg("header.dashboard", "<span>${userName}</span>")}</h1>
+      <h1 class="theme-color-3">${msg("header.dashboard", "<span>${userName}</span>")}</h1>
    </div>
    <div class="links title-button">
       <#assign linkClass><#if "customise-user-dashboard" == activePage>class="active-page"</#if></#assign>

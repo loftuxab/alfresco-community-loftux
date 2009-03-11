@@ -8,7 +8,7 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar flat-button">
+<div id="${args.htmlid}-body" class="toolbar flat-button theme-bg-2">
 
    <div class="navigation-bar <#if (args.showNavigationBar == "false")>hide</#if>">
       <div>
@@ -18,7 +18,7 @@
       </div>
    </div>
 
-   <div class="action-bar">
+   <div class="action-bar theme-bg-1">
       <div class="new-topic"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
    </div>
 

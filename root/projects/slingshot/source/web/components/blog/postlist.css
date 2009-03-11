@@ -21,7 +21,6 @@
 {
    width: auto;
    height: 30px;
-   background-color: #ebeff1;
    border-bottom: thin solid #C6C6C6;
    padding:0.1em 0.5em;
 }
@@ -196,11 +195,6 @@
   padding-left: 20px;
 }
 
-
-.overNode
-{
-  background-color: #f4faff !important;
-}
 
 .node .published
 {

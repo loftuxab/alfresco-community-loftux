@@ -15,7 +15,7 @@
 //]]></script>
 
 <div class="postlist-header">
-   <div class="postlist-infobar yui-gb">
+   <div class="postlist-infobar yui-gb theme-bg-color-4">
       <div class="yui-u first">
          <div id="${args.htmlid}-listtitle" class="listTitle">
             ${msg("title.postlist")}

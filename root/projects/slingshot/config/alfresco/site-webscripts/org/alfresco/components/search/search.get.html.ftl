@@ -12,7 +12,7 @@
 //]]></script>
 
 <div id="${args.htmlid}-body" class="search">
-   <div class="resultbar">
+   <div class="resultbar theme-bg-color-3">
       <span id="${args.htmlid}-search-info">
          ${msg("search.info.searching")}
       </span>

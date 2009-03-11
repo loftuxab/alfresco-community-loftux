@@ -190,13 +190,13 @@
        mouseOverHandler: function(e)
        {
           var currentTarget = e.currentTarget;
-          YAHOO.util.Dom.addClass(currentTarget, 'wikiPageSelected');
+          YAHOO.util.Dom.addClass(currentTarget, 'over');
        },
        
        mouseOutHandler: function(e)
        {
           var currentTarget = e.currentTarget;
-          YAHOO.util.Dom.removeClass(currentTarget, 'wikiPageSelected');
+          YAHOO.util.Dom.removeClass(currentTarget, 'over');
        }
       
       

@@ -3,9 +3,9 @@
       "${page.url.templateArgs["site"]!""}"
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar calendar-toolbar">
+<div id="${args.htmlid}-body" class="toolbar calendar-toolbar ">
    <div class="yui-ge calendar-bar">
-      <div class="yui-u first ">
+      <div class="yui-u first theme-bg-1">
          <button id="${args.htmlid}-today-button">${msg("button.today")}</button>
          <span class="separator">&nbsp;</span>
          <button id="${args.htmlid}-prev-button">&lt; ${msg("button.previous")}</button>

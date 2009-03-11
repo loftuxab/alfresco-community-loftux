@@ -42,7 +42,11 @@
                     <#assign tdclass = 'class="disabled"'>
                     </#if>
                     <td id="cal-${viewArgs.view.dates[id].id}" ${tdclass} width="12.5%">
-                       <div class="day">
+                       <#if (tdclass != '')>
+                        <div class="day theme-bg-color-3">                       
+                       <#else>
+                        <div class="day">
+                       </#if>
                           <a class="dayLabel">${viewArgs.view.dates[id].day}</a>
                           <#if (viewArgs.view.dates[id].events??)>
                            <#assign numEvents = 0>
@@ -50,7 +54,7 @@
                                 <#if (event.allday) >                              
                                     <div class="vevent allday">
                                         <div>
-                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary">${event.summary}</a>
+                                             <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
                                              <p class="description">${event.description}</p>
                                              <p>From <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                              til <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
@@ -72,7 +76,7 @@
                                                </#if>
 
                                                <li class="vevent ${class}">
-                                                     <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary">${event.summary}</a>
+                                                     <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
                                                      <p class="description">${event.description}</p>
                                                      <p>From <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                                      til <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
@@ -155,7 +159,7 @@
                   <#assign id = viewArgs.view.dates[day].id>
                   <#assign divclass = ''>
                   <#if (viewArgs.view.dayOfWeek == day)>
-                      <#assign divclass = 'current"'>
+                      <#assign divclass = 'current'>
                   </#if>
                     <td id="cal-${id}T${time}:00" width="12.5%">
                         <div class="day ${divclass}">

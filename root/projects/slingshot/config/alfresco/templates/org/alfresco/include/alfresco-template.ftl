@@ -2,6 +2,8 @@
 
 <#-- Global DEBUG flag retrieved from web-framework-config-application -->
 <#assign DEBUG=(config.global.flags.childrenMap["debug"][0].value = "true")>
+<#-- allow theme to be specified in url args - helps debugging themes -->
+<#assign theme = (page.url.args.theme)!theme />
 
 <#--
    JavaScript and (future) CSS minimisation via YUI Compressor.

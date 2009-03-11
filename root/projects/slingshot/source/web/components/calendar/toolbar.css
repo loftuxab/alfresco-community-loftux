@@ -68,7 +68,6 @@ div.separator
     padding:0.5em;
 }
 .calendar-bar .yui-u.first {
-  background:transparent url(images/toolbar-bg-gradient.gif);
   padding:0.5em;
   border-right:1px solid #9eb0b7;
 }

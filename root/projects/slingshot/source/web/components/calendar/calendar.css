@@ -1,27 +1,27 @@
 tr.odd td
 {
-	background-color: #f8f8f8;
+   background-color: #f8f8f8;
 }
 
 tr.even td 
 {
-	background-color: #FFFFFF;
+   background-color: #FFFFFF;
 }
 
 table#week-view
 {
-	border: 1px solid #c0c0c0;
+   border: 1px solid #c0c0c0;
 }
 
 table#week-view th
 {
    height: 2em;
-	text-align: center;
-	vertical-align: middle;
+   text-align: center;
+   vertical-align: middle;
 }
 table#week-view th a
 {
-	text-decoration: none;
+   text-decoration: none;
 }
 
 #week-view .label
@@ -31,77 +31,77 @@ table#week-view th a
 
 .yui-content
 {
-	background: #FFFFFF; /* content background color */
+   background: #FFFFFF; /* content background color */
 }
 
 table#month-view
 {
-	width: 100%; 
-	border-collapse: collapse;
+   width: 100%; 
+   border-collapse: collapse;
 }
 table#month-view th
 {
-	text-align: center;
-	border-bottom: 1px solid #CCCCCC;
-	font-weight: normal;
-	color: #000000;
+   text-align: center;
+   border-bottom: 1px solid #CCCCCC;
+   font-weight: normal;
+   color: #000000;
 }
 
 table#month-view td
 {
-	height: 80px;
-	width: 14%;
-	vertical-align: top;
-	margin: 0;
-	padding: 0;
-	border: 1px solid #CCCCCC;
+   height: 80px;
+   width: 14%;
+   vertical-align: top;
+   margin: 0;
+   padding: 0;
+   border: 1px solid #CCCCCC;
 }
 
 div.dayLabel
 {
-	text-align: right;
-	padding-right: 5px;
-	margin: 0;
+   text-align: right;
+   padding-right: 5px;
+   margin: 0;
 }
 
 div.dayLabel a
 {
-	text-decoration: none;
-	color: #000000;
+   text-decoration: none;
+   color: #000000;
 }
 
 div.cal-event-entry
 {
-	font-size: 11px;
-	padding-left: 5px;
-	color: #000000;
+   font-size: 11px;
+   padding-left: 5px;
+   color: #000000;
 }
 
 #monthLabel
 {
-	font-weight: bold;
-	text-align: center;
+   font-weight: bold;
+   text-align: center;
 }
 
 div.boxOutline
 {
-	margin: 0;
-	overflow: hidden;
+   margin: 0;
+   overflow: hidden;
 }
 
 .nextBtn
 {
-	background: url(/slingshot/images/calendar/next.gif) no-repeat center center;
+   background: url(/slingshot/images/calendar/next.gif) no-repeat center center;
 }
 
 .today
 {
-	background-color: #FFFFCC;
+   background-color: #FFFFCC;
 }
 
 #calendarcontainer
 {
-	padding:10px;
+   padding:10px;
 }
 
 #calendarmenu
@@ -112,7 +112,7 @@ div.boxOutline
 
 #calendarendpicker button, #calendarpicker button
 {
-	background: url(images/calendar-16.png) center center no-repeat;
+   background: url(images/calendar-16.png) center center no-repeat;
    text-align: left;
    text-indent: -10em;
    overflow: hidden;
@@ -123,24 +123,24 @@ div.boxOutline
  
 #year-field
 { 
-	width: 3em;
+   width: 3em;
 }
 
 #datefields
 {
-	border: solid 1px #666;
-	padding: .5em;
+   border: solid 1px #666;
+   padding: .5em;
 }
 
 #calendarpicker,
 #calendarendpicker
 {
-	vertical-align: middle;	
+   vertical-align: middle; 
 }
 
 #calendar-view
 {
-	visibility: hidden;
+   visibility: hidden;
 }
 
 #calendar-view .date-title
@@ -173,12 +173,12 @@ div.boxOutline
 /* Day view styles */
 div.timeLabel
 {
-	border-bottom: 2px solid #c0c0c0;
-  	height: 30px;
-	padding-right: 1px;
-	padding-top: 4px;
-	text-align: center;
-  	width: 56px;
+   border-bottom: 2px solid #c0c0c0;
+   height: 30px;
+   padding-right: 1px;
+   padding-top: 4px;
+   text-align: center;
+   width: 56px;
 }
 div.timeLabel.last
 {
@@ -194,12 +194,12 @@ div#timeLabels
 
 div.dayEventsView
 {
-	float: left;
-	font-family: Arial;
-	font-size: 11px;
-	text-align: left;
-	position: relative;
-	height: 100px;
+   float: left;
+   font-family: Arial;
+   font-size: 11px;
+   text-align: left;
+   position: relative;
+   height: 100px;
 }
 
 div#dayContainer
@@ -222,30 +222,30 @@ div.dayEvent
 /** Styling for the agenda view **/
 div.dayheader
 {
-	width: auto;
-	border-bottom: 1px solid #000;
-	font-family: Arial;
-	font-size: 16px;
-	font-weight: bold;
-	margin-bottom: 5px;
+   width: auto;
+   border-bottom: 1px solid #000;
+   font-family: Arial;
+   font-size: 16px;
+   font-weight: bold;
+   margin-bottom: 5px;
 }
 
 table.daytable
 {
-	width: auto;
+   width: auto;
 }
 
 table.daytable td.timelabel
 {
-	width: 7%;
+   width: 7%;
 }
 
 table.daytable td
 {
-	font-size: 12px;
-	color: #333;
-	text-align: left;
-	padding: 2px;
+   font-size: 12px;
+   color: #333;
+   text-align: left;
+   padding: 2px;
 }
 
 div.no-agenda-items
@@ -255,21 +255,21 @@ div.no-agenda-items
 
 div.agenda-item
 {
-	margin-top: 20px;
-	margin-bottom: 20px;
+   margin-top: 20px;
+   margin-bottom: 20px;
 }
 
 div.agenda-item div.cal-event-entry
 {
-	color: #333;
-	font-size: 108%;
-	padding: 2px;
-	text-align: left;
+   color: #333;
+   font-size: 108%;
+   padding: 2px;
+   text-align: left;
 }
 
 div.cal-event-entry a
 {
-	text-decoration: none;
+   text-decoration: none;
 }
 
 div.calendar-currentMonth
@@ -319,7 +319,7 @@ span.eventTime  input[type="text"]
   CSS treatments. */
 body {
     margin:0;
-	padding:0;
+   padding:0;
 }
 #markup { /* dummy container for prototype*/
 /*position:absolute;*/
@@ -345,8 +345,8 @@ z-index:0;
 position:relative;
 }
 .calendar.monthview div.day,.monthview div.day {
-	height:100%;
-	width:100%;
+   height:100%;
+   width:100%;
 }
 .calendar  td.disabled div{
 background-color:#F3F7FB;
@@ -394,8 +394,8 @@ padding:8px 10px;
     border:1px solid #EAEAEA;
     border-width:0 1px 0 0;
     text-align:center;
-  	font:normal 100% Arial;
-  	color:#606060;
+   font:normal 100% Arial;
+   color:#606060;
 }
 .calendar.weekview thead th {
     border-width:0 0 1px 1px; 
@@ -438,11 +438,10 @@ font-size:107%;
  /*border:1px solid black;*/
 }
 ul.dayEvents li,ul.dayEvents li a {
-color:#2B6EB5;
 text-decoration: none;
 }
 ul.dayEvents li a:hover {
-text-decoration: underline;	
+text-decoration: underline;   
 }
 ul.dayEvents li.hidden {
 /*visibility:hidden;*/
@@ -521,70 +520,71 @@ width:100%;
 font-size:85%;
 }
 div.allday, div.allday a {
-	text-decoration: none;
+   text-decoration: none;
 }
 .dayview table{
-	width:100%;
-	border:1px solid #EAEAEA;
-	border-width:2px 0;
-  border-collapse:separate;	
+   width:100%;
+   border:1px solid #EAEAEA;
+   border-width:2px 0;
+  border-collapse:separate;   
 }
 
 .dayview th {
   vertical-align:top;
-	width:4em;
-	color:#999;
-	font-weight: normal;
-	border-right:1px solid #EAEAEA;
+   width:4em;
+   color:#999;
+   font-weight: normal;
+   border-right:1px solid #EAEAEA;
 }
 .dayview th,.dayview td {
-	border-bottom:2px solid #EAEAEA;
+   border-bottom:2px solid #EAEAEA;
 }
 /*.dayview tr {
   border:2px solid #EAEAEA;
 }
 */
 .dayview tr.alldayRow {
-	height:4em;
+   height:4em;
 }
 div.fifteen {
-	height:1.06em;
+   height:1.06em;
 }
 div.thirty {
-	height:2.12em;
+   height:2.12em;
 }
 div.hour1 {
-	height:4.6em;
+   height:4.6em;
 }
 div.hour2 {
-	height:9.2em;
+   height:9.2em;
 }
 div.hour3 {
-	height:13.8em;
+   height:13.8em;
 }
 div.hour4 {
-	height:18.4em;
+   height:18.4em;
 }
 .dayview .day .hourSegment:last-child {
-	border:none;
+   border:none;
 }
 
 .vcalendar.dayview .vevent .dtstart{
-	margin:0.5em 0.25em;
-	display:inline-block;
+   margin:0.5em 0.25em;
+   display:inline-block;
 }
 .vcalendar.dayview .vevent a.summary {
   margin-left:0.5em;
 }
 .vcalendar.dayview .vevent .dtstart,
 .vcalendar.dayview .vevent .dtend {
-	position:static;
-	text-indent:0em;
-	font-weight: bold;
+   position:static;
+   text-indent:0em;
+   font-weight: bold;
 }
 .dayview div.vevent {
   background-color:none;
-  border-left:10px solid #2B6EB5;
+  border-width:0 0 0 10px;
+  border-style:solid;
   width:99.3%;
 }
 div.vevent p.dates {
@@ -598,19 +598,19 @@ div.vevent p.dates {
 .dayview div.vevent div {
     height:100%;
 /*    margin-left:1em;*/
-    background-color:#2B6EB5;
+/*    background-color:#2B6EB5;*/
 }
 .dayview div.vevent div.yui-resize-handle {
   height:5px;
   border:0;
-	-moz-opacity:0; 
-	filter:alpha(opacity=0); 
-	opacity:0;
+   -moz-opacity:0; 
+   filter:alpha(opacity=0); 
+   opacity:0;
 }
 .dayview div.vevent div.yui-resize-handle-b-active,.weekview div.vevent.allday div,.dayview div.vevent.allday div  {
-	-moz-opacity:1.0; 
-	filter:alpha(opacity=100); 
-	opacity:1.0;
+   -moz-opacity:1.0; 
+   filter:alpha(opacity=100); 
+   opacity:1.0;
 }
 /*Week view specific css*/
 .calendar.weekview tbody tr.alldayRow th {
@@ -628,42 +628,42 @@ div.vevent p.dates {
   width:auto;
   min-width:105px;
 /*  width:inherit;*/
-	padding:0;
-/* 	text-align:right; */
-	font-size:100%;
-	color:#999;
-	margin-right:0.5em;
+   padding:0;
+/*    text-align:right; */
+   font-size:100%;
+   color:#999;
+   margin-right:0.5em;
 }
 
 .calendar.weekview tbody td {
-/* 	height:3.5em; 	 */
+/*    height:3.5em;   */
 
 /*  text-align: right;*/
 }
 .calendar.weekview tbody tr.alldayRow th {
-	height:1em;
-	width:105px;
+   height:1em;
+   width:105px;
 /*  position:relative;*/
 }
 .dayview h2, .weekview h2 {
-	font:normal 100% Arial;
-	color:#606060;
-	margin:2px auto;
-	text-align:center;
-	width:100%;
+   font:normal 100% Arial;
+   color:#606060;
+   margin:2px auto;
+   text-align:center;
+   width:100%;
 }
 tr.alldayRow{
-	height:8em;
+   height:8em;
 }
 tr.alldayRow td  { 
-	height:auto;
-	margin:4em 0;
-	vertical-align:top;
+   height:auto;
+   margin:4em 0;
+   vertical-align:top;
 }
 
 .calendar.weekview tbody tr.alldayRow td {
-	border-left:1px dashed #EAEAEA;
-	height:52px;
+   border-left:1px dashed #EAEAEA;
+   height:52px;
 }
 .calendar.weekview tbody td{
 /*  border-left:1px solid #EAEAEA;
@@ -689,8 +689,8 @@ ul.dayEvents li.hidden,
 .agendaview .vevent .category,
 div.vevent.allday p.dates
 {
-	position:absolute;
-	text-indent:-999em;
+   position:absolute;
+   text-indent:-999em;
 }
 div.vevent.allday p.dates {
   *display:none;
@@ -701,7 +701,7 @@ div.vevent.allday p.dates {
 .vcalendar .vevent .description,
 .vcalendar .vevent .summary,
 .vcalendar .vevent p {
-	text-decoration:none;
+   text-decoration:none;
 }
 
 div.vevent *{
@@ -709,42 +709,42 @@ div.vevent *{
   font:100% Arial;
 }
 div.vevent {
-/* 	text-align: right; */
-/* 	position:absolute; */
-/* 	right:0; */
+/*    text-align: right; */
+/*    position:absolute; */
+/*    right:0; */
 
-	color:#fff;
-	width:inherit;
-	font-size: 85%;
-	cursor:pointer;
-	cursor:hand;
-	z-index:99999;
+   color:#fff;
+   width:inherit;
+   font-size: 85%;
+   cursor:pointer;
+   cursor:hand;
+   z-index:99999;
 }
 
 .weekview div.vevent, .dayview div.vevent div{
-	-moz-opacity:.80; 
-	filter:alpha(opacity=80); 
-	opacity:.80; 
+   -moz-opacity:.80; 
+   filter:alpha(opacity=80); 
+   opacity:.80; 
 }
 
 .weekview div.vevent div {
-	margin:0 0.5em;
-	padding:0.5em 0;
+   margin:0 0.5em;
+   padding:0.5em 0;
 }
 .weekview .vevent {
-/* 		padding:0.5em 0 0.5em 0.5em; */
+/*       padding:0.5em 0 0.5em 0.5em; */
    position:absolute;
-	background-color:#2B6EB5;
-	overflow:hidden;
+/* background-color:#2B6EB5;*/
+   overflow:hidden;
 }
 
 /* for week view and non allday events */
 .weekview .vevent .dtstart,
 .weekview .vevent .dtend,
 .weekview .vevent p {
-	text-indent:0em;
-	position:static;
-	font-weight:bold;
+   text-indent:0em;
+   position:static;
+   font-weight:bold;
 }
 
 .ie .hourSegment {
@@ -755,12 +755,12 @@ div.vevent {
 /*  border-bottom:2px solid #EAEAEA;*/
 }
 .hourSegment {
-	min-height:50%;
+   min-height:50%;
   height:25px;
   cursor:pointer;
-	border-bottom:1px solid #EAEAEA;
+   border-bottom:1px solid #EAEAEA;
 /* position:relative;*/
-	
+   
 }
 .hourSegment.last {
   border:none;
@@ -774,74 +774,73 @@ div.vevent {
    border-bottom:0;
 }
 div.vevent.allday {
-	position:static;
-	width:100%;
-	font-size:100%;
-	border-left:0;
+   position:static;
+   width:100%;
+   font-size:100%;
+   border-left:0;
 }
 div.vevent.allday div{
   padding:5px;
 }
 div.hourSegment .vevent {
-	position:absolute;
-	z-index:3;
+   position:absolute;
+   z-index:3;
 }
 .hour {
-	height:52px;
+   height:52px;
 }
 #ygddfdiv { 
-	background-color:#fff;
+   background-color:#fff;
 }
 .weekview .vevent p.dates{
-	display:block;
+   display:block;
 }
 /** agenda view */
 .agendaview {
   border-bottom:1px solid #D4D4D4;
 }
 .agendaview h1 {
-	border-bottom:1px solid #EAEAEA;
-	height:auto;
-	padding:0 1em;
+   border-bottom:1px solid #EAEAEA;
+   height:auto;
+   padding:0 1em;
 }
 .agendaview h2 {
-	border-top:1px solid #D4D4D4;
-	border-bottom:1px dashed #C2C2C2;
-	background-color:#F8F8F8;
-	display:block;
-	padding:0.5em 1em;
+   border-top:1px solid #D4D4D4;
+   border-bottom:1px dashed #C2C2C2;
+   background-color:#F8F8F8;
+   display:block;
+   padding:0.5em 1em;
 }
 .agendaview h1,.agendaview h2 {
-	font-weight: normal;
-	margin:0;
-	font-size:121%;
+   font-weight: normal;
+   margin:0;
+   font-size:121%;
 }
 .agendaview ul{
-	list-style: none;
-	margin:1em 0 1em 1.3em;
-	padding:0;
-	color:#2B6EB5;
+   list-style: none;
+   margin:1em 0 1em 1.3em;
+   padding:0;
 }
-.agendaview ul li {
-	margin-bottom:0.5em;
+div.agendaview ul li {
+   margin-bottom:0.5em;
+   background:none;
 }
 .agendaview ul a {
-	color:#2B6EB5;
-	text-decoration: none;
+   text-decoration: none;
 }
 .agendaview ul a:hover {
-	text-decoration:underline;
+   text-decoration:underline;
 }
 .agendaview ul span.dtstart,.agendaview ul span.dtend {
-	font-weight: bold;
+   font-weight: bold;
 }
 .agendaview ul span.dtend {
-	margin-right:1em;
+   margin-right:1em;
 }
 
 .agendaview div.allday {
-	width:7.1em;
-	margin-right:0.9em;
+   width:7.1em;
+   margin-right:0.9em;
 }
 .agendaview p.dates {
   display:inline;

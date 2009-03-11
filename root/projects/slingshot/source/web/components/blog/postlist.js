@@ -971,7 +971,7 @@
          }
           
          var elem = Dom.getElementsByClassName('post', null, oArgs.target, null);
-         Dom.addClass(elem, 'overNode');
+         Dom.addClass(elem, 'over');
       },
 
       /**
@@ -984,7 +984,7 @@
       onEventUnhighlightRow: function BlogPostList_onEventUnhighlightRow(oArgs)
       {
          var elem = Dom.getElementsByClassName('post', null, oArgs.target, null);
-         Dom.removeClass(elem, 'overNode');
+         Dom.removeClass(elem, 'over');
       },
       
       

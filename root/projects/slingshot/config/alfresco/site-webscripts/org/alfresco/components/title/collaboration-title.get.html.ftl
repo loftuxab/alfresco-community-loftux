@@ -10,7 +10,7 @@
    );
    Alfresco.constants.DASHLET_RESIZE = ${userIsSiteManager?string};
 //]]></script>
-<div class="page-title theme-bg-color-1">
+<div class="page-title theme-bg-color-1 theme-border-1">
    <div class="title">
       <h1>${msg("header.site", "<span>${siteTitle}</span>")}</h1>
    </div>

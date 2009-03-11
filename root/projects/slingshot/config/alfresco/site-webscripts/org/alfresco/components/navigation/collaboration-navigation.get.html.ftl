@@ -7,16 +7,28 @@
 <#if activePage = "wiki-create"><#assign activePage="wiki"></#if>
 <div class="site-navigation">
 <#if siteExists??>
-   <#assign linkClass><#if url.context + "/page/site/" + activeSite + "/dashboard" == page.url.uri>class="active-page"</#if></#assign>
+   <#if url.context + "/page/site/" + activeSite + "/dashboard" == page.url.uri>
+      <#assign linkClass>class="active-page theme-color-4"</#assign>
+   <#else>
+      <#assign linkClass>class="theme-color-4"</#assign>
+   </#if>
    <span class="navigation-item"><a href="${url.context}/page/site/${activeSite}/dashboard" ${linkClass}>${msg("link.siteDashboard")}</a></span>
    <#list pages as p>
       <#assign linkPage><#if p.pageUrl??>${p.pageUrl}<#else>${p.pageId}</#if></#assign>
-      <#assign linkClass><#if linkPage?index_of(activePage) != -1>class="active-page"</#if></#assign>
+      <#if linkPage?index_of(activePage) != -1>
+         <#assign linkClass>class="active-page theme-color-4"</#assign>      
+      <#else>
+         <#assign linkClass>class="theme-color-4"</#assign>
+      </#if>
    <span class="navigation-separator">&nbsp;</span>
    <span class="navigation-item"><a href="${url.context}/page/site/${activeSite}/${linkPage}" ${linkClass}>${p.title}</a></span>
    </#list>
 <span class="navigation-separator-alt">&nbsp;</span>
-   <#assign linkClass><#if ("site-members" == activePage) || ("sent-invites" == activePage) || ("invite" == activePage)>class="active-page"</#if></#assign>
+   <#if ("site-members" == activePage) || ("sent-invites" == activePage) || ("invite" == activePage)>
+      <#assign linkClass>class="active-page theme-color-4"</#assign>      
+   <#else>
+      <#assign linkClass>class="theme-color-4"</#assign>
+   </#if>
 <span class="navigation-item"><a href="${url.context}/page/site/${activeSite}/site-members" ${linkClass}>${msg("link.members")}</a></span>
 </#if>
 </div>

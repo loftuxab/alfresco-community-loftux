@@ -1,5 +1,5 @@
 <#assign activePage = page.url.templateArgs.pageid?lower_case!"">
-<div id="${args.htmlid}-body" class="members-bar">
+<div id="${args.htmlid}-body" class="members-bar theme-bg-2">
 
    <div class="member-link"><a href="site-members" <#if activePage == "site-members">class="activePage"</#if>>${msg("link.site-members")}</a></div>
    <#if isManager>

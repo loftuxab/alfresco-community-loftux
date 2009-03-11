@@ -530,6 +530,7 @@
             var header = Alfresco.CalendarHelper.renderTemplate('agendaDay',{date:date});
             var eventsHTML = '';
             var ul = document.createElement('ul');
+            ul.className = 'theme-color-1';
             var agendaEvts = sortedEvents[event];
             for (var i = 0; i<agendaEvts.length;i++)
             {
@@ -2134,7 +2135,7 @@ Alfresco.CalendarHelper = ( function() {
 } ) (); 
 
 Alfresco.CalendarHelper.addTemplate('vevent',
-    '<{el} class="vevent {allday} {hidden}"> ' +
+    '<{el} class="vevent {allday} {hidden} theme-bg-color-1 theme-border-2"> ' +
 	'<{contEl}>' +
 		'<p class="dates">' +
 		'<span class="dtstart" title="{from}">{start}</span> - ' +
@@ -2244,31 +2245,24 @@ Alfresco.util.DialogManager = ( function () {
            */
           onDateSelectButton: function(e)
           {
-             var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
-             oCalendarMenu.setBody("&#32;");
-             oCalendarMenu.body.id = "calendarcontainer";
-
-             var container = this.get("container");
-             // Render the Overlay instance into the Button's parent element
-             oCalendarMenu.render(container);
-
-             // Align the Overlay to the Button instance
-             oCalendarMenu.align();
-
-                var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
-             oCalendar.render();
-
-             oCalendar.changePageEvent.subscribe(function () {
-                window.setTimeout(function () {
-                   oCalendarMenu.show();
-                }, 0);
+             var o = Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView');
+             o.oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu",{
+               context:[YAHOO.util.Event.getTarget(e),'tl','tr']
              });
-             var me = this;
+             o.oCalendarMenu.setBody("&#32;");
+             o.oCalendarMenu.body.id = "calendarcontainer";
 
-             oCalendar.selectEvent.subscribe(function (type, args) {
+             // Render the Overlay instance into the Button's parent element
+             o.oCalendarMenu.render(YAHOO.util.Dom.getAncestorByClassName(YAHOO.util.Event.getTarget(e),'yui-panel','div'));
+
+             var container = this.get('container');
+             
+             o.oCalendar = new YAHOO.widget.Calendar("buttoncalendar", o.oCalendarMenu.body.id);
+             o.oCalendar.render();
+
+             o.oCalendar.selectEvent.subscribe(function (type, args) {
                 var date;
                 var Dom = YAHOO.util.Dom;
-
                 if (args) {
                    var prettyId, hiddenId;
                    if (container.indexOf("enddate") > -1)
@@ -2305,8 +2299,10 @@ Alfresco.util.DialogManager = ( function () {
                      document.getElementsByName('to')[0].value = elem.value;                   
                    }
                 }
-                oCalendarMenu.hide();
-             });
+                o.oCalendarMenu.hide();
+             },o,true);
+             o.oCalendarMenu.show();
+             o.oCalendar.show();
          },
            _onDateValidation: function(field, args, event, form, silent)
              {

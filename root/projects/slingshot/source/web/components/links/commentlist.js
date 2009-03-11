@@ -771,14 +771,14 @@
          }
 
          var elem = args[1].target;
-         YAHOO.util.Dom.addClass(elem, 'overNode');
+         YAHOO.util.Dom.addClass(elem, 'over');
       },
 
       /** Called whenever the mouse exits a list item. */
       onCommentElementMouseExited: function CommentList_onCommentElementMouseExited(layer, args)
       {
          var elem = args[1].target;
-         YAHOO.util.Dom.removeClass(elem, 'overNode');
+         YAHOO.util.Dom.removeClass(elem, 'over');
       },
 
 

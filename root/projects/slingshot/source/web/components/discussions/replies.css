@@ -50,10 +50,7 @@ html>body .node, .reply, .comment {
 .node.simple{
   padding: 5px;
 }
-.overNode
-{
-  background-color: #f4faff;
-}
+
 .node .published {
   margin: 5px 0 10px 0;
 }

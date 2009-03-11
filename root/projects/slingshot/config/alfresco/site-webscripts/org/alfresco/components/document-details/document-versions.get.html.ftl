@@ -29,7 +29,7 @@ new Alfresco.DocumentVersions("${args.htmlid}").setOptions(
             </div>
          </#if>
          <div id="${args.htmlid}-expand-div-${version_index}" class="info more <#if version_index != 0>collapsed<#else>expanded</#if>">
-            <span class="meta-section-label">${msg("label.label")} ${version.label}</span>
+            <span class="meta-section-label theme-color-1">${msg("label.label")} ${version.label}</span>
             <span id="${args.htmlid}-createdDate-span-${version_index}" class="meta-value">&nbsp;</span>
          </div>
          <div id="${args.htmlid}-moreVersionInfo-div-${version_index}" class="moreInfo" <#if version_index != 0>style="display: none;"</#if>>
