@@ -149,21 +149,24 @@
        */
       onSuccess: function UP_onSuccess(response)
       {
-         if (response && response.json.success)
+         if (response && response.json)
          {
-            // succesfully updated details - refresh back to the user profile main page
-            Alfresco.util.PopupManager.displayPrompt(
+            if (response.json.success)
             {
-               text: Alfresco.util.message("message.success", this.name)
-            });
-            this.navigateToProfile();
-         }
-         else if (response && response.json.message)
-         {
-            Alfresco.util.PopupManager.displayPrompt(
+               // succesfully updated details - refresh back to the user profile main page
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  text: Alfresco.util.message("message.success", this.name)
+               });
+               this.navigateToProfile();
+            }
+            else if (response.json.message)
             {
-               text: response.json.message
-            });
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  text: response.json.message
+               });
+            }
          }
          else
          {

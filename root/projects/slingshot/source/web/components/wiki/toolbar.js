@@ -56,6 +56,7 @@
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("userAccess", this.onUserAccess, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
 
       return this;
    };
@@ -173,7 +174,7 @@
             disabled: true,
             value: "edit"
          });
-         Alfresco.util.createYUIButton(this, "rssFeed-button", null,
+         this.widgets.rssFeedButton = Alfresco.util.createYUIButton(this, "rssFeed-button", null,
          {
             type: "link"
          });
@@ -290,6 +291,25 @@
                      }
                   }
                }
+            }
+         }
+      },
+
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function WikiToolbar_onDeactivateAllControls(layer, args)
+      {
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
+         {
+            if (this.widgets.hasOwnProperty(index))
+            {
+               fnDisable(this.widgets[index]);
             }
          }
       },

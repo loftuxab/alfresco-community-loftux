@@ -77,6 +77,7 @@
       YAHOO.Bubbling.on("blogConfigChanged", this.onBlogConfigChanged, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("blogpostlistRefresh", this.onBlogPostListRefresh, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
    };
@@ -275,8 +276,8 @@
             initialPage: 1,
             template: this._msg("pagination.template"),
             pageReportTemplate: this._msg("pagination.template.page-report"),
-            previousPageLinkLabel : this._msg("pagination.previousPageLinkLabel"),
-            nextPageLinkLabel     : this._msg("pagination.nextPageLinkLabel")
+            previousPageLinkLabel: this._msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel: this._msg("pagination.nextPageLinkLabel")
          });
          
          this.widgets.paginator.subscribe("changeRequest", handlePagination);
@@ -293,7 +294,6 @@
                   me[owner.className].call(me, args[1].target.offsetParent, owner);
                }
             }
-      		 
             return true;
          };
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-div", fnActionHandlerDiv);
@@ -312,7 +312,6 @@
                   args[1].stop = true;
                }
             }
-      		 
             return true;
          };
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-span", fnActionHandlerSpan);
@@ -667,7 +666,7 @@
        * @method onPublishExternal
        * @param row {object} DataTable row representing post to be actioned
        */
-      onPublishExternal: function Blog_onPublishExternal(row)
+      onPublishExternal: function BlogPostList_onPublishExternal(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
          this._publishExternal(record.getData('name'));
@@ -679,7 +678,7 @@
        * @method onUpdateExternal
        * @param row {object} DataTable row representing post to be actioned
        */
-      onUpdateExternal: function Blog_onUpdateExternal(row)
+      onUpdateExternal: function BlogPostList_onUpdateExternal(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
          this._updateExternal(record.getData('name'));
@@ -691,7 +690,7 @@
        * @method onUnpublishExternal
        * @param row {object} DataTable row representing post to be actioned
        */
-      onUnpublishExternal: function Blog_onUnpublishExternal(row)
+      onUnpublishExternal: function BlogPostList_onUnpublishExternal(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
          this._unpublishExternal(record.getData('name'));
@@ -1022,12 +1021,12 @@
        */
       onDeactivateAllControls: function BlogPostList_onDeactivateAllControls(layer, args)
       {
-         var widget;
-         for (widget in this.widgets)
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
          {
-            if (this.widgets.hasOwnProperty(widget))
+            if (this.widgets.hasOwnProperty(index))
             {
-               this.widgets[widget].set("disabled", true);
+               fnDisable(this.widgets[index]);
             }
          }
       },

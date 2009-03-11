@@ -93,10 +93,7 @@
 
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("linksListRefresh", this.onLinksListRefresh, this);
-
-      this.newLinkBtn = null;
-      this.changeListViewBtn = null;
-      this.linksMenu = null;
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    };
 
    Alfresco.Links.prototype =
@@ -293,7 +290,7 @@
       {  
          if (linkPermissions.create === "false")
          {
-            this.newLinkBtn.set("disabled", true);
+            this.widgets.newLinkBtn.set("disabled", true);
          }
       },
       /**
@@ -342,7 +339,7 @@
             elCell.firstChild.onclick = function()
             {
                var count = me.getSelectedLinks().length;
-               me.linksMenu.set("disabled", count === 0);
+               me.widgets.linksMenu.set("disabled", count === 0);
             };
          };
 
@@ -690,7 +687,7 @@
          {
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
             this.updateListTitle();
-            this.linksMenu.set("disabled", this.getSelectedLinks().length === 0);
+            this.widgets.linksMenu.set("disabled", this.getSelectedLinks().length === 0);
             var perm = oResponse.meta.metadata.linkPermissions;
             this.options.permissionDelete = perm["delete"];
             this.options.permissionUpdate = perm["edit"];
@@ -775,11 +772,12 @@
        */
       onDeactivateAllControls: function Links_onDeactivateAllControls(layer, args)
       {
-         for (var widget in this.widgets)
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
          {
-            if (widget)
+            if (this.widgets.hasOwnProperty(index))
             {
-               this.widgets[widget].set("disabled", true);
+               fnDisable(this.widgets[index]);
             }
          }
       },
@@ -834,7 +832,7 @@
                
             case "deselect-item":
                this.deselectAll();
-               this.linksMenu.set("disabled", true);
+               this.widgets.linksMenu.set("disabled", true);
                break;
          }
 
@@ -862,20 +860,20 @@
       attachButtons: function Links_attachButtons()
       {
          var me = this;
-         this.newLinkBtn = Alfresco.util.createYUIButton(this, "create-link-button", this.showCreateLinkDlg,
+         this.widgets.newLinkBtn = Alfresco.util.createYUIButton(this, "create-link-button", this.showCreateLinkDlg,
          {
             disabled: false,
             value: "create"
          });
 
-         this.linksMenu = Alfresco.util.createYUIButton(this, "selected-i-dd", this.onMenuItemClick,
+         this.widgets.linksMenu = Alfresco.util.createYUIButton(this, "selected-i-dd", this.onMenuItemClick,
          {
             disabled: true,
             type: "menu",
             menu:"selectedItems-menu"
          });
 
-         this.changeListViewBtn = Alfresco.util.createYUIButton(this, "viewMode-button", this.changeListView,
+         this.widgets.changeListViewBtn = Alfresco.util.createYUIButton(this, "viewMode-button", this.changeListView,
          {
          });
 
@@ -911,12 +909,12 @@
          {
             case "links-action-deselect-all":
                this.deselectAll();
-               this.linksMenu.set("disabled", true);
+               this.widgets.linksMenu.set("disabled", true);
                break;
 
             case "links-action-select-all":
                this.selectAll();
-               this.linksMenu.set("disabled", !this.getSelectedLinks().length);
+               this.widgets.linksMenu.set("disabled", !this.getSelectedLinks().length);
                break;
 
             case "links-action-invert-selection":
@@ -939,7 +937,7 @@
             ipt.checked = !ipt.checked;
             isDisable = ipt.checked ? true : isDisable;
          }
-         this.linksMenu.set("disabled", !isDisable);
+         this.widgets.linksMenu.set("disabled", !isDisable);
       },
 
       /**
@@ -989,7 +987,7 @@
                j++;
             }
          }
-         this.changeListViewBtn.set("label", this._msg(this.options.simpleView ? "header.detailedList" : "header.simpleList"));
+         this.widgets.changeListViewBtn.set("label", this._msg(this.options.simpleView ? "header.detailedList" : "header.simpleList"));
       },
 
       /**
@@ -1275,23 +1273,6 @@
       _msg: function Links_msg(messageId)
       {
          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
-      },
-
-      /**
-       * Init the 'Create Link' dialog.
-       *
-       * @method _initCreateLinkDialog.
-       */
-      _initCreateLinkDialog: function Links_initCreateLinkDialog()
-      {
-         this.widgets.createLinkDlg = new Alfresco.LinksEditDialog(this.id + "-editdlg");
-         this.widgets.createLinkDlg.setOptions(
-         {
-            siteId:this.options.siteId,
-            containerId:this.options.containerId,
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/links/modaldialogs/edit-dialog"
-         });
-         this.widgets.createLinkDlg.init();
       },
 
       /**

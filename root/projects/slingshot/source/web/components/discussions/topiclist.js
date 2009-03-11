@@ -76,6 +76,7 @@
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("topiclistRefresh", this.onDiscussionsTopicListRefresh, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
    }
@@ -798,9 +799,13 @@
        */
       onDeactivateAllControls: function DiscussionsTopicList_onDeactivateAllControls(layer, args)
       {
-         for (widget in this.widgets)
+         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         for (index in this.widgets)
          {
-            this.widgets[widget].set("disabled", true);
+            if (this.widgets.hasOwnProperty(index))
+            {
+               fnDisable(this.widgets[index]);
+            }
          }
       },
       

@@ -1,12 +1,13 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.WikiList("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs["site"]!""}",    
-      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
+      siteId: "${page.url.templateArgs["site"]!""}",
+      <#if error??>error: true,</#if>
+      pages: [<#if pagelist?? && pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name}"<#if p_has_next>, </#if></#list></#if>] 
    });                                       
 //]]></script>
 <div id="${args.htmlid}-pagelist" class="yui-navset pagelist"> 
-<#if pageList.pages?size &gt; 0>
+<#if pageList?? && pageList.pages?size &gt; 0>
 <#list pageList.pages as p>
    <div class="wikipage <#if p.tags??><#list p.tags as t>wp-${t}<#if t_has_next> </#if></#list></#if>">
    <div class="actionPanel">
@@ -33,6 +34,8 @@
    </div>
    </div><#-- End of wikipage -->
 </#list>
+<#elseif error??>
+   <div class="error-alt">${error}</div>
 <#else>
    <div class="noWikiPages">${msg("label.noPages")}</div>
 </#if>

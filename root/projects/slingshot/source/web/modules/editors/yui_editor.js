@@ -7,59 +7,64 @@ Alfresco.util.RichEditorManager.addEditor('YAHOO.widget.SimpleEditor', function(
    var editor;
    return (
    {
-      init: function RichEditorManager_init(id,config)
+      init: function RichEditorManager_yui_init(id,config)
       {
          editor = new YAHOO.widget.SimpleEditor(id, config);
-         YAHOO.Bubbling.fire("editorInitialized", this);        
+         YAHOO.Bubbling.fire("editorInitialized", this);
          return this;
       },
+      
+      getEditor: function RichEditorManager_yui_getEditor()
+      {
+         return editor;
+      },
 
-      clear: function RichEditorManager_clear() 
+      clear: function RichEditorManager_yui_clear()
       {
          editor.clearEditorDoc();
       },
 
-      render: function RichEditorManager_render() 
+      render: function RichEditorManager_yui_render()
       {
          editor.render();
       },
 
-      disable: function RichEditorManager_disable()
+      disable: function RichEditorManager_yui_disable()
       {
          editor._disableEditor(true);
       },
 
-      enable: function RichEditorManager_enable()
+      enable: function RichEditorManager_yui_enable()
       {
          editor._disableEditor(false);
       },
 
-      getContent: function RichEditorManager_getContent() 
+      getContent: function RichEditorManager_yui_getContent()
       { 
          return editor.getEditorHTML();
       }, 
 
-      setContent: function RichEditorManager_setContent(html) 
+      setContent: function RichEditorManager_yui_setContent(html)
       { 
          editor.setEditorHTML(html);
       },
 
-      save: function RichEditorManager_save()
+      save: function RichEditorManager_yui_save()
       {
          editor.saveHTML();
       },
 
-      getContainer: function RichEditorManager_getContainer()
+      getContainer: function RichEditorManager_yui_getContainer()
       {
          return editor.get('element_cont').get('element');
       },
       
-      activateButton: function RichEditorManager_activateButton(buttonId)
+      activateButton: function RichEditorManager_yui_activateButton(buttonId)
       {
          editor.toolbar.selectButton(buttonId);
       },
       
-      deactivateButton: function RichEditorManager_deactivateButton(buttonId)
+      deactivateButton: function RichEditorManager_yui_deactivateButton(buttonId)
       {
          editor.toolbar.deselectButton(buttonId);
       }

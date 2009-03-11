@@ -4,7 +4,7 @@
       siteId: "${page.url.templateArgs["site"]!""}",
       containerId: "${args.container!'blog'}",
       allowCreate: ${blog.permissions.create?string},
-      allowConfigure: ${blog.permissions.edit?string} 
+      allowConfigure: ${blog.permissions.edit?string}
    }).setMessages(
       ${messages}
    );

@@ -22,13 +22,15 @@
 <#else>
    <#assign permissions = {}>
 </#if>
-
+<#-- Error State? -->
+<#assign errorState = (!result.pagetext?? && result.message??)>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.Wiki("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site}",
       pageTitle: "${page.url.args["title"]!""}",
       mode: "${page.url.args["action"]!"view"}",
+      <#if errorState>error: true,</#if>
       tags: [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>],
       pages: [<#list pageList as p>"${p?js_string}"<#if p_has_next>, </#if></#list>],
       versions: [<#if result.versionhistory??>
@@ -66,7 +68,7 @@
    { 
       "label": msg("tab.view"),
       "action": "view",
-      "permitted": true
+      "permitted": !errorState
    },
    {
       "label": msg("tab.edit"),
@@ -76,7 +78,7 @@
    {
       "label": msg("tab.details"),
       "action": "details",
-      "permitted": true
+      "permitted": !errorState
    }
 ]>
 <#list tabs as tab>
@@ -97,7 +99,7 @@
 <div id="${args.htmlid}-wikipage" class="wiki-page">       
    <div class="yui-content" style="background: #FFFFFF;"> 
 <#if action == "view">       
-      <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
+      <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.message??><span class="error-alt">${result.message}</span></#if></div> 
 <#elseif action == "edit">           
       <div>
          <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">

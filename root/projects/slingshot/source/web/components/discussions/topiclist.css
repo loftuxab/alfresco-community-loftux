@@ -1,4 +1,3 @@
-
 /* Topic list header */
 
 .topiclist-infobar div.hideable
@@ -11,20 +10,6 @@
    display: none;
 }
 
-/*
-.toolbar .createTopic button
-{
-   background: transparent url(../images/create-discussion-16.png) no-repeat 12px 4px;
-   padding-left: 32px;
-}
-
-.toolbar .rss-feed a
-{
-   background: transparent url(../images/feed-icon-16.png) no-repeat 12px 4px;
-   padding-left: 32px;
-}
-*/
-
 .topiclist-infobar
 {
    width: auto;
@@ -33,6 +18,11 @@
    margin: 0 -10px;
    padding-right: 10px;
    padding-top: 0.1em;
+}
+
+.topiclist-infobar .align-right
+{
+   text-align: right;
 }
 
 .topiclist-infobar .listTitle
@@ -53,26 +43,30 @@
    text-align: right;
 }
 
-
 /*******************
  * WYSIWYG CONTENT *
 ********************/
+
 .yuieditor strong
 {
    font-weight: bold;
 }
+
 .yuieditor em
 {
    font-style: italic;
 }
+
 .yuieditor ul, .yuieditor ol
 {
    padding-left: 40px;
 }
+
 .yuieditor ul li
 {
    list-style-type: disc;
 }
+
 .yuieditor ol li
 {
    list-style-type: decimal;
@@ -91,10 +85,12 @@
    width: 100%;
    border: none !important;
 }
+
 .topiclist table thead
 {
    display: none;
 }
+
 .topiclist table td
 {
    border: none !important;
@@ -104,9 +100,24 @@
 {
    background-color: transparent;
 }
+
 .topiclist table .yui-dt-liner
 {
    padding: 0px;
+}
+
+.topiclist .yui-dt-error
+{
+   background: red;
+   color: white;
+   font-weight: bold;
+   margin: 1em auto;
+   padding: 1em;
+}
+
+.topiclist .yui-dt-error .yui-dt-liner
+{
+   padding: 4px;
 }
 
 .topiclist .row-separator
@@ -125,28 +136,33 @@
 }
 
 /* Topic list elements */
+
 /********
  * NODE *
 *********/
+
 .node, .reply, .comment
 {
    padding: 20px 1em;
    margin-left: 0px;
    margin-right: 0px;
    voice-family: "\"}\"";
-   voice-family:inherit;
+   voice-family: inherit;
    display: inline-block;
 }
+
 html>body .node, .reply, .comment
 {
    display: block;
 }
+
 .node table td,
    .reply table td,
    .comment table td
 {
    vertical-align: top;
 }
+
 .node.simple
 {
    padding: 5px;
@@ -176,24 +192,29 @@ html>body .node, .reply, .comment
    line-height: 130%;
    color: #606060;
 }
+
 .nodeAttrValue
 {
    line-height: 130%;
    color: #333333;
 }
+
 .nodeAttrValue a
 {
    color: #2b6eb5;
 }
+
 .node .userLink
 {
    line-height: 150%;
    color: #999999;
 }
+
 .node .userLink a
 {
    color: #2b6eb5;
 }
+
 .nodeContent
 {
    line-height: 150%;
@@ -228,10 +249,10 @@ html>body .node, .reply, .comment
    padding-left: 20px;
 }
 
-
 /*************
  * EDIT BLOCK *
 **************/
+
 .nodeEdit
 {
    float: right;
@@ -244,12 +265,14 @@ html>body .node, .reply, .comment
    padding: 2px 19px;
    margin-bottom: 4px;
 }
+
 .simple .nodeEdit
 {
    width: 200px;
    text-align: right;
    margin: 4px;
 }
+
 .nodeEdit .action-link
 {
    font-size: 93%;
@@ -263,17 +286,19 @@ html>body .node, .reply, .comment
    padding-left: 20px;
    margin-right: 10px;
 }
+
 .nodeEdit .onAddReply
 {
    background: url(../images/reply-to-discussion-16.png) no-repeat scroll 0px 0px;
    padding-left: 20px;
    margin-right: 10px;
 }
+
 .nodeEdit .onEditTopic,
    .nodeEdit .onEditReply,
    .nodeEdit .onEditComment
 {
-   background:url(../images/edit-discussion-16.png) no-repeat scroll 0px 0px;
+   background: url(../images/edit-discussion-16.png) no-repeat scroll 0px 0px;
    padding-left: 20px;
    margin-right: 10px;
 }
@@ -285,4 +310,3 @@ html>body .node, .reply, .comment
    background: url('../images/delete-discussion-16.png') no-repeat scroll 0px 0px;
    padding-left: 20px;
 }
-

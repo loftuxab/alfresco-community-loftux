@@ -8,7 +8,7 @@ Alfresco.util.RichEditorManager.addEditor('tinyMCE', function(id,config)
    
    return (
    {
-      init: function RichEditorManager_init(id,config)
+      init: function RichEditorManager_tinyMCE_init(id, config)
       {
          config.mode = 'exact';
          config.elements = id;
@@ -27,54 +27,60 @@ Alfresco.util.RichEditorManager.addEditor('tinyMCE', function(id,config)
          return this;
       },
 
-      clear: function RichEditorManager_clear() 
+      getEditor: function RichEditorManager_tinyMCE_getEditor()
       {
+         return editor;
+      },
+
+      clear: function RichEditorManager_tinyMCE_clear() 
+      {
+         YAHOO.util.Dom.get(editor.id).value = '';
          editor.setContent('');
       },
 
-      render: function RichEditorManager_render() 
+      render: function RichEditorManager_tinyMCE_render() 
       {
          editor.render();
       },
 
       execCommand: 'execCommand',
 
-      disable: function RichEditorManager_disable()
+      disable: function RichEditorManager_tinyMCE_disable()
       {
          editor.hide();
       },
 
-      enable: function RichEditorManager_enable()
+      enable: function RichEditorManager_tinyMCE_enable()
       {
          editor.show();
       },
 
-      getContent: function RichEditorManager_getContent() 
+      getContent: function RichEditorManager_tinyMCE_getContent() 
       { 
          return editor.getContent();
       }, 
 
-      setContent: function RichEditorManager_setContent(html) 
+      setContent: function RichEditorManager_tinyMCE_setContent(html) 
       { 
          editor.setContent(html);
       }, 
 
-      save: function RichEditorManager_save()
+      save: function RichEditorManager_tinyMCE_save()
       {
          editor.save();
       },
 
-      getContainer: function RichEditorManager_getContainer()
+      getContainer: function RichEditorManager_tinyMCE_getContainer()
       {
          return editor["editorId"] + "_tbl";
       },
       
-      activateButton: function RichEditorManager_activateButton(buttonId)
+      activateButton: function RichEditorManager_tinyMCE_activateButton(buttonId)
       {
          editor.controlManager.setActive(buttonId, true);
       },
       
-      deactivateButton: function RichEditorManager_deactivateButton(buttonId)
+      deactivateButton: function RichEditorManager_tinyMCE_deactivateButton(buttonId)
       {
          editor.controlManager.setActive(buttonId, false);
       }

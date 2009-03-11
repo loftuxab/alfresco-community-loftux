@@ -19,12 +19,12 @@
 .toolbar .action-bar,
 .toolbar .rss-feed
 {
-   padding:4px 0.5em;
+   padding: 4px 0.5em;
 }
 
 .toolbar .navigation-bar
 {
-   padding:2px 1em;
+   padding: 2px 1em;
    line-height: 30px;
    height: 30px;
    background-color: #D6DEE3;
@@ -46,7 +46,7 @@
    background-repeat: no-repeat;
    color: #333333;
    padding: 0 5px 0 19px;
-   margin-right:5px;
+   margin-right: 5px;
 }
 
 .toolbar .forwardLink
@@ -56,7 +56,7 @@
    background-repeat: no-repeat;
    color: #333333;
    padding: 0 21px 0 5px;
-   margin-right:5px;
+   margin-right: 5px;
 }
 
 .toolbar .backLink a:hover,
@@ -69,7 +69,6 @@
 {
    background: transparent url(../images/new-blog-16.png) no-repeat 12px 4px;
    padding-left: 32px;
-   padding-bottom:3px;
 }
 
 .toolbar .new-topic .yui-button-disabled button
@@ -90,7 +89,7 @@
 
 .toolbar .hide
 {
-   padding:0;
-   visibility:hidden;
-   width:0;
+   display: none;
+   padding: 0;
+   width: 0;
 }

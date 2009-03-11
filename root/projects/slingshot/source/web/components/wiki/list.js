@@ -3,9 +3,15 @@
 */
 (function()
 {
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
    Alfresco.WikiList = function(containerId)
    {
-	   this.name = "Alfresco.WikiList";
+      this.name = "Alfresco.WikiList";
       this.id = containerId;
       this.options = {};
 
@@ -40,7 +46,15 @@
           * @property pages
           * @type Array
           */
-         pages: []
+         pages: [],
+         
+         /**
+          * Error state.
+          *
+          * @property error
+          * @type boolean
+          */
+         error: false
 
       },
 
@@ -51,7 +65,7 @@
        * @param obj {object} Object literal specifying a set of options
        * @return {Alfresco.DocListToolbar} returns 'this' for method chaining
        */
-      setOptions: function DLTB_setOptions(obj)
+      setOptions: function WikiList_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
 
@@ -68,24 +82,31 @@
        *
        * @method onComponentsLoaded
        */
-       onComponentsLoaded: function()
+       onComponentsLoaded: function WikiList_onComponentsLoaded()
        {
-          YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
+          Event.onContentReady(this.id, this.onReady, this, true);
        },
        
        /**
         * Fired by YUI when parent element is available for scripting.
         * Initialises components, including YUI widgets.
         *
-        * @method init
+        * @method onReady
         */
-       init: function()
+       onReady: function WikiList_onReady()
        {
-          this._initMouseOverListeners();
+          if (this.options.error)
+          {
+             // Site or container not found - deactivate controls
+             YAHOO.Bubbling.fire("deactivateAllControls");
+             return;
+          }
           
+          this._initMouseOverListeners();
+
           // Render any mediawiki markup
           // TODO: look at doing this on the server
-          var divs = YAHOO.util.Dom.getElementsByClassName('pageCopy', 'div');
+          var divs = Dom.getElementsByClassName('pageCopy', 'div');
           var div;
           for (var i=0; i < divs.length; i++)
           {
@@ -140,9 +161,8 @@
           YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
        },
        
-       onTagSelected: function(e, args)
+       onTagSelected: function WikiList_onTagSelected(e, args)
        {
-          var Dom = YAHOO.util.Dom;
           var tagname = args[1].tagname;
           
           // TODO: do something with the tag name for all tags
@@ -159,9 +179,11 @@
           else if (this._tagSelected !== tagname) 
           {
              var divs = Dom.getElementsByClassName('wikipage', 'div');
-             var div;
-             for (var x=0; x < divs.length; x++) {
-                div = divs[x];
+             var div, i, j;
+             
+             for (i = 0, j = divs.length; i < j; i++)
+             {
+                div = divs[i];
              
                 if (Dom.hasClass(div, 'wikiPageDeselect'))
                 {
@@ -170,7 +192,7 @@
              
                 if (!Dom.hasClass(div, 'wp-' + tagname)) 
                 {
-                   Dom.addClass(divs[x], 'wikiPageDeselect');
+                   Dom.addClass(divs[i], 'wikiPageDeselect');
                 }
              }
           
@@ -178,28 +200,27 @@
           }
        },       
        
-       _initMouseOverListeners: function()
+       _initMouseOverListeners: function WikiList__initMouseOverListeners()
        {
-          var divs = YAHOO.util.Dom.getElementsByClassName('wikipage', 'div');
-          for (var x=0; x < divs.length; x++) {
-             YAHOO.util.Event.addListener(divs[x], 'mouseover', this.mouseOverHandler);
-             YAHOO.util.Event.addListener(divs[x], 'mouseout', this.mouseOutHandler);
+          var divs = Dom.getElementsByClassName('wikipage', 'div');
+          for (var x=0; x < divs.length; x++)
+          {
+             Event.addListener(divs[x], 'mouseover', this.mouseOverHandler);
+             Event.addListener(divs[x], 'mouseout', this.mouseOutHandler);
           }
        },
        
-       mouseOverHandler: function(e)
+       mouseOverHandler: function WikiList_mouseOverHandler(e)
        {
           var currentTarget = e.currentTarget;
-          YAHOO.util.Dom.addClass(currentTarget, 'over');
+          Dom.addClass(currentTarget, 'over');
        },
        
-       mouseOutHandler: function(e)
+       mouseOutHandler: function WikiList_mouseOutHandler(e)
        {
           var currentTarget = e.currentTarget;
-          YAHOO.util.Dom.removeClass(currentTarget, 'over');
-       }
-      
-      
+          Dom.removeClass(currentTarget, 'over');
+       }      
    };
    
 })();   
