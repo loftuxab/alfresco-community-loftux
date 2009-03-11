@@ -10,7 +10,7 @@
     <br/>
     <br/>
     <table>
-      <form action="${url.service}" method="post" enctype="multipart/form-data">
+      <form action="${url.service?html}" method="post" enctype="multipart/form-data">
         <tr><td><td>Web Script:
         <tr><td><td><input type="file" name="webscript">
         <tr><td><td>&nbsp;
