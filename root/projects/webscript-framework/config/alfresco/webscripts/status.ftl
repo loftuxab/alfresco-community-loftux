@@ -45,10 +45,10 @@
    <tr><td></td><td>&nbsp;</td></tr>
    <#if exception.cause?exists == false>
       <#list exception.stackTrace as element>
-         <tr><td></td><td>${element}</td></tr>
+         <tr><td></td><td>${element?html}</td></tr>
       </#list>
    <#else>
-      <tr><td></td><td>${exception.stackTrace[0]}</td></tr>
+      <tr><td></td><td>${exception.stackTrace[0]?html}</td></tr>
    </#if>
    <tr><td></td><td>&nbsp;</td></tr>
    </#if>

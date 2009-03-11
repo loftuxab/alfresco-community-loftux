@@ -6,7 +6,7 @@
       <div>
          <table>
             <tr><td><span class="title">Web Script: ${script.id}</span></td></tr>
-            <tr><td>Generated from ${url.full} on ${date?datetime}</td></tr>
+            <tr><td>Generated from ${url.full?html} on ${date?datetime}</td></tr>
          </table>
          <p/>
          <table>
