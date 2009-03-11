@@ -32,6 +32,11 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Event = YAHOO.util.Event;
+
+   /**
     * Dashboard SiteLinks constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -61,14 +66,6 @@
       options:
       {
          /**
-          * An array with shortNames in the same order as they are listed in the html template
-          *
-          * @property links
-          * @type Array
-          */
-         links: [],
-
-         /**
           * @property siteId
           * @type String
           * */
@@ -96,7 +93,7 @@
        */
       onComponentsLoaded: function SL_onComponentsLoaded()
       {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
 
       /**
@@ -105,10 +102,7 @@
        */
       onReady: function SL_onReady()
       {
-         var me = this;
-         var createLinkButton = document.getElementById(this.id + "-createLink-button");
-         YAHOO.util.Event.addListener(createLinkButton, "click", this.onCreateLinkButtonClick, this, true);
-
+         Alfresco.util.createYUIButton(this, "createLink-button", this.onCreateLinkButtonClick);
       },
 
       /**
@@ -124,6 +118,5 @@
          });
          window.location = url;
       }
-
    };
 })();

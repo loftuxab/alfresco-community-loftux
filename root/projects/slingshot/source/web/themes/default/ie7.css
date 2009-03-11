@@ -35,15 +35,22 @@ textarea
 /**
  * Global site footer
  */
-.sticky-wrapper
+.footer-ent
 {
-   margin-bottom: -2.5em;
+   position: relative;
+   top: -2px;
 }
 
-.footer
+.footer-ent .copyright
 {
-   padding-bottom: 0px;
-   padding-top: 0px;
+   padding-bottom: 0;
+   padding-top: 0;
+}
+
+.footer-ent .copyright img
+{
+   padding-bottom: 10px;
+   padding-top: 10px;
 }
 
 

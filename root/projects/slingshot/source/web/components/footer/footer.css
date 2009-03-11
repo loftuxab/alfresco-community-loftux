@@ -2,9 +2,10 @@
 .footer
 {
    background-color: #f2f2f2;
+   border-bottom: 1px solid #dfdfdf;
    border-top: 1px solid #dfdfdf;
-   padding-top: 6px;
-   padding-bottom: 6px;
+   padding-top: 8px;
+   padding-bottom: 8px;
 }
 
 .footer .links
@@ -15,4 +16,31 @@
 .footer .copyright
 {
    font-size: 77%;
+}
+
+.footer-ent
+{
+   border-top: 1px solid #dfdfdf;
+   padding: 0;
+}
+
+.footer-ent .copyright
+{
+   background-color: #fff;
+   border-left: 1px solid #dfdfdf;
+   border-right: 1px solid #dfdfdf;
+   line-height: 47px;
+   padding: 17px 0.5em;
+}
+
+.footer-ent .copyright img
+{
+   padding-right: 1em;
+   vertical-align: middle;
+}
+
+.footer-ent .copyright span
+{
+   position: relative;
+   top: 3px;
 }

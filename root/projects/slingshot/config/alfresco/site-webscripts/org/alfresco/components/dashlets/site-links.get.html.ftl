@@ -1,19 +1,7 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.SiteLinks("${args.htmlid}").setOptions(
+	new Alfresco.SiteLinks("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!''}",
-      links: [
-<#if links??>
-   <#list links as link>
-      {
-         id: '${link.name?js_string}',
-         title: '${link.title?js_string}',
-         url: '${link.url?js_string}',
-         description: '${link.description?js_string}'
-      }<#if (link_has_next)>,</#if>
-   </#list>
-</#if>
-      ]
+      siteId: "${page.url.templateArgs.site!''}"
    });
    new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
 //]]></script>

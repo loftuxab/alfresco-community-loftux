@@ -56,48 +56,43 @@
                                         <div>
                                              <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
                                              <p class="description">${event.description}</p>
-                                             <p>From <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
-                                             til <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
+                                             <p class="dates"> <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
+                                             - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
                                              <span class="location">${event.location}</span>
                                              <span class="duration" title="PT1H">1h</span>
                                              <span class="category" >${event.tags}</span> 
                                         </div>
                                     </div>
-                                    <#else>
+                                 <#else>
                                     <#assign outputtedUl = false>
-                                           <#if numEvents==0>
-                                            <ul class="dayEvents">
-                                            <#assign outputtedUl = true>
-                                           </#if>
-                                               <#if (numEvents > 4) >
-                                                  <#assign class="hidden">
-                                               <#else>
-                                                  <#assign class="">
-                                               </#if>
+                                        <#if numEvents==0>
+                                         <ul class="dayEvents">
+                                         <#assign outputtedUl = true>
+                                        </#if>
+                                         <#if (numEvents > 4) >
+                                            <#assign class="hidden">
+                                         <#else>
+                                            <#assign class="">
+                                         </#if>
 
-                                               <li class="vevent ${class}">
-                                                     <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
-                                                     <p class="description">${event.description}</p>
-                                                     <p>From <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
-                                                     til <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
-                                                     <span class="location">${event.location}</span>
-                                                     <span class="duration" title="PT1H">1h</span>
-                                                     <span class="category" >${event.tags}</span>
-                                                   </li>
-                                               <#assign numEvents=numEvents + 1>
-
-                                           
-                                           
+                                         <li class="vevent ${class}">
+                                               <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
+                                               <p class="description">${event.description}</p>
+                                               <p class="dates"><span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
+                                               - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
+                                               <span class="location">${event.location}</span>
+                                               <span class="duration" title="PT1H">1h</span>
+                                               <span class="category" >${event.tags}</span>
+                                             </li>
+                                         <#assign numEvents=numEvents + 1>    
                                  </#if>
                            </#list>
                            <#if (numEvents>4)>
                                   <li class="moreEvents"><a href="#todo">+ 5 More</a></li>                                
                               </#if>
-                           <#if outputtedUl?exists>
-                            <#if outputtedUl==true>
+                            <#if (numEvents>0)>
                                 </ul>
                             </#if>
-                           </#if>
                           </#if>
                        </div>
                     </td>
@@ -184,7 +179,7 @@
         <tbody>
             <tr class="alldayRow">
                 <th scope="row"><h2>${msg("label.all-day")}</h2></th>
-                <td id="allday">
+                <td id="alldayCell">
                 </td>
             </tr>
             <tr id="collapseTrigger">

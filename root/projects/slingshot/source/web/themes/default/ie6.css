@@ -18,8 +18,8 @@ textarea
 
 .header .menu-wrapper
 {
-   height:18px;
-   line-height:18px;
+   height: 18px;
+   line-height: 18px;
    padding-bottom: 8px;
 }
 
@@ -67,15 +67,16 @@ textarea
 /**
  * Global site footer
  */
-.sticky-wrapper
-{
-   margin-bottom: -2.5em;
-}
-
-.footer
+.footer-ent .copyright
 {
    padding-bottom: 0;
    padding-top: 0;
+}
+
+.footer-ent .copyright img
+{
+   padding-bottom: 10px;
+   padding-top: 10px;
 }
 
 

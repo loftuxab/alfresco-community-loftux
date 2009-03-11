@@ -201,7 +201,15 @@
          <page id="documentlibrary">documentlibrary</page>
          <page id="discussions-topiclist">discussions-topiclist</page>
          <page id="blog-postlist">blog-postlist</page>
+         <page id="links">links</page>
       </pages>
+   </config>
+
+   <config evaluator="string-compare" condition="HelpPages" replace="true">
+      <help-pages>
+         <share-help>http://www.alfresco.com/help/3/labs/DMShareHelp</share-help>
+         <share-tutorial>http://www.alfresco.com/help/3/labs/ShareTutorial</share-tutorial>
+      </help-pages>
    </config>
 
 </alfresco-config>

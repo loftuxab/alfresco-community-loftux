@@ -18,19 +18,20 @@ html, body
 {
    height: auto !important;
    height: 100%;
-   margin: 0 auto -2.4em;
+   margin: 0 auto -50px;
    min-height: 100%;
 }
 
 .sticky-footer, .sticky-push
 {
-   height: 2.4em;
+   height: 50px;
 }
 
 /* Site-wide Styles */
 
 #alfresco-yuiloader
 {
+   display: none;
    height: 0;
    line-height: 0;
 }
