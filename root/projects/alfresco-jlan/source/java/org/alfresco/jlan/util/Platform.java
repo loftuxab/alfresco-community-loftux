@@ -37,7 +37,7 @@ public class Platform {
   // Platform types
 
   public enum Type {
-    Unchecked, Unknown, WINDOWS, LINUX, SOLARIS, MACOSX
+    Unchecked, Unknown, WINDOWS, LINUX, SOLARIS, MACOSX, AIX
   };
 
   // Platform type we are running on
@@ -67,6 +67,8 @@ public class Platform {
         _platformType = Type.MACOSX;
       else if (osName.startsWith("Solaris") || osName.startsWith("SunOS"))
         _platformType = Type.SOLARIS;
+      else if (osName.startsWith("AIX"))
+      	_platformType = Type.AIX;
     }
 
     // Return the current platform type

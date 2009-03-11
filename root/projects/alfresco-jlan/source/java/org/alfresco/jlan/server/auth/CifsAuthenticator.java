@@ -428,7 +428,7 @@ public abstract class CifsAuthenticator {
 		int pos = respPkt.getByteOffset();
 		byte[] buf = respPkt.getBuffer();
 
-		if ( authCtx.getChallenge() == null) {
+		if ( authCtx == null || authCtx.getChallenge() == null) {
 
 			// Return a dummy encryption key
 
@@ -626,7 +626,8 @@ public abstract class CifsAuthenticator {
 
 		// Set the guest flag for the client, indicate that the session is logged on
 
-		client.setGuest(isGuest);
+		if ( client.isNullSession() == false)
+			client.setGuest(isGuest);
 		sess.setLoggedOn(true);
 
 		// Check if there is a chained commmand with the session setup request (usually a TreeConnect)
