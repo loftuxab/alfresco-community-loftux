@@ -5,17 +5,19 @@ function sortByTitle(link1, link2)
 
 function main()
 {
-   var site = page.url.templateArgs.site;
-   var container = 'links';
-	var url = '/api/links/site/' + site + '/' + container + '?page=1&pageSize=512';
-   var connector = remote.connect("alfresco");
-   var result = connector.get(url);
-	if (result.status == 200)
-	{
-		var links = eval('(' + result.response + ')').items;
+   var site, container, theUrl, connector, result, links;
+   
+   site = page.url.templateArgs.site;
+   container = 'links';
+   theUrl = '/api/links/site/' + site + '/' + container + '?page=1&pageSize=512';
+   connector = remote.connect("alfresco");
+   result = connector.get(theUrl);
+   if (result.status == 200)
+   {
+      links = eval('(' + result.response + ')').items;
       links.sort(sortByTitle);
-		model.links = links;
-	}
+      model.links = links;
+   }
 }
 
 main();

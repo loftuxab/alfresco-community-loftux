@@ -500,11 +500,7 @@
                 }    
               }
           }
-          //render multiple events correctly
-          for (var td in tdsWithEvents)
-          {
-            this.renderMultipleEvents(tdsWithEvents[td]);
-          }
+          
         }
         else if (view === Alfresco.CalendarView.VIEWTYPE_AGENDA)
         {
@@ -545,6 +541,11 @@
           }          
         }
         this.initCalendarEvents();
+        if ( (view===Alfresco.CalendarView.VIEWTYPE_WEEK)  | (view===Alfresco.CalendarView.VIEWTYPE_DAY))
+        {
+          //render multiple events correctly
+          this.renderMultipleEvents();
+        }
         YAHOO.Bubbling.fire("eventDataLoad",events); 
       },
 
@@ -749,7 +750,7 @@
         }
         
         var eventEl = event.getEl();
-        var p = YAHOO.util.Dom.getAncestorByClassName(eventEl,'hourSegment','div');          
+
         var targetEl = null;
         var dateParts = data.dtstart.split('T');
         var hour = dateParts[1].split(':')[0];
@@ -791,9 +792,6 @@
               targetEl = Dom.get(id);
               targetEl = Dom.getElementsByClassName('hourSegment','div',targetEl)[index];
 
-              if (p) {
-                YAHOO.util.Dom.setStyle(p,'position','static');
-              }
               YAHOO.util.Dom.setStyle(targetEl,'position','relative');
               targetEl.appendChild(eventEl);
               
@@ -809,6 +807,7 @@
 
         this.events[eventEl.id].update(data);
         // Refresh the tag component
+        this.renderMultipleEvents();
         YAHOO.Bubbling.fire("tagRefresh");
         
       },
@@ -876,7 +875,7 @@
 
             newCalEvent.on('eventMoved', this.onEventMoved, newCalEvent, this);
             this.adjustHeightByHour(vEventEl);
-          
+            this.renderMultipleEvents();
           }
         }
         
@@ -919,8 +918,10 @@
         }
         Event.purgeElement(this.events[id].getEl(),true);          
         delete this.events[id];
+        this.renderMultipleEvents();
         // Refresh the tag component
         YAHOO.Bubbling.fire("tagRefresh");
+        
       },
       
       /**
@@ -1256,10 +1257,7 @@
         if (args.dropped)
         {
           this.updateEvent(calEvent);
-          //new day/cell
-          this.renderMultipleEvents(Dom.getAncestorByTagName(targetEl,'td'));
-          //previous day/cell
-          this.renderMultipleEvents(arguments[0].previousTargetEl);
+          this.renderMultipleEvents();
         }
       },
       
@@ -1414,35 +1412,61 @@
           this.updateEvent(o[1]);
       },
       /**
-       * Render multiple events correctly
+       * Render (overlapping) multiple events correctly by calulating
+       * events that overlap and resizing their widths accordingly.
+       * It is called every time an event is created, edited, moved or deleted.
        * 
        * @method renderMultipleEvents
-       * @param parNode {object} HTML element in which to render events
        *  
        */
-      renderMultipleEvents : function(parNode)
+      renderMultipleEvents : function()
       {
-        var existingEvents = YAHOO.util.Dom.getElementsByClassName('vevent','div',parNode);
+        var existingEvents = YAHOO.util.Dom.getElementsByClassName('vevent','div');
+
         var numExistingEvents = existingEvents.length;
-        if (numExistingEvents===0)
+        var intersectEvents = [];
+        
+        for (var i=0;i<numExistingEvents;i++)
         {
-          return;
+           var elEv = existingEvents[i];
+           YAHOO.util.Dom.setStyle(elEv,'width','99.3%');
+           YAHOO.util.Dom.setStyle(elEv,'left',0+'px');           
+           intersectEvents[elEv.id] = [];
+
+           var reg = YAHOO.util.Dom.getRegion(elEv);
+           for (var j=0;j<numExistingEvents;j++)
+           {
+              var el = existingEvents[j];
+              if (el.id!==elEv.id)
+              {
+                var intersectRegion = reg.intersect(YAHOO.util.Dom.getRegion(el));
+
+                if (!YAHOO.lang.isNull(intersectRegion))
+                {
+                   intersectEvents[elEv.id].push(el);
+                }
+              }
+           }
         }
-        var parRegion = YAHOO.util.Dom.getRegion(parNode);
-        var newWidth= (parRegion.right-parRegion.left)/numExistingEvents;
-        if (numExistingEvents>1)
-        {
-          for (var i=0 ; i<numExistingEvents; i++){
-            var el = existingEvents[i];
-            YAHOO.util.Dom.setStyle(el,'width',newWidth+'px');
-            YAHOO.util.Dom.setStyle(el,'left',newWidth*(i)+'px');
-          }          
-        }
-        else 
-        {
-          var el = existingEvents[0];
-          YAHOO.util.Dom.setStyle(el,'width',newWidth+'px');
-          YAHOO.util.Dom.setStyle(el,'left',0);
+        var processedElems = [];
+        for (var p in intersectEvents){
+         var numOfIntersectedEvents = intersectEvents[p].length;
+         if (numOfIntersectedEvents>0)
+         {
+            var parRegion = YAHOO.util.Dom.getRegion(document.getElementById(p).parentNode);
+
+            var newWidth= (parRegion.right-parRegion.left)/(numOfIntersectedEvents+1);
+            YAHOO.util.Dom.setStyle(p,'width',newWidth+'px');
+            YAHOO.util.Dom.setStyle(p,'left',0+'px');         
+            processedElems.push(p);
+            for (var i=0;i<numOfIntersectedEvents;i++)
+            {
+               var el = intersectEvents[p][i];
+               YAHOO.util.Dom.setStyle(el,'width',newWidth+'px');
+               YAHOO.util.Dom.setStyle(el,'left',newWidth*(i+1)+'px');
+               processedElems.push(el.id);
+            }
+         }
         }
       },
       
@@ -1738,10 +1762,6 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
         {
             var delta  =  YAHOO.util.Dom.getY(el)-YAHOO.util.Dom.getY(targetEl);
             //move el
-            var p = YAHOO.util.Dom.getAncestorByClassName(el,'hourSegment','div');
-            if (p) {
-              YAHOO.util.Dom.setStyle(p,'position','static');
-            }
             YAHOO.util.Dom.setStyle(targetEl,'position','relative');
             targetEl.appendChild(el);
             //reset to 0,0 origin
@@ -1817,8 +1837,9 @@ YAHOO.extend(Alfresco.calendarEvent, YAHOO.util.DD, {
         var xy = Dom.getXY(el);
 
         //Get the width and height
-        var width = parseInt(Dom.getStyle(el, 'width'), 10);
-        var height = parseInt(Dom.getStyle(el, 'height'), 10);
+        var elRegion = Dom.getRegion(el);
+        var width = parseInt(elRegion.right-elRegion.left, 10);
+        var height = parseInt(elRegion.bottom-elRegion.top, 10);
         //must not include allday and toggle rows
         if (this.config.view===Alfresco.CalendarView.VIEWTYPE_DAY | this.config.view===Alfresco.CalendarView.VIEWTYPE_WEEK)
         {

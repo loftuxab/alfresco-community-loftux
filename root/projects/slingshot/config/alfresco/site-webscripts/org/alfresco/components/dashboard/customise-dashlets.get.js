@@ -47,7 +47,7 @@ for (var i = 0; i < webscripts.length; i++)
    // else skip this webscript since it lacks uri or shortName
 }
 
-var dashboardUrl, dashboardId;
+var dashboardId, dashboardId;
 if (args.dashboardType == "user")
 {
    dashboardId = "user/" + user.name + "/dashboard";
@@ -71,17 +71,16 @@ for (i = 0; i < components.length; i++)
 {
    var comp = components[i];
 
-   var regionId = comp.properties["region-id"];
-   var url = comp.properties.url;
-   if (regionId !== null && url !== null)
+   var regionId = comp.properties["region-id"],
+      theUrl = comp.properties.url;
+   if (regionId !== null && theUrl !== null)
    {
       // Create dashlet
-      var shortName;
-      var description;
+      var shortName, description, d;
       for (var j = 0; j < availableDashlets.length; j++)
       {
-         var d = availableDashlets[j];
-         if (d.url == url)
+         d = availableDashlets[j];
+         if (d.url == theUrl)
          {
             shortName = d.shortName;
             description = d.description;
@@ -90,7 +89,7 @@ for (i = 0; i < components.length; i++)
       }
       var dashlet =
       {
-         url: url,
+         url: theUrl,
          shortName: shortName,
          description: description,
          originalRegionId: regionId
@@ -111,11 +110,11 @@ for (i = 0; i < components.length; i++)
 var currentTemplate = sitedata.findTemplate(dashboardId),
    currentNoOfColumns = getNoOfColumns(currentTemplate),
    currentLayout = 
-{
-   templateId: currentTemplate.id,
-   noOfColumns: currentNoOfColumns,
-   description: currentTemplate.description
-};
+   {
+      templateId: currentTemplate.id,
+      noOfColumns: currentNoOfColumns,
+      description: currentTemplate.description
+   };
 
 // Define the model for the template
 model.availableDashlets = availableDashlets;
