@@ -407,6 +407,11 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    width: auto;
 }
 
+.copy-to .container-picker
+{
+   margin: 0.5em 0.2em 0px;
+}
+
 .copy-to .path .treeview
 {
    width: 16em;
@@ -486,7 +491,8 @@ body.masked div.mask.full-preview-mask
    height: 2em;
 }
 
-.toolbar .hide
+/* Prevent ghost border on first row for DataTables */
+table .yui-dt-empty
 {
-   display: none;
+   border: none !important;
 }

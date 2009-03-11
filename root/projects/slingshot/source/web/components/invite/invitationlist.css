@@ -29,12 +29,16 @@
 }
 .invitationlist .inviteelist table td
 {
-   border-bottom: 1px dashed #d9d9d9;
+   border-top: 1px dashed #d9d9d9;
    border-right: medium none;
+}
+.invitationlist .inviteelist table .yui-dt-last td
+{
+   border-bottom: 1px dashed #d9d9d9;
 }
 .invitationlist .inviteelist table .yui-dt-empty
 {
-   background-color: transparent;
+   background-color: #fff;
 }
 
 .invitationlist .inviteelist .user
@@ -96,7 +100,7 @@
 .invitationlistwrapper
 {
 	background: transparent url(images/green-arrow.png) no-repeat left 15%;
-	margin: 10px 0;
+	margin: 24px 0 10px 0;
 	padding-left: 50px;
 }
 
@@ -104,11 +108,6 @@
 {
 	padding-top: 5px;
 	text-align: right;
-}
-
-.invitationlistwrapper .title
-{
-	padding: 0.5em;
 }
 
 .invitationlist .invitelist-bar

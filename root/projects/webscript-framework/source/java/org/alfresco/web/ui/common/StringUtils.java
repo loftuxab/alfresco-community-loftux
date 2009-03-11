@@ -51,6 +51,10 @@ public class StringUtils
         safeTags.add("/em");
         safeTags.add("strong");
         safeTags.add("/strong");
+        safeTags.add("sup");
+        safeTags.add("/sup");
+        safeTags.add("sub");
+        safeTags.add("/sub");
         safeTags.add("p");
         safeTags.add("/p");
         safeTags.add("b");
@@ -79,11 +83,26 @@ public class StringUtils
         safeTags.add("/h6");
         safeTags.add("span");
         safeTags.add("/span");
+        safeTags.add("div");
+        safeTags.add("/div");
         safeTags.add("a");
         safeTags.add("/a");
         safeTags.add("img");
         safeTags.add("font");
         safeTags.add("/font");
+        safeTags.add("table");
+        safeTags.add("/table");
+        safeTags.add("thead");
+        safeTags.add("/thead");
+        safeTags.add("tbody");
+        safeTags.add("/tbody");
+        safeTags.add("tr");
+        safeTags.add("/tr");
+        safeTags.add("th");
+        safeTags.add("/th");
+        safeTags.add("td");
+        safeTags.add("/td");
+        safeTags.add("hr");
     }
 
     /**

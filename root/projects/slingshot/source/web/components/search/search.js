@@ -35,14 +35,13 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
-       Element = YAHOO.util.Element;
-   
+      Event = YAHOO.util.Event;
+
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML;
-   
+
    /**
     * Search constructor.
     * 
@@ -70,7 +69,7 @@
       YAHOO.Bubbling.on("onSearch", this.onSearch, this);
       
       return this;
-   }
+   };
    
    Alfresco.Search.prototype =
    {
@@ -214,7 +213,7 @@
       {
          // Toggle scope link
          var toggleScopeLink = Dom.get(this.id + "-scope-toggle-link");
-         YAHOO.util.Event.addListener(toggleScopeLink, "click", this.onToggleSearchScope, this, true);
+         Event.addListener(toggleScopeLink, "click", this.onToggleSearchScope, this, true);
 
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/search?";
@@ -280,7 +279,7 @@
             // use the preview image for a document type
             switch (oRecord.getData("type"))
             {
-               case "file":
+               case "document":
                   imageUrl = Alfresco.constants.PROXY_URI + "api/node/" + oRecord.getData("nodeRef").replace(":/", "");
                   imageUrl += "/content/thumbnails/doclib?c=queue&ph=true";
                   break;
@@ -293,7 +292,7 @@
                   imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/blog-post.png';
                   break;
                
-               case "topicpost":
+               case "forumpost":
                   imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/topic-post.png';
                   break;
                
@@ -303,6 +302,10 @@
                
                case "wikipage":
                   imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/wiki-page.png';
+                  break;
+                  
+               case "link":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/search/images/link.png';
                   break;
             }
             
@@ -344,34 +347,22 @@
             
             // type information
             desc += '<div class="details">';
-            switch (oRecord.getData("type"))
+            var type = oRecord.getData("type");
+            switch (type)
             {
-               case "file":
-                  desc += me._msg("label.document");
-                  break;
-               
+               case "document":
                case "folder":
-                  desc += me._msg("label.folder");
-                  break;
-               
                case "blogpost":
-                  desc += me._msg("label.blogpost");
-                  break;
-               
-               case "topicpost":
-                  desc += me._msg("label.forumpost");
-                  break;
-               
+               case "forumpost":
                case "calendarevent":
-                  desc += me._msg("label.calendarevent");
-                  break;
-               
                case "wikipage":
-                  desc += me._msg("label.wikipage");
+               case "link":
+                  desc += me._msg("label." + type);
                   break;
-               
+
                default:
                   desc += me._msg("label.unknown");
+                  break;
             }
             
             // link to the site and other meta-data details
@@ -392,10 +383,11 @@
             var tags = oRecord.getData("tags");
             if (tags.length !== 0)
             {
-               desc += '<div class="details"><span class="tags">' + me._msg("message.tags") + ': ';
-               for (var x=0; x < tags.length; x++)
+               var i, j;
+               desc += '<div class="details">' + me._msg("message.tags") + ': ';
+               for (i = 0, j = tags.length; i < j; i++)
                {
-                   desc += '<span id="' + me.id + '-searchByTag-' + $html(tags[x]) + '"><a class="search-tag" href="#">' + $html(tags[x]) + '</a></span> ';
+                   desc += '<span id="' + me.id + '-searchByTag-' + $html(tags[i]) + '"><a class="search-tag" href="#">' + $html(tags[i]) + '</a> </span>';
                }
                desc += '</span></div>';
             }
@@ -415,13 +407,13 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
+            renderLoopSize: YAHOO.env.ua.ie > 0 ? 0 : 32,
             initialLoad: false
          });
 
          // show initial message
          this._setDefaultDataTableErrors(this.widgets.dataTable);
-         if (this.options.initialSearchTerm.length == 0)
+         if (this.options.initialSearchTerm.length === 0)
          {
             this.widgets.dataTable.set("MSG_EMPTY", "");
          }
@@ -457,7 +449,7 @@
             }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
-         }
+         };
       },
 
       /**
@@ -466,7 +458,7 @@
       _getBrowseUrlForRecord: function (oRecord)
       {
          var url = "#";
-         if (oRecord.getData("browseUrl") != undefined)
+         if (oRecord.getData("browseUrl") !== undefined)
          {
             // browse urls always go to a page. We assume that the url contains the page name and all
             // parameters. What we have to add is the absolute path and the site param
@@ -491,7 +483,7 @@
       {
          this.refreshSearch(
          {
-            searchTerm : param
+            searchTerm: param
          });
       },
       
@@ -503,7 +495,7 @@
          var searchAll = !this.searchAll;
          this.refreshSearch(
          {
-            searchAll : searchAll
+            searchAll: searchAll
          });
       },
       
@@ -516,19 +508,19 @@
       refreshSearch: function Search_refreshSearch(args)
       {
          var searchTerm = this.searchTerm;
-         if (args["searchTerm"] !== undefined)
+         if (args.searchTerm !== undefined)
          {
-            searchTerm = args["searchTerm"];
+            searchTerm = args.searchTerm;
          }
          var searchAll= this.searchAll;
-         if (args["searchAll"] !== undefined)
+         if (args.searchAll !== undefined)
          {
-            searchAll = args["searchAll"];
+            searchAll = args.searchAll;
          }
          
          // redirect to the search page
          var url = Alfresco.constants.URL_CONTEXT + "page/";
-         if (this.options.siteId.length != 0)
+         if (this.options.siteId.length !== 0)
          {
             url += "site/" + this.options.siteId + "/";
          }
@@ -555,14 +547,14 @@
          if (obj !== null)
          {
             var searchTerm = this.searchTerm;
-            if (obj["searchTerm"] !== undefined)
+            if (obj.searchTerm !== undefined)
             {
-               searchTerm = obj["searchTerm"];
+               searchTerm = obj.searchTerm;
             }
             var searchAll= this.searchAll;
-            if (obj["searchAll"] !== undefined)
+            if (obj.searchAll !== undefined)
             {
-               searchAll = obj["searchAll"];
+               searchAll = obj.searchAll;
             }
             this._performSearch(searchTerm, searchAll);
          }
@@ -632,9 +624,9 @@
          
          this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm),
          {
-               success: successHandler,
-               failure: failureHandler,
-               scope: this
+            success: successHandler,
+            failure: failureHandler,
+            scope: this
          });
       },
       
@@ -669,20 +661,13 @@
       _updateSearchScopeLink: function Search__updateSearchScopeLink()
       {
          // only proceed if there's a site to switch to
-         if (this.options.siteId == "")
+         if (this.options.siteId === "")
          {
             return;
          }
          
          // update the search results field
-         if (this.searchAll)
-         {
-            var text = this._msg("search.searchsiteonly", this.options.siteName);
-         }
-         else
-         {
-            var text = this._msg("search.searchall");
-         }
+         var text = this.searchAll ? this._msg("search.searchsiteonly", this.options.siteName) : this._msg("search.searchall");
          
          // Update the link text
          var elem = Dom.get(this.id + '-scope-toggle-link');
@@ -745,36 +730,36 @@
 Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTagName, handlerObject)
 {         
    // Hook the tag events
-   YAHOO.Bubbling.addDefaultAction(className,
-      function genericDefaultAction(layer, args)
+   YAHOO.Bubbling.addDefaultAction(className, function genericDefaultAction(layer, args)
+   {
+      var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
+      if (owner !== null)
       {
-         var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, ownerTagName);
-         if (owner !== null)
+         var tmp, parts, action, param;
+         
+         // check that the html id matches, abort otherwise
+         tmp = owner.id;
+         if (tmp.indexOf(htmlId) !== 0)
          {
-            // check that the html id matches, abort otherwise
-            var tmp = owner.id;
-            if (tmp.indexOf(htmlId) != 0)
-            {
-               return true;
-            }
-            var tmp = tmp.substring(htmlId.length + 1);
-            var parts = tmp.split('-');
-            if (parts.length < 1)
-            {
-               // stop here
-               return true;
-            }
-            // the first entry is the handler method to call
-            var action = parts[0];
-            if (typeof handlerObject[action] == "function")
-            {
-               // extract the param part of the id
-               var param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
-               handlerObject[action].call(handlerObject, param);
-               args[1].stop = true;
-            }
+            return true;
          }
-         return true;
+         tmp = tmp.substring(htmlId.length + 1);
+         parts = tmp.split('-');
+         if (parts.length < 1)
+         {
+            // stop here
+            return true;
+         }
+         // the first entry is the handler method to call
+         action = parts[0];
+         if (typeof handlerObject[action] == "function")
+         {
+            // extract the param part of the id
+            param = parts.length > 1 ? tmp.substring(action.length + 1) : null;
+            handlerObject[action].call(handlerObject, param);
+            args[1].stop = true;
+         }
       }
-   );
-}
+      return true;
+   });
+};

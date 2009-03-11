@@ -229,6 +229,19 @@ span.navigation-separator-alt
    padding: 2px 0 0 4px;
 }
 
+/**
+ * Replace default styles for HTML content
+ */
+.rich-content sub
+{
+   vertical-align: sub;
+}
+
+.rich-content sup
+{
+   vertical-align: super;
+}
+
 .rich-content ul,
 .rich-content ol
 {
@@ -245,6 +258,12 @@ span.navigation-separator-alt
 {
    list-style-type: decimal;
    list-style-position:inside;
+}
+
+.rich-content th,
+.rich-content td
+{
+   padding: 0.2em;
 }
 
 .draggable
