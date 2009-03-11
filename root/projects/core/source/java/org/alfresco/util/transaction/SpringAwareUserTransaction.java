@@ -381,15 +381,6 @@ public class SpringAwareUserTransaction
      */
     public synchronized void begin() throws NotSupportedException, SystemException
     {
-        isBeginMatched = false;
-        if (isCallStackTraced)
-        {
-            // get the stack trace
-            Exception e = new Exception();
-            e.fillInStackTrace();
-            beginCallStack = e.getStackTrace();
-        }
-        
         // make sure that the status and info align - the result may or may not be null
         @SuppressWarnings("unused")
         TransactionInfo txnInfo = getTransactionInfo();
@@ -418,6 +409,16 @@ public class SpringAwareUserTransaction
         internalStatus = Status.STATUS_ACTIVE;
         threadId = Thread.currentThread().getId();
         
+        // Record that transaction details now that begin was successful
+        isBeginMatched = false;
+        if (isCallStackTraced)
+        {
+            // get the stack trace
+            Exception e = new Exception();
+            e.fillInStackTrace();
+            beginCallStack = e.getStackTrace();
+        }
+
         // done
         if (logger.isDebugEnabled())
         {
