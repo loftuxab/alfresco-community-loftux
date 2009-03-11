@@ -1,3 +1,5 @@
+<#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
+<#assign tutorialLink = helpPages.getChildValue("share-tutorial")!"">
 <script type="text/javascript">//<![CDATA[
 new Alfresco.UserWelcome("${args.htmlid}");
 //]]></script>
@@ -11,7 +13,7 @@ new Alfresco.UserWelcome("${args.htmlid}");
       <div class="detail-list-item">
          <h4>${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
-         <div><a href="http://www.alfresco.com/help/3/labs/ShareTutorial" class="theme-color-1" target="_blank">${msg("link.featureTour")}</a></div>
+         <div><a href="${tutorialLink}" class="theme-color-1" target="_blank">${msg("link.featureTour")}</a></div>
       </div>
       <div class="detail-list-item">
          <h4>${msg("header.userProfile")}</h4>

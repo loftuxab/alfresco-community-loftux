@@ -378,7 +378,7 @@ var CalendarScriptHelper  = ( function()
                     var eventDate=  new Date();
                     var ev = events[i];
                     eventDate.setTime(fromISOString(ev.when));
-                    if ((eventDate.getTime() > firstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime()))
+                    if ((eventDate.getTime() >= firstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime()))
                     {
                       var key = 'ev_'+eventDate.getDate();
                       if (viewArgs.viewEvents[key]===undefined)

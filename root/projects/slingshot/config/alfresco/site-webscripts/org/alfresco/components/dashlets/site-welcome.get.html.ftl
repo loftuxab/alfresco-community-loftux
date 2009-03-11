@@ -1,3 +1,6 @@
+<#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
+<#assign helpLink = helpPages.getChildValue("share-help")!"">
+<#assign tutorialLink = helpPages.getChildValue("share-tutorial")!"">
 <div class="dashlet site-welcome">
    <div class="title">${msg("header.userWelcome")}</div>
    <div class="body">
@@ -30,12 +33,12 @@
       <div class="detail-list-item">
          <h4 class="theme-color-1">${msg("header.onlineHelp")}</h4>
          <div>${msg("text.onlineHelp")}</div>
-         <div><a href="http://www.alfresco.com/help/3/labs/DMShareHelp" class="theme-color-1" target="_blank">${msg("link.onlineHelp")}</a></div>
+         <div><a href="${helpLink}" class="theme-color-1" target="_blank">${msg("link.onlineHelp")}</a></div>
       </div>
       <div class="detail-list-item last-item">
          <h4 class="theme-color-1">${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
-         <div><a href="http://www.alfresco.com/help/3/labs/ShareTutorial" class="theme-color-1" target="_blank">${msg("link.featureTour")}</a></div>
+         <div><a href="${tutorialLink}" class="theme-color-1" target="_blank">${msg("link.featureTour")}</a></div>
       </div>
 </#if>
       <div class="clear"></div>

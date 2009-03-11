@@ -1,3 +1,5 @@
+<#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
+<#assign helpLink = helpPages.getChildValue("share-help")!"">
 <#assign siteActive><#if page.url.templateArgs.site??>true<#else>false</#if></#assign>
 <#assign isGuest = (user.name=='guest') />
 <#if !isGuest>
@@ -12,7 +14,6 @@
    );
 //]]></script>
 </#if>
-
 <div class="header">
    <div class="logo-wrapper">
       <div class="logo">
@@ -34,7 +35,7 @@
       </#if>
 
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
-         <span class="menu-item"><a href="http://www.alfresco.com/help/3/labs/DMShareHelp" rel="_blank">${msg("link.help")}</a></span>
+         <span class="menu-item"><a href="${helpLink}" rel="_blank">${msg("link.help")}</a></span>
          <#if !isGuest>
          <span class="menu-item-separator">&nbsp;</span>
          <#if !context.externalAuthentication>

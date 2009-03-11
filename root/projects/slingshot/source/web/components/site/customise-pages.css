@@ -57,11 +57,9 @@
 .customise-pages ul
 {
    list-style: none;
-   padding: 1em;
+   padding: 1em 8em;
    margin-left: auto;
    margin-right: auto;
-   width: 56em;
-
 }
 
 /* Set width and height of the pages list */
