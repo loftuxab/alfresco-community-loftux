@@ -342,20 +342,14 @@
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onFormCancelButtonClick);
 
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
-         {
-            height: '300px',
-            width: '538px',
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
+
+         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);
          this.widgets.editor.render();
 
          // Add validation to the yui editor
          this.widgets.validateOnZero = 0;
-         this.widgets.editor.subscribe("editorKeyUp", function (e)
+         var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';         
+         this.widgets.editor.subscribe(keyUpIdentifier, function (e)
          {
             this.widgets.validateOnZero++;
             YAHOO.lang.later(1000, this, this.validateAfterEditorChange);
@@ -403,7 +397,7 @@
             fn: function(form, obj)
             {
                //Put the HTML back into the text area
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
 
                // Make sure the user has written a text
                if (Dom.get(this.id + '-content').value.length == 0)
@@ -456,7 +450,7 @@
          if (this.widgets.validateOnZero == 0)
          {
             var oldLength = Dom.get(this.id + '-content').value.length;
-            this.widgets.editor.saveHTML();
+            this.widgets.editor.save();
             var newLength = Dom.get(this.id + '-content').value.length;
             if ((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
             {

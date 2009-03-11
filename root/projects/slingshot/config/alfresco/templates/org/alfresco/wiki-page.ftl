@@ -1,6 +1,7 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
   <@link rel="stylesheet" type="text/css" href="${url.context}/templates/wiki/wiki.css" />
+   <@template.htmlEditorAssets />  
 </@>
 
 <@templateBody>

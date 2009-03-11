@@ -15,14 +15,13 @@ Alfresco.gutter = function(myEditor)
          {
             height: '384px',
             width: '300px',
-            context: [myEditor.get('element_cont').get('element'), 'tl', 'tr'],
+            context: [Dom.get(myEditor['editorContainer']), 'tl', 'tr'],
             position: 'absolute',
             visible: false
          });
-
          this.gutter.hideEvent.subscribe(function()
          {
-            myEditor.toolbar.deselectButton('alfresco-imagelib');
+            // myEditor.toolbar.deselectButton('alfresco-imagelib');
             Dom.setStyle('gutter1', 'visibility', 'visible');                
             var anim = new Anim('gutter1',
             {
@@ -46,8 +45,8 @@ Alfresco.gutter = function(myEditor)
 
          this.gutter.showEvent.subscribe(function()
          {
-            myEditor.toolbar.selectButton('alfresco-imagelib');
-            this.gutter.cfg.setProperty('context', [myEditor.get('element_cont').get('element'), 'tl', 'tr']);
+            // myEditor.toolbar.selectButton('alfresco-imagelib');
+            this.gutter.cfg.setProperty('context', [Dom.get(myEditor['editorContainer']), 'tl', 'tr']);
             Dom.setStyle(this.gutter.element, 'width', '0px');
             var anim = new Anim('gutter1',
             {
@@ -94,7 +93,7 @@ Alfresco.gutter = function(myEditor)
          }
       }
    });
-}
+};
 
 /**
  * Alfresco top-level util namespace.
@@ -115,39 +114,35 @@ Alfresco.util.createImageEditor = function(id, options)
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML;   
    
-   var editor = new YAHOO.widget.SimpleEditor(id, options);
-
-   editor.on('toolbarLoaded', function()
-   {
-      var gutter = new Alfresco.gutter(editor);
-
-      // Image Library button config
-      var libraryConfig =
-      {
-         type: 'push',
-         label: Alfresco.util.message("imagelib.tooltip"),
-         value: 'alfresco-imagelib'
-      };
-
-      // Add the button to the "insertitem" group
-      editor.toolbar.addButtonToGroup(libraryConfig, 'insertitem');
-
-      // Handle the button's click
-      editor.toolbar.on('alfresco-imagelibClick', function(ev)
-      {
-         if (ev && ev.img)
-         {
-            var html = '<img src="' + ev.img + '" title="' + ev.title + '"/>';
-            editor.execCommand('inserthtml', html);
-         }
-         gutter.toggle();
-      });
-
-      // Create the gutter control
+   YAHOO.Bubbling.on('editorInitialized',function(e) {
+     // Create the gutter control
       gutter.createGutter();
-   });
+   })
+   options.setup = function(ed) 
+   {
+        ed.addButton('imagelibrary', {
+            title : 'Insert Image Library',
+            image : 'img/example.gif',
+            onclick : 
+            function(ev)
+            {
+               gutter.toggle.call(gutter);
+            }
+        });
+        YAHOO.Bubbling.on('alfresco-imagelibClick',function(ev,args)
+         {
+            if (args && args[1].img)
+            {
+               var html = '<img src="' + args[1].img + '" title="' + ev.title + '"/>';
+               ed.execCommand('mceInsertContent', false, html);
+            }
+            gutter.toggle();
+         });
+   };
+   var editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,id,options);
+   var gutter = new Alfresco.gutter(editor.getEditor());
 
    Event.onAvailable('image_results', function()
    {
@@ -164,8 +159,8 @@ Alfresco.util.createImageEditor = function(id, options)
             }
             if (longdesc)
             {
-               title = target.getAttribute("title");
-               this.toolbar.fireEvent('alfresco-imagelibClick',
+               title = target.getAttribute('title');
+               YAHOO.Bubbling.fire('alfresco-imagelibClick',
                {
                   type: 'alfresco-imagelibClick',
                   img: longdesc,
@@ -213,4 +208,4 @@ Alfresco.util.createImageEditor = function(id, options)
    });
 
    return editor;
-}
+};

@@ -243,24 +243,19 @@
          this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit", {type: "submit"});
 
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
-         {
-            height: this.options.height + 'px',
-            width: this.options.width + 'px',
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
-         this.widgets.editor._render();
+         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);
+         this.widgets.editor.render();
+
+         // Add validation to the yui editor
          this.widgets.validateOnZero = 0;
-         this.widgets.editor.subscribe("editorKeyUp", function (e)
+         var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
+         this.widgets.editor.subscribe(keyUpIdentifier, function (e)
          {
             // Only bother checking if length is short, otherwise HTML cleanup slows the UI down undesirably
             // NOTE: Don't check for zero-length, due to HTML <br>, <span> tags, etc. possibly being present.
-            if (this.widgets.editor.getEditorHTML().length < 20)
+            if (this.widgets.editor.getContent().length < 20)
             {
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
                this.widgets.commentForm.updateSubmitElements();
             }
          }, this, true);
@@ -294,9 +289,9 @@
             fn: function(form, obj)
             {
                //Put the HTML back into the text area
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
 
-               this.widgets.editor._disableEditor(true);
+               this.widgets.editor.disable();
                this.widgets.okButton.set("disabled", true);
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
@@ -320,7 +315,7 @@
       onCreateFormSubmitSuccess: function CreateComment_onCreateFormSubmitSuccess(response, object)
       {
          // clear the content of the comment editor
-         this.widgets.editor.clearEditorDoc();
+         this.widgets.editor.clear();
 
          // reload the comments list
          YAHOO.Bubbling.fire("refreshComments", {reason: "created"});
@@ -336,7 +331,7 @@
          this.widgets.feedbackMessage.destroy();
          this.widgets.okButton.set("disabled", false);
          this.widgets.editor.currentEvent = null; 
-         this.widgets.editor._disableEditor(false);
+         this.widgets.editor.enable();
       },
 
       /**

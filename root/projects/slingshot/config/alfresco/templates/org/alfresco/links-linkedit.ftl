@@ -1,6 +1,6 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   
+      <@template.htmlEditorAssets />   
 </@>
 
 <@templateBody>

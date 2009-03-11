@@ -9,3 +9,9 @@
       }
    //]]></script>
 </#macro>
+
+<#macro htmlEditor htmlEditor="YAHOO.widget.SimpleEditor">
+   <script type="text/javascript">//<![CDATA[
+      Alfresco.constants.HTML_EDITOR = '${htmlEditor}';
+   //]]></script>
+</#macro>

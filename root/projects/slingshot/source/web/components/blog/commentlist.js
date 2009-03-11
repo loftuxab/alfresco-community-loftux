@@ -624,14 +624,7 @@
          this.editData.widgets.cancelButton.subscribe("click", this.onEditFormCancelButtonClick, this, true);
 
          // instantiate the simple editor we use for the form
-         this.editData.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content',
-         {
-            height: this.options.height + 'px',
-            width: this.options.width + 'px',
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
+         this.editData.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,formId + '-content', this.options.editorConfig);
          this.editData.widgets.editor.render();
 
          // create the form that does the validation/submit
@@ -668,10 +661,10 @@
                
                this.editData.widgets.okButton.set("disabled", true);
                this.editData.widgets.cancelButton.set("disabled", true);
-               this.editData.widgets.editor._disableEditor(true);
+               this.editData.widgets.editor.disable();
                 
                //Put the HTML back into the text area
-               this.editData.widgets.editor.saveHTML();
+               this.editData.widgets.editor.save();
             },
             scope: this
          };
@@ -703,7 +696,7 @@
          this.editData.widgets.feedbackMessage.destroy();
          this.editData.widgets.okButton.set("disabled", false);
          this.editData.widgets.cancelButton.set("disabled", false);
-         this.editData.widgets.editor._disableEditor(false);
+         this.editData.widgets.editor.disable();
       },
       
       /**

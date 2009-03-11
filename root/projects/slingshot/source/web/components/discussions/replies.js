@@ -623,16 +623,7 @@
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(formId + '-content',
-         {
-            height: '250px',
-            width: '538px',
-            focusAtStart: true,
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            toolbar: Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
+         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,formId + '-content',this.options.editorConfig);
          // render the editor - we use the private function as we want this to happen
          // prior of displaying the form. Otherwise we get quite ugly ui behavior
          this.widgets.editor.render();
@@ -675,7 +666,7 @@
                this.widgets.cancelButton.set("disabled", true);
          
                //Put the HTML back into the text area
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
                
                // show a wait message
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(

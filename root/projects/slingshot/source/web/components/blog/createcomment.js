@@ -36,7 +36,6 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
       YAHOO.Bubbling.on("setCanCreateComment", this.onSetCanCreateComment, this);
-      
       return this;
    };
    
@@ -180,6 +179,7 @@
        */
       onSetCanCreateComment: function CommentList_onSetCanCreateComment(layer, args)
       {
+
          var obj = args[1];
          if ((obj !== null) && (obj.canCreateComment !== null))
          {
@@ -198,7 +198,7 @@
          {
             return;
          }
-         
+
          // return if we have already been initialized
          if (this.initialized)
          {
@@ -232,7 +232,7 @@
 
          // pageParams
          Dom.get(this.id + '-pageParams').setAttribute("value", YAHOO.lang.JSON.stringify(this.options.activityPageParams));
-         
+
          // register the behaviour with the form and display it finally
          this.registerCreateCommentForm();
       },
@@ -248,22 +248,15 @@
          {
             type: "submit"
          });
-         
+
          // instantiate the simple editor we use for the form
-         this.widgets.editor = new YAHOO.widget.SimpleEditor(this.id + '-content',
-         {
-            height: this.options.height + 'px',
-            width: this.options.width + 'px',
-            dompath: false, //Turns on the bar at the bottom
-            animate: false, //Animates the opening, closing and moving of Editor windows
-            markup: "xhtml",
-            toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
-         });
+         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);
          this.widgets.editor.render();
-         
+
          // Add validation to the yui editor
          this.widgets.validateOnZero = 0;
-         this.widgets.editor.subscribe("editorKeyUp", function (e)
+         var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
+         this.widgets.editor.subscribe(keyUpIdentifier, function (e)
          {
             /**
              * Doing a form validation on every key stroke is process consuming, below we try to make sure we only do
@@ -272,12 +265,13 @@
              * being present. Only a "Select all" followed by delete will clean all tags, otherwise leftovers will
              * be there even if the form looks empty.
              */                       
-            if (this.widgets.editor.getEditorHTML().length < 20 || this.widgets.okButton.get("disabled"))
+            if (this.widgets.editor.getContent().length < 20 || this.widgets.okButton.get("disabled"))
             {
                // Submit was disabled and something has been typed, validate and submit will be enabled
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
                this.widgets.commentForm.updateSubmitElements();
             }
+         
          }, this, true);
 
          // create the form that does the validation/submit
@@ -303,15 +297,16 @@
                scope: this
             }
          });
+
          this.widgets.commentForm.setSubmitAsJSON(true);
          this.widgets.commentForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
                //Put the HTML back into the text area
-               this.widgets.editor.saveHTML();
+               this.widgets.editor.save();
 
-               this.widgets.editor._disableEditor(true);
+               this.widgets.editor.disable();
                this.widgets.okButton.set("disabled", true);
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
@@ -335,8 +330,8 @@
       onCreateFormSubmitSuccess: function CreateComment_onCreateFormSubmitSuccess(response, object)
       {
          // clear the content of the comment editor
-         this.widgets.editor.clearEditorDoc();
-            
+         this.widgets.editor.clear();
+         
          // reload the comments list
          YAHOO.Bubbling.fire("refreshComments",
          {
@@ -353,7 +348,7 @@
       {
          this.widgets.feedbackMessage.destroy();
          this.widgets.okButton.set("disabled", false);
-         this.widgets.editor._disableEditor(false);
+         this.widgets.editor.enable();
       },
 
       /**

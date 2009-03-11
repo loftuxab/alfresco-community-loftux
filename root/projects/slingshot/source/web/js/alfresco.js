@@ -2841,3 +2841,95 @@ Alfresco.service.BaseService.prototype =
     Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
 
 })();
+
+/**
+ * Manager object for managing adapters for HTML editors.
+ *  
+ */
+Alfresco.util.RichEditorManager = (function() {
+  var editors = [];
+  return {
+    /**
+     * @method addEditor store a reference to specified editor
+
+     * @param editorName {string} Name of html editor to use, including namespace eg YAHOO.widget.SimpleEditor
+     * @param reference to editor
+     * 
+     */
+    addEditor : function (editorName,editor) {
+      editors[editorName] = editor;
+    },
+    /**
+     * @method getEditor Returns a reference to specified editor.
+     * 
+     * @param editorName {string}  name of editor to retrieve
+     */
+    getEditor : function (editorName) {
+      if (editors[editorName]) {
+        return editors[editorName];
+      }
+      return null;
+    }
+  }
+})();
+
+/**
+ * @module RichEditor
+ * Factory object for creating instances of adapters around
+ * specified editor implementations. Eg tinyMCE/YUI Editor. Also augments
+ * created editor with YAHOO.util.EventProvider.
+ * Editor can be initialized instantly by passing in 'id' and 'config' parameters or later 
+ * on by calling init() method.
+ * 
+ * Fires editorInitialized event when html editor is initialized.
+ * 
+ * @param editorName {String} Name of editor to use. Must be same as one registered with
+ * Alfresco.util.RichEditManager.
+ *
+ * @param id {String} Optional Id of textarea to turn into rich text editor
+ * @param config {String} Optional config object literal to use to configure editor.
+ * 
+ */
+Alfresco.util.RichEditor = function(editorName,id,config) 
+{
+   var editor = Alfresco.util.RichEditorManager.getEditor(editorName);
+   if (editor)
+   {
+      var ed = new editor();
+      
+      YAHOO.lang.augmentObject(ed,
+        {
+          unsubscribe : function() 
+          {
+          },
+          subscribe : function(event,fn,scope) 
+          {
+              var edtr = ed.getEditor();
+              //yui custom events
+              if (edtr.subscribe)
+              {
+                edtr.subscribe(event,fn,scope,true);
+              }
+              else if (edtr[event]) {
+                edtr[event].add(function() 
+                  {
+                    fn.apply(scope,arguments);
+                  });
+              }
+              YAHOO.Bubbling.on(event, fn, scope);
+              
+          },
+          on : function(event,fn,scope) 
+          {
+            YAHOO.Bubbling.on(event, fn, scope);
+          }
+        }
+      );
+      if (id && config)
+      {
+        ed.init(id,config);
+      }
+      return ed;
+   }
+   return null;
+};
