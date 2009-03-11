@@ -58,46 +58,46 @@ body {font:small/1.2em arial,helvetica,clean,sans-serif;font:x-small;margin-top:
 
     <td width=16> <#-- Record properties icon -->
         <#if child.isDocument>
-        	<a href="/alfresco/navigate/showDocDetails/${childPath}">
+        	<a href="${url.context}/navigate/showDocDetails/${childPath}">
        	<#else>
-       	    <a href="/alfresco/navigate/showSpaceDetails/${childPath}">
+       	    <a href="${url.context}/navigate/showSpaceDetails/${childPath}">
        	</#if>
-        <img src="/alfresco/images/icons/View_details.gif" border=0 align=absmiddle alt="Record Details" title="Record Details"></a>
+        <img src="${url.context}/images/icons/View_details.gif" border=0 align=absmiddle alt="Record Details" title="Record Details"></a>
     </td>
     <td> <#-- Record identifier -->
         <#if child.isDocument>
-        	<a href="/alfresco/navigate/showDocDetails/${childPath}">
+        	<a href="${url.context}/navigate/showDocDetails/${childPath}">
        	<#else>
-       	    <a href="/alfresco/navigate/showSpaceDetails/${childPath}">
+       	    <a href="${url.context}/navigate/showSpaceDetails/${childPath}">
        	</#if>
         ${child.properties["rma:recordIdentifier"]}</a>
     </td>
     <td width=16> <#-- Record icon -->
         <#if child.isDocument>
-        	<a href="/alfresco/download/direct/${childPath}/${child.name}">
+        	<a href="${url.context}/download/direct/${childPath}/${child.name}">
         </#if>
-        <img src="/alfresco${child.icon16}" width=16 height=16 border=0 align=absmiddle alt="View Record" title="View Record">
+        <img src="${url.context}${child.icon16}" width=16 height=16 border=0 align=absmiddle alt="View Record" title="View Record">
         <#if child.isDocument>
         	</a>
         </#if>
     </td>
     <td> <#-- Record title -->
         <#if child.isDocument>
-        	<a href="/alfresco/download/direct/${childPath}/${child.name}">${child.properties["cm:title"]}</a>
+        	<a href="${url.context}/download/direct/${childPath}/${child.name}">${child.properties["cm:title"]}</a>
         <#else>
         	${child.properties["cm:name"]}
         </#if>
     </td>
     <td width=16> <#-- Fileplan icon -->
-        <a href="/alfresco/navigate/browse/${fileplanPath}">
-        <img src="/alfresco${fileplan.icon16}" width=16 height=16 border=0 align=absmiddle alt="Fileplan Contents" title="Fileplan Contents"></a>
+        <a href="${url.context}/navigate/browse/${fileplanPath}">
+        <img src="${url.context}${fileplan.icon16}" width=16 height=16 border=0 align=absmiddle alt="Fileplan Contents" title="Fileplan Contents"></a>
     </td>
     <td width=16> <#-- Fileplan properties icon -->
-        <a href="/alfresco/navigate/showDocDetails/${fileplanPath}">
-        <img src="/alfresco/images/icons/View_details.gif" border=0 align=absmiddle alt="Fileplan Details" title="Fileplan Details"></a>
+        <a href="${url.context}/navigate/showDocDetails/${fileplanPath}">
+        <img src="${url.context}/images/icons/View_details.gif" border=0 align=absmiddle alt="Fileplan Details" title="Fileplan Details"></a>
     </td>
     <td>
-        <a href="/alfresco/navigate/showDocDetails/${fileplanPath}">
+        <a href="${url.context}/navigate/showDocDetails/${fileplanPath}">
         ${fileplan.name}</a>
     </td>
     <td>
