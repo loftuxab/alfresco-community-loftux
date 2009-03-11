@@ -219,8 +219,13 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                var fnStopEvent = function(id, keyEvent)
                {
                   var event = keyEvent[1];
+                  if (event.target.tagName == "TEXTAREA")
+                  {
+                     // Allow linefeeds in textareas
+                     return false;
+                  }
                   var targetName = event.target.name;
-                  if (targetName && (targetName != "-") && (event.target.tagName != "TEXTAREA"))
+                  if (targetName && (targetName != "-"))
                   {
                      me._submitInvoked(event);
                      form.attributes.action.nodeValue = "";
@@ -232,9 +237,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                var enterListener = new KeyListener(form,
                {
                   keys: KeyListener.KEY.ENTER
-               },
-               
-               fnStopEvent, KeyListener.KEYDOWN);
+               }, fnStopEvent, KeyListener.KEYDOWN);
                enterListener.enable();
             }
             

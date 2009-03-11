@@ -41,14 +41,15 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
+      $links = Alfresco.util.activateLinks,
       $combine = Alfresco.util.combinePaths;
 
    /**
     * Preferences
     */
    var PREFERENCES_ROOT = "org.alfresco.share.documentList",
-      PREF_SHOW_FOLDERS = "org.alfresco.share.documentList.showFolders",
-      PREF_SIMPLE_VIEW = "org.alfresco.share.documentList.simpleView";
+      PREF_SHOW_FOLDERS = PREFERENCES_ROOT + ".showFolders",
+      PREF_SIMPLE_VIEW = PREFERENCES_ROOT + ".simpleView";
 
    
    /**
@@ -547,7 +548,6 @@
             Dom.setStyle(this.id + "-doclistBarBottom", "display", "block");
          }
 
-
          // Hide/Show Folders button
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
          this.widgets.showFolders.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
@@ -562,11 +562,9 @@
             type: "menu", 
             menu: "fileSelect-menu"
          });
-         
 
          // Preferences service
          this.services.preferences = new Alfresco.service.Preferences();
-
          
          // DataSource definition
          var uriDocList = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/";
@@ -864,7 +862,7 @@
                   {
                      description = me._msg("details.description.none");
                   }
-                  desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $html(description) + '</span></div>';
+                  desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                   /* Tags */
                   tags = oRecord.getData("tags");
                   desc += '<div class="detail"><span class="item tag-item"><em>' + me._msg("details.tags") + '</em> ';
@@ -919,7 +917,7 @@
                      desc += '<span class="item"><em>' + me._msg("details.checked-out.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span>';
                      desc += '<span class="item"><em>' + me._msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
                      desc += '</div><div class="detail">';
-                     desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $html(description) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
                      desc += '</div>';
                   }
                   else
@@ -933,7 +931,7 @@
                      desc += '<span class="item"><em>' + me._msg("details.version") + '</em> ' + oRecord.getData("version") + '</span>';
                      desc += '<span class="item"><em>' + me._msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
                      desc += '</div><div class="detail">';
-                     desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $html(description) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
                      desc += '</div>';
 
                      /* Tags */

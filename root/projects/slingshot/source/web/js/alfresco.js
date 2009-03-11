@@ -466,15 +466,38 @@ Alfresco.util.encodeHTML = function(text)
 {
    if ((YAHOO.env.ua.ie > 0) || (YAHOO.env.ua.webkit > 0))
    {
-      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;");
    }
    var me = arguments.callee;
    me.text.data = text;
-   return me.div.innerHTML;
+   return me.div.innerHTML.replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;");
 };
 Alfresco.util.encodeHTML.div = document.createElement("div");
 Alfresco.util.encodeHTML.text = document.createTextNode("");
 Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
+
+/**
+ * Scans a text string for links and injects HTML mark-up to activate them.
+ * NOTE: If used in conjunction with encodeHTML, this function must be called last.
+ *
+ * @method Alfresco.util.activateLinks
+ * @param text {string} The string potentially containing links
+ * @return {string} String with links marked-up to make them active
+ * @static
+ */
+Alfresco.util.activateLinks = function(text)
+{
+   var re = new RegExp(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g);
+   if (re.test(text))
+   {
+      var matches = text.match(re);
+      for (var i = 0, j = matches.length; i < j; i++)
+      {
+         text = text.replace(matches[i], '<a href=' + matches[i] + ' target="_blank">' + matches[i] + '</a>');
+      }
+   }
+   return text;
+};
 
 /**
  * Removes all potentially non safe tags from s (tags that are not listed in safeTags).

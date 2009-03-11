@@ -1,15 +1,26 @@
 <#-- Tags -->
-<#if result.tags?? && result.tags?size &gt; 0>
-   <#assign tags=result.tags />
+<#if (result.tags?? && result.tags?size > 0)>
+   <#assign tags = result.tags />
 <#else>
-   <#assign tags=[] />
+   <#assign tags = [] />
 </#if>
-
+<#-- PageList -->
+<#if (result.pageList?? && result.pageList?size > 0)>
+   <#assign pageList=result.pageList />
+<#else>
+   <#assign pageList = [] />
+</#if>
 <#-- Version History -->
 <#if result.versionhistory??>
    <#assign currentVersion = result.versionhistory[0].version>
 <#else>
    <#assign currentVersion = "">
+</#if>
+<#-- Permissions -->
+<#if result.permissions??>
+   <#assign permissions = result.permissions>
+<#else>
+   <#assign permissions = {}>
 </#if>
 
 <script type="text/javascript">//<![CDATA[
@@ -19,9 +30,8 @@
       pageTitle: "${page.url.args["title"]!""}",
       mode: "${page.url.args["action"]!"view"}",
       tags: [<#list tags as tag>"${tag}"<#if tag_has_next>,</#if></#list>],
-      pages: [<#if pageList.pages?size &gt; 0><#list pageList.pages as p>"${p.name?js_string}"<#if p_has_next>, </#if></#list></#if>],
-      versions: [
-      <#if result.versionhistory??>
+      pages: [<#list pageList as p>"${p?js_string}"<#if p_has_next>, </#if></#list>],
+      versions: [<#if result.versionhistory??>
          <#list result.versionhistory as version>
          {
             title: "${version.name?js_string}",
@@ -30,9 +40,14 @@
             createdDate: "${version.date}"
          }<#if (version_has_next)>,</#if>
          </#list>
-      </#if>
-      ],
-      locale:'${locale?substring(0, 2)}'
+      </#if>],
+      locale: "${locale?substring(0, 2)}",
+      permissions:
+      {
+         "create": ${(permissions["create"]!false)?string},
+         "edit": ${(permissions["edit"]!false)?string},
+         "delete": ${(permissions["delete"]!false)?string}
+      }
    }).setMessages(
       ${messages}
    );    
@@ -50,20 +65,25 @@
 [
    { 
       "label": msg("tab.view"),
-      "action": "view"
+      "action": "view",
+      "permitted": true
    },
    {
       "label": msg("tab.edit"),
-      "action": "edit"
+      "action": "edit",
+      "permitted": permissions["edit"]!false
    },
    {
       "label": msg("tab.details"),
-      "action": "details"
+      "action": "details",
+      "permitted": true
    }
 ]>
 <#list tabs as tab>
    <#if tab.action == action>
          <span class="tabSelected">${tab.label}</span>
+   <#elseif tab.permitted == false>
+         <span class="tabLabelDisabled">${tab.label}</span>
    <#else>
          <a href="?title=${page.url.args["title"]!""}&amp;action=${tab.action}" class="tabLabel">${tab.label}</a>
    </#if>
@@ -79,52 +99,52 @@
 <#if action == "view">       
       <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.error??>${result.error}</#if></div> 
 <#elseif action == "edit">           
-         <div>
-            <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
-               <fieldset>
-               <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
-                  <input type="hidden" name="context" value="${pageContext?html}" />
-                  <input type="hidden" name="page" value="wiki-page" />
-                  <input type="hidden" name="currentVersion" value="${currentVersion}" />
-                  <label for="${htmlid}-pagecontent">${msg("label.text")}:</label>
-                  <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
-                  <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
-                  <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+      <div>
+         <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
+            <fieldset>
+            <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
+               <input type="hidden" name="context" value="${pageContext?html}" />
+               <input type="hidden" name="page" value="wiki-page" />
+               <input type="hidden" name="currentVersion" value="${currentVersion}" />
+               <label for="${htmlid}-pagecontent">${msg("label.text")}:</label>
+               <textarea name="pagecontent" id="${args.htmlid}-pagecontent" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
+               <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
+               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
 
-                  <!-- Render the tag inputs -->
-                  <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
-                  <!-- end tags -->
-                  <div class="buttons">
-                     <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
-                     <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
-                  </div>
-               </fieldset>
-            </form>
-         </div>
-<#elseif action == "details">             
-         <div>
-            <div class="details-wrapper">
-            <div class="yui-g">
-               <div class="yui-u first">
-                  <h2>
-                     ${result.title!""}
-                     <#if result.versionhistory??><#list result.versionhistory as version><#if version_index == 0><span id="${args.htmlid}-version-header" class="light">${msg("label.shortVersion")}${version.version}</span></#if></#list></#if>
-                  </h2>
+               <!-- Render the tag inputs -->
+               <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
+               <!-- end tags -->
+               <div class="buttons">
+                  <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
+                  <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
                </div>
-               <div class="yui-u">
-               <#if result.versionhistory??>
-                  <div class="version-quick-change">
-                  <#list result.versionhistory as version>
-                  <#if version_index == 0>
-                  <input type="button" id="${args.htmlid}-selectVersion-button" name="selectButton" value="${version.version} (${msg("label.latest")})">
-                  <select id="${args.htmlid}-selectVersion-menu" name="selectVersion">
-                  </#if>
-                     <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})</#if></option>
-                  </#list>
-                  </select>
-                  </div>
-                  <div class="version-quick-change">${msg("label.viewVersion")}</div>
+            </fieldset>
+         </form>
+      </div>
+<#elseif action == "details">             
+      <div>
+         <div class="details-wrapper">
+         <div class="yui-g">
+            <div class="yui-u first">
+               <h2>
+                  ${result.title!""}
+                  <#if result.versionhistory??><#list result.versionhistory as version><#if version_index == 0><span id="${args.htmlid}-version-header" class="light">${msg("label.shortVersion")}${version.version}</span></#if></#list></#if>
+               </h2>
+            </div>
+            <div class="yui-u">
+            <#if result.versionhistory??>
+               <div class="version-quick-change">
+               <#list result.versionhistory as version>
+               <#if version_index == 0>
+               <input type="button" id="${args.htmlid}-selectVersion-button" name="selectButton" value="${version.version} (${msg("label.latest")})" />
+               <select id="${args.htmlid}-selectVersion-menu" name="selectVersion">
                </#if>
+                  <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})</#if></option>
+               </#list>
+               </select>
+               </div>
+               <div class="version-quick-change">${msg("label.viewVersion")}</div>
+            </#if>
             </div>
          </div>
          <div id="${args.htmlid}-page" class="details-page-content">
@@ -136,6 +156,7 @@
             <div class="yui-u first">
                <div class="columnHeader">${msg("label.versionHistory")}</div>
                <#if result.versionhistory??>
+               <#assign canRevert = permissions["edit"]!false>
                <#list result.versionhistory as version>
                   <#if version_index == 0>
                      <div class="info-sub-section">
@@ -162,7 +183,11 @@
                      </div>
                      <#if version_index != 0>
                      <div class="actions">
-                           <span id="${args.htmlid}-revert-span-${version_index}" class="revert"><a>${msg("link.revert")}</a></span>
+                        <#if canRevert>
+                        <span id="${args.htmlid}-revert-span-${version_index}" class="revert"><a>${msg("link.revert")}</a></span>
+                        <#else>
+                        <span class="revertDisabled">${msg("link.revert")}</span>
+                        </#if>
                      </div>
                      </#if>
                   </div>
@@ -192,7 +217,7 @@
                </div>
             </div>
          </div><#-- end of yui-gb -->
-         </div>
+      </div>
 </#if>
-</div>        
+   </div>        
 </div>

@@ -15,14 +15,16 @@ Alfresco.gutter = function(myEditor)
          {
             height: '384px',
             width: '300px',
-            context: [Dom.get(myEditor['editorContainer']), 'tl', 'tr'],
+            context: [Dom.get(myEditor.getContainer()), 'tl', 'tr'],
             position: 'absolute',
             visible: false
          });
+         
          this.gutter.hideEvent.subscribe(function()
          {
-            // myEditor.toolbar.deselectButton('alfresco-imagelib');
-            Dom.setStyle('gutter1', 'visibility', 'visible');                
+            myEditor.deactivateButton('alfresco-imagelibrary');
+            Dom.setStyle("image_results", "overflow", "hidden");
+            Dom.setStyle("gutter1", "visibility", "visible");
             var anim = new Anim('gutter1',
             {
                width:
@@ -38,16 +40,16 @@ Alfresco.gutter = function(myEditor)
             }, 1);
             anim.onComplete.subscribe(function()
             {
-               Dom.setStyle('gutter1', 'visibility', 'hidden');
+               Dom.setStyle("gutter1", "visibility", "hidden");
             });
             anim.animate();
          }, this, true);
 
          this.gutter.showEvent.subscribe(function()
          {
-            // myEditor.toolbar.selectButton('alfresco-imagelib');
-            this.gutter.cfg.setProperty('context', [Dom.get(myEditor['editorContainer']), 'tl', 'tr']);
-            Dom.setStyle(this.gutter.element, 'width', '0px');
+            myEditor.activateButton('alfresco-imagelibrary');
+            this.gutter.cfg.setProperty('context', [Dom.get(myEditor.getContainer()), 'tl', 'tr']);
+            Dom.setStyle("gutter1", "visibility", "visible");
             var anim = new Anim('gutter1',
             {
                width:
@@ -61,12 +63,17 @@ Alfresco.gutter = function(myEditor)
                   to: 1
                }
             }, 1);
+            anim.onComplete.subscribe(function()
+            {
+               Dom.setStyle("image_results", "overflow", "auto");
+            });
             anim.animate();
          }, this, true);
          
          var libraryTitle = Alfresco.util.message("imagelib.title");
          this.gutter.setBody('<div class="yui-toolbar-container"><div class="yui-toolbar-titlebar"><h2>' + libraryTitle + '</h2></div></div><div id="image_results"></div>');
          this.gutter.render(document.body);
+         Dom.setStyle(this.gutter.element, 'width', '0px');
       },
          
       open: function()
@@ -116,33 +123,35 @@ Alfresco.util.createImageEditor = function(id, options)
     */
    var $html = Alfresco.util.encodeHTML;   
    
-   YAHOO.Bubbling.on('editorInitialized',function(e) {
-     // Create the gutter control
+   YAHOO.Bubbling.on('editorInitialized', function(e)
+   {
+      // Create the gutter control
       gutter.createGutter();
-   })
+   });
+
    options.setup = function(ed) 
    {
-        ed.addButton('imagelibrary', {
-            title : 'Insert Image Library',
-            image : 'img/example.gif',
-            onclick : 
-            function(ev)
-            {
-               gutter.toggle.call(gutter);
-            }
-        });
-        YAHOO.Bubbling.on('alfresco-imagelibClick',function(ev,args)
+      ed.addButton('alfresco-imagelibrary',
+      {
+         title: 'Insert Image Library',
+         image: 'img/example.gif',
+         onclick: function(ev)
          {
-            if (args && args[1].img)
-            {
-               var html = '<img src="' + args[1].img + '" title="' + ev.title + '"/>';
-               ed.execCommand('mceInsertContent', false, html);
-            }
-            gutter.toggle();
-         });
+            gutter.toggle.call(gutter);
+         }
+      });
+      YAHOO.Bubbling.on('alfresco-imagelibClick', function(ev, args)
+      {
+         if (args && args[1].img)
+         {
+            var html = '<img src="' + args[1].img + '" title="' + ev.title + '"/>';
+            ed.execCommand('mceInsertContent', false, html);
+         }
+         gutter.toggle();
+      });
    };
-   var editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,id,options);
-   var gutter = new Alfresco.gutter(editor.getEditor());
+   var editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR, id, options);
+   var gutter = new Alfresco.gutter(editor);
 
    Event.onAvailable('image_results', function()
    {

@@ -26,7 +26,7 @@
    </div>
 
    <div class="action-bar">
-      <#assign hide><#if (page.url.args["title"]! == "")>style="visibility: hidden;"</#if></#assign> 
+      <#assign hide><#if (page.url.args["title"]! == "")>style="display: none;"</#if></#assign> 
       <div class="new-page"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
       <div class="separator" ${hide}>&nbsp;</div>
       <div class="delete-page" ${hide}><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>

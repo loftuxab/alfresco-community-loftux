@@ -71,6 +71,10 @@
    padding-left: 32px;
    padding-bottom:3px;
 }
+.toolbar .new-page .yui-button-disabled button
+{
+   background: transparent url(../images/new-wiki-page-unavailable-16.png) no-repeat 12px 4px;
+}
 
 .toolbar .delete-page button
 {

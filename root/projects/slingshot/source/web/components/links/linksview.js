@@ -19,7 +19,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $links = Alfresco.util.activateLinks;
 
    /**
     * LinksView constructor.
@@ -293,7 +294,7 @@
 
          html += '<div class="detail">';
          html += '<span class="nodeAttrLabel">' + this._msg("link.description") + ": </span>";
-         html += '<span class="nodeAttrValue">' + $html(data.description) + '</span>';
+         html += '<span class="nodeAttrValue">' + $links($html(data.description)) + '</span>';
          html += '</div>';
          
          html += '<div class="nodeFooter">';

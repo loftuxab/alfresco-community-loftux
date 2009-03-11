@@ -31,9 +31,6 @@ function main()
          result.versionhistory.sort(sortByLabel);
       }
       model.result = result;
-
-      // Get all pages for the site so we can display links correctly
-      model.pageList = doGetCall("/slingshot/wiki/pages/" + page.url.templateArgs.site);
    }
    else
    {
