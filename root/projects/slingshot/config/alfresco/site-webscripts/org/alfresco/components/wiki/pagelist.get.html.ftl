@@ -10,9 +10,9 @@
 <#list pageList.pages as p>
    <div class="wikipage <#if p.tags??><#list p.tags as t>wp-${t}<#if t_has_next> </#if></#list></#if>">
    <div class="actionPanel">
-      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit&amp;listViewLinkBack=true">${msg("link.edit")}</a></div>
+      <#if p.permissions.edit><div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=edit&amp;listViewLinkBack=true">${msg("link.edit")}</a></div></#if>
       <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&amp;action=details&amp;listViewLinkBack=true">${msg("link.details")}</a></div>
-      <div class="deletePage"><a href="#" class="delete-link" title="${p.name}">${msg("link.delete")}</a></div>
+      <#if p.permissions.delete><div class="deletePage"><a href="#" class="delete-link" title="${p.name}">${msg("link.delete")}</a></div></#if>
    </div>
    <div class="pageTitle"><a class="pageTitle theme-color-1" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name?url}&listViewLinkBack=true">${p.title}</a></div>
    <div class="publishedDetails">

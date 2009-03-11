@@ -42,6 +42,12 @@
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML;
+
+   /**
+    * Preferences
+    */
+   var PREFERENCES_ROOT = "org.alfresco.share.documentList",
+      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar";
    
    /**
     * DocListToolbar constructor.
@@ -59,6 +65,7 @@
       // Initialise prototype properties
       this.widgets = {};
       this.modules = {};
+      this.services = {};
       this.selectedFiles = [];
       this.currentFilter =
       {
@@ -170,6 +177,14 @@
       modules: null,
 
       /**
+       * Object container for storing service instances.
+       * 
+       * @property services
+       * @type object
+       */
+      services: null,
+
+      /**
        * Array of selected states for visible files.
        * 
        * @property selectedFiles
@@ -250,6 +265,8 @@
 
          // Hide/Show NavBar button
          this.widgets.hideNavBar = Alfresco.util.createYUIButton(this, "hideNavBar-button", this.onHideNavBar);
+         this.widgets.hideNavBar.set("label", this._msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
+         Dom.setStyle(this.id + "-navBar", "display", this.options.hideNavBar ? "none" : "block");
          
          // RSS Feed link button
          this.widgets.rssFeed = Alfresco.util.createYUIButton(this, "rssFeed-button", null, 
@@ -268,6 +285,9 @@
          
          // Reference to Document List component
          this.modules.docList = Alfresco.util.ComponentManager.findFirst("Alfresco.DocumentList");
+
+         // Preferences service
+         this.services.preferences = new Alfresco.service.Preferences();
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -773,6 +793,9 @@
       {
          this.options.hideNavBar = !this.options.hideNavBar;
          p_obj.set("label", this._msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
+
+         this.services.preferences.set(PREF_HIDE_NAVBAR, this.options.hideNavBar);
+
          Dom.setStyle(this.id + "-navBar", "display", this.options.hideNavBar ? "none" : "block");
          Event.preventDefault(e);
       },

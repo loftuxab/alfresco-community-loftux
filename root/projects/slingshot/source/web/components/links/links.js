@@ -40,7 +40,11 @@
          Event = YAHOO.util.Event,
          Element = YAHOO.util.Element;
          
-   var $html = Alfresco.util.encodeHTML;
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML,
+      $links = Alfresco.util.activateLinks;
 
    /**
     * Links constructor.
@@ -390,7 +394,7 @@
                innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.created.on") + ':</em> ' + Alfresco.util.formatDate(data["createdOn"]) + '</span>' +
                             '<span class="item"><em>' + me._msg("details.created.by") + ':</em> ' + Alfresco.util.people.generateUserLink(author) + '</span></div>';
 
-               innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + ':</em> ' + $html(description) + '</span></div>';
+               innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + ':</em> ' + $links($html(description)) + '</span></div>';
 
                innerHtml += '<div class="detail"><span class="tag-item"><em>' + me._msg("details.tags") + ': </em>' + tagsStr + '</span></div>';
             }

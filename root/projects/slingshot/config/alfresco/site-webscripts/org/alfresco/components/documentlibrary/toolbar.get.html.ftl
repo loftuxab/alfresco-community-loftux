@@ -1,7 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DocListToolbar("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!""}"
+      siteId: "${page.url.templateArgs.site!""}",
+      hideNavBar: ${(preferences.hideNavBar!false)?string}
    }).setMessages(
       ${messages}
    );

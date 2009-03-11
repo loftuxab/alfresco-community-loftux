@@ -2,47 +2,66 @@
  *  Adapter for YUI html editor (http://developer.yahoo.com/yui/editor/).
  * 
  */
-Alfresco.util.RichEditorManager.addEditor('YAHOO.widget.SimpleEditor',
-  function(id,config)
-  {
-    var editor;
-    return {
-      init : function RichEditorManager_init(id,config) {
-        editor = new YAHOO.widget.SimpleEditor(id,config);
-        YAHOO.Bubbling.fire("editorInitialized", this);        
-        return this;
-      },
-      clear : function RichEditorManager_clear() 
+Alfresco.util.RichEditorManager.addEditor('YAHOO.widget.SimpleEditor', function(id,config)
+{
+   var editor;
+   return (
+   {
+      init: function RichEditorManager_init(id,config)
       {
-        editor.clearEditorDoc();
+         editor = new YAHOO.widget.SimpleEditor(id, config);
+         YAHOO.Bubbling.fire("editorInitialized", this);        
+         return this;
       },
-      render : function RichEditorManager_render() 
+
+      clear: function RichEditorManager_clear() 
       {
-        editor.render();
+         editor.clearEditorDoc();
       },
-      disable : function RichEditorManager_disable()
+
+      render: function RichEditorManager_render() 
+      {
+         editor.render();
+      },
+
+      disable: function RichEditorManager_disable()
       {
          editor._disableEditor(true);
       },
-      enable : function RichEditorManager_enable()
+
+      enable: function RichEditorManager_enable()
       {
          editor._disableEditor(false);
       },
-      getContent : function RichEditorManager_getContent() 
+
+      getContent: function RichEditorManager_getContent() 
       { 
-        return editor.getEditorHTML();
+         return editor.getEditorHTML();
       }, 
-      setContent : function RichEditorManager_setContent(html) 
+
+      setContent: function RichEditorManager_setContent(html) 
       { 
-        editor.setEditorHTML(html);
+         editor.setEditorHTML(html);
       },
-      save : function RichEditorManager_save()
+
+      save: function RichEditorManager_save()
       {
-        editor.saveHTML();
+         editor.saveHTML();
       },
-      getEditor : function RichEditorManager_getEditor(){
-        return editor;
+
+      getContainer: function RichEditorManager_getContainer()
+      {
+         return editor.get('element_cont').get('element');
+      },
+      
+      activateButton: function RichEditorManager_activateButton(buttonId)
+      {
+         editor.toolbar.selectButton(buttonId);
+      },
+      
+      deactivateButton: function RichEditorManager_deactivateButton(buttonId)
+      {
+         editor.toolbar.deselectButton(buttonId);
       }
-    };
-  }
-);
+   });
+});

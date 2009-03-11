@@ -47,6 +47,11 @@ div.pageTitle
    color: #333333;
 }
 
+.tabLabelDisabled
+{
+   color: #ccc;
+}
+
 .columnHeader
 {
    font-size: 13pt;   
@@ -164,6 +169,12 @@ table.versionHistory
 .wiki-page .actions span.revert
 {
    background-image: url(../images/revert-16.png);
+}
+
+.wiki-page .actions span.revertDisabled
+{
+   background-image: url(../images/revert-unavailable-16.png);
+   color: #ccc;
 }
 
 /* TAGS & LINKS */

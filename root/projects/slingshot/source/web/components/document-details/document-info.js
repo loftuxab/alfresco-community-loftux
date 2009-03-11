@@ -41,7 +41,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $links = Alfresco.util.activateLinks;
    
    /**
     * DocumentInfo constructor.

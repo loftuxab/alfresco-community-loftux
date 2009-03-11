@@ -46,7 +46,7 @@
 {
    height: 90%;
    margin-left: 2px;
-   overflow: auto;
+   overflow: hidden;
    position: static;
 }
 

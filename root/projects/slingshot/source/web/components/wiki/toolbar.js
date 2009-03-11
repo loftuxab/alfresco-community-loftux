@@ -50,6 +50,13 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.onComponentsLoaded, this);
 
+      // Initialise prototype properties
+      this.widgets = {};
+      this.popups = {};
+
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("userAccess", this.onUserAccess, this);
+
       return this;
    };
 
@@ -90,6 +97,22 @@
       },
 
       /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+      widgets: null,
+
+      /**
+       * Object container for storing pop-up window instances.
+       * 
+       * @property popups
+       * @type object
+       */
+      popups: null,
+
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -123,27 +146,39 @@
        */
       onComponentsLoaded: function WikiToolbar_onComponentsLoaded()
       {
-         Event.onContentReady(this.id, this.init, this, true);
+         Event.onContentReady(this.id, this.onReady, this, true);
       },
       
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initialises components, including YUI widgets.
        *
-       * @method init
+       * @method onReady
        */
-      init: function WikiToolbar_init()
+      onReady: function WikiToolbar_onReady()
       {
          // Register buttons with YUI
-         Alfresco.util.createYUIButton(this, "create-button", this.onNewPageClick);
-         Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
-         Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick);
+         this.widgets.newPageButton = Alfresco.util.createYUIButton(this, "create-button", this.onNewPageClick,
+         {
+            disabled: true,
+            value: "create"
+         });
+         this.widgets.deletePageButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick,
+         {
+            disabled: true,
+            value: "delete"
+         });
+         this.widgets.renamePageButton = Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick,
+         {
+            disabled: true,
+            value: "edit"
+         });
          Alfresco.util.createYUIButton(this, "rssFeed-button", null,
          {
             type: "link"
          });
          
-         this.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
+         this.popups.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
          {
             width: "20em",
             fixedcenter: true,
@@ -173,15 +208,16 @@
             }]
          });
          
-         this.deleteDialog.setHeader(this._msg("panel.confirm.header"));
-         this.deleteDialog.render(document.body);
+         this.popups.deleteDialog.setHeader(this._msg("panel.confirm.header"));
+         this.popups.deleteDialog.render(document.body);
          
          // Create the rename panel
          var renamePanel = Dom.get(this.id + "-renamepanel"),
             clonedRenamePanel = renamePanel.cloneNode(true);
+            
          renamePanel.parentNode.removeChild(renamePanel);
          
-         this.renamePanel = new YAHOO.widget.Panel(clonedRenamePanel,
+         this.popups.renamePanel = new YAHOO.widget.Panel(clonedRenamePanel,
          {
             width: "320px",
             visible: false,
@@ -190,7 +226,7 @@
             fixedcenter: true,
             modal: true
          });
-         this.renamePanel.render(document.body);
+         this.popups.renamePanel.render(document.body);
          
          var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,
          {
@@ -219,6 +255,44 @@
          YAHOO.Bubbling.on("deletePage", this.onDeletePage, this);
       },
 
+      /**
+       * User Access event handler
+       *
+       * @method onUserAccess
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onUserAccess: function WikiToolbar_onUserAccess(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.userAccess !== null))
+         {
+            var widget, widgetPermissions, index;
+            for (index in this.widgets)
+            {
+               if (this.widgets.hasOwnProperty(index))
+               {
+                  widget = this.widgets[index];
+                  if (widget.get("srcelement").className != "no-access-check")
+                  {
+                     widget.set("disabled", false);
+                     if (widget.get("value") !== null)
+                     {
+                        widgetPermissions = widget.get("value").split(",");
+                        for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
+                        {
+                           if (!obj.userAccess[widgetPermissions[i]])
+                           {
+                              widget.set("disabled", true);
+                              break;
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
 
       /**
        * Dispatches the browser to the create wiki page
@@ -250,7 +324,7 @@
          if (title)
          {
             this.options.title = title;
-            this.deleteDialog.show();
+            this.popups.deleteDialog.show();
          }
       },
       
@@ -285,7 +359,7 @@
        */
       onCancel: function WikiToolbar_onCancel(e)
       {
-         this.deleteDialog.hide();
+         this.popups.deleteDialog.hide();
       },
       
       /**
@@ -318,7 +392,7 @@
        */
       onRenameClick: function WikiToolbar_onRenameClick(e)
       {
-         this.renamePanel.show();
+         this.popups.renamePanel.show();
 
          // Clear the text field any previously entered values
          var newNameField = Dom.get(this.id + "-renameTo");
@@ -340,7 +414,7 @@
                {
                   // Undo Firefox caret issue
                   Alfresco.util.undoCaretFix(formElement);
-                  this.renamePanel.hide();
+                  this.popups.renamePanel.hide();
                },
                scope: this,
                correctScope: true
@@ -392,7 +466,7 @@
             this.escapeListener.disable();
          }
 
-         this.renamePanel.hide();
+         this.popups.renamePanel.hide();
       },
       
       /**
@@ -442,7 +516,7 @@
        */
       onDeleteClick: function WikiToolbar_onDeleteClick(e)
       {
-         this.deleteDialog.show();
+         this.popups.deleteDialog.show();
       },
 
       /**
