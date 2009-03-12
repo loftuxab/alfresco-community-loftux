@@ -197,7 +197,9 @@ public class PresetsManager
                         {
                             // apply token replacement to each value as it is retrieved
                             String title = replace(c.elementTextTrim(Component.PROP_TITLE), tokens);
+                            String titleId = replace(c.elementTextTrim(Component.PROP_TITLE_ID), tokens);
                             String description = replace(c.elementTextTrim(Component.PROP_DESCRIPTION), tokens);
+                            String descriptionId = replace(c.elementTextTrim(Component.PROP_DESCRIPTION_ID), tokens);
                             String typeId = replace(c.elementTextTrim(Component.PROP_COMPONENT_TYPE_ID), tokens);
                             String scope = replace(c.elementTextTrim(Component.PROP_SCOPE), tokens);
                             String regionId = replace(c.elementTextTrim(Component.PROP_REGION_ID), tokens);
@@ -223,7 +225,9 @@ public class PresetsManager
                             Component component = model.newComponent(scope, regionId, sourceId);
                             component.setComponentTypeId(typeId);
                             component.setTitle(title);
+                            component.setTitleId(titleId);
                             component.setDescription(description);
+                            component.setDescriptionId(descriptionId);
                             component.setURL(url);
                             component.setChrome(chrome);
                             
@@ -252,7 +256,9 @@ public class PresetsManager
                             // apply token replacement to each value as it is retrieved
                             String pageId = replace(p.attributeValue(Page.PROP_ID), tokens);
                             String title = replace(p.elementTextTrim(Page.PROP_TITLE), tokens);
+                            String titleId = replace(p.elementTextTrim(Page.PROP_TITLE_ID), tokens);
                             String description = replace(p.elementTextTrim(Page.PROP_DESCRIPTION), tokens);
+                            String descriptionId = replace(p.elementTextTrim(Page.PROP_DESCRIPTION_ID), tokens);
                             String typeId = replace(p.elementTextTrim(Page.PROP_PAGE_TYPE_ID), tokens);
                             String auth = replace(p.elementTextTrim(Page.PROP_AUTHENTICATION), tokens);
                             String template = replace(p.elementTextTrim(Page.PROP_TEMPLATE_INSTANCE), tokens);
@@ -271,7 +277,9 @@ public class PresetsManager
                             Page page = model.newPage(pageId);
                             page.setPageTypeId(typeId);
                             page.setTitle(title);
+                            page.setTitleId(titleId);
                             page.setDescription(description);
+                            page.setDescriptionId(descriptionId);
                             page.setAuthentication(auth);
                             page.setTemplateId(template);
                             
@@ -300,7 +308,9 @@ public class PresetsManager
                             // apply token replacement to each value as it is retrieved
                             String templateId = replace(t.attributeValue(TemplateInstance.PROP_ID), tokens);
                             String title = replace(t.elementTextTrim(TemplateInstance.PROP_TITLE), tokens);
+                            String titleId = replace(t.elementTextTrim(TemplateInstance.PROP_TITLE_ID), tokens);
                             String description = replace(t.elementTextTrim(TemplateInstance.PROP_DESCRIPTION), tokens);
+                            String descriptionId = replace(t.elementTextTrim(TemplateInstance.PROP_DESCRIPTION_ID), tokens);
                             String templateType = replace(t.elementTextTrim(TemplateInstance.PROP_TEMPLATE_TYPE), tokens);
                             
                             // validate mandatory values
@@ -316,7 +326,9 @@ public class PresetsManager
                             // generate template-instance
                             TemplateInstance template = model.newTemplate(templateId);
                             template.setTitle(title);
+                            template.setTitleId(titleId);
                             template.setDescription(description);
+                            template.setDescriptionId(descriptionId);
                             template.setTemplateType(templateType);
                             
                             // apply arbituary custom properties

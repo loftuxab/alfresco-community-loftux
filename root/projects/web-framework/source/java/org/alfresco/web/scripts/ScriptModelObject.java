@@ -188,6 +188,33 @@ public final class ScriptModelObject extends ScriptBase
     }
     
     /**
+     * Gets the title id.
+     * 
+     * @return the title id
+     */
+    public String getTitleId()
+    {
+        return modelObject.getTitleId();
+    }
+    
+    /**
+     * Sets the title id.
+     * 
+     * @param value the new title id
+     */
+    public void setTitleId(Serializable value)
+    {
+        if (value != null)
+        {
+            getProperties().put("titleId", value);
+        }
+        else
+        {
+            getProperties().delete("titleId");
+        }
+    }
+    
+    /**
      * Gets the description.
      * 
      * @return the description
@@ -195,6 +222,33 @@ public final class ScriptModelObject extends ScriptBase
     public String getDescription()
     {
         return modelObject.getDescription();
+    }
+    
+    /**
+     * Gets the description id.
+     * 
+     * @return the description id
+     */
+    public String getDescriptionId()
+    {
+        return modelObject.getDescriptionId();
+    }
+    
+    /**
+     * Sets the description id.
+     * 
+     * @param value the new description id
+     */
+    public void setDescriptionId(Serializable value)
+    {
+        if (value != null)
+        {
+            getProperties().put("descriptionId", value);
+        }
+        else
+        {
+            getProperties().delete("descriptionId");
+        }
     }
     
     /**
