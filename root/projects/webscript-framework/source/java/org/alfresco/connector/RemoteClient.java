@@ -554,15 +554,15 @@ public class RemoteClient extends AbstractClient
                 }
             }
             
-            // apply request properties, allows for the assignment of specific header properties
+            // apply request properties, allows for the assignment and override of specific header properties
             if (this.requestProperties != null && this.requestProperties.size() != 0)
             {
                 for (Map.Entry<String, String> entry : requestProperties.entrySet())
                 {
                     String headerName = entry.getKey();
                     String headerValue = this.requestProperties.get(headerName);
-                    method.addRequestHeader(headerName, headerValue);
-                    if (trace) logger.trace("Added request header: " + headerName + "=" + headerValue);
+                    method.setRequestHeader(headerName, headerValue);
+                    if (trace) logger.trace("Set request header: " + headerName + "=" + headerValue);
                 }
             }
             

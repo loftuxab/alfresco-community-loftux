@@ -27,6 +27,8 @@ package org.alfresco.web.site;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.HttpMethod;
@@ -45,6 +47,22 @@ import org.alfresco.web.site.exception.UserFactoryException;
  */
 public class SlingshotUserFactory extends AlfrescoUserFactory
 {
+    /**
+     * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
+     */
+    @Override
+    public boolean authenticate(HttpServletRequest request, String username, String password)
+    {
+        // special case to disallow Guest user authentication in Share
+        // TODO: add basic Guest user support
+        boolean authenticated = false;
+        if (!UserFactory.USER_GUEST.equals(username))
+        {
+            authenticated = super.authenticate(request, username, password);
+        }
+        return authenticated;
+    }
+    
     /**
      * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String)
      */
