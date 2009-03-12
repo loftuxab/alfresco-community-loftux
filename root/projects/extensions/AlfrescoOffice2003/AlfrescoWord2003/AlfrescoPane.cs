@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
@@ -315,7 +316,7 @@ namespace AlfrescoWord2003
             ref missingValue, ref missingValue, ref missingValue);
       }
 
-      public void insertDocument(string relativePath)
+      public void insertDocument(string relativePath, string nodeRef)
       {
          object missingValue = Type.Missing;
          object trueValue = true;
@@ -334,6 +335,17 @@ namespace AlfrescoWord2003
             // WebDAV or CIFS?
             string strFullPath = m_ServerDetails.getFullPath(relativePath, m_WordApplication.ActiveDocument.FullName, true);
             string strExtn = Path.GetExtension(relativePath).ToLower();
+
+            // If we're using WebDAV, then download file locally before inserting
+            if (strFullPath.StartsWith("http"))
+            {
+               string strTempFile = Path.GetTempFileName();
+               WebClient fileReader = new WebClient();
+               string url = m_ServerDetails.WebClientURL + "download/direct/" + nodeRef.Replace(":/", "") + "/" + Path.GetFileName(relativePath);
+               fileReader.Headers.Add("Cookie: " + webBrowser.Document.Cookie);
+               fileReader.DownloadFile(url, strTempFile);
+               strFullPath = strTempFile;
+            }
 
             if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
             {
