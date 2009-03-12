@@ -142,7 +142,11 @@
          this.initDD(); 
          this.initEvents();
          this.initCalendarEvents();
-         this.addButton = Alfresco.CalendarHelper.renderTemplate('createEventButton',this.id);
+         this.addButton = Alfresco.CalendarHelper.renderTemplate('createEventButton',
+         {
+             addEventUrl:Alfresco.constants.URL_CONTEXT+'components/calendar/images/add-event-16-2.png',
+             addEvent:this._msg('label.add-event')
+         });
          
          if (this.calendarView !== Alfresco.CalendarView.VIEWTYPE_MONTH)
          {
@@ -2436,7 +2440,7 @@ Alfresco.CalendarHelper.addTemplate('agendaDayItem',
   '<li class="vevent"><span>{start} - {end}</span>'+
   '<a href="{uri}" class="summary">{name}</a></li>');
 
-Alfresco.CalendarHelper.addTemplate('createEventButton','<button id="addEventButton">add</button>');
+Alfresco.CalendarHelper.addTemplate('createEventButton','<button id="addEventButton"><img src="{addEventUrl}" alt="{addEvent}" /></button>');
 Alfresco.CalendarHelper.addTemplate('taggedTitle',"<span class=\"tagged\">{taggedWith} <span>'{tag}'</span></span>");
 
 /**

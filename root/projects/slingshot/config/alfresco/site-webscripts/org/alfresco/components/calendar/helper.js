@@ -468,6 +468,14 @@ var CalendarScriptHelper  = ( function()
                 viewArgs.view = this.initialiseAgendaView(this.getContextDate(this.getDefaultDate()));
             }
             return viewArgs;
+        },
+        convertFromISOString : function(formattedDate)
+        {
+          return fromISOString(formattedDate);
+        },
+        convertToISOString : function(dateObject,options)
+        {
+          return toISOString(dateObject,options)
         }
     };
     

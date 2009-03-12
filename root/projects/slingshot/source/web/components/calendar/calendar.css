@@ -494,9 +494,11 @@ margin-top:1em;
     right:10px;
     position:absolute;
     text-indent:0;
-    border:normal;
+    border:none;
     width:3em;
+    background:none;
 }
+
 /*#showMore {
 height:100%;
 z-index: 1;
