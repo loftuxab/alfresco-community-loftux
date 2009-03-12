@@ -58,10 +58,21 @@ package
 			var paging:String = Application.application.parameters.paging;
 			var fileName:String = Application.application.parameters.fileName;
 			jsCallback = Application.application.parameters.jsCallback;
+			
+			// i18n labels
+			var i18n:Object = new Object();
+			i18n.actualSize = Application.application.parameters.i18n_actualSize;
+			i18n.fitPage = Application.application.parameters.i18n_fitPage;
+			i18n.fitWidth = Application.application.parameters.i18n_fitWidth;
+			i18n.fitHeight = Application.application.parameters.i18n_fitHeight;
+			i18n.fullscreen = Application.application.parameters.i18n_fullscreen;
+			i18n.page = Application.application.parameters.i18n_page;
+			i18n.pageOf = Application.application.parameters.i18n_pageOf;
 						
 			// Set variables on the preview component							
 			previewer.paging = (paging.toLowerCase() == "true");
 			previewer.fileName = fileName;
+			previewer.i18nLabels = i18n;
 			
 			trace(System.totalMemory);
 			// Start the loading the content in to the previewer				

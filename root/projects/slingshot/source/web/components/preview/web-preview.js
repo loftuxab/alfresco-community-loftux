@@ -32,8 +32,15 @@
  */
 (function()
 {
-
+   /**
+    * YUI Library aliases
+    */
    var Dom = YAHOO.util.Dom;
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $msg = function(){};
 
    /**
     * WebPreview constructor.
@@ -143,6 +150,7 @@
       setMessages: function WP_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
+         $msg = this._msg;
          return this;
       },
 
@@ -154,7 +162,6 @@
        */
       onComponentsLoaded: function WP_onComponentsLoaded()
       {
-
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.widgets.swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
          this.widgets.swfPlayerMessage = Dom.get(this.id + "-swfPlayerMessage-div");
@@ -184,6 +191,13 @@
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
                so.addVariable("jsCallback", "Alfresco.util.ComponentManager.find({id:'" + this.id + "'})[0].onWebPreviewerEvent");
+               so.addVariable("i18n_actualSize", $msg("preview.actualSize"));
+               so.addVariable("i18n_fitPage", $msg("preview.fitPage"));
+               so.addVariable("i18n_fitWidth", $msg("preview.fitWidth"));
+               so.addVariable("i18n_fitHeight", $msg("preview.fitHeight"));
+               so.addVariable("i18n_fullscreen", $msg("preview.fullscreen"));
+               so.addVariable("i18n_page", $msg("preview.page"));
+               so.addVariable("i18n_pageOf", $msg("preview.pageOf"));
                so.addParam("allowScriptAccess", "sameDomain");
                so.addParam("allowFullScreen", "true");
                so.addParam("wmode", "transparent");                
@@ -193,22 +207,16 @@
             {
                // Cant find a preview
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true";
-               var message = Alfresco.util.message("label.noPreview", this.name,
-               {
-                  "0": url
-               });
-               this.widgets.swfPlayerMessage["innerHTML"] = message;
+               this.widgets.swfPlayerMessage["innerHTML"] = $msg("label.noPreview", url);
             }
          }
          else
          {
             // No sufficient flash player installed
-            var message = Alfresco.util.message("label.noFlash", this.name);
+            var message = $msg("label.noFlash");
             this.widgets.swfPlayerMessage["innerHTML"] = message;
          }
-
       },
-
 
       /**
        * Helper method for deciding what preview to use, if any
@@ -270,7 +278,7 @@
          var message = "Error";
          if (event.code)
          {
-            message = Alfresco.util.message(event.code, this.name);
+            message = $msg(event.code);
          } 
          Alfresco.util.PopupManager.displayMessage(
          {
@@ -285,8 +293,20 @@
             failureUrl: this.showConfig.failureUrl
          });
 
-      }
+      },
 
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function WP__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.WebPreview", Array.prototype.slice.call(arguments).slice(1));
+      }
    };
 
 })();

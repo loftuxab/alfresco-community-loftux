@@ -338,17 +338,10 @@
          {
             this.tagLibrary.setTags(this.options.tags);
          }
+
+         // Tiny MCE
          this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
-         // {
-         //             height: Math.min(height - 450, 300) + 'px',
-         //             width: width + 'px',
-         //             dompath: false, // Turns on the bar at the bottom
-         //             animate: false, // Animates the opening, closing and moving of Editor windows
-         //             markup: "xhtml",
-         //             siteId: this.options.siteId
-         //          }
          {
-            //Tiny MCE
             height: 300,
             width: 600,
             theme: "advanced",

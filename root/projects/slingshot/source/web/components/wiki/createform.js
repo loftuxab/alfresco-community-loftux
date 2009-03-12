@@ -4,9 +4,16 @@
 (function()
 {
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event;
+
+   /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $msg = function(){};
     
    Alfresco.WikiCreateForm = function(containerId)
    {
@@ -79,6 +86,7 @@
        setMessages: function WikiCreateForm_setMessages(obj)
        { 
           Alfresco.util.addMessages(obj, this.name);
+          $msg = this._msg;
           return this;
        },
          
@@ -90,7 +98,7 @@
         */
        onComponentsLoaded: function WikiCreateForm_onComponentsLoaded()
        {
-          YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
+          Event.onContentReady(this.id, this.init, this, true);
        },
       
       /**
@@ -108,32 +116,24 @@
          });
          this.tagLibrary.initialize();
 
+         // Tiny MCE
          this.widgets.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
-         // {
-         //    height: "300px",
-         //    width: "600px",
-         //    dompath: false, // Turns on the bar at the bottom
-         //    animate: false, // Animates the opening, closing and moving of Editor windows
-         //    markup: "xhtml",
-         //    siteId: this.siteId
-         // }
          {
-         //Tiny MCE
-         height: 300,
-         width: 600,
-         theme:'advanced',
-         theme_advanced_buttons1 : "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,forecolor,backcolor",
-         theme_advanced_buttons2 :"bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,alfresco-imagelibrary,image,cleanup,help,code,removeformat",
-         theme_advanced_toolbar_location : "top",
-         theme_advanced_toolbar_align : "left",
-         theme_advanced_statusbar_location : "bottom",
-         theme_advanced_path : false,
-         theme_advanced_resizing : true,
-         theme_advanced_buttons3 : null,
-         siteId: this.siteId,
-         language:this.options.locale         
-         }
-         );
+            height: 300,
+            width: 600,
+            theme:'advanced',
+            plugins: "table,visualchars,emotions,advhr,print,directionality,fullscreen,insertdatetime",
+            theme_advanced_buttons1: "bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontselect,fontsizeselect,forecolor,backcolor",
+            theme_advanced_buttons2: "bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,alfresco-imagelibrary,image,cleanup,help,code,removeformat,|,insertdate,inserttime",
+            theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,advhr,|,print,|,ltr,rtl,|,fullscreen",
+            theme_advanced_toolbar_location : "top",
+            theme_advanced_toolbar_align : "left",
+            theme_advanced_statusbar_location : "bottom",
+            theme_advanced_path : false,
+            theme_advanced_resizing : true,
+            siteId: this.siteId,
+            language:this.options.locale         
+         });
          this.widgets.pageEditor.render();
 
          this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button",
@@ -159,14 +159,18 @@
                fn: this.onPageCreated,
                scope: this
             },
-            failureMessage: "Page create failed"
+            failureCallback:
+            {
+               fn: this.onPageCreateFailed,
+               scope: this
+            }
          });
 
          form.setSubmitAsJSON(true);
          form.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          form.doBeforeFormSubmit =
          {
-            fn: function(form, obj)
+            fn: function WikiCreateForm_doBeforeFormSubmit(form, obj)
             {
                // Disable save button to prevent double-submission
                this.widgets.saveButton.set("disabled", true);
@@ -176,30 +180,29 @@
                this.tagLibrary.updateForm(this.id + "-form", "tags");
 
                // Avoid submitting the input field used for entering tags
-               var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+               var tagInputElem = Dom.get(this.id + "-tag-input-field");
                if (tagInputElem)
                {
                   tagInputElem.disabled = true;
                }
                
-               var title = YAHOO.util.Dom.get(this.id + "-pageTitle").value;
+               var title = Dom.get(this.id + "-pageTitle").value;
                title = title.replace(/\s+/g, "_");
                // Set the "action" attribute of the form based on the page title
                form.action =  Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + title;
                
                // Display pop-up to indicate that the page is being saved
-               var savingMessage = Alfresco.util.PopupManager.displayMessage(
+               this.widgets.savingMessage = Alfresco.util.PopupManager.displayMessage(
                {
                   displayTime: 0,
-                  text: '<span class="wait">' + $html(Alfresco.util.message("message.saving", this.name)) + '</span>',
+                  text: '<span class="wait">' + $html(this._msg("message.saving")) + '</span>',
                   noEscape: true
                });
             },
             scope: this
-         }
+         };
 
          form.init();         
-         
       },
 
       /**
@@ -221,6 +224,57 @@
       
          // Redirect to the page that has just been created
          window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + name;
+      },
+
+      /**
+       * Event handler that gets called when the page has failed to be created.
+       *
+       * @method onPageCreateFailed
+       * @param e {object} DomEvent
+       */      
+      onPageCreateFailed: function WikiCreateForm_onPageCreateFailed(e)
+      {
+         if (this.widgets.savingMessage)
+         {
+            this.widgets.savingMessage.destroy();
+            this.widgets.savingMessage = null;
+         }
+
+         var pageTitle = e.config.dataObj.pageTitle;
+         var me = this;
+
+         if (e.serverResponse.status === 409)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: $msg("message.failure.title"),
+               text: $msg("message.failure.duplicate", pageTitle),
+               buttons: [
+               {
+                  text: $msg("button.ok"),
+                  handler: function()
+                  {
+                     this.destroy();
+                     Dom.get(me.id + "-pageTitle").focus();
+                  },
+                  isDefault: true
+               }]
+            });
+         }
+
+      },
+      
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function WikiCreateForm__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.WikiCreateForm", Array.prototype.slice.call(arguments).slice(1));
       }
    };
       
