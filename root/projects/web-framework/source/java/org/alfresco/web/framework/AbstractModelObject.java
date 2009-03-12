@@ -50,7 +50,9 @@ public abstract class AbstractModelObject implements ModelObject
     private static final String VERSION_UNKNOWN = "unknown";
     public static String PROP_ID = "id";
     public static String PROP_TITLE = "title";
+    public static String PROP_TITLE_ID = "title-id";
     public static String PROP_DESCRIPTION = "description";
+    public static String PROP_DESCRIPTION_ID = "description-id";
     public static String CONTAINER_PROPERTIES = "properties";
     
     protected final Document document;
@@ -65,7 +67,9 @@ public abstract class AbstractModelObject implements ModelObject
     
     // cached values
     protected String title;
+    protected String titleId;
     protected String description;
+    protected String descriptionId;
     
     
     /**
@@ -151,12 +155,33 @@ public abstract class AbstractModelObject implements ModelObject
     }
     
     /* (non-Javadoc)
+     * @see org.alfresco.web.site.model.ModelObject#getTitleId()
+     */
+    public final String getTitleId()
+    {
+        if (this.titleId == null)
+        {
+            this.titleId = getProperty(PROP_TITLE_ID);
+        }
+        return this.titleId;
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setTitle(java.lang.String)
      */
     public final void setTitle(String title)
     {
         setProperty(PROP_TITLE, title);
         this.title = title;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.model.ModelObject#setTitleId(java.lang.String)
+     */
+    public final void setTitleId(String titleId)
+    {
+        setProperty(PROP_TITLE_ID, titleId);
+        this.titleId = titleId;
     }
 
     /* (non-Javadoc)
@@ -170,6 +195,18 @@ public abstract class AbstractModelObject implements ModelObject
         }
         return this.description;
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.model.ModelObject#getDescriptionId()
+     */
+    public final String getDescriptionId()
+    {
+        if (this.descriptionId == null)
+        {
+            this.descriptionId = getProperty(PROP_DESCRIPTION_ID);
+        }
+        return this.descriptionId;
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setDescription(java.lang.String)
@@ -178,6 +215,15 @@ public abstract class AbstractModelObject implements ModelObject
     {
         setProperty(PROP_DESCRIPTION, value);
         this.description = value;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.model.ModelObject#setDescriptionId(java.lang.String)
+     */
+    public final void setDescriptionId(String value)
+    {
+        setProperty(PROP_DESCRIPTION_ID, value);
+        this.descriptionId = value;
     }
     
     /* (non-Javadoc)

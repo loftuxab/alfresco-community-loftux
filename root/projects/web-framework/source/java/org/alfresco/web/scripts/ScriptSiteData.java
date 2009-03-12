@@ -550,6 +550,31 @@ public final class ScriptSiteData extends ScriptBase
     }
     
     /**
+     * Creates a new Page instance with the specified ID.
+     * 
+     * @param id  The id of the page instance
+     * @param title The title of the page instance
+     * @param titleId Message bundle key used to look up the title of the page instance
+     * @param description The description of the page instance
+     * @param descriptionId Message bundle key used to look up the description of the page instance
+     * 
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newPage(String id, String title, String titleId, String description, String descriptionId)
+    {
+        ParameterCheck.mandatoryString("id", id);
+        ParameterCheck.mandatoryString("title", title);
+        ParameterCheck.mandatoryString("description", description);
+        
+        Page page = (Page) getModel().newPage(id);
+        page.setTitle(title);
+        page.setDescription(description);
+        page.setTitleId(titleId);
+        page.setDescriptionId(descriptionId);
+        return ScriptHelper.toScriptModelObject(context, page);
+    }
+    
+    /**
      * Creates a new PageAssociation instance.
      * 
      * The id for the instance is generated using the Web Framework's Random
@@ -611,13 +636,13 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * Creates a new Component instance.
+     * Creates a new Template instance.
      * 
      * The id for the instance is generated using the Web Framework's Random
      * GUID generator.
      * 
-     * @param componentTypeId   The id of the ComponentType which describes 
-     *                          the type of this component.
+     * @param templateTypeId   The id of the TemplateType which describes 
+     *                         the type of this template.
      * @param title The name of the Template instance
      * @param description The description of the Template instance
      *  
@@ -633,6 +658,36 @@ public final class ScriptSiteData extends ScriptBase
         template.setTemplateType(templateTypeId);
         template.setTitle(title);
         template.setDescription(description);
+        return ScriptHelper.toScriptModelObject(context, template);
+    }
+    
+    /**
+     * Creates a new Template instance.
+     * 
+     * The id for the instance is generated using the Web Framework's Random
+     * GUID generator.
+     * 
+     * @param templateTypeId   The id of the TemplateType which describes 
+     *                         the type of this template.
+     * @param title The name of the Template instance
+     * @param titleId Message bundle key used to look up the title of the Template instance
+     * @param description The description of the Template instance
+     * @param descriptionId Message bundle key used to look up the description of the Template instance
+     *  
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newTemplate(String templateTypeId, String title, String titleId, String description, String descriptionId)
+    {
+        ParameterCheck.mandatoryString("templateTypeId", templateTypeId);
+        ParameterCheck.mandatoryString("title", title);
+        ParameterCheck.mandatoryString("description", description);
+        
+        TemplateInstance template = (TemplateInstance) getModel().newTemplate();
+        template.setTemplateType(templateTypeId);
+        template.setTitle(title);
+        template.setTitleId(titleId);
+        template.setDescription(description);
+        template.setDescriptionId(descriptionId);
         return ScriptHelper.toScriptModelObject(context, template);
     }
     

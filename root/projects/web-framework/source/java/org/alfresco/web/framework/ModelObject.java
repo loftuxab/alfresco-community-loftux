@@ -70,6 +70,20 @@ public interface ModelObject extends Serializable
     public void setTitle(String value);
     
     /**
+     * Returns the title id property of the model object.
+     * 
+     * @return The title id
+     */
+    public String getTitleId();
+    
+    /**
+     * Sets the title id property of the model object
+     * 
+     * @param The new title id
+     */
+    public void setTitleId(String value);
+    
+    /**
      * Returns the description property of the model object
      * 
      * @return The description
@@ -82,6 +96,20 @@ public interface ModelObject extends Serializable
      * @param The description
      */
     public void setDescription(String value);
+    
+    /**
+     * Returns the description id property of the model object
+     * 
+     * @return The description id
+     */
+    public String getDescriptionId();
+    
+    /**
+     * Sets the description id property of the model object
+     * 
+     * @param The description id
+     */
+    public void setDescriptionId(String value);
         
     /**
      * Indicates whether the object is currently persisted (saved)

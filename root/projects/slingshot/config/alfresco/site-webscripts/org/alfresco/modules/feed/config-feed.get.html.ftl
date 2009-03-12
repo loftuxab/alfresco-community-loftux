@@ -1,10 +1,7 @@
 <div id="${args.htmlid}-configDialog" class="config-feed">
-   <div class="hd">Enter URL:</div>
+   <div class="hd">${msg("label.enterUrl")}:</div>
    <div class="bd">
       <form id="${args.htmlid}-form" action="" method="POST">
-         <div class="yui-g">
-            <h2>${msg("header")}:</h2>
-         </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-url">${msg("label.url")}:</label></div>
             <div class="yui-u"><input id="${args.htmlid}-url" type="text" name="url" value=""/>&nbsp;*</div>

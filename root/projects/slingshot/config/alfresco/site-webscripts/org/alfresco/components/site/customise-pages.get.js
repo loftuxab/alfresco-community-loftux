@@ -22,16 +22,21 @@ var pages = [];
 for (var i = 0; i < usedPages.length; i++)
 {
    var pageId = usedPages[i].pageId;
+   
    // Look up real page object from framework
    var p = sitedata.getPage(pageId);
    if (p)
    {
+      // Resolve I18N strings for title/description
+      var title = (p.titleId != null ? msg.get(p.titleId) : p.title);
+      var description = (p.descriptionId != null ? msg.get(p.description) : p.description);
+      
       // Create a page object
       pages[pages.length] =
       {
          pageId: pageId,
-         title: p.title,
-         description: p.description,
+         title: title,
+         description: description,
          used: true
       };
    }
@@ -57,12 +62,16 @@ for (i = 0; i < availablePages.size(); i++)
       var p = sitedata.getPage(pageId);
       if (p)
       {
+         // Resolve I18N strings for title/description
+         var title = (p.titleId != null ? msg.get(p.titleId) : p.title);
+         var description = (p.descriptionId != null ? msg.get(p.description) : p.description);
+         
          // Create a page object
          pages[pages.length] =
          {
             pageId: pageId,
-            title: p.title,
-            description: p.description,
+            title: title,
+            description: description,
             used: false
          };
       }
@@ -71,8 +80,6 @@ for (i = 0; i < availablePages.size(); i++)
 
 // Sort the order of the pages and find out if this page is used or not
 
-
 // Prepare model for template
 model.siteId = siteId;
 model.pages = pages;
-

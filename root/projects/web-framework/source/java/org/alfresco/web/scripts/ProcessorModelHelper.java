@@ -68,12 +68,20 @@ public final class ProcessorModelHelper
     public static final String MODEL_PROPERTIES = "properties";
     public static final String MODEL_THEME = "theme";
     public static final String MODEL_DESCRIPTION = "description";
+    public static final String MODEL_DESCRIPTION_ID = "descriptionId";
     public static final String MODEL_TITLE = "title";
+    public static final String MODEL_TITLE_ID = "titleId";
     public static final String MODEL_ID = "id";
     public static final String MODEL_FORM = "form";
     public static final String MODEL_FORMDATA = "formdata";
     public static final String MODEL_APP = "app";
     public static final String PROP_HTMLID = "htmlid";
+    public static final String MODEL_MESSAGE_METHOD = "msg";
+    
+    private static final FreemarkerI18NMessageMethod FREEMARKER_MESSAGE_METHOD_INSTANCE =
+        new FreemarkerI18NMessageMethod();
+    private static final ScriptConfigModel SCRIPT_CONFIG_MODEL_INSTANCE =
+        new ScriptConfigModel(FrameworkHelper.getConfigService(), null);
     
     /**
      * Templates have the following:
@@ -125,7 +133,9 @@ public final class ProcessorModelHelper
 
             pageModel.put(MODEL_ID, page.getId());
             pageModel.put(MODEL_TITLE, page.getTitle());
+            pageModel.put(MODEL_TITLE_ID, page.getTitleId());
             pageModel.put(MODEL_DESCRIPTION, page.getDescription());
+            pageModel.put(MODEL_DESCRIPTION_ID, page.getDescriptionId());
             pageModel.put(MODEL_THEME, context.getThemeId());
             
             // custom page properties - add to model
@@ -133,7 +143,7 @@ public final class ProcessorModelHelper
             if (page.getCustomProperties().size() != 0)
             {
                 Map<String, Serializable> customProps = new HashMap<String, Serializable>(
-                        page.getCustomProperties().size());
+                        page.getCustomProperties().size()); 
                 customProps.putAll(page.getCustomProperties());
                 pageModel.put(MODEL_PROPERTIES, customProps);
             }
@@ -165,7 +175,9 @@ public final class ProcessorModelHelper
                 // stock the "page" model with attributes from the template
                 pageModel.put(MODEL_ID, template.getId());
                 pageModel.put(MODEL_TITLE, template.getTitle());
+                pageModel.put(MODEL_TITLE_ID, template.getTitleId());
                 pageModel.put(MODEL_DESCRIPTION, template.getDescription());
+                pageModel.put(MODEL_DESCRIPTION_ID, template.getDescriptionId());
                 pageModel.put(MODEL_THEME, context.getThemeId());
                 
                 pageModel.put(MODEL_PROPERTIES, Collections.EMPTY_MAP);
@@ -278,7 +290,10 @@ public final class ProcessorModelHelper
         if (context.getObject() instanceof TemplateInstance)
         {
             // add in the config service accessor
-            model.put(MODEL_CONFIG, new ScriptConfigModel(FrameworkHelper.getConfigService(), null));
+            model.put(MODEL_CONFIG, SCRIPT_CONFIG_MODEL_INSTANCE);
+            
+            // add in msg() method used for template I18N support - already provided by web script framework
+            model.put(MODEL_MESSAGE_METHOD, FREEMARKER_MESSAGE_METHOD_INSTANCE);
         }
     }
     
