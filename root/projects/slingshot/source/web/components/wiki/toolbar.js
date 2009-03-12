@@ -35,6 +35,8 @@
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
 
+   var $msg = function(){};
+
    /**
    * WikiToolbar constructor.
    * 
@@ -136,6 +138,7 @@
       setMessages: function WikiToolbar_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
+         $msg = this._msg;
          return this;
       },
          
@@ -240,11 +243,27 @@
          renameForm.setShowSubmitStateDynamically(true);
          renameForm.setSubmitElements(renameSaveButton);
          renameForm.ajaxSubmitMethod = Alfresco.util.Ajax.POST;
+         renameForm.doBeforeAjaxRequest =
+         {
+            fn: function WikiToolbar_doBeforeAjaxRequest(config, obj)
+            {
+               var pageTitle = config.dataObj.name;
+               config.failureCallback.obj = pageTitle;
+               config.dataObj.name = pageTitle.replace(/\s+/g, "_");
+               return true;
+            },
+            scope: this
+         };
          renameForm.setAJAXSubmit(true,
          {
             successCallback:
             {
                fn: this.onPageRenamed,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this.onPageRenameFailed,
                scope: this
             }
          });        
@@ -430,7 +449,7 @@
                keys: YAHOO.util.KeyListener.KEY.ESCAPE
             },
             {
-               fn: function(id, keyEvent)
+               fn: function WikiToolbar_onRename_escapeListener(id, keyEvent)
                {
                   // Undo Firefox caret issue
                   Alfresco.util.undoCaretFix(formElement);
@@ -446,49 +465,6 @@
          newNameField.focus();
       },
 
-      /**
-       * Event handler for save button on the page rename panel.
-       * Submits the (new) name of the page to the repo.
-       *
-       * @method onRenameSaveClick
-       * @param e {object} DomEvent
-       */      
-      onRenameSaveClick: function WikiToolbar_onRenameSaveClick(e)
-      {
-         var data = {};
-      
-         var newNameField = Dom.get(this.id + "-renameTo");
-         if (newNameField)
-         {
-            data["name"] = newNameField.value.replace(/\s+/g, "_");
-         }
-         
-         // Submit PUT request 
-         Alfresco.util.Ajax.request(
-         {
-            method: Alfresco.util.Ajax.POST,
-            url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.options.siteId + "/" + this.options.title,
-            requestContentType: Alfresco.util.Ajax.JSON,
-            dataObj: data,
-            successCallback:
-            {
-               fn: this.onPageRenamed,
-               scope: this
-            },
-            failureMessage: "Page update failed"
-         });
-
-         // Undo Firefox caret issue
-         Alfresco.util.undoCaretFix(this.id + "-renamePageForm");
-         
-         if (this.escapeListener)
-         {
-            this.escapeListener.disable();
-         }
-
-         this.popups.renamePanel.hide();
-      },
-      
       /**
        * Gets called when a page is successfully renamed.
        * Sets the window location to the URL of the new page.
@@ -524,6 +500,37 @@
                   text: errorMsg
                });
             }
+         }
+      },
+
+      /**
+       * Gets called when a page rename failed.
+       *
+       * @method onPageRenameFailed
+       * @param e {object} DomEvent
+       * @param e {string} Attempted page title
+       */      
+      onPageRenameFailed: function WikiToolbar_onPageRenameFailed(e, pageTitle)
+      {
+         var me = this;
+
+         if (e.serverResponse.status === 409)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: $msg("rename.failure.title"),
+               text: $msg("rename.failure.duplicate", pageTitle),
+               buttons: [
+               {
+                  text: $msg("button.ok"),
+                  handler: function()
+                  {
+                     this.destroy();
+                     Dom.get(me.id + "-renameTo").focus();
+                  },
+                  isDefault: true
+               }]
+            });
          }
       },
       

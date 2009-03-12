@@ -53,13 +53,11 @@ package org.alfresco.previewer
 	[Bindable]
 	public class PreviewerClass extends VBox
 	{
-						
 		/**
 		 * UI CONTROLS IMPLEMENTED BY MXML 
 		 * 
 		 * Should really be protected or private but can't be since code behind is used.
 		 */
-				
 		public var headerApplicationControlBar:ApplicationControlBar;
 		
 		public var fileNameLabel:Label;
@@ -70,6 +68,9 @@ package org.alfresco.previewer
 		public var zoomPercentageTextInput:TextInput;
 		public var snapPointsButton:Button;
 		
+		public var pageLabel:Label;
+		public var ofLabel:Label;
+		
 		public var previousButton:Button;
 		public var pageTextInput:TextInput;
 		public var noOfPagesLabel:Label;
@@ -79,6 +80,7 @@ package org.alfresco.previewer
 		
 		public var documentDisplay:DocumentZoomDisplay;
 		
+		private var i18n:Object = new Object();
 		
 		/** 
 		 * The menu displaying the snapPoints (created in actionscript).
@@ -171,7 +173,19 @@ package org.alfresco.previewer
 		{
 			return fileNameLabel.text;	
 		}
-
+		
+		/**
+		 * The localisation setter.
+		 * 
+		 * @param labels Object literal containing localisation strings.
+		 */		
+		public function set i18nLabels(labels:Object):void
+		{
+			i18n = labels;
+			fullScreenButton.label = i18n.fullscreen;
+			pageLabel.text = i18n.page;
+			ofLabel.text = i18n.pageOf;
+		}
 			
 		/**
 		 * Called when the FLEX framework think this component has been created.
@@ -193,7 +207,6 @@ package org.alfresco.previewer
             // Listen for error events so we can disable our controls
 			documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR, onDocumentDisplayError);
 			documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR, onDocumentDisplayError);
-
             
             // Setup zoom slider control           
             zoomSlider.liveDragging = true;
@@ -208,19 +221,19 @@ package org.alfresco.previewer
             zoomInButton.addEventListener(MouseEvent.CLICK, onZoomInClick);
             zoomOutButton.addEventListener(MouseEvent.CLICK, onZoomOutClick);
             
-            // The hidden button menu for snapPoints 
+            // The hidden button menu for snapPoints
             zoomPercentageTextInput.addEventListener(KeyboardEvent.KEY_DOWN, onZoomPercentageTextInputKeyDown);
 			snapPointsMenu = Menu.createMenu(this, new ArrayCollection(), false);
 			snapPointsMenu.setStyle("openDuration", 0); 
             snapPointsMenu.addEventListener(ListEvent.CHANGE, onSnapPointsMenuChange);            
             snapPointsButton.addEventListener(MouseEvent.CLICK, onSnapPointsButtonClick);
 
-			// Setup listeners for paging controls			
+			// Setup listeners for paging controls
             nextButton.addEventListener(MouseEvent.CLICK, onNextClick);            
             previousButton.addEventListener(MouseEvent.CLICK, onPreviousClick);            
             pageTextInput.addEventListener(KeyboardEvent.KEY_DOWN, onCurrentPageKeyDown);
 
-            // Setup listeners for fullscreen controls            
+            // Setup listeners for fullscreen controls
             fullScreenButton.addEventListener(MouseEvent.CLICK, onFullscreenClick);            
         }
 			
@@ -233,10 +246,10 @@ package org.alfresco.previewer
 		{	
 			// Remove older snapPoints, menu will update since snapPoints is dataProivder to snapPointsMenu
 			snapPoints = new ArrayCollection();								                        
-            snapPoints.addItem({label: "Actual Size", data: 1});
-            snapPoints.addItem({label: "Fit Page", data: event.fitToScreen});
-            snapPoints.addItem({label: "Fit Width", data: event.fitToWidth});
-            snapPoints.addItem({label: "Fit Height", data: event.fitToHeight});
+            snapPoints.addItem({label: i18n.actualSize, data: 1});
+            snapPoints.addItem({label: i18n.fitPage, data: event.fitToScreen});
+            snapPoints.addItem({label: i18n.fitWidth, data: event.fitToWidth});
+            snapPoints.addItem({label: i18n.fitHeight, data: event.fitToHeight});
             
             // Do show /hide the menu gets a size so its location later can be calculated
             snapPointsMenu.dataProvider = snapPoints;
@@ -280,7 +293,7 @@ package org.alfresco.previewer
 		public function onDocumentScaleChange(event:DocumentZoomDisplayEvent):void
 		{
 			// Set slider to the new zoom value, changed by the document display itself 
-			zoomSlider.value = event.documentScale;	
+			zoomSlider.value = event.documentScale;
 			
 			// Update zoom gi controls
 			updateZoomControls();
@@ -294,7 +307,7 @@ package org.alfresco.previewer
 		 */
 		private function onDocumentDisplayError(event:DocumentZoomDisplayEvent):void
 		{
-			currentState = "disabled";				
+			currentState = "disabled";
 		}
 		
 		/**
@@ -512,7 +525,7 @@ package org.alfresco.previewer
 			// Make sure we get a change to take action when toggling between normal and full screen	
 			stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreenDisplayStates);
 			
-			// Display as full screen									
+			// Display as full screen
 			stage.displayState = StageDisplayState.FULL_SCREEN;
 		}
 		
@@ -545,9 +558,6 @@ package org.alfresco.previewer
 				 	currentState = "";	
 				}				
 			}
-			
-	
 		}
-
 	}
 }

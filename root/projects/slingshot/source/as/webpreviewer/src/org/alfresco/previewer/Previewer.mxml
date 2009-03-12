@@ -7,7 +7,7 @@
 	<mx:ApplicationControlBar id="headerApplicationControlBar" styleName="headerApplicationControlBar" width="100%">
 		
 		<!-- FILENAME -->
-		<mx:Label id="fileNameLabel" styleName="fileNameLabel" text="Hello.doc" includeInLayout="false" visible="false"/>
+		<mx:Label id="fileNameLabel" styleName="fileNameLabel" text="" includeInLayout="false" visible="false"/>
 		<mx:Spacer width="100%"/>
 
 		<!-- ZOOMING -->
