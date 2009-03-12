@@ -1,8 +1,11 @@
 const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
 
-function sortByTitle(site1, site2)
+/**
+ * Sort favourites to the top, then in alphabetical order
+ */
+function sortSites(site1, site2)
 {
-   return (site1.title > site2.title) ? 1 : (site1.title < site2.title) ? -1 : 0;
+   return (!site1.isFavourite && site2.isFavourite) ? 1 : (site1.isFavourite && !site2.isFavourite) ? -1 : (site1.title > site2.title) ? 1 : (site1.title < site2.title) ? -1 : 0;
 }
 
 function main()
@@ -18,9 +21,6 @@ function main()
 
       if (sites.length > 0)
       {
-         // Sort the sites by title
-         sites.sort(sortByTitle);
-
          // Call the repo for the user's favourite sites
          result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
          if (result.status == 200 && result != "{}")
@@ -57,6 +57,9 @@ function main()
             // Is this site a user favourite?
             site.isFavourite = !!(favourites[site.shortName]);
          }
+
+         // Sort the favourites to the top
+         sites.sort(sortSites);
       }
 
       // Prepare the model for the template

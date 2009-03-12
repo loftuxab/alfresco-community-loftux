@@ -435,7 +435,7 @@
 
          // Clear the text field any previously entered values
          var newNameField = Dom.get(this.id + "-renameTo");
-         newNameField.value = "";
+         newNameField.value = this.options.title.replace(/_/g, " ");
          
          // Fix Firefox caret issue
          var formElement = Dom.get(this.id + "-renamePageForm");

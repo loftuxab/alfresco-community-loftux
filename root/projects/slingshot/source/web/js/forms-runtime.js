@@ -821,7 +821,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                {
                   name = element.id;
                }
-               var value = element.value;
+               var value = YAHOO.lang.trim(element.value);
                if (name)
                {
                   // check whether the input element is an array value
@@ -1188,7 +1188,7 @@ Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form,
       args = {};
    }
    
-   args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([ ]+$)|([\.]?[\.]+$)/;
+   args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/;
    args.match = false;
 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);

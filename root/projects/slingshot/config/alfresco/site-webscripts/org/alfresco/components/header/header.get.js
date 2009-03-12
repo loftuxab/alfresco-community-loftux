@@ -25,7 +25,8 @@ function main()
       
       // Call the repo to return a specific list of site metadata i.e. those in the fav list
       // and ensure the current user is a member of each before adding to fav list
-      var query = {
+      var query =
+      {
          "shortName" :
          {
             "match" : "exact-membership",
@@ -35,7 +36,10 @@ function main()
       var shortName;
       for (shortName in favourites)
       {
-         query.shortName.values.push(shortName);
+         if (favourites[shortName])
+         {
+            query.shortName.values.push(shortName);
+         }
       }
       
       var connector = remote.connect("alfresco");
@@ -46,7 +50,7 @@ function main()
          var i, ii;
          
          // Create javascript objects from the server response
-         // Each item is a favoriate site that the user is a member of
+         // Each item is a favourite site that the user is a member of
          var sites = eval('(' + result + ')');
          
          if (sites.length != 0)
