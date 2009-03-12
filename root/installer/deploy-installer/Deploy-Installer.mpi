@@ -153,7 +153,7 @@ ProjectID
 CB2C8E57-4826-4821-B9A1-7191DEB3B6CD
 
 ProjectVersion
-1.2.8.0
+1.2.9.0
 
 RMIPORT
 44100
@@ -238,10 +238,10 @@ File ::F8C990F8-7588-42FB-8C8F-CB58E33D03E6 -name W:/V21/root/projects/installer
 File ::5A5F76C5-7F49-4F69-B473-95096A76F43F -name W:/V21/root/projects/installer/application-context.xml -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::A07BFF00-FA26-415F-93CB-3C9003EAD050 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/jug-lgpl-2.0.0.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::C7D50BBF-E90A-4F6D-8C87-71D2E1434A7D -name W:/HEAD/root/projects/deployment/build/assemble/commons-logging-1.1.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::31BE5475-0845-4E03-837B-C41BDE5DDE2F -name W:/HEAD/root/projects/deployment/build/assemble/spring-2.0.6.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::DA8CA081-6BF7-4A85-8606-533A9D3199CA -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/shutdown-context.xml -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::A7F375FF-8C37-43E2-B948-1362422257B8 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/log4j.properties -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::E08CBB53-49A4-4BFD-A113-6B7AA6BF6D27 -name C:/work/alfresco/HEAD/root/projects/deployment/build/assemble/log4j-1.2.15.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::97E7DF8D-0F81-40B7-9DB8-976729831894 -name W:/V3.1/root/projects/deployment/build/assemble/spring-2.0.8.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
 FileGroup ::03791E78-4713-45B0-8559-C66EA67DB28A -setup Install -active Yes -platforms Windows -name {Windows scripts} -parent FileGroups
 File ::D6EBA3BA-8849-4530-AF11-6B6B1BD0A40D -name W:/V21/root/projects/deployment/build/assemble/deploy_start.bat -location ../../projects/deployment/build/assemble -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 File ::E1A99665-AF17-41BF-A38B-31FA8EA7631E -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 03791E78-4713-45B0-8559-C66EA67DB28A
