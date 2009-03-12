@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
@@ -27,6 +28,7 @@ namespace AlfrescoExcel2003
       private bool m_ManuallyHidden = false;
       private bool m_LastWebPageSuccessful = true;
       private bool m_ClearSession = false;
+      private bool m_SuppressAppEvents = false;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
@@ -74,6 +76,8 @@ namespace AlfrescoExcel2003
 
       public void OnDocumentChanged()
       {
+         if (m_SuppressAppEvents) return;
+
          bool bHaveDocument = (m_ExcelApplication.Workbooks.Count > 0);
 
          try
@@ -102,6 +106,8 @@ namespace AlfrescoExcel2003
 
       public void OnWindowActivate()
       {
+         if (m_SuppressAppEvents) return;
+
          if (m_ShowPaneOnActivate && !m_ManuallyHidden)
          {
             if (this.InvokeRequired)
@@ -121,6 +127,8 @@ namespace AlfrescoExcel2003
 
       public void OnWindowDeactivate()
       {
+         if (m_SuppressAppEvents) return;
+
          if (this.InvokeRequired)
          {
             OnWindowDeactivateCallback callback = new OnWindowDeactivateCallback(OnWindowDeactivate);
@@ -135,6 +143,8 @@ namespace AlfrescoExcel2003
 
       public void OnDocumentBeforeClose()
       {
+         if (m_SuppressAppEvents) return;
+
          m_ServerDetails.DocumentPath = "";
          if (m_ExcelApplication.Workbooks.Count == 1)
          {
@@ -314,7 +324,7 @@ namespace AlfrescoExcel2003
       {
       }
 
-      public void insertDocument(string relativePath)
+      public void insertDocument(string relativePath, string nodeRef)
       {
          object missingValue = Type.Missing;
          object trueValue = true;
@@ -322,6 +332,9 @@ namespace AlfrescoExcel2003
 
          try
          {
+            // Suppress all app events during this process
+            m_SuppressAppEvents = true;
+
             // Create a new document if no document currently open
             if (m_ExcelApplication.ActiveWorkbook == null)
             {
@@ -331,6 +344,17 @@ namespace AlfrescoExcel2003
             // WebDAV or CIFS?
             string strFullPath = m_ServerDetails.getFullPath(relativePath, m_ExcelApplication.ActiveWorkbook.FullName, true);
             string strExtn = Path.GetExtension(relativePath).ToLower();
+
+            // If we're using WebDAV, then download file locally before inserting
+            if (strFullPath.StartsWith("http"))
+            {
+               string strTempFile = Path.GetTempFileName();
+               WebClient fileReader = new WebClient();
+               string url = m_ServerDetails.WebClientURL + "download/direct/" + nodeRef.Replace(":/", "") + "/" + Path.GetFileName(relativePath);
+               fileReader.Headers.Add("Cookie: " + webBrowser.Document.Cookie);
+               fileReader.DownloadFile(url, strTempFile);
+               strFullPath = strTempFile;
+            }
 
             Excel.Worksheet worksheet = (Excel.Worksheet)m_ExcelApplication.ActiveSheet;
             Excel.Shapes shapes = worksheet.Shapes;
@@ -346,6 +370,50 @@ namespace AlfrescoExcel2003
                picture.Left = Convert.ToSingle(range.Left);
                picture.ScaleWidth(1, Microsoft.Office.Core.MsoTriState.msoTrue, missingValue);
                picture.ScaleHeight(1, Microsoft.Office.Core.MsoTriState.msoTrue, missingValue);
+            }
+            else if (".xls".IndexOf(strExtn) != -1)
+            {
+               // Workaround for KB210684 if clean, new workbook currently open
+               if (!docHasExtension() && m_ExcelApplication.ActiveWorkbook.Saved)
+               {
+                  string workbookName = m_ExcelApplication.ActiveWorkbook.Name;
+                  string templateName = Path.GetDirectoryName(strFullPath) + "\\" + workbookName + "." + Path.GetFileNameWithoutExtension(strFullPath);
+                  m_ExcelApplication.ActiveWorkbook.Close(falseValue, missingValue, missingValue);
+                  File.Move(strFullPath, templateName);
+                  m_ExcelApplication.Workbooks.Add(templateName);
+               }
+               else
+               {
+
+                  // Load the workbook
+                  object neverUpdateLinks = 2;
+                  object readOnly = true;
+                  Excel.Workbook insertXls = m_ExcelApplication.Workbooks.Open(strFullPath, neverUpdateLinks, readOnly, missingValue, missingValue,
+                     missingValue, missingValue, missingValue, missingValue, missingValue, missingValue, missingValue, missingValue,
+                     missingValue, missingValue);
+
+                  if (insertXls != null)
+                  {
+                     try
+                     {
+                        // Loop backwards through the worksheets copy-pasting them after the active sone
+                        Excel.Worksheet sourceSheet;
+                        for (int i = insertXls.Worksheets.Count; i > 0; i--)
+                        {
+                           sourceSheet = (Excel.Worksheet)insertXls.Worksheets[i];
+                           sourceSheet.Copy(missingValue, worksheet);
+                        }
+                     }
+                     catch (Exception e)
+                     {
+                        MessageBox.Show(Properties.Resources.UnableToInsert + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                     }
+                     finally
+                     {
+                        insertXls.Close(falseValue, missingValue, missingValue);
+                     }
+                  }
+               }
             }
             else
             {
@@ -368,6 +436,11 @@ namespace AlfrescoExcel2003
          catch (Exception e)
          {
             MessageBox.Show(Properties.Resources.UnableToInsert + ": " + e.Message, Properties.Resources.MessageBoxTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+         }
+         finally
+         {
+            // Restore app event processing
+            m_SuppressAppEvents = false;
          }
       }
 
