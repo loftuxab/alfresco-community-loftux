@@ -25,6 +25,8 @@
 package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -38,6 +40,7 @@ import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.exception.ConnectorServiceException;
@@ -81,9 +84,9 @@ public class NTLMAuthenticationFilter implements Filter
     private static final String HEADER_WWWAUTHENTICATE = "WWW-Authenticate";
     
     // NTLM authentication session object names
-    private static final String NTLM_AUTH_SESSION = "_alfNTLMAuthSess";
-    private static final String NTLM_AUTH_DETAILS = "_alfNTLMDetails";
-    private static final String LOGIN_PAGE_PASSTHROUGH = "_alfLoginPassthrough";
+    private static final String NTLM_AUTH_SESSION = "_alfwfNTLMAuthSess";
+    private static final String NTLM_AUTH_DETAILS = "_alfwfNTLMDetails";
+    private static final String LOGIN_PAGE_PASSTHROUGH = "_alfwfLoginPassthrough";
     
     private RemoteConfigElement config;
     private ConnectorService connectorService;
@@ -169,7 +172,8 @@ public class NTLMAuthenticationFilter implements Filter
             try
             {
                 Connector conn = connectorService.getConnector(this.endpoint, session);
-                Response remoteRes = conn.call("/touch", null, req, null);
+                ConnectorContext ctx = new ConnectorContext(null, getConnectionHeaders(conn));
+                Response remoteRes = conn.call("/touch", ctx, req, null);
                 if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
                 {
                     if (logger.isDebugEnabled())
@@ -264,6 +268,27 @@ public class NTLMAuthenticationFilter implements Filter
     }
     
     /**
+     * Return the connection headers for a /touch request
+     * 
+     * @param conn      Connector
+     * 
+     * @return the headers required for the request - if any
+     */
+    private Map<String, String> getConnectionHeaders(Connector conn)
+    {
+        Map<String, String> headers = null;
+        if (conn.getConnectorSession().getCookie("JSESSIONID") == null)
+        {
+            // Ensure we do not proxy over the Session ID from the browser request:
+            // If Alfresco and SURF app are deployed into the same app-server and user is
+            // user same browser instance to access both apps then we could get wrong session ID!
+            headers = new HashMap<String, String>(1);
+            headers.put("Cookie", "");
+        }
+        return headers;
+    }
+    
+    /**
      * Restart the authentication process for NTLM - clear current security details
      */
     private void restartAuthProcess(HttpSession session, HttpServletResponse res) throws IOException
@@ -321,11 +346,12 @@ public class NTLMAuthenticationFilter implements Filter
             try
             {
                 Connector conn = connectorService.getConnector(this.endpoint, session);
-                Response remoteRes = conn.call("/touch", null, req, null);
+                ConnectorContext ctx = new ConnectorContext(null, getConnectionHeaders(conn));
+                Response remoteRes = conn.call("/touch", ctx, req, null);
                 if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
                 {
                     String authHdr = remoteRes.getStatus().getHeaders().get(HEADER_WWWAUTHENTICATE);
-                    if (authHdr.startsWith(AUTH_NTLM))
+                    if (authHdr.startsWith(AUTH_NTLM) && authHdr.length() > 4)
                     {
                         // Decode the received NTLM blob and validate
                         final byte[] authHdrByts = authHdr.substring(5).getBytes();
@@ -449,7 +475,8 @@ public class NTLMAuthenticationFilter implements Filter
             try
             {
                 Connector conn = connectorService.getConnector(this.endpoint, session);
-                Response remoteRes = conn.call("/touch", null, req, null);
+                ConnectorContext ctx = new ConnectorContext(null, getConnectionHeaders(conn));
+                Response remoteRes = conn.call("/touch", ctx, req, null);
                 if (Status.STATUS_UNAUTHORIZED == remoteRes.getStatus().getCode())
                 {
                     String authHdr = remoteRes.getStatus().getHeaders().get(HEADER_WWWAUTHENTICATE);
