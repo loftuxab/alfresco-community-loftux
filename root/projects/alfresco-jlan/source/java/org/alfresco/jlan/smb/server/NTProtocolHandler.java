@@ -3126,11 +3126,22 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
 			return;
 		}
-		else if ( srchPath.endsWith("\\")) {
+		else if ( srchPath.endsWith( FileName.DOS_SEPERATOR_STR)) {
 
 			// Make the search a wildcard search
 
 			srchPath = srchPath + "*.*";
+		}
+		else if ( srchPath.startsWith( FileName.DOS_SEPERATOR_STR) == false) {
+			
+			// Prefix the search path to make it a relative path
+			
+			srchPath = FileName.DOS_SEPERATOR_STR + srchPath;
+
+			// Debug
+
+			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_SEARCH))
+				m_sess.debugPrintln("Search path missing leading slash, converted to relative path");
 		}
 
 		// Check for the Macintosh information level, if the Macintosh extensions are not enabled
