@@ -60,7 +60,7 @@
       this.parser = new Alfresco.WikiParser();
       
       return this;
-   }
+   };
 
    Alfresco.WikiDashlet.prototype =
    {
@@ -119,6 +119,19 @@
       },
 
       /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocumentList} returns 'this' for method chaining
+       */
+      setMessages: function WikiDashlet_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+      
+      /**
 		 * Fired by YUILoaderHelper when required component script files have
 		 * been loaded into the browser.
 		 *
@@ -165,6 +178,8 @@
       {
          var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/wiki/config/" + encodeURIComponent(this.options.guid);
          
+         Event.stopEvent(e);
+         
          if (!this.configDialog)
          {
             this.configDialog = new Alfresco.module.SimpleDialog(this.id + "-configDialog").setOptions(
@@ -183,7 +198,7 @@
                         Dom.get(this.id + "-scrollableList").innerHTML = this.parser.parse(obj["content"], this.options.pages);
                         
                         // Update the title
-                        Dom.get(this.id + "-title").innerHTML = obj["title"];
+                        Dom.get(this.id + "-title").innerHTML = Alfresco.util.message("label.header-prefix", this.name) + " - <a href=\"wiki-page?title=" + encodeURIComponent(e.config.dataObj.wikipage) + "\">" + obj.title + "</a>";
                      }
                   },
                   scope: this

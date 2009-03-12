@@ -110,8 +110,9 @@
        * @method onCreateLinkButtonClick
        * @param event {domEvent} DOM event
        */
-      onCreateLinkButtonClick: function SL_onCreateLinkButtonClick(event)
+      onCreateLinkButtonClick: function SL_onCreateLinkButtonClick(e)
       {
+         Event.stopEvent(e);
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit",
          {
             site: this.options.siteId

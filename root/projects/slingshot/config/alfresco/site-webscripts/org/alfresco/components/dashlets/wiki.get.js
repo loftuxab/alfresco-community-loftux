@@ -12,6 +12,7 @@ if (wikipage)
       model.wikipage = result.response;
    }
    
+   model.wikiLink = String(wikipage);
    model.pageTitle = String(wikipage).replace(/_/g, " ");
 
    // Get all pages for the site so we can display links correctly
