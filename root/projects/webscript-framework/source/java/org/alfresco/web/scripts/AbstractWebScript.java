@@ -794,7 +794,7 @@ public abstract class AbstractWebScript implements WebScript
             {
                 // if config file found, read contents into buffer
                 StringBuilder fileContents = new StringBuilder(1024);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(input), 1024);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"), 1024);
                 char[] buf = new char[1024];
                 int read;
                 while ((read=reader.read(buf)) != -1)
