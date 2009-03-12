@@ -46,6 +46,7 @@ import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.alfresco.web.scripts.servlet.WebScriptServletRuntime;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
@@ -60,7 +61,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * 
  * @author davidc
  */
-public class TestWebScriptServer implements ApplicationContextAware
+public class TestWebScriptServer implements ApplicationContextAware, InitializingBean
 {
     /** The application context */
     protected ApplicationContext applicationContext;
@@ -80,7 +81,7 @@ public class TestWebScriptServer implements ApplicationContextAware
     protected String lastCommand = null;
 
     /** Current user */
-    protected String username = "admin";
+    protected String username = null;
     
     /** Current headers */
     protected Map<String, String> headers = new HashMap<String, String>();
@@ -137,6 +138,23 @@ public class TestWebScriptServer implements ApplicationContextAware
             throws BeansException
     {
         this.applicationContext = applicationContext;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet() throws Exception
+    {
+        username = getDefaultUserName();
+    }
+
+    /**
+     * Get default user name
+     */
+    protected String getDefaultUserName()
+    {
+        return "admin";
     }
 
     /**
