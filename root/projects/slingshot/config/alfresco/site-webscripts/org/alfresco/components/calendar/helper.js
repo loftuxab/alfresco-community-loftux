@@ -448,9 +448,16 @@ var CalendarScriptHelper  = ( function()
             viewArgs.endDate = toISOString(lastDayOfMonth,{selector:'date'});
             return viewArgs;
         },
+        isUserPermittedToCreateEvents : function()
+        {
+          var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships/" + stringUtils.urlEncode(user.name));
+          var membership = eval('(' + json + ')');
+          return (membership.role!=="SiteConsumer") ? 'true' : 'false';
+        },
         initView : function(){
             var viewArgs = {};
             viewArgs.viewType = CalendarScriptHelper.getView();
+            viewArgs.permitToCreateEvents = this.isUserPermittedToCreateEvents();
             if (viewArgs.viewType=='month')
             {
                 viewArgs.view = this.initialiseMonthView(this.getContextDate(this.getDefaultDate()));

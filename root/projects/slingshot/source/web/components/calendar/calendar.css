@@ -102,22 +102,25 @@ div.boxOutline
 #calendarcontainer
 {
    padding:10px;
+   width:182px;
 }
 
 #calendarmenu
 {
    border: 1px solid #bfbfbf;
-   position: absolute; 
+   position: absolute;
+   overflow:visible;
 }
 
-#calendarendpicker button, #calendarpicker button
+#calendarendpicker a, #calendarpicker a
 {
    background: url(images/calendar-16.png) center center no-repeat;
    text-align: left;
    text-indent: -10em;
    overflow: hidden;
    *margin-left: 10em; /* For IE */
-   *padding: 0 3em;    /* For IE */
+   *padding: 0 0.7em;    /* For IE */
+   *vertical-align:top; /* For IE */   
    white-space: nowrap;
 }
  
@@ -342,11 +345,13 @@ cursor:pointer;
 cursor:hand;
 padding:0;
 z-index:0;
-position:relative;
 }
 .calendar.monthview div.day,.monthview div.day {
    height:100%;
    width:100%;
+}
+.calendar  td.disabled {
+background-color:#F3F7FB;
 }
 .calendar  td.disabled div{
 background-color:#F3F7FB;
@@ -426,7 +431,7 @@ ul.dayEvents {
 padding: 0;
 font-size: 85%;
 clear:both;
-
+z-index:1;
 }
 ul.dayEvents li{
       padding-left:0.5em; 
@@ -467,14 +472,15 @@ display:none;
 }*/
 .calendar.monthview ul.showing  {
 background-color:#fff;
-z-index:1000;
+z-index:1;
 position:absolute;
 /*width:15.85em;*/
 height:auto;
 min-height:10em;
 border-bottom:1px solid #EAEAEA;
 width:100%;
-top:23px;
+top:21px;
+*top:23px;
 }
 .calendar.monthview ul.showing li.moreEvents {
 /*position:static;*/
@@ -959,11 +965,11 @@ div.agendaview ul li {
 #calendarendpicker span, #calendarpicker span {
   border:0;
 }
-#calendarendpicker button, #calendarpicker button {
-  background:transparent url(images/calendar-16-2.png) no-repeat scroll 5px 10px;
+#calendarendpicker a, #calendarpicker a {
+  background:transparent url(images/calendar-16-2.png) no-repeat scroll 5px 3px;
   *background-position:0 0;
-  width:16px;
 }
+
 /*Mini calendar stylings*/
 .yui-skin-default .yui-calendar .calnavright,
 .yui-skin-default .yui-calendar .calnavleft {
