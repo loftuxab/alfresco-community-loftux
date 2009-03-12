@@ -253,7 +253,6 @@
          this.widgets.editor.render();
 
          // Add validation to the yui editor
-         this.widgets.validateOnZero = 0;
          var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
          this.widgets.editor.subscribe(keyUpIdentifier, function (e)
          {

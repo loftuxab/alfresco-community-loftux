@@ -525,7 +525,6 @@
 
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + '-links', columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
             initialLoad: false,
             MSG_EMPTY: '<span class="datatable-msg-empty">' + this._msg("links.empty") + '</span>'
          });
