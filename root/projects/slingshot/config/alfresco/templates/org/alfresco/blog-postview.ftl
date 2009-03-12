@@ -5,7 +5,7 @@
    <!-- General Blog Assets -->
    <@script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
-   <@template.htmlEditorAssets />
+   <@templateHtmlEditorAssets />
 </@>
 
 <@templateBody>

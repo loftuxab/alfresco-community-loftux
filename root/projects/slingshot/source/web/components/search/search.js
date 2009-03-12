@@ -340,9 +340,7 @@
             var txt = oRecord.getData("description");
             if (txt !== undefined && txt !== "")
             {
-               desc += '<div class="details">';
-               desc += $html(txt);
-               desc += '</div>';
+               desc += '<div class="details">' + $html(txt) + '</div>';
             }
             
             // type information
@@ -374,7 +372,7 @@
                desc += ' ' + Alfresco.util.formatFileSize(oRecord.getData("size"));
             }
             desc += ' ' + me._msg("message.modifiedby");
-            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + '/user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedByUser")) + '</a> ';
+            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + '/user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedBy")) + '</a> ';
             desc += me._msg("message.modifiedon");
             desc += ' ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"));
             desc += '</div>';
@@ -384,7 +382,7 @@
             if (tags.length !== 0)
             {
                var i, j;
-               desc += '<div class="details">' + me._msg("message.tags") + ': ';
+               desc += '<div class="details"><span class="tags">' + me._msg("message.tags") + ': ';
                for (i = 0, j = tags.length; i < j; i++)
                {
                    desc += '<span id="' + me.id + '-searchByTag-' + $html(tags[i]) + '"><a class="search-tag" href="#">' + $html(tags[i]) + '</a> </span>';
