@@ -1,4 +1,4 @@
-@echo off
+rem @echo off
 rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
@@ -22,6 +22,10 @@ call SetPaths.bat
 del SetPaths.bat
 
 :start
+rem --- Test for Java settings
+set BASEDIR=%CATALINA_HOME%
+call "%CATALINA_HOME%\bin\setclasspath.bat"
+if errorlevel 1 goto error
 set PATH=%JAVA_HOME%\bin;%PATH%
 rem ---------------------------------------
 rem Start Components
@@ -56,3 +60,7 @@ call "%CATALINA_HOME%\bin\shutdown.bat"
 rem if exist "virtual_start.bat" call virtual_stop.bat 
 
 :nostop
+exit
+
+:error
+pause
