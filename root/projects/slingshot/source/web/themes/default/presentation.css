@@ -271,7 +271,7 @@ textarea
 /* Richtext Editor Plug-ins */
 
 .yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon,
-.mce_alfresco-imagelibrary img
+span.mce_alfresco-imagelibrary
 {
    background-position: 0 0 !important;
    background-image: url(images/alfresco-imagelib.png) !important;

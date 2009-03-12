@@ -134,7 +134,6 @@ Alfresco.util.createImageEditor = function(id, options)
       ed.addButton('alfresco-imagelibrary',
       {
          title: 'Insert Image Library',
-         image: 'img/example.gif',
          onclick: function(ev)
          {
             gutter.toggle.call(gutter);
