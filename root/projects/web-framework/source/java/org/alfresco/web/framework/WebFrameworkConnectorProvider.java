@@ -29,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorProvider;
 import org.alfresco.connector.ConnectorService;
-import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
 import org.alfresco.connector.exception.ConnectorProviderException;
 import org.alfresco.connector.exception.ConnectorServiceException;
@@ -71,24 +70,18 @@ public class WebFrameworkConnectorProvider implements ConnectorProvider
     {
         Connector conn = null;
         RequestContext rc = ThreadLocalRequestContext.getRequestContext();
-
+        
         if (rc != null)
         {
             try
             {
-                // check whether we have a credential vault set up
-                CredentialVault vault = rc.getCredentialVault();
-                
-                if (logger.isDebugEnabled())
-                    logger.debug("Found credential vault: " + vault);
-    
                 // check whether we have a current user
                 User user = rc.getUser();
-                if (user == null || vault == null)
+                if (user == null || rc.getCredentialVault() == null)
                 {
                     if (logger.isDebugEnabled())
                         logger.debug("No user was found, creating unauthenticated connector");
-    
+                    
                     // return the non-credential'ed connector to this endpoint
                     conn = connectorService.getConnector(endpoint);                       
                 }
@@ -96,31 +89,30 @@ public class WebFrameworkConnectorProvider implements ConnectorProvider
                 {
                     if (logger.isDebugEnabled())
                         logger.debug("User '" + user.getId() + "' was found, creating authenticated connector");
-    
+                    
                     // return the credential'ed connector to this endpoint
                     HttpSession httpSession = rc.getRequest().getSession(true);
                     conn = connectorService.getConnector(endpoint, rc.getUserId(), httpSession);
                 }
             }
-            catch(ConnectorServiceException cse)
+            catch (ConnectorServiceException cse)
             {
                 throw new ConnectorProviderException("Unable to provision connector for endpoint: " + endpoint, cse);
             }
         }
         else
         {
-            // if we don't have a request context, we can still provision
-            // a non-credential'd connector
+            // if we don't have a request context, we can still provision a connector with no credentials
             try
             {
                 conn = connectorService.getConnector(endpoint);
             }
-            catch(ConnectorServiceException cse)
+            catch (ConnectorServiceException cse)
             {
                 throw new ConnectorProviderException("Unable to provision non-credential'd connector for endpoint: " + endpoint, cse);
             }
         }
-
+        
         return conn;
     }
 }
