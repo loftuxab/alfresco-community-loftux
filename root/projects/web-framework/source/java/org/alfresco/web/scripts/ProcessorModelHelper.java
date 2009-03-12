@@ -82,6 +82,8 @@ public final class ProcessorModelHelper
         new FreemarkerI18NMessageMethod();
     private static final ScriptConfigModel SCRIPT_CONFIG_MODEL_INSTANCE =
         new ScriptConfigModel(FrameworkHelper.getConfigService(), null);
+    private static final TemplateConfigModel TEMPLATE_CONFIG_MODEL_INSTANCE =
+        new TemplateConfigModel(FrameworkHelper.getConfigService(), null);
     
     /**
      * Templates have the following:
@@ -291,9 +293,6 @@ public final class ProcessorModelHelper
         {
             // add in the config service accessor
             model.put(MODEL_CONFIG, SCRIPT_CONFIG_MODEL_INSTANCE);
-            
-            // add in msg() method used for template I18N support - already provided by web script framework
-            model.put(MODEL_MESSAGE_METHOD, FREEMARKER_MESSAGE_METHOD_INSTANCE);
         }
     }
     
@@ -347,9 +346,12 @@ public final class ProcessorModelHelper
                     model.put(MODEL_URL, urlHelper);
                 }                
             }
-
+            
             // add in the config service accessor
-            model.put(MODEL_CONFIG, new TemplateConfigModel(FrameworkHelper.getConfigService(), null));
+            model.put(MODEL_CONFIG, TEMPLATE_CONFIG_MODEL_INSTANCE);
+            
+            // add in msg() method used for template I18N support - already provided by web script framework
+            model.put(MODEL_MESSAGE_METHOD, FREEMARKER_MESSAGE_METHOD_INSTANCE);
         }
         
         /**
