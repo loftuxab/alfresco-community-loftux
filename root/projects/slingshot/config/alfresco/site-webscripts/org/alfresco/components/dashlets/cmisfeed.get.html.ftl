@@ -8,9 +8,7 @@
    <div class="title">${msg("label.title")}</div>
    <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if> id="${args.htmlid}-scrollableList">
    
-   <div>${msg("label.body")} <a href="${msg("label.link")}" target="${target}">${msg("label.linkText")}</a></div>
-   <hr/>
-   <div><a href="${remote}${msg("label.repolink")}" target="${target}">${msg("label.repolinkText")}</a></div>
+   <div>${msg("label.body")} <a href="${msg("label.learnCMISLink")}" target="${target}">${msg("label.learnCMISText")}</a></div>
    <hr/>
    <div>${msg("label.blogTitle")}</div><hr/>
    
