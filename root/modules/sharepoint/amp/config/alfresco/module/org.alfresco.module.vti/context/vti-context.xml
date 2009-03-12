@@ -189,7 +189,7 @@
 	
 	<!-- FrontPage extension methods -->
 	
-    <bean id="abstractVtiMethod" abstract="true" class="org.alfresco.module.vti.web.fp.AbstractVtiMethod">
+    <bean id="abstractVtiMethod" abstract="true" class="org.alfresco.module.vti.web.fp.AbstractMethod">
         <property name="vtiHandler">
             <ref bean="vtiHandler"/>
         </property>

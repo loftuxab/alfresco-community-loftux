@@ -962,7 +962,7 @@
            http://www.profv.de/mingw_cross_env/
 
            In the end, neither the sourceforge nor the profv.de 
-           solutions were entirely satisfactory as-is, but there 
+           solutions were entirely satisfactory as-is, but there
            were some goood ideas in both.
       -->
      <copy todir="${dir.project.mingw.build}">
@@ -2284,11 +2284,11 @@
            depends="init">
       <echo>Packaging Alfresco PHP library</echo>
       <mkdir dir="${dir.module.php.dist}" />
-      <zip destfile="${dir.module.php.dist}/alfresco-php-library.zip">
+      <zip destfile="${dir.module.php.dist}/alfresco-php-library-unsupported.zip">
          <zipfileset dir="${dir.module.php.web.php}"
                      prefix="alfresco-php-library"/>
       </zip>
-      <tar destfile="${dir.module.php.dist}/alfresco-php-library.tar.gz"
+      <tar destfile="${dir.module.php.dist}/alfresco-php-library-unsupported.tar.gz"
            longfile="gnu"
            compression="gzip">
          <tarfileset dir="${dir.module.php}/source/php/remote"
