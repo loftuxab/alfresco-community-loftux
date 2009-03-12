@@ -12,7 +12,8 @@
            **/
            startDate : Alfresco.util.fromISO8601('${viewArgs.view.startDate}'),
            endDate : Alfresco.util.fromISO8601('${viewArgs.view.endDate}'),
-           titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate}')
+           titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate}'),
+           permitToCreateEvents : '${viewArgs.permitToCreateEvents}'
         }
        ).setMessages(
             ${messages}
@@ -87,8 +88,8 @@
                                          <#assign numEvents=numEvents + 1>    
                                  </#if>
                            </#list>
-                           <#if (numEvents>4)>
-                                  <li class="moreEvents"><a href="#todo">+ 5 More</a></li>                                
+                           <#if (numEvents>5)>
+                                  <li class="moreEvents"><a href="#" class="theme-color-1">${msg('label.show-more')}</a></li>                                
                               </#if>
                             <#if (numEvents>0)>
                                 </ul>

@@ -168,12 +168,24 @@
             width: "35em"
          });
          this.panel.render(document.body);
-
+         this.widgets = this.widgets || {};
          // Buttons
-         Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
-         Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick);
-         Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
-
+         this.widgets.deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
+         this.widgets.editButton = Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick);
+         this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick);
+         if (this.options.permitToEditEvents!=='true')
+         {
+           this.widgets.deleteButton.set("disabled", true);
+           this.widgets.editButton.set("disabled", true);
+         }
+         //convert iso date to readable human text
+         var dateElIds = [this.id+'-startdate',this.id+'-enddate'];
+         for (var i=0,len=dateElIds.length;i<len;i++)
+         {
+            var dateTextEl = Dom.get(dateElIds[i]);
+            var textvalue = dateTextEl.innerHTML.split(' ');
+            dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), "dddd, d mmmm yyyy") + ' ' + textvalue[1] + ' ' + textvalue[2];
+         }
          // Display the panel
          this.panel.show();
       },
@@ -214,7 +226,7 @@
          
          var options = 
          {
-              site : this.options.siteId,
+            site : this.options.siteId,
             displayDate :this.options.displayDate,
             actionUrl : Alfresco.constants.PROXY_URI + this.options.eventUri + "?page=calendar",
             templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
@@ -268,8 +280,7 @@
                           Dom.get("fd").value = dateStr;
                           var dateStr = Alfresco.util.formatDate(dte, "dddd, d mmmm yyyy");
                           Dom.get("td").value = dateStr;
-                          Dom.get(this.id+"-from").value = Dom.get("fd").value;
-                          Dom.get(this.id+"-to").value = Dom.get("td").value;
+                          Dom.get(this.id+"-from").value = Dom.get(this.id+"-to").value = Alfresco.util.formatDate(this.options.displayDate,'yyyy/mm/dd');
                           var a = ['what','where','desc'];
                           for (var i=0;i<a.length;i++)
                           {
@@ -279,6 +290,9 @@
                           
                           //init taglib
                           this.tagLibrary.initialize();
+                          Dom.get(this.id + "-tag-input-field").disabled=false;
+                          Dom.get(this.id + "-tag-input-field").tabIndex = 8;
+                          Dom.get(this.id + "-add-tag-button").tabIndex = 9;
                           var tags = YAHOO.util.Dom.get(this.id + "-tag-input-field").value;
                           YAHOO.util.Dom.get(this.id + "-tag-input-field").value = '';
                           this.tagLibrary.setTags(tags.split(' '));
@@ -286,7 +300,7 @@
                           //hide mini-cal
                           this.dialog.hideEvent.subscribe(function() {
                            Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
-                          },this,true);                               
+                          },this,true);                              
                        },
                scope : this.eventDialog
             },
