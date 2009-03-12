@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts.servlet;
 
 import java.io.IOException;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.RuntimeContainer;
@@ -108,10 +110,14 @@ public class WebScriptServlet extends HttpServlet
     {
         if (logger.isDebugEnabled())
             logger.debug("Processing request ("  + req.getMethod() + ") " + req.getRequestURL() + (req.getQueryString() != null ? "?" + req.getQueryString() : ""));
+        
         if (req.getCharacterEncoding() == null)
         {
             req.setCharacterEncoding("UTF-8");
         }
+        
+        setLanguageFromRequestHeader(req);
+        
         WebScriptServletRuntime runtime = new WebScriptServletRuntime(container, authenticatorFactory, req, res, serverProperties);
         runtime.executeScript();
     }
@@ -125,5 +131,20 @@ public class WebScriptServlet extends HttpServlet
     {
         // NOOP
     }
-
+    
+    /**
+     * Apply Client and Repository language locale based on the 'Accept-Language' request header
+     */
+    public static void setLanguageFromRequestHeader(HttpServletRequest req)
+    {
+        // set language locale from browser header
+        String acceptLang = req.getHeader("Accept-Language");
+        if (acceptLang != null && acceptLang.length() != 0)
+        {
+            StringTokenizer t = new StringTokenizer(acceptLang, ",; ");
+            // get language and convert to java locale format
+            String language = t.nextToken().replace('-', '_');
+            I18NUtil.setLocale(I18NUtil.parseLocale(language));
+        }
+    }
 }

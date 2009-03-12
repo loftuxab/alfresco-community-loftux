@@ -19,14 +19,6 @@ else if (args.dashboardType == "site")
 {
    dashboardId = "site/" + page.url.templateArgs.site + "/dashboard";   
 }
-var currentTemplate = sitedata.findTemplate(dashboardId),
-   currentNoOfColumns = getNoOfColumns(currentTemplate),
-   currentLayout =
-   {
-      templateId: currentTemplate.id,
-      noOfColumns: currentNoOfColumns,
-      description: currentTemplate.description
-   };
 
 // Hardcoded templates until proper service exists
 var layouts = [
@@ -36,6 +28,25 @@ var layouts = [
    {templateId: "dashboard-3-columns",            noOfColumns: 3, description: msg.get("msg.template-3-columns")},
    {templateId: "dashboard-4-columns",            noOfColumns: 4, description: msg.get("msg.template-4-columns")}
 ];
+
+var currentTemplate = sitedata.findTemplate(dashboardId),
+   currentNoOfColumns = getNoOfColumns(currentTemplate),
+   currentTemplateDescription = "NONE";
+
+for (var i=0; i<layouts.length; i++)
+{
+   if (layouts[i].templateId == currentTemplate.id)
+   {
+      currentTemplateDescription = layouts[i].description;
+   }
+}
+
+var currentLayout =
+   {
+      templateId: currentTemplate.id,
+      noOfColumns: currentNoOfColumns,
+      description: currentTemplateDescription
+   };
 
 // Prepare model for template
 model.currentLayout = currentLayout;

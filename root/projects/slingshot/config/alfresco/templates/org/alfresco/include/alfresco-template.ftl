@@ -5,6 +5,12 @@
 <#-- allow theme to be specified in url args - helps debugging themes -->
 <#assign theme = (page.url.args.theme)!theme />
 
+<#-- Look up page title from message bundles where possible -->
+<#assign pageTitle = page.title />
+<#if page.titleId??>
+<#assign pageTitle = (msg(page.titleId))!page.title />
+</#if>
+
 <#--
    JavaScript and (future) CSS minimisation via YUI Compressor.
    Currently only client-side JavaScript files are compressed during build.
@@ -30,7 +36,7 @@
    </#if>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-   <title>Alfresco Share &raquo; ${page.title}</title>
+   <title>Alfresco Share &raquo; ${pageTitle}</title>
 
 <!-- Shortcut Icons -->
    <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 

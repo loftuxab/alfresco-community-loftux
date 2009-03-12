@@ -117,13 +117,13 @@ public class ScriptRemote
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
             if (descriptor == null)
             {
-                logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
+                logger.error("No EndPoint descriptor configuration found for ID: " + endpointId);
             }
             else
             {
                 // if a connector provider has not been assigned, we can use a
                 // default provider which provides simple stateless access
-                if(connectorProvider == null)
+                if (connectorProvider == null)
                 {
                     connectorProvider = new ConnectorProviderImpl();                    
                 }
@@ -132,7 +132,7 @@ public class ScriptRemote
                 {
                     // construct a connector to this endpoint
                     Connector connector = connectorProvider.provide(endpointId);
-                    remoteConnector = new ScriptRemoteConnector(connector);
+                    remoteConnector = new ScriptRemoteConnector(connector, descriptor);
                 }
                 catch (ConnectorProviderException cpe)
                 {

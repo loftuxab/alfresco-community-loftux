@@ -37,7 +37,7 @@
 
       <div>
          <br />
-         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png" alt="current layout" />
+         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.templateId}.png" alt="${msg("img.currentLayout")}" />
          <div id="${args.htmlid}-changeButtonWrapper-div" class="buttons">
             <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}" />
          </div>

@@ -73,12 +73,42 @@
    Alfresco.DocumentLinks.prototype =
    {
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * External authentication being used for login
+          * 
+          * @property externalAuth
+          * @type boolean
+          */
+         externalAuth: false
+      },
+      
+      /**
        * Object container for storing YUI widget instances.
        * 
        * @property widgets
        * @type object
        */
-       widgets: {},
+      widgets: {},
+      
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.Search} returns 'this' for method chaining
+       */
+      setOptions: function DocumentLinks_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
       
       /**
        * Set messages for this component.
@@ -112,7 +142,7 @@
          var docData = args[1];
          
          // construct the base content URL
-         var contentUrl = Alfresco.constants.PROXY_URI + docData.contentUrl;
+         var contentUrl = (this.options.externalAuth ? Alfresco.constants.PROXY_URI : Alfresco.constants.PROXY_FEED_URI) + docData.contentUrl;
          
          // populate the text field with the download url
          var downloadUrl = contentUrl + "?a=true";
