@@ -53,6 +53,9 @@
       // Initialise prototype properties
       this.widgets = {};
       this.modules = {};
+      
+      // Register this component
+      Alfresco.util.ComponentManager.register(this);
 
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "calendar"], this.onComponentsLoaded, this);
@@ -452,7 +455,13 @@
             hide_blank_weeks: true,
             mindate: new Date()
          });
-
+         this.widgets.calendar.cfg.setProperty("MONTHS_SHORT", this._msg("months.short").split(","));
+         this.widgets.calendar.cfg.setProperty("MONTHS_LONG", this._msg("months.long").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_1CHAR", this._msg("days.initial").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_SHORT", this._msg("days.short").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_MEDIUM", this._msg("days.medium").split(","));
+         this.widgets.calendar.cfg.setProperty("WEEKDAYS_LONG", this._msg("days.long").split(","));
+         
          this.widgets.calendarOverlay = new YAHOO.widget.Dialog(this.id + "-calendarOverlay",
          {
             close: false,
@@ -795,7 +804,7 @@
        * @return {string} The custom message
        * @private
        */
-       _msg: function DLTB__msg(messageId)
+       _msg: function DLW__msg(messageId)
        {
           return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }

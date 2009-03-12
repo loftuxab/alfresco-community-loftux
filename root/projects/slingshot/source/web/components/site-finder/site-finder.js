@@ -319,6 +319,9 @@
          }, 
          "keydown" 
          ).enable();
+
+         // Set initial focus
+         Dom.get(this.id + "-term").focus();
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -507,12 +510,10 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
             initialLoad: false,
             MSG_EMPTY: this._msg("message.instructions")
          });
          this.widgets.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
-
          
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function SiteFinder_doBeforeLoadData(sRequest, oResponse, oPayload)

@@ -548,11 +548,10 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-members", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 32,
             initialLoad: false,
             MSG_EMPTY: '<span style="white-space: nowrap;">' + this._msg("site-members.enter-search-term") + '</span>'
          });
-         
+
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function SiteMembers_doBeforeLoadData(sRequest, oResponse, oPayload)
          {

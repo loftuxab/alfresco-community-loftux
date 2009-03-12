@@ -1,3 +1,6 @@
+<script type="text/javascript">//<![CDATA[
+   Alfresco.util.ComponentManager.get("${args.htmlid}").setMessages(${messages});
+//]]></script>
 <div id="${args.htmlid}-dialog" class="workflow">
    <div id="${args.htmlid}-title" class="hd"></div>
    <div class="bd">
@@ -49,7 +52,3 @@
       </form>
    </div>
 </div>
-
-<script type="text/javascript">//<![CDATA[
-Alfresco.util.addMessages(${messages}, "Alfresco.module.DoclibWorkflow");
-//]]></script>

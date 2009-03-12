@@ -479,10 +479,18 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 8,
             initialLoad: false,
             MSG_EMPTY: this._msg("message.instructions")
          });
+
+         this.widgets.dataTable.doBeforeLoadData = function PeopleFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
+         {
+            if (oResponse.results)
+            {
+               this.renderLoopSize = oResponse.results.length >> YAHOO.env.ua.gecko ? 3 : 5;
+            }
+            return true;
+         };
 
          // Enable row highlighting
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);

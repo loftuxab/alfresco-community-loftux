@@ -314,13 +314,34 @@
          
          // instantiate the simple editor we use for the form
          this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);         
-         this.widgets.editor.render();    
+         this.widgets.editor.render();
          
+         // Add validation to the editor
+         var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
+         this.widgets.editor.subscribe(keyUpIdentifier, function (e)
+         {
+            /**
+             * Doing a form validation on every key stroke is process consuming, below we try to make sure we only do
+             * a form validation if it's necessarry.
+             * NOTE: Don't check for zero-length in commentsLength, due to HTML <br>, <span> tags, etc. possibly
+             * being present. Only a "Select all" followed by delete will clean all tags, otherwise leftovers will
+             * be there even if the form looks empty.
+             */                       
+            if (this.widgets.editor.getContent().length < 20 || this.widgets.okButton.get("disabled"))
+            {
+               // Submit was disabled and something has been typed, validate and submit will be enabled
+               this.widgets.editor.save();
+               this.widgets.topicForm.updateSubmitElements();
+            }
+         }, this, true);
+
          // create the form that does the validation/submit
-         var topicForm = new Alfresco.forms.Form(this.id + "-form");
-         topicForm.setShowSubmitStateDynamically(true, false);
-         topicForm.setSubmitElements(this.widgets.okButton);
-         topicForm.setAJAXSubmit(true,
+         this.widgets.topicForm = new Alfresco.forms.Form(this.id + "-form");
+         this.widgets.topicForm.setShowSubmitStateDynamically(true, false);
+         this.widgets.topicForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");         
+         this.widgets.topicForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);         
+         this.widgets.topicForm.setSubmitElements(this.widgets.okButton);
+         this.widgets.topicForm.setAJAXSubmit(true,
          {
             successMessage: this._msg("message.savetopic.success"),
             successCallback:
@@ -337,10 +358,10 @@
          });
          if (this.options.editMode)
          {
-             topicForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+             this.widgets.topicForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
          }
-         topicForm.setSubmitAsJSON(true);
-         topicForm.doBeforeFormSubmit =
+         this.widgets.topicForm.setSubmitAsJSON(true);
+         this.widgets.topicForm.doBeforeFormSubmit =
          {
             fn: function(form, obj)
             {
@@ -365,7 +386,7 @@
             scope: this
          };
          
-         topicForm.init();
+         this.widgets.topicForm.init();
          
          // show the form
          var editDiv = Dom.get(this.id + "-topic-create-div");

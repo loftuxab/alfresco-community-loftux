@@ -405,7 +405,6 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: YAHOO.env.ua.ie > 0 ? 0 : 32,
             initialLoad: false
          });
 

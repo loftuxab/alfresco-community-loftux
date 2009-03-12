@@ -431,11 +431,10 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 8,
             initialLoad: false,
             MSG_EMPTY: this._msg("message.empty")
          });
-
+         
          // Enable row highlighting
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
