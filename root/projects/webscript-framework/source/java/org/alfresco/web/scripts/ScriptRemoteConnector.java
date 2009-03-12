@@ -26,12 +26,15 @@ package org.alfresco.web.scripts;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +71,7 @@ public final class ScriptRemoteConnector
     
     
     /**
-     * Invokes a URI on the endpoint.
+     * Invokes a URI on the endpoint via a GET request.
      * 
      * @param uri the uri
      * 
@@ -76,7 +79,8 @@ public final class ScriptRemoteConnector
      */
     public Response call(String uri)
     {
-        return this.connector.call(uri);
+        ConnectorContext context = new ConnectorContext(null, buildDefaultHeaders());
+        return this.connector.call(uri, context);
     }
     
     /**
@@ -101,7 +105,7 @@ public final class ScriptRemoteConnector
      */
     public Response post(String uri, String body)
     {
-        ConnectorContext context = new ConnectorContext();
+        ConnectorContext context = new ConnectorContext(null, buildDefaultHeaders());
         context.setMethod(HttpMethod.POST);
         try
         {
@@ -124,7 +128,7 @@ public final class ScriptRemoteConnector
      */
     public Response post(String uri, String body, String contentType)
     {
-        ConnectorContext context = new ConnectorContext();
+        ConnectorContext context = new ConnectorContext(null, buildDefaultHeaders());
         context.setMethod(HttpMethod.POST);
         context.setContentType(contentType);
         try
@@ -147,7 +151,7 @@ public final class ScriptRemoteConnector
      */
     public Response put(String uri, String body)
     {
-        ConnectorContext context = new ConnectorContext();
+        ConnectorContext context = new ConnectorContext(null, buildDefaultHeaders());
         context.setMethod(HttpMethod.PUT);
         try
         {
@@ -170,7 +174,7 @@ public final class ScriptRemoteConnector
      */
     public Response put(String uri, String body, String contentType)
     {
-        ConnectorContext context = new ConnectorContext();
+        ConnectorContext context = new ConnectorContext(null, buildDefaultHeaders());
         context.setMethod(HttpMethod.PUT);
         context.setContentType(contentType);
         try
@@ -195,7 +199,7 @@ public final class ScriptRemoteConnector
      */
     public Response del(String uri)
     {
-        ConnectorContext context = new ConnectorContext();
+        ConnectorContext context = new ConnectorContext(null, buildDefaultHeaders());
         context.setMethod(HttpMethod.DELETE);
         return this.connector.call(uri, context);
     }
@@ -216,5 +220,19 @@ public final class ScriptRemoteConnector
     public EndpointDescriptor getDescriptor()
     {
         return this.descriptor;
+    }
+    
+    
+    /**
+     * Helper to build a map of the default headers for script requests - we send over
+     * the current users locale so it can be respected by any appropriate REST APIs.
+     *  
+     * @return map of headers
+     */
+    private static Map<String, String> buildDefaultHeaders()
+    {
+        Map<String, String> headers = new HashMap<String, String>(1, 1.0f);
+        headers.put("Accept-Language", I18NUtil.getLocale().toString().replace('_', '-'));
+        return headers;
     }
 }
