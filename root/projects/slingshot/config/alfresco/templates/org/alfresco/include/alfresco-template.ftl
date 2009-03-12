@@ -93,6 +93,7 @@
       Alfresco.constants.USERNAME = "${user.name!""}";
    //]]></script>
    <@common.uriTemplate />
+   <@common.htmlEditor htmlEditor="tinyMCE"/>
 
 <!-- Template Assets -->
 <#nested>
@@ -104,6 +105,19 @@ ${head}
    <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie6.css" /><![endif]-->
    <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie7.css" /><![endif]-->
 </head>
+</#macro>
+
+
+<#--
+   Template "templateHtmlEditorAssets" macro.
+   Loads wrappers for Rich Text editors.
+-->
+<#macro templateHtmlEditorAssets>
+<!-- HTML Editor Assets -->
+   <#-- NOTE: Do not attempt to load -min.js version of tiny_mce/tiny_mce.js -->
+   <script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce/tiny_mce.js"></script>
+   <@script type="text/javascript" src="${page.url.context}/modules/editors/tiny_mce.js"></@script>
+   <@script type="text/javascript" src="${page.url.context}/modules/editors/yui_editor.js"></@script>
 </#macro>
 
 
