@@ -52,4 +52,31 @@ public class PropertyCheck
                     new Object[] {propertyName, target});
         }
     }
+
+    /**
+     * Checks that the given string is not:
+     * <ul>
+     *   <li>null</li>
+     *   <li>empty</li>
+     *   <li>a placeholder of form '${...}'</li>
+     * </ul>
+     *
+     * @param value         the value to check
+     * @return              <tt>true</tt> if the checks all pass
+     */
+    public static boolean isValidPropertyString(String value)
+    {
+        if (value == null || value.length() == 0)
+        {
+            return false;
+        }
+        if (value.startsWith("${") && value.endsWith("}"))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 }
