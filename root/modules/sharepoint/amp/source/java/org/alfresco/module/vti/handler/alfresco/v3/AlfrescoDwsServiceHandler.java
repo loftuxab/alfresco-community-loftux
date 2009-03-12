@@ -274,7 +274,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     {
         List<MemberBean> members = new ArrayList<MemberBean>();
         // gets list of site users names
-        Set<String> membersName = siteService.listMembers(dwsFileInfo.getName(), null, null).keySet();
+        Set<String> membersName = siteService.listMembers(dwsFileInfo.getName(), null, null, -1).keySet();
         Iterator<String> userIterator = membersName.iterator();
 
         while (userIterator.hasNext())
