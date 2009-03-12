@@ -58,7 +58,9 @@
       <pages>
          <page id="site/${siteid}/dashboard">
             <title>Collaboration Site Dashboard</title>
+            <title-id>page.siteDashboard.title</title-id>
             <description>Collaboration site's dashboard page</description>
+            <description-id>page.siteDashboard.description</description-id>
             <template-instance>dashboard-3-columns</template-instance>
             <authentication>user</authentication>
             <properties>
@@ -134,7 +136,9 @@
       <pages>
          <page id="user/${userid}/dashboard">
             <title>User Dashboard</title>
+            <title-id>page.userDashboard.title</title-id>
             <description>Users dashboard page</description>
+            <description-id>page.userDashboard.description</description-id>
             <template-instance>dashboard-3-columns</template-instance>
             <authentication>user</authentication>
          </page>
@@ -187,7 +191,9 @@
       <pages>
          <page id="site/${siteid}/dashboard">
             <title>Document Workspace Dashboard</title>
+            <title-id>page.workspace.title</title-id>
             <description>Document Workspace dashboard page</description>
+            <description-id>page.workspace.description</description-id>
             <template-instance>dashboard-2-columns-wide-left</template-instance>
             <authentication>user</authentication>
             <properties>

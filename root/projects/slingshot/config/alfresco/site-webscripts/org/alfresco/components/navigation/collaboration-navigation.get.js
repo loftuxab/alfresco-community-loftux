@@ -26,6 +26,7 @@ if (p !== null)
    {
       var usedPage = usedPages[i], p = sitedata.getPage(usedPage.pageId), pageUrl = urlMap[usedPage.pageId];
       usedPage.title = p.title;
+      usedPage.titleId = p.titleId;
       if (pageUrl)
       {
          // Overwrite the stored pageUrl with the latest one from config file

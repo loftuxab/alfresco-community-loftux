@@ -32,6 +32,7 @@ import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -45,17 +46,26 @@ import org.apache.commons.logging.LogFactory;
  * @author muzquiano
  * @author kevinr
  */
-public class ScriptRemoteConnector
+public final class ScriptRemoteConnector
 {
     private static final Log logger = LogFactory.getLog(ScriptRemote.class);
     
-    private Connector connector = null;
+    final private Connector connector;
+    final private EndpointDescriptor descriptor; 
     
     
-    public ScriptRemoteConnector(Connector connector)
+    /**
+     * Constructor
+     * 
+     * @param connector     The Connector to wrap
+     * @param descriptor    The description of the endpoint this connector is managing
+     */
+    public ScriptRemoteConnector(Connector connector, EndpointDescriptor descriptor)
     {
         this.connector = connector;
+        this.descriptor = descriptor;
     }
+    
     
     /**
      * Invokes a URI on the endpoint.
@@ -198,5 +208,13 @@ public class ScriptRemoteConnector
     public String getEndpoint()
     {
         return this.connector.getEndpoint();
+    }
+    
+    /**
+     * @return the endpoint descriptor object
+     */
+    public EndpointDescriptor getDescriptor()
+    {
+        return this.descriptor;
     }
 }

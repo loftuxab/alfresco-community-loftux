@@ -3,7 +3,9 @@
    <id>invite</id>
    <page-type>invite</page-type>
    <title>Invite</title>
+   <title-id>page.invite.title</title-id>
    <description>Invite</description>
+   <description-id>page.invite.description</description-id>
    <template-instance>invite</template-instance>
    <authentication>user</authentication>
 </page>

@@ -64,7 +64,7 @@
                      </#list>
                   </#if>
                   <input type="text" size="30" class="rel_left" id="${args.htmlid}-tag-input-field" value="${tags}"/>
-                  <input type="button" id="${args.htmlid}-add-tag-button" value="Add" />
+                  <input type="button" id="${args.htmlid}-add-tag-button" value="${msg("button.add")}" />
                   <div class="bottom_taglist tags_box">
                      <a href="#" id="${args.htmlid}-load-popular-tags-link">${msg("taglibrary.populartagslink")}</a>
                      <ul id="${args.htmlid}-popular-tags">

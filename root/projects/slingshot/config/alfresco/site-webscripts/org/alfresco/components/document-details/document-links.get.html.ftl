@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocumentLinks("${args.htmlid}").setMessages(${messages});
+   new Alfresco.DocumentLinks("${args.htmlid}").setOptions(
+   {
+      externalAuth: ${externalAuth?string("true", "false")}
+   }).setMessages(${messages});
 //]]></script>
 
 <div id="${args.htmlid}-body" class="document-links">
@@ -23,6 +26,5 @@
 	<input id="${args.htmlid}-page-url" class="link-value" />
 	<br/>
 	<input id="${args.htmlid}-page-button" type="button" class="copy-button" value="${msg("document-links.copy")}" />
-
 
 </div>

@@ -35,13 +35,23 @@ for (var i = 0; i < webscripts.length; i++)
 {
    var webscript = webscripts[i];
    var uris = webscript.getURIs();
+   var scriptId, scriptName, shortNameId, descriptionId;
    if (uris !== null && uris.length > 0 && webscript.shortName !== null)
    {
+      // Use the webscript ID to generate a message bundle ID
+      //
+      // This should really be retrieved from an explicit value but the web scripts framework does not provide
+      // a means for storing message bundle IDs, and the web framework is not being used here.
+	  scriptId = webscript.id;
+	  scriptName = scriptId.substring(scriptId.lastIndexOf("/") + 1, scriptId.lastIndexOf("."));
+	  shortNameId = "dashlet." + scriptName + ".shortName";
+	  descriptionId = "dashlet." + scriptName + ".description";
       availableDashlets[i] =
       {
          url: uris[0],
-         shortName: webscript.shortName,
-         description: webscript.description
+         // msg.get(key) returns key if no matching value
+         shortName: (msg.get(shortNameId) != shortNameId ? msg.get(shortNameId) : webscript.shortName),
+         description: (msg.get(descriptionId) != descriptionId ? msg.get(descriptionId) : webscript.description)
       };
    }
    // else skip this webscript since it lacks uri or shortName

@@ -58,15 +58,18 @@ public abstract class AbstractWebScript implements WebScript
 {
     // Logger
     private static final Log logger = LogFactory.getLog(AbstractWebScript.class);
-
-    // dependencies
+    
+    // Constants
+    private static final String DOT_PROPS = ".properties";
+    
+    // Dependencies
     private Container container;
     private Description description;
     
-    // script config
+    // Script config
     private String xmlConfig;
     
-    // service resources
+    // Service resources
     private Map<Locale, ResourceBundle> resources = new HashMap<Locale, ResourceBundle>(4);
     private Map<Locale, String> jsonResources = new HashMap<Locale, String>(4);
     
@@ -160,47 +163,61 @@ public abstract class AbstractWebScript implements WebScript
             result = this.resources.get(locale);
             if (result == null && this.resources.containsKey(locale) == false)
             {
-                // TODO: add improved locale resolution support (from java ResourceBundle code path?)
-                //       i.e. <descid><locale>.properties = mywebscript_en_US.properties
-                // For now we perform the following technique:
-                //  1. lookup <descid><language_country>.properties if fail then
-                //  2. lookup <descid><language>.properties if fail then
-                //  3. lookup <descid>.properties
+                // The following locale based lookup sequence is performed using the supplied locale
+                //  1. lookup <descid><language_country_variant>.properties
+                //  2. lookup <descid><language_country>.properties
+                //  3. lookup <descid><language>.properties
+                // If nothing is found, then the sequence is repeated using the default server locale
+                // Finally the following is attempted:
+                //  lookup <descid>.properties
+                // And the result cached - a null result is acceptable to be cached.
                 try
                 {
                     String webscriptId = getDescription().getId();
-                    String localePath = webscriptId + '_' + locale.toString() + ".properties";
-                    if (container.getSearchPath().hasDocument(localePath))
-                    {
-                        result = new PropertyResourceBundle(container.getSearchPath().getDocument(localePath));
-                    }
-                    else
+                    String localePath = webscriptId + '_' + locale.toString() + DOT_PROPS;
+                    result = getBundleFromPath(localePath);
+                    if (result == null)
                     {
                         // it's quite likely that the first contructed path will be the same as locale.toString()
-                        String resourcePath = webscriptId + '_' + locale.getLanguage() + '_' + locale.getCountry() + ".properties";
-                        if (resourcePath.equals(localePath) == false)
+                        String resourcePath = webscriptId + '_' + locale.getLanguage() + '_' + locale.getCountry() + DOT_PROPS;
+                        if (!resourcePath.equals(localePath))
                         {
-                            if (container.getSearchPath().hasDocument(resourcePath))
-                            {
-                                result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
-                            }
+                            result = getBundleFromPath(resourcePath);
                         }
                         if (result == null)
                         {
-                            resourcePath = webscriptId + '_' + locale.getLanguage() + ".properties";
-                            if (container.getSearchPath().hasDocument(resourcePath))
+                            result = getBundleFromPath(webscriptId + '_' + locale.getLanguage() + DOT_PROPS);
+                        }
+                    }
+                    
+                    // did we find anything? if not, we should try using the default locale lookup sequence
+                    if (result == null)
+                    {
+                        Locale defaultLocale = Locale.getDefault();
+                        if (!defaultLocale.equals(locale))
+                        {
+                            localePath = webscriptId + '_' + defaultLocale.toString() + DOT_PROPS;
+                            result = getBundleFromPath(localePath);
+                            if (result == null)
                             {
-                                result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
-                            }
-                            else
-                            {
-                                resourcePath = webscriptId + ".properties";
-                                if (container.getSearchPath().hasDocument(resourcePath))
+                                // it's quite likely that the first contructed path will be the same as defaultLocale.toString()
+                                String resourcePath = webscriptId + '_' + defaultLocale.getLanguage() + '_' + defaultLocale.getCountry() + DOT_PROPS;
+                                if (!resourcePath.equals(localePath))
                                 {
-                                    result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                                    result = getBundleFromPath(resourcePath);
+                                }
+                                if (result == null)
+                                {
+                                    result = getBundleFromPath(webscriptId + '_' + defaultLocale.getLanguage() + DOT_PROPS);
                                 }
                             }
                         }
+                    }
+                    
+                    // finally if still no result, get the default bundle name with no locale whatsoever
+                    if (result == null)
+                    {
+                        result = getBundleFromPath(webscriptId + DOT_PROPS);
                     }
                 }
                 catch (IOException resErr)
@@ -214,6 +231,16 @@ public abstract class AbstractWebScript implements WebScript
             }
         }
         
+        return result;
+    }
+    
+    private ResourceBundle getBundleFromPath(String path) throws IOException
+    {
+        ResourceBundle result = null;
+        if (container.getSearchPath().hasDocument(path))
+        {
+            result = new PropertyResourceBundle(container.getSearchPath().getDocument(path));
+        }
         return result;
     }
 
@@ -818,7 +845,8 @@ public abstract class AbstractWebScript implements WebScript
         {
             synchronized (jsonResources)
             {
-                result = jsonResources.get(resources.getLocale());
+                Locale locale = I18NUtil.getLocale();
+                result = jsonResources.get(locale);
                 if (result == null)
                 {
                     StringBuilderWriter buf = new StringBuilderWriter(256);
@@ -839,7 +867,7 @@ public abstract class AbstractWebScript implements WebScript
                         throw new WebScriptException("Error rendering I18N resources.", jsonErr);
                     }
                     result = buf.toString();
-                    jsonResources.put(resources.getLocale(), result);
+                    jsonResources.put(locale, result);
                 }
             }
         }

@@ -21,7 +21,9 @@
          <#assign linkClass>class="theme-color-4"</#assign>
       </#if>
    <span class="navigation-separator">&nbsp;</span>
-   <span class="navigation-item"><a href="${url.context}/page/site/${activeSite}/${linkPage}" ${linkClass}>${p.title}</a></span>
+   <span class="navigation-item"><a href="${url.context}/page/site/${activeSite}/${linkPage}" ${linkClass}>
+   <#if p.titleId??>${(msg(p.titleId))!p.title}<#else>${p.title}</#if>
+   </a></span>
    </#list>
 <span class="navigation-separator-alt">&nbsp;</span>
    <#if ("site-members" == activePage) || ("sent-invites" == activePage) || ("invite" == activePage)>
