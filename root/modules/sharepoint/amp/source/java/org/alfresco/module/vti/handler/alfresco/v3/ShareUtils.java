@@ -231,6 +231,7 @@ public class ShareUtils
                 logger.debug("Trying to login into Share. URL: " + loginMethod.getURI());
 
             int loginStatus = httpClient.executeMethod(loginMethod);
+            loginMethod.getResponseBody();
 
             if (logger.isDebugEnabled())
                 logger.debug("Login method returned status: " + loginStatus);
@@ -249,6 +250,7 @@ public class ShareUtils
                 logger.debug("Trying to create Site with name: " + shortName + ". URL: " + createSiteMethod.getURI());
 
             int createSiteStatus = httpClient.executeMethod(createSiteMethod);
+            createSiteMethod.getResponseBody();
 
             if (logger.isDebugEnabled())
                 logger.debug("Create method returned status: " + createSiteStatus);
@@ -267,7 +269,8 @@ public class ShareUtils
             if (logger.isDebugEnabled())
                 logger.debug("Trying to initialize dashboard for Site with name: " + shortName + ". URL: " + dashboard.getURI());
 
-            int dashboardStatus = httpClient.executeMethod(createSiteDashboardMethod(shortName));
+            int dashboardStatus = httpClient.executeMethod(dashboard);
+            dashboard.getResponseBody();
 
             if (logger.isDebugEnabled())
                 logger.debug("Dashboard initialyzing finished with status: " + dashboardStatus);

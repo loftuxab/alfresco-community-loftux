@@ -32,6 +32,7 @@ import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.Association;
 import org.alfresco.webservice.repository.QueryResult;
 import org.alfresco.webservice.repository.RepositoryServiceLocator;
+import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLAddAspect;
@@ -73,6 +74,101 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         super.setUp();
     }
 
+    /**
+     * added:  November 20 2008, ETWOONE-396
+     * 
+     * Now getTotalRowCount  return the number of rows in this specific result set. 
+     * In the previous version getTotalRowCount return the number of rows in the batch.
+     * The method getNextResults(RESULTSETROW[] allResults)  in AbstractQuerySession class was corrected.
+     * Also "paged result set"  and  "full query result set" are equal  (against the same data set)
+     * 
+     * @throws Exception
+     */
+    public void testFetchMoreAndbatchSize() throws Exception
+    {
+    	long NUMBEER_CREATED_FILES = 14;
+    	long fetchRows = 0;
+    	for(long i = 0;i<NUMBEER_CREATED_FILES;i++)
+   	  	{
+    		createTestFetchMoreContent();
+   	  	}
+  	 
+    	System.out.println("testFetchMore_AND_BatcSize:created "+ NUMBEER_CREATED_FILES+" files");
+    	RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();
+    	Query query =    new Query(Constants.QUERY_LANG_LUCENE,"TYPE:\"{http://www.alfresco.org/model/content/1.0}content\" AND @\\{http\\://www.alfresco.org/model/content/1.0\\}name:Web Services sample*");
+        
+        QueryConfiguration queryCfg = new QueryConfiguration();
+   	  	int batchSize = 3;
+   	  	queryCfg.setFetchSize(batchSize);
+   	  
+   	    repositoryService.setHeader(new RepositoryServiceLocator().getServiceName().getNamespaceURI(), "QueryHeader", queryCfg);
+   	  	QueryResult queryResult =repositoryService.query(BaseWebServiceSystemTest.store, query,false);
+
+   	  	ResultSet resultSet = queryResult.getResultSet();
+   	 
+   	  
+   	  	long totalRowCount = resultSet.getTotalRowCount();
+   	    assertTrue("Number of the created files and resultSet.getTotalRowCount() are equal", NUMBEER_CREATED_FILES == totalRowCount);
+   	    
+   	    
+   	  	System.out.println("*************************************");
+   	  	System.out.println(" getTotalRowCount(),all rows:"+ resultSet.getTotalRowCount());
+   	  	System.out.println("*************************************");
+   	  	
+   	  	fetchRows = showRows(queryResult, batchSize);
+   	  	
+
+   	  	System.out.println("==============PagedQuery===============");
+   	  	String querySession = queryResult.getQuerySession();
+
+   	  	while (querySession != null) 
+   	  	{
+   	  		queryResult = repositoryService.fetchMore(querySession);
+   	  		fetchRows+=showRows(queryResult, batchSize);
+   	  		querySession = queryResult.getQuerySession();
+   	  	}
+
+   	    assertTrue("Number of the created files to equally number of the fetcheded files ", NUMBEER_CREATED_FILES == fetchRows);
+    	
+    }
+    private  long showRows(QueryResult queryResult, int batchSize) 
+    {
+    	long fetchedRows = 0;
+		ResultSetRow[] rows = queryResult.getResultSet().getRows();
+		System.out.println(String.format(
+				"--batch size = [%d]----getting next [%d] rows: ", batchSize,
+				rows.length));
+		for (int x = 0; x < rows.length; x++) 
+		{
+			ResultSetRow row = rows[x];
+			System.out.println(row.getColumns(2).getValue());
+			fetchedRows++;
+		}
+		return fetchedRows;
+	}
+    private void createTestFetchMoreContent()throws Exception
+    {
+    	
+             ParentReference parentRef = new ParentReference( BaseWebServiceSystemTest.store , null, BaseWebServiceSystemTest.folderReference.getPath(), Constants.ASSOC_CONTAINS, null);
+             String name = "Web Services sample (" + System.currentTimeMillis() + ")";
+             parentRef.setChildName("cm:" + name);
+             
+             NamedValue[] contentProps = new NamedValue[1]; 
+             contentProps[0] = Utils.createNamedValue(Constants.PROP_NAME, name); 
+             CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, contentProps);
+             
+             NamedValue[] titledProps = new NamedValue[2];
+             titledProps[0] = Utils.createNamedValue(Constants.PROP_TITLE, name);
+             titledProps[1] = Utils.createNamedValue(Constants.PROP_DESCRIPTION, name);
+             CMLAddAspect addAspect = new CMLAddAspect(Constants.ASPECT_TITLED, titledProps, null, "1");
+             
+             CML cml = new CML();
+             cml.setCreate(new CMLCreate[] {create});
+             cml.setAddAspect(new CMLAddAspect[] {addAspect});
+
+             WebServiceFactory.getRepositoryService().update(cml);     
+           
+    } 
     /**
      * Tests the getStores method
      */
