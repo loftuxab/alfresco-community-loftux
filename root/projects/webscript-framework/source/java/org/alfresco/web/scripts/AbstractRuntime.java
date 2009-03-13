@@ -149,10 +149,11 @@ public abstract class AbstractRuntime implements Runtime
         }
         catch(Throwable e)
         {
-            if (logger.isInfoEnabled())
-                logger.info("Caught exception & redirecting to status template: " + e.getMessage());
-            if (logger.isDebugEnabled())
-                logger.debug("Caught exception: " + e.toString());
+        	// log error on server so its not swallowed and lost
+            if (logger.isErrorEnabled())
+            {
+                logger.error("Exception from executeScript - redirecting to status template error: " + e.getMessage(), e);
+            }
 
             // setup context
             WebScriptRequest req = createRequest(null);
