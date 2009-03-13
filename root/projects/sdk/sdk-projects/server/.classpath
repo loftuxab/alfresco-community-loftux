@@ -106,5 +106,9 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/icu4j_3_6_1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/truezip.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/ibatis-2.3.4.726.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/json.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco-jlan-embed.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/subetha-smtp.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/xmlrpc.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

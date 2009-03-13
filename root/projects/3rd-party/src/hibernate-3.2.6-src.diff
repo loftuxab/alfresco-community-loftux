@@ -1,3 +1,16 @@
+Index: src/org/hibernate/jdbc/BorrowedConnectionProxy.java
+===================================================================
+--- src/org/hibernate/jdbc/BorrowedConnectionProxy.java	(revision 15795)
++++ src/org/hibernate/jdbc/BorrowedConnectionProxy.java	(working copy)
+@@ -65,7 +65,7 @@
+ 	public static Connection generateProxy(ConnectionManager connectionManager) {
+ 		BorrowedConnectionProxy handler = new BorrowedConnectionProxy( connectionManager );
+ 		return ( Connection ) Proxy.newProxyInstance(
+-				getProxyClassLoader(),
++				BorrowedConnectionProxy.class.getClassLoader(),
+ 		        PROXY_INTERFACES,
+ 		        handler
+ 		);
 Index: src/org/hibernate/dialect/DialectFactory.java
 ===================================================================
 --- src/org/hibernate/dialect/DialectFactory.java	(revision 15795)

@@ -957,7 +957,7 @@
 
    <target name="distribute-sdk" 
            description="Creates the sdk distribution file for all platforms" 
-           depends="verify-sdk">
+           depends="set-build-number, verify-sdk">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.sdk}.zip">
          <zipfileset dir="${dir.continuous.assemble.sdk}" />
          <zipfileset dir="${dir.project.installer.extras}"
@@ -1072,6 +1072,8 @@
             file="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.jndi.dist}/${file.name.jar.jndi}" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
+            file="${dir.project.jlan.dist}/${file.name.jar.jlan}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server"
             file="${dir.project.linkvalidation.dist}/${file.name.jar.linkvalidation}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
