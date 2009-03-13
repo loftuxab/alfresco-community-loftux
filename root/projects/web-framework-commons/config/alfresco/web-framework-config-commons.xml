@@ -53,10 +53,10 @@
             <show id="cm:author" />
             <!-- <show id="size" /> TODO: Need to extract from content property -->
             <show id="cm:description" />
-            <show id="cm:creator" />
-            <show id="cm:created" />
-            <show id="cm:modifier" />
-            <show id="cm:modified" />
+            <show id="cm:creator" for-mode="view" />
+            <show id="cm:created" for-mode="view" />
+            <show id="cm:modifier" for-mode="view" />
+            <show id="cm:modified" for-mode="view" />
          </field-visibility>
       </form>
    </config>
