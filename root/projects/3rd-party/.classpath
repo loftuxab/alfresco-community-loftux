@@ -75,9 +75,6 @@
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-identity-3.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-jpdl-3.2.2.jar" sourcepath="src/jbpm-jpdl-3.2.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/guessencoding-1.0.jar" sourcepath="src/guessencoding-1.0-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/lucene-snowball-2.1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/lucene-core-2.1.0.jar" sourcepath="src/lucene-2.1.0-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-lang-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/icu4j_3_6_1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/subetha-smtp.jar"/>
@@ -123,8 +120,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0.jar" sourcepath="src/tm-extractors-1.0.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.1.jar" sourcepath="src/poi-3.0.2-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/ibatis-2.3.4.726.jar" sourcepath="src/ibatis-2.3.4.726-src.zip" />
+	<classpathentry exported="true" kind="lib" path="lib/ibatis-2.3.4.726.jar" sourcepath="src/ibatis-2.3.4.726-src.zip"/>
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-core-2.4.1.jar" sourcepath="src/lucene-2.4-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-snowball-2.4.1.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
