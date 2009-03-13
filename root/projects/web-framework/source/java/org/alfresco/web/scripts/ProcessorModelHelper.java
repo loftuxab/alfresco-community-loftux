@@ -331,7 +331,10 @@ public final class ProcessorModelHelper
             model.put(MODEL_HEAD, RenderUtil.renderTemplateHeaderAsString(context));
             
             // add in the config service accessor
-            model.put(MODEL_CONFIG, new TemplateConfigModel(FrameworkHelper.getConfigService(), null));
+            model.put(MODEL_CONFIG, TEMPLATE_CONFIG_MODEL_INSTANCE);
+            
+            // add in msg() method used for template I18N support - already provided by web script framework
+            model.put(MODEL_MESSAGE_METHOD, FREEMARKER_MESSAGE_METHOD_INSTANCE);
         }
         
         // Components rendered in HEADER focus need to have access to URL
@@ -349,9 +352,6 @@ public final class ProcessorModelHelper
             
             // add in the config service accessor
             model.put(MODEL_CONFIG, TEMPLATE_CONFIG_MODEL_INSTANCE);
-            
-            // add in msg() method used for template I18N support - already provided by web script framework
-            model.put(MODEL_MESSAGE_METHOD, FREEMARKER_MESSAGE_METHOD_INSTANCE);
         }
         
         /**
