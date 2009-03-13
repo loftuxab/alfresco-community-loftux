@@ -3,81 +3,62 @@
 <#elseif form?exists>
 
    <#assign formId=args.htmlid + "-form">
-   <#assign formVar=formId?replace("-", "_")>
    
-   <#-- Do we really need the client side JS component, can we just manually include the required files? --> 
-   
-   <script type="text/javascript">//<![CDATA[
-      new Alfresco.FormUI("${formId}");
-   //]]></script>
+   <#if form.mode != "view">
+      <script type="text/javascript">//<![CDATA[
+         new Alfresco.FormUI("${formId}").setOptions(
+         {
+            mode: "${form.mode}",
+            enctype: "${form.enctype}",
+            fieldConstraints: 
+            [
+               <#list form.constraints as constraint>
+               {
+                  "fieldId" : "${args.htmlid}_${constraint.fieldId}", 
+                  "handler" : ${constraint.validationHandler}, 
+                  "params" : ${constraint.params}, 
+                  "event" : "${constraint.event}"
+               }
+               <#if constraint_has_next>,</#if>
+               </#list>
+            ]
+         }).setMessages(
+            ${messages}
+         );
+      //]]></script>
+   </#if>
    
    <div id="${formId}-container" class="form-container">
       
-      <#-- TODO: remove the heading and replace with sets -->
-      <#if form.heading?exists>
-         <div class="heading">${form.heading}</div>
+      <#if form.showCaption?exists && form.showCaption>
+         <div id="${formId}-caption" class="caption"><span class="mandatory-indicator">*</span>${msg("form.required.fields")}</div>
       </#if>
-   
-      <form id="${formId}" method="POST" action="${url.context}/proxy/alfresco${form.submissionUrl}" accept-charset="utf-8"
-            <#if page.url.args.submitMode?exists && page.url.args.submitMode == "multipart">enctype="multipart/form-data"</#if>>
-         <div class="form-fields">
-            <#list form.items as item>
-               <#if item.control.template?exists>
-                  <#assign field=item>
-                  <#include "${field.control.template}" />
-               </#if>
-            </#list>
-         </div>
-         <#if form.mode != "view">
-            <div class="form-buttons">
-               <input id="${formId}-submit" type="submit" value="Submit" />
-            </div>
-         </#if>
-      </form>
+         
+      <#if form.mode != "view">
+         <form id="${formId}" method="${form.method}" accept-charset="utf-8" enctype="${form.enctype}" action="${form.submissionUrl}">
+      </#if>
       
-   </div>
-   
-   <#if form.mode != "view">      
-      <script type="text/javascript">//<![CDATA[
-         function onJsonPostSuccess(response)
-         {
-            Alfresco.util.PopupManager.displayPrompt(
-            {
-               text: response.serverResponse.responseText
-            });
-         }
-         
-         function onJsonPostFailure(response)
-         {
-            Alfresco.util.PopupManager.displayPrompt(
-            {
-               text: "ERROR: Failed to submit JSON data, see logs for details."
-            });
-         }
-         
-         var ${formVar} = new Alfresco.forms.Form("${formId}");
-         ${formVar}.setShowSubmitStateDynamically(true, false);
-         
-         <#if page.url.args.submitMode?exists && page.url.args.submitMode == "json">
-         ${formVar}.setAJAXSubmit(true,
-         {
-            successCallback:
-            {
-               fn: onJsonPostSuccess            
-            },
-            failureCallback:
-            {
-               fn: onJsonPostFailure
-            }
-         });
-         ${formVar}.setSubmitAsJSON(true);
-         </#if>
-         
-         <#list form.constraints as constraint>
-         ${formVar}.addValidation("${args.htmlid}_${constraint.fieldId}", ${constraint.validationHandler}, ${constraint.params}, "${constraint.event}");
+      <div id="${formId}-fields" class="form-fields">
+         <#list form.items as item>
+            <#if item.control.template?exists>
+               <#assign field=item>
+               <#include "${field.control.template}" />
+            </#if>
          </#list>
+      </div>
          
-         ${formVar}.init();
-      //]]></script>
-   </#if>
+      <#if form.mode != "view">
+         <div id="${formId}-buttons" class="form-buttons">
+            <input id="${formId}-submit" type="submit" value="${msg("form.button.submit.label")}" />
+            <#if form.showResetButton?exists && form.showResetButton>
+               &nbsp;<input id="${formId}-reset" type="reset" value="${msg("form.button.reset.label")}" />
+            </#if>
+            <#if form.showCancelButton?exists && form.showCancelButton>
+               &nbsp;<input id="${formId}-cancel" type="button" value="${msg("form.button.cancel.label")}" />
+            </#if>
+         </div>
+         </form>
+      </#if>
+
+   </div>
 </#if>

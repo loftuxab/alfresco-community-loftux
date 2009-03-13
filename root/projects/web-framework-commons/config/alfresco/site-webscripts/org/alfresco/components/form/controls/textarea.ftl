@@ -11,7 +11,5 @@
 <textarea id="${args.htmlid}_${field.id}" name="${field.name}" rows="${rows}" columns="${columns}"
           <#if field.description?exists>title="${field.description}"</#if>
           <#if field.control.params.width?exists>style="width: ${field.control.params.width};"</#if>
-          <#if field.disabled>disabled="true"</#if>>
-${field.value}
-</textarea>
+          <#if field.disabled>disabled="true"</#if>>${field.value}</textarea>
 </#if>

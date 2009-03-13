@@ -1,8 +1,8 @@
-<#import "import/alfresco-template.ftl" as template />
-<@template.header>
+<#include "include/alfresco-template.ftl" />
+<@templateHeader>
 </@>
 
-<@template.body>
+<@templateBody>
    <div id="hd">
       <@region id="header" scope="global" protected=true/>
       <@region id="title" scope="template" protected=true />
@@ -15,10 +15,10 @@
          <#else>
             <#assign mode="edit">
          </#if>
-         <#if url.args.submitMode?exists>
-            <#assign submitMode="${url.args.submitMode}">
+         <#if url.args.submitType?exists>
+            <#assign submitType="${url.args.submitType}">
          <#else>
-            <#assign submitMode="multipart">
+            <#assign submitType="multipart">
          </#if>
          <form method="get">
             <label for="nodeRef">NodeRef:</label>
@@ -28,10 +28,10 @@
             <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
             <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
             <br/>
-            <label for="submitMode-multi">Submit Type:</label>
-            <input id="submitMode-multi" type="radio" name="submitMode" value="multipart"<#if submitMode == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
-            <input id="submitMode-json" type="radio" name="submitMode" value="json"<#if submitMode == "json"> checked</#if>>&nbsp;JSON&nbsp;
-            <input id="submitMode-url" type="radio" name="submitMode" value="urlencoded"<#if submitMode == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
+            <label for="submitType-multi">Submit Type:</label>
+            <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
+            <input id="submitType-json" type="radio" name="submitType" value="json"<#if submitType == "json"> checked</#if>>&nbsp;JSON&nbsp;
+            <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
             <input id="fr-toggle" name="fr" type="checkbox"<#if url.args.fr?exists> checked</#if>>&nbsp;Test Forms Runtime
             <br/>
             <input type="submit" value="Show Form" style="margin-top: 5px; margin-bottom: 5px;" />
@@ -40,7 +40,7 @@
          </form>
       </div>
       
-      <div style="margin-left: 1em; margin-top: 0.8em;">
+      <div style="margin-left: 1em; margin-top: 1.4em;">
          <@region id="form-ui" scope="template" />
       </div>
       
@@ -107,7 +107,7 @@
    </div>
 </@>
 
-<@template.footer>
+<@templateFooter>
    <div id="ft">
       <@region id="footer" scope="global" protected=true />
    </div>

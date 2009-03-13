@@ -178,6 +178,11 @@
          var url = Alfresco.constants.PROXY_URI + this.docData.contentUrl;
          Dom.get(this.id + "-download-action").href = url + "?a=true";
          
+         // update the href for the edit metadata link
+         var metadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
+            "/edit-metadata?nodeRef=" + this.docData.nodeRef;
+         Dom.get(this.id + "-edit-metadata-action").href = metadataUrl;
+         
          /**
           * NOTE: If linefeeds exist between the <div> and <a> tags, the firstChild property
           *       in the outer loop will return a text node "\n" instead of the <a> tag.
@@ -229,25 +234,6 @@
          
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
-      },
-      
-      /**
-       * Asset metadata.
-       *
-       * @method onActionDetails
-       * @param obj {object} Not used
-       */
-      onActionDetails: function DocumentActions_onActionDetails(obj)
-      {
-         if (!this.modules.details)
-         {
-            this.modules.details = new Alfresco.module.DoclibDetails(this.id + "-details");
-         }
-
-         this.modules.details.setOptions(
-         {
-            file: this.docData
-         }).showDialog();
       },
 
       /**

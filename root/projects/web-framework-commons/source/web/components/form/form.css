@@ -1,22 +1,5 @@
 /* FormUI Component */
 
-.form-container
-{
-   padding-top: 0.5em;
-}
-
-.form-container form
-{
-}
-
-/* TODO: replace the heading with sets */
-.form-container .heading
-{
-   color: #333333;
-   font-size: 131%;
-   padding-bottom: 1em;
-}
-
 .form-container .form-fields
 {
    padding-bottom: 1em;
@@ -54,6 +37,7 @@
 {
    color: green;
    margin-left: 0.4em;
+   margin-right: 0.4em;
    vertical-align: -0.3em;
 }
 

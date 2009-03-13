@@ -42,26 +42,52 @@ function main()
          setupCaches(formModel);
          
          // determine what mode we are in from the arguments
-         var mode = args.mode;
-         if (mode === null)
+         var mode = getArgument("mode", "edit");
+         
+         // determine what enctype to use from the arguments
+         var submitType = getArgument("submitType", "multipart");
+         var enctype = null;
+         switch (submitType)
          {
-            mode = context.properties.mode;
-            if (mode === null)
-            {
-         	   mode = "edit";
-            }
+            case "multipart":
+               enctype = "multipart/form-data";
+               break;
+            case "json":
+               enctype = "application/json";
+               break;
+            case "urlencoded":
+               enctype = "application/x-www-form-urlencoded";
+               break;
+            default:
+               enctype = "multipart/form-data";
+               break;
          }
+         
+         // determine what method to use when submitting form
+         var mthd = getArgument("method", "POST");
+         
+         // determine what submisson url to use
+         var submissionUrl = getArgument("submissionUrl", formModel.data.submissionUrl);
+         submissionUrl = url.context + "/proxy/alfresco" + submissionUrl;
+         
+         // determine whether to show caption at top of form
+         var showCaption = getArgument("showCaption", "false");
+         
+         // determine whether to show cancel button
+         var showCancelButton = getArgument("showCancelButton", "false");
+         
+         // determine whether to show reset button
+         var showResetButton = getArgument("showResetButton", "false");
          
          // create and setup form ui model basics
          formUIModel = {};
          formUIModel.mode = mode;
-         formUIModel.submissionUrl = formModel.data.submissionUrl;
-         
-         // TODO: remove the heading and replace with sets
-         if (args.heading !== null)
-         {
-            formUIModel.heading = args.heading;
-         }
+         formUIModel.method = mthd;
+         formUIModel.enctype = enctype;
+         formUIModel.submissionUrl = submissionUrl;
+         formUIModel.showCaption = (showCaption === "true") ? true : false;
+         formUIModel.showCancelButton = (showCancelButton === "true") ? true : false;
+         formUIModel.showResetButton = (showResetButton === "true") ? true : false;
          
          // query for configuration for item
          var nodeConfig = config.scoped[formModel.data.type];
@@ -141,6 +167,8 @@ function main()
          //       and structured with the correct hierarchy, should this be done in
          //       here or is it up to the config service to determine the hierarchy?
          
+         // TODO: see if there is an overidden submissionUrl in the form config
+         
          formUIModel.items = formUIItems;
          formUIModel.constraints = formUIConstraints;
       }
@@ -158,9 +186,45 @@ function main()
 }
 
 /**
+ * Retrieves the value of the given named argument, looks in the 
+ * URL arguments and the component binding properties
+ *
+ * @method getArgument
+ * @param argName The name of the argument to locate
+ * @param defValue The default value to use if the argument could not be found
+ * @return The value or null if not found
+ */
+function getArgument(argName, defValue)
+{
+   var result = null;
+   
+   if (typeof defValue !== "undefined")
+   {
+      result = defValue;
+   }
+   
+   var argValue = args[argName];
+   if (argValue !== null)
+   {
+      result = argValue;
+   }
+   else
+   {
+      argValue = context.properties[argName];
+      if (argValue !== null)
+      {
+   	   result = argValue;
+      }
+   }
+   
+   return result;
+}
+
+/**
  * Sets up the caches used by other functions in this script
  *
  * @method setupCaches
+ * @param formModel The form model returned from the server
  */
 function setupCaches(formModel)
 {
@@ -572,7 +636,6 @@ function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
    
    return constraint;
 }
-
 
 /**
  * Dumps the form UI model, but only if logging is active

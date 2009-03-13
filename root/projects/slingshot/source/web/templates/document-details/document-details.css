@@ -8,6 +8,12 @@
 
 .form-container
 {
-   padding: 0;
-   margin-top: 1.5em;
+   padding-left: 0.5em;
+   margin-right: 0.5em;
+   border-bottom: 1px dashed #C2C2C2;
+}
+
+.form-container .form-fields
+{
+   border-bottom: none !important;
 }
