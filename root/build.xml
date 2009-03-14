@@ -202,9 +202,9 @@
          <pathelement location="${dir.project.3rdparty.lib}/jta.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jug-lgpl-2.0.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/optional/log4j-1.2.15.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/lucene-analyzers-2.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/lucene-core-2.1.0.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/lucene-snowball-2.1.0.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/lucene-analyzers-2.4.1.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/lucene-core-2.4.1.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/lucene-snowball-2.4.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/mail.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/myfaces-api-1.1.5.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/myfaces-impl-1.1.5.jar" />
