@@ -41,8 +41,10 @@ public enum Format
     ATOMFEED ("application/atom+xml;type=feed"),
     ATOMENTRY ("application/atom+xml;type=entry"),
     FORMDATA ("multipart/form-data"),
-    JSON ("application/json");
-
+    JSON ("application/json"),
+    XWWWFORMURLENCODED ("application/x-www-form-urlencoded");
+    //FIXME URL-encoded post of forms data is not yet working.
+    
     private String mimetype;
 
     Format(String mimetype)

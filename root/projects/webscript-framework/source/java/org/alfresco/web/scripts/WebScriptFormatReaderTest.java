@@ -5,16 +5,13 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
-
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
@@ -39,13 +36,14 @@ import org.json.JSONObject;
  * 
  * @author David Ward
  */
+
 public class WebScriptFormatReaderTest extends TestCase
 {
     private static final String URL_REQUESTBODY = "/test/requestbody";
     private static final String URL_JSONECHO = "/test/jsonecho";
+    private static final String URL_ENCODEDPOST = "/test/encodedpost";
     private static final String URL_ATOMENTRY = "/test/atomentry";
     private static final String URL_BOGUS = "/test/bogus";
-
     private static final TestWebScriptServer TEST_SERVER = TestWebScriptServer.getTestServer();
 
     /**
@@ -73,13 +71,28 @@ public class WebScriptFormatReaderTest extends TestCase
         json.put("building", "Park House");
         json.put("street", "Park Street");
         json.put("town", "Maidenhead");
+
         String postCode = "SL6 1SL";
         json.put("postCode", postCode);
         json.put("country", "United Kingdom");
         json.put("year", 2008);
         json.put("valid", true);
+
         String requestBody = json.toString();
         sendRequest(new PostRequest(URL_JSONECHO, requestBody, "application/json; charset=UTF-8"), 200, postCode);
+    }
+
+    /**
+     * 
+     * @throws Exception
+     */
+    public void testXWwwFormUrlEncoded() throws Exception
+    {
+        //FIXME URL-encoded post of forms data is not yet working.
+        String requestBody = "param1=a&param2=Hello+World";
+        String expectedResponse = "<html><body>a<br/>Hello World</body></html>";
+        sendRequest(new PostRequest(URL_ENCODEDPOST, requestBody,
+                "application/x-www-form-urlencoded; charset=UTF-8"), 200, expectedResponse);
     }
 
     /**
