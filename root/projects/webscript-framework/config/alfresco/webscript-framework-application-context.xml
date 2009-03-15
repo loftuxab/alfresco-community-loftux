@@ -60,7 +60,7 @@
 
    <!--  Format Registry -->
    <bean id="webscripts.formatregistry" class="org.alfresco.web.scripts.FormatRegistry">
-   	  <property name="defaultReader"><bean class="org.alfresco.web.scripts.RequestReader"/></property>
+      <property name="defaultReader"><bean class="org.alfresco.web.scripts.RequestReader"/></property>
    </bean>
 
    <!--  Format Map -->
@@ -80,6 +80,7 @@
          <list>
            <bean class="org.alfresco.web.scripts.servlet.FormDataReader" />
            <bean class="org.alfresco.web.scripts.json.JSONReader" />
+           <bean class="org.alfresco.web.scripts.form.UrlEncodedFormReader" />
            <bean class="org.alfresco.web.scripts.atom.AtomReader">
               <property name="abderaService" ref="webscripts.abdera"/>
            </bean>
@@ -151,6 +152,7 @@
             <prop key="application/atom+xml;type=feed">atomfeed</prop>
             <prop key="application/rss+xml">rss</prop>
             <prop key="application/json">json</prop>
+            <prop key="application/x-www-form-urlencoded">xwwwformurlencoded</prop>
             <prop key="application/opensearchdescription+xml">opensearchdescription</prop>
          </props>
       </property>

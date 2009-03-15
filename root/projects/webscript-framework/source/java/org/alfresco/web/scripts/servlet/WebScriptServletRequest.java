@@ -89,6 +89,10 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         {
             formData = (FormData)parseContent();
         }
+        else if (contentType != null && contentType.equals("application/x-www-form-urlencoded"))
+        {
+            //FIXME URL-encoded post of forms data is not yet working.
+        }
     }
 
     /**
