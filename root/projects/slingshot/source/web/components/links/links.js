@@ -523,8 +523,11 @@
             });
          };
 
+         this.widgets.paginator.subscribe("changeRequest", handlePagination);
+
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + '-links', columnDefinitions, this.widgets.dataSource,
          {
+            renderLoopSize: 32,
             initialLoad: false,
             MSG_EMPTY: '<span class="datatable-msg-empty">' + this._msg("links.empty") + '</span>'
          });
@@ -547,7 +550,7 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> YAHOO.env.ua.gecko ? 3 : 5;
+               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
             }
 
             // Must return true to have the "Loading..." message replaced by the error message
