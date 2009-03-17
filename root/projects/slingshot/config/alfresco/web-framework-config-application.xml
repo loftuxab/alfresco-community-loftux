@@ -1,11 +1,11 @@
 <alfresco-config>
 
+   <!-- Global config section -->
    <config>
-      
       <flags>
-         <debug>false</debug>
+         <!-- Developer debugging setting to turn on DEBUG mode for client scripts in the browser -->
+         <client-debug>false</client-debug>
       </flags>
-      
    </config>
 
    <!-- Add in additional Slingshot elements -->
