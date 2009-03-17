@@ -58,4 +58,12 @@ public abstract class ThreadLocalRequestContext extends AbstractRequestContext
     {
         return instance.get();
     }
+
+    /**
+     * Release resources
+     */
+    public void release()
+    {
+        instance.remove();
+    }
 }

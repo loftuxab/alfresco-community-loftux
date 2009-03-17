@@ -388,4 +388,12 @@ public interface RequestContext extends Serializable
      * @return
      */
     public HttpServletRequest getRequest();
+    
+    /**
+     * Release any resources held by the request context
+     * 
+     * As part of the contract for a RequestContext object, this will only ever be called once
+     * and no further method calls will be made to the RequestContext object.
+     */
+    public void release();
 }

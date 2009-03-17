@@ -318,6 +318,7 @@
                     incremental-webframework,
                     incremental-webframeworkcommons,
                     incremental-slingshot,
+                    incremental-mobile,
                     incremental-webstudio" />
 
    <target name="build-modules"
@@ -365,6 +366,14 @@
                     package-webscriptframework-jar,
                     incremental-webframework,
                     deploy-webframework-tomcat" />
+   
+   <target name="incremental-mobile-tomcat" 
+           description="Performs an incremental build and deployment of the mobile WAR"
+           depends="incremental-core, 
+                    package-webscriptframework-jar, 
+                    package-webframework-jar, 
+                    incremental-mobile,
+                    deploy-mobile-tomcat" />
    
    <target name="incremental-slingshot-tomcat" 
            description="Performs an incremental build and deployment of the slingshot WAR"
@@ -426,6 +435,7 @@
                     generate-javadocs-jlan,
                     generate-javadocs-webscriptframework,
                     generate-javadocs-webframework,
+                    generate-javadocs-mobile,
                     generate-javadocs-slingshot" />
 
    <!-- ****************************************************** -->
@@ -440,6 +450,7 @@
            description="Cleans all projects" 
            depends="clean-webclient-projects,
                     clean-slingshot-projects,
+                    clean-mobile-projects,
                     clean-webserviceclient,
                     clean-webstudio" />
                     
@@ -464,6 +475,13 @@
                     clean-webframework,
                     clean-webframeworkcommons,
                     clean-slingshot" />
+                    
+   <target name="clean-mobile-projects" 
+           description="Cleans all projects related to the mobile project" 
+           depends="clean-core,
+                    clean-webscriptframework,
+                    clean-webframework,
+                    clean-mobile" />
    
    <target name="clean-modules"
            description="Cleans all modules"
@@ -506,9 +524,12 @@
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
       <delete dir="${dir.deploy.tomcat.application.slingshot}" 
               includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.mobile}" />
+      <delete dir="${dir.deploy.tomcat.application.mobile}" 
+              includeEmptyDirs="true" quiet="yes" />
       <delete file="${dir.deploy.tomcat.application}/${file.name.war.webstudio}" />
       <delete dir="${dir.deploy.tomcat.application.webstudio}" 
-              includeEmptyDirs="true" quiet="yes" />      
+              includeEmptyDirs="true" quiet="yes" />
    </target>
 
    <target name="clean-virtual-tomcat-deploy"
@@ -796,6 +817,17 @@
          <srcfile />
          <mapper type="glob" from="*.js" to="*-min.js"/>
       </apply>
+   </target>
+   
+   <target name="deploy-mobile-tomcat" depends="init" 
+           description="Deploys the mobile WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.mobile}" />
+      <delete dir="${dir.deploy.tomcat.application.mobile}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
+      <!-- copy the mobile WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
+            file="${dir.project.mobile.dist}/${file.name.war.mobile}" />
    </target>
    
    <target name="deploy-webstudio-tomcat" depends="init" 
