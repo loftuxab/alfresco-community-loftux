@@ -405,6 +405,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
+            renderLoopSize: 32,
             initialLoad: false
          });
 
@@ -442,7 +443,7 @@
                   oResponse.results = oResponse.results.slice(0, me.options.maxResults);
                }
                me.resultsCount = oResponse.results.length;
-               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko) ? 3 : 5;
+               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
             }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;

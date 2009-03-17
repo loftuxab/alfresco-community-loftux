@@ -840,7 +840,7 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
  */
 Alfresco.util.caretFix = function(p_formElement)
 {
-   if (YAHOO.env.ua.gecko == 1.8)
+   if (YAHOO.env.ua.gecko === 1.8)
    {
       if (typeof p_formElement == "string")
       {
@@ -865,7 +865,7 @@ Alfresco.util.caretFix = function(p_formElement)
  */
 Alfresco.util.undoCaretFix = function(p_formElement)
 {
-   if (YAHOO.env.ua.gecko == 1.8)
+   if (YAHOO.env.ua.gecko === 1.8)
    {
       if (typeof p_formElement == "string")
       {

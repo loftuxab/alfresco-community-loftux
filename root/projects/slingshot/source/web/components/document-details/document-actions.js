@@ -389,7 +389,7 @@
          var displayName = this.docData.displayName;
          
          var callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary#path=";
-         var encodedPath = (YAHOO.env.ua.gecko) ? encodeURIComponent(this.docData.location.path) : this.docData.location.path;
+         var encodedPath = (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(this.docData.location.path) : this.docData.location.path;
          
          this.modules.actions.genericAction(
          {

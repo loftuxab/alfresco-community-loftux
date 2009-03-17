@@ -431,6 +431,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
+            renderLoopSize: 32,
             initialLoad: false,
             MSG_EMPTY: this._msg("message.empty")
          });
