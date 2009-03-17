@@ -3,7 +3,8 @@
    {
       componentId: "${instance.object.id}",
       webviewURI: "${uri}",
-      webviewTitle: "${webviewTitle}"
+      webviewTitle: "${webviewTitle}",
+      webviewHeight: "${height}"
    });
 //]]></script>
 <div class="dashlet webview">
@@ -15,7 +16,7 @@
 
    <div class="toolbar"></div>
 
-   <div class="body scrollablePanel" style=";" id="${args.htmlid}-iframeWrapper">
+   <div class="body scrollablePanel" style="<#if height??>height: ${height}px</#if>" id="${args.htmlid}-iframeWrapper">
        <iframe frameborder="0" scrolling="auto" width="100%" height="100%" src="${uri}"></iframe>
    </div><#-- end of body -->
 
