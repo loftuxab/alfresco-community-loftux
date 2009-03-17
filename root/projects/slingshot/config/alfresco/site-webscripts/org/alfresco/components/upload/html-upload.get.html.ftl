@@ -3,9 +3,10 @@
       <span id="${args.htmlid}-title-span"></span>
    </div>
    <div class="bd">
-      <form id="${args.htmlid}-htmlupload-form" action=""
-            method="POST" enctype="multipart/form-data" accept-charset="utf-8"
-            action="${url.context}/proxy/alfresco/api/upload.html" >
+      <form id="${args.htmlid}-htmlupload-form"
+            method="post" enctype="multipart/form-data" accept-charset="utf-8"
+            action="${url.context}/proxy/alfresco/api/upload.html">
+         <fieldset>
          <input type="hidden" id="${args.htmlid}-siteId-hidden" name="siteId" value=""/>
          <input type="hidden" id="${args.htmlid}-containerId-hidden" name="containerId" value=""/>
          <input type="hidden" id="${args.htmlid}-username-hidden" name="username" value=""/>
@@ -46,7 +47,7 @@
                   <label for="${args.htmlid}-filedata-file">${msg("label.file")}</label>
                </div>
                <div class="yui-u">
-                  <input type="file" contentEditable="false" id="${args.htmlid}-filedata-file" name="filedata">
+                  <input type="file" contentEditable="false" id="${args.htmlid}-filedata-file" name="filedata" />
                </div>
             </div>
          </div>
@@ -60,14 +61,14 @@
                   <label for="${args.htmlid}-minorVersion-radioButton">${msg("label.version")}</label>
                </div> 
                <div class="yui-u">
-                  <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" value="false"/> ${msg("label.minorVersion")}
+                  <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="checked" value="false" /> ${msg("label.minorVersion")}
                </div>
             </div>
             <div class="yui-gd">
                <div class="yui-u first">&nbsp;
                </div>
                <div class="yui-u">
-                  <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" value="true"/> ${msg("label.majorVersion")}
+                  <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion" value="true" /> ${msg("label.majorVersion")}
                </div>
             </div>
             <div class="yui-gd">
@@ -75,7 +76,7 @@
                   <label for="${args.htmlid}-description-textarea">${msg("label.comments")}</label>
                </div>
                <div class="yui-u">
-                  <textarea id="${args.htmlid}-description-textarea" name="description" rows="4"></textarea>
+                  <textarea id="${args.htmlid}-description-textarea" name="description" cols="80" rows="4"></textarea>
                </div>
             </div>
          </div>
@@ -85,6 +86,7 @@
             <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.cancel")}" />
          </div>
 
+         </fieldset>
       </form>
 
    </div>
