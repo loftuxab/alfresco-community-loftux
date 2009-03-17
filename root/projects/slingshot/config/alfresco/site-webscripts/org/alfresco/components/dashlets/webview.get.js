@@ -13,6 +13,12 @@ if (!webviewTitle)
    webviewTitle = "";
 }
 
+var height = args.height;
+if (!height)
+{
+   height = "";
+}
+
 var connector = remote.connect("http");
 var re = /^http:\/\//;
 if (!re.test(uri))
@@ -22,3 +28,4 @@ if (!re.test(uri))
 
 model.webviewTitle = webviewTitle;
 model.uri = uri;
+model.height = height;

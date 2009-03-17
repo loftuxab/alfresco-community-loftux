@@ -57,9 +57,9 @@
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
-   Alfresco.WebView.prototype =
+   Alfresco.WebView.prototype = 
    {
       /**
        * Object container for initialization options
@@ -71,7 +71,8 @@
       {
          componentId: "",
          webviewURI: "",
-         webviewTitle: ""
+         webviewTitle: "",
+         webviewHeight: 600
       },
       
       /**
@@ -150,12 +151,20 @@
                         {
                            return (node.tagName.toUpperCase() == "IFRAME");
                         });
-                        if (iframe && iframe.attributes["name"])
+                        if (iframe)
                         {
-                           var titleLink = Dom.get(this.id + "-title-link"),
-                              linkHref = iframe.attributes["name"].value;
-                           titleLink.attributes["href"].value = linkHref;
-                           titleLink.innerHTML = $html(linkHref);
+                           if (iframe.attributes["name"])
+                           {
+                              var titleLink = Dom.get(this.id + "-title-link"),
+                                 linkHref = iframe.attributes["name"].value;
+                              titleLink.attributes["href"].value = linkHref;
+                              titleLink.innerHTML = $html(linkHref);
+                           }
+                           if (iframe.attributes["theHeight"])
+                           {
+                              var theHeight = iframe.attributes["theHeight"].value;
+                              Dom.setStyle(div, "height", theHeight + "px");
+                           }
                         }
                      }
                   },
@@ -182,6 +191,12 @@
                         elem.value = this.options.webviewURI;
                      }
 
+                     /* Get the height value */
+                     elem = Dom.get(this.configDialog.id + "-height");
+                     if (elem)
+                     {
+                        elem.value = this.options.webviewHeight;
+                     }
                   },
                   scope: this
                }
@@ -198,5 +213,4 @@
          Event.stopEvent(event);
       }
    };
-
 })();
