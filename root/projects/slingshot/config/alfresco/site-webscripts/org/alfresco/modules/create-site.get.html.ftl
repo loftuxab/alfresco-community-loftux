@@ -5,12 +5,12 @@
          <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-title">${msg("label.name")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" tabindex="1"/>&nbsp;*</div>
+            <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="title" tabindex="1" maxlength="255" />&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-shortName">${msg("label.shortName")}:</label></div>
             <div class="yui-u">
-               <input id="${args.htmlid}-shortName" type="text" name="shortName" tabindex="2"/>&nbsp;*<br>
+               <input id="${args.htmlid}-shortName" type="text" name="shortName" tabindex="2" maxlength="255" />&nbsp;*<br>
                <span class="help">${msg("label.shortNameHelp")}</span>
             </div>
          </div>
