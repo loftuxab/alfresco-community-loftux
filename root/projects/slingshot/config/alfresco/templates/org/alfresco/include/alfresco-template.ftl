@@ -59,7 +59,7 @@
    <script type="text/javascript" src="${url.context}/yui/animation/animation-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/logger/logger-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/connection/connection-debug.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/element/element-beta-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/element/element-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/get/get-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/button/button-debug.js"></script>
