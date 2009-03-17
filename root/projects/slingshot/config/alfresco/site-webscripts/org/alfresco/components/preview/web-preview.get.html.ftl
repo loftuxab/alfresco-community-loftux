@@ -16,7 +16,7 @@ new Alfresco.WebPreview("${args.htmlid}").setOptions(
    <div class="hd">
       <div class="title">
          <h4>
-            <img id="${args.htmlid}-title-img" src="${url.context}/components/images/generic-file-32.png"/>
+            <img id="${args.htmlid}-title-img" src="${url.context}/components/images/generic-file-32.png" alt="File" />
             <span id="${args.htmlid}-title-span"></span>
          </h4>
       </div>
