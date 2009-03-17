@@ -762,6 +762,7 @@
          var renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
             var name = oRecord.getData("fileName"),
+               title = oRecord.getData("title"),
                type = oRecord.getData("type"),
                isLink = oRecord.getData("isLink"),
                locn = oRecord.getData("location"),
@@ -785,7 +786,7 @@
                {
                   var id = me.id + '-preview-' + oRecord.getId();
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
-                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                   
                   // Preview tooltip
                   me.previewTooltips.push(id);
@@ -807,7 +808,7 @@
                else
                {
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
-                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="thumbnail">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" /></a></span>';
+                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="thumbnail">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                }
             }
          };
@@ -978,7 +979,7 @@
                /**
                 * Detailed View
                 */
-                oColumn.width = 140;
+                oColumn.width = 180;
             }
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
@@ -1012,7 +1013,7 @@
             key: "fileName", label: "Description", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 140
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 180
          }];
 
          // DataTable definition
@@ -1058,7 +1059,7 @@
             }
             else if (oResponse.results && !me.options.usePagination)
             {
-               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko > 0) ? 3 : 5;
+               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
             }
             
             // We don't get an renderEvent for an empty recordSet, but we'd like one anyway
@@ -1392,13 +1393,10 @@
          // Call through to get the row highlighted by YUI
          this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
 
-         /**
-          * NOTE: YUI 2.6.0 drops the yuiRecordId property. The value can be found in target.id
-          */
          var target = oArgs.target;
 
          // elRename is the element id of the rename file link
-         // var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
+         // var elRename = Dom.get(this.id + "-rename-" + target.id);
 
          // elActions is the element id of the active table cell where we'll inject the actual links
          var elActions = Dom.get(this.id + "-actions-" + target.id);
@@ -1505,12 +1503,9 @@
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
 
-         /**
-          * NOTE: YUI 2.6.0 drops the yuiRecordId property. The value can be found in target.id
-          */
          var target = oArgs.target;
-         // var renameId = this.id + "-rename-" + target.yuiRecordId;
-         var elActions = Dom.get(this.id + "-actions-" + (target.yuiRecordId || target.id));
+         // var renameId = this.id + "-rename-" + target.id;
+         var elActions = Dom.get(this.id + "-actions-" + target.id);
 
          if (!this.showingMoreActions)
          {

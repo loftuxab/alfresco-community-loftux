@@ -187,7 +187,7 @@
        */
       _encodePath: function DocumentPath__encodePath(path)
       {
-         var encodedPath = (YAHOO.env.ua.gecko) ? encodeURIComponent(path) : path;
+         var encodedPath = (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(path) : path;
          
          return encodedPath;
       }

@@ -99,7 +99,8 @@
    margin-bottom: 4px;
 }
 
-.site-finder h3 a
+.site-finder h3 a,
+.site-finder h3 a:visited
 {
    color: #2b6eb5;
 }

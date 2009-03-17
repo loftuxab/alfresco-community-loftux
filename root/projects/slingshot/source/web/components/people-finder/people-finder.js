@@ -479,6 +479,7 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
+            renderLoopSize: 32,
             initialLoad: false,
             MSG_EMPTY: this._msg("message.instructions")
          });
@@ -487,7 +488,7 @@
          {
             if (oResponse.results)
             {
-               this.renderLoopSize = oResponse.results.length >> YAHOO.env.ua.gecko ? 3 : 5;
+               this.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
             }
             return true;
          };
