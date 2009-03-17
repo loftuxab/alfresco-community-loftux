@@ -291,6 +291,12 @@ public class WrappedRequestContext implements RequestContext
         return this.context.getRequest();
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.RequestContext#release()
+     */
+    public void release()
+    {
+    }
     
     @Override
     public String toString()

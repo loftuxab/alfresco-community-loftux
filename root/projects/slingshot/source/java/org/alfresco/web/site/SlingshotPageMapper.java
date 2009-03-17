@@ -35,10 +35,8 @@ import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLDecoder;
-import org.alfresco.web.framework.exception.ContentLoaderException;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
-import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.scripts.ProcessorModelHelper;
 import org.alfresco.web.scripts.URLHelper;
 import org.alfresco.web.scripts.WebScriptProcessor;
@@ -58,7 +56,7 @@ import org.alfresco.web.uri.UriTemplateListIndex;
  * 		/page/<pageId>?<objArgument>=<objectId>
  * 		/page/<pageId>?<objArgument>=<objectId>&other arguments
  * 
- * Other forms may exists, they are matched against the configured uri templates.
+ * Other forms may exist, they are matched against the configured uri templates.
  * See web-framework-config-application.xml for available uri templates.
  * 
  * The <pageId> identifier could be the id of the page object.
@@ -100,7 +98,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
     	}
     	
     	// The request URI string.  This comes in as something like:
-    	//    /slingshot/page/collaboration/user-profile
+    	//    /slingshot/page/user-profile
         // Strip off the webapp name (if any - may be ROOT i.e. "/")
         HttpServletRequest req = ((HttpServletRequest)request);
     	String requestURI = req.getRequestURI().substring(req.getContextPath().length());
@@ -139,16 +137,9 @@ public class SlingshotPageMapper extends AbstractPageMapper
             }
         }
         
-        // build a URLHelper object one time - it is immutable and can be reused
+        // build a URLHelper object one time here - it is an immutable object
         URLHelper urlHelper = new URLHelper(req, uriTokens);
         context.setValue(ProcessorModelHelper.MODEL_URL, urlHelper);
-    	
-    	// Did we receive an "object" request parameter
-    	String objectId = (String)request.getParameter("doc");
-    	if (objectId != null && objectId.length() == 0)
-    	{
-    		objectId = null;
-    	}
     	
         /**
          * Extract the page type id and determine which page to bind
@@ -208,37 +199,6 @@ public class SlingshotPageMapper extends AbstractPageMapper
          * pick up the default format.
          */
         context.setFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
-    	
-        /**
-         * If we received a "currently viewed object", then lets set it
-         * onto the request as well.
-         */
-    	if (objectId != null)
-    	{
-        	ResourceContent content = null;
-        	try
-        	{
-        		content = loadContent(context, objectId);
-	        	if (content != null)
-	        	{
-	        		context.setCurrentObject(content);
-	        	}
-        	}
-    		catch (ContentLoaderException cle)
-    		{
-    			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
-    		}    		
-    	}
-    	
-        // get the connector "session" to this endpoint (for this user)        
-        ConnectorSession connectorSession =
-            FrameworkHelper.getConnectorSession(context, AlfrescoUserFactory.ALFRESCO_ENDPOINT_ID);
-        if (connectorSession != null)
-        {
-            // retrieve the alfTicket - special case for Flash apps that do not share the user session
-            String ticket = (String)connectorSession.getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
-            context.setValue(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET, ticket);
-        }
     }
     
     /**

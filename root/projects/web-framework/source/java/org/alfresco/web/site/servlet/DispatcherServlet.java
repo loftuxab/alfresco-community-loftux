@@ -203,6 +203,9 @@ public class DispatcherServlet extends BaseServlet
                 response.getWriter().close();
             }
             
+            // release any resources associated with the request context
+            context.release();
+            
             // stop the service timer and print out any timing information (if enabled)
             if (Timer.isTimerEnabled())
             {

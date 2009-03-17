@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <!-- Override WebScript Messages - add Mobile application messages -->
+   <bean id="webscripts.resources" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
+         <list>
+            <value>alfresco.messages.webscripts</value>
+            <value>alfresco.messages.mobile</value>
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Mobile "no-component" processor -->
+   <bean id="webframework.processor.nocomponent" class="org.alfresco.web.site.EmptyRegionRenderer" />   
+   
+   <!-- import app-context extensions -->
+   <import resource="classpath*:alfresco/web-extension/custom-mobile-application-context.xml"/>
+   
+</beans>

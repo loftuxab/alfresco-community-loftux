@@ -31,13 +31,13 @@ import org.alfresco.web.framework.render.ProcessorContext;
 /**
  * Processor class which renders a null result.
  * 
- * Used by Slingshot to render vacant "empty" regions when there are no bound components.
+ * Used to render vacant "empty" regions when there are no bound components.
+ * A common use case for application that are not "design focused".
  * 
  * @author Kevin Roast
  */
 public class EmptyRegionRenderer extends AbstractProcessor
 {
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.AbstractProcessor#executeHeader(org.alfresco.web.framework.render.ProcessorContext)
      */
