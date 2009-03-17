@@ -52,7 +52,8 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Element = YAHOO.util.Element;
+      Element = YAHOO.util.Element,
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * FlashUpload constructor.
@@ -455,6 +456,17 @@
          this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
          this.uploader.subscribe("uploadError",this.onUploadError, this, true);
          this.uploader.subscribe("contentReady", this.onContentReady, this, true);
+
+         // Register the ESC key to close the dialog
+         this.widgets.escapeListener = new KeyListener(document,
+         {
+            keys: KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: this.onCancelOkButtonClick,
+            scope: this,
+            correctScope: true
+         });
       },
 
 
@@ -521,6 +533,9 @@
          // Apply the config before it is shown
          this._applyConfig();
 
+         // Enable the Esc key listener
+         this.widgets.escapeListener.enable();
+
          // Show the upload panel
          this.panel.show();
       },
@@ -539,7 +554,6 @@
          this.widgets.uploadButton.set("disabled", true);
          this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
          this.widgets.cancelOkButton.set("disabled", false);
-
       },
 
       /**
@@ -903,6 +917,9 @@
          // Hide the panel
          this.panel.hide();
                   
+         // Disable the Esc key listener
+         this.widgets.escapeListener.disable();
+
          // Remove all files and references for this upload "session"
          this._clear();
 

@@ -50,7 +50,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      KeyListener = YAHOO.util.KeyListener;
 
    /**
     * HtmlUpload constructor.
@@ -251,6 +252,17 @@
          // We're in a popup, so need the tabbing fix
          form.applyTabFix();
          form.init();
+
+         // Register the ESC key to close the dialog
+         this.widgets.escapeListener = new KeyListener(document,
+         {
+            keys: KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: this.onCancelButtonClick,
+            scope: this,
+            correctScope: true
+         });
       },
 
       /**
@@ -288,6 +300,9 @@
          {
             this.showConfig.uploadDirectory = "/";
          }
+
+         // Enable the Esc key listener
+         this.widgets.escapeListener.enable();
 
          this._showPanel();
       },
@@ -352,6 +367,9 @@
        */
       onCancelButtonClick: function HU_onCancelButtonClick()
       {
+         // Disable the Esc key listener
+         this.widgets.escapeListener.disable();
+
          // Hide the panel
          this.widgets.panel.hide();
       },

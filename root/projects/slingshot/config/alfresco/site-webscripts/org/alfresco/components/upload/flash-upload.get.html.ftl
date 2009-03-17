@@ -44,7 +44,7 @@
                <label for="${args.htmlid}-description-textarea">${msg("label.comments")}</label>
             </div>
             <div class="yui-u">
-               <textarea id="${args.htmlid}-description-textarea" name="description" rows="4"></textarea>
+               <textarea id="${args.htmlid}-description-textarea" name="description" cols="80" rows="4"></textarea>
             </div>
          </div>
       </div>
@@ -63,7 +63,7 @@
          </div>
          <div id="${args.htmlid}-center-div" class="fileupload-center-div">
             <span class="fileupload-progressSuccess-span">&nbsp;</span>
-            <img src="${url.context}/components/images/generic-file-32.png" class="fileupload-docImage-img"/>
+            <img src="${url.context}/components/images/generic-file-32.png" class="fileupload-docImage-img" alt="file" />
             <span class="fileupload-progressInfo-span"></span>
          </div>
          <div id="${args.htmlid}-right-div" class="fileupload-right-div">
