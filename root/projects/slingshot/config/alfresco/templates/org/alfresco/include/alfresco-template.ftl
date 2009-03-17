@@ -1,7 +1,7 @@
 <#import "../import/alfresco-common.ftl" as common />
 
 <#-- Global DEBUG flag retrieved from web-framework-config-application -->
-<#assign DEBUG=(config.global.flags.childrenMap["debug"][0].value = "true")>
+<#assign DEBUG=(config.global.flags.childrenMap["client-debug"][0].value = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
 <#assign theme = (page.url.args.theme)!theme />
 
@@ -15,7 +15,7 @@
    JavaScript and (future) CSS minimisation via YUI Compressor.
    Currently only client-side JavaScript files are compressed during build.
 -->
-<#assign minJS=(config.global.flags.childrenMap["debug"][0].value = "true")?string(".js", "-min.js")>
+<#assign minJS=DEBUG?string(".js", "-min.js")>
 <#macro script type src>
    <script type="${type}" src="${src?replace(".js", minJS)}"></script>
 </#macro>
