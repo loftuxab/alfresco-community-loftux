@@ -197,13 +197,13 @@ Alfresco.widget.Resizer.prototype =
       Dom.setStyle(this.divLeft, "height", "auto");
       Dom.setStyle(handle, "height", "");
 
-      var h = Dom.getDocumentHeight() - Dom.get("ft").offsetHeight - Dom.get("hd").offsetHeight;
+      var h = Dom.getDocumentHeight() - Dom.get("alf-ft").offsetHeight - Dom.get("alf-hd").offsetHeight;
       
       if (YAHOO.env.ua.ie === 6)
       {
-         var hd = Dom.get("hd"), tmpHeight = -5;
+         var hd = Dom.get("alf-hd"), tmpHeight = -5;
          tmpHeight = hd.childNodes[0].offsetHeight + hd.childNodes[1].offsetHeight + hd.childNodes[2].offsetHeight;
-         h = Dom.get("ft").parentNode.offsetTop - tmpHeight; 
+         h = Dom.get("alf-ft").parentNode.offsetTop - tmpHeight; 
       }
       if (h < this.MIN_FILTER_PANEL_HEIGHT)
       {

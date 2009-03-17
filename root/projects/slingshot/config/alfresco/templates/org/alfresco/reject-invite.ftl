@@ -3,7 +3,7 @@
 </@>
 
 <@templateBody>
-   <div id="hd">
+   <div id="alf-hd">
       <@region id="header" scope="global" protected=true />
    </div>
    <div id="bd">
@@ -12,7 +12,7 @@
 </@>
 
 <@templateFooter>
-   <div id="ft">
+   <div id="alf-ft">
       <@region id="footer" scope="global" protected=true />
    </div>
 </@>
