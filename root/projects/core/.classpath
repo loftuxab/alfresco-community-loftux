@@ -11,5 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/jug-lgpl-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/spring-2.0.8.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/junit.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/ibatis-2.3.4.726.jar" sourcepath="/3rd Party/src/ibatis-2.3.4.726-src.zip"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/xml-apis.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

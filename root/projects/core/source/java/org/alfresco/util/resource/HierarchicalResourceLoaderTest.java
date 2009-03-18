@@ -41,18 +41,18 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.springframework.core.io.Resource;
 
 /**
- * @see HierarchicalResourceLoaderBean
+ * @see HierarchicalResourceLoader
  * 
  * @author Derek Hulley
  * @since 3.2 (Mobile)
  */
-public class HierarchicalResourceLoaderBeanTest extends TestCase
+public class HierarchicalResourceLoaderTest extends TestCase
 {
-    private HierarchicalResourceLoaderBean getLoader(
+    private HierarchicalResourceLoader getLoader(
             Class<? extends Object> baseClazz,
             Class<? extends Object> clazz) throws Throwable
     {
-        HierarchicalResourceLoaderBean loader = new HierarchicalResourceLoaderBean();
+        HierarchicalResourceLoader loader = new HierarchicalResourceLoader();
         loader.setDialectBaseClass(baseClazz.getName());
         loader.setDialectClass(clazz.getName());
         loader.afterPropertiesSet();
@@ -150,7 +150,7 @@ public class HierarchicalResourceLoaderBeanTest extends TestCase
     public void testResourceLoading() throws Throwable
     {
         // First, do a successful few
-        HierarchicalResourceLoaderBean bean;
+        HierarchicalResourceLoader bean;
         Resource resource;
 
         bean = getLoader(AbstractCollection.class, TreeSet.class);
