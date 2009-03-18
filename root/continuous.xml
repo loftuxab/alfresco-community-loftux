@@ -672,6 +672,10 @@
          <fileset dir="${dir.project.slingshot.dist}" includes="${file.name.war.slingshot}" />
          <metainf dir="${dir.enterpriseproject.examples.src.metainf}" excludes="application.xml"/>
       </ear>
+      <!-- JMX Dumper -->
+      <copy todir="${dir.continuous.dist}/">
+         <fileset dir="${dir.enterpriseproject.jmx-dumper.dist}"/>
+      </copy>
    </target>      
 
    <!-- ************************ -->

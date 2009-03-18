@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-20087 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -82,6 +82,7 @@ public class SystemPropertiesFactoryBean extends PropertiesFactoryBean
         Properties props = super.mergeProperties();
         for (String systemProperty : systemProperties)
         {
+            resolveMergedProperty(systemProperty, props);
             if (systemPropertiesMode == PropertyPlaceholderConfigurer.SYSTEM_PROPERTIES_MODE_NEVER)
             {
                 // Break out immediately
@@ -103,4 +104,14 @@ public class SystemPropertiesFactoryBean extends PropertiesFactoryBean
         return props;
     }
 
+    /**
+     * Override hook. Allows subclasses to resolve a merged property from an alternative source, whilst still respecting
+     * the chosen system property fallback path.
+     * 
+     * @param systemProperty
+     * @param props
+     */
+    protected void resolveMergedProperty(String systemProperty, Properties props)
+    {
+    }
 }

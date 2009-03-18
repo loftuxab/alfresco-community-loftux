@@ -106,7 +106,7 @@ public class ConnectorService implements ApplicationListener, ApplicationContext
         {
             ContextRefreshedEvent refreshEvent = (ContextRefreshedEvent)event;
             ApplicationContext refreshContext = refreshEvent.getApplicationContext();
-            if (refreshContext != null)
+            if (refreshContext != null && refreshContext == this.applicationContext)
             {
                 // cache the remote configuration block
                 this.remoteConfig = (RemoteConfigElement) getConfigService().getConfig("Remote").getConfigElement("remote");

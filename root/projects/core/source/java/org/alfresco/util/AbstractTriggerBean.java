@@ -31,6 +31,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.scheduling.quartz.JobDetailAwareTrigger;
 
@@ -39,7 +40,7 @@ import org.springframework.scheduling.quartz.JobDetailAwareTrigger;
  * 
  * @author Andy Hind
  */
-public abstract class AbstractTriggerBean implements InitializingBean, JobDetailAwareTrigger, BeanNameAware
+public abstract class AbstractTriggerBean implements InitializingBean, JobDetailAwareTrigger, BeanNameAware, DisposableBean
 {
 
     private static Log s_logger = LogFactory.getLog(AbstractTriggerBean.class);
@@ -49,6 +50,8 @@ public abstract class AbstractTriggerBean implements InitializingBean, JobDetail
     private Scheduler scheduler;
 
     private String beanName;
+    
+    private Trigger trigger;
 
     public AbstractTriggerBean()
     {
@@ -111,10 +114,22 @@ public abstract class AbstractTriggerBean implements InitializingBean, JobDetail
         {
             s_logger.info("Job " + getBeanName() + " is active");
             // Register the job with the scheduler
-            Trigger trigger = getTrigger();
-            scheduler.scheduleJob(jobDetail, trigger);
+            this.trigger = getTrigger();
+            scheduler.scheduleJob(jobDetail, this.trigger);
         }
 
+    }
+        
+    /**
+     * Ensures that the job is unscheduled with the context is shut down.
+     */
+    public void destroy() throws Exception
+    {
+        if (this.trigger != null)
+        {
+            scheduler.unscheduleJob(this.trigger.getName(), this.trigger.getGroup());
+            this.trigger = null;
+        }
     }
 
     /**
