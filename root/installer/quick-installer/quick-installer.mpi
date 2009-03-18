@@ -3202,7 +3202,7 @@ Condition 5019D322-283D-49A4-9FF6-CB74EEB5F0BA -active Yes -parent 3E64C4C8-6089
 InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB} -title {Configure MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 6E4369AA-C5B3-4FFE-AEE9-F796D29DE3F6
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
-InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command insert -alias jdbcpanel -active No -parent StandardInstall
+InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command reorder -alias jdbcpanel -active Yes -parent StandardInstall
 Condition 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -active Yes -parent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 448A4C99-13E3-42B0-AE70-2BFA0854ECBE
 InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {8945FF90-FE58-47F6-A4C7-97F8E8DDC075 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
 Condition 8945FF90-FE58-47F6-A4C7-97F8E8DDC075 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8945FF90-FE58-47F6-A4C7-97F8E8DDC075
@@ -3226,7 +3226,7 @@ InstallComponent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A -setup Install -type pane 
 InstallComponent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -setup Install -type action -conditions {895E7578-265C-44C3-8943-CF6D99925B9F 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 895E7578-265C-44C3-8943-CF6D99925B9F -active Yes -parent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 895E7578-265C-44C3-8943-CF6D99925B9F
 Condition 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293 -active Yes -parent 66C9CA4C-4EC7-46BF-9F36-F153A72E6127 -title {String Is Condition} -component StringIsCondition -TreeObject::id 95B1E547-96EC-4BD9-85DE-E3F2EE8EF293
-InstallComponent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -setup Install -type action -conditions {8C84F652-D836-4749-A91D-892366F14735 638BA725-B209-4B92-B603-09E568B32EEF} -title {Launch Application Checkbutton} -component AddWidget -command reorder -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
+InstallComponent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -setup Install -type action -conditions {8C84F652-D836-4749-A91D-892366F14735 638BA725-B209-4B92-B603-09E568B32EEF} -title {Launch Application Checkbutton} -component AddWidget -command insert -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
 Condition 8C84F652-D836-4749-A91D-892366F14735 -active Yes -parent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C84F652-D836-4749-A91D-892366F14735
 Condition 638BA725-B209-4B92-B603-09E568B32EEF -active Yes -parent 3C2A5354-3573-40E7-AB27-0A4B29A33C48 -title {String Is Condition} -component StringIsCondition -TreeObject::id 638BA725-B209-4B92-B603-09E568B32EEF
 InstallComponent 11D931E9-F589-4F10-AEFF-734DE33E8488 -setup Install -type action -conditions {801A25C3-DE59-469C-88AD-41BF330BCD3F 33613CE2-AD68-4419-9786-8D72A8B04979} -title {Desktop Shortcut Checkbutton} -component AddWidget -command insert -active No -parent 3E2B5A18-5DE0-4F11-A47E-1B49A21FE55A
@@ -4931,6 +4931,9 @@ A2841CF3-EEB2-479E-9284-330E06D1E1A7,NextButton,subst
 
 A2C4506D-7B3F-4F25-A656-7C86AB8838AD,Conditions
 {1 condition}
+
+A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Active
+Yes
 
 A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Alias
 jdbcpanel
