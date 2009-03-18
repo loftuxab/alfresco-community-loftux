@@ -90,7 +90,7 @@ function main()
          formUIModel.showResetButton = (showResetButton === "true") ? true : false;
          
          // query for configuration for item
-         var nodeConfig = config.scoped[formModel.data.type];
+         var nodeConfig = config.scoped[nodeRef];
          
          if (nodeConfig != null)
          {
