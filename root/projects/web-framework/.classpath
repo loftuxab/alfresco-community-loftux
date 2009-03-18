@@ -4,7 +4,7 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Alfresco JLAN"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/WebScript Framework"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/json.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/devenv/jsp.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.13.jar" sourcepath="/3rd Party/src/freemarker-2.3.13.zip"/>

@@ -56,7 +56,7 @@ public class DefaultLookupAlgorithm implements ConfigLookupAlgorithm
          {
             // if the config element being added already exists we need to combine it or replace it
             String name = newConfigElement.getName();
-            ConfigElement existingConfigElement = (ConfigElement)results.getConfigElements().get(name);
+            ConfigElement existingConfigElement = results.getConfigElements().get(name);
             if (existingConfigElement != null)
             {
                if (section.isReplace())
