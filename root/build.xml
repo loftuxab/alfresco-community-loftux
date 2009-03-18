@@ -154,7 +154,8 @@
          <pathelement location="${dir.project.3rdparty.lib}/acegi-security-0.8.2_patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/addressing-1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/antlr-2.7.5H3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/antlr-3.1b1.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/antlr-3.1.3.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/stringtemplate-3.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/aopalliance.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/axis-1.4.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/bcel.jar" />
