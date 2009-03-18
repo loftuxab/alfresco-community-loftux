@@ -40,10 +40,10 @@ import org.springframework.core.io.Resource;
  * <p/>
  * For example assume classpath resources:<br/>
  * <pre>
- *    RESOURCE 1: config/ibatis/org.hibernate.dialect.Dialect/SqlMapConfig-DOG.xml
- *    RESOURCE 2: config/ibatis/org.hibernate.dialect.MySQLInnoDBDialect/SqlMapConfig-DOG.xml
- *    RESOURCE 3: config/ibatis/org.hibernate.dialect.Dialect/SqlMapConfig-CAT.xml
- *    RESOURCE 4: config/ibatis/org.hibernate.dialect.MySQLDialect/SqlMapConfig-CAT.xml
+ *    RESOURCE 1: config/ibatis/org.hibernate.dialect.Dialect/SqlMap-DOG.xml
+ *    RESOURCE 2: config/ibatis/org.hibernate.dialect.MySQLInnoDBDialect/SqlMap-DOG.xml
+ *    RESOURCE 3: config/ibatis/org.hibernate.dialect.Dialect/SqlMap-CAT.xml
+ *    RESOURCE 4: config/ibatis/org.hibernate.dialect.MySQLDialect/SqlMap-CAT.xml
  * </pre>
  * and<br/>
  * <pre>
@@ -51,24 +51,24 @@ import org.springframework.core.io.Resource;
  * </pre>
  * For dialect <b>org.hibernate.dialect.MySQLInnoDBDialect</b> the following will be returned:<br>
  * <pre>
- *    config/ibatis/#resource.dialect#/SqlMapConfig-DOG.xml == RESOURCE 2
- *    config/ibatis/#resource.dialect#/SqlMapConfig-CAT.xml == RESOURCE 4
+ *    config/ibatis/#resource.dialect#/SqlMap-DOG.xml == RESOURCE 2
+ *    config/ibatis/#resource.dialect#/SqlMap-CAT.xml == RESOURCE 4
  * </pre>
  * For dialect<b>org.hibernate.dialect.MySQLDBDialect</b> the following will be returned:<br>
  * <pre>
- *    config/ibatis/#resource.dialect#/SqlMapConfig-DOG.xml == RESOURCE 1
- *    config/ibatis/#resource.dialect#/SqlMapConfig-CAT.xml == RESOURCE 4
+ *    config/ibatis/#resource.dialect#/SqlMap-DOG.xml == RESOURCE 1
+ *    config/ibatis/#resource.dialect#/SqlMap-CAT.xml == RESOURCE 4
  * </pre>
  * For dialect<b>org.hibernate.dialect.Dialect</b> the following will be returned:<br>
  * <pre>
- *    config/ibatis/#resource.dialect#/SqlMapConfig-DOG.xml == RESOURCE 1
- *    config/ibatis/#resource.dialect#/SqlMapConfig-CAT.xml == RESOURCE 3
+ *    config/ibatis/#resource.dialect#/SqlMap-DOG.xml == RESOURCE 1
+ *    config/ibatis/#resource.dialect#/SqlMap-CAT.xml == RESOURCE 3
  * </pre>
  * 
  * @author Derek Hulley
  * @since 3.2 (Mobile)
  */
-public class HierarchicalResourceLoaderBean implements InitializingBean
+public class HierarchicalResourceLoader extends DefaultResourceLoader implements InitializingBean
 {
     public static final String DEFAULT_DIALECT_PLACEHOLDER = "#resource.dialect#";
     public static final String DEFAULT_DIALECT_REGEX = "\\#resource\\.dialect\\#";
@@ -79,7 +79,7 @@ public class HierarchicalResourceLoaderBean implements InitializingBean
     /**
      * Create a new HierarchicalResourceLoader.
      */
-    public HierarchicalResourceLoaderBean()
+    public HierarchicalResourceLoader()
     {
         super();
     }
@@ -149,16 +149,21 @@ public class HierarchicalResourceLoaderBean implements InitializingBean
      * @return                  a resource found by successive searches using class name replacement, or
      *                          <tt>null</tt> if not found.
      */
+    @Override
     public Resource getResource(String location)
     {
+        if (dialectClass == null || dialectBaseClass == null)
+        {
+            return super.getResource(location);
+        }
+        
         Class<? extends Object> clazz = dialectClass;
         Resource resource = null;
-        DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
         while (resource == null)
         {
             // Do replacement
             String newLocation = location.replaceAll(DEFAULT_DIALECT_REGEX, clazz.getName());
-            resource = resourceLoader.getResource(newLocation);
+            resource = super.getResource(newLocation);
             if (resource != null && resource.exists())
             {
                 // Found
