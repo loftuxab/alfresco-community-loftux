@@ -273,7 +273,7 @@
             fields: ['name', 'title', 'description', 'url', 'tags', 'internal', 'createdOn', 'author', 'permissions'],
             metaFields:
             {
-               paginationRecordOffset: 'startIndex',
+               recordOffset: 'startIndex',
                totalRecords: 'total',
                metadata: 'metadata'
             }
@@ -795,22 +795,7 @@
          Dom.setStyle(this.id + '-body', 'visibility', 'visible');
 
          this.createDataSource();
-         this._attachResize();
          this.createDataTable();
-      },
-
-      /**
-       * topic list resize event handler
-       * @method onTopicListResize.
-       * @param width {int}
-       */
-      onTopicListResize: function Links_onTopicListResize(width)
-      {
-         if (width)
-         {
-            Dom.setStyle(Dom.get("divLinkFilters"), "height", "auto");
-            Dom.setStyle(Dom.get("divLinkList"), "margin-left", width + 3 + "px");
-         }
       },
 
       /**
@@ -1085,7 +1070,6 @@
       onUpdateLink: function Links_onUpdateLink(rowData, row)
       {
          this.updateLinks();
-
       },
 
       /**
@@ -1148,29 +1132,6 @@
        */
 
       /**
-       * activation of resize
-       * @method _attachResize.
-       */
-      _attachResize: function Links__attachResize()
-      {
-         this.widgets.horizResize = new YAHOO.util.Resize("divLinkFilters",
-         {
-            handles: ["r"],
-            minWidth: this.options.MIN_FILTER_PANEL_WIDTH,
-            maxWidth: this.options.MAX_FILTER_PANEL_WIDTH
-         });
-
-
-         this.widgets.horizResize.on("resize",
-               function(eventTarget)
-               {
-                  this.onTopicListResize(eventTarget.width);
-               }, this, true);
-
-         this.widgets.horizResize.resize(null, null, this.options.MIN_FILTER_PANEL_WIDTH, 0, 0, true);
-      },
-
-      /**
        * Generate ID alias for tag, suitable for DOM ID attribute
        *
        * @method _generateTagId
@@ -1228,18 +1189,7 @@
          var url = "";
          if (filterOwner == "Alfresco.LinkFilter")
          {
-            switch (filterId)
-            {
-               case "all":
-                  url = "?filter=all";
-                  break;
-               case "user":
-                  url = "?filter=user";
-                  break;
-               case "recent":
-                  url = "?filter=recent";
-                  break;
-            }
+            url = "?filter=" + filterId;
          }
          else if (filterOwner == "Alfresco.LinkTags")
          {
@@ -1326,12 +1276,9 @@
       _generateTagLink: function Links_generateTagLink(tagName)
       {
          var encodedTagName = $html(tagName);
-         var html = '';
-         html += '<span id="' + this._generateTagId(tagName) + '" class="nodeAttrValue">';
+         var html = '<span id="' + this._generateTagId(tagName) + '" class="nodeAttrValue">';
          html += '<a href="#" class="tag-link" title="' + encodedTagName + '">';
-         html += '<span>' + encodedTagName + '</span>';
-         html += '</a>';
-         html += '</span>';
+         html += '<span>' + encodedTagName + '</span></a></span>';
          return html;
       },
 
@@ -1343,12 +1290,12 @@
        */
       _generateRSSFeedUrl: function Links__generateRSSFeedUrl()
       {
-            var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "service/components/links/rss?site={site}",
-            {
-               site: this.options.siteId
-            });
+         var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "service/components/links/rss?site={site}",
+         {
+            site: this.options.siteId
+         });
 
-       return url;
+         return url;
       }
    };
 })();
