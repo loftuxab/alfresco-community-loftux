@@ -7,6 +7,7 @@
    <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/document-details/document-details.js"></@script>   
+   <@templateHtmlEditorAssets />
 </@>
 
 <@templateBody>
