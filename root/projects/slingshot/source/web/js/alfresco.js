@@ -2999,6 +2999,22 @@ Alfresco.util.RichEditor = function(editorName,id,config)
 
       if (id && config)
       {
+         // Check we can support the requested language
+         if (config.language)
+         {
+            var langs = Alfresco.util.message("tinymce_languages").split(","),
+               lang = "en";
+            for (var i = 0, j = langs.length; i < j; i++)
+            {
+               if (langs[i] == config.language)
+               {
+                  lang = config.language;
+                  break;
+               }
+            }
+            config.language = lang;
+         }
+         
          ed.init(id,config);
       }
       return ed;
