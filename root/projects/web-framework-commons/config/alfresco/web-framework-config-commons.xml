@@ -47,17 +47,23 @@
       <form>
          <field-visibility>
             <show id="cm:name" />
-            <!-- <show id="mimetype" /> TODO: Need to extract from content property -->
             <show id="cm:title" />
             <show id="cm:description" />
-            <show id="cm:author" />
-            <!-- <show id="size" /> TODO: Need to extract from content property -->
-            <show id="cm:description" />
+            <show id="mimetype" />
+            <show id="size" for-mode="view" />
             <show id="cm:creator" for-mode="view" />
             <show id="cm:created" for-mode="view" />
             <show id="cm:modifier" for-mode="view" />
             <show id="cm:modified" for-mode="view" />
          </field-visibility>
+         <appearance>
+            <field id="mimetype">
+               <control template="controls/mimetype.ftl" />
+            </field>
+            <field id="size">
+               <control template="controls/size.ftl" />
+            </field>
+         </appearance>
       </form>
    </config>
    
