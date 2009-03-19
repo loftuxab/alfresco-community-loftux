@@ -83,6 +83,16 @@ Alfresco.util.RichEditorManager.addEditor('tinyMCE', function(id,config)
       deactivateButton: function RichEditorManager_tinyMCE_deactivateButton(buttonId)
       {
          editor.controlManager.setActive(buttonId, false);
+      },
+
+      isDirty: function RichEditorManager_tinyMCE_isDirty()
+      {
+         return editor.isDirty();
+      },
+
+      clearDirtyFlag: function RichEditorManager_tinyMCE_clearDirtyFlag()
+      {
+         editor.isNotDirty = 1;
       }
    });
 });
