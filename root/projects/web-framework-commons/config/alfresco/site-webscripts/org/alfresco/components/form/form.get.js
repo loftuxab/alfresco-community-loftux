@@ -88,6 +88,7 @@ function main()
          formUIModel.showCaption = (showCaption === "true") ? true : false;
          formUIModel.showCancelButton = (showCancelButton === "true") ? true : false;
          formUIModel.showResetButton = (showResetButton === "true") ? true : false;
+         formUIModel.data = formModel.data.formData;
          
          // query for configuration for item
          var nodeConfig = config.scoped[nodeRef];
@@ -281,13 +282,7 @@ function setupField(formModel, fieldName, fieldConfig)
       {
          logger.warn("\"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
       }
-      fieldDef = {};
-      fieldDef.kind = "field";
-      fieldDef.configName = fieldName;
-      fieldDef.name = fieldName.replace(/:/g, "_");
-      fieldDef.id = fieldDef.name;
-      fieldDef.control = {};
-      fieldDef.control.template = "controls/ambiguous.ftl";
+      createTransientField(fieldName, "controls/ambiguous.ftl", null);
    }
    else
    {
@@ -336,9 +331,16 @@ function setupField(formModel, fieldName, fieldConfig)
             fieldDef.value = formModel.data.formData[fieldDef.name];
          }
       }
-      else if (logger.isWarnLoggingEnabled())
+      else
       {
-         logger.warn("Ignoring field \"" + fieldName + "\" as a field definition could not be located");
+         // the field does not have a definition but may be a 'transient' field so
+         // check for some configuration, in particular a template
+         fieldDef = setupTransientField(fieldName, fieldConfig);
+         
+         if (fieldDef === null && logger.isWarnLoggingEnabled())
+         {
+            logger.warn("Ignoring field \"" + fieldName + "\" as a field definition or configuration could not be located");
+         }
       }
    }
    
@@ -635,6 +637,68 @@ function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
    }
    
    return constraint;
+}
+
+/**
+ * Sets up a transient field if the given fieldName has some
+ * configuration including a control template to use.
+ *
+ * @method setupTransientField
+ * @param fieldName The name of the field to setup
+ * @param fieldConfig Object representing the UI configuration 
+ *                    or null if there isn't any configuration 
+ * @return Object representing the transient field 
+ */
+function setupTransientField(fieldName, fieldConfig)
+{
+   var fieldDef = null;
+   
+   // ensure the config has defined a control template to use
+   if (fieldConfig !== null && fieldConfig.template !== null)
+   {
+      var params = {};
+      
+      var paramsConfig = fieldConfig.controlParams;
+      for (var p = 0; p < paramsConfig.size(); p++)
+      {
+         params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
+      }
+      
+      fieldDef = createTransientField(fieldName, fieldConfig.template, params);
+   }
+   
+   return fieldDef;
+}
+
+/**
+ * Creates a transient field that represents a field to display that
+ * does not have a corresponding field definition.
+ *
+ * @method createTransientField
+ * @param fieldName The name of the transient field as defined in the configuration
+ * @param controlTemplate The template to use for the control
+ * @param controlParams An object representing the parameters for the control, can be null
+ * @return Object representing the transient field
+ */
+function createTransientField(fieldName, controlTemplate, controlParams)
+{
+   var fieldDef = {};
+   
+   fieldDef.kind = "field";
+   fieldDef.configName = fieldName;
+   // force the name to convert to a JavaScript string so replace method can be used
+   var name = "" + fieldName;
+   fieldDef.name = name.replace(/:/g, "_");
+   fieldDef.id = fieldDef.name;
+   fieldDef.control = {};
+   fieldDef.control.template = controlTemplate;
+   
+   if (typeof controlParams !== "undefined" && controlParams !== null)
+   {
+      fieldDef.control.params = controlParams;
+   }
+   
+   return fieldDef;
 }
 
 /**
