@@ -186,7 +186,7 @@
             window.onbeforeunload = function(e)
             {
                var e = e || window.event;
-               if (me.pageEditor.editorDirty)
+               if (me.pageEditor.isDirty())
                {
                   if (e)
                   {
@@ -590,7 +590,7 @@
        */
       onCancelSelect: function Wiki_onCancelSelect(e)
       {
-         this.pageEditor.editorDirty = null;
+         this.pageEditor.clearDirtyFlag();
          this._redirect();
       },
       
@@ -603,7 +603,7 @@
        */
       onPageUpdated: function Wiki_onPageUpdated(e)
       {
-         this.pageEditor.editorDirty = null;
+         this.pageEditor.clearDirtyFlag();
          this._redirect();
       },
       

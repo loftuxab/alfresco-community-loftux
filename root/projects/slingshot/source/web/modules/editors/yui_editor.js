@@ -67,6 +67,16 @@ Alfresco.util.RichEditorManager.addEditor('YAHOO.widget.SimpleEditor', function(
       deactivateButton: function RichEditorManager_yui_deactivateButton(buttonId)
       {
          editor.toolbar.deselectButton(buttonId);
+      },
+      
+      isDirty: function RichEditorManager_yui_isDirty()
+      {
+         return editor.editorDirty;
+      },
+      
+      clearDirtyFlag: function RichEditorManager_yui_clearDirtyFlag()
+      {
+         editor.editorDirty = null;
       }
    });
 });
