@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.config;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,15 +73,15 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
     {
         boolean result = false;
 
-        if (obj instanceof CharSequence)
+        if (obj instanceof String)
         {
-            CharSequence chSeq = (CharSequence) obj;
-            Matcher m = nodeRefPattern.matcher(chSeq);
+            String objAsString = (String) obj;
+            Matcher m = nodeRefPattern.matcher(objAsString);
             if (m.matches())
             {
                 try
                 {
-                    String jsonResponseString = callMetadataService(chSeq);
+                    String jsonResponseString = callMetadataService(objAsString);
 
                     result = checkJsonAgainstCondition(condition, jsonResponseString);
                 } catch (ConnectorServiceException e)
@@ -95,12 +97,25 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
         return result;
     }
 
-    private String callMetadataService(CharSequence nodeString) throws ConnectorServiceException
+    private String callMetadataService(String nodeString) throws ConnectorServiceException
     {
-        ConnectorService connService = FrameworkHelper.getConnectorService();
+        // Before making the remote call, we'll check the request-scoped cache in
+        // ThreadLocalRequestContext.
+        StringBuilder builder = new StringBuilder().append("forms.cache.").append(nodeString);
+        String keyForCachedJson = builder.toString();
         
-        // TODO assuming the below obj is req-scoped, it may be the right place to cache
-        //      our metadata.
+        Map<String, Serializable> valuesMap = ThreadLocalRequestContext.getRequestContext().getValuesMap();
+        Serializable cachedResult = valuesMap.get(keyForCachedJson);
+        if (cachedResult != null & cachedResult instanceof String)
+        {
+            if (getLogger().isDebugEnabled())
+            {
+                getLogger().debug("Retrieved cached metadata for " + nodeString);
+            }
+            return (String)cachedResult;
+        }
+
+        ConnectorService connService = FrameworkHelper.getConnectorService();
         
         RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
         String currentUserId = requestContext.getUserId();
@@ -110,6 +125,14 @@ public abstract class NodeMetadataBasedEvaluator implements Evaluator
         Response r = connector.call("/api/metadata?nodeRef=" + nodeString + "&shortQNames=true");
 
         String jsonResponseString = r.getResponse();
+        
+        // Cache the jsonResponseString in the RequestContext
+        if (getLogger().isDebugEnabled())
+        {
+            getLogger().debug("Caching metadata for " + nodeString);
+        }
+        ThreadLocalRequestContext.getRequestContext().setValue(keyForCachedJson, jsonResponseString);
+        
         return jsonResponseString;
     }
 }
