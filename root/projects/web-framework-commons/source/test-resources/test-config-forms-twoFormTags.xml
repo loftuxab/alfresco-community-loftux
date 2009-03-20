@@ -38,10 +38,15 @@
             <show id="my:broken" />
          </field-visibility>
          <appearance>
+            <field id="cm:name">
+               <control template="/form-controls/mytextfield.ftl" />
+               <constraint-message type="REGEX" message="You can't have these characters in a name: /*" />
+            </field>
             <field id="my:text" label="Custom Text" description="This is a custom model text field">
                <control>
                   <control-param name="width">500px</control-param>
                </control>
+               <constraint-message type="REGEX" message-id="custom_msg" />
             </field>
             <field id="my:mltext" label="Custom ML Text" description="This is a custom model multilingual text field">
                <control>

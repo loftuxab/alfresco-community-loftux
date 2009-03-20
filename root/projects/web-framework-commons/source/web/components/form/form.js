@@ -199,7 +199,7 @@
             for (var c = 0; c < this.options.fieldConstraints.length; c++)
             {
                var fc = this.options.fieldConstraints[c];
-               formsRuntime.addValidation(fc.fieldId, fc.handler, fc.params, fc.event);
+               formsRuntime.addValidation(fc.fieldId, fc.handler, fc.params, fc.event, fc.message);
             }
             
             // fire event to inform any listening components that the form is about to be initialised

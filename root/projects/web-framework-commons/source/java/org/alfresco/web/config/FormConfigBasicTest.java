@@ -229,4 +229,27 @@ public class FormConfigBasicTest extends BaseTest
             // intentionally empty
         }
     }
+    
+    public void testEmptyConstraintsMsgs()
+    {
+        // check the messages on the cm:name field
+        FormField field = formConfigElement.getFields().get("cm:name");
+        assertNotNull("Expecting cm:name to be present", field);
+        Map<String, ConstraintMessage> msgs = field.getConstraintMessageMap();
+        assertNotNull(msgs);
+        ConstraintMessage msg = msgs.get("REGEX");
+        assertNotNull(msg);
+        assertNull(msg.getMessageId());
+        assertEquals("You can't have these characters in a name: /*", msg.getMessage());
+        
+        // check the messages on the cm:text field
+        field = formConfigElement.getFields().get("my:text");
+        assertNotNull("Expecting cm:text to be present", field);
+        msgs = field.getConstraintMessageMap();
+        assertNotNull(msgs);
+        msg = msgs.get("REGEX");
+        assertNotNull(msg);
+        assertNull(msg.getMessage());
+        assertEquals("custom_msg", msg.getMessageId());
+    }
 }

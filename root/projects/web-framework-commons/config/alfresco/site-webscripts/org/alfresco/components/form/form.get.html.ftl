@@ -14,10 +14,11 @@
             [
                <#list form.constraints as constraint>
                {
-                  "fieldId" : "${args.htmlid}_${constraint.fieldId}", 
-                  "handler" : ${constraint.validationHandler}, 
-                  "params" : ${constraint.params}, 
-                  "event" : "${constraint.event}"
+                  fieldId : "${args.htmlid}_${constraint.fieldId}", 
+                  handler : ${constraint.validationHandler}, 
+                  params : ${constraint.params}, 
+                  event : "${constraint.event}",
+                  message : <#if constraint.message?exists>"${constraint.message}"<#else>null</#if>
                }
                <#if constraint_has_next>,</#if>
                </#list>

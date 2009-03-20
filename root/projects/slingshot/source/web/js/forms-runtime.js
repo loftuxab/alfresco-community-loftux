@@ -436,9 +436,11 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        *        can be any event applicable for the field for example on a text
        *        field "blur" can be used to fire the validation handler as the 
        *        user leaves the field. If null, the validation is only called
-       *        upon form submission. 
+       *        upon form submission
+       * @param message Message to be displayed when validation fails, if omitted
+                or null the default message in the handler is used
        */
-      addValidation: function(fieldId, validationHandler, validationArgs, when)
+      addValidation: function(fieldId, validationHandler, validationArgs, when, message)
       {
          var field = Dom.get(fieldId);
          if (field == null)
@@ -447,12 +449,18 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             return;
          }
          
+         if (message === undefined)
+         {
+            message = null;
+         }
+         
          // create object representation of validation
          var validation =
          {
             fieldId: fieldId,
             args: validationArgs,
-            handler: validationHandler
+            handler: validationHandler,
+            message: message
          };
          
          // add to list of validations
@@ -644,7 +652,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @method _validationEventFired
        * @param event {object} The event
        * @param validation {object} Object representing the validation to execute, consists of 
-       *        'fieldId', 'args' and 'handler' properties.
+       *        'fieldId', 'args', 'handler' and 'message' properties.
        * @private
        */
       _validationEventFired: function(event, validation)
@@ -670,7 +678,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          }
          
          // call handler
-         validation.handler(Event.getTarget(event), validation.args, event, this, silent);
+         validation.handler(Event.getTarget(event), validation.args, event, this, silent, validation.message);
          
          // update submit elements state, if required
          if (this.showSubmitStateDynamically)
@@ -944,9 +952,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.mandatory = function mandatory(field, args, event, form, silent)
+Alfresco.forms.validation.mandatory = function mandatory(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating mandatory state of field '" + field.id + "'");
@@ -983,7 +992,8 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
       // if the keyCode from the event is the TAB or SHIFT keys don't show the error
       if (event && event.keyCode != 9 && event.keyCode != 16)
       {
-         form.addError(form.getFieldLabel(field.id) + " is mandatory.", field);
+         var msg = (message != null) ? message : "is mandatory.";
+         form.addError(form.getFieldLabel(field.id) + " " + msg, field);
       }
    }
    
@@ -1004,9 +1014,10 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.length = function length(field, args, event, form, silent)
+Alfresco.forms.validation.length = function length(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating length of field '" + field.id +
@@ -1053,7 +1064,8 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
    
    if (!valid && !silent && form !== null)
    {
-      form.addError(form.getFieldLabel(field.id) + " is not the correct length.", field);
+      var msg = (message != null) ? message : "is not the correct length.";
+      form.addError(form.getFieldLabel(field.id) + " " + msg, field);
    }
    
    return valid;
@@ -1068,9 +1080,10 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.number = function number(field, args, event, form, silent)
+Alfresco.forms.validation.number = function number(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a number");
@@ -1079,7 +1092,8 @@ Alfresco.forms.validation.number = function number(field, args, event, form, sil
    
    if (!valid && !silent && form !== null)
    {
-      form.addError(form.getFieldLabel(field.id) + " is not a number.", field);
+      var msg = (message != null) ? message : "is not a number.";
+      form.addError(form.getFieldLabel(field.id) + " " + msg, field);
    }
    
    return valid;
@@ -1099,14 +1113,15 @@ Alfresco.forms.validation.number = function number(field, args, event, form, sil
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.numberRange = function numberRange(field, args, event, form, silent)
+Alfresco.forms.validation.numberRange = function numberRange(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating number range of field '" + field.id +
                             "' using args: " + YAHOO.lang.dump(args));
-   
+                            
    var valid = true;
    var value = field.value;
    
@@ -1118,7 +1133,8 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
          
          if (!silent && form !== null)
          {
-            form.addError(form.getFieldLabel(field.id) + " is not a number.", field);
+            var msg = (message != null) ? message : "is not a number.";
+            form.addError(form.getFieldLabel(field.id) + " " + msg, field);
          }
       }
       else
@@ -1158,7 +1174,8 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
          
          if (!valid && !silent && form !== null)
          {
-            form.addError(form.getFieldLabel(field.id) + " is not within the allowable range.", field);
+            var msg = (message != null) ? message : "is not within the allowable range.";
+            form.addError(form.getFieldLabel(field.id) + " " + msg, field);
          }
       }
    }
@@ -1176,9 +1193,10 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, event,
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form, silent)
+Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid node name");
@@ -1191,7 +1209,7 @@ Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form,
    args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/;
    args.match = false;
 
-   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
 };
 
 /**
@@ -1204,9 +1222,10 @@ Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form,
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.email = function email(field, args, event, form, silent)
+Alfresco.forms.validation.email = function email(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid email address");
@@ -1219,7 +1238,7 @@ Alfresco.forms.validation.email = function email(field, args, event, form, silen
    args.pattern = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/;
    args.match = true;
 
-   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
 };
 
 /**
@@ -1231,9 +1250,10 @@ Alfresco.forms.validation.email = function email(field, args, event, form, silen
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.url = function url(field, args, event, form, silent)
+Alfresco.forms.validation.url = function url(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid URL");
@@ -1246,7 +1266,7 @@ Alfresco.forms.validation.url = function url(field, args, event, form, silent)
    args.pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
    args.match = true;
 
-   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
 };
 
 
@@ -1269,9 +1289,10 @@ Alfresco.forms.validation.url = function url(field, args, event, form, silent)
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.regexMatch = function regexMatch(field, args, event, form, silent)
+Alfresco.forms.validation.regexMatch = function regexMatch(field, args, event, form, silent, message)
 {
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating regular expression of field '" + field.id +
@@ -1300,7 +1321,8 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, event, f
       // Inform the user if invalid
       if (!valid && !silent && form !== null)
       {
-         form.addError(form.getFieldLabel(field.id) + " is invalid.", field);
+         var msg = (message != null) ? message : "is invalid.";
+         form.addError(form.getFieldLabel(field.id) + " " + msg, field);
       }
    }
    
@@ -1318,16 +1340,17 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, event, f
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, event, form, silent)
+Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, event, form, silent, message)
 {
    // convert parameters
    args.pattern = args.expression;
    args.match = !args.requiresMatch;
 
    // call the standard regex handler
-   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
 };
 
 /**
@@ -1341,9 +1364,10 @@ Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, 
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
  * @static
  */
-Alfresco.forms.validation.inList = function inList(field, args, event, form, silent)
+Alfresco.forms.validation.inList = function inList(field, args, event, form, silent, message)
 {
    return true;
 };
