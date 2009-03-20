@@ -1330,3 +1330,21 @@ Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent);
 };
 
+/**
+ * Validation handler for the repository 'list of values' constraint. As the UI
+ * handles this by displaying the list of allowable values this handler is a dummy
+ * placeholder.
+ *
+ * @method listOfValues
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} The list of allowable values
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.forms.validation.inList = function inList(field, args, event, form, silent)
+{
+   return true;
+};
+

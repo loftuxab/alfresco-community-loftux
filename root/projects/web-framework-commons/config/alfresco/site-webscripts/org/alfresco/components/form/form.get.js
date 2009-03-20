@@ -549,7 +549,7 @@ function setupConstraints(fieldDef, fieldConfig)
          }
       }
    }
-   
+
    // remove the constraints property from the fieldDef object
    delete fieldDef.constraints;
 }
@@ -629,6 +629,16 @@ function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
       if (logger.isLoggingEnabled())
       {
          logger.log("Built constraint: " + jsonUtils.toJSONString(constraint));
+      }
+      
+      if (constraintId === "LIST")
+      {
+         // if the constraint is the list of values constraint force the control
+         // template to be select.ftl and setup the options
+         fieldDef.control.template = "controls/select.ftl";
+         
+         // setup the options string and set as control params
+         fieldDef.control.params.options = constraintParams.allowedValues;
       }
    }
    else if (logger.isWarnLoggingEnabled())

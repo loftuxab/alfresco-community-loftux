@@ -40,6 +40,7 @@
          <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
          <constraint type="NUMBER" validation-handler="Alfresco.forms.validation.number" event="keyup" />
          <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
+         <constraint type="LIST" validation-handler="Alfresco.forms.validation.inList" event="blur" />
          <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup"
                      message="The field contains an invalid character" />
       </constraint-handlers>
