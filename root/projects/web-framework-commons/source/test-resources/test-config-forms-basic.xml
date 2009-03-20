@@ -40,11 +40,13 @@
          <appearance>
             <field id="cm:name">
                <control template="/form-controls/mytextfield.ftl" />
+               <constraint-message type="REGEX" message="You can't have these characters in a name: /*" />
             </field>
             <field id="my:text" label="Custom Text" description="This is a custom model text field">
                <control>
                   <control-param name="width">500px</control-param>
                </control>
+               <constraint-message type="REGEX" message-id="custom_msg" />
             </field>
             <field id="my:duplicate" label="Duplicate" read-only="true" help="This is a test for duplicate props and assocs" />
             <field id="my:date" label="Custom Date" description-id="form.field.dateformat" />

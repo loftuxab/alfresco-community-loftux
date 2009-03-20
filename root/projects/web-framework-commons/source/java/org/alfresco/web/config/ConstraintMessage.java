@@ -63,8 +63,8 @@ public class ConstraintMessage
     	}
     	this.type = type;
     	
-    	this.message = message == null ? "" : message;
-    	this.messageId = messageId == null ? "" : messageId;
+    	this.message = message;
+    	this.messageId = messageId;
     }
 
     /**
@@ -114,35 +114,5 @@ public class ConstraintMessage
         result.append(type).append(":").append(message)
             .append("/").append(messageId);
         return result.toString();
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        return type.hashCode() + 7 * message.hashCode() + 13 * messageId.hashCode();
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object otherObj)
-    {
-        if (otherObj == this)
-        {
-            return true;
-        }
-        else if (otherObj == null
-                || !otherObj.getClass().equals(this.getClass()))
-        {
-            return false;
-        }
-        ConstraintMessage otherCM = (ConstraintMessage) otherObj;
-        return otherCM.type.equals(this.type)
-                && otherCM.message.equals(this.message)
-                && otherCM.messageId.equals(this.messageId);
     }
 }

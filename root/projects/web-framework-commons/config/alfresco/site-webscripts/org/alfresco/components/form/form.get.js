@@ -590,32 +590,26 @@ function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
       // look for an overridden message in the field's constraint config, 
       // if none found look in the default constraint config
       
-      // TODO: change constraint config so null is returned if no message present
-      
       var constraintMsg = null;
       if (fieldConfig !== null && fieldConfig.constraintMessageMap[constraintId] !== null)
       {
          var fieldConstraintConfig = fieldConfig.constraintMessageMap[constraintId];
-         if (fieldConstraintConfig.messageId !== null && 
-               fieldConstraintConfig.messageId.length > 0)
+         if (fieldConstraintConfig.messageId !== null)
          {
             constraintMsg = msg.get(fieldConstraintConfig.messageId);
          }
-         else if (fieldConstraintConfig.message !== null && 
-               fieldConstraintConfig.message.length > 0)
+         else if (fieldConstraintConfig.message !== null)
          {
             constraintMsg = fieldConstraintConfig.message;
          }
       }
       else if (typeof defaultConstraintConfig.messageId !== "undefined" && 
-               defaultConstraintConfig.messageId !== null && 
-               defaultConstraintConfig.messageId.length > 0)
+               defaultConstraintConfig.messageId !== null)
       {
          constraintMsg = msg.get(defaultConstraintConfig.messageId);
       }
       else if (typeof defaultConstraintConfig.message !== "undefined" && 
-               defaultConstraintConfig.message !== null && 
-               defaultConstraintConfig.message.length > 0)
+               defaultConstraintConfig.message !== null)
       {
          constraintMsg = defaultConstraintConfig.message;
       }
