@@ -6,8 +6,11 @@
          <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
          <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>
       </element-readers>
+      <evaluators>
+         <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
+      </evaluators>
    </plug-ins>
-
+   
    <config>
       <default-controls>
          <type name="d:text" template="controls/textfield.ftl" />
@@ -43,7 +46,7 @@
    </config>
    
    <!-- Default form configuration for the cm:content type -->
-   <config evaluator="string-compare" condition="cm:content">
+   <config evaluator="node-type" condition="cm:content">
       <form>
          <field-visibility>
             <show id="cm:name" />
@@ -68,7 +71,7 @@
    </config>
    
    <!-- Default form configuration for the cm:folder type -->
-   <config evaluator="string-compare" condition="cm:folder">
+   <config evaluator="node-type" condition="cm:folder">
       <form>
          <field-visibility>
             <show id="cm:name" />
