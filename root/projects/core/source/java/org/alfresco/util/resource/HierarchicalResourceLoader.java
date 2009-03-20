@@ -73,8 +73,8 @@ public class HierarchicalResourceLoader extends DefaultResourceLoader implements
     public static final String DEFAULT_DIALECT_PLACEHOLDER = "#resource.dialect#";
     public static final String DEFAULT_DIALECT_REGEX = "\\#resource\\.dialect\\#";
     
-    private Class<? extends Object> dialectBaseClass;
-    private Class<? extends Object> dialectClass;
+    private String dialectBaseClass;
+    private String dialectClass;
     
     /**
      * Create a new HierarchicalResourceLoader.
@@ -93,53 +93,19 @@ public class HierarchicalResourceLoader extends DefaultResourceLoader implements
     @SuppressWarnings("unchecked")
     public void setDialectBaseClass(String className)
     {
-        try
-        {
-            dialectBaseClass = (Class<Object>) Class.forName(className);
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new RuntimeException("Unable to set 'dialectBaseClass'.  Class not found: " + className);
-        }
+        this.dialectBaseClass = className;
     }
     
     @SuppressWarnings("unchecked")
     public void setDialectClass(String className)
     {
-        try
-        {
-            dialectClass = (Class<? extends Object>) Class.forName(className);
-        }
-        catch (ClassNotFoundException e)
-        {
-            throw new RuntimeException("Unable to set 'dialectClass'.  Class not found: " + className);
-        }
+        this.dialectClass = className;
     }
 
     public void afterPropertiesSet() throws Exception
     {
         PropertyCheck.mandatory(this, "dialectBaseClass", dialectBaseClass);
         PropertyCheck.mandatory(this, "dialectClass", dialectClass);
-        // Ensure that we are dealing with classes and not interfaces
-        if (!Object.class.isAssignableFrom(dialectBaseClass))
-        {
-            throw new RuntimeException(
-                    "Dialect base class must be derived from java.lang.Object: " +
-                    dialectBaseClass.getName());
-        }
-        if (!Object.class.isAssignableFrom(dialectClass))
-        {
-            throw new RuntimeException(
-                    "Dialect class must be derived from java.lang.Object: " +
-                    dialectClass.getName());
-        }
-        // We expect these to be in the same hierarchy
-        if (!dialectBaseClass.isAssignableFrom(dialectClass))
-        {
-            throw new RuntimeException(
-                    "Non-existent HierarchicalResourceLoaderBean hierarchy: " +
-                    dialectBaseClass.getName() + " is not a superclass of " + dialectClass);
-        }
     }
     
     /**
@@ -149,6 +115,7 @@ public class HierarchicalResourceLoader extends DefaultResourceLoader implements
      * @return                  a resource found by successive searches using class name replacement, or
      *                          <tt>null</tt> if not found.
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Resource getResource(String location)
     {
@@ -157,7 +124,60 @@ public class HierarchicalResourceLoader extends DefaultResourceLoader implements
             return super.getResource(location);
         }
         
-        Class<? extends Object> clazz = dialectClass;
+        // If a property value has not been substituted, extract the property name and load from system
+        String dialectBaseClassStr = dialectBaseClass;
+        if (!PropertyCheck.isValidPropertyString(dialectBaseClass))
+        {
+            String prop = PropertyCheck.getPropertyName(dialectBaseClass);
+            dialectBaseClassStr = System.getProperty(prop, dialectBaseClass);
+        }
+        String dialectClassStr = dialectClass;
+        if (!PropertyCheck.isValidPropertyString(dialectClass))
+        {
+            String prop = PropertyCheck.getPropertyName(dialectClass);
+            dialectClassStr = System.getProperty(prop, dialectClass);
+        }
+
+        Class dialectBaseClazz;
+        try
+        {
+            dialectBaseClazz = Class.forName(dialectBaseClassStr);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new RuntimeException("Dialect base class not found: " + dialectBaseClassStr);
+        }
+        Class dialectClazz;
+        try
+        {
+            dialectClazz = Class.forName(dialectClassStr);
+        }
+        catch (ClassNotFoundException e)
+        {
+            throw new RuntimeException("Dialect class not found: " + dialectClassStr);
+        }
+        // Ensure that we are dealing with classes and not interfaces
+        if (!Object.class.isAssignableFrom(dialectBaseClazz))
+        {
+            throw new RuntimeException(
+                    "Dialect base class must be derived from java.lang.Object: " +
+                    dialectBaseClazz.getName());
+        }
+        if (!Object.class.isAssignableFrom(dialectClazz))
+        {
+            throw new RuntimeException(
+                    "Dialect class must be derived from java.lang.Object: " +
+                    dialectClazz.getName());
+        }
+        // We expect these to be in the same hierarchy
+        if (!dialectBaseClazz.isAssignableFrom(dialectClazz))
+        {
+            throw new RuntimeException(
+                    "Non-existent HierarchicalResourceLoaderBean hierarchy: " +
+                    dialectBaseClazz.getName() + " is not a superclass of " + dialectClazz);
+        }
+        
+        Class<? extends Object> clazz = dialectClazz;
         Resource resource = null;
         while (resource == null)
         {
@@ -172,7 +192,7 @@ public class HierarchicalResourceLoader extends DefaultResourceLoader implements
             // Not found
             resource = null;
             // Are we at the base class?
-            if (clazz.equals(dialectBaseClass))
+            if (clazz.equals(dialectBaseClazz))
             {
                 // We don't go any further
                 break;
@@ -183,7 +203,7 @@ public class HierarchicalResourceLoader extends DefaultResourceLoader implements
             {
                 throw new RuntimeException(
                         "Non-existent HierarchicalResourceLoaderBean hierarchy: " +
-                        dialectBaseClass.getName() + " is not a superclass of " + dialectClass);
+                        dialectBaseClazz.getName() + " is not a superclass of " + dialectClazz);
             }
         }
         return resource;

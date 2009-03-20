@@ -79,4 +79,33 @@ public class PropertyCheck
             return true;
         }
     }
+    
+    /**
+     * Dig out the property name from a placeholder-style property of form
+     * <b>${prop.name}</b>, which will yield <b>prop.name</b>.  If the placeholders
+     * are not there, the value is returned directly.  <tt>null</tt> values are
+     * not allowed, but empty strings are.
+     * 
+     * @param value     The property with or without property placeholders
+     * @return          Returns the core property without the property placeholders
+     *                  <b>${</b> and <b>}</b>.
+     * @throws IllegalArgumentException         if the value is <tt>null</tt>
+     */
+    public static String getPropertyName(String value)
+    {
+        if (value == null)
+        {
+            throw new IllegalArgumentException("'value' is a required argument.");
+        }
+        if (!value.startsWith("${"))
+        {
+            return value;
+        }
+        if (!value.endsWith("}"))
+        {
+            return value;
+        }
+        int strLen = value.length();
+        return value.substring(2, strLen - 1);
+    }
 }
