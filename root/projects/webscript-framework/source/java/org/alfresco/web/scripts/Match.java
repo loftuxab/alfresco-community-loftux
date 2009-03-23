@@ -24,21 +24,26 @@
  */
 package org.alfresco.web.scripts;
 
+import java.util.Collections;
 import java.util.Map;
+
+import org.apache.commons.collections.map.UnmodifiableMap;
 
 
 /**
  * Represents a URI to Web Script match
- *  
+ * 
+ * This class is immutable.
+ * 
  * @author davidc
  */
-public class Match
+public final class Match
 {
-    private String templatePath;
-    private Map<String, String> templateVars;
-    private String matchPath;
-    private WebScript script;
-    private Kind kind;
+    final private String templatePath;
+    final private Map<String, String> templateVars;
+    final private String matchPath;
+    final private WebScript script;
+    final private Kind kind;
 
     /**
      * Kind of Match
@@ -61,7 +66,7 @@ public class Match
     {
         this.kind = Kind.FULL;
         this.templatePath = templatePath;
-        this.templateVars = templateVars;
+        this.templateVars = Collections.unmodifiableMap(templateVars);
         this.matchPath = matchPath;
         this.script = script;
     }
@@ -75,8 +80,9 @@ public class Match
     {
         this.kind = Kind.URI;
         this.templatePath = templatePath;
-        this.templateVars = templateVars;
+        this.templateVars = Collections.unmodifiableMap(templateVars);
         this.matchPath = matchPath;
+        this.script = null;
     }
 
     /**
@@ -133,5 +139,4 @@ public class Match
     {
         return templatePath;
     }
-    
 }

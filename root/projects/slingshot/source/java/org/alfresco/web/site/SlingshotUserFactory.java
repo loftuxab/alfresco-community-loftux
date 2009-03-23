@@ -64,12 +64,12 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
     }
     
     /**
-     * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String)
+     * @see org.alfresco.web.site.AlfrescoUserFactory#constructUser(java.lang.String, boolean)
      */
     @Override
-    protected AlfrescoUser constructUser(String userId)
+    protected AlfrescoUser constructUser(String userId, boolean isAdmin)
     {
-        return new SlingshotUser(userId);
+        return super.constructUser(userId, isAdmin);
     }
 
     /**

@@ -86,7 +86,6 @@ public class MediaType
             }
         }
     }
-
     
     /**
      * @return  type

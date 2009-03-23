@@ -234,66 +234,82 @@ public class DispatcherServlet extends BaseServlet
         
         if (page != null)
         {
-            // do we need to redirect to a login page type?
+            // redirect to login based on page authentication required 
+            boolean login = false;
+            User user = context.getUser();
             switch (page.getAuthentication())
             {
-                case user:
-                    User user = context.getUser();
-                    if ((user == null || user.getId().equals(UserFactory.USER_GUEST)))
-                    {
-                        // no valid user found - login required
-                        String loginPageId = null;
-                        
-                        // Consider the theme first - which can override common page types
-                        String themeId = (String) context.getThemeId();
-                        Theme theme = context.getModel().getTheme(themeId);
-                        if (theme != null)
-                        {
-                            loginPageId = theme.getPageId(PageType.PAGETYPE_LOGIN);
-                        }
-                        
-                        // Consider whether a system default has been set up
-                        if (loginPageId == null)
-                        {
-                            loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
-                        }
-                        
-                        Page loginPage = null;
-                        if (loginPageId != null)
-                        {
-                            loginPage = context.getModel().getPage(loginPageId);
-                            if (loginPage != null)
-                            {
-                                // get URL arguments as a map ready for rebuilding the request params
-                                Map<String, String> args = new HashMap<String, String>(
-                                        request.getParameterMap().size(), 1.0f);
-                                Enumeration names = request.getParameterNames();
-                                while (names.hasMoreElements())
-                                {
-                                    String name = (String)names.nextElement();
-                                    args.put(name, request.getParameter(name));
-                                }
-                                // construct redirection url
-                                String redirectUrl = request.getRequestURI() + 
-                                    (request.getQueryString() != null ? ("?" + request.getQueryString()) : "");
-                                
-                                // set redirect url for use on login page template
-                                context.setValue(ALF_REDIRECT_URL, redirectUrl);
-                                
-                                context.setPage(loginPage);
-                                dispatchPage(context, formatId);
-                                return;
-                            }
-                        }
-                        
-                        if (loginPageId == null || loginPage == null)
-                        {
-                            throw new AlfrescoRuntimeException("No 'login' page type configured - but page auth required it.");
-                        }
-                    }
+                case guest:
+                {
+                    login = (user == null);
                     break;
+                }
                 
-                // TODO: support admin/guest required auth cases
+                case user:
+                {
+                    login = (user == null || user.getId().equals(UserFactory.USER_GUEST));
+                    break;
+                }
+                
+                case admin:
+                {
+                    login = (user == null || !user.isAdmin());
+                    break;
+                }
+            }
+            
+            if (login)
+            {
+                String loginPageId = null;
+                
+                // Consider the theme first - which can override common page types
+                String themeId = (String) context.getThemeId();
+                Theme theme = context.getModel().getTheme(themeId);
+                if (theme != null)
+                {
+                    loginPageId = theme.getPageId(PageType.PAGETYPE_LOGIN);
+                }
+                
+                // Consider whether a system default has been set up
+                if (loginPageId == null)
+                {
+                    loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
+                }
+                
+                Page loginPage = null;
+                if (loginPageId != null)
+                {
+                    loginPage = context.getModel().getPage(loginPageId);
+                    if (loginPage != null)
+                    {
+                        // get URL arguments as a map ready for rebuilding the request params
+                        Map<String, String> args = new HashMap<String, String>(
+                                request.getParameterMap().size(), 1.0f);
+                        Enumeration names = request.getParameterNames();
+                        while (names.hasMoreElements())
+                        {
+                            String name = (String)names.nextElement();
+                            args.put(name, request.getParameter(name));
+                        }
+                        // construct redirection url
+                        String redirectUrl = request.getRequestURI() + 
+                            (request.getQueryString() != null ? ("?" + request.getQueryString()) : "");
+                        
+                        // set redirect url for use on login page template
+                        context.setValue(ALF_REDIRECT_URL, redirectUrl);
+                        context.setPage(loginPage);
+                        dispatchPage(context, formatId);
+                        
+                        // no need to process further as we have dispatched
+                        return;
+                    }
+                }
+                
+                // if we get here then no login page was found - the webapp is not configured correctly
+                if (loginPageId == null || loginPage == null)
+                {
+                    throw new AlfrescoRuntimeException("No 'login' page type configured - but page auth required it.");
+                }
             }
         }
         

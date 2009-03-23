@@ -27,13 +27,15 @@ package org.alfresco.web.scripts;
 
 /**
  * Map between media type and format
- *  
+ * 
+ * This class is immutable.
+ * 
  * @author davidc
  */
-public class NegotiatedFormat
+public final class NegotiatedFormat
 {
-    private MediaType mediaType;
-    private String format;
+    final private MediaType mediaType;
+    final private String format;
     
     /**
      * Construct
@@ -91,5 +93,4 @@ public class NegotiatedFormat
         }
         return format;
     }
-    
 }
