@@ -8,6 +8,9 @@ var currentToolId = page.url.templateArgs["toolid"];
 var family = page.url.templateArgs["pageid"];
 if (family != null)
 {
+   // find the existing current tool component binding
+   var component = sitedata.getComponent("page", "tool", family);
+   
    // collect the tools required for this console
    var tools = sitedata.findWebScripts(family);
    
@@ -25,11 +28,23 @@ if (family != null)
       toolInfo[i] =
       {
          id: scriptName,
-         url: tool.getURIs()[0],
+         url: new String(tool.getURIs()[0]),
          label: (msg.get(labelId) != labelId ? msg.get(labelId) : tool.shortName),
          description: (msg.get(descId) != descId ? msg.get(descId) : tool.description),
          selected: (currentToolId == scriptName)
       };
+      
+      // dynamically update the component binding if this tool is the current selection
+      if (toolInfo[i].selected)
+      {
+         if (component == null)
+         {
+            // first ever visit to the page - there is no component binding yet
+            component = sitedata.newComponent("page", "tool", family);
+         }
+         component.properties.url = toolInfo[i].url.toString();
+         component.save();
+      }
    }
 }
 model.tools = toolInfo;
