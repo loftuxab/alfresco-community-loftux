@@ -62,7 +62,7 @@ import org.alfresco.repo.avm.PurgeVersionTxnListener;
 import org.alfresco.repo.avm.util.RawServices;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.PropertyValue;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.AuthenticationContext;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.sandbox.SandboxConstants;
@@ -196,7 +196,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     LinkValidationStoreCallbackHandler    store_latest_version_info_;
     HashMap<String,Pair<Integer,Integer>> webapp_asset_count_info_;
 
-    AuthenticationComponent     auth_component_;
+    AuthenticationContext     authenticationContext;
 
     int local_connect_timeout_  = 10000;
     int remote_connect_timeout_ = 10000;
@@ -236,9 +236,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     public LinkValidationServiceImpl() { }
 
 
-    public void setAuthenticationComponent( AuthenticationComponent auth_component)
+    public void setAuthenticationContext( AuthenticationContext authenticationContext)
     { 
-        auth_component_ = auth_component;
+        authenticationContext = authenticationContext;
     }
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
@@ -517,7 +517,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         try                                                 // The validator
         {                                                   // must have auth to
-            auth_component_.setSystemUserAsCurrentUser();   // look see all, so
+            authenticationContext.setSystemUserAsCurrentUser();   // look see all, so
         }                                                   // run as system.
         catch (Exception e)
         {
