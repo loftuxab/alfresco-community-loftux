@@ -41,9 +41,6 @@
    {
       Alfresco.ConsoleTemplate.superclass.constructor.call(this);
       
-      /* Decoupled event listeners */
-      YAHOO.Bubbling.on("toolChanged", this.onToolChanged, this);
-      
       return this;
    };
 

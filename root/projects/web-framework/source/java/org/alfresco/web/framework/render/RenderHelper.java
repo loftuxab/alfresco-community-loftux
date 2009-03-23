@@ -311,6 +311,13 @@ public class RenderHelper
             renderable = component.getComponentType(context);
         }
         
+        // catch issues where the URL etc. have not been defined
+        if (renderable == null)
+        {
+            throw new RendererExecutionException("Cannot resolve component URL - may be missing from the definition: " +
+                    component.toString());
+        }
+        
         // get the processor
         Processor processor = RenderHelper.getProcessor(renderable);
         if (processor != null)
