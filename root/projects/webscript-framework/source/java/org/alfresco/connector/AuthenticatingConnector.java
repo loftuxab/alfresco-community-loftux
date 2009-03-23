@@ -118,11 +118,11 @@ public class AuthenticatingConnector implements Connector
             
             // now that we've authenticated, try again
             response = this.connector.call(uri);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Received " + response.getStatus().getCode() + " on " +
+                        (firstcall ? "first" : "second") + " call to: " + uri);
         }
-        
-        if (logger.isDebugEnabled())
-            logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }
@@ -162,12 +162,12 @@ public class AuthenticatingConnector implements Connector
             
             // now that we've authenticated, try again
             response = this.connector.call(uri, context);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Received " + response.getStatus().getCode() + " on " +
+                        (firstcall ? "first" : "second") + " call to: " + uri);
         }
 
-        if (logger.isDebugEnabled())
-            logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (firstcall ? "first " : "second") + "call to: " + uri);
-        
         return response;        
     }
 
@@ -206,11 +206,11 @@ public class AuthenticatingConnector implements Connector
 
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, in);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Received " + response.getStatus().getCode() + " on " +
+                        (firstcall ? "first" : "second") + " call to: " + uri);
         }
-        
-        if (logger.isDebugEnabled())
-            logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }
@@ -250,11 +250,11 @@ public class AuthenticatingConnector implements Connector
             
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, in, out);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Received " + response.getStatus().getCode() + " on " +
+                        (firstcall ? "first" : "second") + " call to: " + uri);
         }
-        
-        if (logger.isDebugEnabled())
-            logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }
@@ -294,11 +294,11 @@ public class AuthenticatingConnector implements Connector
             
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, req, res);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Received " + response.getStatus().getCode() + " on " +
+                        (firstcall ? "first" : "second") + " call to: " + uri);
         }
-        
-        if (logger.isDebugEnabled())
-            logger.debug("Received " + response.getStatus().getCode() + " on " +
-                    (firstcall ? "first " : "second") + "call to: " + uri);
         
         return response;
     }

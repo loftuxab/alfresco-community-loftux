@@ -49,6 +49,7 @@ import org.alfresco.web.framework.render.RenderHelper;
 import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.framework.render.bean.DefaultRenderContext;
 import org.alfresco.web.framework.resource.ResourceContent;
+import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
@@ -57,6 +58,8 @@ import org.alfresco.web.site.UserFactory;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestDispatchException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -73,7 +76,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class DispatcherServlet extends BaseServlet
 {
-    private static final String ALF_REDIRECT_URL = "alfRedirectUrl";
+    private static Log logger = LogFactory.getLog(DispatcherServlet.class);
+    
+    private static final String ALF_REDIRECT_URL   = "alfRedirectUrl";
     private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
     
     /**
@@ -110,6 +115,13 @@ public class DispatcherServlet extends BaseServlet
             Timer.start(request, "service");
         }
         
+        if (logger.isDebugEnabled())
+        {
+            String qs = request.getQueryString();
+            logger.debug("Processing URL: ("  + request.getMethod() + ") " + request.getRequestURI() + 
+                  ((qs != null && qs.length() != 0) ? ("?" + qs) : ""));
+        }
+        
         // apply language from browser locale setting
         setLanguageFromRequestHeader(request);
         
@@ -130,12 +142,8 @@ public class DispatcherServlet extends BaseServlet
             throw new ServletException(ex);
         }
         
-        if (isDebugEnabled())
-        {
-            String qs = request.getQueryString();
-            debug(context, "Processing URL: ("  + request.getMethod() + ") " + request.getRequestURI() + 
-                  ((qs != null && qs.length() != 0) ? ("?" + qs) : ""));
-        }
+        if (logger.isDebugEnabled())
+            debug(context, "Context created for request: " + request.getRequestURI());
         
         // stamp any theme information onto the request
         ThemeUtil.applyTheme(context, request);
@@ -182,7 +190,7 @@ public class DispatcherServlet extends BaseServlet
             
             errorOccured = true;
             
-            FrameworkHelper.getLogger().error(t);
+            logger.error(t);
             
             // for now, we will throw back to servlet container
             if (t instanceof RuntimeException)
@@ -254,6 +262,12 @@ public class DispatcherServlet extends BaseServlet
                 case admin:
                 {
                     login = (user == null || !user.isAdmin());
+                    if (login)
+                    {
+                        // special case for admin - need to clear user context before
+                        // we can login again to "upgrade" our user authentication level
+                        AuthenticationUtil.clearUserContext(request);
+                    }
                     break;
                 }
             }
@@ -313,7 +327,7 @@ public class DispatcherServlet extends BaseServlet
             }
         }
         
-        if (isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
             debug(context, "Current Page ID: " + pageId);
             debug(context, "Current Format ID: " + formatId);
@@ -323,7 +337,7 @@ public class DispatcherServlet extends BaseServlet
         // if at this point there really is nothing to view...
         if (page == null && objectId == null)
         {
-            if (isDebugEnabled())
+            if (logger.isDebugEnabled())
                 debug(context, "No Page or Object determined");
             
             // Go to the getting started page
@@ -343,7 +357,7 @@ public class DispatcherServlet extends BaseServlet
             // if we have a page specified, then we'll go there
             if (pageId != null)
             {
-                if (isDebugEnabled())
+                if (logger.isDebugEnabled())
                     debug(context, "Dispatching to Page: " + pageId);
                 
                 // if there happens to be a content item specified as well,
@@ -357,7 +371,7 @@ public class DispatcherServlet extends BaseServlet
             else
             {
                 // otherwise, a page wasn't specified and a content item was
-                if (isDebugEnabled())
+                if (logger.isDebugEnabled())
                     debug(context, "Dispatching to Content Object: " + objectId);
                 
                 dispatchContent(context, objectId, formatId);
@@ -399,7 +413,7 @@ public class DispatcherServlet extends BaseServlet
         {        
             // otherwise, we dispatch to the associated content template
             String sourceId = content.getTypeId();
-            if (isDebugEnabled())
+            if (logger.isDebugEnabled())
                 debug(context, "Content - Object Source Id: " + sourceId);
             
             // Look up which template to use to display this content
@@ -411,7 +425,7 @@ public class DispatcherServlet extends BaseServlet
                 TemplateInstance templateInstance = association.getTemplate(context);
                 if (templateInstance != null)
                 {
-                    if (isDebugEnabled())
+                    if (logger.isDebugEnabled())
                         debug(context, "Content - Dispatching to Template Instance: " + templateInstance.getId());
     
                     // set the current template
@@ -466,20 +480,20 @@ public class DispatcherServlet extends BaseServlet
     {
         Page page = context.getPage();
         
-        if (isDebugEnabled())
+        if (logger.isDebugEnabled())
             debug(context, "Template ID: " + page.getTemplateId());
         
         TemplateInstance currentTemplate = page.getTemplate(context);
         if (currentTemplate != null)
         {
-            if (isDebugEnabled())
+            if (logger.isDebugEnabled())
                 debug(context, "Rendering Page with template: " + currentTemplate.getId());
             
                PresentationUtil.renderPage(context, RenderFocus.BODY);
         }
         else
         {
-            if (isDebugEnabled())
+            if (logger.isDebugEnabled())
                 debug(context, "Unable to render Page - template was not found");
             
             try
@@ -494,13 +508,8 @@ public class DispatcherServlet extends BaseServlet
         }
     }
     
-    protected static boolean isDebugEnabled()
-    {
-        return FrameworkHelper.getLogger().isDebugEnabled();
-    }
-    
     protected static void debug(RequestContext context, String value)
     {
-        FrameworkHelper.getLogger().debug("[" + context.getId() + "] " + value);
+        logger.debug("[" + context.getId() + "] " + value);
     }
 }
