@@ -81,6 +81,12 @@ public class AuthenticationUtil
         }
     }
     
+    public static void clearUserContext(HttpServletRequest request)
+    {
+        request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+        request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+    }
+    
     public static boolean isAuthenticated(HttpServletRequest request)
     {
         // get user id from the session
