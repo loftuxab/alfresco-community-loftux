@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Admin Console</title>
+   <title-id>page.adminConsole.title</title-id>
+   <description>Administration and Management Console</description>
+   <description-id>page.adminConsole.description</description-id>
+   <template-instance>console</template-instance>
+   <authentication>admin</authentication>
+</page>
