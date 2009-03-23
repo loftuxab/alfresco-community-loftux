@@ -72,7 +72,7 @@ public class HierarchicalResourceLoaderTest extends TestCase
         // Now blow up a bit
         try
         {
-            getLoader(Collection.class, Object.class);
+            getLoader(Collection.class, Object.class).getResource("abc");
             fail("Failed to detect incompatible class hierarchy");
         }
         catch (RuntimeException e)
@@ -81,7 +81,7 @@ public class HierarchicalResourceLoaderTest extends TestCase
         }
         try
         {
-            getLoader(ArrayList.class, AbstractCollection.class);
+            getLoader(ArrayList.class, AbstractCollection.class).getResource("abc");
             fail("Failed to detect incompatible class hierarchy");
         }
         catch (RuntimeException e)
