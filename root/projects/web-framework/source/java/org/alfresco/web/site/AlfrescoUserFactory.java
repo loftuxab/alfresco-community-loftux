@@ -79,6 +79,7 @@ public class AlfrescoUserFactory extends UserFactory
     public static final String CM_LASTNAME = "{http://www.alfresco.org/model/content/1.0}lastName";
     public static final String CM_FIRSTNAME = "{http://www.alfresco.org/model/content/1.0}firstName";
     public static final String CM_USERNAME = "{http://www.alfresco.org/model/content/1.0}userName";
+    private static final String ISADMIN = "isAdmin";
     
     public static final String ALFRESCO_ENDPOINT_ID = "alfresco";
 
@@ -166,7 +167,8 @@ public class AlfrescoUserFactory extends UserFactory
             
             // Construct the Alfresco User object based on the cm:person properties
             // ensure we have the correct username case
-            user = constructUser(properties.getString(CM_USERNAME));
+            user = constructUser(properties.getString(CM_USERNAME),
+                    properties.has(ISADMIN) && Boolean.parseBoolean(properties.getString(ISADMIN)));
             user.setFirstName(properties.getString(CM_FIRSTNAME));
             user.setLastName(properties.getString(CM_LASTNAME));
             if (properties.has(CM_JOBTITLE))
@@ -258,8 +260,8 @@ public class AlfrescoUserFactory extends UserFactory
      * 
      * @return the AlfrescoUser object
      */
-    protected AlfrescoUser constructUser(String userId)
+    protected AlfrescoUser constructUser(String userId, boolean isAdmin)
     {
-        return new AlfrescoUser(userId);
+        return new AlfrescoUser(userId, isAdmin);
     }
 }

@@ -31,12 +31,14 @@ import java.util.Map;
 /**
  * Script / Template Model representing Web Script URLs
  * 
+ * This class is immutable.
+ * 
  * @author davidc
  */
-public class URLModel
+public final class URLModel
 {
-    private static Map<String, String> emptyArgs = Collections.emptyMap();
-    private WebScriptRequest req;
+    private final static Map<String, String> emptyArgs = Collections.emptyMap();
+    private final WebScriptRequest req;
     
     /**
      * Construct
@@ -172,5 +174,4 @@ public class URLModel
         Map<String, String> args = req.getServiceMatch().getTemplateVars();
         return (args == null) ? emptyArgs : args;
     }
-    
 }

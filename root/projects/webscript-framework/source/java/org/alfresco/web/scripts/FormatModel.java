@@ -28,12 +28,14 @@ package org.alfresco.web.scripts;
 /**
  * Format Model
  * 
+ * This class is immutable.
+ * 
  * @author davidc
  */
-public class FormatModel
+public final class FormatModel
 {
-    private FormatRegistry registry;
-    private String format;
+    private final FormatRegistry registry;
+    private final String format;
 
 
     /**
@@ -68,5 +70,4 @@ public class FormatModel
         String type = registry.getMimeType(null, format);
         return (type == null) ? "" : type;
     }
-    
 }
