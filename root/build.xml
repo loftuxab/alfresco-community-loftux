@@ -991,7 +991,23 @@
       </java>
    </target>
 
-
+   <target name="run-forms-engine-tests" depends="init, test-webframeworkcommons">
+      <!-- run FormService test -->
+      <antcall target="run-junit-test">
+         <param name="testcase" value="org.alfresco.repo.forms.FormServiceImplTest" />
+         <param name="projectdir" value="${dir.project.repository}" />
+      </antcall>
+      
+      <!-- run REST API tests -->
+      <antcall target="run-junit-test">
+         <param name="testcase" value="org.alfresco.repo.web.scripts.forms.FormRestApiGet_Test" />
+         <param name="projectdir" value="${dir.project.remoteapi}" />
+      </antcall>
+      <antcall target="run-junit-test">
+         <param name="testcase" value="org.alfresco.repo.web.scripts.forms.FormRestApiJsonPost_Test" />
+         <param name="projectdir" value="${dir.project.remoteapi}" />
+      </antcall>
+   </target>
 
    <!-- ****************************************************** -->
    <!-- ******************** Debug targets ******************* -->
