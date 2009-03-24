@@ -35,6 +35,10 @@
       </#if>
 
       <div class="util-menu" id="${args.htmlid}-searchcontainer">
+         <#if user.isAdmin>
+         <span class="menu-item"><a href="${url.context}/page/console/admin-console/">${msg("link.console")}</a></span>
+         <span class="menu-item-separator">&nbsp;</span>
+         </#if>
          <span class="menu-item"><a href="${helpLink}" rel="_blank">${msg("link.help")}</a></span>
          <#if !isGuest>
          <span class="menu-item-separator">&nbsp;</span>

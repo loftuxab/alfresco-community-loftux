@@ -13,13 +13,13 @@
    
    <div id="bd">
    	<div class="yui-t1" id="divConsoleWrapper">
-   		<div class="yui-b" id="divConsoleTools">
-   			<@region id="tools" scope="template" protected=true />
-   		</div>
    		<div id="yui-main">
    			<div class="yui-b" id="divConsoleMain">
    				<@region id="tool" scope="page" protected=true />
    			</div>
+   		</div>
+   		<div class="yui-b" id="divConsoleTools">
+   			<@region id="tools" scope="template" protected=true />
    		</div>
    	</div>
    </div>	

@@ -20,7 +20,7 @@
    
    <div class="search-controls theme-bg-color-3">
       <input id="${args.htmlid}-term" type="text" class="search-term" />
-      <input id="${args.htmlid}-button" type="button" value="${msg("site-members.search-button")}" />
+      <input id="${args.htmlid}-button" type="button" value="${msg("button.search")}" />
    </div>
    
    <#-- this div contains the site members results -->
