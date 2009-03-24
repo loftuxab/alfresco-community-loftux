@@ -291,6 +291,11 @@ public final class ScriptUser extends ScriptBase
     {
         this.user.setCompanyAddress3(value);
     }
+    
+    public boolean getIsAdmin()
+    {
+        return this.user.isAdmin();
+    }
         
     /**
      * Persist user changes

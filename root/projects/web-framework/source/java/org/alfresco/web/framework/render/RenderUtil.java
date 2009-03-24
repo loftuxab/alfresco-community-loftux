@@ -891,52 +891,34 @@ public final class RenderUtil
             return "";
         }
         
-        String headTags = (String) parentContext.getValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, RenderContext.SCOPE_REQUEST);
-        if (headTags == null)
+        String headTags = null;
+        
+        // produce a new render context
+        RenderContext context = RenderHelper.provideRenderContext(parentContext);
+        try
         {
-            // produce a new render context
-            RenderContext context = RenderHelper.provideRenderContext(parentContext);
-            try
-            {
-                // start a timer
-                if (Timer.isTimerEnabled())
-                    Timer.start(parentContext, "RenderTemplateHeaderAsString");
-
-                // start building the buffer
-                StringBuilder buf = new StringBuilder(2048);
-                buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
-                buf.append(NEWLINE);
-                
-                // wrap so that we can capture output
-                context = RenderHelper.wrapRenderContext(context);
-                
-                // get the 'template' renderer bean
-                // execute the renderer for 'header'
-                Renderer renderer = RenderHelper.getRenderer(RendererType.TEMPLATE);
-                renderer.header(context);
-                    
-                // get head tags from captured output
-                headTags = ((WrappedRenderContext)context).getContentAsString();
-                    
-                // build buffer
-                buf.append(headTags);
-                buf.append(NEWLINE);
-                buf.append(NEWLINE);
-            }
-            finally
-            {
-                // release the render context
-                context.release();
-    
-                if (Timer.isTimerEnabled())
-                    Timer.stop(context, "RenderTemplateHeaderAsString");
-            }
-              
-            if (headTags != null)
-            {
-                // store back                
-                context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);                                
-            }
+            // start a timer
+            if (Timer.isTimerEnabled())
+                Timer.start(parentContext, "RenderTemplateHeaderAsString");
+            
+            // wrap so that we can capture output
+            context = RenderHelper.wrapRenderContext(context);
+            
+            // get the 'template' renderer bean
+            // execute the renderer for 'header'
+            Renderer renderer = RenderHelper.getRenderer(RendererType.TEMPLATE);
+            renderer.header(context);
+            
+            // get head tags from captured output
+            headTags = ((WrappedRenderContext)context).getContentAsString();
+        }
+        finally
+        {
+            // release the render context
+            context.release();
+            
+            if (Timer.isTimerEnabled())
+                Timer.stop(context, "RenderTemplateHeaderAsString");
         }
         
         if (headTags == null)
@@ -946,6 +928,7 @@ public final class RenderUtil
         
         return headTags;
     }
+    
     
     /** Mask for hex encoding. */
     private static final int MASK = (1 << 4) - 1;

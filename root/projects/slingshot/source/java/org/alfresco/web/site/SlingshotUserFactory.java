@@ -69,7 +69,7 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
     @Override
     protected AlfrescoUser constructUser(String userId, boolean isAdmin)
     {
-        return super.constructUser(userId, isAdmin);
+        return new SlingshotUser(userId, isAdmin);
     }
 
     /**

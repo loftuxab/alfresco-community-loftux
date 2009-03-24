@@ -48,7 +48,6 @@ public class ScriptableWrappedMap implements ScriptableMap, Wrapper
     private Map map;
     private Scriptable parentScope;
     private Scriptable prototype;
-    private ScriptValueConverter valueConverter = new ScriptValueConverter();
     
     
     /**
@@ -114,7 +113,7 @@ public class ScriptableWrappedMap implements ScriptableMap, Wrapper
         }
         else
         {
-            return valueConverter.wrapValue(this.parentScope != null ? this.parentScope : start, map.get(name));
+            return ScriptValueConverter.wrapValue(this.parentScope != null ? this.parentScope : start, map.get(name));
         }
     }
 
@@ -130,7 +129,7 @@ public class ScriptableWrappedMap implements ScriptableMap, Wrapper
         {
             value = itrValues.next();
         }
-        return valueConverter.wrapValue(this.parentScope != null ? this.parentScope : start, value);
+        return ScriptValueConverter.wrapValue(this.parentScope != null ? this.parentScope : start, value);
     }
 
     /* (non-Javadoc)
@@ -156,7 +155,7 @@ public class ScriptableWrappedMap implements ScriptableMap, Wrapper
     @SuppressWarnings("unchecked")
     public void put(String name, Scriptable start, Object value)
     {
-        map.put(name, valueConverter.unwrapValue(value));
+        map.put(name, ScriptValueConverter.unwrapValue(value));
     }
 
     /* (non-Javadoc)

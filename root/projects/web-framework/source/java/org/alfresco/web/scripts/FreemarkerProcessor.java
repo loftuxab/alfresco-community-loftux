@@ -35,6 +35,7 @@ import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.render.AbstractProcessor;
 import org.alfresco.web.framework.render.ProcessorContext;
 import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderContextScope;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -177,7 +178,7 @@ public class FreemarkerProcessor extends AbstractProcessor
             
             if (context.getObject() instanceof TemplateInstance)
             {
-                if (context.hasValue(SCRIPT_RESULTS) == false)
+                if (context.hasValue(SCRIPT_RESULTS, RenderContextScope.REQUEST) == false)
                 {
                     // Attempt to execute a .js file for this page template
                     resultModel = new HashMap<String, Object>(8, 1.0f);
@@ -192,23 +193,28 @@ public class FreemarkerProcessor extends AbstractProcessor
                         scriptModel.put("model", resultModel);
                         
                         // execute the script
-                        scriptProcessor.executeScript(script, scriptModel);
+                        try
+                        {
+                            scriptProcessor.executeScript(script, scriptModel);
+                        }
+                        catch (WebScriptException we)
+                        {
+                            throw new RendererExecutionException(we);
+                        }
                     }
                     
                     // store the result model in the request context for the next pass
                     // this removes the need to execute the script twice
                     if (context.isPassiveMode())
                     {
-                        context.setValue(SCRIPT_RESULTS, (Serializable)resultModel);
+                        context.setValue(SCRIPT_RESULTS, (Serializable)resultModel, RenderContextScope.REQUEST);
                     }
                 }
                 else
                 {
-                    // retrieve results from the request context - we already executed a pass
+                    // Retrieve results from the request context - we already executed a pass.
+                    // Note that there is no need to remove the results - this context is template local.
                     resultModel = (Map<String, Object>)context.getValue(SCRIPT_RESULTS);
-                    
-                    // remove the results from the context - we do not want other templates finding it
-                    context.removeValue(SCRIPT_RESULTS);
                 }
             }
             
@@ -241,7 +247,14 @@ public class FreemarkerProcessor extends AbstractProcessor
         }
         catch (Exception ex)
         {
-            throw new RendererExecutionException("FreemarkerProcessor failed to process template: " + templateName, ex);
+            if (ex instanceof RendererExecutionException)
+            {
+                throw (RendererExecutionException)ex;
+            }
+            else
+            {
+                throw new RendererExecutionException("FreemarkerProcessor failed to process template: " + templateName, ex);
+            }
         }
     }
 }

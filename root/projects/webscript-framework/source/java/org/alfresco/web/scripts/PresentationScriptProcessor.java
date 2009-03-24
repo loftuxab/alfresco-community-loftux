@@ -60,7 +60,6 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
 
     private static final String PATH_CLASSPATH = "classpath:";
 
-    protected ScriptValueConverter valueConverter = new ScriptValueConverter();
     protected SearchPath searchPath;
     protected ScriptLoader scriptLoader;
     
@@ -291,7 +290,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
      */
     public Object unwrapValue(Object value)
     {
-        return valueConverter.unwrapValue(value);
+        return ScriptValueConverter.unwrapValue(value);
     }
 
     /* (non-Javadoc)

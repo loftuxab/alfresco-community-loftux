@@ -41,6 +41,14 @@ import org.alfresco.web.site.Timer;
  */
 public class TemplateInstanceRenderer extends AbstractRenderer
 {
+    /**
+     * Preprocess the template - with no actually output capture or component rendering - 
+     * to capture which components are bound into regions. This information can then be
+     * used to render the "head" templates up-front beforethe main template executes. 
+     * 
+     * @param parentContext
+     * @throws RendererExecutionException
+     */
     private void calculateComponentDependencies(RenderContext parentContext)
         throws RendererExecutionException
     {
@@ -73,8 +81,7 @@ public class TemplateInstanceRenderer extends AbstractRenderer
             if (Timer.isTimerEnabled())
                 Timer.stop(preContext, "TemplateInstanceRenderer1-" + template.getId());
             
-            // TODO: is this necessary?  think not
-            // switch out of passive mode
+            // switch out of passive mode, for completeness
             preContext.setPassiveMode(false);
             
             // release the render context
@@ -91,10 +98,7 @@ public class TemplateInstanceRenderer extends AbstractRenderer
         TemplateInstance template = (TemplateInstance) parentContext.getObject();
         if (template != null)
         {        
-            // FIRST PASS - calculate component dependencies
-            calculateComponentDependencies(parentContext);
-    
-            // SECOND PASS - render output of components        
+            // Render "head" output of components        
             Component component = null;
             Component[] components = parentContext.getRenderingComponents();
             if (components != null)

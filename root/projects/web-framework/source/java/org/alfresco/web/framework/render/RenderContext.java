@@ -39,10 +39,6 @@ import org.alfresco.web.site.RequestContext;
  */
 public interface RenderContext extends RequestContext 
 {
-    public final int SCOPE_ANY = 0;
-    public final int SCOPE_RENDERING = 1;
-    public final int SCOPE_REQUEST = 2;
-
     public RenderMode getRenderMode();
     public void setRenderMode(RenderMode renderMode);
 
@@ -63,8 +59,8 @@ public interface RenderContext extends RequestContext
 
     public void release();
 
-    public void setValue(String key, Serializable value, int scope);
-    public Serializable getValue(String key, int scope);
-    public void removeValue(String key, int scope);
-    public boolean hasValue(String key, int scope);    
+    public void setValue(String key, Serializable value, RenderContextScope scope);
+    public Serializable getValue(String key, RenderContextScope scope);
+    public void removeValue(String key, RenderContextScope scope);
+    public boolean hasValue(String key, RenderContextScope scope);
 }
