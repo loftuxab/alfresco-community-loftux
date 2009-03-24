@@ -79,7 +79,7 @@ public final class ScriptMessage extends AbstractMessageHelper
         
         if (id != null && id.length() != 0)
         {
-            Object params = new ScriptValueConverter().unwrapValue(args);
+            Object params = ScriptValueConverter.unwrapValue(args);
             if (params instanceof List)
             {
                 result = resolveMessage(id, ((List)params).toArray());

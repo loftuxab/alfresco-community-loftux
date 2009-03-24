@@ -212,9 +212,9 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#setValue(java.lang.String, java.io.Serializable, int)
      */
-    public void setValue(String key, Serializable value, int scope)
+    public void setValue(String key, Serializable value, RenderContextScope scope)
     {
-        if (scope == RenderContext.SCOPE_REQUEST)
+        if (scope == RenderContextScope.REQUEST)
         {
             this.getOriginalContext().setValue(key, value);
         }
@@ -227,11 +227,11 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#getValue(java.lang.String, int)
      */
-    public Serializable getValue(String key, int scope)
+    public Serializable getValue(String key, RenderContextScope scope)
     {
         Serializable value = null;
         
-        if (scope == RenderContext.SCOPE_REQUEST)
+        if (scope == RenderContextScope.REQUEST)
         {
             value = this.getOriginalContext().getValue(key);
         }
@@ -246,9 +246,9 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#removeValue(java.lang.String, int)
      */
-    public void removeValue(String key, int scope)
+    public void removeValue(String key, RenderContextScope scope)
     {
-        if (scope == RenderContext.SCOPE_REQUEST)
+        if (scope == RenderContextScope.REQUEST)
         {
             this.getOriginalContext().removeValue(key);
         }
@@ -261,11 +261,11 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.RenderContext#hasValue(java.lang.String, int)
      */
-    public boolean hasValue(String key, int scope)
+    public boolean hasValue(String key, RenderContextScope scope)
     {
         boolean has = false;
         
-        if (scope == RenderContext.SCOPE_REQUEST)
+        if (scope == RenderContextScope.REQUEST)
         {
             has = this.getOriginalContext().hasValue(key);
         }

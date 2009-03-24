@@ -133,22 +133,22 @@ final public class WrappedRenderContext
         this.renderContext.release();
     }
     
-    public void setValue(String key, Serializable value, int scope)
+    public void setValue(String key, Serializable value, RenderContextScope scope)
     {
         this.renderContext.setValue(key, value, scope);
     }
     
-    public Serializable getValue(String key, int scope)
+    public Serializable getValue(String key, RenderContextScope scope)
     {
         return this.renderContext.getValue(key, scope);
     }
     
-    public void removeValue(String key, int scope)
+    public void removeValue(String key, RenderContextScope scope)
     {
         this.renderContext.removeValue(key, scope);
     }
     
-    public boolean hasValue(String key, int scope)
+    public boolean hasValue(String key, RenderContextScope scope)
     {
         return this.renderContext.hasValue(key, scope);
     }

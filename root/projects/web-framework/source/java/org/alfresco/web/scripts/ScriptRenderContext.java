@@ -24,19 +24,21 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.Serializable;
+
 import org.alfresco.connector.User;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.framework.render.RenderContext;
+import org.alfresco.web.framework.render.RenderContextScope;
 import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.ThemeUtil;
+import org.mozilla.javascript.Context;
 
 /**
- * A read-only root-scoped Java object that wraps the Render Context 
- * and provides lightweight methods for working with the render context 
- * object.
+ * A root-scoped Java object that wraps the Render Context object.
  * 
  * @author muzquiano
  */
@@ -75,6 +77,11 @@ public final class ScriptRenderContext extends ScriptBase
         }
         
         return this.properties;
+    }
+    
+    public void setValue(String key, Object value)
+    {
+        this.renderContext.setValue(key, (Serializable)ScriptValueConverter.unwrapValue(value), RenderContextScope.REQUEST);
     }
 
     
