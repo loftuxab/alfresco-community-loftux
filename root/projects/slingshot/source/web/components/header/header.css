@@ -100,8 +100,9 @@
 
 .header div.util-menu
 {
-   float:right;
-   margin:5px 10px 0 0;
+   float: right;
+   line-height: 2.2em;
+   margin: 1px 10px 0 0;
 }
 
 .header .search-tinput

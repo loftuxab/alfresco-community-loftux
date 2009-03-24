@@ -82,9 +82,10 @@
    padding: 1em;
 }
 
-.blog-postlist .yui-dt-error .yui-dt-liner
+.blog-postlist table .yui-dt-empty .yui-dt-liner,
+.blog-postlist table .yui-dt-error .yui-dt-liner
 {
-   padding: 4px;
+   padding: 4px 10px;
 }
 
 
