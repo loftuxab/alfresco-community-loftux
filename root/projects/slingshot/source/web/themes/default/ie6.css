@@ -13,7 +13,6 @@ textarea
 {
    margin-bottom: -1px;
    margin-right: -3px;
-   /*padding-bottom: 10px;*/
 }
 
 .header .menu-wrapper
@@ -25,9 +24,15 @@ textarea
 
 .header .personal-menu
 {
-   height:18px;
+   height: 18px;
    padding-top: 6px;
    padding-bottom: 6px;
+}
+
+.header div.util-menu
+{
+   margin-top: 4px;
+   padding-top: 1px;
 }
 
 .header .link-menu-button

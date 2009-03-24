@@ -101,9 +101,10 @@
    background-color: transparent;
 }
 
-.topiclist table .yui-dt-liner
+.topiclist table .yui-dt-empty .yui-dt-liner,
+.topiclist table .yui-dt-error .yui-dt-liner
 {
-   padding: 0px;
+   padding: 4px 10px;
 }
 
 .topiclist .yui-dt-error

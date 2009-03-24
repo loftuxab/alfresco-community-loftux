@@ -15,8 +15,9 @@ textarea
    padding-top: 6px;
 }
 
-.header .util-menu
+.header div.util-menu
 {
+   margin-top: 4px;
    padding-top: 1px;
 }
 
