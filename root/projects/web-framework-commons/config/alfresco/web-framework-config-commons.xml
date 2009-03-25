@@ -53,6 +53,7 @@
             <show id="cm:title" />
             <show id="cm:description" />
             <show id="mimetype" />
+            <show id="cm:author" />
             <show id="size" for-mode="view" />
             <show id="cm:creator" for-mode="view" />
             <show id="cm:created" for-mode="view" />
@@ -76,7 +77,7 @@
          <field-visibility>
             <show id="cm:name" />
             <show id="cm:title" />
-            <hide id="cm:description" />
+            <show id="cm:description" />
          </field-visibility>
       </form>
    </config>
