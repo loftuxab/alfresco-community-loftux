@@ -77,6 +77,7 @@
                     distribute-installers,
                     distribute-docs,
                     distribute-enterprise-examples,
+                    distribute-xforms-examples,
                     revert-changes" />
 
    <target name="set-build-number"
@@ -735,6 +736,20 @@
            longfile="gnu" 
            compression="gzip">
          <tarfileset dir="${dir.continuous.assemble.extension-samples}" />
+      </tar>
+   </target>
+   
+   <target name="distribute-xforms-examples" depends="continuous-init"
+           description="Creates an archive of all XForms samples and tests">
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.xforms-examples}.zip">
+         <zipfileset dir="${dir.project.webclient.xforms.examples}" excludes="unit-tests/**" />
+      </zip>
+      <tar destfile="${dir.continuous.dist}/${file.name.dist.xforms-examples}.tar.gz" 
+           longfile="gnu" 
+           compression="gzip">
+         <tarfileset dir="${dir.project.webclient.xforms.examples}" excludes="unit-tests/**" />
       </tar>
    </target>
 
