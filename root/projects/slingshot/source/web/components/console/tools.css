@@ -13,15 +13,6 @@
    background-color: #d2e5f2;
 }
 
-.tool a.disabled,
-.tool a.disabled:active,
-.tool a.disabled:hover,
-.tool a.disabled:visited
-{
-   color: #a6a6a6;
-   cursor: not-allowed;
-}
-
 .tool a:hover
 {
    text-decoration: none;
@@ -35,11 +26,6 @@
 .tool ul.toolLink .first-link
 {
 	position: relative;
-}
-
-.tools-link
-{
-   
 }
 
 .tools-link h2
