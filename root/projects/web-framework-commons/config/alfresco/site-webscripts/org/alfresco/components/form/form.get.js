@@ -282,7 +282,7 @@ function setupField(formModel, fieldName, fieldConfig)
       {
          logger.warn("\"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
       }
-      createTransientField(fieldName, "controls/ambiguous.ftl", null);
+      createTransientField(fieldName, { template: "controls/ambiguous.ftl" });
    }
    else
    {
@@ -318,26 +318,30 @@ function setupField(formModel, fieldName, fieldConfig)
          fieldDef.name = name.replace(/:/g, "_");
          fieldDef.id = fieldDef.name;
          
-         // setup appearance of field i.e. the control, label etc.
-         setupAppearance(fieldDef, fieldConfig);
+         // setup the state of the field i.e. if it's active or disabled
+         setupFieldState(fieldDef, fieldConfig);
+   
+         // setup the control for the field
+         setupFieldControl(fieldDef, fieldConfig);
+   
+         // setup text for the field i.e. the label, description & help
+         setupFieldText(fieldDef, fieldConfig);
          
          // setup constraints for the field
-         setupConstraints(fieldDef, fieldConfig);
+         setupFieldConstraints(fieldDef, fieldConfig);
          
-         // set the value for the field
-         fieldDef.value = "";
-         if (typeof formModel.data.formData[fieldDef.name] !== "undefined")
-         {
-            fieldDef.value = formModel.data.formData[fieldDef.name];
-         }
+         // setup the value for the field
+         setupFieldValue(formModel, fieldDef, fieldConfig);
       }
       else
       {
-         // the field does not have a definition but may be a 'transient' field so
-         // check for some configuration, in particular a template
-         fieldDef = setupTransientField(fieldName, fieldConfig);
-         
-         if (fieldDef === null && logger.isWarnLoggingEnabled())
+         // the field does not have a definition but may be a 'transient' field
+         // if there is at least a control template create a transient field
+         if (fieldConfig !== null && fieldConfig.template !== null)
+         {
+            fieldDef = createTransientField(fieldName, fieldConfig);
+         }
+         else if (logger.isWarnLoggingEnabled())
          {
             logger.warn("Ignoring field \"" + fieldName + "\" as a field definition or configuration could not be located");
          }
@@ -348,70 +352,22 @@ function setupField(formModel, fieldName, fieldConfig)
 }
 
 /**
- * Sets up the appearance of the field.
+ * Sets up the state of the field i.e. whether it's active or disabled.
  *
- * @method setupAppearance
+ * @method setupFieldState
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
  *                    or null if there isn't any configuration
  */
-function setupAppearance(fieldDef, fieldConfig)
+function setupFieldState(fieldDef, fieldConfig)
 {
-   // setup the control object
-   setupControl(fieldDef, fieldConfig);
-   
-   // setup textual properties
-   if (fieldConfig !== null)
-   {
-      var configLabel = null;
-      if (fieldConfig.labelId !== null)
-      {
-         configLabel = msg.get(fieldConfig.labelId);
-      }
-      else if (fieldConfig.label !== null)
-      {
-         configLabel = fieldConfig.label;
-      }
-      if (configLabel !== null)
-      {
-         fieldDef.label = configLabel;
-      }
-
-      var configDesc = null;
-      if (fieldConfig.descriptionId !== null)
-      {
-         configDesc = msg.get(fieldConfig.descriptionId);
-      }
-      else if (fieldConfig.description !== null)
-      {
-         configDesc = fieldConfig.description;
-      }
-      if (configDesc !== null)
-      {
-         fieldDef.description = configDesc;
-      }
-      
-      var configHelp = null;
-      if (fieldConfig.helpTextId !== null)
-      {
-         configHelp = msg.get(fieldConfig.helpTextId);
-      }
-      else if (fieldConfig.helpText !== null)
-      {
-         configHelp = fieldConfig.helpText;
-      }
-      if (configHelp !== null)
-      {
-         fieldDef.help = configHelp;
-      }
-   }
-   
    // configure read-only state (and remove protectedField property)
    var disabled = fieldDef.protectedField;
    if (!fieldDef.protectedField && fieldConfig !== null && fieldConfig.readOnly)
    {
       disabled = true;
    }
+   
    fieldDef.disabled = disabled;
    delete fieldDef.protectedField;
 }
@@ -419,12 +375,12 @@ function setupAppearance(fieldDef, fieldConfig)
 /**
  * Sets up the control for the field.
  *
- * @method setupControl
+ * @method setupFieldControl
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
  *                    or null if there isn't any configuration
  */
-function setupControl(fieldDef, fieldConfig)
+function setupFieldControl(fieldDef, fieldConfig)
 {
    // construct the control object for the field
    var control = {};
@@ -500,19 +456,85 @@ function setupControl(fieldDef, fieldConfig)
 }
 
 /**
- * Sets up the constraints for the field, if it has any
+ * Sets up the textual aspects of the field i.e. the label, 
+ * description and help text
  *
- * @method setupConstraints
+ * @method setupFieldText
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
  *                    or null if there isn't any configuration
  */
-function setupConstraints(fieldDef, fieldConfig)
+function setupFieldText(fieldDef, fieldConfig)
+{
+   if (fieldConfig !== null)
+   {
+      // process label
+      var configLabel = null;
+      
+      if (fieldConfig.labelId !== null)
+      {
+         configLabel = msg.get(fieldConfig.labelId);
+      }
+      else if (fieldConfig.label !== null)
+      {
+         configLabel = fieldConfig.label;
+      }
+      
+      if (configLabel !== null)
+      {
+         fieldDef.label = configLabel;
+      }
+
+      // process description
+      var configDesc = null;
+      
+      if (fieldConfig.descriptionId !== null)
+      {
+         configDesc = msg.get(fieldConfig.descriptionId);
+      }
+      else if (fieldConfig.description !== null)
+      {
+         configDesc = fieldConfig.description;
+      }
+      
+      if (configDesc !== null)
+      {
+         fieldDef.description = configDesc;
+      }
+      
+      // process help
+      var configHelp = null;
+      
+      if (fieldConfig.helpTextId !== null)
+      {
+         configHelp = msg.get(fieldConfig.helpTextId);
+      }
+      else if (fieldConfig.helpText !== null)
+      {
+         configHelp = fieldConfig.helpText;
+      }
+      
+      if (configHelp !== null)
+      {
+         fieldDef.help = configHelp;
+      }
+   }
+}
+
+/**
+ * Sets up the constraints for the field, if it has any
+ *
+ * @method setupFieldConstraints
+ * @param fieldDef Object representing the field definition 
+ * @param fieldConfig Object representing the UI configuration
+ *                    or null if there isn't any configuration
+ */
+function setupFieldConstraints(fieldDef, fieldConfig)
 {
    // setup mandatory constraint if field is marked as such
    if (fieldDef.mandatory && fieldDef.disabled == false)
    {
-      var constraint = buildConstraint("MANDATORY", {}, fieldDef, fieldConfig);
+      var constraint = createFieldConstraint("MANDATORY", {}, fieldDef, fieldConfig);
       
       if (constraint !== null)
       {
@@ -525,7 +547,7 @@ function setupConstraints(fieldDef, fieldConfig)
    if (fieldDef.dataType === "d:int" || fieldDef.dataType === "d:long" || 
        fieldDef.dataType === "d:double" || fieldDef.dataType === "d:float" )
    {
-      var constraint = buildConstraint("NUMBER", {}, fieldDef, fieldConfig);
+      var constraint = createFieldConstraint("NUMBER", {}, fieldDef, fieldConfig);
       
       if (constraint !== null)
       {
@@ -540,7 +562,7 @@ function setupConstraints(fieldDef, fieldConfig)
       for (var c = 0; c < fieldDef.constraints.length; c++)
       {
          var obj = fieldDef.constraints[c];
-         var constraint = buildConstraint(obj.type, obj.params, fieldDef, fieldConfig);
+         var constraint = createFieldConstraint(obj.type, obj.params, fieldDef, fieldConfig);
       
          if (constraint !== null)
          {
@@ -558,7 +580,7 @@ function setupConstraints(fieldDef, fieldConfig)
  * Creates an object representing the constraint with the given
  * id for the given field definition and configuration
  *
- * @method setupConstraints
+ * @method createFieldConstraint
  * @param constraintId The contstraint identifier, for example "REGEX"
  * @param constraintParams Object representing parameters to pass to the client side handler
  * @param fieldDef Object representing the field definition 
@@ -567,7 +589,7 @@ function setupConstraints(fieldDef, fieldConfig)
  * @return An object representing the constraint or null if it could
  *         not be constructed
  */
-function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
+function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
 {
    var constraint = null;
    
@@ -644,63 +666,74 @@ function buildConstraint(constraintId, constraintParams, fieldDef, fieldConfig)
 }
 
 /**
- * Sets up a transient field if the given fieldName has some
- * configuration including a control template to use.
+ * Sets up the value of the field.
  *
- * @method setupTransientField
- * @param fieldName The name of the field to setup
- * @param fieldConfig Object representing the UI configuration 
- *                    or null if there isn't any configuration 
- * @return Object representing the transient field 
+ * @method setupFieldValue
+ * @param formModel The form model returned from the server
+ * @param fieldDef Object representing the field definition 
+ * @param fieldConfig Object representing the UI configuration
+ *                    or null if there isn't any configuration
  */
-function setupTransientField(fieldName, fieldConfig)
+function setupFieldValue(formModel, fieldDef, fieldConfig)
 {
-   var fieldDef = null;
+   fieldDef.value = "";
    
-   // ensure the config has defined a control template to use
-   if (fieldConfig !== null && fieldConfig.template !== null)
+   if (typeof formModel.data.formData[fieldDef.name] !== "undefined")
    {
-      var params = {};
-      
-      var paramsConfig = fieldConfig.controlParams;
-      for (var p = 0; p < paramsConfig.size(); p++)
-      {
-         params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
-      }
-      
-      fieldDef = createTransientField(fieldName, fieldConfig.template, params);
+      fieldDef.value = formModel.data.formData[fieldDef.name];
    }
-   
-   return fieldDef;
 }
 
 /**
- * Creates a transient field that represents a field to display that
- * does not have a corresponding field definition.
+ * Creates a transient field that represents a field to display
+ * that does not have a corresponding field definition.
  *
  * @method createTransientField
  * @param fieldName The name of the transient field as defined in the configuration
- * @param controlTemplate The template to use for the control
- * @param controlParams An object representing the parameters for the control, can be null
- * @return Object representing the transient field
+ * @param fieldConfig Object representing the UI configuration of the field, 
+          MUST not be null and MUST define at least a control template.
+ * @return Object representing the transient field or null if it could not be created
  */
-function createTransientField(fieldName, controlTemplate, controlParams)
+function createTransientField(fieldName, fieldConfig)
 {
+   // we can't continue without at least a control template
+   if (fieldConfig === null || fieldConfig.template === null)
+   {
+      return null;
+   }
+   
    var fieldDef = {};
    
+   // apply defaults for transient field
    fieldDef.kind = "field";
    fieldDef.configName = fieldName;
    // force the name to convert to a JavaScript string so replace method can be used
    var name = "" + fieldName;
    fieldDef.name = name.replace(/:/g, "_");
    fieldDef.id = fieldDef.name;
-   fieldDef.control = {};
-   fieldDef.control.template = controlTemplate;
+   fieldDef.label = fieldName;
+   fieldDef.value = "";
+   fieldDef.transitory = true;
+   fieldDef.mandatory = false;
+   fieldDef.disabled = false;
    
-   if (typeof controlParams !== "undefined" && controlParams !== null)
+   // setup control
+   fieldDef.control = {};
+   fieldDef.control.template = fieldConfig.template;
+   
+   var params = {};
+   if (typeof fieldConfig.controlParams !== "undefined")
    {
-      fieldDef.control.params = controlParams;
+      var paramsConfig = fieldConfig.controlParams;
+      for (var p = 0; p < paramsConfig.size(); p++)
+      {
+         params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
+      }
    }
+   fieldDef.control.params = params;
+   
+   // apply any configured text
+   setupFieldText(fieldDef, fieldConfig);
    
    return fieldDef;
 }
