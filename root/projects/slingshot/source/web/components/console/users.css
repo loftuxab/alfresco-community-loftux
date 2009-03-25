@@ -1,0 +1,68 @@
+.users
+{
+   color: #000;
+   margin: 16px 10px 10px;
+}
+
+.users .title
+{
+   font-size: 123.1%;
+   font-weight: bold;
+   color: #515D6B;
+   padding-bottom: 0.5em;
+}
+
+.yui-t1 #yui-main .yui-b
+{
+   margin-left: 0em;
+}
+
+.users .align-right
+{
+   text-align: right;
+}
+
+.users .list
+{
+   margin-bottom: 10px;
+}
+
+.users .search-bar
+{
+   margin-top: 0.8em;
+   padding: 0.4em;
+}
+
+.users .search-button
+{
+   margin-top: -2.0em;
+   padding-left: 16em;
+}
+
+.users .search-text input
+{
+}
+
+.users .results table
+{
+   width: 100%;
+   border: none;
+}
+
+.users .yui-dt td
+{
+   border-bottom: 1px dashed #D7D7D7;
+   border-right: medium none;
+}
+
+.users .yui-dt-last td
+{
+   border-bottom: medium none;
+}
+
+.users tr.yui-dt-odd,
+.users tr.yui-dt-even
+{
+   background-color: #ffffff;
+   cursor: auto;
+}
