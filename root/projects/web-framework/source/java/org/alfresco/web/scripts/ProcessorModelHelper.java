@@ -132,7 +132,7 @@ public final class ProcessorModelHelper
             {
                 pageModel.put(MODEL_URL, urlHelper);
             }
-
+            
             pageModel.put(MODEL_ID, page.getId());
             pageModel.put(MODEL_TITLE, page.getTitle());
             pageModel.put(MODEL_TITLE_ID, page.getTitleId());
@@ -188,7 +188,7 @@ public final class ProcessorModelHelper
             }            
         }
         
-        // things from the current template
+        // objects relevant to the current template
         // use ${template.properties["abc"]}
         if (context.getTemplate() != null)
         {
@@ -207,6 +207,20 @@ public final class ProcessorModelHelper
             
             model.put(MODEL_TEMPLATE, templateModel);
         }
+        
+        // if we're rendering a component, then provide a "form" object
+        if (context.getObject() instanceof Component)
+        {
+            // add form
+            ScriptForm form = new ScriptForm(context);
+            model.put(MODEL_FORM, form);
+            
+            if ("POST".equalsIgnoreCase(context.getRequestMethod()))
+            {
+                ScriptFormData formData = new ScriptFormData(context);
+                model.put(MODEL_FORMDATA, formData);
+            }
+        }  
         
         // the global app theme
         model.put(MODEL_THEME, context.getThemeId());
@@ -232,45 +246,27 @@ public final class ProcessorModelHelper
         ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(context);
         model.put(MODEL_INSTANCE, scriptRenderer);
         
-        // add in the application reference
-        // TODO: can we share an instance of this?
+        // add in the web application reference
         ScriptWebApplication scriptWebApplication = new ScriptWebApplication(context);
         model.put(MODEL_APP, scriptWebApplication);
         
-        // add in the user
+        // add in the current User
         if (context.getUser() != null)
         {
             ScriptUser scriptUser = new ScriptUser(context, context.getUser());
             model.put(MODEL_USER, scriptUser);
         }                        
-
+        
         // we are also given the "rendering configuration" for the current
         // object.  usually, this is either a component or a template.
         // in either case, the configuration is set up ahead of time
         // our job here is to make sure that freemarker has everything
         // it needs for the component or template to process
-        if (context != null)
+        String htmlBindingId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
+        if (htmlBindingId != null && htmlBindingId.length() != 0)
         {
-            String htmlBindingId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_HTMLID);
-            if (htmlBindingId != null && htmlBindingId.length() != 0)
-            {
-                model.put(PROP_HTMLID, htmlBindingId);
-            }
+            model.put(PROP_HTMLID, htmlBindingId);
         }
-
-        // if we're rendering a component, then provide a "form" object
-        if (context != null && context.getObject() instanceof Component)
-        {
-            // add form
-            ScriptForm form = new ScriptForm(context);
-            model.put(MODEL_FORM, form);
-            
-            if ("POST".equalsIgnoreCase(context.getRequestMethod()))
-            {
-                ScriptFormData formData = new ScriptFormData(context);
-                model.put(MODEL_FORMDATA, formData);
-            }
-        }        
     }
     
     /**

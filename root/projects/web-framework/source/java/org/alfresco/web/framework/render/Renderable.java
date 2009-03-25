@@ -69,7 +69,7 @@ public interface Renderable
      * 
      * @return an array of render modes
      */
-    public String[] getRenderModes();
+    public RenderMode[] getRenderModes();
 
     /**
      * Gets the default 'view' processor id
@@ -85,7 +85,7 @@ public interface Renderable
      * 
      * @return the processor id
      */
-    public String getProcessorId(String renderMode);
+    public String getProcessorId(RenderMode renderMode);
 
     /**
      * Gets a default 'view' processor property
@@ -104,7 +104,7 @@ public interface Renderable
      * 
      * @return the processor property value
      */
-    public String getProcessorProperty(String renderMode, String propertyName);
+    public String getProcessorProperty(RenderMode renderMode, String propertyName);
     
     /**
      * Gets a map of default 'view' processor properties
@@ -120,23 +120,8 @@ public interface Renderable
      * 
      * @return the map
      */    
-    public Map<String, String> getProcessorProperties(String renderMode);
-
-    /**
-     * Sets the processor id.
-     * 
-     * @param processorId the id of the processor
-     */
-    public void setProcessorId(String processorId);
-
-    /**
-     * Sets the processor id for a given mode
-     * 
-     * @param renderMode the render mode
-     * @param processorId the id of the processor 
-     */
-    public void setProcessorId(String renderMode, String processorId);
-
+    public Map<String, String> getProcessorProperties(RenderMode renderMode);
+    
     /**
      * Sets a property on the default 'view' processor
      * 
@@ -152,7 +137,7 @@ public interface Renderable
      * @param propertyName
      * @param propertyValue
      */
-    public void setProcessorProperty(String renderMode, String propertyName, String propertyValue);
+    public void setProcessorProperty(RenderMode renderMode, String propertyName, String propertyValue);
     
     /**
      * Removes the default processor
@@ -164,5 +149,5 @@ public interface Renderable
      * 
      * @param renderMode the renderer mode
      */
-    public void removeProcessor(String renderMode);    
+    public void removeProcessor(RenderMode renderMode);    
 }

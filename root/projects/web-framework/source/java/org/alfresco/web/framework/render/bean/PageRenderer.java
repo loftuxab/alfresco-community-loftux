@@ -86,7 +86,7 @@ public class PageRenderer extends AbstractRenderer
 
             if (Timer.isTimerEnabled())
                 Timer.stop(context, "PageRendererBody-" + page.getId());
-        }        
+        }
     }
 
     /**

@@ -53,7 +53,7 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
      */
     public String page(RequestContext context, String pageId)
     {
-        String formatId = context.getConfig().getDefaultFormatId();
+        String formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         return page(context, pageId, formatId);
     }
 
@@ -108,7 +108,7 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
      */
     public String pageType(RequestContext context, String pageTypeId)
     {
-        String formatId = context.getConfig().getDefaultFormatId();
+        String formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         return pageType(context, pageTypeId, formatId);
     }
 
@@ -163,7 +163,7 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
      */    
     public String object(RequestContext context, String objectId)
     {
-        String formatId = context.getConfig().getDefaultFormatId();
+        String formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         return object(context, objectId, formatId);
     }
 

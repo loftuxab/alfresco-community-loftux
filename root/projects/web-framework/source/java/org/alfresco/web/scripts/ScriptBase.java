@@ -27,6 +27,7 @@ package org.alfresco.web.scripts;
 import java.io.Serializable;
 
 import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.Model;
 import org.alfresco.web.site.RequestContext;
 
@@ -102,7 +103,7 @@ public abstract class ScriptBase implements Serializable
     
     final public WebFrameworkConfigElement getConfig()
     {
-        return context.getConfig();
+        return FrameworkHelper.getConfig();
     }
 
     /* (non-Javadoc)

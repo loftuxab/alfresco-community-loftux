@@ -27,6 +27,7 @@ package org.alfresco.web.framework.render;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.framework.AbstractModelObject;
@@ -48,6 +49,14 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     public static String PROP_PROCESSOR = "processor";
     public static String ATTR_RENDER_MODE = "mode";
     
+    // concurrent cache of RenderMode to Processor properties
+    private final Map<RenderMode, HashMap<String, String>> processorPropertyCache =
+        new ConcurrentHashMap<RenderMode, HashMap<String,String>>(8);
+    
+    // the render modes available to this renderable object
+    private final RenderMode[] renderModes;
+    
+    
     /**
      * Constructs a new model object
      * 
@@ -56,6 +65,30 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     public AbstractRenderableModelObject(String id, ModelPersisterInfo info, Document document)
     {
         super(id, info, document);
+        
+        // first cache the render modes available for this renderable object
+        List<Element> processorElements = getDocument().getRootElement().elements(PROP_PROCESSOR);
+        this.renderModes = new RenderMode[processorElements.size()];
+        for (int i = 0; i < processorElements.size(); i++)
+        {
+            Element processorElement = processorElements.get(i);
+            this.renderModes[i] = RenderMode.valueOf(processorElement.attributeValue(ATTR_RENDER_MODE).toUpperCase());
+            
+            // for each render mode, retrieve all processor properties
+            HashMap<String, String> props = new HashMap<String, String>(4);
+            List children = XMLUtil.getChildren(processorElement);
+            for (int n = 0; n < children.size(); n++)
+            {
+                Element child = (Element)children.get(n);
+                String name = child.getName();
+                String value = XMLUtil.getChildValue(processorElement, name);
+                
+                props.put(name, value);
+            }
+            
+            // store the properties in the cache against the rendermode
+            this.processorPropertyCache.put(this.renderModes[i], props);
+        }
     }
         
     /* (non-Javadoc)
@@ -69,7 +102,7 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderable#getProcessorId(java.lang.String)
      */
-    public String getProcessorId(String mode)
+    public String getProcessorId(RenderMode mode)
     {
         return getProcessorProperty(mode, PROP_PROCESSOR_ID);
     }
@@ -85,22 +118,14 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderable#getProcessorProperty(java.lang.String, java.lang.String)
      */
-    public String getProcessorProperty(String mode, String propertyName)
+    public String getProcessorProperty(RenderMode mode, String propertyName)
     {
         if (mode == null)
         {
-            mode = RenderMode.VIEW.toString();
+            mode = RenderMode.VIEW;
         }
         
-        String value = null;
-        
-        Element processorElement = getProcessorElement(mode);
-        if (processorElement != null)
-        {
-            value = XMLUtil.getChildValue(processorElement, propertyName);
-        }
-        
-        return value;
+        return this.processorPropertyCache.get(mode).get(propertyName);
     }
     
     /* (non-Javadoc)
@@ -114,46 +139,15 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderable#getProcessorProperties(java.lang.String)
      */
-    public Map<String, String> getProcessorProperties(String renderMode)
+    public Map<String, String> getProcessorProperties(RenderMode renderMode)
     {
         if (renderMode == null)
         {
-            renderMode = RenderMode.VIEW.toString();
+            renderMode = RenderMode.VIEW;
         }
         
-        Map<String, String> map = new HashMap<String, String>(16);
-        
-        Element processorElement = getProcessorElement(renderMode);
-        if (processorElement != null)
-        {
-            List children = XMLUtil.getChildren(processorElement);
-            for(int i = 0; i < children.size(); i++)
-            {
-                Element child = (Element) children.get(i);
-                String name = child.getName();
-                String value = XMLUtil.getChildValue(processorElement, name);
-                
-                map.put(name, value);
-            }
-        }
-        
-        return map;        
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.render.Renderable#setProcessorId(java.lang.String)
-     */
-    public void setProcessorId(String processorId)
-    {
-        setProcessorId(processorId, null);
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.render.Renderable#setProcessorId(java.lang.String, java.lang.String)
-     */
-    public void setProcessorId(String renderMode, String processorId)
-    {
-        setProcessorProperty(renderMode, PROP_PROCESSOR_ID, processorId);
+        // return a clone of the available properties - as it can be modified later
+        return (Map<String, String>)this.processorPropertyCache.get(renderMode).clone();
     }
 
     /* (non-Javadoc)
@@ -167,20 +161,23 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderable#setProcessorProperty(java.lang.String, java.lang.String, java.lang.String)
      */
-    public void setProcessorProperty(String renderMode, String propertyName, String propertyValue)
+    public void setProcessorProperty(RenderMode renderMode, String propertyName, String propertyValue)
     {
         if (renderMode == null)
         {
-            renderMode = RenderMode.VIEW.toString();
+            renderMode = RenderMode.VIEW;
         }
         
         Element processorElement = getProcessorElement(renderMode);
         if (processorElement == null)
         {
             processorElement = getDocument().getRootElement().addElement(PROP_PROCESSOR);
-            processorElement.addAttribute(ATTR_RENDER_MODE, renderMode);
+            processorElement.addAttribute(ATTR_RENDER_MODE, renderMode.toString());
         }
-        XMLUtil.setChildValue(processorElement, propertyName, propertyValue);        
+        XMLUtil.setChildValue(processorElement, propertyName, propertyValue);
+        
+        // update cache
+        this.processorPropertyCache.get(renderMode).put(propertyName, propertyValue);
     }
     
     /* (non-Javadoc)
@@ -188,17 +185,17 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
      */
     public void removeProcessor()
     {
-        removeProcessor(null);
+        removeProcessor(RenderMode.VIEW);
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderable#removeProcessor(java.lang.String)
      */
-    public void removeProcessor(String renderMode)
+    public void removeProcessor(RenderMode renderMode)
     {
         if (renderMode == null)
         {
-            renderMode = RenderMode.VIEW.toString();
+            renderMode = RenderMode.VIEW;
         }
         
         Element processorElement = this.getProcessorElement(renderMode);
@@ -211,19 +208,9 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.render.Renderable#getRenderModes()
      */
-    public String[] getRenderModes()
+    public RenderMode[] getRenderModes()
     {
-        List<Element> processorElements = getDocument().getRootElement().elements(PROP_PROCESSOR);
-        
-        String[] renderModes = new String[processorElements.size()];
-        
-        for (int i = 0; i < processorElements.size(); i++)
-        {
-            Element processorElement = processorElements.get(i);
-            renderModes[i] = processorElement.attributeValue(ATTR_RENDER_MODE);
-        }
-        
-        return renderModes;
+        return this.renderModes;
     }
     
     
@@ -234,11 +221,11 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
      * 
      * @return the processor element
      */
-    private Element getProcessorElement(String renderMode)
+    private Element getProcessorElement(RenderMode renderMode)
     {
         if (renderMode == null)
         {
-            renderMode = RenderMode.VIEW.toString();
+            renderMode = RenderMode.VIEW;
         }
         
         Element result = null;
@@ -248,15 +235,7 @@ public abstract class AbstractRenderableModelObject extends AbstractModelObject 
         {
             Element processorElement = processorElements.get(i);
             String _renderMode = processorElement.attributeValue(ATTR_RENDER_MODE);
-            if (renderMode == null)
-            {
-                if (_renderMode == null || _renderMode.length() == 0)
-                {
-                    result = processorElement;
-                    break;
-                }
-            }
-            else if (renderMode.equals(_renderMode))
+            if (renderMode.toString().equals(_renderMode))
             {
                 result = processorElement;
                 break;

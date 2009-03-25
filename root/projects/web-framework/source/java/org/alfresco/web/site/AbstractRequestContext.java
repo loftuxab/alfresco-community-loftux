@@ -35,8 +35,6 @@ import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
 import org.alfresco.util.Content;
 import org.alfresco.util.InputStreamContent;
-import org.alfresco.web.config.RemoteConfigElement;
-import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
@@ -44,7 +42,6 @@ import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.framework.resource.ResourceContent;
 import org.alfresco.web.scripts.WebScriptException;
-import org.apache.commons.logging.Log;
 
 /**
  * Represents the context of the original request to the web page.
@@ -373,43 +370,12 @@ public abstract class AbstractRequestContext implements RequestContext
         return this.model;
     }
     
-    public void setModel(Model model)
-    {
-        this.model = model;
-    }
-    
     /**
      * Sets the model
      */
-
-    /**
-     * Returns the configuration for the framework.
-     * 
-     * @return
-     */    
-    public WebFrameworkConfigElement getConfig()
+    public void setModel(Model model)
     {
-        return FrameworkHelper.getConfig();
-    }
-
-    /**
-     * Returns the configuration for the remote.
-     * 
-     * @return
-     */
-    public RemoteConfigElement getRemoteConfig()
-    {
-        return FrameworkHelper.getRemoteConfig();
-    }
-
-    /**
-     * Returns the logger for the framework
-     * 
-     * @return
-     */
-    public Log getLogger()
-    { 
-        return FrameworkHelper.getLogger();
+        this.model = model;
     }
 
     /**

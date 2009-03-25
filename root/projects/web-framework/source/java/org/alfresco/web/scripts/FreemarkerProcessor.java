@@ -36,6 +36,7 @@ import org.alfresco.web.framework.render.AbstractProcessor;
 import org.alfresco.web.framework.render.ProcessorContext;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.render.RenderContextScope;
+import org.alfresco.web.site.FrameworkHelper;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -131,7 +132,7 @@ public class FreemarkerProcessor extends AbstractProcessor
         // Attempt to execute the templates associated .head. file, if it has one
         
         // path to the template (switches on format)        
-        String templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");            
+        String templateName = uri + ((format != null && format.length() != 0 && !FrameworkHelper.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");            
         if (templateProcessor.hasTemplate(templateName))
         {
             try
@@ -181,12 +182,12 @@ public class FreemarkerProcessor extends AbstractProcessor
                 if (context.hasValue(SCRIPT_RESULTS, RenderContextScope.REQUEST) == false)
                 {
                     // Attempt to execute a .js file for this page template
-                    resultModel = new HashMap<String, Object>(8, 1.0f);
+                    resultModel = new HashMap<String, Object>(4, 1.0f);
                     ScriptContent script = templateStore.getScriptLoader().getScript(uri + ".js");
                     if (script != null)
                     {
                         // build the model
-                        Map<String, Object> scriptModel = new HashMap<String, Object>(8);
+                        Map<String, Object> scriptModel = new HashMap<String, Object>(16);
                         ProcessorModelHelper.populateScriptModel(context, scriptModel);
                         
                         // add in the model object
@@ -219,7 +220,7 @@ public class FreemarkerProcessor extends AbstractProcessor
             }
             
             // Execute the template file itself
-            Map<String, Object> templateModel = new HashMap<String, Object>(32);
+            Map<String, Object> templateModel = new HashMap<String, Object>(32, 1.0f);
             ProcessorModelHelper.populateTemplateModel(context, templateModel);
             
             // merge script results model into the template model
@@ -237,7 +238,8 @@ public class FreemarkerProcessor extends AbstractProcessor
             
             // path to the template (switches on format)
             templateName = uri + ".ftl";
-            if (format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format))
+            if (format != null && format.length() != 0 &&
+                !FrameworkHelper.getConfig().getDefaultFormatId().equals(format))
             {
                 templateName = uri + "." + format + ".ftl";
             }

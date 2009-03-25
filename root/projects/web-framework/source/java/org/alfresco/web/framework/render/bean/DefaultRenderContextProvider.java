@@ -145,7 +145,6 @@ public final class DefaultRenderContextProvider extends AbstractRenderContextPro
         context.setValue(WebFrameworkConstants.RENDER_DATA_HTMLID, RenderUtil.validHtmlId(page.getId()));
     }
     
-    
     /**
      * Populates the configuration for a template instance.
      * 

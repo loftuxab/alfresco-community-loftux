@@ -48,7 +48,7 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         
         if (formatId == null)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
         
         StringBuilder buffer = new StringBuilder(64);
@@ -81,7 +81,7 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         
         if (formatId == null)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
         
         StringBuilder buffer = new StringBuilder(64);
@@ -113,7 +113,7 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         }
         if (formatId == null)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
         
         StringBuilder buffer = new StringBuilder(64);

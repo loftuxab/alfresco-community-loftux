@@ -31,14 +31,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
-import org.alfresco.web.config.RemoteConfigElement;
-import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.model.Theme;
-import org.apache.commons.logging.Log;
 
 /**
  * @author muzquiano
@@ -160,21 +157,6 @@ public class WrappedRequestContext implements RequestContext
     public void setModel(Model model)
     {
         this.context.setModel(model);
-    }
-    
-    public WebFrameworkConfigElement getConfig()
-    {
-        return this.context.getConfig();
-    }
-
-    public RemoteConfigElement getRemoteConfig()
-    {
-        return this.context.getRemoteConfig();
-    }
-
-    public Log getLogger()
-    { 
-        return this.context.getLogger();
     }
 
     public void setUser(User user)

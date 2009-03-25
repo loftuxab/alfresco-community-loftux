@@ -287,7 +287,7 @@ public class DispatcherServlet extends BaseServlet
                 // Consider whether a system default has been set up
                 if (loginPageId == null)
                 {
-                    loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
+                    loginPageId = FrameworkHelper.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
                 }
                 
                 Page loginPage = null;
