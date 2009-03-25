@@ -416,7 +416,7 @@
    -->
 
    <target name="build-sharepoint" 
-           depends="clean-sharepoint, incremental-webclient-tomcat">
+           depends="incremental-webclient-tomcat">
       <ant dir="${dir.module.sharepoint}/amp" target="deploy" />
    </target>
    
@@ -493,6 +493,7 @@
                     clean-mediawiki,
                     clean-php,
                     clean-rm, 
+                    clean-sharepoint,
                     clean-truncatemalformedxml" />
    
    <target name ="clean-tomcat-deployments" 

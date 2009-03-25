@@ -365,6 +365,7 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/quick-installer/output" />
+      <mkdir dir="${dir.project.installer.builder}/quick-installer/output" />
       <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
@@ -382,7 +383,7 @@
            compression="gzip">
          <tarfileset dir="${dir.project.installer.builder}/quick-installer/output"
                      includes="Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install"
-                     mode="755" />
+                     mode="755"/>
       </tar>
       <delete quiet="yes"
               file="${dir.project.installer.builder}/quick-installer/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
@@ -951,7 +952,6 @@
    <target name="distribute-sharepoint" 
            description="Creates the distribution files for Sharepoint Protocol Support"
            depends="continuous-init">
-      <ant dir="${dir.module.sharepoint}/amp" target="clean" />
       <ant dir="${dir.module.sharepoint}/amp" target="amp" />
    </target>
 
