@@ -33,7 +33,7 @@ import java.util.Map;
 final public class ProcessorContext 
 {
     final private RenderContext context;
-    final private Map<String, ProcessorDescriptor> descriptors = new HashMap<String, ProcessorDescriptor>(8, 1.0f);
+    final private Map<RenderMode, ProcessorDescriptor> descriptors = new HashMap<RenderMode, ProcessorDescriptor>(4, 1.0f);
     
     public ProcessorContext(RenderContext context)
     {
@@ -47,33 +47,20 @@ final public class ProcessorContext
 
     public ProcessorDescriptor getDescriptor(RenderMode renderMode)
     {
-        return getDescriptor(renderMode.toString());
+        return this.descriptors.get(renderMode);
     }
     
-    public ProcessorDescriptor getDescriptor(String renderMode)
-    {
-        return (ProcessorDescriptor) this.descriptors.get(renderMode);
-    }
-    
-    public void putDescriptor(String renderMode, ProcessorDescriptor descriptor)
+    public void putDescriptor(RenderMode renderMode, ProcessorDescriptor descriptor)
     {
         this.descriptors.put(renderMode, descriptor);
     }
         
-    public void removeDescriptor(String renderMode)
+    public void removeDescriptor(RenderMode renderMode)
     {
         this.descriptors.remove(renderMode);
     }
     
-    public ProcessorDescriptor addDescriptor(String renderMode)
-    {
-        ProcessorDescriptor processorDescriptor = new ProcessorDescriptor();
-        putDescriptor(renderMode, processorDescriptor);
-        
-        return processorDescriptor;
-    }
-    
-    public void addDescriptor(String renderMode, Map<String, String> properties)
+    public void addDescriptor(RenderMode renderMode, Map<String, String> properties)
     {
         ProcessorDescriptor descriptor = new ProcessorDescriptor(properties);
         putDescriptor(renderMode, descriptor);        
@@ -81,7 +68,7 @@ final public class ProcessorContext
     
     public void load(Renderable renderable)
     {
-        String[] renderModes = renderable.getRenderModes();
+        RenderMode[] renderModes = renderable.getRenderModes();
         
         for (int i = 0; i < renderModes.length; i++)
         {
@@ -92,9 +79,9 @@ final public class ProcessorContext
         }
     }
 
-    public static class ProcessorDescriptor
+    public final static class ProcessorDescriptor
     {
-        public Map<String, String> properties = null;
+        public final Map<String, String> properties;
         
         public ProcessorDescriptor()
         {

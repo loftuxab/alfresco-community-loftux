@@ -66,7 +66,7 @@ public class ContentLoaderUtil
         String endpointId = context.getRequest().getParameter("endpoint");
         if (endpointId == null)
         {
-            endpointId = context.getRemoteConfig().getDefaultEndpointId();
+            endpointId = FrameworkHelper.getRemoteConfig().getDefaultEndpointId();
         }
         return _loadContent(context, objectId, endpointId);
     }
@@ -89,11 +89,11 @@ public class ContentLoaderUtil
 
         ResourceContent content = null;
 
-        String[] ids = context.getConfig().getResourceLoaderIds();
+        String[] ids = FrameworkHelper.getConfig().getResourceLoaderIds();
         int i = 0;
         while ((i < ids.length) && (content == null))
         {
-            ResourceLoaderDescriptor descriptor = (ResourceLoaderDescriptor) context.getConfig().getResourceLoaderDescriptor(
+            ResourceLoaderDescriptor descriptor = (ResourceLoaderDescriptor)FrameworkHelper.getConfig().getResourceLoaderDescriptor(
                     ids[i]);
             if (descriptor != null)
             {

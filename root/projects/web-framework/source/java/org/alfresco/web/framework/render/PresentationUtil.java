@@ -26,6 +26,7 @@ package org.alfresco.web.framework.render;
 
 import org.alfresco.web.framework.exception.JspRenderException;
 import org.alfresco.web.framework.exception.RendererExecutionException;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.RequestDispatchException;
 
@@ -209,9 +210,9 @@ public class PresentationUtil
             Throwable t, String pageId) throws RequestDispatchException
     {
         // log the error
-        context.getLogger().error("A Page Rendering problem was handled");
-        context.getLogger().error("Page Id: " + pageId);
-        context.getLogger().error("Trace", t);
+        FrameworkHelper.getLogger().error("A Page Rendering problem was handled");
+        FrameworkHelper.getLogger().error("Page Id: " + pageId);
+        FrameworkHelper.getLogger().error("Trace", t);
         try
         {
             context.getRequest().setAttribute("error", t);
@@ -232,9 +233,9 @@ public class PresentationUtil
             Throwable t, String templateId) throws RequestDispatchException
     {
         // log the error
-        context.getLogger().error("A Template Rendering problem was handled");
-        context.getLogger().error("Template Id: " + templateId);
-        context.getLogger().error(t);
+        FrameworkHelper.getLogger().error("A Template Rendering problem was handled");
+        FrameworkHelper.getLogger().error("Template Id: " + templateId);
+        FrameworkHelper.getLogger().error(t);
         try
         {
             context.getRequest().setAttribute("error", t);
@@ -256,11 +257,11 @@ public class PresentationUtil
             String regionScopeId) throws RequestDispatchException
     {
         // log the error
-        context.getLogger().error("A Region Rendering problem was handled");
-        context.getLogger().error("Template Id: " + templateId);
-        context.getLogger().error("Region Id: " + regionId);
-        context.getLogger().error("Region Scope Id: " + regionScopeId);
-        context.getLogger().error(t);
+        FrameworkHelper.getLogger().error("A Region Rendering problem was handled");
+        FrameworkHelper.getLogger().error("Template Id: " + templateId);
+        FrameworkHelper.getLogger().error("Region Id: " + regionId);
+        FrameworkHelper.getLogger().error("Region Scope Id: " + regionScopeId);
+        FrameworkHelper.getLogger().error(t);
         try
         {
             String regionSourceId = RenderUtil.getSourceId(context, regionScopeId);
@@ -289,9 +290,9 @@ public class PresentationUtil
             Throwable t, String componentId) throws RequestDispatchException
     {
         // log the error
-        context.getLogger().error("A Component Rendering problem was handled");
-        context.getLogger().error("Component Id: " + componentId);
-        context.getLogger().error(t);
+        FrameworkHelper.getLogger().error("A Component Rendering problem was handled");
+        FrameworkHelper.getLogger().error("Component Id: " + componentId);
+        FrameworkHelper.getLogger().error(t);
         try
         {
             context.getRequest().setAttribute("error", t);

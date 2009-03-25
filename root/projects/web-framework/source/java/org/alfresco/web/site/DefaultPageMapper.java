@@ -105,7 +105,7 @@ public class DefaultPageMapper extends AbstractPageMapper
         String formatId = (String) request.getParameter("f");
         if (formatId == null || formatId.length() == 0)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
         if (formatId != null)
         {

@@ -194,17 +194,16 @@ public class Page extends AbstractModelObject
      */
     public Map<String, TemplateInstance> getTemplates(RequestContext context)
     {
-        Map map = new HashMap(8, 1.0f);
-
-        List templateElements = getDocument().getRootElement().elements(
-                PROP_TEMPLATE_INSTANCE);
+        Map<String, TemplateInstance> map = new HashMap<String, TemplateInstance>(8, 1.0f);
+        
+        List templateElements = getDocument().getRootElement().elements(PROP_TEMPLATE_INSTANCE);
         for (int i = 0; i < templateElements.size(); i++)
         {
             Element templateElement = (Element) templateElements.get(i);
             String formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
             if (formatId == null || formatId.length() == 0)
             {
-                formatId = context.getConfig().getDefaultFormatId();
+                formatId = FrameworkHelper.getConfig().getDefaultFormatId();
             }
 
             String templateId = templateElement.getStringValue();
@@ -214,7 +213,7 @@ public class Page extends AbstractModelObject
                 map.put(formatId, template);
             }
         }
-
+        
         return map;
     }
 

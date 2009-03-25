@@ -41,7 +41,7 @@ import org.alfresco.web.site.RequestContext;
  * 
  * @author muzquiano
  */
-public class DefaultRenderContext extends AbstractRenderContext
+public final class DefaultRenderContext extends AbstractRenderContext
 {
     private final Map<String, Serializable> ourValuesMap;
     

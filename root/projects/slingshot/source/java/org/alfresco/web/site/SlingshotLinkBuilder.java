@@ -73,7 +73,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         
         if (formatId == null)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
         
         // TODO: how should we handle the format?
@@ -127,7 +127,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         
         if (formatId == null)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
 
         StringBuilder buffer = new StringBuilder(128);
@@ -163,7 +163,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         
         if (formatId == null)
         {
-            formatId = context.getConfig().getDefaultFormatId();
+            formatId = FrameworkHelper.getConfig().getDefaultFormatId();
         }
 
         StringBuffer buffer = new StringBuffer(128);

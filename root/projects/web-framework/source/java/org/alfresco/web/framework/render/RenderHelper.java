@@ -41,6 +41,7 @@ import org.alfresco.web.site.RequestContext;
 
 /**
  * @author muzquiano
+ * @author kevinr
  */
 public class RenderHelper 
 {
@@ -48,6 +49,7 @@ public class RenderHelper
     private static final String WEBFRAMEWORK_RENDERCONTEXT_PROVIDER = "webframework.rendercontext.provider";
     private static final String PREFIX_WEBFRAMEWORK_PROCESSOR = "webframework.processor.";
     private static final String PREFIX_WEBFRAMEWORK_RENDERER = "webframework.renderer.";
+    
 
     /**
      * Gets a renderer for the given renderer type
@@ -110,14 +112,14 @@ public class RenderHelper
     }
 
     /**
-     * Returns a processor for a renderable in the VIEW render mode
+     * Returns a processor for a renderable in the default VIEW render mode
      * 
      * @param renderable
      * @return
      */
     public static Processor getProcessor(Renderable renderable)
     {
-        return getProcessor(renderable, RenderMode.VIEW);        
+        return getProcessor(renderable, RenderMode.VIEW);
     }
     
     /**
@@ -129,7 +131,7 @@ public class RenderHelper
      */
     public static Processor getProcessor(Renderable renderable, RenderMode renderMode)
     {
-        String processorId = renderable.getProcessorId(renderMode.toString());        
+        String processorId = renderable.getProcessorId(renderMode);
         return getProcessorById(processorId);
     }
     
@@ -331,7 +333,7 @@ public class RenderHelper
             // apply any overrides from special cases
             if (uri != null)
             {
-                ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW.toString());
+                ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW);
                 viewDescriptor.put("uri", uri);
             }
             
@@ -375,7 +377,7 @@ public class RenderHelper
             // apply any overrides from special cases
             if (uri != null)
             {
-                ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW.toString());
+                ProcessorDescriptor viewDescriptor = processorContext.getDescriptor(RenderMode.VIEW);
                 viewDescriptor.put("uri", uri);
             }
             

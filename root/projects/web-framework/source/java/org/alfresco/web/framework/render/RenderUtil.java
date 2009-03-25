@@ -704,7 +704,7 @@ public final class RenderUtil
         // see if a default chrome is specified in the framework configuration
         if (chromeId == null)
         {
-            chromeId = context.getConfig().getDefaultRegionChrome();
+            chromeId = FrameworkHelper.getConfig().getDefaultRegionChrome();
         }
                 
         if (chromeId != null && chromeId.length() != 0)
@@ -724,8 +724,7 @@ public final class RenderUtil
     {
         Chrome chrome = null;
         
-        // if the chrome id is empty, see if the component instance intself
-        // the chrome that it would like to use
+        // if the chrome id is empty, see if the component instance specifies one
         if (chromeId == null)
         {
             chromeId = component.getChrome();
@@ -734,7 +733,7 @@ public final class RenderUtil
         // see if a default chrome was specified
         if (chromeId == null)
         {
-            chromeId = context.getConfig().getDefaultComponentChrome();
+            chromeId = FrameworkHelper.getConfig().getDefaultComponentChrome();
         }
         
         if (chromeId != null && chromeId.length() != 0)
@@ -800,7 +799,7 @@ public final class RenderUtil
                 Timer.start(parentContext, "RenderErrorHandlerPage-" + errorHandlerPageId);
     
             // get the error handler descriptor from config
-            ErrorHandlerDescriptor descriptor = context.getConfig().getErrorHandlerDescriptor(errorHandlerPageId);
+            ErrorHandlerDescriptor descriptor = FrameworkHelper.getConfig().getErrorHandlerDescriptor(errorHandlerPageId);
             
             // get descriptor properties and processor id
             String processorId = descriptor.getProcessorId();
@@ -811,7 +810,7 @@ public final class RenderUtil
             
             // load processor context
             ProcessorContext processorContext = new ProcessorContext(context);
-            processorContext.addDescriptor(RenderMode.VIEW.toString(), descriptorProperties);
+            processorContext.addDescriptor(RenderMode.VIEW, descriptorProperties);
             
             // execute processor
             processor.executeBody(processorContext);
@@ -848,7 +847,7 @@ public final class RenderUtil
                 Timer.start(parentContext, "RenderSystemPage-" + systemPageId);
     
             // get the system page descriptor from config
-            SystemPageDescriptor descriptor = context.getConfig().getSystemPageDescriptor(systemPageId);
+            SystemPageDescriptor descriptor = FrameworkHelper.getConfig().getSystemPageDescriptor(systemPageId);
             
             // get descriptor properties and processor id
             String processorId = descriptor.getProcessorId();
@@ -859,7 +858,7 @@ public final class RenderUtil
             
             // load processor context
             ProcessorContext processorContext = new ProcessorContext(context);
-            processorContext.addDescriptor(RenderMode.VIEW.toString(), descriptorProperties);
+            processorContext.addDescriptor(RenderMode.VIEW, descriptorProperties);
             
             // execute processor
             processor.executeBody(processorContext);
@@ -945,16 +944,16 @@ public final class RenderUtil
      */
     public static String validHtmlId(String id)
     {
-        int len = id.length();
-        StringBuilder buf = new StringBuilder(len + (len>>1) + 8);
+        final int len = id.length();
+        final StringBuilder buf = new StringBuilder(len + (len>>1) + 8);
         for (int i = 0; i<len; i++)
         {
-            char c = id.charAt(i);
-            int ci = (int)c;
+            final char c = id.charAt(i);
+            final int ci = (int)c;
             if (i == 0)
             {
-                if ((ci >= 65 && ci <= 90) ||   // A-Z
-                    (ci >= 97 && ci <= 122))    // a-z
+                if ((ci >= 97 && ci <= 122) ||   // a-z
+                    (ci >= 65 && ci <= 90))      // A-Z
                 {
                     buf.append(c);
                 }
@@ -965,8 +964,8 @@ public final class RenderUtil
             }
             else
             {
-                if ((ci >= 65 && ci <= 90) ||   // A-Z
-                    (ci >= 97 && ci <= 122) ||  // a-z
+                if ((ci >= 97 && ci <= 122) ||  // a-z
+                    (ci >= 65 && ci <= 90) ||   // A-Z
                     (ci >= 48 && ci <= 57) ||   // 0-9
                     ci == 45 || ci == 95)       // - and _
                 {

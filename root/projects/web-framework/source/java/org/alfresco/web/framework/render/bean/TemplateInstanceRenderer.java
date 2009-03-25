@@ -38,6 +38,7 @@ import org.alfresco.web.site.Timer;
  * Bean responsible for rendering a template instance.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class TemplateInstanceRenderer extends AbstractRenderer
 {

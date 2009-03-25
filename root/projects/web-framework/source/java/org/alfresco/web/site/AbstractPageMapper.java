@@ -131,7 +131,7 @@ public abstract class AbstractPageMapper implements PageMapper
             return null;
         }
         
-        return context.getConfig().getDefaultPageTypeInstanceId(pageTypeId);
+        return FrameworkHelper.getConfig().getDefaultPageTypeInstanceId(pageTypeId);
     }
     
     /**
