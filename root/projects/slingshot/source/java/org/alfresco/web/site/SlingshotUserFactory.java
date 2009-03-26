@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -56,7 +56,7 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
         // special case to disallow Guest user authentication in Share
         // TODO: add basic Guest user support
         boolean authenticated = false;
-        if (!UserFactory.USER_GUEST.equals(username))
+        if (!AuthenticationUtil.isGuest(username))
         {
             authenticated = super.authenticate(request, username, password);
         }

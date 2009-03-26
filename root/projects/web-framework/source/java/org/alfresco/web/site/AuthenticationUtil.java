@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,6 +36,8 @@ public class AuthenticationUtil
 {
     /** cookie names */
     private static final String COOKIE_ALFLOGIN = "alfLogin";
+    
+    private static final String MT_GUEST_PREFIX = UserFactory.USER_GUEST + "@"; // eg. for MT Share
 
     public static void logout(HttpServletRequest request)
     {
@@ -93,7 +95,13 @@ public class AuthenticationUtil
         String userId = (String)request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
         
         // return whether is non-null and not 'guest'
-        return (userId != null && !UserFactory.USER_GUEST.equals(userId));    	
+        return (userId != null && !isGuest(userId));
+    }
+    
+    public static boolean isGuest(String userId)
+    {
+        // return whether 'guest' (or 'guest@tenant')
+        return (userId != null && (UserFactory.USER_GUEST.equals(userId) || userId.startsWith(MT_GUEST_PREFIX)));
     }
     
     public static boolean isExternalAuthentication(HttpServletRequest request)

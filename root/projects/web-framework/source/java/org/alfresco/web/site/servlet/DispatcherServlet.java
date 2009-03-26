@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -54,7 +54,6 @@ import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.Timer;
-import org.alfresco.web.site.UserFactory;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestDispatchException;
@@ -255,7 +254,7 @@ public class DispatcherServlet extends BaseServlet
                 
                 case user:
                 {
-                    login = (user == null || user.getId().equals(UserFactory.USER_GUEST));
+                    login = (user == null || AuthenticationUtil.isGuest(user.getId()));
                     break;
                 }
                 
