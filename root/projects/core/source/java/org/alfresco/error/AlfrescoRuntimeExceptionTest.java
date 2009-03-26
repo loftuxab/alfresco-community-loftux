@@ -60,25 +60,21 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
         // Register the bundle
         I18NUtil.registerResourceBundle(BASE_RESOURCE_NAME);
         
-        // AlfrescoRuntimeExceptions are prefixed with an 8-digit integer value
-        // and a space. We're not interesting in testing the value of that prefix here.
-        final int errorLogNoPrefixLength = 9;
-        
         AlfrescoRuntimeException exception1 = new AlfrescoRuntimeException(MSG_PARAMS, new Object[]{PARAM_VALUE});
-        assertEquals(VALUE_PARAMS, exception1.getMessage().substring(errorLogNoPrefixLength));
+        assertTrue(exception1.getMessage().contains(VALUE_PARAMS));
         AlfrescoRuntimeException exception3 = new AlfrescoRuntimeException(MSG_ERROR);
-        assertEquals(VALUE_ERROR, exception3.getMessage().substring(errorLogNoPrefixLength));
-            
+        assertTrue(exception3.getMessage().contains(VALUE_ERROR));
+        
         // Change the locale and re-test
         I18NUtil.setLocale(new Locale("fr", "FR"));
         
         AlfrescoRuntimeException exception2 = new AlfrescoRuntimeException(MSG_PARAMS, new Object[]{PARAM_VALUE});
-        assertEquals(VALUE_FR_PARAMS, exception2.getMessage().substring(errorLogNoPrefixLength));   
+        assertTrue(exception2.getMessage().contains(VALUE_FR_PARAMS));   
         AlfrescoRuntimeException exception4 = new AlfrescoRuntimeException(MSG_ERROR);
-        assertEquals(VALUE_FR_ERROR, exception4.getMessage().substring(errorLogNoPrefixLength));  
+        assertTrue(exception4.getMessage().contains(VALUE_FR_ERROR));  
         
         AlfrescoRuntimeException exception5 = new AlfrescoRuntimeException(NON_I18NED_MSG);
-        assertEquals(NON_I18NED_MSG, exception5.getMessage().substring(errorLogNoPrefixLength));
+        assertTrue(exception5.getMessage().contains(NON_I18NED_MSG));
     }
     
     public void testMakeRuntimeException()
