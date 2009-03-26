@@ -74,12 +74,12 @@ public abstract class AbstractWebScript implements WebScript
     private Map<Locale, String> jsonResources = new HashMap<Locale, String>(4);
     
     // Status Template cache
-    private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
+    private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>(4);    
     private ReentrantReadWriteLock statusTemplateLock = new ReentrantReadWriteLock(); 
     
     // Script Context
     private String basePath;
-    private Map<String, ScriptDetails> scripts = new HashMap<String, ScriptDetails>();
+    private Map<String, ScriptDetails> scripts = new HashMap<String, ScriptDetails>(4);
     private ReentrantReadWriteLock scriptLock = new ReentrantReadWriteLock(); 
     
     // The entry we use to 'remember' nulls in the cache
@@ -457,8 +457,8 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String> createArgs(WebScriptRequest req)
     {
-        Map<String, String> args = new HashMap<String, String>(8, 1.0f);
         String[] names = req.getParameterNames();
+        Map<String, String> args = new HashMap<String, String>(names.length, 1.0f);
         for (String name : names)
         {
             args.put(name, req.getParameter(name));
@@ -474,8 +474,8 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String[]> createArgsM(WebScriptRequest req)
     {
-        Map<String, String[]> args = new HashMap<String, String[]>(8, 1.0f);
         String[] names = req.getParameterNames();
+        Map<String, String[]> args = new HashMap<String, String[]>(names.length, 1.0f);
         for (String name : names)
         {
             args.put(name, req.getParameterValues(name));
@@ -621,10 +621,10 @@ public abstract class AbstractWebScript implements WebScript
         {
             we = new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Wrapped Exception (with status template): " + e.getMessage(), e);
         }       
+        
         // find status template and construct model for it
         we.setStatusTemplateFactory(new StatusTemplateFactory()
         {
-
             public Map<String, Object> getStatusModel()
             {
                 return createTemplateParameters(req, res, null);
@@ -638,6 +638,7 @@ public abstract class AbstractWebScript implements WebScript
                 return AbstractWebScript.this.getStatusTemplate(scriptId, statusCode, (format == null) ? "" : format);
             }
         });
+        
         return we;
     }
     
