@@ -138,6 +138,14 @@ public class AlfrescoRuntimeException extends RuntimeException
         return buildErrorLogNumber(message);
     }
     
+    /**
+     * Generate an error log number - based on MMDDXXXX - where M is month,
+     * D is day and X is an atomic integer count.
+     * 
+     * @param message       Message to prepend the error log number to 
+     * 
+     * @return message with error log number prefix
+     */
     private static String buildErrorLogNumber(String message)
     {
         Date today = new Date();
