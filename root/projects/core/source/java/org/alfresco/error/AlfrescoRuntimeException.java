@@ -24,6 +24,9 @@
  */
 package org.alfresco.error;
 
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.alfresco.i18n.I18NUtil;
 
 /**
@@ -132,6 +135,33 @@ public class AlfrescoRuntimeException extends RuntimeException
             // If a localised string cannot be found then return the messageId
             message = messageId;
         }
-        return message;
+        return buildErrorLogNumber(message);
     }
+    
+    private static String buildErrorLogNumber(String message)
+    {
+        Date today = new Date();
+        StringBuilder buf = new StringBuilder(message.length() + 10);
+        padInt(buf, today.getMonth(), 2);
+        padInt(buf, today.getDate(), 2);
+        padInt(buf, errorCounter.getAndIncrement(), 4);
+        buf.append(' ');
+        buf.append(message);
+        return buf.toString();
+    }
+    
+    /**
+     * Helper to zero pad a number to specified length 
+     */
+    private static void padInt(StringBuilder buffer, int value, int length)
+    {
+        String strValue = Integer.toString(value);
+        for (int i = length - strValue.length(); i > 0; i--)
+        {
+            buffer.append('0');
+        }
+        buffer.append(strValue);
+    }
+    
+    private static AtomicInteger errorCounter = new AtomicInteger();
 }
