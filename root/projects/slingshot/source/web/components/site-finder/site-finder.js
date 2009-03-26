@@ -321,7 +321,7 @@
          ).enable();
 
          // Set initial focus
-         Dom.get(this.id + "-term").focus();
+         searchIinput.focus();
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");

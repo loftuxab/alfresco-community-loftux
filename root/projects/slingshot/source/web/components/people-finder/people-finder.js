@@ -262,7 +262,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "people",
-             fields: ["url", "userName", "avatar", "title", "firstName", "lastName", "organisation", "jobtitle", "email"]
+             fields: ["userName", "avatar", "firstName", "lastName", "organisation", "jobtitle", "email"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
@@ -304,30 +304,25 @@
          
          // Setup the DataTable
          this._setupDataTable();
-
-         // Set initial focus
+         
+         // register the "enter" event on the search text field
          var searchText = Dom.get(this.id + "-search-text");
-         searchText.focus();
-
-         /*
-          * Enter key listener function needs to be enclosed due to having "window" scope
-          *
-          * @method: onKeyEnter
-          * @param id
-          * @param keyEvent {object} The key event details
-          */
-         var onKeyEnter = function PeopleFinder_onKeyEnter(id, keyEvent)
-         {
-            me.onSearchClick.call(me, keyEvent, null);
-            return false;
-         }
-
-         // Enter key listener
-         var enterListener = new YAHOO.util.KeyListener(searchText,
+         
+         new YAHOO.util.KeyListener(searchText,
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
-         }, onKeyEnter, "keyup");
-         enterListener.enable();
+         },
+         {
+            fn: function() 
+            {
+               me.onSearchClick();
+            },
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
+         
+         // Set initial focus
+         searchText.focus();
       },
       
       /**
@@ -567,7 +562,6 @@
        */
       onSearchClick: function PeopleFinder_onSearchClick(e, p_obj)
       {
-         // fetch the firstname, lastname nad email
          var searchTermElem = Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
          searchTerm = $html(searchTerm);
@@ -695,10 +689,10 @@
       },
 
       /**
-       * Build URI parameter string for doclist JSON data webscript
+       * Build URI parameter string for People Finder JSON data webscript
        *
        * @method _buildSearchParams
-       * @param path {string} Path to query
+       * @param searchTerm {string} Search terms to query
        */
       _buildSearchParams: function PeopleFinder__buildSearchParams(searchTerm)
       {
