@@ -12,11 +12,6 @@
    padding-bottom: 0.5em;
 }
 
-.yui-t1 #yui-main .yui-b
-{
-   margin-left: 0em;
-}
-
 .users .align-right
 {
    text-align: right;
@@ -29,7 +24,6 @@
 
 .users .search-bar
 {
-   margin-top: 0.8em;
    padding: 0.4em;
 }
 
@@ -41,6 +35,17 @@
 
 .users .search-text input
 {
+   padding: 3px;
+}
+
+.users .separator
+{
+   margin-bottom: 0.8em;
+}
+
+.users .panel
+{
+   border: 1px solid #D7D7D7;
 }
 
 .users .results table
@@ -65,4 +70,10 @@
 {
    background-color: #ffffff;
    cursor: auto;
+}
+
+.users td.yui-dt-asc,
+.users td.yui-dt-desc
+{
+   background-color: #ffffff !important;
 }

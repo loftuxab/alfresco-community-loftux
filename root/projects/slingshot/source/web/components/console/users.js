@@ -161,34 +161,87 @@
          // New User button
          this.widgets.newuserButton = Alfresco.util.createYUIButton(this, "newuser-button", this.onNewUserClick);
          
-         //
-         // TODO: datatable and datasource setup
-         //
-         
-         // Set initial focus
-         var searchText = Dom.get(this.id + "-search-text");
-         searchText.focus();
-         
-         /*
-          * Enter key listener function needs to be enclosed due to having "window" scope
-          *
-          * @method: onKeyEnter
-          * @param id
-          * @param keyEvent {object} The key event details
-          */
-         var onKeyEnter = function ConsoleUsers_onKeyEnter(id, keyEvent)
+         // DataTable and DataSource setup
+         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/people");
+         this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+         this.widgets.dataSource.responseSchema =
          {
-            me.onSearchClick.call(me, keyEvent, null);
-            return false;
+            resultsList: "people",
+            fields:
+            [
+               "avatar", "userName", "firstName", "lastName", "jobtitle", "email", "quota", "sizeCurrent"
+            ],
+            metaFields:
+            {
+               recordOffset: "startIndex",
+               totalRecords: "totalRecords"
+            }
+         };
+         
+         // Work to be performed after data has been queried but before display by the DataTable
+         this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
+         {
+            var updatedResponse = oFullResponse;
+            
+            if (oFullResponse)
+            {
+               var items = oFullResponse.people;
+               
+               // remove GUEST(s)
+               for (var i = 0; i < items.length; i++)
+               {
+                   if (items[i].userName == "guest" || items[i].userName.indexOf("guest&") == 0)
+                   {
+                      items.splice(i, 1);
+                   }
+               }
+               
+               // initial sort by username field
+               items.sort(function(a, b)
+               {
+                  return (a.userName > b.userName);
+               });
+               
+               // we need to wrap the array inside a JSON object so the DataTable gets the object it expects
+               updatedResponse =
+               {
+                  "people": items
+               };
+            }
+            
+            // update Results Bar message with number of results found
+            if (items.length < me.options.maxSearchResults)
+            {
+               me._setResultsMessage("message.results", $html(me.searchTerm), items.length);
+            }
+            else
+            {
+               me._setResultsMessage("message.maxresults", me.options.maxSearchResults);
+            }
+            
+            return updatedResponse;
          }
-
-         // Enter key listener
-         var enterListener = new YAHOO.util.KeyListener(searchText,
+         
+         this._setupDataTable();
+         
+         // register the "enter" event on the search text field
+         var searchText = Dom.get(this.id + "-search-text");
+         
+         new YAHOO.util.KeyListener(searchText,
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
-         }, onKeyEnter, "keyup");
+         },
+         {
+            fn: function() 
+            {
+               me.onSearchClick();
+            },
+            scope: this,
+            correctScope: true
+         }, "keydown").enable();
          
-         enterListener.enable();
+         // Set initial focus
+         searchText.focus();
       },
       
       /**
@@ -207,7 +260,122 @@
           */
          var me = this;
          
-         // TODO: add datatable renderers
+         /**
+          * User avatar custom datacell formatter
+          *
+          * @method renderCellAvatar
+          */
+         var renderCellAvatar = function ConsoleUsers_renderCellAvatar(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            
+            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+            if (oRecord.getData("avatar") !== undefined)
+            {
+               avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
+            }
+            
+            elCell.innerHTML = '<img class="avatar" src="' + avatarUrl + '" alt="' + $html(oRecord.getData("userName")) + '" />';
+         };
+         
+         /**
+          * User full name custom datacell formatter
+          *
+          * @method renderCellFullName
+          */
+         var renderCellFullName = function ConsoleUsers_renderCellFullName(elCell, oRecord, oColumn, oData)
+         {
+            var firstName = oRecord.getData("firstName");
+            var lastName = oRecord.getData("lastName");
+            var name = firstName + ' ' + (lastName ? lastName : "");
+            
+            elCell.innerHTML = $html(name);
+         };
+         
+         /**
+          * Quota custom datacell formatter
+          *
+          * @method renderCellQuota
+          */
+         var renderCellQuota = function ConsoleUsers_renderCellQuota(elCell, oRecord, oColumn, oData)
+         {
+            var quota = oRecord.getData("quota");
+            var display = (quota > 0 ? Alfresco.util.formatFileSize(quota) : "");
+            elCell.innerHTML = display;
+         };
+         
+         /**
+          * Usage custom datacell formatter
+          *
+          * @method renderCellUsage
+          */
+         var renderCellUsage = function ConsoleUsers_renderCellQuota(elCell, oRecord, oColumn, oData)
+         {
+            elCell.innerHTML = Alfresco.util.formatFileSize(oRecord.getData("sizeCurrent"));
+         };
+         
+         /**
+          * Generic HTML-safe custom datacell formatter
+          */
+         var renderCellSafeHTML = function ConsoleUsers_renderCellSafeHTML(elCell, oRecord, oColumn, oData)
+         {
+            elCell.innerHTML = $html(oData);
+         };
+         
+         /**
+          * Usage custom datacell sorter
+          */
+         var sortCellUsage = function ConsoleUsers_sortCellUsage(a, b, desc)
+         {
+            var numA = a.getData("sizeCurrent"),
+                numB = b.getData("sizeCurrent");
+            
+            if (desc)
+            {
+               return (numA < numB ? 1 : (numA > numB ? -1 : 0));
+            }
+            return (numA < numB ? -1 : (numA > numB ? 1 : 0));
+         };
+         
+         /**
+          * Quota custom datacell sorter
+          */
+         var sortCellQuota = function ConsoleUsers_sortCellQuota(a, b, desc)
+         {
+            var numA = a.getData("quota"),
+                numB = b.getData("quota");
+            
+            if (desc)
+            {
+               return (numA < numB ? 1 : (numA > numB ? -1 : 0));
+            }
+            return (numA < numB ? -1 : (numA > numB ? 1 : 0));
+         };
+         
+         // DataTable column defintions
+         var columnDefinitions =
+         [
+            { key: "avatar", label: "", sortable: false, formatter: renderCellAvatar, width: 70 },
+            { key: "fullName", label: this._msg("label.name"), sortable: true, formatter: renderCellFullName },
+            { key: "userName", label: this._msg("label.username"), sortable: true, formatter: renderCellSafeHTML },
+            { key: "jobtitle", label: this._msg("label.jobtitle"), sortable: true, formatter: renderCellSafeHTML },
+            { key: "email", label: this._msg("label.email"), sortable: true, formatter: renderCellSafeHTML },
+            { key: "usage", label: this._msg("label.usage"), sortable: true, sortOptions: {sortFunction: sortCellUsage}, formatter: renderCellUsage },
+            { key: "quota", label: this._msg("label.quota"), sortable: true, sortOptions: {sortFunction: sortCellQuota}, formatter: renderCellQuota }
+         ];
+         
+         // DataTable definition
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-datatable", columnDefinitions, this.widgets.dataSource,
+         {
+            initialLoad: false,
+            renderLoopSize: 32,
+            sortedBy:
+            {
+               key: "userName",
+               dir: "asc"
+            },
+            MSG_EMPTY: this._msg("message.empty")
+         });
       },
 
       /**
@@ -226,7 +394,7 @@
       {
          var searchTermElem = Dom.get(this.id + "-search-text");
          var searchTerm = searchTermElem.value;
-         searchTerm = $html(searchTerm);
+         
          if (searchTerm.length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
@@ -261,6 +429,7 @@
        *
        * @method _setDefaultDataTableErrors
        * @param dataTable {object} Instance of the DataTable
+       * @private
        */
       _setDefaultDataTableErrors: function ConsoleUsers__setDefaultDataTableErrors(dataTable)
       {
@@ -274,9 +443,13 @@
        *
        * @method _performSearch
        * @param searchTerm {string} Search term from input field
+       * @private
        */
       _performSearch: function ConsoleUsers__performSearch(searchTerm)
       {
+         // keep track of the last search performed
+         this.searchTerm = searchTerm;
+         
          // Reset the custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
          
@@ -306,6 +479,7 @@
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
                   this.widgets.dataTable.set("MSG_ERROR", response.message);
                   this.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
+                  this._setResultsMessage("message.noresults");
                }
                catch(e)
                {
@@ -314,7 +488,6 @@
             }
          }
          
-         this.searchTerm = searchTerm;
          this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
          {
                success: successHandler,
@@ -324,14 +497,28 @@
       },
 
       /**
-       * Build URI parameters for doclist JSON data webscript
+       * Build URI parameters for People List JSON data webscript
        *
        * @method _buildSearchParams
-       * @param path {string} Path to query
+       * @param searchTerm {string} User search term
+       * @private
        */
       _buildSearchParams: function ConsoleUsers__buildSearchParams(searchTerm)
       {
-         return "q=" + encodeURIComponent(searchTerm) + "&maxResults=" + this.options.maxSearchResults;
+         return "?filter=" + encodeURIComponent(searchTerm) + "&maxResults=" + this.options.maxSearchResults;
+      },
+      
+      /**
+       * Set the message in the Results Bar area
+       * 
+       * @method _setResultsMessage
+       * @param messageId {string} The messageId to display
+       * @private
+       */
+      _setResultsMessage: function ConsoleUsers__setResultsMessage(messageId, arg1, arg2)
+      {
+         var resultsDiv = Dom.get(this.id + "-search-bar");
+         resultsDiv.innerHTML = this._msg(messageId, arg1, arg2);
       },
       
       /**
