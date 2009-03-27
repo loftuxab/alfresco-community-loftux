@@ -6,8 +6,8 @@ var defaultConstraintHandlers = null;
 var formUIConstraints = null;
          
 /* constants */
-const PROP_PREFIX = "prop_"
-const ASSOC_PREFIX = "assoc_";
+const PROP_PREFIX = "prop:"
+const ASSOC_PREFIX = "assoc:";
 
 /**
  * Main entrypoint for component webscript logic
@@ -282,7 +282,8 @@ function setupField(formModel, fieldName, fieldConfig)
       {
          logger.warn("\"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
       }
-      createTransientField(fieldName, { template: "controls/ambiguous.ftl" });
+      
+      fieldDef = createTransientField(fieldName, { template: "controls/ambiguous.ftl" });
    }
    else
    {
@@ -314,7 +315,24 @@ function setupField(formModel, fieldName, fieldConfig)
          // setup the basic properties
          fieldDef.kind = "field";
          fieldDef.configName = fieldName;
-         var name = (fieldDef.type === "association") ? ASSOC_PREFIX + fieldName : PROP_PREFIX + fieldName;
+         // force the conversion to a JavaScript string object so replace() can be used below
+         var name = "" + fieldName;
+         if (fieldDef.type === "association") 
+         {
+            // check that the association does not already have the prefix
+            if (name.indexOf(ASSOC_PREFIX) !== 0)
+            {
+               name = ASSOC_PREFIX + fieldName;
+            }
+         }
+         else
+         {
+            // check that the property does not already have the prefix
+            if (name.indexOf(PROP_PREFIX) !== 0)
+            {
+               name = PROP_PREFIX + fieldName;
+            }
+         }         
          fieldDef.name = name.replace(/:/g, "_");
          fieldDef.id = fieldDef.name;
          
