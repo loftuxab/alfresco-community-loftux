@@ -12,3 +12,5 @@
 ::BuilderAPI::ModifyObject -object "Java" -active Yes
 ::BuilderAPI::ModifyObject -object "OpenOffice" -active Yes
 ::BuilderAPI::ModifyObject -object "OOLocation" -active No
+
+source labs.ijs
