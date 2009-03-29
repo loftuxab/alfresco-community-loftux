@@ -367,16 +367,16 @@
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/quick-installer/output" />
       <mkdir dir="${dir.project.installer.builder}/quick-installer/output" />
-      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Linux-x86 -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
       </exec>
       <tar destfile="${dir.continuous.dist}/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOSXInstall.tar.gz"
@@ -693,7 +693,7 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/deploy-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer129.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.deploy}"'/>
       </exec>
       <move todir="${dir.continuous.dist}" failonerror="false">

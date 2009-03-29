@@ -1,13 +1,17 @@
-Alfresco Enterprise 3.1 Release
--------------------------------
+Alfresco Labs 3E
+================
+
+For information on what is included in this release, refer to:
+http://wiki.alfresco.com/wiki/Alfresco_Labs_3
 
 For Release Notes, refer to:
-http://wiki.alfresco.com/wiki/Release_3.1
+http://wiki.alfresco.com/wiki/Alfresco_Labs_3e_Release_Notes
 
 For Installation instructions, refer to:
-Administering an Alfresco ECM Version 3.1 Production Environment at either:
+Installing and configuring Alfresco Labs guide in:
 
-http://partners.alfresco.com or http://customers.alfresco.com
+share.alfresco.com
+Document Library > Documents > Documentation > Labs 3e
 
-For Support, your named contact can log an issue at http://support.alfresco.com
-or email act@alfresco.com. If this is a severity 1 issue, please call us.
+For support, refer to:
+http://forums.alfresco.com
