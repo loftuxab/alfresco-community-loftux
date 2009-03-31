@@ -1,0 +1,147 @@
+.object-finder
+{
+   color: #000;
+   margin: 0.6em 0 1.3em;
+}
+
+.object-finder.list
+{
+   margin-bottom: 10px;
+}
+
+.object-finder .finder-wrapper
+{
+	border: 1px solid #c0c0c0;
+	margin-top: 10px;
+	display: none;
+}
+
+.object-finder .results table
+{
+   width: 100%;
+   border: none;
+}
+
+.object-finder .results table thead
+{
+   display: none;
+}
+
+.object-finder .yui-dt td
+{
+   border-bottom: 1px dashed #D7D7D7;
+   border-right: medium none;
+}
+
+.object-finder .yui-dt-last td
+{
+   border-bottom: medium none;
+}
+
+.object-finder tr.yui-dt-odd,
+.object-finder tr.yui-dt-even
+{
+   background-color: #ffffff;
+   cursor: auto;
+}
+
+/**
+ * If an element with "position: relative;" is used inside
+ * another element with "overflow: scroll;" IE takes the inner element "out of
+ * the flow" which makes statically positioned on the screen ignoring to be
+ * hidden and following the scrollbar.
+ *
+ * In this component, position relative is used for the progress bars, but
+ * a YUI button is also used which causes the same problem.
+ *
+ * If the outer element also has "position: relative;" it works though.
+ */
+/*.object-finder .results .yui-dt-bd
+{
+   position:relative;
+}*/
+
+.object-finder .title
+{
+   color: #008000;
+   font-size: 108%;
+}
+
+.object-finder .search-bar
+{
+	border-bottom: 1px dashed #c0c0c0;
+   height: 2.4em;
+	padding: 0.5em;
+}
+
+.object-finder .search-bar div
+{
+   float: left;
+}
+
+.object-finder .search-text
+{
+   padding: 0.3em 1em 0.5em 0.5em;
+}
+
+.object-finder .search-text input
+{
+   width: 20em;
+}
+
+.object-finder .search-button button
+{
+   background: transparent url(../images/search-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+
+.object-finder .results
+{
+   clear: both;
+   background-color: #f6f9fc;
+   overflow-x: hidden;
+   overflow-y: auto;
+   position: relative !important;
+}
+
+/*.object-finder .itemname a
+{
+   color: #276FB6;
+}
+*/
+.object-finder .detail
+{
+   line-height: 1.4em;
+}
+
+.object-finder .detail span
+{
+   color: #656565;
+}
+
+/* Compact Mode */
+.object-finder.compact div.title
+{
+   display: none;
+}
+
+.object-finder.compact .search-text input
+{
+   width: 14em;
+   margin: 0;
+}
+
+.object-finder.compact .results
+{
+   height: 160px;
+}
+
+.object-finder.compact img.avatar
+{
+   width: 32px;
+}
+
+.object-finder.compact div.detail
+{
+   display: inline;
+}
