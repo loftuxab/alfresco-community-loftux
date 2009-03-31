@@ -248,15 +248,15 @@ public class PresentationTemplateProcessor
     protected void initConfig()
     {
         // construct template config
-        templateConfig = new Configuration();
-        templateConfig.setCacheStorage(new MruCacheStorage(this.cacheSize, this.cacheSize << 1));
-        templateConfig.setTemplateUpdateDelay(updateDelay);
-        templateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        templateConfig.setLocalizedLookup(false);
-        templateConfig.setOutputEncoding("UTF-8");
+        Configuration config = new Configuration();
+        config.setCacheStorage(new MruCacheStorage(cacheSize, cacheSize << 1));
+        config.setTemplateUpdateDelay(updateDelay);
+        config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        config.setLocalizedLookup(false);
+        config.setOutputEncoding("UTF-8");
         if (defaultEncoding != null)
         {
-            templateConfig.setDefaultEncoding(defaultEncoding);
+            config.setDefaultEncoding(defaultEncoding);
         }
         
         if (searchPath != null)
@@ -272,7 +272,9 @@ public class PresentationTemplateProcessor
            }
         }
         MultiTemplateLoader loader = new MultiTemplateLoader(loaders.toArray(new TemplateLoader[loaders.size()]));
-        templateConfig.setTemplateLoader(loader);
+        config.setTemplateLoader(loader);
+        
+        templateConfig = config;
         
         // construct string config
         stringConfig = new Configuration();
