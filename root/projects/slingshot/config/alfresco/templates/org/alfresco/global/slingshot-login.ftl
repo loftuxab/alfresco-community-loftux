@@ -88,13 +88,23 @@
       Dom.get("username").focus();
    });
    
-   <#if url.args["error"]??>
+<#if url.args["error"]??>
    Alfresco.util.PopupManager.displayPrompt(
+   {
+      title: Alfresco.util.message("message.loginfailure"),
+      text: Alfresco.util.message("message.loginautherror"),
+      buttons: [
       {
-         title: Alfresco.util.message("message.loginfailure"),
-         text: Alfresco.util.message("message.loginautherror")
-      });
-   </#if>
+         text: Alfresco.util.message("button.ok"),
+         handler: function error_onOk()
+         {
+            this.destroy();
+            YAHOO.util.Dom.get("username").focus();
+         },
+         isDefault: true
+      }]
+   });
+</#if>
    //]]></script>
 </@>
 </body>

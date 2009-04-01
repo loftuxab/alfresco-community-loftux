@@ -1815,8 +1815,8 @@
       onActionUploadNewVersion: function DL_onActionUploadNewVersion(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("fileName");
-         var nodeRef = record.getData("nodeRef");
+         var fileName = record.getData("fileName"),
+            nodeRef = record.getData("nodeRef");
 
          if (this.fileUpload === null)
          {
