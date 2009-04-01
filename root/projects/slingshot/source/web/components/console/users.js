@@ -267,7 +267,9 @@
           */
          var renderCellAvatar = function ConsoleUsers_renderCellAvatar(elCell, oRecord, oColumn, oData)
          {
+            Dom.setStyle(elCell, "min-height", "64px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.setStyle(elCell.parentNode, "border-right", "1px solid #D7D7D7");
             
             var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
             if (oRecord.getData("avatar") !== undefined)
