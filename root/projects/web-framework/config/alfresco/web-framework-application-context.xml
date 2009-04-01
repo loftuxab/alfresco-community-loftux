@@ -113,7 +113,8 @@
    
    <bean id="webframework.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
       <property name="searchPath" ref="webframework.searchpath" />
-   </bean>  
+      <property name="compile"><value>true</value></property>
+   </bean>
    
    <bean id="webframework.webscripts.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />
    
@@ -188,6 +189,7 @@
    
    <bean id="webframework.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
       <property name="searchPath" ref="webframework.templates.searchpath" />
+      <property name="compile"><value>true</value></property>
    </bean>
 
 

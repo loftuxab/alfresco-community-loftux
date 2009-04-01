@@ -185,7 +185,4 @@
    <!-- Slingshot "no-component" processor -->
    <bean id="webframework.processor.nocomponent" class="org.alfresco.web.site.EmptyRegionRenderer" />   
    
-   <!-- import app-context extensions -->
-   <import resource="classpath*:alfresco/web-extension/custom-slingshot-application-context.xml"/>
-   
 </beans>
