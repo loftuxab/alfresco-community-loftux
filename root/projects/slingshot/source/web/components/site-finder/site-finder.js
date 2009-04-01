@@ -36,8 +36,8 @@
     */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
-   
+      KeyListener = YAHOO.util.KeyListener;
+      
    /**
     * Alfresco Slingshot aliases
     */
@@ -62,6 +62,7 @@
       this.searchTerm = "";
       this.memberOfSites = {};
       this.membershipsRetrieved = false;
+      this.pendingInvites = {};
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -72,7 +73,7 @@
       YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
 
       return this;
-   }
+   };
    
    Alfresco.SiteFinder.prototype =
    {
@@ -94,21 +95,20 @@
          maxResults: 100,
          
          /**
-          * Flag to indicate whether private sites should be displayed
-          * 
-          * @property showPrivateSites
-          * @type boolean
-          * @default false
-          */
-         showPrivateSites: false,
-         
-         /**
           * The userid of the current user
           * 
           * @property currentUser
           * @type string
           */
-         currentUser: ""
+         currentUser: "",
+         
+         /**
+          * Invite data for pending invitations
+          *
+          * @property @inviteData
+          * @type array
+          */
+         inviteData: []
       },
 
       /**
@@ -117,7 +117,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * List of Join/Leave buttons
@@ -125,7 +125,7 @@
        * @property buttons
        * @type array
        */
-      buttons: [],
+      buttons: null,
 
       /**
        * Object container for storing module instances.
@@ -133,7 +133,7 @@
        * @property modules
        * @type object
        */
-      modules: {},
+      modules: null,
 
       /**
        * Search term used for the site search.
@@ -149,7 +149,7 @@
        * @property memberOfSites
        * @type object
        */
-      memberOfSites: {},
+      memberOfSites: null,
       
       /**
        * Flag to determine whether membership details have been
@@ -160,6 +160,14 @@
        * @type boolean
        */
       membershipsRetrieved: null,
+      
+      /**
+       * Provides easy look-up of pending invites for this user
+       * 
+       * @property pendingInvites
+       * @type object
+       */
+      pendingInvites: null,
       
       /**
        * Set multiple initialization options at once.
@@ -218,7 +226,12 @@
                fn: this._processMembership, 
                scope: this 
             },
-            failureMessage: me._msg("site-finder.no-membership-detail")
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: this._msg("site-finder.no-membership-detail"),
+               scope: this
+            }
          };
          Alfresco.util.Ajax.request(config);
          
@@ -230,7 +243,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["url", "sitePreset", "shortName", "title", "description", "isSiteManager", "node", "tagScope", "isPublic", "button"]
+             fields: ["url", "sitePreset", "shortName", "title", "description", "isSiteManager", "node", "tagScope", "visibility", "button"]
          };
          this.widgets.dataSource.doBeforeParseData = function SiteFinder_doBeforeParseData(oRequest , oFullResponse)
          {
@@ -241,28 +254,23 @@
                var items = [];
                
                // determine list of sites to show
-               if (me.searchTerm.length == 0 && me.showPrivateSites)
+               if (me.searchTerm.length === 0)
                {
-                  // if no search term and private sites are to be shown
-                  // just pass response through
                   items = oFullResponse;
                }
                else
                {
-                  for (var x = 0; x < oFullResponse.length; x++)
+                  var siteData, shortName, title, siteVisibility;
+                  
+                  for (var x = 0, y = oFullResponse.length; x < y; x++)
                   {
-                     var siteData = oFullResponse[x];
-                     var shortName = siteData.shortName;
-                     var title = siteData.title;
-                     var isPublic = siteData.isPublic;
+                     siteData = oFullResponse[x];
+                     shortName = siteData.shortName;
+                     title = siteData.title;
+                     siteVisibility = siteData.visibility;
                      
-                     // Filter out private sites if necessary
-                     if (me.options.showPrivateSites ||
-                         (!me.options.showPrivateSites && isPublic))
-                     {
-                        // add site to list
-                        items.push(siteData);
-                     }
+                     // add site to list
+                     items.push(siteData);
                   }
                }
 
@@ -273,13 +281,14 @@
                });
 
                // Resolve what sites the user is site admin for
-               for(var i = 0; i < items.length; i++)
+               var siteManagers, i, j, k, l;
+               for (i = 0, j = items.length; i < j; i++)
                {
                   items[i].isSiteManager = false;
-                  var siteManagers = items[i].siteManagers;
-                  for(var j = 0; siteManagers && j < siteManagers.length; j++)
+                  siteManagers = items[i].siteManagers;
+                  for (k = 0, l = siteManagers.length; siteManagers && k < l; k++)
                   {
-                     if(siteManagers[j] == Alfresco.constants.USERNAME)
+                     if (siteManagers[k] == Alfresco.constants.USERNAME)
                      {
                         items[i].isSiteManager = true;
                         break;
@@ -304,24 +313,22 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
          
          // register the "enter" event on the search text field
-         var searchIinput = Dom.get(this.id + "-term");
-         new YAHOO.util.KeyListener(searchIinput,
+         var searchInput = Dom.get(this.id + "-term");
+         new KeyListener(searchInput,
          {
             keys:13
          },
          {
             fn: function() 
             {
-               me.doSearch()
+               me.doSearch();
             },
             scope:this,
             correctScope:true
-         }, 
-         "keydown" 
-         ).enable();
+         }, "keydown").enable();
 
          // Set initial focus
-         searchIinput.focus();
+         searchInput.focus();
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -329,14 +336,24 @@
 
       _processMembership: function SiteFinder__processMembership(response)
       {
+         var i, j;
+         
+         // Copy the pending invite data
+         var invites = this.options.inviteData, invite;
+         for (i = 0, j = invites.length; i < j; i++)
+         {
+            invite = invites[i];
+            this.pendingInvites[invite.siteId] = invite.id;
+            this.memberOfSites[invite.siteId] = "PENDING";
+         }
+         
          if (response.json.error === undefined)
          {
-            var sites = response.json;
-            for (var x = 0; x < sites.length; x++)
+            var sites = response.json, site;
+            for (i = 0, j = sites.length; i < j; i++)
             {
-               var site = sites[x];
-               
-               this.memberOfSites[site.shortName] = true;
+               site = sites[i];
+               this.memberOfSites[site.shortName] = "MEMBER";
             }
             
             // indicate that membership details have been received
@@ -344,6 +361,12 @@
          }
       },
       
+      /**
+       * Declare inline DataTable renderes and create YUI object
+       *
+       * @method _setupDataTable
+       * @private
+       */
       _setupDataTable: function SiteFinder_setupDataTable()
       {
          /**
@@ -386,16 +409,12 @@
           */
          renderCellDescription = function SiteFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var shortName = oRecord.getData("shortName");
-            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";         
-            var title = oRecord.getData("title");
-            var desc = oRecord.getData("description");
-            var isPublic = oRecord.getData("isPublic");
+            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + oRecord.getData("shortName") + "/dashboard";         
             
             // title/link to site page
-            var details = '<h3 class="sitename"><a href="' + url + '" class="theme-color-1">' + $html(title) + '</a></h3>';
+            var details = '<h3 class="sitename"><a href="' + url + '" class="theme-color-1">' + $html(oRecord.getData("title")) + '</a></h3>';
             // description
-            details += '<div class="sitedescription">' + $html(desc) + '</div>';
+            details += '<div class="sitedescription">' + $html(oRecord.getData("description")) + '</div>';
             
             elCell.innerHTML = details;
          };
@@ -413,47 +432,90 @@
          {
             if (me.membershipsRetrieved)
             {
-               var isPublic = oRecord.getData("isPublic");
-               if (isPublic)
-               {
-                  var shortName = oRecord.getData("shortName");
-                  var isSiteManager = oRecord.getData("isSiteManager");
-                  var title = $html(oRecord.getData("title"));
-                  var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
-                  if (shortName in me.memberOfSites && isSiteManager)
-                  {
-                     action = '<span id="' + me.id + '-deleteButton-' + shortName + '"></span>&nbsp;' + action;
-                  }
-                  elCell.innerHTML = action;
-                  
-                  // create button
-                  var button = new YAHOO.widget.Button(
-                  {
-                      container: me.id + '-button-' + shortName
-                  });
-                  
-                  // if the user is already a member of the site show leave button
-                  // otherwise show join button
-                  if (shortName in me.memberOfSites)
-                  {
-                     // delete site button
-                     var deleteButton = new YAHOO.widget.Button(
-                     {
-                         container: me.id + '-deleteButton-' + shortName
-                     });
-                     deleteButton.set("label", me._msg("site-finder.delete"));
-                     deleteButton.set("onclick",
-                     {
-                        fn: me.doDelete,
-                        obj:
-                        {
-                           shortName: shortName,
-                           title: title
-                        },
-                        scope: me
-                     });
+               var siteVisibility = oRecord.getData("visibility").toUpperCase(),
+                  shortName = oRecord.getData("shortName"),
+                  isSiteManager = oRecord.getData("isSiteManager"),
+                  title = $html(oRecord.getData("title"));
 
-                     // leave button
+               var hasDelete = (me.memberOfSites[shortName] == "MEMBER" && isSiteManager);
+
+               // Create the mark-up for at least one button, adding delete if appropriate
+               var action = '<span id="' + me.id + '-button-' + shortName + '"></span>';
+               if (hasDelete)
+               {
+                  action = '<span id="' + me.id + '-deleteButton-' + shortName + '"></span>&nbsp;' + action;
+               }
+               elCell.innerHTML = action;
+
+               if (hasDelete)
+               {
+                  // Delete site button can now be YUI'd
+                  var deleteButton = new YAHOO.widget.Button(
+                  {
+                      container: me.id + '-deleteButton-' + shortName
+                  });
+                  deleteButton.set("label", me._msg("site-finder.delete"));
+                  deleteButton.set("onclick",
+                  {
+                     fn: me.doDelete,
+                     obj:
+                     {
+                        shortName: shortName,
+                        title: title
+                     },
+                     scope: me
+                  });
+               }
+
+               // Create generic button - action populated later depending on state
+               var button = new YAHOO.widget.Button(
+               {
+                   container: me.id + '-button-' + shortName
+               });
+
+               switch (siteVisibility)
+               {
+                  case "PUBLIC":
+                     // If already a member of the site then show leave action, otherwise show join
+                     if (me.memberOfSites[shortName] == "MEMBER")
+                     {
+                        // Leave site action
+                        button.set("label", me._msg("site-finder.leave"));
+                        button.set("onclick",
+                        {
+                           fn: me.doLeave,
+                           obj:
+                           {
+                              shortName: shortName,
+                              title: title
+                           },
+                           scope: me
+                        });
+                     }
+                     else
+                     {
+                        // Join site action
+                        button.set("label", me._msg("site-finder.join"));
+                        button.set("onclick",
+                        {
+                           fn: me.doJoin,
+                           obj:
+                           {
+                              shortName: shortName, 
+                              title: title
+                           },
+                           scope: me
+                        });
+                     }
+
+                     me.buttons[shortName] =
+                     {
+                        button: button
+                     };
+                     break;
+                  
+                  case "PRIVATE":
+                     // Must already be a member of the site so show leave action
                      button.set("label", me._msg("site-finder.leave"));
                      button.set("onclick",
                      {
@@ -465,46 +527,87 @@
                         },
                         scope: me
                      });
-                  }
-                  else
-                  {
-                     button.set("label", me._msg("site-finder.join"));
-                     button.set("onclick",
+
+                     me.buttons[shortName] =
                      {
-                        fn: me.doJoin,
-                        obj:
-                        {
-                           shortName: shortName, 
-                           title: title
-                        },
-                        scope: me
-                     });
-                  }
+                        button: button
+                     };
+                     break;
                   
-                  me.buttons[shortName] =
-                  {
-                     button: button
-                  };
+                  case "MODERATED":
+                     // If already a member of the site then show leave action, otherwise show join request
+                     if (me.memberOfSites[shortName] == "MEMBER")
+                     {
+                        // Leave site action
+                        button.set("label", me._msg("site-finder.leave"));
+                        button.set("onclick",
+                        {
+                           fn: me.doLeave,
+                           obj:
+                           {
+                              shortName: shortName,
+                              title: title
+                           },
+                           scope: me
+                        });
+                     }
+                     else if (me.memberOfSites[shortName] == "PENDING")
+                     {
+                        // Leave site action
+                        button.set("label", me._msg("site-finder.cancel-request"));
+                        button.set("onclick",
+                        {
+                           fn: me.doCancelRequest,
+                           obj:
+                           {
+                              shortName: shortName,
+                              title: title
+                           },
+                           scope: me
+                        });
+                     }
+                     else
+                     {
+                        // Join site action
+                        button.set("label", me._msg("site-finder.request-join"));
+                        button.set("onclick",
+                        {
+                           fn: me.doRequestJoin,
+                           obj:
+                           {
+                              shortName: shortName, 
+                              title: title
+                           },
+                           scope: me
+                        });
+                     }
+
+                     me.buttons[shortName] =
+                     {
+                        button: button
+                     };
+                     break;
+                  
+                  default:
+                     // output padding div so layout is not messed up due to missing buttons
+                     elCell.innerHTML = '<div></div>';
+                     break;
                }
-            }
-            else
-            {
-               // output padding div so layout is not messed up due to missing buttons
-               elCell.innerHTML = '<div></div>';
             }
          };
 
          // DataTable column defintions
-         var columnDefinitions = [
-         {
-            key: "shortName", label: "Short Name", sortable: false, formatter: renderCellThumbnail
-         },
-         {
-            key: "title", label: "Title", sortable: false, formatter: renderCellDescription
-         },
-         {
-            key: "description", label: "Description", formatter: renderCellActions
-         }
+         var columnDefinitions =
+         [
+            {
+               key: "shortName", label: "Short Name", sortable: false, formatter: renderCellThumbnail
+            },
+            {
+               key: "description", label: "Description", sortable: false, formatter: renderCellDescription
+            },
+            {
+               key: "button", label: "Actions", formatter: renderCellActions
+            }
          ];
 
          // DataTable definition
@@ -533,7 +636,7 @@
             }
             else if (oResponse.results)
             {
-               if (oResponse.results.length == 0)
+               if (oResponse.results.length === 0)
                {
                   me.widgets.dataTable.set("MSG_EMPTY", '<span style="white-space: nowrap;">' + me._msg("message.empty") + '</span>');
                }
@@ -542,7 +645,7 @@
             
             // Must return true to have the "Searching..." message replaced by the error message
             return true;
-         }
+         };
       },
       
       /**
@@ -554,6 +657,26 @@
       {
          this.searchTerm = Dom.get(this.id + "-term").value;
          this._performSearch(this.searchTerm);
+      },
+      
+      /**
+       * Generic failure callback handler
+       *
+       * @method _failureCallback
+       * @private
+       * @param message {string} Display message
+       */
+      _failureCallback: function SiteFinder__failureCallback(obj, message)
+      {
+         this._clearFeedbackMessage();
+         if (message)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: Alfresco.util.message("message.failure"),
+               text: message
+            });
+         }
       },
       
       /**
@@ -586,7 +709,12 @@
                obj: site,
                scope: this
             },
-            failureMessage: this._msg("site-finder.join-failure", this.options.currentUser, site.title)
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: this._msg("site-finder.join-failure", this.options.currentUser, site.title),
+               scope: this
+            }
          });
       },
       
@@ -600,7 +728,7 @@
       _joinSuccess: function SiteFinder__joinSuccess(response, site)
       {
          // add site to site membership list
-         this.memberOfSites[site.shortName] = true;
+         this.memberOfSites[site.shortName] = "MEMBER";
          
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
@@ -634,7 +762,12 @@
                obj: site,
                scope: this
             },
-            failureMessage: this._msg("site-finder.leave-failure", this.options.currentUser, site.title)
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: this._msg("site-finder.leave-failure", this.options.currentUser, site.title),
+               scope: this
+            }
          });
       },
       
@@ -660,6 +793,141 @@
          this.doSearch();
       },
 
+      /**
+       * Request Join event handler
+       *
+       * @method doRequestJoin
+       * @param event {object} The event object
+       * @param site {string} The shortName of the site to request joining
+       */
+      doRequestJoin: function SiteFinder_doRequestJoin(event, site)
+      {
+         var user = this.options.currentUser;
+         
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.please-wait"),
+            spanClass: "wait",
+            displayTime: 0
+         });
+
+         // make ajax call to site service to request joining
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site.shortName + "/invitations",
+            method: "POST",
+            dataObj:
+            {
+               invitationType: "MODERATED",
+               inviteeUserName: user,
+               inviteeComments: "",
+               inviteeRoleName: "SiteConsumer"
+            },
+            successCallback:
+            {
+               fn: this._requestJoinSuccess,
+               obj: site,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: this._msg("site-finder.request-join-failure", this.options.currentUser, site.title),
+               scope: this
+            }
+         });
+      },
+      
+      /**
+       * Callback handler used when a request has successfully been made to join a site
+       * 
+       * @method _requestJoinSuccess
+       * @param response {object}
+       * @param siteData {object}
+       */
+      _requestJoinSuccess: function SiteFinder__requestJoinSuccess(response, site)
+      {
+         var data = response.json.data,
+            siteId = site.shortName;
+
+         // add site to site membership list
+         this.memberOfSites[siteId] = "PENDING";
+         
+         // Get data.inviteId for the cancel request
+         this.pendingInvites[siteId] = data.inviteId;
+         
+         // show popup message to confirm
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("site-finder.request-join-success", this.options.currentUser, site.title)
+         });
+         
+         // redo the search again to get updated info
+         this.doSearch();
+      },
+
+      /**
+       * Cancel Join Request event handler
+       *
+       * @method doCancelRequest
+       * @param event {object} The event object
+       * @param site {string} The shortName of the site to cancel join request for
+       */
+      doCancelRequest: function SiteFinder_doCancelRequest(event, site)
+      {
+         var user = this.options.currentUser,
+            siteId = site.shortName;
+         
+         // show a wait message
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.please-wait"),
+            spanClass: "wait",
+            displayTime: 0
+         });
+
+         // make ajax call to site service to request joining
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + siteId + "/invitations/" + this.pendingInvites[siteId],
+            method: "DELETE",
+            successCallback:
+            {
+               fn: this._cancelRequestSuccess,
+               obj: site,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: this._msg("site-finder.cancel-request-failure", this.options.currentUser, site.title),
+               scope: this
+            }
+         });
+      },
+      
+      /**
+       * Callback handler used when a request has successfully been cancelled to join a site
+       * 
+       * @method _cancelRequestSuccess
+       * @param response {object}
+       * @param siteData {object}
+       */
+      _cancelRequestSuccess: function SiteFinder__cancelRequestSuccess(response, site)
+      {
+         // reset site status
+         this.memberOfSites[site.shortName] = "MODERATED";
+         
+         // show popup message to confirm
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("site-finder.cancel-request-success", this.options.currentUser, site.title)
+         });
+         
+         // redo the search again to get updated info
+         this.doSearch();
+      },
 
       /**
        * Delete event handler
@@ -679,7 +947,6 @@
       /**
        * Resets the YUI DataTable errors to our custom messages
        *
-       *
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
        * @method _setDefaultDataTableErrors
@@ -690,6 +957,27 @@
          var msg = Alfresco.util.message;
          dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.SiteFinder"));
          dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.SiteFinder"));
+      },
+      
+      /**
+       * Clears any current feedback message pop-up
+       *
+       * @method _cleanFeedbackMessage
+       */
+      _clearFeedbackMessage: function SiteFinder__clearFeedbackMessage()
+      {
+         if (this.widgets.feedbackMessage)
+         {
+            try
+            {
+               this.widgets.feedbackMessage.destroy();
+            }
+            catch(e)
+            {
+               
+            }
+            this.widgets.feeedbackMessage = null;
+         }
       },
       
       /**

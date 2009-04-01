@@ -29,12 +29,7 @@
    </#list>
          </p>
 </#if>
-         <p><span class="label">${msg("label.visibility")}</span>&nbsp;
-<#if profile.isPublic?? && profile.isPublic>
-         ${msg("text.public")}
-<#else>
-         ${msg("text.private")}
-</#if>
+         <p><span class="label">${msg("label.visibility")}</span>&nbsp;${msg("text." + (profile.visibility!"unknown")?lower_case)}</p>
          </p>
       </div>
       <div class="clear"></div>

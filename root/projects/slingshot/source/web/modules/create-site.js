@@ -34,7 +34,9 @@
 (function()
 {
    
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      Event = YAHOO.util.Event,
+      KeyListener = YAHOO.util.KeyListener;
    
    /**
     * CreateSite constructor.
@@ -157,7 +159,7 @@
          containerDiv.innerHTML = response.serverResponse.responseText;
 
          // The panel is created from the HTML returned in the XHR request, not the container
-         var panelDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+         var panelDiv = Dom.getFirstChild(containerDiv);
 
          this.widgets.panel = new YAHOO.widget.Panel(panelDiv,
          {
@@ -179,6 +181,12 @@
          {
             type: "submit"
          });
+         
+         // Site access form controls
+         this.widgets.siteVisibility = Dom.get(this.id + "-visibility");
+         this.widgets.isPublic = Dom.get(this.id + "-isPublic");
+         this.widgets.isModerated = Dom.get(this.id + "-isModerated");
+         this.widgets.isPrivate = Dom.get(this.id + "-isPrivate");
 
          // Configure the forms runtime
          var createSiteForm = new Alfresco.forms.Form(this.id + "-form");
@@ -203,11 +211,27 @@
          {
             fn: function()
             {
-               var formEl = YAHOO.util.Dom.get(this.id + "-form");
+               var formEl = Dom.get(this.id + "-form");
                formEl.attributes.action.nodeValue = Alfresco.constants.URL_SERVICECONTEXT + "modules/create-site"; 
-
+               
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
+               
+               // Site access
+               var siteVisibility = "PUBLIC";
+               if (this.widgets.isPublic.checked == true)
+               {
+                  if (this.widgets.isModerated.checked == true)
+                  {
+                     siteVisibility = "MODERATED";
+                  }
+               }
+               else
+               {
+                  siteVisibility = "PRIVATE";
+               }
+               this.widgets.siteVisibility.value = siteVisibility;
+               
                this.widgets.panel.hide();
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
@@ -239,24 +263,8 @@
          createSiteForm.applyTabFix();
          createSiteForm.init();
 
-         this.widgets.isPublicCheckbox = Dom.get(this.id + "-isPublic-checkbox");
-         YAHOO.util.Event.addListener(this.widgets.isPublicCheckbox, "change", this.onIsPublicChange, this, true);
-         this.widgets.isPublic = Dom.get(this.id + "-isPublic");
-
          // Show the panel
          this._showPanel();
-      },
-
-      /**
-       * Called when user clicks on the isPublic checkbox.
-       *
-       * @method onCancelButtonClick
-       * @param type
-       * @param args
-       */
-      onIsPublicChange: function CS_onIsPublicChange(type, args)
-      {
-         this.widgets.isPublic.value = this.widgets.isPublicCheckbox.checked ? "true" : "false";
       },
 
       /**
@@ -342,9 +350,9 @@
          Alfresco.util.caretFix(this.id + "-form");
 
          // Register the ESC key to close the dialog
-         var escapeListener = new YAHOO.util.KeyListener(document,
+         var escapeListener = new KeyListener(document,
          {
-            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            keys: KeyListener.KEY.ESCAPE
          },
          {
             fn: function(id, keyEvent)
@@ -357,7 +365,7 @@
          escapeListener.enable();
 
          // Set the focus on the first field
-         YAHOO.util.Dom.get(this.id + "-title").focus();
+         Dom.get(this.id + "-title").focus();
       }
 
    };

@@ -140,37 +140,50 @@
        */
       onReady: function CollaborationTitle_onReady()
       {
-         // Add event listeners for join link if present
-         var joinLink = document.getElementById(this.id + "-join-link");
-         if(joinLink)
+         var link;
+         
+         // Add event listener for join link if present
+         link = document.getElementById(this.id + "-join-link");
+         if (link)
          {
-            Event.addListener(joinLink, "click",
-                    function (event, obj)
-                    {
-                       // Call join site from a scope wokring in all browsers where we have all info
-                       obj.thisComponent.joinSite(obj.thisComponent.options.user, obj.thisComponent.options.site);
-                    },
+            Event.addListener(link, "click", function(e, obj)
+            {
+               // Call join site from a scope wokring in all browsers where we have all info
+               obj.thisComponent.joinSite(obj.thisComponent.options.user, obj.thisComponent.options.site);
+            },
             {
                thisComponent: this
             });
          }
 
-         // Add event listeners for leave link if present
-         var leaveLink = document.getElementById(this.id + "-leave-link");
-         if(leaveLink)
+         // Add event listener for request-to-join link if present
+         link = document.getElementById(this.id + "-requestJoin-link");
+         if (link)
          {
-            Event.addListener(leaveLink, "click",
-                    function (event, obj)
-                    {
-                       // Call leave site from a scope wokring in all browsers where we have all info
-                       obj.thisComponent.leaveSite(obj.thisComponent.options.user, obj.thisComponent.options.site);
-                    },
+            Event.addListener(link, "click", function(e, obj)
+            {
+               // Call join site from a scope wokring in all browsers where we have all info
+               obj.thisComponent.requestJoinSite(obj.thisComponent.options.user, obj.thisComponent.options.site);
+            },
+            {
+               thisComponent: this
+            });
+         }
+
+         // Add event listener for leave link if present
+         link = document.getElementById(this.id + "-leave-link");
+         if (link)
+         {
+            Event.addListener(link, "click", function(e, obj)
+            {
+              // Call leave site from a scope wokring in all browsers where we have all info
+              obj.thisComponent.leaveSite(obj.thisComponent.options.user, obj.thisComponent.options.site);
+            },
             {
                thisComponent: this
             });
          }
       },
-
 
       /**
        * Called when the user clicks on the join site button
@@ -203,7 +216,8 @@
             },
             failureCallback:
             {
-               fn: this._joinSiteFailure,
+               fn: this._failureCallback,
+               obj: Alfresco.util.message("message.join-failure", this.name, encodeURIComponent(this.options.user), this.options.site),
                scope: this
             }
          });
@@ -230,20 +244,78 @@
       },
 
       /**
-       * Callback handler used when adding user from site failed
+       * Called when the user clicks on the request-to-join site button
        *
-       * @method _joinSiteFailure
+       * @method requestJoinSite
+       * @param user {string} The user requesting to join the site
+       * @param site {string} The site the user is requesting to join
+       */
+      requestJoinSite: function CollaborationTitle_requestJoinSite(user, site)
+      {
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/invitations",
+            method: "POST",
+            dataObj:
+            {
+               invitationType: "MODERATED",
+               inviteeUserName: user,
+               inviteeComments: "",
+               inviteeRoleName: "SiteConsumer"
+            },
+            successCallback:
+            {
+               fn: this._requestJoinSuccess,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this._failureCallback,
+               obj: Alfresco.util.message("message.request-join-failure", this.name, encodeURIComponent(this.options.user), this.options.site),
+               scope: this
+            }
+         });
+
+         // Let the user know something is happening
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         {
+            text: Alfresco.util.message("message.request-joining", this.name, user, site),
+            spanClass: "wait",
+            displayTime: 0
+         });
+      },
+
+      /**
+       * Callback handler used when the current user successfully has requested to join the current site
+       *
+       * @method _requestJoinSuccess
        * @param response {object}
        */
-      _joinSiteFailure: function CollaborationTitle__joinSiteFailure(response)
+      _requestJoinSuccess: function CollaborationTitle__requestJoinSuccess(response)
       {
-         // Hide the feedback message
-         this.widgets.feedbackMessage.destroy();
+         if (this.widgets.feedbackMessage)
+         {
+            this.widgets.feedbackMessage.destroy();
+            this.widgets.feedbackMessage = null;
+         }
          
-         // Display error message
+         var me = this;
+         
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: Alfresco.util.message("message.join-failure", this.name, encodeURIComponent(this.options.user), this.options.site)
+            title: Alfresco.util.message("message.success"),
+            text: Alfresco.util.message("message.request-join-success", this.name, this.options.user, this.options.site),
+            buttons: [
+            {
+               text: Alfresco.util.message("button.ok"),
+               handler: function error_onOk()
+               {
+                  this.destroy();
+                  // Reload user dashboard as they are no longer a member of this site
+                  document.location.href = Alfresco.constants.URL_PAGECONTEXT + "user/" + me.options.user + "/dashboard";
+               },
+               isDefault: true
+            }]
          });
       },
 
@@ -270,7 +342,8 @@
             },
             failureCallback:
             {
-               fn: this._leaveSiteFailure,               
+               fn: this._failureCallback,
+               obj: Alfresco.util.message("message.leave-failure", this.name, encodeURIComponent(this.options.user), this.options.site),
                scope: this
             }
          });
@@ -292,31 +365,33 @@
        */
       _leaveSiteSuccess: function CollaborationTitle__leaveSiteSuccess(response)
       {
-         // Hide the feedback message
-         this.widgets.feedbackMessage.destroy();
-
          // Reload user dashboard as they are no longer a member of this site
          document.location.href = Alfresco.constants.URL_PAGECONTEXT + "user/" + this.options.user + "/dashboard";
       },
 
       /**
-       * Callback handler used when removing user from site failed
+       * Generic failure callback handler
        *
-       * @method _leaveSiteFailure
-       * @param response {object}
+       * @method _failureCallback
+       * @private
+       * @param message {string} Display message
        */
-      _leaveSiteFailure: function CollaborationTitle__leaveSiteFailure(response)
+      _failureCallback: function CollaborationTitle__failureCallback(obj, message)
       {
-         // Hide the feedback message
-         this.widgets.feedbackMessage.destroy();
-
-         // Display error message
-         Alfresco.util.PopupManager.displayPrompt(
+         if (this.widgets.feedbackMessage)
          {
-            text: Alfresco.util.message("message.leave-failure", this.name, encodeURIComponent(this.options.user), this.options.site)
-         });
+            this.widgets.feedbackMessage.destroy();
+            this.widgets.feedbackMessage = null;
+         }
 
+         if (message)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: Alfresco.util.message("message.failure"),
+               text: message
+            });
+         }
       }
-
    };
 })();

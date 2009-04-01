@@ -99,8 +99,14 @@ hr
 .yui-skin-default .yui-panel .bdft,
 .yui-skin-default .yui-panel .ft
 {
-   text-align:center;
+   text-align: center;
 }
+
+.yui-skin-default .yui-panel .bd .yui-u.first
+{
+   text-align: right;
+}
+
 /* Style the default message  */
 
 .yui-skin-default #message
@@ -110,7 +116,7 @@ hr
 
 .yui-skin-default #message .bd
 {
-   padding:2em;
+   padding: 2em;
 }
 
 .yui-skin-default #message .bd span.wait
@@ -121,10 +127,9 @@ hr
 
 /* Style the default prompt */
 
-
 .yui-skin-default #prompt .hd
 {
-   border-bottom:medium none;
+   border-bottom: medium none;
 }
 
 .yui-skin-default #prompt .bd
