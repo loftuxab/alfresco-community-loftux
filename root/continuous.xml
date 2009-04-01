@@ -365,31 +365,31 @@
            depends="continuous-init, set-build-number">
       <delete quiet="yes"
               includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/quick-installer/output" />
-      <mkdir dir="${dir.project.installer.builder}/quick-installer/output" />
-      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+              dir="${dir.installer.quick}/output" />
+      <mkdir dir="${dir.installer.quick}/output" />
+      <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-Full" --control-script "${file.name.installer.fullijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Windows -DCodeline "${file.name.codeline}" -DIncludes "-OOo" --control-script "${file.name.installer.ooijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.installer.quick}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" --platform Linux-x86 -DCodeline "${file.name.codeline}" -DIncludes "-Mini" --control-script "${file.name.installer.coreijs}" --build --quiet "${file.name.installer.quick}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}/quick-installer" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+      <exec dir="${dir.installer.quick}" executable="${file.name.installerMac.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.mac}"'/>
       </exec>
       <tar destfile="${dir.continuous.dist}/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOSXInstall.tar.gz"
            longfile="gnu"
            compression="gzip">
-         <tarfileset dir="${dir.project.installer.builder}/quick-installer/output"
+         <tarfileset dir="${dir.installer.quick}/output"
                      includes="Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install"
                      mode="755"/>
       </tar>
       <delete quiet="yes"
-              file="${dir.project.installer.builder}/quick-installer/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
+              file="${dir.installer.quick}/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
       <move todir="${dir.continuous.dist}" failonerror="no">
-         <fileset dir="${dir.project.installer.builder}/quick-installer/output">
+         <fileset dir="${dir.installer.quick}/output">
             <include name="**/*"/>
          </fileset>
       </move>
@@ -685,19 +685,19 @@
    <!-- ************************ -->
       
    <target name="distribute-deployment" 
-           depends="continuous-init"
+           depends="continuous-init, set-build-number"
            description="Creates a zip file containing the deployment receiver">
       <mkdir dir="${dir.continuous.dist}" />
       <copy file="${dir.project.deployment.dist}/${file.name.zip.deployment}"
             tofile="${dir.continuous.dist}/${file.name.dist.deployment}.zip" />
       <delete quiet="yes"
               includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/deploy-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+              dir="${dir.installer.deploy}/output" />
+      <exec dir="${dir.installer.deploy}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${file.name.exe.version}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.deploy}"'/>
       </exec>
       <move todir="${dir.continuous.dist}" failonerror="false">
-         <fileset dir="${dir.project.installer.builder}/deploy-installer/output">
+         <fileset dir="${dir.installer.deploy}/output">
             <include name="**/*"/>
          </fileset>
       </move>
