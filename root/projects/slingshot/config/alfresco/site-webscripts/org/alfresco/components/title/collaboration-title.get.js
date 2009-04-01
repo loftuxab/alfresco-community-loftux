@@ -4,7 +4,8 @@ var json = remote.call("/api/sites/" + page.url.templateArgs.site);
 var profile =
 {
    title: "",
-   shortName: ""
+   shortName: "",
+   visibility: "PUBLIC"
 };
 
 if (json.status == 200)

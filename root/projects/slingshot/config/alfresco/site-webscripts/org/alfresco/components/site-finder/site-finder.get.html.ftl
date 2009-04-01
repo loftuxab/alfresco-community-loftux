@@ -1,8 +1,16 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.SiteFinder("${args.htmlid}").setOptions(
    {
-      showPrivateSites: true,
-      currentUser: "${user.id}"
+      currentUser: "${user.id}",
+      inviteData: [
+   <#list inviteData as invite>
+      {
+         id: "${invite.inviteId}",
+         siteId: "${invite.resourceName}",
+         type: "${invite.invitationType}"
+      }
+   </#list>
+      ]
    }).setMessages(
       ${messages}
    );

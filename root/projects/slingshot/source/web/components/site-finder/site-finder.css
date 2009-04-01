@@ -74,6 +74,11 @@
    border-right: medium none;
 }
 
+.site-finder .yui-dt td.yui-dt-last
+{
+   text-align: center;
+}
+
 .site-finder .yui-dt-last td
 {
    border-bottom: medium none;

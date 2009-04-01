@@ -45,15 +45,15 @@ function getRequestParam(paramName, defaultValue)
  * Adds a request parameter to a url
  * @return the new url
  */
-function addParamToUrl(url, paramName, paramValue)
+function addParamToUrl(theUrl, paramName, paramValue)
 {
-   if (url.indexOf('?') > -1)
+   if (theUrl.indexOf('?') > -1)
    {
-      return url += "&" + paramName + "=" + paramValue;
+      return theUrl += "&" + paramName + "=" + paramValue;
    }
    else
    {
-      return url += "?" + paramName + "=" + paramValue;
+      return theUrl += "?" + paramName + "=" + paramValue;
    }
 }
 
@@ -62,13 +62,13 @@ function addParamToUrl(url, paramName, paramValue)
  * /abc/def/ghi. On the other hand, if elem is null, the input url would be
  * returned
  */
-function addUrlPathElement(url, elem)
+function addUrlPathElement(theUrl, elem)
 {
    if (elem != undefined && elem.length > 0)
    {
-      url += "/" + elem;
+      theUrl += "/" + elem;
    }
-   return url;
+   return theUrl;
 }
 
 /** 
@@ -94,10 +94,10 @@ function applyDataToModel(data)
 /**
  * POST call
  */
-function doPostCall(url, paramsJSON, suppressError)
+function doPostCall(theUrl, paramsJSON, suppressError)
 {
    var connector = remote.connect("alfresco");
-   var result = connector.post(url, paramsJSON, "application/json");
+   var result = connector.post(theUrl, paramsJSON, "application/json");
    if ((result.status != status.STATUS_OK) && !suppressError)
    {
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
@@ -111,10 +111,10 @@ function doPostCall(url, paramsJSON, suppressError)
 /**
  * PUT call
  */
-function doPutCall(url, paramsJSON, suppressError)
+function doPutCall(theUrl, paramsJSON, suppressError)
 {
    var connector = remote.connect("alfresco");
-   var result = connector.put(url, paramsJSON, "application/json");
+   var result = connector.put(theUrl, paramsJSON, "application/json");
    if ((result.status != status.STATUS_OK) && !suppressError)
    {
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Error during remote call. " +
@@ -128,10 +128,10 @@ function doPutCall(url, paramsJSON, suppressError)
 /**
  * GET call
  */
-function doGetCall(url, suppressError)
+function doGetCall(theUrl, suppressError)
 {
    var connector = remote.connect("alfresco");
-   var result = connector.get(url);
+   var result = connector.get(theUrl);
    if ((result.status != status.STATUS_OK) && !suppressError)
    {
       status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Error during remote call. " +

@@ -32,7 +32,11 @@
    <#else>
       <span class="yui-button yui-link-button">
          <span class="first-child">
+      <#if profile.visibility == "PUBLIC">
             <a id="${args.htmlid}-join-link" href="#">${msg("link.join")}</a>
+      <#else>
+            <a id="${args.htmlid}-requestJoin-link" href="#">${msg("link.request-join")}</a>
+      </#if>
          </span>
       </span>
    </#if>
