@@ -37,7 +37,7 @@ import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.ServerListener;
 import org.alfresco.jlan.server.SrvSessionList;
 import org.alfresco.jlan.server.Version;
-import org.alfresco.jlan.server.auth.CifsAuthenticator;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigurationListener;
 import org.alfresco.jlan.server.config.CoreServerConfigSection;
@@ -349,7 +349,7 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 	 * 
 	 * @return CifsAuthenticator
 	 */
-	public final CifsAuthenticator getCifsAuthenticator() {
+	public final ICifsAuthenticator getCifsAuthenticator() {
 		return getCIFSConfiguration().getAuthenticator();
 	}
 
@@ -422,7 +422,7 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 
 			if ( getCifsAuthenticator() != null)
 				Debug.println("[SMB] Using authenticator " + getCifsAuthenticator().getClass().getName() + ", mode="
-						+ (getCifsAuthenticator().getAccessMode() == CifsAuthenticator.SHARE_MODE ? "SHARE" : "USER"));
+						+ (getCifsAuthenticator().getAccessMode() == ICifsAuthenticator.SHARE_MODE ? "SHARE" : "USER"));
 
 			// Display the timezone offset/name
 

@@ -39,6 +39,7 @@ import org.alfresco.jlan.server.auth.AuthContext;
 import org.alfresco.jlan.server.auth.AuthenticatorException;
 import org.alfresco.jlan.server.auth.CifsAuthenticator;
 import org.alfresco.jlan.server.auth.ClientInfo;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.auth.NTLanManAuthContext;
 import org.alfresco.jlan.server.auth.UserAccount;
 import org.alfresco.jlan.server.auth.ntlm.NTLM;
@@ -190,7 +191,7 @@ public class PassthruAuthenticator extends CifsAuthenticator implements SessionL
 			if ( hasDebug())
 				Debug.println("Null CIFS logon allowed");
 
-			return CifsAuthenticator.AUTH_ALLOW;
+			return ICifsAuthenticator.AUTH_ALLOW;
 		}
 
 		// Check if this is a guest logon
@@ -248,7 +249,7 @@ public class PassthruAuthenticator extends CifsAuthenticator implements SessionL
 
 						// Allow the user access as a guest
 
-						authSts = CifsAuthenticator.AUTH_GUEST;
+						authSts = ICifsAuthenticator.AUTH_GUEST;
 
 						// Debug
 
@@ -259,7 +260,7 @@ public class PassthruAuthenticator extends CifsAuthenticator implements SessionL
 				else {
 					// Allow the user full access to the server
 
-					authSts = CifsAuthenticator.AUTH_ALLOW;
+					authSts = ICifsAuthenticator.AUTH_ALLOW;
 
 					// Debug
 

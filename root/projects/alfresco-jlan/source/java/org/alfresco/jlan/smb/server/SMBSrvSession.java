@@ -40,7 +40,7 @@ import org.alfresco.jlan.netbios.NetBIOSSession;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
 import org.alfresco.jlan.server.SrvSession;
 import org.alfresco.jlan.server.auth.AuthenticatorException;
-import org.alfresco.jlan.server.auth.CifsAuthenticator;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.filesys.DiskDeviceContext;
 import org.alfresco.jlan.server.filesys.NetworkFile;
 import org.alfresco.jlan.server.filesys.TooManyConnectionsException;
@@ -1039,7 +1039,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 			// Access the authenticator for this server and determine if the server is in share or
 			// user level security mode.
 
-			CifsAuthenticator auth = getSMBServer().getCifsAuthenticator();
+			ICifsAuthenticator auth = getSMBServer().getCifsAuthenticator();
 
 			// LanMan dialect negotiate response
 
@@ -1104,7 +1104,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 			// Access the authenticator for this server and determine if the server is in share or
 			// user level security mode.
 
-			CifsAuthenticator auth = getSMBServer().getCIFSConfiguration().getAuthenticator();
+			ICifsAuthenticator auth = getSMBServer().getCIFSConfiguration().getAuthenticator();
 
 			// Check if the authenticator supports extended security, override the client setting
 			

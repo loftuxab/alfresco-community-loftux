@@ -25,13 +25,13 @@
 
 package org.alfresco.jlan.oncrpc.nfs;
 
+import org.alfresco.config.ConfigElement;
 import org.alfresco.jlan.oncrpc.RpcAuthenticator;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigSection;
 import org.alfresco.jlan.server.config.ConfigurationListener;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
 import org.alfresco.jlan.server.config.ServerConfiguration;
-import org.alfresco.config.ConfigElement;
 
 
 /**
@@ -468,11 +468,10 @@ public class NFSConfigSection extends ConfigSection {
         
     //  Inform listeners, validate the configuration change
     
-    sts = fireConfigurationChange(ConfigId.NFSRpcAuthenticator, auth);
+    sts = setRpcAuthenticator(auth);
 
-    //  Set the RPC authenticator and initialization parameters
+    //  Set the initialization parameters
         
-    m_rpcAuthenticator = auth;
     m_rpcAuthParams    = params;
       
     //  Return the change status
@@ -480,6 +479,31 @@ public class NFSConfigSection extends ConfigSection {
     return sts;
   }
   
+  /**
+   * Set the RPC authenticator to be used to authenticate access to the RPC based services (portmapper, mount
+   * server and NFS server)
+   *
+   * @param authClass String
+   * @param params ConfigElement
+   * @return int
+   * @exception InvalidConfigurationException
+   */
+  public final int setRpcAuthenticator(RpcAuthenticator auth)
+    throws InvalidConfigurationException {
+       
+    //  Inform listeners, validate the configuration change
+    
+    int sts = fireConfigurationChange(ConfigId.NFSRpcAuthenticator, auth);
+
+    //  Set the RPC authenticator
+        
+    m_rpcAuthenticator = auth;
+      
+    //  Return the change status
+    
+    return sts;
+  }
+
   /**
    * Set the NFS file cache I/O timer, in milliseconds
    *

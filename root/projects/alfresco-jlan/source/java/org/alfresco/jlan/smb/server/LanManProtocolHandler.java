@@ -30,8 +30,8 @@ import java.io.IOException;
 
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
-import org.alfresco.jlan.server.auth.CifsAuthenticator;
 import org.alfresco.jlan.server.auth.ClientInfo;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.auth.InvalidUserException;
 import org.alfresco.jlan.server.config.GlobalConfigSection;
 import org.alfresco.jlan.server.core.InvalidDeviceInterfaceException;
@@ -331,10 +331,10 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 
 		// Authenticate the share connect, if the server is using share mode security
 
-		CifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		int filePerm = FileAccess.Writeable;
 
-		if ( auth != null && auth.getAccessMode() == CifsAuthenticator.SHARE_MODE) {
+		if ( auth != null && auth.getAccessMode() == ICifsAuthenticator.SHARE_MODE) {
 
 			// Validate the share connection
 
@@ -1687,17 +1687,17 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 
 		// Authenticate the user, if the server is using user mode security
 
-		CifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		boolean isGuest = false;
 
-		if ( auth != null && auth.getAccessMode() == CifsAuthenticator.USER_MODE) {
+		if ( auth != null && auth.getAccessMode() == ICifsAuthenticator.USER_MODE) {
 
 			// Validate the user
 
-			int sts = auth.authenticateUser(client, m_sess, CifsAuthenticator.LANMAN);
-			if ( sts > 0 && (sts & CifsAuthenticator.AUTH_GUEST) != 0)
+			int sts = auth.authenticateUser(client, m_sess, ICifsAuthenticator.LANMAN);
+			if ( sts > 0 && (sts & ICifsAuthenticator.AUTH_GUEST) != 0)
 				isGuest = true;
-			else if ( sts != CifsAuthenticator.AUTH_ALLOW) {
+			else if ( sts != ICifsAuthenticator.AUTH_ALLOW) {
 
 				// Invalid user, reject the session setup request
 
@@ -3300,7 +3300,7 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 		// Authenticate the share connection depending upon the security mode the server is running
 		// under
 
-		CifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		int filePerm = FileAccess.Writeable;
 
 		if ( auth != null) {

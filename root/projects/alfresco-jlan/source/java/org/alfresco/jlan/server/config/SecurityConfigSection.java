@@ -363,11 +363,10 @@ public class SecurityConfigSection extends ConfigSection {
 
         //  Inform listeners, validate the configuration change
 
-        sts = fireConfigurationChange(ConfigId.ShareMapper, shareMapper);
+        sts = setShareMapper(shareMapper);
 
-        //  Set the share mapper and initializtion parameters
+        //  Set the initialization parameters
       
-        m_shareMapper  = shareMapper;
         m_mapperParams = params;
       }
       else
@@ -385,6 +384,30 @@ public class SecurityConfigSection extends ConfigSection {
     return sts;
   }
   
+    /**
+     * Set the share mapper
+     * 
+     * @param shareMapper
+     *            pre-initialized share mapper
+     * @return int
+     * @exception InvalidConfigurationException
+     */
+    public final int setShareMapper(ShareMapper shareMapper) throws InvalidConfigurationException
+    {
+
+        // Inform listeners, validate the configuration change
+
+        int sts = fireConfigurationChange(ConfigId.ShareMapper, shareMapper);
+
+        // Set the share mapper
+
+        m_shareMapper = shareMapper;
+
+        // Return the change status
+
+        return sts;
+    }
+
   /**
    * Set the user account list.
    *

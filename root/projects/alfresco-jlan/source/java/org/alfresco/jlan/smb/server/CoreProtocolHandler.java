@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
-import org.alfresco.jlan.server.auth.CifsAuthenticator;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.auth.InvalidUserException;
 import org.alfresco.jlan.server.core.InvalidDeviceInterfaceException;
 import org.alfresco.jlan.server.core.ShareType;
@@ -3108,7 +3108,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 		// Authenticate the share connection depending upon the security mode the server is running
 		// under
 
-		CifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		int filePerm = FileAccess.Writeable;
 
 		if ( auth != null) {

@@ -34,7 +34,7 @@ import org.alfresco.jlan.locking.FileLock;
 import org.alfresco.jlan.locking.LockConflictException;
 import org.alfresco.jlan.locking.NotLockedException;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
-import org.alfresco.jlan.server.auth.CifsAuthenticator;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.auth.InvalidUserException;
 import org.alfresco.jlan.server.auth.acl.AccessControl;
 import org.alfresco.jlan.server.auth.acl.AccessControlManager;
@@ -387,7 +387,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Call the authenticator to process the session setup
 
-		CifsAuthenticator cifsAuthenticator = m_sess.getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator cifsAuthenticator = m_sess.getSMBServer().getCifsAuthenticator();
 
 		try {
 
@@ -693,10 +693,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Authenticate the share connect, if the server is using share mode security
 
-		CifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		int sharePerm = FileAccess.Writeable;
 
-		if ( auth != null && auth.getAccessMode() == CifsAuthenticator.SHARE_MODE) {
+		if ( auth != null && auth.getAccessMode() == ICifsAuthenticator.SHARE_MODE) {
 
 			// Validate the share connection
 
@@ -1173,7 +1173,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Authenticate the share connection depending upon the security mode the server is running
 		// under
 
-		CifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
+		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		int sharePerm = FileAccess.Writeable;
 
 		if ( auth != null) {

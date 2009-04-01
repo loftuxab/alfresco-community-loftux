@@ -28,9 +28,11 @@ package org.alfresco.jlan.smb.server;
 import java.net.InetAddress;
 import java.util.List;
 
+import org.alfresco.config.ConfigElement;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
+import org.alfresco.jlan.server.SessionListener;
 import org.alfresco.jlan.server.auth.CifsAuthenticator;
-import org.alfresco.jlan.server.auth.passthru.DomainMapping;
+import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigSection;
 import org.alfresco.jlan.server.config.ConfigurationListener;
@@ -40,7 +42,6 @@ import org.alfresco.jlan.smb.DialectSelector;
 import org.alfresco.jlan.smb.ServerType;
 import org.alfresco.jlan.smb.TcpipSMB;
 import org.alfresco.jlan.util.StringList;
-import org.alfresco.config.ConfigElement;
 
 /**
  * CIFS Server Configuration Section Class
@@ -94,7 +95,7 @@ public class CIFSConfigSection extends ConfigSection {
   
   //  Authenticator, used to authenticate users and share connections.
 
-  private CifsAuthenticator m_authenticator;
+  private ICifsAuthenticator m_authenticator;
   private ConfigElement m_authParams;
 
   //  NetBIOS name server and host announcer debug enable
@@ -200,7 +201,7 @@ public class CIFSConfigSection extends ConfigSection {
    *
    * @return CifsAuthenticator
    */
-  public final CifsAuthenticator getAuthenticator() {
+  public final ICifsAuthenticator getAuthenticator() {
     return m_authenticator;
   }
 
@@ -622,17 +623,39 @@ public class CIFSConfigSection extends ConfigSection {
         
     //  Inform listeners, validate the configuration change
     
-    sts = fireConfigurationChange(ConfigId.SMBAuthenticator, auth);
+    sts = setAuthenticator(auth);
+    
+    //  Set initialization parameters
 
-    //  Set the server authenticator and initialization parameters
-        
-    m_authenticator = auth;
     m_authParams    = params;
       
     //  Return the change status
     
     return sts;
   }
+
+  /**
+   * Set the authenticator to be used to authenticate users and share connections.
+   *
+   * @param auth the authenticator
+   * @return int
+   * @exception InvalidConfigurationException
+   */
+  public final int setAuthenticator(ICifsAuthenticator auth)
+    throws InvalidConfigurationException {      
+      //  Inform listeners, validate the configuration change
+      
+      int sts = fireConfigurationChange(ConfigId.SMBAuthenticator, auth);
+      
+      //  Set the server authenticator
+
+      m_authenticator = auth;
+        
+      //  Return the change status
+      
+      return sts;
+  }
+  
 
   /**
    * Set the local address that the SMB server should bind to.

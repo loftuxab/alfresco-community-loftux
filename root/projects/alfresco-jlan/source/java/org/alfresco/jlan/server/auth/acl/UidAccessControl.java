@@ -42,7 +42,19 @@ public class UidAccessControl extends AccessControl {
   
   private int m_uid;
   
-	/**
+    /**
+     * Default constructor to allow container initialization.
+     */
+    protected UidAccessControl()
+    {        
+    }
+    
+    public void setUid(int uid)
+    {
+        this.m_uid = uid;
+    }
+
+    /**
 	 * Class constructor
 	 *
 	 * @param uidStr String
@@ -55,7 +67,7 @@ public class UidAccessControl extends AccessControl {
 		
 		//	Set the required user id
 		
-		m_uid = uid;
+		setUid(uid);
 	}
   
 
