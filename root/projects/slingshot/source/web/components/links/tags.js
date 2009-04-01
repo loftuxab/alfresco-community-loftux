@@ -211,7 +211,6 @@
        */
       onFilterChanged: function LinkTags_onFilterChanged(layer, args)
       {
-           //debugger;
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
