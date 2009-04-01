@@ -69,6 +69,9 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
     /** Pre initialized non secure scope object. */
     private Scriptable nonSecureScope;
     
+    /** Flag to enable or disable runtime script compliation */
+    private boolean compile = true;
+    
     /** Cache of runtime compiled script instances */
     private Map<String, Script> scriptCache = new ConcurrentHashMap<String, Script>(256);
 
@@ -79,6 +82,14 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
     public void setSearchPath(SearchPath searchPath)
     {
         this.searchPath = searchPath;
+    }
+    
+    /**
+     * @param compile   the compile flag to set
+     */
+    public void setCompile(boolean compile)
+    {
+        this.compile = compile;
     }
 
     /* (non-Javadoc)
@@ -114,7 +125,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             // test the cache for a pre-compiled script matching our path
             String path = location.getPath();
             Script script = null;
-            if (location.isCachable())
+            if (this.compile && location.isCachable())
             {
                 script = this.scriptCache.get(path);
             }
@@ -142,7 +153,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
                     // rely on the ConcurrentHashMap impl to deal both with ensuring the safety of the
                     // underlying structure with asynchronous get/put operations and for fast
                     // multi-threaded access to the common cache.
-                    if (location.isCachable())
+                    if (this.compile && location.isCachable())
                     {
                         this.scriptCache.put(path, script);
                     }
@@ -329,7 +340,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         {
             cx.setWrapFactory(wrapFactory);
             this.secureScope = cx.initStandardObjects();
-
+            
             // remove security issue related objects - this ensures the script may not access
             // unsecure java.* libraries or import any other classes for direct access - only
             // the configured root host objects will be available to the script writer
@@ -347,7 +358,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         try
         {
             cx.setWrapFactory(wrapFactory);
-
+            
             // allow access to all libraries and objects, including the importer
             // @see http://www.mozilla.org/rhino/ScriptingJava.html
             this.nonSecureScope = new ImporterTopLevel(cx);
