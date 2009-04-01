@@ -46,4 +46,12 @@ public interface ServerConfigurationAccessor
      * @return String
      */
     public String getServerName();
+
+    /**
+     * Check if the specified protocol server exists and is running
+     * 
+     * @param proto String
+     * @return boolean
+     */
+    public boolean isServerRunning( String proto);
 }

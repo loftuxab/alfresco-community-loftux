@@ -186,12 +186,9 @@ public class ServerConfiguration implements ServerConfigurationAccessor {
 		return m_serverList.numberOfServers();
 	}
 
-  /**
-   * Check if the specified protocol server exists and is running
-   * 
-   * @param proto String
-   * @return boolean
-   */
+ /* (non-Javadoc)
+  * @see org.alfresco.jlan.server.config.ServerConfigurationAccessor#isServerRunning()
+  */
   public final boolean isServerRunning( String proto) {
     
     //  Check if the server exists
