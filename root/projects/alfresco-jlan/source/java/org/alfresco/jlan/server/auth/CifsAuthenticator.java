@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2008 Alfresco Software Limited.
+ * Copyright (C) 2006-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,6 +30,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
+import org.alfresco.config.ConfigElement;
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
 import org.alfresco.jlan.server.SrvSession;
@@ -37,6 +38,7 @@ import org.alfresco.jlan.server.auth.passthru.DomainMapping;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
 import org.alfresco.jlan.server.config.SecurityConfigSection;
 import org.alfresco.jlan.server.config.ServerConfiguration;
+import org.alfresco.jlan.server.config.ServerConfigurationAccessor;
 import org.alfresco.jlan.server.core.NoPooledMemoryException;
 import org.alfresco.jlan.server.core.SharedDevice;
 import org.alfresco.jlan.smb.Capability;
@@ -52,7 +54,6 @@ import org.alfresco.jlan.smb.server.VirtualCircuit;
 import org.alfresco.jlan.util.DataPacker;
 import org.alfresco.jlan.util.HexDump;
 import org.alfresco.jlan.util.IPAddress;
-import org.alfresco.config.ConfigElement;
 
 /**
  * CIFS Authenticator Class
@@ -63,41 +64,9 @@ import org.alfresco.config.ConfigElement;
  * 
  * @author gkspencer
  */
-public abstract class CifsAuthenticator {
+public abstract class CifsAuthenticator implements ICifsAuthenticator {
 
 	// Server access mode
-
-	public static final int SHARE_MODE = 0;
-	public static final int USER_MODE  = 1;
-
-	// Encryption algorithm types
-
-	public static final int LANMAN = PasswordEncryptor.LANMAN;
-	public static final int NTLM1  = PasswordEncryptor.NTLM1;
-	public static final int NTLM2  = PasswordEncryptor.NTLM2;
-
-	// Authentication status values
-
-	public static final int AUTH_ALLOW 			= 0;
-	public static final int AUTH_GUEST 			= 0x10000000;
-	public static final int AUTH_DISALLOW 		= -1;
-	public static final int AUTH_BADPASSWORD 	= -2;
-	public static final int AUTH_BADUSER 		= -3;
-	public static final int AUTH_PASSEXPIRED 	= -4;
-	public static final int AUTH_ACCDISABLED 	= -5;
-
-	// Share access permissions, returned by authenticateShareConnect()
-
-	public static final int NoAccess 	= 0;
-	public static final int ReadOnly 	= 1;
-	public static final int Writeable 	= 2;
-
-	// Standard encrypted password and challenge length
-
-	public static final int STANDARD_PASSWORD_LEN 	= 24;
-	public static final int STANDARD_CHALLENGE_LEN 	= 8;
-
-	// Default guest user name
 
 	protected static final String GUEST_USERNAME = "guest";
 
@@ -137,41 +106,43 @@ public abstract class CifsAuthenticator {
 
 	// Server configuration and required sections
 
-	protected ServerConfiguration m_config;
-	protected SecurityConfigSection m_securityConfig;
-	protected CIFSConfigSection m_cifsConfig;
+	protected ServerConfigurationAccessor m_config;
 
 	// Debug output enable
 
 	private boolean m_debug;
 
 	/**
-	 * Authenticate a connection to a share.
-	 * 
-	 * @param client User/client details from the tree connect request.
-	 * @param share Shared device the client wants to connect to.
-	 * @param sharePwd Share password.
-	 * @param sess Server session.
-	 * @return int Granted file permission level or disallow status if negative. See the
-	 *         FilePermission class.
-	 */
+     * @param debug activate debug mode?
+     */
+    public void setDebug(boolean debug)
+    {
+        this.m_debug = debug;
+    }
+    
+    /**
+     * @param config an accessor for the file server configuration sections
+     */
+    public void setConfig(ServerConfigurationAccessor config)
+    {
+        this.m_config = config;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#authenticateShareConnect(org.alfresco.jlan.server.auth.ClientInfo, org.alfresco.jlan.server.core.SharedDevice, java.lang.String, org.alfresco.jlan.server.SrvSession)
+     */
 	public int authenticateShareConnect(ClientInfo client, SharedDevice share, String sharePwd, SrvSession sess) {
 
 		// Allow write access
 		//
 		// Main authentication is handled by authenticateUser()
 
-		return CifsAuthenticator.Writeable;
+		return ICifsAuthenticator.Writeable;
 	}
 
-	/**
-	 * Authenticate a user. A user may be granted full access, guest access or no access.
-	 * 
-	 * @param client User/client details from the session setup request.
-	 * @param sess Server session
-	 * @param alg Encryption algorithm
-	 * @return int Access level or disallow status.
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#authenticateUser(org.alfresco.jlan.server.auth.ClientInfo, org.alfresco.jlan.server.SrvSession, int)
+     */
 	public int authenticateUser(ClientInfo client, SrvSession sess, int alg) {
 
 		// Check if the user exists in the user list
@@ -213,14 +184,9 @@ public abstract class CifsAuthenticator {
 		return allowGuest() ? AUTH_GUEST : AUTH_DISALLOW;
 	}
 
-	/**
-	 * Authenticate a user using a plain text password.
-	 * 
-	 * @param client User/client details from the session setup request.
-	 * @param sess Server session
-	 * @return int Access level or disallow status.
-	 * @throws InvalidConfigurationException
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#authenticateUserPlainText(org.alfresco.jlan.server.auth.ClientInfo, org.alfresco.jlan.server.SrvSession)
+     */
 	public final int authenticateUserPlainText(ClientInfo client, SrvSession sess) {
 
 		// Get a challenge key
@@ -249,20 +215,19 @@ public abstract class CifsAuthenticator {
 	}
 
 	/**
-	 * Initialize the authenticator
+	 * Initialize the authenticator, after properties have been set
 	 * 
-	 * @param config ServerConfiguration
-	 * @param params ConfigElement
 	 * @exception InvalidConfigurationException
 	 */
-	public void initialize(ServerConfiguration config, ConfigElement params)
+	public void initialize()
 		throws InvalidConfigurationException {
 
-		// Save the server configuration so we can access the authentication component
+	    // Check all required properties have been set
 
-		m_config = config;
+	    if ( m_config == null)
+            throw new InvalidConfigurationException("server configuration accessor not set");
 
-		// Allocate the SMB dialect selector, and initialize using the default list of dialects
+        // Allocate the SMB dialect selector, and initialize using the default list of dialects
 
 		m_dialects = new DialectSelector();
 
@@ -272,19 +237,28 @@ public abstract class CifsAuthenticator {
 		m_dialects.AddDialect(Dialect.LanMan2);
 		m_dialects.AddDialect(Dialect.LanMan2_1);
 		m_dialects.AddDialect(Dialect.NT);
-
-		// Get the required configuration sections
-
-		m_securityConfig = (SecurityConfigSection) m_config.getConfigSection(SecurityConfigSection.SectionName);
-		m_cifsConfig = (CIFSConfigSection) m_config.getConfigSection(CIFSConfigSection.SectionName);
-
-		// Check if debug output is enabled
-
-		if ( params.getChild("Debug") != null)
-			m_debug = true;
 	}
 
-	/**
+    /**
+     * Initialize the authenticator
+     * 
+     * @param config ServerConfiguration
+     * @param params ConfigElement
+     * @exception InvalidConfigurationException
+     */
+    public void initialize(ServerConfiguration config, ConfigElement params)
+        throws InvalidConfigurationException {
+
+        if ( params.getChild("Debug") != null)
+            setDebug(true);
+        
+        // Save the server configuration so we can access the authentication component
+        setConfig(config);
+        
+        initialize();
+    }
+
+    /**
 	 * Encrypt the plain text password with the specified encryption key using the specified
 	 * encryption algorithm.
 	 * 
@@ -316,29 +290,23 @@ public abstract class CifsAuthenticator {
 		return encPwd;
 	}
 
-	/**
-	 * Return the access mode of the server, either SHARE_MODE or USER_MODE.
-	 * 
-	 * @return int
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getAccessMode()
+     */
 	public final int getAccessMode() {
 		return m_accessMode;
 	}
 
-	/**
-	 * Determine if extended security methods are available
-	 * 
-	 * @return boolean
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#hasExtendedSecurity()
+     */
 	public final boolean hasExtendedSecurity() {
 		return m_extendedSecurity;
 	}
 
-	/**
-	 * Return an authentication context for the new session
-	 * 
-	 * @return AuthContext
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getAuthContext(org.alfresco.jlan.smb.server.SMBSrvSession)
+     */
 	public AuthContext getAuthContext(SMBSrvSession sess) {
 
 		AuthContext authCtx = null;
@@ -362,31 +330,25 @@ public abstract class CifsAuthenticator {
 		return authCtx;
 	}
 
-	/**
-	 * Return the enabled SMB dialects that the server will use when negotiating sessions.
-	 * 
-	 * @return DialectSelector
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getEnabledDialects()
+     */
 	public final DialectSelector getEnabledDialects() {
 		return m_dialects;
 	}
 
-	/**
-	 * Return the security mode flags
-	 * 
-	 * @return int
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getSecurityMode()
+     */
 	public final int getSecurityMode() {
 		return m_securityMode;
 	}
 
-	/**
-	 * Return the CIFS configuration section
-	 * 
-	 * @return CIFSConfigSection
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getCIFSConfig()
+     */
 	public final CIFSConfigSection getCIFSConfig() {
-		return m_cifsConfig;
+        return (CIFSConfigSection) m_config.getConfigSection(CIFSConfigSection.SectionName);
 	}
 
 	/**
@@ -395,27 +357,19 @@ public abstract class CifsAuthenticator {
 	 * @return SecurityConfigSection
 	 */
 	public final SecurityConfigSection getsecurityConfig() {
-		return m_securityConfig;
+        return (SecurityConfigSection) m_config.getConfigSection(SecurityConfigSection.SectionName);
 	}
 
-	/**
-	 * Determine if debug output is enabled
-	 * 
-	 * @return boolean
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#hasDebug()
+     */
 	public final boolean hasDebug() {
 		return m_debug;
 	}
 
-	/**
-	 * Generate the CIFS negotiate response packet, the authenticator should add authentication
-	 * specific fields to the response.
-	 * 
-	 * @param sess SMBSrvSession
-	 * @param respPkt SMBSrvPacket
-	 * @param extendedSecurity boolean
-	 * @exception AuthenticatorException
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#generateNegotiateResponse(org.alfresco.jlan.smb.server.SMBSrvSession, org.alfresco.jlan.smb.server.SMBSrvPacket, boolean)
+     */
 	public void generateNegotiateResponse(SMBSrvSession sess, SMBSrvPacket respPkt, boolean extendedSecurity)
 		throws AuthenticatorException {
 
@@ -459,13 +413,9 @@ public abstract class CifsAuthenticator {
 		respPkt.setByteCount(pos - respPkt.getByteOffset());
 	}
 
-	/**
-	 * Process the CIFS session setup request packet and build the session setup response
-	 * 
-	 * @param sess SMBSrvSession
-	 * @param reqPkt SMBSrvPacket
-	 * @exception SMBSrvException
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#processSessionSetup(org.alfresco.jlan.smb.server.SMBSrvSession, org.alfresco.jlan.smb.server.SMBSrvPacket)
+     */
 	public void processSessionSetup(SMBSrvSession sess, SMBSrvPacket reqPkt)
 		throws SMBSrvException {
 
@@ -569,9 +519,9 @@ public abstract class CifsAuthenticator {
 
 		boolean isGuest = false;
 
-		int sts = authenticateUser(client, sess, CifsAuthenticator.NTLM1);
+		int sts = authenticateUser(client, sess, ICifsAuthenticator.NTLM1);
 
-		if ( sts > 0 && (sts & CifsAuthenticator.AUTH_GUEST) != 0) {
+		if ( sts > 0 && (sts & ICifsAuthenticator.AUTH_GUEST) != 0) {
 
 			// Guest logon
 
@@ -582,7 +532,7 @@ public abstract class CifsAuthenticator {
 			if ( Debug.EnableInfo && sess.hasDebug(SMBSrvSession.DBG_NEGOTIATE))
 				Debug.println("[SMB] User " + user + ", logged on as guest");
 		}
-		else if ( sts != CifsAuthenticator.AUTH_ALLOW) {
+		else if ( sts != ICifsAuthenticator.AUTH_ALLOW) {
 
 			// DEBUG
 
@@ -692,50 +642,40 @@ public abstract class CifsAuthenticator {
 		respPkt.setParameter(1, pos - RFCNetBIOSProtocol.HEADER_LEN);
 	}
 
-	/**
-	 * Return the encryption key/challenge length
-	 * 
-	 * @return int
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getEncryptionKeyLength()
+     */
 	public int getEncryptionKeyLength() {
 
 		return STANDARD_CHALLENGE_LEN;
 	}
 
-	/**
-	 * Return the server capability flags
-	 * 
-	 * @return int
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getServerCapabilities()
+     */
 	public int getServerCapabilities() {
 
 		return Capability.Unicode + Capability.RemoteAPIs + Capability.NTSMBs + Capability.NTFind + Capability.NTStatus
 				+ Capability.LargeFiles + Capability.LargeRead + Capability.LargeWrite;
 	}
 
-	/**
-	 * Determine if guest access is allowed
-	 * 
-	 * @return boolean
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#allowGuest()
+     */
 	public final boolean allowGuest() {
 		return m_allowGuest;
 	}
 
-	/**
-	 * Return the guest user name
-	 * 
-	 * @return String
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getGuestUserName()
+     */
 	public final String getGuestUserName() {
 		return m_guestUserName;
 	}
 
-	/**
-	 * Determine if unknown users should be mapped to the guest account
-	 * 
-	 * @return boolean
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#mapUnknownUserToGuest()
+     */
 	public final boolean mapUnknownUserToGuest() {
 		return m_mapToGuest;
 	}
@@ -785,9 +725,9 @@ public abstract class CifsAuthenticator {
 		m_extendedSecurity = extSec;
 	}
 
-	/**
-	 * Close the authenticator, perform any cleanup
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#closeAuthenticator()
+     */
 	public void closeAuthenticator() {
 
 		// Override if cleanup required
@@ -981,17 +921,14 @@ public abstract class CifsAuthenticator {
 		client.setGuest(true);
 	}
 
-	/**
-	 * Search for the requried user account details
-	 * 
-	 * @param user String
-	 * @return UserAccount
-	 */
+	/* (non-Javadoc)
+     * @see org.alfresco.jlan.server.auth.ICifsAuthenticator#getUserDetails(java.lang.String)
+     */
 	public final UserAccount getUserDetails(String user) {
 
 		// Get the user account details via the users interface
 
-		return m_securityConfig.getUsersInterface().getUserAccount(user);
+		return getsecurityConfig().getUsersInterface().getUserAccount(user);
 	}
 
 	/**
@@ -1012,14 +949,15 @@ public abstract class CifsAuthenticator {
 
 		// Check if there are any domain mappings
 
-		if ( m_securityConfig.hasDomainMappings() == false)
+	    SecurityConfigSection securityConfig = getsecurityConfig();
+		if ( securityConfig.hasDomainMappings() == false)
 			return null;
 
 		// Convert the client IP address to an integer value
 
 		int clientAddr = IPAddress.asInteger(clientIP);
 
-		for (DomainMapping domainMap : m_securityConfig.getDomainMappings()) {
+		for (DomainMapping domainMap : securityConfig.getDomainMappings()) {
 
 			if ( domainMap.isMemberOfDomain(clientAddr)) {
 

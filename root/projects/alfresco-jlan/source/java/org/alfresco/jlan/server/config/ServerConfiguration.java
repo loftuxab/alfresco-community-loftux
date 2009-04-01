@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2008 Alfresco Software Limited.
+ * Copyright (C) 2006-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,7 +43,7 @@ import org.alfresco.jlan.util.Platform;
  *
  * @author gkspencer
  */
-public class ServerConfiguration {
+public class ServerConfiguration implements ServerConfigurationAccessor {
 
 	//	Constants
 	//
@@ -117,12 +117,9 @@ public class ServerConfiguration {
     return m_configSections.containsKey( name);
   }
   
-  /**
-   * Return the required configuration section
-   * 
-   * @param name String
-   * @return ConfigSection
-   */
+  /* (non-Javadoc)
+ * @see org.alfresco.jlan.server.config.ServerConfigurationAccessor#getConfigSection(java.lang.String)
+ */
   public final ConfigSection getConfigSection(String name) {
     return m_configSections.get( name);
   }
@@ -144,11 +141,9 @@ public class ServerConfiguration {
     m_configSections.clear();
   }
   
-  /**
-   * Return the server name
-   * 
-   * @return String
-   */
+  /* (non-Javadoc)
+ * @see org.alfresco.jlan.server.config.ServerConfigurationAccessor#getServerName()
+ */
   public final String getServerName() {
     return m_serverName;
   }

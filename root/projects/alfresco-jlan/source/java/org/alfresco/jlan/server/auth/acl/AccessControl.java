@@ -64,7 +64,14 @@ public abstract class AccessControl {
 	
 	private int m_access;
 	
-	/**
+    /**
+     * Default constructor to allow container initialization.
+     */
+    protected AccessControl()
+    {        
+    }
+
+    /**
 	 * Class constructor
 	 * 
 	 * @param name String
@@ -197,7 +204,7 @@ public abstract class AccessControl {
 	 * 
 	 * @param typ String
 	 */
-	protected final void setType(String typ) {
+	public final void setType(String typ) {
 		m_type = typ;
 	}
 	
@@ -206,11 +213,22 @@ public abstract class AccessControl {
 	 * 
 	 * @param name String
 	 */
-	protected final void setName(String name) {
+	public final void setName(String name) {
 		m_name = name;	
 	}
 	
 	/**
+     * Set the access level from a String
+     * 
+     * @param accessLevel
+     * @throws ACLParseException
+     */
+    public void setAccess(String accessLevel) throws ACLParseException
+    {
+        this.m_access = AccessControlParser.parseAccessTypeString(accessLevel);
+    }
+
+    /**
 	 * Return the access control type as a string
 	 *
 	 * @param access int 

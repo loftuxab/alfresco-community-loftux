@@ -42,7 +42,19 @@ public class GidAccessControl extends AccessControl {
   
   private int m_gid;
   
-	/**
+    /**
+     * Default constructor to allow container initialization.
+     */
+    protected GidAccessControl()
+    {        
+    }
+    
+	public void setGid(int gid)
+    {
+        m_gid = gid;
+    }
+
+    /**
 	 * Class constructor
 	 *
 	 * @param gidStr String

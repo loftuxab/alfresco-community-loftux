@@ -48,7 +48,21 @@ public class ProtocolAccessControl extends AccessControl {
 	
 	private String[] m_checkList;
 			
-	/**
+    /**
+     * Default constructor to allow container initialization.
+     */
+    protected ProtocolAccessControl()
+    {        
+    }
+    
+   
+    public void setCheckList(String protList)
+    {
+        m_checkList = listFromString(protList);
+    }
+
+
+    /**
 	 * Class constructor
 	 *
 	 * @param protList String
@@ -60,7 +74,7 @@ public class ProtocolAccessControl extends AccessControl {
 		
 		//	Parse the protocol list
 		
-		m_checkList = listFromString(protList);
+		setCheckList(protList);
 	}
 	
 	/**

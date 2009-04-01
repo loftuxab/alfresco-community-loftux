@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -27,13 +27,13 @@ package org.alfresco.jlan.ftp;
 
 import java.net.InetAddress;
 
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.element.GenericConfigElement;
 import org.alfresco.jlan.server.config.ConfigId;
 import org.alfresco.jlan.server.config.ConfigSection;
 import org.alfresco.jlan.server.config.ConfigurationListener;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
 import org.alfresco.jlan.server.config.ServerConfiguration;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.config.element.GenericConfigElement;
 
 /**
  * FTP Server Configuration Section Class
@@ -467,14 +467,34 @@ public class FTPConfigSection extends ConfigSection {
         
     //  Inform listeners, validate the configuration change
     
-    sts = fireConfigurationChange(ConfigId.FTPAuthenticator, auth);
+    sts = setAuthenticator(auth);
 
-    //  Set the FTP authenticator interface
-        
-    m_ftpAuthenticator = auth;
-      
     //  Return the change status
     
     return sts;
   }
+  
+  /**
+   * Set the authenticator to be used to authenticate FTP users.
+   *
+   * @param auth the authenticator
+   * @return int
+   * @exception InvalidConfigurationException
+   */
+  public final int setAuthenticator(FTPAuthenticator auth)
+    throws InvalidConfigurationException {
+
+      //  Inform listeners, validate the configuration change
+      
+      int sts = fireConfigurationChange(ConfigId.FTPAuthenticator, auth);
+
+      //  Set the FTP authenticator interface
+          
+      m_ftpAuthenticator = auth;
+        
+      //  Return the change status
+      
+      return sts;
+  }
+  
 }

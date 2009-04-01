@@ -39,6 +39,13 @@ import org.alfresco.jlan.smb.server.SMBSrvSession;
  */
 public class DomainAccessControl extends AccessControl {
 
+    /**
+     * Default constructor to allow container initialization.
+     */
+    protected DomainAccessControl()
+    {        
+    }
+    
 	/**
 	 * Class constructor
 	 *
