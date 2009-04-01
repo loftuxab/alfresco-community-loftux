@@ -35,7 +35,7 @@
          </div>
       </div>
       <div class="yui-u align-right">
-         View: DROPDOWN
+         <!-- TODO: enabled/disabled account filter -->
       </div>
    </div>
    <div class="panel">
