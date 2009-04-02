@@ -83,16 +83,15 @@ namespace AlfrescoPowerPoint2003
             if (bHaveDocument)
             {
                this.showDocumentDetails();
+               if (!m_ManuallyHidden)
+               {
+                  this.Show();
+               }
             }
             else
             {
                m_ServerDetails.DocumentPath = "";
-               this.showHome(false);
-            }
-
-            if (!m_ManuallyHidden)
-            {
-               this.Show();
+               // this.showHome(false);
             }
          }
          catch
@@ -217,10 +216,13 @@ namespace AlfrescoPowerPoint2003
                InternetSetOption(0, INTERNET_OPTION_END_BROWSER_SESSION, null, 0);
             }
 
-            webBrowser.ObjectForScripting = this;
-            UriBuilder uriBuilder = new UriBuilder(theURI);
-            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
-            PanelMode = PanelModes.WebBrowser;
+            if (!isClosing || (strAuthTicket != ""))
+            {
+               webBrowser.ObjectForScripting = this;
+               UriBuilder uriBuilder = new UriBuilder(theURI);
+               webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri, null, null, strAuthHeader);
+               PanelMode = PanelModes.WebBrowser;
+            }
          }
       }
 

@@ -85,16 +85,15 @@ namespace AlfrescoExcel2003
             if (bHaveDocument)
             {
                this.showDocumentDetails();
+               if (!m_ManuallyHidden)
+               {
+                  this.Show();
+               }
             }
             else
             {
                m_ServerDetails.DocumentPath = "";
-               this.showHome(false);
-            }
-
-            if (!m_ManuallyHidden)
-            {
-               this.Show();
+               // this.showHome(false);
             }
          }
          catch
