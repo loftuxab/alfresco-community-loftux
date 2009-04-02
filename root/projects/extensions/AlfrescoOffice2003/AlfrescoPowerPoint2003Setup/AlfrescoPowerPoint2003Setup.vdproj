@@ -15,8 +15,20 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_3D1A0E348FB8FC49019B2632FD7B01E2"
-        "OwnerKey" = "8:_60B2D2799E05E8C17676592C08918E66"
+        "MsmKey" = "8:_3C91EAAE1568C1DC5D58D8BA4B58859D"
+        "OwnerKey" = "8:_5CDB04FEB59F3672E3210FD6CA6DD6E4"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3C91EAAE1568C1DC5D58D8BA4B58859D"
+        "OwnerKey" = "8:_57EB081DA42E4A3688D8646D51423C2E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3C91EAAE1568C1DC5D58D8BA4B58859D"
+        "OwnerKey" = "8:_EF63C41FF3FA71F067C9647E66403BCA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -33,24 +45,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5492B47A5720A56F41EE21675CFD16AF"
-        "OwnerKey" = "8:_3D1A0E348FB8FC49019B2632FD7B01E2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5492B47A5720A56F41EE21675CFD16AF"
-        "OwnerKey" = "8:_57EB081DA42E4A3688D8646D51423C2E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5492B47A5720A56F41EE21675CFD16AF"
-        "OwnerKey" = "8:_60B2D2799E05E8C17676592C08918E66"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_57EB081DA42E4A3688D8646D51423C2E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -63,8 +57,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_60B2D2799E05E8C17676592C08918E66"
-        "OwnerKey" = "8:_57EB081DA42E4A3688D8646D51423C2E"
+        "MsmKey" = "8:_5CDB04FEB59F3672E3210FD6CA6DD6E4"
+        "OwnerKey" = "8:_EF63C41FF3FA71F067C9647E66403BCA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -111,6 +105,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_EF63C41FF3FA71F067C9647E66403BCA"
+        "OwnerKey" = "8:_57EB081DA42E4A3688D8646D51423C2E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_FC501193D2E991F80D380DEAC714DB9F"
         "OwnerKey" = "8:_BBA9E607D54C7B067B8C0277123E230F"
         "MsmSig" = "8:_UNDEFINED"
@@ -130,25 +130,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_60B2D2799E05E8C17676592C08918E66"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5492B47A5720A56F41EE21675CFD16AF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_44F0191A3D4E2E35A4BB112CB122CC43"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3D1A0E348FB8FC49019B2632FD7B01E2"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -161,6 +143,24 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_57EB081DA42E4A3688D8646D51423C2E"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_EF63C41FF3FA71F067C9647E66403BCA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5CDB04FEB59F3672E3210FD6CA6DD6E4"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_3C91EAAE1568C1DC5D58D8BA4B58859D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -307,7 +307,7 @@
             "Sequence" = "3:1"
             "Identifier" = "8:_B46C2CA3_B54D_4EA4_B9AB_0238090E2818"
             "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:/assemblyName=\"AlfrescoPowerPoint2003.dll\" /targetDir=\"[TARGETDIR]\\\" /solutionCodeGroupName=\"Alfresco.AlfrescoPowerPoint2003\" /solutionCodeGroupDescription=\"Code group for PowerPointAddin\" /assemblyCodeGroupName=\"AlfrescoPowerPoint2003\" /assemblyCodeGroupDescription=\"Code group for PowerPointAddin\" /allUsers=[ALLUSERS]"
+            "CustomActionData" = "8:/assemblyName=\"AlfrescoPowerPoint2003.dll\" /targetDir=\"[TARGETDIR]\\\" /solutionCodeGroupName=\"Alfresco.AlfrescoPowerPoint2003\" /solutionCodeGroupDescription=\"Code group for PowerPointAddin\" /assemblyCodeGroupName=\"AlfrescoPowerPoint2003\" /assemblyCodeGroupDescription=\"Code group for PowerPointAddin\" /allUsers=1"
             }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_FE8E55A192614A31B5961162347831DF"
             {
@@ -346,20 +346,20 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3D1A0E348FB8FC49019B2632FD7B01E2"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3C91EAAE1568C1DC5D58D8BA4B58859D"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Vbe.Interop, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+            "AssemblyAsmDisplayName" = "8:office, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
                 "ScatterAssemblies"
                 {
-                    "_3D1A0E348FB8FC49019B2632FD7B01E2"
+                    "_3C91EAAE1568C1DC5D58D8BA4B58859D"
                     {
-                    "Name" = "8:Microsoft.Vbe.Interop.dll"
+                    "Name" = "8:Office.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Microsoft.Vbe.Interop.dll"
+            "SourcePath" = "8:Office.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CB4E10FDBB5649DC8776DB0CFB4184EA"
@@ -408,37 +408,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5492B47A5720A56F41EE21675CFD16AF"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:office, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
-                "ScatterAssemblies"
-                {
-                    "_5492B47A5720A56F41EE21675CFD16AF"
-                    {
-                    "Name" = "8:office.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:office.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_CB4E10FDBB5649DC8776DB0CFB4184EA"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5B63331D7D7F49B8B5FAEAC7E10BCF79"
             {
             "SourcePath" = "8:..\\alfrescoInstall.jpg"
@@ -459,20 +428,20 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_60B2D2799E05E8C17676592C08918E66"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5CDB04FEB59F3672E3210FD6CA6DD6E4"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:TRUE"
-            "AssemblyAsmDisplayName" = "8:Microsoft.Office.Interop.PowerPoint, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Vbe.Interop, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
                 "ScatterAssemblies"
                 {
-                    "_60B2D2799E05E8C17676592C08918E66"
+                    "_5CDB04FEB59F3672E3210FD6CA6DD6E4"
                     {
-                    "Name" = "8:Microsoft.Office.Interop.PowerPoint.dll"
+                    "Name" = "8:Microsoft.Vbe.Interop.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:Microsoft.Office.Interop.PowerPoint.dll"
+            "SourcePath" = "8:Microsoft.Vbe.Interop.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CB4E10FDBB5649DC8776DB0CFB4184EA"
@@ -595,6 +564,37 @@
                     }
                 }
             "SourcePath" = "8:VSTOStorageWrapper.Interop.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_CB4E10FDBB5649DC8776DB0CFB4184EA"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_EF63C41FF3FA71F067C9647E66403BCA"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:TRUE"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Office.Interop.PowerPoint, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+                "ScatterAssemblies"
+                {
+                    "_EF63C41FF3FA71F067C9647E66403BCA"
+                    {
+                    "Name" = "8:Microsoft.Office.Interop.PowerPoint.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Microsoft.Office.Interop.PowerPoint.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CB4E10FDBB5649DC8776DB0CFB4184EA"
