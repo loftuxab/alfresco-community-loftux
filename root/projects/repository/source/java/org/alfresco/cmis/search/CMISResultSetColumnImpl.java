@@ -25,7 +25,8 @@
 package org.alfresco.cmis.search;
 
 import org.alfresco.cmis.CMISDataTypeEnum;
-import org.alfresco.cmis.dictionary.CMISPropertyDefinition;
+import org.alfresco.cmis.CMISPropertyDefinition;
+import org.alfresco.cmis.CMISResultSetColumn;
 
 /**
  * @author andyh
