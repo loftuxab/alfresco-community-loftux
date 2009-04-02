@@ -61,6 +61,11 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
 
+      /* initialise member variables */ 
+      this.widgets = {};
+      this.itemSelectButtons = {};
+      this.selectedItems = {};
+      
       return this;
    }
    
@@ -124,7 +129,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Object container for storing YUI button instances, indexed by nodeRef.
@@ -132,7 +137,7 @@
        * @property itemSelectButtons
        * @type object
        */
-      itemSelectButtons: {},
+      itemSelectButtons: null,
       
       /**
        * Current search term, obtained from form input field.
@@ -156,7 +161,7 @@
        * @property selectedItems
        * @type object
        */
-      selectedItems: {},
+      selectedItems: null,
 
       /**
        * Set multiple initialization options at once.
