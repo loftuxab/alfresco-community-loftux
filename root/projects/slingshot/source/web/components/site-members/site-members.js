@@ -60,7 +60,6 @@
       this.listWidgets = {};
       this.buttons = [];
       this.modules = {};
-      this.searchTerm = "";
       this.isCurrentUserSiteAdmin = false;
       
       /* Register this component */
@@ -94,13 +93,22 @@
          siteId: "",
          
          /**
-          * Maximum number of results displayed.
+          * Number of characters required for a search.
           * 
-          * @property maxResults
+          * @property minSearchTermLength
+          * @type int
+          * @default 3
+          */
+         minSearchTermLength: 3,
+         
+         /**
+          * Maximum number of search results displayed.
+          * 
+          * @property maxSearchResults
           * @type int
           * @default 100
           */
-         maxResults: 100,
+         maxSearchResults: 100,
          
          /**
           * The userid of the current user
@@ -161,14 +169,6 @@
        */
       modules: null,
 
-      /**
-       * Search term used for the site search.
-       * 
-       * @property searchTerm
-       * @type string
-       */
-      searchTerm: "",
-      
       /**
        * Flag to determine whether the current user is a site administrator
        * 
@@ -303,8 +303,12 @@
          // setup of the datatable.
          this._setupDataTable();
          
-         // setup the button
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
+         // setup the buttons
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.onSearch);
+         this.widgets.invitePeople = Alfresco.util.createYUIButton(this, "invitePeople", null, 
+         {
+            type: "link"
+         });
          
          // register the "enter" event on the search text field
          var searchInput = Dom.get(this.id + "-term");
@@ -315,7 +319,7 @@
          {
             fn: function() 
             {
-               me.doSearch();
+               me.onSearch();
             },
             scope: this,
             correctScope: true
@@ -330,6 +334,8 @@
             // Deactivate controls
             YAHOO.Bubbling.fire("deactivateAllControls");
          }
+         
+         searchInput.focus();
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -581,16 +587,25 @@
             return true;
          };
       },
-      
+
       /**
        * Search event handler
        *
-       * @method doSearch
+       * @method onSearch
        */
-      doSearch: function SiteMembers_doSearch()
+      onSearch: function SiteMembers_onSearch()
       {
-         this.searchTerm = Dom.get(this.id + "-term").value;
-         this._performSearch(this.searchTerm);
+         var searchTerm = $html(Dom.get(this.id + "-term").value);
+         if (searchTerm.length < this.options.minSearchTermLength)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+            });
+            return;
+         }
+
+         this._performSearch(searchTerm);
       },
       
       /**
@@ -790,7 +805,6 @@
          
          function successHandler(sRequest, oResponse, oPayload)
          {
-            this.searchTerm = searchTerm;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
@@ -834,8 +848,8 @@
       {
          var params = YAHOO.lang.substitute("size={maxResults}&nf={term}",
          {
-            maxResults : this.options.maxResults,
-            term : encodeURIComponent(searchTerm)
+            maxResults: this.options.maxSearchResults,
+            term: encodeURIComponent(searchTerm)
          });
          
          return params;

@@ -7,3 +7,5 @@ if (json.status == 200)
    var obj = eval('(' + json + ')');
    model.isManager = (obj.role == "SiteManager");
 }
+
+context.properties["isManager"] = model.isManager;

@@ -55,10 +55,17 @@
       this.name = "Alfresco.PeopleFinder";
       this.id = htmlId;
       
-      /* Register this component */
+      // Initialise prototype properties
+      this.widgets = {};
+      this.userSelectButtons = {};
+      this.searchTerm = "";
+      this.singleSelectedUser = "";
+      this.selectedUsers = {};
+
+      // Register this component
       Alfresco.util.ComponentManager.register(this);
 
-      /* Load YUI Components */
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
    
       /**
@@ -67,7 +74,14 @@
       YAHOO.Bubbling.on("personDeselected", this.onPersonDeselected, this);
 
       return this;
-   }
+   };
+   
+   YAHOO.lang.augmentObject(Alfresco.PeopleFinder,
+   {
+      VIEW_MODE_DEFAULT: "",
+      VIEW_MODE_COMPACT: "COMPACT",
+      VIEW_MODE_FULLPAGE: "FULLPAGE"
+   });
    
    Alfresco.PeopleFinder.prototype =
    {
@@ -88,21 +102,13 @@
          siteId: "",
 
          /**
-          * Current username.
-          *
-          * @property currentUser
-          * @type string
-          */
-         currentUser: "",
-
-         /**
-          * Compact mode flag
+          * View mode
           * 
-          * @property compactMode
-          * @type boolean
-          * @default false
+          * @property viewMode
+          * @type string
+          * @default Alfresco.PeopleFinder.VIEW_MODE_DEFAULT
           */
-         compactMode: false,
+         viewMode: Alfresco.PeopleFinder.VIEW_MODE_DEFAULT,
 
          /**
           * Single Select mode flag
@@ -121,15 +127,6 @@
           * @default false
           */
          showSelf: false,
-         
-         /**
-          * People List mode flag
-          * 
-          * @property peopleListMode
-          * @type boolean
-          * @default false
-          */
-         peopleListMode: false,
          
          /**
           * Number of characters required for a search.
@@ -156,7 +153,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
       
       /**
        * Object container for storing YUI button instances, indexed by username.
@@ -164,7 +161,7 @@
        * @property userSelectButtons
        * @type object
        */
-      userSelectButtons: {},
+      userSelectButtons: null,
       
       /**
        * Current search term, obtained from form input field.
@@ -172,7 +169,7 @@
        * @property searchTerm
        * @type string
        */
-      searchTerm: "",
+      searchTerm: null,
       
       /**
        * Single selected user, for when in single select mode
@@ -180,7 +177,7 @@
        * @property singleSelectedUser
        * @type string
        */
-      singleSelectedUser: "",
+      singleSelectedUser: null,
 
       /**
        * Selected users. Keeps a list of selected users for correct Add button state.
@@ -188,7 +185,7 @@
        * @property selectedUsers
        * @type object
        */
-      selectedUsers: {},
+      selectedUsers: null,
 
       /**
        * Set multiple initialization options at once.
@@ -237,12 +234,12 @@
       {  
          var me = this;
          
-         // Compact mode, list mode or other?
-         if (this.options.compactMode)
+         // View mode
+         if (this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
          {
             Dom.addClass(this.id + "-body", "compact");
          }
-         else if (this.options.peopleListMode)
+         else if (this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_FULLPAGE)
          {
             Dom.setStyle(this.id + "-results", "height", "auto");
          }
@@ -284,7 +281,7 @@
                {
                   for (var i = 0; i < items.length; i++)
                   {
-                      if (items[i].userName == me.options.currentUser)
+                      if (items[i].userName == Alfresco.constants.USERNAME)
                       {
                          items.splice(i, 1);
                          break;
@@ -295,12 +292,12 @@
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {
-                  "people": items
+                  people: items
                };
             }
             
             return updatedResponse;
-         }
+         };
          
          // Setup the DataTable
          this._setupDataTable();
@@ -308,7 +305,8 @@
          // register the "enter" event on the search text field
          var searchText = Dom.get(this.id + "-search-text");
          
-         new YAHOO.util.KeyListener(searchText,
+         // declare variable to keep JSLint and YUI Compressor happy
+         var enterListener = new YAHOO.util.KeyListener(searchText,
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
          },
@@ -319,7 +317,8 @@
             },
             scope: this,
             correctScope: true
-         }, "keydown").enable();
+         }, "keydown");
+         enterListener.enable();
          
          // Set initial focus
          searchText.focus();
@@ -374,26 +373,28 @@
           */
          var renderCellDescription = function PeopleFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var userName = oRecord.getData("userName");
-            var name = userName;
-            var firstName = oRecord.getData("firstName");
-            var lastName = oRecord.getData("lastName");
+            var userName = oRecord.getData("userName"),
+               name = userName,
+               firstName = oRecord.getData("firstName"),
+               lastName = oRecord.getData("lastName");
+            
             if ((firstName !== undefined) || (lastName !== undefined))
             {
                name = firstName ? firstName + " " : "";
                name += lastName ? lastName : "";
             }
             
-            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
-            var organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
+            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "",
+               organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
+            
             var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
             {
                userid: userName
             });
-            desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + ' class="theme-color-1">' + $html(name) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
-            if (title.length != 0)
+            var desc = '<h3 class="itemname"><a href=' + encodeURI(profileUrl) + ' class="theme-color-1">' + $html(name) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+            if (title.length !== 0)
             {
-               if (me.options.compactMode)
+               if (me.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
                {
                   desc += '<div class="detail">' + $html(title) + '</div>';
                }
@@ -402,9 +403,9 @@
                   desc += '<div class="detail"><span>' + me._msg("label.title") + ":</span> " + $html(title) + '</div>';
                }
             }
-            if (organisation.length != 0)
+            if (organisation.length !== 0)
             {
-               if (me.options.compactMode)
+               if (me.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
                {
                   desc += '<div class="detail">&nbsp;(' + $html(organisation) + ')</div>';
                }
@@ -435,7 +436,7 @@
             elCell.innerHTML = desc;
             
             // create button if require - it is not required in the plain people list mode
-            if (!me.options.peopleListMode)
+            if (me.options.viewMode !== Alfresco.PeopleFinder.VIEW_MODE_FULLPAGE)
             {
                var button = new YAHOO.widget.Button(
                {
@@ -452,7 +453,7 @@
                });
                me.userSelectButtons[userName] = button;
                
-               if ((userName in me.selectedUsers) || (me.options.singleSelectMode && me.singleSelectedUser != ""))
+               if ((userName in me.selectedUsers) || (me.options.singleSelectMode && me.singleSelectedUser !== ""))
                {
                   me.userSelectButtons[userName].set("disabled", true);
                }
@@ -462,7 +463,7 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: this.options.compactMode ? 36 : 70
+            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT ? 36 : 70
          },
          {
             key: "person", label: "Description", sortable: false, formatter: renderCellDescription
@@ -542,9 +543,12 @@
          // Disable the add button(s)
          if (this.options.singleSelectMode)
          {
-            for (button in this.userSelectButtons)
+            for (var button in this.userSelectButtons)
             {
-               this.userSelectButtons[button].set("disabled", true);
+               if (this.userSelectButtons.hasOwnProperty(button))
+               {
+                  this.userSelectButtons[button].set("disabled", true);
+               }
             }
          }
          else
@@ -562,8 +566,7 @@
        */
       onSearchClick: function PeopleFinder_onSearchClick(e, p_obj)
       {
-         var searchTermElem = Dom.get(this.id + "-search-text");
-         var searchTerm = searchTermElem.value;
+         var searchTerm = Dom.get(this.id + "-search-text").value;
          if (searchTerm.length < this.options.minSearchTermLength)
          {
             Alfresco.util.PopupManager.displayMessage(
@@ -602,9 +605,12 @@
             // Re-enable the add button(s)
             if (this.options.singleSelectMode)
             {
-               for (button in this.userSelectButtons)
+               for (var button in this.userSelectButtons)
                {
-                  this.userSelectButtons[button].set("disabled", false);
+                  if (this.userSelectButtons.hasOwnProperty(button))
+                  {
+                     this.userSelectButtons[button].set("disabled", false);
+                  }
                }
             }
             else
@@ -654,7 +660,7 @@
          {
             this._setDefaultDataTableErrors(this.widgets.dataTable);
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-         }
+         };
          
          var failureHandler = function PeopleFinder__pS_failureHandler(sRequest, oResponse)
          {
@@ -676,14 +682,14 @@
                   this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
-         }
+         };
          
          this.searchTerm = searchTerm;
          this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
          {
-               success: successHandler,
-               failure: failureHandler,
-               scope: this
+            success: successHandler,
+            failure: failureHandler,
+            scope: this
          });
       },
 

@@ -158,7 +158,13 @@
        * @method onReady
        */
       onReady: function InvitationList_onReady()
-      {   
+      {  
+         // WebKit CSS fix
+         if (YAHOO.env.ua.webkit > 0)
+         {
+            Dom.setStyle(this.id + "-backTo", "vertical-align", "sub");
+         }
+         
          // button to invite all people in the list 
          this.widgets.inviteButton = Alfresco.util.createYUIButton(this, "invite-button", this.inviteButtonClick);
          
@@ -257,10 +263,10 @@
             Dom.setStyle(templateInstance, "display", "");
 
             // define the role dropdown menu and the event listeners
-            var rolesMenu = [];
-            for (var x=0; x < me.options.roles.length; x++)
+            var rolesMenu = [], role;
+            for (var i = 0, j = me.options.roles.length; i < j; i++)
             {
-               var role = me.options.roles[x];
+               role = me.options.roles[i];
                rolesMenu.push(
                {
                   text: me._msg("role." + role),
@@ -357,13 +363,15 @@
       onAddInvite: function Invitationlist_onAddInvite(layer, args)
       {   
          var data = args[1];
-         var inviteData = {};
-         inviteData.id = this.uniqueRecordId++;
-         inviteData.userName = data.userName || "";
-         inviteData.firstName = data.firstName;
-         inviteData.lastName = data.lastName;
-         inviteData.userName = data.userName;
-         inviteData.email = data.email;
+         var inviteData =
+         {
+            id: this.uniqueRecordId++,
+            userName: data.userName || "",
+            firstName: data.firstName,
+            lastName: data.lastName,
+            userName: data.userName,
+            email: data.email
+         };
          this.widgets.dataTable.addRow(inviteData);
          this._enableDisableInviteButton();
       },
@@ -427,7 +435,7 @@
       /**
        * Implementation of set all roles functionality
        */
-      _setAllRolesImpl: function(roleName)
+      _setAllRolesImpl: function InvitationList__setAllRolesImpl(roleName)
       {
          var recordSet = this.widgets.dataTable.getRecordSet();
          for (var x=0; x < recordSet.getLength(); x++)
@@ -443,7 +451,7 @@
       /**
        * Sets the role for a given record
        */
-      _setRoleForRecord: function(record, role)
+      _setRoleForRecord: function InvitationList__setRoleForRecord(record, role)
       {
          // set the new role
          record.setData('role', role);
@@ -499,14 +507,14 @@
          // show a wait message
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.wait"),
+            text: this._msg("message.please-wait"),
             spanClass: "wait",
             displayTime: 0
          });
          
          // copy over all records
          var recs = [];
-         for (var i=0; i < recordSet.getLength(); i++)
+         for (var i = 0, j = recordSet.getLength(); i < j; i++)
          {
             recs.push(recordSet.getRecord(i));
          }
@@ -564,26 +572,40 @@
           
          // fetch the record to process
          var record = inviteData.recs[inviteData.index];
-         var firstName = record.getData('firstName');
-         var lastName = record.getData('lastName');
-         var email = record.getData('email');
-         var userName = record.getData('userName') || "";
-         var role = record.getData('role');
          
          // We have to do a backend call for each invited person
          var serverPath = window.location.protocol + "//" + window.location.host + Alfresco.constants.URL_CONTEXT;
+
          Alfresco.util.Ajax.request(
          {
+/**
+ * TODO: Swap to new API when it's complete
+ *
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/invitations",
+            method: "POST",
+            dataObj:
+            {
+               invitationType: "NOMINATED",
+               inviteeUserName: record.getData('userName') || "",
+               inviteeRoleName: record.getData('role'),
+               inviteeFirstName: record.getData('firstName'),
+               inviteeLastName: record.getData('lastName'),
+               inviteeEmail: record.getData('email'),
+               serverPath: serverPath,
+               acceptUrl: 'page/accept-invite',
+               rejectUrl: 'page/reject-invite'
+            },
+*/
             method: "GET",
             url: Alfresco.constants.PROXY_URI + "api/invite/start",
             dataObj:
             {
-               inviteeFirstName: firstName,
-               inviteeLastName: lastName,
-               inviteeEmail: email,
-               inviteeUserName: userName,
+               inviteeFirstName: record.getData('firstName'),
+               inviteeLastName: record.getData('lastName'),
+               inviteeEmail: record.getData('email'),
+               inviteeUserName: record.getData('userName') || "",
                siteShortName : this.options.siteId,
-               inviteeSiteRole : role,
+               inviteeSiteRole : record.getData('role'),
                serverPath : serverPath,
                acceptUrl : 'page/accept-invite',
                rejectUrl : 'page/reject-invite'
