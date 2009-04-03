@@ -335,8 +335,6 @@
                      prefix="tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer.builder}/configwizard"
-                     includes="output/*.bin" />
          <tarfileset dir="${dir.project.installer}"
                      includes="install_extension/**" />
          <tarfileset dir="${dir.project.installer}"
