@@ -20,9 +20,9 @@
    <div id="${args.htmlid}-invitationBar" class="invitelist-bar">
       <button id="${args.htmlid}-selectallroles-button">${msg("invitationlist.selectallroles")}</button>
       <select id="${args.htmlid}-selectallroles-menu">
-         <#list siteRoles as siteRole>
+      <#list siteRoles as siteRole>
          <option value="${siteRole}">${msg('role.' + siteRole)}</option>
-         </#list>
+      </#list>
       </select>
    </div>
 
@@ -35,6 +35,7 @@
 
 </div>
 <div class="sinvite">
-   <input type="button" value="${msg("invitationlist.invite")}"  id="${args.htmlid}-invite-button" />
+   <span id="${args.htmlid}-invite-button" class="yui-button yui-push-button"><span class="first-child"><button>${msg("invitationlist.invite")}</button></span></span>
+   <span id="${args.htmlid}-backTo" class="back-to">${msg("invitationlist.or")} <a href="site-members">${msg("invitationlist.back-to")}</a></span>
 </div>
 </div>

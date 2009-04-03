@@ -275,7 +275,7 @@
          // Set the correct options for our use
          this.modules.peopleFinder.setOptions(
          {
-            compactMode: true,
+            viewMode: Alfresco.PeopleFinder.VIEW_MODE_COMPACT,
             singleSelectMode: true,
             showSelf: true
          });

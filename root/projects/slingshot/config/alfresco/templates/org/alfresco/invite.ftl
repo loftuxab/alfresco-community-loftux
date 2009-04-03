@@ -18,17 +18,16 @@
 		<div class="yui-g grid">
 
 			<div class="yui-u first column1">
-					<div class="yui-b" id="byAlfrescoUsers">
+					<div class="yui-b">
 					   <@region id="people-finder" scope="template" protected=true />
 					</div>
-
-					<div class="yui-b" id="byEmail">
+					<div class="yui-b">
 					   <@region id="addemail" scope="template" protected=true />
 					</div>
 			</div>
 
 			<div class="yui-u column2">
-					<div class="yui-b" id="invitationList">
+					<div class="yui-b">
 						<@region id="invitationlist" scope="template" protected=true />
 					</div>
 			</div>

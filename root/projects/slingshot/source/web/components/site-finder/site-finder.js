@@ -55,7 +55,7 @@
       this.name = "Alfresco.SiteFinder";
       this.id = htmlId;
       
-      // initialise prototype properties
+      // Initialise prototype properties
       this.widgets = {};
       this.buttons = [];
       this.modules = {};
@@ -64,10 +64,10 @@
       this.membershipsRetrieved = false;
       this.pendingInvites = {};
       
-      /* Register this component */
+      // Register this component
       Alfresco.util.ComponentManager.register(this);
 
-      /* Load YUI Components */
+      // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
 
       YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);

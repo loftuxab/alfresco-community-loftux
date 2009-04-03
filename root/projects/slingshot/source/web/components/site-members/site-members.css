@@ -1,46 +1,62 @@
 .site-members 
 {
-	margin: 10px;
+   color: #000;
+   margin: 24px 10px 10px;
 }
 
 .site-members .heading
 {
    color: #333333;
    font-size: 153.9%;
-   margin: 16px 0px;
+   margin: 16px 0 0;
 }
 
-.site-members .search-controls
+.site-members.list
 {
-   border-top: 1px solid #bababa;
-   border-left: 1px solid #bababa;
-   border-right: 1px solid #bababa;
-   padding: 8px;
+   margin-bottom: 10px;
+}
+
+.site-members .invite-people
+{
+   text-align: right;
+}
+
+.site-members .invite-people a:hover
+{
+   text-decoration: none;
+}
+
+.site-members .finder-wrapper
+{
+   border: 1px solid #c0c0c0;
    margin-top: 10px;
 }
 
-.site-members .search-controls .search-term
+.site-members .results table
 {
-   vertical-align: text-bottom;
-   height: 18px;
-   width: 75%;
+   border: none;
+   width: 100%;
 }
 
-.site-members .members-list table
+.site-members .results table thead
 {
-   border: 1px solid #a1a1a1;
-	width: 100%;
-}
-
-.site-members .members-list table thead
-{
-	display: none;
+   display: none;
 }
 
 .site-members .yui-dt td
 {
    border-bottom: 1px dashed #D7D7D7;
    border-right: medium none;
+}
+
+.site-members .yui-dt-last td
+{
+   border-bottom: medium none;
+}
+
+.site-members tr.yui-dt-odd
+{
+   background-color: #fbfbfb;
 }
 
 .site-members .yui-dt-error
@@ -52,19 +68,41 @@
    padding: 1em;
 }
 
-.site-members .yui-dt-first
+.site-members .search-controls
 {
-   width: 70px;
+   border-bottom: 1px dashed #c0c0c0;
+   height: 2em;
+   padding: 0.5em;
 }
 
-.site-members .yui-dt-last
+.site-members .search-controls div
 {
-   width: 75px;
+   float: left;
 }
 
-.site-members tr.yui-dt-odd
+.site-members .search-controls .search-text
 {
-   background-color: #fbfbfb;
+   padding: 0.3em 1em 0.5em 0.5em;
+}
+
+.site-members .search-controls .search-text input
+{
+   width: 20em;
+}
+
+.site-members .search-controls .search-button button
+{
+   background: transparent url(../images/search-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+
+.site-members .search-controls .results
+{
+   clear: both;
+   background-color: #f6f9fc;
+   overflow-x: hidden;
+   overflow-y: auto;
+   position: relative !important;
 }
 
 .site-members h3 a
@@ -82,7 +120,7 @@
    color: #333333;
 }
 
-/* Use a class since IE6 crashes if setStyle is use to se overflow with !important */
+/* Use a class since IE6 crashes if setStyle is use overflow with !important */
 .site-members .overflow
 {
    overflow: visible !important;

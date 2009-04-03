@@ -9,7 +9,7 @@
       // Set the correct options for our use
       peopleFinder.setOptions(
       {
-         peopleListMode: true
+         viewMode: Alfresco.PeopleFinder.VIEW_MODE_FULLPAGE
       });
    });
    //]]></script>

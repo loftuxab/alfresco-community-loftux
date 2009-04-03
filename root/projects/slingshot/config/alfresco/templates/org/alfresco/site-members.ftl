@@ -10,15 +10,12 @@
    </div>
    
    <div id="bd">
-
-	   <@region id="membersbar" scope="template" protected=true />
-   
+      <@region id="membersbar" scope="template" protected=true />
       <div>
          <@region id="site-members" scope="template" />
       </div>
-	</div>
-	
-    <br />
+   </div>
+   <br />
 </@>
 
 <@templateFooter>

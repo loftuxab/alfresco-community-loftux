@@ -107,7 +107,12 @@
 .invitationlistwrapper .sinvite
 {
 	padding-top: 5px;
-	text-align: right;
+}
+
+.invitationlistwrapper .sinvite .back-to
+{
+   padding-left: 0.5em;
+   vertical-align: super;
 }
 
 .invitationlist .invitelist-bar
