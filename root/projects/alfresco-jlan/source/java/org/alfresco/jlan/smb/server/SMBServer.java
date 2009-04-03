@@ -421,8 +421,7 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 			// Output the authenticator details
 
 			if ( getCifsAuthenticator() != null)
-				Debug.println("[SMB] Using authenticator " + getCifsAuthenticator().getClass().getName() + ", mode="
-						+ (getCifsAuthenticator().getAccessMode() == ICifsAuthenticator.SHARE_MODE ? "SHARE" : "USER"));
+				Debug.println("[SMB] Using authenticator " + getCifsAuthenticator().toString());
 
 			// Display the timezone offset/name
 

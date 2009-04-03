@@ -980,4 +980,13 @@ public abstract class CifsAuthenticator implements ICifsAuthenticator {
 		return null;
 	}
 
+	/**
+	 * Generate a description for debugging purposes
+	 */
+    @Override
+    public String toString()
+    {
+        return getClass().getName() + ", mode="
+        + (getAccessMode() == ICifsAuthenticator.SHARE_MODE ? "SHARE" : "USER");
+    }
 }
