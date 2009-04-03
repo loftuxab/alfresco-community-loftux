@@ -1,3 +1,15 @@
+/* History Manager */
+#yui-history-iframe
+{
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 1px;
+   height: 1px;
+   visibility: hidden;
+}
+
+/* Users Tool */
 .users
 {
    color: #000;
@@ -17,9 +29,14 @@
    text-align: right;
 }
 
-.users .list
+.users .hidden
 {
-   margin-bottom: 10px;
+   display: none;
+}
+
+.users .separator
+{
+   margin-bottom: 0.8em;
 }
 
 .users .search-bar
@@ -38,12 +55,7 @@
    padding: 3px;
 }
 
-.users .separator
-{
-   margin-bottom: 0.8em;
-}
-
-.users .panel
+.users .search-main
 {
    border: 1px solid #D7D7D7;
 }
@@ -76,4 +88,85 @@
 .users td.yui-dt-desc
 {
    background-color: #ffffff !important;
+}
+
+.users .view-main
+{
+   border: 1px solid #D7D7D7;
+   padding-bottom: 1em;
+}
+
+.users .edituser-button
+{
+   float: right;
+}
+
+.users .deleteuser-button
+{
+   float: right;
+}
+
+.users .header-bar
+{
+   height: 1.1em;
+   padding: 0.3em;
+   margin: 1.0em;
+   background-color: #e3eaec;
+   border-bottom: 2px solid #f0f3f4;
+   font-weight: bold;
+   font-size: 116%;
+}
+
+.users .photo-row
+{
+   margin-left: 4em;
+   padding: 0.333em;
+   height: 7em;
+}
+
+.users .photo
+{
+   padding: 0.5em;
+   float: left;
+}
+
+.users .bio-row
+{
+   padding: 0em 1.5em 0.3em 11.75em;
+}
+
+.users .field-row
+{
+   padding: 0.333em;
+}
+
+.users .name-label
+{
+   margin-left: 96px;
+   font-size: 123.1%;
+   line-height: 1.7em;
+}
+
+.users .field-label
+{
+   margin-left: 96px;
+   line-height: 1.5em;
+}
+
+.users .field-label-right
+{
+   clear: left;
+   display: block;
+   padding-right: 0.8em;
+   width: 9em;
+   margin-left: 2em;
+   text-align: right;
+   font-weight: bold;
+}
+
+.users .field-value
+{
+   float: left;
+   margin-left: 12em;
+   margin-top: -1.2em;
 }

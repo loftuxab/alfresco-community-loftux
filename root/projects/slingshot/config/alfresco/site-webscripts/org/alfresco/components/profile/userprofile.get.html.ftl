@@ -8,14 +8,15 @@
    );
 //]]></script>
 
+<#assign el=args.htmlid>
 <#assign editable = (user.name == profile.name)>
 <#assign displayname=profile.firstName>
 <#if profile.lastName??><#assign displayname=displayname + " " + profile.lastName></#if>
-<div id="${args.htmlid}-body" class="profile">
-   <div id="${args.htmlid}-readview" class="hidden">
+<div id="${el}-body" class="profile">
+   <div id="${el}-readview" class="hidden">
       <#if editable>
       <div class="editcolumn">
-         <div class="btn-edit"><button id="${args.htmlid}-button-edit" name="edit">${msg("button.editprofile")}</button></div>
+         <div class="btn-edit"><button id="${el}-button-edit" name="edit">${msg("button.editprofile")}</button></div>
       </div>
       </#if>
       <div class="viewcolumn">
@@ -117,45 +118,45 @@
    </div>
    
    <#if editable>
-   <div id="${args.htmlid}-editview" class="hidden">
+   <div id="${el}-editview" class="hidden">
       <form id="${htmlid}-form" action="${url.context}/service/components/profile/userprofile" method="post">
       
       <div class="header-bar">${msg("label.about")}</div>
       <div class="drow">
          <div class="reqcolumn">&nbsp;*</div>
          <div class="rightcolumn">
-            <span class="label"><label for="${args.htmlid}-input-lastName">${msg("label.lastname")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-lastName" value="<#if profile.lastName??>${profile.lastName?html}</#if>" /></span>
+            <span class="label"><label for="${el}-input-lastName">${msg("label.lastname")}:</label></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-lastName" value="<#if profile.lastName??>${profile.lastName?html}</#if>" /></span>
          </div>
          <div class="leftcolumn">
-            <span class="label"><label for="${args.htmlid}-input-firstName">${msg("label.firstname")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-firstName" value="<#if profile.firstName??>${profile.firstName?html}</#if>" />&nbsp;*</span>
+            <span class="label"><label for="${el}-input-firstName">${msg("label.firstname")}:</label></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-firstName" value="<#if profile.firstName??>${profile.firstName?html}</#if>" />&nbsp;*</span>
          </div>
       </div>
       <div class="drow">
          <div class="reqcolumn">&nbsp;</div>         
          <div class="leftcolumn">
-            <span class="label"><label for="${args.htmlid}-input-jobtitle">${msg("label.title")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-jobtitle" value="<#if profile.jobTitle??>${profile.jobTitle?html}</#if>" /></span>
+            <span class="label"><label for="${el}-input-jobtitle">${msg("label.jobtitle")}:</label></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-jobtitle" value="<#if profile.jobTitle??>${profile.jobTitle?html}</#if>" /></span>
          </div>
          <div class="rightcolumn">
-            <span class="label"><label for="${args.htmlid}-input-location">${msg("label.location")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-location" value="<#if profile.location??>${profile.location?html}</#if>" /></span>
+            <span class="label"><label for="${el}-input-location">${msg("label.location")}:</label></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-location" value="<#if profile.location??>${profile.location?html}</#if>" /></span>
          </div>
       </div>
       <!--
       <div class="drow">
          <div class="leftcolumn">
             <span class="label">${msg("label.timezone")}:</span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-timezone" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-timezone" /></span>
          </div>
          <div class="rightcolumn">
          </div>
       </div>
       -->
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-bio">${msg("label.bio")}:</label></span>
-         <span class="input"><textarea id="${args.htmlid}-input-bio" name="${args.htmlid}-text-biography" rows="5" cols="60">${profile.biography!""}</textarea></span>
+         <span class="label"><label for="${el}-input-bio">${msg("label.bio")}:</label></span>
+         <span class="input"><textarea id="${el}-input-bio" name="${el}-text-biography" rows="5" cols="60">${profile.biography!""}</textarea></span>
       </div>
       
       <div class="header-bar">${msg("label.photo")}</div>
@@ -164,7 +165,7 @@
             <img class="photoimg" src="${url.context}<#if profile.properties.avatar??>/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force<#else>/components/images/no-user-photo-64.png</#if>" alt="" />
          </div>
          <div class="photobtn">
-            <button id="${args.htmlid}-button-upload" name="upload">${msg("button.upload")}</button>
+            <button id="${el}-button-upload" name="upload">${msg("button.upload")}</button>
             <div class="phototxt">${msg("label.photoimagesize")}</div>
             <div class="phototxt">${msg("label.photonote")}</div>
          </div>
@@ -172,71 +173,71 @@
       
       <div class="header-bar">${msg("label.contactinfo")}</div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-telephone">${msg("label.telephone")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-telephone" value="<#if profile.telephone??>${profile.telephone?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-telephone">${msg("label.telephone")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-telephone" value="<#if profile.telephone??>${profile.telephone?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-mobile">${msg("label.mobile")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-mobile" value="<#if profile.mobilePhone??>${profile.mobilePhone?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-mobile">${msg("label.mobile")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-mobile" value="<#if profile.mobilePhone??>${profile.mobilePhone?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-email">${msg("label.email")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-email" value="<#if profile.email??>${profile.email?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-email">${msg("label.email")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-email" value="<#if profile.email??>${profile.email?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-skype">${msg("label.skype")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-skype" value="<#if profile.skype??>${profile.skype?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-skype">${msg("label.skype")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-skype" value="<#if profile.skype??>${profile.skype?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-instantmsg">${msg("label.im")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-instantmsg" value="<#if profile.instantMsg??>${profile.instantMsg?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-instantmsg">${msg("label.im")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-instantmsg" value="<#if profile.instantMsg??>${profile.instantMsg?html}</#if>" /></span>
       </div>
       
       <div class="header-bar">${msg("label.companyinfo")}</div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-organization">${msg("label.name")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-organization" value="<#if profile.organization??>${profile.organization?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-organization">${msg("label.name")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-organization" value="<#if profile.organization??>${profile.organization?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-companyaddress1">${msg("label.address")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyaddress1" value="<#if profile.companyAddress1??>${profile.companyAddress1?html}</#if>" /></span>
-      </div>
-      <div class="row">
-         <span class="label"></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyaddress2" value="<#if profile.companyAddress2??>${profile.companyAddress2?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-companyaddress1">${msg("label.address")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress1" value="<#if profile.companyAddress1??>${profile.companyAddress1?html}</#if>" /></span>
       </div>
       <div class="row">
          <span class="label"></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyaddress3" value="<#if profile.companyAddress3??>${profile.companyAddress3?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress2" value="<#if profile.companyAddress2??>${profile.companyAddress2?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-companypostcode">${msg("label.postcode")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companypostcode" value="<#if profile.companyPostcode??>${profile.companyPostcode?html}</#if>" /></span>
+         <span class="label"></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress3" value="<#if profile.companyAddress3??>${profile.companyAddress3?html}</#if>" /></span>
+      </div>
+      <div class="row">
+         <span class="label"><label for="${el}-input-companypostcode">${msg("label.postcode")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companypostcode" value="<#if profile.companyPostcode??>${profile.companyPostcode?html}</#if>" /></span>
       </div>
       <!--
       <div class="row">
          <span class="label">${msg("label.map")}:</span>
-         <span class="check"><input type="checkbox" id="${args.htmlid}-input-showmap" /> ${msg("label.showmap")}</span>
+         <span class="check"><input type="checkbox" id="${el}-input-showmap" /> ${msg("label.showmap")}</span>
       </div>
       -->
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-companytelephone">${msg("label.telephone")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companytelephone" value="<#if profile.companyTelephone??>${profile.companyTelephone?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-companytelephone">${msg("label.telephone")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companytelephone" value="<#if profile.companyTelephone??>${profile.companyTelephone?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-companyfax">${msg("label.fax")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyfax" value="<#if profile.companyFax??>${profile.companyFax?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-companyfax">${msg("label.fax")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyfax" value="<#if profile.companyFax??>${profile.companyFax?html}</#if>" /></span>
       </div>
       <div class="row">
-         <span class="label"><label for="${args.htmlid}-input-companyemail">${msg("label.email")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${args.htmlid}-input-companyemail" value="<#if profile.companyEmail??>${profile.companyEmail?html}</#if>" /></span>
+         <span class="label"><label for="${el}-input-companyemail">${msg("label.email")}:</label></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyemail" value="<#if profile.companyEmail??>${profile.companyEmail?html}</#if>" /></span>
       </div>
       
       <hr/>
       
       <div class="buttons">
-         <button id="${args.htmlid}-button-save" name="save">${msg("button.savechanges")}</button>
-         <button id="${args.htmlid}-button-cancel" name="cancel">${msg("button.cancel")}</button>
+         <button id="${el}-button-save" name="save">${msg("button.savechanges")}</button>
+         <button id="${el}-button-cancel" name="cancel">${msg("button.cancel")}</button>
       </div>
       
       </form>
