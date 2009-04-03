@@ -106,6 +106,7 @@ public interface CMISConstants
     public static final String REL_ALLVERSIONS = "cmis-allversions";
     public static final String REL_TYPE = "cmis-type";
     public static final String REL_SOURCE = "cmis-source";
+    public static final String REL_ALLOWABLEACTIONS = "cmis-allowableactions";
     
     // CMIS Nested Entry
     public static final QName NESTED_ENTRY = Constants.ENTRY;
