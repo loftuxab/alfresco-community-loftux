@@ -35,12 +35,12 @@
          </div>
          <div>
             <label for="${args.htmlid}-url">${msg("form.url")}:</label>
-	        <input  class="lbl" id="${args.htmlid}-url" type="text" name="url" tabindex="3"/>
+	        <input class="lbl" id="${args.htmlid}-url" type="text" name="url" tabindex="3"/>
             <span class="lbl dot">*</span>
          </div>
          <div>
             <label for="${args.htmlid}-internal">${msg("form.internal")}:</label>
-            <input class="lbl checkInternal" id="${args.htmlid}-internal" class="internal" type="checkbox" name="internal" tabindex="4"/>
+            <input class="internal" id="${args.htmlid}-internal" type="checkbox" name="internal" tabindex="4"/>
             <span class="lbl help">${msg("form.internalDescription")}</span>
          </div>
 

@@ -1,56 +1,59 @@
 /********
  * FORM *
 *********/
+
 .editLinkForm
 {
-  margin: 4px;
-  border: thin solid #000;
-  padding: 4px;
-  background-color: #FAFAFA;
+   background-color: #FAFAFA;
+   border: thin solid #000;
+   margin: 4px;
+   padding: 4px;
 }
 
 .editLinkForm label
 {
-  width: 100px;
-  float: left;
-  text-align: right;
-  clear: left;
-  margin: 5px 15px 7px 0;
+   clear: left;
+   float: left;
+   margin: 5px 15px 7px 0;
+   text-align: right;
+   width: 100px;
 }
 
 .editLinkForm input, .editLinkForm textarea
 {
-  margin-bottom: 15px;
+   margin-bottom: 15px;
 }
 
 .editLinkForm .internal
 {
-  margin-top: 6px;
-  margin-bottom: 0px;
+   float: left;
+   margin-top: 6px;
+   margin-bottom: 0px;
 }
 
 .editLinkForm .nodeFormAction
 {
-  margin: 0 0 10px 115px;
+   margin: 0 0 10px 115px;
 }
 
 /* Tag lib */
+
 .editLinkForm .taglibrary
 {
-  margin-bottom : 0px;
-  margin-left : 115px;	
+   margin-bottom: 0px;
+   margin-left: 115px;
 }
 
 .hidden
 {
-  display: none;
+   display: none;
 }
 
 .help
 {
-  font-size:81%;
-  margin-left:5px;
-  margin-top:8px;
+   font-size: 81%;
+   margin-left: 5px;
+   margin-top: 8px;
 }
 
 .lbl
@@ -66,11 +69,6 @@ textarea.lbl
 
 .dot
 {
-  margin-left:10px;
-  margin-top:5px;
-}
-
-.checkInternal
-{
-  margin-top:8px;
+   margin-left: 10px;
+   margin-top: 5px;
 }
