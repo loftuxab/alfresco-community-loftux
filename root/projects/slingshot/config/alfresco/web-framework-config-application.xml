@@ -208,8 +208,8 @@
 
    <config evaluator="string-compare" condition="HelpPages" replace="true">
       <help-pages>
-         <share-help>http://www.alfresco.com/help/3/labs/DMShareHelp</share-help>
-         <share-tutorial>http://www.alfresco.com/help/3/labs/ShareTutorial</share-tutorial>
+         <share-help>http://www.alfresco.com/help/32/labs/sharehelp/</share-help>
+         <share-tutorial>http://www.alfresco.com/help/32/labs/sharetutorial/</share-tutorial>
       </help-pages>
    </config>
 
