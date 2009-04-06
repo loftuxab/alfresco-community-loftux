@@ -369,7 +369,6 @@
             userName: data.userName || "",
             firstName: data.firstName,
             lastName: data.lastName,
-            userName: data.userName,
             email: data.email
          };
          this.widgets.dataTable.addRow(inviteData);
@@ -483,9 +482,8 @@
        */
       _enableDisableInviteButton: function InvitationList__enableDisableInviteButton()
       {
-         var enable = this.widgets.dataTable.getRecordSet().getLength() > 0 &&
-                      this._checkAllRolesSet();
-         this.widgets.inviteButton.set("disabled", ! enable);
+         var enable = this.widgets.dataTable.getRecordSet().getLength() > 0 && this._checkAllRolesSet();
+         this.widgets.inviteButton.set("disabled", !enable);
       },
       
       /**
@@ -534,7 +532,7 @@
       /**
        * Processes the invite data.
        */
-      _processInviteData: function(inviteData)
+      _processInviteData: function InvitationList__processInviteData(inviteData)
       {   
          // check if we are already done
          if (inviteData.index >= inviteData.size)
@@ -578,11 +576,10 @@
 
          Alfresco.util.Ajax.request(
          {
-/**
- * TODO: Swap to new API when it's complete
- *
             url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/invitations",
             method: "POST",
+            requestContentType: "application/json",
+            responseContentType: "application/json",
             dataObj:
             {
                invitationType: "NOMINATED",
@@ -592,23 +589,8 @@
                inviteeLastName: record.getData('lastName'),
                inviteeEmail: record.getData('email'),
                serverPath: serverPath,
-               acceptUrl: 'page/accept-invite',
-               rejectUrl: 'page/reject-invite'
-            },
-*/
-            method: "GET",
-            url: Alfresco.constants.PROXY_URI + "api/invite/start",
-            dataObj:
-            {
-               inviteeFirstName: record.getData('firstName'),
-               inviteeLastName: record.getData('lastName'),
-               inviteeEmail: record.getData('email'),
-               inviteeUserName: record.getData('userName') || "",
-               siteShortName : this.options.siteId,
-               inviteeSiteRole : record.getData('role'),
-               serverPath : serverPath,
-               acceptUrl : 'page/accept-invite',
-               rejectUrl : 'page/reject-invite'
+               acceptURL: 'page/accept-invite',
+               rejectURL: 'page/reject-invite'
             },
             successCallback:
             {
@@ -644,8 +626,8 @@
             text: message
          });
          
-         // re-enable invite button
-         this.widgets.inviteButton.set("disabled", false);
+         // update the invite button
+         this._enableDisableInviteButton();
       },
 
       /**
