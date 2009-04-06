@@ -28,8 +28,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,10 +48,6 @@ public class HttpConnector extends AbstractConnector
 {
     private static Log logger = LogFactory.getLog(HttpConnector.class);
     
-    private static final int RECONNECT_TIMEOUT = 20000;
-    
-    private static ConcurrentMap<String, Long> endpointTimeouts = new ConcurrentHashMap<String, Long>();
-    
     
     /**
      * Instantiates a new http connector.
@@ -64,14 +58,14 @@ public class HttpConnector extends AbstractConnector
     public HttpConnector(ConnectorDescriptor descriptor, String endpoint)
     {
         super(descriptor, endpoint);
-        endpointTimeouts.putIfAbsent(endpoint, 0L);
+        EndpointManager.registerEndpoint(endpoint);
     }
 
 
     public Response call(String uri, ConnectorContext context)
     {
         Response response;
-        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        if (EndpointManager.allowConnect(this.endpoint))
         {
             RemoteClient remoteClient = initRemoteClient(context);
             
@@ -91,7 +85,7 @@ public class HttpConnector extends AbstractConnector
     public Response call(String uri, ConnectorContext context, InputStream in)
     {
         Response response;
-        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        if (EndpointManager.allowConnect(this.endpoint))
         {
             RemoteClient remoteClient = initRemoteClient(context);
             
@@ -111,7 +105,7 @@ public class HttpConnector extends AbstractConnector
     public Response call(String uri, ConnectorContext context, InputStream in, OutputStream out)
     {
         Response response;
-        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        if (EndpointManager.allowConnect(this.endpoint))
         {
             RemoteClient remoteClient = initRemoteClient(context);
             
@@ -132,7 +126,7 @@ public class HttpConnector extends AbstractConnector
     public Response call(String uri, ConnectorContext context, HttpServletRequest req, HttpServletResponse res)
     {
         Response response;
-        if (endpointTimeouts.get(this.endpoint) + RECONNECT_TIMEOUT < System.currentTimeMillis())
+        if (EndpointManager.allowConnect(this.endpoint))
         {
             RemoteClient remoteClient = initRemoteClient(context);
                     
@@ -226,16 +220,8 @@ public class HttpConnector extends AbstractConnector
      */
     protected void processResponse(Response response)
     {
-        if (RemoteClient.SC_REMOTE_CONN_NOHOST == response.getStatus().getCode() ||
-            RemoteClient.SC_REMOTE_CONN_TIMEOUT == response.getStatus().getCode())
-        {
-            // If special error codes were returned, don't check the remote connection
-            // again for a short time. This is to ensure we don't continually
-            // connect+timeout potentially 100's of times in a row therefore slowing
-            // the server statup etc. if an endpoint is not currently available.
-            this.endpointTimeouts.put(this.endpoint, System.currentTimeMillis());
-        }
-        else if (getConnectorSession() != null)
+        if (EndpointManager.processResponseCode(this.endpoint, response.getStatus().getCode()) &&
+            getConnectorSession() != null)
         {
             Map<String, String> headers = response.getStatus().getHeaders();
             for (String headerName : headers.keySet())
