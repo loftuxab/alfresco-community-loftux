@@ -449,6 +449,10 @@ Alfresco.util.toISO8601 = function(date)
  */
 Alfresco.util.decodeHTML = function(html)
 {
+   if (html === null)
+   {
+      return "";
+   }
    return html.split("&lt;").join("<").split("&gt;").join(">").split("&amp;").join("&");
 };
 
@@ -464,6 +468,11 @@ Alfresco.util.decodeHTML = function(html)
  */
 Alfresco.util.encodeHTML = function(text)
 {
+   if (text === null)
+   {
+      return "";
+   }
+   
    if ((YAHOO.env.ua.ie > 0) || (YAHOO.env.ua.webkit > 0))
    {
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;");

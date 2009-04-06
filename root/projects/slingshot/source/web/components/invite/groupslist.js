@@ -564,21 +564,21 @@
           
          // fetch the record to process
          var record = resultData.recs[resultData.index];
-         var itemName = record.getData('itemName'),
-            displayName = record.getData('displayName');
-         var role = record.getData('role');
-         
+
          // Repository call for each group
-         var serverPath = window.location.protocol + "//" + window.location.host + Alfresco.constants.URL_CONTEXT;
+         /**
+          * TODO (mjh): Ensure the API parameters are correct once the REST API is in place
+          */
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/invitations",
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships",
             method: "POST",
+            requestContentType: "application/json",
+            responseContentType: "application/json",
             dataObj:
             {
-               invitationType: "NOMINATED",
-               inviteeUserName: itemName,
-               inviteeRoleName: role
+               group: record.getData('itemName'),
+               role: record.getData('role')
             },
             successCallback:
             {
