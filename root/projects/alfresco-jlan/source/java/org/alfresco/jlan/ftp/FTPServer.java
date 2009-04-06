@@ -704,7 +704,7 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
     
 		// Close the authenticator
 		
-		m_configSection.getFTPAuthenticator().closeAuthenticator();
+		m_configSection.closeConfig();
 		
 		//	Fire a shutdown notification event
     

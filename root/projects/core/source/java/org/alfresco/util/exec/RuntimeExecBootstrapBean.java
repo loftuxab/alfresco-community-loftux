@@ -52,6 +52,8 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
     /** Keep track of the processes so that we can kill them on shutdown */
     private List<ExecutionResult> executionResults;
 
+    private Thread shutdownThread;
+
     /**
      * Initializes the bean
      * <ul>
@@ -139,8 +141,8 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
         if (killProcessesOnShutdown)
         {
             // Force a shutdown on VM termination as we can't rely on the Spring context termination
-            Thread shutdownThread = new KillProcessShutdownThread();
-            Runtime.getRuntime().addShutdownHook(shutdownThread);
+            this.shutdownThread = new KillProcessShutdownThread();
+            Runtime.getRuntime().addShutdownHook(this.shutdownThread);
         }
         // done
         if (logger.isDebugEnabled())
@@ -160,21 +162,38 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
         @Override
         public void run()
         {
-            if (!killProcessesOnShutdown)
-            {
-                // Do not force a kill
-                return;
-            }
-            for (ExecutionResult executionResult : executionResults)
-            {
-                executionResult.killProcess();
-            }
+            doShutdown();
         }
     }
 
-    /** NO-OP */
+    /**
+     * Handle the shutdown of a subsystem but not the entire VM
+     */
     @Override
     protected synchronized void onShutdown(ApplicationEvent event)
     {
+        try
+        {
+            // We managed to stop the process ourselves (e.g. on subsystem shutdown). Remove the shutdown hook
+            Runtime.getRuntime().removeShutdownHook(this.shutdownThread);
+            doShutdown();
+        }
+        catch (IllegalStateException e)
+        {
+            // The system is shutting down - we'll have to let the shutdown hook run
+        }
+    }
+    
+    private void doShutdown()
+    {
+        if (!killProcessesOnShutdown)
+        {
+            // Do not force a kill
+            return;
+        }
+        for (ExecutionResult executionResult : executionResults)
+        {
+            executionResult.killProcess();
+        }        
     }
 }

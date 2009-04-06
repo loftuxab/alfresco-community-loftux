@@ -26,11 +26,9 @@
 package org.alfresco.jlan.smb.server;
 
 import java.net.InetAddress;
-import java.util.List;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
-import org.alfresco.jlan.server.SessionListener;
 import org.alfresco.jlan.server.auth.CifsAuthenticator;
 import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.config.ConfigId;
@@ -98,6 +96,9 @@ public class CIFSConfigSection extends ConfigSection {
   private ICifsAuthenticator m_authenticator;
   private ConfigElement m_authParams;
 
+  /** Is the authenticator instance owned by this object? **/
+  private boolean m_localAuthenticator;
+  
   //  NetBIOS name server and host announcer debug enable
 
   private boolean m_nbDebug = false;
@@ -625,6 +626,9 @@ public class CIFSConfigSection extends ConfigSection {
     
     sts = setAuthenticator(auth);
     
+    // Remember that the authenticator instance will need destroying
+    m_localAuthenticator = true;
+    
     //  Set initialization parameters
 
     m_authParams    = params;
@@ -650,6 +654,7 @@ public class CIFSConfigSection extends ConfigSection {
       //  Set the server authenticator
 
       m_authenticator = auth;
+      m_localAuthenticator = false;
         
       //  Return the change status
       
@@ -1438,8 +1443,10 @@ public class CIFSConfigSection extends ConfigSection {
   public final void closeConfig() {
     
     // Close the authenticator
-    
-    if ( getAuthenticator() != null)
-      getAuthenticator().closeAuthenticator();
+    if (m_authenticator != null && m_localAuthenticator)
+    {
+        m_authenticator.closeAuthenticator();
+        m_authenticator = null;
+    }
   }
 }

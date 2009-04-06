@@ -69,6 +69,9 @@ public class FTPConfigSection extends ConfigSection {
   
   private FTPAuthenticator m_ftpAuthenticator;
   
+  /** Is the authenticator instance owned by this object? **/
+  private boolean m_localFtpAuthenticator;
+  
   //  FTP server debug flags
   
   private int m_ftpDebug;
@@ -92,6 +95,7 @@ public class FTPConfigSection extends ConfigSection {
     //  Set the default FTP authenticator
     
     m_ftpAuthenticator = new LocalAuthenticator();
+    m_localFtpAuthenticator = true;
     
     try {
       m_ftpAuthenticator.initialize( config, new GenericConfigElement( "ftpAuthenticator"));
@@ -468,6 +472,10 @@ public class FTPConfigSection extends ConfigSection {
     //  Inform listeners, validate the configuration change
     
     sts = setAuthenticator(auth);
+    
+    // Remember that the authenticator instance will need destroying
+    m_localFtpAuthenticator = true;
+    
 
     //  Return the change status
     
@@ -491,10 +499,22 @@ public class FTPConfigSection extends ConfigSection {
       //  Set the FTP authenticator interface
           
       m_ftpAuthenticator = auth;
+      m_localFtpAuthenticator = false;
         
       //  Return the change status
       
       return sts;
+  }
+  
+  /**
+   * Close the configuration section
+   */
+  public final void closeConfig() {
+      if (m_localFtpAuthenticator && m_ftpAuthenticator != null)
+      {
+          m_ftpAuthenticator.closeAuthenticator();         
+      }
+      m_ftpAuthenticator = null;
   }
   
 }
