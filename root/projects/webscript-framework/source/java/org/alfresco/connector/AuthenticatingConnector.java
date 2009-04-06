@@ -393,25 +393,33 @@ public class AuthenticatingConnector implements Connector
         if (logger.isDebugEnabled())
             logger.debug("Performing authentication handshake");
         
-        ConnectorSession cs = null;
-        try
+        if (EndpointManager.allowConnect(getEndpoint()))
+        {
+            ConnectorSession cs = null;
+            try
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Authentication handshake using credentials: " + getCredentials());
+                    logger.debug("Authentication handshake using connectorSession: " + getConnectorSession());
+                }
+                
+                cs = this.authenticator.authenticate(getEndpoint(), getCredentials(), getConnectorSession());
+            }
+            catch (AuthenticationException ae)
+            {
+                logger.error("An exception occurred while attempting authentication handshake for endpoint: " + getEndpoint(), ae);
+            }
+            if (cs != null)
+            {
+                this.setConnectorSession(cs);
+                success = true;
+            }
+        }
+        else
         {
             if (logger.isDebugEnabled())
-            {
-                logger.debug("Authentication handshake using credentials: " + getCredentials());
-                logger.debug("Authentication handshake using connectorSession: " + getConnectorSession());
-            }
-            
-            cs = this.authenticator.authenticate(getEndpoint(), getCredentials(), getConnectorSession());
-        }
-        catch (AuthenticationException ae)
-        {
-            logger.error("An exception occurred while attempting authentication handshake for endpoint: " + getEndpoint(), ae);
-        }
-        if (cs != null)
-        {
-            this.setConnectorSession(cs);
-            success = true;
+                logger.debug("Skipping authentication handshake, waiting for reconnect on: " + getEndpoint());
         }
         
         return success;
