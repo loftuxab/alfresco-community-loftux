@@ -36,7 +36,7 @@
             <component-chrome></component-chrome>
       		<page-type>
       			<id>login</id>
-      			<page-instance-id>mobile-login</page-instance-id>
+      			<page-instance-id>login</page-instance-id>
       		</page-type>
          </application-defaults>
          

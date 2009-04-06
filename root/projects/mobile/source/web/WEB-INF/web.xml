@@ -12,7 +12,9 @@
          classpath:alfresco/webscript-framework-application-context.xml
          classpath:alfresco/web-framework-application-context.xml
          classpath:alfresco/web-framework-model-context.xml
+         classpath*:alfresco/web-extension/custom-web-framework-application-context.xml
          classpath:alfresco/mobile-application-context.xml
+         classpath*:alfresco/web-extension/custom-mobile-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>

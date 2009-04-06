@@ -16,7 +16,4 @@
    <!-- Mobile "no-component" processor -->
    <bean id="webframework.processor.nocomponent" class="org.alfresco.web.site.EmptyRegionRenderer" />   
    
-   <!-- import app-context extensions -->
-   <import resource="classpath*:alfresco/web-extension/custom-mobile-application-context.xml"/>
-   
 </beans>

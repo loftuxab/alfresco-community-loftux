@@ -3,8 +3,7 @@
    <name>Mobile Project</name>
    <description>Mobile Project</description>
    <source-id>mobile</source-id>
-   <!--
    <properties>
-      <root-page>site-index</root-page>
-   </properties>-->
+      <root-page>home</root-page>
+   </properties>
 </configuration>
