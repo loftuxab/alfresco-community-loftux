@@ -55,6 +55,9 @@
       this.name = "Alfresco.MyTasks";
       this.id = htmlId;
 
+      // Initialise prototype properties
+      this.widgets = {};
+
       // Register this component
       Alfresco.util.ComponentManager.register(this);
 
@@ -90,7 +93,7 @@
        * @property widgets
        * @type object
        */
-      widgets: {},
+      widgets: null,
 
       /**
        * Task list DOM container.
@@ -140,7 +143,16 @@
          });
          this.widgets.all.on("checkedChange", this.onAllCheckedChanged, this.widgets.all, this);
          
-         // Dropdown filter
+         // "Invites" filter
+         this.widgets.invites = new YAHOO.widget.Button(this.id + "-invites",
+         {
+            type: "checkbox",
+            value: "invites",
+            checked: false
+         });
+         this.widgets.invites.on("checkedChange", this.onInvitesCheckedChanged, this.widgets.invites, this);
+         
+         // DueDate dropdown filter
          this.widgets.dueOn = new YAHOO.widget.Button(this.id + "-dueOn",
          {
             type: "split",
@@ -157,7 +169,7 @@
             }
          });
          this.widgets.dueOn.value = "today";
-         
+
          // Hook events for task transitions
          var fnTaskHandler = function MyTasks_fnTaskHandler(layer, args)
          {
@@ -171,7 +183,6 @@
             return true;
          }
          YAHOO.Bubbling.addDefaultAction("task-transition", fnTaskHandler);
-         
          
          // The task list container
          this.taskList = Dom.get(this.id + "-taskList");
@@ -239,11 +250,18 @@
          switch (filter)
          {
             case "all":
+               this.widgets.invites.set("checked", false, true);
+               Dom.removeClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
+               break;
+
+            case "invites":
+               this.widgets.all.set("checked", false, true);
                Dom.removeClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
                break;
             
             default:
                this.widgets.all.set("checked", false, true);
+               this.widgets.invites.set("checked", false, true);
                Dom.addClass(this.widgets.dueOn.get("element"), "yui-checkbox-button-checked");
                break;
          }
@@ -275,6 +293,19 @@
       {
          this.setActiveFilter("all");
          this.populateTaskList("all");
+         p_obj.set("checked", true, true);
+      },
+
+      /**
+       * Invite tasks
+       * @method onInvitesCheckedChanged
+       * @param p_oEvent {object} Button event
+       * @param p_obj {object} Button
+       */
+      onInvitesCheckedChanged: function MyTasks_onInvitesCheckedChanged(p_oEvent, p_obj)
+      {
+         this.setActiveFilter("invites");
+         this.populateTaskList("invites");
          p_obj.set("checked", true, true);
       },
 

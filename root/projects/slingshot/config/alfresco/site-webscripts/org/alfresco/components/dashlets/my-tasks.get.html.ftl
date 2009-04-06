@@ -25,6 +25,7 @@
          <option value="overdue">${msg("filter.overdue")}</option>
          <option value="no-due-date">${msg("filter.no-due-date")}</option>                
       </select>
+      <input id="${args.htmlid}-invites" type="checkbox" name="invites" value="${msg("filter.invites")}" />
    </div>
    <div id="${args.htmlid}-taskList" class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
    </div>
