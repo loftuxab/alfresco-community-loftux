@@ -136,7 +136,15 @@
          </div>
          
          <div class="header-bar">${msg("label.moreuserinfo")}</div>
-         <!-- TODO: Groups and Account Status -->
+         <!-- TODO: Account Status -->
+         <div class="field-row">
+            <span class="field-label-right">${msg("label.username")}:</span>
+            <span id="${el}-view-username" class="field-value"></span>
+         </div>
+         <div class="field-row">
+            <span class="field-label-right">${msg("label.groups")}:</span>
+            <span id="${el}-view-groups" class="field-value"></span>
+         </div>
          <div class="field-row">
             <span class="field-label-right">${msg("label.quota")}:</span>
             <span id="${el}-view-quota" class="field-value"></span>

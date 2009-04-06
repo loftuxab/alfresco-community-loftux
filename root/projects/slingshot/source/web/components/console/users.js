@@ -567,14 +567,14 @@
                
                // apply avatar image URL
                var photos = Dom.getElementsByClassName("photoimg", "img");
-               for (i in photos)
+               for (var i in photos)
                {
                   photos[i].src = person.avatar ?
                         Alfresco.constants.PROXY_URI + person.avatar + "?c=force" :
                         Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
                }
                
-               // apply to person fields to view
+               // About section fields
                var firstName = person.firstName;
                var lastName = person.lastName;
                var fullName = firstName + ' ' + (lastName ? lastName : "");
@@ -582,10 +582,19 @@
                fnSetter("-view-name", fullName);
                fnSetter("-view-jobtitle", person.jobtitle);
                fnSetter("-view-organization", person.organization);
+               // biography is a special html field
+               var bio = person.persondescription ? person.persondescription : "";
+               Dom.get(me.id + "-view-bio").innerHTML = Alfresco.util.stripUnsafeHTMLTags(bio).replace(/\n/g, "<br/>");
+               
+               // Contact section fields
                fnSetter("-view-location", person.location);
                fnSetter("-view-email", person.email);
                fnSetter("-view-telephone", person.telephone);
                fnSetter("-view-mobile", person.mobile);
+               fnSetter("-view-skype", person.skype);
+               fnSetter("-view-instantmsg", person.instantmsg);
+               
+               // Company section fields
                fnSetter("-view-companyname", person.organization);
                // build the company address up and set manually - encoding each value
                var addr = "";
@@ -597,19 +606,18 @@
                fnSetter("-view-companytelephone", person.companytelephone);
                fnSetter("-view-companyfax", person.companyfax);
                fnSetter("-view-companyemail", person.companyemail);
-               fnSetter("-view-skype", person.skype);
-               fnSetter("-view-instantmsg", person.instantmsg);
+               
+               // More section fields
+               fnSetter("-view-username", userid);
                fnSetter("-view-quota", (person.quota > 0 ? Alfresco.util.formatFileSize(person.quota) : ""));
                fnSetter("-view-usage", Alfresco.util.formatFileSize(person.sizeCurrent));
-               // biography is a special html field
-               var bio = person.persondescription ? person.persondescription : "";
-               Dom.get(me.id + "-view-bio").innerHTML = Alfresco.util.stripUnsafeHTMLTags(bio).replace(/\n/g, "<br/>");;
+               fnSetter("-view-groups", person.groups.join(", "));
             };
             
             // make an ajax call to get user details
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(userid),
+               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(userid) + "?groups=true",
                method: Alfresco.util.Ajax.GET,
                successCallback:
                {
