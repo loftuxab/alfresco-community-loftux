@@ -127,7 +127,10 @@ public abstract class AbstractTriggerBean implements InitializingBean, JobDetail
     {
         if (this.trigger != null)
         {
-            scheduler.unscheduleJob(this.trigger.getName(), this.trigger.getGroup());
+            if (!this.scheduler.isShutdown())
+            {
+                scheduler.unscheduleJob(this.trigger.getName(), this.trigger.getGroup());
+            }
             this.trigger = null;
         }
     }
