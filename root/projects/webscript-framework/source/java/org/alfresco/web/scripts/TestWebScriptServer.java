@@ -474,7 +474,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             out.println();
         }
 
-        else if (command[0].equals("post"))
+        else if (command[0].equals("put"))
         {
             String uri = (command.length > 1) ? command[1] : null;
             String contentType = (command.length > 2) ? command[2] : null;
