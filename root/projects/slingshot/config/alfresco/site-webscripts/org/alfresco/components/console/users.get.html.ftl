@@ -146,6 +146,10 @@
             <span id="${el}-view-groups" class="field-value"></span>
          </div>
          <div class="field-row">
+            <span class="field-label-right">${msg("label.accountstatus")}:</span>
+            <span id="${el}-view-enabled" class="field-value"></span>
+         </div>
+         <div class="field-row">
             <span class="field-label-right">${msg("label.quota")}:</span>
             <span id="${el}-view-quota" class="field-value"></span>
          </div>

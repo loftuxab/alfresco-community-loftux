@@ -609,6 +609,7 @@
                
                // More section fields
                fnSetter("-view-username", userid);
+               fnSetter("-view-enabled", person.enabled ? me._msg("label.enabled") : me._msg("label.disabled"));
                fnSetter("-view-quota", (person.quota > 0 ? Alfresco.util.formatFileSize(person.quota) : ""));
                fnSetter("-view-usage", Alfresco.util.formatFileSize(person.sizeCurrent));
                fnSetter("-view-groups", person.groups.join(", "));
