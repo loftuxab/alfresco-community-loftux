@@ -66,9 +66,6 @@
    </bean>   
 
    <!-- Model Object: Chrome -->
-   <bean id="webframework.remotestore.chrome" parent="webframework.remotestore">
-      <property name="path"><value>alfresco/site-data/chrome</value></property>
-   </bean>   
    <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -80,9 +77,6 @@
    </bean>
 	
    <!-- Model Object: Component -->
-   <bean id="webframework.remotestore.component" parent="webframework.remotestore">
-      <property name="path"><value>alfresco/site-data/components</value></property>
-   </bean>   
    <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -94,9 +88,6 @@
    </bean>
 
    <!-- Model Object: Component Type -->
-   <bean id="webframework.remotestore.component-types" parent="webframework.remotestore">
-      <property name="path"><value>alfresco/site-data/component-types</value></property>
-   </bean>   
    <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -108,9 +99,6 @@
    </bean>
 	  	  
    <!-- Model Object: Configuration -->
-   <bean id="webframework.remotestore.configurations" parent="webframework.remotestore">
-      <property name="path"><value>alfresco/site-data/configurations</value></property>
-   </bean>   
    <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -122,9 +110,6 @@
    </bean>
 
    <!-- Model Object: Content Association -->
-   <bean id="webframework.remotestore.content-associations" parent="webframework.remotestore">
-      <property name="path"><value>alfresco/site-data/content-associations</value></property>
-   </bean>   
    <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
