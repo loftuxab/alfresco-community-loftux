@@ -50,6 +50,11 @@ WebStudio.PageEditor.prototype.onTabItemClick = function(id, data)
 {
 };
 
+WebStudio.PageEditor.prototype.resize = function()
+{
+	this.resizeTabItems();
+};
+
 WebStudio.PageEditor.prototype.resizeTabItems = function()
 {
 	for (var tn in this.tabs)
@@ -118,15 +123,15 @@ WebStudio.PageEditor.prototype.show = function()
 	this.generalLayer.style.visibility = '';
 	this.isHide = false;
 	this.isShow = true;
+	
+	this.showTabItems();
+	
 	return this;
 };
 
 WebStudio.PageEditor.prototype.showFast = function()
 {
-	this.generalLayer.style.visibility = '';
-	this.isHide = false;
-	this.isShow = true;
-	return this;
+	return this.show();
 };
 
 WebStudio.PageEditor.prototype.hide = function()
@@ -134,6 +139,9 @@ WebStudio.PageEditor.prototype.hide = function()
 	this.generalLayer.style.visibility = 'hidden';
 	this.isHide = true;
 	this.isShow = false;
+	
+	this.hideTabItems();
+	
 	return this;
 };
 
@@ -347,8 +355,38 @@ WebStudio.PETabItem = function(el, whiteOverlay, colorOverlay, backPanelOverlay,
 		duration: 300,
 		transition: Fx.Transitions.Quart.easeInOut
 	});
-	this.colorOverlay.addEvent('mouseenter', function() { myFx.start(0.2, 0.5); });
-	this.colorOverlay.addEvent('mouseleave', function() { myFx.start(0.5, 0.2); });
+	//this.colorOverlay.addEvent('mouseenter', function() { myFx.start(0.2, 0.5); });
+	//this.colorOverlay.addEvent('mouseleave', function() { myFx.start(0.5, 0.2); });
+	
+	
+	// dragdrop color overlay stuff
+	// set up droppable behaviour
+	WebStudio.dd.makeDroppable(this.colorOverlay, "region", {
+		onDrop: function(el, options)
+		{
+			// mouse out
+			myFx.start(0.5, 0.2);
+			
+			// handler
+			_this.pageEditor.onRegionDrop(el, options);
+		}
+		,
+ 		over: function(ev, ui) {
+ 			myFx.start(0.2, 0.5);
+ 			jQuery(this).effect("shake", { times: 1, distance: 1 });
+ 		}
+ 		,
+ 		out: function(ev, ui) {
+ 			myFx.start(0.5, 0.2);
+ 		}
+	});
+	jQuery(this.colorOverlay).mouseover(function(){
+		myFx.start(0.2, 0.5);
+ 	});
+	jQuery(this.colorOverlay).mouseout(function(){
+		myFx.start(0.5, 0.2);
+ 	});
+	
 	
 	// full resize
 	this.resize();	
@@ -395,8 +433,9 @@ WebStudio.PETabItem.prototype.expand = function()
 
 	// flip it
 	var direction = 'tb';
+	
 	//jQuery(this.el).flip({ direction: direction, bgColor: unflippedColor, color: '#333333', speed: 400 });
-	jQuery(this.colorOverlay).flip({ direction: direction, bgColor: unflippedColor, color: '#333333', speed: 400 });
+	jQuery(this.colorOverlay).flip({ direction: direction, bgColor: unflippedColor, color: '#333333', speed: 300 });
 	
 	var f = function(){
 	
@@ -441,7 +480,7 @@ WebStudio.PETabItem.prototype.restore = function()
 		var width = _this.originalWidth;
 
 		// remove the magnifiers (if they exist)
-		_this.removeMagnifiers();
+		//_this.removeMagnifiers();
 		
 		// show the component again
 		//_this.el.setStyle('visibility', 'visible');
@@ -551,6 +590,7 @@ WebStudio.PETabItem.prototype.generateOptionsHtml = function(uid)
 	return html;
 };
 
+/*
 WebStudio.PETabItem.prototype.removeMagnifiers = function()
 {
 	var _this = this;
@@ -564,15 +604,18 @@ WebStudio.PETabItem.prototype.removeMagnifiers = function()
 	
 	this.hasMagnifiers = false;
 };
+*/
 
 WebStudio.PETabItem.prototype.resetMagnifiers = function()
 {
 	var _this = this;
 	
+	/*
 	if(this.hasMagnifiers)
 	{
 		_this.removeMagnifiers();
 	}
+	*/
 	
 	_this.optionsOverlay.setHTML(_this.generateOptionsHtml(_this.optionsOverlay.id));
 };
@@ -582,61 +625,53 @@ WebStudio.PETabItem.prototype.initMagnifiers = function()
 	var _this = this;
 	
 	// reset existing magnifiers if they are in place
-	this.resetMagnifiers();
+	//this.resetMagnifiers();
 
 	// launch edit magnifier
-   	jQuery("#magnifier_edit_" + _this.optionsOverlay.id).magnifier({
-   		overlap: true,
-   		distance: 50,
-   		click: function(e, ui){
+	jQuery("#edit_" + _this.optionsOverlay.id).hoverpulse({
+		size: 20,
+		speed: 400
+	});
+	jQuery("#magnifier_edit_" + _this.optionsOverlay.id).click(function(e) 
+	{
+   		e = new Event(e);
+   			
+		var optionsOverlayId = this.id.substring(15);   			
+		_this.loadForm(optionsOverlayId);
+   			
+		e.stop(); 
+	});
+
+	// launch standalone magnifier
+	jQuery("#standalone_" + _this.optionsOverlay.id).hoverpulse({
+		size: 20,
+		speed: 400
+	});	
+   	jQuery("#magnifier_standalone_" + _this.optionsOverlay.id).click(function(e)
+   	{
+   		e = new Event(e);
    		
-   			e = new Event(e);
+		var optionsOverlayId = this.id.substring(21);   			
+
+		var url = WebStudio.url.studio("/c/view/" + _this.componentId);
+		Alf.openBrowser('component', url);
    			
-   			var elem = ui.current;
-   			if(elem.id)
-   			{
-  				_this.loadForm(_this.el.id);
-  			}
-   			
-			e.stop();    			
-   		}
+		e.stop();
    	});
 
 	// launch edit magnifier
-   	jQuery("#magnifier_standalone_" + _this.optionsOverlay.id).magnifier({
-   		overlap: true,
-   		distance: 50,
-   		click: function(e, ui){
-   		
-   			e = new Event(e);
-   			
-   			var elem = ui.current;
-   			if(elem.id)
-   			{
-				var url = WebStudio.url.studio("/c/view/" + _this.componentId);
-				Alf.openBrowser('component', url);
-			}
-   			
-			e.stop();
-   		}
-   	});
+	jQuery("#remove_" + _this.optionsOverlay.id).hoverpulse({
+		size: 20,
+		speed: 400
+	});	
+   	jQuery("#magnifier_remove_" + _this.optionsOverlay.id).click(function(e)
+   	{
+		e = new Event(e);
 
-	// launch edit magnifier
-   	jQuery("#magnifier_remove_" + _this.optionsOverlay.id).magnifier({
-   		overlap: true,
-   		distance: 50,
-   		click: function(e, ui){
-   		
-   			e = new Event(e);
+		var optionsOverlayId = this.id.substring(17);
+		_this.onDeleteClickEWnd();
    			
-   			var elem = ui.current;
-   			if(elem.id)
-   			{
-   				_this.onDeleteClickEWnd();
-   			}
-   			
-			e.stop();    			
-   		}
+		e.stop();    			
    	});
    	
    	this.hasMagnifiers = true;
@@ -649,11 +684,16 @@ WebStudio.PETabItem.prototype.resize = function()
 	
 	// absolute mount points
 	var absX = 0;
-	if(!WebStudio.app.isDockingPanelHidden())
+	var absY = 0;
+	
+	if (!WebStudio.app.isDockingPanelHidden() && WebStudio.app.isEditMode())
 	{
-		absX = absX + $('SurfaceSplitterPanel').offsetWidth + $('AlfSplitterDivider').offsetWidth;
+		absX = absX + $('AlfSplitterPanel1').offsetWidth + $('AlfSplitterDivider').offsetWidth;
 	}
-	var absY = $('AlfMenuTemplate').offsetHeight;
+	if (WebStudio.app.isEditMode())
+	{
+		absY = $('AlfMenuTemplate').offsetHeight;
+	}
 	
 	// the total amount of horizontal dead space
 	var horzCrud = absX + Alf.getScrollerSize().w;
@@ -1078,4 +1118,435 @@ WebStudio.PageEditor.prototype.onScroll = function(left, top)
 	this.scrollTop = top;
 	
 	this.resizeTabItems();
+};
+
+/**
+ * Fired when an item is dropped onto this region overlay
+ */
+WebStudio.PageEditor.prototype.onRegionDrop = function(el, options)
+{
+	// drop options
+	var source = options["source"];
+	var type = options["type"];
+	var binding = options["binding"];
+
+	// get the region tab from the page editor
+	var regionId = el.attributes.regionId;
+	var dropDivId = "region-overlay-" + el.getAttribute("regionId");
+	var regionTab = this.tabs[dropDivId];
+	
+	// binding config 
+	var config;
+	
+	// base binding properties
+	var sourceType; // control type (i.e. webcontent)
+	var sourceEndpoint;
+	var sourcePath;
+	var sourceMimetype;	
+	var sourceIsContainer;
+	
+	// additional properties
+	var sourceAlfType;
+	var sourceCmType;
+	var sourceNodeRef;
+	var sourceNodeId;
+	
+	// SHORTCUT ACTION: they drop a web script component type
+	// Special Handling for Web Scripts as components
+	// Do binding and exit
+	if ("webscriptComponent" == type)
+	{
+		config = WebStudio.components.newBinding();
+		config["binding"]["componentType"] = "webscript";
+		config["properties"]["title"] = "WebScript Component";
+		config["properties"]["description"] = options.nodeId;
+		config["properties"]["url"] = options.nodeId;
+		this.bindToRegionTab(regionTab, config);
+		return true;
+	}
+	
+	// assume that the data binding is a standardized data binding
+	sourceType = binding.sourceType;
+	sourceEndpoint = binding.sourceEndpoint;
+	sourcePath = binding.sourcePath;
+	sourceMimetype = binding.sourceMimetype;
+	sourceIsContainer = binding.sourceIsContainer;
+	sourceAlfType = binding.sourceAlfType;
+	sourceCmType = binding.sourceCmType;
+	sourceNodeRef = binding.sourceNodeRef;
+	sourceNodeId = binding.sourceNodeId;
+	
+	// string version of node references (for use later)
+	var nodeString;
+	
+	// process space node ref binding types
+	if ("dmFile" == sourceAlfType || 
+	    "dmSpace" == sourceAlfType)
+	{
+		nodeString = WebStudio.app.toNodeString(sourceNodeRef);	
+	}
+
+	// process site node ref binding types
+	if ("siteFile" == sourceType ||
+	    "siteSpace" == sourceType)
+	{
+		nodeString = "workspace/SpacesStore/" + sourceNodeId;
+		sourceType = "space";	
+	}
+
+
+
+	//////////////////////////////////////////
+	// Now process the bindings
+	//////////////////////////////////////////
+	
+	// Container Bindings
+	if (sourceIsContainer)
+	{
+		// bind containers to "display items" component
+		config = WebStudio.components.newDisplayItems(sourceType, sourceEndpoint, sourcePath, null);	
+	}
+
+	// Object Bindings
+	if (!sourceIsContainer)
+	{
+		if (sourceMimetype)
+		{
+			// bind images to "image" component
+			if (sourceMimetype.startsWith("image"))
+			{
+				config = WebStudio.components.newImage(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+			}
+
+			// bind XML to "xml display" component			
+			if (sourceMimetype == "text/xml")
+			{		
+				// TODO
+				//config = WebStudio.components.newXml("webapp", "alfresco", path, sourceMimetype);
+			}
+
+			// bind HTML to "include" component			
+			if (sourceMimetype == "text/html" && sourceMimetype == "text/shtml") 
+			{
+				config = WebStudio.components.newInclude(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+			}
+	
+			// bind video to video component
+			if (sourceMimetype.startsWith("video"))
+			{
+				config = WebStudio.components.newVideo(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+				if (sourceMimetype == "video/quicktime")
+				{
+					config["properties"]["player"] = "quicktime";
+				}
+				else
+				{
+					if(window.ie)
+					{
+						config["properties"]["player"] = "windowsmedia";
+					}
+					else
+					{
+						config["properties"]["player"] = "quicktime";
+					}
+				}
+			}
+	
+			// bind audio to "audio" component
+			if (sourceMimetype.startsWith("audio"))
+			{
+				config = WebStudio.components.newAudio(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+			}
+			
+			// bind mp3 to "mp3" component
+			if (sourceMimetype == "audio/x-mpeg")
+			{
+				config = WebStudio.components.newFlashMP3(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+			}
+						
+			// bind flash to "flash" component			
+			if (sourceMimetype == "application/x-shockwave-flash")
+			{
+				config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+			}
+
+			// bind flv to "flash" component
+			if (sourceMimetype == "application/octet-stream")
+			{
+				if(sourcePath && sourcePath.endsWith(".flv"))
+				{
+					config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+					config["properties"]["fileext"] = "flv";
+				}
+			}
+
+			// bind mp4 video to "flash" component
+			if (sourceMimetype == "video/mp4")
+			{
+				config = WebStudio.components.newFlash(sourceType, sourceEndpoint, sourcePath, sourceMimetype);
+				config["properties"]["fileext"] = "mp4";
+			}
+		}
+	}
+	
+	if(config)
+	{
+		this.bindToRegionTab(regionTab, config);
+		return true;	
+	}
+
+	return false;
+};
+
+WebStudio.PageEditor.prototype.bindToRegionTab = function(regionTab, config)
+{
+	var regionId = regionTab.regionId;
+	var regionScopeId = regionTab.regionScopeId;
+	var regionSourceId = regionTab.regionSourceId;
+
+	this.bindToRegion(regionId, regionScopeId, regionSourceId, config);
+};
+
+WebStudio.PageEditor.prototype.bindToRegion = function(regionId, regionScopeId, regionSourceId, config)
+{
+	var _this = this;
+	
+	// update binding
+	config["binding"]["regionId"] = regionId;
+	config["binding"]["regionSourceId"] = regionSourceId;
+	config["binding"]["regionScopeId"] = regionScopeId;
+	
+	// fire the event
+	var params = { "json" : Json.toString(config) };
+	var url = WebStudio.ws.studio("/incontext/components", params);
+	
+	var myAjax = new Ajax(url, {
+		method: 'get',
+		onComplete: function(data){
+			_this.RefreshPageRegion(data);
+		}
+	}).request();
+};
+
+WebStudio.PageEditor.prototype.RefreshPageRegion = function(data)
+{
+	if(data)
+	{
+		data = Json.evaluate(data);
+	}
+
+	// refresh the object cache
+	WebStudio.app.refreshObjectCache();
+
+	var binding = { };
+	
+	// region data
+	binding["regionId"] = data.regionId;
+	binding["regionScopeId"] = data.regionScopeId;
+	binding["regionSourceId"] = data.regionSourceId;
+	
+	// component binding data
+	binding["componentId"] = data.componentId;
+	binding["componentTypeId"] = data.componentTypeId;
+	binding["componentTitle"] = data.componentTitle;
+	binding["componentTypeTitle"] = data.componentTypeTitle;
+	binding["componentEditorUrl"] = data.componentEditorUrl;
+
+	this.faultRegion(binding);
+};
+
+WebStudio.PageEditor.prototype.faultRegion = function(binding)
+{
+	var _this = this;
+	
+	var regionId = binding["regionId"];
+	var regionScopeId = binding["regionScopeId"];
+	
+ 	var templateId = Surf.context.getCurrentTemplateId();
+ 	
+	var url = WebStudio.url.studio("/region/" + regionId + "/" + regionScopeId + "/" + templateId);
+	if(WebStudio.request.queryString && WebStudio.request.queryString.length > 0)
+	{
+		url = url + "&" + WebStudio.request.queryString;
+	}
+	var myAjax = new Ajax(url, {
+		method: 'get',
+		onComplete: function(responseObject) {
+			_this.faultRegionSuccess(responseObject, binding);
+		}
+	}).request();	
+};
+
+WebStudio.PageEditor.prototype.faultRegionSuccess = function(html, binding)
+{
+	var _this = this;
+	
+	// region binding data
+	var regionId = binding["regionId"];
+	var regionScopeId = binding["regionScopeId"];
+	var regionSourceId = binding["regionSourceId"];
+
+	// component binding data
+	var componentId = binding["componentId"];
+	var componentTypeId = binding["componentTypeId"];
+	var componentTitle = binding["componentTitle"];
+	var componentTypeTitle = binding["componentTypeTitle"];
+	var componentEditorUrl = binding["componentEditorUrl"];	
+	
+	// this is the function that we call to do final processing
+	var finalProcessing = function(scriptText, regionDiv, restorePageEditor)
+	{
+		// set up new component binding information
+		if(componentId)
+		{
+			WebStudio.configureComponent(regionDiv.id, componentId, componentTypeId, componentTitle, componentTypeTitle, componentEditorUrl);
+		}
+
+		// process scripts and other dependencies
+		for(var st = 0; st < scriptText.length; st++)
+		{
+			// evaluate the script
+			try {
+				var t = scriptText[st];
+				if(t)
+				{
+					Alf.evaluate(t);
+				}
+			}
+			catch(err)
+			{
+				alert("ERROR: " + err);
+				// TODO: explore how and why this could occur
+			}				
+		}
+		
+		// resize the element to the size of its children
+		// this removes excess white space
+		Alf.resizeToChildren(regionDiv);
+		
+		// fire the load event
+		Alf.fireEvent(regionDiv, "load");				
+
+		// restore the page editor (if it was enabled originally)			
+		if(restorePageEditor)
+		{
+			// TODO: Ideally, this should trigger from completion of tags and load of the DOM element
+			// it should be tied to an update event of some kind
+			
+			// delay
+			_this.showPageEditor.delay(500, _this);
+		}						
+	};
+	
+	var delayFinalProcessing = function(scriptText, regionDiv, restorePageEditor)
+	{
+		var f = function()
+		{
+			var g = finalProcessing.bind(_this);
+			g(scriptText, regionDiv, restorePageEditor);
+		};
+		
+		f.bind(this).delay(500);
+	};
+	
+	var processHtml = function(regionDiv, restorePageEditor)
+	{
+		// any script text that we need to process
+		var scriptText = [];			
+		
+		// deal with SCRIPT and LINK tags in the retrieved content
+		var hasDependencies = false;
+		var x = regionDiv.getElementsByTagName("script");
+		if(x)
+		{
+			for(var x1 = 0; x1 < x.length; x1++)
+			{
+				// gather up script text
+				if(x[x1] && x[x1].text && x[x1].text !== "")
+				{
+					// store for execution later
+					scriptText[scriptText.length] = x[x1].text;
+				}
+				
+				// flag if there are script imports to process
+				if(x[x1] && x[x1].src && x[x1].src !== "")
+				{
+					hasDependencies = true;
+				}
+			}
+		}
+		var y = regionDiv.getElementsByTagName("link");
+		if(y)
+		{
+			for(var y1 = 0; y1 < y.length; y1++)
+			{
+				// flag if there are link imports to process
+				if(y[y1] && y[y1].src && y[y1].src !== "")
+				{
+					requiresLoading = true;
+				}
+			}
+		}
+
+		if(!hasDependencies)
+		{
+			// if we don't require any loading
+			// execute the final processing
+			finalProcessing(scriptText, regionDiv, restorePageEditor);
+		}
+		else
+		{
+			// load all dependencies and do final processing on
+			// completion of the load
+			var zFunc = delayFinalProcessing.pass([scriptText, regionDiv, restorePageEditor], _this); 
+			_this.tempLoader = WebStudio.util.loadDependencies(regionDiv.id, regionDiv, zFunc);
+		}
+	};
+		
+	// walk through all of the divs and find the one that matches this
+	var regions = WebStudio.app.panels.secondPanel.getElementsByTagName("div");
+	for(var i = 0; i < regions.length; i++)
+	{
+		// get the region properties
+		var divRegionId = regions[i].getAttribute("regionId");
+		var divRegionScopeId = regions[i].getAttribute("regionScopeId");
+		var divRegionSourceId = regions[i].getAttribute("regionSourceId");
+		
+		if(divRegionId == regionId && divRegionScopeId == regionScopeId)
+		{
+			var restorePageEditor = false;
+			if(this.pageEditor)
+			{
+				this.hidePageEditor();
+				
+				this.pageEditor.hideTabItems();
+				this.pageEditor.removeTabItems();
+				this.pageEditor = null;
+				
+				restorePageEditor = true;
+			} 			
+
+			var regionDiv = $(regions[i]);
+			
+			
+			// blank out the existing region div
+			Alf.setHTML(regionDiv, "");
+			WebStudio.unconfigureComponent(regionDiv.id);
+						
+			// manually parse out the region div
+			var origHtml = html;
+			var i1 = html.indexOf("<div");
+			var i2 = html.lastIndexOf("</div>");
+			//var i2 = html.indexOf("</div>", i1);
+			html = html.substring(i1,i2+6);
+			
+			// replace contents of regionDiv
+			// this sets the child nodes into the DIV
+			WebStudio.util.setHTML(regionDiv, html, true);
+			
+			// ideally, we want to now wait until the HTML finishes loading
+			var delayedProcessHtml = processHtml.pass([regionDiv, restorePageEditor], _this);
+			delayedProcessHtml.delay(1000); 
+		}
+	}
 };

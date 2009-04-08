@@ -10,15 +10,11 @@ WebStudio.Templates.Model.Row.prototype.init = function(parent)
 
 	// Set up CSS
 	this.setCSS("TemplateTableRow");
-	this.setOnMouseOverCSS("RowOnMouseOver");
-	this.setOnMouseOutCSS("TemplateTableRow");
+	this.setTitleCSS("TemplateRowTitle");
+	this.setMenuCSS("TemplateRowMenu");
 	
-	this.setTitleCSS("TemplateRowTitle");	
-	this.setTitleOnMouseOverCSS("TemplateRowTitleOnMouseOver");	
-	this.setTitleOnMouseOutCSS("TemplateRowTitle");
-	
-	// CSS for menu div.
-	this.setMenuCSS("TemplateRowMenu");	
+	// Set mouseover CSS	
+	this.setOnMouseOverCSS("TemplateObjectOnMouseOver");
 };
 
 /**
@@ -179,118 +175,48 @@ WebStudio.Templates.Model.Row.prototype.render = function(container)
 {
 	this.container = container;
 
-	/**
-	 * Row container element for this row object.
-	 */
-	var tr = document.createElement('tr');	
-	tr.setAttribute("id", "tr_" + this.getId());
-		
-	// Set the height of the row.
-	// The width will be 100%		    
-	WebStudio.util.setStyle(tr, 'height', this.getHeight() + "%");
+	// row div (set as root element)
+	var row = Alf.createElement('div', this.getId());
+	YAHOO.util.Dom.addClass(row, this.getCSS());
+    WebStudio.util.injectInside(this.container, row);
+    this.setElement(row);
     
-    WebStudio.util.injectInside(this.container, tr);
-			
-	var td = document.createElement('td');
-	td.setAttribute("id", "td_" + this.getId());
+    // calculate the width of the row
+	var width = jQuery(container).width();
+	jQuery(row).css({ 'width' : width - 16});
 	
-    WebStudio.util.injectInside(tr, td);	
-	
-	// root div
-	var root = document.createElement('div');
-	root.setAttribute("id", this.getId());	
-	WebStudio.util.setStyle(root, "height", "100%");		
-	WebStudio.util.setStyle(root, "border", "1px dashed black");		
-    
-	this.setElement(root);
-    WebStudio.util.injectInside(td, root);	
+	// calculate the height of the row
+	var height = (jQuery(container).height() - 16) / this.getTotalChildCount();
+	height = height - 16;
+	height = Math.floor(height);
+    jQuery(row).css( { "height" : height } );	    
 
-	// title element
-	var titleElement = document.createElement('div');
-    YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());   		
-	titleElement.setAttribute("id", "row_div_" + this.getId());		
+	// title div
+	var titleElement = Alf.createElement("div", "row_div_" + this.getId());
+    YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());
 	WebStudio.util.pushHTML(titleElement, "Row: " + this.getSequenceNumber());
+    WebStudio.util.injectInside(row, titleElement);	
 
-    WebStudio.util.injectInside(root, titleElement);	
+	// body div	
+	var bodyElement = Alf.createElement("div", "row_div_body_" + this.getId());
+	YAHOO.util.Dom.addClass(bodyElement, "TemplateTableRowBody");
+	WebStudio.util.injectInside(row, bodyElement);	
+
+	// set up events
+	this.setupEvents(titleElement);
+	this.setupEvents(bodyElement);
+	this.setupEvents();		
 		
-	// register mouse events
-	this.setupEvents(titleElement);		
-
-	/**
-	 * Container element for all columns in current row.
-	 * This table should be at 100% for the height and the width.
-	 */
-	var columnsTable = document.createElement("table");
-	columnsTable.setAttribute("id", "table_" + this.getId());
-	WebStudio.util.setStyle(columnsTable, "width", "100%");	
-	columnsTable.setAttribute("cellspacing", "0px");
-	
-	// This needs to be at 100%, for the table
-	// to take up the entire height of the 
-	// parent div.		
-	WebStudio.util.setStyle(columnsTable, "height", "93%");	
-		
-    // Inject the table that will contain all columsn
-    // into the root element.
-	WebStudio.util.injectInside(root, columnsTable);
-
-	/**
-     * A TBODY element is required for IE 
-     */
-    var tableBody = document.createElement('tbody');       
-    tableBody.setAttribute("id", "columns_table_tbody" + this.getId());
-	YAHOO.util.Dom.addClass(tableBody, "TemplateTableTBodyRow");
-	
-	WebStudio.util.injectInside(columnsTable, tableBody);
-	
-    /**
-     * This row element will contain all of the 
-     * column elements for current row object.
-     */
-    var columnsRow = document.createElement('tr');       
-    columnsRow.setAttribute("id", "inner_tr_" + this.getId());
-    	
-    this.setElement(tableBody);
-    
-    /**
-     * Add row element to columns table element.
-     */    
-    WebStudio.util.injectInside(tableBody, columnsRow);    
-
-	// register mouse events for tbody.
-	this.setupEvents(tableBody);
-        
+	// render the columns        
 	if (this.getChildCount() > 0)
 	{		
 		// render child objects
-		this.renderChildren(columnsRow);
+		this.renderChildren(bodyElement);
 	} 
 	else 
 	{	
-		// We will not be able to highlight an empty row.
-		// Let's add a placeholder column, until
-		// the row contains child elements.
-		var placeHolderColumn = document.createElement("td");
-		
-		placeHolderColumn.setAttribute("id", "placeHolderColumn_" + this.getId());
-		
-		var rowDimensions = "&nbsp; Height: " + Math.round(this.getHeight()) + "%<br>&nbsp;Width: " + "100%";
-				
-		WebStudio.util.pushHTML(placeHolderColumn, rowDimensions);
-		
-		// Inject inside the row element that will
-		// contain all columns for this object.
-		WebStudio.util.injectInside(columnsRow, placeHolderColumn);
-		
-		// Setup mouse event listeners for this
-		// td element.
-		this.setupEvents(placeHolderColumn);
-
-		// Let's make this element the root element,
-		// for properly processing event notifications.
-		// This will only be the case of the row does 
-		// not contain any child elements.
-		this.setElement(placeHolderColumn);
+		// To ensure that the entire template region is active
+		WebStudio.util.pushHTML(bodyElement, "&nbsp;&nbsp;");	
 	}
 };
 

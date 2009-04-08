@@ -9,6 +9,7 @@
 	background-image:url(<%=rootPath%>/images/trees/contenttree/webapproot.gif);
 	background-repeat:no-repeat;
 	background-position:2px 0px;
+	vertical-align:middle;
 }
 
 .icon-web-content-folder { 

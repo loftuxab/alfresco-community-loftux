@@ -17,16 +17,11 @@ WebStudio.Templates.Model.Abstract = new Class({
 	this.css = null;
 	
 	// CSS for mouse events.
-	this.onMouseOutCSS = null;
 	this.onMouseOverCSS = null;
 	
 	// Initial CSS class name for Title div.
 	this.titleCSS = null;
-	
-	// Title div mouse events CSS class names.
-	this.titleOnMouseOutCSS = null;
-	this.titleOnMouseOverCSS = null;
-	
+		
 	// Menu CSS class name.
 	this.menuCSS = null;	
 	
@@ -121,36 +116,35 @@ WebStudio.Templates.Model.Abstract.prototype.destroyMenu = function(element)
 /*
  *  Register event handlers for DOM element.
  */
-WebStudio.Templates.Model.Abstract.prototype.setupEvents = function(element)
+WebStudio.Templates.Model.Abstract.prototype.setupEvents = function(el)
 {
 	/**
 	 * DOM element that we will add event listeners to.
 	 * If the param element is null or undefined,
 	 * let's add the listeners to the root element.
 	 */
-	
-	this.element = element;
-	if(!this.element)
+
+	if (!el)
 	{
-		this.element = this.getElement();
+		el = this.getElement();
 	}
 	
-  YAHOO.util.Event.addListener(this.element, 
+	YAHOO.util.Event.addListener(el, 
                                  "mouseover", 
                                  this.onMouseOver, 
-                                 this.element, 
+                                 el, 
                                  this);
         
-    YAHOO.util.Event.addListener(this.element, 
+    YAHOO.util.Event.addListener(el, 
                                  "mouseout", 
                                  this.onMouseOut, 
-                                 this.element, 
+                                 el, 
                                  this);
     
-    YAHOO.util.Event.addListener(this.element, 
+    YAHOO.util.Event.addListener(el, 
                                  "click", 
                                  this.onClick, 
-                                 this.element, 
+                                 el, 
                                  this);
 };
 
@@ -294,6 +288,9 @@ WebStudio.Templates.Model.Abstract.prototype.renderChildren = function(parentEle
 			// components that don't have names,
 			// like rows and columns.
 			child.setSequenceNumber(i+1);
+
+			// Total number of elements
+			child.setTotalChildCount(children.length);
 			
 			// Call render method on child
 			// and pass in the container element.
@@ -370,6 +367,16 @@ WebStudio.Templates.Model.Abstract.prototype.setSequenceNumber = function(sequen
 	this.sequenceNumber = sequenceNumber;
 };
 
+WebStudio.Templates.Model.Abstract.prototype.getTotalChildCount = function()
+{
+	return this.totalChildCount;
+};
+
+WebStudio.Templates.Model.Abstract.prototype.setTotalChildCount = function(count)
+{
+	this.totalChildCount = count;
+};
+
 WebStudio.Templates.Model.Abstract.prototype.setCSS = function(css)
 {
     this.css = css;
@@ -380,16 +387,6 @@ WebStudio.Templates.Model.Abstract.prototype.getCSS = function()
 	return this.css;
 };
 
-WebStudio.Templates.Model.Abstract.prototype.setOnMouseOutCSS = function(css)
-{
-    this.onMouseOutCSS = css;
-};
-
-WebStudio.Templates.Model.Abstract.prototype.getOnMouseOutCSS = function()
-{
-	return this.onMouseOutCSS;
-};
-
 WebStudio.Templates.Model.Abstract.prototype.setOnMouseOverCSS = function(css)
 {
     this.onMouseOverCSS = css;
@@ -398,26 +395,6 @@ WebStudio.Templates.Model.Abstract.prototype.setOnMouseOverCSS = function(css)
 WebStudio.Templates.Model.Abstract.prototype.getOnMouseOverCSS = function()
 {
 	return this.onMouseOverCSS;
-};
-
-WebStudio.Templates.Model.Abstract.prototype.setTitleOnMouseOutCSS = function(css)
-{
-    this.titleOnMouseOutCSS = css;
-};
-
-WebStudio.Templates.Model.Abstract.prototype.getTitleOnMouseOutCSS = function()
-{
-	return this.titleOnMouseOutCSS;
-};
-
-WebStudio.Templates.Model.Abstract.prototype.setTitleOnMouseOverCSS = function(css)
-{
-    this.titleOnMouseOverCSS = css;
-};
-
-WebStudio.Templates.Model.Abstract.prototype.getTitleOnMouseOverCSS = function()
-{
-	return this.titleOnMouseOverCSS;
 };
 
 WebStudio.Templates.Model.Abstract.prototype.setTitleCSS = function(css)
@@ -441,91 +418,90 @@ WebStudio.Templates.Model.Abstract.prototype.getMenuCSS = function()
 };
 
 WebStudio.Templates.Model.Abstract.prototype.onMouseOver = function(e, element)
-{    		
-
+{    	
+	if (WebStudio.Templates.hasContextMenu)
+	{
+		return;
+	}
+	
     var target = YAHOO.util.Event.getTarget(e);    
 	     
-	 // Determine title div name for this object.
-	 var objectType = this.getObjectType();
-	 var titleDivName = objectType + "_div_" + this.getId();
-	 var titleDiv = null;
-	    
-	 // Check target to see if
-	 // we are dealing with the element's title div.
-	 if(target.id == titleDivName)
-	 {
-	   	// Stop event from propagation to other DOM elements
+    // Determine title div name for this object.
+    var titleDivName = this.getObjectType() + "_div_" + this.getId();
+    var bodyDivName = this.getObjectType() + "_div_body_" + this.getId();
+	     
+    // Check target to see if it is the title div.    
+    if (target.id == titleDivName ||
+        target.id == bodyDivName ||
+        target.id == element.id)    
+    {
+        // Stop event from propagation to other DOM elements
         WebStudio.util.stopPropagation(e);
-		 
-		titleDiv = document.getElementById(titleDivName);
-	        
-	  	// Set the CSS on the title div
-	     YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOutCSS());	     
-	     YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOverCSS());
-	     	
-	   	// Set the CSS on the current object's root element.
-	     YAHOO.util.Dom.removeClass(this.getElement(), this.getOnMouseOutCSS());	     
-	     YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOverCSS());	     	     
-	 } 
-	 else if( target.id == element.id)
-	 {   	    
-	   	// Stop event from propagation to other DOM elements
-        WebStudio.util.stopPropagation(e);		 
-
-	    YAHOO.util.Dom.removeClass(this.getElement(), this.getOnMouseOutCSS());	     
-	    YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOverCSS());
-	        
-	    // Finally, update the title div's CSS as well.
-	    titleDiv = document.getElementById(titleDivName);
-
-	    YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOutCSS());	     
-	    YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOverCSS());		            
-	 }
+        
+        this.startMouseOver();
+    }
 };
 
 WebStudio.Templates.Model.Abstract.prototype.onMouseOut = function(e, element)
 {
+	if (WebStudio.Templates.hasContextMenu)
+	{
+		return;
+	}
+	
 	// Get the target element.
 	// We will use to to determine what 
 	// UI actions to take.
 	var target = YAHOO.util.Event.getTarget(e);
 	
     // Determine title div name for this object.
-    var objectType = this.getObjectType();
-    var titleDivName = objectType + "_div_" + this.getId();
-    var titleDiv = null;
+    var titleDivName = this.getObjectType() + "_div_" + this.getId();
+    var bodyDivName = this.getObjectType() + "_div_body_" + this.getId();
 
     // Check target to see if it is the title div.    
-    if(target.id == titleDivName)
-    {
-        // Stop event from propagation to other DOM elements
-        WebStudio.util.stopPropagation(e);    	
-
-    	// Update root element's css
-        YAHOO.util.Dom.removeClass(this.getElement(), this.getOnMouseOverCSS());
-        YAHOO.util.Dom.addClass(this.getElement(), this.getOnMouseOutCSS());        		
-
-		// Get the title div element
-        titleDiv = document.getElementById(titleDivName);
-        YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOverCSS());
-        YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOutCSS());        		                
-    }
-    else if(target.id == element.id)    
+    if (target.id == titleDivName ||
+        target.id == bodyDivName ||
+        target.id == element.id)    
     {
         // Stop event from propagation to other DOM elements
         WebStudio.util.stopPropagation(e);
         
-    	// Update intended target.
-        
-        YAHOO.util.Dom.removeClass(element, this.getOnMouseOverCSS());
-        YAHOO.util.Dom.addClass(element, this.getOnMouseOutCSS());        		
-        
-        // Finally, update the current object's
-        // title div's css as well.
-    	titleDiv = document.getElementById(titleDivName);            	
-        YAHOO.util.Dom.removeClass(titleDiv, this.getTitleOnMouseOverCSS());
-        YAHOO.util.Dom.addClass(titleDiv, this.getTitleOnMouseOutCSS());        		
-    }        
+        this.clearMouseOver();
+    }
+};    	
+
+WebStudio.Templates.Model.Abstract.prototype.clearMouseOver = function()
+{
+    var titleDivName = this.getObjectType() + "_div_" + this.getId();
+    var bodyDivName = this.getObjectType() + "_div_body_" + this.getId();
+
+   	// Update root element's css
+   	jQuery(this.getElement()).removeClass(this.getOnMouseOverCSS());
+
+	// Update title div
+	titleDiv = document.getElementById(titleDivName);
+	jQuery(titleDiv).removeClass(this.getOnMouseOverCSS());
+
+	// Update body div
+	bodyDiv = document.getElementById(bodyDivName);
+	jQuery(bodyDiv).removeClass(this.getOnMouseOverCSS());
+};
+
+WebStudio.Templates.Model.Abstract.prototype.startMouseOver = function()
+{
+    var titleDivName = this.getObjectType() + "_div_" + this.getId();
+    var bodyDivName = this.getObjectType() + "_div_body_" + this.getId();
+
+   	// Update root element's css
+   	jQuery(this.getElement()).addClass(this.getOnMouseOverCSS());
+
+	// Update title div
+	titleDiv = document.getElementById(titleDivName);
+	jQuery(titleDiv).addClass(this.getOnMouseOverCSS());
+
+	// Update body div
+	bodyDiv = document.getElementById(bodyDivName);
+	jQuery(bodyDiv).addClass(this.getOnMouseOverCSS());
 };
 
 WebStudio.Templates.Model.Abstract.prototype.getContextMenuDivId = function()
@@ -600,6 +576,7 @@ WebStudio.Templates.Model.Abstract.prototype._createContextMenu = function()
 	    // Add menu to menu manager
 	    YAHOO.widget.MenuManager.addMenu(objContextMenu);     
 	}    
+	
 	return objContextMenu;
 };
 
@@ -625,6 +602,20 @@ WebStudio.Templates.Model.Abstract.prototype.onClick = function(e, element)
         
         // Attach menu to contextMenuDiv.
         objContextMenu.render(this.CONTEXT_MENU_DIV);
+        
+        // mark that the context menu is in effect
+		if (objContextMenu)
+		{
+			WebStudio.Templates.hasContextMenu = true;
+		}
+        
+        // subscribe to hide event
+        var _this = this;
+        objContextMenu.hideEvent.subscribe(function() {
+        	_this.clearMouseOver();
+        	WebStudio.Templates.hasContextMenu = false;
+        });
+
         // Make menu visibie.
         objContextMenu.show();
 

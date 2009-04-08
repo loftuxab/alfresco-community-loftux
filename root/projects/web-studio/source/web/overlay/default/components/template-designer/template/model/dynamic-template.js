@@ -8,22 +8,13 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.init = function(parent)
 	// Object type	
 	this.objectType = "template";
 	
-	// Set up default tamplate table CSS.
+	// Set CSS
 	this.setCSS("TemplateTable");
+	this.setTitleCSS("TemplateTableTitle");
+	this.setMenuCSS("TemplateTableMenu");
 	
 	// Mouse event CSS for template table.
-	this.setOnMouseOverCSS("TemplateTableOnMouseOver");
-	this.setOnMouseOutCSS("TemplateTable");
-	
-	// Default Title div CSS.
-	this.setTitleCSS("TemplateTableTitle");
-	
-	// Mouse event CSS for Title div.
-	this.setTitleOnMouseOverCSS("TemplateTitleOnMouseOver");	
-	this.setTitleOnMouseOutCSS("TemplateTableTitle");
-	
-	// CSS for menu div.
-	this.setMenuCSS("TemplateTableMenu");	
+	this.setOnMouseOverCSS("TemplateObjectOnMouseOver");
 };
 
 /**
@@ -157,71 +148,46 @@ WebStudio.Templates.Model.DynamicTemplate.prototype.render = function(container)
 	
 	this.container = container;	 
 
-	// root div
-	var root = document.createElement('div');
-	root.setAttribute("id", this.getId());
-
-	// set as root element for this object.
+	// template div (set as root element)
+	var root = Alf.createElement('div', this.getId());
+	YAHOO.util.Dom.addClass(root, this.getCSS());
+	WebStudio.util.injectInside(this.container, root);
 	this.setElement(root);
 	
-	// Add into DOM element.
-	WebStudio.util.injectInside(this.container, root);
-				   
-	// title element
-	var titleElement = document.createElement('div');
-	titleElement.setAttribute("id", "template_div_" + this.getId());	
+	// calculate the full width of the template drawing space
+	var width = jQuery(container).width();
+	jQuery(root).css({ 'width' : width });
+	
+	// calculate the full height of the template drawing space
+	var height = jQuery(container).height();
+	jQuery(root).css({ 'height' : height });
+		
+	// title div
+	var titleElement = Alf.createElement('div', "template_div_" + this.getId());	
 	YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());	
-	WebStudio.util.pushHTML(titleElement, "Template: " + this.getTitle());
+	WebStudio.util.pushHTML(titleElement, "Template: " + this.getTitle());	
+	WebStudio.util.injectInside(root, titleElement);
 	
-	WebStudio.util.injectInside(root, titleElement);	
+	// body div	
+	var bodyElement = Alf.createElement('div', "template_div_body_" + this.getId());
+	YAHOO.util.Dom.addClass(bodyElement, "TemplateTableBody");
+	WebStudio.util.injectInside(root, bodyElement);
 
-	// register mouse events for given element.
+	// set up events
 	this.setupEvents(titleElement);
-	
-	// Template Table.
-	var table = document.createElement('table');
-	YAHOO.util.Dom.addClass(table, this.getCSS());	
-	table.setAttribute("id", "templateTable");	
-	table.setAttribute("cellspacing", "5px");		
-	table.setAttribute("cellpadding", "5px");	
-
-	// Template Table.
-	var tableBody = document.createElement('tbody');
-	tableBody.setAttribute("id", "templateTableBody");
-	
-	// Add to DOM.
-	WebStudio.util.injectInside(root, table);
-
-	WebStudio.util.injectInside(table, tableBody);
-	
-	// register mouse events, for root element.
+	this.setupEvents(bodyElement);
 	this.setupEvents();
 
+	// render the rows	
 	if(this.getChildCount() > 0)
 	{
 		// render child objects		
-		this.renderChildren(tableBody);		
+		this.renderChildren(bodyElement);		
 	}
 	else
 	{
-		// To ensure that the entire template region is active,
-		// - even if there are no rows -
-		// let's increase the size of the title element to
-		// have it cover 100% of the template area.
-		
-		var tr = document.createElement("tr");
-		
-		var td = document.createElement("td");
-		td.setAttribute("id", "empty_template_td_" + this.getId());
-		YAHOO.util.Dom.addClass(td, this.getCSS());	
-		
-		this.setElement(td);
-		this.setupEvents(td);
-		
-		WebStudio.util.pushHTML(td, "&nbsp;&nbsp;");
-		
-		WebStudio.util.injectInside(tr, td);
-		WebStudio.util.injectInside(tableBody, tr);
+		// To ensure that the entire template region is active
+		WebStudio.util.pushHTML(bodyElement, "&nbsp;&nbsp;");
 	}
 };
 

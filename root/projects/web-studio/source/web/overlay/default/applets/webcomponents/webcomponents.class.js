@@ -21,7 +21,7 @@ WebStudio.Applets.WebComponents.prototype.getDependenciesConfig = function()
 
 WebStudio.Applets.WebComponents.prototype.getTemplateDomId = function()
 {
-	return "SurfaceComponentsSlider";
+	return "ComponentsApplet_Slider";
 };
 
 WebStudio.Applets.WebComponents.prototype.bindSliderControl = function(container) 
@@ -47,6 +47,9 @@ WebStudio.Applets.WebComponents.prototype.bindSliderControl = function(container
 				selector: 'div[id=ATVTreeWebComponents]'
 			}
 		};
+		this.treeView.draggable = true;
+		this.treeView.draggableScope = 'region';
+		this.treeView.draggableType = "webscriptComponent";
 		this.treeView.activate();
 		
 		var _treeView = this.treeView;
@@ -88,9 +91,6 @@ WebStudio.Applets.WebComponents.prototype.bindSliderControl = function(container
 			WebStudio.app.openBrowser("network", "http://network.alfresco.com");
 		
 		});
-
-		// add the application treeview drop handler
-		this.treeView.dropFromTreeView = this.getApplication().dropFromTreeView.bind(this.getApplication());		
 	}
 	
 	return this.treeView;
@@ -159,23 +159,21 @@ WebStudio.Applets.WebComponents.prototype.loadData = function(node, fnLoadComple
 
 WebStudio.Applets.WebComponents.prototype.onShowApplet = function()
 {
-	// hide all designers
 	this.getApplication().hideAllDesigners();
-   
-	// show the page editor
 	this.getApplication().showPageEditor();
 };
 
 WebStudio.Applets.WebComponents.prototype.onHideApplet = function()
 {
-	// hide the page editor
-	this.getApplication().hidePageEditor();
+	this.getApplication().hideAllDesigners();
 };
 
 WebStudio.Applets.WebComponents.prototype.bindPageEditor = function(pageEditor)
 {
+	/*
 	if(this.treeView)
 	{
 		this.treeView.setDroppables(pageEditor.tabs);
 	}
+	*/
 };

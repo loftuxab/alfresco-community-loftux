@@ -17,7 +17,7 @@ WebStudio.Applets.WebContent.prototype.getDependenciesConfig = function()
 
 WebStudio.Applets.WebContent.prototype.getTemplateDomId = function()
 {
-	return "ContentWebContentSlider";
+	return "WebContentApplet_Slider";
 };
 
 WebStudio.Applets.WebContent.prototype.bindSliderControl = function(container) 
@@ -42,7 +42,11 @@ WebStudio.Applets.WebContent.prototype.bindSliderControl = function(container)
 			TreeHolder: {
 				selector: 'div[id=ATVTreeWebContent]'
 			}
-		};		
+		};	
+		treeView.draggable = true;
+		treeView.draggableScope = 'region';
+		treeView.draggableType = "webcontent";
+		treeView.nodeToBindingDescriptor = this.nodeToBindingDescriptor;			
 		treeView.activate();
 		
 		var _treeView = treeView;
@@ -72,9 +76,6 @@ WebStudio.Applets.WebContent.prototype.bindSliderControl = function(container)
 		{
 			// no action
 		};
-
-		// add the application treeview drop handler
-		treeView.dropFromTreeView = this.getApplication().dropFromTreeView.bind(this.getApplication());
 
 		// disable the buttons (for now)
 		treeView.getMenu().setDisabled("roots", 0);
@@ -218,8 +219,27 @@ WebStudio.Applets.WebContent.prototype.nodeDoubleClickHandler = function(e)
 
 WebStudio.Applets.WebContent.prototype.bindPageEditor = function(pageEditor)
 {
+	/*
 	if(this.treeView)
 	{
 		this.treeView.setDroppables(pageEditor.tabs);
 	}
+	*/
+};
+
+WebStudio.Applets.WebContent.prototype.nodeToBindingDescriptor = function(node)
+{
+	var sourceIsContainer = ("directory" == node.data.alfType);
+	
+	var binding = {
+		sourceType : "webapp",
+		sourceEndpoint : "alfresco",
+		sourcePath : node.data.path,
+		sourceMimetype : node.data.mimetype,
+		sourceAlfType : node.data.alfType,
+		sourceNodeId : node.data.nodeID,
+		sourceIsContainer : sourceIsContainer 
+	};
+
+	return binding;
 };

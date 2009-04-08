@@ -1,4 +1,5 @@
-WebStudio.Applets.Templates = WebStudio.Applets.Abstract.extend({});
+WebStudio.Applets.Templates = WebStudio.Applets.Abstract.extend({
+});
 
 WebStudio.Applets.Templates.prototype.getDependenciesConfig = function()
 {
@@ -17,7 +18,7 @@ WebStudio.Applets.Templates.prototype.getDependenciesConfig = function()
 
 WebStudio.Applets.Templates.prototype.getTemplateDomId = function()
 {
-	return "SurfaceTemplatesSlider";
+	return "TemplatesApplet_Slider";
 };
 
 WebStudio.Applets.Templates.prototype.bindSliderControl = function(container) 
@@ -48,7 +49,6 @@ WebStudio.Applets.Templates.prototype.bindSliderControl = function(container)
 
 WebStudio.Applets.Templates.prototype.onShowSlider = function()
 {
-	// hide all designers
 	this.getApplication().hideAllDesigners();
 
 	// show the template designer
@@ -57,6 +57,5 @@ WebStudio.Applets.Templates.prototype.onShowSlider = function()
 
 WebStudio.Applets.Templates.prototype.onHideSlider = function()
 {
-	// hide the template designer
-	this.getApplication().hideTemplateDesigner();
+	this.getApplication().hideAllDesigners();
 };

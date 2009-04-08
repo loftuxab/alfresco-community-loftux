@@ -1,259 +1,25 @@
-WebStudio.Applications.WebDesigner = WebStudio.Applications.Abstract.extend({});
+/**
+   PAGE BUILDER APPLICATION
+**/
+WebStudio.Applications.Presentation = WebStudio.Applications.Abstract.extend({});
 
-WebStudio.Applications.WebDesigner.prototype.getMenu = function()
+WebStudio.Applications.Presentation.prototype.getSlidersSectorTemplateId = function()
 {
-	var _this = this;
-	
-	if(!this.menu)
-	{
-		var menu = new WebStudio.MenuNew();
-		menu.onItemClick = function(id){
-			_this.onMenuItemClick(id);
-		};
-		menu.activate();
-	
-		// alfresco menu
-		
-		var r0 = menu.addRootItem('alfresco', "", WebStudio.overlayImagesPath + "/AlfrescoLogo16.gif");
-		//var r0 = menu.addRootItem('alfresco', "", WebStudio.overlayIconsPath + "/visit_alfresco.jpg");
-		r0.addItem("visit-alfresco", "Visit Alfresco", "text", WebStudio.overlayImagesPath + "/AlfrescoLogo16.gif");
-		r0.addItem("explore-alfresco-network", "Explore Alfresco Network", "text", WebStudio.overlayImagesPath + "/network_16.gif");
-		r0.addItem("separator","item2","separator");
-		r0.addItem("about-webstudio", "About Web Studio", "text", WebStudio.overlayImagesPath + "/webstudio_16.gif");
-		
-		// site menu
-		var r1 = menu.addRootItem("webproject", "Web Project", "");
-		r1.addItem("site-switch", "Switch Sites...", "text", WebStudio.overlayIconsPath + "/switch_website.gif");
-		r1.addItem("site-import", "Import...", "text", WebStudio.overlayIconsPath + "/export.gif", { disable: true} );
-		r1.addItem("site-export", "Export...", "text", WebStudio.overlayIconsPath + "/import.gif", { disable: true} );
-		r1.addItem("separator2","item2","separator");	
-		r1.addItem("site-content-type-associations", "Content Associations...", "text", WebStudio.overlayIconsPath + "/content_type_associations.gif");
-		r1.addItem("separator3","item2","separator");
-		r1.addItem("site-view-web-project", "View in Explorer", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
-		r1.addItem("site-view-web-project-webdav", "View in WebDAV", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
-		r1.addItem("site-view-web-project-cifs", "View in CIFS", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
-		r1.addItem("site-view-web-project-ftp", "View in FTP", "text", WebStudio.overlayIconsPath + "/dashboard.gif" );
-		
-		/*		
-		r1.addItem("site-view-modified-items", "View Modified Items", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
-		r1.addItem("site-view-sandbox", "View Sandbox", "text", WebStudio.overlayIconsPath + "/dashboard.gif", { disable: true } );
-		*/
-		
-		r1.addItem("separator4","item2","separator");
-		r1.addItem("site-properties", "Properties...", "text", WebStudio.overlayIconsPath + "/properties.gif");
-		
-		// page menu
-		var r2 = menu.addRootItem('page', "Current Page", "");
-		r2.addItem("page-template-associations-view", "Template Associations...", "text", WebStudio.overlayIconsPath + "/template_associations.gif");
-		r2.addItem("page-template-edit", "Edit Page Template", "text", WebStudio.overlayIconsPath + "/template_associations.gif");
-		r2.addItem("separator1","item2","separator");
-		r2.addItem("page-properties", "Properties...", "text", WebStudio.overlayIconsPath + "/properties.gif");
-			
-		// options menu
-		var r4 = menu.addRootItem('options', 'Options', ''); 
-		r4.addItem("refresh-cache", "Refresh Cache", "text", WebStudio.overlayIconsPath + "/refresh_cache.gif");
-		r4.addItem("separator","item2","separator");
-		r4.addItem("show-docking-panel", "Toggle Docking Panel", "checkbox", null, {checked : !this.isHideDockingPanel});
-
-		this.menu = menu;
-	}
-		
-	return this.menu;
+	return "PresentationApplication_SlidersSectorTemplate";
 };
 
-WebStudio.Applications.WebDesigner.prototype.getTabTitle = function()
+WebStudio.Applications.Presentation.prototype.getSlidersPanelDomId = function()
 {
-	return "Design";
+	return "PresentationApplication_SplitterPanel";
 };
 
-WebStudio.Applications.WebDesigner.prototype.getTabImageUrl = function()
-{
-	return "/images/webstudio_surface_16.gif";
-};
-
-WebStudio.Applications.WebDesigner.prototype.getSlidersSectorTemplateId = function()
-{
-	return "SurfaceSlidersSectorTemplate";
-};
-
-WebStudio.Applications.WebDesigner.prototype.getSlidersPanelDomId = function()
-{
-	return "SurfaceSplitterPanel";
-};
-
-/*
- * Fired when a menu item is clicked
- */
-WebStudio.Applications.WebDesigner.prototype.onMenuItemClick = function(index,data) 
-{
-	var _this = this;
-	var url = null;
-	var w = null;
-	
-	// check that the user is logged in
-	if(!WebStudio.app.userAuth())
-	{
-		return;
-	}
-
-	var pageId = Surf.context.getCurrentPageId();
-	
-	// Alfresco
-	
-	if(index == 'visit-alfresco')
-	{
-		WebStudio.app.openBrowser("alfresco.com", "http://www.alfresco.com");
-	}
-	
-	if(index == 'explore-alfresco-network')
-	{
-		WebStudio.app.openBrowser("network", "http://network.alfresco.com");
-	}
-	
-	if(index == 'about-webstudio')
-	{
-		WebStudio.app.openBrowser("aboutWebStudio", "http://wiki.alfresco.com/wiki/Web_Studio");
-	}
-			
-	// Site - Content Type Associations
-	if (index == 'site-content-type-associations')
-	{
-		this.showContentTypeAssociationsDialog();
-	}
-	
-	// Site - Switch Web Site
-	if (index == 'site-switch')
-	{
-		WebStudio.app.resetContext({
-		
-			success: function(oResponse) {
-							
-				// set up the context
-				WebStudio.context.webProjectId = null;
-				WebStudio.context.sandboxId = null;
-				WebStudio.context.storeId = null;				
-
-				WebStudio.app.sandboxMounted();
-				
-			}
-			,
-			failure: function(oResponse) {
-			
-				// TODO
-			}
-			,
-			timeout: 7000
-		});		
-	}
-	
-	// Site - Site Export
-	if (index == 'site-export')
-	{
-	}
-	
-	// Site - Site Import
-	if (index == 'site-import')
-	{
-	}
-	
-	// Site - Site Properties
-	if (index == 'site-properties')
-	{
-		w = new WebStudio.Wizard();
-		w.setDefaultJson(
-		{
-			refreshSession: 'true'
-		});
-		url = WebStudio.ws.studio("/wizard/site/config");
-		w.start(url, 'siteproperties');			
-	}
-	
-	// Site - View Modified Items
-	if (index == 'site-view-modified-items')
-	{
-	}
-
-	// Site - View Sandbox
-	if(index == 'site-view-sandbox')
-	{
-	}
-	
-	// Site - View Web Project (Alfresco Explorer)
-	if(index == 'site-view-web-project')
-	{
-		url = "http://localhost:8080/alfresco/service/webframework/redirect/jsf-client/browse/webproject/" + WebStudio.context.getWebProjectId();
-		WebStudio.app.openBrowser("alfresco", url);
-	}	
-
-	// Site - View Web Project (WebDAV)
-	if(index == 'site-view-web-project-webdav')
-	{
-		url = "http://localhost:8080/alfresco/webdav/Web Projects/" + WebStudio.context.getWebProjectId();
-		WebStudio.app.openBrowser("webdav", url);
-	}	
-
-	// Site - View Web Project (CIFS)
-	if(index == 'site-view-web-project-cifs')
-	{
-	}	
-
-	// Site - View Web Project (FTP)
-	if(index == 'site-view-web-project-ftp')
-	{
-		url = "ftp://localhost/AVM/";
-		url += WebStudio.context.getStoreId();
-		url += "/HEAD/DATA/www/avm_webapps/";
-		url += WebStudio.context.getWebappId();
-		url += "/";
-		WebStudio.app.openBrowser("ftp", url);
-	}	
-	
-	// Page - Edit Template
-	if (index == 'page-template-edit')
-	{
-		// jump to the current template
-		this.GoToTemplateDisplay(Surf.context.getCurrentTemplateId());
-	}
-	
-	// Page - Template Associations
-	if (index == 'page-template-associations-view')
-	{
-		this.showTemplateAssociationsDialog();
-	}
-	
-	// Page - Page Properties
-	if (index == 'page-properties')
-	{
-		w = new WebStudio.Wizard();
-		w.setDefaultJson(
-		{
-			refreshSession: 'true',
-			pageId: pageId
-		});
-		url = WebStudio.ws.studio("/wizard/navigation/edit");
-		w.start(url, 'editpage');
-	}
-
-	// Options - Cache Refresh
-	if (index == 'refresh-cache')
-	{
-		WebStudio.app.refreshAll();
-	}
-	
-	// Options - Show Docking Panel
-	if (index == 'show-docking-panel')
-	{
-		WebStudio.app.toggleSlidersPanel();
-	}	
-};
-
-WebStudio.Applications.WebDesigner.prototype.hideAllDesigners = function()
+WebStudio.Applications.Presentation.prototype.hideAllDesigners = function()
 {
 	this.hidePageEditor();
 	this.hideTemplateDesigner();
 };
 
-WebStudio.Applications.WebDesigner.prototype.showPageEditor = function()
+WebStudio.Applications.Presentation.prototype.showPageEditor = function()
 {
 	if(!this.pageEditor)
 	{
@@ -268,7 +34,7 @@ WebStudio.Applications.WebDesigner.prototype.showPageEditor = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.setupPageEditor = function()
+WebStudio.Applications.Presentation.prototype.setupPageEditor = function()
 {
 	// Remove any existing overlays
 	this.pageEditor.removeTabItems();
@@ -301,7 +67,7 @@ WebStudio.Applications.WebDesigner.prototype.setupPageEditor = function()
 	}	
 };
 
-WebStudio.Applications.WebDesigner.prototype.hidePageEditor = function()
+WebStudio.Applications.Presentation.prototype.hidePageEditor = function()
 {
 	if(this.pageEditor)
 	{
@@ -310,7 +76,7 @@ WebStudio.Applications.WebDesigner.prototype.hidePageEditor = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.showTemplateDesigner = function()
+WebStudio.Applications.Presentation.prototype.showTemplateDesigner = function()
 {
 	if(!this.templateDesigner)
 	{
@@ -331,7 +97,7 @@ WebStudio.Applications.WebDesigner.prototype.showTemplateDesigner = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.hideTemplateDesigner = function()
+WebStudio.Applications.Presentation.prototype.hideTemplateDesigner = function()
 {
 	if(this.templateDesigner)
 	{
@@ -342,7 +108,7 @@ WebStudio.Applications.WebDesigner.prototype.hideTemplateDesigner = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.GoToTemplateDisplay = function(templateId)
+WebStudio.Applications.Presentation.prototype.GoToTemplateDisplay = function(templateId)
 {
 	// hide everything
 	this.hideAllDesigners();
@@ -363,13 +129,13 @@ WebStudio.Applications.WebDesigner.prototype.GoToTemplateDisplay = function(temp
 /**
  * Fired when an item is dropped from a tree view onto the page editor
  */
-WebStudio.Applications.WebDesigner.prototype.dropFromTreeView = function(dropDivId, options)
+WebStudio.Applications.Presentation.prototype.dropFromTreeView = function(dropDivId, options)
 {
 	var regionTab = this.pageEditor.tabs[dropDivId];
 	this.dropOntoRegion(regionTab,null,null,null,options);
 };
 
-WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab, nodeData, source, e, options)
+WebStudio.Applications.Presentation.prototype.dropOntoRegion = function(regionTab, nodeData, source, e, options)
 {
 	// get the kind of thing that was dropped
 	var alfType = options.data.alfType;
@@ -511,7 +277,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 			}
 			
 			/** HTML **/
-			if (mimetype == "text/html" || mimetype == "text/shtml") 
+			if (mimetype == "text/html" && mimetype == "text/shtml") 
 			{
 				config = WebStudio.components.newInclude(sourceType, sourceEndpoint, sourcePath, mimetype);
 			}
@@ -584,7 +350,7 @@ WebStudio.Applications.WebDesigner.prototype.dropOntoRegion = function(regionTab
 	return false;
 };
 
-WebStudio.Applications.WebDesigner.prototype.bindToRegionTab = function(regionTab, config)
+WebStudio.Applications.Presentation.prototype.bindToRegionTab = function(regionTab, config)
 {
 	var regionId = regionTab.regionId;
 	var regionScopeId = regionTab.regionScopeId;
@@ -593,7 +359,7 @@ WebStudio.Applications.WebDesigner.prototype.bindToRegionTab = function(regionTa
 	this.bindToRegion(regionId, regionScopeId, regionSourceId, config);
 };
 
-WebStudio.Applications.WebDesigner.prototype.bindToRegion = function(regionId, regionScopeId, regionSourceId, config)
+WebStudio.Applications.Presentation.prototype.bindToRegion = function(regionId, regionScopeId, regionSourceId, config)
 {
 	var _this = this;
 	
@@ -603,9 +369,7 @@ WebStudio.Applications.WebDesigner.prototype.bindToRegion = function(regionId, r
 	config["binding"]["regionScopeId"] = regionScopeId;
 	
 	// fire the event
-	var _json = Json.toString(config);
-	_json = Alf.urlEncode(_json);
-	var params = { "json" : _json };
+	var params = { "json" : Json.toString(config) };
 	var url = WebStudio.ws.studio("/incontext/components", params);
 	
 	var myAjax = new Ajax(url, {
@@ -616,7 +380,7 @@ WebStudio.Applications.WebDesigner.prototype.bindToRegion = function(regionId, r
 	}).request();
 };
 
-WebStudio.Applications.WebDesigner.prototype.RefreshPageRegion = function(data)
+WebStudio.Applications.Presentation.prototype.RefreshPageRegion = function(data)
 {
 	if(data)
 	{
@@ -643,7 +407,7 @@ WebStudio.Applications.WebDesigner.prototype.RefreshPageRegion = function(data)
 	this.faultRegion(binding);
 };
 
-WebStudio.Applications.WebDesigner.prototype.faultRegion = function(binding)
+WebStudio.Applications.Presentation.prototype.faultRegion = function(binding)
 {
 	var _this = this;
 	
@@ -665,7 +429,7 @@ WebStudio.Applications.WebDesigner.prototype.faultRegion = function(binding)
 	}).request();	
 };
 
-WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html, binding)
+WebStudio.Applications.Presentation.prototype.faultRegionSuccess = function(html, binding)
 {
 	var _this = this;
 	
@@ -840,7 +604,7 @@ WebStudio.Applications.WebDesigner.prototype.faultRegionSuccess = function(html,
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.showContentTypeAssociationsDialog = function()
+WebStudio.Applications.Presentation.prototype.showContentTypeAssociationsDialog = function()
 {
 	// show the cta control
 	if(!this.ctaDialog)
@@ -854,7 +618,7 @@ WebStudio.Applications.WebDesigner.prototype.showContentTypeAssociationsDialog =
 	this.ctaDialog.popup();
 };
 
-WebStudio.Applications.WebDesigner.prototype.showTemplateAssociationsDialog = function()
+WebStudio.Applications.Presentation.prototype.showTemplateAssociationsDialog = function()
 {
 	// show the pta control
 	if(!this.ptaDialog)
@@ -868,7 +632,7 @@ WebStudio.Applications.WebDesigner.prototype.showTemplateAssociationsDialog = fu
 	this.ptaDialog.popup();
 };
 
-WebStudio.Applications.WebDesigner.prototype.resize = function()
+WebStudio.Applications.Presentation.prototype.resize = function()
 {
 	if(this.templateDesigner && !this.templateDesigner.isHidden())
 	{
@@ -876,7 +640,7 @@ WebStudio.Applications.WebDesigner.prototype.resize = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.onContentScroll = function(left, top)
+WebStudio.Applications.Presentation.prototype.onContentScroll = function(left, top)
 {
 	// tell the page editor to resize all of its colored region overlays
 	if(this.pageEditor)
@@ -890,17 +654,17 @@ WebStudio.Applications.WebDesigner.prototype.onContentScroll = function(left, to
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.getPageEditor = function()
+WebStudio.Applications.Presentation.prototype.getPageEditor = function()
 {
 	return this.pageEditor;
 };
 
-WebStudio.Applications.WebDesigner.prototype.getTemplateDesigner = function()
+WebStudio.Applications.Presentation.prototype.getTemplateDesigner = function()
 {
 	return this.templateDesigner;
 };
 
-WebStudio.Applications.WebDesigner.prototype.onPanelsResize = function()
+WebStudio.Applications.Presentation.prototype.onPanelsResize = function()
 {
 	// tell the page editor to resize all of its colored region overlays
 	if(this.pageEditor)
@@ -914,7 +678,7 @@ WebStudio.Applications.WebDesigner.prototype.onPanelsResize = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.onEndEdit = function()
+WebStudio.Applications.Presentation.prototype.onEndEdit = function()
 {
 	// close all applets
 	var appletIds = this.getAppletIds();
@@ -947,7 +711,7 @@ WebStudio.Applications.WebDesigner.prototype.onEndEdit = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.onSlidersPanelHide = function()
+WebStudio.Applications.Presentation.prototype.onSlidersPanelHide = function()
 {
 	if(this.pageEditor)
 	{
@@ -956,11 +720,21 @@ WebStudio.Applications.WebDesigner.prototype.onSlidersPanelHide = function()
 	}
 };
 
-WebStudio.Applications.WebDesigner.prototype.onSlidersPanelShow = function()
+WebStudio.Applications.Presentation.prototype.onSlidersPanelShow = function()
 {
 	if(this.pageEditor)
 	{
 		this.hidePageEditor();
 		this.showPageEditor();
 	}
+};
+
+WebStudio.Applications.Presentation.prototype.onSelected = function()
+{
+	this.showPageEditor();
+};
+
+WebStudio.Applications.Presentation.prototype.onUnselected = function()
+{
+	this.removePageEditor();
 };

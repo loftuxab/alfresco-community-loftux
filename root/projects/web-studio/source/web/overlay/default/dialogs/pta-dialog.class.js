@@ -176,9 +176,14 @@ WebStudio.PTADialog.prototype.popup = function()
 			draggable: false, 
 			modal: true,
 			visible: false,
-			constraintoviewport: true,
 			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}		
 		};
+
+		if(window.ie)
+		{
+			// HACK to fix an IE issue
+			options["width"] = "640px";
+		}
 
 		this.modal = new YAHOO.widget.Panel("PageTemplateAssociationsPanel", options);
 		

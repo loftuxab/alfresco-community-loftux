@@ -31,7 +31,7 @@
 
 .icon-sites-wiki { 
 	display:block;
-	height:16px;
+	height:22px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/sitestree/wiki-16.png);
 	background-repeat:no-repeat;
@@ -40,7 +40,7 @@
 
 .icon-sites-blog { 
 	display:block;
-	height:16px;
+	height:22px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/sitestree/blog-16.png);
 	background-repeat:no-repeat;
@@ -49,7 +49,7 @@
 
 .icon-sites-discussions { 
 	display:block;
-	height:16px;
+	height:22px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/sitestree/discussion-16.png);
 	background-repeat:no-repeat;
@@ -58,7 +58,7 @@
 
 .icon-sites-doclib { 
 	display:block;
-	height:16px;
+	height:22px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/sitestree/doclib-16.png);
 	background-repeat:no-repeat;
@@ -67,7 +67,7 @@
 
 .icon-sites-calendar { 
 	display:block;
-	height:16px;
+	height:22px;
 	padding-left:20px;
 	background-image:url(<%=rootPath%>/images/trees/sitestree/calendar-16.png);
 	background-repeat:no-repeat;

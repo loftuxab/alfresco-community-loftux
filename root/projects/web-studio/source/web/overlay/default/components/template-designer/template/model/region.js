@@ -10,15 +10,11 @@ WebStudio.Templates.Model.Region.prototype.init = function(parent)
 	
 	// Set up CSS
 	this.setCSS("TemplateRegion");
-	this.setOnMouseOverCSS("RegionOnMouseOver");
-	this.setOnMouseOutCSS("TemplateRegion");
-	
-	this.setTitleCSS("TemplateRegionTitle");	
-	this.setTitleOnMouseOverCSS("TemplateRegionTitleOnMouseOver");	
-	this.setTitleOnMouseOutCSS("TemplateRegionTitle");
-
-	// CSS for menu div.
+	this.setTitleCSS("TemplateRegionTitle");
 	this.setMenuCSS("TemplateRegionMenu");
+	
+	// Set mouseover css	
+	this.setOnMouseOverCSS("TemplateObjectOnMouseOver");
 };
 
 
@@ -136,13 +132,14 @@ WebStudio.Templates.Model.Region.prototype.render = function(container)
 	this.container = container;
 
 	// Create the div element that will contain
-	// the region.
-	var regionDiv = document.createElement('div');
-	regionDiv.setAttribute("id", this.getId());
+	// the region
+	var region = Alf.createElement("div", this.getId());
+	YAHOO.util.Dom.addClass(region, this.getCSS());
+	WebStudio.util.injectInside(container, region);
+	this.setElement(region);
 	
-	// Default CSS class for region div.
-	YAHOO.util.Dom.addClass(regionDiv, this.getCSS());
-	
+	// TODO: figure out the height of the region
+	/*	
 	var regionHeight = null;
 	
 	// If a height was specified on creation of
@@ -160,35 +157,30 @@ WebStudio.Templates.Model.Region.prototype.render = function(container)
 	}
 	
 	// Set the height
-	WebStudio.util.setStyle(regionDiv, "height", regionHeight);	
-	
-	// Add region div to parent container.
-	WebStudio.util.injectInside(container, regionDiv);
-	
-	// Make the region div the root
-	// element for this object.
-	this.setElement(regionDiv);
+	WebStudio.util.setStyle(regionDiv, "height", regionHeight);
+	*/	
 	
 	// title element
-	var titleElement = document.createElement('div');
-	
-	// Set default title css for region.
+	var titleElement = Alf.createElement("div", "region_div_" + this.getId());
 	YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());
+	WebStudio.util.pushHTML(titleElement, "Region: " + this.getTitle());
+	WebStudio.util.injectInside(region, titleElement);
 	
-	// Set ID. This will later be used for mouse over events.
-	titleElement.setAttribute("id", "region_div_" + this.getId());
+	// body div	
+	var bodyElement = Alf.createElement("div", "region_div_body_" + this.getId());
+	YAHOO.util.Dom.addClass(bodyElement, "TemplateRegionBody");
+	WebStudio.util.pushHTML(bodyElement, "&nbsp;&nbsp;");
+	WebStudio.util.injectInside(region, bodyElement);
 	
-	// Set Title text.
-	WebStudio.util.pushHTML(titleElement, "Region Name: " + this.getTitle());
+	// calculate the height of the region
+	var height = jQuery(container).height() - 32;
+	jQuery(region).css( { "height" : height } );		
 	
-	// Add to region div element.
-	WebStudio.util.injectInside(regionDiv, titleElement);
-	
-	// register mouse events for title.
+	// set up events
 	this.setupEvents(titleElement);
-	
-	// register mouse events for root element.
-	this.setupEvents();		
+	this.setupEvents(bodyElement);
+	this.setupEvents();
+		
 };
 
 WebStudio.Templates.Model.Region.prototype.setScope = function(scope)

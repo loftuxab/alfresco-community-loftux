@@ -3,9 +3,10 @@
  * @author Luca Manno (luca@smashup.it) [http://i.smashup.it]
  * 		[Original idea by Nicola Rizzo (thanks!)]
  * 
- * @version 0.4.1
+ * @version 0.5
  * 
  * @changelog
+ * v 0.5	->  Added patch to make it work with Opera (thanks to Peter Siewert), Added callbacks [Feb. 1, 2008]
  * v 0.4.1 	->	Fixed a regression in Chrome and Safari caused by getTransparent [Oct. 1, 2008]
  * v 0.4 	->	Fixed some bugs with transparent color. Now Flip! works on non-white backgrounds | Update: jquery.color.js plugin or jqueryUI still needed :( [Sept. 29, 2008]
  * v 0.3 	->	Now is possibile to define the content after the animation.
@@ -15,27 +16,40 @@
  * 
  */
 (function($) {
-	
-  var getTransparent = function(el){
-  		for(var n=0;n<el.parents().length;n++){
-			var parent = el.parents().get(n);
-			var pBg = $.browser.safari ? $(parent).css("background") : $(parent).css("background-color");
-			if(pBg!='' && pBg!='transparent'){
-				return pBg;
-			}
+var getTransparent, parent, pBg;
+getTransparent = function(el){
+		for(var n=0;n<el.parents().length;n++){
+		parent = el.parents().get(n);
+		pBg = $.browser.safari ? $(parent).css("background") : $(parent).css("background-color");
+		if(pBg!='' && pBg!='transparent'){
+			return pBg;
 		}
-  }
+	}
+}
+
+function int_prop(fx){ 
+	fx.elem.style[ fx.prop ] = parseInt(fx.now) + fx.unit; 
+} 
+jQuery.extend( jQuery.fx.step, {
+  borderTopWidth : int_prop,
+  borderBottomWidth : int_prop,
+  borderLeftWidth: int_prop,
+  borderRightWidth: int_prop
+});
 	
-  jQuery.fn.flip = function(settings){
+jQuery.fn.flip = function(settings){
 	return this.each( function() {
-		var $this = $(this);
-		if($this.data('flipLock')==true){
+		
+		var $this, flipObj, cloneId, dirOptions, _self, newContent;
+		
+		$this = $(this);
+		if($this.data('flipLock')){
 			return false;
 		} else {
-			$this.data('flipLock',true);	
-		}
+			$this.data('flipLock',1);	
+		};
 		
-		var flipObj = {
+		flipObj = {
 			width: $this.width(),
 			height: $this.height(),
 			bgColor: settings.bgColor || $this.css("background-color"),
@@ -46,10 +60,13 @@
 			top: $this.offset().top,
 			left: $this.offset().left,
 			target: settings.content || null,
-			transparent: getTransparent($this) || '#fff'
+			transparent: getTransparent($this) || '#fff',
+			onBefore: settings.onBefore || function(){},
+			onEnd: settings.onEnd || function(){},
+			onAnimation: settings.onAnimation || function(){}			
 		};
 	
-		var cloneId = "flipClone_"+(new Date()).getTime();
+		cloneId = "flipClone_"+(new Date()).getTime();
 		
 		$this
 			.css("visibility","hidden")
@@ -58,7 +75,7 @@
 				.html("")
 				.css({visibility:"visible",position:"absolute",left:flipObj.left,top:flipObj.top,margin:0,zIndex:9999}).attr("id",cloneId);
 	
-		var dirOptions = {
+		dirOptions = {
 			"tb": {
 				"start": {fontSize:'0px',lineHeight:'0px',borderTopWidth:flipObj.height,borderLeftWidth:'0px',borderRightWidth:'0px',borderBottomWidth:'0px',borderTopColor:flipObj.bgColor,borderBottomColor:flipObj.transparent,borderLeftColor:flipObj.transparent,borderRightColor:flipObj.transparent,borderStyle:'solid',height:'0px',width:flipObj.width},
 				"first": {borderTopWidth: '0px',borderLeftWidth: (flipObj.height/100)*15,borderRightWidth: (flipObj.height/100)*15,borderBottomWidth: '0px',borderTopColor: '#999',borderBottomColor: '#999',borderLeftColor: flipObj.transparent,borderRightColor: flipObj.transparent,top: (flipObj.top+(flipObj.height/2)),left: (flipObj.left-(flipObj.height/100)*15)},
@@ -82,19 +99,24 @@
 			}
 		};
 		
-		var _self = $this;
+		_self = $this;
 		
-		var newContent = function(){
+		newContent = function(){
 			var target = flipObj.target;
 			return target && target.jquery ? target.html() : target;
 		}
 		
 		function queue(_this,_self){			
 			_this.queue(function(){
+				flipObj.onBefore();
 				_this.html('').css(dirOptions[flipObj.direction].start);
 				_this.dequeue();
 			});
 			_this.animate(dirOptions[flipObj.direction].first,flipObj.speed);	
+			_this.queue(function(){
+				flipObj.onAnimation();
+				_this.dequeue();
+			});			
 			_this.animate(dirOptions[flipObj.direction].second,flipObj.speed);
 			_this.queue(function(){
 				_self.css({
@@ -104,6 +126,7 @@
 				var nC = newContent();
 				if(nC){_self.html(nC);}
 				_this.remove();
+				flipObj.onEnd();
 				_self.removeData('flipLock');
 				_this.dequeue();
 			});

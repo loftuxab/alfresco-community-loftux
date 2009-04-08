@@ -178,7 +178,18 @@ WebStudio.Applets.Abstract.prototype.bindSliderControl = function(container)
 
 WebStudio.Applets.Abstract.prototype.getApplication = function()
 {
-	return this.app;
+	var theApplication = null;
+	
+	if (this.app)
+	{
+		theApplication = this.app;
+	}
+	else
+	{
+		theApplication = WebStudio.app.getCurrentApplication();
+	}
+	
+	return theApplication;
 };
 
 WebStudio.Applets.Abstract.prototype.getContainer = function()

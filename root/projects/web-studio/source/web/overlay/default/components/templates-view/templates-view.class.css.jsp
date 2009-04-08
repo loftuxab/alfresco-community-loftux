@@ -58,6 +58,10 @@
 
 .TemplateRow
 {
+}
+
+.TemplateRowCell
+{
 	cursor: pointer;
 	
 	font-family:tahoma,arial,helvetica,sans-serif;
@@ -66,28 +70,17 @@
 	font-style:normal;
 	font-variant:normal;
 	font-weight:normal;
-
-	height: 24px; 
-}
-
-.TemplateRow TD:hover
-{
-	text-decoration: underline;
-}
-
-.SelectedTemplateRow
-{
-	cursor: pointer;
 	
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight: bold;
+	border-bottom: 1px solid #CCC; 
+}
 
+.TemplateRowOver
+{
+	background-color: #e9f2fd;
+}
+
+.TemplateRowSelected
+{
 	background-color: #d9e8fb;
-	text-decoration: underline;
-	height: 24px; 
 }
 

@@ -25,7 +25,7 @@
 		overlayTemplate = new StringBuilder();
 
 		// include the template
-		OverlayUtil.include(request, overlayTemplate, "/overlay/default/template/dom.jsp");
+		OverlayUtil.include(request, response, overlayTemplate, "/overlay/default/template/dom.jsp");
 
 		if(!WebStudio.getConfig().isDeveloperMode())
 		{
@@ -260,10 +260,12 @@ WebStudio.onLoad = function()
 				appDescription = appObjectId;
 			}
 		}
+		String appImageUrl = appDescriptor.getImageUrl();
 %>
 	applicationsConfig["<%=appObjectId%>"] = { };
 	applicationsConfig["<%=appObjectId%>"]["title"] = "<%=appTitle%>";
 	applicationsConfig["<%=appObjectId%>"]["description"] = "<%=appDescription%>";
+	applicationsConfig["<%=appObjectId%>"]["imageUrl"] = "<%=appImageUrl%>";
 	applicationsConfig["<%=appObjectId%>"]["classname"] = "<%=appClassName%>";
 	applicationsConfig["<%=appObjectId%>"]["loader"] = { };
 	applicationsConfig["<%=appObjectId%>"]["loader"]["bootstrap"] = { };

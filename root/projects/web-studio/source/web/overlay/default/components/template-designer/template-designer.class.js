@@ -64,11 +64,8 @@ WebStudio.TemplateDesigner.prototype.resize = function()
 	{
 
 		WebStudio.util.setStyle(this.Frame.el, 'left', 0);
-		
 		WebStudio.util.setStyle(this.Frame.el, 'top', 0);		
-
 		WebStudio.util.setStyle(this.Frame.el, 'width', this.injectObject.offsetWidth);
-		
 		WebStudio.util.setStyle(this.Frame.el, 'height', this.injectObject.offsetHeight);		
 	}
 	
@@ -76,12 +73,9 @@ WebStudio.TemplateDesigner.prototype.resize = function()
 	{
 
 		WebStudio.util.setStyle(this.Editor.el, 'left', '7px');		
-		
 		WebStudio.util.setStyle(this.Editor.el, 'top', '7px');		
-		
-		WebStudio.util.setStyle(this.Editor.el, 'width', this.injectObject.offsetWidth - 14);		
-		
-		WebStudio.util.setStyle(this.Editor.el, 'height', this.injectObject.offsetHeight - 14);		
+		WebStudio.util.setStyle(this.Editor.el, 'width', this.injectObject.offsetWidth - 16);		
+		WebStudio.util.setStyle(this.Editor.el, 'height', this.injectObject.offsetHeight - 17);		
 	}
 };
 
