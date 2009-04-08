@@ -27,33 +27,29 @@ WebStudio.Application = function()
 	this.defaultElementsConfig = {
 	
 		FloatingMenuControl: {
-	
 			selector: 'div[id=FloatingMenuControl]',
 			blockSelection: true,
 			objects: {
-				FloatingMenuOptions: {
-					selector: '.FloatingMenuOptions',
-					events: {
-						mouseenter: function() {
-							this.setStyle('text-decoration', 'underline');
-						},
-						mouseleave: function() {
-							this.setStyle('text-decoration', 'none');
-						}
-					}
+				FloatingMenuInfo: {
+					selector: '.FloatingMenuInfo'
 				},
-				FloatingMenuWebProjectId: {
-					selector: '.FloatingMenuWebProjectId'
+				FloatingMenuTitle: {
+					selector: '.FloatingMenuTitle',
+					events: {
+						click: function(e) {
+							e = new Event(e);
+							if(WebStudio.app.currentApplicationId)
+							{
+								WebStudio.app.toggleEdit();
+							}
+							e.stop();
+						}					
+					}
 				},
 				FloatingMenuSandboxId: {
 					selector: '.FloatingMenuSandboxId'
 				}
-			},
-			events: {
-				click: function() {
-					WebStudio.app.toggleEdit();
-				}
-			}			
+			}
 		}
 		,
 		PanelsHolder: {
@@ -74,15 +70,20 @@ WebStudio.Application = function()
 			selector: 'div[id=AlfrescoMessageBoxProgressBar]',
 			remove: true
 		}
+		,
+		FloatingMenuSelector: {
+			selector: 'div[id=FloatingMenuSelector]',
+			blockSelection: true
+		}
     };
 
-	this.editState = 'view'; //'view' or 'edit'
-    this.isHideDockingPanel = false;
-
-	// menu
-	this.activeMenu = null;
-	
+	// the loaded applications container object
 	this.applications = { };
+
+	// set up initial state
+	this.incontextMode = 'view'; //'view' or 'edit'
+    this.isHideDockingPanel = false;
+	this.activeMenu = null;	
 };
 
 WebStudio.Application.prototype = new WebStudio.AbstractTemplater('WebStudio.Application');
@@ -92,7 +93,51 @@ WebStudio.Application.prototype = new WebStudio.AbstractTemplater('WebStudio.App
  */
 WebStudio.Application.prototype.init = function() 
 {
+	var _this = this;
+	
 	this.activate();
+	
+	// set up the floating menu icon
+	var floatingMenuIcon = $('FloatingMenuIcon');
+	floatingMenuIcon.addEvent("click", function(e) {
+		e = new Event(e);
+		WebStudio.app.toggleApplicationSelector();
+		e.stop();		
+	});
+	
+	if(WebStudio.context.getSandboxId())
+	{	
+		this.initApps();
+	}
+};
+
+/**
+ * Begins initialization of applications
+ */
+WebStudio.Application.prototype.initApps = function()
+{
+	var _this = this;
+	
+	if(!this.applicationsBootstrapped)
+	{
+		var postFunction = function()
+		{
+			_this.postInitApps();
+		};
+	
+		this.startApplications(postFunction);
+	}
+};
+
+/**
+ * Called after the application resources have been loaded
+ */
+WebStudio.Application.prototype.postInitApps = function()
+{
+	// selects the default 'preview' application
+	this.selectApplication('preview');
+
+	// other things
 	this.resizeWindow();
 };
 
@@ -129,7 +174,11 @@ WebStudio.Application.prototype.activate = function()
 	else
 	{
 		WebStudio.app.panels.secondPanel.addEvent('scroll', this.onContentScroll.bind(WebStudio.app.panels.secondPanel));	
-	}	
+	}
+	
+	// initial set up of the panels
+	this.panels.minLeftWidth = 230;
+	this.panels.minRightWidth = 400;
 	
 	// updates the floating menu position
 	this.updateFloatingMenu();
@@ -154,12 +203,6 @@ WebStudio.Application.prototype.build = function()
 	{
 		_this.onPanelsResize(fs,sz);
 	};
-	/*
-	with (this.PanelsHolder.el.style) {
-        top = "0px";
-        left = "0px";
-    };
-    */
     
     this.panels.injectObject = this.PanelsHolder.el;
 	this.panels.activate();
@@ -212,24 +255,38 @@ WebStudio.Application.prototype.getApplication = function(id)
 	return this.getApplications()[id];
 };
 
+WebStudio.Application.prototype.getApplicationCount = function()
+{
+	var count = 0;
+
+	for(var appId in this.applicationsConfig)
+	{
+		if(this.applicationsConfig.hasOwnProperty(appId))
+		{
+			count++;
+		}
+	}
+	
+	return count;
+};
+
 WebStudio.Application.prototype.getDefaultApplication = function()
 {
 	return this.getApplication(this.getDefaultApplicationId());
 };
 
+WebStudio.Application.prototype.getCurrentApplication = function()
+{
+	return this.getApplication(this.currentApplicationId);
+};
+
 WebStudio.Application.prototype.getDefaultApplicationId = function()
 {
-	if(!this.defaultApplicationId)
+	if (!this.defaultApplicationId)
 	{
-		for(var appId in this.applications)
-		{
-			if(this.applications.hasOwnProperty(appId))
-			{
-				this.defaultApplicationId = appId;
-				return this.defaultApplicationId;
-			}
-		}
+		this.defaultApplicationId = 'preview';
 	}
+	
 	return this.defaultApplicationId;
 };
 
@@ -238,13 +295,17 @@ WebStudio.Application.prototype.setDefaultApplicationId = function(defaultApplic
 	this.defaultApplicationId = defaultApplicationId;
 };
 
+/**
+ * Called when a user clicks on a new icon in the
+ * applications elector
+ **/
 WebStudio.Application.prototype.selectApplication = function(appId) 
 {
-	if(appId == "off" || !appId)
+	var _this = this;
+	
+	if(!appId)
 	{
-		this.endEdit();
-		this.currentApplicationId = null;
-		return;	
+		appId = "off";
 	}
 	
 	if(this.currentApplicationId && this.currentApplicationId == appId)
@@ -253,138 +314,85 @@ WebStudio.Application.prototype.selectApplication = function(appId)
 		return;
 	}
 	
-	// if there is a current application, hide and remove its old stuff
-	if(this.currentApplicationId)
+	// if we're exiting, let's make sure to switch out of edit mode
+	if(appId == "off" || appId == "preview")
 	{
-		this.hideSlidersPanel();
+		if(this.isEditMode())
+		{
+			this.endEdit();
+		}
+	}	
+	
+	// fire the old application unselected method
+	var oldApplicationId = this.currentApplicationId;	
+	if (oldApplicationId)
+	{
+		var oldApplication = this.applications[oldApplicationId];
+		if (oldApplication && oldApplication.onUnselected)
+		{
+			oldApplication.onUnselected();
+		}
+	}	
+
+	// if there is a current application
+	// make sure all of its overlay pieces are hidden
+	if(this.currentApplicationId && this.isEditMode())
+	{
+		this.panels.hidePanel(true);
 		this.activeMenu.hide();
 		
 		// move old panel to application panel holding space
 		$('ApplicationSplitterPanelHolder').appendChild(this.panels.firstPanel);
 	}
-	
-	// Get the application we seek
-	var application = this.applications[appId];
-	if(!application)
+
+	// exit point for switching to preview/off mode
+	if(appId == "off" || appId == "preview")
 	{
-		alert('no such application');
-		return;
-	}
+		this.currentApplicationId = null;
+		return;	
+	}	
 	
-	// Flip on the application
-	this.slidersSector = application.slidersSector;
-	this.activeMenu = application.getMenu();
-	this.activeMenu.show();
+	// select the application
+	var application = this.applications[appId];	
 	this.currentApplicationId = appId;
 
+	// build the application overlay pieces
+	// but keep them hidden	
+	this.slidersSector = application.slidersSector;
+	this.activeMenu = application.getMenu();
+	this.activeMenu.hide();
+	
 	// move our panel into the splitter
+	// make sure it remains hidden
 	this.panels.firstPanel = application["firstPanel"];
 	$('AlfSplitterContainer').appendChild(this.panels.firstPanel);
-
-	// format panels	
-	this.panels.minLeftWidth = 230;
-	this.panels.minRightWidth = 400;
-	this.panels.setPanelsSize(230);
-	this.panels.firstPanelSize = this.panels.firstPanel.offsetWidth;
+	this.panels.hidePanel(true);	
 	
-	// Resize the panel	
-	this.resizePanel();		
+	// show the menu?
+	var editMode = this.isEditMode();
+	if (editMode)
+	{
+		// show the menu
+		this.activeMenu.show();
 		
-	// Show the panels
-	this.showSlidersPanel();
+		// Set up the panel which was newly mounted
+		this.panels.firstPanelSize = this.panels.minLeftWidth;
+		this.panels.setPanelsSize(this.panels.minLeftWidth);
+		//this.panels.firstPanelSize = this.panels.firstPanel.offsetWidth;
+
+		// Show Panels
+		this.showSlidersPanel();
 	
-	// Resize the panel	
-	this.resizePanel();
+		// Resize the panel	
+		this.resizePanel();		
+	}
 	
 	// fire the application selected method
-	application.onSelected();	
+	application.onSelected();
+	
+	// refresh all of the designers
+	this.onDesignersRefresh();	
 };	
-
-WebStudio.Application.prototype.newMountSelectorItem = function(id, title, imageUrl, selected)
-{
-	var _this = this;
-	
-	var mountSelectorRoot = new Element('div', { 
-		'class': 'MountSelectorRoot',
-		'height': '21px', 
-		'styles': { width: '70px' }
-	});
-	
-	var table = new Element('table', {
-		'height': '21px',
-		'class': 'MountSelectorTable',
-		'cellpadding': '0',
-		'cellspacing': '0'
-	});
-	Alf.injectInside(mountSelectorRoot, table);
-	
-	// ROW
-	var tr = new Element('tr');
-	Alf.injectInside(table, tr);
-	
-	// TD SPACER
-	var td1 = new Element('td', {
-		'width': '3px',
-		'height' : '21px',
-		'class': 'MountSelectorLeft'
-	});
-	Alf.injectInside(tr, td1);
-	
-	// TD IMAGE
-	var td2 = new Element('td', {
-		'class': 'MountSelectorCenter',
-		'height' : '21px',
-		'valign' : 'center',
-		'events': {
-			'click' : function() {
-				_this.onMountSelectorClick(id);
-			}
-		}		
-	});
-	Alf.injectInside(tr, td2);
-	var img = new Element('img', {
-		'src': imageUrl,
-		'border': 0
-	});
-	Alf.injectInside(td2, img);
-	
-	// TD TITLE
-	var td3class = "MountSelectorCenter";
-	if(selected)
-	{
-		td3class = "MountSelectorCenterSelected";
-	}
-	var td3 = new Element('td', {
-		'id': 'mountSelectorItem_' + id,
-		'class': td3class,
-		'height' : '21px',
-		'valign' : 'center',
-		'events': {
-			'click' : function() {
-				_this.onMountSelectorClick(id);
-			}
-		}
-	});
-	td3.setHTML(title);
-	Alf.injectInside(tr, td3);
-	
-	// TD SPACER
-	var td4 = new Element('td', {
-		'width': '3px',
-		'height' : '21px',
-		'class': 'MountSelectorRight'
-	});
-	Alf.injectInside(tr, td4);
-	
-	return mountSelectorRoot;
-};
-
-
-
-
-
-
-
 
 
 
@@ -834,17 +842,9 @@ WebStudio.Application.prototype.startApplications = function(postFunction)
 				onSuccess: function() {
 
 					_this.clearBlockNotify();
-										
-					// we've mounted the applications
-					// select the default application
-					_this.selectApplication(_this.getDefaultApplicationId());
-					
-					// start the editor
-					if(!postFunction)
-					{
-						_this.startEdit();
-					}
-					else
+															
+					// call back
+					if(postFunction)
 					{
 						postFunction();
 					}
@@ -929,7 +929,7 @@ WebStudio.Application.prototype.mountApplications = function(options)
 		if(this.applications.hasOwnProperty(id))
 		{
 			// update notification to the end user
-			this.blockNotify("Mounting Application: " + this.applications[id].title);	
+			this.blockNotify("Loading Application: " + this.applications[id].title);	
 			this.mountApplication(id);
 		}
 	}
@@ -997,32 +997,6 @@ WebStudio.Application.prototype.mountApplication = function(appId)
 		var panel = $(slidersPanelDomId);
 		app.firstPanel = panel;
 		
-		// configure the application's "mount selector" (or app selector)
-		var mountSelector = new Element('div', { 
-			'class': 'MountSelector' 
-		});
-		mountSelector.injectInside(panel);
-		
-		// walk through all applications and inject onto app selector
-		for(var zId in this.applications)
-		{
-			if(this.applications.hasOwnProperty(zId))
-			{
-				var zApp = this.applications[zId];
-				var zAppTitle = app.getTabTitle();
-				var zAppImageUrl = app.getTabImageUrl();
-				
-				var zSelected = false;
-				
-				if(zId == appId) { 
-					zSelected = true; 
-				}
-				 
-				var zApplication = this.newMountSelectorItem(zId, zAppTitle, WebStudio.overlayPath + zAppImageUrl, zSelected);
-				zApplication.injectInside(mountSelector);
-			}
-		}
-		
 		// build the body of the application slider
 		app.slidersSector = new WebStudio.SlidersSector('AlfrescoAppGeneralSlidersSector_' + appId);
 		app.slidersSector.defaultTemplateSelector = 'div[id=' + app.getSlidersSectorTemplateId() + ']';
@@ -1050,33 +1024,28 @@ WebStudio.Application.prototype.mountApplication = function(appId)
  */
  
 /**
+ * Fired when the application designers need to be refreshed
+ */
+WebStudio.Application.prototype.onDesignersRefresh = function()
+{
+	var app = WebStudio.app.getCurrentApplication();
+	if (app)
+	{
+		app.onDesignersRefresh();
+	}
+};
+
+/**
  * Fired when the panels are resized (via the divider)
  */
 WebStudio.Application.prototype.onPanelsResize = function(fs,sz)
 {
-    // Fire to all application event handlers
-    for(var appId in this.applications)
+    var app = this.getCurrentApplication();
+    if (app)
     {
-    	if(this.applications.hasOwnProperty(appId))
-    	{
-	    	var application = this.applications[appId];
-	    	if(application)
-	    	{
-	    		application.onPanelsResize();
-	    	}
-	    }
+    	app.onPanelsResize();
     }
 };
-
-/*
- * Fired when an application mount selector is clicked
- */
-WebStudio.Application.prototype.onMountSelectorClick = function(id)
-{
-	this.selectApplication(id);
-	return this;
-};
-
 
 /**
  * Common error handler for AJAX processes.
@@ -1283,21 +1252,37 @@ WebStudio.Application.prototype._refreshObjects = function(options, onComplete, 
  */
 WebStudio.Application.prototype.updateFloatingMenu = function() 
 {
-	var top = this.getWindowSize().h - 70;
-	var left = 25;
+	var top = this.getWindowSize().h - 60;
+	var left = 20;
+	
+	// if we're in "edit mode", then reposition the floating menu to mount
+	// to the lower left-hand corner
+	if(this.isEditMode())
+	{
+		top = this.getWindowSize().h - 60;
+		left = 20;
+	}
 	
 	this.FloatingMenuControl.el.setStyles({
 		top: top,
 		left: left
 	});
+	
+	var floatingMenuIcon = $('FloatingMenuIcon');	
 		
 	// set up the floating caption
 	this.updateFloatingMenuCaption();
-	
-	var floatingMenuIcon = $('FloatingMenuIcon');
-	
+		
 	// set up the floating icon
-	if(this.editState == 'edit')
+	var iconPath = "/images/floatingmenu/webstudio-preview-64.png";
+	if(this.currentApplicationId)
+	{
+		iconPath = WebStudio.app.applicationsConfig[this.currentApplicationId].imageUrl;
+	}
+	floatingMenuIcon.setStyle("background-repeat", "no-repeat");
+	floatingMenuIcon.setStyle("background-image", "url(" + WebStudio.overlayPath + iconPath +")");
+	
+	if(this.isEditMode())
 	{
 		floatingMenuIcon.removeClass("FloatingMenuIconView");
 		floatingMenuIcon.addClass("FloatingMenuIconEdit");
@@ -1320,7 +1305,7 @@ WebStudio.Application.prototype.updateFloatingMenu = function()
 	// set up some widths (for ie)
 	if(window.ie)
 	{
-		var _w = this.FloatingMenuControl[0].FloatingMenuWebProjectId.el.offsetWidth;
+		var _w = this.FloatingMenuControl[0].FloatingMenuTitle.el.offsetWidth;
 		if(this.FloatingMenuControl[0].FloatingMenuSandboxId.el.offsetWidth > _w)
 		{
 			_w = this.FloatingMenuControl[0].FloatingMenuSandboxId.el.offsetWidth;
@@ -1361,7 +1346,7 @@ WebStudio.Application.prototype.showFloatingMenu = function()
  */
 WebStudio.Application.prototype.toggleEdit = function() 
 {
-	if (this.editState == 'view')
+	if (this.incontextMode == 'view')
 	{
 		this.startEdit();
 	}
@@ -1369,7 +1354,6 @@ WebStudio.Application.prototype.toggleEdit = function()
 	{
 		this.endEdit();
 	}
-	return this;
 };
 
 /**
@@ -1380,33 +1364,45 @@ WebStudio.Application.prototype.startEdit = function()
 {
 	var _this = this;
 	
-	if(!this.applicationsBootstrapped)
+	if (!this.currentApplicationId)
 	{
-		var postFunction = function()
+		return;
+	}
+
+	/**
+	 * Called after the panels slide into place
+	 */	
+	var callback = function()
+	{
+		// show the menu
+		_this.activeMenu.show();
+
+		// set to edit mode
+		_this.incontextMode = 'edit';
+
+		// set up the panels
+		_this.panels.generalLayer.setStyle('margin-top', _this.getTopOffset());
+		_this.panels.setHeight(_this.panels.getHeight() - _this.getTopOffset());		
+		_this.panels.firstPanelSize = _this.panels.minLeftWidth;
+		_this.panels.setPanelsSize(_this.panels.minLeftWidth);
+		_this.onPanelsResize(WebStudio.app.panels.firstPanel.offsetWidth, WebStudio.app.panels.secondPanel.offsetWidth);		
+				
+		// update the floating menu
+		_this.updateFloatingMenu();	
+		
+		// fire the 'start edit' method if available
+		var application = _this.getCurrentApplication();
+		if (application && application.onStartEdit)
 		{
-			_this.startEdit();
-		};
+			application.onStartEdit();
+		}	
+		
+		// refresh designers
+		_this.onDesignersRefresh();
+	};
+
 	
-		this.startApplications(postFunction);
-		return false;
-	}
-
-		
-	this.activeMenu.showFast();
-
-	if (!this.isHideDockingPanel)
-	{
-		this.panels.showPanels();
-	}
-
-	this.panels.generalLayer.setStyle('margin-top', this.getTopOffset());
-	this.panels.setHeight(this.panels.getHeight() - this.getTopOffset());
-	this.editState = 'edit';
-	this.updateFloatingMenu();
-
-	this.onPanelsResize(WebStudio.app.panels.firstPanel.offsetWidth,WebStudio.app.panels.secondPanel.offsetWidth);
-		
-	return this;
+	this.slideInPanels(callback);
 };
 
 /**
@@ -1415,39 +1411,40 @@ WebStudio.Application.prototype.startEdit = function()
  */
 WebStudio.Application.prototype.endEdit = function() 
 {
-	if (!this.isHideDockingPanel) 
+	var _this = this;
+	
+	/**
+	 * Called after the panels slide out of place
+	 */		
+	var callback = function()
 	{
-		this.panels.hidePanel(true);
-	}
-	
-	this.updateFloatingMenuCaption();
-	
-	this.panels.generalLayer.setStyle('margin-top', 0);
-	this.panels.setHeight(this.panels.getHeight() + this.getTopOffset());
-	this.activeMenu.hide();
-	this.editState = 'view';
-	this.resizePanel();
-	this.updateFloatingMenu();
-	this.PanelsHolder.el.style.top = "0px";
+		// hide the menu
+		_this.activeMenu.hide();
 
-    // Fire to all application event handlers
-    for(var appId in this.applications)
-    {
-    	if(this.applications.hasOwnProperty(appId))
-    	{
-	    	var application = this.applications[appId];
-	    	if(application)
-	    	{
-	    		application.onEndEdit();
-	    	}
-	    }
-    }
-
-	this.onPanelsResize(WebStudio.app.panels.firstPanel.offsetWidth, WebStudio.app.panels.secondPanel.offsetWidth);
-	
-	this.activeMenu.addEvent('onHideComplete', 'AlfrescoApplicationHide', this.resizePanel, this);
+		// set to view mode
+		_this.incontextMode = 'view';
 		
-	return this;
+		// set up the panels		
+		_this.panels.generalLayer.setStyle('margin-top', 0);
+		_this.panels.setHeight(_this.panels.getHeight() + _this.getTopOffset());
+		_this.PanelsHolder.el.style.top = "0px";
+		_this.resizePanel();
+			
+		// update floating menu
+		_this.updateFloatingMenu();
+	
+		// fire the 'end edit' method if available
+		var application = _this.getCurrentApplication();
+		if (application && application.onEndEdit)
+		{
+			application.onEndEdit();
+		}	
+		
+		// refresh designers
+		_this.onDesignersRefresh();		
+	};
+	
+	this.slideOutPanels(callback);
 };
 
 /**
@@ -1455,23 +1452,61 @@ WebStudio.Application.prototype.endEdit = function()
  */
 WebStudio.Application.prototype.updateFloatingMenuCaption = function() 
 {
+	// update the web project id
 	var webProjectId = WebStudio.context.getWebProjectId();
-	var sandboxId = WebStudio.context.getSandboxId();
-	
-	this.FloatingMenuControl[0].FloatingMenuWebProjectId.el.setHTML(webProjectId);
-	this.FloatingMenuControl[0].FloatingMenuSandboxId.el.setHTML(sandboxId);
-	
-	var html = "<img src='" + WebStudio.overlayImagesPath + "/arrow-right.gif'/>";
-	html += "Start Editing";
-	
-	if(this.editState == 'edit')
-	{
-		// editor is on
-		html = "<img src='" + WebStudio.overlayImagesPath + "/arrow.gif'/>";
-		html += "Stop Editing";
-	}
+	this.FloatingMenuControl[0].FloatingMenuSandboxId.el.setHTML(webProjectId);
 
-	this.FloatingMenuControl[0].FloatingMenuOptions.el.setHTML(html);
+	// figure out what we're talking about
+	var thing = null;
+	if(this.currentApplicationId == "content")
+	{
+		thing = "Content Editor";
+	}
+	else if(this.currentApplicationId == "surfassemble")
+	{
+		thing = "Page Assembly Tools";
+	}
+	else if(this.currentApplicationId == "surfsite")
+	{
+		thing = "Surf Administrator";
+	}
+		
+	// update the title
+	var title = null;
+	if (thing)
+	{
+		title = "<img src='" + WebStudio.overlayImagesPath + "/dt-arrow-up.png'/>";
+		if(this.isViewMode())
+		{
+			title += "Show " + thing;
+		}
+		else
+		{
+			title += "Hide " + thing;
+		}
+		
+		this.FloatingMenuControl[0].FloatingMenuTitle.el.setStyle("cursor", "pointer");
+		this.FloatingMenuControl[0].FloatingMenuTitle.el.setStyle("color", "#000000");
+		this.FloatingMenuControl[0].FloatingMenuTitle.el.setStyle("cursor", "pointer");
+	}
+	else
+	{
+		title = "Preview";
+		this.FloatingMenuControl[0].FloatingMenuTitle.el.setStyle("color", "#555555");
+	}
+	this.FloatingMenuControl[0].FloatingMenuTitle.el.setHTML(title);
+	
+	// update the info
+	var sandboxId = WebStudio.context.getSandboxId();
+	if(sandboxId)
+	{
+		var infoText = "Staging";
+		if(sandboxId.indexOf("--") > -1)
+		{
+			infoText = "User Sandbox";
+		}
+		this.FloatingMenuControl[0].FloatingMenuInfo.el.setHTML(infoText);
+	}
 };
 
 /**
@@ -1497,18 +1532,12 @@ WebStudio.Application.prototype.hideSlidersPanel = function()
 	this.panels.hidePanel(true);
 	this.isHideDockingPanel = true;
 	
-    // Fire to all application event handlers
-    for(var appId in this.applications)
-    {
-    	if(this.applications.hasOwnProperty(appId))
-    	{
-	    	var application = this.applications[appId];
-	    	if(application)
-	    	{
-	    		application.onSlidersPanelHide();
-	    	}
-	    }
-    }
+	// inform the current application
+	var app = this.getCurrentApplication();
+	if (app)
+	{
+		app.onSlidersPanelHide();
+	}
     
 	// updates the floating menu position
 	this.updateFloatingMenu();
@@ -1524,18 +1553,12 @@ WebStudio.Application.prototype.showSlidersPanel = function()
 	this.panels.showPanels();
 	this.isHideDockingPanel = false;
 
-    // Fire to all application event handlers
-    for(var appId in this.applications)
-    {
-    	if(this.applications.hasOwnProperty(appId))
-    	{
-	    	var application = this.applications[appId];
-	    	if(application)
-	    	{
-	    		application.onSlidersPanelShow();
-	    	}
-	    }
-    }
+	// inform current application
+	var app = this.getCurrentApplication();
+	if (app)
+	{
+		app.onSlidersPanelShow();
+	}
     
     // refresh the floating menu
     this.showFloatingMenu();    
@@ -1566,17 +1589,11 @@ WebStudio.Application.prototype.resizeWindow = function ()
         'height' : this.getWindowSize().h
     });
     
-    // Fire to all application event handlers
-    for(var appId in this.applications)
+    // inform the current application
+    var app = this.getCurrentApplication();
+    if (app)
     {
-    	if(this.applications.hasOwnProperty(appId))
-    	{
-	    	var application = this.applications[appId];
-	    	if(application)
-	    	{
-	    		application.onResizeWindow();
-	    	}
-	    }
+    	app.onResizeWindow();
     }
 };
 
@@ -1587,6 +1604,8 @@ WebStudio.Application.prototype.resizePanel = function()
 
     this.panels.setWidth(w);
 	this.panels.setHeight(h);
+	
+	this.onPanelsResize(WebStudio.app.panels.firstPanel.offsetWidth,WebStudio.app.panels.secondPanel.offsetWidth);
         
     return this;
 };
@@ -1612,6 +1631,8 @@ WebStudio.Application.prototype.blockNotify = function(msg)
 			fixedcenter: true,
 			close: false, 
 			draggable: false,
+			width: 250,
+			height: 0,
 			modal: true,
 			visible: false,
 			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5} 			
@@ -1690,9 +1711,369 @@ WebStudio.Application.prototype.onContentScroll = function(ev)
 	}
 
 	// get the current application
-	var app = WebStudio.app.getApplication("webdesigner");
-	if(app)
+	var app = WebStudio.app.getCurrentApplication();
+	if (app)
 	{
 		app.onContentScroll(left, top);
 	}	
+};
+
+WebStudio.Application.prototype.getApplicationSelector = function()
+{
+	var el = $('FloatingMenuSelector');
+		
+	if(!el)
+	{
+		var floatingMenuControl = $('FloatingMenuControl');
+		
+		// the total number of applications
+		var totalAppCount = WebStudio.app.getApplicationCount() + 1;
+
+		// create the container element
+		el = Alf.createElement("div", "FloatingMenuSelector");
+		Alf.injectInside($(document.body), el);		
+			
+		var html = "<table border='0' cellpadding='0' cellspacing='0'>";
+		html += "<tr>";
+		
+		var buildIconHtml = function(appId, appTitle, appImageUrl)
+		{
+			var imageSize = 56;
+			var cellSize = 60;
+			
+			var _html = "<td width='" + cellSize + "px'>";
+			_html += "<div id='mag_app_" + appId + "' style='height: " + cellSize + "px'>";
+			_html += "<img id='app_" + appId + "' src='" + appImageUrl + "' width='" + imageSize + "px' height='" + imageSize + "px' title='" + appTitle + "' />";
+			_html += "</div>";
+			_html += "</td>";
+		
+			return _html;
+		};
+		
+		// add in applications
+		for(var appId in WebStudio.app.applicationsConfig)
+		{
+			if(WebStudio.app.applicationsConfig.hasOwnProperty(appId))
+			{
+				var appConfig = WebStudio.app.applicationsConfig[appId];
+				
+				var appTitle = appConfig.title;
+				var appDescription = appConfig.description;
+				var appImageUrl = WebStudio.overlayPath + appConfig.imageUrl;
+				
+				html += buildIconHtml(appId, appTitle, appImageUrl);
+			}
+		}
+		
+		// add in the preview item
+		html += buildIconHtml("preview", "Preview", WebStudio.overlayPath + "/images/floatingmenu/webstudio-preview-64.png");
+				
+		html += "</tr>";
+		html += "</table>";
+		
+		el.setHTML(html);
+
+		// move the element into place
+		var floatingMenuIcon = $('FloatingMenuIcon');		
+		el.setStyle('top', floatingMenuIcon.style.top);
+		el.setStyle('left', floatingMenuIcon.style.left);
+				
+		// helper function to init magnifiers
+		var initMagnifier = function(appId, appTitle)
+		{
+			jQuery("#app_" + appId).hoverpulse({
+				size: 20,
+				speed: 400
+			});
+
+			jQuery("#mag_app_" + appId).click(function(e)
+			{
+	   			e = new Event(e);
+	   		
+	   			var selectedAppId = this.id.substring(8);	
+
+   				// hide the application selector
+   				WebStudio.app.hideApplicationSelector();
+
+   				// select the new application
+   				WebStudio.app.selectApplication(selectedAppId);
+   				
+   				// make sure the icon stays hidden
+   				var floatingMenuIcon = $('FloatingMenuIcon');
+   				floatingMenuIcon.setStyles({ display: "none" });
+   				
+   				// update the floating menu
+   				WebStudio.app.updateFloatingMenu();
+	   			
+				e.stop();    			
+	   		});
+		   	
+		   	jQuery("#mag_app_" + appId).mouseover(function(){
+		   		
+		   		// create a text div if it doesn't already exist
+		   		var textDiv = jQuery("#map_app_" + appId + "_text");
+		   		if (textDiv.length === 0)
+		   		{
+		   			var textDivEl = Alf.createElement("div", "map_app_" + appId + "_text");
+		   			Alf.setHTML(textDivEl, appTitle);
+		   			Alf.injectInside($(document.body), textDivEl);
+		   			
+		   			//var left = jQuery(this).offset().left;
+		   			var left = jQuery("#FloatingMenuControl").offset().left;
+		   			var top = jQuery("#FloatingMenuControl").offset().top - 60;
+		   				   			
+		   			textDiv = jQuery(textDivEl);
+		   			textDiv.css({ display : "block" });
+		   			textDiv.css({ position : "absolute" });
+		   			textDiv.css({ left : left });
+		   			textDiv.css({ top : top });	   			
+		   			textDiv.css({ "z-index" : 99999});
+		   			textDiv.css({ "font-size" : "18px" });
+		   			textDiv.css({ "font-family" : "tahoma,verdana,helvetica" });
+		   			textDiv.css({ "font-weight" : "bold" });
+		   		}
+		   	});
+	
+		   	jQuery("#mag_app_" + appId).mouseout(function(){
+		   		
+		   		var textDiv = jQuery("#map_app_" + appId + "_text");
+		   		if (textDiv.length > 0)
+		   		{
+		   			textDiv.remove();
+		   		}
+		   	});
+
+		};
+		
+		// init magnifiers on application selector
+		el.setStyles({ display: "block" });
+		for(var _appId in WebStudio.app.applicationsConfig)
+		{
+			if(WebStudio.app.applicationsConfig.hasOwnProperty(_appId))
+			{
+				var _appDescription = WebStudio.app.applicationsConfig[_appId].description;
+				initMagnifier(_appId, _appDescription);
+			}
+		}	
+		
+		// init the preview magnifier
+		initMagnifier("preview", "Switch to Preview Mode (Off)");
+		el.setStyles({ display: "none" });
+	}
+	
+	return el;
+};
+
+WebStudio.Application.prototype.getApplicationSelectorWidth = function()
+{
+	var totalAppCount = WebStudio.app.getApplicationCount() + 1;
+	return totalAppCount * 60;
+};
+
+WebStudio.Application.prototype.showApplicationSelector = function()
+{
+	// hide the floating menu icon
+	var floatingMenuIcon = $('FloatingMenuIcon');
+	floatingMenuIcon.setStyles({ display: "none" });
+	
+	// get the application selector
+	var appSelector = $('FloatingMenuSelector');
+	
+	// get the floating menu control
+	var floatingMenuControl = $('FloatingMenuControl');
+		
+	// widen the floating menu
+	floatingMenuControl.setStyles({ display: "block" });	
+	var fmChange = new Fx.Style($('FloatingMenuIconSpacer'), 'width', {
+		duration: 300,
+		onComplete: function() {
+		}
+	});
+	fmChange.start(48, this.getApplicationSelectorWidth());
+	
+	// widen the application selector
+	appSelector.setStyles({ width: 0 });
+	appSelector.setStyles({ display: "block" });
+	var asChange = new Fx.Style($(appSelector), 'width', {
+		duration: 300,
+		onComplete: function() {
+
+			// show the application selector
+			appSelector.setStyles({ display: "block" });
+			
+		}
+	});
+	asChange.start(0, this.getApplicationSelectorWidth());
+};
+
+WebStudio.Application.prototype.hideApplicationSelector = function(doUpdateFloatingMenu)
+{
+	// the application selector
+	var appSelector = this.getApplicationSelector();
+
+	// the floating menu icon	
+	var floatingMenuIcon = $('FloatingMenuIcon');
+
+	// helper function to remove magnifiers	
+	var removeMagnifier = function(appId)
+	{
+		jQuery("#mag_app_" + appId).magnifier("destroy");
+	};
+	
+	// hide the application selector
+	appSelector.setStyles({ display: "none" });
+	
+	var totalAppCount = WebStudio.app.getApplicationCount() + 1;
+	
+	// shrink the floating menu
+	var fmChange = new Fx.Style($('FloatingMenuIconSpacer'), 'width', {
+		duration: 300,
+		onComplete: function() {
+		}
+	});
+	fmChange.start(this.getApplicationSelectorWidth(), 48);
+	
+	// shrink the application selector
+	appSelector.setStyles({ display: "block" });
+	var asChange = new Fx.Style($(appSelector), 'width', {
+		duration: 300,
+		onComplete: function() {
+
+			// hide the application selector
+			appSelector.setStyles({ display: "none" });
+			
+			// show the floating menu icon
+			floatingMenuIcon.setStyles({ display: "block" });					
+		}
+	});
+	asChange.start(this.getApplicationSelectorWidth(), 0);
+	
+};
+
+WebStudio.Application.prototype.toggleApplicationSelector = function()
+{
+	var el = this.getApplicationSelector();
+	
+	if(el.style.display == "block")
+	{
+		// hide it
+		this.hideApplicationSelector();
+	}
+	else
+	{
+		// show it
+		this.showApplicationSelector();
+	}
+};
+
+WebStudio.Application.prototype.isEditMode = function()
+{
+	return (this.incontextMode == 'edit');
+};
+
+WebStudio.Application.prototype.isViewMode = function()
+{
+	return (this.incontextMode == 'view');
+};
+
+
+WebStudio.Application.prototype.slideInPanels = function (callback) 
+{
+	var _this = this;
+	
+	var cb = function()
+	{
+		_this.showSlidersPanel();		
+		_this.onPanelsResize();
+		
+		callback();
+	};
+	
+	_this.hideSlidersPanel();
+	
+	jQuery(this.panels.firstPanel).animate({ 
+		width: this.panels.firstPanelSize 
+	}, 300, "swing", cb);
+};
+
+WebStudio.Application.prototype.slideOutPanels = function (callback) 
+{
+	var _this = this;
+	
+	var cb = function()
+	{
+		_this.hideSlidersPanel();
+
+		_this.onPanelsResize();
+		
+		callback();
+	};
+	
+	_this.showSlidersPanel();
+	
+	jQuery(this.panels.firstPanel).animate({ 
+		width: 0 
+	}, 300, "swing", cb);	
+};
+
+WebStudio.Application.prototype.getMenuHeight = function()
+{
+	var height = 0;
+	
+	if (this.isEditMode())
+	{
+		height = $('AlfMenuTemplate').offsetHeight;
+	}
+	
+	return height;
+};
+
+
+
+
+
+
+
+/**
+ TO BE REMOVED
+ **/
+ 
+WebStudio.Application.prototype.showContentTypeAssociationsDialog = function()
+{
+	// show the cta control
+	if(!this.ctaDialog)
+	{
+		this.ctaDialog = new WebStudio.CTADialog();
+	
+		// activate and pop up
+		this.ctaDialog.activate();
+	}
+	
+	this.ctaDialog.popup();
+};
+
+WebStudio.Application.prototype.showTemplateAssociationsDialog = function()
+{
+	// show the pta control
+	if(!this.ptaDialog)
+	{
+		this.ptaDialog = new WebStudio.PTADialog();
+	
+		// activate and pop up
+		this.ptaDialog.activate();
+	}
+	
+	this.ptaDialog.popup();
+};
+
+WebStudio.Application.prototype.GoToTemplateDisplay = function(templateId)
+{
+	// switch to the "surfsite" app
+	this.selectApplication("surfsite");
+	
+	// get the current app
+	var app = this.getCurrentApplication();
+	
+	// go to the template display
+	app.GoToTemplateDisplay(templateId);
 };

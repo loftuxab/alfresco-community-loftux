@@ -197,13 +197,13 @@
 		<div id="AlfrescoForm" class="alf-form yui-skin-sam" height="600px">
 			<div class="alf-form-caption"></div>
 			<div class="alf-form-body">
-				<table border="0" cellpadding="0" cellspacing="0" width="100%">
+				<table border="0" cellpadding="0" cellspacing="0">
 					<tr>
 						<td align="left" valign="top" class="alf-form-body-content" nowrap>
 							<table id="AlfFormFieldText" width="100%" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
-										<td class="alf-form-label" valign="top" align="left" nowrap></td>
+										<td class="alf-form-label" valign="top" align="left"></td>
 										<td class="alf-form-field-container" align="left">
 											<input type="text" class="alf-form-field"/>
 										</td>
@@ -213,7 +213,7 @@
 							<table id="AlfFormFieldTextArea" width="100%" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
-										<td class="alf-form-label" valign="top" align="left" nowrap></td>
+										<td class="alf-form-label" valign="top" align="left"></td>
 										<td class="alf-form-field-container" align="left">
 											<textarea class="alf-form-field"></textarea>
 										</td>
@@ -224,14 +224,14 @@
 								<tbody>
 									<tr class="alf-form-row" align="left">
 										<td class="alf-form-label" valign="top" align="left" nowrap></td>
-										<td class="alf-form-field-container" align="left"></td>
+										<td class="alf-form-field-container" align="left" nowrap></td>
 									</tr>
 								</tbody>
 							</table>
 							<table id="AlfFormRadio" width="100%" cellpadding="0" cellspacing="0" align="left">
 								<tbody>
 									<tr class="alf-form-row" align="left">
-										<td class="alf-form-label" valign="top" align="left" nowrap></td>
+										<td class="alf-form-label" valign="top" align="left"></td>
 										<td class="alf-form-field-container" align="left"></td>
 									</tr>
 								</tbody>
@@ -260,32 +260,27 @@
 		<div id="FloatingMenuControl">
 			<table width="100%" height="100%" cellpadding="0" cellspacing="0" border="0">
 				<tr>
-					<td width="48px" style="border-bottom: 1px white solid; border-top: 1px white solid; border-left: 1px white solid">
-						<img src="<%=rootPath%>/images/spacer.gif" width="48px" />
+					<td style="border-bottom: 1px white solid; border-top: 1px white solid; border-left: 1px white solid">
+						<img id="FloatingMenuIconSpacer" src="<%=rootPath%>/images/spacer.gif" width="48px" />
 					</td>
-					<td width="100%" valign="top" style="padding-left: 3px; padding-top: 1px; padding-right: 1px; border-right: 1px white solid; border-bottom: 1px white solid; border-top: 1px white solid" valign="top" align="left">
-					
+					<td width="100%" valign="top" style="padding-left: 3px; padding-top: 1px; padding-right: 1px; border-right: 1px white solid; border-bottom: 1px white solid; border-top: 1px white solid" valign="top" align="left">					
 						<table width="100%" cellpadding="1" cellspacing="0">
 							<tr>
-								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px" nowrap>
-									<span class="FloatingMenuOptions">
-										<img src="<%=rootPath%>/images/arrow-right.gif">
-										Options
-									</span>
+								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
+									<span class="FloatingMenuTitle"></span>
 								</td>
-							</tr>
+							</tr>						
 							<tr>
 								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
-									<span class="FloatingMenuWebProjectId"></span>
+									<span class="FloatingMenuSandboxId"></span>
 								</td>
 							</tr>
 							<tr>
 								<td width="100%" style="padding-bottom: 1px">
-									<span class="FloatingMenuSandboxId"></span>
+									<span class="FloatingMenuInfo"></span>
 								</td>
 							</tr>
-						</table>
-						
+						</table>						
 					</td>
 				</tr>
 			</table>
@@ -361,77 +356,26 @@
 		</div>
 	</div>
 
-
 	<!-- Sliders Sector Template -->
 	<div id="AlfrescoSlidersSectorTemplate"></div>
 	
-	<!-- Holds Application Panels -->
+	<!-- Application Panels -->
 	<div id="ApplicationSplitterPanelHolder" style="width : 100%; height : 100%; overflow : hidden;">
-		<div id="SurfaceSplitterPanel" style="position : absolute; top : 0px; overflow : hidden; height : 100%"> </div>
-		<div id="ContentSplitterPanel" style="position : absolute; top : 0px; overflow : hidden; height : 100%"> </div>
-		<div id="AdminSplitterPanel" style="position : absolute; top : 0px; overflow : hidden; height : 100%"> </div>
+		<div id="SurfSiteApplication_SplitterPanel" style="position : absolute; top : 0px; overflow : hidden; height : 100%"> </div>
+		<div id="SurfAssembleApplication_SplitterPanel" style="position : absolute; top : 0px; overflow : hidden; height : 100%"> </div>
+		<div id="ContentApplication_SplitterPanel" style="position : absolute; top : 0px; overflow : hidden; height : 100%"> </div>
 	</div>
-	
-	<!-- Application: Surface -->
-	<div id="SurfaceSlidersSectorTemplate">
 
-		<!-- Dashboards -->
-		<div id="SurfaceDashboardsSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
+	<!-- Application: Surf Site -->
+	<div id="SurfSiteApplication_SlidersSectorTemplate">
 
-		<!-- Search -->
-		<!--
-		<div id="SurfaceSearchSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-		-->
-
-		<!-- Components -->
-		<div id="SurfaceComponentsSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-
-		<!-- Templates -->
-		<div id="SurfaceTemplatesSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-
-		<!-- Navigation -->
-		<div id="SurfaceNavigationSlider" class="ASSSlider">
+		<!-- Applet: Navigation -->
+		<div id="NavigationApplet_Slider" class="ASSSlider">
 			<div class="ASSSliderDropper">&nbsp;</div>
 			<div class="ASSSliderContent">
 				<div class="ASSSliderHeader">
 					<div class="ASSToggleImage">&nbsp;</div>
-					<div class="ASSHeaderTitle">Generic Slider Header</div>
+					<div class="ASSHeaderTitle"></div>
 				</div>
 				<div class="ASSSliderData">
 					<div class="ASSNavigation"></div>
@@ -439,20 +383,8 @@
 			</div>
 		</div>
 		
-		<!-- Spaces -->
-		<div id="ContentSpacesSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-
-		<!-- Sites -->
-		<div id="ContentSitesSlider" class="ASSSlider">
+		<!-- Applet: Templates -->
+		<div id="TemplatesApplet_Slider" class="ASSSlider">
 			<div class="ASSSliderDropper">&nbsp;</div>
 			<div class="ASSSliderContent">
 				<div class="ASSSliderHeader">
@@ -463,14 +395,166 @@
 			</div>
 		</div>		
 		
+		<!-- Applet: Components -->
+		<div id="ComponentsApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>		
+
+		<!-- Applet: Content Associations -->
+		<div id="ContentAssociationsApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+		
+		<!-- Applet: Sandbox -->
+		<div id="SandboxApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>		
+		
+		<!-- Applet: Search -->
+		<!--
+		<div id="SearchApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+		-->		
+		
 	</div>
 	
+	<!-- Application: Surf Assemble Application -->
+	<div id="SurfAssembleApplication_SlidersSectorTemplate">
+
+		<!-- Applet: Web Content -->
+		<div id="WebContentApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+		
+		<!-- Applet: Images -->
+		<div id="ImagesApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+
+		<!-- Applet: Videos -->
+		<div id="VideosApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+				
+		<!-- Applet: Spaces -->
+		<div id="SpacesApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+
+		<!-- Applet: Sites -->
+		<div id="SitesApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>		
+		
+		<!-- Applet: Sandbox -->
+		<div id="SandboxApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>				
+		
+		<!-- Applet: Search -->
+		<!--
+		<div id="SearchApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>
+		-->		
+		
+	</div>
 	
 	<!-- Application: Content -->
-	<div id="ContentSlidersSectorTemplate">
-
-		<!-- Dashboards -->
-		<div id="ContentDashboardsSlider" class="ASSSlider">
+	<div id="ContentApplication_SlidersSectorTemplate">
+		
+		<!-- Applet: Web Forms -->
+		<div id="WebFormsApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>		
+		
+		<!-- Applet: Images -->
+		<div id="ImagesApplet_Slider" class="ASSSlider">
 			<div class="ASSSliderDropper">&nbsp;</div>
 			<div class="ASSSliderContent">
 				<div class="ASSSliderHeader">
@@ -481,8 +565,8 @@
 			</div>
 		</div>
 
-		<!-- Search -->
-		<div id="ContentSearchSlider" class="ASSSlider">
+		<!-- Applet: Videos -->
+		<div id="VideosApplet_Slider" class="ASSSlider">
 			<div class="ASSSliderDropper">&nbsp;</div>
 			<div class="ASSSliderContent">
 				<div class="ASSSliderHeader">
@@ -492,9 +576,22 @@
 				<div class="ASSSliderData"></div>
 			</div>
 		</div>
-
-		<!-- Web Content -->
-		<div id="ContentWebContentSlider" class="ASSSlider">
+				
+		<!-- Applet: Sandbox -->
+		<div id="SandboxApplet_Slider" class="ASSSlider">
+			<div class="ASSSliderDropper">&nbsp;</div>
+			<div class="ASSSliderContent">
+				<div class="ASSSliderHeader">
+	  					<div class="ASSToggleImage">&nbsp;</div>
+	  					<div class="ASSHeaderTitle"></div>
+				</div>
+				<div class="ASSSliderData"></div>
+			</div>
+		</div>				
+		
+		<!-- Applet: Search -->
+		<!--
+		<div id="SearchApplet_Slider" class="ASSSlider">
 			<div class="ASSSliderDropper">&nbsp;</div>
 			<div class="ASSSliderContent">
 				<div class="ASSSliderHeader">
@@ -504,63 +601,10 @@
 				<div class="ASSSliderData"></div>
 			</div>
 		</div>
+		-->			
 
 	</div>
 	
-	<!-- Application: Admin -->
-	<div id="AdminSlidersSectorTemplate">
-
-		<!-- Dashboards -->
-		<div id="AdminDashboardsSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-
-		<!-- Search -->
-		<div id="AdminSearchSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-
-		<!-- Web Content -->
-		<div id="AdminWebContentSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-
-		<!-- Site Administrator -->
-		<div id="AdminSiteAdministratorSlider" class="ASSSlider">
-			<div class="ASSSliderDropper">&nbsp;</div>
-			<div class="ASSSliderContent">
-				<div class="ASSSliderHeader">
-	  					<div class="ASSToggleImage">&nbsp;</div>
-	  					<div class="ASSHeaderTitle"></div>
-				</div>
-				<div class="ASSSliderData"></div>
-			</div>
-		</div>
-	</div>
-
-
-
 	<!-- Window Template -->
 	<div id="AlfrescoWindowTemplate" class="Active alf-window">
 
@@ -658,8 +702,6 @@
 	<!-- Control Templates -->
 	<div id="AlfrescoTemplatesViewTemplate" class="AlfrescoTemplatesView">
         <div id="ALVMenu"></div>
-        <div id="ALVNetwork"></div>	
-        <div height="16px">&nbsp;</div>
 		<div id="ALVInstances"></div>				
 	</div>
 	<div id="AlfrescoSearchViewTemplate">
@@ -788,6 +830,26 @@
 	<div id="AlfrescoTreeViewSpacesTemplate" class="AlfrescoTreeView">
 		<div id="ATVTreeSpaces"></div>
 	</div>
+	<div id="AlfrescoContentViewTemplate" class="AlfrescoContentView">
+		<div id="ACVMenu"></div>
+		<div id="ACVMenuTemplate" class="AMHorizontalHolder">
+			<div class="AMRoot">
+				<table height="21" cellpadding="0" cellspacing="0" border="0">
+					<tr>
+						<td width="1px;" class="AMItemLeft">&nbsp;</td>
+						<td class="AMItemCenter" valign="middle">
+						   <img src="<%=rootPath%>/images/buttons/add.gif" style="padding-right: 2px">
+						</td>
+						<td class="AMItemCenter" valign="middle" style="font-size:10px">Preview</td>
+						<td width="1px;" class="AMItemRight">&nbsp;</td>
+				    </tr>
+				</table>
+			</div>
+		</div>
+		<div id="ACVBody" class="scrollBody">
+			<div class="scrollContainer"></div>
+		</div>				
+	</div>
 
 		
 	<!--  Alfresco Template Designer Template -->
@@ -808,6 +870,13 @@
 	<div id="AlfrescoSiteAdministratorViewTemplate">
 		<div id="ASABody"></div>
 	</div>
+
+	<!--  Page Blocker -->
+	<div id="_AlfrescoPageBlocker">
+		<div id="_AlfrescoPageBlockerFrame" class="AlfrescoPageBlockerFrame"></div>
+		<div id="_AlfrescoPageBlockerEditor" class="AlfrescoPageBlockerEditor"></div>
+	</div>
+
 	
 	
 	<!--  LOGIN DIALOG -->
@@ -833,7 +902,7 @@
 					</div>
 					<div style="padding-top:32px">
 						<span class="login-copyright">
-							&copy; 2005-2008 Alfresco Software Inc. All rights reserved.
+							&copy; 2005-2009 Alfresco Software Inc. All rights reserved.
 						</span>
 					</div>
 				</fieldset>
@@ -932,7 +1001,7 @@
 					</div>
 					<div style="padding-top:4px">
 						<span class="sandbox-copyright">
-							&copy; 2005-2008 Alfresco Software Inc. All rights reserved.
+							&copy; 2005-2009 Alfresco Software Inc. All rights reserved.
 						</span>
 					</div>
 				</fieldset>

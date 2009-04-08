@@ -10,7 +10,7 @@ WebStudio.Splitter = function()
 
 	this.defaultTemplateSelector = "div[id=AlfSplitterTemplate]";
 
-	this.dividerSize = 10;
+	this.dividerSize = 8;
 	this.minLeftWidth = 0;
 	this.minRightWidth = 0;
 
@@ -87,7 +87,7 @@ WebStudio.Splitter.prototype.attachPanels = function()
 	this.divider.setStyle('width', this.dividerSize);
 
 	// move the second panel down 3 for formatting purposes
-	// TODO: do the other panels need tos lide down as well?
+	// TODO: do the other panels need to slide down as well?
 	this.secondPanel.setStyles({
 		top : 3,
 		left : (initialWidth + this.dividerSize),

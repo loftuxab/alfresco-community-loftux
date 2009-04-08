@@ -17,7 +17,7 @@ WebStudio.Applets.Sites.prototype.getDependenciesConfig = function()
 
 WebStudio.Applets.Sites.prototype.getTemplateDomId = function()
 {
-	return "ContentSitesSlider";
+	return "SitesApplet_Slider";
 };
 
 WebStudio.Applets.Sites.prototype.bindSliderControl = function(container) 
@@ -35,7 +35,11 @@ WebStudio.Applets.Sites.prototype.bindSliderControl = function(container)
 			TreeHolder: {
 				selector: 'div[id=ATVTreeSites]'
 			}
-		};					
+		};	
+		treeView.draggable = true;
+		treeView.draggableScope = 'region';
+		treeView.draggableType = "sites";
+		treeView.nodeToBindingDescriptor = this.nodeToBindingDescriptor;			
 		treeView.activate();
 		
 		var rootNode = new YAHOO.widget.TextNode({id:'root', label: 'Sites', nodeID: 'root', innerNodesSlyle: 'icon-sites-folder', path: ''}, treeView.getRoot(), false);
@@ -43,10 +47,6 @@ WebStudio.Applets.Sites.prototype.bindSliderControl = function(container)
 		treeView.setDynamicLoad(this.loadData.bind(treeView));
 		treeView.draw();
 		treeView.addNodeLink('root', rootNode);
-			
-		// add the application treeview drop handler
-		treeView.dropFromTreeView = this.getApplication().dropFromTreeView.bind(this.getApplication());
-				
 				
 		// set up 'expand' listener
 		treeView.tree.subscribe("expandComplete", function(node) 
@@ -195,8 +195,27 @@ WebStudio.Applets.Sites.prototype.nodeDoubleClickHandler = function(e)
 
 WebStudio.Applets.Sites.prototype.bindPageEditor = function(pageEditor)
 {
+	/*
 	if(this.treeView)
 	{
 		this.treeView.setDroppables(pageEditor.tabs);
 	}
+	*/
+};
+
+WebStudio.Applets.Sites.prototype.nodeToBindingDescriptor = function(node)
+{
+	var binding = {
+		sourceType : "site",
+		sourceEndpoint : "alfresco",
+		sourcePath : node.data.path,
+		sourceMimetype : node.data.mimetype,
+		sourceAlfType : node.data.alfType,
+		sourceCmType : node.data.cmType,
+		sourceNodeRef : node.data.nodeRef,
+		sourceNodeId : node.data.nodeId,
+		sourceIsContainer : !node.data.leaf	 
+	};
+
+	return binding;
 };

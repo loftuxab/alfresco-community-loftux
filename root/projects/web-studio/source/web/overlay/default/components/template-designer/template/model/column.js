@@ -10,15 +10,11 @@ WebStudio.Templates.Model.Column.prototype.init = function(parent)
 	
 	// Set up CSS
 	this.setCSS("TemplateTableColumn");
-	this.setOnMouseOverCSS("ColumnOnMouseOver");
-	this.setOnMouseOutCSS("TemplateTableColumn");
+	this.setTitleCSS("TemplateColumnTitle");
+	this.setMenuCSS("TemplateColumnMenu");
 	
-	this.setTitleCSS("TemplateColumnTitle");	
-	this.setTitleOnMouseOverCSS("TemplateColumnTitleOnMouseOver");	
-	this.setTitleOnMouseOutCSS("TemplateColumnTitle");
-	
-	// CSS for menu div.
-	this.setMenuCSS("TemplateColumnMenu");	
+	// Mouseover CSS
+	this.setOnMouseOverCSS("TemplateObjectOnMouseOver");
 };
 
 
@@ -195,58 +191,61 @@ WebStudio.Templates.Model.Column.prototype.addTemplateRegion = function(eventTyp
  * Renders the template to a given container
  */
 WebStudio.Templates.Model.Column.prototype.render = function(container)
-{
-	
-	// Parent container.
+{	
 	this.container = container;
 
-	// Create TD that will contain root Div element.
-	var td = document.createElement('td');	
-	td.setAttribute("id", this.getId());		
-	
-	// If a width was specified on creation
-	// of column, let's set it here.
-	if(this.getWidth())
-	{
-		WebStudio.util.setStyle(td, "width", this.getWidth() + "%");
+	// column (set as root element)
+	var column = Alf.createElement('div', this.getId());
+	YAHOO.util.Dom.addClass(column, this.getCSS());
+    WebStudio.util.injectInside(this.container, column);
+    this.setElement(column);
+    
+    // calculate the width of the column
+    var width = (jQuery(container).width() / this.getTotalChildCount());
+    width = width - 16;  
+	width = Math.floor(width);
+    jQuery(column).css( { "width" : width } );
+    
+    if (this.getTotalChildCount() > 1)
+    {
+    	jQuery(column).css( { "float" : "left" } );    
+	    if (this.getSequenceNumber() == this.getTotalChildCount())
+	    {
+	    	jQuery(column).css( { "float" : "right" } );
+	    }
 	}
-
-	// Add TD to parent container.
-	WebStudio.util.injectInside(this.container, td);	
 	
-	// Div element that represents column object.
-	var columnDiv = document.createElement('div');
-	columnDiv.setAttribute("id", "col_div_" + this.getId());
-	YAHOO.util.Dom.addClass(columnDiv, this.getCSS());	
-	WebStudio.util.setStyle(columnDiv, "height", "93%");
+	// calculate the height of the column
+	var height = jQuery(container).height() - 32;
+	jQuery(column).css( { "height" : height } );
 	
-	// Set this element as the root
-	// element for this column object.
-	this.setElement(columnDiv);
-		
-	// Add to the TD
-	WebStudio.util.injectInside(td, columnDiv);
-	
-	// Setup mouse events
-	this.setupEvents(columnDiv);
-	
-	// Div element that will represent column title.
-	var titleElement = document.createElement('div');
-	YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());	
-	titleElement.setAttribute("id", "column_div_" + this.getId());	
+	// title div
+	var titleElement = Alf.createElement("div", "column_div_" + this.getId());
+    YAHOO.util.Dom.addClass(titleElement, this.getTitleCSS());
 	WebStudio.util.pushHTML(titleElement, "Column: " + this.getSequenceNumber());
-	
-	// Add column div.
-	WebStudio.util.injectInside(columnDiv, titleElement);	
+    WebStudio.util.injectInside(column, titleElement);	
 
-	// register mouse events
+	// body div	
+	var bodyElement = Alf.createElement("div", "column_div_body_" + this.getId());
+	YAHOO.util.Dom.addClass(bodyElement, "TemplateTableColumnBody");
+	WebStudio.util.injectInside(column, bodyElement);
+
+	// set up events
 	this.setupEvents(titleElement);
-	
+	this.setupEvents(bodyElement);
+	this.setupEvents();		
+		
+	// render the columns        
 	if (this.getChildCount() > 0)
 	{		
 		// render child objects
-		this.renderChildren(columnDiv);
+		this.renderChildren(bodyElement);
 	} 
+	else 
+	{	
+		// To ensure that the entire template region is active
+		WebStudio.util.pushHTML(bodyElement, "&nbsp;&nbsp;");	
+	}
 };
 
 

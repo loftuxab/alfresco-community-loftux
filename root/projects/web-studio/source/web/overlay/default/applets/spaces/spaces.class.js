@@ -3,7 +3,7 @@ WebStudio.Applets.Spaces = WebStudio.Applets.Abstract.extend({});
 WebStudio.Applets.Spaces.prototype.getDependenciesConfig = function()
 {
 	return {
-		"webcomponents" : {
+		"spaces" : {
 			"title" : "applet dependencies",
 			"loader" : {
 				"CSS" : {
@@ -17,7 +17,7 @@ WebStudio.Applets.Spaces.prototype.getDependenciesConfig = function()
 
 WebStudio.Applets.Spaces.prototype.getTemplateDomId = function()
 {
-	return "ContentSpacesSlider";
+	return "SpacesApplet_Slider";
 };
 
 WebStudio.Applets.Spaces.prototype.bindSliderControl = function(container) 
@@ -35,7 +35,11 @@ WebStudio.Applets.Spaces.prototype.bindSliderControl = function(container)
 			TreeHolder: {
 				selector: 'div[id=ATVTreeSpaces]'
 			}
-		};					
+		};				
+		this.treeView.draggable = true;
+		this.treeView.draggableScope = 'region';
+		this.treeView.draggableType = "spaces";
+		this.treeView.nodeToBindingDescriptor = this.nodeToBindingDescriptor;			
 		this.treeView.activate();
 		
 		_treeView = this.treeView;
@@ -66,10 +70,7 @@ WebStudio.Applets.Spaces.prototype.bindSliderControl = function(container)
 					childDiv.ondblclick = this.nodeDoubleClickHandler.bind(childNode);
 				}
 			}
-		});
-		
-		// add the application treeview drop handler
-		this.treeView.dropFromTreeView = this.getApplication().dropFromTreeView.bind(this.getApplication());		
+		});		
 	}
 		
 	return this.treeView;
@@ -187,8 +188,27 @@ WebStudio.Applets.Spaces.prototype.nodeDoubleClickHandler = function(e)
 
 WebStudio.Applets.Spaces.prototype.bindPageEditor = function(pageEditor)
 {
+	/*
 	if(this.treeView)
 	{
 		this.treeView.setDroppables(pageEditor.tabs);
 	}
+	*/
+};
+
+WebStudio.Applets.Spaces.prototype.nodeToBindingDescriptor = function(node)
+{
+	var binding = {
+		sourceType : "space",
+		sourceEndpoint : "alfresco",
+		sourcePath : node.data.path,
+		sourceMimetype : node.data.mimetype,
+		sourceAlfType : node.data.alfType,
+		sourceCmType : node.data.cmType,
+		sourceNodeRef : node.data.nodeRef,
+		sourceNodeId : node.data.nodeId,
+		sourceIsContainer : !node.data.leaf	 
+	};
+
+	return binding;
 };

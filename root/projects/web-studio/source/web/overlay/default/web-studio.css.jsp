@@ -529,3 +529,34 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
 {
 	padding: 2px;
 }
+
+
+.AlfrescoPageBlockerFrame
+{
+	display: none;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: gray;
+}
+
+.AlfrescoPageBlockerEditor
+{
+	display: none;
+	position: absolute;
+	border: 1px black solid;
+	overflow: hidden;
+	background-color: #ffffff;
+	background-image: url('<%=imagesPath%>/AlfrescoFadedBG.png');
+	background-repeat: no-repeat;
+	background-attachment:fixed;
+	background-position: 0px 0px;	
+}
+
+.draggable
+{
+}
+
+.DropZoneRegion
+{
+}

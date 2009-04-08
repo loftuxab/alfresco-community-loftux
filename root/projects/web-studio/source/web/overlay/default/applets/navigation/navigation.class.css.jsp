@@ -10,6 +10,7 @@
 	background-image:url(<%=rootPath%>/images/trees/navtree/rootnode.gif);
 	background-repeat:no-repeat;
 	background-position:2px 0px;
+	vertical-align: middle;
 }
 
 .icon-navigation-node 
@@ -20,4 +21,5 @@
 	background-image:url(<%=rootPath%>/images/trees/navtree/node.gif);
 	background-repeat:no-repeat;
 	background-position:2px 0px;
+	vertical-align: middle;
 }

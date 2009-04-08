@@ -835,3 +835,180 @@ WebStudio.components = WebStudio.components ||
 		return config;	
 	}	
 };
+
+/**
+ * WebStudio top-level dd namespace
+ *
+ * @namespace WebStudio
+ * @class WebStudio.dd
+ */
+WebStudio.dd = WebStudio.dd ||
+{
+	register: function(options)
+	{
+		if (!this.draggables)
+		{
+			this.draggables = { };
+		}
+		
+		var id = "dd" + this.counter();
+		options["ddId"] = id;
+		
+		this.draggables[id] = options;
+		
+		return id;
+	}
+	,
+	get: function(id)
+	{
+		if (!this.draggables)
+		{
+			this.draggables = { };
+		}
+		
+		return this.draggables[id];
+	}
+	,
+	unregister: function(id)
+	{
+		this.draggables[id] = null;
+	}
+	,
+	counter: function()
+	{
+		if (!this.ddCounter)
+		{
+			this.ddCounter = 0;
+		}
+		
+		this.ddCounter++;
+		
+		return this.ddCounter;
+	}
+	,
+	makeDraggable: function(el, scope, options, imgUrl)
+	{
+		// fail out if this element is already draggable
+		if (el.hasClass("ui-draggable"))
+		{
+			return;
+		}
+	
+		jQuery(el).draggable({
+			helper: function() {
+			
+				var clone = null;
+				
+				if (imgUrl)
+				{
+					// set up the div
+					var div = document.createElement("div");
+					div.injectInside(document.body);
+					
+					// set up image in the div
+					var img = document.createElement("img");
+					img.src = imgUrl;
+					img.injectInside(div);		
+					
+					// get the image height and width
+					var height = jQuery(img).height();
+					var width = jQuery(img).width();
+					
+					// set the css on to the div
+					jQuery(div).css( {'width': width });	
+					jQuery(div).css( {'height': height });
+					
+					clone = jQuery(div)[0];				
+				}
+				
+				if (!clone)
+				{
+					clone = jQuery(this).clone()[0];
+				}
+				
+				jQuery(clone).css( {'opacity': 0.7} );
+				jQuery(clone).css( {'position': 'absolute' });
+				jQuery(clone).css( {'z-index': 10 });
+				jQuery(clone).addClass('DragClone');
+				
+				// ensure the width and height satisfy minimum values
+				var _width = jQuery(clone).width();
+				if (_width < 200)
+				{
+					_width = 200;
+					jQuery(clone).css( {'width': _width });
+				}
+				var _height = jQuery(clone).height();
+				if (_height < 24)
+				{
+					_height = 24;
+					jQuery(clone).css( {'height': _height });
+				}
+				
+				// register a drop object
+				clone.ddId = WebStudio.dd.register(options);
+				
+				return clone;
+			},
+			revert: 'invalid',
+			cursor: 'move',
+			appendTo: 'body',
+			cursorAt: { left: 5, top: 5 },
+			stop: function(ev, ui) {
+			
+				//debugger;
+				var payload = ui.helper[0];
+				jQuery(payload).remove();
+				
+			}
+		});
+		
+		if (scope)
+		{
+			jQuery(el).draggable('option', 'scope', scope);
+		}
+	}
+	,
+	makeDroppable: function(el, scope, options)
+	{
+		// fail out if this element is already droppable
+		if (el.hasClass("ui-droppable"))
+		{
+			return;
+		}
+		
+		if (!options)
+		{
+			options = { };
+		}
+		
+		if (scope)
+		{
+			options["scope"] = scope;
+		}
+		
+		//options["tolerance"] = "touch";
+		options["tolerance"] = "pointer";
+		options["greedy"] = true;
+		options["drop"] = function(ev, ui) 
+		{
+ 			var payload = ui.helper[0];
+ 			
+ 			var ddId = payload.ddId;
+ 			
+ 			// unregister
+ 			WebStudio.dd.unregister(ddId);
+ 			
+ 			var draggableOptions = WebStudio.dd.get(ddId);
+ 			if (draggableOptions)
+ 			{
+ 				if (options.onDrop)
+ 				{
+ 					options.onDrop(el, draggableOptions);
+ 				}
+			}
+		};		
+		
+		jQuery(el).droppable(options);
+	}
+};

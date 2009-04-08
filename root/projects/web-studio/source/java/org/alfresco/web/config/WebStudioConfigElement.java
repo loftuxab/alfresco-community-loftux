@@ -224,6 +224,7 @@ public class WebStudioConfigElement extends ConfigElementAdapter implements
     {
         private static final String TITLE = "title";
         private static final String DESCRIPTION = "description";
+        private static final String IMAGEURL = "image-url";
         private static final String BOOTSTRAP_CLASSNAME = "bootstrap-classname";
         private static final String BOOTSTRAP_LOCATION = "bootstrap-location";
 
@@ -254,6 +255,11 @@ public class WebStudioConfigElement extends ConfigElementAdapter implements
         public String getDescription()
         {
             return getStringProperty(DESCRIPTION);
+        }
+        
+        public String getImageUrl()
+        {
+            return getStringProperty(IMAGEURL);
         }
 
         public String getBootstrapClassName()

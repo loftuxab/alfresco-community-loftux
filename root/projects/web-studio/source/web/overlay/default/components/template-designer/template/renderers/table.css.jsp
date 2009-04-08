@@ -3,11 +3,10 @@
 {         
 	cursor: pointer;	             	
 	background-color: #FFFFE0;
+	
+	width: 100%;
 
 	border-spacing: 0;
-
-	width: 100%;                
-    height: 100%;
 
     vertical-align: top;
 
@@ -16,127 +15,146 @@
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
+	
+	overflow: hidden;
 }    
 
 /* TEMPLATE TITLE*/
 .TemplateTableTitle 
 {         
-	background-color: #FFFFE0;	
-	cursor: pointer;	             	
-	height: 15px;
-	width: 100%; 
+	height: 12px;
 
-	border-spacing: 0;
-	border: 0;
-	
 	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
+	font-size:9px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
-}    
+	
+	padding-left: 3px;
+	padding-top: 2px;
+} 
+
+.TemplateTableBody
+{
+	width: 100%;
+	height: 100%;
+	vertical-align: top;
+}   
 
 /* ROW */
 .TemplateTableRow 
 {
-	border: 0;
-		
 	background-color: #FFF7B5;
-    width: 100%;
-    height: 100%;
     
-    vertical-align, top;      
+    vertical-align: top;      
     
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
+	
+	border-top: 1px white solid;
+	border-left: 1px white solid;
+	border-right: 1px black solid;
+	border-bottom: 1px black solid;
+
+	margin-left: 7px;
+	margin-top: 7px;
+	margin-bottom: 7px;
+	margin-right: 7px;
+	
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
 /* ROW TITLE*/
 .TemplateRowTitle
 {
-	background-color: #FFF7B5;
-	cursor: pointer;	
-    height: 15px;
-	width: 100%; 	
-
-	border: 0;
+    height: 12px;	
 
 	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
+	font-size:9px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
+	font-weight:normal;
+	
+	padding-left: 3px;
+	padding-top: 2px;
 }
 
-/* ROW */
-.TemplateTableTBodyRow 
+.TemplateTableRowBody
 {
-	background-color: #FFF7B5;
-    width: 100%;
-    height: 100%;
-    
-	border: 0;
-
-    vertical-align, top;      
-    
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
+	width: 100%;
+	height: 100%;
+	vertical-align: top;
 }
-
 
 /* COLUMN */
 .TemplateTableColumn 
 { 
 	background-color: #EEE8AA;	
-    vertical-align: top;          
-
-    height: 100%;
-
-	border: 1px dashed black;
-
-	margin: 3px;
-
+    vertical-align: top;
+    
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
 	font-weight:normal;	
+
+	border-top: 1px white solid;
+	border-left: 1px white solid;
+	border-right: 1px black solid;
+	border-bottom: 1px black solid;
+
+	margin-left: 7px;
+	margin-top: 7px;
+	margin-bottom: 7px;
+	margin-right: 7px;
+	
+	overflow: hidden;
 }
 
 /* COLUMN TITLE*/
 .TemplateColumnTitle 
 { 
-	background-color: #EEE8AA;
-	cursor: pointer;	
-    height: 15px;
-	width: 100%; 
+    height: 12px;
+    color:black;
 	
 	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
+	font-size:9px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
 	font-weight:normal;
+	
+	padding-left: 3px;
+	padding-top: 2px;
+}
+
+.TemplateTableColumnBody
+{
+	width: 100%;
+	height: 100%;
+	vertical-align: top;
 }
 
 /* REGION */
 .TemplateRegion 
 { 
-	border: 1px dashed black;	
-
 	background-color: #EEDC82; 
 
-	margin-top: 2px;	
-	margin-bottom: 5px;	
-	margin-left: 5px;
-	margin-right: 5px;
+	border-top: 1px white solid;
+	border-left: 1px white solid;
+	border-right: 1px black solid;
+	border-bottom: 1px black solid;
+
+	margin-left: 7px;
+	margin-top: 7px;
+	margin-bottom: 7px;
+	margin-right: 7px;
 
 	font-family:tahoma,arial,helvetica,sans-serif;
 	font-size:11px;
@@ -148,18 +166,18 @@
 /* REGION TITLE*/
 .TemplateRegionTitle 
 { 
-	background-color: #EEDC82;
-	cursor: pointer;
-    height: 15px;
-	width: 100%;
+    height: 12px;
 	color:black;
     
 	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
+	font-size:9px;
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
 	font-weight:normal;
+	
+	padding-left: 3px;
+	padding-top: 2px;
 }
 
 /* TEMPLATE TABLE MENU */            
@@ -208,163 +226,13 @@
 }
 
 /* MOUSE OVER -- TEMPLATE */            
-.TemplateTableOnMouseOver 
+.TemplateObjectOnMouseOver 
 { 
-    background-color: #d9e8fb;                                           
-
-	width: 100%;                
-	height: 100%;
-	
-	border-spacing: 0;
-	border: 0;
-
-	vertical-align: top;
-	
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-    
-    cursor: pointer;     
-}
-
-.RowOnMouseOver 
-{ 
+    background-color: #d9e8fb;    
     cursor: pointer;
-	
-	border: 0;
-
-	background-color: #d9e8fb;              
-	width: 100%;
-	height: 100%;
-	    
-	vertical-align, top;      
-	
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;	
+    font-variant:bold;   
 }
 
-
-.ColumnOnMouseOver 
-{ 
-    background-color: #d9e8fb;
-    vertical-align: top;                                                              
-    height: 100%;
-
-	border: 1px dashed black;
-
-	margin: 3px;
-
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;
-} 
- 
-            
-.RegionOnMouseOver 
-{ 
-	border: 1px dashed black;
-                
-    background-color: #d9e8fb;
-    height: 100%;
-
-	margin-top: 2px;	
-	margin-bottom: 5px;	
-	margin-left: 5px;
-	margin-right: 5px;
-
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;
-
-	cursor: pointer; 
-}
-
-/* ROW TITLE ON MOUSE OVER */
-.TemplateTitleOnMouseOver
-{
-	background-color: #d9e8fb;	
-		
-	cursor: pointer;	             	
-	height: 15px;
-	width: 100%; 
-	
-	border-bottom: 0;
-	border-spacing: 0;
-	
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;	
-}
-
-/* ROW TITLE ON MOUSE OVER */
-.TemplateRowTitleOnMouseOver
-{
-    background-color: #d9e8fb;	
-	
-	cursor: pointer;	             	
-	height: 15px;
-	width: 100%; 
-	
-	border: 0;
-	
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;
-}
-
-/* COLUMN TITLE ON MOUSE OVER */
-.TemplateColumnTitleOnMouseOver
-{
-	border: 0px;
-
-    background-color: #d9e8fb;	
-	cursor: pointer;	
-    height: 15px;
-	width: 100%; 
-
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;
-}
-
-/* REGION TITLE ON MOUSE OVER */
-.TemplateRegionTitleOnMouseOver
-{
-	border: 0px;
-    background-color: #d9e8fb;	
-	cursor: pointer;	
-    height: 15px;
-	width: 100%; 
-	color:black;
-	
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:normal;
-	font-weight:bold;	
-}
 
 /* TEMPLATE FONT */
 .TemplateFontNormal 
@@ -374,13 +242,4 @@
 	font-size-adjust:none;
 	font-style:normal;
 	font-variant:normal;
-}
-
-.TemplateFontOnMouseOver 
-{         
-	font-family:tahoma,arial,helvetica,sans-serif;
-	font-size:11px;
-	font-size-adjust:none;
-	font-style:normal;
-	font-variant:bold;
 }

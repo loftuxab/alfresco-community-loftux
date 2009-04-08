@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.studio.bean;
+package org.alfresco.web.framework.plugin;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,10 +36,10 @@ import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.studio.WebStudioUtil;
 
 /**
- * Provides Web-Studio extensions to component rendering
+ * Modifies the way that components are rendered when Surf is running in preview mode.
+ * This allows Web Studio to pull "pulled in" to any Surf Preview application.
  * 
  * Primarily, this enables components to output additional Web Studio
  * specific JavaScript to bind client-side DOM elements together.
@@ -57,11 +57,10 @@ public class WebStudioComponentRenderer extends ComponentRenderer
      */
     public void postProcess(RenderContext context) throws IOException
     {
-        // if web studio is enabled + not passive mode + overlays
-        // enabled
-        if (FrameworkHelper.getConfig().isWebStudioEnabled()
-                && !context.isPassiveMode()
-                && WebStudioUtil.isOverlayEnabled(context.getRequest()))
+        // if we are in preview mode
+        // if we are not in passive mode
+        if (FrameworkHelper.getConfig().isPreviewEnabled()
+                && !context.isPassiveMode())
         {
             // html binding id
             String htmlId = (String) context
@@ -75,8 +74,7 @@ public class WebStudioComponentRenderer extends ComponentRenderer
 
             // commit to output
             PrintWriter writer = context.getResponse().getWriter();
-            writer
-                    .println("<script language='Javascript' type='text/javascript'>");
+            writer.println("<script language='Javascript' type='text/javascript'>");
 
             // if there is a component, bind that in too
             if (componentId != null && componentTypeId != null)

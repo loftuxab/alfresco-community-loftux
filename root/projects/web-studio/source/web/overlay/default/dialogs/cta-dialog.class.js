@@ -31,8 +31,6 @@ WebStudio.CTADialog.prototype.activate = function()
 		onclick: { 
 			fn: function() {
 
-				dialog.modal.hide();
-				
 				var w = new WebStudio.Wizard();
 				w.setDefaultJson(
 				{
@@ -43,8 +41,6 @@ WebStudio.CTADialog.prototype.activate = function()
 
 				w.onComplete = function() 
 				{
-					dialog.modal.show();
-					
 					dialog.initDataTable();					
 				};
 			 
@@ -57,8 +53,6 @@ WebStudio.CTADialog.prototype.activate = function()
 		onclick: { 
 			fn: function() {
 			
-				dialog.modal.hide();
-				
 				var rowIds = dialog.cDataTable.getSelectedRows();
 				if(rowIds && rowIds.length > 0)
 				{
@@ -81,8 +75,6 @@ WebStudio.CTADialog.prototype.activate = function()
 					});
 					w.onComplete = function() 
 					{
-						dialog.modal.show();
-						
 						dialog.initDataTable();					
 					};
 					
@@ -180,9 +172,14 @@ WebStudio.CTADialog.prototype.popup = function()
 			draggable: false, 
 			modal: true,
 			visible: false,
-			constraintoviewport: true,
 			effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration:0.5}		
 		};
+
+		if(window.ie)
+		{
+			// HACK to fix an IE issue
+			options["width"] = "640px";
+		}
 
 		this.modal = new YAHOO.widget.Panel("ContentTypeAssociationsPanel", options);
 

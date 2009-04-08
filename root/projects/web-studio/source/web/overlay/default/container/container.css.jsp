@@ -120,15 +120,16 @@ div#AlfrescoApplication.Default {
 	border-bottom:1px solid #000000;
 	height:48px;
 	background-image:url(<%=rootPath%>/images/floatingmenu/background.png);
-	cursor: pointer;
 }
 
-.FloatingMenuWebProjectId
+.FloatingMenuTitle
 {
 	font-family: Tahoma,Arial,Helvetica,sans-serif;
 	font-size:11px;
 	font-style:normal;
-	font-weight: bold;
+}
+.FloatingMenuTitle DIV:hover { 
+	text-decoration: underline;
 }
 
 .FloatingMenuSandboxId
@@ -156,14 +157,13 @@ div#AlfrescoApplication.Default {
     height: 64px;
 }
 
-.FloatingMenuIconView
+#FloatingMenuSelector
 {
-	background-image:url(<%=rootPath%>/images/floatingmenu/webstudio-64.png);
-	background-repeat:no-repeat;
-}
-
-.FloatingMenuIconEdit
-{
-	background-image:url(<%=rootPath%>/images/floatingmenu/webstudio-design-64.png);
-	background-repeat:no-repeat;
+	font-family: Tahoma,Arial,Helvetica,sans-serif;
+	font-size:11px;
+	font-style:normal;
+	position:absolute;
+	display: none;
+	width: 300px;
+	z-index: 999999;
 }

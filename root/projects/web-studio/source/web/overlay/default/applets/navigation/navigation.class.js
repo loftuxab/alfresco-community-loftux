@@ -24,7 +24,7 @@ WebStudio.Applets.Navigation.prototype.getDependenciesConfig = function()
 
 WebStudio.Applets.Navigation.prototype.getTemplateDomId = function()
 {
-	return "SurfaceNavigationSlider";
+	return "NavigationApplet_Slider";
 };
 
 WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container) 
@@ -97,13 +97,6 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 					childDiv.ondblclick = _this.nodeDoubleClickHandler.bind(childNode);
 				}
 			}
-			
-			// if this has child nodes, block the "remove" button
-			_this.treeView.menu.setDisabled('roots', _this.INDEX_BUTTON_DELETE);
-			if(node.children.length === 0)
-			{
-				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_DELETE);
-			}
 		});
 		
 		// set up a handler for changes to active node state
@@ -121,16 +114,7 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_ADD);
 				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_EDIT);
 				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_COPY);
-				_this.treeView.menu.setDisabled('roots', _this.INDEX_BUTTON_DELETE);
-				
-				// only allow delete if the current node doesn't have any children
-				if(_this.treeView.activeNode.children)
-				{
-					if(_this.treeView.activeNode.children.length === 0)
-					{
-						_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_DELETE);
-					}
-				}
+				_this.treeView.menu.setEnabled('roots', _this.INDEX_BUTTON_DELETE);
 			}
 		};
 		
@@ -317,10 +301,7 @@ WebStudio.Applets.Navigation.prototype.bindSliderControl = function(container)
 				}
 			};
 		});
-		
-		// add the application treeview drop handler
-		this.treeView.dropFromTreeView = this.getApplication().dropFromTreeView.bind(this.getApplication());
-		
+				
 		// initial button state
 		this.treeView.menu.setDisabled('roots', this.INDEX_BUTTON_ADD);
 		this.treeView.menu.setDisabled('roots', this.INDEX_BUTTON_EDIT);
@@ -385,10 +366,12 @@ WebStudio.Applets.Navigation.prototype.loadData = function(node, fnLoadComplete)
 WebStudio.Applets.Navigation.prototype.onShowApplet = function()
 {
 	this.getApplication().hideAllDesigners();
+	this.getApplication().showPageBlocker();	
 };
 
 WebStudio.Applets.Navigation.prototype.onHideApplet = function()
 {
+	this.getApplication().hideAllDesigners();
 };
 
 WebStudio.Applets.Navigation.prototype.nodeDoubleClickHandler = function(e)

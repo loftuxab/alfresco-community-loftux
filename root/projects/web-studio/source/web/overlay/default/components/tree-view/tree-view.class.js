@@ -153,10 +153,11 @@ WebStudio.TreeView.prototype.createDraggables = function ()
 	return this;
 };
 
-WebStudio.TreeView.prototype.setDroppables = function(map) 
+/*
+WebStudio.TreeView.prototype.setDroppables = function(tabs) 
 {
 	var _this = this;
-	$each(map, function(it)
+	$each(tabs, function(it)
 	{
 		var _el = it.colorOverlay;
 		
@@ -178,7 +179,8 @@ WebStudio.TreeView.prototype.setDroppables = function(map)
 					obj.options.label.fireEvent('mouseup');
 										
 					el.parentNode.removeChild(el);
-					_this.dropFromTreeView(it.id, obj.options);
+					
+					_this.onDrop(it.id, obj.options);
 				}
 					
 				return false;			
@@ -189,6 +191,7 @@ WebStudio.TreeView.prototype.setDroppables = function(map)
 	});
 	return this;
 };
+*/
 
 WebStudio.TreeView.prototype.checkExistsComponentInRegion = function(regionDivId) 
 {
@@ -207,6 +210,28 @@ WebStudio.TreeView.prototype.setDraggableNode = function(nodeId)
 	var node = this.nodes[nodeId];
 	if (node) 
 	{
+		if (this.draggable && this.draggableType)
+		{
+			var labelEl = node.getLabelEl();
+			
+			var scope = null;
+			if (this.draggableScope)
+			{
+				scope = this.draggableScope;
+			}
+						
+			var binding = this.nodeToBindingDescriptor(node);
+			
+			WebStudio.dd.makeDraggable(labelEl, scope, {
+				"source" : "tree-view",
+				"type" : this.draggableType,
+				"binding" : binding,
+				"nodeId" : nodeId,
+				"nodeData" : node.data						
+			});
+		}
+		
+		/*
 		var label = $(node.getLabelEl());
 		if(label)
 		{
@@ -280,6 +305,7 @@ WebStudio.TreeView.prototype.setDraggableNode = function(nodeId)
 				this.removeProperty('drag');
 			});
 		}
+		*/
 	}
 	return this;
 };
@@ -301,11 +327,28 @@ WebStudio.TreeView.prototype.setElementConfig = function(item, index, ob, config
 	//'item' = html dom element, 'index' = name of array of 'item's; ob = js container for 'index'; config = js object with configuration for item
 };
 
-WebStudio.TreeView.prototype.dropFromTreeView = function(dropDivId, options)
+WebStudio.TreeView.prototype.onDrop = function(dropDivId, options)
 {
+	WebStudio.app.onDrop(dropDivId, options);
 };
 
 WebStudio.TreeView.prototype.getMenu = function()
 {
 	return this.menu;
+};
+
+/**
+ * Converts Tree Node into Object Binding Definition
+ */
+WebStudio.TreeView.prototype.nodeToBindingDescriptor = function(node)
+{
+	var binding = {
+		sourceType : "",
+		sourceEndpoint : "",
+		sourcePath : "",
+		sourceMimetype : "",
+		sourceIsContainer: false				 
+	};
+
+	return binding;
 };

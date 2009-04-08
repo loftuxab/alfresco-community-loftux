@@ -13,6 +13,6 @@
 	String regionId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_ID);
 	String regionScopeId = (String) context.getValue(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID);
 %>
-<div id="<%=htmlId%>" style="border-top: 2px #aaaaaa dotted; border-left: 2px #aaaaaa dotted; border-right: 2px #aaaaaa dotted; border-bottom: 2px #aaaaaa dotted; padding: 8px; margin: 2px; color: #aaaaaa" align="center" valign="middle">
+<div id="<%=htmlId%>" style="border-top: 1px #999 dotted; border-left: 1px #999 dotted; border-right: 1px #999 dotted; border-bottom: 1px #999 dotted; margin: 1px; padding: 8px; color: #999" align="center" valign="middle">
 <i><%=regionId%></i>
 </div>

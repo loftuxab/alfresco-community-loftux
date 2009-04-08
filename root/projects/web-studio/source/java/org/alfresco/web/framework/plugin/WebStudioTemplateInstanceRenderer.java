@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.studio.bean;
+package org.alfresco.web.framework.plugin;
 
 import java.util.Map;
 
@@ -33,9 +33,14 @@ import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.framework.render.bean.TemplateInstanceRenderer;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.studio.WebStudioUtil;
 
 /**
+ * Modifies the way that components are rendered when Surf is running in preview mode.
+ * This allows Web Studio to pull "pulled in" to any Surf Preview application.
+ * 
+ * Primarily, this enables the regions to output additional Web Studio
+ * specific JavaScript to bind client-side DOM elements together.
+ * 
  * @author muzquiano
  */
 public class WebStudioTemplateInstanceRenderer extends TemplateInstanceRenderer
@@ -43,10 +48,8 @@ public class WebStudioTemplateInstanceRenderer extends TemplateInstanceRenderer
     public void postHeaderProcess(RenderContext context)
             throws RendererExecutionException
     {
-        // if web studio is enabled + overlays enabled, bind it in via
-        // javascript
-        if (FrameworkHelper.getConfig().isWebStudioEnabled()
-                && WebStudioUtil.isOverlayEnabled(context.getRequest()))
+        // if we are in preview mode
+        if (FrameworkHelper.getConfig().isPreviewEnabled())
         {
             String location = FrameworkHelper.getConfig()
                     .getWebStudioLocation();
