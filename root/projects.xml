@@ -2957,7 +2957,7 @@
    <!-- ************************ -->
    
    <target name="incremental-webstudio" 
-           depends="package-webstudio" />
+           depends="incremental-surfauthoring,package-webstudio" />
       
    <target name="build-webstudio" 
            depends="clean-webstudio, 
@@ -2996,52 +2996,29 @@
            depends="package-webstudio-jar">
       <mkdir dir="${dir.project.webstudio.assemble}" />
       
-      <!-- copy all required files from webscript and web framework projects -->
-      <copy todir="${dir.project.webstudio.assemble}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.webstudio.src.web}" excludes="WEB-INF/web.xml" />
-      </copy>
+      <!-- copy all required files from Surf Preview assembly -->
+      <copy todir="${dir.project.webstudio.assemble}" overwrite="true">
+         <fileset dir="${dir.project.webframework.assemble}" excludes="WEB-INF/web.xml" />
+      </copy>      
       
-      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.webstudio.config}" excludes="**/web-extension/**" />
-      </copy>
-
-      <!-- Removing any and all test objects (from alfwf) -->
-      <delete includeemptydirs="true">
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-webscripts"
-      	          includes="**/*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/templates"
-      	          includes="**/*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/components"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/configurations"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/content-associations"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/page-associations"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/pages"
-      	          includes="**/*.*" defaultexcludes="false" />
-      	 <fileset dir="${dir.project.webstudio.assemble}/WEB-INF/classes/alfresco/site-data/template-instances"
-      	          includes="**/*.*" defaultexcludes="false" />
-      </delete>
-
       <!-- copy all required files from project: web-framework-samples -->
-      <copy todir="${dir.project.webstudio.assemble}">
+      <copy todir="${dir.project.webstudio.assemble}" overwrite="true">
          <fileset dir="${dir.projects}/web-framework-samples/source/web" excludes="WEB-INF/web.xml" />
       </copy>
-      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes">
+      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes" overwrite="true">
          <fileset dir="${dir.projects}/web-framework-samples/config" excludes="**/web-extension/**" />
       </copy>
+      
+      <!-- copy all required files from Web Studio inclusions -->      
+      <copy todir="${dir.project.webstudio.assemble}" overwrite="true">
+         <fileset dir="${dir.project.webstudio.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>      
+      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/classes" overwrite="true">
+         <fileset dir="${dir.project.webstudio.config}" excludes="**/web-extension/**" />
+      </copy>      
 
       <!-- add all JAR to WEB-INF/lib -->
-      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/lib">
+      <copy todir="${dir.project.webstudio.assemble}/WEB-INF/lib" overwrite="true">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/optional" 
@@ -3182,7 +3159,7 @@
    <!-- ** Web Framework (Surf) Project ** -->
    <!-- ************************************* -->
 
-   <!-- Builds an empty Surf application -->
+   <!-- Builds an empty Surf application (delivery tier) -->
    <target name="incremental-surf" 
            depends="build-surf-empty">
                     
@@ -3193,7 +3170,7 @@
                     
    </target>
            
-   <!-- Builds a starter Surf application -->
+   <!-- Builds a starter Surf application (delivery tier) -->
    <target name="incremental-surf-starter" 
            depends="build-surf-empty">
 
@@ -3210,6 +3187,23 @@
          <fileset dir="${dir.project.webframework.assemble}" />
       </war>      
       
+   </target>
+   
+   <!-- Builds an empty Surf application (authoring tier) -->
+   <target name="incremental-surfauthoring" 
+           depends="build-surf-empty">
+                    
+      <!-- Copy Surf Authoring configuration files into the assembly -->
+      <copy   file="${dir.project.webframework}/config/alfresco/web-extension/custom-web-framework-application-context.xml.preview"
+            tofile="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/web-extension/custom-web-framework-application-context.xml"/>
+      <copy   file="${dir.project.webframework}/config/alfresco/web-extension/web-framework-config-custom.xml.preview"
+            tofile="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/web-extension/web-framework-config-custom.xml"/>
+                    
+      <war warfile="${dir.project.webframework.dist}/surf-preview.war" 
+           webxml="${dir.project.webframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </war>
+                    
    </target>
    
    <!-- Inits the environment for a surf app build -->
@@ -3246,6 +3240,8 @@
       	          includes="**/*.*" defaultexcludes="false" />
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data/template-instances"
       	          includes="**/*.*" defaultexcludes="false" />
+      	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco"
+      	          includes="**/*-test.xml" defaultexcludes="false" />
       </delete>
       
    </target>

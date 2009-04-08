@@ -396,7 +396,8 @@
 
    <target name="incremental-webstudio-tomcat" 
            description="Performs an incremental build and deployment of the webstudio WAR"
-           depends="incremental-core, 
+           depends="clean-surf,
+                    incremental-core, 
                     package-webscriptframework-jar, 
                     package-webframework-jar,
                     package-webframeworkcommons-jar,
