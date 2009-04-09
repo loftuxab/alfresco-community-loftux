@@ -74,7 +74,7 @@
          </div>
       </div>
       
-      <div class="view-main">
+      <div id="${el}-view-main" class="view-main">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photo-row">
