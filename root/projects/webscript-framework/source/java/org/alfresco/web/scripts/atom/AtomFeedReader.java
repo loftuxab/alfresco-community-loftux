@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts.atom;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,7 +84,14 @@ public class AtomFeedReader implements FormatReader<Feed>
         {
             throw new WebScriptException("Failed to convert request to Atom Feed");
         }
-        return abderaService.parseFeed(req.getContent().getInputStream(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        try
+        {
+            return abderaService.parseFeed(content.getReader(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        }
+        catch (IOException e)
+        {
+            throw new WebScriptException("Failed to convert request to Atom Feed", e);
+        }
     }
     
     /* (non-Javadoc)

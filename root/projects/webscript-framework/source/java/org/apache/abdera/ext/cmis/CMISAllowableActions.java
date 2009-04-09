@@ -33,7 +33,7 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
- * CMIS Properties Element Wrapper for the Abdera ATOM library.
+ * CMIS Allowable Actions Element Wrapper for the Abdera ATOM library.
  * 
  * Encapsulates access and modification of CMIS extension values to ATOM.
  * 
@@ -44,12 +44,12 @@ import org.apache.abdera.model.ElementWrapper;
  * 
  * @author davidc
  */
-public class CMISProperties extends ElementWrapper
+public class CMISAllowableActions extends ElementWrapper
 {
     /**
      * @param internal
      */
-    public CMISProperties(Element internal)
+    public CMISAllowableActions(Element internal)
     {
         super(internal);
     }
@@ -57,48 +57,92 @@ public class CMISProperties extends ElementWrapper
     /**
      * @param factory
      */
-    public CMISProperties(Factory factory)
+    public CMISAllowableActions(Factory factory)
     {
-        super(factory, CMISConstants.PROPERTIES);
+        super(factory, CMISConstants.ALLOWABLEACTIONS);
     }
 
     /**
-     * Gets all property names
+     * Gets the Parent Id of the Actions
+     * 
+     * @return
+     */
+    public String getParentId()
+    {
+        Element child = getFirstChild(CMISConstants.ALLOWABLEACTIONS_PARENT_ID);
+        if (child != null)
+        {
+            return child.getText();
+        }
+        return null;
+    }
+
+    /**
+     * Gets the Parent URL of the Actions
+     * 
+     * @return
+     */
+    public String getParentUrl()
+    {
+        Element child = getFirstChild(CMISConstants.ALLOWABLEACTIONS_PARENT_URL);
+        if (child != null)
+        {
+            return child.getText();
+        }
+        return null;
+    }
+    
+    /**
+     * Gets all allowable actions names
      * 
      * @return  list of property names
      */
     public List<String> getNames()
     {
-        List<CMISProperty> props = getElements();
-        List<String> names = new ArrayList<String>(props.size());
-        for (CMISProperty prop : props)
+        List<CMISAllowableAction> actions = getElements();
+        List<String> names = new ArrayList<String>(actions.size());
+        for (Element action : actions)
         {
-            names.add(prop.getName());
+            if (action instanceof CMISAllowableAction)
+            {
+                names.add(((CMISAllowableAction)action).getName());
+            }
         }
         return names;
     }
     
     /**
-     * Finds property by name
+     * Finds action by name
      * 
      * @param name  property name
      * @return  property
      */
-    public CMISProperty find(String name)
+    public CMISAllowableAction find(String name)
     {
         List<Element> elements = getElements();
         for (Element element : elements)
         {
-            if (element instanceof CMISProperty)
+            if (element instanceof CMISAllowableAction)
             {
-                CMISProperty prop = (CMISProperty)element;
-                if (prop.getName().equals(name))
+                CMISAllowableAction action = (CMISAllowableAction)element;
+                if (action.getName().equals(name))
                 {
-                    return prop;
+                    return action;
                 }
             }
         }
         return null;
     }
 
+    /**
+     * Is Action allowed?
+     * 
+     * @param name
+     * @return
+     */
+    public boolean isAllowed(String name)
+    {
+        CMISAllowableAction action = find(name);
+        return (action == null) ? false : action.isAllowed();
+    }
 }

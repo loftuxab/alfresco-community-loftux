@@ -26,6 +26,7 @@ package org.alfresco.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 
 
 /**
@@ -70,4 +71,11 @@ public interface Content
      * @return  input stream
      */
     public InputStream getInputStream();
+
+    /**
+     * Gets the content reader (which is sensitive to encoding)
+     * 
+     * @return
+     */
+    public Reader getReader() throws IOException;
 }

@@ -76,6 +76,21 @@ public class CMISObject extends ExtensibleElementWrapper
     }
 
     /**
+     * Gets all Allowable Actions for this CMIS Object
+     * 
+     * @return  allowable actions
+     */
+    public CMISAllowableActions getAllowableActions()
+    {
+        Element child = getFirstChild(CMISConstants.ALLOWABLEACTIONS);
+        if (child == null)
+        {
+            child = addExtension(CMISConstants.ALLOWABLEACTIONS); 
+        }
+        return (CMISAllowableActions)child;
+    }
+
+    /**
      * Gets name
      * 
      * @return  name property
@@ -294,5 +309,5 @@ public class CMISObject extends ExtensibleElementWrapper
     {
         return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_URI);
     }
-
+    
 }

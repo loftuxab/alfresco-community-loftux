@@ -68,6 +68,34 @@ public class CMISExtensionFactory extends AbstractExtensionFactory
         addImpl(PROPERTY_ID, CMISPropertyId.class);
         addImpl(PROPERTY_XML, CMISPropertyXml.class);
         addImpl(PROPERTY_HTML, CMISPropertyHtml.class);
+        addImpl(ALLOWABLEACTIONS, CMISAllowableActions.class);
+        addImpl(CAN_DELETE, CMISAllowableAction.class);
+        addImpl(CAN_UPDATE_PROPERTIES, CMISAllowableAction.class); 
+        addImpl(CAN_GET_PROPERTIES, CMISAllowableAction.class); 
+        addImpl(CAN_GET_RELATIONSHIPS, CMISAllowableAction.class); 
+        addImpl(CAN_GET_PARENTS, CMISAllowableAction.class); 
+        addImpl(CAN_GET_FOLDER_PARENT, CMISAllowableAction.class); 
+        addImpl(CAN_GET_DESCENDANTS, CMISAllowableAction.class); 
+        addImpl(CAN_MOVE, CMISAllowableAction.class); 
+        addImpl(CAN_DELETE_VERSION, CMISAllowableAction.class); 
+        addImpl(CAN_DELETE_CONTENT, CMISAllowableAction.class); 
+        addImpl(CAN_CHECKOUT, CMISAllowableAction.class); 
+        addImpl(CAN_CANCEL_CHECKOUT, CMISAllowableAction.class); 
+        addImpl(CAN_CHECKIN, CMISAllowableAction.class); 
+        addImpl(CAN_SET_CONTENT, CMISAllowableAction.class); 
+        addImpl(CAN_GET_ALL_VERSIONS, CMISAllowableAction.class); 
+        addImpl(CAN_ADD_TO_FOLDER, CMISAllowableAction.class); 
+        addImpl(CAN_REMOVE_FROM_FOLDER, CMISAllowableAction.class); 
+        addImpl(CAN_VIEW_CONTENT, CMISAllowableAction.class); 
+        addImpl(CAN_ADD_POLICY, CMISAllowableAction.class); 
+        addImpl(CAN_GET_APPLIED_POLICIES, CMISAllowableAction.class); 
+        addImpl(CAN_REMOVE_POLICY, CMISAllowableAction.class); 
+        addImpl(CAN_GET_CHILDREN, CMISAllowableAction.class); 
+        addImpl(CAN_CREATE_DOCUMENT, CMISAllowableAction.class); 
+        addImpl(CAN_CREATE_FOLDER, CMISAllowableAction.class); 
+        addImpl(CAN_CREATE_RELATIONSHIP, CMISAllowableAction.class); 
+        addImpl(CAN_CREATE_POLICY, CMISAllowableAction.class); 
+        addImpl(CAN_DELETE_TREE, CMISAllowableAction.class);
     }
 
 }

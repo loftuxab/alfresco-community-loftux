@@ -111,7 +111,6 @@ public interface CMISConstants
     // CMIS Nested Entry
     public static final QName NESTED_ENTRY = Constants.ENTRY;
     
-    
     // CMIS Properties Names
     public static final String PROP_NAME = "Name";
     public static final String PROP_OBJECT_ID  = "ObjectId";
@@ -135,7 +134,6 @@ public interface CMISConstants
     public static final String PROP_CONTENT_STREAM_MIMETYPE = "ContentStreamMimetype";
     public static final String PROP_CONTENT_STREAM_FILENAME = "ContentStreamFilename";
     public static final String PROP_CONTENT_STREAM_URI = "ContentStreamURI";
-    
 
     // CMIS Property Types
     public static final String PROP_TYPE_STRING = "string";
@@ -148,4 +146,35 @@ public interface CMISConstants
     public static final String PROP_TYPE_XML = "xml";
     public static final String PROP_TYPE_HTML = "html";
     
+    // CMIS Allowable Actions
+    public static final QName ALLOWABLEACTIONS = new QName(CMIS_200805_NS, "allowableActions");
+    public static final QName ALLOWABLEACTIONS_PARENT_ID = new QName(CMIS_200805_NS, "parentId");
+    public static final QName ALLOWABLEACTIONS_PARENT_URL = new QName(CMIS_200805_NS, "parentUrl");
+    public static final QName CAN_DELETE = new QName(CMIS_200805_NS, "canDelete");
+    public static final QName CAN_UPDATE_PROPERTIES = new QName(CMIS_200805_NS, "canUpdateProperties"); 
+    public static final QName CAN_GET_PROPERTIES = new QName(CMIS_200805_NS, "canGetProperties"); 
+    public static final QName CAN_GET_RELATIONSHIPS = new QName(CMIS_200805_NS, "canGetRelationships"); 
+    public static final QName CAN_GET_PARENTS = new QName(CMIS_200805_NS, "canGetParents"); 
+    public static final QName CAN_GET_FOLDER_PARENT = new QName(CMIS_200805_NS, "canGetFolderParent"); 
+    public static final QName CAN_GET_DESCENDANTS = new QName(CMIS_200805_NS, "canGetDescendants"); 
+    public static final QName CAN_MOVE = new QName(CMIS_200805_NS, "canMove"); 
+    public static final QName CAN_DELETE_VERSION = new QName(CMIS_200805_NS, "canDeleteVersion"); 
+    public static final QName CAN_DELETE_CONTENT = new QName(CMIS_200805_NS, "canDeleteContent"); 
+    public static final QName CAN_CHECKOUT = new QName(CMIS_200805_NS, "canCheckout"); 
+    public static final QName CAN_CANCEL_CHECKOUT = new QName(CMIS_200805_NS, "canCancelCheckout"); 
+    public static final QName CAN_CHECKIN = new QName(CMIS_200805_NS, "canCheckin"); 
+    public static final QName CAN_SET_CONTENT = new QName(CMIS_200805_NS, "canSetContent"); 
+    public static final QName CAN_GET_ALL_VERSIONS = new QName(CMIS_200805_NS, "canGetAllVersions"); 
+    public static final QName CAN_ADD_TO_FOLDER = new QName(CMIS_200805_NS, "canAddToFolder"); 
+    public static final QName CAN_REMOVE_FROM_FOLDER = new QName(CMIS_200805_NS, "canRemoveFromFolder"); 
+    public static final QName CAN_VIEW_CONTENT = new QName(CMIS_200805_NS, "canViewContent"); 
+    public static final QName CAN_ADD_POLICY = new QName(CMIS_200805_NS, "canAddPolicy"); 
+    public static final QName CAN_GET_APPLIED_POLICIES = new QName(CMIS_200805_NS, "canGetAppliedPolicies"); 
+    public static final QName CAN_REMOVE_POLICY = new QName(CMIS_200805_NS, "canRemovePolicy"); 
+    public static final QName CAN_GET_CHILDREN = new QName(CMIS_200805_NS, "canGetChildren"); 
+    public static final QName CAN_CREATE_DOCUMENT = new QName(CMIS_200805_NS, "canCreateDocument"); 
+    public static final QName CAN_CREATE_FOLDER = new QName(CMIS_200805_NS, "canCreateFolder"); 
+    public static final QName CAN_CREATE_RELATIONSHIP = new QName(CMIS_200805_NS, "canCreateRelationship"); 
+    public static final QName CAN_CREATE_POLICY = new QName(CMIS_200805_NS, "canCreatePolicy"); 
+    public static final QName CAN_DELETE_TREE = new QName(CMIS_200805_NS, "canDeleteTree");
 }

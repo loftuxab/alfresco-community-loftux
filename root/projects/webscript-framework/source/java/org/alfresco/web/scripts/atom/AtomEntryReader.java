@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.scripts.atom;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,7 +86,14 @@ public class AtomEntryReader implements FormatReader<Entry>
         {
             throw new WebScriptException("Failed to convert request to Atom Entry");
         }
-        return abderaService.parseEntry(req.getContent().getInputStream(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        try
+        {
+            return abderaService.parseEntry(content.getReader(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        }
+        catch (IOException e)
+        {
+            throw new WebScriptException("Failed to convert request to Atom Entry", e);
+        }
     }
     
     /* (non-Javadoc)
