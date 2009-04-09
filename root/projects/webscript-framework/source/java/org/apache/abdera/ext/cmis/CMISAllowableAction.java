@@ -24,8 +24,7 @@
  */
 package org.apache.abdera.ext.cmis;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.namespace.QName;
 
 import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Element;
@@ -33,9 +32,10 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
- * CMIS Properties Element Wrapper for the Abdera ATOM library.
+ * CMIS Allowable Action for the Abdera ATOM library.
  * 
- * Encapsulates access and modification of CMIS extension values to ATOM.
+ * Encapsulates access and modification of CMIS extension values to CMIS
+ * Property.
  * 
  * NOTE: Potentially, this extension can be contributed to Abdera upon
  *       publication of CMIS.  This is why it is organised under a
@@ -44,61 +44,43 @@ import org.apache.abdera.model.ElementWrapper;
  * 
  * @author davidc
  */
-public class CMISProperties extends ElementWrapper
+public abstract class CMISAllowableAction extends ElementWrapper
 {
     /**
      * @param internal
      */
-    public CMISProperties(Element internal)
+    public CMISAllowableAction(Element internal)
     {
         super(internal);
     }
 
     /**
      * @param factory
+     * @param qname
      */
-    public CMISProperties(Factory factory)
+    public CMISAllowableAction(Factory factory, QName qname)
     {
-        super(factory, CMISConstants.PROPERTIES);
+        super(factory, qname);
     }
 
     /**
-     * Gets all property names
+     * Gets the Allowable Action name
      * 
-     * @return  list of property names
+     * @return  name
      */
-    public List<String> getNames()
+    public String getName()
     {
-        List<CMISProperty> props = getElements();
-        List<String> names = new ArrayList<String>(props.size());
-        for (CMISProperty prop : props)
-        {
-            names.add(prop.getName());
-        }
-        return names;
+        return getQName().getLocalPart();
     }
     
     /**
-     * Finds property by name
+     * Is the Action Allowed
      * 
-     * @param name  property name
-     * @return  property
+     * @return
      */
-    public CMISProperty find(String name)
+    public boolean isAllowed()
     {
-        List<Element> elements = getElements();
-        for (Element element : elements)
-        {
-            if (element instanceof CMISProperty)
-            {
-                CMISProperty prop = (CMISProperty)element;
-                if (prop.getName().equals(name))
-                {
-                    return prop;
-                }
-            }
-        }
-        return null;
+        return Boolean.getBoolean(this.getText());
     }
-
+    
 }

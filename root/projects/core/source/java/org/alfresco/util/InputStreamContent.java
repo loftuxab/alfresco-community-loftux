@@ -27,7 +27,10 @@ package org.alfresco.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 
 import org.springframework.util.FileCopyUtils;
 
@@ -87,6 +90,13 @@ public class InputStreamContent implements Content, Serializable
     public InputStream getInputStream()
     {
         return stream;
+    }
+
+    
+    public Reader getReader()
+        throws IOException
+    {
+        return (encoding == null) ? new InputStreamReader(stream) : new InputStreamReader(stream, encoding);
     }
     
     /* (non-Javadoc)

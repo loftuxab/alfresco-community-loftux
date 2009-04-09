@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts.atom;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -85,7 +86,14 @@ public class AtomReader implements FormatReader<Element>
         {
             throw new WebScriptException("Failed to convert request to Atom");
         }
-        return abderaService.parse(req.getContent().getInputStream(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        try
+        {
+            return abderaService.parse(content.getReader(), req.getServerPath() + URLEncoder.encodeUri(req.getServicePath()));
+        }
+        catch (IOException e)
+        {
+            throw new WebScriptException("Failed to convert request to Atom", e);
+        }
     }
     
     /* (non-Javadoc)
