@@ -26,6 +26,7 @@
 package org.alfresco.jlan.ftp;
 
 import java.io.IOException;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -66,13 +67,13 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 	
 	protected static final int SERVER_PORT		= 21;
 	
-  //  Thread group
+	//  Thread group
   
-  protected static final ThreadGroup FTPThreadGroup = new ThreadGroup( "FTPSessions");
+	protected static final ThreadGroup FTPThreadGroup = new ThreadGroup( "FTPSessions");
   
-  //  FTP server configuration
+  	//  FTP server configuration
   
-  private FTPConfigSection m_configSection;
+  	private FTPConfigSection m_configSection;
   
 	//	Server socket
 	
@@ -91,9 +92,9 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 	
 	private SharedDeviceList m_shares;
 	
-  //	Next available session id
+	//	Next available session id
 
-  private int m_sessId;
+	private int m_sessId;
 
 	//	Root path for new sessions
 	
@@ -103,17 +104,13 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 	
 	private Thread m_srvThread;
 	
-	//	Local server address string, in FTP format (ie. n,n,n,n)
-	
-	private String m_localFTPaddress;
-	
-  // SITE command interface
+	// SITE command interface
   
-  private FTPSiteInterface m_siteInterface;
+	private FTPSiteInterface m_siteInterface;
   
-  // UTF-8 string normalizer
+	// UTF-8 string normalizer
   
-  private UTF8Normalizer m_normalizer;
+	private UTF8Normalizer m_normalizer;
   
 	/**
 	 * Class constructor
@@ -237,20 +234,9 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 	  
 	  if ( getFTPConfiguration().hasFTPDataPortRange() == false) {
 	    
-	    //	Create a new FTP data session
-	    
-	    if ( remAddr != null) {
+	    //	Create a normal data session
 	      
-	      //	Create a normal data session
-	      
-	      dataSess = new FTPDataSession(sess, remAddr, remPort);
-	    }
-	    else {
-	      
-	      //	Create a passive data session
-	      
-	      dataSess = new FTPDataSession(sess, getBindAddress());
-	    }
+	    dataSess = new FTPDataSession(sess, remAddr, remPort);
 	    
 	    //	Return the data session
 	    
@@ -273,10 +259,7 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 
 	  //	Make sure we can bind to the allocated local port
 	  
-	  if ( remAddr != null)
-	    dataSess = new FTPDataSession(sess, dataPort, remAddr, remPort);
-	  else
-	    dataSess = new FTPDataSession(sess, dataPort, getBindAddress());
+      dataSess = new FTPDataSession(sess, dataPort, remAddr, remPort);
 
 	  //	Add the data session to the allocated session table
 	  
@@ -286,6 +269,64 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 	  
 	  if ( Debug.EnableInfo && sess.hasDebug(FTPSrvSession.DBG_DATAPORT))
 	    Debug.println("[FTP] Allocated data port " + dataPort + " to session " + sess.getSessionId());
+	  
+	  //	Return the data session
+	  
+	  return dataSess;
+	}
+	
+	/**
+	 * Allocate a local port for a passive mode data session
+	 * 
+	 * @param sess FTPSrvSession
+	 * @param localAddr InetAddress
+	 * @return FTPDataSession
+	 * @exception IOException
+	 */
+	protected final FTPDataSession allocatePassiveDataSession(FTPSrvSession sess, InetAddress localAddr)
+		throws IOException {
+	  
+	  //	Check if there is a data port range configured, if not then just create a new FTP data session
+	  
+	  FTPDataSession dataSess = null;
+	  
+	  if ( getFTPConfiguration().hasFTPDataPortRange() == false) {
+	    
+	    //	Create a new passive FTP data session
+	    
+		dataSess = new FTPDataSession(sess, localAddr);
+	    
+	    //	Return the data session
+	    
+	    return dataSess;
+	  }
+	  
+	  //	Check if all available ports in the valid range are in use
+
+	  int dataPortLow  = getFTPConfiguration().getFTPDataPortLow();
+	  int dataPortHigh = getFTPConfiguration().getFTPDataPortHigh();
+	  
+	  if ( m_dataSessions.numberOfSessions() == ( dataPortHigh - dataPortLow))
+	    throw new IOException("No free data session ports");
+	  
+	  //	Allocate a port for the new data session
+	  
+	  int dataPort = getNextFreeDataSessionPort();
+	  if ( dataPort == -1)
+	    throw new IOException("Failed to allocate data port");
+
+	  //	Make sure we can bind to the allocated local port
+	  
+	  dataSess = new FTPDataSession(sess, dataPort, localAddr);
+
+	  //	Add the data session to the allocated session table
+	  
+	  m_dataSessions.addSession(dataPort, dataSess);
+	  
+	  //	DEBUG
+	  
+	  if ( Debug.EnableInfo && sess.hasDebug(FTPSrvSession.DBG_DATAPORT))
+	    Debug.println("[FTP] Allocated passive data port " + dataPort + " to session " + sess.getSessionId());
 	  
 	  //	Return the data session
 	  
@@ -434,15 +475,6 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 	}
 
 	/**
-	 * Return the local FTP server address string in n,n,n,n format
-	 * 
-	 * @return String
-	 */
-	public final String getLocalFTPAddressString() {
-		return m_localFTPaddress;
-	}
-	
-	/**
 	 * Return the next available session id
 	 * 
 	 * @return int
@@ -519,9 +551,15 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 			
 			if ( hasBindAddress())
 				m_srvSock = new ServerSocket(getPort(), LISTEN_BACKLOG, getBindAddress());
-			else
-				m_srvSock = new ServerSocket(getPort(), LISTEN_BACKLOG);
+			else {
 				
+	    		// If IPv6 is enabled we need to bind to the global IPv6 address in order to get an IPv6 socket
+	    	
+				if ( getFTPConfiguration().isIPv6Enabled())
+					m_srvSock = new ServerSocket(getPort(), LISTEN_BACKLOG, InetAddress.getByName("::"));
+				else
+					m_srvSock = new ServerSocket(getPort(), LISTEN_BACKLOG);
+			}
 				
 			//	DEBUG
 			
@@ -531,17 +569,15 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 					Debug.println(getBindAddress().getHostAddress());
 				else
 					Debug.println("ALL");
+				
+				if ( m_srvSock.getInetAddress() instanceof Inet6Address)
+					Debug.println("[FTP] Listening on IPv6");
 			}
 
 			//	Check if the FTP server is using a limited data port range
 			
 			if ( Debug.EnableInfo && hasDebug() && getFTPConfiguration().hasFTPDataPortRange())
 			  Debug.println("[FTP] Data ports restricted to range " + getFTPConfiguration().getFTPDataPortLow() + " - " + getFTPConfiguration().getFTPDataPortHigh());
-			
-			//	If a bind address is set then we can set the FTP local address
-			
-			if ( hasBindAddress())
-				m_localFTPaddress = getBindAddress().getHostAddress().replace('.', ',');
 			
 			//	Indicate that the server is active
 			
@@ -556,16 +592,9 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 		
 		    Socket sessSock = getSocket().accept();
 		    
-				//	Set the local address string in FTP format (n,n,n,n), if not already set
+			//	Set socket options
 				
-		    if ( m_localFTPaddress == null) {
-					if ( sessSock.getLocalAddress() != null)
-		    		m_localFTPaddress = sessSock.getLocalAddress().getHostAddress().replace('.', ',');
-		    }
-			
-				//	Set socket options
-				
-				sessSock.setTcpNoDelay(true);
+			sessSock.setTcpNoDelay(true);
 						
 		    //  Debug
 		
@@ -579,18 +608,18 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 		    srvSess.setUniqueId("FTP" + srvSess.getSessionId());
 		    srvSess.setDebugPrefix("[FTP" + srvSess.getSessionId() + "] ");
 
-				//	Initialize the root path for the new session, if configured
+			//	Initialize the root path for the new session, if configured
 				
-				if ( hasRootPath())
-					srvSess.setRootPath(getRootPath());
+			if ( hasRootPath())
+				srvSess.setRootPath(getRootPath());
 							
-				//	Add the session to the active session list
+			//	Add the session to the active session list
 	
-				addSession(srvSess);
+			addSession(srvSess);
 
-				//	Inform listeners that a new session has been created
+			//	Inform listeners that a new session has been created
 				
-				fireSessionOpenEvent(srvSess);
+			fireSessionOpenEvent(srvSess);
 									
 		    //  Start the new session in a seperate thread
 		
@@ -599,13 +628,13 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
 		    srvThread.setName("Sess_FTP" + srvSess.getSessionId() + "_" + sessSock.getInetAddress().getHostAddress());
 		    srvThread.start();
 
-				//	Sleep for a while
+			//	Sleep for a while
 				
-				try {
-					Thread.sleep(1000L);
-				}
-				catch (InterruptedException ex) {
-				}
+			try {
+				Thread.sleep(1000L);
+			}
+			catch (InterruptedException ex) {
+			}
       }
     }
     catch (SocketException ex) {

@@ -235,9 +235,19 @@ public class XMLServerConfiguration extends CifsOnlyXMLServerConfiguration {
 
 		FTPConfigSection ftpConfig = new FTPConfigSection(this);
 
+		// Check if IPv6 support is enabled
+		
+		Element elem = findChildNode("IPv6", ftp.getChildNodes());
+		if ( elem != null) {
+			
+			// Enable IPv6 support
+			
+			ftpConfig.setIPv6Enabled( true);
+		}
+		
 		// Check for a bind address
 
-		Element elem = findChildNode("bindto", ftp.getChildNodes());
+		elem = findChildNode("bindto", ftp.getChildNodes());
 		if ( elem != null) {
 
 			// Check if the network adapter name has been specified
