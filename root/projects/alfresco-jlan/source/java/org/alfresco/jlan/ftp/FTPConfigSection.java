@@ -84,6 +84,10 @@ public class FTPConfigSection extends ConfigSection {
   
   private String m_ftpCharSet;
   
+  // IPv6 enabled
+  
+  private boolean m_ipv6;
+  
   /**
    * Class constructor
    * 
@@ -230,6 +234,15 @@ public class FTPConfigSection extends ConfigSection {
    */
   public final String getFTPCharacterSet() {
     return m_ftpCharSet;
+  }
+  
+  /**
+   * Check if IPv6 support is enabled
+   * 
+   * @return boolean
+   */
+  public final boolean isIPv6Enabled() {
+	  return m_ipv6;
   }
   
   /**
@@ -505,6 +518,29 @@ public class FTPConfigSection extends ConfigSection {
       
       return sts;
   }
+
+  /**
+   * Enable/disable IPv6 support
+   * 
+   * @param ipv6ena boolean
+   * @return int
+   * @exception InvalidConfigurationException
+   */
+  public final int setIPv6Enabled(boolean ipv6ena)
+  	throws InvalidConfigurationException {
+
+    //  Inform listeners, validate the configuration change
+    
+    int sts = fireConfigurationChange(ConfigId.FTPIPv6Enable, new Boolean( ipv6ena));
+
+    //  Set the IPv6 enabled flag
+
+    m_ipv6 = ipv6ena;
+      
+    //  Return the change status
+    
+    return sts;
+  }
   
   /**
    * Close the configuration section
@@ -516,5 +552,4 @@ public class FTPConfigSection extends ConfigSection {
       }
       m_ftpAuthenticator = null;
   }
-  
 }

@@ -30,8 +30,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -158,6 +162,11 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 	protected static final int MDTM_DATETIME_MINLEN = 14; // YYYYMMDDHHMMSS
 
+	// Network address types, for EPRT and EPSV commands
+	
+	protected static final String TypeIPv4 = "1";
+	protected static final String TypeIPv6 = "2";
+	
 	// Session socket
 
 	private Socket m_sock;
@@ -917,7 +926,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Create a passive data session
 
 		try {
-			m_dataSess = getFTPServer().allocateDataSession(this, null, 0);
+			m_dataSess = getFTPServer().allocatePassiveDataSession(this, m_sock.getLocalAddress());
 		}
 		catch (IOException ex) {
 			m_dataSess = null;
@@ -937,7 +946,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		StringBuffer msg = new StringBuffer();
 
 		msg.append("227 Entering Passive Mode (");
-		msg.append(getFTPServer().getLocalFTPAddressString());
+		msg.append(getLocalFTPAddressString());
 		msg.append(",");
 		msg.append(pasvPort >> 8);
 		msg.append(",");
@@ -949,7 +958,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// DEBUG
 
 		if ( Debug.EnableInfo && hasDebug(DBG_DATAPORT))
-			debugPrintln("Passive open addr=" + getFTPServer().getLocalFTPAddressString() + ", port=" + pasvPort);
+			debugPrintln("Passive open addr=" + m_sock.getLocalAddress() + ", port=" + pasvPort);
 	}
 
 	/**
@@ -3374,6 +3383,235 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	}
 
 	/**
+	 * Process an extended port command
+	 * 
+	 * @param req FTPRequest
+	 * @exception IOException
+	 */
+	protected final void procExtendedPort(FTPRequest req)
+		throws IOException {
+
+		// Check if the user is logged in
+
+		if ( isLoggedOn() == false) {
+			sendFTPResponse(500, "");
+			return;
+		}
+
+		// Check if the parameter has been specified
+
+		if ( req.hasArgument() == false) {
+			sendFTPResponse(501, "Required argument missing");
+			return;
+		}
+
+		// Parse the client address
+		
+		InetSocketAddress clientAddr = parseExtendedAddress( req.getArgument());
+		if ( clientAddr == null) {
+			sendFTPResponse(501, "Invalid argument");
+			return;
+		}
+
+		// DEBUG
+
+		if ( Debug.EnableInfo && hasDebug(DBG_DATAPORT))
+			debugPrintln("Opening data socket addr=" + clientAddr.getAddress() + ", port=" + clientAddr.getPort());
+
+		// Create an active data session, the actual socket connection will be made later
+			
+		m_dataSess = getFTPServer().allocateDataSession(this, clientAddr.getAddress(), clientAddr.getPort());
+
+		// Return a success response to the client
+
+		sendFTPResponse(200, "Port OK");
+
+		// DEBUG
+
+		if ( Debug.EnableInfo && hasDebug(DBG_DATAPORT))
+			debugPrintln("Extended port open addr=" + clientAddr.getAddress() + ", port=" + clientAddr.getPort());
+	}
+
+	/**
+	 * Process an extended passive command
+	 * 
+	 * @param req FTPRequest
+	 * @exception IOException
+	 */
+	protected final void procExtendedPassive(FTPRequest req)
+		throws IOException {
+
+		// Check if the user is logged in
+
+		if ( isLoggedOn() == false) {
+			sendFTPResponse(500, "");
+			return;
+		}
+
+		// Create a passive data session
+
+		try {
+			m_dataSess = getFTPServer().allocatePassiveDataSession(this, m_sock.getLocalAddress());
+		}
+		catch (IOException ex) {
+			m_dataSess = null;
+		}
+
+		// Check if the data session is valid
+
+		if ( m_dataSess == null) {
+			sendFTPResponse(550, "Requested action not taken");
+			return;
+		}
+
+		// Get the passive connection address/port and return to the client
+
+		int pasvPort = m_dataSess.getPassivePort();
+
+		StringBuffer msg = new StringBuffer();
+
+		msg.append("229 Entering Extended Passive Mode (|||");
+		msg.append(pasvPort);
+		msg.append("|)");
+
+		sendFTPResponse(msg);
+
+		// DEBUG
+
+		if ( Debug.EnableInfo && hasDebug(DBG_DATAPORT))
+			debugPrintln("Extended passive open addr=" + m_sock.getLocalAddress() + ", port=" + pasvPort);
+	}
+
+	/**
+	 * Parse the extended network address string
+	 * 
+	 * @param extAddr String
+	 * @return InetSocketAddress
+	 */
+	private final InetSocketAddress parseExtendedAddress( String extAddr) {
+	
+		// Make sure the string is valid
+		
+		if ( extAddr == null || extAddr.length() < 7)
+			return null;
+		
+		// Split the string into network type, network address and port strings
+		
+		StringTokenizer tokens = new StringTokenizer( extAddr, extAddr.substring(0, 1));
+		if ( tokens.countTokens() < 3)
+			return null;
+		
+		String netType = tokens.nextToken();
+		String netAddr = tokens.nextToken();
+		String netPort = tokens.nextToken();
+		
+		// Check if it is an IPv4 style address
+		
+		InetSocketAddress sockAddr = null;
+		
+		if ( netType.equals( TypeIPv4)) {
+			
+			// Parse the IPv4 network address
+			
+			InetAddress addr = null;
+			
+			try {
+				addr = InetAddress.getByName( netAddr);
+			}
+			catch ( UnknownHostException ex) {
+				addr = null;
+			}
+
+			// Make sure we got an IPv4 address
+			
+			if ( addr != null && addr instanceof Inet4Address) {
+				
+				// Parse the port
+				
+				int port = -1;
+				
+				try {
+					port = Integer.parseInt( netPort);
+				}
+				catch ( NumberFormatException ex) {
+					port = -1;
+				}
+
+				// Create the socket address
+
+				if ( port != -1)
+					sockAddr = new InetSocketAddress( addr, port);
+			}
+		}
+		else if ( netType.equals( TypeIPv6)) {
+			
+			// Parse the IPv6 network address
+			
+			InetAddress addr = null;
+			
+			try {
+				addr = InetAddress.getByName( netAddr);
+			}
+			catch ( UnknownHostException ex) {
+				addr = null;
+			}
+
+			// Make sure we got an IPv6 address
+			
+			if ( addr != null && addr instanceof Inet6Address) {
+				
+				// Parse the port
+				
+				int port = -1;
+				
+				try {
+					port = Integer.parseInt( netPort);
+				}
+				catch ( NumberFormatException ex) {
+					port = -1;
+				}
+
+				// Check if the scope-id from the original client socket connection needs to be added to
+				// the provided address
+				
+				Inet6Address ip6addr = (Inet6Address) addr;
+				
+				if ( ip6addr.getScopeId() == 0 && m_sock.getInetAddress() instanceof Inet6Address) {
+					
+					// Check the client socket scope-id
+
+					Inet6Address clientAddr = (Inet6Address) m_sock.getInetAddress();
+					Inet6Address localAddr  = (Inet6Address) m_sock.getLocalAddress();
+					
+					if ( clientAddr.getScopeId() != 0) {
+				
+						// Create a client data socket address with a scope-id, to make sure the socket connection
+						// gets routed back to the client correctly
+						
+						try {
+
+							addr = Inet6Address.getByAddress( addr.getHostAddress(), addr.getAddress(), localAddr.getScopeId());
+						}
+						catch ( UnknownHostException ex) {
+							
+							// Stick with the original parsed address
+						}
+					}
+				}
+
+				// Create the socket address
+
+				if ( port != -1)
+					sockAddr = new InetSocketAddress( addr, port);
+			}
+		}
+
+		// Return the socket address, or null if an unknown type
+		
+		return sockAddr;
+	}
+	
+	/**
 	 * Build a list of file name or file information objects for the specified server path
 	 * 
 	 * @param path FTPPath
@@ -3810,6 +4048,15 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	}
 
 	/**
+	 * Return the local IP address as a string in 'n,n,n,n' format
+	 * 
+	 * @return String
+	 */
+	private final String getLocalFTPAddressString() {
+		return m_sock.getLocalAddress().getHostAddress().replace('.', ',');
+	}
+	
+	/**
 	 * Start the FTP session in a seperate thread
 	 */
 	public void run() {
@@ -4083,13 +4330,13 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 					// Extended Port command
 
 					case FTPCommand.EPrt:
-						sendFTPResponse(522, "Command not recognized");
+						procExtendedPort(ftpReq);
 						break;
 
 					// Extended Passive command
 
 					case FTPCommand.EPsv:
-						sendFTPResponse(522, "Command not recognized");
+						procExtendedPassive(ftpReq);
 						break;
 
 					// SSL/TLS authentication
