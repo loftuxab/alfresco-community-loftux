@@ -99,7 +99,7 @@ public class CMISAllowableActions extends ElementWrapper
      */
     public List<String> getNames()
     {
-        List<CMISAllowableAction> actions = getElements();
+        List<Element> actions = getElements();
         List<String> names = new ArrayList<String>(actions.size());
         for (Element action : actions)
         {
