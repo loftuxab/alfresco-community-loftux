@@ -1393,19 +1393,17 @@
          // Call through to get the row highlighted by YUI
          this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
 
-         var target = oArgs.target;
-
          // elRename is the element id of the rename file link
-         // var elRename = Dom.get(this.id + "-rename-" + target.id);
+         // var elRename = Dom.get(this.id + "-rename-" + oArgs.target.id);
 
          // elActions is the element id of the active table cell where we'll inject the actual links
-         var elActions = Dom.get(this.id + "-actions-" + target.id);
+         var elActions = Dom.get(this.id + "-actions-" + oArgs.target.id);
 
          // Inject the correct action elements into the actionsId element
          if (elActions.firstChild === null)
          {
             // Retrieve the actionSet for this asset
-            var record = this.widgets.dataTable.getRecord(target.id);
+            var record = this.widgets.dataTable.getRecord(oArgs.target.id);
             var actionSet = record.getData("actionSet");
             
             // Clone the actionSet template node from the DOM
@@ -1482,12 +1480,13 @@
          {
             this.deferredActionsMenu = elActions;
          }
-         else
+         else if (!Dom.hasClass(document.body, "masked"))
          {
             this.currentActionsMenu = elActions;
             // Show the actions
             // Dom.removeClass(elRename, "hidden");
             Dom.removeClass(elActions, "hidden");
+            this.deferredActionsMenu = null;
          }
       },
 
@@ -1503,15 +1502,16 @@
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
 
-         var target = oArgs.target;
-         // var renameId = this.id + "-rename-" + target.id;
-         var elActions = Dom.get(this.id + "-actions-" + target.id);
+         // var renameId = this.id + "-rename-" + oArgs.target.id;
+         var elActions = Dom.get(this.id + "-actions-" + (oArgs.target.id));
 
-         if (!this.showingMoreActions)
+         // Don't hide unless the More Actions drop-down is showing, or a dialog mask is present
+         if (!this.showingMoreActions || Dom.hasClass(document.body, "masked"))
          {
             // Just hide the action links, rather than removing them from the DOM
             // Dom.addClass(renameId, "hidden");
             Dom.addClass(elActions, "hidden");
+            this.deferredActionsMenu = null;
          }
       },
 
@@ -1538,7 +1538,7 @@
          // Get the pop-up div, sibling of the "More Actions" link
          var elMoreActions = Dom.getNextSibling(elMore);
          Dom.removeClass(elMoreActions, "hidden");
-         me.showingMoreActions = elMoreActions;
+         me.showingMoreActions = true;
          
          // Hide pop-up timer function
          var fnHidePopup = function DL_oASM_fnHidePopup()
@@ -1662,8 +1662,9 @@
       _onActionDeleteConfirm: function DL__onActionDeleteConfirm(record)
       {
          var fileType = record.getData("type"),
+            path = record.getData("location").path,
             fileName = record.getData("fileName"),
-            filePath = $combine(this.currentPath, fileName),
+            filePath = $combine(path, fileName),
             displayName = record.getData("displayName");
          
          this.modules.actions.genericAction(
@@ -1678,7 +1679,7 @@
                   activityData:
                   {
                      fileName: fileName,
-                     path: this.currentPath
+                     path: path
                   }
                },
                event:
@@ -1697,7 +1698,7 @@
             },
             webscript:
             {
-               name: $combine("file/site", this.options.siteId, this.options.containerId, this.currentPath, fileName),
+               name: $combine("file/site", this.options.siteId, this.options.containerId, path, fileName),
                method: Alfresco.util.Ajax.DELETE
             }
          });
@@ -1711,9 +1712,10 @@
        */
       onActionEditOffline: function DL_onActionEditOffline(row)
       {
-         var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("fileName");
-         var displayName = record.getData("displayName");
+         var record = this.widgets.dataTable.getRecord(row),
+            path = record.getData("location").path,
+            fileName = record.getData("fileName"),
+            displayName = record.getData("displayName");
 
          this.modules.actions.genericAction(
          {
@@ -1786,7 +1788,7 @@
             },
             webscript:
             {
-               name: $combine("checkout/site", this.options.siteId, this.options.containerId, this.currentPath, fileName),
+               name: $combine("checkout/site", this.options.siteId, this.options.containerId, path, fileName),
                method: Alfresco.util.Ajax.POST
             }
          });
@@ -1832,6 +1834,7 @@
             containerId: this.options.containerId,
             updateNodeRef: nodeRef,
             updateFilename: fileName,
+            overwrite: true,
             filter: [
             {
                description: description,
@@ -2323,6 +2326,9 @@
          
          // Reset preview tooltips array
          this.previewTooltips = [];
+         
+         // More Actions menu no longer relevant
+         this.showingMoreActions = false;
          
          // Slow data webscript message
          var timerShowLoadingMessage = YAHOO.lang.later(this.options.loadingMessageDelay, this, fnShowLoadingMessage);

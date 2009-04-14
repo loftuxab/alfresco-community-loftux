@@ -31,7 +31,7 @@
          </div>
          <div>
             <label for="${args.htmlid}-description">${msg("form.description")}:</label>
-            <textarea class="lbl" id="${args.htmlid}-description" type="textarea" rows="3" name="description" tabindex="2"></textarea>
+            <textarea class="lbl" id="${args.htmlid}-description" type="textarea" rows="5" name="description" tabindex="2"></textarea>
          </div>
          <div>
             <label for="${args.htmlid}-url">${msg("form.url")}:</label>

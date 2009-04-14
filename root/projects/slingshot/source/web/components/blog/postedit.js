@@ -297,7 +297,6 @@
          {
             siteId: this.options.siteId
          });
-         this.modules.tagLibrary.initialize();
          
          // add the tags that are already set on the post
          if (this.options.editMode && this.blogPostData.tags.length > 0)
@@ -338,15 +337,14 @@
             label: publishExternalButtonLabel
          });
 
-         // cancel button
+         // Cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onFormCancelButtonClick);
 
-         // instantiate the simple editor we use for the form
-
+         // Instantiate the simple editor we use for the form
          this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);
          this.widgets.editor.render();
 
-         // Add validation to the yui editor
+         // Add validation to the rich text editor
          this.widgets.validateOnZero = 0;
          var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';         
          this.widgets.editor.subscribe(keyUpIdentifier, function (e)
@@ -355,11 +353,17 @@
             YAHOO.lang.later(1000, this, this.validateAfterEditorChange);
          }, this, true);
 
-         // create the form that does the validation/submit
+         // Create the form that does the validation/submit
          this.widgets.postForm = new Alfresco.forms.Form(this.id + "-form");
 
          // Title is mandatory
-         this.widgets.postForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+         this.widgets.postForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
+         this.widgets.postForm.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
+         this.widgets.postForm.addValidation(this.id + "-title", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
 
          // Text is mandatory
          this.widgets.postForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
@@ -432,14 +436,16 @@
             },
             scope: this
          };
+         this.modules.tagLibrary.initialize(this.widgets.postForm);
          this.widgets.postForm.init();
          
          // finally display the form
          Dom.removeClass(this.id + "-div", "hidden");
+         Dom.get(this.id + "-title").focus();
       },
 
       /**
-       * Called when a key was pressed in the yui editor.
+       * Called when a key was pressed in the rich text editor.
        * Will trigger form validation after the last key stroke after a seconds pause.
        *
        * @method validateAfterEditorChange

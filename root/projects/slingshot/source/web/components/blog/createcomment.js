@@ -252,7 +252,7 @@
          this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);
          this.widgets.editor.render();
 
-         // Add validation to the yui editor
+         // Add validation to the rich text editor
          var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
          this.widgets.editor.subscribe(keyUpIdentifier, function (e)
          {

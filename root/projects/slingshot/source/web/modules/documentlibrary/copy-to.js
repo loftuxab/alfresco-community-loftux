@@ -365,7 +365,7 @@
                         var tempNode = new YAHOO.widget.TextNode(
                         {
                            label: item.name,
-                           path: nodePath + "/" + item.name,
+                           path: $combine(nodePath, item.name),
                            nodeRef: item.nodeRef,
                            description: item.description,
                            userAccess: item.userAccess,
@@ -852,9 +852,11 @@
           * of parent paths that we need to expand one-by-one in order to
           * eventually display the current path's node
           */
-         var paths = path.split("/");
-         var expandPath = "";
-         for (var i = 0; i < paths.length; i++)
+         var paths = path.split("/"),
+            expandPath = "";
+         this.pathsToExpand = [];
+         
+         for (var i = 0, j = paths.length; i < j; i++)
          {
             if (paths[i] != "")
             {

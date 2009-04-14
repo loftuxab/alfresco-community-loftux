@@ -246,10 +246,23 @@
          this.modules.form = new Alfresco.forms.Form(this.id + "-form");
 
          // Validation
-         // Name: mandatory value
-         this.modules.form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "keyup");
-         // Name: valid filename
+         this.modules.form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "blur");
          this.modules.form.addValidation(this.id + "-name", Alfresco.forms.validation.nodeName, null, "keyup");
+         this.modules.form.addValidation(this.id + "-name", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+         this.modules.form.addValidation(this.id + "-fileTitle", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+         this.modules.form.addValidation(this.id + "-description", Alfresco.forms.validation.length,
+         {
+            max: 512,
+            crop: true
+         }, "keyup");
          this.modules.form.setShowSubmitStateDynamically(true, false);
 
          // OK button submits the form

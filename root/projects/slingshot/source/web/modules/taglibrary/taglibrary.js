@@ -138,8 +138,11 @@
       
       /**
        * Registers the tag library logic with the dom tree
+       *
+       * @method initialize
+       * @param formsRuntime {object} Instance of Alfresco.forms.Form
        */
-      initialize: function TagLibrary_initialize()
+      initialize: function TagLibrary_initialize(formsRuntime)
       {
          // Hook tag actions
          var me = this;
@@ -161,12 +164,21 @@
             return true;
          }
          YAHOO.Bubbling.addDefaultAction("taglibrary-action", fnActionHandlerDiv);
+
+         // Add max length validator
+         if (formsRuntime)
+         {
+            formsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.length,
+            {
+               max: 256,
+               crop: true
+            }, "keyup");
+         }
          
          // load link for popular tags
          YAHOO.util.Event.addListener(this.id + "-load-popular-tags-link", "click", this.onPopularTagsLinkClicked, this, true);
          
-         // register the "enter" event on the tag text field to add the tag (otherwise
-         // the form gets submitted
+         // register the "enter" event on the tag text field to add the tag (otherwise the form gets submitted)
          var zinput = YAHOO.util.Dom.get(this.id + "-tag-input-field");
          var me = this;
          new YAHOO.util.KeyListener(zinput, 

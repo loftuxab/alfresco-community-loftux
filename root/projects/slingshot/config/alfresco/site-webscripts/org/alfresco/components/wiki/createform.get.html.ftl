@@ -15,12 +15,12 @@
       <form id="${args.htmlid}-form" action="" method="post">
          <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
          <div class="leftcolumn">
-            <span class="label"><label for="${args.htmlid}-pageTitle">${msg("label.title")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="75" id="${args.htmlid}-pageTitle" name="pageTitle"/></span>
+            <span class="label"><label for="${args.htmlid}-title">${msg("label.title")}:</label></span>
+            <span class="input"><input type="text" maxlength="256" size="75" id="${args.htmlid}-title" name="pageTitle"/></span>
          </div>
       
-         <span class="label" for="${args.htmlid}-pagecontent">${msg("label.text")}:</span>
-         <textarea class="yuieditor" name="pagecontent" id="${args.htmlid}-pagecontent" cols="180" rows="10"></textarea>
+         <span class="label" for="${args.htmlid}-content">${msg("label.text")}:</span>
+         <textarea class="yuieditor" name="pagecontent" id="${args.htmlid}-content" cols="180" rows="10"></textarea>
       
       <!-- tags -->
          <span class="label"><label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label></span>

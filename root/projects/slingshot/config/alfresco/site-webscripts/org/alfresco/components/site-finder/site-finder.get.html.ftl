@@ -22,7 +22,7 @@
 	
    <div class="finder-wrapper">
       <div class="search-bar theme-bg-color-3">
-         <div class="search-text"><input type="text" id="${args.htmlid}-term" class="search-term" /></div>
+         <div class="search-text"><input type="text" id="${args.htmlid}-term" class="search-term" maxlength="256" /></div>
          <div class="search-button"><button id="${args.htmlid}-button">${msg("site-finder.search-button")}</button></div>
       </div>
 

@@ -193,9 +193,15 @@
 
          // Title is mandatory
          createSiteForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+         // ...and has a maximum length
+         createSiteForm.addValidation(this.id + "-title", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
 
          // Shortname is mandatory
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
          // and can NOT contain whitespace characters
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch,
          {
@@ -203,6 +209,19 @@
          }, "keyup");
          // and should be valid file name
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
+         // ...and has a maximum length
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.length,
+         {
+            max: 72,
+            crop: true
+         }, "keyup");
+
+         // Description kept to a reasonable length
+         createSiteForm.addValidation(this.id + "-description", Alfresco.forms.validation.length,
+         {
+            max: 512,
+            crop: true
+         }, "keyup");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
          createSiteForm.setShowSubmitStateDynamically(true, false);

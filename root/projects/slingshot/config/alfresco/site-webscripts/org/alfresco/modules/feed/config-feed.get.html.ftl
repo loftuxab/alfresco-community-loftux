@@ -4,7 +4,7 @@
       <form id="${args.htmlid}-form" action="" method="POST">
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-url">${msg("label.url")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-url" type="text" name="url" value=""/>&nbsp;*</div>
+            <div class="yui-u"><input id="${args.htmlid}-url" type="text" name="url" value="" maxlength="2048" />&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label>${msg("label.displayItems")}:</label></div>

@@ -294,7 +294,6 @@
          {
             siteId: this.options.siteId
          });
-         this.modules.tagLibrary.initialize();
 
          // add the tags that are already set on the post
          if (this.options.editMode && this.discussionsTopicData.tags.length > 0)
@@ -338,8 +337,15 @@
          // create the form that does the validation/submit
          this.widgets.topicForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.topicForm.setShowSubmitStateDynamically(true, false);
-         this.widgets.topicForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");         
-         this.widgets.topicForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);         
+         // Title
+         this.widgets.topicForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+         this.widgets.topicForm.addValidation(this.id + "-title", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+         // Content
+         this.widgets.topicForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
          this.widgets.topicForm.setSubmitElements(this.widgets.okButton);
          this.widgets.topicForm.setAJAXSubmit(true,
          {
@@ -386,11 +392,12 @@
             scope: this
          };
          
+         this.modules.tagLibrary.initialize(this.widgets.topicForm);
          this.widgets.topicForm.init();
          
          // show the form
-         var editDiv = Dom.get(this.id + "-topic-create-div");
-         Dom.removeClass(editDiv, "hidden");
+         Dom.removeClass(this.id + "-topic-create-div", "hidden");
+         Dom.get(this.id + '-title').focus();
       },
       
       /**

@@ -333,14 +333,13 @@
          {
             siteId: this.options.siteId
          });
-         this.tagLibrary.initialize();
          if (this.options.tags.length > 0)
          {
             this.tagLibrary.setTags(this.options.tags);
          }
 
          // Tiny MCE
-         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
+         this.pageEditor = Alfresco.util.createImageEditor(this.id + '-content',
          {
             height: 300,
             width: 600,
@@ -488,7 +487,8 @@
             scope: this
          };
          
-         form.init();         
+         this.tagLibrary.initialize(form);
+         form.init();
          
          YAHOO.Bubbling.on("onTagLibraryTagsChanged", this.onTagLibraryTagsChanged, this);
       },

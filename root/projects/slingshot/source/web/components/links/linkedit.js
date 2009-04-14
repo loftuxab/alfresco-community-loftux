@@ -277,7 +277,6 @@
          {
             siteId: this.options.siteId
          });
-         this.modules.tagLibrary.initialize();
          
          // add the tags that are already set on the link
          if (this.options.editMode && this.linkData.tags.length > 0)
@@ -306,10 +305,30 @@
 
          // create the form that does the validation/submit
          this.widgets.linkForm = new Alfresco.forms.Form(this.id + "-form");
+         // Title
          this.widgets.linkForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
-
-         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.mandatory, null, "keyup");
-         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.regexMatch, {pattern: /^(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/}, "keyup");
+         this.widgets.linkForm.addValidation(this.id + "-title", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+         // Description
+         this.widgets.linkForm.addValidation(this.id + "-description", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+         // URL
+         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.mandatory, null, "blur");
+         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.regexMatch,
+         {
+            pattern: /^(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/
+         }, "keyup");
+         this.widgets.linkForm.addValidation(this.id + "-url", Alfresco.forms.validation.length,
+         {
+            max: 2048,
+            crop: true
+         }, "blur");
 
          this.widgets.linkForm.setShowSubmitStateDynamically(true, false);
          this.widgets.linkForm.setSubmitElements(this.widgets.okButton);
@@ -354,6 +373,7 @@
             },
             scope: this
          };
+         this.modules.tagLibrary.initialize(this.widgets.linkForm);
          this.widgets.linkForm.init();
          
          // finally display the form

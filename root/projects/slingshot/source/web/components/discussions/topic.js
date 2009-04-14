@@ -556,7 +556,6 @@
                siteId: this.options.siteId
             });
          }
-         this.modules.tagLibrary.initialize();
          this.modules.tagLibrary.setTags(this.topicData.tags);
          
          // register the okButton
@@ -631,6 +630,7 @@
             scope: this
          };
          
+         this.modules.tagLibrary.initialize(editForm);
          editForm.init();
          
          // show the form and hide the view
