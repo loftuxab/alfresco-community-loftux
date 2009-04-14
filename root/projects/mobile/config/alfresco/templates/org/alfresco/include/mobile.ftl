@@ -25,15 +25,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
    <title>Alfresco Mobile &raquo; ${pageTitle}</title>
-
+   <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+   <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0" />    
 <!-- Shortcut Icons -->
    <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 
    <link rel="icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" />
 
 <!-- Site-wide Common Assets -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
+   <#-- <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" /> -->
+   <style type="text/css" media="screen">
+      @import "${url.context}/themes/${theme}/core.css";
+      @import "${url.context}/themes/${theme}/lists.css";
+      @import "${url.context}/themes/${theme}/tabs.css";
+      @import "${url.context}/themes/${theme}/spinningwheel.css";      
+    </style>
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
    <@script type="text/javascript" src="${url.context}/js/mobile.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/Core.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/UI.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/CustomEvent.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/Button.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/Panel.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/App.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/xui.js"></@script>
    <script type="text/javascript">//<![CDATA[
       Mobile.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
       Mobile.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
@@ -45,7 +59,12 @@
       Mobile.constants.URL_FEEDSERVICECONTEXT = "${url.context}/feedservice/";
       Mobile.constants.USERNAME = "${user.name!""}";
    //]]></script>
-
+   <script type="text/javascript" charset="utf-8">//<![CDATA[
+      window.addEventListener('DOMContentLoaded',function(){
+          App.init();            
+        }
+      );
+   //]]></script>
 <!-- Template Assets -->
 <#nested>
 
@@ -59,7 +78,7 @@ ${head}
    Pulls in main template body.
 -->
 <#macro templateBody>
-<body>
+<body id="${htmlid}Page">
 <#-- Template-specific body markup -->
 <#nested>
 <#--

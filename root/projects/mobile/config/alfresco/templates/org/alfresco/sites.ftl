@@ -4,5 +4,5 @@
 
 <@templateBody>
 <@region id="header" scope="global" protected=true />
-<@region id="home" scope="template" protected=true />
+<@region id="sites" scope="template" protected=true />
 </@>
