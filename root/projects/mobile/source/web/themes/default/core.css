@@ -1,0 +1,468 @@
+body {
+   font-family: Helvetica;
+  margin: 0px;
+  overflow-x: hidden;
+  background-image:url(./images/background.png);        
+  min-height:480px;
+}
+
+h2 {
+  color: rgb(102, 102, 102);
+  font:bold 15px Helvetica;
+  margin:0 0 4px 1.5em;
+}
+a {
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
+  text-decoration:none;
+}     
+
+body.landscape, body.landscape .content {
+  min-height:222px;
+}
+div.content {
+  min-height:392px;
+}
+div.panel.loading .content {
+  background-color:#fff;
+  text-align:center;
+}
+
+a.disabled {
+   color:#999 !important;
+   font-style:italic;
+}
+
+/* Toolbars */
+#appBar {
+  background: url(./images/appbar-bg3.png) repeat-x rgb(0, 0, 0);
+}
+#appBar form {
+  margin:4px 0.5em;
+  float:right;
+/*  top:-5px;*/
+  position:relative;
+}
+
+#appBar form input {
+ font-size:17px;
+ -webkit-border-radius: 8px;
+ border-width: 1px;
+ width:190px;
+}
+#appBar #homeButton {
+   margin:2px 0 2px 0.5em;
+   display:inline-block;
+}
+
+.toolbar, #appBar,.panelBar {
+  -webkit-box-sizing: border-box;
+  height: 43px;
+  padding: 8px 0 12px 6px;
+  position: relative;
+}
+.toolbar a.action.button {
+   float:right;
+   margin-right:0.5em;
+}
+#appBar {
+   padding:0;
+}
+#container {
+  width:100%;
+  min-height:320px;
+  background-color:#fff;
+}
+.toolbar,#container,.panelBar {
+  background:  url(./images/toolbar.png) repeat-x;
+}
+
+.toolbar h1 {
+  color: rgb(246, 246, 246);
+  font-size: 20px;
+  font-weight: bold;
+  height: 45px;
+  left: 50%;
+  margin: 1px 0px 0px -75px;
+  overflow: hidden;
+  position: absolute;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 150px;
+}
+/* end Toolbars */
+
+/* Panels */
+.panel {
+  display:block;
+  position:absolute;
+  left:0;
+  width:100%;
+  -webkit-transform: translate(100%, 0px);
+  background-color:#fff;
+  background-image:url(./images/background.png);
+  min-height:320px;
+  -webkit-box-sizing: border-box;        
+}
+.panel.selected {
+  display:block;
+  -webkit-transform: translate(0, 0px);
+}
+ body.portrait div.panel{
+   min-height:376px;
+ }
+ body.landscape div.panel {
+   min-height:332px;
+ }
+
+/* end Panels */      
+
+/* Buttons */ 
+#appBar .button,input.button  {
+  background: none;
+  -webkit-border-image: url(./images/button.png) 0 5 0 5 stretch stretch;
+  border-width: 0px 5px;
+  bottom: 5px;
+  color: white;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  height: 30px;
+  line-height: 30px;
+  margin: 0px;
+  overflow: hidden;
+  padding: 0px 3px;
+  position: absolute;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  text-shadow: rgba(0, 0, 0, 0.597656) 0px -1px 0px;
+  white-space: nowrap;
+  width: auto;
+}
+input.button {
+   position:static;
+}
+.toolbar .back {
+  -webkit-border-image: url(./images/iPhoneBackButton.png) 0 8 0 14 stretch stretch;
+  border-width: 0px 8px 0px 15px;
+  left: 6px;
+  top:20%;
+  max-width: 55px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow:hidden;
+  padding: 0px;
+  right: auto;
+}
+
+a.button
+{
+  -webkit-border-radius: 0;
+  text-decoration:none;
+  border-width: 0 8px 0 8px;
+  padding: 0;
+  height: 28px;
+  line-height: 28px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #FFFFFF;
+  text-shadow: rgba(0, 0, 0, 0.6) 0px -1px 0;
+  background: none;
+/*  position:absolute;*/
+  -webkit-tap-highlight-color:rgba(0,0,0,0);
+  -webkit-border-image: url(./images/navbutton.png) 0 5 0 4 stretch stretch;
+  display:inline-block;
+  width:auto;
+}
+
+a.button.white {
+  -webkit-border-image: url(./images/loadmore-btn2.png) 0 14 0 14 stretch stretch;      
+}
+a.button.delete {
+   right:0.5em;
+   position:absolute;
+  -webkit-border-image: url(./images/redbutton.png) 0 14 0 14 stretch stretch;   
+}
+.panelBar .button{
+   height:28px;
+   top:20%;
+}
+/* end Button */
+
+/* Homepage */
+#homePage ul.nav li a,
+#sitePage ul.list .rr  li a,
+#DocsPage ul.list.rr li a  {
+  padding-left:2em;
+  font-weight:bold;
+}
+
+#homePage ul.nav li li a,
+#sitePage ul.list .rr  li a,
+#DocsPage ul.list.rr li a,
+#SelectSitePage ul.e2e li a {  
+   background:transparent url(./images/icons/16-icons-sprite.png) no-repeat  top left; 
+} 
+
+#homePage ul.nav li.events a{ 
+   background-position: 10px -116px; 
+} 
+#homePage ul.nav li.fav a{    
+   background-position: 10px -163px;
+} 
+#homePage ul.nav li.invitetosite a{ 
+   background-position:10px -213px; 
+} 
+#homePage ul.nav li.newwikipage a { 
+   background-position: 10px -351px; 
+} 
+#homePage ul.nav li.recentactivity a{ 
+   background-position:10px -399px; 
+} 
+#homePage ul.nav li.recentdocs a{ 
+   background-position: 10px -447px; 
+} 
+
+#homePage ul.nav li.sites a,
+#homePage ul.nav li.publicsites a{ 
+   background-position: 10px -495px;
+
+} 
+#homePage ul.nav li.tasks a,
+#homePage ul.nav li.all a,
+#homePage ul.nav li.overdue a{ 
+   background-position:  10px -543px; 
+} 
+#homePage ul.nav li.today a,
+#homePage ul.nav li.recentdays a{ 
+   background-position:10px -592px; 
+}
+
+#homePage ul.nav li.tasks span,
+#homePage ul.nav li.events span 
+{
+   color:#999;
+   font-weight:normal;
+}
+
+body#loginPage {
+   background:#fff url(./images/login-bg.png) no-repeat 0 130px;
+   text-align:center;
+}
+body#loginPage img{
+   width:210px;
+   margin:25px 0 40px 0;
+}
+body#loginPage form {
+   width:80%;
+   margin:0 auto;
+}
+body#loginPage form * {
+   text-align:left;
+}
+body#loginPage form fieldset {
+   border:0;
+}
+body#loginPage form input {
+   margin:0.5em 0 1em 0;
+   display:block;
+   font-size:16px; 
+}
+body#loginPage form input[type="text"],body#loginPage form input[type="password"]{
+   width:200px;
+}
+body#loginPage form input[type="checkbox"]{
+   margin-right:0.5em;
+   display:inline;
+   line-height:14px;
+   height:14px;
+}
+body#loginPage label {
+   display:inline-block;
+   font-weight:bold;
+   color:#333;
+   font-size:14px;
+}
+body#loginPage #btn-login {
+   display:block;
+}
+#sitePage ul.list .rr li.documents a,
+#sitePage ul.list .rr li.mydocuments a,
+#sitePage ul.list .rr li.alldocuments a {
+    background-position:10px -66px;   
+}
+
+#sitePage ul.list li.allfolders a, 
+#DocsPage ul.list li.allfolders a {
+    background-position:10px -22px;   
+}
+
+#sitePage ul.list .rr li.mainwikipage a {
+    background-position:10px -303px;   
+}
+
+#sitePage ul.list .rr li.wikipagelist a{
+    background-position:10px -638px;   
+}
+
+#sitePage ul.list .rr li.newwikipage a{
+    background-position:10px -352px;   
+}
+
+#sitePage ul.list .rr li.invitetosite a{
+    background-position:10px -212px;   
+}
+
+#sitePage ul.list .rr li.leavesite a{
+    background-position:10px -260px;   
+}
+
+ul.e2e.fav li a {
+   padding-left:2em;
+   background:transparent url(./images/icons/16-fav.png) no-repeat  10px 50%; 
+}
+#homePage #homePanel .toolbar {
+   display:none;
+}
+/*#homePage .toolbar .back.button {
+   display:none;
+}*/
+.content form {
+   width:100%;
+   font-size:16px;
+}
+ .content form * {
+   line-height:2em;
+   font-size:16px;
+}
+.content form select,
+ .content form input[type="text"],
+ .content form textarea
+/*#TaskPage .content form input[type="text"],
+#InviteUserPage .content form input[type="text"],
+#InviteUserPage .content form select {
+*/
+{
+   margin:0 1em;
+   width:85%;
+}
+
+.content form select {
+   width:91%;
+}
+
+
+ .content form div
+/*#TaskPage .content form div,
+#TaskPage .content form,
+#InviteUserPage .content form,
+#InviteUserPage .content form div {
+*/
+{   text-align:center;
+   margin:1em;
+}
+/*#InviteUserPage */
+.content form label {
+   display:block;
+   margin-left:1em;
+}
+/*#InviteUserPage .content form input[type="text"],
+#InviteUserPage .content form select {
+   margin:1em 0;
+   width:100%;
+   
+}
+*/
+#SearchResultsPage .toolbar {
+   display:none;
+}
+#SearchResultsPage .tabs * {
+   text-align:center;
+}
+#SearchResultsPage a#loadmore {
+   text-align:center;
+   position:static;
+   color:#000;
+   display:inline-block;
+   text-shadow:none;
+}
+
+#SearchResultsPage .tabs .tabcontent *{
+   text-align:left;
+}
+#SearchResultsPage .tabcontent h2 {
+   padding:0.5em;
+   margin:0 0 0 0.5em;
+   color:#000;
+   font-weight:normal;
+   line-height:16px;
+}
+#SearchResultsPage .tabcontent h2 span {
+   float:right;
+   color:#999;
+   font-size:12px;
+}
+.tabcontent {
+   background-color:#f2f2f2;
+   margin:0;
+   padding:0 0 1em 0;
+}
+#SitesPage .tabcontent,#TasksPage .tabcontent {
+   padding:0;
+}
+#TaskPage .info {
+   margin-top:1em;
+}
+#TaskPage .content h3 {
+   margin:0 0 0 0.7em;
+   color:#666;
+   font-size:16px;
+}
+#SelectSitePage ul.e2e li a
+{
+   padding-left:2em;
+   background-position: 10px -495px;    
+}
+
+
+#UserProfilePage .details {
+   background-color:#fff;
+   margin:0;
+}
+
+#UserProfilePage .details h2 {
+   font-size:20px;
+}
+#UserProfilePage .details p {
+   font-size:12px;
+   padding-left:30px;
+}
+#UserProfilePage .tabcontent h2 {
+   margin:5px;
+   padding:0;
+   font-size:12px;
+}
+#UserProfilePage .e2e {
+   margin-bottom:0;
+}
+#UserProfilePage .e2e li {
+   border:none;
+   padding:0.5em;
+   color:#000;
+   font-weight:normal;
+   font-size:12px;
+}
+#UserProfilePage .e2e li span {
+   width:5em;
+   text-align:right;
+   display:inline-block;
+   font-weight:bold;
+   margin-right:1em;
+}
+#UserProfilePage .e2e li a {
+   padding:0;
+   display:inline;
+}
+#alf-ft {
+   display:none;
+}
