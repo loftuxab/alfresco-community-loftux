@@ -631,14 +631,11 @@
           * of parent paths that we need to expand one-by-one in order to
           * eventually display the current path's node
           */
-         var paths = path.split("/");
-         // Check for root path special case
-         if (path === "/")
-         {
-            paths = ["/"];
-         }
-         var expandPath = "";
-         for (var i = 0; i < paths.length; i++)
+         var paths = path.split("/"),
+            expandPath = "";
+         this.pathsToExpand = [];
+         
+         for (var i = 0, j = paths.length; i < j; i++)
          {
             if (paths[i] != "")
             {

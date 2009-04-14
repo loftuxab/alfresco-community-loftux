@@ -303,6 +303,11 @@
          }, null, "keyup");
          // Comment: mandatory value
          this.modules.form.addValidation(this.id + "-comment", Alfresco.forms.validation.mandatory, null, "keyup");
+         this.modules.form.addValidation(this.id + "-comment", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
          this.modules.form.setShowSubmitStateDynamically(true, false);
 
          // OK button submits the form

@@ -98,26 +98,25 @@
         */
        onComponentsLoaded: function WikiCreateForm_onComponentsLoaded()
        {
-          Event.onContentReady(this.id, this.init, this, true);
+          Event.onContentReady(this.id, this.onReady, this, true);
        },
       
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initialises components, including YUI widgets.
        *
-       * @method init
+       * @method onReady
        */
-      init: function WikiCreateForm_init()
+      onReady: function WikiCreateForm_onReady()
       {
          this.tagLibrary = new Alfresco.module.TagLibrary(this.id);
          this.tagLibrary.setOptions(
          {
             siteId: this.siteId
          });
-         this.tagLibrary.initialize();
 
          // Tiny MCE
-         this.widgets.pageEditor = Alfresco.util.createImageEditor(this.id + '-pagecontent',
+         this.widgets.editor = Alfresco.util.createImageEditor(this.id + '-content',
          {
             height: 300,
             width: 600,
@@ -134,7 +133,7 @@
             siteId: this.siteId,
             language:this.options.locale         
          });
-         this.widgets.pageEditor.render();
+         this.widgets.editor.render();
 
          this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button",
          {
@@ -145,11 +144,30 @@
          {
             type: "link"
          });
+
+         // Add validation to the rich text editor
+         this.widgets.validateOnZero = 0;
+         var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';         
+         this.widgets.editor.subscribe(keyUpIdentifier, function (e)
+         {
+            this.widgets.validateOnZero++;
+            YAHOO.lang.later(1000, this, this.validateAfterEditorChange);
+         }, this, true);
          
          // Create the form that does the validation/submit
-         var form = new Alfresco.forms.Form(this.id + "-form");
-         form.addValidation(this.id + "-pageTitle", Alfresco.forms.validation.mandatory, null, "blur");
-         form.addValidation(this.id + "-pageTitle", Alfresco.forms.validation.nodeName, null, "keyup");
+         this.widgets.form = new Alfresco.forms.Form(this.id + "-form");
+         var form = this.widgets.form;
+         form.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
+         form.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
+         form.addValidation(this.id + "-title", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+
+         // Content is mandatory
+         form.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
+
          form.setShowSubmitStateDynamically(true);
          form.setSubmitElements(this.widgets.saveButton);
          form.setAJAXSubmit(true,
@@ -175,7 +193,7 @@
                // Disable save button to prevent double-submission
                this.widgets.saveButton.set("disabled", true);
                // Put the HTML back into the text area
-               this.widgets.pageEditor.save();
+               this.widgets.editor.save();
                // Update the tags set in the form
                this.tagLibrary.updateForm(this.id + "-form", "tags");
 
@@ -186,7 +204,7 @@
                   tagInputElem.disabled = true;
                }
                
-               var title = Dom.get(this.id + "-pageTitle").value;
+               var title = Dom.get(this.id + "-title").value;
                title = title.replace(/\s+/g, "_");
                // Set the "action" attribute of the form based on the page title
                form.action =  Alfresco.constants.PROXY_URI + "slingshot/wiki/page/" + this.siteId + "/" + title;
@@ -202,7 +220,30 @@
             scope: this
          };
 
-         form.init();         
+         this.tagLibrary.initialize(form);
+         form.init();
+         Dom.get(this.id + "-title").focus();
+      },
+
+      /**
+       * Called when a key was pressed in the rich text editor.
+       * Will trigger form validation after the last key stroke after a seconds pause.
+       *
+       * @method validateAfterEditorChange
+       */
+      validateAfterEditorChange: function WikiCreateForm_validateAfterEditorChange()
+      {
+         this.widgets.validateOnZero--;
+         if (this.widgets.validateOnZero == 0)
+         {
+            var oldLength = Dom.get(this.id + '-content').value.length;
+            this.widgets.editor.save();
+            var newLength = Dom.get(this.id + '-content').value.length;
+            if ((oldLength == 0 && newLength != 0) || (oldLength > 0 && newLength == 0))
+            {
+               this.widgets.form.updateSubmitElements();
+            }
+         }
       },
 
       /**
@@ -255,7 +296,7 @@
                   handler: function()
                   {
                      this.destroy();
-                     Dom.get(me.id + "-pageTitle").focus();
+                     Dom.get(me.id + "-title").focus();
                   },
                   isDefault: true
                }]

@@ -1368,87 +1368,94 @@
        * @param elTarget {object} Element in which the event occured (click)
        *  
        */
-      showAddDialog : function(elTarget) {
-
-          var displayDate;
-          //if from toolbar add event
-          if (YAHOO.lang.isUndefined(elTarget))
-          {
-              if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
-              {
-                  elTarget = Dom.get('cal-'+Alfresco.util.toISO8601(this.options.startDate).split('T')[0]);
-              }
-              else if (this.calendarView !== Alfresco.CalendarView.VIEWTYPE_AGENDA)
-              {
-                  elTarget = Dom.get('cal-'+Alfresco.util.toISO8601(this.options.startDate).split(':')[0]+':00');
-              }
-              this.currentDate = displayDate = (Alfresco.util.getQueryStringParameter('date')) ? Alfresco.util.fromISO8601(Alfresco.util.getQueryStringParameter('date')) : new Date();
-          }
-          else { // from cell
+      showAddDialog: function CalendarView_showAddDialog(elTarget)
+      {
+         var displayDate;
+         //if from toolbar add event
+         if (YAHOO.lang.isUndefined(elTarget))
+         {
+            if (this.calendarView === Alfresco.CalendarView.VIEWTYPE_MONTH)
+            {
+               elTarget = Dom.get('cal-'+Alfresco.util.toISO8601(this.options.startDate).split('T')[0]);
+            }
+            else if (this.calendarView !== Alfresco.CalendarView.VIEWTYPE_AGENDA)
+            {
+               elTarget = Dom.get('cal-'+Alfresco.util.toISO8601(this.options.startDate).split(':')[0]+':00');
+            }
+            this.currentDate = displayDate = (Alfresco.util.getQueryStringParameter('date')) ? Alfresco.util.fromISO8601(Alfresco.util.getQueryStringParameter('date')) : new Date();
+         }
+         else
+         {
+            // from cell
             this.currentDate = displayDate = this.getClickedDate(elTarget);
-          }
-          if (!this.eventDialog)
-          {
-              this.eventDialog = Alfresco.util.DialogManager.getDialog('CalendarView.addEvent');
-              this.eventDialog.id = this.id+ "-addEvent";
-              if (this.eventDialog.tagLibrary == undefined)
-              {
-                 this.eventDialog.tagLibrary = new Alfresco.module.TagLibrary( this.eventDialog.id);
-                 this.eventDialog.tagLibrary.setOptions({ siteId: this.options.siteId });
-              }
-          }
-          var options = 
-          {
-               site : this.options.siteId,
-               displayDate : displayDate,
-               actionUrl : Alfresco.constants.PROXY_URI+ "/calendar/create",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
-               templateRequestParams : {
-                      site : this.options.siteId
+         }
+
+         if (!this.eventDialog)
+         {
+            this.eventDialog = Alfresco.util.DialogManager.getDialog('CalendarView.addEvent');
+            this.eventDialog.id = this.id+ "-addEvent";
+            if (this.eventDialog.tagLibrary == undefined)
+            {
+               this.eventDialog.tagLibrary = new Alfresco.module.TagLibrary( this.eventDialog.id);
+               this.eventDialog.tagLibrary.setOptions({ siteId: this.options.siteId });
+            }
+         }
+         var options = 
+         {
+            site: this.options.siteId,
+            displayDate: displayDate,
+            actionUrl: Alfresco.constants.PROXY_URI+ "/calendar/create",
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+            templateRequestParams:
+            {
+               site : this.options.siteId
+            },
+            doBeforeFormSubmit:
+            {
+               fn: function(form, obj)
+               {                           
+                  // Update the tags set in the form
+                  this.tagLibrary.updateForm(this.id + "-form", "tags");
+                  // Avoid submitting the input field used for entering tags
+                  var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
+                  if (tagInputElem)
+                  {
+                     tagInputElem.disabled = true;
+                  }
                },
-               doBeforeFormSubmit : 
+               scope: this.eventDialog
+            },
+            doBeforeAjaxRequest:
+            {
+               fn: function(p_config, p_obj) 
                {
-                 fn : function(form, obj)
-                      {                           
-                        // Update the tags set in the form
-                        this.tagLibrary.updateForm(this.id + "-form", "tags");
-                        // Avoid submitting the input field used for entering tags
-                        var tagInputElem = YAHOO.util.Dom.get(this.id + "-tag-input-field");
-                        if (tagInputElem)
-                        {
-                           tagInputElem.disabled = true;
-                        }
-                      },
-                 scope:this.eventDialog
+                  if (p_config.dataObj.tags)
+                  {
+                     p_config.dataObj.tags = p_config.dataObj.tags.join(' ');
+                  }
+                  return true;
                },
-               doBeforeAjaxRequest : {
-                   fn : function(p_config, p_obj) 
-                        {
-                            if (p_config.dataObj.tags)
-                            {
-                              p_config.dataObj.tags = p_config.dataObj.tags.join(' ');
-                            }
-                            return true;
-                        },
-                   scope : this.eventDialog
+               scope: this.eventDialog
+            },
+            onSuccess:
+            {
+               fn: this.onEventSaved,
+               scope: this
+            },
+            onFailure:
+            {
+               fn:function()
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: Alfresco.util.message('message.created.failure',this.name)
+                  });
                },
-               onSuccess : {
-                  fn : this.onEventSaved,
-                  scope : this
-               },
-               onFailure : {
-                   fn:function()
-                   {
-                       Alfresco.util.PopupManager.displayMessage(
-                       {
-                          text: Alfresco.util.message('message.created.failure',this.name)
-                       });
-                   },
-                   scope:this
-               }
-           };
-           this.eventDialog.setOptions(options);
-           this.eventDialog.show();
+               scope:this
+            }
+         };
+         this.eventDialog.setOptions(options);
+         this.eventDialog.show();
       },
 
       /**
@@ -1461,7 +1468,6 @@
        */
       showDialog : function(e,elTarget)
       {
-          
           //show create event dialog
           if (YAHOO.util.Selector.test(elTarget, 'button#addEventButton')  )
           {

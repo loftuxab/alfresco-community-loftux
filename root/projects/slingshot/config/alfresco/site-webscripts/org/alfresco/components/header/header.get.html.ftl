@@ -49,7 +49,7 @@
          <span class="menu-item">
             <span class="search-container">
                <label for="${args.htmlid}-searchtext" style="display:none">${msg("header.search.inputlabel")}</label>
-               <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" />
+               <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" maxlength="256" />
                <span id="${args.htmlid}-search-tbutton" class="search-site-icon"><a href="#">&nbsp;&nbsp;</a></span>
             </span>
          </span>

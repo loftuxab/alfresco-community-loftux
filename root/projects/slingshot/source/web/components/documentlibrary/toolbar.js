@@ -41,7 +41,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
 
    /**
     * Preferences
@@ -308,20 +309,28 @@
        */
       onNewFolder: function DLTB_onNewFolder(e, p_obj)
       {
-         var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/site/{site}/{container}/{path}",
-         {
-            site: this.options.siteId,
-            container: this.options.containerId,
-            path: this.currentPath
-         });
+         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/action/folder/site", this.options.siteId, this.options.containerId, this.currentPath);
 
          var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
          {
             // Validation
-            // Name: mandatory value
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.mandatory, null, "keyup");
-            // Name: valid filename
+            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.mandatory, null, "blur");
             p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
+            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.length,
+            {
+               max: 256,
+               crop: true
+            }, "keyup");
+            p_form.addValidation(this.id + "-createFolder-title", Alfresco.forms.validation.length,
+            {
+               max: 256,
+               crop: true
+            }, "keyup");
+            p_form.addValidation(this.id + "-createFolder-description", Alfresco.forms.validation.length,
+            {
+               max: 512,
+               crop: true
+            }, "keyup");
             p_form.setShowSubmitStateDynamically(true, false);
          };
 

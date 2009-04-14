@@ -984,7 +984,7 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
    }
    else
    {
-      valid = field.value.length != 0;
+      valid = YAHOO.lang.trim(field.value).length !== 0;
    }
    
    if (!valid && !silent && form !== null)
@@ -1006,10 +1006,11 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
  * 
  * @method length
  * @param field {object} The element representing the field the validation is for
- * @param args {object} Object representing the minimum and maximum length, for example
+ * @param args {object} Object representing the minimum and maximum length, and whether to crop content
  *        {
- *           min: 3;
- *           max: 10;
+ *           min: 3,
+ *           max: 10,
+ *           crop: true
  *        }
  * @param event {object} The event that caused this handler to be called, maybe null
  * @param form {object} The forms runtime class instance the field is being managed by
@@ -1024,42 +1025,32 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
                             "' using args: " + YAHOO.lang.dump(args));
    
    var valid = true;
-   
-   // TODO: Use merge to determine arg values.
-   
-   var min = -1;
-   var max = -1;
-   
-   if (args.min)
+   var myArgs = YAHOO.lang.merge(
    {
-      min = parseInt(args.min);
-   }
-   
-   if (args.minLength)
-   {
-      min = parseInt(args.minLength);
-   }
-   
-   if (args.max)
-   {
-      max = parseInt(args.max);
-   }
-   
-   if (args.maxLength)
-   {
-      max = parseInt(args.maxLength);
-   }
+      min: -1,
+      max: -1,
+      crop: false
+   }, args);
 
    var length = field.value.length;
    
-   if (min != -1 && length < min)
+   if (myArgs.min != -1 && length < myArgs.min)
    {
       valid = false;
    }
    
-   if (max != -1 && length > max)
+   if (myArgs.max != -1 && length > myArgs.max)
    {
       valid = false;
+      if (myArgs.crop)
+      {
+         field.value = field.value.substring(0, myArgs.max);
+         if (field.type && field.type == "textarea")
+         {
+            field.scrollTop = field.scrollHeight;
+         }
+         valid = true;
+      }
    }
    
    if (!valid && !silent && form !== null)
@@ -1206,6 +1197,10 @@ Alfresco.forms.validation.nodeName = function nodeName(field, args, event, form,
       args = {};
    }
    
+   /**
+    * Pattern for disallowing leading and trailing spaces. See CHK-6614
+    args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)|(^[ \t]+|[ \t]+$)/;
+    */
    args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([\.]?[\.]+$)/;
    args.match = false;
 

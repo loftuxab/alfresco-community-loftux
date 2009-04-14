@@ -28,7 +28,7 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-description">${msg("label.description")}:</label></div>
-            <div class="yui-u"><textarea id="${args.htmlid}-description" name="properties.description" rows="3" cols="20" tabindex="3"></textarea></div>
+            <div class="yui-u"><textarea id="${args.htmlid}-description" name="properties.description" rows="5" cols="20" tabindex="3"></textarea></div>
          </div>
          <div class="yui-gd" id="${args.htmlid}-mimetype-field">
             <div class="yui-u first"><label for="${args.htmlid}-mimetype">${msg("label.mimetype")}:</label></div>

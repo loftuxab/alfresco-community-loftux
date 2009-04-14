@@ -240,6 +240,12 @@
          var renameForm = new Alfresco.forms.Form(this.id + "-renamePageForm");
          renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.mandatory, null, "blur");
          renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.nodeName, null, "keyup");
+         renameForm.addValidation(this.id + "-renameTo", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+         
          renameForm.setShowSubmitStateDynamically(true);
          renameForm.setSubmitElements(renameSaveButton);
          renameForm.ajaxSubmitMethod = Alfresco.util.Ajax.POST;

@@ -622,15 +622,34 @@
          });
          this.widgets.cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
          
-         // instantiate the simple editor we use for the form
-         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,formId + '-content',this.options.editorConfig);
-         // render the editor - we use the private function as we want this to happen
-         // prior of displaying the form. Otherwise we get quite ugly ui behavior
+         // Instantiate and render the simple editor we use for the form
+         this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR, formId + '-content',this.options.editorConfig);
          this.widgets.editor.render();
          
+         // Add validation to the rich text editor
+         var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
+         this.widgets.editor.subscribe(keyUpIdentifier, function (e)
+         {
+            /**
+             * Doing a form validation on every key stroke is process consuming, below we try to make sure we only do
+             * a form validation if it's necessarry.
+             * NOTE: Don't check for zero-length in commentsLength, due to HTML <br>, <span> tags, etc. possibly
+             * being present. Only a "Select all" followed by delete will clean all tags, otherwise leftovers will
+             * be there even if the form looks empty.
+             */                       
+            if (this.widgets.editor.getContent().length < 20 || this.widgets.okButton.get("disabled"))
+            {
+               // Submit was disabled and something has been typed, validate and submit will be enabled
+               this.widgets.editor.save();
+               this.widgets.form.updateSubmitElements();
+            }
+         }, this, true);
+
          // create the form that does the validation/submit
-         var replyForm = new Alfresco.forms.Form(formId + "-form");
+         this.widgets.form = new Alfresco.forms.Form(formId + "-form");
+         var replyForm = this.widgets.form;
          replyForm.setShowSubmitStateDynamically(true, false);
+         replyForm.addValidation(formId + "-content", Alfresco.forms.validation.mandatory, null);         
          replyForm.setSubmitElements(this.widgets.okButton);
          if (isEdit)
          {

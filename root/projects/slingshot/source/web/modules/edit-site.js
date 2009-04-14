@@ -207,6 +207,19 @@
 
          // Title is mandatory
          editSiteForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+         // ...and has a maximum length
+         editSiteForm.addValidation(this.id + "-title", Alfresco.forms.validation.length,
+         {
+            max: 256,
+            crop: true
+         }, "keyup");
+
+         // Description kept to a reasonable length
+         editSiteForm.addValidation(this.id + "-description", Alfresco.forms.validation.length,
+         {
+            max: 512,
+            crop: true
+         }, "keyup");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
          editSiteForm.setShowSubmitStateDynamically(true, false);
