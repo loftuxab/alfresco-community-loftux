@@ -162,7 +162,7 @@
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
          onFileUploadComplete: null,
-         overwrite: true,
+         overwrite: false,
          thumbnails: null,
          htmlUploadURL: null,
          flashUploadURL: null,
@@ -194,7 +194,7 @@
        *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},         // limits what kind of files the user can select in the OS file selector
        *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
+       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to overwrite a versionable file with the existing name
        *                             // If false and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to append a number to the versionable filename to avoid

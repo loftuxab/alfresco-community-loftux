@@ -115,7 +115,7 @@
          updateFilename: null,
          mode: this.MODE_SINGLE_UPLOAD,
          onFileUploadComplete: null,
-         overwrite: true,
+         overwrite: false,
          thumbnails: null,
          uploadURL: null,
          username: null
@@ -281,7 +281,7 @@
        *    mode: {int},             // MODE_SINGLE_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},         // limits what kind of files the user can select in the OS file selector
        *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
+       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to overwrite a versionable file with the existing name
        *                             // If false and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to append a number to the versionable filename to avoid
@@ -313,13 +313,13 @@
        *
        * @method onUploadSuccess
        */
-      onUploadSuccess: function HU_onUploadSuccess(e)
+      onUploadSuccess: function HU_onUploadSuccess(response)
       {
          // Hide the current message display
          this.widgets.feedbackMessage.destroy();
 
          // Tell the document list to refresh itself if present
-         var fileName = this.widgets.filedata.value;
+         var fileName = response.fileName ? response.fileName : this.widgets.filedata.value;
          YAHOO.Bubbling.fire("doclistRefresh",
          {
             currentPath: this.showConfig.path,
@@ -329,7 +329,7 @@
          // Todo see if the nodeRef can be added to the list
          var objComplete =
          {
-            successful: [{nodeRef: e.nodeRef, fileName: fileName}]
+            successful: [{nodeRef: response.nodeRef, fileName: fileName}]
          };
 
          var callback = this.showConfig.onFileUploadComplete;

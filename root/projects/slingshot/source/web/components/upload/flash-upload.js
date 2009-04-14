@@ -239,7 +239,7 @@
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
          onFileUploadComplete: null,
-         overwrite: true,
+         overwrite: false,
          thumbnails: null,
          uploadURL: null,
          username: null
@@ -499,7 +499,7 @@
        *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},         // limits what kind of files the user can select in the OS file selector
        *    onFileUploadComplete: null, // Callback after upload
-       *    overwrite: true          // If true and in mode MODE_XXX_UPLOAD it tells
+       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to overwrite a versionable file with the existing name
        *                             // If false and in mode MODE_XXX_UPLOAD it tells
        *                             // the backend to append a number to the versionable filename to avoid
@@ -716,16 +716,17 @@
          fileInfo.state = this.STATE_SUCCESS;
          fileInfo.fileButton.set("disabled", true);
 
-         // Extract the nodeRef from the JSON response
+         // Extract the nodeRef and (possibly changed) fileName from the JSON response
+         var oldFileName = fileInfo.fileName;
          var json = Alfresco.util.parseJSON(event.data);
          if (json)
          {
             fileInfo.nodeRef = json.nodeRef;
+            fileInfo.fileName = json.fileName;
          }
 
-         // Add the label "Successful" after the filename
-         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] +
-                                              " " + Alfresco.util.message("label.success", this.name);
+         // Add the label "Successful" after the filename, updating the fileName from the response
+         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"].replace(oldFileName, fileInfo.fileName) + " " + Alfresco.util.message("label.success", this.name);
 
          // Change the style of the progress bar
          fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");
