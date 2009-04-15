@@ -273,13 +273,22 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                         case DIR :
                         {
                             File f = deployment.getFileForPath(path);
-                            if (f.exists())
+                            if(f.exists())
                             {
-                                File dest = new File(f.getAbsolutePath() + ".alf");
-                                f.renameTo(dest);
-                                f = deployment.getFileForPath(path);
+                            	if(f.isFile())
+                            	{
+                            		File dest = new File(f.getAbsolutePath() + ".alf");
+                            		f.renameTo(dest);
+                            		f = deployment.getFileForPath(path);
+                            		f.mkdir();
+                            	}
                             }
-                            f.mkdir();
+                            else 
+                            {
+                            	// create a new dir
+                            	f.mkdir();
+                            }
+                           
                             break;
                         }
                         case FILE :
