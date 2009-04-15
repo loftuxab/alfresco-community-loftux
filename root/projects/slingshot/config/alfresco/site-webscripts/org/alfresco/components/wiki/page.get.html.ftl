@@ -109,7 +109,7 @@
                <input type="hidden" name="page" value="wiki-page" />
                <input type="hidden" name="currentVersion" value="${currentVersion}" />
                <label for="${htmlid}-content">${msg("label.text")}:</label>
-               <textarea name="pagecontent" id="${args.htmlid}-content" cols="50" rows="10"><#if result.pagetext??>${result.pagetext}</#if></textarea>
+               <textarea name="pagecontent" id="${args.htmlid}-content" cols="50" rows="10"><#if result.pagetext??>${result.pagetext?html}</#if></textarea>
                <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
                <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
 
