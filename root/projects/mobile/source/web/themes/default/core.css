@@ -28,8 +28,8 @@ div.panel.loading .content {
 }
 
 a.disabled {
-   color:#999 !important;
-   font-style:italic;
+/*   color:#999 !important;
+   font-style:italic;*/
 }
 
 /* Toolbars */
@@ -193,7 +193,7 @@ a.button.delete {
 #homePage ul.nav li a,
 #sitePage ul.list .rr  li a,
 #DocsPage ul.list.rr li a  {
-  padding-left:2em;
+  padding-left:2.2em;
   font-weight:bold;
 }
 
@@ -201,41 +201,58 @@ a.button.delete {
 #sitePage ul.list .rr  li a,
 #DocsPage ul.list.rr li a,
 #SelectSitePage ul.e2e li a {  
-   background:transparent url(./images/icons/16-icons-sprite.png) no-repeat  top left; 
+/*   background:transparent url(./images/icons/16-icons-sprite.png) no-repeat  top left; */
 } 
 
 #homePage ul.nav li.events a{ 
-   background-position: 10px -116px; 
+     background:transparent url(./images/icons/24-events.png) no-repeat  5px 5px;   
+/*   background-position: 10px -116px; */
 } 
-#homePage ul.nav li.fav a{    
-   background-position: 10px -163px;
+#homePage ul.nav li.fav a,
+ul.e2e.fav li a {
+   background:transparent url(./images/icons/24-favourite-selected.png) no-repeat  5px 5px;      
+/*   background-position: 10px -163px;*/
 } 
-#homePage ul.nav li.invitetosite a{ 
-   background-position:10px -213px; 
+#homePage ul.nav li.invitetosite a,
+#sitePage ul.list .rr li.invitetosite a { 
+   background:transparent url(./images/icons/invite-site-24.png) no-repeat  5px 5px;      
+/*   background-position:10px -213px; */
 } 
-#homePage ul.nav li.newwikipage a { 
-   background-position: 10px -351px; 
+#homePage ul.nav li.newwikipage a,
+#sitePage ul.list .rr li.newwikipage a { 
+   background:transparent url(./images/icons/24-new-wiki-page.png) no-repeat  5px 5px;      
+/*   background-position: 10px -351px; */
 } 
-#homePage ul.nav li.recentactivity a{ 
-   background-position:10px -399px; 
+#homePage ul.nav li.recentactivity a{
+   background:transparent url(./images/icons/my-activities-24.png) no-repeat  5px 5px;         
+/*   background-position:10px -399px; */
 } 
 #homePage ul.nav li.recentdocs a{ 
-   background-position: 10px -447px; 
+   background:transparent url(./images/icons/recent-docs-24.png) no-repeat  5px 5px;         
+/*   background-position: 10px -447px; */
 } 
 
-#homePage ul.nav li.sites a,
-#homePage ul.nav li.publicsites a{ 
-   background-position: 10px -495px;
+#homePage ul.nav li.sites a {
+   background:transparent url(./images/icons/24-site.png) no-repeat  5px 5px;         
+}
+#homePage ul.nav li.publicsites a {
+   background:transparent url(./images/icons/browse-sites-24.png) no-repeat  5px 5px;      
+/*   background-position: 10px -495px;*/
+
 
 } 
-#homePage ul.nav li.tasks a,
 #homePage ul.nav li.all a,
-#homePage ul.nav li.overdue a{ 
-   background-position:  10px -543px; 
-} 
-#homePage ul.nav li.today a,
-#homePage ul.nav li.recentdays a{ 
-   background-position:10px -592px; 
+#homePage ul.nav li.tasks a {
+   background:transparent url(./images/icons/24-tasks.png) no-repeat  5px 5px;         
+}
+
+#homePage ul.nav li.siteactivities a {
+   background:transparent url(./images/icons/site-activities-24.png) no-repeat  5px 5px;         
+}
+
+#homePage ul.nav ul,
+#sitePage ul.list .rr {
+   margin-bottom:1.5em;
 }
 
 #homePage ul.nav li.tasks span,
@@ -286,40 +303,48 @@ body#loginPage label {
 body#loginPage #btn-login {
    display:block;
 }
-#sitePage ul.list .rr li.documents a,
-#sitePage ul.list .rr li.mydocuments a,
+#sitePage ul.list .rr li.documents a {
+   background:transparent url(./images/icons/recent-modified-docs-24-a.png) no-repeat  5px 5px;               
+}
+#sitePage ul.list .rr li.mydocuments a {
+   background:transparent url(./images/icons/my-docs-24-a.png) no-repeat  5px 5px;               
+}
 #sitePage ul.list .rr li.alldocuments a {
-    background-position:10px -66px;   
+   background:transparent url(./images/icons/all-documents-24-a.png) no-repeat  5px 5px;            
+/*    background-position:10px -66px;   */
 }
 
 #sitePage ul.list li.allfolders a, 
 #DocsPage ul.list li.allfolders a {
-    background-position:10px -22px;   
+   background:transparent url(./images/icons/24-folder.png) no-repeat  5px 5px;            
+ /*    background-position:10px -22px;   */
 }
 
 #sitePage ul.list .rr li.mainwikipage a {
-    background-position:10px -303px;   
+   background:transparent url(./images/icons/main-wiki-24.png) no-repeat  5px 5px;            
+/*    background-position:10px -303px;   */
 }
 
 #sitePage ul.list .rr li.wikipagelist a{
-    background-position:10px -638px;   
+   background:transparent url(./images/icons/wiki-list-24.png) no-repeat  5px 5px;               
+/*    background-position:10px -638px;   */
 }
 
-#sitePage ul.list .rr li.newwikipage a{
+/*#sitePage ul.list .rr li.newwikipage a{
     background-position:10px -352px;   
 }
-
-#sitePage ul.list .rr li.invitetosite a{
+*/
+/*#sitePage ul.list .rr li.invitetosite a{
     background-position:10px -212px;   
-}
+}*/
 
 #sitePage ul.list .rr li.leavesite a{
-    background-position:10px -260px;   
+   background:transparent url(./images/icons/24-leave-site.png) no-repeat  5px 5px;            
+/*    background-position:10px -260px;   */
 }
 
 ul.e2e.fav li a {
-   padding-left:2em;
-   background:transparent url(./images/icons/16-fav.png) no-repeat  10px 50%; 
+   padding-left:2.2em;
 }
 #homePage #homePanel .toolbar {
    display:none;

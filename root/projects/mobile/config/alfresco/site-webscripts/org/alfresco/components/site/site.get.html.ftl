@@ -22,7 +22,7 @@
            <li>
              <h2>${msg('Document Library')}</h2>
              <ul class="rr">
-               <li class="documents"><a id="Documents" href="#documents?site=${page.url.args.site}" class="panelLink">${msg('Documents')}</a></li>
+               <li class="documents"><a id="Documents" href="#documents?site=${page.url.args.site}" class="panelLink">${msg('Recently Modified')}</a></li>
                <li class="mydocuments"><a id="My-Folders"  class="disabled">${msg('My Documents')}</a></li>
                <li class="alldocuments"><a id="All-Documents"  class="disabled">${msg('All Documents')}</a></li>
                <li class="allfolders"><a id="All-Folders" class="disabled">${msg('All Folders')}</a></li>
