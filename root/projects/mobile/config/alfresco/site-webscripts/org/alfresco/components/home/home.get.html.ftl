@@ -9,10 +9,10 @@
             <li>
               <h2>${msg('My Alfresco Share')}</h2>
               <ul id="my" class="rr">
-                <li class="recentdocs"><a id="Recent-Documents"  class="disabled">${msg('Recent Documents')}</a></li>
-                <li class="recentactivity"><a id="Recent-Activity" class="disabled">${msg('Recent Activity')}</a></li>
-                <li class="fav"><a id="Favourite-Sites" href="#sites" class="panelLink">${msg('Favourite Sites')}</a></li>
-                <li class="sites"><a class="disabled">${msg('Sites')}</a></li>
+                <li class="recentdocs"><a id="Recent-Documents"  class="disabled">${msg('My Recent Documents')}</a></li>
+                <li class="recentactivity"><a id="Recent-Activity" class="disabled">${msg('My Recent Activity')}</a></li>
+                <li class="fav"><a id="Favourite-Sites" href="#sites" class="panelLink">${msg('My Favourite Sites')}</a></li>
+                <li class="sites"><a class="disabled">${msg('My Sites')}</a></li>
               </ul>
             </li>
             <li>
@@ -23,23 +23,18 @@
               </ul>
             </li>
             <li>
-              <h2>${msg('Site Activities')}</h2>
               <ul class="rr">        
-                  <li class="today"><a class="disabled">${msg('Today')}</a></li>
-                  <li class="recentdays"><a class="disabled">${msg('Last 7 days')}</a></li>
+                  <li class="siteactivities"><a class="disabled">${msg('Site Activities')}</a></li>
               </ul>
             </li>
             <li>
-              <h2>${msg('Tasks')}</h2>
               <ul class="rr">        
-                <li class="all"><a class="disabled">${msg('All')}</a></li>       
-                <li class="overdue"><a class="disabled">${msg('Overdue')}</a></li>
+                <li class="all"><a class="disabled">${msg('All Tasks')}</a></li>       
               </ul>
             </li>
             <li>
-              <h2>${msg('Browse Sites')}</h2>
               <ul class="rr">            
-                  <li class="publicsites"><a class="disabled">${msg('All Public Sites')}</a></li>
+                  <li class="publicsites"><a class="disabled">${msg('Browse Public Sites')}</a></li>
               </ul>
             </li>  
             <li>
