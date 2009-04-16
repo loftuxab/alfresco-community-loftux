@@ -3,6 +3,14 @@
 
 <beans>
 
+    <bean id="vtiResourceBundles" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.messages.vti-webview</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="vtiProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders">
             <value>true</value>

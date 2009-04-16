@@ -97,7 +97,7 @@ public class GetVersionsEndpoint extends AbstractEndpoint
 
         results.addElement("list").addAttribute("id", "");
         results.addElement("versioning").addAttribute("enabled", "1");
-        results.addElement("settings").addAttribute("url", host + context + dws + "/documentDetails.vti?doc=" + dws + "/" + fileName.getText());
+        results.addElement("settings").addAttribute("url", host + context + dws + "/documentDetails.vti?doc=" + notSortedVersions.get(0).getId());
 
         List<DocumentVersionBean> versions = new ArrayList<DocumentVersionBean>();
         

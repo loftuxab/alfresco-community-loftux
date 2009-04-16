@@ -32,6 +32,7 @@ import org.alfresco.module.vti.metadata.dic.VtiError;
 import org.alfresco.module.vti.metadata.dic.VtiProperty;
 import org.alfresco.module.vti.metadata.dic.VtiType;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -145,16 +146,16 @@ public abstract class AbstractMethod implements VtiMethod
         }
         else
         {
-            response.writeMetaDictionary(VtiProperty.FILE_TITLE, VtiType.STRING, VtiConstraint.R, docMetaInfo.getTitle());
+            response.writeMetaDictionary(VtiProperty.FILE_TITLE, VtiType.STRING, VtiConstraint.R, VtiEncodingUtils.encode(docMetaInfo.getTitle()));
             response.writeMetaDictionary(VtiProperty.FILE_FILESIZE, VtiType.INT, VtiConstraint.R, docMetaInfo.getFilesize());
-            response.writeMetaDictionary(VtiProperty.FILE_METATAGS , VtiType.VECTOR, VtiConstraint.R, docMetaInfo.getMetatags());
-            response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLCHECKEDOUTBY, VtiType.STRING, VtiConstraint.R, docMetaInfo.getSourcecontrolcheckedoutby());
+            response.writeMetaDictionary(VtiProperty.FILE_METATAGS , VtiType.VECTOR, VtiConstraint.R, VtiEncodingUtils.encode(docMetaInfo.getMetatags()));
+            response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLCHECKEDOUTBY, VtiType.STRING, VtiConstraint.R, VtiEncodingUtils.encode(docMetaInfo.getSourcecontrolcheckedoutby()));
             response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLTIMECHECKEDOUT, VtiType.TIME, VtiConstraint.R, docMetaInfo.getSourcecontroltimecheckedout());
             response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLVERSION, VtiType.STRING, VtiConstraint.R, "V" + docMetaInfo.getSourcecontrolversion());
             response.writeMetaDictionary(VtiProperty.FILE_SOURCECONTROLLOCKEXPIRES, VtiType.TIME, VtiConstraint.R, docMetaInfo.getSourcecontrollockexpires());
             response.writeMetaDictionary(VtiProperty.FILE_THICKETSUPPORTINGFILE, VtiType.BOOLEAN, VtiConstraint.R, docMetaInfo.getThicketsupportingfile());
-            response.writeMetaDictionary(VtiProperty.FILE_MODIFIEDBY, VtiType.STRING, VtiConstraint.R, docMetaInfo.getModifiedBy());
-            response.writeMetaDictionary(VtiProperty.FILE_AUTHOR, VtiType.STRING, VtiConstraint.R, docMetaInfo.getAuthor());
+            response.writeMetaDictionary(VtiProperty.FILE_MODIFIEDBY, VtiType.STRING, VtiConstraint.R, VtiEncodingUtils.encode(docMetaInfo.getModifiedBy()));
+            response.writeMetaDictionary(VtiProperty.FILE_AUTHOR, VtiType.STRING, VtiConstraint.R, VtiEncodingUtils.encode(docMetaInfo.getAuthor()));
         }
 
     }

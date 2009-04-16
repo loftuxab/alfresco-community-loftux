@@ -32,6 +32,7 @@ import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.dic.PutOption;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
 import org.alfresco.module.vti.metadata.model.Document;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,9 +86,9 @@ public class PutDocumentMethod extends AbstractMethod
         }
 
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
-        response.addParameter("message", "successfully put document '" + docMetaInfo.getPath() + "' as '" + docMetaInfo.getPath() + "'");
+        response.addParameter("message", "successfully put document '" + VtiEncodingUtils.encode(docMetaInfo.getPath()) + "' as '" + VtiEncodingUtils.encode(docMetaInfo.getPath()) + "'");
         response.beginList("document");
-        response.addParameter("document_name", docMetaInfo.getPath());
+        response.addParameter("document_name", VtiEncodingUtils.encode(docMetaInfo.getPath()));
         response.beginList("meta_info");
         processDocMetaInfo(docMetaInfo, request, response);
         response.endList();

@@ -34,6 +34,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.metadata.dialog.DialogMetaInfo;
 import org.alfresco.module.vti.metadata.dialog.DialogMetaInfoComparator;
@@ -46,6 +47,7 @@ import org.alfresco.util.URLEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import freemarker.core.Environment;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -80,7 +82,7 @@ public class FileOpenDialog extends AbstractMethod
         {
             logger.debug("Start method execution. Method name: " + getName());
         }
-        String location = request.getParameter("location", "");
+        String location = request.getNotEncodedParameter("location");
         String site = getSiteUrl(request);
         if (site.equals(""))
         {
@@ -103,6 +105,7 @@ public class FileOpenDialog extends AbstractMethod
         }
 
         List<DialogMetaInfo> items = dialogInfo.getDialogMetaInfoList();
+
         Collections.sort(items, new DialogMetaInfoComparator(sortField, sort));
 
         Map<String, Object> freeMarkerMap = new HashMap<String, Object>();
@@ -115,14 +118,28 @@ public class FileOpenDialog extends AbstractMethod
         freeMarkerMap.put("location", URLEncoder.encode(location));
         freeMarkerMap.put("request", request);
         freeMarkerMap.put("DialogUtils", new DialogUtils());
+        freeMarkerMap.put("type", new String(I18NUtil.getMessage("vti.webview.type").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("name", new String(I18NUtil.getMessage("vti.webview.name").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("modified_by", new String(I18NUtil.getMessage("vti.webview.modified_by").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("modified", new String(I18NUtil.getMessage("vti.webview.modified").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("checked_out_to", new String(I18NUtil.getMessage("vti.webview.checked_out_to").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("sort_by_type", new String(I18NUtil.getMessage("vti.webview.sort_by_type").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("sort_by_name", new String(I18NUtil.getMessage("vti.webview.sort_by_name").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("sort_by_modified_by", new String(I18NUtil.getMessage("vti.webview.sort_by_name").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("sort_by_modified", new String(I18NUtil.getMessage("vti.webview.sort_by_modified").getBytes("ISO-8859-1"), "UTF-8"));
+        freeMarkerMap.put("sort_by_checked_out_to", new String(I18NUtil.getMessage("vti.webview.sort_by_checked_out_to").getBytes("ISO-8859-1"), "UTF-8"));
 
         try
         {
             if (template == null)
             {
-                template = new Template("FileOpenDialog", new InputStreamReader(getClass().getResourceAsStream("FileOpenDialog.ftl")), null);
+                template = new Template("FileOpenDialog", new InputStreamReader(getClass().getResourceAsStream("FileOpenDialog.ftl")), null, "utf-8");
             }
-            template.process(freeMarkerMap, response.getWriter());
+            response.setContentType("text/html; charset=utf-8");
+            response.flushBuffer();
+            Environment env = template.createProcessingEnvironment(freeMarkerMap, response.getWriter());
+            env.setOutputEncoding("utf-8");
+            env.process();
             response.getWriter().flush();
         }
         catch (TemplateException e)

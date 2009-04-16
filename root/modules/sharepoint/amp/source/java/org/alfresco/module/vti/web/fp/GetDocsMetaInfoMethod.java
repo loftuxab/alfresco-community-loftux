@@ -31,6 +31,7 @@ import java.util.List;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
 import org.alfresco.module.vti.metadata.model.DocsMetaInfo;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -99,7 +100,7 @@ public class GetDocsMetaInfoMethod extends AbstractMethod
         for (DocMetaInfo docMetaInfo : fileMetaInfoList)
         {
             response.beginList();
-            response.addParameter("document_name", docMetaInfo.getPath());
+            response.addParameter("document_name", VtiEncodingUtils.encode(docMetaInfo.getPath()));
             response.beginList("meta_info");
             processDocMetaInfo(docMetaInfo, request, response);
             response.endList();
@@ -112,7 +113,7 @@ public class GetDocsMetaInfoMethod extends AbstractMethod
         for (DocMetaInfo docMetaInfo : folderMetaInfoList)
         {
             response.beginList();
-            response.addParameter("url", docMetaInfo.getPath());
+            response.addParameter("url", VtiEncodingUtils.encode(docMetaInfo.getPath()));
             response.beginList("meta_info");
             processDocMetaInfo(docMetaInfo, request, response);
             response.endList();
@@ -126,7 +127,7 @@ public class GetDocsMetaInfoMethod extends AbstractMethod
             response.beginList("failedUrls");
             for (DocMetaInfo docMetaInfo : failedUrls)
             {
-                response.addParameter(docMetaInfo.getPath());
+                response.addParameter(VtiEncodingUtils.encode(docMetaInfo.getPath()));
             }
             response.endList();
         }

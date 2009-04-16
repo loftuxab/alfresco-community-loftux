@@ -32,6 +32,7 @@ import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
 import org.alfresco.module.vti.metadata.model.DocsMetaInfo;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,7 +99,7 @@ public class ListDocumentsMethod extends AbstractMethod
         for (DocMetaInfo docMetaInfo : fileMetaInfoList)
         {
             response.beginList();
-            response.addParameter("document_name", docMetaInfo.getPath().substring(serviceName.length() + 1));
+            response.addParameter("document_name", VtiEncodingUtils.encode(docMetaInfo.getPath().substring(serviceName.length() + 1)));
             response.beginList("meta_info");
             processDocMetaInfo(docMetaInfo, request, response);
             response.endList();
@@ -119,11 +120,11 @@ public class ListDocumentsMethod extends AbstractMethod
             {
                 if (serviceName.equals(""))
                 {
-                    response.addParameter("url", docMetaInfo.getPath());
+                    response.addParameter("url", VtiEncodingUtils.encode(docMetaInfo.getPath()));
                 }
                 else
                 {
-                    response.addParameter("url", docMetaInfo.getPath().substring(serviceName.length() + 1));
+                    response.addParameter("url", VtiEncodingUtils.encode(docMetaInfo.getPath().substring(serviceName.length() + 1)));
                 }
             }
             response.beginList("meta_info");

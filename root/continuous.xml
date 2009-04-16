@@ -719,7 +719,11 @@
          <fileset dir="${dir.project.repository.config}" 
                   includes="alfresco/extension/**/*" />
       </copy>
-
+      <!-- include the sharepoint module extension files -->
+      <copy todir="${dir.continuous.assemble.extension-samples}/alfresco/extension">
+         <fileset dir="${dir.module.sharepoint.config}/alfresco/module/org.alfresco.module.vti/context" 
+                  includes="custom-vti*.*" />
+      </copy>
    </target>
    
    <target name="distribute-sample-extensions" 
@@ -949,7 +953,7 @@
 	        depends="continuous-init,
                          package-php-extension, package-mediawiki-extension, package-rm-extension,
                          package-fb-doclib-extension, package-googlegadgets,
-                         package-truncatemalformedxml-extension, distribute-sharepoint">
+                         package-truncatemalformedxml-extension, package-sharepoint-extension">
 		
 		<copy todir="${dir.continuous.dist}">
 			<fileset dir="${dir.module.php.dist}"                  includes="${file.name.amp.php}" />
@@ -958,15 +962,9 @@
 			<fileset dir="${dir.module.truncatemalformedxml.dist}" includes="${file.name.amp.truncatemalformedxml}" />
 			<fileset dir="${dir.module.fb.doclib.dist}"            includes="${file.name.amp.fb.doclib}" />
 			<fileset dir="${dir.module.gg.dist}"                   includes="${file.name.zip.gg}" />
-         <fileset dir="${dir.module.sharepoint}/amp/build/dist" includes="vti-module.amp" />
+         <fileset dir="${dir.module.sharepoint.dist}"           includes="${file.name.amp.sharepoint}" />
 	   </copy>
 	</target>
-	
-   <target name="distribute-sharepoint" 
-           description="Creates the distribution files for Sharepoint Protocol Support"
-           depends="continuous-init">
-      <ant dir="${dir.module.sharepoint}/amp" target="amp" />
-   </target>
 
    <!-- ***************** -->
    <!-- ** SDK targets ** -->

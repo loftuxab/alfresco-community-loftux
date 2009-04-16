@@ -66,6 +66,8 @@ import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.URLDecoder;
+import org.alfresco.util.URLEncoder;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -130,7 +132,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         if (uri.contains("documentLibrary") && req.getAttribute("VALID_SITE_URL") != null)
         {
             int pos = uri.indexOf("documentLibrary");
-            docLibPath = uri.substring(pos + "documentLibrary".length());
+            docLibPath = URLDecoder.decode(uri.substring(pos + "documentLibrary".length()));
             uri = uri.substring(0, pos + "documentLibrary".length()) + ".vti";            
         }
         
@@ -159,8 +161,17 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
             if (action.equals("userInformation"))
             {
                 // redirect to user profile
-                String userName = req.getParameter("ID");
-                redirectTo = redirectTo.replace("...", userName);
+                final String userID = req.getParameter("ID");
+                
+                String userName = AuthenticationUtil.runAs(new RunAsWork<String>()
+                {
+                    public String doWork() throws Exception
+                    {                        
+                        return (String)nodeService.getProperty(new NodeRef(userID), ContentModel.PROP_USERNAME);
+                    }
+                }, authenticationComponent.getSystemUserName());
+                
+                redirectTo = redirectTo.replace("...", URLEncoder.encode(userName));
             }
             else
             {
@@ -170,23 +181,13 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
                 redirectTo = redirectTo.replace("...", siteName);
                 if (action.equals("documentLibrary") && docLibPath != null && docLibPath.length() != 0)
                 {
-                    redirectTo = redirectTo + "#path=" + docLibPath;
+                    redirectTo = redirectTo + "#path=" + ShareUtils.encode(docLibPath);
                 }
             }
-            final String doc = req.getParameter("doc");
+            String doc = req.getParameter("doc");
             if (doc != null)
             {
-
-                NodeRef nodeRef = AuthenticationUtil.runAs(new RunAsWork<NodeRef>()
-                {
-                    public NodeRef doWork() throws Exception
-                    {
-                        return pathHelper.resolvePathFileInfo(doc).getNodeRef();
-                    }
-
-                }, authenticationComponent.getSystemUserName());
-
-                redirectTo = redirectTo + "?nodeRef=" + nodeRef;
+                redirectTo = redirectTo + "?nodeRef=" + doc;
             }
             if (logger.isDebugEnabled())
                 logger.debug("Redirection URI: " + redirectTo);
@@ -284,7 +285,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
             String firstName = nodeService.getProperty(personNodeRef, ContentModel.PROP_FIRSTNAME).toString();
             String lastName = nodeService.getProperty(personNodeRef, ContentModel.PROP_LASTNAME).toString();
             String email = nodeService.getProperty(personNodeRef, ContentModel.PROP_EMAIL).toString();
-            members.add(new MemberBean(username, firstName + " " + lastName, username, email, false));
+            members.add(new MemberBean(personNodeRef.toString(), firstName + " " + lastName, username, email, false));
         }
 
         return members;
@@ -349,7 +350,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
      */
     protected SchemaBean doCreateLinkSchemaBean(FileInfo dwsFileInfo, List<SchemaFieldBean> fields)
     {
-        return new SchemaBean("Links", "", fields);
+        return new SchemaBean("Links", null, fields);
     }
 
     /**

@@ -1996,6 +1996,68 @@
       </java>
    </target>
 
+   <!-- ********************************* -->
+   <!-- ** Sharepoint Protocol Project ** -->
+   <!-- ********************************* -->
+
+   <target name="incremental-sharepoint"
+           depends="package-sharepoint" />
+
+   <target name="build-sharepoint"
+           depends="clean-sharepoint, incremental-sharepoint" />
+
+   <target name="clean-sharepoint"
+           depends="init">
+      <clean projectdir="${dir.module.sharepoint}" />
+   </target>
+
+   <target name="compile-sharepoint"
+           depends="init">
+      <compile-java projectdir="${dir.module.sharepoint}" />
+   </target>
+
+   <target name="package-sharepoint"
+           depends="package-sharepoint-war, deploy-webclient-tomcat" />
+
+   <target name="package-sharepoint-jar"
+           depends="compile-sharepoint">
+      <mkdir dir="${dir.module.sharepoint.dist}" />
+      <jar jarfile="${dir.module.sharepoint.dist}/${file.name.jar.sharepoint}"
+           basedir="${dir.module.sharepoint.classes}" encoding="UTF-8" />
+   </target>
+
+   <target name="package-sharepoint-war"
+           depends="package-sharepoint-extension">
+      <echo>Installing Sharepoint (vti) into WAR...</echo>
+      <install-amp ampfile="${dir.module.sharepoint.dist}/${file.name.amp.sharepoint}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-sharepoint-extension"
+           depends="package-sharepoint-jar">
+      <zip destfile="${dir.module.sharepoint.dist}/${file.name.amp.sharepoint}" update="true" encoding="UTF-8">
+         <zipfileset file="${dir.module.sharepoint.property}/module.properties"/>
+         <zipfileset file="${dir.module.sharepoint.dist}/${file.name.jar.sharepoint}" prefix="lib" />
+         <zipfileset dir="${dir.module.sharepoint.lib}" prefix="lib" />
+         <zipfileset dir="${dir.module.sharepoint.config}" prefix="config">
+            <exclude name="**/module.properties" />
+            <exclude name="**/vti-handler-alfresco2-context.xml.sample" />
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-sharepoint"
+           depends="compile-sharepoint">
+      <run-tests projectdir="${dir.module.sharepoint}" />
+   </target>
+
+   <target name="generate-javadocs-sharepoint"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Sharepoint Protocol (vti) Extension"
+                         windowtitle="Alfresco Sharepoint Protocol"
+                         projectdir="${dir.module.sharepoint}"/>
+   </target>
+      
    <!-- ******************************** -->
    <!-- ** Records Management Project ** -->
    <!-- ******************************** -->

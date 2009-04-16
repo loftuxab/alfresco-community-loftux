@@ -236,6 +236,7 @@ public abstract class AbstractAlfrescoVersionsServiceHandler implements Versions
             logger.debug("Getting all versions for '" + documentFileInfo.getName() + "'.");
 
         List<DocumentVersionBean> versions = new LinkedList<DocumentVersionBean>();
+        String id = documentFileInfo.getNodeRef().toString();
 
         if (logger.isDebugEnabled())
             logger.debug("Getting current version.");
@@ -245,7 +246,7 @@ public abstract class AbstractAlfrescoVersionsServiceHandler implements Versions
             if (logger.isDebugEnabled())
                 logger.debug("Adding current version to result.");
 
-            versions.add(getDocumentVersionInfo(currentVersion));
+            versions.add(getDocumentVersionInfo(currentVersion, id));
 
             boolean currentFound = false;
             for (Version version : versionService.getVersionHistory(documentFileInfo.getNodeRef()).getAllVersions())
@@ -258,7 +259,7 @@ public abstract class AbstractAlfrescoVersionsServiceHandler implements Versions
                 {
                     if (logger.isDebugEnabled())
                         logger.debug("Adding version '" + version.getVersionLabel() + "' to result.");
-                    versions.add(getDocumentVersionInfo(version));
+                    versions.add(getDocumentVersionInfo(version, id));
                 }
             }
         }
@@ -276,15 +277,17 @@ public abstract class AbstractAlfrescoVersionsServiceHandler implements Versions
      * Get document version bean by version
      * 
      * @param version version ({@link Version})
+     * @param id the file id
      * @return DocumentVersionBean version bean
      */
-    protected DocumentVersionBean getDocumentVersionInfo(Version version)
+    protected DocumentVersionBean getDocumentVersionInfo(Version version, String id)
     {
         DocumentVersionBean docVersion = new DocumentVersionBean();
 
         NodeRef versionNodeRef = version.getFrozenStateNodeRef();
         FileInfo documentFileInfo = fileFolderService.getFileInfo(versionNodeRef);
 
+        docVersion.setId(id);
         docVersion.setUrl(generateDownloadURL(documentFileInfo.getNodeRef(), documentFileInfo.getName()));
         docVersion.setVersion(version.getVersionLabel());
         docVersion.setCreatedBy(version.getCreator());
@@ -327,6 +330,7 @@ public abstract class AbstractAlfrescoVersionsServiceHandler implements Versions
     {
         DocumentVersionBean docVersion = new DocumentVersionBean();
 
+        docVersion.setId(documentFileInfo.getNodeRef().toString());
         docVersion.setUrl("/" + pathHelper.toUrlPath(documentFileInfo));
         docVersion.setVersion("1.0");
         docVersion.setCreatedBy((String) documentFileInfo.getProperties().get(ContentModel.PROP_CREATOR));

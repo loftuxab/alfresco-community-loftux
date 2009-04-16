@@ -39,6 +39,9 @@ public class DocumentVersionBean implements Serializable
      */
     private static final long serialVersionUID = 8732427482027589331L;
 
+    // version id
+    private String id;
+
     // version number
     private String version;
     
@@ -164,6 +167,24 @@ public class DocumentVersionBean implements Serializable
     public void setSize(long size)
     {
         this.size = size;
+    }
+    
+    /**
+     * 
+     * @return the id
+     */
+    public String getId()
+    {
+        return id;
+    }
+    
+    /**
+     * 
+     * @param id the id to set
+     */
+    public void setId(String id)
+    {
+        this.id = id;
     }
     
     /**
