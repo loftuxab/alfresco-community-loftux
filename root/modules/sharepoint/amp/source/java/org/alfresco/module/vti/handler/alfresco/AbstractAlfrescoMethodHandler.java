@@ -71,7 +71,6 @@ import org.alfresco.service.cmr.version.VersionType;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.Pair;
-import org.alfresco.util.URLEncoder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -406,7 +405,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
         }
 
         DocMetaInfo docMetaInfo = new DocMetaInfo(false);
-        docMetaInfo.setPath(VtiUtils.htmlEncode(documentName));
+        docMetaInfo.setPath(documentName);
         setDocMetaInfo(documentFileInfo, docMetaInfo);
 
         return docMetaInfo;
@@ -440,7 +439,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
         documentFileInfo = getFileFolderService().getFileInfo(documentFileInfo.getNodeRef());
         DocMetaInfo docMetaInfo = new DocMetaInfo(false);
         setDocMetaInfo(documentFileInfo, docMetaInfo);
-        docMetaInfo.setPath(VtiUtils.htmlEncode(getPathHelper().toUrlPath(documentFileInfo)));
+        docMetaInfo.setPath(getPathHelper().toUrlPath(documentFileInfo));
 
         return docMetaInfo;
     }
@@ -548,7 +547,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
             {
                 DocMetaInfo docMetaInfo = new DocMetaInfo(fileInfo.isFolder());
                 setDocMetaInfo(fileInfo, docMetaInfo);
-                docMetaInfo.setPath(VtiUtils.htmlEncode(url));
+                docMetaInfo.setPath(url);
 
                 if (fileInfo.isFolder())
                 {
@@ -562,7 +561,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
             else
             {
                 DocMetaInfo docMetaInfo = new DocMetaInfo(false);
-                docMetaInfo.setPath(VtiUtils.htmlEncode(url));
+                docMetaInfo.setPath(url);
                 docsMetaInfo.getFailedUrls().add(docMetaInfo);
             }
         }
@@ -593,13 +592,13 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
         {
             if (fileInfo.isFolder())
             {
-                result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));
+                result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));                
             }
             else if (getNodeService().hasAspect(fileInfo.getNodeRef(), ContentModel.ASPECT_WORKING_COPY) == false
                     && VtiDocumentHepler.applyFilters(fileInfo.getName(), fileDialogFilterValue))
             {
                 result.getDialogMetaInfoList().add(getDialogMetaInfo(fileInfo));
-            }
+            }             
         }
 
         if (logger.isDebugEnabled())
@@ -745,7 +744,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
             tx.commit();
 
             DocMetaInfo docMetaInfo = new DocMetaInfo(destFileInfo.isFolder());
-            docMetaInfo.setPath(VtiUtils.htmlEncode(newURL));
+            docMetaInfo.setPath(newURL);
             setDocMetaInfo(destFileInfo, docMetaInfo);
 
             DocsMetaInfo result = new DocsMetaInfo();
@@ -936,7 +935,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
         curDocumentFileInfo = getFileFolderService().getFileInfo(curDocumentFileInfo.getNodeRef());
 
         DocMetaInfo result = new DocMetaInfo(false);
-        result.setPath(VtiUtils.htmlEncode(document.getPath()));
+        result.setPath(document.getPath());
         setDocMetaInfo(curDocumentFileInfo, result);
 
         return result;
@@ -967,7 +966,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
                 AlfrescoMethodHandler.assertValidFileInfo(fileInfo);
 
                 DocMetaInfo docMetaInfo = new DocMetaInfo(fileInfo.isFolder());
-                docMetaInfo.setPath(VtiUtils.htmlEncode(url));
+                docMetaInfo.setPath(url);
                 setDocMetaInfo(fileInfo, docMetaInfo);
 
                 if (fileInfo.isFolder())
@@ -1122,9 +1121,9 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
                 }
             }
 
-            docMetaInfo.setTitle(VtiUtils.htmlEncode((String) originalProps.get(ContentModel.PROP_TITLE)));
-            docMetaInfo.setAuthor(VtiUtils.htmlEncode((String) originalProps.get(ContentModel.PROP_CREATOR)));
-            docMetaInfo.setModifiedBy(VtiUtils.htmlEncode((String) originalProps.get(ContentModel.PROP_MODIFIER)));
+            docMetaInfo.setTitle((String) originalProps.get(ContentModel.PROP_TITLE));
+            docMetaInfo.setAuthor((String) originalProps.get(ContentModel.PROP_CREATOR));
+            docMetaInfo.setModifiedBy((String) originalProps.get(ContentModel.PROP_MODIFIER));
 
             Version currentVersion = getVersionService().getCurrentVersion(originalFileInfo.getNodeRef());
             if (currentVersion != null)
@@ -1149,8 +1148,8 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
     private DialogMetaInfo getDialogMetaInfo(FileInfo fileInfo)
     {
         DialogMetaInfo dialogMetaInfo = new DialogMetaInfo(fileInfo.isFolder());
-        dialogMetaInfo.setPath(URLEncoder.encode(getPathHelper().toUrlPath(fileInfo)));
-        dialogMetaInfo.setName(VtiUtils.htmlEncode(fileInfo.getName()));
+        dialogMetaInfo.setPath(getPathHelper().toUrlPath(fileInfo).replace("\'", "%27"));
+        dialogMetaInfo.setName(fileInfo.getName().replace("\'", "&#39;"));
         dialogMetaInfo.setModifiedBy((String) fileInfo.getProperties().get(ContentModel.PROP_MODIFIER));
 
         if (fileInfo.isFolder() == false)
@@ -1325,7 +1324,7 @@ public abstract class AbstractAlfrescoMethodHandler implements MethodHandler
         for (FileInfo fileInfo : getFileFolderService().list(rootFolder.getNodeRef()))
         {
             DocMetaInfo docMetaInfo = new DocMetaInfo(fileInfo.isFolder());
-            docMetaInfo.setPath(VtiUtils.htmlEncode(getPathHelper().toUrlPath(fileInfo)));
+            docMetaInfo.setPath(getPathHelper().toUrlPath(fileInfo));
             setDocMetaInfo(fileInfo, docMetaInfo);
 
             if (fileInfo.isFolder())

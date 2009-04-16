@@ -422,11 +422,6 @@
            depends="package-webclient-war-jboss, 
                     deploy-jboss" />
    -->
-
-   <target name="build-sharepoint" 
-           depends="incremental-webclient-tomcat">
-      <ant dir="${dir.module.sharepoint}/amp" target="deploy" />
-   </target>
    
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
@@ -554,11 +549,6 @@
        </delete>
    </target>
    
-   <target name="clean-sharepoint" 
-           depends="clean-webclient-tomcat-deploy">
-      <ant dir="${dir.module.sharepoint}/amp" target="clean" />
-   </target>
-      
    <!--
    <target name="clean-jboss-deploy" 
            description="Cleans the Alfresco application from JBoss" 

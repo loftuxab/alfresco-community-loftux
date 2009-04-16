@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServlet;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.AbstractLifecycleBean;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.servlet.Context;
@@ -45,6 +47,8 @@ import org.springframework.context.ApplicationEvent;
  */
 public class VtiServer extends AbstractLifecycleBean
 {
+    private static Log logger = LogFactory.getLog(VtiServer.class);
+   
     private Server server;
     private Connector connector;
     private HttpServlet servlet;
@@ -102,33 +106,37 @@ public class VtiServer extends AbstractLifecycleBean
         }
     }
 
-	/**
-	 * Method starts the server.  
-	 * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
-	 */
-	@Override
-	protected void onBootstrap(ApplicationEvent event) {
-		check();
-		
-        server = new Server();
-        server.setStopAtShutdown(true);
-        server.setConnectors(new Connector[] { connector });
+   /**
+    * Method starts the server.  
+    * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
+    */
+   @Override
+   protected void onBootstrap(ApplicationEvent event) 
+   {
+      check();
+      
+      server = new Server();
+      server.setStopAtShutdown(true);
+      server.setConnectors(new Connector[] { connector });
 
-        Context context = new Context(server, "/", Context.SESSIONS);
-        context.addServlet(new ServletHolder(servlet), "/*");
-        context.addFilter(new FilterHolder(filter), "/*", 1);
-                
-		try 
-		{
-			server.start();
-		} 
-		catch (Exception e) 
-		{
-			throw new AlfrescoRuntimeException("Error start VtiServer, cause: ", e);
-		}
-	}
-	
-	/**
+      Context context = new Context(server, "/", Context.SESSIONS);
+      context.addServlet(new ServletHolder(servlet), "/*");
+      context.addFilter(new FilterHolder(filter), "/*", 1);
+      
+      try 
+      {
+         server.start();
+         
+         if (logger.isInfoEnabled())
+            logger.info("Vti server started successfully on port: " + this.connector.getLocalPort());
+      } 
+      catch (Exception e) 
+      {
+         throw new AlfrescoRuntimeException("Error start VtiServer, cause: ", e);
+      }
+   }
+
+   /**
      * Method stops the server.  
      * @see org.alfresco.util.AbstractLifecycleBean#onBootstrap(org.springframework.context.ApplicationEvent)
      */

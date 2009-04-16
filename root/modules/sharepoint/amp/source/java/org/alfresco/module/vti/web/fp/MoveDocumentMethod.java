@@ -31,11 +31,11 @@ import java.util.List;
 
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
-import org.alfresco.module.vti.handler.alfresco.VtiUtils;
 import org.alfresco.module.vti.metadata.dic.PutOption;
 import org.alfresco.module.vti.metadata.dic.RenameOption;
 import org.alfresco.module.vti.metadata.model.DocMetaInfo;
 import org.alfresco.module.vti.metadata.model.DocsMetaInfo;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,9 +86,9 @@ public class MoveDocumentMethod extends AbstractMethod
 
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
 
-        response.addParameter("message=successfully renamed URL '" + VtiUtils.htmlEncode(oldUrl) + "' as '" + VtiUtils.htmlEncode(newUrl) + "'");
-        response.addParameter("oldUrl", VtiUtils.htmlEncode(oldUrl));
-        response.addParameter("newUrl", VtiUtils.htmlEncode(newUrl));
+        response.addParameter("message=successfully renamed URL '" + VtiEncodingUtils.encode(oldUrl) + "' as '" + VtiEncodingUtils.encode(newUrl) + "'");
+        response.addParameter("oldUrl", VtiEncodingUtils.encode(oldUrl));
+        response.addParameter("newUrl", VtiEncodingUtils.encode(newUrl));
         response.beginList("document_list");
         response.endList();
 
@@ -96,7 +96,7 @@ public class MoveDocumentMethod extends AbstractMethod
         for (DocMetaInfo document : docs.getFileMetaInfoList())
         {
             response.beginList();
-            response.addParameter("document_name", document.getPath());
+            response.addParameter("document_name", VtiEncodingUtils.encode(document.getPath()));
             response.beginList("meta_info");
             processDocMetaInfo(document, request, response);
             response.endList();
@@ -108,7 +108,7 @@ public class MoveDocumentMethod extends AbstractMethod
         for (DocMetaInfo url : docs.getFolderMetaInfoList())
         {
             response.beginList();
-            response.addParameter("url", url.getPath());
+            response.addParameter("url", VtiEncodingUtils.encode(url.getPath()));
             response.beginList("meta_info");
             processDocMetaInfo(url, request, response);
             response.endList();

@@ -27,6 +27,7 @@ package org.alfresco.module.vti.web.fp;
 import java.io.IOException;
 
 import org.alfresco.module.vti.handler.VtiHandlerException;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,8 +69,8 @@ public class UrlToWebUrlMethod extends AbstractMethod
             }
 
             response.beginVtiAnswer(getName(), ServerVersionMethod.version);
-            response.addParameter("webUrl=" + relativeUrls[0]);
-            response.addParameter("fileUrl=" + relativeUrls[1]);
+            response.addParameter("webUrl=" + VtiEncodingUtils.encode(relativeUrls[0]));
+            response.addParameter("fileUrl=" + VtiEncodingUtils.encode(relativeUrls[1]));
             response.endVtiAnswer();
         }
 

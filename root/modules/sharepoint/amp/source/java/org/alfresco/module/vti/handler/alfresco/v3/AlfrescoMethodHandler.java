@@ -204,7 +204,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler
                             {
                                 logger.debug("WebUrl: " + webUrl + ", fileUrl: '" + fileUrl + "'");
                             }
-                            return new String[] { webUrl, VtiUtils.htmlEncode(fileUrl) };
+                            return new String[] { webUrl, fileUrl };
                         }
                     }
                 }
@@ -339,7 +339,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler
         }
 
         Document document = new Document();
-        document.setPath(VtiUtils.htmlEncode(documentName));
+        document.setPath(documentName);
         setDocMetaInfo(documentFileInfo, document);
         ContentReader contentReader = getFileFolderService().getReader(documentFileInfo.getNodeRef());
         if (contentReader != null)
@@ -517,7 +517,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler
         documentFileInfo = getFileFolderService().getFileInfo(documentFileInfo.getNodeRef());
 
         DocMetaInfo docMetaInfo = new DocMetaInfo(false);
-        docMetaInfo.setPath(VtiUtils.htmlEncode(documentName));
+        docMetaInfo.setPath(documentName);
         setDocMetaInfo(documentFileInfo, docMetaInfo);
 
         return docMetaInfo;
@@ -551,7 +551,7 @@ public class AlfrescoMethodHandler extends AbstractAlfrescoMethodHandler
             setDocMetaInfo(fileInfo, docMetaInfo);
         }
 
-        docMetaInfo.setPath(VtiUtils.htmlEncode(path));
+        docMetaInfo.setPath(path);
 
         if (getNodeService().getType(fileInfo.getNodeRef()).equals(SiteModel.TYPE_SITE))
         {

@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.transaction.UserTransaction;
 
@@ -74,6 +75,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHandler
 {
     private static Log logger = LogFactory.getLog(AbstractAlfrescoDwsServiceHandler.class);
+    private static final Pattern illegalCharactersRegExpPattern = Pattern.compile("[^A-Za-z0-9_]+");
 
     protected FileFolderService fileFolderService;
     protected NodeService nodeService;
@@ -218,8 +220,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         // setting the permissions for current user such as add/edit/delete items or users
         List<Permission> permissions = doGetUsersPermissions(dwsNode);
 
-        // includes information about the schemas, lists, documents, links,
-        // and tasks lists of a document workspace site
+        // includes information about the schemas, lists, documents, links lists of a document workspace site
         if (!minimal)
         {
             // set Documents schema
@@ -253,7 +254,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
             List<ListInfoBean> listInfoItems = new ArrayList<ListInfoBean>();
             listInfoItems.add(new ListInfoBean("Documents", false, permissions));
             
-            // set Documents listInfo for documents list            
+            // set Links listInfo for links list            
             listInfoItems.add(new ListInfoBean("Links", false, permissions));
             
             dwsMetadata.setListInfoItems(listInfoItems);
@@ -795,7 +796,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         String lastName = (String) nodeService.getProperty(person, ContentModel.PROP_LASTNAME);
         boolean isSiteAdmin = (loginName.equals("admin") ? true : false);
 
-        return new UserBean(loginName, firstName + ' ' + lastName, loginName, email, false, isSiteAdmin);
+        return new UserBean(person.toString(), firstName + ' ' + lastName, loginName, email, false, isSiteAdmin);
     }
 
     /**
@@ -850,7 +851,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      */
     protected String removeIllegalCharacters(String value)
     {
-        return value.replaceAll("[!@#$%\\^&*\\(\\)\\-+=~`:;/\\\\\\[\\]\\{\\}|.,\"'\\s\\?<>]+", "_");
+        return illegalCharactersRegExpPattern.matcher(value).replaceAll("_");
     }
     
     /**

@@ -29,6 +29,7 @@ import java.io.IOException;
 import org.alfresco.module.vti.metadata.dic.VtiConstraint;
 import org.alfresco.module.vti.metadata.dic.VtiProperty;
 import org.alfresco.module.vti.metadata.dic.VtiType;
+import org.alfresco.module.vti.web.VtiEncodingUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,13 +69,13 @@ public class OpenServiceMethod extends AbstractMethod
         }
         response.beginVtiAnswer(getName(), ServerVersionMethod.version);
         response.beginList("service");
-        response.addParameter("service_name=" + (service_name.equals("/") ? "" : service_name));
+        response.addParameter("service_name=" + (service_name.equals("/") ? "" : VtiEncodingUtils.encode(service_name)));
         response.addParameter("meta_info=");
         response.beginList();
         response.writeMetaDictionary(VtiProperty.SERVICE_CASESENSITIVEURLS, VtiType.INT, VtiConstraint.X, "0");
         response.writeMetaDictionary(VtiProperty.SERVICE_LONGFILENAMES, VtiType.INT, VtiConstraint.X, "1");
         response.writeMetaDictionary(VtiProperty.SERVICE_WELCOMENAMES, VtiType.VECTOR, VtiConstraint.X, "index.html");
-        response.writeMetaDictionary(VtiProperty.SERVICE_USERNAME, VtiType.STRING, VtiConstraint.X, vtiHandler.getUserName());
+        response.writeMetaDictionary(VtiProperty.SERVICE_USERNAME, VtiType.STRING, VtiConstraint.X, VtiEncodingUtils.encode(vtiHandler.getUserName()));
         response.writeMetaDictionary(VtiProperty.SERVICE_SERVERTZ, VtiType.STRING, VtiConstraint.X, vtiHandler.getServertimeZone());
         response.writeMetaDictionary(VtiProperty.SERVICE_SOURCECONTROLSYSTEM, VtiType.STRING, VtiConstraint.R, "lw");
         response.writeMetaDictionary(VtiProperty.SERVICE_SOURCECONTROLVERSION, VtiType.STRING, VtiConstraint.R, "V1");

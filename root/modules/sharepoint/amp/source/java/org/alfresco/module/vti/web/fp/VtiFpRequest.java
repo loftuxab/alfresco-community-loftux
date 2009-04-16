@@ -109,6 +109,31 @@ public class VtiFpRequest extends HttpServletRequestWrapper
             param = checkForLineFeed(params[0]);
         }
 
+        try
+        {
+            if (param != null) {
+                param = new String(param.getBytes("ISO-8859-1"), "UTF-8");
+            }
+        }
+        catch (UnsupportedEncodingException e)
+        {
+        }
+        
+        return param;
+    }
+    
+    /**
+     * @see javax.servlet.ServletRequestWrapper#getParameter(java.lang.String)
+     */
+    public String getNotEncodedParameter(String name)
+    {
+        String param = null;
+        String[] params = getParameterValues(name);
+        if (params != null && params.length > 0)
+        {
+            param = checkForLineFeed(params[0]);
+        }
+        
         return param;
     }
 
@@ -413,7 +438,7 @@ public class VtiFpRequest extends HttpServletRequestWrapper
      */
     public Document getParameter(String paramName, Document defaultValue) throws IOException
     {
-        String mapString = checkForLineFeed(getParameter(paramName));
+        String mapString = checkForLineFeed(getNotEncodedParameter(paramName));
 
         Document result = new Document();
         if (mapString != null && mapString.length() > 0)

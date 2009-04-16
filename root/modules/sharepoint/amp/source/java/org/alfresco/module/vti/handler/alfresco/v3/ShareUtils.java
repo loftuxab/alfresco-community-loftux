@@ -25,7 +25,11 @@
 package org.alfresco.module.vti.handler.alfresco.v3;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.alfresco.util.URLEncoder;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.NameValuePair;
@@ -235,12 +239,16 @@ public class ShareUtils
 
             if (logger.isDebugEnabled())
                 logger.debug("Login method returned status: " + loginStatus);
+            
+            if (loginStatus >= HttpServletResponse.SC_BAD_REQUEST)
+            {
+               logger.error("Unexpected response code from share login method (" + loginMethod.getURI() + "): " + loginStatus);
+            }
         }
         catch (Exception e)
         {
             loginMethod.releaseConnection();
-            if (logger.isDebugEnabled())
-                logger.debug("Login into share failed. Message: " + e.getMessage());
+            logger.error("Login into share using URL " + loginMethod.getURI() + " failed. Message: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -254,12 +262,16 @@ public class ShareUtils
 
             if (logger.isDebugEnabled())
                 logger.debug("Create method returned status: " + createSiteStatus);
+            
+            if (createSiteStatus != HttpServletResponse.SC_OK)
+            {
+               logger.error("Unexpected response code from create site method (" + createSiteMethod.getURI() + "): " + createSiteStatus);
+            }
         }
         catch (Exception e)
         {
             createSiteMethod.releaseConnection();
-            if (logger.isDebugEnabled())
-                logger.debug("Fail to create the Site with name: " + shortName + ". Message: " + e.getMessage());
+            logger.error("Failed to create the site with name: " + shortName + ". Message: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
@@ -274,11 +286,15 @@ public class ShareUtils
 
             if (logger.isDebugEnabled())
                 logger.debug("Dashboard initialyzing finished with status: " + dashboardStatus);
+            
+            if (dashboardStatus != HttpServletResponse.SC_OK)
+            {
+               logger.error("Unexpected response code from initialise dashboard method (" + dashboard.getURI() + "): " + dashboardStatus);
+            }
         }
         catch (Exception e)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Dashboard initialyzing failed. Message: " + e.getMessage());
+            logger.error("Dashboard initialising failed. Message: " + e.getMessage());
             throw new RuntimeException(e);
         }
         finally
@@ -315,12 +331,16 @@ public class ShareUtils
 
             if (logger.isDebugEnabled())
                 logger.debug("Login method returned status: " + loginStatus);
+            
+            if (loginStatus >= HttpServletResponse.SC_BAD_REQUEST)
+            {
+               logger.error("Unexpected response code from share login method (" + loginMethod.getURI() + "): " + loginStatus);
+            }
         }
         catch (Exception e)
         {
             loginMethod.releaseConnection();
-            if (logger.isDebugEnabled())
-                logger.debug("Login into share failed. Message: " + e.getMessage());
+            logger.error("Login into share using URL " + loginMethod.getURI() + " failed. Message: " + e.getMessage());
             throw new RuntimeException(e);
         }
         try
@@ -332,11 +352,15 @@ public class ShareUtils
 
             if (logger.isDebugEnabled())
                 logger.debug("Delete method returned status: " + deleteSiteStatus);
+            
+            if (deleteSiteStatus != HttpServletResponse.SC_OK)
+            {
+               logger.error("Unexpected response code from share delete method (" + deleteSiteMethod.getURI() + "): " + deleteSiteStatus);
+            }
         }
         catch (Exception e)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("Fail to delete the Site with name: " + shortName + ". Message: " + e.getMessage());
+            logger.error("Failed to delete the Site with name: " + shortName + ". Message: " + e.getMessage());
             throw new RuntimeException(e);
         }
         finally
@@ -355,4 +379,36 @@ public class ShareUtils
         return shareContext;
     }
 
+    /**
+     * <p>encode string to share specific manner (all characters with code > 127 will be encoded in %u0... format)</p>
+     * 
+     * @param value to encode
+     * @return encoded value
+     * @throws UnsupportedEncodingException 
+     */
+    public static String encode(String value) throws UnsupportedEncodingException
+    {
+        StringBuilder result = new StringBuilder(value.length());
+        
+        for (int i = 0; i < value.length(); i++)
+        {
+            char c = value.charAt(i);
+            if (c > 127)
+            {
+                result.append("%u0" + Integer.toHexString(c).toUpperCase());
+            }
+            else
+            {
+                if (c > 'a' && c < 'z' || c > 'A' && c < 'Z' || c == '/' || c == '@' || c == '+')
+                {
+                    result.append(c);
+                }
+                else
+                {
+                    result.append(URLEncoder.encode(c + ""));                    
+                }   
+            }
+        }
+        return result.toString();        
+    }
 }
