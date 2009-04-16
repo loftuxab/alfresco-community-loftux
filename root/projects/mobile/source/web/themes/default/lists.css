@@ -2,7 +2,7 @@
 ul.list,ul.list li {
    list-style:none;
    padding:0;
-   line-height: 17px;
+   line-height: 24px;
 }
 /* Rounded corner lists */
 ul.rr,div.rr {

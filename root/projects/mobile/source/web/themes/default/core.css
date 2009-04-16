@@ -193,7 +193,7 @@ a.button.delete {
 #homePage ul.nav li a,
 #sitePage ul.list .rr  li a,
 #DocsPage ul.list.rr li a  {
-  padding-left:2.2em;
+  padding-left:2.5em;
   font-weight:bold;
 }
 
@@ -205,49 +205,49 @@ a.button.delete {
 } 
 
 #homePage ul.nav li.events a{ 
-     background:transparent url(./images/icons/24-events.png) no-repeat  5px 5px;   
+     background:transparent url(./images/icons/24-events.png) no-repeat 8px 8px;
 /*   background-position: 10px -116px; */
 } 
 #homePage ul.nav li.fav a,
 ul.e2e.fav li a {
-   background:transparent url(./images/icons/24-favourite-selected.png) no-repeat  5px 5px;      
+   background:transparent url(./images/icons/24-favourite-selected.png) no-repeat 8px 8px;
 /*   background-position: 10px -163px;*/
 } 
 #homePage ul.nav li.invitetosite a,
 #sitePage ul.list .rr li.invitetosite a { 
-   background:transparent url(./images/icons/invite-site-24.png) no-repeat  5px 5px;      
+   background:transparent url(./images/icons/invite-site-24.png) no-repeat 8px 8px;
 /*   background-position:10px -213px; */
 } 
 #homePage ul.nav li.newwikipage a,
 #sitePage ul.list .rr li.newwikipage a { 
-   background:transparent url(./images/icons/24-new-wiki-page.png) no-repeat  5px 5px;      
+   background:transparent url(./images/icons/24-new-wiki-page.png) no-repeat 8px 8px;
 /*   background-position: 10px -351px; */
 } 
 #homePage ul.nav li.recentactivity a{
-   background:transparent url(./images/icons/my-activities-24.png) no-repeat  5px 5px;         
+   background:transparent url(./images/icons/my-activities-24.png) no-repeat 8px 8px;
 /*   background-position:10px -399px; */
 } 
 #homePage ul.nav li.recentdocs a{ 
-   background:transparent url(./images/icons/recent-docs-24.png) no-repeat  5px 5px;         
+   background:transparent url(./images/icons/recent-docs-24.png) no-repeat 8px 8px;
 /*   background-position: 10px -447px; */
 } 
 
 #homePage ul.nav li.sites a {
-   background:transparent url(./images/icons/24-site.png) no-repeat  5px 5px;         
+   background:transparent url(./images/icons/24-site.png) no-repeat 8px 8px;
 }
 #homePage ul.nav li.publicsites a {
-   background:transparent url(./images/icons/browse-sites-24.png) no-repeat  5px 5px;      
+   background:transparent url(./images/icons/browse-sites-24.png) no-repeat 8px 8px;
 /*   background-position: 10px -495px;*/
 
 
 } 
 #homePage ul.nav li.all a,
 #homePage ul.nav li.tasks a {
-   background:transparent url(./images/icons/24-tasks.png) no-repeat  5px 5px;         
+   background:transparent url(./images/icons/24-tasks.png) no-repeat 8px 8px;         
 }
 
 #homePage ul.nav li.siteactivities a {
-   background:transparent url(./images/icons/site-activities-24.png) no-repeat  5px 5px;         
+   background:transparent url(./images/icons/site-activities-24.png) no-repeat 8px 8px;         
 }
 
 #homePage ul.nav ul,
