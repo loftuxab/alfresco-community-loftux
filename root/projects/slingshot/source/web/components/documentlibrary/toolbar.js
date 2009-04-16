@@ -48,7 +48,8 @@
     * Preferences
     */
    var PREFERENCES_ROOT = "org.alfresco.share.documentList",
-      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar";
+      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar",
+      PREF_ACTIONS = PREFERENCES_ROOT + ".actions";
    
    /**
     * DocListToolbar constructor.
@@ -263,6 +264,9 @@
          this.widgets.selectedItems.getMenu().lazyLoad = false;
          this.widgets.selectedItems.getMenu().initEvent.fire();
          this.widgets.selectedItems.getMenu().render();
+
+         // Customize button
+         this.widgets.customize = Alfresco.util.createYUIButton(this, "customize-button", this.onCustomize);
 
          // Hide/Show NavBar button
          this.widgets.hideNavBar = Alfresco.util.createYUIButton(this, "hideNavBar-button", this.onHideNavBar);
@@ -792,6 +796,18 @@
       },
 
       /**
+       * Customize button click handler
+       *
+       * @method onCustomize
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onCustomize: function DLTB_onCustomize(e, p_obj)
+      {
+         
+      },
+
+      /**
        * Show/Hide navigation bar button click handler
        *
        * @method onHideNavBar
@@ -808,7 +824,6 @@
          Dom.setStyle(this.id + "-navBar", "display", this.options.hideNavBar ? "none" : "block");
          Event.preventDefault(e);
       },
-
 
       /**
        * Folder Up Navigate button click handler
