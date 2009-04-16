@@ -40,6 +40,7 @@
    float: right;
 }
 
+.toolbar .customize,
 .toolbar .hide-navbar,
 .toolbar .rss-feed
 {
@@ -207,6 +208,16 @@
 .toolbar .file-upload .yui-button-disabled button
 {
    background-image: url(images/upload-disabled-16.png);
+}
+
+.toolbar .customize button
+{
+   background: transparent url(images/customize-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+.toolbar .customize .yui-button-disabled button
+{
+   background-image: url(images/customize-disabled-16.png);
 }
 
 .toolbar .rss-feed a

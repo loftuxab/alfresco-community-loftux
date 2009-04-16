@@ -473,8 +473,9 @@ Alfresco.util.encodeHTML = function(text)
       return "";
    }
    
-   if ((YAHOO.env.ua.ie > 0) || (YAHOO.env.ua.webkit > 0))
+   if (YAHOO.env.ua.ie > 0)
    {
+      text = "" + text;
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;");
    }
    var me = arguments.callee;
@@ -522,6 +523,7 @@ Alfresco.util.activateLinks = function(text)
 Alfresco.util.stripUnsafeHTMLTags = function(s)
 {
    var me = arguments.callee;
+   s = "" + s;
    s = s.replace("onclick", "$");
    s = s.replace("onmouseover", "$");
    s = s.replace("onmouseout", "$");

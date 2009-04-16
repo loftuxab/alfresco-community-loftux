@@ -69,51 +69,30 @@
          <div class="onActionShowMore"><a href="#" class="show-more" title="${msg("actions.more")}"><span>${msg("actions.more")}</span></a></div>
          <div class="more-actions hidden"></div>
       </div>
-      
-      <#--
-         IMPORTANT: Do not add linefeeds between tags on individual actions as this will break DOM parsing code.
-         (See note in documentlist.js)
-      -->
+
       <!-- Action Set Templates -->
-      <div id="${args.htmlid}-actionSet-empty" class="action-set">
+<#list actionSets?keys as key>
+   <#assign actionSet = actionSets[key]>
+      <div id="${args.htmlid}-actionSet-${key}" class="action-set">
+   <#list actionSet as action>
+         <div class="${action.id}"><a rel="${action.permission!""}" href="${action.href}" class="${action.type}" title="${msg(action.label)}"><span>${msg(action.label)}</span></a></div>
+   </#list>
       </div>
+</#list>
+   </div>
 
-      <div id="${args.htmlid}-actionSet-document" class="action-set">
-         <div class="onActionDownload"><a rel="" href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download")}"><span>${msg("actions.document.download")}</span></a></div>
-         <div class="onActionDetails"><a rel="edit" href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
-         <div class="onActionEditOnline"><a rel="edit,online-edit" href="#" class="action-link" title="${msg("actions.document.edit-online")}"><span>${msg("actions.document.edit-online")}</span></a></div>
-         <div class="onActionEditOffline"><a rel="edit" href="#" class="action-link" title="${msg("actions.document.edit-offline")}"><span>${msg("actions.document.edit-offline")}</span></a></div>
-         <div class="onActionCopyTo"><a rel="" href="#" class="action-link" title="${msg("actions.document.copy-to")}"><span>${msg("actions.document.copy-to")}</span></a></div>
-         <div class="onActionMoveTo"><a rel="delete" href="#" class="action-link" title="${msg("actions.document.move-to")}"><span>${msg("actions.document.move-to")}</span></a></div>
-         <div class="onActionDelete"><a rel="delete" href="#" class="action-link" title="${msg("actions.document.delete")}"><span>${msg("actions.document.delete")}</span></a></div>
-         <div class="onActionAssignWorkflow"><a rel="" href="#" class="action-link" title="${msg("actions.document.assign-workflow")}"><span>${msg("actions.document.assign-workflow")}</span></a></div>
-         <div class="onActionManagePermissions"><a rel="permissions" href="#" class="action-link" title="${msg("actions.document.manage-permissions")}"><span>${msg("actions.document.manage-permissions")}</span></a></div>
-      </div>
-
-      <div id="${args.htmlid}-actionSet-locked" class="action-set">
-         <div class="onActionDownload"><a rel="" href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download")}"><span>${msg("actions.document.download")}</span></a></div>
-      </div>
-
-      <div id="${args.htmlid}-actionSet-lockOwner" class="action-set">
-         <div class="onActionDownload"><a rel="" href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download-original")}"><span>${msg("actions.document.download-original")}</span></a></div>
-      </div>
-
-      <div id="${args.htmlid}-actionSet-workingCopyOwner" class="action-set">
-         <div class="onActionUploadNewVersion"><a href="#" class="action-link" title="${msg("actions.document.upload-new-version")}"><span>${msg("actions.document.upload-new-version")}</span></a></div>
-         <div class="onActionDownload"><a rel="" href="{downloadUrl}" class="simple-link" title="${msg("actions.document.download-again")}"><span>${msg("actions.document.download-again")}</span></a></div>
-         <div class="onActionCancelEditing"><a rel="" href="#" class="action-link" title="${msg("actions.document.cancel-editing")}"><span>${msg("actions.document.cancel-editing")}</span></a></div>
-      </div>
-
-      <div id="${args.htmlid}-actionSet-folder" class="action-set">
-         <div class="onActionDetails"><a rel="edit" href="#" class="action-link" title="${msg("actions.document.details")}"><span>${msg("actions.document.details")}</span></a></div>
-         <div class="onActionCopyTo"><a rel="" href="#" class="action-link" title="${msg("actions.folder.copy-to")}"><span>${msg("actions.folder.copy-to")}</span></a></div>
-         <div class="onActionMoveTo"><a rel="delete" href="#" class="action-link" title="${msg("actions.folder.move-to")}"><span>${msg("actions.folder.move-to")}</span></a></div>
-         <div class="onActionDelete"><a rel="delete" href="#" class="action-link" title="${msg("actions.folder.delete")}"><span>${msg("actions.folder.delete")}</span></a></div>
-         <div class="onActionManagePermissions"><a rel="permissions" href="#" class="action-link" title="${msg("actions.document.manage-permissions")}"><span>${msg("actions.document.manage-permissions")}</span></a></div>
-      </div>
-
-      <div id="${args.htmlid}-actionSet-link" class="action-set">
-         <div class="onActionDelete"><a rel="delete" href="#" class="action-link" title="${msg("actions.link.delete")}"><span>${msg("actions.link.delete")}</span></a></div>
+   <div id="${args.htmlid}-customize" class="customize">
+      <div class="hd">${msg("customize.title")}</div>
+      <div class="bd">
+         <form id="${args.htmlid}-customize-form" action="#" method="post">
+            <div class="yui-g">
+               <h2>${msg("customize.header.actions")}:</h2>
+            </div>
+            <div class="bdft">
+               <input type="button" id="${args.htmlid}-customize-ok" value="${msg("button.ok")}" tabindex="1" />
+               <input type="button" id="${args.htmlid}-customize-cancel" value="${msg("button.cancel")}" tabindex="2" />
+            </div>
+         </form>
       </div>
    </div>
 

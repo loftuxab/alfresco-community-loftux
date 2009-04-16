@@ -33,6 +33,7 @@
          </div>
       </div>
       <div class="right">
+         <div class="customize" style="display: none;"><button id="${args.htmlid}-customize-button" name="customize">${msg("button.customize")}</button></div>
          <div class="hide-navbar"><button id="${args.htmlid}-hideNavBar-button" name="hideNavBar">${msg("button.navbar.hide")}</button></div>
          <div class="rss-feed"><button id="${args.htmlid}-rssFeed-button" name="rssFeed">${msg("link.rss-feed")}</button></div>
       </div>

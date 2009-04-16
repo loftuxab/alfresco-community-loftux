@@ -1396,7 +1396,7 @@
          // elRename is the element id of the rename file link
          // var elRename = Dom.get(this.id + "-rename-" + oArgs.target.id);
 
-         // elActions is the element id of the active table cell where we'll inject the actual links
+         // elActions is the element id of the active table cell where we'll inject the actions
          var elActions = Dom.get(this.id + "-actions-" + oArgs.target.id);
 
          // Inject the correct action elements into the actionsId element
@@ -1434,6 +1434,7 @@
                userAccess["online-edit"] = true;
             }
             
+            // Remove any actions the user doesn't have permission for
             var actions = YAHOO.util.Selector.query("div", clone);
             var actionPermissions, i, ii, j, jj;
             for (i = 0, ii = actions.length; i < ii; i++)
