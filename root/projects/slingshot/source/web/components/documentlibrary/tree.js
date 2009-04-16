@@ -521,6 +521,7 @@
             {
                // Node found, so rename it
                node.label = obj.file.displayName;
+               node.data.path = obj.file.location.path;
                this.widgets.treeview.render();
                this._showHighlight(true);
             }
@@ -745,6 +746,9 @@
          // Create a new tree
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
          this.widgets.treeview = tree;
+         
+         // Having both focus and highlight are just confusing (YUI 2.7.0 addition)
+         YAHOO.widget.TreeView.FOCUS_CLASS_NAME = "";
 
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
