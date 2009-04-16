@@ -117,7 +117,7 @@ ul.e2e li.details p
 ul.e2e li.details span {
    color:#000;
 }
-/*ul.e2e li.doc{
+ul.e2e li.doc{
    background:#fff url(./images/icons/doc.png) no-repeat 0.5em;
 }
 
@@ -136,7 +136,7 @@ ul.e2e li.pdf {
 ul.e2e li.xls {
    background:#fff url(./images/icons/xls.png) no-repeat 0.5em;
 }
-*/
+
 ul.rr.info li {
    background-image:none;
    padding:0.5em;
