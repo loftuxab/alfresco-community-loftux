@@ -122,7 +122,7 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
     /**
      * Spring initilaise method used to register the policy behaviours
      */
-    public void initialise()
+    public void init()
     {
         // Register the policy behaviours
         this.policyComponent.bindClassBehaviour(

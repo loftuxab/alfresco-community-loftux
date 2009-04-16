@@ -13,7 +13,7 @@
     </bean>
       
     <!-- ContentHits Aspect Behaviour Bean -->
-    <bean id="contentHitsAspect" class="org.alfresco.sample.ContentHitsAspect" init-method="initialise">
+    <bean id="contentHitsAspect" class="org.alfresco.sample.ContentHitsAspect" init-method="init">
     	<property name="nodeService">
     		<ref bean="nodeService"/>
     	</property>
