@@ -70,6 +70,7 @@ div.tabs ul.tablinks li:last-child a
 .tabs .e2e.active,
 .tabcontent div.active,
 .tabcontent div.active .e2e,
+.tabs .active .e2e,
 .tabcontent div.details,
 .tabcontent div.details div  {
    display:block;

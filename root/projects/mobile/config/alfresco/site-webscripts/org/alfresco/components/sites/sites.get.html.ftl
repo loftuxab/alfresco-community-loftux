@@ -17,22 +17,22 @@
               <li><a href="#All" class="button">${msg('All')}</a></li>
             </ul> 
             <div class="tabcontent">
-              <ul id="Fav" class="e2e list active fav">
+              <ul id="Fav" class="e2e list active hilite">
                 <#list favSites as site>
-                <li><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
+                <li class="fav"><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
                 </#list>
                 <#-- <li><a id="Sales" href="#site.html" class="panelLink">Sales</a></li>
                 <li><a id="Project-Mobile" href="#site.html" class="panelLink">Project Mobile</a></li>
                 <li><a id="New-Wiki" href="#newwikipage.html" class="panelLink">Project Jaws</a></li> -->
               </ul>
-              <ul id="My" class="e2e list">
+              <ul id="My" class="e2e list hilite">
                 <#list sites as site>
                 <li><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
                 </#list>                
                 <#-- <li><a id="My-Site-1" href="#site.html" class="panelLink">My Site 1</a></li>
                 <li><a id="My-Site-2" href="#site.html" class="panelLink">My Site 2</a></li> -->
               </ul>
-              <ul id="All" class="e2e list">
+              <ul id="All" class="e2e list hilite">
                 <#list allSites as site>
                 <li><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
                 </#list>                

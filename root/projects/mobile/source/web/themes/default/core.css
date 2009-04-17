@@ -190,10 +190,11 @@ a.button.delete {
 /* end Button */
 
 /* Homepage */
-#homePage ul.nav li a,
+/*#homePage ul.nav li a,
 #sitePage ul.list .rr  li a,
 #DocsPage ul.list.rr li a  {
-  padding-left:2.5em;
+*/
+ul.rr li a {
   font-weight:bold;
 }
 
@@ -204,50 +205,88 @@ a.button.delete {
 /*   background:transparent url(./images/icons/16-icons-sprite.png) no-repeat  top left; */
 } 
 
-#homePage ul.nav li.events a{ 
-     background:transparent url(./images/icons/24-events.png) no-repeat 8px 8px;
-/*   background-position: 10px -116px; */
+
+/* this will need to be done separately for each once the icons have been sprited */
+li.fav:hover a,
+ul.e2e li.fav:hover a,
+li.events:hover a,
+li.invitetosite:hover a,
+li.newwikipage:hover a,
+li.recentactivity:hover a,
+li.recentdocs:hover a,
+li.sites:hover a,
+li.publicsites:hover a,
+li.all:hover a,
+li.tasks:hover a,
+li.siteactivities:hover a,
+li.documents:hover a,
+li.mydocuments:hover a,
+li.alldocuments:hover a,
+li.allfolders:hover a, 
+li.mainwikipage:hover a,
+li.wikipagelist:hover a,
+li.leavesite:hover a
+{
+   background-position:8px 8px,100% -32px;
+}
+li.events a{ 
+   background:url(./images/icons/24-events.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 } 
-#homePage ul.nav li.fav a,
-ul.e2e.fav li a {
-   background:transparent url(./images/icons/24-favourite-selected.png) no-repeat 8px 8px;
-/*   background-position: 10px -163px;*/
+
+li.fav a,
+ul.e2e li.fav a {
+   background:url(./images/icons/24-favourite-selected.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 } 
-#homePage ul.nav li.invitetosite a,
-#sitePage ul.list .rr li.invitetosite a { 
-   background:transparent url(./images/icons/invite-site-24.png) no-repeat 8px 8px;
-/*   background-position:10px -213px; */
+li.invitetosite a { 
+   background:url(./images/icons/invite-site-24.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 } 
-#homePage ul.nav li.newwikipage a,
-#sitePage ul.list .rr li.newwikipage a { 
-   background:transparent url(./images/icons/24-new-wiki-page.png) no-repeat 8px 8px;
-/*   background-position: 10px -351px; */
+/*#homePage ul.nav li.newwikipage a,
+#sitePage ul.list .rr li.newwikipage a { */
+li.newwikipage a {
+   background:url(./images/icons/24-new-wiki-page.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 } 
-#homePage ul.nav li.recentactivity a{
-   background:transparent url(./images/icons/my-activities-24.png) no-repeat 8px 8px;
-/*   background-position:10px -399px; */
+/*#homePage ul.nav li.recentactivity a{*/
+li.recentactivity a {   
+   background:url(./images/icons/my-activities-24.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 } 
-#homePage ul.nav li.recentdocs a{ 
-   background:transparent url(./images/icons/recent-docs-24.png) no-repeat 8px 8px;
+/*#homePage ul.nav li.recentdocs a{ */
+li.recentdocs a { 
+   background:url(./images/icons/recent-docs-24.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 /*   background-position: 10px -447px; */
 } 
 
-#homePage ul.nav li.sites a {
-   background:transparent url(./images/icons/24-site.png) no-repeat 8px 8px;
+/*#homePage ul.nav li.sites a {*/
+li.sites a {   
+   background:url(./images/icons/24-site.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 }
-#homePage ul.nav li.publicsites a {
-   background:transparent url(./images/icons/browse-sites-24.png) no-repeat 8px 8px;
+/*#homePage ul.nav li.publicsites a {*/
+li.publicsites a {   
+   background:url(./images/icons/browse-sites-24.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;
 /*   background-position: 10px -495px;*/
 
 
 } 
-#homePage ul.nav li.all a,
+/*#homePage ul.nav li.all a,
 #homePage ul.nav li.tasks a {
-   background:transparent url(./images/icons/24-tasks.png) no-repeat 8px 8px;         
+*/
+li.all a,
+li.tasks a {
+   background:url(./images/icons/24-tasks.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;        
 }
 
-#homePage ul.nav li.siteactivities a {
-   background:transparent url(./images/icons/site-activities-24.png) no-repeat 8px 8px;         
+/*#homePage ul.nav li.siteactivities a {*/
+li.siteactivities a {   
+   background:url(./images/icons/site-activities-24.png) no-repeat 8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;         
 }
 
 #homePage ul.nav ul,
@@ -303,30 +342,45 @@ body#loginPage label {
 body#loginPage #btn-login {
    display:block;
 }
-#sitePage ul.list .rr li.documents a {
-   background:transparent url(./images/icons/recent-modified-docs-24-a.png) no-repeat  5px 5px;               
+
+
+/*#sitePage ul.list .rr li.documents a {*/
+li.documents a {   
+   background:url(./images/icons/recent-modified-docs-24-a.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;               
 }
-#sitePage ul.list .rr li.mydocuments a {
-   background:transparent url(./images/icons/my-docs-24-a.png) no-repeat  5px 5px;               
+/*#sitePage ul.list .rr li.mydocuments a {*/
+li.mydocuments a {   
+   background:url(./images/icons/my-docs-24-a.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;               
 }
-#sitePage ul.list .rr li.alldocuments a {
-   background:transparent url(./images/icons/all-documents-24-a.png) no-repeat  5px 5px;            
+/*#sitePage ul.list .rr li.alldocuments a {*/
+li.alldocuments a {   
+   background:url(./images/icons/all-documents-24-a.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;            
 /*    background-position:10px -66px;   */
 }
 
-#sitePage ul.list li.allfolders a, 
-#DocsPage ul.list li.allfolders a {
-   background:transparent url(./images/icons/24-folder.png) no-repeat  5px 5px;            
+/*#sitePage ul.list li.allfolders a, 
+#DocsPage ul.list li.allfolders a {*/
+li.allfolders a {
+
+   background:url(./images/icons/24-folder.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;            
  /*    background-position:10px -22px;   */
 }
 
-#sitePage ul.list .rr li.mainwikipage a {
-   background:transparent url(./images/icons/main-wiki-24.png) no-repeat  5px 5px;            
+/*#sitePage ul.list .rr li.mainwikipage a {*/
+li.mainwikipage a {   
+   background:url(./images/icons/main-wiki-24.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;            
 /*    background-position:10px -303px;   */
 }
 
-#sitePage ul.list .rr li.wikipagelist a{
-   background:transparent url(./images/icons/wiki-list-24.png) no-repeat  5px 5px;               
+/*#sitePage ul.list .rr li.wikipagelist a{*/
+li.wikipagelist a {   
+   background:url(./images/icons/wiki-list-24.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;               
 /*    background-position:10px -638px;   */
 }
 
@@ -338,13 +392,15 @@ body#loginPage #btn-login {
     background-position:10px -212px;   
 }*/
 
-#sitePage ul.list .rr li.leavesite a{
-   background:transparent url(./images/icons/24-leave-site.png) no-repeat  5px 5px;            
+/*#sitePage ul.list .rr li.leavesite a{*/
+li.leavesite a {
+background:url(./images/icons/24-leave-site.png) no-repeat  8px 8px,
+              url(./images/arrow2.png) 100% 7px no-repeat;            
 /*    background-position:10px -260px;   */
 }
 
-ul.e2e.fav li a {
-   padding-left:2.2em;
+ul.e2e li.fav a {
+   padding-left:2.5em;
 }
 #homePage #homePanel .toolbar {
    display:none;
@@ -398,13 +454,13 @@ ul.e2e.fav li a {
    
 }
 */
-#SearchResultsPage .toolbar {
+#searchPage .toolbar {
    display:none;
 }
-#SearchResultsPage .tabs * {
+#searchPage .tabs * {
    text-align:center;
 }
-#SearchResultsPage a#loadmore {
+#searchPage a#loadmore {
    text-align:center;
    position:static;
    color:#000;
@@ -412,20 +468,25 @@ ul.e2e.fav li a {
    text-shadow:none;
 }
 
-#SearchResultsPage .tabs .tabcontent *{
+#searchPage .tabs .tabcontent *{
    text-align:left;
 }
-#SearchResultsPage .tabcontent h2 {
+#searchPage .tabcontent h2 {
    padding:0.5em;
    margin:0 0 0 0.5em;
    color:#000;
    font-weight:normal;
    line-height:16px;
 }
-#SearchResultsPage .tabcontent h2 span {
+#searchPage .tabcontent h2 span {
    float:right;
    color:#999;
    font-size:12px;
+}
+
+#searchPage #Sites p.toenail a{
+   padding-top:0;
+   padding-left:0;
 }
 .tabcontent {
    background-color:#f2f2f2;

@@ -35,7 +35,6 @@
           this.elements = x$(this.config.el);
         };
         this.activeEls = x$(this.config.el).find('.active');
-        console.log(this.activeEls.elements)
 
         //this.elements is .tabs element
         var that = this;
