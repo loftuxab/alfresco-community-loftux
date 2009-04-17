@@ -16,7 +16,7 @@
              <h2>${site.shortName}</h2>
              <p>${site.description}</p>
            </div>
-           <a href="#TODO" class="more"><img src="${url.context}/themes/${theme}/images/30-goarrow.png" /></a>
+           <a href="#TODO" class="more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
          </div>
          <ul class="nav list">
            <li>
