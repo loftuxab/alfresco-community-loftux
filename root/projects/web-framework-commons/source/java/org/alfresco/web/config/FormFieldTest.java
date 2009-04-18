@@ -47,7 +47,7 @@ public class FormFieldTest extends TestCase
         testElement.addField("id1",
                 Arrays.asList(new String[]{"aa", "bb", "cc"}),
                 Arrays.asList(new String[]{"AA", "BB", "CC"}));
-        testElement.addConstraintForField("id1", "REGEX", "Test message", "Test msg ID");
+        testElement.addConstraintForField("id1", "REGEX", "Test message", "Test msg ID", null, null);
         testElement.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
                 Arrays.asList(new String[]{"CP1", "CP2"}));
@@ -82,14 +82,18 @@ public class FormFieldTest extends TestCase
         assertEquals("test1.ftl", fieldID1.getTemplate());
         assertEquals("test2.ftl", fieldID2.getTemplate());
         
-        assertEquals("Test message", fieldID1.getConstraintMessages().get(0).getMessage());
-        assertEquals(Collections.emptyList(), fieldID2.getConstraintMessages());
+        Map<String, ConstraintHandlerDefinition> fieldID1Constraints = fieldID1.getConstraintDefinitionMap();
+        Map<String, ConstraintHandlerDefinition> fieldID2Constraints = fieldID2.getConstraintDefinitionMap();
+        ConstraintHandlerDefinition firstFieldID1Constraint = fieldID1Constraints.values().iterator().next();
         
-        assertEquals("Test msg ID", fieldID1.getConstraintMessages().get(0).getMessageId());
-        assertEquals(Collections.emptyList(), fieldID2.getConstraintMessages());
+        assertEquals("Test message", firstFieldID1Constraint.getMessage());
+        assertEquals(Collections.emptyMap(), fieldID2Constraints);
+        
+        assertEquals("Test msg ID", firstFieldID1Constraint.getMessageId());
+        assertEquals(Collections.emptyMap(), fieldID2Constraints);
 
-        assertEquals("REGEX", fieldID1.getConstraintMessages().get(0).getType());
-        assertEquals(Collections.emptyList(), fieldID2.getConstraintMessages());
+        assertEquals("REGEX", firstFieldID1Constraint.getType());
+        assertEquals(Collections.emptyMap(), fieldID2Constraints);
 
         List<ControlParam> expectedCPs = new ArrayList<ControlParam>();
         expectedCPs.add(new ControlParam("cp1", "CP1"));
@@ -123,7 +127,7 @@ public class FormFieldTest extends TestCase
     {
         FormConfigElement fce = new FormConfigElement();
         fce.addField("id1", null, null);
-        fce.addConstraintForField("id1", "REGEX", null, null);
+        fce.addConstraintForField("id1", "REGEX", null, null, null, null);
         fce.addControlForField("id1", null, null, null);
         
         FormField recoveredFce = fce.getFields().get("id1");
@@ -138,7 +142,7 @@ public class FormFieldTest extends TestCase
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
         assertEquals("Expected no template.", null, recoveredFce.getTemplate());
         assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControlParams());
-        assertEquals("Expected no constraint msg.", Collections.emptyList(), recoveredFce.getConstraintMessages());
+        assertEquals("Expected no constraint msg.", Collections.emptyMap(), recoveredFce.getConstraintDefinitionMap());
     }
     
     public void testExtraControlParamValueIsIgnored()
@@ -181,7 +185,7 @@ public class FormFieldTest extends TestCase
         FormField secondInstance = new FormField("name", attrs2);
         secondInstance.setTemplate("test.ftl");
         secondInstance.addControlParam("foo", "bar");
-        secondInstance.addConstraintMessage("REGEX", "msg", "msg-id");
+        secondInstance.addConstraintDefinition("REGEX", "msg", "msg-id", null, null);
         
         FormField combinedField = firstInstance.combine(secondInstance);
         
@@ -217,7 +221,7 @@ public class FormFieldTest extends TestCase
         FormField firstInstance = new FormField("name", attrs1);
         firstInstance.setTemplate("test.ftl");
         firstInstance.addControlParam("foo", "bar");
-        firstInstance.addConstraintMessage("REGEX", "msg", "msg-id");
+        firstInstance.addConstraintDefinition("REGEX", "msg", "msg-id", null, null);
         
         Map<String, String> attrs2 = new LinkedHashMap<String, String>();
         attrs2.put("label", "Name");
@@ -225,7 +229,7 @@ public class FormFieldTest extends TestCase
         FormField secondInstance = new FormField("name", attrs2);
         secondInstance.setTemplate("newtest.ftl");
         secondInstance.addControlParam("foo", "barrr");
-        secondInstance.addConstraintMessage("REGEX", "newmsg", "newmsg-id");
+        secondInstance.addConstraintDefinition("REGEX", "newmsg", "newmsg-id", null, null);
         
         FormField combinedField = firstInstance.combine(secondInstance);
         

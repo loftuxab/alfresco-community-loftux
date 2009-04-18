@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -45,12 +45,12 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
      * entries. We are interested here in the insertion order of key/value pairs and
      * later in this class, we are traversing the keys with the assumption that they
      * will be iterated in insertion order.
-     * Sun's javadoc is interesting here as it makes it clear that the <i>values</i> will have
+     * Sun's javadoc is interesting here as it makes it clear that the values will have
      * their order maintained.
-     * TODO The insertion order of keys is observed to be maintained in Apple's 1.5 VM,
+     * The insertion order of keys is observed to be maintained in Apple's 1.5 VM,
      * but it's not clear that this is a contractual obligation w.r.t. the class API.
      */
-    private Map<String, ItemDefinition> items = new LinkedHashMap<String, ItemDefinition>();
+    private Map<String, ConstraintHandlerDefinition> items = new LinkedHashMap<String, ConstraintHandlerDefinition>();
 
     /**
      * This constructor creates an instance with the default name.
@@ -120,7 +120,7 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     /* package */void addDataMapping(String type, String validationHandler,
             String message, String messageID, String event)
     {
-        items.put(type, new ItemDefinition(type, validationHandler, message, messageID, event));
+        items.put(type, new ConstraintHandlerDefinition(type, validationHandler, message, messageID, event));
     }
 
     /**
@@ -188,64 +188,8 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     	return this.getConstraintTypes();
     }
     
-    public Map<String, ItemDefinition> getItems()
+    public Map<String, ConstraintHandlerDefinition> getItems()
     {
     	return Collections.unmodifiableMap(items);
-    }
-    
-    public class ItemDefinition
-    {
-    	private final String type;
-    	private final String validationHandler;
-    	private final String message;
-    	private final String messageId;
-    	private final String event;
-    	
-    	public ItemDefinition(String type, String validationHandler, 
-    	                      String msg, String msgId, String event)
-    	{
-            this.type              = type == null ? "" : type;
-            this.validationHandler = validationHandler;
-            this.message           = msg;
-            this.messageId         = msgId;
-            this.event             = event;
-    	}
-    	
-		public String getType() 
-		{
-			return type;
-		}
-		
-		public String getValidationHandler() 
-		{
-			return validationHandler;
-		}
-		
-		public String getMessage() 
-		{
-			return message;
-		}
-		
-		public String getMessageId() 
-		{
-			return messageId;
-		}
-		
-		public String getEvent()
-		{
-		    return event;
-		}
-
-        @Override
-        public String toString()
-        {
-            StringBuilder result = new StringBuilder();
-            result.append(type).append(", ")
-                .append(validationHandler).append(", ")
-                .append(message).append(", ")
-                .append(messageId).append(", ")
-                .append(event);
-            return result.toString();
-        }
     }
 }

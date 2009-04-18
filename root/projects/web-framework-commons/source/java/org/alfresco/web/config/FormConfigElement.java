@@ -24,8 +24,8 @@
  */
 package org.alfresco.web.config;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,8 +47,10 @@ public class FormConfigElement extends ConfigElementAdapter
 {
     private static final long serialVersionUID = -7008510360503886308L;
     private static Log logger = LogFactory.getLog(FormConfigElement.class);
-
-    public static final String FORM_ID = "form";
+    
+    public static final String FORM_NAME_ID = "form";
+    
+    private String formId;
     private String submissionURL;
 //    private List<StringPair> modelOverrides = new ArrayList<StringPair>();
     
@@ -56,17 +58,18 @@ public class FormConfigElement extends ConfigElementAdapter
      * Map of the required roles for create-form templates.
      * Key = the template String. Value = the requires-role String.
      */
-    private final Map<String, String> rolesForCreateTemplates = new LinkedHashMap<String, String>();
-    private final Map<String, String> rolesForEditTemplates = new LinkedHashMap<String, String>();
-    private final Map<String, String> rolesForViewTemplates = new LinkedHashMap<String, String>();
+    private final Map<String, String> rolesForCreateTemplates = new LinkedHashMap<String, String>(2);
+    private final Map<String, String> rolesForEditTemplates = new LinkedHashMap<String, String>(2);
+    private final Map<String, String> rolesForViewTemplates = new LinkedHashMap<String, String>(2);
     
     FieldVisibilityManager fieldVisibilityManager = new FieldVisibilityManager();
-    private final Map<String, FormSet> sets = new LinkedHashMap<String, FormSet>();
-    private Map<String, FormField> fields = new LinkedHashMap<String, FormField>();
+    private final Map<String, FormSet> sets = new LinkedHashMap<String, FormSet>(4);
+    private Map<String, FormField> fields = new LinkedHashMap<String, FormField>(8);
+    private List<String> forcedFields = new ArrayList<String>(4);
     
     public FormConfigElement()
     {
-        super(FORM_ID);
+        super(FORM_NAME_ID);
     }
 
     public FormConfigElement(String name)
@@ -81,7 +84,7 @@ public class FormConfigElement extends ConfigElementAdapter
     public List<ConfigElement> getChildren()
     {
         throw new ConfigException(
-                "Reading the default-controls config via the generic interfaces is not supported");
+                "Reading the form config via the generic interfaces is not supported");
     }
 
     /**
@@ -226,6 +229,11 @@ public class FormConfigElement extends ConfigElementAdapter
         String otherSubmissionURL = otherFormElem.getSubmissionURL();
         result.setSubmissionURL(otherSubmissionURL == null ? this.submissionURL : otherSubmissionURL);
     }
+    
+    public String getId()
+    {
+    	return this.formId;
+    }
 
     public String getSubmissionURL()
     {
@@ -313,6 +321,11 @@ public class FormConfigElement extends ConfigElementAdapter
 //        return Collections.unmodifiableList(modelOverrides);
 //    }
 
+    void setFormId(String formId)
+    {
+    	this.formId = formId;
+    }
+    
     /* package */void setSubmissionURL(String newURL)
     {
         this.submissionURL = newURL;
@@ -349,9 +362,15 @@ public class FormConfigElement extends ConfigElementAdapter
     }
 
     /* package */void addFieldVisibility(String showOrHide, String fieldId,
-            String mode)
+            String mode, String forceString)
     {
-        fieldVisibilityManager.addInstruction(showOrHide, fieldId, mode);
+        fieldVisibilityManager.addInstruction(showOrHide, fieldId, mode, forceString);
+        
+        boolean isForced = new Boolean(forceString);
+        if (isForced && (this.forcedFields.contains(fieldId) == false))
+        {
+            this.forcedFields.add(fieldId);
+        }
     }
 
     /* package */void addSet(String setId, String parentSetId, String appearance)
@@ -460,10 +479,10 @@ public class FormConfigElement extends ConfigElementAdapter
     }
 
     /* package */void addConstraintForField(String fieldId, String type,
-            String message, String messageId)
+            String message, String messageId, String validationHandler, String event)
     {
         FormField field = fields.get(fieldId);
-        field.addConstraintMessage(type, message, messageId);
+        field.addConstraintDefinition(type, message, messageId, validationHandler, event);
     }
 
 //    /* package */void addModelOverrides(String name, String value)
@@ -531,13 +550,47 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * This method checks whether the specified field is visible in the specified mode.
      * 
-     * @param fieldId
-     * @param m
+     * @param fieldId the id of the field
+     * @param m a mode.
      * @return
      */
     public boolean isFieldVisible(String fieldId, Mode m)
     {
         return fieldVisibilityManager.isFieldVisible(fieldId, m);
+    }
+
+    /**
+     * This method checks whether the specified field is forced to be visible.
+     * 
+     * @param fieldId the id of the field
+     * @param m a mode.
+     * @return true if the field is forced to be shown and is visible in the specified
+     * mode.
+     */
+    public boolean isFieldForcedVisible(String fieldId, Mode m)
+    {
+    	return fieldVisibilityManager.isFieldForced(fieldId, m);
+    }
+    
+    /**
+     * Determines whether the given fieldId has been configured as 'force'd
+     * 
+     * @param fieldId The field id to check
+     * @return true if the field is being forced to be visible
+     */
+    public boolean isFieldForced(String fieldId)
+    {
+        return this.forcedFields.contains(fieldId);
+    }
+    
+    /**
+     * Returns the list of fields that have been forced to be visible
+     * 
+     * @return List of field ids
+     */
+    public List<String> getForcedFields()
+    {
+        return this.forcedFields;
     }
 
     private List<String> getFieldNamesVisibleInMode(Mode mode)

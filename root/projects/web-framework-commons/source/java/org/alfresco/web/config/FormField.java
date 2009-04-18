@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,7 +26,6 @@ package org.alfresco.web.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class FormField
     private final Map<String, String> attributes;
     private String template;
     private final List<ControlParam> controlParams = new ArrayList<ControlParam>();
-    private final List<ConstraintMessage> constraintMessages = new ArrayList<ConstraintMessage>();
+    private final List<ConstraintHandlerDefinition> constraintDefns = new ArrayList<ConstraintHandlerDefinition>();
     
     /**
      * 
@@ -102,19 +101,22 @@ public class FormField
     	}
     	this.controlParams.add(new ControlParam(name, value));
     }
-    void addConstraintMessage(String type, String message, String messageId)
+    void addConstraintDefinition(String type, String message, String messageId,
+    		String validationHandler, String event)
     {
-    	for (ConstraintMessage cm : this.constraintMessages)
+    	for (ConstraintHandlerDefinition constraint : this.constraintDefns)
     	{
-    		if (cm.getType().equals(type))
+    		if (constraint.getType().equals(type))
     		{
     			// The value for this constraint-message is being overridden.
-    			cm.setMessage(message);
-    			cm.setMessageId(messageId);
+    			constraint.setMessage(message);
+    			constraint.setMessageId(messageId);
+    			constraint.setValidationHandler(validationHandler);
+    			constraint.setEvent(event);
     			return;
     		}
     	}
-    	this.constraintMessages.add(new ConstraintMessage(type, message, messageId));
+    	this.constraintDefns.add(new ConstraintHandlerDefinition(type, validationHandler, message, messageId, event));
     }
     public Map<String, String> getAttributes()
     {
@@ -180,21 +182,16 @@ public class FormField
     	return Collections.unmodifiableList(this.controlParams);
     }
     
-    public List<ConstraintMessage> getConstraintMessages()
+    public Map<String, ConstraintHandlerDefinition> getConstraintDefinitionMap()
     {
-    	return Collections.unmodifiableList(this.constraintMessages);
-    }
-    
-    public Map<String, ConstraintMessage> getConstraintMessageMap()
-    {
-        Map<String, ConstraintMessage> msgs = new HashMap<String, ConstraintMessage>(4);
+        Map<String, ConstraintHandlerDefinition> defns = new LinkedHashMap<String, ConstraintHandlerDefinition>(4);
         
-        for (ConstraintMessage msg : this.constraintMessages)
+        for (ConstraintHandlerDefinition defn : this.constraintDefns)
         {
-            msgs.put(msg.getType(), msg);
+            defns.put(defn.getType(), defn);
         }
         
-        return Collections.unmodifiableMap(msgs);
+        return Collections.unmodifiableMap(defns);
     }
     
     public FormField combine(FormField otherField)
@@ -246,13 +243,15 @@ public class FormField
         }
         
         // Combine constraint-message data
-        for (ConstraintMessage cp : this.constraintMessages)
+        for (ConstraintHandlerDefinition constraint : this.constraintDefns)
         {
-        	result.addConstraintMessage(cp.getType(), cp.getMessage(), cp.getMessageId());
+        	result.addConstraintDefinition(constraint.getType(), constraint.getMessage(),
+        			constraint.getMessageId(), constraint.getValidationHandler(), constraint.getEvent());
         }
-        for (ConstraintMessage cp : otherField.constraintMessages)
+        for (ConstraintHandlerDefinition constraint : otherField.constraintDefns)
         {
-        	result.addConstraintMessage(cp.getType(), cp.getMessage(), cp.getMessageId());
+        	result.addConstraintDefinition(constraint.getType(), constraint.getMessage(),
+        			constraint.getMessageId(), constraint.getValidationHandler(), constraint.getEvent());
         }
 
         return result;
@@ -296,10 +295,10 @@ public class FormField
         logger.debug(msg.toString());
         msg = new StringBuilder();
 
-        msg.append("Combining constraint-messages")
-            .append(constraintMessages)
+        msg.append("Combining constraint-definitions")
+            .append(constraintDefns)
             .append(" and ")
-            .append(otherField.constraintMessages);
+            .append(otherField.constraintDefns);
         logger.debug(msg.toString());
     }
 }

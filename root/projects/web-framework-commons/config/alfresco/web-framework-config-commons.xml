@@ -4,7 +4,7 @@
       <element-readers>
          <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
          <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
-         <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>
+         <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
       <evaluators>
          <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
@@ -47,39 +47,43 @@
    
    <!-- Default form configuration for the cm:content type -->
    <config evaluator="node-type" condition="cm:content">
-      <form>
-         <field-visibility>
-            <show id="cm:name" />
-            <show id="cm:title" />
-            <show id="cm:description" />
-            <show id="mimetype" />
-            <show id="cm:author" />
-            <show id="size" for-mode="view" />
-            <show id="cm:creator" for-mode="view" />
-            <show id="cm:created" for-mode="view" />
-            <show id="cm:modifier" for-mode="view" />
-            <show id="cm:modified" for-mode="view" />
-         </field-visibility>
-         <appearance>
-            <field id="mimetype">
-               <control template="controls/mimetype.ftl" />
-            </field>
-            <field id="size">
-               <control template="controls/size.ftl" />
-            </field>
-         </appearance>
-      </form>
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+               <show id="mimetype" />
+               <show id="cm:author" force="true" />
+               <show id="size" for-mode="view" />
+               <show id="cm:creator" for-mode="view" />
+               <show id="cm:created" for-mode="view" />
+               <show id="cm:modifier" for-mode="view" />
+               <show id="cm:modified" for-mode="view" />
+            </field-visibility>
+            <appearance>
+               <field id="mimetype">
+                  <control template="controls/mimetype.ftl" />
+               </field>
+               <field id="size">
+                  <control template="controls/size.ftl" />
+               </field>
+            </appearance>
+         </form>
+      </forms>
    </config>
    
    <!-- Default form configuration for the cm:folder type -->
    <config evaluator="node-type" condition="cm:folder">
-      <form>
-         <field-visibility>
-            <show id="cm:name" />
-            <show id="cm:title" />
-            <show id="cm:description" />
-         </field-visibility>
-      </form>
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" />
+               <show id="cm:description" />
+            </field-visibility>
+          </form>
+      </forms>
    </config>
 
 </alfresco-config>

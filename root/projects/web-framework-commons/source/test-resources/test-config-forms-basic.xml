@@ -1,13 +1,9 @@
-<!-- This config file should contain the vanilla data for testing.
-     i.e. it should contain one of each type of config data in every location.
-     It need not handle overriding or any complexities as these are handled in other
-     test files. -->
 <alfresco-config>
    <plug-ins>
       <element-readers>
          <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
          <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
-         <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>
+         <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 
@@ -21,6 +17,14 @@
             <control-param name="a">Hello</control-param>
             <control-param name="b"></control-param>
          </type>
+         <type name="d:boolean" template="/form-controls/checkbox.ftl" />
+         <type name="association" template="/form-controls/association-picker.ftl" />
+         <type name="abc" template="/form-controls/abc.ftl">
+            <control-param name="a">1</control-param>
+            <control-param name="b">Hello</control-param>
+            <control-param name="c">For ever and ever.</control-param>
+            <control-param name="d"></control-param>
+         </type>
       </default-controls>
       <constraint-handlers>
          <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
@@ -31,28 +35,78 @@
    </config>
    
    <config evaluator="string-compare" condition="my:example">
-      <form submission-url="submission/url">
-         <field-visibility>
-            <show id="cm:name" />
-            <show id="my:text" />
-            <show id="my:mltext" />
-         </field-visibility>
-         <appearance>
-            <field id="cm:name">
-               <control template="/form-controls/mytextfield.ftl" />
-               <constraint-message type="REGEX" message="You can't have these characters in a name: /*" />
-            </field>
-            <field id="my:text" label="Custom Text" description="This is a custom model text field">
-               <control>
-                  <control-param name="width">500px</control-param>
-               </control>
-               <constraint-message type="REGEX" message-id="custom_msg" />
-            </field>
-            <field id="my:duplicate" label="Duplicate" read-only="true" help="This is a test for duplicate props and assocs" />
-            <field id="my:date" label="Custom Date" description-id="form.field.dateformat" />
-            <field id="my:dateTime" label="Custom Date Time" description-id="form.field.dateformat" />
-         </appearance>
-      </form>
+      <forms>
+          <form submission-url="submit/default/form">
+             <field-visibility>
+                <show id="cm:name"/>
+                <show id="my:text" />
+                <show id="my:mltext" />
+                <show id="my:date" />
+                <show id="my:duplicate" />
+                <show id="my:int" />
+                <show id="my:broken" />
+             </field-visibility>
+             <appearance>
+                <field id="cm:name">
+                   <control template="/form-controls/mytextfield.ftl" />
+                   <constraint-message type="REGEX" message="You can't have these characters in a name: /*"
+                                       validation-handler="Alfresco.forms.validation.regexMatch"/>
+                   <constraint-message type="NUMERIC" message="Numeric message" />
+                </field>
+                <field id="my:text" label="Custom Text" description="This is a custom model text field">
+                   <control>
+                      <control-param name="width">500px</control-param>
+                   </control>
+                   <constraint-message type="REGEX" message-id="custom_msg" />
+                </field>
+                <field id="my:mltext" label="Custom ML Text" description="This is a custom model multilingual text field">
+                   <control>
+                      <control-param name="rows">10</control-param>
+                      <control-param name="width">500px</control-param>
+                   </control>
+                </field>
+                <field id="my:duplicate" label="Duplicate" read-only="true" help="This is a test for duplicate props and assocs" />
+                <field id="my:date" label="Custom Date" description-id="form.field.dateformat" />
+                <field id="my:dateTime" label="Custom Date Time" description-id="form.field.dateformat" />
+             </appearance>
+          </form>
+
+          <form id="id" submission-url="submit/id/form">
+          </form>
+	  </forms>
+   </config>
+
+   <config evaluator="string-compare" condition="no-appearance">
+      <forms>
+          <!-- For this example, I'm going to include all optional attributes -->
+          <form submission-url="submission/url">
+             <view-form template="/path/view/template" requires-role="Consumer" />
+             <edit-form template="/path/edit/template/manager" requires-role="Manager" />
+             <edit-form template="/path/edit/template/contributor" requires-role="Contributor" />
+             <create-form template="/path/create/template" requires-role="Manager" />
+             <create-form template="/path/create/template/norole"/>
+             <field-visibility>
+                <show id="cm:name" force="true"/>
+                <show id="cm:title" for-mode="view, create"/>
+                <show id="cm:description" />
+                <show id="cm:content" />
+                <show id="my:text" />
+                <show id="my:mltext" />
+                <show id="my:date" />
+             </field-visibility>
+          </form>
+      </forms>
+   </config>
+
+   <config evaluator="string-compare" condition="no-visibility">
+      <forms>
+          <form>
+             <appearance>
+                <field id="cm:name" label="Name From Config" />
+                <field id="xx:irrelevant" label="label-text" />
+             </appearance>
+          </form>
+      </forms>
    </config>
 </alfresco-config>
      

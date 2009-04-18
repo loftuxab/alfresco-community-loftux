@@ -24,7 +24,6 @@
  */
 package org.alfresco.web.config;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,12 +49,13 @@ public class ConstraintHandlersConfigTest extends BaseTest
     protected Config globalConfig;
     protected ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
-    protected FormConfigElement formConfigElement;
+    protected FormsConfigElement formsConfigElement;
+    protected FormConfigElement defaultFormConfigElement;
     protected DefaultControlsConfigElement defltCtrlsConfElement;
 
     protected String getConfigXmlFile()
     {
-        return "test-config-forms.xml";
+        return "test-config-forms-basic.xml";
     }
     
     @SuppressWarnings("unchecked")
@@ -217,14 +217,15 @@ public class ConstraintHandlersConfigTest extends BaseTest
         configService = initXMLConfigService(getConfigXmlFile());
         assertNotNull("configService was null.", configService);
     
-        Config contentConfig = configService.getConfig("content");
+        Config contentConfig = configService.getConfig("my:example");
         assertNotNull("contentConfig was null.", contentConfig);
     
-        ConfigElement confElement = contentConfig.getConfigElement("form");
+        ConfigElement confElement = contentConfig.getConfigElement("forms");
         assertNotNull("confElement was null.", confElement);
-        assertTrue("confElement should be instanceof FormConfigElement.",
-                confElement instanceof FormConfigElement);
-        formConfigElement = (FormConfigElement) confElement;
+        assertTrue("confElement should be instanceof FormsConfigElement.",
+                confElement instanceof FormsConfigElement);
+        formsConfigElement = (FormsConfigElement) confElement;
+        defaultFormConfigElement = formsConfigElement.getDefaultForm();
     
         globalConfig = configService.getGlobalConfig();
     

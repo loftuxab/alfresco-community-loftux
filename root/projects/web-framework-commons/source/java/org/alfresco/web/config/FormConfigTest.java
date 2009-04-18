@@ -27,6 +27,7 @@ package org.alfresco.web.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +52,8 @@ public class FormConfigTest extends BaseTest
     protected Config globalConfig;
     protected ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
-    protected FormConfigElement formConfigElement;
+    protected FormsConfigElement formsConfigElement;
+    protected FormConfigElement defaultFormConfigElement;
     protected DefaultControlsConfigElement defltCtrlsConfElement;
 
     protected String getConfigXmlFile()
@@ -62,24 +64,24 @@ public class FormConfigTest extends BaseTest
     public void testFormSubmissionUrl()
     {
         assertEquals("Submission URL was incorrect.", "submission/url",
-                formConfigElement.getSubmissionURL());
+                defaultFormConfigElement.getSubmissionURL());
     }
     
     @SuppressWarnings("unchecked")
     public void testGetFormTemplatesWithoutRoles()
     {
         assertEquals("Incorrect template.","/path/create/template/norole",
-        		formConfigElement.getFormTemplate(Mode.CREATE, null));
+        		defaultFormConfigElement.getFormTemplate(Mode.CREATE, null));
         assertEquals("Incorrect template.","/path/create/template/norole",
-        		formConfigElement.getFormTemplate(Mode.CREATE, Collections.EMPTY_LIST));
+        		defaultFormConfigElement.getFormTemplate(Mode.CREATE, Collections.EMPTY_LIST));
 
-        assertNull("Incorrect template.", formConfigElement.getFormTemplate(
+        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
                 Mode.EDIT, null));
-        assertNull("Incorrect template.", formConfigElement.getFormTemplate(
+        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
                 Mode.VIEW, null));
-        assertNull("Incorrect template.", formConfigElement.getFormTemplate(
+        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
                 Mode.EDIT, Collections.EMPTY_LIST));
-        assertNull("Incorrect template.", formConfigElement.getFormTemplate(
+        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
                 Mode.VIEW, Collections.EMPTY_LIST));
     }
 
@@ -89,11 +91,11 @@ public class FormConfigTest extends BaseTest
         roles.add("Consumer");
         roles.add("Manager");
         assertEquals("Incorrect template.", "/path/create/template",
-                formConfigElement.getFormTemplate(Mode.CREATE, roles));
+                defaultFormConfigElement.getFormTemplate(Mode.CREATE, roles));
         assertEquals("Incorrect template.", "/path/edit/template/manager",
-                formConfigElement.getFormTemplate(Mode.EDIT, roles));
+                defaultFormConfigElement.getFormTemplate(Mode.EDIT, roles));
         assertEquals("Incorrect template.", "/path/view/template",
-                formConfigElement.getFormTemplate(Mode.VIEW, roles));
+                defaultFormConfigElement.getFormTemplate(Mode.VIEW, roles));
     }
 
     public void testGetFormTemplatesWithIrrelevantRoles()
@@ -102,40 +104,40 @@ public class FormConfigTest extends BaseTest
         roles.add("Bread");
         roles.add("Jam"); // hoho
         assertEquals("Incorrect template.", "/path/create/template/norole",
-                formConfigElement.getFormTemplate(Mode.CREATE, roles));
+                defaultFormConfigElement.getFormTemplate(Mode.CREATE, roles));
         assertEquals("Incorrect template.", null,
-                formConfigElement.getFormTemplate(Mode.EDIT, roles));
+                defaultFormConfigElement.getFormTemplate(Mode.EDIT, roles));
         assertEquals("Incorrect template.", null,
-                formConfigElement.getFormTemplate(Mode.VIEW, roles));
+                defaultFormConfigElement.getFormTemplate(Mode.VIEW, roles));
     }
 
     public void testGetFormFieldVisibilitiesForModes()
     {
-        assertTrue("Field 'name' should be visible.", formConfigElement
+        assertTrue("Field 'name' should be visible.", defaultFormConfigElement
                 .isFieldVisible("name", Mode.CREATE));
-        assertTrue("Field 'title' should be visible.", formConfigElement
+        assertTrue("Field 'title' should be visible.", defaultFormConfigElement
                 .isFieldVisible("title", Mode.CREATE));
-        assertFalse("Field 'rubbish' should be invisible.", formConfigElement
+        assertFalse("Field 'rubbish' should be invisible.", defaultFormConfigElement
                 .isFieldVisible("rubbish", Mode.CREATE));
 
-        assertTrue("Field 'name' should be visible.", formConfigElement
+        assertTrue("Field 'name' should be visible.", defaultFormConfigElement
                 .isFieldVisible("name", Mode.EDIT));
-        assertFalse("Field 'title' should be invisible.", formConfigElement
+        assertFalse("Field 'title' should be invisible.", defaultFormConfigElement
                 .isFieldVisible("title", Mode.EDIT));
-        assertFalse("Field 'rubbish' should be invisible.", formConfigElement
+        assertFalse("Field 'rubbish' should be invisible.", defaultFormConfigElement
                 .isFieldVisible("rubbish", Mode.EDIT));
 
-        assertTrue("Field 'name' should be visible.", formConfigElement
+        assertTrue("Field 'name' should be visible.", defaultFormConfigElement
                 .isFieldVisible("name", Mode.VIEW));
-        assertTrue("Field 'title' should be visible.", formConfigElement
+        assertTrue("Field 'title' should be visible.", defaultFormConfigElement
                 .isFieldVisible("title", Mode.VIEW));
-        assertFalse("Field 'rubbish' should be invisible.", formConfigElement
+        assertFalse("Field 'rubbish' should be invisible.", defaultFormConfigElement
                 .isFieldVisible("rubbish", Mode.VIEW));
     }
     
     public void testVisibleFieldsMustBeCorrectlyOrdered()
     {
-    	List<String> fieldNames = formConfigElement.getVisibleViewFieldNames();
+    	List<String> fieldNames = defaultFormConfigElement.getVisibleViewFieldNames();
     	
     	List<String> expectedFieldNames = new ArrayList<String>();
     	expectedFieldNames.add("name");
@@ -148,9 +150,9 @@ public class FormConfigTest extends BaseTest
         Set<String> expectedSetIds = new HashSet<String>();
         expectedSetIds.add("details");
         expectedSetIds.add("user");
-        assertEquals("Set IDs were wrong.", expectedSetIds, formConfigElement.getSets().keySet());
+        assertEquals("Set IDs were wrong.", expectedSetIds, defaultFormConfigElement.getSets().keySet());
 
-        Map<String, FormSet> sets = formConfigElement.getSets();
+        Map<String, FormSet> sets = defaultFormConfigElement.getSets();
         assertEquals("Set parent was wrong.", "details", sets.get("user")
                 .getParentId());
         assertEquals("Set parent was wrong.", null, sets.get("details")
@@ -165,7 +167,7 @@ public class FormConfigTest extends BaseTest
     public void testAccessAllFieldRelatedData()
     {
         // Field checks
-        Map<String, FormField> fields = formConfigElement.getFields();
+        Map<String, FormField> fields = defaultFormConfigElement.getFields();
         assertEquals("Wrong number of Fields.", 5, fields.size());
 
         FormField usernameField = fields.get("username");
@@ -192,20 +194,21 @@ public class FormConfigTest extends BaseTest
         assertEquals("Control param has wrong name.", "foo", firstCP.getName());
         assertEquals("Control param has wrong value.", "bar", firstCP.getValue());
 
+        ConstraintHandlerDefinition regExConstraint
+            = nameField.getConstraintDefinitionMap().values().iterator().next();
         assertEquals("name field had incorrect type.", "REGEX",
-        		nameField.getConstraintMessages().get(0).getType());
+        		regExConstraint.getType());
         assertEquals("name field had incorrect message.",
                 "The name can not contain the character '{0}'",
-        		nameField.getConstraintMessages().get(0).getMessage());
+                regExConstraint.getMessage());
         assertEquals("name field had incorrect message-id.",
-                "field_error_name",
-        		nameField.getConstraintMessages().get(0).getMessageId());
+                "field_error_name", regExConstraint.getMessageId());
     }
 
     public void testControlParamSequenceThatIncludesValuelessParamsParsesCorrectly()
     {
         // Field checks
-        Map<String, FormField> fields = formConfigElement.getFields();
+        Map<String, FormField> fields = defaultFormConfigElement.getFields();
 
         FormField testField = fields.get("fieldWithMixedCtrlParams");
 
@@ -225,12 +228,14 @@ public class FormConfigTest extends BaseTest
     
     public void testFormsShouldSupportMultipleConstraintMessageTags()
     {
-    	FormField nameField = formConfigElement.getFields().get("name");
-    	assertEquals(3, nameField.getConstraintMessages().size());
+    	FormField nameField = defaultFormConfigElement.getFields().get("name");
+    	Map<String, ConstraintHandlerDefinition> constraintDefinitions = nameField.getConstraintDefinitionMap();
+		assertEquals(3, constraintDefinitions.size());
     	
-    	ConstraintMessage regexField = nameField.getConstraintMessages().get(0);
-    	ConstraintMessage applesField = nameField.getConstraintMessages().get(1);
-    	ConstraintMessage orangesField = nameField.getConstraintMessages().get(2);
+		Iterator<ConstraintHandlerDefinition> valuesIterator = constraintDefinitions.values().iterator();
+    	ConstraintHandlerDefinition regexField = valuesIterator.next();
+    	ConstraintHandlerDefinition applesField = valuesIterator.next();
+    	ConstraintHandlerDefinition orangesField = valuesIterator.next();
 
     	assertEquals("REGEX", regexField.getType());
     	assertEquals("apples", applesField.getType());
@@ -244,7 +249,7 @@ public class FormConfigTest extends BaseTest
     {
         try
         {
-            formConfigElement.getChildren();
+            defaultFormConfigElement.getChildren();
             fail("getChildren() did not throw an exception.");
         } catch (ConfigException expectedException)
         {
@@ -265,11 +270,12 @@ public class FormConfigTest extends BaseTest
         Config contentConfig = configService.getConfig("content");
         assertNotNull("contentConfig was null.", contentConfig);
     
-        ConfigElement confElement = contentConfig.getConfigElement("form");
+        ConfigElement confElement = contentConfig.getConfigElement("forms");
         assertNotNull("confElement was null.", confElement);
-        assertTrue("confElement should be instanceof FormConfigElement.",
-                confElement instanceof FormConfigElement);
-        formConfigElement = (FormConfigElement) confElement;
+        assertTrue("confElement should be instanceof FormsConfigElement.",
+                confElement instanceof FormsConfigElement);
+        formsConfigElement = (FormsConfigElement) confElement;
+        defaultFormConfigElement = formsConfigElement.getDefaultForm();
     
         globalConfig = configService.getGlobalConfig();
     

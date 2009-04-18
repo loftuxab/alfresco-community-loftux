@@ -3,7 +3,7 @@
       <element-readers>
          <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
          <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
-         <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>
+         <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 
@@ -19,17 +19,19 @@
    
    <!-- The evaluator would normally be node-type, but that makes testing difficult -->
    <config evaluator="string-compare" condition="content">
-      <form submission-url="submission/url">
-         <field-visibility>
-         </field-visibility>
-         <appearance>
-            <!-- It is illegal to declare a set which has a non-existent parent -->
-            <set id="root" />
-            <set id="leaf" parent="root" appearance="panel" />
-            <set id="illegal" parent="definedTooLate" appearance="panel" />
-            <set id="definedTooLate" />
-         </appearance>
-      </form>
+      <forms>
+	      <form>
+	        <field-visibility>
+	        </field-visibility>
+	        <appearance>
+               <!-- It is illegal to declare a set which has a non-existent parent -->
+	           <set id="root" />
+	           <set id="leaf" parent="root" appearance="panel" />
+	           <set id="illegal" parent="definedTooLate" appearance="panel" />
+	           <set id="definedTooLate" />
+	        </appearance>
+	     </form>
+      </forms>
    </config>
    
 </alfresco-config>

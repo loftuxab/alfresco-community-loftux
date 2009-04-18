@@ -19,15 +19,97 @@ function main()
    var formModel = null;
    var formUIModel = null;
    
-   if (context.properties.nodeRef != null && context.properties.nodeRef != "")
+   var itemKind = getArgument("itemKind");
+   var itemId = getArgument("itemId")
+   
+   if (itemKind != null && itemKind.length > 0 && itemId != null && itemId.length > 0)
    {
-      var nodeRef = context.properties.nodeRef;
       if (logger.isLoggingEnabled())
       {
-         logger.log("nodeRef = " + nodeRef);
+         logger.log("Showing form for item: [" + itemKind + "]" + itemId);
+      }
+
+      // determine what mode we are in from the arguments
+      var mode = getArgument("mode", "edit");
+      
+      var formConfig = null;
+      var visibleFields = null;
+      
+      // query for configuration for item
+      var nodeConfig = config.scoped[itemId];
+      
+      if (nodeConfig != null)
+      {
+         // get the visible fields for the current mode
+         var formsConfig = nodeConfig.forms;
+
+         // Initially we will always select the default form.
+         //TODO Add support for form-id selection
+         formConfig = nodeConfig.forms.defaultForm;
+         
+         if (formConfig != null)
+         {
+            // TODO: deal with hidden vs. show mode and no config
+         
+            switch (mode)
+            {
+               case "view":
+                  visibleFields = formConfig.visibleViewFieldNames;
+                  break;
+               case "edit":
+                  visibleFields = formConfig.visibleEditFieldNames;
+                  break;
+               case "create":
+                  visibleFields = formConfig.visibleCreateFieldNames;
+                  break;
+               default:
+                  visibleFields = formConfig.visibleViewFieldNames;
+                  break;
+            }
+            
+            if (logger.isLoggingEnabled())
+            {
+               logger.log("Visible fields for " + mode + " mode = " + visibleFields);
+            }
+         }
       }
       
-      var json = remote.call("/api/forms/node/" + nodeRef.replace(":/", ""));
+      // build the JSON object to send to the server
+      var postBody = {};
+      
+      if (visibleFields !== null)
+      {
+         // TODO: find a way to return/make a native JS array, for now
+         //       convert the Java List to a JS array checking force as we go
+         var postBodyFields = [];
+         var postBodyForcedFields = [];
+         var fieldId = null;
+         for (var f = 0; f < visibleFields.size(); f++)
+         {
+            fieldId = visibleFields.get(f)
+            postBodyFields.push(fieldId);
+            if (formConfig.isFieldForced(fieldId))
+            {
+               postBodyForcedFields.push(fieldId);
+            }
+         }
+         
+         postBody.fields = postBodyFields;
+         if (postBodyForcedFields.length > 0)
+         {
+            postBody.force = postBodyForcedFields;
+         }
+      }
+      
+      if (logger.isLoggingEnabled())
+      {
+         logger.log("postBody = " + jsonUtils.toJSONString(postBody));
+      }
+         
+      // make remote call to service
+      var connector = remote.connect("alfresco");
+      var json = connector.post("/api/form/definition/" + itemKind + "/" + itemId.replace(":/", ""), 
+            jsonUtils.toJSONString(postBody), "application/json");
       
       if (logger.isLoggingEnabled())
       {
@@ -36,13 +118,11 @@ function main()
       
       formModel = eval('(' + json + ')');
       
+      // if we got a successful response attempt to render the form
       if (json.status == 200)
       {
-         // setup caches
+         // setup caches and variables
          setupCaches(formModel);
-         
-         // determine what mode we are in from the arguments
-         var mode = getArgument("mode", "edit");
          
          // determine what enctype to use from the arguments
          var submitType = getArgument("submitType", "multipart");
@@ -90,78 +170,44 @@ function main()
          formUIModel.showResetButton = (showResetButton === "true") ? true : false;
          formUIModel.data = formModel.data.formData;
          
-         // query for configuration for item
-         var nodeConfig = config.scoped[nodeRef];
-         
-         if (nodeConfig != null)
+         if (formConfig != null)
          {
-            // get the visible fields for the current mode
-            var formConfig = nodeConfig.form;
+            // iterate round each visible field name, retrieve all data and
+            // add to the form ui model
+            var configuredFields = formConfig.fields;
+            var formUIItems = [];
             
-            if (formConfig != null)
+            if (visibleFields != null)
             {
-               var visibleFields = null;
-               
-               // TODO: deal with hidden vs. show mode and no config
-               
-               switch (mode)
+               for (var f = 0; f < visibleFields.size(); f++)
                {
-                  case "view":
-                     visibleFields = formConfig.visibleViewFieldNames;
-                     break;
-                  case "edit":
-                     visibleFields = formConfig.visibleEditFieldNames;
-                     break;
-                  case "create":
-                     visibleFields = formConfig.visibleCreateFieldNames;
-                     break;
-                  default:
-                     visibleFields = formConfig.visibleViewFieldNames;
-                     break;
-               }
-               
-               if (logger.isLoggingEnabled())
-               {
-                  logger.log("Visible fields for " + formUIModel.mode + " mode = " + visibleFields);
-               }
-               
-               // iterate round each visible field name, retrieve all data and
-               // add to the form ui model
-               var configuredFields = formConfig.fields;
-               var formUIItems = [];
-               
-               if (visibleFields != null)
-               {
-                  for (var f = 0; f < visibleFields.size(); f++)
+                  var fieldName = visibleFields.get(f);
+                  var fieldConfig = configuredFields[fieldName];
+                  
+                  // setup the field
+                  var fieldDef = setupField(formModel, fieldName, fieldConfig);
+                  
+                  // if a field was created add to the list to be displayed
+                  if (fieldDef !== null)
                   {
-                     var fieldName = visibleFields.get(f);
-                     var fieldConfig = configuredFields[fieldName];
+                     formUIItems.push(fieldDef);
                      
-                     // setup the field
-                     var fieldDef = setupField(formModel, fieldName, fieldConfig);
-                     
-                     // if a field was created add to the list to be displayed
-                     if (fieldDef !== null)
+                     if (logger.isLoggingEnabled())
                      {
-                        formUIItems.push(fieldDef);
-                        
-                        if (logger.isLoggingEnabled())
-                        {
-                           logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
-                        }
+                        logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
                      }
                   }
-               }
-               else
-               {
-                  model.error = "No fields to render for node type \"" + formModel.data.type + "\".";
                }
             }
             else
             {
-               // TODO: This should just show all properties instead
-               model.error = "No configuration found for node type \"" + formModel.data.type + "\".";
+               model.error = "No fields to render for node type \"" + formModel.data.type + "\".";
             }
+         }
+         else
+         {
+            // TODO: This should just show all properties instead
+            model.error = "No configuration found for node type \"" + formModel.data.type + "\".";
          }
          
          // TODO: deal with 'sets', the fields must be within their appropriate set
@@ -629,11 +675,10 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       
       // look for an overridden message in the field's constraint config, 
       // if none found look in the default constraint config
-      
       var constraintMsg = null;
-      if (fieldConfig !== null && fieldConfig.constraintMessageMap[constraintId] !== null)
+      if (fieldConfig !== null && fieldConfig.constraintDefinitionMap[constraintId] !== null)
       {
-         var fieldConstraintConfig = fieldConfig.constraintMessageMap[constraintId];
+         var fieldConstraintConfig = fieldConfig.constraintDefinitionMap[constraintId];
          if (fieldConstraintConfig.messageId !== null)
          {
             constraintMsg = msg.get(fieldConstraintConfig.messageId);
