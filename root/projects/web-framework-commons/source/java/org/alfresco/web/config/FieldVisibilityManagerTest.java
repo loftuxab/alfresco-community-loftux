@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,7 +29,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-
 public class FieldVisibilityManagerTest extends TestCase
 {
     private static FieldVisibilityManager emptyFVM = new FieldVisibilityManager();
@@ -54,7 +53,7 @@ public class FieldVisibilityManagerTest extends TestCase
         secondOverrideFVM.addInstruction("hide", "B", "create");
 
         thirdOverrideFVM.addInstruction("show", "C", "create");
-        thirdOverrideFVM.addInstruction("show", "D", "");
+        thirdOverrideFVM.addInstruction("show", "D", "", "true");
 
         fourthOverrideFVM.addInstruction("hide", "D", null);
 
@@ -130,6 +129,9 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(Arrays.asList(new String[]{"D"}),
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
+        
+        assertFalse("Expected field C to not be forced to be shown.", testFVM.isFieldForced("C", Mode.CREATE));
+        assertTrue("Expected field D to be forced to be shown.", testFVM.isFieldForced("D", Mode.CREATE));
     }
     
     public void testFourthOverrideFVM()

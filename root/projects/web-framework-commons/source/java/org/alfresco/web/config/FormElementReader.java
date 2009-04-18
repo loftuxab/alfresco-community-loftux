@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,10 +41,13 @@ import org.dom4j.Element;
  */
 public class FormElementReader implements ConfigElementReader
 {
-    public static final String ATTR_APPEARANCE = "appearance";
+	public static final String ATTR_APPEARANCE = "appearance";
     public static final String ATTR_FOR_MODE = "for-mode";
+    public static final String ATTR_FORM_ID = "id";
     public static final String ATTR_MESSAGE = "message";
     public static final String ATTR_MESSAGE_ID = "message-id";
+    public static final String ATTR_EVENT = "event";
+    public static final String ATTR_VALIDATION_HANDLER = "validation-handler";
     public static final String ATTR_NAME = "name";
     public static final String ATTR_NAME_ID = "id";
     public static final String ATTR_PARENT = "parent";
@@ -55,6 +58,7 @@ public class FormElementReader implements ConfigElementReader
     public static final String ELEMENT_FORM = "form";
     public static final String ELEMENT_HIDE = "hide";
     public static final String ELEMENT_SHOW = "show";
+    public static final String ATTR_FORCE = "force";
 
     /**
      * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -76,6 +80,8 @@ public class FormElementReader implements ConfigElementReader
         }
 
         result = new FormConfigElement();
+        
+        parseFormId(formElement, result);
         
         parseSubmissionURL(formElement, result);
         
@@ -163,7 +169,9 @@ public class FormElementReader implements ConfigElementReader
                 String type = constraintMessage.attributeValue(ATTR_TYPE);
                 String message = constraintMessage.attributeValue(ATTR_MESSAGE);
                 String messageId = constraintMessage.attributeValue(ATTR_MESSAGE_ID);
-                result.addConstraintForField(fieldIdValue, type, message, messageId);
+                String validationHandler = constraintMessage.attributeValue(ATTR_VALIDATION_HANDLER);
+                String event = constraintMessage.attributeValue(ATTR_EVENT);
+                result.addConstraintForField(fieldIdValue, type, message, messageId, validationHandler, event);
             }
         }
     }
@@ -188,8 +196,9 @@ public class FormElementReader implements ConfigElementReader
             String nodeName = showOrHideElem.getName();
             String fieldId = showOrHideElem.attributeValue(ATTR_NAME_ID);
             String mode = showOrHideElem.attributeValue(ATTR_FOR_MODE);
+            String forceString = showOrHideElem.attributeValue(ATTR_FORCE);
             
-            result.addFieldVisibility(nodeName, fieldId, mode);
+            result.addFieldVisibility(nodeName, fieldId, mode, forceString);
         }
     }
 
@@ -210,5 +219,12 @@ public class FormElementReader implements ConfigElementReader
     {
         String submissionURL = formElement.attributeValue(ATTR_SUBMISSION_URL);
         result.setSubmissionURL(submissionURL);
+    }
+
+    private void parseFormId(Element formElement,
+            FormConfigElement result)
+    {
+        String formId = formElement.attributeValue(ATTR_FORM_ID);
+        result.setFormId(formId);
     }
 }

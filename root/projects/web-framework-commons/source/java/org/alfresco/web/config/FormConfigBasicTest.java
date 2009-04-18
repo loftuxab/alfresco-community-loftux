@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,11 +38,10 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
-import org.alfresco.web.config.ConstraintHandlersConfigElement.ItemDefinition;
 import org.alfresco.web.config.DefaultControlsConfigElement.DefaultControl;
 
 /**
- * JUnit tests to exercise the forms-related capabilities in to the web client
+ * JUnit tests to exercise the forms-related capabilities in the web client
  * config service. These tests only include those that require a single config
  * xml file. Override-related tests, which use multiple config xml files, are
  * located in peer classes in this package.
@@ -50,17 +50,23 @@ import org.alfresco.web.config.DefaultControlsConfigElement.DefaultControl;
  */
 public class FormConfigBasicTest extends BaseTest
 {
-    protected XMLConfigService configService;
+    private static final String TEST_CONFIG_FORMS_BASIC_XML = "test-config-forms-basic.xml";
+	protected XMLConfigService configService;
     protected Config globalConfig;
     protected ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
-    protected FormConfigElement formConfigElement;
+    protected FormsConfigElement myExampleFormsConfigElement;
+    protected FormConfigElement myExampleDefaultForm;
+    protected FormsConfigElement noAppearanceFormsConfigElement;
+    protected FormConfigElement noAppearanceDefaultForm;
+    protected FormsConfigElement noVisibilityFormsConfigElement;
+    protected FormConfigElement noVisibilityDefaultForm;
     protected DefaultControlsConfigElement defltCtrlsConfElement;
 
     protected List<String> getConfigFiles()
     {
         List<String> result = new ArrayList<String>(1);
-        result.add("test-config-forms-basic.xml");
+        result.add(TEST_CONFIG_FORMS_BASIC_XML);
         return result;
     }
     
@@ -92,12 +98,36 @@ public class FormConfigBasicTest extends BaseTest
         Config myExampleConfigObj = configService.getConfig("my:example");
         assertNotNull(myExampleConfigObj);
     
-        ConfigElement formConfigObj = myExampleConfigObj.getConfigElement("form");
-        assertNotNull(formConfigObj);
-        assertTrue("formConfigObj should be instanceof FormConfigElement.",
-                formConfigObj instanceof FormConfigElement);
-        formConfigElement = (FormConfigElement) formConfigObj;
+        ConfigElement myExampleFormsConfigObj = myExampleConfigObj.getConfigElement("forms");
+        assertNotNull(myExampleFormsConfigObj);
+        assertTrue("formsConfigObj should be instanceof FormsConfigElement.",
+                myExampleFormsConfigObj instanceof FormsConfigElement);
+        myExampleFormsConfigElement = (FormsConfigElement) myExampleFormsConfigObj;
+        myExampleDefaultForm = myExampleFormsConfigElement.getDefaultForm();
+        assertNotNull(myExampleDefaultForm);
+        
+        Config noAppearanceConfigObj = configService.getConfig("no-appearance");
+        assertNotNull(noAppearanceConfigObj);
     
+        ConfigElement noAppearanceFormsConfigObj = noAppearanceConfigObj.getConfigElement("forms");
+        assertNotNull(noAppearanceFormsConfigObj);
+        assertTrue("noAppearanceFormsConfigObj should be instanceof FormsConfigElement.",
+        		noAppearanceFormsConfigObj instanceof FormsConfigElement);
+        noAppearanceFormsConfigElement = (FormsConfigElement) noAppearanceFormsConfigObj;
+        noAppearanceDefaultForm = noAppearanceFormsConfigElement.getDefaultForm();
+        assertNotNull(noAppearanceDefaultForm);
+        
+        Config noVisibilityConfigObj = configService.getConfig("no-visibility");
+        assertNotNull(noVisibilityConfigObj);
+    
+        ConfigElement noVisibilityFormsConfigObj = noVisibilityConfigObj.getConfigElement("forms");
+        assertNotNull(noVisibilityFormsConfigObj);
+        assertTrue("noVisibilityFormsConfigObj should be instanceof FormsConfigElement.",
+        		noVisibilityFormsConfigObj instanceof FormsConfigElement);
+        noVisibilityFormsConfigElement = (FormsConfigElement) noVisibilityFormsConfigObj;
+        noVisibilityDefaultForm = noVisibilityFormsConfigElement.getDefaultForm();
+        assertNotNull(noVisibilityDefaultForm);
+        
         globalConfig = configService.getGlobalConfig();
     
         globalDefaultControls = globalConfig.getConfigElement("default-controls");
@@ -115,11 +145,41 @@ public class FormConfigBasicTest extends BaseTest
                 "config element should be an instance of ConstraintHandlersConfigElement",
                 (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
     }
+    
+    public void testGetDefaultFormElement() throws Exception
+    {
+    	FormConfigElement defaultFormCE = myExampleFormsConfigElement.getDefaultForm();
+    	assertNotNull(defaultFormCE);
+    	
+    	assertEquals("submit/default/form", defaultFormCE.getSubmissionURL());
+    	assertNull(defaultFormCE.getId());
+    }
+
+    public void off_testGetNonexistentDefaultFormElement() throws Exception
+    {
+    	FormConfigElement defaultFormCE = myExampleFormsConfigElement.getDefaultForm();
+    	assertNull(defaultFormCE);
+    }
+
+    public void off_testGetFormElementById() throws Exception
+    {
+    	FormConfigElement formCE = myExampleFormsConfigElement.getForm("id");
+    	assertNotNull(formCE);
+
+    	assertEquals("submit/id/form", formCE.getSubmissionURL());
+    	assertEquals("id", formCE.getId());
+    }
+
+    public void off_testGetNonexistentFormElementById() throws Exception
+    {
+    	FormConfigElement noSuchFormCE = myExampleFormsConfigElement.getForm("rubbish");
+    	assertNull(noSuchFormCE);
+    }
 
     public void testFormSubmissionUrl()
     {
-        assertEquals("Submission URL was incorrect.", "submission/url",
-                formConfigElement.getSubmissionURL());
+        assertEquals("Submission URL was incorrect.", "submit/default/form",
+                myExampleDefaultForm.getSubmissionURL());
     }
     
     public void testGlobalConstraintHandlers()
@@ -128,7 +188,7 @@ public class FormConfigBasicTest extends BaseTest
         ConstraintHandlersConfigElement constraintHandlers
                 = (ConstraintHandlersConfigElement)globalConstraintHandlers;
         
-        Map<String, ItemDefinition> constraintItems = constraintHandlers.getItems();
+        Map<String, ConstraintHandlerDefinition> constraintItems = constraintHandlers.getItems();
         assertEquals("Incorrect count for global constraint-handlers.",
                 3, constraintItems.size());
         
@@ -139,11 +199,11 @@ public class FormConfigBasicTest extends BaseTest
         assertEquals("Incorrect global constraint-handler types.", expectedTypeNames,
                 constraintItems.keySet());
         
-        ItemDefinition mandatoryItem = constraintItems.get("MANDATORY");
+        ConstraintHandlerDefinition mandatoryItem = constraintItems.get("MANDATORY");
         assertNotNull(mandatoryItem);
-        ItemDefinition regexItem = constraintItems.get("REGEX");
+        ConstraintHandlerDefinition regexItem = constraintItems.get("REGEX");
         assertNotNull(regexItem);
-        ItemDefinition numericItem = constraintItems.get("NUMERIC");
+        ConstraintHandlerDefinition numericItem = constraintItems.get("NUMERIC");
         assertNotNull(numericItem);
         
         assertEquals("Alfresco.forms.validation.mandatory", mandatoryItem.getValidationHandler());
@@ -172,12 +232,15 @@ public class FormConfigBasicTest extends BaseTest
         
         Map<String, DefaultControl> defCtrlItems = defaultControls.getItems();
         assertEquals("Incorrect count for global default-controls.",
-                3, defCtrlItems.size());
+                6, defCtrlItems.size());
         
         Set<String> expectedTypeNames = new HashSet<String>();
         expectedTypeNames.add("d:long");
         expectedTypeNames.add("d:text");
         expectedTypeNames.add("d:test");
+        expectedTypeNames.add("d:boolean");
+        expectedTypeNames.add("association");
+        expectedTypeNames.add("abc");
         assertEquals("Incorrect global default-control types.", expectedTypeNames,
                 defCtrlItems.keySet());
         
@@ -211,7 +274,7 @@ public class FormConfigBasicTest extends BaseTest
         Map<String, DefaultControl> defCtrlItems = defaultControls.getItems();
         List<ControlParam> controlParamsGlobal = defCtrlItems.get("d:test").getControlParams();
         
-        List<ControlParam> controlParamsField = formConfigElement.getFields().get("my:text").getControlParams();
+        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControlParams();
         
         // The simple fact that the above code compiles and runs is enough to ensure
         // that the APIs are consistent. But here's an assert to dissuade changes.
@@ -222,7 +285,7 @@ public class FormConfigBasicTest extends BaseTest
     {
         try
         {
-            formConfigElement.getChildren();
+            myExampleDefaultForm.getChildren();
             fail("getChildren() did not throw an exception.");
         } catch (ConfigException expectedException)
         {
@@ -233,23 +296,168 @@ public class FormConfigBasicTest extends BaseTest
     public void testEmptyConstraintsMsgs()
     {
         // check the messages on the cm:name field
-        FormField field = formConfigElement.getFields().get("cm:name");
+        FormField field = myExampleDefaultForm.getFields().get("cm:name");
         assertNotNull("Expecting cm:name to be present", field);
-        Map<String, ConstraintMessage> msgs = field.getConstraintMessageMap();
-        assertNotNull(msgs);
-        ConstraintMessage msg = msgs.get("REGEX");
-        assertNotNull(msg);
-        assertNull(msg.getMessageId());
-        assertEquals("You can't have these characters in a name: /*", msg.getMessage());
+        Map<String, ConstraintHandlerDefinition> constraints = field.getConstraintDefinitionMap();
+        assertNotNull(constraints);
+        ConstraintHandlerDefinition constraint = constraints.get("REGEX");
+        assertNotNull(constraint);
+        assertNull(constraint.getMessageId());
+        assertEquals("You can't have these characters in a name: /*", constraint.getMessage());
         
         // check the messages on the cm:text field
-        field = formConfigElement.getFields().get("my:text");
+        field = myExampleDefaultForm.getFields().get("my:text");
         assertNotNull("Expecting cm:text to be present", field);
-        msgs = field.getConstraintMessageMap();
-        assertNotNull(msgs);
-        msg = msgs.get("REGEX");
-        assertNotNull(msg);
-        assertNull(msg.getMessage());
-        assertEquals("custom_msg", msg.getMessageId());
+        constraints = field.getConstraintDefinitionMap();
+        assertNotNull(constraints);
+        constraint = constraints.get("REGEX");
+        assertNotNull(constraint);
+        assertNull(constraint.getMessage());
+        assertEquals("custom_msg", constraint.getMessageId());
+    }
+    
+    public void testFieldsVisibleInViewModeShouldStillBeVisibleWithNoAppearanceTag()
+    {
+        List<String> fieldNames = noAppearanceDefaultForm.getVisibleViewFieldNames();
+        
+        // The order specified in the config XML should also be preserved.
+        List<String> expectedFieldNames = new ArrayList<String>();
+        expectedFieldNames.add("cm:name");
+        expectedFieldNames.add("cm:title");
+        expectedFieldNames.add("cm:description");
+        expectedFieldNames.add("cm:content");
+        expectedFieldNames.add("my:text");
+        expectedFieldNames.add("my:mltext");
+        expectedFieldNames.add("my:date");
+        
+        assertEquals("Visible fields wrong.", expectedFieldNames, fieldNames);
+    }
+
+    public void testGetFormFieldVisibilitiesForModes()
+    {
+        assertTrue("Field should be visible.", noAppearanceDefaultForm
+                .isFieldVisible("cm:name", Mode.CREATE));
+        assertTrue("Field should be visible.", noAppearanceDefaultForm
+                .isFieldVisible("cm:title", Mode.CREATE));
+        assertFalse("Field should be invisible.", noAppearanceDefaultForm
+                .isFieldVisible("rubbish", Mode.CREATE));
+
+        assertTrue("Field should be visible.", noAppearanceDefaultForm
+                .isFieldVisible("cm:name", Mode.EDIT));
+        assertFalse("Field should be invisible.", noAppearanceDefaultForm
+                .isFieldVisible("cm:title", Mode.EDIT));
+        assertFalse("Field should be invisible.", noAppearanceDefaultForm
+                .isFieldVisible("rubbish", Mode.EDIT));
+
+        assertTrue("Field should be visible.", noAppearanceDefaultForm
+                .isFieldVisible("cm:name", Mode.VIEW));
+        assertTrue("Field should be visible.", noAppearanceDefaultForm
+                .isFieldVisible("cm:title", Mode.VIEW));
+        assertFalse("Field should be invisible.", noAppearanceDefaultForm
+                .isFieldVisible("rubbish", Mode.VIEW));
+    }
+
+    public void testGetFormFieldForcedVisibilities()
+    {
+        assertTrue("Field should be forced.", noAppearanceDefaultForm
+        		.isFieldForcedVisible("cm:name", Mode.CREATE));
+        assertFalse("Field should be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("cm:title", Mode.CREATE));
+        assertFalse("Field should not be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("rubbish", Mode.CREATE));
+
+        assertTrue("Field should be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("cm:name", Mode.EDIT));
+        assertFalse("Field should not be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("cm:title", Mode.EDIT));
+        assertFalse("Field should not be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("rubbish", Mode.EDIT));
+
+        assertTrue("Field should be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("cm:name", Mode.VIEW));
+        assertFalse("Field should be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("cm:title", Mode.VIEW));
+        assertFalse("Field should not be forced.", noAppearanceDefaultForm
+                .isFieldForcedVisible("rubbish", Mode.VIEW));
+        
+        // get a list of of forced fields for view mode
+        List<String> forcedFields = noAppearanceDefaultForm.getForcedFields();
+        assertEquals("Expecting one forced field", 1, forcedFields.size());
+        
+        assertTrue("Expected cm:name to be forced", 
+                    noAppearanceDefaultForm.isFieldForced("cm:name"));
+        assertFalse("Expected cm:title not to be forced", 
+                    noAppearanceDefaultForm.isFieldForced("cm:title"));
+    }
+
+    public void testGetVisibleFieldsForFormWithoutFieldVisibilityReturnsNull()
+    {
+        assertEquals(null, noVisibilityDefaultForm.getVisibleCreateFieldNames());
+        assertEquals(null, noVisibilityDefaultForm.getVisibleEditFieldNames());
+        assertEquals(null, noVisibilityDefaultForm.getVisibleViewFieldNames());
+    }
+    
+    public void testFieldVisibilityForTwoCombinedFormTags()
+    {
+        FormConfigElement combinedConfig = (FormConfigElement)myExampleDefaultForm.combine(noVisibilityFormsConfigElement.getDefaultForm());
+        
+        Set<String> expectedFields = new LinkedHashSet<String>();
+        expectedFields.add("cm:name");
+        expectedFields.add("my:text");
+        expectedFields.add("my:mltext");
+        expectedFields.add("my:date");
+        expectedFields.add("my:duplicate");
+        expectedFields.add("my:int");
+        expectedFields.add("my:broken");
+        
+        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleCreateFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleEditFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleViewFieldNames());
+
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleCreateFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleEditFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleViewFieldNames());
+    }
+    
+    /**
+     * This test case should test the overriding of a constraint handler from the default
+     * (or form) level, to a single field and on to an overridden field.
+     * 
+     * @throws Exception
+     */
+    public void testConstraintHandlerOnField() throws Exception
+    {
+    	// The default or form level constraint handler
+    	ConstraintHandlersConfigElement defaultConstraintHandlers
+    	    = (ConstraintHandlersConfigElement)globalConstraintHandlers;
+    	Map<String, ConstraintHandlerDefinition> handlers = defaultConstraintHandlers.getItems();
+    	
+    	ConstraintHandlerDefinition regexConstraintHandler = handlers.get("REGEX");
+    	assertNotNull(regexConstraintHandler);
+    	
+    	assertEquals("REGEX", regexConstraintHandler.getType());
+    	assertEquals("Alfresco.forms.validation.regexMatch", regexConstraintHandler.getValidationHandler());
+    	assertNull(regexConstraintHandler.getMessage());
+    	assertNull(regexConstraintHandler.getMessageId());
+    	assertNull(regexConstraintHandler.getEvent());
+    	
+    	//TODO Currently if we define a constraint-handler on a field which overrides
+    	// the default (form-level) constraint, the properties of the constraint-handler
+    	// are only those of the field-level constraint. The form-level default one is
+    	// not inherited.
+
+    	ConstraintHandlerDefinition regexFieldConstr
+    	    = myExampleDefaultForm.getFields().get("cm:name").getConstraintDefinitionMap().get("REGEX");
+    	assertNotNull(regexFieldConstr);
+    	assertEquals("REGEX", regexFieldConstr.getType());
+    	assertEquals("Alfresco.forms.validation.regexMatch", regexFieldConstr.getValidationHandler());
+    	assertEquals("You can't have these characters in a name: /*", regexFieldConstr.getMessage());
+    	assertNull(regexFieldConstr.getMessageId());
+    	assertNull(regexFieldConstr.getEvent());
+    	
+    	// We also need to support multiple constraint-handlers on a single field.
+    	ConstraintHandlerDefinition numericFieldConstr
+    	    = myExampleDefaultForm.getFields().get("cm:name").getConstraintDefinitionMap().get("NUMERIC");
+    	assertNotNull(numericFieldConstr);
     }
 }

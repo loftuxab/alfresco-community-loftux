@@ -21,10 +21,12 @@
             <#assign submitType="multipart">
          </#if>
          <form method="get">
-            <label for="nodeRef">NodeRef:</label>
-            <input id="nodeRef" type="text" name="nodeRef" style="width: 400px; margin-top: 5px; margin-bottom: 5px;" 
-                   value="<#if url.args.nodeRef?exists>${url.args.nodeRef}</#if>"/>
-            &nbsp;&nbsp;
+            <label for="itemKind">Item Kind:</label>
+            <input id="itemKind" type="text" name="itemKind" style="width: 50px; margin: 5px 5px 5px 0px;" 
+                   value="<#if url.args.itemKind?exists>${url.args.itemKind}<#else>node</#if>" />
+            <label for="itemId">Item Id:</label>
+            <input id="itemId" type="text" name="itemId" style="width: 400px; margin: 5px 5px 5px 0px;" 
+                   value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" />
             <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
             <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
             <br/>
@@ -36,7 +38,7 @@
             <br/>
             <input type="submit" value="Show Form" style="margin-top: 5px; margin-bottom: 5px;" />
             <input type="button" value="Clear" style="margin-top: 5px; margin-bottom: 5px;"
-                   onclick="javascript:document.getElementById('nodeRef').value='';" />
+                   onclick="javascript:document.getElementById('itemKind').value='';document.getElementById('itemId').value='';" />
          </form>
       </div>
       

@@ -5,6 +5,8 @@
    <source-id>document-details</source-id>
    <url>/components/form</url>
    <properties>
+      <itemKind>node</itemKind>
+      <itemId>{nodeRef}</itemId>
       <mode>view</mode>
    </properties>
 </component>

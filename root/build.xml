@@ -987,19 +987,26 @@
                     test-webserviceclient" />
 
    <target name="run-junit-test" 
-           description="Runs a single JUnit test. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir]"
+           description="Runs a single JUnit test. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir] [-Dstoponerror=[yes|no]]"
            depends="init">
       <fail unless="testcase" 
             message="You must supply a testcase to run using -Dtestcase=[test]"/>
       <fail unless="projectdir" 
             message="You must supply a projectdir to run using -Dprojectdir=[dir]"/>
+      
+      <condition property="haltonfailure" else="no">
+         <and>
+            <isset property="stoponerror" />
+            <istrue value="${stoponerror}" />
+         </and>
+      </condition>
 
       <mkdir dir="${projectdir}/${dir.name.build}/${dir.name.test.results}" />
 
       <junit printsummary="yes" 
              fork="yes" 
              maxmemory="${mem.size.max}" 
-             haltonfailure="no" 
+             haltonfailure="${haltonfailure}" 
              dir="${projectdir}">
          <jvmarg value="-server"/>
          <classpath refid="classpath.unit.test" />
@@ -1035,16 +1042,19 @@
       <antcall target="run-junit-test">
          <param name="testcase" value="org.alfresco.repo.forms.FormServiceImplTest" />
          <param name="projectdir" value="${dir.project.repository}" />
+         <param name="stoponerror" value="yes" />
       </antcall>
       
       <!-- run REST API tests -->
       <antcall target="run-junit-test">
          <param name="testcase" value="org.alfresco.repo.web.scripts.forms.FormRestApiGet_Test" />
          <param name="projectdir" value="${dir.project.remoteapi}" />
+         <param name="stoponerror" value="yes" />
       </antcall>
       <antcall target="run-junit-test">
          <param name="testcase" value="org.alfresco.repo.web.scripts.forms.FormRestApiJsonPost_Test" />
          <param name="projectdir" value="${dir.project.remoteapi}" />
+         <param name="stoponerror" value="yes" />
       </antcall>
    </target>
 

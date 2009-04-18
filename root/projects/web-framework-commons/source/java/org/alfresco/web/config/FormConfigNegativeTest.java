@@ -28,20 +28,17 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in to the web client
  * config service.
- * These tests are aimed at the XML config file that has no &lt;appearance&gt; tag.
  * 
  * @author Neil McErlean
  */
 public class FormConfigNegativeTest extends BaseTest
 {
-    private static Log logger = LogFactory.getLog(FormConfigNoAppearanceTest.class);
-    private XMLConfigService configService;
+    private static final String TEST_CONFIG_FORMS_NEGATIVE_XML = "test-config-forms-negative.xml";
+	private XMLConfigService configService;
     private Config globalConfig;
     private ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
@@ -50,7 +47,7 @@ public class FormConfigNegativeTest extends BaseTest
     
     public void testInvalidConfigXmlShouldProduceNullConfigElements()
     {
-        configService = initXMLConfigService("test-config-forms-negative.xml");
+        configService = initXMLConfigService(TEST_CONFIG_FORMS_NEGATIVE_XML);
         assertNotNull("configService was null.", configService);
 
         Config contentConfig = configService.getConfig("content");

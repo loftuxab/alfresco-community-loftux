@@ -85,9 +85,22 @@ class FieldVisibilityManager
 
     // We can't store 3 separate Lists for each of the 3 modes as the presence
     // of a <show> tag in any mode has repercussions for field-visibility in all modes.
-    private List<FieldVisibilityInstruction> newInstructions = new ArrayList<FieldVisibilityInstruction>();
-    
+    private List<FieldVisibilityInstruction> visibilityInstructions = new ArrayList<FieldVisibilityInstruction>();
+
     void addInstruction(String showOrHide, String fieldId, String modesString)
+    {
+    	this.addInstruction(showOrHide, fieldId, modesString, "false");
+    }
+    
+    /**
+     * 
+     * @param showOrHide
+     * @param fieldId
+     * @param modesString
+     * @param forceString if this parameter equalsIgnoreString("true") then a show
+     * instruction should be forced.
+     */
+    void addInstruction(String showOrHide, String fieldId, String modesString, String forceString)
     {
         if (logger.isDebugEnabled())
         {
@@ -96,11 +109,13 @@ class FieldVisibilityManager
                 .append(" ")
                 .append(fieldId)
                 .append(" ")
-                .append(modesString);
+                .append(modesString)
+                .append(" force=")
+                .append(forceString);
             logger.debug(msg.toString());
         }
-        
-        this.newInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString));
+            	
+        this.visibilityInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString, forceString));
     }
     
     public FieldVisibilityManager combine(FieldVisibilityManager otherFVM)
@@ -111,8 +126,8 @@ class FieldVisibilityManager
         }
         FieldVisibilityManager result = new FieldVisibilityManager();
         
-        result.newInstructions.addAll(this.newInstructions);
-        result.newInstructions.addAll(otherFVM.newInstructions);
+        result.visibilityInstructions.addAll(this.visibilityInstructions);
+        result.visibilityInstructions.addAll(otherFVM.visibilityInstructions);
 
         return result;
     }
@@ -129,7 +144,7 @@ class FieldVisibilityManager
         // First attempt: the brute force simple impl.
         // TODO Could refactor later to have less loop iteration.
 
-        if (this.newInstructions.isEmpty())
+        if (this.visibilityInstructions.isEmpty())
         {
             return true;
         }
@@ -144,7 +159,7 @@ class FieldVisibilityManager
             
             // We need to ignore all those instructions that precede the first 'show'.
             List<FieldVisibilityInstruction> relevantInstructions
-                    = newInstructions.subList(indexOfFirstShow, newInstructions.size());
+                    = visibilityInstructions.subList(indexOfFirstShow, visibilityInstructions.size());
             
             // With any show tag present, show/hide is explicitly config managed,
             // so we default to HIDE.
@@ -165,7 +180,7 @@ class FieldVisibilityManager
         else
         {
             // There are no "show" tags, only hides.
-            for (FieldVisibilityInstruction fvi : newInstructions)
+            for (FieldVisibilityInstruction fvi : visibilityInstructions)
             {
                 if (fvi.getFieldId().equals(fieldId)
                         && fvi.getShowOrHide().equals(Visibility.HIDE) // Always true.
@@ -179,15 +194,42 @@ class FieldVisibilityManager
     }
     
     /**
+     * This method checks whether the specified field is "forced" to be shown.
+     * It will return true if the field is visible in the specified mode AND is marked
+     * as to be forced to be visible.
+     * 
+     * @param fieldId
+     * @param m
+     * @return
+     */
+    public boolean isFieldForced(String fieldId, Mode m)
+    {
+    	if (isFieldVisible(fieldId, m) == false)
+    	{
+    		return false;
+    	}
+    	
+    	boolean result = false;
+        for (FieldVisibilityInstruction fvi : this.visibilityInstructions)
+        {
+        	if (fvi.getFieldId().equals(fieldId))
+        	{
+        		result = fvi.isForced();
+        	}
+        }
+        return result;
+    }
+    
+    /**
      * Finds the index of the first "show" instruction.
      * 
      * @return an int index of the first "show" instruction, or -1 if none exists.
      */
     public int getIndexOfFirstShow()
     {
-        for (int i = 0; i < newInstructions.size(); i++)
+        for (int i = 0; i < visibilityInstructions.size(); i++)
         {
-            if (newInstructions.get(i).getShowOrHide().equals(Visibility.SHOW)) return i;
+            if (visibilityInstructions.get(i).getShowOrHide().equals(Visibility.SHOW)) return i;
         }
         return -1;
     }
@@ -223,7 +265,7 @@ class FieldVisibilityManager
             Set<String> result = new LinkedHashSet<String>();
 
             List<FieldVisibilityInstruction> relevantInstructions
-                   = newInstructions.subList(indexOfFirstShow, newInstructions.size());
+                   = visibilityInstructions.subList(indexOfFirstShow, visibilityInstructions.size());
             
             for (FieldVisibilityInstruction fvi : relevantInstructions)
             {

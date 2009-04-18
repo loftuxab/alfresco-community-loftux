@@ -51,12 +51,13 @@ public class DefaultControlsConfigTest extends BaseTest
     protected Config globalConfig;
     protected ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
-    protected FormConfigElement formConfigElement;
+    protected FormsConfigElement formsConfigElement;
+    protected FormConfigElement defaultFormConfigElement;
     protected DefaultControlsConfigElement defltCtrlsConfElement;
 
     protected String getConfigXmlFile()
     {
-        return "test-config-forms.xml";
+        return "test-config-forms-basic.xml";
     }
     
     @SuppressWarnings("unchecked")
@@ -64,13 +65,12 @@ public class DefaultControlsConfigTest extends BaseTest
     {
         // Test that the default-control types are read from the config file
         Map<String, String> expectedDataMappings = new HashMap<String, String>();
-        expectedDataMappings.put("d:text",
-                "org/alfresco/forms/controls/textfield.ftl");
-        expectedDataMappings.put("d:boolean",
-                "org/alfresco/forms/controls/checkbox.ftl");
-        expectedDataMappings.put("association",
-                "org/alfresco/forms/controls/association-picker.ftl");
-        expectedDataMappings.put("abc", "org/alfresco/abc.ftl");
+        expectedDataMappings.put("d:long", "/form-controls/mytextfield.ftl");
+        expectedDataMappings.put("d:text", "/form-controls/mytextfield.ftl");
+        expectedDataMappings.put("d:test", "/form-controls/test.ftl");
+        expectedDataMappings.put("d:boolean", "/form-controls/checkbox.ftl");
+        expectedDataMappings.put("association", "/form-controls/association-picker.ftl");
+        expectedDataMappings.put("abc", "/form-controls/abc.ftl");
 
         List<String> actualNames = defltCtrlsConfElement.getItemNames();
         assertEquals("Incorrect name count, expected "
@@ -219,14 +219,15 @@ public class DefaultControlsConfigTest extends BaseTest
         configService = initXMLConfigService(getConfigXmlFile());
         assertNotNull("configService was null.", configService);
     
-        Config contentConfig = configService.getConfig("content");
+        Config contentConfig = configService.getConfig("my:example");
         assertNotNull("contentConfig was null.", contentConfig);
     
-        ConfigElement confElement = contentConfig.getConfigElement("form");
+        ConfigElement confElement = contentConfig.getConfigElement("forms");
         assertNotNull("confElement was null.", confElement);
-        assertTrue("confElement should be instanceof FormConfigElement.",
-                confElement instanceof FormConfigElement);
-        formConfigElement = (FormConfigElement) confElement;
+        assertTrue("confElement should be instanceof FormsConfigElement.",
+                confElement instanceof FormsConfigElement);
+        formsConfigElement = (FormsConfigElement) confElement;
+        defaultFormConfigElement = formsConfigElement.getDefaultForm();
     
         globalConfig = configService.getGlobalConfig();
     

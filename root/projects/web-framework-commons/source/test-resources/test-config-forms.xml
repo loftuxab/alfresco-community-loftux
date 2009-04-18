@@ -3,7 +3,7 @@
       <element-readers>
          <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
          <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
-         <element-reader element-name="form" class="org.alfresco.web.config.FormElementReader"/>
+         <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 
@@ -31,46 +31,48 @@
    
    <!-- The evaluator would normally be node-type, but that makes testing difficult -->
    <config evaluator="string-compare" condition="content">
-      <!-- For this example, I'm going to include all optional attributes -->
-      <form submission-url="submission/url">
-         <view-form template="/path/view/template" requires-role="Consumer" />
-         <edit-form template="/path/edit/template/manager" requires-role="Manager" />
-         <edit-form template="/path/edit/template/contributor" requires-role="Contributor" />
-         <create-form template="/path/create/template" requires-role="Manager" />
-         <create-form template="/path/create/template/norole"/>
-         <field-visibility>
-            <!-- This comment is here to test the FormReader -->
-            <show id="name" />
-            <show id="title" for-mode="view, create" />
-         </field-visibility>
-         <appearance>
-            <set id="details" appearance="fieldset" />
-            <set id="user" parent="details" appearance="panel" />
-
-            <field id="name" label="Name" label-id="field_label_name" read-only="true" set="details"
-                     help="This is the name of the node" help-id="field_help_name" >
-               <control template="alfresco/extension/formcontrols/my-name.ftl">
-                  <control-param name="foo">bar</control-param>
-               </control>
-               <constraint-message type="REGEX" message="The name can not contain the character '{0}'"
-                                                    message-id="field_error_name" />
-               <constraint-message type="apples" message="Pink Lady" message-id="" />
-               <constraint-message type="oranges" message="" message-id="Mandarin" />
-            </field>
-            <field id="title" label="My Title" set="details" />
-            <field id="username" set="user" />
-            <field id="quota" set="user" requires-role="Coordinator" /> 
-            <field id="fieldWithMixedCtrlParams" >
-               <control template="test.ftl">
-                  <control-param name="one">un</control-param>
-                  <control-param name="two">deux</control-param>
-                  <!-- This third param intentionally has no value -->
-                  <control-param name="three"></control-param>
-                  <control-param name="four">quatre</control-param>
-               </control>
-            </field>
-         </appearance>
-      </form>
+      <forms>
+	      <!-- For this example, I'm going to include all optional attributes -->
+	      <form submission-url="submission/url">
+	         <view-form template="/path/view/template" requires-role="Consumer" />
+	         <edit-form template="/path/edit/template/manager" requires-role="Manager" />
+	         <edit-form template="/path/edit/template/contributor" requires-role="Contributor" />
+	         <create-form template="/path/create/template" requires-role="Manager" />
+	         <create-form template="/path/create/template/norole"/>
+	         <field-visibility>
+	            <!-- This comment is here to test the FormReader -->
+	            <show id="name" />
+	            <show id="title" for-mode="view, create" />
+	         </field-visibility>
+	         <appearance>
+	            <set id="details" appearance="fieldset" />
+	            <set id="user" parent="details" appearance="panel" />
+	
+	            <field id="name" label="Name" label-id="field_label_name" read-only="true" set="details"
+	                     help="This is the name of the node" help-id="field_help_name" >
+	               <control template="alfresco/extension/formcontrols/my-name.ftl">
+	                  <control-param name="foo">bar</control-param>
+	               </control>
+	               <constraint-message type="REGEX" message="The name can not contain the character '{0}'"
+	                                                    message-id="field_error_name" />
+	               <constraint-message type="apples" message="Pink Lady" message-id="" />
+	               <constraint-message type="oranges" message="" message-id="Mandarin" />
+	            </field>
+	            <field id="title" label="My Title" set="details" />
+	            <field id="username" set="user" />
+	            <field id="quota" set="user" requires-role="Coordinator" /> 
+	            <field id="fieldWithMixedCtrlParams" >
+	               <control template="test.ftl">
+	                  <control-param name="one">un</control-param>
+	                  <control-param name="two">deux</control-param>
+	                  <!-- This third param intentionally has no value -->
+	                  <control-param name="three"></control-param>
+	                  <control-param name="four">quatre</control-param>
+	               </control>
+	            </field>
+	         </appearance>
+	      </form>
+      </forms>
    </config>
    
 </alfresco-config>

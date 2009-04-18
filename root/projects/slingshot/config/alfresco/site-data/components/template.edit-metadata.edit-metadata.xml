@@ -5,6 +5,8 @@
    <source-id>edit-metadata</source-id>
    <url>/components/form</url>
    <properties>
+      <itemKind>node</itemKind>
+      <itemId>{nodeRef}</itemId>
       <mode>edit</mode>
       <submitType>json</submitType>
       <showCaption>true</showCaption>
