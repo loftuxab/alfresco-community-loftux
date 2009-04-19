@@ -3274,8 +3274,7 @@
                     clean-webframework" />   
    
    <target name="build-surf-empty"
-           depends="clean-surf,
-                    incremental-core,
+           depends="incremental-core,
                     package-webscriptframework-jar, 
                     package-webframework-jar, 
                     package-webframeworkcommons-jar,
@@ -3285,7 +3284,7 @@
            depends="assemble-webframework-war">
 
       <!-- Removing any and all test objects -->
-      <delete includeemptydirs="true">
+      <delete includeemptydirs="true" quiet="yes">
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts"
       	          includes="**/*" defaultexcludes="false" />
       	 <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates"
@@ -3306,6 +3305,7 @@
       	          includes="**/*-test.xml" defaultexcludes="false" />
       </delete>
       
+      <mkdir dir="${dir.project.webframework.dist}" />
    </target>
    
    
