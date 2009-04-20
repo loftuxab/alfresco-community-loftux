@@ -53,15 +53,15 @@ public final class WildCard {
 	//		translate '*' to '<' if followed by a '.'
 	
 	public static final int SINGLECHAR_UNICODE_WILDCARD	= '>';
-	public static final int DOT_UNICODE_WILDCARD				= '"';
+	public static final int DOT_UNICODE_WILDCARD		= '"';
 	public static final int MULTICHAR_UNICODE_WILDCARD	= '<';
 
 	//	Wildcard types
 	
-	public static final int WILDCARD_NONE			= 0;		//	no wildcard characters present in pattern
-	public static final int WILDCARD_ALL			= 1;		// '*.*' and '*'
-	public static final int WILDCARD_NAME			= 2;		// '*.ext'
-	public static final int WILDCARD_EXT			= 3;		// 'name.*'
+	public static final int WILDCARD_NONE		= 0;		//	no wildcard characters present in pattern
+	public static final int WILDCARD_ALL		= 1;		// '*.*' and '*'
+	public static final int WILDCARD_NAME		= 2;		// '*.ext'
+	public static final int WILDCARD_EXT		= 3;		// 'name.*'
 	public static final int WILDCARD_COMPLEX	= 4;		// complex wildcard
 
 	public static final int WILDCARD_INVALID	= -1;
@@ -506,7 +506,7 @@ public final class WildCard {
 
   			if ( i < ( str.length() - 1)) {
   				char nextCh = str.charAt(i+1);
-  				if ( nextCh == SINGLECHAR_WILDCARD || nextCh == MULTICHAR_WILDCARD || nextCh == SINGLECHAR_UNICODE_WILDCARD)
+  				if ( nextCh == MULTICHAR_WILDCARD || nextCh == SINGLECHAR_UNICODE_WILDCARD)
   					ch = '.';
   			}
   		}

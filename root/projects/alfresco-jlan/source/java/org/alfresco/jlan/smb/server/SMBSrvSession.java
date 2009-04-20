@@ -374,6 +374,11 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 		// Delete any temporary shares that were created for this session
 
 		getSMBServer().deleteTemporaryShares(this);
+		
+		// Commit any outstanding transaction that may have been started during cleanup
+		
+		if ( hasTransaction())
+			endTransaction();
 	}
 
 	/**
