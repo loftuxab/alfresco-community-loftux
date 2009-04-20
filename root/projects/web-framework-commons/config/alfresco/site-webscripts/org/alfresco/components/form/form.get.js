@@ -76,6 +76,8 @@ function main()
       
       // build the JSON object to send to the server
       var postBody = {};
+      postBody.itemKind = itemKind;
+      postBody.itemId = itemId.replace(":/", "");
       
       if (visibleFields !== null)
       {
@@ -108,7 +110,7 @@ function main()
          
       // make remote call to service
       var connector = remote.connect("alfresco");
-      var json = connector.post("/api/form/definition/" + itemKind + "/" + itemId.replace(":/", ""), 
+      var json = connector.post("/api/formdefinitions", 
             jsonUtils.toJSONString(postBody), "application/json");
       
       if (logger.isLoggingEnabled())
