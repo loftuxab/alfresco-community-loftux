@@ -37,7 +37,7 @@ import java.io.OutputStream;
  */
 public class DataUtil
 {
-    public static int BUFFER_SIZE = 4 * 1024;
+    private static int BUFFER_SIZE = 1024;
 
     /**
      * Copy stream.
@@ -71,13 +71,13 @@ public class DataUtil
      * @throws IOException
      *             Signals that an I/O exception has occurred.
      */
-    public static int copyStream(InputStream in, OutputStream out, boolean closeStreams)
+    public static int copyStream(final InputStream in, final OutputStream out, final boolean closeStreams)
         throws IOException
     {
         try
         {
             int byteCount = 0;
-            byte[] buffer = new byte[BUFFER_SIZE];
+            final byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead = -1;
             while ((bytesRead = in.read(buffer)) != -1)
             {
@@ -145,22 +145,6 @@ public class DataUtil
     }
 
     /**
-     * To string.
-     * 
-     * @param input
-     *            the input
-     * 
-     * @return the string
-     * 
-     * @throws IOException
-     *             Signals that an I/O exception has occurred.
-     */
-    public static String toString(InputStream input) throws IOException
-    {
-        return copyToByteArray(input, true).toString();
-    }
-
-    /**
      * Copy to byte array.
      * 
      * @param input
@@ -176,25 +160,9 @@ public class DataUtil
     public static ByteArrayOutputStream copyToByteArray(InputStream input, boolean closeInputStream)
         throws IOException
     {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream(512);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream(BUFFER_SIZE);
         
-        try
-        {
-            copyStream(input, buffer, closeInputStream);
-        }
-        finally
-        {
-            try
-            {
-                if (buffer != null)
-                {
-                    buffer.close();
-                }
-            }
-            catch (IOException ignored)
-            {
-            }
-        }
+        copyStream(input, buffer, closeInputStream);
         
         return buffer;
     }
@@ -209,10 +177,10 @@ public class DataUtil
      * 
      * @throws IOException  Signals that an I/O exception has occurred.
      */
-    public static String copyToString(InputStream input, boolean closeInputStream)
+    public static String copyToString(InputStream input, String encoding, boolean closeInputStream)
         throws IOException
     {
         ByteArrayOutputStream baos = copyToByteArray(input, closeInputStream);
-        return new String(baos.toByteArray());
+        return encoding != null ? new String(baos.toByteArray(), encoding) : new String(baos.toByteArray());
     }
 }
