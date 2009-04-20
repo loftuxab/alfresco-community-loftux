@@ -388,7 +388,7 @@ public class RemoteStore implements Store
      */
     public void updateDocument(String documentPath, String content) throws IOException
     {
-        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes("UTF-8"));
         Response res = callPost(buildEncodeCall(API_UPDATE, documentPath), in);
         
         if (logger.isDebugEnabled())
@@ -421,7 +421,7 @@ public class RemoteStore implements Store
      */
     public void createDocument(String documentPath, String content) throws IOException
     {
-        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
+        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes("UTF-8"));
         Response res = callPost(buildEncodeCall(API_CREATE, documentPath), in);
         
         if (logger.isDebugEnabled())

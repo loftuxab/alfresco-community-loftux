@@ -228,7 +228,7 @@ public class XMLUtil
     }
 
     /**
-     * Parses the.
+     * Parses the given stream to an XML document (in UTF-8 format).
      * 
      * @param stream the stream
      * 
@@ -240,7 +240,7 @@ public class XMLUtil
     public static Document parse(InputStream stream) throws DocumentException,
             IOException
     {
-        return parse(DataUtil.copyToString(stream, true));
+        return parse(DataUtil.copyToString(stream, "UTF-8", true));
     }
 
     /**
