@@ -252,14 +252,14 @@ function getArgument(argName, defValue)
       result = defValue;
    }
    
-   var argValue = args[argName];
+   var argValue = context.properties[argName];
    if (argValue !== null)
    {
       result = argValue;
    }
    else
    {
-      argValue = context.properties[argName];
+      argValue = args[argName];
       if (argValue !== null)
       {
    	   result = argValue;
@@ -743,9 +743,9 @@ function setupFieldValue(formModel, fieldDef, fieldConfig)
 {
    fieldDef.value = "";
    
-   if (typeof formModel.data.formData[fieldDef.name] !== "undefined")
+   if (typeof formModel.data.formData[fieldDef.dataKeyName] !== "undefined")
    {
-      fieldDef.value = formModel.data.formData[fieldDef.name];
+      fieldDef.value = formModel.data.formData[fieldDef.dataKeyName];
    }
 }
 
