@@ -427,6 +427,8 @@
                   includes="${file.name.war.webclient}" />
          <fileset dir="${dir.project.slingshot.dist}"
                   includes="${file.name.war.slingshot}" />
+         <fileset dir="${dir.project.mobile.dist}"
+                  includes="${file.name.war.mobile}" />
       </copy>
 
       <!-- place latest Xalan jars to ensure they are used -->
@@ -487,6 +489,8 @@
                      includes="${file.name.war.webclient}" />
          <zipfileset dir="${dir.project.slingshot.dist}"
                      includes="${file.name.war.slingshot}" />
+         <zipfileset dir="${dir.project.mobile.dist}"
+                     includes="${file.name.war.mobile}" />
          <zipfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -531,6 +535,8 @@
                      includes="${file.name.war.webclient}" />
          <tarfileset dir="${dir.project.slingshot.dist}"
                      includes="${file.name.war.slingshot}" />
+         <tarfileset dir="${dir.project.mobile.dist}"
+                     includes="${file.name.war.mobile}" />
          <tarfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -665,7 +671,7 @@
       <copy todir="${dir.continuous.dist}/">
          <fileset dir="${dir.enterpriseproject.examples.config}/hyperic"/>
       </copy>
-	  <!-- Weblogic .ear -->
+      <!-- Weblogic .ear -->
       <ear destfile="${dir.continuous.dist}/${file.name.ear.alfresco}" 
            appxml="${dir.enterpriseproject.examples.src.metainf}/application.xml" >
          <fileset dir="${dir.project.webclient.dist}" includes="${file.name.war.webclient}" />
