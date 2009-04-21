@@ -51,7 +51,7 @@
          </form>
       </div>
       
-      <div style="margin-left: 1em; margin-top: 1.4em;">
+      <div style="margin-left: 1.4em; margin-top: 1.4em;">
          <@region id="form-ui" scope="template" />
       </div>
       
