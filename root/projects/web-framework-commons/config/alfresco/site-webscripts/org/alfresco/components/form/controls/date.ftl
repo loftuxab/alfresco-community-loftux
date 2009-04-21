@@ -14,7 +14,7 @@
 </div>
 <#else>
 
-<label for="${dpId}-date">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">*</span></#if></label>
+<label for="${dpId}-date">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
 <input id="${dpId}" type="hidden" name="${field.name}" value="${field.value}" />
 <input id="${dpId}-date" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 

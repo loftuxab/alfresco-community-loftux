@@ -4,7 +4,7 @@
    <span class="viewmode-value">${field.value?html}</span>
 </div>
 <#else>
-<label for="${args.htmlid}-${field.id}">${field.label?html}:<#if field.endpointMandatory><span class="mandatory-indicator">*</span></#if></label>
+<label for="${args.htmlid}-${field.id}">${field.label?html}:<#if field.endpointMandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
 
 <script type="text/javascript">//<![CDATA[
    new Alfresco.ObjectFinder("${args.htmlid}-${field.id}").setOptions(

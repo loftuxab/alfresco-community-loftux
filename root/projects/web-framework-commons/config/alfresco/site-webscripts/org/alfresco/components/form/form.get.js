@@ -714,12 +714,22 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       
       if (constraintId === "LIST")
       {
-         // if the constraint is the list of values constraint force the control
+         // if the constraint is the list of values constraint, force the control
          // template to be select.ftl and setup the options
          fieldDef.control.template = "controls/select.ftl";
          
          // setup the options string and set as control params
          fieldDef.control.params.options = constraintParams.allowedValues;
+      }
+      else if (constraintId === "LENGTH")
+      {
+         // if the constraint is the length constraint, pass the maxLength
+         // parameter to the control if appropriate
+         if (typeof constraintParams.maxLength !== "undefined" && 
+             constraintParams.maxLength != -1)
+         {
+            fieldDef.control.params.maxLength = constraintParams.maxLength;
+         }
       }
    }
    else if (logger.isWarnLoggingEnabled())

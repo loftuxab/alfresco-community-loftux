@@ -7,5 +7,5 @@
 <label for="${args.htmlid}_${field.id}">${field.label?html}:</label>
 <input id="${args.htmlid}_${field.id}" type="text" value="${field.value}" disabled="true"
        title="${msg("form.field.not.editable")}"
-       <#if field.control.params.width?exists>style="width: ${field.control.params.width};"</#if> />
+       <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if> />
 </#if>
