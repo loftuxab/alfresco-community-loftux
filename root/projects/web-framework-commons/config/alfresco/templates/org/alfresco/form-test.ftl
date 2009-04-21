@@ -21,24 +21,33 @@
             <#assign submitType="multipart">
          </#if>
          <form method="get">
-            <label for="itemKind">Item Kind:</label>
-            <input id="itemKind" type="text" name="itemKind" style="width: 50px; margin: 5px 5px 5px 0px;" 
-                   value="<#if url.args.itemKind?exists>${url.args.itemKind}<#else>node</#if>" />
-            <label for="itemId">Item Id:</label>
-            <input id="itemId" type="text" name="itemId" style="width: 400px; margin: 5px 5px 5px 0px;" 
-                   value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" />
-            <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
-            <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
-            <br/>
-            <label for="submitType-multi">Submit Type:</label>
-            <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
-            <input id="submitType-json" type="radio" name="submitType" value="json"<#if submitType == "json"> checked</#if>>&nbsp;JSON&nbsp;
-            <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
-            <input id="fr-toggle" name="fr" type="checkbox"<#if url.args.fr?exists> checked</#if>>&nbsp;Test Forms Runtime
-            <br/>
-            <input type="submit" value="Show Form" style="margin-top: 5px; margin-bottom: 5px;" />
-            <input type="button" value="Clear" style="margin-top: 5px; margin-bottom: 5px;"
-                   onclick="javascript:document.getElementById('itemKind').value='';document.getElementById('itemId').value='';" />
+            <fieldset style="border: 1px solid #aaa; margin-top: 10px; padding: 8px;">
+               <legend style="color: #515d6b;">Item Details</legend>
+               <label for="itemKind">Kind:</label>
+               <input id="itemKind" type="text" name="itemKind" style="width: 50px; margin: 5px 5px 5px 0px;" 
+                      value="<#if url.args.itemKind?exists>${url.args.itemKind}<#else>node</#if>" />
+               <label for="itemId">Id:</label>
+               <input id="itemId" type="text" name="itemId" style="width: 450px; margin: 5px 5px 5px 0px;" 
+                      value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" />
+            </fieldset>
+            <fieldset style="border: 1px solid #aaa; margin: 10px 0px; padding: 8px;">
+               <legend style="color: #515d6b;">Form Details</legend>
+               <label for="formId">Id:</label>
+               <input id="formId" name="formId" style="width: 200px; margin: 5px 10px 5px 0px;" 
+                      value="<#if url.args.formId?exists>${url.args.formId}</#if>" />
+               <label style="margin-right: 5px;">Mode:</label>
+               <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
+               <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
+               <br/>
+               <label style="margin-right: 5px;">Submit Type:</label>
+               <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;
+               <input id="submitType-json" type="radio" name="submitType" value="json"<#if submitType == "json"> checked</#if>>&nbsp;JSON&nbsp;
+               <input id="submitType-url" type="radio" name="submitType" value="urlencoded"<#if submitType == "urlencoded"> checked</#if>>&nbsp;URL Encoded&nbsp;&nbsp;&nbsp;
+               <input id="fr-toggle" name="fr" type="checkbox"<#if url.args.fr?exists> checked</#if>>&nbsp;Test Forms Runtime
+            </fieldset>
+            <input type="submit" value="Show Form" />
+            <input type="button" value="Clear"
+                   onclick="javascript:document.getElementById('itemKind').value='';document.getElementById('itemId').value='';document.getElementById('formId').value='';" />
          </form>
       </div>
       
