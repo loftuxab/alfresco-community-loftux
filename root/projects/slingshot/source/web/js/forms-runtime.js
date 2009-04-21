@@ -1031,6 +1031,16 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
       max: -1,
       crop: false
    }, args);
+   
+   if (myArgs.minLength)
+   {
+      myArgs.min = myArgs.minLength;
+   }
+   
+   if (myArgs.maxLength)
+   {
+      myArgs.max = myArgs.maxLength;
+   }
 
    var length = field.value.length;
    

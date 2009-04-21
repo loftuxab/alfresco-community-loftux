@@ -6,7 +6,8 @@
 <#else>
 <label for="${args.htmlid}_${field.id}">${msg("form.control.mimetype.label")}:</label>
 <#-- TODO: Make this control make an AJAX callback to get list of mimetypes -->
-<select id="${args.htmlid}_${field.id}" name="${field.name}">
+<select id="${args.htmlid}_${field.id}" name="${field.name}" 
+        <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>>
    <option value="">${msg("form.control.mimetype.unknown")}</option>
    <@mimetypeOption mt="application/pdf" />
    <@mimetypeOption mt="audio/x-aiff" />

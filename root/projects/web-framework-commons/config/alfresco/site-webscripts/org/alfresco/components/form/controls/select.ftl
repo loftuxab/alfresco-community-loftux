@@ -4,10 +4,11 @@
    <span class="viewmode-value">${field.value?html}</span>
 </div>
 <#else>
-<label for="${args.htmlid}_${field.id}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">*</span></#if></label>
+<label for="${args.htmlid}_${field.id}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
 <select id="${args.htmlid}_${field.id}" name="${field.name}" 
        <#if field.description?exists>title="${field.description}"</#if>
        <#if field.control.params.size?exists>size="${field.control.params.size}"</#if> 
+       <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
        <#if field.disabled>disabled="true"</#if>>
    <#if field.control.params.options?exists>  
       <#list field.control.params.options?split(",") as nameValue>

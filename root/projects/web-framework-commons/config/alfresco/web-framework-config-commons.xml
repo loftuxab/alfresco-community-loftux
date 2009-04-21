@@ -42,6 +42,7 @@
          <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
          <constraint type="LIST" validation-handler="Alfresco.forms.validation.inList" event="blur" />
          <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup" />
+         <constraint type="LENGTH" validation-handler="Alfresco.forms.validation.length" event="keyup" />
       </constraint-handlers>
    </config>
    
