@@ -20,17 +20,20 @@ function main()
    var formUIModel = null;
    
    var itemKind = getArgument("itemKind");
-   var itemId = getArgument("itemId")
+   var itemId = getArgument("itemId");
    
    if (itemKind != null && itemKind.length > 0 && itemId != null && itemId.length > 0)
    {
-      if (logger.isLoggingEnabled())
-      {
-         logger.log("Showing form for item: [" + itemKind + "]" + itemId);
-      }
-
       // determine what mode we are in from the arguments
       var mode = getArgument("mode", "edit");
+      
+      // determine if a form with a specific form is required
+      var formId = getArgument("formId");
+
+      if (logger.isLoggingEnabled())
+      {
+         logger.log("Showing form (id=" + formId + ") for item: [" + itemKind + "]" + itemId);
+      }
       
       var formConfig = null;
       var visibleFields = null;
@@ -38,38 +41,49 @@ function main()
       // query for configuration for item
       var nodeConfig = config.scoped[itemId];
       
-      if (nodeConfig != null)
+      if (nodeConfig !== null)
       {
-         // get the visible fields for the current mode
+         // get the forms configuration
          var formsConfig = nodeConfig.forms;
 
-         // Initially we will always select the default form.
-         //TODO Add support for form-id selection
-         formConfig = nodeConfig.forms.defaultForm;
-         
-         if (formConfig != null)
+         if (formsConfig !== null)
          {
-            // TODO: deal with hidden vs. show mode and no config
-         
-            switch (mode)
+            if (formId !== null && formId.length > 0)
             {
-               case "view":
-                  visibleFields = formConfig.visibleViewFieldNames;
-                  break;
-               case "edit":
-                  visibleFields = formConfig.visibleEditFieldNames;
-                  break;
-               case "create":
-                  visibleFields = formConfig.visibleCreateFieldNames;
-                  break;
-               default:
-                  visibleFields = formConfig.visibleViewFieldNames;
-                  break;
+               // look up the specific form
+               formConfig = formsConfig.getForm(formId);
+            }
+            else
+            {
+               // look up the default form
+               formConfig = formsConfig.defaultForm;
             }
             
-            if (logger.isLoggingEnabled())
+            if (formConfig != null)
             {
-               logger.log("Visible fields for " + mode + " mode = " + visibleFields);
+               // TODO: deal with hidden vs. show mode, sets and no config at all!
+            
+               // get visible fields for the current mode
+               switch (mode)
+               {
+                  case "view":
+                     visibleFields = formConfig.visibleViewFieldNames;
+                     break;
+                  case "edit":
+                     visibleFields = formConfig.visibleEditFieldNames;
+                     break;
+                  case "create":
+                     visibleFields = formConfig.visibleCreateFieldNames;
+                     break;
+                  default:
+                     visibleFields = formConfig.visibleViewFieldNames;
+                     break;
+               }
+               
+               if (logger.isLoggingEnabled())
+               {
+                  logger.log("Visible fields for " + mode + " mode = " + visibleFields);
+               }
             }
          }
       }
@@ -203,13 +217,13 @@ function main()
             }
             else
             {
-               model.error = "No fields to render for node type \"" + formModel.data.type + "\".";
+               model.error = "No fields to render for node type \"" + formModel.data.type + "\" and form id \"" + formId + "\".";
             }
          }
          else
          {
             // TODO: This should just show all properties instead
-            model.error = "No configuration found for node type \"" + formModel.data.type + "\".";
+            model.error = "No configuration found for node type \"" + formModel.data.type + "\" and form id \"" + formId + "\".";
          }
          
          // TODO: deal with 'sets', the fields must be within their appropriate set
