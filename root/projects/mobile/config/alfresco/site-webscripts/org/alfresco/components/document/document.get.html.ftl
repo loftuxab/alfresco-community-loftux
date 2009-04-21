@@ -11,16 +11,16 @@
     </div>
     <div class="content">
        <div class="panelBar">
-            <a class="button" href="workflow.html">${msg('Assign Workflow')}</a>
-            <a class="button delete">${msg('Delete')}</a><!-- make form button-->
+            <a class="button" href="workflow.html">${msg('label.assignWorkflow')}</a>
+            <a class="button delete">${msg('button.delete')}</a><!-- make form button-->
           </div>
-          <a class="preview" href="/share/proxy/alfresco-feed/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" /></a>
+          <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" /></a>
           <ul class="rr info">
-              <li><span>${msg('Name')}:</span> ${doc.title}</li>
-              <li><span>${msg('Description')}:</span> ${doc.description}</li>
-              <li><span>${msg('Size')}:</span> ${doc.size} Kb</li> <!-- todo kb text fix-->
-              <li><span>${msg('Type')}:</span> ${doc.type}</li>
-              <li><span>${msg('Tags')}:</span> ${doc.tags}</li>              
+              <li><span>${msg('label.name')}:</span> ${doc.displayName}</li>
+              <li><span>${msg('label.description')}:</span> ${doc.description}</li>
+              <li><span>${msg('label.size')}:</span> ${doc.size} Kb</li> <!-- todo kb text fix-->
+              <li><span>${msg('label.type')}:</span> ${doc.type}</li>
+              <li><span>${msg('label.tags')}:</span> ${doc.tags}</li>              
           </ul>
       </div>
    </div>
