@@ -1,12 +1,14 @@
 const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
 
 // http://localhost:8080/alfresco/service/api/sites
-function getAllSites() {
+function getAllSites()
+{
   var data  = remote.call("/api/sites");
   return eval('('+ data+')');
 }
 //http://localhost:8080/alfresco/service/api/people/admin/sites?size={pagesize?}&pos={position?}
-function getUserSites() {
+function getUserSites()
+{
   // var data = remote.call("/api/people/"+ +"/sites");
   //   return eval('('+ data+')');
 // Call the repo for sites the user is a member of
@@ -16,7 +18,7 @@ function getUserSites() {
       var i, ii, j, jj;
 
       // Create javascript objects from the server response
-      var sites = eval('(' + result + ')'), site, favourites = {},userfavs = [];
+      var sites = eval('(' + result + ')'), site, favourites = {}, userfavs = [];
 
       if (sites.length > 0)
       {
@@ -46,19 +48,20 @@ function getUserSites() {
             }
             site.isFavourite = !!(favourites[site.shortName]);
          }
-        var userSites = {
-          sites : sites,
-          favSites: userfavs
-        }
-        return userSites;
+         var userSites =
+         {
+            sites : sites,
+            favSites: userfavs
+         }
+         return userSites;
       }
       return null;
-   }  
+   }
 }
 
 var userSites = getUserSites();
 model.sites = userSites.sites;
-model.favSites=userSites.favSites;
+model.favSites = userSites.favSites;
 model.allSites = getAllSites();
 model.pageTitle = 'Sites';
 model.backButton = true
