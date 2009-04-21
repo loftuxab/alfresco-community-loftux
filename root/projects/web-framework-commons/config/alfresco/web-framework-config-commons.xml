@@ -73,7 +73,7 @@
                <show id="cm:subject"/>
                
                <!-- cm:complianceable aspect -->
-               <show id="removeAfter" />
+               <show id="cm:removeAfter" />
                
                <!-- cm:effectivity aspect -->
                <show id="cm:from"/>
@@ -81,10 +81,6 @@
                
                <!--  cm:summarizable aspect -->
                <show id="cm:summary" />
-               
-               <!-- cm:versionable aspect -->
-               <show id="cm:versionLabel" for-mode="view" />
-               <show id="cm:autoVersion" />
                
                <!-- cm:translatable aspect -->
                <show id="cm:translations" />

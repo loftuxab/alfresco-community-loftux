@@ -421,9 +421,9 @@ function setupField(formModel, fieldName, fieldConfig)
          {
             fieldDef = createTransientField(fieldName, fieldConfig);
          }
-         else if (logger.isWarnLoggingEnabled())
+         else if (logger.isLoggingEnabled())
          {
-            logger.warn("Ignoring field \"" + fieldName + "\" as a field definition or configuration could not be located");
+            logger.log("Ignoring field \"" + fieldName + "\" as a field definition or configuration could not be located");
          }
       }
    }

@@ -9,6 +9,9 @@
 
 <#if form.mode == "view">
 <div class="viewmode-field">
+   <#if field.mandatory && field.value == "">
+      <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.incomplete.field")}" /><span>
+   </#if>
    <span class="viewmode-label">${field.label?html}:</span>
    <span class="viewmode-value"><#if field.value != "">${field.value?datetime("yyyy-MM-dd'T'HH:mm:ss")?string(viewFormat)}</#if></span>
 </div>

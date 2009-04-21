@@ -41,6 +41,17 @@
    vertical-align: -0.3em;
 }
 
+.form-container .incomplete-warning
+{
+   margin-left: -22px;
+}
+
+.form-container .incomplete-warning img
+{
+   margin-right: 2px;
+   vertical-align: -2px;
+}
+   
 .form-container .viewmode-field
 {
    margin-bottom: 0.7em;
