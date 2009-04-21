@@ -25,18 +25,22 @@
 //    },
 //    ...
 
-function getDocType(doc) {
+function getDocType(doc)
+{
   var displayType = '';
-  if (doc.type == 'document') {
+  if (doc.type == 'document')
+  {
     displayType = doc.name.match(/([^\/\\]+)\.(\w+)$/)[2] 
   }
-  else {
+  else
+  {
     displayType = doc.type; 
   }
   return displayType;
 }
 
-function getContentSearchResults(term) {
+function getContentSearchResults(term)
+{
   var data  = remote.call("/slingshot/search?term="+stringUtils.urlEncode(term)+"&site=&container=&maxResults=26");
   data = eval('('+ data+')');
   for (var i=0,len=data.items.length;i<len;i++)
@@ -47,20 +51,23 @@ function getContentSearchResults(term) {
     data.items[i]=doc;
   } 
   //work out if there we need pagination 
-  if (data.items.length===26) {
+  if (data.items.length===26)
+  {
     data.hasMore = true;
     //remove last
     data.items.pop();
   }
   return data;
-};
+}
 
-function getSiteResults(term) {
+function getSiteResults(term)
+{
   var data =remote.call("/api/sites?size=25&nf=" + stringUtils.urlEncode(term));
   return eval('('+ data+')');
 }
 
-function getPeopleResults(term) {
+function getPeopleResults(term)
+{
   var data = remote.call("/api/people?filter="+ stringUtils.urlEncode(term) +"&maxResults=26")
   return eval('('+ data+')');  
 }

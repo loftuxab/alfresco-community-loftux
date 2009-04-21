@@ -1,11 +1,10 @@
-
 <div id="container">
-      <div id="homePanel" class="panel selected">
-         <div class="toolbar">
-            <h1>${pageTitle}</h1>
-         </div>
-        <div class="content">
-          <ul class="nav list">
+   <div id="homePanel" class="panel selected">
+      <div class="toolbar">
+         <h1>${pageTitle}</h1>
+      </div>
+      <div class="content">
+         <ul class="nav list">
             <li>
               <h2>${msg('My Alfresco Share')}</h2>
               <ul id="my" class="rr hilite">
@@ -23,28 +22,28 @@
               </ul>
             </li>
             <li>
-              <ul class="rr hilite">        
-                  <li class="siteactivities"><a class="disabled">${msg('Site Activities')}</a></li>
+              <ul class="rr hilite">
+                 <li class="siteactivities"><a class="disabled">${msg('Site Activities')}</a></li>
               </ul>
             </li>
             <li>
-              <ul class="rr hilite">        
-                <li class="all"><a class="disabled">${msg('All Tasks')}</a></li>       
+              <ul class="rr hilite">
+                <li class="all"><a class="disabled">${msg('All Tasks')}</a></li>
               </ul>
             </li>
             <li>
-              <ul class="rr hilite">            
-                  <li class="publicsites"><a class="disabled">${msg('Browse Public Sites')}</a></li>
+              <ul class="rr hilite">
+                 <li class="publicsites"><a class="disabled">${msg('Browse Public Sites')}</a></li>
               </ul>
             </li>  
             <li>
               <h2>${msg('Quick Actions')}</h2>
               <ul class="rr hilite">            
-                  <li class="newwikipage"><a class="panelLink disabled" href="sites">${msg('New Wiki Page')}</a></li>
-                  <li class="invitetosite"><a href="#selectsite.html" class="panelLink disabled">${msg('Invite to Site')}</a></li>
+                 <li class="newwikipage"><a class="panelLink disabled" href="sites">${msg('New Wiki Page')}</a></li>
+                 <li class="invitetosite"><a href="#selectsite.html" class="panelLink disabled">${msg('Invite to Site')}</a></li>
               </ul>
-            </li>  
-          </ul>       
-        </div>
-       </div>
+            </li>
+         </ul>
       </div>
+   </div>
+</div>

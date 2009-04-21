@@ -12,31 +12,31 @@
     <div class="content">
        <div class="tabs">
            <ul class="tablinks">
-             <li><a href="#My" class="button">${msg('My')}</a></li>
-             <li><a href="#RMod" class="button active">${msg('Recently Modified<')}/a></li>
-             <li><a href="#All" class="button">${msg('All')}</a></li>
+             <li><a href="#My" class="button">${msg('label.my')}</a></li>
+             <li><a href="#RMod" class="button active">${msg('label.recentlyModified')}</a></li>
+             <li><a href="#All" class="button">${msg('label.all')}</a></li>
            </ul>
            <div class="tabcontent">
              <div id="RMod" class="active">
              <ul class="list">
                <li>
-                 <h2>${msg('Today')}</h2>
+                 <h2>${msg('label.today')}</h2>
                  <ul class="e2e">
                    <#list recentDocs as doc >
                    <li class="details ${doc.type}">
-                      <p class="toenail"><a href="/share/proxy/alfresco-feed/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>                  
-                     <h3><a href="/share/proxy/alfresco-feed/${doc.contentUrl}">${doc.title}</a></h3>
-                     <p><span>${msg('Modified by')}:</span> ${doc.modifiedBy}</p>
-                     <p><span>${msg('Modified on')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
-                     <p><span>${msg('Size')}:</span> ${doc.size} kb</p>
+                      <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>                  
+                     <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName}</a></h3>
+                     <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
+                     <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
+                     <p><span>${msg('label.size')}:</span> ${doc.size} kb</p>
                      <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                   </li>
                    </#list>
                    <#-- <li class="details doc">
                      <h3><a href="../testfiles/test.pdf">Mobile User Stories.doc</a></h3>
-                     <p><span>${msg('Modified by')}:</span> Kurt Damewood</p>
-                     <p><span>${msg('Modified on')}:</span> 25th Feb 2009 10:12</p>
-                     <p><span>${msg('Size')}:</span> 121KB</p>
+                     <p><span>${msg('label.modifiedBy')}:</span> Kurt Damewood</p>
+                     <p><span>${msg('label.modifiedOn')}:</span> 25th Feb 2009 10:12</p>
+                     <p><span>${msg('label.size')}:</span> 121KB</p>
                      <a id="Mobile-User-Stories" href="#document.html" class="panelLink more"><img src="static/images/30-goarrow2.png" /></a> 
                    </li> -->
                  </ul>
@@ -46,9 +46,9 @@
                  <ul>
                    <#-- TODO <li class="details pdf">
                      <h3><a href="../testfiles/test.pdf">Mobile User Stories.doc</a></h3>
-                     <p><span>${msg('Modified by')}:</span> Kurt Damewood</p>
-                     <p><span>${msg('Modified on')}:</span> 25th Feb 2009 10:12</p>
-                     <p><span>${msg('Size')}:</span> 121KB</p>
+                     <p><span>${msg('label.modifiedBy')}:</span> Kurt Damewood</p>
+                     <p><span>${msg('label.modifiedOn')}:</span> 25th Feb 2009 10:12</p>
+                     <p><span>${msg('label.size')}:</span> 121KB</p>
                      <a id="Mobile-User-Stories" href="#document.html" class="panelLink more"><img src="static/images/30-goarrow2.png" /></a>
                    </li> -->
                  </ul>
@@ -59,11 +59,11 @@
              <ul class="e2e list">
                    <#list myDocs as doc >
                    <li class="details ${doc.type}">
-                      <p class="toenail"><a href="/share/proxy/alfresco-feed/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
-                     <h3><a href="/share/proxy/alfresco-feed/${doc.contentUrl}">${doc.title}</a></h3>
-                     <p><span>${msg('Modified by')}:</span> ${doc.modifiedBy}</p>
-                     <p><span>${msg('Modified on')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
-                     <p><span>${msg('Size')}:</span> ${doc.size} kb</p>
+                      <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
+                     <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName}</a></h3>
+                     <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
+                     <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
+                     <p><span>${msg('label.size')}:</span> ${doc.size} kb</p>
                      <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                   </li>
                   </#list>
@@ -74,19 +74,18 @@
                <#-- <li class="details ppt"> -->
                    <#list allDocs as doc >
                    <li class="details ${doc.type}">
-                      <p class="toenail"><a href="/share/proxy/alfresco-feed/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
-                     <h3><a href="/share/proxy/alfresco-feed/${doc.contentUrl}">${doc.title}</a></h3>
-                     <p><span>${msg('Modified by')}:</span> ${doc.modifiedBy}</p>
-                     <p><span>${msg('Modified on')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
-                     <p><span>${msg('Size')}:</span> ${doc.size} kb</p>
+                      <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
+                     <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName}</a></h3>
+                     <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
+                     <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
+                     <p><span>${msg('label.size')}:</span> ${doc.size} kb</p>
                      <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                   </li>
                   </#list>
-                 
              </ul>
             </div>
              <ul class="rr list">
-               <li class="allfolders"><a class="disabled">${msg('All Folders')}</a></li>
+               <li class="allfolders"><a class="disabled">${msg('label.allFolders')}</a></li>
              </ul>
            </div>
          </div>

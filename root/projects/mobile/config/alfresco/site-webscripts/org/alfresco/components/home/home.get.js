@@ -1,5 +1,3 @@
-// <import resource="classpath:alfresco/site-webscripts/org/alfresco/callutils.js">
-
 // var json = remote.call("/api/sites/stuff/memberships/admin");
 // var membership = eval('(' + json + ')');
 
@@ -10,7 +8,8 @@ function getUserTasks()
   return eval('(' + data + ')');      
 }
 //http://localhost:8080/alfresco/service/calendar/events/user
-function getUserEvents() {
+function getUserEvents()
+{
   var data = remote.call("/calendar/events/user");
   return eval('(' + data + ')');
 }

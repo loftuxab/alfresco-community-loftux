@@ -84,52 +84,54 @@
 }
 */
 // http://localhost:8080/alfresco/service/slingshot/doclib/doclist/{type}/site/{sites}/{container}/?
-function getDocuments(site,container,filter,amount)
+function getDocuments(site, container, filter, amount)
 {
-    var uri = '/slingshot/doclib/doclist/documents/site/'+site+'/'+container+'/?filter='+filter+'&size='+amount
-    var data  = remote.call(uri);
-    var data = eval('('+ data+')');
-
-    var imgTypes = 'png,gif,jpg,jpeg,tiff,bmp';
-    for (var i=0,len=data.items.length;i<len;i++)
-    {
+   var uri = '/slingshot/doclib/doclist/documents/site/' + site + '/' + container + '/?filter=' + filter + '&size=' + amount;
+   var data  = remote.call(uri);
+   var data = eval('(' + data+ ')');
+   
+   var imgTypes = 'png,gif,jpg,jpeg,tiff,bmp';
+   for (var i=0,len=data.items.length; i<len; i++)
+   {
       var doc = data.items[i];
       doc.modifiedOn = new Date(doc.modifiedOn);
       doc.createdOn = new Date(doc.createdOn);
-
+      
       var type = doc.mimetype.split('/')[1];
       if (imgTypes.indexOf(type)!=-1)
       {
-        doc.type = 'img';
+         doc.type = 'img';
       }
       else if (type == 'pdf')
       {
-        doc.type = 'pdf'
+         doc.type = 'pdf';
       }
       else if (type == 'msword')
       {
-        doc.type = 'doc'
+         doc.type = 'doc';
       }
       else if (type == 'msexcel')
       {
-        doc.type = 'xls'
+         doc.type = 'xls';
       }      
       else if (type == 'mspowerpoint')
       {
-        doc.type = 'ppt'
+         doc.type = 'ppt';
       }
-      else {
-        doc.type = 'unknown'
+      else
+      {
+         doc.type = 'unknown';
       }
-      //make valid dom id using docTitle - prob needs fixing for unicode characters
-      doc.domId = doc.title.replace(/ /g,'').match(/^[a-zA-Z][a-zA-Z0-9\-\_]+/g)[0];
+      
+      // make valid dom id using noderef ID
+      doc.domId = doc.nodeRef.split("/")[3];
       data.items[i]=doc;
-    }
-
-    return data;
+   }
+   
+   return data;
 }
 
-model.recentDocs = getDocuments(page.url.args.site,'documentLibrary','recentlyModified',3).items
-model.allDocs = getDocuments(page.url.args.site,'documentLibrary','all',30).items
-model.myDocs = getDocuments(page.url.args.site,'documentLibrary','editingMe',3).items
-model.backButton = true
+model.recentDocs = getDocuments(page.url.args.site,'documentLibrary','recentlyModified',3).items;
+model.allDocs = getDocuments(page.url.args.site,'documentLibrary','all',30).items;
+model.myDocs = getDocuments(page.url.args.site,'documentLibrary','editingMe',3).items;
+model.backButton = true;
