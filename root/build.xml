@@ -381,7 +381,8 @@
                    package-webscriptframework-jar, 
                    package-webframework-jar, 
                    package-mobile-jar,
-                   deploy-mobile-tomcat-exploded" />
+                   deploy-mobile-tomcat-exploded,
+                   minimize-mobile-deployed-javascript" />
 
    <target name="incremental-slingshot-tomcat" 
            description="Performs an incremental build and deployment of the slingshot WAR"
@@ -868,6 +869,22 @@
          <fileset dir="${dir.project.3rdparty.lib}/abdera"  
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
+   </target>
+
+   <target name="minimize-mobile-deployed-javascript" depends="init">
+      <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}">
+         <fileset dir="${dir.deploy.tomcat.application.mobile}">
+            <include name="**/*.js" />
+            <exclude name="**/*-min.js" />
+            <exclude name="**/WEB-INF/**" />
+         </fileset>
+         <arg line="-jar"/>
+         <arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile />
+         <srcfile />
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
    </target>
    
    <target name="deploy-webstudio-tomcat" depends="init" 

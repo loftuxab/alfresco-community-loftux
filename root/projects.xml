@@ -3341,7 +3341,8 @@
    </target>
 
    <target name="package-mobile-war" 
-           depends="assemble-mobile-war">
+           depends="assemble-mobile-war,
+                    minimize-mobile-javascript">
       <war warfile="${dir.project.mobile.dist}/${file.name.war.mobile}" 
            webxml="${dir.project.mobile.src.webinf}/web.xml">
          <fileset dir="${dir.project.mobile.assemble}" />
@@ -3385,6 +3386,24 @@
          <fileset dir="${dir.project.mobile.dist}" 
                   includes="${file.name.jar.mobile}" />
       </copy>
+   </target>
+
+   <target name="minimize-mobile-javascript"
+           depends="init">
+      <echo>Compressing Mobile Javascript...</echo>
+      <apply executable="java" parallel="false" dest="${dir.project.mobile.assemble}">
+         <fileset dir="${dir.project.mobile.assemble}">
+            <include name="**/*.js" />
+            <exclude name="**/*-min.js" />
+            <exclude name="**/WEB-INF/**" />
+         </fileset>
+         <arg line="-jar"/>
+         <arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile />
+         <srcfile />
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
    </target>
    
    <target name="generate-javadocs-mobile" 
