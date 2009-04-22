@@ -42,6 +42,16 @@ public class ConstraintHandlersElementReader implements ConfigElementReader
    // <constraint-handler> elements can appear at a number of different places within
    // the config file, currently underneath the <config> element and also underneath
    // <field> elements.
+   //
+   // Note: this class' parse method is called directly by FormElementReader in order
+   // to read <constraint-handlers> defined at a field level. There is an interesting
+   // note here: if a customer chooses to override the element-reader defined for
+   // "constraint-handlers" that new implementation of parse will be called as normal
+   // for constraint-handlers elements defined underneath a <config> element.
+   //
+   // However, if the "forms" element-reader is not also overridden, the standard parse
+   // implementation will be called which - for field-level constraint-handlers - delegates
+   // from FormsElementReader to FormElementReader and from there to this class.
    public static final String ELEMENT_CONSTRAINT_HANDLERS = "constraint-handlers";
    public static final String ATTR_TYPE = "type";
    public static final String ATTR_VALIDATOR_HANDLER = "validation-handler";
