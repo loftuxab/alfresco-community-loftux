@@ -1,5 +1,83 @@
-<import resource="classpath:alfresco/site-webscripts/org/alfresco/utils.js">
+/*
+{
+   "totalRecords": 1,
+   "startIndex": 0,
+   "metadata":
+   {
+      "permissions":
+      {
+         "userRole": "SiteManager",
+         "userAccess":
+         {
+            "create" : true,
+            "edit" : true,
+            "delete" : true
+         }
+      },
+      "onlineEditing": false
+   },
+   "items":
+   [
+      {
+         "index": 0,
+         "nodeRef": "workspace://SpacesStore/b0468312-e317-4ad1-b406-96f0ad5855e4",
+         "type": "document",
+         "isLink": false,
+         "mimetype": "image\/png",
+         "icon32": "\/images\/filetypes32\/png.gif",
+         "fileName": "grayButton.png",
+         "displayName": "grayButton.png",
+         "status": "",
+         "lockedBy": "",
+         "lockedByUser": "",
+         "title": "grayButton.png",
+         "description": "",
+         "author": "",
+         "createdOn": "17 Apr 2009 10:59:26 GMT+0100 (BST)",
+         "createdBy": "Administrator",
+         "createdByUser": "admin",
+         "modifiedOn": "17 Apr 2009 10:59:26 GMT+0100 (BST)",
+         "modifiedBy": "Administrator",
+         "modifiedByUser": "admin",
+         "size": "1361",
+         "version": "1.0",
+         "contentUrl": "api/node/content/workspace/SpacesStore/b0468312-e317-4ad1-b406-96f0ad5855e4/grayButton.png",
+         "actionSet": "document",
+         "tags": [],
+         "activeWorkflows": "",
+         "location":
+         {
+            "site": "mobile",
+            "container": "documentLibrary",
+            "path": "\/",
+            "file": "grayButton.png"
+         },
+         "permissions":
+         {
+            "inherited": true,
+            "roles":
+            [
+               "ALLOWED;GROUP_site_mobile_SiteConsumer;SiteConsumer",
+               "ALLOWED;GROUP_EVERYONE;SiteConsumer",
+               "ALLOWED;GROUP_site_mobile_SiteCollaborator;SiteCollaborator",
+               "ALLOWED;GROUP_site_mobile_SiteManager;SiteManager",
+               "ALLOWED;GROUP_site_mobile_SiteContributor;SiteContributor",
+               "ALLOWED;GROUP_EVERYONE;ReadPermissions"
+            ],
+            "userAccess":
+            {
+               "create": true,
+               "edit": true,
+               "delete": true,
+               "permissions": true
+            }
+         }
+      }
+   ]
+}
 
+
+*/
 function getDocDetails(nodeRef) 
 {
    var data = remote.call('/slingshot/doclib/doclist/documents/node/' + nodeRef.replace(":/", "") + '?filter=node');

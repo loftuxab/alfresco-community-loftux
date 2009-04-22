@@ -68,6 +68,10 @@ ul.e2e li.details:hover a,
 ul.e2e li.details:active a {
    background:none;
 }
+ul.rr.info li:active,
+ul.rr.info li:hover  {
+   background:#fff none;
+}
 ul.e2e li:active,
 ul.e2e li:hover,
 ul.rr li:active,
