@@ -1,6 +1,6 @@
 <div id="container">
    <div id="${htmlid}Panel" class="panel selected">
-     <div class="toolbar">
+      <div class="toolbar">
       <h1>${doc.title}</h1>
       <#if (backButton??)>
          <a class="back button">${msg('label.backText')}</a>
@@ -11,8 +11,10 @@
     </div>
     <div class="content">
        <div class="panelBar">
-            <a class="button" href="workflow.html">${msg('label.assignWorkflow')}</a>
-            <a class="button delete">${msg('button.delete')}</a><!-- make form button-->
+            <a class="button" href="${url.context}/p/workflow?nodeRef=${doc.nodeRef}&site=${doc.location.site}">${msg('label.assignWorkflow')}</a>
+            <form action="${url.context}/p/document" method="post">
+               <input type="submit" name="delete" value="${msg('Delete')}" id="delete" class="button delete">
+            </form>
           </div>
           <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" /></a>
           <ul class="rr info">

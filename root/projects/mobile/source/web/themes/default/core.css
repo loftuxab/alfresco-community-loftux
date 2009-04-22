@@ -121,7 +121,7 @@ a.disabled {
 #appBar .button,input.button  {
   background: none;
   -webkit-border-image: url(./images/button.png) 0 5 0 5 stretch stretch;
-  border-width: 0px 5px;
+  border-width: 0px 7px;
   bottom: 5px;
   color: white;
   font-family: inherit;
@@ -159,7 +159,7 @@ a.button
 {
   -webkit-border-radius: 0;
   text-decoration:none;
-  border-width: 0 8px 0 8px;
+  border-width: 0 5px;
   padding: 0;
   height: 28px;
   line-height: 28px;
@@ -178,10 +178,11 @@ a.button
 a.button.white {
   -webkit-border-image: url(./images/loadmore-btn2.png) 0 14 0 14 stretch stretch;      
 }
-a.button.delete {
+input.button.delete {
    right:0.5em;
    position:absolute;
-  -webkit-border-image: url(./images/redbutton.png) 0 14 0 14 stretch stretch;   
+  -webkit-border-image: url(./images/redbutton.png) 0 14 0 14 stretch stretch;
+  font-size:14px;
 }
 .panelBar .button{
    height:28px;
@@ -551,4 +552,8 @@ ul.e2e li.fav a {
 }
 #alf-ft {
    display:none;
+}
+
+#datePicker {
+   margin-left:1em;
 }

@@ -1,6 +1,3 @@
-// var json = remote.call("/api/sites/stuff/memberships/admin");
-// var membership = eval('(' + json + ')');
-
 //http://localhost:8080/alfresco/service/slingshot/dashlets/my-tasks?filter={filter?}&date={date?}
 function getUserTasks()
 {

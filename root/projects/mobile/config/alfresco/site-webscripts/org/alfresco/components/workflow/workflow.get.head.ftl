@@ -1,0 +1,1 @@
+<script type="text/javascript" src="${url.context}/js/spinningwheel.js"></script>
