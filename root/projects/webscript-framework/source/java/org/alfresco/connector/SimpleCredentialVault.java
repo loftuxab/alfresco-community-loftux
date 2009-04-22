@@ -129,6 +129,6 @@ public class SimpleCredentialVault implements CredentialVault, Serializable
     @Override
     public String toString()
     {
-        return "SimpleCredentialVault - " + credentialsMap.toString();
+        return "SimpleCredentialVault - " + this.id;
     }    
 }

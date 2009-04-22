@@ -92,6 +92,6 @@ public abstract class AbstractPersistentCredentialVault extends SimpleCredential
     @Override
     public String toString()
     {
-        return "PersistentCredentialVault - " + credentialsMap.toString();
+        return "PersistentCredentialVault - " + this.id;
     }    
 }
