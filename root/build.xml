@@ -872,19 +872,24 @@
    </target>
 
    <target name="minimize-mobile-deployed-javascript" depends="init">
-      <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}">
+   	<concat destfile="${dir.deploy.tomcat.application.mobile}/js/alf-mobile.js">
          <fileset dir="${dir.deploy.tomcat.application.mobile}">
             <include name="**/*.js" />
+            <exclude name="**/alf-mobile.js" />
             <exclude name="**/*-min.js" />
             <exclude name="**/WEB-INF/**" />
          </fileset>
-         <arg line="-jar"/>
-         <arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
-         <arg line="-o"/>
-         <targetfile />
-         <srcfile />
-         <mapper type="glob" from="*.js" to="*-min.js"/>
-      </apply>
+   	</concat>
+
+   	<apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}/js">
+   		<fileset dir="${dir.deploy.tomcat.application.mobile}/js" includes="alf-mobile.js"/>
+   		<arg line="-jar"/>
+   		<arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
+   		<arg line="-o"/>
+   		<targetfile/>
+   		<srcfile/>
+   		<mapper type="glob" from="*.js" to="*-min.js"/>
+   	</apply>
    </target>
    
    <target name="deploy-webstudio-tomcat" depends="init" 
