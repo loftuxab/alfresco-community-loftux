@@ -196,7 +196,7 @@ public class WebScriptProcessor extends AbstractProcessor
             }
             
             // Find the web script
-            Match match = registry.findWebScript("GET", url);
+            Match match = registry.findWebScript(request.getMethod(), url);
             if (match != null)
             {
                 WebScript webScript = match.getWebScript();
