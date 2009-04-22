@@ -171,7 +171,9 @@ public class FormFieldTest extends TestCase
         //     <control template="test.ftl">
         //         <control-param name="foo">bar</control-param>
         //     </control>
-        //     <constraint-message type="REGEX" message="msg" message-id="msg-id" />
+        //     <constraint-handlers>
+        //         <constraint type="REGEX" message="msg" message-id="msg-id" />
+        //     </constraint-handlers>
         // </field>
 
         Map<String, String> attrs1 = new LinkedHashMap<String, String>();
@@ -203,7 +205,9 @@ public class FormFieldTest extends TestCase
         //     <control template="test.ftl">
         //         <control-param name="foo">bar</control-param>
         //     </control>
-        //     <constraint-message type="REGEX" message="msg" message-id="msg-id" />
+        //     <constraint-handlers>
+        //         <constraint type="REGEX" message="msg" message-id="msg-id" />
+        //     </constraint-handlers>
         // </field>
         
         // combined with
@@ -212,7 +216,9 @@ public class FormFieldTest extends TestCase
         //     <control template="test.ftl">
         //         <control-param name="foo">bar</control-param>
         //     </control>
-        //     <constraint-message type="REGEX" message="msg" message-id="msg-id" />
+        //     <constraint-handlers>
+        //         <constraint type="REGEX" message="msg" message-id="msg-id" />
+        //     </constraint-handlers>
         // </field>
 
         Map<String, String> attrs1 = new LinkedHashMap<String, String>();

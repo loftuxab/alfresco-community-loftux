@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,6 +39,9 @@ import org.dom4j.Element;
  */
 public class ConstraintHandlersElementReader implements ConfigElementReader
 {
+   // <constraint-handler> elements can appear at a number of different places within
+   // the config file, currently underneath the <config> element and also underneath
+   // <field> elements.
    public static final String ELEMENT_CONSTRAINT_HANDLERS = "constraint-handlers";
    public static final String ATTR_TYPE = "type";
    public static final String ATTR_VALIDATOR_HANDLER = "validation-handler";

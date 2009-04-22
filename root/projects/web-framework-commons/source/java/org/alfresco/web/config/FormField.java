@@ -108,7 +108,7 @@ public class FormField
     	{
     		if (constraint.getType().equals(type))
     		{
-    			// The value for this constraint-message is being overridden.
+    			// The value for this constraint is being overridden.
     			constraint.setMessage(message);
     			constraint.setMessageId(messageId);
     			constraint.setValidationHandler(validationHandler);
@@ -242,7 +242,7 @@ public class FormField
         	result.addControlParam(cp.getName(), cp.getValue());
         }
         
-        // Combine constraint-message data
+        // Combine constraint data
         for (ConstraintHandlerDefinition constraint : this.constraintDefns)
         {
         	result.addConstraintDefinition(constraint.getType(), constraint.getMessage(),

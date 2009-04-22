@@ -40,7 +40,6 @@
 	         <create-form template="/path/create/template" requires-role="Manager" />
 	         <create-form template="/path/create/template/norole"/>
 	         <field-visibility>
-	            <!-- This comment is here to test the FormReader -->
 	            <show id="name" />
 	            <show id="title" for-mode="view, create" />
 	         </field-visibility>
@@ -53,10 +52,12 @@
 	               <control template="alfresco/extension/formcontrols/my-name.ftl">
 	                  <control-param name="foo">bar</control-param>
 	               </control>
-	               <constraint-message type="REGEX" message="The name can not contain the character '{0}'"
-	                                                    message-id="field_error_name" />
-	               <constraint-message type="apples" message="Pink Lady" message-id="" />
-	               <constraint-message type="oranges" message="" message-id="Mandarin" />
+	               <constraint-handlers>
+		               <constraint type="REGEX" message="The name can not contain the character '{0}'"
+		                                                    message-id="field_error_name" />
+		               <constraint type="apples" message="Pink Lady" message-id="" />
+		               <constraint type="oranges" message="" message-id="Mandarin" />
+	               </constraint-handlers>
 	            </field>
 	            <field id="title" label="My Title" set="details" />
 	            <field id="username" set="user" />

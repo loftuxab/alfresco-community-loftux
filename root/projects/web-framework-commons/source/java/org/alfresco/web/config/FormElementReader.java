@@ -26,6 +26,7 @@ package org.alfresco.web.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
@@ -55,10 +56,10 @@ public class FormElementReader implements ConfigElementReader
     public static final String ATTR_SUBMISSION_URL = "submission-url";
     public static final String ATTR_TEMPLATE = "template";
     public static final String ATTR_TYPE = "type";
+    public static final String ATTR_FORCE = "force";
     public static final String ELEMENT_FORM = "form";
     public static final String ELEMENT_HIDE = "hide";
     public static final String ELEMENT_SHOW = "show";
-    public static final String ATTR_FORCE = "force";
 
     /**
      * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
@@ -85,14 +86,11 @@ public class FormElementReader implements ConfigElementReader
         
         parseSubmissionURL(formElement, result);
         
-        // Using xpath expressions to select nodes under <form> and their attributes.
         parseFormTag(formElement, result);
 
         parseFieldVisibilityTag(formElement, result);
 
         parseAppearanceTag(formElement, result);
-
-//        parseModelOverrideTag(formElement, result);
 
         return result;
     }
@@ -104,19 +102,10 @@ public class FormElementReader implements ConfigElementReader
         parseFieldTags(formElement, result);
     }
 
-//    private void parseModelOverrideTag(Element formElement, FormConfigElement result)
-//    {
-//        for (Object propObj : formElement.selectNodes("./model-override/property")) {
-//            Element propertyElem = (Element)propObj;
-//            String propName = propertyElem.attributeValue(ATTR_NAME);
-//            String propValue = propertyElem.getTextTrim();
-//            result.addModelOverrides(propName, propValue);
-//        }
-//    }
-
     @SuppressWarnings("unchecked")
     private void parseFieldTags(Element formElement, FormConfigElement result)
     {
+        // xpath expressions.
         for (Object fieldObj : formElement.selectNodes("./appearance/field")) {
             Element fieldElem = (Element)fieldObj;
             List<Attribute> fieldAttributes = fieldElem.selectNodes("./@*");
@@ -164,14 +153,25 @@ public class FormElementReader implements ConfigElementReader
                 result.addControlForField(fieldIdValue, templateValue, controlParamNames, controlParamValues);
             }
             
-            for (Object constraintMessageObj : fieldElem.selectNodes("./constraint-message")) {
-                Element constraintMessage = (Element)constraintMessageObj;
-                String type = constraintMessage.attributeValue(ATTR_TYPE);
-                String message = constraintMessage.attributeValue(ATTR_MESSAGE);
-                String messageId = constraintMessage.attributeValue(ATTR_MESSAGE_ID);
-                String validationHandler = constraintMessage.attributeValue(ATTR_VALIDATION_HANDLER);
-                String event = constraintMessage.attributeValue(ATTR_EVENT);
-                result.addConstraintForField(fieldIdValue, type, message, messageId, validationHandler, event);
+            // Delegate the reading of the <constraint-handlers> tag(s) to the reader.
+            ConstraintHandlersElementReader constraintHandlersElementReader = new ConstraintHandlersElementReader();
+            for (Object constraintHandlerObj : fieldElem.selectNodes("./constraint-handlers")) {
+                // There need only be one <constraint-handlers> element, but there is nothing
+                // to prevent the use of multiple such elements.
+                
+                Element constraintHandlers = (Element)constraintHandlerObj;
+                ConfigElement confElem = constraintHandlersElementReader.parse(constraintHandlers);
+                ConstraintHandlersConfigElement constraintHandlerCE = (ConstraintHandlersConfigElement)confElem;
+                // This ConstraintHandlersConfigElement contains the config data for all
+                // <constraint> elements under the current <constraint-handlers> element.
+                
+                Map<String, ConstraintHandlerDefinition> constraintItems = constraintHandlerCE.getItems();
+                for (String key : constraintItems.keySet())
+                {
+                    ConstraintHandlerDefinition defn = constraintItems.get(key);
+                    result.addConstraintForField(fieldIdValue, defn.getType(), defn.getMessage(),
+                            defn.getMessageId(), defn.getValidationHandler(), defn.getEvent());
+                }
             }
         }
     }
