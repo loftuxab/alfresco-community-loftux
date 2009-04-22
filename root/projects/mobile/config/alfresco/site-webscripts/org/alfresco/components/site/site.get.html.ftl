@@ -22,9 +22,9 @@
            <li>
              <h2>${msg('label.documentLibrary')}</h2>
              <ul class="rr">
-               <li class="documents"><a id="Documents" href="#documents?site=${page.url.args.site}" class="panelLink">${msg('label.recentlyModified')}</a></li>
-               <li class="mydocuments"><a id="My-Folders"  class="disabled">${msg('label.myDocuments')}</a></li>
-               <li class="alldocuments"><a id="All-Documents"  class="disabled">${msg('label.allDocuments')}</a></li>
+               <li class="documents"><a id="Documents" href="#documents?site=${page.url.args.site}#RMod" class="panelLink">${msg('label.recentlyModified')}</a></li>
+               <li class="mydocuments"><a id="My-Documents" href="#documents?site=${page.url.args.site}#My" class="disabled panelLink">${msg('label.myDocuments')}</a></li>
+               <li class="alldocuments"><a id="All-Documents" href="#documents?site=${page.url.args.site}#All" class="disabled panelLink" >${msg('label.allDocuments')}</a></li>
                <li class="allfolders"><a id="All-Folders" class="disabled">${msg('label.allFolders')}</a></li>
              </ul>
            </li>

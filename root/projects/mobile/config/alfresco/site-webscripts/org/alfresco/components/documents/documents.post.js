@@ -33,7 +33,7 @@ function assignWorkflow()
    var connector = remote.connect("alfresco");
    //send post, not forgetting to strip wrapped rounded brackets that toSource() adds.
    var result = connector.post('/slingshot/doclib/action/assign-workflow',params.slice(1,params.length-1) , "application/json");
-   return result;
+   return eval('('+ result +')');
 }
 
 model.recentDocs = getDocuments(page.url.args.site,'documentLibrary','recentlyModified',3).items;
@@ -41,11 +41,11 @@ model.allDocs = getDocuments(page.url.args.site,'documentLibrary','all',30).item
 model.myDocs = getDocuments(page.url.args.site,'documentLibrary','editingMe',3).items;
 model.backButton = true;
 var workflowResult = assignWorkflow();
-if (workflowResult.overallSuccess)
+if (workflowResult.overallSuccess==true)
 {
-   model.workflowResult = true;
+   model.workflowResult = 'true';
 }
 else
 {
-   model.workflowResult = false;
+   model.workflowResult = 'false';
 }
