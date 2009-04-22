@@ -24,30 +24,39 @@
  */
 package org.alfresco.connector;
 
+import java.text.MessageFormat;
+
 import org.alfresco.connector.exception.AuthenticationException;
 import org.alfresco.util.URLEncoder;
+import org.alfresco.web.scripts.json.JSONUtils;
+import org.alfresco.web.scripts.json.JSONWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * An implementation of an Alfresco ticket-based Authenticator.
  * 
- * This Authenticator can be plugged into a connector to allow
- * the connector to handshake with an Alfresco Repository.  This
- * handshake involves sending username and password to the login
- * web script.
+ * This Authenticator can be plugged into a connector to allo the connector
+ * to handshake with an Alfresco Repository. This handshake involves POSTing
+ * the username and password to the /api/login WebScript.
  * 
- * A ticket is returned that is then plugged into
- * a connector session.
+ * A ticket is returned that is then plugged into a connector session.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class AlfrescoAuthenticator extends AbstractAuthenticator
 {
-    public final static String CS_PARAM_ALF_TICKET = "alfTicket";
     private static Log logger = LogFactory.getLog(AlfrescoAuthenticator.class);
+    
+    private static final String JSON_lOGIN = "'{'\"username\": \"{0}\", \"password\": \"{1}\"'}'";
+    private static final String API_LOGIN = "/api/login";
+    private static final String MIMETYPE_APPLICATION_JSON = "application/json";
+    
+    public final static String CS_PARAM_ALF_TICKET = "alfTicket";
+    
     
     /* (non-Javadoc)
      * @see org.alfresco.connector.AbstractAuthenticator#authenticate(java.lang.String, org.alfresco.connector.Credentials, org.alfresco.connector.ConnectorSession)
@@ -62,33 +71,33 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
             // build a new remote client
             RemoteClient remoteClient = new RemoteClient(endpoint);
             
-            // call the login web script
+            // retrieve the username and password
             String user = (String) credentials.getProperty(Credentials.CREDENTIAL_USERNAME);
             String pass = (String) credentials.getProperty(Credentials.CREDENTIAL_PASSWORD);
             
             if (logger.isDebugEnabled())
                 logger.debug("Authenticating user: " + user);
             
-            Response response = remoteClient.call("/api/login?u=" +
-                    URLEncoder.encode(user) + "&pw=" + URLEncoder.encode(pass));
+            // POST to the login WebScript
+            remoteClient.setRequestContentType(MIMETYPE_APPLICATION_JSON);
+            String body = MessageFormat.format(JSON_lOGIN, JSONWriter.encodeJSONString(user), JSONWriter.encodeJSONString(pass));
+            Response response = remoteClient.call(API_LOGIN, body);
             
             // read back the ticket
             if (response.getStatus().getCode() == 200)
             {
-                String responseText = response.getResponse();
-                
-                // read out the ticket id
-                String ticket = null;
+                String ticket;
                 try
                 {
-                    ticket = DocumentHelper.parseText(responseText).getRootElement().getTextTrim();
-                }
-                catch (DocumentException de)
+                    JSONObject json = new JSONObject(response.getResponse());
+                    ticket = json.getJSONObject("data").getString("ticket");
+                } 
+                catch (JSONException jErr)
                 {
-                    // the ticket that came back was unparseable or invalid
+                    // the ticket that came back could not be parsed
                     // this will cause the entire handshake to fail
                     throw new AuthenticationException(
-                            "Unable to retrieve ticket from Alfresco", de);
+                            "Unable to retrieve login ticket from Alfresco", jErr);
                 }
                 
                 if (logger.isDebugEnabled())

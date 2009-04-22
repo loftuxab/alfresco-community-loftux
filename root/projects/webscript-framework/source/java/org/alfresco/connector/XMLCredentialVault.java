@@ -275,7 +275,7 @@ public class XMLCredentialVault extends AbstractPersistentCredentialVault
     @Override
     public String toString()
     {
-        return "XMLCredentialVault - " + credentialsMap.toString();
+        return "XMLCredentialVault - " + location;
     }        
     
     /**
