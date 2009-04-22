@@ -238,6 +238,8 @@ function(){
   }()
 );
 
-    //  window.addEventListener('DOMContentLoaded',function(){
-    //   App.init();
-    // });
+/*
+   window.addEventListener('DOMContentLoaded',function(){
+      App.init();
+});
+*/
