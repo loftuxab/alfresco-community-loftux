@@ -76,19 +76,18 @@
       {
         //attempt to hide scroll bar appearing when js handled links are clicked
         //iUI has the problem too
-        // App.hideBrowserNavBar();
-        // if (!Constants.doNotLoadPage)
-        // {
           if (this.config.el.nodeName.toUpperCase()==='A')
           {
+            //These hacks will be removed once the search bar appearing twice bug is fixed.
             var href = this.config.el.href.split('#');
             //get url
             href = (href.length>1) ? href[1] : href[0];
-            // if (Constants.animate)
-            // {
-            //   href+='#doAnim';
-            // };r
+            if (href.indexOf('%')!=-1)
+            {
+               href = decodeURIComponent(href);
+            }
             setTimeout(function (){window.location=href;},100);
+
             //Remove Panel as this is still shown sometimes when user 
             //clicks 'back' on next page
             var that = this;

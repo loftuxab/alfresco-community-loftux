@@ -34,8 +34,7 @@
           this.config.el = this.elements.find('.tabs').first();
           this.elements = x$(this.config.el);
         };
-        this.activeEls = x$(this.config.el).find('.active');
-
+            
         //this.elements is .tabs element
         var that = this;
         this.elements.on('click',function(e)
@@ -44,10 +43,29 @@
           if (e.srcElement.className.indexOf('button')!=-1)
           {
             e.preventDefault();
-            that.onClick(e);
+            that.onClick(e.srcElement);
           }
-
         });
+        //get active elements as specifed by css class in DOM.
+        this.activeEls = x$(this.config.el).find('.active');
+
+        //override if a hash is passed in url
+        var hash = window.location.hash;
+        if (hash!='')
+        {
+           var tabLinks = x$('.tablinks').find('.button');
+           tabLinks.each(function(el)
+              {
+               if (el.href.indexOf(hash)!=-1)
+               {
+                  if (x$(hash)) {
+                     this.activeEls = x$(el,x$(hash).first());
+                     that.onClick(this.activeEls.elements[0])                     
+                  }
+               }
+              }
+           );
+        }; 
         //TODO - change to Button instance create new button for each .tabs.button 
         // console.log(x$(this.config.el).find('.button').each(function(el){
         // console.log(el);
@@ -55,9 +73,8 @@
         // //button mus read config and assign as required. But what about activeels? keep handler on TB but create buttons too. just make handler call button mewthods when required
         // }));
       },
-      onClick : function(e)
+      onClick : function(el)
       {
-        var el = e.srcElement;
         if (x$(el).is('.button'))
         {
           var href =  el.href;

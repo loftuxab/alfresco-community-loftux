@@ -37,7 +37,7 @@
                  <p class="toenail"><a href="${url.context}/p/site?site=${site.shortName}"><img src="${url.context}/themes/${theme}/images/64-siteicon.png"/></a></p>
                  <h3><a href="${url.context}/p/site?site=${site.shortName}">${site.title}</a></h3>
                  <p>${site.description}</p>
-                 <a href="#docactions.html" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                 <a href="${url.context}/p/site?site=${site.shortName}" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                </li>
                </#list>
                </ul>

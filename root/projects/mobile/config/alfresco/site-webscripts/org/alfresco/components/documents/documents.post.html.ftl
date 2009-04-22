@@ -1,7 +1,6 @@
 <#include "documents.ftl" />
-
 <script type="text/javascript" charset="utf-8">
-<#if (workflowResult)>
+<#if (workflowResult?string='true')>
    alert('${msg("Workflow Assigned")}');
 <#else>
    alert('${msg("Workflow Not Assigned")}');

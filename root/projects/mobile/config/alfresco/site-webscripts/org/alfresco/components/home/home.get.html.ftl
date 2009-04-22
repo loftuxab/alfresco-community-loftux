@@ -10,8 +10,8 @@
               <ul id="my" class="rr hilite">
                 <li class="recentdocs"><a id="Recent-Documents"  class="disabled">${msg('label.myDocuments')}</a></li>
                 <li class="recentactivity"><a id="Recent-Activity" class="disabled">${msg('label.myActivity')}</a></li>
-                <li class="fav"><a id="Favourite-Sites" href="#sites" class="panelLink">${msg('label.myFavoriteSites')}</a></li>
-                <li class="sites"><a class="disabled">${msg('label.mySites')}</a></li>
+                <li class="fav"><a id="Favourite-Sites" href="#sites#Fav" class="panelLink">${msg('label.myFavoriteSites')}</a></li>
+                <li class="sites"><a id="My-Sites" href="#sites#My" class="disabled panelLink">${msg('label.mySites')}</a></li>
               </ul>
             </li>
             <li>
@@ -33,7 +33,7 @@
             </li>
             <li>
               <ul class="rr hilite">
-                 <li class="publicsites"><a class="disabled">${msg('label.browsePublicSites')}</a></li>
+                 <li class="publicsites"><a id="Public-Sites" href="#sites#All" class="disabled panelLink">${msg('label.browsePublicSites')}</a></li>
               </ul>
             </li>  
             <li>
