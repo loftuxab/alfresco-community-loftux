@@ -30,7 +30,6 @@
             <value>classpath:alfresco/web-extension/web-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
             
-            
          </list>
       </constructor-arg>
    </bean>
@@ -80,6 +79,7 @@
    <!--                                                     -->
    <!-- Configuration of the Web Script Runtime / Container -->
    <!--                                                     -->
+   
    <bean id="webframework.store.webscripts" class="org.alfresco.web.scripts.ClassPathStore">
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/site-webscripts</value></property>
@@ -143,6 +143,7 @@
    <!--                                                    -->
    <!-- Configuration of the FreeMarker Template Processor -->
    <!--                                                    -->
+   
    <bean id="webframework.store.templates" class="org.alfresco.web.scripts.ClassPathStore">
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/templates</value></property>
@@ -177,9 +178,9 @@
    </bean>
 
    
-   <!--                                                     -->
-   <!-- Configuration of the Script and Template Processors -->
-   <!--                                                     -->
+   <!--                                              -->
+   <!-- Configuration of the WebFramework Processors -->
+   <!--                                              -->
 
    <bean id="webframework.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
       <property name="searchPath" ref="webframework.templates.searchpath" />
@@ -225,7 +226,10 @@
    </bean>
 
 
+   <!--                       -->
    <!-- Web Framework Manager -->
+   <!--                       -->
+   
    <bean id="webframework.manager" class="org.alfresco.web.framework.WebFrameworkManager" init-method="init">
       <property name="configService" ref="web.config" />
    </bean>
@@ -267,7 +271,10 @@
    </bean>
    
    
-   <!-- Web Framework - Freemarker and JSP processors -->
+   <!--                                             -->
+   <!-- Web Framework Freemarker and JSP processors -->
+   <!--                                             -->
+   
    <bean id="webframework.processor.webscript" class="org.alfresco.web.scripts.WebScriptProcessor">
       <property name="containerBean" ref="webframework.webscripts.container" />
       <property name="templateProcessor" ref="webframework.templateprocessor" />
@@ -297,5 +304,13 @@
       <property name="configService" ref="web.config"/>
       <property name="connectorProvider" ref="webframework.connector.provider"/>
    </bean>
+   
+   
+   <!--                                                 -->
+   <!-- Import Script and Template Processor Extensions -->
+   <!--                                                 -->
+   
+   <import resource="classpath*:alfresco/web-framework-script-services-context.xml" />
+   <import resource="classpath*:alfresco/web-framework-template-services-context.xml" />
 
 </beans>

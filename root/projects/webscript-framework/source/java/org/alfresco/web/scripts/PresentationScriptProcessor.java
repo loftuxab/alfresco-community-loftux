@@ -28,13 +28,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.processor.ProcessorExtension;
 import org.alfresco.scripts.ScriptResourceHelper;
 import org.alfresco.scripts.ScriptResourceLoader;
+import org.alfresco.web.scripts.processor.BaseProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Context;
@@ -53,14 +56,17 @@ import org.springframework.util.FileCopyUtils;
  * @author davidc
  * @author kevinr
  */
-public class PresentationScriptProcessor implements ScriptProcessor, ScriptResourceLoader
+public class PresentationScriptProcessor extends BaseProcessor implements ScriptProcessor, ScriptResourceLoader
 {
     private static final Log logger = LogFactory.getLog(PresentationScriptProcessor.class);
     private static WrapFactory wrapFactory = new PresentationWrapFactory(); 
 
     private static final String PATH_CLASSPATH = "classpath:";
-
+    
+    /** Script loading SearchPath */
     protected SearchPath searchPath;
+    
+    /** Object that gets the script location for the script at the specified path */
     protected ScriptLoader scriptLoader;
     
     /** Pre initialized secure scope object. */
@@ -90,6 +96,22 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
     public void setCompile(boolean compile)
     {
         this.compile = compile;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.processor.Processor#getExtension()
+     */
+    public String getExtension()
+    {
+        return "js";
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.processor.Processor#getName()
+     */
+    public String getName()
+    {
+        return "javascript";
     }
 
     /* (non-Javadoc)
@@ -261,14 +283,23 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             scope.setPrototype(sharedScope);
             scope.setParentScope(null);
             
-            // insert supplied object model into root of the default scope
-            if (model != null)
+            // there's always a model, if only to hold the extension objects
+            if (model == null)
             {
-                for (String key : model.keySet())
-                {
-                    Object obj = model.get(key);
-                    ScriptableObject.putProperty(scope, key, obj);
-                }
+                model = new HashMap<String, Object>();
+            }
+            
+            // add the global scripts
+            for (ProcessorExtension ex : this.processorExtensions.values()) 
+            {
+                model.put(ex.getExtensionName(), ex);
+            }
+            
+            // insert supplied object model into root of the default scope
+            for (String key : model.keySet())
+            {
+                Object obj = model.get(key);
+                ScriptableObject.putProperty(scope, key, obj);
             }
             
             // execute the script and return the result
@@ -312,8 +343,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         init();
         this.scriptCache.clear();
     }
-
-
+    
     /**
      * One time init.
      * 

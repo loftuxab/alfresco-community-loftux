@@ -350,10 +350,7 @@
       <property name="location" value="/alfresco/xml" />
    </bean>
    
-
    
-
-
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->

@@ -22,44 +22,54 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.processor;
+package org.alfresco.web.scripts.processor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.alfresco.processor.Processor;
 import org.alfresco.processor.ProcessorExtension;
 
 /**
- * Abstract base class for a processor extension
+ * Abstract base class for a processor extension in the presentation tier.
  * 
- * @author Roy Wetherall
+ * {@link org.alfresco.repo.processor.BaseProcessorExtension}
  */
 public abstract class BaseProcessorExtension implements ProcessorExtension
 {
-	/** The processor */
-	private Processor processor;
+	/** The list of processors */
+	private List<Processor> processors = null;
 	
 	/** The name of the extension */
 	private String extensionName;
 	
+	
 	/**
-	 * Sets the processor
+	 * Sets the processor list.
 	 * 
-	 * @param scriptProcessor		the processor
+	 * @param processor		  The processor list
 	 */
-	public void setProcessor(Processor processor)
+	public void setProcessors(List<Processor> processors)
 	{
-		this.processor = processor;
+		this.processors = processors;
 	}
 	
 	/**
-	 * Registers this script with the script service
+	 * Spring bean init method - registers this extension with the appropriate processor.
 	 */
 	public void register()
 	{
-		this.processor.registerProcessorExtension(this);
+	    if (this.processors != null)
+	    {
+	        for (Processor processor : this.processors)
+	        {
+	            processor.registerProcessorExtension(this);
+	        }
+	    }
 	}
 	
 	/**
-	 * Sets the extension name
+	 * Sets the extension name.
 	 * 
 	 * @param extensionName the extension name
 	 */
