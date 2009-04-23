@@ -52,5 +52,28 @@
 	      </form>
 	  </forms>
    </config>
+   
+      <config evaluator="string-compare" condition="no-appearance">
+      <forms>
+          <form submission-url="submission/url">
+              <!-- Override the templates -->
+             <view-form template="/view/template/override"/>
+             <edit-form template="/edit/template/override" />
+             <create-form template="/create/template/override" />
+             <field-visibility>
+                <show id="cm:name" force="true"/>
+                <show id="cm:title" for-mode="view, create"/>
+                <!-- Add a second 'forced' field -->
+                <show id="cm:description" force="true"/>
+                <show id="cm:content" />
+                <show id="my:text" />
+                <show id="my:mltext" />
+                <show id="my:date" />
+             </field-visibility>
+          </form>
+      </forms>
+   </config>
+
+   
 </alfresco-config>
      

@@ -60,4 +60,26 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
                 new ControlParam("b", null),
                 new ControlParam("c", "This is new"));
     }
+
+    @Override
+    protected List<String> getExpectedTemplatesForNoAppearanceDefaultForm()
+    {
+        return Arrays.asList(new String[]{"/view/template/override",
+                "/edit/template/override", "/create/template/override"});
+    }
+    
+    @Override
+    public void testGetForcedFields()
+    {
+        List<String> forcedFields = noAppearanceDefaultForm.getForcedFields();
+        assertEquals("Wrong forced fields count", 2, forcedFields.size());
+
+        assertTrue("Expected cm:name to be forced", noAppearanceDefaultForm
+                .isFieldForced("cm:name"));
+        assertTrue("Expected cm:description to be forced", noAppearanceDefaultForm
+                .isFieldForced("cm:description"));
+        assertFalse("Expected cm:title not to be forced", noAppearanceDefaultForm
+                .isFieldForced("cm:title"));
+    }
+
 }

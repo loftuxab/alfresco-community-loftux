@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,7 +25,6 @@
 package org.alfresco.web.config;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -67,48 +66,10 @@ public class FormConfigTest extends BaseTest
                 defaultFormConfigElement.getSubmissionURL());
     }
     
-    @SuppressWarnings("unchecked")
-    public void testGetFormTemplatesWithoutRoles()
+    public void testGetFormTemplates()
     {
-        assertEquals("Incorrect template.","/path/create/template/norole",
-        		defaultFormConfigElement.getFormTemplate(Mode.CREATE, null));
-        assertEquals("Incorrect template.","/path/create/template/norole",
-        		defaultFormConfigElement.getFormTemplate(Mode.CREATE, Collections.EMPTY_LIST));
-
-        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
-                Mode.EDIT, null));
-        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
-                Mode.VIEW, null));
-        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
-                Mode.EDIT, Collections.EMPTY_LIST));
-        assertNull("Incorrect template.", defaultFormConfigElement.getFormTemplate(
-                Mode.VIEW, Collections.EMPTY_LIST));
-    }
-
-    public void testGetFormTemplatesWithRoles()
-    {
-        List<String> roles = new ArrayList<String>();
-        roles.add("Consumer");
-        roles.add("Manager");
-        assertEquals("Incorrect template.", "/path/create/template",
-                defaultFormConfigElement.getFormTemplate(Mode.CREATE, roles));
-        assertEquals("Incorrect template.", "/path/edit/template/manager",
-                defaultFormConfigElement.getFormTemplate(Mode.EDIT, roles));
-        assertEquals("Incorrect template.", "/path/view/template",
-                defaultFormConfigElement.getFormTemplate(Mode.VIEW, roles));
-    }
-
-    public void testGetFormTemplatesWithIrrelevantRoles()
-    {
-        List<String> roles = new ArrayList<String>();
-        roles.add("Bread");
-        roles.add("Jam"); // hoho
-        assertEquals("Incorrect template.", "/path/create/template/norole",
-                defaultFormConfigElement.getFormTemplate(Mode.CREATE, roles));
-        assertEquals("Incorrect template.", null,
-                defaultFormConfigElement.getFormTemplate(Mode.EDIT, roles));
-        assertEquals("Incorrect template.", null,
-                defaultFormConfigElement.getFormTemplate(Mode.VIEW, roles));
+        assertEquals("Incorrect template.","/create/template",
+        		defaultFormConfigElement.getFormTemplate(Mode.CREATE));
     }
 
     public void testGetFormFieldVisibilitiesForModes()
