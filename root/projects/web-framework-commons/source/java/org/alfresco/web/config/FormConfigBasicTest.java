@@ -86,6 +86,16 @@ public class FormConfigBasicTest extends BaseTest
     }
     
     /**
+     * This method returns a List<String> containing the 3 expected templates for
+     * respectively view, edit and create mode.
+     * @return
+     */
+    protected List<String> getExpectedTemplatesForNoAppearanceDefaultForm()
+    {
+        return Arrays.asList(new String[]{"/view/template", "/edit/template", "/create/template"});
+    }
+    
+    /**
      * @see junit.framework.TestCase#setUp()
      */
     @Override
@@ -155,13 +165,21 @@ public class FormConfigBasicTest extends BaseTest
     	assertNull(defaultFormCE.getId());
     }
 
-    public void off_testGetNonexistentDefaultFormElement() throws Exception
+    public void testGetNonexistentDefaultFormElement() throws Exception
     {
-    	FormConfigElement defaultFormCE = myExampleFormsConfigElement.getDefaultForm();
-    	assertNull(defaultFormCE);
+        Config noDefaultConfigObj = configService.getConfig("no-default-form");
+        assertNotNull(noDefaultConfigObj);
+    
+        ConfigElement noDefaultFormsConfigObj = noDefaultConfigObj.getConfigElement("forms");
+        assertNotNull(noDefaultFormsConfigObj);
+        assertTrue("noDefaultFormsConfigObj should be instanceof FormsConfigElement.",
+                noDefaultFormsConfigObj instanceof FormsConfigElement);
+        FormsConfigElement noDefaultFormsConfigElement = (FormsConfigElement) noDefaultFormsConfigObj;
+        FormConfigElement noDefaultForm = noDefaultFormsConfigElement.getDefaultForm();
+        assertNull(noDefaultForm);
     }
 
-    public void off_testGetFormElementById() throws Exception
+    public void testGetFormElementById() throws Exception
     {
     	FormConfigElement formCE = myExampleFormsConfigElement.getForm("id");
     	assertNotNull(formCE);
@@ -170,7 +188,7 @@ public class FormConfigBasicTest extends BaseTest
     	assertEquals("id", formCE.getId());
     }
 
-    public void off_testGetNonexistentFormElementById() throws Exception
+    public void testGetNonexistentFormElementById() throws Exception
     {
     	FormConfigElement noSuchFormCE = myExampleFormsConfigElement.getForm("rubbish");
     	assertNull(noSuchFormCE);
@@ -180,6 +198,14 @@ public class FormConfigBasicTest extends BaseTest
     {
         assertEquals("Submission URL was incorrect.", "submit/default/form",
                 myExampleDefaultForm.getSubmissionURL());
+    }
+    
+    public void testGetFormTemplatesForViewEditCreate() throws Exception
+    {
+        FormConfigElement testForm = noAppearanceFormsConfigElement.getDefaultForm();
+        assertEquals(getExpectedTemplatesForNoAppearanceDefaultForm().get(0), testForm.getViewTemplate());
+        assertEquals(getExpectedTemplatesForNoAppearanceDefaultForm().get(1), testForm.getEditTemplate());
+        assertEquals(getExpectedTemplatesForNoAppearanceDefaultForm().get(2), testForm.getCreateTemplate());
     }
     
     public void testGlobalConstraintHandlers()
@@ -357,37 +383,15 @@ public class FormConfigBasicTest extends BaseTest
                 .isFieldVisible("rubbish", Mode.VIEW));
     }
 
-    public void testGetFormFieldForcedVisibilities()
+    public void testGetForcedFields()
     {
-        assertTrue("Field should be forced.", noAppearanceDefaultForm
-        		.isFieldForcedVisible("cm:name", Mode.CREATE));
-        assertFalse("Field should be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("cm:title", Mode.CREATE));
-        assertFalse("Field should not be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("rubbish", Mode.CREATE));
-
-        assertTrue("Field should be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("cm:name", Mode.EDIT));
-        assertFalse("Field should not be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("cm:title", Mode.EDIT));
-        assertFalse("Field should not be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("rubbish", Mode.EDIT));
-
-        assertTrue("Field should be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("cm:name", Mode.VIEW));
-        assertFalse("Field should be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("cm:title", Mode.VIEW));
-        assertFalse("Field should not be forced.", noAppearanceDefaultForm
-                .isFieldForcedVisible("rubbish", Mode.VIEW));
-        
-        // get a list of of forced fields for view mode
         List<String> forcedFields = noAppearanceDefaultForm.getForcedFields();
         assertEquals("Expecting one forced field", 1, forcedFields.size());
-        
-        assertTrue("Expected cm:name to be forced", 
-                    noAppearanceDefaultForm.isFieldForced("cm:name"));
-        assertFalse("Expected cm:title not to be forced", 
-                    noAppearanceDefaultForm.isFieldForced("cm:title"));
+
+        assertTrue("Expected cm:name to be forced", noAppearanceDefaultForm
+                .isFieldForced("cm:name"));
+        assertFalse("Expected cm:title not to be forced", noAppearanceDefaultForm
+                .isFieldForced("cm:title"));
     }
 
     public void testGetVisibleFieldsForFormWithoutFieldVisibilityReturnsNull()

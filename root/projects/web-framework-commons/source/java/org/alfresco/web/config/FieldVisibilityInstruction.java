@@ -30,10 +30,7 @@ import java.util.List;
 
 /**
  * This class represents an instruction (within the forms config) to show or hide a
- * field. The instruction may only apply in certain modes. Also a show instruction
- * (but not a hide instruction) can be "forced", which means that the field should
- * always be returned by the form service, even if the relevant property/association
- * is not currently present on the node (in the case of form items that are NodeRefs).
+ * field. The instruction may only apply in certain modes.
  * 
  * @see Mode
  * 
@@ -44,19 +41,14 @@ class FieldVisibilityInstruction
     private final Visibility showOrHide;
     private final String fieldId;
     private final List<Mode> forModes;
-    private final boolean force;
     
     /**
      * 
      * @param showOrHide
      * @param fieldId
      * @param modesString
-     * @param forceString indicates that the field should always be returned
-     * by the form service even if it is not currently present on the form item (node).
-     * A value of forceString.equalsIgnoreCase("true") for this parameter only makes
-     * sense for and will only be applied for show instructions.
      */
-    public FieldVisibilityInstruction(String showOrHide, String fieldId, String modesString, String forceString)
+    public FieldVisibilityInstruction(String showOrHide, String fieldId, String modesString)
     {
         this.showOrHide = Visibility.visibilityFromString(showOrHide);
         this.fieldId = fieldId;
@@ -68,11 +60,6 @@ class FieldVisibilityInstruction
         {
             this.forModes = Mode.modesFromString(modesString);
         }
-        
-        boolean isForced = forceString != null && forceString.equalsIgnoreCase("true");
-        // A force value of 'true' will only be applied for 'show' not 'hide' instructions.
-    	boolean forceShow = isForced && this.showOrHide.equals(Visibility.SHOW);
-        this.force = forceShow;
     }
 
     public Visibility getShowOrHide()
@@ -89,15 +76,6 @@ class FieldVisibilityInstruction
     {
         return Collections.unmodifiableList(forModes);
     }
-
-    /**
-     * This method returns true if the field should be 'forced' to be shown.
-     * @return
-     */
-    public boolean isForced()
-    {
-    	return this.force;
-    }
     
     @Override
     public String toString()
@@ -107,9 +85,7 @@ class FieldVisibilityInstruction
             .append(" ")
             .append(fieldId)
             .append(" ")
-            .append(forModes)
-            .append(" force=")
-            .append(force);
+            .append(forModes);
         return result.toString();
     }
 }

@@ -87,20 +87,13 @@ class FieldVisibilityManager
     // of a <show> tag in any mode has repercussions for field-visibility in all modes.
     private List<FieldVisibilityInstruction> visibilityInstructions = new ArrayList<FieldVisibilityInstruction>();
 
-    void addInstruction(String showOrHide, String fieldId, String modesString)
-    {
-    	this.addInstruction(showOrHide, fieldId, modesString, "false");
-    }
-    
     /**
      * 
      * @param showOrHide
      * @param fieldId
      * @param modesString
-     * @param forceString if this parameter equalsIgnoreString("true") then a show
-     * instruction should be forced.
      */
-    void addInstruction(String showOrHide, String fieldId, String modesString, String forceString)
+    void addInstruction(String showOrHide, String fieldId, String modesString)
     {
         if (logger.isDebugEnabled())
         {
@@ -109,13 +102,11 @@ class FieldVisibilityManager
                 .append(" ")
                 .append(fieldId)
                 .append(" ")
-                .append(modesString)
-                .append(" force=")
-                .append(forceString);
+                .append(modesString);
             logger.debug(msg.toString());
         }
             	
-        this.visibilityInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString, forceString));
+        this.visibilityInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString));
     }
     
     public FieldVisibilityManager combine(FieldVisibilityManager otherFVM)
@@ -191,33 +182,6 @@ class FieldVisibilityManager
             }
             return true;
         }
-    }
-    
-    /**
-     * This method checks whether the specified field is "forced" to be shown.
-     * It will return true if the field is visible in the specified mode AND is marked
-     * as to be forced to be visible.
-     * 
-     * @param fieldId
-     * @param m
-     * @return
-     */
-    public boolean isFieldForced(String fieldId, Mode m)
-    {
-    	if (isFieldVisible(fieldId, m) == false)
-    	{
-    		return false;
-    	}
-    	
-    	boolean result = false;
-        for (FieldVisibilityInstruction fvi : this.visibilityInstructions)
-        {
-        	if (fvi.getFieldId().equals(fieldId))
-        	{
-        		result = fvi.isForced();
-        	}
-        }
-        return result;
     }
     
     /**

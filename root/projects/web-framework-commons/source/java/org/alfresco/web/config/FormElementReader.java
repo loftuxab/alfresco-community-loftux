@@ -52,7 +52,6 @@ public class FormElementReader implements ConfigElementReader
     public static final String ATTR_NAME = "name";
     public static final String ATTR_NAME_ID = "id";
     public static final String ATTR_PARENT = "parent";
-    public static final String ATTR_REQUIRES_ROLE = "requires-role";
     public static final String ATTR_SUBMISSION_URL = "submission-url";
     public static final String ATTR_TEMPLATE = "template";
     public static final String ATTR_TYPE = "type";
@@ -208,9 +207,8 @@ public class FormElementReader implements ConfigElementReader
             Element editOrViewOrCreateFormElem = (Element)obj;
             String nodeName = editOrViewOrCreateFormElem.getName();
             String template = editOrViewOrCreateFormElem.attributeValue(ATTR_TEMPLATE);
-            String requiresRole = editOrViewOrCreateFormElem.attributeValue(ATTR_REQUIRES_ROLE);
             
-            result.addFormTemplate(nodeName, template, requiresRole);
+            result.setFormTemplate(nodeName, template);
         }
     }
 

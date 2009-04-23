@@ -84,11 +84,9 @@
       <forms>
           <!-- For this example, I'm going to include all optional attributes -->
           <form submission-url="submission/url">
-             <view-form template="/path/view/template" requires-role="Consumer" />
-             <edit-form template="/path/edit/template/manager" requires-role="Manager" />
-             <edit-form template="/path/edit/template/contributor" requires-role="Contributor" />
-             <create-form template="/path/create/template" requires-role="Manager" />
-             <create-form template="/path/create/template/norole"/>
+             <view-form template="/view/template"/>
+             <edit-form template="/edit/template" />
+             <create-form template="/create/template" />
              <field-visibility>
                 <show id="cm:name" force="true"/>
                 <show id="cm:title" for-mode="view, create"/>
@@ -112,5 +110,14 @@
           </form>
       </forms>
    </config>
+
+   <config evaluator="string-compare" condition="no-default-form">
+      <forms>
+          <form id="form_id">
+             <appearance>
+                <field id="cm:name" label="Name From Config" />
+             </appearance>
+          </form>
+      </forms>
+   </config>
 </alfresco-config>
-     

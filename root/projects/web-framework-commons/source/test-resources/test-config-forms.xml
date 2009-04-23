@@ -29,16 +29,12 @@
       </constraint-handlers>
    </config>
    
-   <!-- The evaluator would normally be node-type, but that makes testing difficult -->
    <config evaluator="string-compare" condition="content">
       <forms>
-	      <!-- For this example, I'm going to include all optional attributes -->
 	      <form submission-url="submission/url">
-	         <view-form template="/path/view/template" requires-role="Consumer" />
-	         <edit-form template="/path/edit/template/manager" requires-role="Manager" />
-	         <edit-form template="/path/edit/template/contributor" requires-role="Contributor" />
-	         <create-form template="/path/create/template" requires-role="Manager" />
-	         <create-form template="/path/create/template/norole"/>
+	         <view-form template="/view/template" />
+	         <edit-form template="/edit/template" />
+	         <create-form template="/create/template"/>
 	         <field-visibility>
 	            <show id="name" />
 	            <show id="title" for-mode="view, create" />
@@ -61,7 +57,7 @@
 	            </field>
 	            <field id="title" label="My Title" set="details" />
 	            <field id="username" set="user" />
-	            <field id="quota" set="user" requires-role="Coordinator" /> 
+	            <field id="quota" set="user" /> 
 	            <field id="fieldWithMixedCtrlParams" >
 	               <control template="test.ftl">
 	                  <control-param name="one">un</control-param>

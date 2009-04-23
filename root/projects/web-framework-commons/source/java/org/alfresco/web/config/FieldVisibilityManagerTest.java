@@ -53,7 +53,7 @@ public class FieldVisibilityManagerTest extends TestCase
         secondOverrideFVM.addInstruction("hide", "B", "create");
 
         thirdOverrideFVM.addInstruction("show", "C", "create");
-        thirdOverrideFVM.addInstruction("show", "D", "", "true");
+        thirdOverrideFVM.addInstruction("show", "D", "");
 
         fourthOverrideFVM.addInstruction("hide", "D", null);
 
@@ -129,9 +129,6 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(Arrays.asList(new String[]{"D"}),
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
-        
-        assertFalse("Expected field C to not be forced to be shown.", testFVM.isFieldForced("C", Mode.CREATE));
-        assertTrue("Expected field D to be forced to be shown.", testFVM.isFieldForced("D", Mode.CREATE));
     }
     
     public void testFourthOverrideFVM()
