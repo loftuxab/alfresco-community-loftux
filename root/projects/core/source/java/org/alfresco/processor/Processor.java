@@ -22,19 +22,33 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.service.cmr.repository;
+package org.alfresco.processor;
 
 /**
- * Interface to represent a server side script implementation
+ * Interface for Proccessor classes - such as Template or Scripting Processors.
  * 
  * @author Roy Wetherall
  */
-public interface ProcessorExtension 
+public interface Processor
 {
-	/**
-	 * Returns the name of the extension 
-	 * 
-	 * @return the name of the extension
-	 */
-	String getExtensionName();
+    /**
+     * Get the name of the processor
+     * 
+     * @return  the name of the processor
+     */
+    public String getName();
+    
+    /**
+     * The file extension that the processor is associated with, null if none.
+     * 
+     * @return  the extension
+     */
+    public String getExtension();
+    
+    /**
+     * Registers a processor extension with the processor
+     * 
+     * @param processorExtension    the process extension
+     */
+    public void registerProcessorExtension(ProcessorExtension processorExtension);
 }

@@ -22,28 +22,19 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.service.cmr.repository;
-
-import org.alfresco.processor.ProcessorExtension;
+package org.alfresco.processor;
 
 /**
- * Interface to represent a server side template extension implementation
+ * Interface to represent a server side script implementation
  * 
- * @author Kevin Roast
+ * @author Roy Wetherall
  */
-public interface TemplateProcessorExtension extends ProcessorExtension
-{   
-    /**
-     * Set the template image resolver for this extension
-     * 
-     * @param resolver      TemplateImageResolver
-     */
-    void setTemplateImageResolver(TemplateImageResolver resolver);
-    
-    /**
-     * Get the template image resolver for this extension
-     * 
-     * @return TemplateImageResolver
-     */
-    TemplateImageResolver getTemplateImageResolver();
+public interface ProcessorExtension 
+{
+	/**
+	 * Returns the name of the extension 
+	 * 
+	 * @return the name of the extension
+	 */
+	String getExtensionName();
 }

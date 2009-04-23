@@ -20,36 +20,32 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.service.cmr.repository;
+package org.alfresco.web.scripts.processor;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.alfresco.processor.Processor;
+import org.alfresco.processor.ProcessorExtension;
 
 /**
- * Processor interface.
+ * Base class for Web-Tier processing classes - Script and Template.
  * 
- * @author Roy Wetherall
+ * @author Kevin Roast
  */
-public interface Processor
+public abstract class BaseProcessor implements Processor
 {
-    /**
-     * Get the name of the processor
-     * 
-     * @return  the name of the processor
-     */
-    public String getName();
+    /** A map containing all the processor extenstions */
+    protected Map<String, ProcessorExtension> processorExtensions = new HashMap<String, ProcessorExtension>(16);
+    
     
     /**
-     * The file extension that the processor is associated with, null if none.
-     * 
-     * @return  the extension
+     * @see org.alfresco.processor.Processor#registerProcessorExtension(org.alfresco.processor.ProcessorExtension)
      */
-    public String getExtension();
-    
-    /**
-     * Registers a processor extension with the processor
-     * 
-     * @param processorExtension    the process extension
-     */
-    public void registerProcessorExtension(ProcessorExtension processorExtension);
+    public void registerProcessorExtension(ProcessorExtension processorExtension)
+    {
+        this.processorExtensions.put(processorExtension.getExtensionName(), processorExtension);
+    }
 }

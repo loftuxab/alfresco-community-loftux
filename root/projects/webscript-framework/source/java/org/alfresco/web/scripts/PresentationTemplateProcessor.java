@@ -29,8 +29,12 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.processor.ProcessorExtension;
+import org.alfresco.web.scripts.processor.BaseProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -52,21 +56,38 @@ import freemarker.template.TemplateExceptionHandler;
  * Presentation (web tier) Template Processor
  *  
  * @author davidc
+ * @author kevinr
  */
-public class PresentationTemplateProcessor
+public class PresentationTemplateProcessor extends BaseProcessor
     implements TemplateProcessor, ApplicationListener, ApplicationContextAware
 {
     private static final Log logger = LogFactory.getLog(PresentationTemplateProcessor.class);
 
+    /** Spring app context */
     private ApplicationContext applicationContext;
+    
+    /** Template loading search path */
     private SearchPath searchPath;
+    
+    /** Default template input encoding */
     private String defaultEncoding;
+    
+    /** FreeMarker config for templates */
     private Configuration templateConfig;
+    
+    /** FreeMarker config for string based generated template */
     private Configuration stringConfig;
+    
+    /** List of loaders found when processing the SearchPath */
     private List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
+    
+    /** Time in seconds between FreeMarker checking for new template instances */
     private int updateDelay = 0;
+    
+    /** Size of the FreeMarker in-memory template cache */
     private int cacheSize = 256;
 
+    
     /**
      * @param searchPath
      */
@@ -109,6 +130,22 @@ public class PresentationTemplateProcessor
             this.cacheSize = cacheSize;
         }
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.processor.Processor#getExtension()
+     */
+    public String getExtension()
+    {
+        return "ftl";
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.processor.Processor#getName()
+     */
+    public String getName()
+    {
+        return "freemarker";
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.TemplateProcessor#process(java.lang.String, java.lang.Object, java.io.Writer)
@@ -133,9 +170,11 @@ public class PresentationTemplateProcessor
             long startTime = 0;
             if (logger.isDebugEnabled())
             {
-                logger.debug("Executing template: " + template);// + " on model: " + model);
+                logger.debug("Executing template: " + template);
                 startTime = System.nanoTime();
             }
+            
+            addProcessorModelExtensions(model);
             
             Template t = templateConfig.getTemplate(template);
             if (t != null)
@@ -188,9 +227,11 @@ public class PresentationTemplateProcessor
         long startTime = 0;
         if (logger.isDebugEnabled())
         {
-            logger.debug("Executing template: " + template);// + " on model: " + model);
+            logger.debug("Executing template: " + template);
             startTime = System.nanoTime();
         }
+        
+        addProcessorModelExtensions(model);
         
         try
         {
@@ -310,5 +351,27 @@ public class PresentationTemplateProcessor
         throws BeansException
     {
         this.applicationContext = applicationContext;
+    }
+    
+    /**
+     * Add any configured processor model extentions to the model.
+     * 
+     * @param model
+     */
+    private void addProcessorModelExtensions(Object model)
+    {
+        // there's always a model, if only to hold the extension objects
+        if (model == null)
+        {
+            model = new HashMap<String, Object>();
+        }
+        if (model instanceof Map)
+        {
+            // add any processor extensions
+            for (ProcessorExtension ex : this.processorExtensions.values()) 
+            {
+                ((Map<String, Object>)model).put(ex.getExtensionName(), ex);
+            }
+        }
     }
 }
