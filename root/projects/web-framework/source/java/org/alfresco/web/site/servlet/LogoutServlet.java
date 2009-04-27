@@ -43,7 +43,7 @@ public class LogoutServlet extends BaseServlet
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        AuthenticationUtil.logout(request);
+        AuthenticationUtil.logout(request, response);
         
         // redirect to the root of the website
         response.sendRedirect(request.getContextPath());

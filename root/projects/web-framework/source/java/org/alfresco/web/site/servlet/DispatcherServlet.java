@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -78,7 +79,9 @@ public class DispatcherServlet extends BaseServlet
     private static Log logger = LogFactory.getLog(DispatcherServlet.class);
     
     private static final String ALF_REDIRECT_URL   = "alfRedirectUrl";
+    private static final String ALF_LAST_USERNAME = "alfLastUsername";
     private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
+    
     
     /**
      * One time framework init
@@ -310,6 +313,15 @@ public class DispatcherServlet extends BaseServlet
                         
                         // set redirect url for use on login page template
                         context.setValue(ALF_REDIRECT_URL, redirectUrl);
+                        
+                        // set last username if any
+                        Cookie cookie = AuthenticationUtil.getUsernameCookie(request);
+                        if (cookie != null)
+                        {
+                            context.setValue(ALF_LAST_USERNAME, cookie.getValue());
+                        }
+                        
+                        // dispatch to the login page
                         context.setPage(loginPage);
                         dispatchPage(context, formatId);
                         

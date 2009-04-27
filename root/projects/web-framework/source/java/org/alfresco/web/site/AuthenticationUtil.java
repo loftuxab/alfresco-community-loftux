@@ -36,14 +36,26 @@ public class AuthenticationUtil
 {
     /** cookie names */
     private static final String COOKIE_ALFLOGIN = "alfLogin";
+    private static final String COOKIE_ALFUSER = "alfUsername";
+    private static final int TIMEOUT = 60*60*24*7;
     
     private static final String MT_GUEST_PREFIX = UserFactory.USER_GUEST + "@"; // eg. for MT Share
-
-    public static void logout(HttpServletRequest request)
+    
+    
+    public static void logout(HttpServletRequest request, HttpServletResponse response)
     {
         // invalidate the web session - will remove all session bound objects
         // such as connector sessions, theme settings etc.
         request.getSession().invalidate();
+        
+        // remove cookie
+        if (response != null)
+        {
+            Cookie userCookie = new Cookie(COOKIE_ALFUSER, "");
+            userCookie.setPath(request.getContextPath());
+            userCookie.setMaxAge(0);
+            response.addCookie(userCookie);
+        }
     }
     
     public static void login(HttpServletRequest request, String userId)
@@ -58,28 +70,28 @@ public class AuthenticationUtil
         if (currentUserId != null)
         {
             // log out the current user
-            logout(request);
+            logout(request, response);
         }
         
         // place user id onto the session
         request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
         
-        // set login time cookie
+        // set login and last username cookies
         if (response != null)
         {
             long timeInSeconds = System.currentTimeMillis() / 1000L;
-            Cookie cookie = getLoginCookie(request);
-            if (cookie == null)
+            Cookie loginCookie = new Cookie(COOKIE_ALFLOGIN, Long.toString(timeInSeconds));
+            loginCookie.setPath(request.getContextPath());
+            loginCookie.setMaxAge(TIMEOUT);
+            response.addCookie(loginCookie);
+            
+            if (isGuest(userId) == false)
             {
-                cookie = new Cookie(COOKIE_ALFLOGIN, Long.toString(timeInSeconds));
+                Cookie userCookie = new Cookie(COOKIE_ALFUSER, userId);
+                userCookie.setPath(request.getContextPath());
+                userCookie.setMaxAge(TIMEOUT);
+                response.addCookie(userCookie);
             }
-            else
-            {
-                cookie.setValue(Long.toString(timeInSeconds));
-            }
-            cookie.setPath(request.getContextPath());
-            cookie.setMaxAge(60*60*24*7);
-            response.addCookie(cookie);
         }
     }
     
@@ -113,30 +125,47 @@ public class AuthenticationUtil
     {
         return (String)request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
     }
-
+    
     /**
-     * Helper to return the Alfresco cookie. The cookie saves the last login time for a username.
+     * Helper to return cookie that saves the last login time for the current user.
      * 
      * @param httpRequest
      * 
      * @return Cookie if found or null if not present
      */
-    public static Cookie getLoginCookie(HttpServletRequest request)
+    public static Cookie getLastLoginCookie(HttpServletRequest request)
     {
-        Cookie authCookie = null;
+        return getCookie(request, COOKIE_ALFLOGIN);
+    }
+
+    /**
+     * Helper to return cookie that saves the last login time for the current user.
+     * 
+     * @param httpRequest
+     * 
+     * @return Cookie if found or null if not present
+     */
+    public static Cookie getUsernameCookie(HttpServletRequest request)
+    {
+        return getCookie(request, COOKIE_ALFUSER);
+    }
+    
+    private static Cookie getCookie(HttpServletRequest request, String name)
+    {
+        Cookie cookie = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null)
         {
             for (int i=0; i<cookies.length; i++)
             {
-                if (COOKIE_ALFLOGIN.equals(cookies[i].getName()))
+                if (name.equals(cookies[i].getName()))
                 {
                     // found cookie
-                    authCookie = cookies[i];
+                    cookie = cookies[i];
                     break;
                 }
             }
         }
-        return authCookie;
+        return cookie;
     }
 }
