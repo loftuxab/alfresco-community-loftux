@@ -39,7 +39,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Custom config element that represents form values for the client.
+ * This config element represents form values for the client. Note the distinction
+ * between 'form' and 'forms' elements in the config xml. Form elements are contained
+ * by forms elements.
  * 
  * @author Neil McErlean.
  */
@@ -254,17 +256,34 @@ public class FormConfigElement extends ConfigElementAdapter
         return !fieldVisibilityManager.isManagingHiddenFields();
     }
     
+    public List<String> getHiddenCreateFieldNames()
+    {
+        return getFieldNamesHiddenInMode(Mode.CREATE);
+    }
+    
+    public List<String> getHiddenEditFieldNames()
+    {
+        return getFieldNamesHiddenInMode(Mode.EDIT);
+    }
+    
+    public List<String> getHiddenViewFieldNames()
+    {
+        return getFieldNamesHiddenInMode(Mode.VIEW);
+    }
+
     public List<String> getVisibleCreateFieldNames()
     {
-    	return getFieldNamesVisibleInMode(Mode.CREATE);
+        return getFieldNamesVisibleInMode(Mode.CREATE);
     }
+    
     public List<String> getVisibleEditFieldNames()
     {
-    	return getFieldNamesVisibleInMode(Mode.EDIT);
+        return getFieldNamesVisibleInMode(Mode.EDIT);
     }
+    
     public List<String> getVisibleViewFieldNames()
     {
-    	return getFieldNamesVisibleInMode(Mode.VIEW);
+        return getFieldNamesVisibleInMode(Mode.VIEW);
     }
 
     public String getCreateTemplate()
@@ -287,164 +306,6 @@ public class FormConfigElement extends ConfigElementAdapter
     	this.formId = formId;
     }
     
-    /* package */void setSubmissionURL(String newURL)
-    {
-        this.submissionURL = newURL;
-    }
-
-    //TODO Where is this called? Wouldn't 3 setters be neater?
-    /* package */void setFormTemplate(String nodeName, String newTemplate)
-    {
-        if (nodeName.equals("create-form"))
-        {
-            createTemplate = newTemplate;
-        }
-        else if (nodeName.equals("edit-form"))
-        {
-            editTemplate = newTemplate;
-        }
-        else if (nodeName.equals("view-form"))
-        {
-            viewTemplate = newTemplate;
-        }
-        else
-        {
-            if (logger.isWarnEnabled())
-            {
-                logger.warn("Unrecognised mode: " + nodeName);
-            }
-            return;
-        }
-    }
-
-    /* package */void addFieldVisibility(String showOrHide, String fieldId,
-            String mode, String forceString)
-    {
-        fieldVisibilityManager.addInstruction(showOrHide, fieldId, mode);
-        
-        boolean isForced = new Boolean(forceString);
-        if (isForced && (this.forcedFields.contains(fieldId) == false))
-        {
-            this.forcedFields.add(fieldId);
-        }
-    }
-
-    /* package */void addSet(String setId, String parentSetId, String appearance)
-    {
-        FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance);
-        
-        // I am disallowing the declaration of sets whose parents do not already exist.
-        // The reason for this is to ensure that cycles within the parent structure
-        // are not possible.
-        if (parentSetId != null &&
-                parentSetId.trim().length() != 0 &&
-                !sets.containsKey(parentSetId))
-        {
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Set [").append(setId).append("] has undefined parent [")
-                .append(parentSetId).append("].");
-            throw new ConfigException(errorMsg.toString());
-        }
-        
-        sets.put(setId, newFormSetObject);
-        
-        // Set parent/child references
-        if (parentSetId != null && parentSetId.trim().length() != 0)
-        {
-            FormSet parentObject = sets.get(parentSetId);
-            
-            newFormSetObject.setParent(parentObject);
-            parentObject.addChild(newFormSetObject);
-        }
-    }
-
-    /* package */void addField(String fieldId, List<String> attributeNames,
-            List<String> attributeValues)
-    {
-        if (attributeNames == null)
-        {
-            attributeNames = Collections.emptyList();
-        }
-        if (attributeValues == null)
-        {
-            attributeValues = Collections.emptyList();
-        }
-        if (attributeNames.size() < attributeValues.size()
-                && logger.isWarnEnabled())
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.append("field ")
-                .append(fieldId)
-                .append(" has ")
-                .append(attributeNames.size())
-                .append(" xml attribute names and ")
-                .append(attributeValues.size())
-                .append(" xml attribute values. The trailing extra data will be ignored.");
-            logger.warn(msg.toString());
-        }
-        
-        Map<String, String> attrs = new LinkedHashMap<String, String>();
-        for (int i = 0; i < attributeNames.size(); i++)
-        {
-            attrs.put(attributeNames.get(i), attributeValues.get(i));
-        }
-        fields.put(fieldId, new FormField(fieldId, attrs));
-    }
-    
-    /* package */ void setFields(Map<String, FormField> newFieldsMap)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Setting new fields map " + newFieldsMap);
-        }
-        this.fields = newFieldsMap;
-    }
-
-    /* package */ void addControlForField(String fieldId, String template,
-            List<String> controlParamNames, List<String> controlParamValues,
-            List<String> cssDeps, List<String> jsDeps)
-    {
-        if (controlParamNames == null)
-        {
-            controlParamNames = Collections.emptyList();
-        }
-        if (controlParamValues == null)
-        {
-            controlParamValues = Collections.emptyList();
-        }
-        if (controlParamNames.size() < controlParamValues.size()
-                && logger.isWarnEnabled())
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.append("field ")
-                .append(fieldId)
-                .append(" has ")
-                .append(controlParamNames.size())
-                .append(" control-param names and ")
-                .append(controlParamValues.size())
-                .append(" control-param values. The trailing extra data will be ignored.");
-            logger.warn(msg.toString());
-        }
-        
-        FormField field = fields.get(fieldId);
-        field.setTemplate(template);
-        for (int i = 0; i < controlParamNames.size(); i++)
-        {
-            field.addControlParam(controlParamNames.get(i),
-                    controlParamValues.get(i));
-        }
-        
-        field.addCssDependencies(cssDeps);
-        field.addJsDependencies(jsDeps);
-    }
-
-    /* package */void addConstraintForField(String fieldId, String type,
-            String message, String messageId, String validationHandler, String event)
-    {
-        FormField field = fields.get(fieldId);
-        field.addConstraintDefinition(type, message, messageId, validationHandler, event);
-    }
-
     /**
      * 
      * @param m
@@ -495,10 +356,173 @@ public class FormConfigElement extends ConfigElementAdapter
         return this.forcedFields;
     }
 
+    private List<String> getFieldNamesHiddenInMode(Mode mode)
+    {
+        List<String> result = fieldVisibilityManager.getFieldNamesHiddenInMode(mode);
+        return result;
+    }
+
     private List<String> getFieldNamesVisibleInMode(Mode mode)
     {
         List<String> result = fieldVisibilityManager.getFieldNamesVisibleInMode(mode);
         return result;
     }
-}
 
+    /* package */void setSubmissionURL(String newURL)
+    {
+        this.submissionURL = newURL;
+    }
+    
+    //TODO Where is this called? Wouldn't 3 setters be neater?
+    /* package */void setFormTemplate(String nodeName, String newTemplate)
+    {
+        if (nodeName.equals("create-form"))
+        {
+            createTemplate = newTemplate;
+        }
+        else if (nodeName.equals("edit-form"))
+        {
+            editTemplate = newTemplate;
+        }
+        else if (nodeName.equals("view-form"))
+        {
+            viewTemplate = newTemplate;
+        }
+        else
+        {
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Unrecognised mode: " + nodeName);
+            }
+            return;
+        }
+    }
+    
+    /* package */void addFieldVisibility(String showOrHide, String fieldId,
+            String mode, String forceString)
+    {
+        fieldVisibilityManager.addInstruction(showOrHide, fieldId, mode);
+        
+        boolean isForced = new Boolean(forceString);
+        if (isForced && (this.forcedFields.contains(fieldId) == false))
+        {
+            this.forcedFields.add(fieldId);
+        }
+    }
+    
+    /* package */void addSet(String setId, String parentSetId, String appearance)
+    {
+        FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance);
+        
+        // I am disallowing the declaration of sets whose parents do not already exist.
+        // The reason for this is to ensure that cycles within the parent structure
+        // are not possible.
+        if (parentSetId != null &&
+                parentSetId.trim().length() != 0 &&
+                !sets.containsKey(parentSetId))
+        {
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Set [").append(setId).append("] has undefined parent [")
+            .append(parentSetId).append("].");
+            throw new ConfigException(errorMsg.toString());
+        }
+        
+        sets.put(setId, newFormSetObject);
+        
+        // Set parent/child references
+        if (parentSetId != null && parentSetId.trim().length() != 0)
+        {
+            FormSet parentObject = sets.get(parentSetId);
+            
+            newFormSetObject.setParent(parentObject);
+            parentObject.addChild(newFormSetObject);
+        }
+    }
+    
+    /* package */void addField(String fieldId, List<String> attributeNames,
+            List<String> attributeValues)
+    {
+        if (attributeNames == null)
+        {
+            attributeNames = Collections.emptyList();
+        }
+        if (attributeValues == null)
+        {
+            attributeValues = Collections.emptyList();
+        }
+        if (attributeNames.size() < attributeValues.size()
+                && logger.isWarnEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("field ")
+            .append(fieldId)
+            .append(" has ")
+            .append(attributeNames.size())
+            .append(" xml attribute names and ")
+            .append(attributeValues.size())
+            .append(" xml attribute values. The trailing extra data will be ignored.");
+            logger.warn(msg.toString());
+        }
+        
+        Map<String, String> attrs = new LinkedHashMap<String, String>();
+        for (int i = 0; i < attributeNames.size(); i++)
+        {
+            attrs.put(attributeNames.get(i), attributeValues.get(i));
+        }
+        fields.put(fieldId, new FormField(fieldId, attrs));
+    }
+    
+    /* package */ void setFields(Map<String, FormField> newFieldsMap)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Setting new fields map " + newFieldsMap);
+        }
+        this.fields = newFieldsMap;
+    }
+    
+    /* package */ void addControlForField(String fieldId, String template,
+            List<String> controlParamNames, List<String> controlParamValues,
+            List<String> cssDeps, List<String> jsDeps)
+    {
+        if (controlParamNames == null)
+        {
+            controlParamNames = Collections.emptyList();
+        }
+        if (controlParamValues == null)
+        {
+            controlParamValues = Collections.emptyList();
+        }
+        if (controlParamNames.size() < controlParamValues.size()
+                && logger.isWarnEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("field ")
+            .append(fieldId)
+            .append(" has ")
+            .append(controlParamNames.size())
+            .append(" control-param names and ")
+            .append(controlParamValues.size())
+            .append(" control-param values. The trailing extra data will be ignored.");
+            logger.warn(msg.toString());
+        }
+        
+        FormField field = fields.get(fieldId);
+        field.setTemplate(template);
+        for (int i = 0; i < controlParamNames.size(); i++)
+        {
+            field.addControlParam(controlParamNames.get(i),
+                    controlParamValues.get(i));
+        }
+        
+        field.addCssDependencies(cssDeps);
+        field.addJsDependencies(jsDeps);
+    }
+    
+    /* package */void addConstraintForField(String fieldId, String type,
+            String message, String messageId, String validationHandler, String event)
+    {
+        FormField field = fields.get(fieldId);
+        field.addConstraintDefinition(type, message, messageId, validationHandler, event);
+    }
+}
