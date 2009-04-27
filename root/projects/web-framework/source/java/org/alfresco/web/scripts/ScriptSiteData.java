@@ -1186,7 +1186,7 @@ public final class ScriptSiteData extends ScriptBase
     
     public void logout()
     {
-        AuthenticationUtil.logout(getRequestContext().getRequest());
+        AuthenticationUtil.logout(getRequestContext().getRequest(), null);
     }
     
     /**

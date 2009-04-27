@@ -12,7 +12,7 @@
                <label id="txt-username" for="username"></label>
             </div>
             <div style="padding-top:4px">
-               <input type="text" id="username" name="username" maxlength="256" style="width:200px"/>
+               <input type="text" id="username" name="username" maxlength="256" style="width:200px" value="<#if lastUsername??>${lastUsername?html}</#if>" />
             </div>
             <div style="padding-top:12px">
                <label id="txt-password" for="password"></label>
@@ -85,7 +85,7 @@
       panel.render(document.body);
       
       Dom.get("success").value += window.location.hash;
-      Dom.get("username").focus();
+      Dom.get(<#if lastUsername??>"password"<#else>"username"</#if>).focus();
    });
    
 <#if url.args["error"]??>

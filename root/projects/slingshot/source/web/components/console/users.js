@@ -523,6 +523,7 @@
          {
             // Hide the main panel area before it is displayed - so we don't show
             // old data to the user before the Update() method paints the results
+            Dom.get(parent.id + "-view-title").innerHTML = "";
             Dom.setStyle(parent.id + "-view-main", "visibility", "hidden");
          },
          
@@ -652,6 +653,14 @@
       widgets: {},
       
       /**
+       * Object container for storing YUI pop dialog instances.
+       * 
+       * @property popups
+       * @type object
+       */
+      popups: {},
+      
+      /**
        * List of the available UI panel handler objects; such as Search, View, Edit etc.
        * 
        * @property panels
@@ -727,7 +736,41 @@
        * @method onReady
        */
       onReady: function ConsoleUsers_onReady()
-      {  
+      {
+         // Generate the popup dialog for confirmation of deleting a user
+         this.popups.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
+         {
+            width: "36em",
+            fixedcenter: true,
+            visible: false,
+            draggable: false,
+            modal: true,
+            close: true,
+            text: '<div class="yui-u" style="text-align:center"><br/>' + this._msg("panel.delete.msg") + '<br/><br/></div>',
+            constraintoviewport: true,
+            buttons: [
+            {
+               text: this._msg("button.delete"),
+               handler:
+               {
+                  fn: this.onDeleteUserOK,
+                  scope: this
+               }
+            },
+            {
+               text: this._msg("button.cancel"),
+               handler:
+               {
+                  fn: this.onDeleteUserCancel,
+                  scope: this
+               },
+               isDefault: true
+            }]
+         });
+         
+         this.popups.deleteDialog.setHeader(this._msg("panel.delete.header"));
+         this.popups.deleteDialog.render(document.body);
+         
          // YUI History
          var bookmarkedSearch = YAHOO.util.History.getBookmarkedState("search") || "";
          var bookmarkedPanel = YAHOO.util.History.getBookmarkedState("panel") || this.panels[0].id;
@@ -905,18 +948,6 @@
       },
       
       /**
-       * Delete User button click event handler
-       *
-       * @method onDeleteUserClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onDeleteUserClick: function ConsoleUsers_onDeleteUserClick(e, args)
-      {
-         
-      },
-      
-      /**
        * Edit User button click event handler
        *
        * @method onEditUserClick
@@ -941,7 +972,64 @@
          
          YAHOO.util.History.multiNavigate({panel: "view", userid: userid});
       },
-
+      
+      /**
+       * Delete User button click event handler
+       *
+       * @method onDeleteUserClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeleteUserClick: function ConsoleUsers_onDeleteUserClick(e, args)
+      {
+         this.popups.deleteDialog.show();
+      },
+      
+      /**
+       * Fired when the admin confirms that they want to delete a User.
+       *
+       * @method onDeleteUserOK
+       * @param e {object} DomEvent
+       */
+      onDeleteUserOK: function ConsoleUsers_onDeleteUserOK(e)
+      {
+         Alfresco.util.Ajax.request(
+         {
+            method: Alfresco.util.Ajax.DELETE,
+            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.currentUserId),
+            successCallback:
+            {
+               fn: this.onDeletedUser,
+               scope: this
+            },
+            failureMessage: this._msg("panel.delete.fail")
+         });
+      },
+      
+      /**
+       * Fired on successful deletion of a user.
+       *
+       * @method onDeletedUser
+       * @param e {object} DomEvent
+       */
+      onDeletedUser: function ConsoleUsers_onDeletedUser(e)
+      {
+         // return to the search screen - we can no longer view the user details
+         this.popups.deleteDialog.hide();
+         YAHOO.util.History.multiNavigate({panel: "search", "search": this.searchTerm});
+      },
+      
+      /**
+       * Fired when the admin cancels the operation to delete a User.
+       *
+       * @method onDeleteUserCancel
+       * @param e {object} DomEvent
+       */
+      onDeleteUserCancel: function ConsoleUsers_onDeleteUserCancel(e)
+      {
+         this.popups.deleteDialog.hide();
+      },
+      
       /**
        * PRIVATE FUNCTIONS
        */
