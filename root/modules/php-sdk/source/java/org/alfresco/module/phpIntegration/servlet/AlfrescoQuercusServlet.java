@@ -35,7 +35,7 @@ import org.alfresco.module.phpIntegration.PHPMethodExtension;
 import org.alfresco.module.phpIntegration.PHPObjectExtension;
 import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
-import org.alfresco.service.cmr.repository.ProcessorExtension;
+import org.alfresco.processor.ProcessorExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

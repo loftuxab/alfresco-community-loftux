@@ -24,8 +24,8 @@
  */
 package org.alfresco.module.phpIntegration;
 
+import org.alfresco.processor.ProcessorExtension;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ProcessorExtension;
 
 import com.caucho.quercus.module.AbstractQuercusModule;
 import com.caucho.quercus.module.QuercusModule;
