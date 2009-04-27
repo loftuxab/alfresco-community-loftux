@@ -51,6 +51,9 @@ public class FormConfigElement extends ConfigElementAdapter
     private static Log logger = LogFactory.getLog(FormConfigElement.class);
     
     public static final String FORM_NAME_ID = "form";
+    //TODO Need to decide on an id for the default set: "" or "default" or
+    //     "alfresco.default"
+    public static final String DEFAULT_SET_ID = "";
     
     private String formId;
     private String submissionURL;
@@ -256,34 +259,130 @@ public class FormConfigElement extends ConfigElementAdapter
         return !fieldVisibilityManager.isManagingHiddenFields();
     }
     
+    /**
+     * @see FieldVisibilityManager#getFieldNamesHiddenInMode(Mode)
+     */
     public List<String> getHiddenCreateFieldNames()
     {
         return getFieldNamesHiddenInMode(Mode.CREATE);
     }
     
+    /**
+     * @see FieldVisibilityManager#getFieldNamesHiddenInMode(Mode)
+     */
     public List<String> getHiddenEditFieldNames()
     {
         return getFieldNamesHiddenInMode(Mode.EDIT);
     }
     
+    /**
+     * @see FieldVisibilityManager#getFieldNamesHiddenInMode(Mode)
+     */
     public List<String> getHiddenViewFieldNames()
     {
         return getFieldNamesHiddenInMode(Mode.VIEW);
     }
 
+    /**
+     * @see FieldVisibilityManager#getFieldNamesVisibleInMode(Mode)
+     */
     public List<String> getVisibleCreateFieldNames()
     {
         return getFieldNamesVisibleInMode(Mode.CREATE);
     }
     
+    /**
+     * @see FieldVisibilityManager#getFieldNamesVisibleInMode(Mode)
+     */
     public List<String> getVisibleEditFieldNames()
     {
         return getFieldNamesVisibleInMode(Mode.EDIT);
     }
     
+    /**
+     * @see FieldVisibilityManager#getFieldNamesVisibleInMode(Mode)
+     */
     public List<String> getVisibleViewFieldNames()
     {
         return getFieldNamesVisibleInMode(Mode.VIEW);
+    }
+
+    /**
+     * This method returns an array of fieldNames for those fields which are
+     * visible in Create mode and which are also members of the specified set.
+     * 
+     * @param setId
+     * @return the array of fieldNames (if there are any).
+     *         <code>null</code> will be returned if the specified setId is not
+     *         recognised or if the visible fields are not known.
+     */
+    public String[] getVisibleCreateFieldNamesForSet(String setId)
+    {
+        //TODO String[] is better than List<String> here as it is JS-friendly.
+        //     But we need to get consistency in this class API.
+
+        List <String> result = getVisibleFieldNamesFor(setId, Mode.CREATE);
+        if (result == null)
+        {
+            return null;
+        }
+        return result.toArray(new String[0]);
+    }
+
+    public String[] getVisibleEditFieldNamesForSet(String setId)
+    {
+        List <String> result = getVisibleFieldNamesFor(setId, Mode.EDIT);
+        if (result == null)
+        {
+            return null;
+        }
+        return result.toArray(new String[0]);
+    }
+
+    public String[] getVisibleViewFieldNamesForSet(String setId)
+    {
+        List <String> result = getVisibleFieldNamesFor(setId, Mode.VIEW);
+        if (result == null)
+        {
+            return null;
+        }
+        return result.toArray(new String[0]);
+    }
+
+    private List<String> getVisibleFieldNamesFor(String setId, Mode mode)
+    {
+        List <String> result = new ArrayList<String>();
+
+        FormSet specifiedSet = getSets().get(setId);
+        if (specifiedSet == null)
+        {
+            return null;
+        }
+
+        final List<String> visibleFields = getFieldNamesVisibleInMode(mode);
+        if (visibleFields == null)
+        {
+            return null;
+        }
+        
+        for (String fieldName : visibleFields)
+        {
+            final FormField formField = getFields().get(fieldName);
+            if (formField == null)
+            {
+                continue;
+            }
+            final String set = formField.getSet();
+            if (set == null)
+            {
+                continue;
+            }
+            if (set.equals(setId))
+            {
+                result.add(fieldName);
+            }
+        }
+        return result;
     }
 
     public String getCreateTemplate()
@@ -414,7 +513,7 @@ public class FormConfigElement extends ConfigElementAdapter
     {
         FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance);
         
-        // I am disallowing the declaration of sets whose parents do not already exist.
+        // We disallow the declaration of sets whose parents do not already exist.
         // The reason for this is to ensure that cycles within the parent structure
         // are not possible.
         if (parentSetId != null &&
@@ -424,6 +523,16 @@ public class FormConfigElement extends ConfigElementAdapter
             StringBuilder errorMsg = new StringBuilder();
             errorMsg.append("Set [").append(setId).append("] has undefined parent [")
             .append(parentSetId).append("].");
+            throw new ConfigException(errorMsg.toString());
+        }
+        
+        // We disallow the creation of sets whose id is that of the default set and
+        // who have parents. In other words, the default set must be a root set.
+        if (setId.equals(DEFAULT_SET_ID) && parentSetId != null)
+        {
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Default set cannot have any parent set. Parent specified was: [")
+                .append(parentSetId).append("].");
             throw new ConfigException(errorMsg.toString());
         }
         
