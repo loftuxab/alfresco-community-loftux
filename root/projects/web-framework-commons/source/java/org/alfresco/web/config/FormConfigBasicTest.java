@@ -38,7 +38,6 @@ import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.XMLConfigService;
 import org.alfresco.util.BaseTest;
-import org.alfresco.web.config.DefaultControlsConfigElement.DefaultControl;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in the web client
@@ -256,7 +255,7 @@ public class FormConfigBasicTest extends BaseTest
         DefaultControlsConfigElement defaultControls
                 = (DefaultControlsConfigElement)globalDefaultControls;
         
-        Map<String, DefaultControl> defCtrlItems = defaultControls.getItems();
+        Map<String, Control> defCtrlItems = defaultControls.getItems();
         assertEquals("Incorrect count for global default-controls.",
                 6, defCtrlItems.size());
         
@@ -270,11 +269,11 @@ public class FormConfigBasicTest extends BaseTest
         assertEquals("Incorrect global default-control types.", expectedTypeNames,
                 defCtrlItems.keySet());
         
-        DefaultControl longItem = defCtrlItems.get("d:long");
+        Control longItem = defCtrlItems.get("d:long");
         assertNotNull(longItem);
-        DefaultControl textItem = defCtrlItems.get("d:text");
+        Control textItem = defCtrlItems.get("d:text");
         assertNotNull(textItem);
-        DefaultControl testItem = defCtrlItems.get("d:test");
+        Control testItem = defCtrlItems.get("d:test");
         assertNotNull(testItem);
         
         assertEquals("/form-controls/mytextfield.ftl", longItem.getTemplate());
@@ -297,10 +296,10 @@ public class FormConfigBasicTest extends BaseTest
         DefaultControlsConfigElement defaultControls
                 = (DefaultControlsConfigElement)globalDefaultControls;
         
-        Map<String, DefaultControl> defCtrlItems = defaultControls.getItems();
+        Map<String, Control> defCtrlItems = defaultControls.getItems();
         List<ControlParam> controlParamsGlobal = defCtrlItems.get("d:test").getControlParams();
         
-        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControlParams();
+        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControl().getControlParams();
         
         // The simple fact that the above code compiles and runs is enough to ensure
         // that the APIs are consistent. But here's an assert to dissuade changes.
@@ -445,7 +444,7 @@ public class FormConfigBasicTest extends BaseTest
     	assertNull(regexConstraintHandler.getMessageId());
     	assertNull(regexConstraintHandler.getEvent());
     	
-    	//TODO Currently if we define a constraint-handler on a field which overrides
+    	//TODO Currently if we define a constraint-handler on a field which overrides 
     	// the default (form-level) constraint, the properties of the constraint-handler
     	// are only those of the field-level constraint. The form-level default one is
     	// not inherited.
@@ -463,5 +462,74 @@ public class FormConfigBasicTest extends BaseTest
     	ConstraintHandlerDefinition numericFieldConstr
     	    = myExampleDefaultForm.getFields().get("cm:name").getConstraintDefinitionMap().get("NUMERIC");
     	assertNotNull(numericFieldConstr);
+    }
+
+    /**
+     * This test checks that the expected JS and CSS resources are available for a
+     * default-control.
+     */
+    public void testGetDependenciesForDefaultControl() throws Exception
+    {
+        DefaultControlsConfigElement defaultControls
+                = (DefaultControlsConfigElement)globalDefaultControls;
+        
+        Map<String, Control> defCtrlItems = defaultControls.getItems();
+        
+        Control testItem = defCtrlItems.get("d:test");
+        assertNotNull(testItem);
+        
+        // We want the dependencies as arrays as these are more JS-friendly than
+        // Lists, but I'll compare the expected values as Lists.
+        String[] expectedCssDependencies = new String[]{"/css/path/1", "/css/path/2"};
+        String[] expectedJsDependencies = new String[]{"/js/path/1", "/js/path/2"};
+
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(testItem.getCssDependencies()));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(testItem.getJsDependencies()));
+    }
+
+    /**
+     * This test checks that the expected JS and CSS resources are available for a
+     * control defined on a field.
+     */
+    public void off_testGetDependenciesForFieldControl() throws Exception
+    {
+        Control nameControl
+            = myExampleDefaultForm.getFields().get("cm:name").getControl();
+        
+        // We want the dependencies as arrays as these are more JS-friendly than
+        // Lists, but I'll compare the expected values as Lists.
+        String[] expectedCssDependencies = new String[]{"/css/path/f1", "/css/path/f2"};
+        String[] expectedJsDependencies = new String[]{"/js/path/f1", "/js/path/f2"};
+
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(nameControl.getCssDependencies()));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(nameControl.getJsDependencies()));
+    }
+
+    /**
+     * This test checks that the code behaves correctly when there are no
+     * dependencies on a default-control.
+     */
+    public void testGetDependenciesForDefaultControl_Negative() throws Exception
+    {
+        DefaultControlsConfigElement defaultControls = (DefaultControlsConfigElement) globalDefaultControls;
+        Map<String, Control> defCtrlItems = defaultControls.getItems();
+
+        Control testItem = defCtrlItems.get("d:boolean");
+        assertNotNull(testItem);
+
+        assertNull(testItem.getCssDependencies());
+        assertNull(testItem.getJsDependencies());
+    }
+
+    /**
+     * This test checks that the code behaves correctly when there are no
+     * dependencies for a control defined on a field.
+     */
+    public void testGetDependenciesForFieldControl_Negative() throws Exception
+    {
+        Control myTextControl = myExampleDefaultForm.getFields().get("my:text").getControl();
+
+        assertNull(myTextControl.getCssDependencies());
+        assertNull(myTextControl.getJsDependencies());
     }
 }

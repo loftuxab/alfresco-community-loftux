@@ -50,12 +50,12 @@ public class FormFieldTest extends TestCase
         testElement.addConstraintForField("id1", "REGEX", "Test message", "Test msg ID", null, null);
         testElement.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
-                Arrays.asList(new String[]{"CP1", "CP2"}));
+                Arrays.asList(new String[]{"CP1", "CP2"}), null, null);
         
         testElement.addField("id2",
                 Arrays.asList(new String[]{"xx", "yy", "zz"}),
                 Arrays.asList(new String[]{"XX", "YY", "ZZ"}));
-        testElement.addControlForField("id2", "test2.ftl", null, null);
+        testElement.addControlForField("id2", "test2.ftl", null, null, null, null);
 
         Map<String, FormField> fields = testElement.getFields();
         assertNotNull(fields);
@@ -79,8 +79,8 @@ public class FormFieldTest extends TestCase
         expectedAttributes.put("zz", "ZZ");
         assertEquals(expectedAttributes, fieldID2.getAttributes());
         
-        assertEquals("test1.ftl", fieldID1.getTemplate());
-        assertEquals("test2.ftl", fieldID2.getTemplate());
+        assertEquals("test1.ftl", fieldID1.getControl().getTemplate());
+        assertEquals("test2.ftl", fieldID2.getControl().getTemplate());
         
         Map<String, ConstraintHandlerDefinition> fieldID1Constraints = fieldID1.getConstraintDefinitionMap();
         Map<String, ConstraintHandlerDefinition> fieldID2Constraints = fieldID2.getConstraintDefinitionMap();
@@ -98,8 +98,8 @@ public class FormFieldTest extends TestCase
         List<ControlParam> expectedCPs = new ArrayList<ControlParam>();
         expectedCPs.add(new ControlParam("cp1", "CP1"));
         expectedCPs.add(new ControlParam("cp2", "CP2"));
-        assertEquals(expectedCPs, fieldID1.getControlParams());
-        assertEquals(Collections.emptyList(), fieldID2.getControlParams());
+        assertEquals(expectedCPs, fieldID1.getControl().getControlParams());
+        assertEquals(Collections.emptyList(), fieldID2.getControl().getControlParams());
     }
     
     public void testGetAttributesViaExplicitGetters()
@@ -128,20 +128,20 @@ public class FormFieldTest extends TestCase
         FormConfigElement fce = new FormConfigElement();
         fce.addField("id1", null, null);
         fce.addConstraintForField("id1", "REGEX", null, null, null, null);
-        fce.addControlForField("id1", null, null, null);
+        fce.addControlForField("id1", null, null, null, null, null);
         
         FormField recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
-        assertEquals("Expected no template.", null, recoveredFce.getTemplate());
-        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControlParams());
+        assertEquals("Expected no template.", null, recoveredFce.getControl().getTemplate());
+        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControl().getControlParams());
 
         fce = new FormConfigElement();
         fce.addField("id1", null, null);
         
         recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
-        assertEquals("Expected no template.", null, recoveredFce.getTemplate());
-        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControlParams());
+        assertEquals("Expected no template.", null, recoveredFce.getControl().getTemplate());
+        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControl().getControlParams());
         assertEquals("Expected no constraint msg.", Collections.emptyMap(), recoveredFce.getConstraintDefinitionMap());
     }
     
@@ -151,8 +151,8 @@ public class FormFieldTest extends TestCase
         fce.addField("id1", null, null);
         fce.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
-                Arrays.asList(new String[]{"CP1", "CP2", "CP3"}));
-        List<ControlParam> params = fce.getFields().get("id1").getControlParams();
+                Arrays.asList(new String[]{"CP1", "CP2", "CP3"}), null, null);
+        List<ControlParam> params = fce.getFields().get("id1").getControl().getControlParams();
         assertEquals(2, params.size());
         List<ControlParam> expectedParams = new ArrayList<ControlParam>(2);
         expectedParams.add(new ControlParam("cp1", "CP1"));

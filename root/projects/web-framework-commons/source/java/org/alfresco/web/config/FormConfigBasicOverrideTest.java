@@ -27,6 +27,7 @@ package org.alfresco.web.config;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class FormConfigBasicOverrideTest extends FormConfigBasicTest
 {
@@ -82,4 +83,46 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
                 .isFieldForced("cm:title"));
     }
 
+    /**
+     * This test checks that the expected JS and CSS resources are available for a
+     * default-control.
+     */
+    @Override
+    public void testGetDependenciesForDefaultControl() throws Exception
+    {
+        DefaultControlsConfigElement defaultControls
+                = (DefaultControlsConfigElement)globalDefaultControls;
+        
+        Map<String, Control> defCtrlItems = defaultControls.getItems();
+        
+        Control testItem = defCtrlItems.get("d:test");
+        assertNotNull(testItem);
+        
+        // We want the dependencies as arrays as these are more JS-friendly than
+        // Lists, but I'll compare the expected values as Lists.
+        String[] expectedCssDependencies = new String[]{"/css/path/1/override", "/css/path/2"};
+        String[] expectedJsDependencies = new String[]{"/js/path/1", "/js/path/2/override"};
+
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(testItem.getCssDependencies()));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(testItem.getJsDependencies()));
+    }
+
+    /**
+     * This test checks that the expected JS and CSS resources are available for a
+     * control defined on a field.
+     */
+    @Override
+    public void off_testGetDependenciesForFieldControl() throws Exception
+    {
+        Control nameControl
+            = myExampleDefaultForm.getFields().get("cm:name").getControl();
+        
+        // We want the dependencies as arrays as these are more JS-friendly than
+        // Lists, but I'll compare the expected values as Lists.
+        String[] expectedCssDependencies = new String[]{"/css/path/f1", "/css/path/f2/override"};
+        String[] expectedJsDependencies = new String[]{"/js/path/f1/override", "/js/path/f2"};
+
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(nameControl.getCssDependencies()));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(nameControl.getJsDependencies()));
+    }
 }

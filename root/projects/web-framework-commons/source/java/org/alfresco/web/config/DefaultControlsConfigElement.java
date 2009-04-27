@@ -25,6 +25,7 @@
 package org.alfresco.web.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,7 +47,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     public static final String CONFIG_ELEMENT_ID = "default-controls";
     private static final long serialVersionUID = -6758804774427314050L;
 
-    private final Map<String, DefaultControl> datatypeDefCtrlMappings = new LinkedHashMap<String, DefaultControl>();
+    private final Map<String, Control> datatypeDefCtrlMappings = new LinkedHashMap<String, Control>();
 
     /**
      * This constructor creates an instance with the default name.
@@ -92,47 +93,64 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         for (String nextDataType : datatypeDefCtrlMappings.keySet())
         {
             String nextTemplate = getTemplateFor(nextDataType);
-            DefaultControl nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
+            Control nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
                     .get(nextDataType);
             List<ControlParam> nextControlParams = null;
+            List<String> cssDeps = null;
+            List<String> jsDeps = null;
             if (nextDefaultControls != null)
             {
                 nextControlParams = nextDefaultControls.getControlParams();
+
+                final String[] cssDepsArray = nextDefaultControls.getCssDependencies();
+                final String[] jsDepsArray = nextDefaultControls.getJsDependencies();
+                cssDeps = cssDepsArray == null ? null : Arrays.asList(cssDepsArray);
+                jsDeps = jsDepsArray == null ? null : Arrays.asList(jsDepsArray);
             }
             
             result.addDataMapping(nextDataType, nextTemplate,
-                            nextControlParams);
+                            nextControlParams, cssDeps, jsDeps);
         }
 
         for (String nextDataType : otherDCCElement.datatypeDefCtrlMappings.keySet())
         {
             String nextTemplate = otherDCCElement.getTemplateFor(nextDataType);
-            DefaultControl nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
+            Control nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
                     .get(nextDataType);
             List<ControlParam> nextControlParams = null;
+            List<String> cssDeps = null;
+            List<String> jsDeps = null;
             if (nextDefaultControls != null)
             {
                 nextControlParams = nextDefaultControls.getControlParams();
+                
+                final String[] cssDepsArray = nextDefaultControls.getCssDependencies();
+                final String[] jsDepsArray = nextDefaultControls.getJsDependencies();
+                cssDeps = cssDepsArray == null ? null : Arrays.asList(cssDepsArray);
+                jsDeps = jsDepsArray == null ? null : Arrays.asList(jsDepsArray);
             }
             
-            result.addDataMapping(nextDataType, nextTemplate, nextControlParams);
+            result.addDataMapping(nextDataType, nextTemplate,
+                            nextControlParams, cssDeps, jsDeps);
         }
 
         return result;
     }
 
     /* package */void addDataMapping(String dataType, String template,
-            List<ControlParam> parameters)
+            List<ControlParam> parameters, List<String> cssDeps, List<String> jsDeps)
     {
         if (parameters == null)
         {
             parameters = Collections.emptyList();
         }
-        DefaultControl newControl = new DefaultControl(dataType, template);
+        Control newControl = new Control(dataType, template);
         for (ControlParam p : parameters)
         {
             newControl.addControlParam(p);
         }
+        newControl.addCssDependencies(cssDeps);
+        newControl.addJsDependencies(jsDeps);
         this.datatypeDefCtrlMappings.put(dataType, newControl);
     }
     
@@ -143,7 +161,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     	return Collections.unmodifiableList(resultList);
     }
     
-    public Map<String, DefaultControl> getItems()
+    public Map<String, Control> getItems()
     {
     	return Collections.unmodifiableMap(datatypeDefCtrlMappings);
     }
@@ -158,7 +176,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
      */
     public String getTemplateFor(String dataType)
     {
-        DefaultControl ctrl = datatypeDefCtrlMappings.get(dataType);
+        Control ctrl = datatypeDefCtrlMappings.get(dataType);
         if (ctrl == null)
         {
             return null;
@@ -182,75 +200,5 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     {
         return Collections.unmodifiableList(datatypeDefCtrlMappings.get(
                 dataType).getControlParams());
-    }
-
-    /**
-     * This class represents a single default-control configuration item within a
-     * group of &lt;default-controls&gt;.
-     * 
-     * @author Neil McErlean.
-     */
-    public static class DefaultControl
-    {
-        private final String name;
-        private final String template;
-        private final List<ControlParam> controlParams = new ArrayList<ControlParam>();
-
-        /**
-         * Constructs a DefaultControl object with the specified name and template.
-         * 
-         * @param name the name of the type.
-         * @param template the template associated with that name.
-         */
-        public DefaultControl(String name, String template)
-        {
-            this.name = name;
-            this.template = template;
-        }
-
-        void addControlParam(ControlParam param)
-        {
-            controlParams.add(param);
-        }
-
-        /**
-         * This method returns the name of the type of this DefaultControl.
-         * @return the name of the type.
-         */
-        public String getName()
-        {
-            return name;
-        }
-
-        /**
-         * This method returns the template path of this DefaultControl.
-         * @return the template path.
-         */
-        public String getTemplate()
-        {
-            return template;
-        }
-
-        /**
-         * This method returns an unmodifiable List of <code>ControlParam</code>
-         * objects that are associated with this DefaultControl.
-         * @return an unmodifiable List of ControlParam references.
-         */
-        public List<ControlParam> getControlParams()
-        {
-            return Collections.unmodifiableList(controlParams);
-        }
-
-        /**
-         * @see java.lang.Object#toString()
-         */
-        @Override
-        public String toString()
-        {
-            StringBuilder result = new StringBuilder();
-            result.append(name).append(":").append(template);
-            result.append(controlParams);
-            return result.toString();
-        }
     }
 }

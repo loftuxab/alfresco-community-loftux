@@ -137,16 +137,16 @@ public class FormConfigTest extends BaseTest
                 .containsKey("set"));
         assertEquals("Incorrect attribute.", "user", usernameField
                 .getAttributes().get("set"));
-        assertNull("username field's template should be null.", usernameField
+        assertNull("username field's template should be null.", usernameField.getControl()
                 .getTemplate());
 
         FormField nameField = fields.get("name");
-        String nameTemplate = nameField.getTemplate();
+        String nameTemplate = nameField.getControl().getTemplate();
         assertNotNull("name field had null template", nameTemplate);
         assertEquals("name field had incorrect template.",
                 "alfresco/extension/formcontrols/my-name.ftl", nameTemplate);
 
-        List<ControlParam> controlParams = nameField.getControlParams();
+        List<ControlParam> controlParams = nameField.getControl().getControlParams();
         assertNotNull("name field should have control params.", controlParams);
         assertEquals("name field has incorrect number of control params.", 1,
                 controlParams.size());
@@ -173,7 +173,7 @@ public class FormConfigTest extends BaseTest
 
         FormField testField = fields.get("fieldWithMixedCtrlParams");
 
-        List<ControlParam> controlParams = testField.getControlParams();
+        List<ControlParam> controlParams = testField.getControl().getControlParams();
         assertNotNull("field should have control params.", controlParams);
         assertEquals("field has incorrect number of control params.", 4,
                 controlParams.size());
