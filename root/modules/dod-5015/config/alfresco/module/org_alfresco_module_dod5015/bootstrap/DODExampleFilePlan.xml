@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view:view 	xmlns:view="http://www.alfresco.org/view/repository/1.0" 
+			xmlns:nt="http://www.jcp.org/jcr/nt/1.0" 
+  			xmlns:alf="http://www.alfresco.org" 
+  			xmlns:d="http://www.alfresco.org/model/dictionary/1.0" 
+  			xmlns:act="http://www.alfresco.org/model/action/1.0" 
+  			xmlns:wf="http://www.alfresco.org/model/workflow/1.0" 
+  			xmlns:app="http://www.alfresco.org/model/application/1.0" 
+  			xmlns:usr="http://www.alfresco.org/model/user/1.0" 
+  			xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" 
+  			xmlns:cm="http://www.alfresco.org/model/content/1.0" 
+  			xmlns:sv="http://www.jcp.org/jcr/sv/1.0" 
+  			xmlns:mix="http://www.jcp.org/jcr/mix/1.0" 
+  			xmlns:jcr="http://www.jcp.org/jcr/1.0" 
+  			xmlns:sys="http://www.alfresco.org/model/system/1.0" 
+  			xmlns:rule="http://www.alfresco.org/model/rule/1.0" 
+  			xmlns:fm="http://www.alfresco.org/model/forum/1.0" 
+  			xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" 
+  			xmlns:rma="http://www.alfresco.org/model/recordsmanagement/1.0"
+  			xmlns:custom="custom.model" 
+  			xmlns="" >
+
+	<rma:recordSeries view:childName="cm:Reports">
+    
+    	<view:properties>
+	   		<cm:name>Reports</cm:name>
+	   		<rma:identifier>0318</rma:identifier>
+	   		<cm:title>Reports</cm:title>
+	   		<cm:description>Record series for reports</cm:description>
+    	</view:properties>
+    	    	
+    	<view:associations>
+      		<cm:contains>
+      			
+      			<rma:recordCategory view:childName="cm:AIS Audit Records">
+      			
+      				<view:aspects>
+			            <rma:reviewIndicator></rma:reviewIndicator>
+			            <rma:cutOffSchedule></rma:cutOffSchedule>
+			            <rma:retentionSchedule></rma:retentionSchedule>
+			      	</view:aspects>
+      			
+			    	<view:properties>
+			    	    <cm:name>AIS Audit Records</cm:name>
+				   		<rma:identifier>0318-01</rma:identifier>
+				   		<cm:title>AIS Audit Records</cm:title>
+				   		<cm:description>Consisting of AIS Security Officer or Terminal Area Security Officer weekly audit records of audit actions performed on all AIS as required by applicable policy which are maintained by any JS/combatant command activity.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-4 item 023</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off monthly, hold 1 month, then destroy.</rma:dispositionInstructions>
+				   		<rma:reviewPeriod>week|1</rma:reviewPeriod>
+				   		<rma:cutOffSchedule>monthend|1</rma:cutOffSchedule>
+				   		<rma:retentionSchedule>month|1</rma:retentionSchedule>
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Unit Manning Documents">
+      			
+      				<view:aspects>
+			            <rma:cutOffSchedule></rma:cutOffSchedule>
+			            <rma:retentionSchedule></rma:retentionSchedule>
+			      	</view:aspects>
+      			
+      				<view:properties>
+			    	    <cm:name>Unit Manning Documents</cm:name>
+				   		<rma:identifier>0318-02</rma:identifier>
+				   		<cm:title>Unit Manning Documents</cm:title>
+				   		<cm:description>Consisting of manpower document and monthly strength report forwarded to OSD and other activities which are maintained by personnel office as the official record copy.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-89-1 item 002</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off every 3 months, hold 3 months, then destroy.</rma:dispositionInstructions>
+				   		<rma:cutOffSchedule>quaterend|1</rma:cutOffSchedule>
+				   		<rma:retentionSchedule>month|3</rma:retentionSchedule>
+			    	</view:properties>	
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Overtime Reports">
+      			
+      				<view:aspects>
+			            <rma:cutOffSchedule></rma:cutOffSchedule>
+			            <rma:retentionSchedule></rma:retentionSchedule>
+			      	</view:aspects>
+      			
+      				<view:properties>
+			    	    <cm:name>Overtime Reports</cm:name>
+				   		<rma:identifier>0318-03</rma:identifier>
+				   		<cm:title>Overtime reports and related documents</cm:title>
+				   		<cm:description>Overtime reports and related documents which are maintained by JS/combatant controller as the official record copy.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-7 item 28</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off at end of FY, hold 3 years, then destroy.</rma:dispositionInstructions>
+				   		<rma:cutOffSchedule>fyend|1</rma:cutOffSchedule>
+				   		<rma:retentionSchedule>year|3</rma:retentionSchedule>
+			    	</view:properties>	
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      		</cm:contains>
+      	</view:associations>
+    
+  	</rma:recordSeries> 
+
+	<rma:recordSeries view:childName="cm:Military Files">
+    
+    	<view:properties>
+	   		<cm:name>Military Files</cm:name>
+	   		<rma:identifier>0412</rma:identifier>
+	   		<cm:title>Military Files</cm:title>
+	   		<cm:description>Record series for military files</cm:description>
+    	</view:properties>
+    
+  	</rma:recordSeries>
+
+	<rma:recordSeries view:childName="cm:Civilian Files">
+    
+    	<view:properties>
+	   		<cm:name>Civilian Files</cm:name>
+	   		<rma:identifier>0430</rma:identifier>
+	   		<cm:title>Civilian Files</cm:title>
+	   		<cm:description>Record series for civilian files</cm:description>
+    	</view:properties>
+    
+  	</rma:recordSeries>  	
+
+	<rma:recordSeries view:childName="cm:Miscellaneous Files">
+    
+    	<view:properties>
+	   		<cm:name>Miscellaneous Files</cm:name>
+	   		<rma:identifier>0950</rma:identifier>
+	   		<cm:title>Miscellaneous Files</cm:title>
+	   		<cm:description>Record series for miscellaneous files</cm:description>
+    	</view:properties>
+    
+  	</rma:recordSeries>
+  	
+</view:view> 
