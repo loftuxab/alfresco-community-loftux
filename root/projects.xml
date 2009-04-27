@@ -2121,6 +2121,70 @@
                          projectdir="${dir.module.rm}"/>
    </target>
 
+
+   <!-- ******************************** -->
+   <!-- ** DOD 5015 Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-dod5015" 
+           depends="package-dod5015" />
+
+   <target name="build-dod5015" 
+           depends="clean-dod5015, incremental-dod5015" />
+
+   <target name="clean-dod5015" 
+           depends="init">
+      <clean projectdir="${dir.module.dod5015}" />
+   </target>
+
+   <target name="compile-dod5015" 
+           depends="init">
+      <compile-java projectdir="${dir.module.dod5015}" />
+   </target>
+
+   <target name="package-dod5015"
+           depends="package-dod5015-war, deploy-webclient-tomcat" />
+
+   <target name="package-dod5015-jar"
+           depends="compile-dod5015">
+      <mkdir dir="${dir.module.dod5015.dist}" />
+      <jar jarfile="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" 
+           basedir="${dir.module.dod5015.classes}" />
+   </target>
+
+   <target name="package-dod5015-war"
+           depends="package-dod5015-extension">
+      <echo>Installing DOD 5015 into WAR...</echo>
+      <install-amp ampfile="${dir.module.dod5015.dist}/${file.name.amp.dod5015}" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-dod5015-extension"
+           depends="package-dod5015-jar">
+      <zip destfile="${dir.module.dod5015.dist}/${file.name.amp.dod5015}" 
+           update="true">
+         <zipfileset file="${dir.module.dod5015.property}/module.properties"/>
+         <zipfileset file="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" 
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.dod5015.config}" 
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-dod5015" 
+           depends="compile-dod5015">
+      <run-tests projectdir="${dir.module.dod5015}" />
+   </target>
+
+   <target name="generate-javadocs-dod5015"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco DOD 5015 Extension"
+                         windowtitle="DOD 5015 Records Management"
+                         projectdir="${dir.module.dod5015}"/>
+   </target>
+
    <!-- ******************************************************************* -->
    <!-- Note: avmCompare and truncateMalformedXml have a nearly identical   -->
    <!--       set of tasks.   It would be very nice if we could use a macro -->

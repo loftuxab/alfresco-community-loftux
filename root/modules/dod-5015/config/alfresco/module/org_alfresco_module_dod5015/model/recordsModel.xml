@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Definition of Records Management Model -->
+
+<!-- Note: the rma: namespace is defined further on in the document -->
+<model name="rma:recordsmanagement" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <!-- Meta-data about the model -->   
+   <description>Records Management Model</description>
+   <author>Roy Wetherall</author>
+   <version>1.0</version>
+
+   <!-- Imports are required to allow references to definitions in other models -->   
+   <imports>
+      <!-- Import Alfresco Dictionary Definitions -->
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <!-- Import Alfresco Content Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+      <!-- Import Alfresco Content Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+   </imports>
+
+   <!-- Records Management Namespace -->
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
+   </namespaces>
+   
+   <types>
+   
+      <type name="rma:filePlan">
+         <title>File Plan</title>
+         <parent>cm:folder</parent>
+        
+         <!-- TODO do we need this on here?
+         <mandatory-aspects>                   
+            <aspect>rma:recordComponentIdentifier</aspect>
+         </mandatory-aspects>
+         -->
+         
+      </type>
+      
+      <type name="rma:recordSeries">
+         <title>Record Series</title>
+         <parent>cm:folder</parent>
+         
+         <mandatory-aspects>               
+            <aspect>cm:titled</aspect>               
+            <aspect>rma:recordComponentIdentifier</aspect>
+         </mandatory-aspects>         
+         
+      </type>      
+      
+      <type name="rma:recordCategory">
+      
+         <title>Record Category</title>
+         <parent>cm:folder</parent>
+         
+         <properties>
+            
+            <!-- cm:name used for the Record Category Name -->
+            <!-- cm:description used for Record Category Decription --> 
+            
+            <property name="rma:dispositionAuthority">
+               <title>Disposition Authority</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <property name="rma:dispositionInstructions">
+               <title>Disposition Instructions</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+    
+         </properties>
+         
+         <associations>
+            
+            <child-association name="rma:dispositionActions">
+               	<source>
+                  	<mandatory>false</mandatory>
+                  	<many>false</many>
+               	</source>
+               	<target>
+                  	<class>rma:dispositionAction</class>
+                  	<mandatory>false</mandatory>
+                  	<many>true</many>
+            	</target>
+            </child-association>
+         
+         </associations>
+         
+         <mandatory-aspects>         
+            <aspect>cm:titled</aspect>            
+            <aspect>rma:recordComponentIdentifier</aspect>
+         </mandatory-aspects>
+         
+      </type>      
+      
+      <type name="rma:recordFolder">
+         
+         <title>Record Folder</title>
+         <parent>cm:folder</parent>
+         
+         <properties>
+                    
+            <!-- cm:name used for the Folder Identifier -->
+            <!-- cm:title used for the Folder Name -->   
+                                    
+            <property name="rma:recordFolderLocation">
+               <title>Record Folder Location</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>        
+                                   
+            <property name="rma:recordFolderSupplementalMarkingList">
+               <title>Record Folder Supplemental Marking List</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            
+         </properties>       
+         
+         <mandatory-aspects>         
+            <aspect>cm:titled</aspect>
+            <aspect>rma:recordComponentIdentifier</aspect>
+         </mandatory-aspects>
+         
+      </type>
+      
+      <type name="rma:dispositionAction">
+         
+         <title>Disposition Action</title>
+         <parent>cm:cmobject</parent>
+         
+         <properties>
+                    
+            <property name="rma:dispositionAction">
+               <title>Disposition action to take</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>        
+                                   
+            <property name="rma:dispositionPeriod">
+               <title>Period after which the disposition will take place</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>immediately|0</default>
+            </property>
+            
+         </properties>       
+      
+      </type>
+   	
+   </types>
+   
+   <aspects>
+   
+      <aspect name="rma:cutOffSchedule">
+         <title>Cut off schedule details</title>         
+         <properties>                
+            <property name="rma:cutOffSchedulePeriod">
+               <title>Cut off schedule period</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+      </aspect>
+   
+      <aspect name="rma:retentionSchedule">
+         <title>Retention schedule details</title>         
+         <properties>                
+            <property name="rma:retentionSchedulePeriod">
+               <title>Retention schedule period</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+      </aspect>
+   
+      <aspect name="rma:recordComponentIdentifier">
+         <title>Record component identifier</title>         
+         <properties>                
+            <property name="rma:identifier">
+               <title>Record Component Identifier</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+         </properties>
+      </aspect>
+         
+      <aspect name="rma:record">
+         <title>Record</title>
+         
+         <properties>
+         
+            <!-- cm:name used for the Unique Record Identifier -->
+            <!-- cm:title used for the Title -->
+            <!-- cm:author user for Author/Origionator -->
+            
+            <property name="rma:dateFiled">
+               <title>Date Filed</title>
+               <type>d:date</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <property name="rma:publicationDate">
+               <title>Publication Date</title>
+               <type>d:date</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <property name="rma:originatingOrganization">
+               <title>Originating Organization</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+                                   
+            <property name="rma:supplementalMarkingList">
+               <title>Supplemental Marking List</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+                                    
+            <property name="rma:MediaType">
+               <title>Media Type</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+                        
+            <property name="rma:format">
+               <title>SupplementalMarkingList</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+                        
+            <property name="rma:dateReceived">
+               <title>Date Received</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property> 
+                        
+            <!-- TODO
+                 Do we need to model this as broken up address?  
+                 Should we have a separate property for other address or just a multivalue property?
+            -->           
+            <property name="rma:address">
+               <title>Address</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>                        
+            <property name="rma:otherAddress">
+               <title>Other Address</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>     
+                                    
+            <property name="rma:location">
+               <title>Location</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>                                  
+         
+         </properties>         
+         
+         <mandatory-aspects>         
+            <aspect>cm:titled</aspect>
+            <aspect>cm:author</aspect>
+         </mandatory-aspects>
+         
+      </aspect>
+      
+      <aspect name="rma:reviewIndicator">
+         <title>Review Indicator</title>         
+         <properties>          
+            <!-- TODO
+                 This property should have the period data type
+              -->              
+            <property name="rma:reviewPeriod">
+               <title>Review Period</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>
+      
+      <aspect name="rma:accessionIndicator">
+         <title>Accession Indicator</title>                  
+      </aspect>
+      
+      <!-- Custom properties marker aspects -->      
+      
+      <aspect name="rma:customRecordCategoryProperties">
+         <title>Custom Record Category Properties</title>
+      </aspect>
+            
+      <aspect name="rma:customRecordFolderProperties">
+         <title>Custom Record Folder Properties</title>         
+      </aspect>      
+      
+      <aspect name="rma:customRecordProperties">
+         <title>Custom Record Properties</title>
+      </aspect>
+      
+   </aspects>
+   
+</model>
