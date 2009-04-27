@@ -139,4 +139,19 @@ public class FormSetTest extends TestCase
         }
         fail("Expected exception not thrown.");
     }
+    
+    public void testCannotGiveTheDefaultSetAParent() throws Exception
+    {
+        // It should not be possible to create the default set except as a 'root set'.
+        try
+        {
+            this.testElement.addSet(FormConfigElement.DEFAULT_SET_ID, "root1", null);
+        }
+        catch(ConfigException expected)
+        {
+            expected.toString();
+            return;
+        }
+        fail("Expected exception not thrown.");
+    }
 }
