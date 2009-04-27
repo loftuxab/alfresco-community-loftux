@@ -25,6 +25,7 @@
 package org.alfresco.web.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -74,6 +75,13 @@ public class FieldVisibilityManagerTest extends TestCase
                 emptyFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(null,
                 emptyFVM.getFieldNamesVisibleInMode(Mode.VIEW));
+
+        assertEquals(Collections.emptyList(),
+                emptyFVM.getFieldNamesHiddenInMode(Mode.CREATE));
+        assertEquals(Collections.emptyList(),
+                emptyFVM.getFieldNamesHiddenInMode(Mode.EDIT));
+        assertEquals(Collections.emptyList(),
+                emptyFVM.getFieldNamesHiddenInMode(Mode.VIEW));
     }
     
     public void testFirstOverrideFVM()
@@ -92,7 +100,14 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(null,
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
-    }
+
+        assertEquals(Arrays.asList(new String[]{"A"}),
+                testFVM.getFieldNamesHiddenInMode(Mode.CREATE));
+        assertEquals(Arrays.asList(new String[]{"A"}),
+                testFVM.getFieldNamesHiddenInMode(Mode.EDIT));
+        assertEquals(Arrays.asList(new String[]{"A", "B"}),
+                testFVM.getFieldNamesHiddenInMode(Mode.VIEW));
+}
     
     public void testSecondOverrideFVM()
     {
@@ -110,7 +125,14 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(null,
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
-    }
+
+        assertEquals(Arrays.asList(new String[]{"A", "B"}),
+                testFVM.getFieldNamesHiddenInMode(Mode.CREATE));
+        assertEquals(Arrays.asList(new String[]{"A"}),
+                testFVM.getFieldNamesHiddenInMode(Mode.EDIT));
+        assertEquals(Arrays.asList(new String[]{"A", "B"}),
+                testFVM.getFieldNamesHiddenInMode(Mode.VIEW));
+}
     
     public void testThirdOverrideFVM()
     {
@@ -129,7 +151,11 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(Arrays.asList(new String[]{"D"}),
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
-    }
+
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.CREATE));
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.EDIT));
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.VIEW));
+}
     
     public void testFourthOverrideFVM()
     {
@@ -148,7 +174,11 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(Arrays.asList(new String[]{}),
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
-    }
+
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.CREATE));
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.EDIT));
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.VIEW));
+}
     
     public void testFifthOverrideFVM()
     {
@@ -166,7 +196,11 @@ public class FieldVisibilityManagerTest extends TestCase
                 testFVM.getFieldNamesVisibleInMode(Mode.EDIT));
         assertEquals(Arrays.asList(new String[]{}),
                 testFVM.getFieldNamesVisibleInMode(Mode.VIEW));
-    }
+
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.CREATE));
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.EDIT));
+        assertEquals(null, testFVM.getFieldNamesHiddenInMode(Mode.VIEW));
+}
     
     public void testCheckVisibleFieldsforHideManagingFVM()
     {
@@ -194,6 +228,34 @@ public class FieldVisibilityManagerTest extends TestCase
         assertEquals(Arrays.asList(new String[]{"C", "D"}), visibleCreateFields);
         assertEquals(Arrays.asList(new String[]{"D"}), visibleEditFields);
         assertEquals(Arrays.asList(new String[]{"D"}), visibleViewFields);
+    }
+    
+    public void testCheckHiddenFieldsforHideManagingFVM()
+    {
+        FieldVisibilityManager testFVM = emptyFVM.combine(firstOverrideFVM).combine(secondOverrideFVM);
+        List<String> hiddenCreateFields = testFVM.getFieldNamesHiddenInMode(Mode.CREATE);
+        List<String> hiddenEditFields = testFVM.getFieldNamesHiddenInMode(Mode.EDIT);
+        List<String> hiddenViewFields = testFVM.getFieldNamesHiddenInMode(Mode.VIEW);
+        
+        assertEquals(Arrays.asList(new String[]{"A", "B"}), hiddenCreateFields);
+        assertEquals(Arrays.asList(new String[]{"A"}), hiddenEditFields);
+        assertEquals(Arrays.asList(new String[]{"A", "B"}), hiddenViewFields);
+    }
+    
+    public void testCheckHiddenFieldsforShowManagingFVM()
+    {
+        FieldVisibilityManager testFVM = emptyFVM.combine(firstOverrideFVM)
+            .combine(secondOverrideFVM).combine(thirdOverrideFVM);
+        List<String> hiddenCreateFields = testFVM.getFieldNamesHiddenInMode(Mode.CREATE);
+        List<String> hiddenEditFields = testFVM.getFieldNamesHiddenInMode(Mode.EDIT);
+        List<String> hiddenViewFields = testFVM.getFieldNamesHiddenInMode(Mode.VIEW);
+        
+        assertNull("We cannot know what fields are hidden when there are any show tags.",
+                hiddenCreateFields);
+        assertNull("We cannot know what fields are hidden when there are any show tags.",
+                hiddenEditFields);
+        assertNull("We cannot know what fields are hidden when there are any show tags.",
+                hiddenViewFields);
     }
     
     private void assertFieldIsVisibleInModes(FieldVisibilityManager fvm, String fieldId, Mode... modes)

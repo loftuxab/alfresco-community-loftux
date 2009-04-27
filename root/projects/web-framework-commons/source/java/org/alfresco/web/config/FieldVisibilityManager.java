@@ -33,11 +33,10 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 /**
  * This class is responsible for implementing the algorithm that defines field
  * visibility. This is governed by the particular formulation of &lt;show&gt; and
- * &lt;hide&gt; tags in the field-visibility tag.
+ * &lt;hide&gt; tags under the &lt;field-visibility&gt; tag.
  * <P/>
  * The algorithm for determining visibility works as follows
  * <ul>
@@ -80,11 +79,15 @@ class FieldVisibilityManager
     // algorithm on each call to isFieldVisible.
     //
     // The latter has been adopted for maintainability, extensibility reasons.
+    //
+    // Later note: The latter approach is actually required as the show/hide instructions
+    //      must not be cached - in order to support changes at runtime.
     
     private static Log logger = LogFactory.getLog(FieldVisibilityManager.class);
 
     // We can't store 3 separate Lists for each of the 3 modes as the presence
     // of a <show> tag in any mode has repercussions for field-visibility in all modes.
+    //TODO Is this correct?
     private List<FieldVisibilityInstruction> visibilityInstructions = new ArrayList<FieldVisibilityInstruction>();
 
     /**
@@ -109,6 +112,14 @@ class FieldVisibilityManager
         this.visibilityInstructions.add(new FieldVisibilityInstruction(showOrHide, fieldId, modesString));
     }
     
+    /**
+     * This method combines the specified otherFVM with the current instance and returns
+     * a new instance of FieldVisibilityManager which represents the combination of
+     * these two.
+     * 
+     * @param otherFVM
+     * @return a new instance of FieldVisibilityManager.
+     */
     public FieldVisibilityManager combine(FieldVisibilityManager otherFVM)
     {
         if (otherFVM == this)
@@ -212,16 +223,17 @@ class FieldVisibilityManager
      * visible in the specified Mode. Such a request only makes sense if this
      * class is managing 'shown' fields, in other words, if there has been at least
      * one show tag.
+     * 
      * @param mode the Mode.
      * @return the list of fields visible in the specified mode if this is knowable,
-     * else null.
+     * else <code>null</code>.
      */
     public List<String> getFieldNamesVisibleInMode(Mode mode)
     {
         int indexOfFirstShow = getIndexOfFirstShow();
         if (indexOfFirstShow == -1)
         {
-            // Visible fields for any mode are not knowable
+            // Visible fields for any mode are not knowable at this point.
             return null;
         }
         else
@@ -242,6 +254,45 @@ class FieldVisibilityManager
                     else if (fvi.getShowOrHide().equals(Visibility.HIDE))
                     {
                         result.remove(fvi.getFieldId());
+                    }
+                }
+            }
+            
+            return Collections.unmodifiableList(new ArrayList<String>(result));
+        }
+    }
+
+    /**
+     * This method attempts to return a List of the fieldIDs of the fields which are
+     * hidden in the specified Mode. Such a request only makes sense if this
+     * class not managing 'shown' fields, in other words, if there has not been any
+     * show tags.
+     * 
+     * @param mode the Mode.
+     * @return the list of fields hidden in the specified mode if this is knowable,
+     * else <code>null</code>.
+     */
+    public List<String> getFieldNamesHiddenInMode(Mode mode)
+    {
+        int indexOfFirstShow = getIndexOfFirstShow();
+        if (indexOfFirstShow != -1)
+        {
+            // Hidden fields for any mode are not knowable at this point.
+            return null;
+        }
+        else
+        {
+            Set<String> result = new LinkedHashSet<String>();
+
+            for (FieldVisibilityInstruction fvi : visibilityInstructions)
+            {
+                if (fvi.getModes().contains(mode))
+                {
+                    // There should only be 'hide' instructions at this point so
+                    // perhaps the below 'if' clause is unnecessary, but...
+                    if (fvi.getShowOrHide().equals(Visibility.HIDE))
+                    {
+                        result.add(fvi.getFieldId());
                     }
                 }
             }
