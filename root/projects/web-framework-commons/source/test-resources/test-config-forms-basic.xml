@@ -14,6 +14,13 @@
             <control-param name="size">50</control-param>
          </type>
          <type name="d:test" template="/form-controls/test.ftl">
+            <!-- These dependencies are CSS, JS resources needed by this control. -->
+            <dependencies>
+                <css src="/css/path/1" />
+                <css src="/css/path/2" />
+                <js src="/js/path/1" />
+                <js src="/js/path/2" />
+            </dependencies>
             <control-param name="a">Hello</control-param>
             <control-param name="b"></control-param>
          </type>
@@ -48,7 +55,15 @@
              </field-visibility>
              <appearance>
                 <field id="cm:name">
-                   <control template="/form-controls/mytextfield.ftl" />
+                   <control template="/form-controls/mytextfield.ftl" >
+		                <!-- These dependencies are CSS, JS resources needed by this control. -->
+		                <dependencies>
+		                    <css src="/css/path/f1" />
+		                    <css src="/css/path/f2" />
+		                    <js src="/js/path/f1" />
+		                    <js src="/js/path/f2" />
+		                </dependencies>
+		           </control>
                    <constraint-handlers>
                        <constraint type="REGEX" message="You can't have these characters in a name: /*"
                                        validation-handler="Alfresco.forms.validation.regexMatch"/>
@@ -82,7 +97,6 @@
 
    <config evaluator="string-compare" condition="no-appearance">
       <forms>
-          <!-- For this example, I'm going to include all optional attributes -->
           <form submission-url="submission/url">
              <view-form template="/view/template"/>
              <edit-form template="/edit/template" />

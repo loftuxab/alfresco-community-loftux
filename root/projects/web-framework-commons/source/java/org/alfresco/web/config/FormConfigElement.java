@@ -401,7 +401,8 @@ public class FormConfigElement extends ConfigElementAdapter
     }
 
     /* package */ void addControlForField(String fieldId, String template,
-            List<String> controlParamNames, List<String> controlParamValues)
+            List<String> controlParamNames, List<String> controlParamValues,
+            List<String> cssDeps, List<String> jsDeps)
     {
         if (controlParamNames == null)
         {
@@ -432,6 +433,9 @@ public class FormConfigElement extends ConfigElementAdapter
             field.addControlParam(controlParamNames.get(i),
                     controlParamValues.get(i));
         }
+        
+        field.addCssDependencies(cssDeps);
+        field.addJsDependencies(jsDeps);
     }
 
     /* package */void addConstraintForField(String fieldId, String type,

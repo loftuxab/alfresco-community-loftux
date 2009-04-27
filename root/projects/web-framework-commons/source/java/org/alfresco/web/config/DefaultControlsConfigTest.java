@@ -137,14 +137,14 @@ public class DefaultControlsConfigTest extends BaseTest
     public void testCombineDefaultControlsWithAddedParam()
     {
         DefaultControlsConfigElement basicElement = new DefaultControlsConfigElement();
-        basicElement.addDataMapping("text", "path/textbox.ftl", null);
+        basicElement.addDataMapping("text", "path/textbox.ftl", null, null, null);
 
         // This element is the same as the above, but adds a control-param.
         DefaultControlsConfigElement parameterisedElement = new DefaultControlsConfigElement();
         List<ControlParam> testParams = new ArrayList<ControlParam>();
         testParams.add(new ControlParam("A", "1"));
         parameterisedElement.addDataMapping("text", "path/textbox.ftl",
-                testParams);
+                testParams, null, null);
 
         DefaultControlsConfigElement combinedElem
                 = (DefaultControlsConfigElement)basicElement.combine(parameterisedElement);
@@ -165,7 +165,7 @@ public class DefaultControlsConfigTest extends BaseTest
         DefaultControlsConfigElement initialElement = new DefaultControlsConfigElement();
         List<ControlParam> testParams = new ArrayList<ControlParam>();
         testParams.add(new ControlParam("A", "1"));
-        initialElement.addDataMapping("text", "path/textbox.ftl", testParams);
+        initialElement.addDataMapping("text", "path/textbox.ftl", testParams, null, null);
 
         // This element is the same as the above, but modifies the
         // control-param.
@@ -173,7 +173,7 @@ public class DefaultControlsConfigTest extends BaseTest
         List<ControlParam> modifiedTestParams = new ArrayList<ControlParam>();
         modifiedTestParams.add(new ControlParam("A", "5"));
         modifiedElement.addDataMapping("text", "path/textbox.ftl",
-                modifiedTestParams);
+                modifiedTestParams, null, null);
 
         DefaultControlsConfigElement combinedElem
                = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
@@ -194,12 +194,12 @@ public class DefaultControlsConfigTest extends BaseTest
         DefaultControlsConfigElement initialElement = new DefaultControlsConfigElement();
         List<ControlParam> testParams = new ArrayList<ControlParam>();
         testParams.add(new ControlParam("A", "1"));
-        initialElement.addDataMapping("text", "path/textbox.ftl", testParams);
+        initialElement.addDataMapping("text", "path/textbox.ftl", testParams, null, null);
 
         // This element is the same as the above, but deletes the
         // control-param.
         DefaultControlsConfigElement modifiedElement = new DefaultControlsConfigElement();
-        modifiedElement.addDataMapping("text", "path/textbox.ftl", null);
+        modifiedElement.addDataMapping("text", "path/textbox.ftl", null, null, null);
 
         DefaultControlsConfigElement combinedElem
                = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);

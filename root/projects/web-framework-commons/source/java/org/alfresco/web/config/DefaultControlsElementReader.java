@@ -31,6 +31,7 @@ import java.util.List;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -50,15 +51,15 @@ public class DefaultControlsElementReader implements ConfigElementReader
      * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
      */
     @SuppressWarnings("unchecked")
-    public ConfigElement parse(Element element)
+    public ConfigElement parse(Element defaultCtrlsElem)
     {
         DefaultControlsConfigElement result = null;
-        if (element == null)
+        if (defaultCtrlsElem == null)
         {
             return null;
         }
 
-        String name = element.getName();
+        String name = defaultCtrlsElem.getName();
         if (!name.equals(ELEMENT_DEFAULT_CONTROLS))
         {
             throw new ConfigException(this.getClass().getName()
@@ -68,19 +69,20 @@ public class DefaultControlsElementReader implements ConfigElementReader
 
         result = new DefaultControlsConfigElement();
 
-        Iterator<Element> xmlNodes = element.elementIterator();
-        while (xmlNodes.hasNext())
+        // There is an assumption here that all children are <type> elements.
+        Iterator<Element> typeNodes = defaultCtrlsElem.elementIterator();
+        while (typeNodes.hasNext())
         {
-            Element nextNode = xmlNodes.next();
-            String typeName = nextNode.attributeValue(ATTR_NAME);
-            String templatePath = nextNode.attributeValue(ATTR_TEMPLATE);
+            Element nextTypeNode = typeNodes.next();
+            String typeName = nextTypeNode.attributeValue(ATTR_NAME);
+            String templatePath = nextTypeNode.attributeValue(ATTR_TEMPLATE);
 
-            List<Element> controlParamNode = nextNode.elements(ELEMENT_CONTROL_PARAM);
+            List<Element> controlParamNodes = nextTypeNode.elements(ELEMENT_CONTROL_PARAM);
             ControlParam param = null;
             // If the optional control-param tags are present
             List<ControlParam> params = new ArrayList<ControlParam>();
 
-            for (Element nextControlParam : controlParamNode)
+            for (Element nextControlParam : controlParamNodes)
             {
                 String paramName = nextControlParam.attributeValue(ATTR_NAME);
                 String elementValue = nextControlParam.getTextTrim();
@@ -89,10 +91,46 @@ public class DefaultControlsElementReader implements ConfigElementReader
                 param = new ControlParam(paramName, elementValue);
                 params.add(param);
             }
+            
+            List<String> cssDependencies = getSrcDependencies(nextTypeNode, "./dependencies/css");
+            List<String> jsDependencies = getSrcDependencies(nextTypeNode, "./dependencies/js");
 
-            result.addDataMapping(typeName, templatePath, params);
+            result.addDataMapping(typeName, templatePath, params, cssDependencies, jsDependencies);
         }
 
+        return result;
+    }
+
+    /**
+     * This method takes the specified xml node, finds children matching the specified
+     * xpath expression and returns a List<String> containing the values of the "src"
+     * attribute on each of those child nodes.
+     * 
+     * @param typeNode
+     * @param xpathExpression
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    static List<String> getSrcDependencies(Element typeNode, final String xpathExpression)
+    {
+        List<String> result = new ArrayList<String>();
+        
+        for (Object cssObj : typeNode.selectNodes(xpathExpression))
+        {
+            Element cssElem = (Element)cssObj;
+            List<Attribute> cssAttributes = cssElem.selectNodes("./@*");
+            for (Attribute nextAttr : cssAttributes)
+            {
+                String nextAttrName = nextAttr.getName();
+                if (nextAttrName.equals("src"))
+                {
+                    String nextAttrValue = nextAttr.getValue();
+                    result.add(nextAttrValue);
+                }
+                // Ignore attributes not called "src".
+            }
+        }
+        
         return result;
     }
 }

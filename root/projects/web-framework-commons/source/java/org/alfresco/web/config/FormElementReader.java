@@ -137,6 +137,7 @@ public class FormElementReader implements ConfigElementReader
             List<Element> controlObjs = fieldElem.selectNodes("./control");
             if (!controlObjs.isEmpty())
             {
+                // We are assuming that there is only one <control> child element
                 Element controlElem = controlObjs.get(0);
             
                 String templateValue = controlElem.attributeValue(ATTR_TEMPLATE);
@@ -149,7 +150,12 @@ public class FormElementReader implements ConfigElementReader
                     controlParamNames.add(paramElem.attributeValue(ATTR_NAME));
                     controlParamValues.add(paramElem.getTextTrim());
                 }
-                result.addControlForField(fieldIdValue, templateValue, controlParamNames, controlParamValues);
+
+                List<String> cssDependencies = DefaultControlsElementReader.getSrcDependencies(controlElem, "./dependencies/css");
+                List<String> jsDependencies = DefaultControlsElementReader.getSrcDependencies(controlElem, "./dependencies/js");
+
+                result.addControlForField(fieldIdValue, templateValue, controlParamNames,
+                        controlParamValues, cssDependencies, jsDependencies);
             }
             
             // Delegate the reading of the <constraint-handlers> tag(s) to the reader.

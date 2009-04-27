@@ -55,8 +55,7 @@ public class FormField
     
     private final String id;
     private final Map<String, String> attributes;
-    private String template;
-    private final List<ControlParam> controlParams = new ArrayList<ControlParam>();
+    private Control associatedControl = new Control();
     private final List<ConstraintHandlerDefinition> constraintDefns = new ArrayList<ConstraintHandlerDefinition>();
     
     /**
@@ -83,24 +82,41 @@ public class FormField
         }
         this.attributes = attributes;
     }
+    
+    public Control getControl()
+    {
+        return this.associatedControl;
+    }
 
     void setTemplate(String template)
     {
-        this.template = template;
+        associatedControl.setTemplate(template);
     }
+    
     void addControlParam(String name, String value)
     {
-    	for (ControlParam cp : this.controlParams)
-    	{
-    		if (cp.getName().equals(name))
-    		{
-    			// The value for this control-param is being overridden.
-    			cp.setValue(value);
-    			return;
-    		}
-    	}
-    	this.controlParams.add(new ControlParam(name, value));
+        for (ControlParam cp : this.associatedControl.getControlParams())
+        {
+            if (cp.getName().equals(name))
+            {
+                // The value for this control-param is being overridden.
+                cp.setValue(value);
+                return;
+            }
+        }
+        this.associatedControl.addControlParam(new ControlParam(name, value));
     }
+    
+    void addCssDependencies(List<String> cssDeps)
+    {
+        this.associatedControl.addCssDependencies(cssDeps);
+    }
+    
+    void addJsDependencies(List<String> jsDeps)
+    {
+        this.associatedControl.addJsDependencies(jsDeps);
+    }
+    
     void addConstraintDefinition(String type, String message, String messageId,
     		String validationHandler, String event)
     {
@@ -118,6 +134,7 @@ public class FormField
     	}
     	this.constraintDefns.add(new ConstraintHandlerDefinition(type, validationHandler, message, messageId, event));
     }
+    
     public Map<String, String> getAttributes()
     {
         return Collections.unmodifiableMap(attributes);
@@ -171,17 +188,7 @@ public class FormField
     	return attributes.get(ATTR_HELP_TEXT_ID);
     }
     // End of convenience accessor methods.
-    
-    public String getTemplate()
-    {
-        return template;
-    }
-    
-    public List<ControlParam> getControlParams()
-    {
-    	return Collections.unmodifiableList(this.controlParams);
-    }
-    
+        
     public Map<String, ConstraintHandlerDefinition> getConstraintDefinitionMap()
     {
         Map<String, ConstraintHandlerDefinition> defns = new LinkedHashMap<String, ConstraintHandlerDefinition>(4);
@@ -225,22 +232,23 @@ public class FormField
         
         FormField result = new FormField(this.id, combinedAttributes);
         
+        //TODO Combine control objects.
         // Combine templates
-        result.setTemplate(this.template);
-        if (otherField.template != null)
-        {
-            result.setTemplate(otherField.template);
-        }
-        
-        // Combine control-params
-        for (ControlParam cp : this.controlParams)
-        {
-        	result.addControlParam(cp.getName(), cp.getValue());
-        }
-        for (ControlParam cp : otherField.controlParams)
-        {
-        	result.addControlParam(cp.getName(), cp.getValue());
-        }
+//        result.setTemplate(this.template);
+//        if (otherField.template != null)
+//        {
+//            result.setTemplate(otherField.template);
+//        }
+//        
+//        // Combine control-params
+//        for (ControlParam cp : this.controlParams)
+//        {
+//        	result.addControlParam(cp.getName(), cp.getValue());
+//        }
+//        for (ControlParam cp : otherField.controlParams)
+//        {
+//        	result.addControlParam(cp.getName(), cp.getValue());
+//        }
         
         // Combine constraint data
         for (ConstraintHandlerDefinition constraint : this.constraintDefns)
@@ -268,37 +276,37 @@ public class FormField
 
     private void logDebugInformation(FormField otherField)
     {
-        if (!logger.isDebugEnabled())
-        {
-            return;
-        }
-
-        StringBuilder msg = new StringBuilder();
-        msg.append("Combining xml attributes ")
-            .append(attributes.keySet())
-            .append(" and ")
-            .append(otherField.attributes.keySet());
-        logger.debug(msg.toString());
-
-        msg = new StringBuilder();
-        msg.append("Combining templates ")
-            .append(template)
-            .append(" and ")
-            .append(otherField.template);
-        logger.debug(msg.toString());
-
-        msg = new StringBuilder();
-        msg.append("Combining control-params ")
-            .append(controlParams)
-            .append(" and ")
-            .append(otherField.controlParams);
-        logger.debug(msg.toString());
-        msg = new StringBuilder();
-
-        msg.append("Combining constraint-definitions")
-            .append(constraintDefns)
-            .append(" and ")
-            .append(otherField.constraintDefns);
-        logger.debug(msg.toString());
+//        if (!logger.isDebugEnabled())
+//        {
+//            return;
+//        }
+//
+//        StringBuilder msg = new StringBuilder();
+//        msg.append("Combining xml attributes ")
+//            .append(attributes.keySet())
+//            .append(" and ")
+//            .append(otherField.attributes.keySet());
+//        logger.debug(msg.toString());
+//
+//        msg = new StringBuilder();
+//        msg.append("Combining templates ")
+//            .append(template)
+//            .append(" and ")
+//            .append(otherField.template);
+//        logger.debug(msg.toString());
+//
+//        msg = new StringBuilder();
+//        msg.append("Combining control-params ")
+//            .append(controlParams)
+//            .append(" and ")
+//            .append(otherField.controlParams);
+//        logger.debug(msg.toString());
+//        msg = new StringBuilder();
+//
+//        msg.append("Combining constraint-definitions")
+//            .append(constraintDefns)
+//            .append(" and ")
+//            .append(otherField.constraintDefns);
+//        logger.debug(msg.toString());
     }
 }
