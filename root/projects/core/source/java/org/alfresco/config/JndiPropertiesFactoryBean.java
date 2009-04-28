@@ -48,7 +48,14 @@ public class JndiPropertiesFactoryBean extends SystemPropertiesFactoryBean
             Object value = this.jndiTemplate.lookup("java:comp/env/properties/" + propertyName);
             if (value != null)
             {
-                props.setProperty(propertyName, value.toString());
+                String stringValue = value.toString();
+                if (stringValue.length() > 0)
+                {
+                    // Unfortunately, JBoss 4 wrongly expects every env-entry declared in web.xml to have an
+                    // env-entry-value (even though these are meant to be decided on deployment!). So we treat the empty
+                    // string as null.
+                    props.setProperty(propertyName, stringValue);
+                }
             }
         }
         catch (NamingException e)
