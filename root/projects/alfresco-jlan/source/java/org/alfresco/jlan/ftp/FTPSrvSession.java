@@ -3451,7 +3451,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Create a passive data session
 
 		try {
-			m_dataSess = getFTPServer().allocatePassiveDataSession(this, m_sock.getLocalAddress());
+			m_dataSess = getFTPServer().allocatePassiveDataSession(this, getLocalAddress());
 		}
 		catch (IOException ex) {
 			m_dataSess = null;
@@ -3576,14 +3576,17 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				
 				Inet6Address ip6addr = (Inet6Address) addr;
 				
-				if ( ip6addr.getScopeId() == 0 && m_sock.getInetAddress() instanceof Inet6Address) {
+				if ( m_sock.getInetAddress() instanceof Inet6Address) {
 					
 					// Check the client socket scope-id
 
 					Inet6Address clientAddr = (Inet6Address) m_sock.getInetAddress();
-					Inet6Address localAddr  = (Inet6Address) m_sock.getLocalAddress();
+					Inet6Address localAddr  = null;
 					
-					if ( clientAddr.getScopeId() != 0) {
+					if ( m_sock.getLocalAddress() instanceof Inet6Address)
+						localAddr = (Inet6Address) m_sock.getLocalAddress();
+					
+					if ( clientAddr.getScopeId() != 0 && localAddr != null) {
 				
 						// Create a client data socket address with a scope-id, to make sure the socket connection
 						// gets routed back to the client correctly
@@ -4054,6 +4057,46 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	 */
 	private final String getLocalFTPAddressString() {
 		return m_sock.getLocalAddress().getHostAddress().replace('.', ',');
+	}
+	
+	/**
+	 * Return the local address for the session socket
+	 * 
+	 * @return InetAddress
+	 */
+	private final InetAddress getLocalAddress() {
+		
+		// Check if the session socket is valid
+		
+		if ( m_sock == null || m_sock.isClosed())
+			return null;
+		
+		// Get the local address from the session socket
+		
+		InetAddress addr = m_sock.getLocalAddress();
+		
+		// If the local address indicates a global bind address it may be returned as an IPv4 address
+		
+		if ( addr != null && addr.isAnyLocalAddress() && addr instanceof Inet4Address) {
+			
+			// Check if an IPv6 connection is being used
+		
+			if ( m_sock.getInetAddress() instanceof Inet6Address) {
+				
+				try {
+					
+					// Convert the global bind address to an IPv6 global bind address
+					
+					addr = InetAddress.getByName( "::");
+				}
+				catch ( UnknownHostException ex) {
+				}
+			}
+		}
+		
+		// Return the local address
+		
+		return addr;
 	}
 	
 	/**
