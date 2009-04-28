@@ -148,6 +148,12 @@ public class AlfrescoRuntimeException extends RuntimeException
      */
     private static String buildErrorLogNumber(String message)
     {
+        // ensure message is not null
+        if (message == null)
+        {
+            message= "";
+        }
+        
         Date today = new Date();
         StringBuilder buf = new StringBuilder(message.length() + 10);
         padInt(buf, today.getMonth(), 2);

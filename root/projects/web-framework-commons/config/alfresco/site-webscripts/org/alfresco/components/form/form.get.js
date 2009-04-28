@@ -482,9 +482,9 @@ function setupFieldControl(fieldDef, fieldConfig)
    
    // see if the fieldConfig already has a template defined, if not 
    // retrive the default template for the field's data type
-   if (fieldConfig !== null && fieldConfig.template !== null)
+   if (fieldConfig !== null && fieldConfig.control !== null && fieldConfig.control.template !== null)
    {
-      control.template = fieldConfig.template;
+      control.template = fieldConfig.control.template;
    }
    else
    {
@@ -525,7 +525,7 @@ function setupFieldControl(fieldDef, fieldConfig)
    // get overridden control parameters (if there are any)
    if (fieldConfig !== null)
    {
-      var paramsConfig = fieldConfig.controlParams;
+      var paramsConfig = fieldConfig.control.controlParams;
       for (var p = 0; p < paramsConfig.size(); p++)
       {
          control.params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
