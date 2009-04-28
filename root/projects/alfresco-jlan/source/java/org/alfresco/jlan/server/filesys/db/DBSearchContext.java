@@ -29,6 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.filesys.FileInfo;
 import org.alfresco.jlan.server.filesys.SearchContext;
 import org.alfresco.jlan.util.WildCard;
@@ -101,7 +102,7 @@ public abstract class DBSearchContext extends SearchContext {
     	resumeId = m_rs.getRow();
   	}
   	catch (SQLException ex) {
-  	  ex.printStackTrace();
+  	  Debug.println(ex);
   	}
   	
   	return resumeId;
@@ -228,7 +229,7 @@ public abstract class DBSearchContext extends SearchContext {
   				m_stmt.close();
   		}
   		catch (Exception ex) {
-  			ex.printStackTrace();
+  			Debug.println(ex);
   		}
   		m_rs   = null;
   		m_stmt = null;

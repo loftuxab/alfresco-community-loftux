@@ -34,6 +34,7 @@ import org.alfresco.jlan.locking.FileLock;
 import org.alfresco.jlan.locking.LockConflictException;
 import org.alfresco.jlan.locking.NotLockedException;
 import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
+import org.alfresco.jlan.server.auth.CifsAuthenticator;
 import org.alfresco.jlan.server.auth.ICifsAuthenticator;
 import org.alfresco.jlan.server.auth.InvalidUserException;
 import org.alfresco.jlan.server.auth.acl.AccessControl;
@@ -123,7 +124,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 	// Flag to enable faking of oplock requests when opening files
 
-	public static final boolean FakeOpLocks = false;
+	public static final boolean FakeOpLocks = true;
 
 	// Number of write requests per file to report file size change notifications
 
@@ -564,7 +565,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 	 * 
 	 * @param cmdOff int Offset to the chained command within the request packet.
 	 * @param smbPkt Request packet.
-	 * @param repsPkt Response packet
+	 * @param respPkt Response packet
 	 * @param endOff int Offset to the current end of the reply packet.
 	 * @return New end of reply offset.
 	 */
@@ -696,7 +697,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		ICifsAuthenticator auth = getSession().getSMBServer().getCifsAuthenticator();
 		int sharePerm = FileAccess.Writeable;
 
-		if ( auth != null && auth.getAccessMode() == ICifsAuthenticator.SHARE_MODE) {
+		if ( auth != null && auth.getAccessMode() == CifsAuthenticator.SHARE_MODE) {
 
 			// Validate the share connection
 
@@ -3196,6 +3197,11 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			}
 			else {
 
+				// Deallocate the search
+
+//				if ( searchId != -1)
+//					vc.deallocateSearchSlot(searchId);
+
 				// Failed to start the search, return a no more files error
 
 				m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTNoSuchFile, SMBStatus.DOSFileNotFound, SMBStatus.ErrDos);
@@ -4765,6 +4771,12 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectPathNotFound, SMBStatus.HRDDriveNotReady, SMBStatus.ErrHrd);
 		}
+		catch (DirectoryNotEmptyException ex) {
+
+			// Directory not empty
+
+			m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.DOSDirectoryNotEmpty, SMBStatus.ErrDos);
+		}
 		catch (Exception ex) {
 
 			// Other error during set file
@@ -5673,7 +5685,8 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Build the NT create andX response
 
-		smbPkt.setParameterCount(34);
+		boolean extendedResponse = ( flags & WinNT.ExtendedResponse) != 0;
+		smbPkt.setParameterCount( extendedResponse ? 42 : 34);
 
 		smbPkt.setAndXCommand(0xFF);
 		smbPkt.setParameter(1, 0); // AndX offset
@@ -5714,20 +5727,35 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		prms.packInt(respAction);
 
 		// Pack the file/directory dates
+		//
+		// Creation
+		// Access
+		// Modify
+		// Change
 
 		if ( netFile.hasCreationDate())
 			prms.packLong(NTTime.toNTTime(netFile.getCreationDate()));
 		else
 			prms.packLong(0);
 
+		if ( netFile.hasAccessDate())
+			prms.packLong(NTTime.toNTTime(netFile.getAccessDate()));
+		else {
+			
+			// Use the modify date/time if access ate/time has not been set
+
+			if ( netFile.hasModifyDate())
+				prms.packLong(NTTime.toNTTime(netFile.getModifyDate()));
+			else
+				prms.packLong(0);
+		}
+		
 		if ( netFile.hasModifyDate()) {
 			long modDate = NTTime.toNTTime(netFile.getModifyDate());
 			prms.packLong(modDate);
 			prms.packLong(modDate);
-			prms.packLong(modDate);
 		}
 		else {
-			prms.packLong(0); // Last access time
 			prms.packLong(0); // Last write time
 			prms.packLong(0); // Change time
 		}
@@ -5747,6 +5775,27 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		prms.packByte(netFile.isDirectory() ? 1 : 0);
 
 		prms.packWord(0); // byte count = 0
+		
+		// Pack the extra extended response area, if requested
+		
+		if ( extendedResponse == true) {
+			
+			// 22 byte block of zeroes
+			
+			prms.packLong( 0);
+			prms.packLong( 0);
+			prms.packInt( 0);
+			prms.packWord( 0);
+			
+			// Pack the permissions
+			
+			prms.packInt( 0x1F01FF);
+			
+			// 6 byte block of zeroes
+			
+			prms.packInt( 0);
+			prms.packWord( 0);
+		}
 
 		// Set the AndX offset
 

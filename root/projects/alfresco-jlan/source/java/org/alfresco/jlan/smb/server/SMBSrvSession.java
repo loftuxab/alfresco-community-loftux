@@ -396,7 +396,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 			m_pktHandler.closeHandler();
 		}
 		catch (Exception ex) {
-			ex.printStackTrace();
+			Debug.println( ex);
 		}
 	}
 
@@ -1319,13 +1319,13 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 			if ( isShutdown() == false) {
 				debugPrintln("Closing session due to exception");
 				debugPrintln(ex);
-				ex.printStackTrace();
+				Debug.println( ex);
 			}
 		}
 		catch (Throwable ex) {
 			debugPrintln("Closing session due to throwable");
 			debugPrintln(ex.toString());
-			ex.printStackTrace();
+			Debug.println( ex);
 		}
 		finally {
 			
@@ -1483,13 +1483,13 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 				if ( isShutdown() == false) {
 					debugPrintln("Closing session due to exception");
 					debugPrintln(ex);
-					ex.printStackTrace();
+					Debug.println( ex);
 				}
 			}
 			catch (Throwable ex) {
 				debugPrintln("Closing session due to throwable");
 				debugPrintln(ex.toString());
-				ex.printStackTrace();
+				Debug.println( ex);
 			}
 			finally {
 				

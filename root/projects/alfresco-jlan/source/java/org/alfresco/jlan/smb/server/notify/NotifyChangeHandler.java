@@ -818,7 +818,7 @@ public class NotifyChangeHandler implements Runnable {
 					}
 				}
 				catch (Exception ex) {
-				  ex.printStackTrace();
+				  Debug.println( ex);
 				}
 			}
 			else {

@@ -37,6 +37,8 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.alfresco.jlan.debug.Debug;
+
 /**
  * Password Encryptor Class
  * 
@@ -368,19 +370,19 @@ public class PasswordEncryptor {
       System.arraycopy(res, 0, enc, 16, 8);
     }
     catch (NoSuchPaddingException ex) {
-      ex.printStackTrace();
+      Debug.println( ex);
       enc = null;
     }
     catch (IllegalBlockSizeException ex) {
-      ex.printStackTrace();
+      Debug.println( ex);
       enc = null;
     }
     catch (BadPaddingException ex) {
-      ex.printStackTrace();
+      Debug.println( ex);
       enc = null;
     }
     catch (InvalidKeyException ex) {
-      ex.printStackTrace();
+      Debug.println( ex);
       enc = null;
     }
 

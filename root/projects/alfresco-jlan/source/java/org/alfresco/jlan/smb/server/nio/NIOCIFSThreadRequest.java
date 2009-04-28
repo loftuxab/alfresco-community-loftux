@@ -27,6 +27,7 @@ package org.alfresco.jlan.smb.server.nio;
 
 import java.nio.channels.SelectionKey;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.thread.ThreadRequest;
 import org.alfresco.jlan.smb.server.PacketHandler;
 import org.alfresco.jlan.smb.server.SMBSrvPacket;
@@ -107,7 +108,7 @@ public class NIOCIFSThreadRequest implements ThreadRequest {
 				}
 			}
 			catch ( Throwable ex) {
-				ex.printStackTrace();
+				Debug.println( ex);
 			}
 			finally {
 				

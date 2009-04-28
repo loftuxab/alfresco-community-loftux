@@ -113,7 +113,7 @@ public class AsyncWinsockCIFSReadRequest implements ThreadRequest {
 				smbPkt = null;
 			}
 			catch ( Throwable ex) {
-				ex.printStackTrace();
+				Debug.println(ex);
 			}
 			finally {
 				

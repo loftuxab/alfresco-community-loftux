@@ -29,6 +29,7 @@ import java.net.InetAddress;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.util.IPAddress;
 
 /**
@@ -393,7 +394,7 @@ public class NetBIOSName {
 				nameBytes = getName().getBytes();
 		}
 		catch (Exception ex) {
-			ex.printStackTrace();
+			Debug.println( ex);
 		}
 
 		System.arraycopy(nameBytes, 0, nameBuf, 0, nameBytes.length);

@@ -1094,7 +1094,7 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 							Debug.println("## DBFileLoader JAR loaded " + loadReq.toString() + ", jarId=" + dataDetails.getJarId());
 					}
 					catch (Exception ex) {
-						ex.printStackTrace();
+						Debug.println(ex);
 					}
 					finally {
 						
@@ -1302,7 +1302,7 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 						outFile.close();
 					}
 					catch (IOException ex) {
-						ex.printStackTrace();
+						Debug.println(ex);
 					}
 				}
 			}
@@ -1524,7 +1524,7 @@ public class DBFileLoader implements FileLoader, BackgroundFileLoader, FileState
 			}
 		}
 		catch ( IOException ex) {
-			ex.printStackTrace();
+			Debug.println(ex);
 		}
 		finally {
 				

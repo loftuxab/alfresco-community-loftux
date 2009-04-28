@@ -2204,7 +2204,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			if ( Debug.EnableInfo && hasDebug(DBG_ERROR))
 				debugPrintln(" Error during transfer, " + ex.toString());
-			ex.printStackTrace();
+			debugPrintln( ex);
 
 			// Indicate that there was an error during transmission of the file data
 

@@ -27,6 +27,7 @@ package org.alfresco.jlan.server.auth.ntlm;
 
 import java.io.UnsupportedEncodingException;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.util.DataPacker;
 
 /**
@@ -316,7 +317,7 @@ public abstract class NTLMMessage {
       str = new String(m_buf, m_offset + pos, len, isuni ? "UnicodeLittle" : "US-ASCII");
     }
     catch (UnsupportedEncodingException ex) {
-      ex.printStackTrace();
+      Debug.println( ex);
     }
 
     return str;

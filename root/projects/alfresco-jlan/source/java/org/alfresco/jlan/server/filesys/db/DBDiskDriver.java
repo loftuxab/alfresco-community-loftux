@@ -620,7 +620,7 @@ public class DBDiskDriver implements DiskInterface, DiskSizeInterface, DiskVolum
       fstate.removeAttribute(FileState.FileInformation);
     }
     catch (DBException ex) {
-      ex.printStackTrace(System.err);
+      Debug.println( ex);
       throw new IOException();
     }
   }
