@@ -160,4 +160,128 @@
       </div>
    </div>
    
+   <!-- Create User panel -->
+   <div id="${el}-create" class="hidden">
+      <div class="yui-g separator">
+         <div class="yui-u first">
+            <div class="title">${msg("label.title-create")}</div>
+         </div>
+         <div class="yui-u">
+            <div style="float:right">* ${msg("label.requiredfield")}</div>
+         </div>
+      </div>
+      
+      <div id="${el}-create-main" class="create-main">
+         <!-- Each info section separated by a header-bar div -->
+         <div class="header-bar">${msg("label.info")}</div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.firstname")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-create-firstname" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.lastname")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-create-lastname" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.email")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-create-email" type="text" maxlength="256" />
+         </div>
+         
+         <div class="header-bar">${msg("label.aboutuser")}</div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.username")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-create-username" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.password")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-create-password" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.verifypassword")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-create-verifypassword" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.groups")}:</span>
+         </div>
+         <div class="field-row">
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.quota")}:</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input-quota" id="${el}-create-quota" type="text" maxlength="8" />
+            <select id="${el}-create-quotatype">
+               <option value="gb">${msg("size.gigabytes")}</option>
+               <option value="mb">${msg("size.megabytes")}</option>
+               <option value="kb">${msg("size.kilobytes")}</option>
+            </select>
+         </div>
+         <div class="field-row">
+            <span class="crud-label"><input type="checkbox" id="${el}-create-disableaccount" />&nbsp;${msg("label.disableaccount")}</span>
+         </div>
+      </div>
+      
+      <div>
+         <div class="createuser-ok-button left">
+            <span class="yui-button yui-push-button" id="${el}-createuser-ok-button">
+               <span class="first-child"><button>${msg("button.createuser")}</button></span>
+            </span>
+         </div>
+         <div class="createuser-another-button left">
+            <span class="yui-button yui-push-button" id="${el}-createuser-another-button">
+               <span class="first-child"><button>${msg("button.createanother")}</button></span>
+            </span>
+         </div>
+         <div class="createuser-cancel-button">
+            <span class="yui-button yui-push-button" id="${el}-createuser-cancel-button">
+               <span class="first-child"><button>${msg("button.cancel")}</button></span>
+            </span>
+         </div>
+      </div>
+   </div>
+   
+   <!-- Update User panel -->
+   <div id="${el}-update" class="hidden">
+      <div class="yui-g separator">
+         <div class="yui-u first">
+            <div class="title">${msg("label.title-update")}: <span id="${el}-update-title"></span></div>
+         </div>
+         <div class="yui-u">
+            <div style="float:right">* ${msg("label.requiredfield")}</div>
+         </div>
+      </div>
+      
+      <div id="${el}-update-main" class="update-main">
+         <!-- Each info section separated by a header-bar div -->
+         <div class="header-bar">${msg("label.info")}</div>
+         
+      </div>
+      
+      <div>
+         <!-- buttons
+         <div class="deleteuser-button">
+            <span class="yui-button yui-push-button" id="${el}-deleteuser-button">
+               <span class="first-child"><button>${msg("button.deleteuser")}</button></span>
+            </span>
+         </div>
+         <div class="edituser-button">
+            <span class="yui-button yui-push-button" id="${el}-edituser-button">
+               <span class="first-child"><button>${msg("button.edituser")}</button></span>
+            </span>
+         </div>-->
+      </div>
+   </div>
+   
 </div>

@@ -176,3 +176,44 @@
    margin-left: 12em;
    margin-top: -1.2em;
 }
+
+.users .create-main
+{
+   border: 1px solid #D7D7D7;
+   padding-bottom: 1em;
+   margin-bottom: 1.5em;
+}
+
+.users .update-main
+{
+   border: 1px solid #D7D7D7;
+   padding-bottom: 1em;
+   margin-bottom: 1.5em;
+}
+
+.users .crud-label
+{
+   margin-left: 1.5em;
+   line-height: 1.5em;
+}
+
+.users .crud-input
+{
+   margin-left: 1.5em;
+}
+
+.users .crud-input-quota
+{
+   margin-left: 1.5em;
+   width: 6em;
+}
+
+.users select
+{
+   width: 4em;
+}
+
+.users .left
+{
+   float: left;
+}
