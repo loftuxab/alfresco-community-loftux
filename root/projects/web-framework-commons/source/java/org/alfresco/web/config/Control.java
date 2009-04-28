@@ -26,7 +26,9 @@ package org.alfresco.web.config;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a single control configuration item. These items can exist
@@ -36,36 +38,38 @@ import java.util.List;
  */
 public class Control
 {
-    //TODO Can I remove this field and simply use a key in an external map?
-    private final String name;
     private String template;
-    private final List<ControlParam> controlParams = new ArrayList<ControlParam>();
+    private final Map<String, ControlParam> controlParams = new LinkedHashMap<String, ControlParam>();
     private final List<String> cssDependencies = new ArrayList<String>();
     private final List<String> jsDependencies = new ArrayList<String>();
 
     /**
-     * Constructs a Control object with a null name.
+     * Constructs a Control object with a null template.
      */
     public Control()
     {
-        this(null, null);
+        this(null);
     }
     
     /**
-     * Constructs a Control object with the specified name and template.
+     * Constructs a Control object with the specified template.
      * 
-     * @param name the name of the type.
-     * @param template the template associated with that name.
+     * @param template.
      */
-    public Control(String name, String template)
+    public Control(String template)
     {
-        this.name = name;
         this.template = template;
+    }
+
+    void addControlParam(String cpName, String cpValue)
+    {
+        ControlParam cp = new ControlParam(cpName, cpValue);
+        this.addControlParam(cp);
     }
 
     void addControlParam(ControlParam param)
     {
-        controlParams.add(param);
+        controlParams.put(param.getName(), param);
     }
 
     void addCssDependencies(List<String> cssDeps)
@@ -84,15 +88,6 @@ public class Control
             return;
         }
         this.jsDependencies.addAll(jsDeps);
-    }
-    
-    /**
-     * This method returns the name of the type of this Control.
-     * @return the name of the type.
-     */
-    public String getName()
-    {
-        return name;
     }
 
     /**
@@ -114,9 +109,14 @@ public class Control
      * objects that are associated with this Control.
      * @return an unmodifiable List of ControlParam references.
      */
-    public List<ControlParam> getControlParams()
+    public List<ControlParam> getParams()
     {
-        return Collections.unmodifiableList(controlParams);
+        List<ControlParam> result = new ArrayList<ControlParam>(controlParams.size());
+        for (Map.Entry<String, ControlParam> entry : controlParams.entrySet())
+        {
+            result.add(entry.getValue());
+        }
+        return Collections.unmodifiableList(result);
     }
     
     /**
@@ -159,16 +159,41 @@ public class Control
     
     public Control combine(Control otherControl)
     {
-        // We should only combine controls that have the same name.
+        String combinedTemplate = otherControl.template == null ? this.template : otherControl.template;
+        Control result = new Control(combinedTemplate);
         
-        //TODO Implement control
-
-        String name = otherControl.name == null ? this.name : otherControl.name;
-        String template = otherControl.template == null ? this.template : otherControl.template;
+        for (Map.Entry<String, ControlParam> thisEntry : this.controlParams.entrySet())
+        {
+            ControlParam thisCP = thisEntry.getValue();
+            result.controlParams.put(thisCP.getName(), thisCP);
+        }
+        for (Map.Entry<String, ControlParam> otherEntry : otherControl.controlParams.entrySet())
+        {
+            ControlParam otherCP = otherEntry.getValue();
+            // This call to 'put' will replace any cp entries with the same name
+            // that are already in the map.
+            result.controlParams.put(otherCP.getName(), otherCP);
+        }
         
-        Control result = new Control(name, template);
+        if (otherControl.cssDependencies.isEmpty() == false)
+        {
+            result.addCssDependencies(otherControl.cssDependencies);
+        }
+        else
+        {
+            result.addCssDependencies(this.cssDependencies);
+        }
         
-        return null;
+        if (otherControl.jsDependencies.isEmpty() == false)
+        {
+            result.addJsDependencies(otherControl.jsDependencies);
+        }
+        else
+        {
+            result.addJsDependencies(this.jsDependencies);
+        }
+        
+        return result;
     }
 
     /**
@@ -178,7 +203,7 @@ public class Control
     public String toString()
     {
         StringBuilder result = new StringBuilder();
-        result.append(name).append(":").append(template);
+        result.append(template);
         result.append(controlParams);
         return result.toString();
     }

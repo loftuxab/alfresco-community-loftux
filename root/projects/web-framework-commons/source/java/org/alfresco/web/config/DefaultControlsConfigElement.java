@@ -100,7 +100,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             List<String> jsDeps = null;
             if (nextDefaultControls != null)
             {
-                nextControlParams = nextDefaultControls.getControlParams();
+                nextControlParams = nextDefaultControls.getParams();
 
                 final String[] cssDepsArray = nextDefaultControls.getCssDependencies();
                 final String[] jsDepsArray = nextDefaultControls.getJsDependencies();
@@ -122,7 +122,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             List<String> jsDeps = null;
             if (nextDefaultControls != null)
             {
-                nextControlParams = nextDefaultControls.getControlParams();
+                nextControlParams = nextDefaultControls.getParams();
                 
                 final String[] cssDepsArray = nextDefaultControls.getCssDependencies();
                 final String[] jsDepsArray = nextDefaultControls.getJsDependencies();
@@ -144,7 +144,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         {
             parameters = Collections.emptyList();
         }
-        Control newControl = new Control(dataType, template);
+        Control newControl = new Control(template);
         for (ControlParam p : parameters)
         {
             newControl.addControlParam(p);
@@ -199,6 +199,6 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     public List<ControlParam> getControlParamsFor(String dataType)
     {
         return Collections.unmodifiableList(datatypeDefCtrlMappings.get(
-                dataType).getControlParams());
+                dataType).getParams());
     }
 }

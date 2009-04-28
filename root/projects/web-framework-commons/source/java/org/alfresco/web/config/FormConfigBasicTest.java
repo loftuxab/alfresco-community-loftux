@@ -280,11 +280,11 @@ public class FormConfigBasicTest extends BaseTest
         assertEquals("/form-controls/mytextfield.ftl", textItem.getTemplate());
         assertEquals("/form-controls/test.ftl", testItem.getTemplate());
         
-        assertEquals(Collections.emptyList(), longItem.getControlParams());
+        assertEquals(Collections.emptyList(), longItem.getParams());
         assertEquals(getExpectedControlParamsForDText(),
-                textItem.getControlParams());
+                textItem.getParams());
         assertEquals(getExpectedControlParamsForDTest(),
-                testItem.getControlParams());
+                testItem.getParams());
     }
 
     /*
@@ -297,9 +297,9 @@ public class FormConfigBasicTest extends BaseTest
                 = (DefaultControlsConfigElement)globalDefaultControls;
         
         Map<String, Control> defCtrlItems = defaultControls.getItems();
-        List<ControlParam> controlParamsGlobal = defCtrlItems.get("d:test").getControlParams();
+        List<ControlParam> controlParamsGlobal = defCtrlItems.get("d:test").getParams();
         
-        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControl().getControlParams();
+        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControl().getParams();
         
         // The simple fact that the above code compiles and runs is enough to ensure
         // that the APIs are consistent. But here's an assert to dissuade changes.
@@ -491,7 +491,7 @@ public class FormConfigBasicTest extends BaseTest
      * This test checks that the expected JS and CSS resources are available for a
      * control defined on a field.
      */
-    public void off_testGetDependenciesForFieldControl() throws Exception
+    public void testGetDependenciesForFieldControl() throws Exception
     {
         Control nameControl
             = myExampleDefaultForm.getFields().get("cm:name").getControl();

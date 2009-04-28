@@ -617,15 +617,14 @@ public class FormConfigElement extends ConfigElementAdapter
         }
         
         FormField field = fields.get(fieldId);
-        field.setTemplate(template);
+        field.getControl().setTemplate(template);
         for (int i = 0; i < controlParamNames.size(); i++)
         {
-            field.addControlParam(controlParamNames.get(i),
-                    controlParamValues.get(i));
+            ControlParam cp = new ControlParam(controlParamNames.get(i), controlParamValues.get(i));
+            field.getControl().addControlParam(cp);
         }
-        
-        field.addCssDependencies(cssDeps);
-        field.addJsDependencies(jsDeps);
+        field.getControl().addCssDependencies(cssDeps);
+        field.getControl().addJsDependencies(jsDeps);
     }
     
     /* package */void addConstraintForField(String fieldId, String type,

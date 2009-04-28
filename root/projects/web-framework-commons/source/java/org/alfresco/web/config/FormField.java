@@ -88,35 +88,6 @@ public class FormField
         return this.associatedControl;
     }
 
-    void setTemplate(String template)
-    {
-        associatedControl.setTemplate(template);
-    }
-    
-    void addControlParam(String name, String value)
-    {
-        for (ControlParam cp : this.associatedControl.getControlParams())
-        {
-            if (cp.getName().equals(name))
-            {
-                // The value for this control-param is being overridden.
-                cp.setValue(value);
-                return;
-            }
-        }
-        this.associatedControl.addControlParam(new ControlParam(name, value));
-    }
-    
-    void addCssDependencies(List<String> cssDeps)
-    {
-        this.associatedControl.addCssDependencies(cssDeps);
-    }
-    
-    void addJsDependencies(List<String> jsDeps)
-    {
-        this.associatedControl.addJsDependencies(jsDeps);
-    }
-    
     void addConstraintDefinition(String type, String message, String messageId,
     		String validationHandler, String event)
     {
@@ -211,44 +182,29 @@ public class FormField
         }
         
         // It doesn't make sense to combine two fields with different IDs.
-        if (!this.id.equals(otherField.id) && logger.isWarnEnabled())
+        if (!this.id.equals(otherField.id))
         {
-            StringBuilder msg = new StringBuilder();
-            msg.append("Illegal attempt to combine two FormFields with different IDs: ")
-                .append(this.id)
-                .append(", ")
-                .append(otherField.id);
-            logger.warn(msg.toString());
+            if (logger.isWarnEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Illegal attempt to combine two FormFields with different IDs: ")
+                    .append(this.id)
+                    .append(", ")
+                    .append(otherField.id);
+                logger.warn(msg.toString());
+            }
             return this;
         }
 
-        logDebugInformation(otherField);
-        
         // Combine the xml attributes of the <field> tag.
         Map<String, String> combinedAttributes = new LinkedHashMap<String, String>();
         combinedAttributes.putAll(this.attributes);
         combinedAttributes.putAll(otherField.attributes);
-
         
         FormField result = new FormField(this.id, combinedAttributes);
         
-        //TODO Combine control objects.
-        // Combine templates
-//        result.setTemplate(this.template);
-//        if (otherField.template != null)
-//        {
-//            result.setTemplate(otherField.template);
-//        }
-//        
-//        // Combine control-params
-//        for (ControlParam cp : this.controlParams)
-//        {
-//        	result.addControlParam(cp.getName(), cp.getValue());
-//        }
-//        for (ControlParam cp : otherField.controlParams)
-//        {
-//        	result.addControlParam(cp.getName(), cp.getValue());
-//        }
+        Control combinedControl = this.associatedControl.combine(otherField.associatedControl);
+        result.associatedControl = combinedControl;
         
         // Combine constraint data
         for (ConstraintHandlerDefinition constraint : this.constraintDefns)
@@ -272,41 +228,5 @@ public class FormField
         result.append("FormField:")
             .append(this.id);
         return result.toString();
-    }
-
-    private void logDebugInformation(FormField otherField)
-    {
-//        if (!logger.isDebugEnabled())
-//        {
-//            return;
-//        }
-//
-//        StringBuilder msg = new StringBuilder();
-//        msg.append("Combining xml attributes ")
-//            .append(attributes.keySet())
-//            .append(" and ")
-//            .append(otherField.attributes.keySet());
-//        logger.debug(msg.toString());
-//
-//        msg = new StringBuilder();
-//        msg.append("Combining templates ")
-//            .append(template)
-//            .append(" and ")
-//            .append(otherField.template);
-//        logger.debug(msg.toString());
-//
-//        msg = new StringBuilder();
-//        msg.append("Combining control-params ")
-//            .append(controlParams)
-//            .append(" and ")
-//            .append(otherField.controlParams);
-//        logger.debug(msg.toString());
-//        msg = new StringBuilder();
-//
-//        msg.append("Combining constraint-definitions")
-//            .append(constraintDefns)
-//            .append(" and ")
-//            .append(otherField.constraintDefns);
-//        logger.debug(msg.toString());
     }
 }
