@@ -96,7 +96,7 @@ public class AsyncWinsockCIFSWriteRequest implements ThreadRequest {
 				
 			}
 			catch ( Throwable ex) {
-				ex.printStackTrace();
+				Debug.println(ex);
 			}
 		}
 	}

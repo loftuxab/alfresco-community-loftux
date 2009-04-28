@@ -39,6 +39,7 @@ import org.alfresco.jlan.server.filesys.UnsupportedInfoLevelException;
 import org.alfresco.jlan.smb.PacketType;
 import org.alfresco.jlan.smb.SMBStatus;
 import org.alfresco.jlan.smb.TransactionNames;
+import org.alfresco.jlan.smb.WinNT;
 import org.alfresco.jlan.smb.dcerpc.DCEPipeType;
 import org.alfresco.jlan.smb.dcerpc.server.DCEPipeFile;
 import org.alfresco.jlan.smb.dcerpc.server.DCEPipeHandler;
@@ -609,7 +610,8 @@ class IPCHandler {
 
 		// Build the NT create andX response
 
-		smbPkt.setParameterCount(34);
+		boolean extendedResponse = ( flags & WinNT.ExtendedResponse) != 0;
+		smbPkt.setParameterCount( extendedResponse ? 42 : 34);
 
 		prms.reset(smbPkt.getBuffer(), SMBSrvPacket.PARAMWORDS + 4);
 
@@ -631,6 +633,27 @@ class IPCHandler {
 
 		prms.packByte(0); // directory flag
 
+		// Pack the extra extended response area, if requested
+		
+		if ( extendedResponse == true) {
+			
+			// 22 byte block of zeroes
+			
+			prms.packLong( 0);
+			prms.packLong( 0);
+			prms.packInt( 0);
+			prms.packWord( 0);
+			
+			// Pack the permissions
+			
+			prms.packInt( 0x1F01FF);
+			
+			// 6 byte block of zeroes
+			
+			prms.packInt( 0);
+			prms.packWord( 0);
+		}
+		
 		smbPkt.setByteCount(0);
 
 		smbPkt.setAndXCommand(0xFF);
@@ -717,8 +740,7 @@ class IPCHandler {
 			smbPkt.packWord(0);
 
 			// Create a data buffer using the SMB packet. The response should always fit into a
-			// single
-			// reply packet.
+			// single reply packet.
 
 			DataBuffer replyBuf = new DataBuffer(buf, dataPos, buf.length - dataPos);
 
@@ -733,6 +755,10 @@ class IPCHandler {
 
 			fileInfo.setFileId(netFile.getFileId());
 
+			// Set the file allocation size, looks like it is used as the pipe buffer size
+			
+			fileInfo.setAllocationSize( 4096L);
+			
 			// Pack the file information into the return data packet
 
 			int dataLen = QueryInfoPacker.packInfo(fileInfo, replyBuf, infoLevl, true);

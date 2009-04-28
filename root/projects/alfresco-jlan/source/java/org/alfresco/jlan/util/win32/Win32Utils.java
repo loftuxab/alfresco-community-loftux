@@ -25,6 +25,7 @@
 
 package org.alfresco.jlan.util.win32;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.util.X64;
 
 /**
@@ -90,7 +91,7 @@ public class Win32Utils {
       System.loadLibrary( dllName);
     }
     catch (Exception ex) {
-      ex.printStackTrace(System.err);
+      Debug.println( ex);
     }
   }
 }

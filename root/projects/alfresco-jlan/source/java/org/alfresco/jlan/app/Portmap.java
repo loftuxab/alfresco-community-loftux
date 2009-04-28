@@ -25,6 +25,7 @@
 
 package org.alfresco.jlan.app;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.oncrpc.nfs.NFSConfigSection;
 import org.alfresco.jlan.oncrpc.portmap.PortMapperServer;
 import org.alfresco.jlan.server.config.ServerConfiguration;
@@ -88,7 +89,7 @@ public class Portmap {
 			portMapper.shutdownServer( false);
 		}
 		catch (Exception ex) {
-			ex.printStackTrace();
+			Debug.println( ex);
 		}
 	}
 }

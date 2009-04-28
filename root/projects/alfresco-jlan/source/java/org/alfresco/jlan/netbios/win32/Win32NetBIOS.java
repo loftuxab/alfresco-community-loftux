@@ -31,6 +31,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.NetBIOSName;
 import org.alfresco.jlan.util.DataBuffer;
 import org.alfresco.jlan.util.IPAddress;
@@ -839,7 +840,7 @@ public class Win32NetBIOS {
 			System.loadLibrary(dllName);
 		}
 		catch (Throwable ex) {
-			ex.printStackTrace(System.err);
+			Debug.println( ex);
 		}
 	}
 }
