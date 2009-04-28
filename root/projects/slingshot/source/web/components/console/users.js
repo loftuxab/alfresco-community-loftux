@@ -612,6 +612,191 @@
       });
       new ViewPanelHandler();
       
+      /* Create User Panel Handler */
+      CreatePanelHandler = function CreatePanelHandler_constructor()
+      {
+         CreatePanelHandler.superclass.constructor.call(this, "create");
+      };
+      
+      YAHOO.extend(CreatePanelHandler, Alfresco.ConsolePanelHandler,
+      {
+         onLoad: function onLoad()
+         {
+            // Buttons
+            parent.widgets.createuserOkButton = Alfresco.util.createYUIButton(parent, "createuser-ok-button", parent.onCreateUserOKClick);
+            parent.widgets.createuserAnotherButton = Alfresco.util.createYUIButton(parent, "createuser-another-button", parent.onCreateUserAnotherClick);
+            parent.widgets.createuserCancelButton = Alfresco.util.createYUIButton(parent, "createuser-cancel-button", parent.onCreateUserCancelClick);
+         },
+         
+         onBeforeShow: function onBeforeShow()
+         {
+            // Hide the main panel area before it is displayed - so we don't show
+            // old data to the user before the onShow() method paints the results
+            Dom.setStyle(parent.id + "-create-main", "visibility", "hidden");
+            
+            var fnClearEl = function(id)
+            {
+               Dom.get(parent.id + id).value = "";
+            };
+            
+            // clear avatar image URL
+            var photos = Dom.getElementsByClassName("photoimg", "img");
+            for (var i in photos)
+            {
+               photos[i].src = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+            }
+            
+            // clear data fields
+            fnClearEl("-create-firstname");
+            fnClearEl("-create-lastname");
+            fnClearEl("-create-email");
+            fnClearEl("-create-username");
+            fnClearEl("-create-password");
+            fnClearEl("-create-verifypassword");
+            fnClearEl("-create-quota");
+            Dom.get(parent.id + "-create-disableaccount").checked = false;
+            
+            // reset quota selection drop-down
+            Dom.get(parent.id + "-create-quotatype").value = "gb";
+         },
+         
+         onShow: function onShow()
+         {
+            window.scrollTo(0, 0);
+            
+            // Make main panel area visible
+            Dom.setStyle(parent.id + "-create-main", "visibility", "visible");
+            
+            Dom.get(parent.id + "-create-firstname").focus();
+         }
+      });
+      new CreatePanelHandler();
+      
+      /* Update User Panel Handler */
+      UpdatePanelHandler = function UpdatePanelHandler_constructor()
+      {
+         UpdatePanelHandler.superclass.constructor.call(this, "update");
+      };
+      
+      YAHOO.extend(UpdatePanelHandler, Alfresco.ConsolePanelHandler,
+      {
+         onLoad: function onLoad()
+         {
+            // Buttons
+            //parent.widgets.deleteuserButton = Alfresco.util.createYUIButton(parent, "deleteuser-button", parent.onDeleteUserClick);
+         },
+         
+         onHistoryInit: function onHistoryInit()
+         {
+            var bookmarkedUserId = YAHOO.util.History.getBookmarkedState("userid") || null;
+            if (bookmarkedUserId !== null)
+            {
+               YAHOO.Bubbling.fire("userIdChanged",
+               {
+                  userid: bookmarkedUserId
+               });
+            }
+         },
+         
+         onBeforeShow: function onBeforeShow()
+         {
+            // Hide the main panel area before it is displayed - so we don't show
+            // old data to the user before the Update() method paints the results
+            Dom.get(parent.id + "-update-title").innerHTML = "";
+            Dom.setStyle(parent.id + "-createupdate-main", "visibility", "hidden");
+         },
+         
+         onShow: function onShow()
+         {
+            window.scrollTo(0, 0);
+            this._refresh();
+         },
+         
+         onUpdate: function onUpdate()
+         {
+            this._refresh();
+         },
+         
+         _refresh: function _refresh()
+         {
+            var success = function(res)
+            {
+               var fnSetter = function(id, val)
+               {
+                  Dom.get(parent.id + id).innerHTML = val ? $html(val) : "";
+               };
+               
+               var person = YAHOO.lang.JSON.parse(res.serverResponse.responseText);
+               
+               // apply avatar image URL
+               var photos = Dom.getElementsByClassName("photoimg", "img");
+               for (var i in photos)
+               {
+                  photos[i].src = person.avatar ?
+                        Alfresco.constants.PROXY_URI + person.avatar + "?c=force" :
+                        Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+               }
+               
+               // About section fields
+               var firstName = person.firstName;
+               var lastName = person.lastName;
+               var fullName = firstName + ' ' + (lastName ? lastName : "");
+               fnSetter("-update-title", fullName);
+               /*fnSetter("-view-name", fullName);
+               fnSetter("-view-jobtitle", person.jobtitle);
+               fnSetter("-view-organization", person.organization);
+               // biography is a special html field
+               var bio = person.persondescription ? person.persondescription : "";
+               Dom.get(parent.id + "-view-bio").innerHTML = Alfresco.util.stripUnsafeHTMLTags(bio).replace(/\n/g, "<br/>");
+               
+               // Contact section fields
+               fnSetter("-view-location", person.location);
+               fnSetter("-view-email", person.email);
+               fnSetter("-view-telephone", person.telephone);
+               fnSetter("-view-mobile", person.mobile);
+               fnSetter("-view-skype", person.skype);
+               fnSetter("-view-instantmsg", person.instantmsg);
+               
+               // Company section fields
+               fnSetter("-view-companyname", person.organization);
+               // build the company address up and set manually - encoding each value
+               var addr = "";
+               addr += person.companyaddress1 ? ($html(person.companyaddress1) + "<br/>") : "";
+               addr += person.companyaddress2 ? ($html(person.companyaddress2) + "<br/>") : "";
+               addr += person.companyaddress3 ? ($html(person.companyaddress3) + "<br/>") : "";
+               addr += person.companypostcode ? ($html(person.companypostcode) + "<br/>") : "";
+               Dom.get(parent.id + "-view-companyaddress").innerHTML = addr;
+               fnSetter("-view-companytelephone", person.companytelephone);
+               fnSetter("-view-companyfax", person.companyfax);
+               fnSetter("-view-companyemail", person.companyemail);
+               
+               // More section fields
+               fnSetter("-view-username", parent.currentUserId);
+               fnSetter("-view-enabled", person.enabled ? parent._msg("label.enabled") : parent._msg("label.disabled"));
+               fnSetter("-view-quota", (person.quota > 0 ? Alfresco.util.formatFileSize(person.quota) : ""));
+               fnSetter("-view-usage", Alfresco.util.formatFileSize(person.sizeCurrent));
+               fnSetter("-view-groups", person.groups.join(", "));*/
+               
+               // Make main panel area visible
+               Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
+            };
+            
+            // make an ajax call to get user details
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(parent.currentUserId) + "?groups=true",
+               method: Alfresco.util.Ajax.GET,
+               successCallback:
+               {
+                  fn: success,
+                  scope: parent
+               },
+               failureMessage: parent._msg("message.getuser-failure", parent.currentUserId)   
+            });
+         }
+      });
+      new UpdatePanelHandler();
+      
       return this;
    }
    
@@ -904,7 +1089,9 @@
          this.currentUserId = userid;
          
          // annoyingly we need to check the panel ID so we don't update multiple times
-         if (this.currentPanelId === "view")
+         if (this.currentPanelId === "view" ||
+             this.currentPanelId === "create" ||
+             this.currentPanelId === "update")
          {
             this._updateCurrentPanel();
          }
@@ -944,7 +1131,7 @@
        */
       onNewUserClick: function ConsoleUsers_onNewUserClick(e, args)
       {
-         
+         YAHOO.util.History.navigate("panel", "create");
       },
       
       /**
@@ -956,7 +1143,7 @@
        */
       onEditUserClick: function ConsoleUsers_onEditUserClick(e, args)
       {
-         
+         YAHOO.util.History.navigate("panel", "update");
       },
       
       /**
@@ -969,7 +1156,6 @@
       onViewUserClick: function ConsoleUsers_onViewUserClick(e, args)
       {
          var userid = args[1].username;
-         
          YAHOO.util.History.multiNavigate({panel: "view", userid: userid});
       },
       
@@ -1016,7 +1202,11 @@
       {
          // return to the search screen - we can no longer view the user details
          this.popups.deleteDialog.hide();
-         YAHOO.util.History.multiNavigate({panel: "search", "search": this.searchTerm});
+         Alfresco.util.PopupManager.displayMessage(
+         {
+            text: this._msg("message.delete-success")
+         });
+         YAHOO.util.History.navigate("panel", "search");
       },
       
       /**
@@ -1028,6 +1218,106 @@
       onDeleteUserCancel: function ConsoleUsers_onDeleteUserCancel(e)
       {
          this.popups.deleteDialog.hide();
+      },
+      
+      /**
+       * Fired when the Create User OK button is clicked.
+       *
+       * @method onCreateUserOKClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onCreateUserOKClick: function ConsoleUsers_onCreateUserOKClick(e, args)
+      {
+         // TODO: mandatory field check against button enabled state
+         // TODO: verify password against second
+         
+         var me = this;
+         var fnGetter = function(id)
+         {
+            return Dom.get(me.id + id).value;
+         };
+         
+         var createSuccess = function(res)
+         {
+            var passwordSuccess = function(res)
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this._msg("message.create-success")
+               });
+               YAHOO.util.History.navigate("panel", "search");
+            };
+            
+            var passwordObj =
+            {
+               newpw: fnGetter("-create-password")
+            };
+            
+            // set the given password for the user
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(this.currentUserId),
+               method: Alfresco.util.Ajax.POST,
+      	      dataObj: passwordObj,
+      	      requestContentType: Alfresco.util.Ajax.JSON,
+               successCallback:
+               {
+                  fn: passwordSuccess,
+                  scope: this
+               },
+               failureMessage: this._msg("message.password-failure")   
+            });
+         };
+         
+         // gather up the data for our JSON PUT request
+         var username = fnGetter("-create-username");
+         var personObj =
+         {
+            userName: username,
+            firstName: fnGetter("-create-firstname"),
+            lastName: fnGetter("-create-lastname"),
+            email: fnGetter("-create-email")
+            // TODO: add missing REST APIs for Quota etc.!!!
+         };
+         
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/people",
+            method: Alfresco.util.Ajax.POST,
+   	      dataObj: personObj,
+   	      requestContentType: Alfresco.util.Ajax.JSON,
+            successCallback:
+            {
+               fn: createSuccess,
+               scope: this
+            },
+            failureMessage: this._msg("message.create-failure")   
+         });
+      },
+      
+      /**
+       * Fired when the Create User and Create Another button is clicked.
+       *
+       * @method onCreateUserAnotherClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onCreateUserAnotherClick: function ConsoleUsers_onCreateUserAnotherClick(e, args)
+      {
+         
+      },
+      
+      /**
+       * Fired when the Create User Cancel button is clicked.
+       *
+       * @method onCreateUserCancelClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onCreateUserCancelClick: function ConsoleUsers_onCreateUserCancelClick(e, args)
+      {
+         YAHOO.util.History.navigate("panel", "search");
       },
       
       /**
@@ -1047,10 +1337,15 @@
          if (this.currentPanelId !== panelId)
          {
             this.currentPanelId = panelId;
+            var newPanel = null;
             for (var index in this.panels)
             {
                var panel = this.panels[index];
-               if (panel.id !== panelId)
+               if (panel.id === panelId)
+               {
+                  newPanel = panel;
+               }
+               else
                {
                   Dom.setStyle(this.id + "-" + panel.id, "display", "none");
                   
@@ -1059,14 +1354,17 @@
                }
             }
             
-            // Fire the onBeforeShow() panel lifecycle event
-            panel.onBeforeShow();
-            
-            // Display the specified panel to the user
-            Dom.setStyle(this.id + "-" + panelId, "display", "block");
-            
-            // Fire the onShow() panel lifecycle event
-            panel.onShow();
+            if (newPanel != null)
+            {
+               // Fire the onBeforeShow() panel lifecycle event
+               newPanel.onBeforeShow();
+               
+               // Display the specified panel to the user
+               Dom.setStyle(this.id + "-" + panelId, "display", "block");
+               
+               // Fire the onShow() panel lifecycle event
+               newPanel.onShow();
+            }
          }
       },
       
