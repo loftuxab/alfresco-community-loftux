@@ -622,10 +622,43 @@
       {
          onLoad: function onLoad()
          {
+            var validFields = [];
+            var onFieldKeyUp = function onFieldKeyUp(e)
+            {
+               validFields[this.id] = (this.value.length !== 0);
+               var valid = true;
+               for (var i in validFields)
+               {
+                  if (validFields[i] == false)
+                  {
+                     valid = false;
+                     break;
+                  }
+               }
+               parent.widgets.createuserOkButton.set("disabled", !valid);
+               parent.widgets.createuserAnotherButton.set("disabled", !valid);
+            };
+            
             // Buttons
             parent.widgets.createuserOkButton = Alfresco.util.createYUIButton(parent, "createuser-ok-button", parent.onCreateUserOKClick);
             parent.widgets.createuserAnotherButton = Alfresco.util.createYUIButton(parent, "createuser-another-button", parent.onCreateUserAnotherClick);
             parent.widgets.createuserCancelButton = Alfresco.util.createYUIButton(parent, "createuser-cancel-button", parent.onCreateUserCancelClick);
+            parent.widgets.createuserOkButton.set("disabled", true);
+            parent.widgets.createuserAnotherButton.set("disabled", true);
+            
+            // Event handlers for mandatory fields
+            validFields[parent.id + "-create-firstname"] = false;
+            Event.on(parent.id + "-create-firstname", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-create-lastname"] = false;
+            Event.on(parent.id + "-create-lastname", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-create-email"] = false;
+            Event.on(parent.id + "-create-email", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-create-username"] = false;
+            Event.on(parent.id + "-create-username", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-create-password"] = false;
+            Event.on(parent.id + "-create-password", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-create-verifypassword"] = false;
+            Event.on(parent.id + "-create-verifypassword", "keyup", onFieldKeyUp);
          },
          
          onBeforeShow: function onBeforeShow()
@@ -1229,71 +1262,15 @@
        */
       onCreateUserOKClick: function ConsoleUsers_onCreateUserOKClick(e, args)
       {
-         // TODO: mandatory field check against button enabled state
-         // TODO: verify password against second
-         
-         var me = this;
-         var fnGetter = function(id)
+         var handler = function(res)
          {
-            return Dom.get(me.id + id).value;
-         };
-         
-         var createSuccess = function(res)
-         {
-            var passwordSuccess = function(res)
+            Alfresco.util.PopupManager.displayMessage(
             {
-               Alfresco.util.PopupManager.displayMessage(
-               {
-                  text: this._msg("message.create-success")
-               });
-               YAHOO.util.History.navigate("panel", "search");
-            };
-            
-            var passwordObj =
-            {
-               newpw: fnGetter("-create-password")
-            };
-            
-            // set the given password for the user
-            Alfresco.util.Ajax.request(
-            {
-               url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(this.currentUserId),
-               method: Alfresco.util.Ajax.POST,
-      	      dataObj: passwordObj,
-      	      requestContentType: Alfresco.util.Ajax.JSON,
-               successCallback:
-               {
-                  fn: passwordSuccess,
-                  scope: this
-               },
-               failureMessage: this._msg("message.password-failure")   
+               text: this._msg("message.create-success")
             });
+            YAHOO.util.History.navigate("panel", "search");
          };
-         
-         // gather up the data for our JSON PUT request
-         var username = fnGetter("-create-username");
-         var personObj =
-         {
-            userName: username,
-            firstName: fnGetter("-create-firstname"),
-            lastName: fnGetter("-create-lastname"),
-            email: fnGetter("-create-email")
-            // TODO: add missing REST APIs for Quota etc.!!!
-         };
-         
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.PROXY_URI + "api/people",
-            method: Alfresco.util.Ajax.POST,
-   	      dataObj: personObj,
-   	      requestContentType: Alfresco.util.Ajax.JSON,
-            successCallback:
-            {
-               fn: createSuccess,
-               scope: this
-            },
-            failureMessage: this._msg("message.create-failure")   
-         });
+         this._createUser(handler);
       },
       
       /**
@@ -1305,7 +1282,17 @@
        */
       onCreateUserAnotherClick: function ConsoleUsers_onCreateUserAnotherClick(e, args)
       {
-         
+         var handler = function(res)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this._msg("message.create-success")
+            });
+            
+            window.scrollTo(0, 0);
+            Dom.get(this.id + "-create-firstname").focus();
+         };
+         this._createUser(handler);
       },
       
       /**
@@ -1323,6 +1310,99 @@
       /**
        * PRIVATE FUNCTIONS
        */
+      
+      /**
+       * Create a user - returning true on success, false on any error.
+       * 
+       * @method _createUser
+       * @private
+       */
+      _createUser: function ConsoleUsers__createUser(handler)
+      {
+         // TODO: verify password against second
+         
+         var me = this;
+         var fnGetter = function(id)
+         {
+            return Dom.get(me.id + id).value;
+         };
+         
+         var createSuccess = function(res)
+         {
+            var passwordObj =
+            {
+               newpw: fnGetter("-create-password")
+            };
+            
+            // set the given password for the user
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(username),
+               method: Alfresco.util.Ajax.POST,
+               dataObj: passwordObj,
+               requestContentType: Alfresco.util.Ajax.JSON,
+               successCallback:
+               {
+                  fn: handler,
+                  scope: me
+               },
+               failureMessage: me._msg("message.password-failure")   
+            });
+         };
+         
+         // gather up the data for our JSON PUT request
+         var username = fnGetter("-create-username");
+         var quota = -1;
+         var quotaValue = Dom.get(me.id + "-create-quota").value;
+         if (quotaValue.length !== 0)
+         {
+            // convert from giga/mega/kilo bytes
+            try
+            {
+               quota = parseInt(quotaValue);
+               var quotaType = Dom.get(me.id + "-create-quotatype").value;
+               if (quotaType === "gb")
+               {
+                  quota *= 1073741824;
+               }
+               else if (quotaType === "mb")
+               {
+                  quota *= 1048576;
+               }
+               else if (quotaType === "kb")
+               {
+                  quota *= 1024;
+               }
+            }
+            catch (e)
+            {
+               // ignore if we cannot parse quota field
+            }
+         }
+         var personObj =
+         {
+            userName: username,
+            firstName: fnGetter("-create-firstname"),
+            lastName: fnGetter("-create-lastname"),
+            email: fnGetter("-create-email"),
+            disableAccount: Dom.get(me.id + "-create-disableaccount").checked,
+            quota: quota
+         };
+         
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/people",
+            method: Alfresco.util.Ajax.POST,
+            dataObj: personObj,
+            requestContentType: Alfresco.util.Ajax.JSON,
+            successCallback:
+            {
+               fn: createSuccess,
+               scope: this
+            },
+            failureMessage: this._msg("message.create-failure")   
+         });
+      },
       
       /**
        * Make the specified panel visible - hiding any others and firing
