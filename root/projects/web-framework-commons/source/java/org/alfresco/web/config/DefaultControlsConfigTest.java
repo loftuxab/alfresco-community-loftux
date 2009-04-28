@@ -150,7 +150,7 @@ public class DefaultControlsConfigTest extends BaseTest
                 = (DefaultControlsConfigElement)basicElement.combine(parameterisedElement);
         
         assertEquals("path/textbox.ftl", combinedElem.getItems().get("text").getTemplate());
-        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getControlParams();
+        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getParams();
         assertEquals("Wrong count of control-params", 1, actualControlParams.size());
         assertEquals("A", actualControlParams.get(0).getName());
         assertEquals("1", actualControlParams.get(0).getValue());
@@ -179,7 +179,7 @@ public class DefaultControlsConfigTest extends BaseTest
                = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
 
         assertEquals("path/textbox.ftl", combinedElem.getItems().get("text").getTemplate());
-        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getControlParams();
+        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getParams();
         assertEquals("Wrong count of control-params", 1, actualControlParams.size());
         assertEquals("A", actualControlParams.get(0).getName());
         assertEquals("5", actualControlParams.get(0).getValue());
@@ -205,7 +205,7 @@ public class DefaultControlsConfigTest extends BaseTest
                = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
 
         assertEquals("path/textbox.ftl", combinedElem.getItems().get("text").getTemplate());
-        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getControlParams();
+        List<ControlParam> actualControlParams = combinedElem.getItems().get("text").getParams();
         assertEquals("Wrong count of control-params", 0, actualControlParams.size());
     }
 

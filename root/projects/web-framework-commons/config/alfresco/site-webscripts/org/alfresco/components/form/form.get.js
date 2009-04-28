@@ -515,7 +515,7 @@ function setupFieldControl(fieldDef, fieldConfig)
    // get control parameters for the default control (if there is one)
    if (defaultControlConfig !== null)
    {
-      var paramsConfig = defaultControlConfig.controlParams;
+      var paramsConfig = defaultControlConfig.params;
       for (var p = 0; p < paramsConfig.size(); p++)
       {
          control.params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
@@ -525,7 +525,7 @@ function setupFieldControl(fieldDef, fieldConfig)
    // get overridden control parameters (if there are any)
    if (fieldConfig !== null)
    {
-      var paramsConfig = fieldConfig.control.controlParams;
+      var paramsConfig = fieldConfig.control.params;
       for (var p = 0; p < paramsConfig.size(); p++)
       {
          control.params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
@@ -811,9 +811,9 @@ function createTransientField(fieldName, fieldConfig)
    fieldDef.control.template = fieldConfig.template;
    
    var params = {};
-   if (typeof fieldConfig.controlParams !== "undefined")
+   if (typeof fieldConfig.params !== "undefined")
    {
-      var paramsConfig = fieldConfig.controlParams;
+      var paramsConfig = fieldConfig.params;
       for (var p = 0; p < paramsConfig.size(); p++)
       {
          params[paramsConfig.get(p).name] = paramsConfig.get(p).value;

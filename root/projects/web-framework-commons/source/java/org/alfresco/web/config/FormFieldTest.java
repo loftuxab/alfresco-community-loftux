@@ -98,8 +98,8 @@ public class FormFieldTest extends TestCase
         List<ControlParam> expectedCPs = new ArrayList<ControlParam>();
         expectedCPs.add(new ControlParam("cp1", "CP1"));
         expectedCPs.add(new ControlParam("cp2", "CP2"));
-        assertEquals(expectedCPs, fieldID1.getControl().getControlParams());
-        assertEquals(Collections.emptyList(), fieldID2.getControl().getControlParams());
+        assertEquals(expectedCPs, fieldID1.getControl().getParams());
+        assertEquals(Collections.emptyList(), fieldID2.getControl().getParams());
     }
     
     public void testGetAttributesViaExplicitGetters()
@@ -133,7 +133,7 @@ public class FormFieldTest extends TestCase
         FormField recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
         assertEquals("Expected no template.", null, recoveredFce.getControl().getTemplate());
-        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControl().getControlParams());
+        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControl().getParams());
 
         fce = new FormConfigElement();
         fce.addField("id1", null, null);
@@ -141,7 +141,7 @@ public class FormFieldTest extends TestCase
         recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
         assertEquals("Expected no template.", null, recoveredFce.getControl().getTemplate());
-        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControl().getControlParams());
+        assertEquals("Expected no control params.", Collections.emptyList(), recoveredFce.getControl().getParams());
         assertEquals("Expected no constraint msg.", Collections.emptyMap(), recoveredFce.getConstraintDefinitionMap());
     }
     
@@ -152,7 +152,7 @@ public class FormFieldTest extends TestCase
         fce.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
                 Arrays.asList(new String[]{"CP1", "CP2", "CP3"}), null, null);
-        List<ControlParam> params = fce.getFields().get("id1").getControl().getControlParams();
+        List<ControlParam> params = fce.getFields().get("id1").getControl().getParams();
         assertEquals(2, params.size());
         List<ControlParam> expectedParams = new ArrayList<ControlParam>(2);
         expectedParams.add(new ControlParam("cp1", "CP1"));
@@ -185,8 +185,8 @@ public class FormFieldTest extends TestCase
         attrs2.put("label", "Name");
         attrs2.put("disabled", "true");
         FormField secondInstance = new FormField("name", attrs2);
-        secondInstance.setTemplate("test.ftl");
-        secondInstance.addControlParam("foo", "bar");
+        secondInstance.getControl().setTemplate("test.ftl");
+        secondInstance.getControl().addControlParam("foo", "bar");
         secondInstance.addConstraintDefinition("REGEX", "msg", "msg-id", null, null);
         
         FormField combinedField = firstInstance.combine(secondInstance);
@@ -225,16 +225,16 @@ public class FormFieldTest extends TestCase
         attrs1.put("label", "Name");
         attrs1.put("disabled", "true");
         FormField firstInstance = new FormField("name", attrs1);
-        firstInstance.setTemplate("test.ftl");
-        firstInstance.addControlParam("foo", "bar");
+        firstInstance.getControl().setTemplate("test.ftl");
+        firstInstance.getControl().addControlParam("foo", "bar");
         firstInstance.addConstraintDefinition("REGEX", "msg", "msg-id", null, null);
         
         Map<String, String> attrs2 = new LinkedHashMap<String, String>();
         attrs2.put("label", "Name");
         attrs2.put("disabled", "false");
         FormField secondInstance = new FormField("name", attrs2);
-        secondInstance.setTemplate("newtest.ftl");
-        secondInstance.addControlParam("foo", "barrr");
+        secondInstance.getControl().setTemplate("newtest.ftl");
+        secondInstance.getControl().addControlParam("foo", "barrr");
         secondInstance.addConstraintDefinition("REGEX", "newmsg", "newmsg-id", null, null);
         
         FormField combinedField = firstInstance.combine(secondInstance);

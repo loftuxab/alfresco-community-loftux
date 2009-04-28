@@ -112,7 +112,7 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
      * control defined on a field.
      */
     @Override
-    public void off_testGetDependenciesForFieldControl() throws Exception
+    public void testGetDependenciesForFieldControl() throws Exception
     {
         Control nameControl
             = myExampleDefaultForm.getFields().get("cm:name").getControl();
@@ -122,7 +122,13 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
         String[] expectedCssDependencies = new String[]{"/css/path/f1", "/css/path/f2/override"};
         String[] expectedJsDependencies = new String[]{"/js/path/f1/override", "/js/path/f2"};
 
-        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(nameControl.getCssDependencies()));
-        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(nameControl.getJsDependencies()));
+        final String[] actualCssDependencies = nameControl.getCssDependencies();
+        final String[] actualJsDependencies = nameControl.getJsDependencies();
+
+        assertNotNull(actualCssDependencies);
+        assertNotNull(actualJsDependencies);
+        
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(actualCssDependencies));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(actualJsDependencies));
     }
 }
