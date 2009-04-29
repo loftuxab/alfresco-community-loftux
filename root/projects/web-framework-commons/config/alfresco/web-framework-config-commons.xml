@@ -98,11 +98,13 @@
                <show id="app:editInline" />
                
                <!-- cm:emailed aspect -->
+               <!--
                <show id="cm:originator" />
                <show id="cm:addressee" />
                <show id="cm:addressees" />
                <show id="cm:sentdate" />
                <show id="cm:subjectline" />
+               -->
             </field-visibility>
             <appearance>
                <field id="mimetype">
@@ -111,11 +113,13 @@
                <field id="size">
                   <control template="controls/size.ftl" />
                </field>
+               <!--
                <field id="cm:originator" read-only="true" />
                <field id="cm:addressee" read-only="true" />
                <field id="cm:addressees" read-only="true" />
                <field id="cm:sentdate" read-only="true" />
                <field id="cm:subjectline" read-only="true" />
+               -->
             </appearance>
          </form>
          
