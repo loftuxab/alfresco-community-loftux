@@ -25,14 +25,14 @@
             <control-param name="showTime">true</control-param>
          </type>
          <type name="d:any" template="controls/textfield.ftl" />
-         <type name="association" template="controls/association.ftl" />
+         <type name="association" template="controls/experimental-association.ftl" />
          <!-- Data types that should always be rendered read-only -->
          <type name="d:content" template="controls/readonly.ftl" />
          <type name="d:qname" template="controls/readonly.ftl" />
          <type name="d:noderef" template="controls/readonly.ftl" />
-         <type name="d:category" template="controls/readonly.ftl" />
-         <type name="d:childassocref" template="controls/readonly.ftl" />
-         <type name="d:assocref" template="controls/readonly.ftl" />
+         <type name="d:category" template="controls/experimental-categories.ftl" />
+         <type name="d:childassocref" template="controls/experimental-association.ftl" />
+         <type name="d:assocref" template="controls/experimental-association.ftl" />
          <type name="d:path" template="controls/readonly.ftl" />
          <type name="d:locale" template="controls/readonly.ftl" />
       </default-controls>
@@ -56,6 +56,8 @@
                <show id="cm:description" force="true" />
                <show id="mimetype" />
                <show id="cm:author" force="true" />
+               <show id="cm:categories" />
+               <show id="cm:thumbnails" />
                <show id="size" for-mode="view" />
                <show id="cm:creator" for-mode="view" />
                <show id="cm:created" for-mode="view" />

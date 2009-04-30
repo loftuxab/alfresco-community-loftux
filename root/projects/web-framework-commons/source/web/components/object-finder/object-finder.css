@@ -1,147 +1,160 @@
-.object-finder
+.object-finder .current-values div
 {
-   color: #000;
-   margin: 0.6em 0 1.3em;
+   float: left;
+   padding: 0.5em;
 }
 
-.object-finder.list
+.object-finder .current-values img
 {
-   margin-bottom: 10px;
+   position: relative;
+   top: 2px;
 }
 
-.object-finder .finder-wrapper
+.object-finder .show-picker
 {
-	border: 1px solid #c0c0c0;
-	margin-top: 10px;
-	display: none;
+   clear: left;
 }
 
-.object-finder .results table
-{
-   width: 100%;
-   border: none;
-}
-
-.object-finder .results table thead
+.object-finder .picker
 {
    display: none;
+   width: 60em;
 }
 
-.object-finder .yui-dt td
+.object-finder .bd
 {
-   border-bottom: 1px dashed #D7D7D7;
-   border-right: medium none;
+   border: 2px solid #aaa;
+   padding: 0.5em;
 }
 
-.object-finder .yui-dt-last td
+.object-finder .bdft
 {
-   border-bottom: medium none;
+   margin-top: 1em;
+   text-align: center;
 }
 
-.object-finder tr.yui-dt-odd,
-.object-finder tr.yui-dt-even
+.object-finder .picker-header
 {
-   background-color: #ffffff;
-   cursor: auto;
+   height: 2em;
+   padding: 0.5em;
 }
 
-/**
- * If an element with "position: relative;" is used inside
- * another element with "overflow: scroll;" IE takes the inner element "out of
- * the flow" which makes statically positioned on the screen ignoring to be
- * hidden and following the scrollbar.
- *
- * In this component, position relative is used for the progress bars, but
- * a YUI button is also used which causes the same problem.
- *
- * If the outer element also has "position: relative;" it works though.
- */
-/*.object-finder .results .yui-dt-bd
-{
-   position:relative;
-}*/
-
-.object-finder .title
-{
-   color: #008000;
-   font-size: 108%;
-}
-
-.object-finder .search-bar
-{
-	border-bottom: 1px dashed #c0c0c0;
-   height: 2.4em;
-	padding: 0.5em;
-}
-
-.object-finder .search-bar div
+.object-finder .picker-header div
 {
    float: left;
 }
 
-.object-finder .search-text
+.object-finder .picker-header .folder-up button
 {
-   padding: 0.3em 1em 0.5em 0.5em;
+   background: transparent url(../images/up-arrow-16.png) no-repeat 50% 50%;
+}
+.object-finder .picker-header .folder-up .yui-button-disabled button
+{
+   background-image: url(../images/up-arrow-disabled-16.png);
 }
 
-.object-finder .search-text input
+.object-finder .picker-header .navigator span.wait
 {
-   width: 20em;
+   background-image: url(../images/ajax_anim.gif);
+   background-repeat: no-repeat;
+   padding: 1px 0 2px 16px;
 }
 
-.object-finder .search-button button
+.object-finder .picker-header .navigator button span.item-icon img
 {
-   background: transparent url(../images/search-16.png) no-repeat 12px 4px;
-   padding-left: 32px;
+   padding-right: 0.3em;
+   vertical-align: middle;
 }
 
-.object-finder .results
+.object-finder .picker-header .navigator button span.item-name
 {
-   clear: both;
-   background-color: #f6f9fc;
-   overflow-x: hidden;
-   overflow-y: auto;
-   position: relative !important;
 }
 
-/*.object-finder .itemname a
+.object-finder .picker-header .navigator .navigator-items-list .yuimenuitemlabel
 {
-   color: #276FB6;
-}
-*/
-.object-finder .detail
-{
-   line-height: 1.4em;
+   padding: 0.2em 12px;
 }
 
-.object-finder .detail span
+.object-finder .picker-header .navigator .navigator-items-list span.item-icon img
 {
-   color: #656565;
+   padding-right: 0.3em;
+   vertical-align: middle;
 }
 
-/* Compact Mode */
-.object-finder.compact div.title
+.object-finder .picker-header .navigator .navigator-items-list span.item-name
+{
+}
+
+.object-finder .picker-items
+{
+   border: 2px solid #aaa;
+   height: 20em;
+   overflow-y: scroll;
+}
+
+.object-finder .picker-items .icon32
+{
+   display: block;
+   min-height: 32px;
+}
+
+.object-finder .picker-items a.remove-item:hover
+{
+   text-decoration: none;
+}
+
+.object-finder .picker-items .removeIcon
+{
+	background: transparent url(../images/remove-icon-16.png) no-repeat center center;
+	padding: 8px;
+}
+
+
+.object-finder .picker-items table
+{
+   border: medium none;
+   width: 100%;
+}
+
+.object-finder .picker-items thead
 {
    display: none;
 }
 
-.object-finder.compact .search-text input
+.object-finder .picker-items.yui-dt .yui-dt-message td
 {
-   width: 14em;
-   margin: 0;
+   border: medium none;
 }
 
-.object-finder.compact .results
+.object-finder .picker-items.yui-dt .yui-dt-data td
 {
-   height: 160px;
+   border-bottom: 1px dashed #d9d9d9;
+   border-right: medium none;
+   vertical-align: top;
 }
 
-.object-finder.compact img.avatar
+.object-finder .panel-left,
+.object-finder .panel-right
 {
-   width: 32px;
+   
 }
 
-.object-finder.compact div.detail
+.object-finder .panel-left .picker-items
 {
-   display: inline;
+   clear: left;
+   margin-left: 0.5em;
+   margin-right: 6px;
+   overflow-x: hidden;
+}
+
+.object-finder .panel-right .picker-items
+{
+   clear: left;
+   margin-left: -5px;
+   margin-right: 0.5em;
+}
+
+.yui-skin-default .yui-panel .bd div.yui-u
+{
+   padding: 0;
 }
