@@ -51,8 +51,6 @@ public class FormConfigElement extends ConfigElementAdapter
     private static Log logger = LogFactory.getLog(FormConfigElement.class);
     
     public static final String FORM_NAME_ID = "form";
-    //TODO Need to decide on an id for the default set: "" or "default" or
-    //     "alfresco.default"
     public static final String DEFAULT_SET_ID = "";
     
     private String formId;
@@ -69,12 +67,16 @@ public class FormConfigElement extends ConfigElementAdapter
     
     public FormConfigElement()
     {
-        super(FORM_NAME_ID);
+        this(FORM_NAME_ID);
     }
 
     public FormConfigElement(String name)
     {
         super(name);
+        // There should always be a 'default set' for those fields which do not declare
+        // explicit membership of any set.
+        FormSet defaultSet = new FormSet(DEFAULT_SET_ID, null, null);
+        this.sets.put(DEFAULT_SET_ID, defaultSet);
     }
 
     /**
@@ -234,7 +236,7 @@ public class FormConfigElement extends ConfigElementAdapter
             String nextKey = iter.next();
             FormSet nextSet = sets.get(nextKey);
             String nextParentID = nextSet.getParentId();
-            if (nextParentID == null || nextParentID.trim().length() == 0)
+            if (nextParentID == null)
             {
                 result.put(nextKey, nextSet);
             }
@@ -428,9 +430,26 @@ public class FormConfigElement extends ConfigElementAdapter
      * @param m a mode.
      * @return
      */
-    // TODO This method not available to JS.
     public boolean isFieldVisible(String fieldId, Mode m)
     {
+        return fieldVisibilityManager.isFieldVisible(fieldId, m);
+    }
+
+    /**
+     * This method checks whether the specified field is visible in the specified mode.
+     * This is added as a convenience for JavaScript clients.
+     * 
+     * @param fieldId
+     * @param modeString
+     * @return
+     * @see #isFieldVisible(String, Mode)
+     */
+    public boolean isFieldVisibleInMode(String fieldId, String modeString)
+    {
+        // Note. We cannot have the same method name as isFieldVisible(String, Mode)
+        // as this is intended for use by JavaScript clients where method overloading
+        // is not supported.
+        Mode m = Mode.modeFromString(modeString);
         return fieldVisibilityManager.isFieldVisible(fieldId, m);
     }
     
@@ -472,7 +491,6 @@ public class FormConfigElement extends ConfigElementAdapter
         this.submissionURL = newURL;
     }
     
-    //TODO Where is this called? Wouldn't 3 setters be neater?
     /* package */void setFormTemplate(String nodeName, String newTemplate)
     {
         if (nodeName.equals("create-form"))
@@ -517,7 +535,6 @@ public class FormConfigElement extends ConfigElementAdapter
         // The reason for this is to ensure that cycles within the parent structure
         // are not possible.
         if (parentSetId != null &&
-                parentSetId.trim().length() != 0 &&
                 !sets.containsKey(parentSetId))
         {
             StringBuilder errorMsg = new StringBuilder();
@@ -539,7 +556,7 @@ public class FormConfigElement extends ConfigElementAdapter
         sets.put(setId, newFormSetObject);
         
         // Set parent/child references
-        if (parentSetId != null && parentSetId.trim().length() != 0)
+        if (parentSetId != null)
         {
             FormSet parentObject = sets.get(parentSetId);
             

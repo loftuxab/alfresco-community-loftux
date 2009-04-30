@@ -25,6 +25,7 @@
 package org.alfresco.web.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +53,7 @@ public class FormConfigTest extends BaseTest
     protected ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
     protected FormsConfigElement formsConfigElement;
-    protected FormConfigElement defaultFormConfigElement;
+    protected FormConfigElement defaultFormInContent;
     protected DefaultControlsConfigElement defltCtrlsConfElement;
 
     protected String getConfigXmlFile()
@@ -63,57 +64,78 @@ public class FormConfigTest extends BaseTest
     public void testFormSubmissionUrl()
     {
         assertEquals("Submission URL was incorrect.", "submission/url",
-                defaultFormConfigElement.getSubmissionURL());
+                defaultFormInContent.getSubmissionURL());
     }
     
     public void testGetFormTemplates()
     {
         assertEquals("Incorrect template.","/create/template",
-        		defaultFormConfigElement.getFormTemplate(Mode.CREATE));
+        		defaultFormInContent.getFormTemplate(Mode.CREATE));
     }
 
     public void testGetFormFieldVisibilitiesForModes()
     {
-        assertTrue("Field 'name' should be visible.", defaultFormConfigElement
+        assertTrue("Field 'name' should be visible.", defaultFormInContent
                 .isFieldVisible("name", Mode.CREATE));
-        assertTrue("Field 'title' should be visible.", defaultFormConfigElement
+        assertTrue("Field 'title' should be visible.", defaultFormInContent
                 .isFieldVisible("title", Mode.CREATE));
-        assertFalse("Field 'rubbish' should be invisible.", defaultFormConfigElement
+        assertFalse("Field 'rubbish' should be invisible.", defaultFormInContent
                 .isFieldVisible("rubbish", Mode.CREATE));
 
-        assertTrue("Field 'name' should be visible.", defaultFormConfigElement
+        assertTrue("Field 'name' should be visible.", defaultFormInContent
                 .isFieldVisible("name", Mode.EDIT));
-        assertFalse("Field 'title' should be invisible.", defaultFormConfigElement
+        assertFalse("Field 'title' should be invisible.", defaultFormInContent
                 .isFieldVisible("title", Mode.EDIT));
-        assertFalse("Field 'rubbish' should be invisible.", defaultFormConfigElement
+        assertFalse("Field 'rubbish' should be invisible.", defaultFormInContent
                 .isFieldVisible("rubbish", Mode.EDIT));
 
-        assertTrue("Field 'name' should be visible.", defaultFormConfigElement
+        assertTrue("Field 'name' should be visible.", defaultFormInContent
                 .isFieldVisible("name", Mode.VIEW));
-        assertTrue("Field 'title' should be visible.", defaultFormConfigElement
+        assertTrue("Field 'title' should be visible.", defaultFormInContent
                 .isFieldVisible("title", Mode.VIEW));
-        assertFalse("Field 'rubbish' should be invisible.", defaultFormConfigElement
+        assertFalse("Field 'rubbish' should be invisible.", defaultFormInContent
                 .isFieldVisible("rubbish", Mode.VIEW));
     }
     
     public void testVisibleFieldsMustBeCorrectlyOrdered()
     {
-    	List<String> fieldNames = defaultFormConfigElement.getVisibleViewFieldNames();
+        FormConfigElement setForm = readSetMembershipFormFromConfig();
+
+        List<String> fieldNames = setForm.getVisibleViewFieldNames();
     	
     	List<String> expectedFieldNames = new ArrayList<String>();
-    	expectedFieldNames.add("name");
-    	expectedFieldNames.add("title");
+        expectedFieldNames.add("all");
+        expectedFieldNames.add("v");
+        expectedFieldNames.add("cev");
+        expectedFieldNames.add("all_set");
+        expectedFieldNames.add("v_set");
+        expectedFieldNames.add("cev_set");
     	assertEquals("Visible fields wrong.", expectedFieldNames, fieldNames);
+    }
+
+    private FormConfigElement readSetMembershipFormFromConfig()
+    {
+        Config setConfig = configService.getConfig("set_membership");
+        assertNotNull("setConfig was null.", setConfig);
+    
+        ConfigElement confElement = setConfig.getConfigElement("forms");
+        assertNotNull("confElement was null.", confElement);
+        assertTrue("confElement should be instanceof FormsConfigElement.",
+                confElement instanceof FormsConfigElement);
+        FormsConfigElement setFormsConfigElement = (FormsConfigElement) confElement;
+        FormConfigElement setForm = setFormsConfigElement.getDefaultForm();
+        return setForm;
     }
 
     public void testGetSetsFromForm()
     {
         Set<String> expectedSetIds = new HashSet<String>();
+        expectedSetIds.add(FormConfigElement.DEFAULT_SET_ID);
         expectedSetIds.add("details");
         expectedSetIds.add("user");
-        assertEquals("Set IDs were wrong.", expectedSetIds, defaultFormConfigElement.getSets().keySet());
+        assertEquals("Set IDs were wrong.", expectedSetIds, defaultFormInContent.getSets().keySet());
 
-        Map<String, FormSet> sets = defaultFormConfigElement.getSets();
+        Map<String, FormSet> sets = defaultFormInContent.getSets();
         assertEquals("Set parent was wrong.", "details", sets.get("user")
                 .getParentId());
         assertEquals("Set parent was wrong.", null, sets.get("details")
@@ -124,11 +146,59 @@ public class FormConfigTest extends BaseTest
         assertEquals("Set parent was wrong.", "panel", sets.get("user")
                 .getAppearance());
     }
+
+    /**
+     * This test method retrieves those fields which are visible or hidden for a
+     * particular mode and for the default set.
+     */
+    public void testGetFieldsInTheDefaultSet_ViewEditCreate()
+    {
+        FormConfigElement setForm = readSetMembershipFormFromConfig();
+
+        final String testSetId = FormConfigElement.DEFAULT_SET_ID;
+
+        String[] visibleViewFields_Create = setForm.getVisibleCreateFieldNamesForSet(testSetId);
+        String[] visibleViewFields_Edit = setForm.getVisibleEditFieldNamesForSet(testSetId);
+        String[] visibleViewFields_View = setForm.getVisibleViewFieldNamesForSet(testSetId);
+        
+        assertNotNull(visibleViewFields_Create);
+        assertNotNull(visibleViewFields_Edit);
+        assertNotNull(visibleViewFields_View);
+        
+        assertEquals(Arrays.asList(new String[]{"all", "c", "ce", "cev"}),
+                     Arrays.asList(visibleViewFields_Create));
+        assertEquals(Arrays.asList(new String[]{"all", "e", "ce", "cev"}),
+                     Arrays.asList(visibleViewFields_Edit));
+        assertEquals(Arrays.asList(new String[]{"all", "v", "cev"}),
+                     Arrays.asList(visibleViewFields_View));
+    }
+    
+    /**
+     * This test method retrieves those fields which are visible or hidden for a
+     * particular mode and for a non-default set.
+     */
+    public void testGetFieldsInASet_ViewEditCreate()
+    {
+        FormConfigElement setForm = readSetMembershipFormFromConfig();
+
+        final String testSetId = "user";
+
+        String[] visibleViewFields_Create = setForm.getVisibleCreateFieldNamesForSet(testSetId);
+        String[] visibleViewFields_Edit = setForm.getVisibleEditFieldNamesForSet(testSetId);
+        String[] visibleViewFields_View = setForm.getVisibleViewFieldNamesForSet(testSetId);
+
+        assertEquals(Arrays.asList(visibleViewFields_Create),
+                Arrays.asList(new String[]{"all_set", "c_set", "ce_set", "cev_set"}));
+        assertEquals(Arrays.asList(visibleViewFields_Edit),
+                Arrays.asList(new String[]{"all_set", "e_set", "ce_set", "cev_set"}));
+        assertEquals(Arrays.asList(visibleViewFields_View),
+                Arrays.asList(new String[]{"all_set", "v_set", "cev_set"}));
+    }
     
     public void testAccessAllFieldRelatedData()
     {
         // Field checks
-        Map<String, FormField> fields = defaultFormConfigElement.getFields();
+        Map<String, FormField> fields = defaultFormInContent.getFields();
         assertEquals("Wrong number of Fields.", 5, fields.size());
 
         FormField usernameField = fields.get("username");
@@ -169,7 +239,7 @@ public class FormConfigTest extends BaseTest
     public void testControlParamSequenceThatIncludesValuelessParamsParsesCorrectly()
     {
         // Field checks
-        Map<String, FormField> fields = defaultFormConfigElement.getFields();
+        Map<String, FormField> fields = defaultFormInContent.getFields();
 
         FormField testField = fields.get("fieldWithMixedCtrlParams");
 
@@ -189,20 +259,18 @@ public class FormConfigTest extends BaseTest
     
     public void testFormsShouldSupportMultipleConstraintMessageTags()
     {
-    	FormField nameField = defaultFormConfigElement.getFields().get("name");
+    	FormField nameField = defaultFormInContent.getFields().get("name");
     	Map<String, ConstraintHandlerDefinition> constraintDefinitions = nameField.getConstraintDefinitionMap();
-		assertEquals(3, constraintDefinitions.size());
+		assertEquals(2, constraintDefinitions.size());
     	
 		Iterator<ConstraintHandlerDefinition> valuesIterator = constraintDefinitions.values().iterator();
     	ConstraintHandlerDefinition regexField = valuesIterator.next();
     	ConstraintHandlerDefinition applesField = valuesIterator.next();
-    	ConstraintHandlerDefinition orangesField = valuesIterator.next();
 
     	assertEquals("REGEX", regexField.getType());
-    	assertEquals("apples", applesField.getType());
-    	assertEquals("oranges", orangesField.getType());
+    	assertEquals("LIMIT", applesField.getType());
     	
-    	assertEquals("Pink Lady", applesField.getMessage());
+    	assertEquals("limit exceeded", applesField.getMessage());
     	assertEquals("", applesField.getMessageId());
     }
     
@@ -210,7 +278,7 @@ public class FormConfigTest extends BaseTest
     {
         try
         {
-            defaultFormConfigElement.getChildren();
+            defaultFormInContent.getChildren();
             fail("getChildren() did not throw an exception.");
         } catch (ConfigException expectedException)
         {
@@ -236,7 +304,7 @@ public class FormConfigTest extends BaseTest
         assertTrue("confElement should be instanceof FormsConfigElement.",
                 confElement instanceof FormsConfigElement);
         formsConfigElement = (FormsConfigElement) confElement;
-        defaultFormConfigElement = formsConfigElement.getDefaultForm();
+        defaultFormInContent = formsConfigElement.getDefaultForm();
     
         globalConfig = configService.getGlobalConfig();
     

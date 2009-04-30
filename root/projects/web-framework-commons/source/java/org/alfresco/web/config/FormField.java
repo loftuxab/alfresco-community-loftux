@@ -146,7 +146,15 @@ public class FormField
     
     public String getSet()
     {
-    	return attributes.get(ATTR_SET);
+    	final String setId = attributes.get(ATTR_SET);
+    	if (setId != null)
+    	{
+    	    return setId;
+    	}
+    	else
+    	{
+    	    return FormConfigElement.DEFAULT_SET_ID;
+    	}
     }
     
     public String getHelpText()

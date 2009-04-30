@@ -194,7 +194,7 @@ public class FormFieldTest extends TestCase
         assertEquals("name", combinedField.getId());
         assertEquals("Name", combinedField.getLabel());
         assertEquals(null, combinedField.getLabelId());
-        assertEquals(null, combinedField.getSet());
+        assertEquals(FormConfigElement.DEFAULT_SET_ID, combinedField.getSet());
         assertEquals(null, combinedField.getHelpText());
         assertEquals(null, combinedField.getHelpTextId());
     }
@@ -242,7 +242,7 @@ public class FormFieldTest extends TestCase
         assertEquals("name", combinedField.getId());
         assertEquals("Name", combinedField.getLabel());
         assertEquals(null, combinedField.getLabelId());
-        assertEquals(null, combinedField.getSet());
+        assertEquals(FormConfigElement.DEFAULT_SET_ID, combinedField.getSet());
         assertEquals(null, combinedField.getHelpText());
         assertEquals(null, combinedField.getHelpTextId());
     }
