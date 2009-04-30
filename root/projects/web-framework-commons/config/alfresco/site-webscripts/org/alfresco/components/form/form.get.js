@@ -310,10 +310,10 @@ function setupCaches(formModel)
    }
    
    // get the default controls configuration
-   defaultControls = config.global["default-controls"];
+   defaultControls = config.global["forms"].defaultControls;
    
    // get the default constraint handlers configuration
-   defaultConstraintHandlers = config.global["constraint-handlers"];
+   defaultConstraintHandlers = config.global["forms"].constraintHandlers;
 }
 
 /**
@@ -481,7 +481,7 @@ function setupFieldControl(fieldDef, fieldConfig)
    }
    
    // see if the fieldConfig already has a template defined, if not 
-   // retrive the default template for the field's data type
+   // retrieve the default template for the field's data type
    if (fieldConfig !== null && fieldConfig.control !== null && fieldConfig.control.template !== null)
    {
       control.template = fieldConfig.control.template;
