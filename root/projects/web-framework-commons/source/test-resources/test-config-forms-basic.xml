@@ -1,44 +1,44 @@
 <alfresco-config>
    <plug-ins>
       <element-readers>
-         <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
-         <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
          <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 
    <config>
-      <default-controls>
-         <type name="d:long" template="/form-controls/mytextfield.ftl" />
-         <type name="d:text" template="/form-controls/mytextfield.ftl">
-            <control-param name="size">50</control-param>
-         </type>
-         <type name="d:test" template="/form-controls/test.ftl">
-            <!-- These dependencies are CSS, JS resources needed by this control. -->
-            <dependencies>
-                <css src="/css/path/1" />
-                <css src="/css/path/2" />
-                <js src="/js/path/1" />
-                <js src="/js/path/2" />
-            </dependencies>
-            <control-param name="a">Hello</control-param>
-            <control-param name="b"></control-param>
-         </type>
-         <type name="d:boolean" template="/form-controls/checkbox.ftl" />
-         <type name="association" template="/form-controls/association-picker.ftl" />
-         <type name="abc" template="/form-controls/abc.ftl">
-            <control-param name="a">1</control-param>
-            <control-param name="b">Hello</control-param>
-            <control-param name="c">For ever and ever.</control-param>
-            <control-param name="d"></control-param>
-         </type>
-      </default-controls>
-      <constraint-handlers>
-         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
-         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
-         <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
-                     message="Test Message" message-id="regex_error" />
-      </constraint-handlers>
+      <forms>
+	      <default-controls>
+	         <type name="d:long" template="/form-controls/mytextfield.ftl" />
+	         <type name="d:text" template="/form-controls/mytextfield.ftl" >
+	            <control-param name="size">50</control-param>
+	         </type>
+	         <type name="d:test" template="/form-controls/test.ftl">
+	            <control-param name="a">Hello</control-param>
+	            <control-param name="b"></control-param>
+	         </type>
+	         <type name="d:boolean" template="/form-controls/checkbox.ftl" />
+	         <type name="association" template="/form-controls/association-picker.ftl" />
+	         <type name="abc" template="/form-controls/abc.ftl">
+	            <control-param name="a">1</control-param>
+	            <control-param name="b">Hello</control-param>
+	            <control-param name="c">For ever and ever.</control-param>
+	            <control-param name="d"></control-param>
+	         </type>
+	      </default-controls>
+	      <constraint-handlers>
+	         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
+	         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
+	         <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
+	                     message="Test Message" message-id="regex_error" />
+	      </constraint-handlers>
+          <!-- These dependencies are CSS, JS resources needed by the controls. -->
+          <dependencies>
+              <css src="/css/path/1" />
+              <css src="/css/path/2" />
+              <js src="/js/path/1" />
+              <js src="/js/path/2" />
+          </dependencies>
+      </forms>
    </config>
    
    <config evaluator="string-compare" condition="my:example">
@@ -55,15 +55,7 @@
              </field-visibility>
              <appearance>
                 <field id="cm:name">
-                   <control template="/form-controls/mytextfield.ftl" >
-		                <!-- These dependencies are CSS, JS resources needed by this control. -->
-		                <dependencies>
-		                    <css src="/css/path/f1" />
-		                    <css src="/css/path/f2" />
-		                    <js src="/js/path/f1" />
-		                    <js src="/js/path/f2" />
-		                </dependencies>
-		           </control>
+                   <control template="/form-controls/mytextfield.ftl" />
                    <constraint-handlers>
                        <constraint type="REGEX" message="You can't have these characters in a name: /*"
                                        validation-handler="Alfresco.forms.validation.regexMatch"/>

@@ -95,6 +95,11 @@ public class FormConfigElement extends ConfigElementAdapter
     @Override
     public ConfigElement combine(ConfigElement otherConfigElement)
     {
+        if (otherConfigElement == null)
+        {
+            return this;
+        }
+        
         FormConfigElement otherFormElem = (FormConfigElement)otherConfigElement;
         FormConfigElement result = new FormConfigElement();
         
@@ -225,8 +230,11 @@ public class FormConfigElement extends ConfigElementAdapter
     
     /**
      * This method returns a Map of those &lt;set&gt;s which have no declared parentID
-     * i&#46;e&#46; those that are 'roots' in the tree of sets.
+     * i&#46;e&#46; those that are 'roots' in the tree of sets. Note that this map will
+     * always have at least one member; the default set.
+     * 
      * @return
+     * @see #DEFAULT_SET_ID
      */
     public Map<String, FormSet> getRootSets()
     {
@@ -608,8 +616,7 @@ public class FormConfigElement extends ConfigElementAdapter
     }
     
     /* package */ void addControlForField(String fieldId, String template,
-            List<String> controlParamNames, List<String> controlParamValues,
-            List<String> cssDeps, List<String> jsDeps)
+            List<String> controlParamNames, List<String> controlParamValues)
     {
         if (controlParamNames == null)
         {
@@ -640,8 +647,6 @@ public class FormConfigElement extends ConfigElementAdapter
             ControlParam cp = new ControlParam(controlParamNames.get(i), controlParamValues.get(i));
             field.getControl().addControlParam(cp);
         }
-        field.getControl().addCssDependencies(cssDeps);
-        field.getControl().addJsDependencies(jsDeps);
     }
     
     /* package */void addConstraintForField(String fieldId, String type,

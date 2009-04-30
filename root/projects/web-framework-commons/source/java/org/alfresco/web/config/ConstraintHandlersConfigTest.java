@@ -229,8 +229,9 @@ public class ConstraintHandlersConfigTest extends BaseTest
     
         globalConfig = configService.getGlobalConfig();
     
-        globalDefaultControls = globalConfig
-                .getConfigElement("default-controls");
+        FormsConfigElement globalForms = (FormsConfigElement)globalConfig.getConfigElement("forms");
+        
+        globalDefaultControls = globalForms.getDefaultControls();
         assertNotNull("global default-controls element should not be null",
                 globalDefaultControls);
         assertTrue(
@@ -238,8 +239,7 @@ public class ConstraintHandlersConfigTest extends BaseTest
                 (globalDefaultControls instanceof DefaultControlsConfigElement));
         defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
     
-        globalConstraintHandlers = globalConfig
-                .getConfigElement("constraint-handlers");
+        globalConstraintHandlers = globalForms.getConstraintHandlers();
         assertNotNull("global constraint-handlers element should not be null",
                 globalConstraintHandlers);
         assertTrue(

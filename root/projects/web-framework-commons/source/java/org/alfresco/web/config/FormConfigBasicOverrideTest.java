@@ -84,51 +84,22 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
     }
 
     /**
-     * This test checks that the expected JS and CSS resources are available for a
-     * default-control.
+     * This test checks that the expected JS and CSS resources are available.
      */
     @Override
-    public void testGetDependenciesForDefaultControl() throws Exception
+    public void testGetDependencies() throws Exception
     {
-        DefaultControlsConfigElement defaultControls
-                = (DefaultControlsConfigElement)globalDefaultControls;
-        
-        Map<String, Control> defCtrlItems = defaultControls.getItems();
-        
-        Control testItem = defCtrlItems.get("d:test");
-        assertNotNull(testItem);
+        FormsConfigElement globalForms = (FormsConfigElement)globalConfig.getConfigElement("forms");
+
+        DependenciesConfigElement depsCE = globalForms.getDependencies();
+        assertNotNull(depsCE);
         
         // We want the dependencies as arrays as these are more JS-friendly than
         // Lists, but I'll compare the expected values as Lists.
         String[] expectedCssDependencies = new String[]{"/css/path/1/override", "/css/path/2"};
         String[] expectedJsDependencies = new String[]{"/js/path/1", "/js/path/2/override"};
 
-        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(testItem.getCssDependencies()));
-        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(testItem.getJsDependencies()));
-    }
-
-    /**
-     * This test checks that the expected JS and CSS resources are available for a
-     * control defined on a field.
-     */
-    @Override
-    public void testGetDependenciesForFieldControl() throws Exception
-    {
-        Control nameControl
-            = myExampleDefaultForm.getFields().get("cm:name").getControl();
-        
-        // We want the dependencies as arrays as these are more JS-friendly than
-        // Lists, but I'll compare the expected values as Lists.
-        String[] expectedCssDependencies = new String[]{"/css/path/f1", "/css/path/f2/override"};
-        String[] expectedJsDependencies = new String[]{"/js/path/f1/override", "/js/path/f2"};
-
-        final String[] actualCssDependencies = nameControl.getCssDependencies();
-        final String[] actualJsDependencies = nameControl.getJsDependencies();
-
-        assertNotNull(actualCssDependencies);
-        assertNotNull(actualJsDependencies);
-        
-        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(actualCssDependencies));
-        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(actualJsDependencies));
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(depsCE.getCss()));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(depsCE.getJs()));
     }
 }

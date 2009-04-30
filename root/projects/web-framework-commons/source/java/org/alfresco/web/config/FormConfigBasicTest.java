@@ -139,15 +139,15 @@ public class FormConfigBasicTest extends BaseTest
         
         globalConfig = configService.getGlobalConfig();
     
-        globalDefaultControls = globalConfig.getConfigElement("default-controls");
+        FormsConfigElement globalForms = (FormsConfigElement)globalConfig.getConfigElement("forms");
+        globalDefaultControls = globalForms.getDefaultControls();
         assertNotNull("global default-controls element should not be null",
                 globalDefaultControls);
         assertTrue("config element should be an instance of DefaultControlsConfigElement",
                 (globalDefaultControls instanceof DefaultControlsConfigElement));
         defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
     
-        globalConstraintHandlers = globalConfig
-                .getConfigElement("constraint-handlers");
+        globalConstraintHandlers = globalForms.getConstraintHandlers();
         assertNotNull("global constraint-handlers element should not be null",
                 globalConstraintHandlers);
         assertTrue(
@@ -465,71 +465,21 @@ public class FormConfigBasicTest extends BaseTest
     }
 
     /**
-     * This test checks that the expected JS and CSS resources are available for a
-     * default-control.
+     * This test checks that the expected JS and CSS resources are available.
      */
-    public void testGetDependenciesForDefaultControl() throws Exception
+    public void testGetDependencies() throws Exception
     {
-        DefaultControlsConfigElement defaultControls
-                = (DefaultControlsConfigElement)globalDefaultControls;
+        FormsConfigElement globalForms = (FormsConfigElement)globalConfig.getConfigElement("forms");
         
-        Map<String, Control> defCtrlItems = defaultControls.getItems();
-        
-        Control testItem = defCtrlItems.get("d:test");
-        assertNotNull(testItem);
-        
+        DependenciesConfigElement depsCE = globalForms.getDependencies();
+        assertNotNull(depsCE);
+
         // We want the dependencies as arrays as these are more JS-friendly than
         // Lists, but I'll compare the expected values as Lists.
         String[] expectedCssDependencies = new String[]{"/css/path/1", "/css/path/2"};
         String[] expectedJsDependencies = new String[]{"/js/path/1", "/js/path/2"};
 
-        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(testItem.getCssDependencies()));
-        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(testItem.getJsDependencies()));
-    }
-
-    /**
-     * This test checks that the expected JS and CSS resources are available for a
-     * control defined on a field.
-     */
-    public void testGetDependenciesForFieldControl() throws Exception
-    {
-        Control nameControl
-            = myExampleDefaultForm.getFields().get("cm:name").getControl();
-        
-        // We want the dependencies as arrays as these are more JS-friendly than
-        // Lists, but I'll compare the expected values as Lists.
-        String[] expectedCssDependencies = new String[]{"/css/path/f1", "/css/path/f2"};
-        String[] expectedJsDependencies = new String[]{"/js/path/f1", "/js/path/f2"};
-
-        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(nameControl.getCssDependencies()));
-        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(nameControl.getJsDependencies()));
-    }
-
-    /**
-     * This test checks that the code behaves correctly when there are no
-     * dependencies on a default-control.
-     */
-    public void testGetDependenciesForDefaultControl_Negative() throws Exception
-    {
-        DefaultControlsConfigElement defaultControls = (DefaultControlsConfigElement) globalDefaultControls;
-        Map<String, Control> defCtrlItems = defaultControls.getItems();
-
-        Control testItem = defCtrlItems.get("d:boolean");
-        assertNotNull(testItem);
-
-        assertNull(testItem.getCssDependencies());
-        assertNull(testItem.getJsDependencies());
-    }
-
-    /**
-     * This test checks that the code behaves correctly when there are no
-     * dependencies for a control defined on a field.
-     */
-    public void testGetDependenciesForFieldControl_Negative() throws Exception
-    {
-        Control myTextControl = myExampleDefaultForm.getFields().get("my:text").getControl();
-
-        assertNull(myTextControl.getCssDependencies());
-        assertNull(myTextControl.getJsDependencies());
+        assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(depsCE.getCss()));
+        assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(depsCE.getJs()));
     }
 }

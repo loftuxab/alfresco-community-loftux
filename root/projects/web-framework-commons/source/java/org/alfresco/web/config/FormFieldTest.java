@@ -50,12 +50,12 @@ public class FormFieldTest extends TestCase
         testElement.addConstraintForField("id1", "REGEX", "Test message", "Test msg ID", null, null);
         testElement.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
-                Arrays.asList(new String[]{"CP1", "CP2"}), null, null);
+                Arrays.asList(new String[]{"CP1", "CP2"}));
         
         testElement.addField("id2",
                 Arrays.asList(new String[]{"xx", "yy", "zz"}),
                 Arrays.asList(new String[]{"XX", "YY", "ZZ"}));
-        testElement.addControlForField("id2", "test2.ftl", null, null, null, null);
+        testElement.addControlForField("id2", "test2.ftl", null, null);
 
         Map<String, FormField> fields = testElement.getFields();
         assertNotNull(fields);
@@ -128,7 +128,7 @@ public class FormFieldTest extends TestCase
         FormConfigElement fce = new FormConfigElement();
         fce.addField("id1", null, null);
         fce.addConstraintForField("id1", "REGEX", null, null, null, null);
-        fce.addControlForField("id1", null, null, null, null, null);
+        fce.addControlForField("id1", null, null, null);
         
         FormField recoveredFce = fce.getFields().get("id1");
         assertEquals("Expected no attributes.", Collections.emptyMap(), recoveredFce.getAttributes());
@@ -151,7 +151,7 @@ public class FormFieldTest extends TestCase
         fce.addField("id1", null, null);
         fce.addControlForField("id1", "test1.ftl",
                 Arrays.asList(new String[]{"cp1", "cp2"}),
-                Arrays.asList(new String[]{"CP1", "CP2", "CP3"}), null, null);
+                Arrays.asList(new String[]{"CP1", "CP2", "CP3"}));
         List<ControlParam> params = fce.getFields().get("id1").getControl().getParams();
         assertEquals(2, params.size());
         List<ControlParam> expectedParams = new ArrayList<ControlParam>(2);

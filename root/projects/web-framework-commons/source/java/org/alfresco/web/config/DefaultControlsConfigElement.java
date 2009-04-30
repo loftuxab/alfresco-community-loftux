@@ -83,6 +83,10 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
     @Override
     public ConfigElement combine(ConfigElement configElement)
     {
+        if (configElement == null)
+        {
+            return this;
+        }
         // There is an assumption here that it is only like-with-like combinations
         // that are allowed. i.e. Only an instance of a DefaultControlsConfigElement
         // can be combined with this.
@@ -96,20 +100,13 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             Control nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
                     .get(nextDataType);
             List<ControlParam> nextControlParams = null;
-            List<String> cssDeps = null;
-            List<String> jsDeps = null;
             if (nextDefaultControls != null)
             {
                 nextControlParams = nextDefaultControls.getParams();
-
-                final String[] cssDepsArray = nextDefaultControls.getCssDependencies();
-                final String[] jsDepsArray = nextDefaultControls.getJsDependencies();
-                cssDeps = cssDepsArray == null ? null : Arrays.asList(cssDepsArray);
-                jsDeps = jsDepsArray == null ? null : Arrays.asList(jsDepsArray);
             }
             
             result.addDataMapping(nextDataType, nextTemplate,
-                            nextControlParams, cssDeps, jsDeps);
+                            nextControlParams);
         }
 
         for (String nextDataType : otherDCCElement.datatypeDefCtrlMappings.keySet())
@@ -118,27 +115,20 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             Control nextDefaultControls = otherDCCElement.datatypeDefCtrlMappings
                     .get(nextDataType);
             List<ControlParam> nextControlParams = null;
-            List<String> cssDeps = null;
-            List<String> jsDeps = null;
             if (nextDefaultControls != null)
             {
                 nextControlParams = nextDefaultControls.getParams();
-                
-                final String[] cssDepsArray = nextDefaultControls.getCssDependencies();
-                final String[] jsDepsArray = nextDefaultControls.getJsDependencies();
-                cssDeps = cssDepsArray == null ? null : Arrays.asList(cssDepsArray);
-                jsDeps = jsDepsArray == null ? null : Arrays.asList(jsDepsArray);
             }
             
             result.addDataMapping(nextDataType, nextTemplate,
-                            nextControlParams, cssDeps, jsDeps);
+                            nextControlParams);
         }
 
         return result;
     }
 
     /* package */void addDataMapping(String dataType, String template,
-            List<ControlParam> parameters, List<String> cssDeps, List<String> jsDeps)
+            List<ControlParam> parameters)
     {
         if (parameters == null)
         {
@@ -149,8 +139,6 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         {
             newControl.addControlParam(p);
         }
-        newControl.addCssDependencies(cssDeps);
-        newControl.addJsDependencies(jsDeps);
         this.datatypeDefCtrlMappings.put(dataType, newControl);
     }
     

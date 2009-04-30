@@ -2,8 +2,6 @@
 
    <plug-ins>
       <element-readers>
-         <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
-         <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
          <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
       <evaluators>
@@ -12,38 +10,40 @@
    </plug-ins>
    
    <config>
-      <default-controls>
-         <type name="d:text" template="controls/textfield.ftl" />
-         <type name="d:mltext" template="controls/textarea.ftl" />
-         <type name="d:int" template="controls/textfield.ftl" />
-         <type name="d:float" template="controls/textfield.ftl" />
-         <type name="d:double" template="controls/textfield.ftl" />
-         <type name="d:long" template="controls/textfield.ftl" />
-         <type name="d:boolean" template="controls/checkbox.ftl" />
-         <type name="d:date" template="controls/date.ftl" />
-         <type name="d:datetime" template="controls/date.ftl">
-            <control-param name="showTime">true</control-param>
-         </type>
-         <type name="d:any" template="controls/textfield.ftl" />
-         <type name="association" template="controls/experimental-association.ftl" />
-         <!-- Data types that should always be rendered read-only -->
-         <type name="d:content" template="controls/readonly.ftl" />
-         <type name="d:qname" template="controls/readonly.ftl" />
-         <type name="d:noderef" template="controls/readonly.ftl" />
-         <type name="d:category" template="controls/experimental-categories.ftl" />
-         <type name="d:childassocref" template="controls/experimental-association.ftl" />
-         <type name="d:assocref" template="controls/experimental-association.ftl" />
-         <type name="d:path" template="controls/readonly.ftl" />
-         <type name="d:locale" template="controls/readonly.ftl" />
-      </default-controls>
-      <constraint-handlers>
-         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
-         <constraint type="NUMBER" validation-handler="Alfresco.forms.validation.number" event="keyup" />
-         <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
-         <constraint type="LIST" validation-handler="Alfresco.forms.validation.inList" event="blur" />
-         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup" />
-         <constraint type="LENGTH" validation-handler="Alfresco.forms.validation.length" event="keyup" />
-      </constraint-handlers>
+      <forms>
+	      <default-controls>
+	         <type name="d:text" template="controls/textfield.ftl" />
+	         <type name="d:mltext" template="controls/textarea.ftl" />
+	         <type name="d:int" template="controls/textfield.ftl" />
+	         <type name="d:float" template="controls/textfield.ftl" />
+	         <type name="d:double" template="controls/textfield.ftl" />
+	         <type name="d:long" template="controls/textfield.ftl" />
+	         <type name="d:boolean" template="controls/checkbox.ftl" />
+	         <type name="d:date" template="controls/date.ftl" />
+	         <type name="d:datetime" template="controls/date.ftl">
+	            <control-param name="showTime">true</control-param>
+	         </type>
+	         <type name="d:any" template="controls/textfield.ftl" />
+	         <type name="association" template="controls/experimental-association.ftl" />
+	         <!-- Data types that should always be rendered read-only -->
+	         <type name="d:content" template="controls/readonly.ftl" />
+	         <type name="d:qname" template="controls/readonly.ftl" />
+	         <type name="d:noderef" template="controls/readonly.ftl" />
+	         <type name="d:category" template="controls/experimental-categories.ftl" />
+	         <type name="d:childassocref" template="controls/experimental-association.ftl" />
+	         <type name="d:assocref" template="controls/experimental-association.ftl" />
+	         <type name="d:path" template="controls/readonly.ftl" />
+	         <type name="d:locale" template="controls/readonly.ftl" />
+	      </default-controls>
+	      <constraint-handlers>
+	         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
+	         <constraint type="NUMBER" validation-handler="Alfresco.forms.validation.number" event="keyup" />
+	         <constraint type="MINMAX" validation-handler="Alfresco.forms.validation.numberRange" event="keyup" />
+	         <constraint type="LIST" validation-handler="Alfresco.forms.validation.inList" event="blur" />
+	         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.repoRegexMatch" event="keyup" />
+	         <constraint type="LENGTH" validation-handler="Alfresco.forms.validation.length" event="keyup" />
+	      </constraint-handlers>
+      </forms>
    </config>
    
    <!-- Default form configuration for the cm:content type -->
@@ -123,7 +123,6 @@
                -->
             </appearance>
          </form>
-         
       </forms>
    </config>
    
@@ -139,5 +138,4 @@
           </form>
       </forms>
    </config>
-
 </alfresco-config>

@@ -86,6 +86,10 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
     @Override
     public ConfigElement combine(ConfigElement configElement)
     {
+        if (configElement == null)
+        {
+            return this;
+        }
         // There is an assumption here that it is only like-with-like combinations
         // that are allowed. i.e. Only an instance of a ConstraintHandlersConfigElement
         // can be combined with this.

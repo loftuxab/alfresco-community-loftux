@@ -40,8 +40,6 @@ public class Control
 {
     private String template;
     private final Map<String, ControlParam> controlParams = new LinkedHashMap<String, ControlParam>();
-    private final List<String> cssDependencies = new ArrayList<String>();
-    private final List<String> jsDependencies = new ArrayList<String>();
 
     /**
      * Constructs a Control object with a null template.
@@ -70,24 +68,6 @@ public class Control
     void addControlParam(ControlParam param)
     {
         controlParams.put(param.getName(), param);
-    }
-
-    void addCssDependencies(List<String> cssDeps)
-    {
-        if (cssDeps == null)
-        {
-            return;
-        }
-        this.cssDependencies.addAll(cssDeps);
-    }
-
-    void addJsDependencies(List<String> jsDeps)
-    {
-        if (jsDeps == null)
-        {
-            return;
-        }
-        this.jsDependencies.addAll(jsDeps);
     }
 
     /**
@@ -119,44 +99,6 @@ public class Control
         return Collections.unmodifiableList(result);
     }
     
-    /**
-     * This method returns the css dependencies as an array of Strings containing
-     * the values of the 'src' attribute. If there are no dependencies, <code>null</code>
-     * is returned.
-     * 
-     * @return
-     */
-    public String[] getCssDependencies()
-    {
-        if (this.cssDependencies.isEmpty())
-        {
-            return null;
-        }
-        else
-        {
-            return this.cssDependencies.toArray(new String[0]);
-        }
-    }
-    
-    /**
-     * This method returns the js dependencies as an array of Strings containing
-     * the values of the 'src' attribute. If there are no dependencies, <code>null</code>
-     * is returned.
-     * 
-     * @return
-     */
-    public String[] getJsDependencies()
-    {
-        if (this.jsDependencies.isEmpty())
-        {
-            return null;
-        }
-        else
-        {
-            return this.jsDependencies.toArray(new String[0]);
-        }
-    }
-    
     public Control combine(Control otherControl)
     {
         String combinedTemplate = otherControl.template == null ? this.template : otherControl.template;
@@ -173,24 +115,6 @@ public class Control
             // This call to 'put' will replace any cp entries with the same name
             // that are already in the map.
             result.controlParams.put(otherCP.getName(), otherCP);
-        }
-        
-        if (otherControl.cssDependencies.isEmpty() == false)
-        {
-            result.addCssDependencies(otherControl.cssDependencies);
-        }
-        else
-        {
-            result.addCssDependencies(this.cssDependencies);
-        }
-        
-        if (otherControl.jsDependencies.isEmpty() == false)
-        {
-            result.addJsDependencies(otherControl.jsDependencies);
-        }
-        else
-        {
-            result.addJsDependencies(this.jsDependencies);
         }
         
         return result;
