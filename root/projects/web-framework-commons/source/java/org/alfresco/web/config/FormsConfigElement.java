@@ -46,6 +46,9 @@ public class FormsConfigElement extends ConfigElementAdapter
     private FormConfigElement defaultFormElement;
     private Map<String, FormConfigElement> formElementsById =
     	    new LinkedHashMap<String, FormConfigElement>();
+    private DefaultControlsConfigElement defaultControlsElement;
+    private ConstraintHandlersConfigElement constraintHandlersElement;
+    private DependenciesConfigElement dependenciesConfigElement;
     
     public FormsConfigElement()
     {
@@ -99,7 +102,37 @@ public class FormsConfigElement extends ConfigElementAdapter
     {
     	this.formElementsById.put(formId, formCE);
     }
-    
+
+    public DefaultControlsConfigElement getDefaultControls()
+    {
+        return this.defaultControlsElement;
+    }
+
+    void setDefaultControls(DefaultControlsConfigElement defltCtrlsCE)
+    {
+        this.defaultControlsElement = defltCtrlsCE;
+    }
+        
+    public ConstraintHandlersConfigElement getConstraintHandlers()
+    {
+        return this.constraintHandlersElement;
+    }
+
+    void setConstraintHandlers(ConstraintHandlersConfigElement constraintHandlersCE)
+    {
+        this.constraintHandlersElement = constraintHandlersCE;
+    }
+        
+    public DependenciesConfigElement getDependencies()
+    {
+        return this.dependenciesConfigElement;
+    }
+
+    void setDependencies(DependenciesConfigElement dependenciesCS)
+    {
+        this.dependenciesConfigElement = dependenciesCS;
+    }
+        
     /**
      * @see org.alfresco.config.ConfigElement#combine(org.alfresco.config.ConfigElement)
      */
@@ -109,7 +142,9 @@ public class FormsConfigElement extends ConfigElementAdapter
         FormsConfigElement otherFormsElem = (FormsConfigElement)otherConfigElement;
         FormsConfigElement result = new FormsConfigElement();
 
-        ConfigElement combinedDefaultForm = this.defaultFormElement.combine(otherFormsElem.getDefaultForm());
+        ConfigElement combinedDefaultForm = this.defaultFormElement == null ?
+                otherFormsElem.getDefaultForm()
+                : this.defaultFormElement.combine(otherFormsElem.getDefaultForm());
         result.setDefaultForm((FormConfigElement)combinedDefaultForm);
         
         for (String thisFormId : this.formElementsById.keySet())
@@ -136,8 +171,25 @@ public class FormsConfigElement extends ConfigElementAdapter
         		result.addFormById(otherFormsElem.formElementsById.get(otherFormId), otherFormId);
         	}
         }
+
+        // Combine default-controls
+        ConfigElement combinedDefaultControls = this.defaultControlsElement == null ?
+                otherFormsElem.getDefaultControls()
+                : this.defaultControlsElement.combine(otherFormsElem.getDefaultControls());
+        result.setDefaultControls((DefaultControlsConfigElement)combinedDefaultControls);
+
+        // Combine constraint-handlers
+        ConfigElement combinedConstraintHandlers = this.constraintHandlersElement == null ?
+                otherFormsElem.getConstraintHandlers()
+                : this.constraintHandlersElement.combine(otherFormsElem.getConstraintHandlers());
+        result.setConstraintHandlers((ConstraintHandlersConfigElement)combinedConstraintHandlers);
+        
+        // Combine dependencies
+        ConfigElement combinedDependencies = this.dependenciesConfigElement == null ?
+                otherFormsElem.getDependencies()
+                : this.dependenciesConfigElement.combine(otherFormsElem.getDependencies());
+        result.setDependencies((DependenciesConfigElement)combinedDependencies);
         
         return result;
     }
 }
-

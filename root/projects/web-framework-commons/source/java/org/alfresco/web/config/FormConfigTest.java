@@ -50,7 +50,6 @@ public class FormConfigTest extends BaseTest
 {
     protected XMLConfigService configService;
     protected Config globalConfig;
-    protected ConfigElement globalDefaultControls;
     protected ConfigElement globalConstraintHandlers;
     protected FormsConfigElement formsConfigElement;
     protected FormConfigElement defaultFormInContent;
@@ -308,21 +307,13 @@ public class FormConfigTest extends BaseTest
     
         globalConfig = configService.getGlobalConfig();
     
-        globalDefaultControls = globalConfig
-                .getConfigElement("default-controls");
+        FormsConfigElement globalForms = (FormsConfigElement)globalConfig.getConfigElement("forms");
+        defltCtrlsConfElement = globalForms.getDefaultControls();
         assertNotNull("global default-controls element should not be null",
-                globalDefaultControls);
-        assertTrue(
-                "config element should be an instance of DefaultControlsConfigElement",
-                (globalDefaultControls instanceof DefaultControlsConfigElement));
-        defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
+                defltCtrlsConfElement);
     
-        globalConstraintHandlers = globalConfig
-                .getConfigElement("constraint-handlers");
+        globalConstraintHandlers = globalForms.getConstraintHandlers();
         assertNotNull("global constraint-handlers element should not be null",
                 globalConstraintHandlers);
-        assertTrue(
-                "config element should be an instance of ConstraintHandlersConfigElement",
-                (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
     }
 }

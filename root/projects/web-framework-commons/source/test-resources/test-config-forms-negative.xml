@@ -1,20 +1,20 @@
 <alfresco-config>
    <plug-ins>
       <element-readers>
-         <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
-         <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
          <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 
    <config>
-      <default-controls>
-         <type name="d:text" template="org/alfresco/forms/controls/textfield.ftl">
-         </type>
-      </default-controls>
-      <constraint-handlers>
-         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
-      </constraint-handlers>
+      <forms>
+	      <default-controls>
+	         <type name="d:text" template="org/alfresco/forms/controls/textfield.ftl">
+	         </type>
+	      </default-controls>
+	      <constraint-handlers>
+	         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
+	      </constraint-handlers>
+      </forms>
    </config>
    
    <!-- The evaluator would normally be node-type, but that makes testing difficult -->
@@ -33,5 +33,4 @@
 	     </form>
       </forms>
    </config>
-   
 </alfresco-config>

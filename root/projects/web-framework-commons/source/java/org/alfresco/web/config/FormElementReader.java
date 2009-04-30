@@ -151,11 +151,8 @@ public class FormElementReader implements ConfigElementReader
                     controlParamValues.add(paramElem.getTextTrim());
                 }
 
-                List<String> cssDependencies = DefaultControlsElementReader.getSrcDependencies(controlElem, "./dependencies/css");
-                List<String> jsDependencies = DefaultControlsElementReader.getSrcDependencies(controlElem, "./dependencies/js");
-
                 result.addControlForField(fieldIdValue, templateValue, controlParamNames,
-                        controlParamValues, cssDependencies, jsDependencies);
+                        controlParamValues);
             }
             
             // Delegate the reading of the <constraint-handlers> tag(s) to the reader.

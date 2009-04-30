@@ -31,7 +31,6 @@ import java.util.List;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
-import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
@@ -92,45 +91,9 @@ public class DefaultControlsElementReader implements ConfigElementReader
                 params.add(param);
             }
             
-            List<String> cssDependencies = getSrcDependencies(nextTypeNode, "./dependencies/css");
-            List<String> jsDependencies = getSrcDependencies(nextTypeNode, "./dependencies/js");
-
-            result.addDataMapping(typeName, templatePath, params, cssDependencies, jsDependencies);
+            result.addDataMapping(typeName, templatePath, params);
         }
 
-        return result;
-    }
-
-    /**
-     * This method takes the specified xml node, finds children matching the specified
-     * xpath expression and returns a List<String> containing the values of the "src"
-     * attribute on each of those child nodes.
-     * 
-     * @param typeNode
-     * @param xpathExpression
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    static List<String> getSrcDependencies(Element typeNode, final String xpathExpression)
-    {
-        List<String> result = new ArrayList<String>();
-        
-        for (Object cssObj : typeNode.selectNodes(xpathExpression))
-        {
-            Element cssElem = (Element)cssObj;
-            List<Attribute> cssAttributes = cssElem.selectNodes("./@*");
-            for (Attribute nextAttr : cssAttributes)
-            {
-                String nextAttrName = nextAttr.getName();
-                if (nextAttrName.equals("src"))
-                {
-                    String nextAttrValue = nextAttr.getValue();
-                    result.add(nextAttrValue);
-                }
-                // Ignore attributes not called "src".
-            }
-        }
-        
         return result;
     }
 }

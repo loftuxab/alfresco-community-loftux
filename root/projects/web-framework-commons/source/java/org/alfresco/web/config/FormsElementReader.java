@@ -72,12 +72,42 @@ public class FormsElementReader implements ConfigElementReader
 
             if (form.getId() == null)
             {
-            	result.setDefaultForm(form);
+                result.setDefaultForm(form);
             }
             else
             {
-            	result.addFormById(form, form.getId());
+                result.addFormById(form, form.getId());
             }
+        }
+        
+        // Go through each of the <default-controls> tags under <forms>
+        for (Object obj : formsElement.selectNodes("./default-controls")) {
+            Element defltCtrlsElement = (Element)obj;
+            
+            DefaultControlsElementReader defltCtrlsReader = new DefaultControlsElementReader();
+            DefaultControlsConfigElement defltCtrlsCE = (DefaultControlsConfigElement)defltCtrlsReader.parse(defltCtrlsElement);
+
+            result.setDefaultControls(defltCtrlsCE);
+        }
+        
+        // Go through each of the <constraint-handlers> tags under <forms>
+        for (Object obj : formsElement.selectNodes("./constraint-handlers")) {
+            Element constraintHandlersElement = (Element)obj;
+            
+            ConstraintHandlersElementReader constraintHandlersReader = new ConstraintHandlersElementReader();
+            ConstraintHandlersConfigElement constraintHandlersCE = (ConstraintHandlersConfigElement)constraintHandlersReader.parse(constraintHandlersElement);
+
+            result.setConstraintHandlers(constraintHandlersCE);
+        }
+
+        // Go through each of the <dependencies> tags under <forms>
+        for (Object obj : formsElement.selectNodes("./dependencies")) {
+            Element depsElement = (Element)obj;
+            
+            DependenciesElementReader depsReader = new DependenciesElementReader();
+            DependenciesConfigElement depsCE = (DependenciesConfigElement)depsReader.parse(depsElement);
+
+            result.setDependencies(depsCE);
         }
         
         return result;

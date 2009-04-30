@@ -1,37 +1,37 @@
 <alfresco-config>
    <plug-ins>
       <element-readers>
-         <element-reader element-name="constraint-handlers" class="org.alfresco.web.config.ConstraintHandlersElementReader"/>
-         <element-reader element-name="default-controls" class="org.alfresco.web.config.DefaultControlsElementReader"/>
          <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 
    <config>
-      <default-controls>
-         <type name="d:long" template="/form-controls/mytextfield.ftl" />
-         <type name="d:text" template="/form-controls/mytextfield.ftl">
-            <control-param name="size">999</control-param>
-         </type>
-         <type name="d:test" template="/form-controls/test.ftl">
-             <!-- Override the values of some dependencies -->
-            <dependencies>
-                <css src="/css/path/1/override" />
-                <css src="/css/path/2" />
-                <js src="/js/path/1" />
-                <js src="/js/path/2/override" />
-            </dependencies>
-            <control-param name="a">Goodbye</control-param>
-            <control-param name="b"></control-param>
-            <control-param name="c">This is new</control-param>
-         </type>
-      </default-controls>
-      <constraint-handlers>
-         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
-         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
-         <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
-                     message="Test Message override" message-id="regex_error" />
-      </constraint-handlers>
+      <forms>
+	      <default-controls>
+	         <type name="d:long" template="/form-controls/mytextfield.ftl" />
+	         <type name="d:text" template="/form-controls/mytextfield.ftl">
+	            <control-param name="size">999</control-param>
+	         </type>
+	         <type name="d:test" template="/form-controls/test.ftl">
+	            <control-param name="a">Goodbye</control-param>
+	            <control-param name="b"></control-param>
+	            <control-param name="c">This is new</control-param>
+	         </type>
+	      </default-controls>
+	      <constraint-handlers>
+	         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="blur" />
+	         <constraint type="REGEX" validation-handler="Alfresco.forms.validation.regexMatch" />
+	         <constraint type="NUMERIC" validation-handler="Alfresco.forms.validation.numericMatch"
+	                     message="Test Message override" message-id="regex_error" />
+	      </constraint-handlers>
+          <!-- Override the values of some dependencies -->
+          <dependencies>
+              <css src="/css/path/1/override" />
+              <css src="/css/path/2" />
+              <js src="/js/path/1" />
+              <js src="/js/path/2/override" />
+          </dependencies>
+      </forms>
    </config>
    
    <config evaluator="string-compare" condition="my:example">
@@ -44,14 +44,7 @@
 	         </field-visibility>
 	         <appearance>
 	            <field id="cm:name">
-	               <control template="/form-controls/mytextfield.ftl">
-                        <dependencies>
-                            <css src="/css/path/f1" />
-                            <css src="/css/path/f2/override" />
-                            <js src="/js/path/f1/override" />
-                            <js src="/js/path/f2" />
-                        </dependencies>
-	               </control>
+	               <control template="/form-controls/mytextfield.ftl" />
 	            </field>
 	            <field id="my:text" label="Custom Text" description="This is a custom model text field">
 	               <control>
@@ -67,7 +60,7 @@
 	  </forms>
    </config>
    
-      <config evaluator="string-compare" condition="no-appearance">
+    <config evaluator="string-compare" condition="no-appearance">
       <forms>
           <form submission-url="submission/url">
               <!-- Override the templates -->
@@ -87,7 +80,5 @@
           </form>
       </forms>
    </config>
-
-   
 </alfresco-config>
      

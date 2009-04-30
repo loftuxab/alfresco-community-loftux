@@ -137,14 +137,14 @@ public class DefaultControlsConfigTest extends BaseTest
     public void testCombineDefaultControlsWithAddedParam()
     {
         DefaultControlsConfigElement basicElement = new DefaultControlsConfigElement();
-        basicElement.addDataMapping("text", "path/textbox.ftl", null, null, null);
+        basicElement.addDataMapping("text", "path/textbox.ftl", null);
 
         // This element is the same as the above, but adds a control-param.
         DefaultControlsConfigElement parameterisedElement = new DefaultControlsConfigElement();
         List<ControlParam> testParams = new ArrayList<ControlParam>();
         testParams.add(new ControlParam("A", "1"));
         parameterisedElement.addDataMapping("text", "path/textbox.ftl",
-                testParams, null, null);
+                testParams);
 
         DefaultControlsConfigElement combinedElem
                 = (DefaultControlsConfigElement)basicElement.combine(parameterisedElement);
@@ -165,7 +165,7 @@ public class DefaultControlsConfigTest extends BaseTest
         DefaultControlsConfigElement initialElement = new DefaultControlsConfigElement();
         List<ControlParam> testParams = new ArrayList<ControlParam>();
         testParams.add(new ControlParam("A", "1"));
-        initialElement.addDataMapping("text", "path/textbox.ftl", testParams, null, null);
+        initialElement.addDataMapping("text", "path/textbox.ftl", testParams);
 
         // This element is the same as the above, but modifies the
         // control-param.
@@ -173,7 +173,7 @@ public class DefaultControlsConfigTest extends BaseTest
         List<ControlParam> modifiedTestParams = new ArrayList<ControlParam>();
         modifiedTestParams.add(new ControlParam("A", "5"));
         modifiedElement.addDataMapping("text", "path/textbox.ftl",
-                modifiedTestParams, null, null);
+                modifiedTestParams);
 
         DefaultControlsConfigElement combinedElem
                = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
@@ -194,12 +194,12 @@ public class DefaultControlsConfigTest extends BaseTest
         DefaultControlsConfigElement initialElement = new DefaultControlsConfigElement();
         List<ControlParam> testParams = new ArrayList<ControlParam>();
         testParams.add(new ControlParam("A", "1"));
-        initialElement.addDataMapping("text", "path/textbox.ftl", testParams, null, null);
+        initialElement.addDataMapping("text", "path/textbox.ftl", testParams);
 
         // This element is the same as the above, but deletes the
         // control-param.
         DefaultControlsConfigElement modifiedElement = new DefaultControlsConfigElement();
-        modifiedElement.addDataMapping("text", "path/textbox.ftl", null, null, null);
+        modifiedElement.addDataMapping("text", "path/textbox.ftl", null);
 
         DefaultControlsConfigElement combinedElem
                = (DefaultControlsConfigElement)initialElement.combine(modifiedElement);
@@ -219,10 +219,10 @@ public class DefaultControlsConfigTest extends BaseTest
         configService = initXMLConfigService(getConfigXmlFile());
         assertNotNull("configService was null.", configService);
     
-        Config contentConfig = configService.getConfig("my:example");
-        assertNotNull("contentConfig was null.", contentConfig);
+        Config myExampleConfig = configService.getConfig("my:example");
+        assertNotNull("myExampleConfig was null.", myExampleConfig);
     
-        ConfigElement confElement = contentConfig.getConfigElement("forms");
+        ConfigElement confElement = myExampleConfig.getConfigElement("forms");
         assertNotNull("confElement was null.", confElement);
         assertTrue("confElement should be instanceof FormsConfigElement.",
                 confElement instanceof FormsConfigElement);
@@ -230,22 +230,14 @@ public class DefaultControlsConfigTest extends BaseTest
         defaultFormConfigElement = formsConfigElement.getDefaultForm();
     
         globalConfig = configService.getGlobalConfig();
-    
-        globalDefaultControls = globalConfig
-                .getConfigElement("default-controls");
+        ConfigElement globalFormsCE = globalConfig.getConfigElement("forms");
+        final FormsConfigElement globalForms = (FormsConfigElement)globalFormsCE;
+
+        this.defltCtrlsConfElement = globalForms.getDefaultControls();
         assertNotNull("global default-controls element should not be null",
-                globalDefaultControls);
-        assertTrue(
-                "config element should be an instance of DefaultControlsConfigElement",
-                (globalDefaultControls instanceof DefaultControlsConfigElement));
-        defltCtrlsConfElement = (DefaultControlsConfigElement) globalDefaultControls;
+                defltCtrlsConfElement);
     
-        globalConstraintHandlers = globalConfig
-                .getConfigElement("constraint-handlers");
         assertNotNull("global constraint-handlers element should not be null",
-                globalConstraintHandlers);
-        assertTrue(
-                "config element should be an instance of ConstraintHandlersConfigElement",
-                (globalConstraintHandlers instanceof ConstraintHandlersConfigElement));
+                globalForms.getConstraintHandlers());
     }
 }
