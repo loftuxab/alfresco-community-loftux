@@ -39,7 +39,7 @@ import org.dom4j.Element;
  * 
  * @author Neil McErlean.
  */
-public class DependenciesElementReader implements ConfigElementReader
+class DependenciesElementReader implements ConfigElementReader
 {
     public static final String ELEMENT_DEPENDENCIES = "dependencies";
 

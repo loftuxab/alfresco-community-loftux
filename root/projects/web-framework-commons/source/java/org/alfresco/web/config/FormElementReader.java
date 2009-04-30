@@ -40,7 +40,7 @@ import org.dom4j.Element;
  * 
  * @author Neil McErlean.
  */
-public class FormElementReader implements ConfigElementReader
+class FormElementReader implements ConfigElementReader
 {
 	public static final String ATTR_APPEARANCE = "appearance";
     public static final String ATTR_FOR_MODE = "for-mode";

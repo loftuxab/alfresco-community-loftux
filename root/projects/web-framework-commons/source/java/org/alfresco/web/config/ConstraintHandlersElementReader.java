@@ -37,7 +37,7 @@ import org.dom4j.Element;
  * 
  * @author Neil McErlean.
  */
-public class ConstraintHandlersElementReader implements ConfigElementReader
+class ConstraintHandlersElementReader implements ConfigElementReader
 {
    // <constraint-handler> elements can appear at a number of different places within
    // the config file, currently underneath the <config> element and also underneath
