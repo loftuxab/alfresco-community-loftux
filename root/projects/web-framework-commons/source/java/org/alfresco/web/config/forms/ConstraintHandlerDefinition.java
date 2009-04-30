@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.config;
+package org.alfresco.web.config.forms;
 
 /**
  * This struct class represents the definition of a constraint-handler, as may be

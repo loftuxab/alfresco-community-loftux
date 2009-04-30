@@ -22,24 +22,22 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.config;
+package org.alfresco.web.config.forms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 /**
- * Evaluator that determines whether a given object has a particular aspect
- * applied.
+ * Evaluator that determines whether a given object has a particular node type.
  * 
  * @author Neil McErlean
  */
-public class AspectEvaluator extends NodeMetadataBasedEvaluator
+public class NodeTypeEvaluator extends NodeMetadataBasedEvaluator
 {
-    static Log logger = LogFactory.getLog(AspectEvaluator.class);
+    private static Log logger = LogFactory.getLog(NodeTypeEvaluator.class);
 
     @Override
     protected Log getLogger()
@@ -48,10 +46,10 @@ public class AspectEvaluator extends NodeMetadataBasedEvaluator
     }
 
     /**
-     * This method checks if the specified condition is matched by any of the aspects
+     * This method checks if the specified condition is matched by the node type
      * within the specified jsonResponse String.
      * 
-     * @return true if any aspect matches the condition, else false.
+     * @return true if the node type matches the condition, else false.
      */
     @Override
     protected boolean checkJsonAgainstCondition(String condition, String jsonResponseString)
@@ -60,23 +58,15 @@ public class AspectEvaluator extends NodeMetadataBasedEvaluator
         try
         {
             JSONObject json = new JSONObject(new JSONTokener(jsonResponseString));
-            Object aspectsObj = json.get("aspects");
-            if (aspectsObj instanceof JSONArray)
+            Object typeObj = json.get("type");
+            if (typeObj instanceof String)
             {
-                JSONArray aspectsArray = (JSONArray) aspectsObj;
-                for (int i = 0; i < aspectsArray.length(); i++)
-                {
-                    String nextAspect = aspectsArray.getString(i);
-
-                    if (condition.equals(nextAspect))
-                    {
-                        result = true;
-                        break;
-                    }
-                }
+                String typeString = (String) typeObj;
+                result = condition.equals(typeString);
             }
         } catch (JSONException e)
         {
+
             if (getLogger().isWarnEnabled())
             {
                 getLogger().warn("Failed to read JSON response from metadata service.", e);

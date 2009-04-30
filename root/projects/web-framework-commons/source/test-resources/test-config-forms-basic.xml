@@ -1,7 +1,7 @@
 <alfresco-config>
    <plug-ins>
       <element-readers>
-         <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
+         <element-reader element-name="forms" class="org.alfresco.web.config.forms.FormsElementReader"/>
       </element-readers>
    </plug-ins>
 

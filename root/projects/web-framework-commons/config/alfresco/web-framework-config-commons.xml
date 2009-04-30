@@ -2,10 +2,10 @@
 
    <plug-ins>
       <element-readers>
-         <element-reader element-name="forms" class="org.alfresco.web.config.FormsElementReader"/>
+         <element-reader element-name="forms" class="org.alfresco.web.config.forms.FormsElementReader"/>
       </element-readers>
       <evaluators>
-         <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
+         <evaluator id="node-type" class="org.alfresco.web.config.forms.NodeTypeEvaluator" />
       </evaluators>
    </plug-ins>
    
