@@ -483,21 +483,22 @@
             // Check for root path special case
             if (obj.path === "/")
             {
-               paths = ["/"];
+               paths = [""];
             }
-            var expandPath = "";
+            var expandPath = "/";
             for (var i = 0; i < paths.length; i++)
             {
-               if (paths[i] !== "")
-               {
-                  // Push the path onto the list of paths to be expanded
-                  expandPath += "/" + paths[i];
-                  this.pathsToExpand.push(expandPath);
-               }
+               // Push the path onto the list of paths to be expanded
+               expandPath = $combine(expandPath, paths[i]);
+               this.pathsToExpand.push(expandPath);
             }
             
-            // Kick off the expansion process by expanding the root node
-            node = this.widgets.treeview.getNodeByProperty("path", "/");
+            // Kick off the expansion process by expanding the first unexpanded path
+            do
+            {
+               node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
+            } while (this.pathsToExpand.length > 0 && node.expanded)
+            
             if (node !== null)
             {
                node.expand();
@@ -521,7 +522,7 @@
             {
                // Node found, so rename it
                node.label = obj.file.displayName;
-               node.data.path = obj.file.location.path;
+               node.data.path = $combine(obj.file.location.path, obj.file.location.file);
                this.widgets.treeview.render();
                this._showHighlight(true);
             }
