@@ -22,55 +22,58 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.config;
+package org.alfresco.web.config.forms;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
-/**
- * Evaluator that determines whether a given object has a particular node type.
- * 
- * @author Neil McErlean
- */
-public class NodeTypeEvaluator extends NodeMetadataBasedEvaluator
+public enum Mode
 {
-    private static Log logger = LogFactory.getLog(NodeTypeEvaluator.class);
-
-    @Override
-    protected Log getLogger()
+    VIEW, EDIT, CREATE;
+    
+    private static Log logger = LogFactory.getLog(Mode.class);
+    
+    public static Mode modeFromString(String modeString)
     {
-        return logger;
+        if ("create".equalsIgnoreCase(modeString)) {
+            return Mode.CREATE;
+        }
+        else if ("edit".equalsIgnoreCase(modeString))
+        {
+            return Mode.EDIT;
+        }
+        else if ("view".equalsIgnoreCase(modeString))
+        {
+            return Mode.VIEW;
+        }
+        else
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Illegal modeString: " + modeString);
+            }
+            return null;
+        }
     }
-
-    /**
-     * This method checks if the specified condition is matched by the node type
-     * within the specified jsonResponse String.
-     * 
-     * @return true if the node type matches the condition, else false.
-     */
-    @Override
-    protected boolean checkJsonAgainstCondition(String condition, String jsonResponseString)
+    
+    public static List<Mode> modesFromString(String commaSeparatedModesString)
     {
-        boolean result = false;
-        try
+        if (commaSeparatedModesString == null)
         {
-            JSONObject json = new JSONObject(new JSONTokener(jsonResponseString));
-            Object typeObj = json.get("type");
-            if (typeObj instanceof String)
-            {
-                String typeString = (String) typeObj;
-                result = condition.equals(typeString);
-            }
-        } catch (JSONException e)
+            return Collections.emptyList();
+        }
+        List<Mode> result = new ArrayList<Mode>();
+        StringTokenizer st = new StringTokenizer(commaSeparatedModesString, ",");
+        while (st.hasMoreTokens())
         {
-
-            if (getLogger().isWarnEnabled())
-            {
-                getLogger().warn("Failed to read JSON response from metadata service.", e);
-            }
+            String nextToken = st.nextToken().trim();
+            Mode nextMode = Mode.modeFromString(nextToken);
+            result.add(nextMode);
         }
         return result;
     }

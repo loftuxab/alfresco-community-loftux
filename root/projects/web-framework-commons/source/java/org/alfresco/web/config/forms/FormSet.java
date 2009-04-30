@@ -1,4 +1,4 @@
-package org.alfresco.web.config;
+package org.alfresco.web.config.forms;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

@@ -22,59 +22,36 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.config;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.StringTokenizer;
+package org.alfresco.web.config.forms;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public enum Mode
+public enum Visibility
 {
-    VIEW, EDIT, CREATE;
+    SHOW, HIDE;
+
+    private static Log logger = LogFactory.getLog(Visibility.class);
     
-    private static Log logger = LogFactory.getLog(Mode.class);
-    
-    public static Mode modeFromString(String modeString)
+    public static Visibility visibilityFromString(String visibilityString)
     {
-        if ("create".equalsIgnoreCase(modeString)) {
-            return Mode.CREATE;
+        if (visibilityString.equalsIgnoreCase("show")) {
+            return Visibility.SHOW;
         }
-        else if ("edit".equalsIgnoreCase(modeString))
+        else if (visibilityString.equalsIgnoreCase("hide"))
         {
-            return Mode.EDIT;
-        }
-        else if ("view".equalsIgnoreCase(modeString))
-        {
-            return Mode.VIEW;
+            return Visibility.HIDE;
         }
         else
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Illegal modeString: " + modeString);
+                StringBuilder msg = new StringBuilder();
+                msg.append("Illegal visibilityString: ")
+                    .append(visibilityString);
+                logger.debug(msg.toString());
             }
             return null;
         }
-    }
-    
-    public static List<Mode> modesFromString(String commaSeparatedModesString)
-    {
-        if (commaSeparatedModesString == null)
-        {
-            return Collections.emptyList();
-        }
-        List<Mode> result = new ArrayList<Mode>();
-        StringTokenizer st = new StringTokenizer(commaSeparatedModesString, ",");
-        while (st.hasMoreTokens())
-        {
-            String nextToken = st.nextToken().trim();
-            Mode nextMode = Mode.modeFromString(nextToken);
-            result.add(nextMode);
-        }
-        return result;
     }
 }
