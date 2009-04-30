@@ -44,7 +44,7 @@ href="/alfresco/css/taskpane.css" />
 <#if document.isDocument >
    <#if hasAspect(document, "cm:versionable") == 1 >
                  <!-- lb: start repeat row -->
-      <#list document.versionHistory?sort_by("versionLabel")?reverse as record>
+      <#list document.versionHistory as record>
                    <tr>
                        <td valign="top">
                        <a href="/alfresco${document.url}"><img src="/alfresco/images/taskpane/document.gif" border="0" alt="Open ${record.versionLabel}"/></a>
