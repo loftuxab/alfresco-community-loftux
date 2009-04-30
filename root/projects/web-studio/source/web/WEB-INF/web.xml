@@ -7,6 +7,11 @@
    <description>Alfresco Web Studio</description>
    
    <context-param>
+      <param-name>org.jboss.jbossfaces.WAR_BUNDLES_JSF_IMPL</param-name>
+      <param-value>true</param-value>
+   </context-param>
+
+   <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
@@ -19,6 +24,12 @@
       <description>Spring config file locations</description>
    </context-param>
       
+   <context-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
+      <description>Spring context class</description>
+   </context-param>
+
    <filter>
       <filter-name>UrlRewriteFilter</filter-name>
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
