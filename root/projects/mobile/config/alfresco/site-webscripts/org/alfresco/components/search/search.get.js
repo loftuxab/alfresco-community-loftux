@@ -48,6 +48,7 @@ function getContentSearchResults(term)
     var doc = data.items[i];
     doc.modifiedOn = new Date(doc.modifiedOn);
     doc.displayType = getDocType(doc);
+    doc.doclink =  "api/node/content/"+doc.nodeRef.replace(':/','')+'/'+stringUtils.urlEncode(doc.name);
     data.items[i]=doc;
   } 
   //work out if there we need pagination 
